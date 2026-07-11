@@ -19,6 +19,11 @@ internal sealed class GeneratedFont
     public SfntFont? Sfnt { get; init; }
 
     public Dictionary<ushort, int> GidToUnicode { get; } = [];
+
+    // Compact glyf renumbering (original gid -> new gid) computed once all pages
+    // are planned; content streams emit the NEW gid so CID == gid stays true for
+    // the compact embedded subset. Null for CFF faces (identity CIDs).
+    public Dictionary<ushort, ushort>? CompactGidMap { get; set; }
 }
 
 internal sealed class GeneratedImage
@@ -163,6 +168,14 @@ internal sealed class DocumentGenerator
         }
 
         document.Structure = documentElement;
+
+        foreach (var font in allFonts)
+        {
+            if (font.Sfnt is { IsCff: false } sfnt)
+            {
+                font.CompactGidMap = GlyfSubsetter.BuildCompactGidMap(sfnt, font.GidToUnicode.Keys);
+            }
+        }
 
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
@@ -1115,10 +1128,26 @@ internal sealed class DocumentGenerator
         var map = new Dictionary<string, ReverseFont>(System.StringComparer.Ordinal);
         foreach (var font in generated.Fonts)
         {
-            map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(font.GidToUnicode);
+            map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
         }
 
         return map;
+    }
+
+    private static Dictionary<ushort, int> RemapGidToUnicode(GeneratedFont font)
+    {
+        if (font.CompactGidMap is not { } gidMap)
+        {
+            return font.GidToUnicode;
+        }
+
+        var remapped = new Dictionary<ushort, int>(font.GidToUnicode.Count);
+        foreach (var (gid, codepoint) in font.GidToUnicode)
+        {
+            remapped[gidMap[gid]] = codepoint;
+        }
+
+        return remapped;
     }
 
     // Content emission order: fills and edges (untagged artifacts), untagged images
@@ -1325,7 +1354,7 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" Td\n");
         }
 
-        writer.WriteString(text.Bytes);
+        writer.WriteString(RemapBytes(text));
         writer.WriteRaw(" Tj\n");
         if (text.StrokeWidth > 0)
         {
@@ -1337,5 +1366,26 @@ internal sealed class DocumentGenerator
         {
             writer.WriteRaw("Q\n");
         }
+    }
+
+    // Layout emits original gids; the compact map renumbers them into the embedded
+    // subset's 0..N-1 space so the 2-byte Identity-H code equals the new gid.
+    private static byte[] RemapBytes(in TextDraw text)
+    {
+        if (text.Font.CompactGidMap is not { } gidMap)
+        {
+            return text.Bytes;
+        }
+
+        var bytes = text.Bytes;
+        var remapped = new byte[bytes.Length];
+        for (var i = 0; i + 1 < bytes.Length; i += 2)
+        {
+            var gid = gidMap[(ushort)((bytes[i] << 8) | bytes[i + 1])];
+            remapped[i] = (byte)(gid >> 8);
+            remapped[i + 1] = (byte)gid;
+        }
+
+        return remapped;
     }
 }

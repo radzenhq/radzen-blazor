@@ -5,9 +5,13 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Rebuilds a TrueType font retaining only the glyf outlines in the closure of a
-// requested glyph set (identity glyph IDs, PDF CIDFontType2). numGlyphs, hmtx,
-// cmap, name and metadata tables pass through unchanged; layout tables are dropped.
+// Rebuilds a TrueType font as a COMPACT subset: glyphs are renumbered into a
+// contiguous 0..N-1 space holding exactly the closure of the requested set
+// (requested + recursive composite components + .notdef), with compact
+// loca/glyf/hmtx sized for N glyphs. New gids are assigned in ascending original
+// gid order, so the mapping is deterministic and monotonic. Composite component
+// ids are rewritten into the compact space. cmap/name and layout tables are
+// dropped (a Type0/CIDFontType2 embedded subset needs neither).
 internal static class GlyfSubsetter
 {
     private const ushort MoreComponents = 0x0020;
@@ -17,14 +21,9 @@ internal static class GlyfSubsetter
     private const ushort TwoByTwo = 0x0080;
     private const uint ChecksumMagic = 0xB1B0AFBA;
 
-    private static readonly string[] RetainedTags =
-    [
-        "cmap", "glyf", "head", "hhea", "hmtx", "loca", "maxp", "name", "OS/2", "post",
-    ];
-
     public static byte[] Subset(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
-        var rented = SubsetPooled(font, glyphIds, out var length);
+        var rented = SubsetPooled(font, glyphIds, out var length, out _);
         try
         {
             return rented.AsSpan(0, length).ToArray();
@@ -35,65 +34,85 @@ internal static class GlyfSubsetter
         }
     }
 
-    public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length)
-        => SubsetPooled(font, glyphIds, out length, out _);
-
-    // Returns a pooled array holding the subset in its first length bytes; the
-    // caller must return it to ArrayPool<byte>.Shared. closure receives the full
-    // embedded glyph set including composite component glyphs.
-    public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length, out HashSet<ushort> closure)
+    // The compact renumbering for a request: original gid -> new gid, covering the
+    // full glyf closure plus .notdef, assigned in ascending original-gid order.
+    // Deterministic, so content generation and embedding agree on the codes.
+    public static Dictionary<ushort, ushort> BuildCompactGidMap(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
         ArgumentNullException.ThrowIfNull(font);
         ArgumentNullException.ThrowIfNull(glyphIds);
 
+        RequireTrueType(font, out var glyfMemory, out var locaMemory, out var headMemory);
+        var loca = new LocaTable(locaMemory.Span, ReadInt16(headMemory.Span, 50) != 0);
+        return BuildMap(OrderedClosure(glyfMemory.Span, loca, font.GlyphCount, glyphIds));
+    }
+
+    // Returns a pooled array holding the subset in its first length bytes; the
+    // caller must return it to ArrayPool<byte>.Shared. gidMap receives the
+    // original-to-compact renumbering (same as BuildCompactGidMap).
+    public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length, out Dictionary<ushort, ushort> gidMap)
+    {
+        ArgumentNullException.ThrowIfNull(font);
+        ArgumentNullException.ThrowIfNull(glyphIds);
+
+        RequireTrueType(font, out var glyfMemory, out var locaMemory, out var headMemory);
+
+        var glyf = glyfMemory.Span;
+        var head = headMemory.Span;
+        var loca = new LocaTable(locaMemory.Span, ReadInt16(head, 50) != 0);
+
+        var ordered = OrderedClosure(glyf, loca, font.GlyphCount, glyphIds);
+        gidMap = BuildMap(ordered);
+        var count = ordered.Count;
+
+        var glyfLength = 0;
+        foreach (var gid in ordered)
+        {
+            glyfLength += (int)(loca[gid + 1] - loca[gid]);
+        }
+
+        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var newGlyf = pool.Rent(Math.Max(glyfLength, 1));
+        var newLoca = new byte[(count + 1) * 4];
+        try
+        {
+            FillGlyf(glyf, loca, ordered, gidMap, newGlyf, newLoca);
+            var newHead = BuildHead(head);
+            var newHmtx = BuildHmtx(font, ordered);
+            var newHhea = BuildHhea(font, count);
+            var newMaxp = BuildMaxp(font, count);
+            return Assemble(font, newGlyf.AsMemory(0, glyfLength), newLoca, newHead, newHmtx, newHhea, newMaxp, out length);
+        }
+        finally
+        {
+            pool.Return(newGlyf);
+        }
+    }
+
+    private static void RequireTrueType(SfntFont font, out ReadOnlyMemory<byte> glyf, out ReadOnlyMemory<byte> loca, out ReadOnlyMemory<byte> head)
+    {
         if (font.IsCff)
         {
             throw new NotSupportedException("glyf subsetting requires TrueType outlines; this font uses CFF outlines.");
         }
 
-        if (!font.TryGetTableMemory("glyf", out var glyfMemory)
-            || !font.TryGetTableMemory("loca", out var locaMemory)
-            || !font.TryGetTableMemory("head", out var headMemory))
+        if (!font.TryGetTableMemory("glyf", out glyf)
+            || !font.TryGetTableMemory("loca", out loca)
+            || !font.TryGetTableMemory("head", out head))
         {
             throw new InvalidDataException("Font is missing required TrueType tables (glyf/loca/head).");
         }
+    }
 
-        var glyf = glyfMemory.Span;
-        var head = headMemory.Span;
-        var numGlyphs = font.GlyphCount;
-        var longLoca = ReadInt16(head, 50) != 0;
-        var loca = new LocaTable(locaMemory.Span, longLoca);
-
-        var fullClosure = ComputeClosure(glyf, loca, numGlyphs, glyphIds);
-
-        // The out set reports only glyphs actually emitted with outline data. A
-        // PDF/A CIDSet must mark exactly the present glyphs (veraPDF 6.2.11.4.2),
-        // so used glyphs with an empty outline (e.g. space) are excluded.
-        closure = [];
-        foreach (var gid in fullClosure)
+    private static Dictionary<ushort, ushort> BuildMap(List<ushort> ordered)
+    {
+        var map = new Dictionary<ushort, ushort>(ordered.Count);
+        for (var i = 0; i < ordered.Count; i++)
         {
-            if (loca[gid + 1] > loca[gid])
-            {
-                closure.Add(gid);
-            }
+            map[ordered[i]] = (ushort)i;
         }
 
-        var glyfLength = MeasureGlyf(loca, numGlyphs, fullClosure);
-        var locaLength = (numGlyphs + 1) * 4;
-        var pool = System.Buffers.ArrayPool<byte>.Shared;
-        var newGlyf = pool.Rent(glyfLength);
-        var newLoca = pool.Rent(locaLength);
-        try
-        {
-            FillGlyf(glyf, loca, numGlyphs, fullClosure, newGlyf, newLoca);
-            var newHead = BuildHead(head);
-            return Assemble(font, newGlyf.AsMemory(0, glyfLength), newLoca.AsMemory(0, locaLength), newHead, out length);
-        }
-        finally
-        {
-            pool.Return(newGlyf);
-            pool.Return(newLoca);
-        }
+        return map;
     }
 
     // Reads glyph offsets straight from the raw loca table instead of
@@ -108,7 +127,7 @@ internal static class GlyfSubsetter
             : (uint)ReadUInt16(raw, index * 2) * 2;
     }
 
-    private static HashSet<ushort> ComputeClosure(ReadOnlySpan<byte> glyf, LocaTable loca, ushort numGlyphs, IReadOnlyCollection<ushort> requested)
+    private static List<ushort> OrderedClosure(ReadOnlySpan<byte> glyf, LocaTable loca, ushort numGlyphs, IReadOnlyCollection<ushort> requested)
     {
         var closure = new HashSet<ushort>();
         var pending = new Stack<ushort>();
@@ -146,23 +165,8 @@ internal static class GlyfSubsetter
             while (true)
             {
                 var flags = ReadUInt16(glyf, pos);
-                var component = ReadUInt16(glyf, pos + 2);
-                Enqueue(component);
-                pos += 4;
-
-                pos += (flags & Arg1And2AreWords) != 0 ? 4 : 2;
-                if ((flags & WeHaveAScale) != 0)
-                {
-                    pos += 2;
-                }
-                else if ((flags & XAndYScale) != 0)
-                {
-                    pos += 4;
-                }
-                else if ((flags & TwoByTwo) != 0)
-                {
-                    pos += 8;
-                }
+                Enqueue(ReadUInt16(glyf, pos + 2));
+                pos += ComponentRecordTail(flags) + 4;
 
                 if ((flags & MoreComponents) == 0)
                 {
@@ -171,39 +175,67 @@ internal static class GlyfSubsetter
             }
         }
 
-        return closure;
+        var ordered = new List<ushort>(closure);
+        ordered.Sort();
+        return ordered;
     }
 
-    private static int MeasureGlyf(LocaTable loca, ushort numGlyphs, HashSet<ushort> closure)
+    private static int ComponentRecordTail(ushort flags)
     {
-        var total = 0;
-        for (ushort gid = 0; gid < numGlyphs; gid++)
+        var tail = (flags & Arg1And2AreWords) != 0 ? 4 : 2;
+        if ((flags & WeHaveAScale) != 0)
         {
-            if (closure.Contains(gid))
-            {
-                total += (int)(loca[gid + 1] - loca[gid]);
-            }
+            tail += 2;
+        }
+        else if ((flags & XAndYScale) != 0)
+        {
+            tail += 4;
+        }
+        else if ((flags & TwoByTwo) != 0)
+        {
+            tail += 8;
         }
 
-        return total;
+        return tail;
     }
 
-    private static void FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, ushort numGlyphs, HashSet<ushort> closure, byte[] newGlyf, byte[] newLoca)
+    private static void FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
     {
         var offset = 0;
-        for (ushort gid = 0; gid < numGlyphs; gid++)
+        for (var newGid = 0; newGid < ordered.Count; newGid++)
         {
-            WriteUInt32(newLoca, gid * 4, (uint)offset);
-            if (closure.Contains(gid))
+            WriteUInt32(newLoca, newGid * 4, (uint)offset);
+            var gid = ordered[newGid];
+            var start = (int)loca[gid];
+            var length = (int)(loca[gid + 1] - loca[gid]);
+            glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
+
+            if (length >= 10 && ReadInt16(glyf, start) < 0)
             {
-                var start = (int)loca[gid];
-                var length = (int)(loca[gid + 1] - loca[gid]);
-                glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
-                offset += length;
+                RewriteComponents(newGlyf, offset, gidMap);
             }
+
+            offset += length;
         }
 
-        WriteUInt32(newLoca, numGlyphs * 4, (uint)offset);
+        WriteUInt32(newLoca, ordered.Count * 4, (uint)offset);
+    }
+
+    private static void RewriteComponents(byte[] outline, int glyphOffset, Dictionary<ushort, ushort> gidMap)
+    {
+        var pos = glyphOffset + 10;
+        while (true)
+        {
+            var flags = ReadUInt16(outline, pos);
+            var component = ReadUInt16(outline, pos + 2);
+            WriteUInt16(outline, pos + 2, gidMap[component]);
+            pos += ComponentRecordTail(flags) + 4;
+
+            if ((flags & MoreComponents) == 0)
+            {
+                break;
+            }
+        }
     }
 
     private static byte[] BuildHead(ReadOnlySpan<byte> head)
@@ -211,6 +243,61 @@ internal static class GlyfSubsetter
         var result = head.ToArray();
         WriteUInt32(result, 8, 0); // checkSumAdjustment, finalized after assembly
         WriteInt16(result, 50, 1); // indexToLocFormat = long
+        return result;
+    }
+
+    // Full 4-byte (advance, lsb) entries for all N glyphs; hhea.numberOfHMetrics
+    // is patched to N to match.
+    private static byte[] BuildHmtx(SfntFont font, List<ushort> ordered)
+    {
+        var hasHmtx = font.TryGetTableMemory("hmtx", out var hmtxMemory);
+        var numberOfHMetrics = 0;
+        if (font.TryGetTableMemory("hhea", out var hheaMemory) && hheaMemory.Length >= 36)
+        {
+            numberOfHMetrics = ReadUInt16(hheaMemory.Span, 34);
+        }
+
+        var hmtx = hasHmtx ? hmtxMemory.Span : default;
+        var result = new byte[ordered.Count * 4];
+        for (var newGid = 0; newGid < ordered.Count; newGid++)
+        {
+            var gid = ordered[newGid];
+            WriteUInt16(result, newGid * 4, font.GetAdvanceWidth(gid));
+            WriteInt16(result, newGid * 4 + 2, LeftSideBearing(hmtx, numberOfHMetrics, gid));
+        }
+
+        return result;
+    }
+
+    private static short LeftSideBearing(ReadOnlySpan<byte> hmtx, int numberOfHMetrics, ushort gid)
+    {
+        var offset = gid < numberOfHMetrics
+            ? gid * 4 + 2
+            : numberOfHMetrics * 4 + (gid - numberOfHMetrics) * 2;
+        return offset + 2 <= hmtx.Length ? ReadInt16(hmtx, offset) : (short)0;
+    }
+
+    private static byte[] BuildHhea(SfntFont font, int glyphCount)
+    {
+        if (!font.TryGetTableMemory("hhea", out var hhea) || hhea.Length < 36)
+        {
+            throw new InvalidDataException("Font is missing a valid 'hhea' table.");
+        }
+
+        var result = hhea.ToArray();
+        WriteUInt16(result, 34, (ushort)glyphCount);
+        return result;
+    }
+
+    private static byte[] BuildMaxp(SfntFont font, int glyphCount)
+    {
+        if (!font.TryGetTableMemory("maxp", out var maxp) || maxp.Length < 6)
+        {
+            throw new InvalidDataException("Font is missing a valid 'maxp' table.");
+        }
+
+        var result = maxp.ToArray();
+        WriteUInt16(result, 4, (ushort)glyphCount);
         return result;
     }
 
@@ -224,24 +311,34 @@ internal static class GlyfSubsetter
         return result;
     }
 
-    private static byte[] Assemble(SfntFont font, ReadOnlyMemory<byte> newGlyf, ReadOnlyMemory<byte> newLoca, byte[] newHead, out int length)
+    private static byte[] Assemble(
+        SfntFont font,
+        ReadOnlyMemory<byte> newGlyf,
+        ReadOnlyMemory<byte> newLoca,
+        byte[] newHead,
+        byte[] newHmtx,
+        byte[] newHhea,
+        byte[] newMaxp,
+        out int length)
     {
-        var tables = new List<(string Tag, ReadOnlyMemory<byte> Data)>(RetainedTags.Length);
-        foreach (var tag in RetainedTags)
+        var tables = new List<(string Tag, ReadOnlyMemory<byte> Data)>(8)
         {
-            ReadOnlyMemory<byte>? data = tag switch
-            {
-                "glyf" => newGlyf,
-                "loca" => newLoca,
-                "head" => newHead,
-                "post" => font.TryGetTableMemory(tag, out var rawPost) ? BuildPost(rawPost.Span) : null,
-                _ => font.TryGetTableMemory(tag, out var raw) ? raw : null,
-            };
+            ("glyf", newGlyf),
+            ("head", newHead),
+            ("hhea", newHhea),
+            ("hmtx", newHmtx),
+            ("loca", newLoca),
+            ("maxp", newMaxp),
+        };
 
-            if (data is { } table)
-            {
-                tables.Add((tag, table));
-            }
+        if (font.TryGetTableMemory("OS/2", out var os2))
+        {
+            tables.Add(("OS/2", os2));
+        }
+
+        if (font.TryGetTableMemory("post", out var post))
+        {
+            tables.Add(("post", BuildPost(post.Span)));
         }
 
         tables.Sort(static (a, b) => string.CompareOrdinal(a.Tag, b.Tag));
@@ -260,7 +357,6 @@ internal static class GlyfSubsetter
 
         var directorySize = 12 + numTables * 16;
         var offsets = new int[numTables];
-        var checksums = new uint[numTables];
         var cursor = directorySize;
         for (var i = 0; i < numTables; i++)
         {
@@ -282,11 +378,10 @@ internal static class GlyfSubsetter
             var (tag, data) = tables[i];
             data.Span.CopyTo(file.AsSpan(offsets[i]));
             file.AsSpan(offsets[i] + data.Length, Align4(data.Length) - data.Length).Clear();
-            checksums[i] = TableChecksum(file, offsets[i], Align4(data.Length));
 
             var rec = 12 + i * 16;
             WriteTag(file, rec, tag);
-            WriteUInt32(file, rec + 4, checksums[i]);
+            WriteUInt32(file, rec + 4, TableChecksum(file, offsets[i], Align4(data.Length)));
             WriteUInt32(file, rec + 8, (uint)offsets[i]);
             WriteUInt32(file, rec + 12, (uint)data.Length);
         }

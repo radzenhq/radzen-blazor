@@ -12,7 +12,10 @@ namespace Radzen.Documents.Pdf.Fonts;
 // Builds the Type0/CID font object graph (ISO 32000-1 9.7) for a used-glyph subset:
 // a composite Type0 dictionary, a descendant CIDFontType2 (glyf) or CIDFontType0 (CFF),
 // a FontDescriptor with an embedded FontFile2/FontFile3 subset, /W widths, a /CIDSet
-// bitmap and a /ToUnicode CMap. Under Identity-H the CID equals the original glyph id.
+// bitmap and a /ToUnicode CMap. The glyf path renumbers glyphs into a compact
+// 0..N-1 space (GlyfSubsetter.BuildCompactGidMap); under Identity-H the content
+// code equals the NEW compact gid, so CIDToGIDMap stays Identity and W/CIDSet/
+// ToUnicode are keyed by the compact gid. The CFF path keeps CID == original gid.
 internal static class Type0FontEmbedder
 {
     private const int StemV = 80;
@@ -43,21 +46,34 @@ internal static class Type0FontEmbedder
         };
 
         // The CIDSet must flag exactly the glyphs present in the embedded subset
-        // (PDF/A 6.2.11.4.2): for glyf that is the outline-bearing closure (composite
-        // components included, empty-outline glyphs like space excluded); CFF
-        // charstrings are always present, so used + notdef.
-        SortedSet<ushort> embeddedGids;
+        // (PDF/A 6.2.11.4.2): the compact glyf subset contains every gid 0..N-1
+        // (empty-outline glyphs own a loca entry), so all bits are set; CFF keeps
+        // CID == original gid, so used + notdef.
+        byte[] cidSet;
+        ArrayObject widths;
+        IReadOnlyDictionary<ushort, int> toUnicode;
         if (font.IsCff)
         {
             EmbedCff(writer, font, usedGids, descriptor);
-            embeddedGids = [.. usedGids, 0];
+            cidSet = BuildCidSet([.. usedGids, 0]);
+            widths = BuildWidths(font, usedGids, null);
+            toUnicode = gidToUnicode;
         }
         else
         {
-            embeddedGids = [.. EmbedGlyf(writer, font, usedGids, descriptor)];
+            var gidMap = EmbedGlyf(writer, font, usedGids, descriptor);
+            cidSet = BuildFullCidSet(gidMap.Count);
+            widths = BuildWidths(font, usedGids, gidMap);
+            var remapped = new Dictionary<ushort, int>(gidToUnicode.Count);
+            foreach (var (gid, codepoint) in gidToUnicode)
+            {
+                remapped[gidMap[gid]] = codepoint;
+            }
+
+            toUnicode = remapped;
         }
 
-        descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(BuildCidSet(embeddedGids)));
+        descriptor["CIDSet"] = writer.Add(FlateFilter.EncodeStream(cidSet));
         var descriptorRef = writer.Add(descriptor);
 
         var descendant = new DictionaryObject
@@ -73,7 +89,7 @@ internal static class Type0FontEmbedder
             },
             ["FontDescriptor"] = descriptorRef,
             ["DW"] = new NumberObject(DefaultWidth),
-            ["W"] = BuildWidths(font, usedGids),
+            ["W"] = widths,
         };
 
         if (!font.IsCff)
@@ -82,7 +98,7 @@ internal static class Type0FontEmbedder
         }
 
         var descendantRef = writer.Add(descendant);
-        var toUnicodeRef = writer.Add(FlateFilter.EncodeStream(BuildToUnicode(gidToUnicode)));
+        var toUnicodeRef = writer.Add(FlateFilter.EncodeStream(BuildToUnicode(toUnicode)));
 
         var top = new DictionaryObject
         {
@@ -97,15 +113,15 @@ internal static class Type0FontEmbedder
         return writer.Add(top);
     }
 
-    private static HashSet<ushort> EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
+    private static Dictionary<ushort, ushort> EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
     {
-        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength, out var closure);
+        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength, out var gidMap);
         try
         {
             var stream = FlateFilter.EncodeStream(subset.AsSpan(0, subsetLength));
             stream.Dictionary["Length1"] = new NumberObject(subsetLength);
             descriptor["FontFile2"] = writer.Add(stream);
-            return closure;
+            return gidMap;
         }
         finally
         {
@@ -143,17 +159,30 @@ internal static class Type0FontEmbedder
         descriptor["FontFile3"] = writer.Add(stream);
     }
 
-    private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids)
+    // gidMap (compact glyf renumbering, monotonic in the original gid) keys W by
+    // the new gid; null keeps the original gid as the CID (CFF path).
+    private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids, Dictionary<ushort, ushort>? gidMap)
     {
         var w = new ArrayObject();
         foreach (var gid in usedGids)
         {
             var width = (int)Math.Round(font.GetAdvanceWidth(gid) * 1000.0 / font.UnitsPerEm, MidpointRounding.AwayFromZero);
-            w.Add(new NumberObject(gid));
+            w.Add(new NumberObject(gidMap is null ? gid : gidMap[gid]));
             w.Add(new ArrayObject { new NumberObject(width) });
         }
 
         return w;
+    }
+
+    private static byte[] BuildFullCidSet(int glyphCount)
+    {
+        var bytes = new byte[(glyphCount + 7) >> 3];
+        for (var cid = 0; cid < glyphCount; cid++)
+        {
+            bytes[cid >> 3] |= (byte)(0x80 >> (cid & 7));
+        }
+
+        return bytes;
     }
 
     private static byte[] BuildCidSet(SortedSet<ushort> usedGids)
