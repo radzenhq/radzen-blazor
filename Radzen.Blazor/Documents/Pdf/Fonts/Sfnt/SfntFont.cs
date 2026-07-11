@@ -89,6 +89,21 @@ internal sealed class SfntFont
         return false;
     }
 
+    // Zero-copy variant for read-only consumers (e.g. subsetting a multi-MB glyf
+    // table); the memory aliases the font's source buffer and must not be mutated.
+    public bool TryGetTableMemory(string tag, out ReadOnlyMemory<byte> table)
+    {
+        ArgumentNullException.ThrowIfNull(tag);
+        if (directory.TryGet(tag, out var record))
+        {
+            table = data.AsMemory((int)record.Offset, (int)record.Length);
+            return true;
+        }
+
+        table = default;
+        return false;
+    }
+
     public static SfntFont Parse(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);

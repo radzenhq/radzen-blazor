@@ -24,7 +24,25 @@ public sealed class NameObject(string value) : DocumentObject
     /// <inheritdoc />
     public override void Write(Stream stream)
     {
-        PdfBytes.WriteAscii(stream, Escape(Value));
+        WriteEscaped(stream, Value);
+    }
+
+    // Streams the escaped form without allocating when no byte needs escaping,
+    // which is the case for almost every name written by the generator.
+    internal static void WriteEscaped(Stream stream, string name)
+    {
+        foreach (var ch in name)
+        {
+            var code = ch & 0xFF;
+            if (code <= 0x20 || code >= 0x7F || IsDelimiter(code) || code == '#')
+            {
+                PdfBytes.WriteAscii(stream, Escape(name));
+                return;
+            }
+        }
+
+        stream.WriteByte((byte)'/');
+        PdfBytes.WriteAscii(stream, name);
     }
 
     internal static string Escape(string name)

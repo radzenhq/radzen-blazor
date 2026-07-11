@@ -56,34 +56,39 @@ public sealed class DocumentWriter(Stream stream)
     /// </summary>
     public void Close()
     {
-        using var buffer = new MemoryStream();
+        using var buffer = new CountingBufferedStream(stream);
         buffer.Write(Header, 0, Header.Length);
 
         var offsets = new long[objects.Count];
         for (var i = 0; i < objects.Count; i++)
         {
             offsets[i] = buffer.Position;
-            PdfBytes.WriteAscii(buffer, string.Create(CultureInfo.InvariantCulture, $"{i + 1} 0 obj\n"));
+            PdfBytes.WriteInteger(buffer, i + 1);
+            PdfBytes.WriteAscii(buffer, " 0 obj\n");
             objects[i].Write(buffer);
             PdfBytes.WriteAscii(buffer, "\nendobj\n");
         }
 
         var xrefOffset = buffer.Position;
         var size = objects.Count + 1;
-        PdfBytes.WriteAscii(buffer, string.Create(CultureInfo.InvariantCulture, $"xref\n0 {size}\n"));
-        PdfBytes.WriteAscii(buffer, "0000000000 65535 f \n");
+        PdfBytes.WriteAscii(buffer, "xref\n0 ");
+        PdfBytes.WriteInteger(buffer, size);
+        PdfBytes.WriteAscii(buffer, "\n0000000000 65535 f \n");
+        Span<char> padded = stackalloc char[20];
         foreach (var offset in offsets)
         {
-            PdfBytes.WriteAscii(buffer, string.Create(CultureInfo.InvariantCulture, $"{offset:D10} 00000 n \n"));
+            offset.TryFormat(padded, out var written, "D10", CultureInfo.InvariantCulture);
+            PdfBytes.WriteAscii(buffer, padded[..written]);
+            PdfBytes.WriteAscii(buffer, " 00000 n \n");
         }
 
         Trailer["Size"] = new NumberObject(size);
         PdfBytes.WriteAscii(buffer, "trailer\n");
         Trailer.Write(buffer);
-        PdfBytes.WriteAscii(buffer, string.Create(CultureInfo.InvariantCulture, $"\nstartxref\n{xrefOffset}\n%%EOF\n"));
+        PdfBytes.WriteAscii(buffer, "\nstartxref\n");
+        PdfBytes.WriteInteger(buffer, xrefOffset);
+        PdfBytes.WriteAscii(buffer, "\n%%EOF\n");
 
-        buffer.Position = 0;
-        buffer.CopyTo(stream);
-        stream.Flush();
+        buffer.Flush();
     }
 }

@@ -1,8 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
+using System.IO;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
@@ -94,10 +93,17 @@ internal static class Type0FontEmbedder
 
     private static void EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
     {
-        var subset = GlyfSubsetter.Subset(font, usedGids);
-        var stream = FlateFilter.EncodeStream(subset);
-        stream.Dictionary["Length1"] = new NumberObject(subset.Length);
-        descriptor["FontFile2"] = writer.Add(stream);
+        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength);
+        try
+        {
+            var stream = FlateFilter.EncodeStream(subset.AsSpan(0, subsetLength));
+            stream.Dictionary["Length1"] = new NumberObject(subsetLength);
+            descriptor["FontFile2"] = writer.Add(stream);
+        }
+        finally
+        {
+            System.Buffers.ArrayPool<byte>.Shared.Return(subset);
+        }
     }
 
     private static void EmbedCff(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
@@ -169,46 +175,64 @@ internal static class Type0FontEmbedder
         var entries = new List<KeyValuePair<ushort, int>>(gidToUnicode);
         entries.Sort((a, b) => a.Key.CompareTo(b.Key));
 
-        var sb = new StringBuilder();
-        sb.Append("/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n");
-        sb.Append("/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n");
-        sb.Append("/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n");
-        sb.Append("1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n");
+        using var output = new PooledBufferStream(512 + entries.Count * 16);
+        PdfBytes.WriteAscii(output, "/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n");
+        PdfBytes.WriteAscii(output, "/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n");
+        PdfBytes.WriteAscii(output, "/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n");
+        PdfBytes.WriteAscii(output, "1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n");
 
         for (var offset = 0; offset < entries.Count; offset += 100)
         {
             var count = Math.Min(100, entries.Count - offset);
-            sb.Append(count.ToString(CultureInfo.InvariantCulture)).Append(" beginbfchar\n");
+            PdfBytes.WriteInteger(output, count);
+            PdfBytes.WriteAscii(output, " beginbfchar\n");
             for (var i = 0; i < count; i++)
             {
                 var entry = entries[offset + i];
-                sb.Append('<').Append(entry.Key.ToString("X4", CultureInfo.InvariantCulture)).Append("> <");
-                sb.Append(Utf16BeHex(entry.Value)).Append(">\n");
+                output.WriteByte((byte)'<');
+                WriteHex4(output, entry.Key);
+                PdfBytes.WriteAscii(output, "> <");
+                WriteUtf16BeHex(output, entry.Value);
+                PdfBytes.WriteAscii(output, ">\n");
             }
 
-            sb.Append("endbfchar\n");
+            PdfBytes.WriteAscii(output, "endbfchar\n");
         }
 
-        sb.Append("endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n");
-        return Encoding.ASCII.GetBytes(sb.ToString());
+        PdfBytes.WriteAscii(output, "endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n");
+        return output.ToArray();
     }
 
-    private static string Utf16BeHex(int codepoint)
+    private static void WriteUtf16BeHex(Stream stream, int codepoint)
     {
         if (codepoint is < 0 or > 0x10FFFF or (>= 0xD800 and <= 0xDFFF))
         {
             // Lone surrogate (or out-of-range value): emit the raw UTF-16 unit.
-            return (codepoint & 0xFFFF).ToString("X4", CultureInfo.InvariantCulture);
+            WriteHex4(stream, codepoint & 0xFFFF);
         }
-
-        var s = char.ConvertFromUtf32(codepoint);
-        var sb = new StringBuilder(s.Length * 4);
-        foreach (var ch in s)
+        else if (codepoint <= 0xFFFF)
         {
-            sb.Append(((int)ch).ToString("X4", CultureInfo.InvariantCulture));
+            WriteHex4(stream, codepoint);
+        }
+        else
+        {
+            var v = codepoint - 0x10000;
+            WriteHex4(stream, 0xD800 + (v >> 10));
+            WriteHex4(stream, 0xDC00 + (v & 0x3FF));
+        }
+    }
+
+    private static void WriteHex4(Stream stream, int value)
+    {
+        Span<byte> hex = stackalloc byte[4];
+        for (var i = 3; i >= 0; i--)
+        {
+            var nibble = value & 0xF;
+            hex[i] = (byte)(nibble < 10 ? '0' + nibble : 'A' + nibble - 10);
+            value >>= 4;
         }
 
-        return sb.ToString();
+        stream.Write(hex);
     }
 
     private static ArrayObject FontBBox(SfntFont font, double scale)

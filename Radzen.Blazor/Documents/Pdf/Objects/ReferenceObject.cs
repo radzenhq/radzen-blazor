@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -28,6 +27,9 @@ public sealed class ReferenceObject(int objectNumber, int generation) : Document
     /// <inheritdoc />
     public override void Write(Stream stream)
     {
-        PdfBytes.WriteAscii(stream, string.Create(CultureInfo.InvariantCulture, $"{ObjectNumber} {Generation} R"));
+        PdfBytes.WriteInteger(stream, ObjectNumber);
+        stream.WriteByte((byte)' ');
+        PdfBytes.WriteInteger(stream, Generation);
+        PdfBytes.WriteAscii(stream, " R");
     }
 }

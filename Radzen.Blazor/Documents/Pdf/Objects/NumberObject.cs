@@ -71,9 +71,14 @@ public sealed class NumberObject : DocumentObject
             throw new InvalidOperationException("A PDF number cannot be NaN or infinite.");
         }
 
-        PdfBytes.WriteAscii(stream, IsInteger
-            ? integerValue.ToString(CultureInfo.InvariantCulture)
-            : FormatReal(realValue));
+        if (IsInteger)
+        {
+            PdfBytes.WriteInteger(stream, integerValue);
+        }
+        else
+        {
+            PdfBytes.WriteAscii(stream, FormatReal(realValue));
+        }
     }
 
     private static string FormatReal(double value)
