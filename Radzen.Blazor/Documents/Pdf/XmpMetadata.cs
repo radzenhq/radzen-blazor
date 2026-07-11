@@ -10,6 +10,8 @@ internal sealed class FacturXMetadata
     public string DocumentFileName { get; set; } = "factur-x.xml";
 
     public string Version { get; set; } = "1.0";
+
+    public string ConformanceLevel { get; set; } = "BASIC";
 }
 
 internal sealed class XmpMetadata
@@ -91,6 +93,9 @@ internal sealed class XmpMetadata
                 .Append(Escape(fx.DocumentFileName))
                 .Append("</fx:DocumentFileName>\n");
             builder.Append("   <fx:Version>").Append(Escape(fx.Version)).Append("</fx:Version>\n");
+            builder.Append("   <fx:ConformanceLevel>")
+                .Append(Escape(fx.ConformanceLevel))
+                .Append("</fx:ConformanceLevel>\n");
         }
 
         builder.Append("  </rdf:Description>\n");
