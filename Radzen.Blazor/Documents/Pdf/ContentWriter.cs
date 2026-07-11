@@ -7,18 +7,41 @@ namespace Radzen.Documents.Pdf;
 
 #nullable enable
 
-// Accumulates a page content stream and the base-14 font resources it references.
-// The font key prefix keeps overlay streams from colliding with generated resources.
-internal sealed class ContentWriter(string fontKeyPrefix = "F")
+// Accumulates a page content stream and the base-14 font and image XObject resources
+// it references. The key prefixes keep overlay streams from colliding with generated
+// resources.
+internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im")
 {
     private readonly List<byte> buffer = [];
     private readonly Dictionary<string, string> keysByBaseFont = new(System.StringComparer.Ordinal);
+    private readonly List<KeyValuePair<string, ImageXObject>> images = [];
 
     public IReadOnlyList<byte> Buffer => buffer;
 
     public IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
 
+    public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
+
     public byte[] ToArray() => [.. buffer];
+
+    // Returns null when the payload is not a decodable PNG/JPEG so the element can
+    // degrade to emitting nothing instead of failing the whole save.
+    public string? RegisterImage(byte[] encodedImage)
+    {
+        ImageXObject decoded;
+        try
+        {
+            decoded = ImageDecoder.Decode(encodedImage);
+        }
+        catch (System.NotSupportedException)
+        {
+            return null;
+        }
+
+        var key = imageKeyPrefix + images.Count.ToString(CultureInfo.InvariantCulture);
+        images.Add(new KeyValuePair<string, ImageXObject>(key, decoded));
+        return key;
+    }
 
     public string RegisterFont(Font font)
     {

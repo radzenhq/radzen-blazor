@@ -321,7 +321,7 @@ public sealed class Document
                 var resources = BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
                 if (overlayEmitter is not null)
                 {
-                    resources = OverlayResources(resources, overlayEmitter);
+                    resources = OverlayResources(writer, resources, overlayEmitter);
                 }
 
                 if (resources is not null)
@@ -337,13 +337,17 @@ public sealed class Document
                 continue;
             }
 
-            var contentBytes = page.BuildContent(out var emitter);
+            var contentBytes = page.BuildContent(out var emitter, out var overlayBytes, out var pageOverlayEmitter);
             if (contentBytes is not null)
             {
-                pageNode["Contents"] = writer.Add(new StreamObject(contentBytes));
+                var contentRef = writer.Add(new StreamObject(contentBytes));
+                pageNode["Contents"] = overlayBytes is null
+                    ? contentRef
+                    : new ArrayObject { contentRef, writer.Add(new StreamObject(overlayBytes)) };
             }
 
-            var emitted = emitter is not null ? BuildResources(emitter) : null;
+            var activeEmitter = emitter ?? pageOverlayEmitter;
+            var emitted = activeEmitter is not null ? BuildResources(writer, activeEmitter) : null;
             var merged = importer is not null && source is not null
                 && sourceResources.TryGetValue(page, out var loadedResources)
                 ? MergeResources(importer, source, loadedResources, emitted)
@@ -571,34 +575,38 @@ public sealed class Document
         return reference;
     }
 
-    // Adds the fonts referenced by an overlay stream to a built page's resources.
-    // Overlay keys use a distinct prefix so generated entries are never clobbered.
-    private static DictionaryObject? OverlayResources(DictionaryObject? resources, ContentWriter emitter)
+    // Adds the fonts and image XObjects referenced by an overlay stream to a built
+    // page's resources. Overlay keys use a distinct prefix so generated entries are
+    // never clobbered.
+    private static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentWriter emitter)
     {
-        var emitted = BuildResources(emitter);
+        var emitted = BuildResources(writer, emitter);
         if (emitted is null)
         {
             return resources;
         }
 
         resources ??= new DictionaryObject();
-        if (resources.TryGetValue("Font", out var existing) && existing is DictionaryObject fonts
-            && emitted["Font"] is DictionaryObject added)
+        foreach (var key in emitted.Keys)
         {
-            foreach (var key in added.Keys)
+            if (resources.TryGetValue(key, out var existing) && existing is DictionaryObject target
+                && emitted[key] is DictionaryObject added)
             {
-                fonts[key] = added[key];
+                foreach (var name in added.Keys)
+                {
+                    target[name] = added[name];
+                }
             }
-        }
-        else
-        {
-            resources["Font"] = emitted["Font"];
+            else
+            {
+                resources[key] = emitted[key];
+            }
         }
 
         return resources;
     }
 
-    private static DictionaryObject? BuildResources(ContentWriter emitter)
+    private static DictionaryObject? BuildResources(DocumentWriter writer, ContentWriter emitter)
     {
         DictionaryObject? fonts = null;
         foreach (var (baseFont, key) in emitter.Fonts)
@@ -613,12 +621,35 @@ public sealed class Document
             };
         }
 
-        if (fonts is null)
+        DictionaryObject? xobjects = null;
+        foreach (var (key, image) in emitter.Images)
+        {
+            xobjects ??= new DictionaryObject();
+            if (image.SoftMask is { } mask)
+            {
+                image.Image.Dictionary["SMask"] = writer.Add(mask);
+            }
+
+            xobjects[key] = writer.Add(image.Image);
+        }
+
+        if (fonts is null && xobjects is null)
         {
             return null;
         }
 
-        return new DictionaryObject { ["Font"] = fonts };
+        var resources = new DictionaryObject();
+        if (fonts is not null)
+        {
+            resources["Font"] = fonts;
+        }
+
+        if (xobjects is not null)
+        {
+            resources["XObject"] = xobjects;
+        }
+
+        return resources;
     }
 
     private static ArrayObject MediaBox(Page page) =>
