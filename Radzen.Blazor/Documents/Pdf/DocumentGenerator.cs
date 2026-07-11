@@ -77,7 +77,7 @@ internal sealed class DocumentGenerator
         public Rect? Clip { get; set; }
     }
 
-    private readonly struct ImageDraw
+    private struct ImageDraw
     {
         public required double X { get; init; }
         public required double Y { get; init; }
@@ -85,15 +85,17 @@ internal sealed class DocumentGenerator
         public required double Height { get; init; }
         public required GeneratedImage Image { get; init; }
         public StructureElement? Element { get; init; }
+        public Rect? Clip { get; set; }
     }
 
-    private readonly struct FillDraw
+    private struct FillDraw
     {
         public required double X { get; init; }
         public required double Y { get; init; }
         public required double Width { get; init; }
         public required double Height { get; init; }
         public required Color Color { get; init; }
+        public Rect? Clip { get; set; }
     }
 
     private readonly struct EdgeDraw
@@ -575,6 +577,13 @@ internal sealed class DocumentGenerator
     private void EmitCode(PagePlan plan, PositionedCode positioned, double left, double top)
         => EmitCodeBlock(plan, positioned.Source, left + positioned.XOffset, top - positioned.Y);
 
+    private static double CodeWidth(Block code) => code switch
+    {
+        QrCode qr => qr.Size.Point,
+        Barcode barcode => barcode.Width.Point,
+        _ => 0,
+    };
+
     private void EmitCodeBlock(PagePlan plan, Block source, double x, double topY)
     {
         switch (source)
@@ -759,24 +768,32 @@ internal sealed class DocumentGenerator
             }
         }
 
-        // An unbreakable token wider than the cell is clipped to the cell box so it
-        // never overpaints the neighboring cell.
+        // An unbreakable token or oversized image/code wider than the cell is clipped to the
+        // cell box so it never overpaints the neighboring cell.
+        var cellClip = new Rect(
+            left + cell.Bounds.X,
+            contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
+            cell.Bounds.Width,
+            cell.Bounds.Height);
         if (overflows)
         {
-            var clip = new Rect(
-                left + cell.Bounds.X,
-                contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
-                cell.Bounds.Width,
-                cell.Bounds.Height);
             var texts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
             for (var t = firstText; t < texts.Length; t++)
             {
-                texts[t].Clip = clip;
+                texts[t].Clip = cellClip;
             }
         }
 
+        var boundsLeft = cell.Bounds.X;
+        var boundsRight = cell.Bounds.X + cell.Bounds.Width;
+        var contentOverflows = false;
+        var firstImage = plan.Images.Count;
+        var firstFill = plan.Fills.Count;
+        var firstCodeText = plan.Texts.Count;
+
         foreach (var image in cell.Images)
         {
+            contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
             var xobject = Decode(image.Source);
             plan.Images.Add(new ImageDraw
             {
@@ -792,7 +809,29 @@ internal sealed class DocumentGenerator
 
         foreach (var code in cell.Codes)
         {
+            contentOverflows |= code.X < boundsLeft - 0.01 || code.X + CodeWidth(code.Source) > boundsRight + 0.01;
             EmitCodeBlock(plan, code.Source, left + code.X, contentTop - (code.Y + delta));
+        }
+
+        if (contentOverflows)
+        {
+            var images = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Images);
+            for (var im = firstImage; im < images.Length; im++)
+            {
+                images[im].Clip = cellClip;
+            }
+
+            var fills = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Fills);
+            for (var f = firstFill; f < fills.Length; f++)
+            {
+                fills[f].Clip = cellClip;
+            }
+
+            var codeTexts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
+            for (var t = firstCodeText; t < codeTexts.Length; t++)
+            {
+                codeTexts[t].Clip = cellClip;
+            }
         }
 
         foreach (var nested in cell.Tables)
@@ -1378,6 +1417,12 @@ internal sealed class DocumentGenerator
 
         foreach (var fill in plan.Fills)
         {
+            if (fill.Clip is { } fillClip)
+            {
+                writer.WriteRaw("q\n");
+                WriteClipRect(writer, fillClip);
+            }
+
             writer.WriteColor(fill.Color, "rg");
             writer.WriteNumber(fill.X);
             writer.WriteRaw(" ");
@@ -1387,6 +1432,10 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" ");
             writer.WriteNumber(fill.Height);
             writer.WriteRaw(" re f\n");
+            if (fill.Clip is not null)
+            {
+                writer.WriteRaw("Q\n");
+            }
         }
 
         foreach (var edge in plan.Edges)
@@ -1522,9 +1571,26 @@ internal sealed class DocumentGenerator
         }
     }
 
+    private static void WriteClipRect(ContentWriter writer, in Rect clip)
+    {
+        writer.WriteNumber(clip.X);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(clip.Y);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(clip.Width);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(clip.Height);
+        writer.WriteRaw(" re W n\n");
+    }
+
     private static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
     {
         writer.WriteRaw("q\n");
+        if (image.Clip is { } clip)
+        {
+            WriteClipRect(writer, clip);
+        }
+
         writer.WriteNumber(image.Width);
         writer.WriteRaw(" 0 0 ");
         writer.WriteNumber(image.Height);
@@ -1542,14 +1608,7 @@ internal sealed class DocumentGenerator
         if (text.Clip is { } clip)
         {
             writer.WriteRaw("q\n");
-            writer.WriteNumber(clip.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(clip.Y);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(clip.Width);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(clip.Height);
-            writer.WriteRaw(" re W n\n");
+            WriteClipRect(writer, clip);
         }
 
         writer.WriteRaw("BT\n");
