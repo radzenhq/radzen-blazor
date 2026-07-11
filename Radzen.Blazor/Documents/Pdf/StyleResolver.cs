@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -9,6 +10,14 @@ namespace Radzen.Documents.Pdf;
 // property defaults).
 internal static class StyleResolver
 {
+    // The resolved item-level font of each list item (marker + content default), attached
+    // here rather than on the model so Paginator.ExpandItem can consume it when it expands
+    // the list into paragraphs.
+    private static readonly ConditionalWeakTable<ListItem, Font> itemFonts = [];
+
+    internal static Font? ItemFont(ListItem item)
+        => itemFonts.TryGetValue(item, out var font) ? font : null;
+
     public static void Resolve(DocumentBuilder builder)
     {
         foreach (var section in builder.Sections)
@@ -34,6 +43,45 @@ internal static class StyleResolver
             else if (block is Barcode barcode)
             {
                 ResolveBarcode(barcode, styles, inherited);
+            }
+            else if (block is List list)
+            {
+                ResolveList(list, styles, inherited);
+            }
+        }
+    }
+
+    // List items cascade exactly like paragraph runs: item run -> item.Font -> list.Font ->
+    // inherited cell/row/table context -> Normal. The item-level font (marker glyph and the
+    // default for runs) omits the run override; both are stored for Paginator.ExpandItem.
+    private static void ResolveList(List list, StyleCollection styles, List<Font> inherited)
+    {
+        foreach (var item in list.Items)
+        {
+            var itemFont = new Font();
+            itemFont.InheritFrom(item.Font);
+            itemFont.InheritFrom(list.Font);
+            foreach (var font in inherited)
+            {
+                itemFont.InheritFrom(font);
+            }
+
+            itemFont.InheritFrom(styles.Normal.Font);
+            itemFonts.AddOrUpdate(item, itemFont);
+
+            foreach (var run in item.Inlines)
+            {
+                var effective = new Font();
+                effective.InheritFrom(run.Font);
+                effective.InheritFrom(item.Font);
+                effective.InheritFrom(list.Font);
+                foreach (var font in inherited)
+                {
+                    effective.InheritFrom(font);
+                }
+
+                effective.InheritFrom(styles.Normal.Font);
+                run.EffectiveFont = effective;
             }
         }
     }
