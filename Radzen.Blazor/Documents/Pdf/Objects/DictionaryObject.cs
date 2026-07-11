@@ -66,7 +66,7 @@ public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<
         foreach (var key in keys)
         {
             stream.WriteByte((byte)' ');
-            PdfBytes.WriteAscii(stream, NameObject.Escape(key));
+            NameObject.WriteEscaped(stream, key);
             stream.WriteByte((byte)' ');
             values[key].Write(stream);
         }

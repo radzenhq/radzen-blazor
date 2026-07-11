@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -36,7 +35,7 @@ public sealed class StreamObject : DocumentObject
     public override void Write(Stream stream)
     {
         PdfBytes.WriteAscii(stream, "<< /Length ");
-        PdfBytes.WriteAscii(stream, Data.Length.ToString(CultureInfo.InvariantCulture));
+        PdfBytes.WriteInteger(stream, Data.Length);
 
         foreach (var key in Dictionary.Keys)
         {
@@ -46,7 +45,7 @@ public sealed class StreamObject : DocumentObject
             }
 
             stream.WriteByte((byte)' ');
-            PdfBytes.WriteAscii(stream, NameObject.Escape(key));
+            NameObject.WriteEscaped(stream, key);
             stream.WriteByte((byte)' ');
             Dictionary[key].Write(stream);
         }

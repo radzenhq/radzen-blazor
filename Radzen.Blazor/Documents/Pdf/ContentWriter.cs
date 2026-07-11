@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -12,17 +13,16 @@ namespace Radzen.Documents.Pdf;
 // resources.
 internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im")
 {
-    private readonly List<byte> buffer = [];
-    private readonly Dictionary<string, string> keysByBaseFont = new(System.StringComparer.Ordinal);
+    private byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(1024);
+    private int length;
+    private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
     private readonly List<KeyValuePair<string, ImageXObject>> images = [];
-
-    public IReadOnlyList<byte> Buffer => buffer;
 
     public IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
 
     public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
 
-    public byte[] ToArray() => [.. buffer];
+    public byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 
     // Returns null when the payload is not a decodable PNG/JPEG so the element can
     // degrade to emitting nothing instead of failing the whole save.
@@ -33,7 +33,7 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         {
             decoded = ImageDecoder.Decode(encodedImage);
         }
-        catch (System.NotSupportedException)
+        catch (NotSupportedException)
         {
             return null;
         }
@@ -55,22 +55,46 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         return key;
     }
 
-    public void WriteRaw(string text)
+    public void WriteRaw(string text) => WriteRaw(text.AsSpan());
+
+    public void WriteRaw(ReadOnlySpan<char> text)
     {
-        foreach (var c in text)
+        var destination = Reserve(text.Length);
+        for (var i = 0; i < text.Length; i++)
         {
-            buffer.Add((byte)c);
+            destination[i] = (byte)text[i];
         }
+
+        length += text.Length;
     }
 
     public void WriteName(string name)
     {
-        WriteRaw(NameObject.Escape(name));
+        foreach (var ch in name)
+        {
+            var code = ch & 0xFF;
+            if (code <= 0x20 || code >= 0x7F || code == '#' || IsDelimiter(code))
+            {
+                WriteRaw(NameObject.Escape(name));
+                return;
+            }
+        }
+
+        Append((byte)'/');
+        WriteRaw(name);
     }
 
     public void WriteNumber(double value)
     {
-        WriteRaw(value.ToString("0.######", CultureInfo.InvariantCulture));
+        Span<char> chars = stackalloc char[32];
+        if (value.TryFormat(chars, out var written, "0.######", CultureInfo.InvariantCulture))
+        {
+            WriteRaw(chars[..written]);
+        }
+        else
+        {
+            WriteRaw(value.ToString("0.######", CultureInfo.InvariantCulture));
+        }
     }
 
     public void WriteColor(Color color, string operatorName)
@@ -87,7 +111,7 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
 
     public void WriteString(byte[] bytes)
     {
-        buffer.Add((byte)'(');
+        Append((byte)'(');
         foreach (var b in bytes)
         {
             switch (b)
@@ -95,24 +119,61 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
                 case (byte)'\\':
                 case (byte)'(':
                 case (byte)')':
-                    buffer.Add((byte)'\\');
-                    buffer.Add(b);
+                    Append((byte)'\\');
+                    Append(b);
                     break;
                 default:
                     if (b < 0x20 || b == 0x7F)
                     {
-                        buffer.Add((byte)'\\');
-                        WriteRaw(System.Convert.ToString(b, 8).PadLeft(3, '0'));
+                        Append((byte)'\\');
+                        Append((byte)('0' + ((b >> 6) & 0x7)));
+                        Append((byte)('0' + ((b >> 3) & 0x7)));
+                        Append((byte)('0' + (b & 0x7)));
                     }
                     else
                     {
-                        buffer.Add(b);
+                        Append(b);
                     }
 
                     break;
             }
         }
 
-        buffer.Add((byte)')');
+        Append((byte)')');
+    }
+
+    private static bool IsDelimiter(int code) => code switch
+    {
+        '(' or ')' or '<' or '>' or '[' or ']' or '{' or '}' or '/' or '%' => true,
+        _ => false,
+    };
+
+    private void Append(byte value)
+    {
+        if (length == buffer.Length)
+        {
+            Grow(1);
+        }
+
+        buffer[length++] = value;
+    }
+
+    private Span<byte> Reserve(int size)
+    {
+        if (buffer.Length - length < size)
+        {
+            Grow(size);
+        }
+
+        return buffer.AsSpan(length, size);
+    }
+
+    private void Grow(int size)
+    {
+        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var replacement = pool.Rent(Math.Max(buffer.Length * 2, length + size));
+        buffer.AsSpan(0, length).CopyTo(replacement);
+        pool.Return(buffer);
+        buffer = replacement;
     }
 }

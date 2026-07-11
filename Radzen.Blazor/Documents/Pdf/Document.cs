@@ -256,7 +256,7 @@ public sealed class Document
     /// <returns>The complete PDF file bytes.</returns>
     public byte[] ToArray()
     {
-        using var stream = new MemoryStream();
+        using var stream = new PooledBufferStream(64 * 1024);
         SaveToStream(stream);
         return stream.ToArray();
     }
