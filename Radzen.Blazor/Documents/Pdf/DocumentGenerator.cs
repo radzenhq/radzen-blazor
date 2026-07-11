@@ -163,6 +163,12 @@ internal sealed class DocumentGenerator
         var paginated = new List<PaginatedPage>();
         foreach (var section in builder.Sections)
         {
+            // RTL / vertical shaping is not implemented; fail loudly rather than silently laying out LTR.
+            if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
+            {
+                throw new System.NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
+            }
+
             paginated.AddRange(Paginator.Paginate(section, fonts, MeasureImage));
         }
 
