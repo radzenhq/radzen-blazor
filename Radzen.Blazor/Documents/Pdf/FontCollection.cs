@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -13,14 +14,18 @@ namespace Radzen.Documents.Pdf;
 public sealed class FontCollection
 {
     private const uint TtcTag = 0x74746366; // 'ttcf'
+    private const int SignatureWindow = 64 * 1024;
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
     private readonly List<string> fallback = [];
 
-    // Weak-keyed parse cache: entries are keyed on the identity of the caller's font
-    // array and live only while that array is reachable, so nothing is rooted for the
-    // life of the process. Values are immutable parsed faces safe to share.
-    private static readonly ConditionalWeakTable<byte[], ParsedSource> parseCache = [];
+    // Content-keyed parse cache: entries are keyed on a signature of the font bytes so
+    // the same content hits regardless of how the caller wraps it. Values are weak and
+    // dead entries are pruned on access, so nothing is rooted for the life of the
+    // process; the faceRetention ephemerons keep an entry alive exactly while any of
+    // its faces is still referenced by a live FontCollection or caller.
+    private static readonly Dictionary<(ulong Hash, int Length), WeakReference<ParsedSource>> parseCache = [];
+    private static readonly ConditionalWeakTable<SfntFont, ParsedSource> faceRetention = [];
 
     private sealed class ParsedSource(byte[] data, bool isCollection, IReadOnlyList<SfntFont> faces)
     {
@@ -61,26 +66,166 @@ public sealed class FontCollection
             : parsed.Faces[0];
     }
 
-    // Serves the parsed faces from the weak-keyed cache when the stream exposes its
-    // backing array; otherwise buffers and parses without caching. Faces are always
-    // parsed from a private copy, and a hit re-verifies content against that copy so
-    // in-place mutation of the source array is never served stale.
+    // Faces are always parsed from a private copy, and a hit is verified byte-for-byte
+    // against that copy so hash collisions and in-place mutation of the source bytes
+    // are never served stale. A MemoryStream without an exposed buffer (the idiomatic
+    // 'new MemoryStream(bytes)') is hashed and verified in place so a hit copies
+    // nothing; its position is left unchanged, matching the buffering ToArray path.
     private static ParsedSource ParseSource(Stream font)
     {
-        if (font is MemoryStream ms && ms.TryGetBuffer(out var segment)
-            && segment.Array is { } key && segment.Offset == 0 && segment.Count == key.Length)
+        if (font is MemoryStream ms)
         {
-            if (parseCache.TryGetValue(key, out var cached) && cached.Data.AsSpan().SequenceEqual(key))
+            if (ms.TryGetBuffer(out var segment) && segment.Array is { } array
+                && segment.Offset == 0 && segment.Count == array.Length)
+            {
+                return FromBytes(array, sharedWithCaller: true);
+            }
+
+            var position = ms.Position;
+            try
+            {
+                return FromMemoryStream(ms);
+            }
+            finally
+            {
+                ms.Position = position;
+            }
+        }
+
+        return FromBytes(ReadFully(font), sharedWithCaller: false);
+    }
+
+    private static ParsedSource FromBytes(byte[] bytes, bool sharedWithCaller)
+    {
+        var length = bytes.Length;
+        var window = Math.Min(length, SignatureWindow);
+        var signature = (Signature(bytes.AsSpan(0, window), bytes.AsSpan(length - window)), length);
+
+        lock (parseCache)
+        {
+            if (TryGetLive(signature, out var cached) && cached.Data.AsSpan().SequenceEqual(bytes))
             {
                 return cached;
             }
 
-            var parsed = ParseCopy([.. key]);
-            parseCache.AddOrUpdate(key, parsed);
-            return parsed;
+            return ParseAndStore(signature, sharedWithCaller ? [.. bytes] : bytes);
+        }
+    }
+
+    private static ParsedSource FromMemoryStream(MemoryStream ms)
+    {
+        var length = checked((int)ms.Length);
+        var window = Math.Min(length, SignatureWindow);
+        var buffer = new byte[window];
+
+        ms.Position = 0;
+        ms.ReadExactly(buffer);
+        var hash = Signature(buffer, default);
+        ms.Position = length - window;
+        ms.ReadExactly(buffer);
+        var signature = (Signature(default, buffer, hash), length);
+
+        lock (parseCache)
+        {
+            if (TryGetLive(signature, out var cached) && ContentEquals(ms, cached.Data, buffer))
+            {
+                return cached;
+            }
+
+            var bytes = new byte[length];
+            ms.Position = 0;
+            ms.ReadExactly(bytes);
+            return ParseAndStore(signature, bytes);
+        }
+    }
+
+    private static ParsedSource ParseAndStore((ulong, int) signature, byte[] ownedBytes)
+    {
+        PruneDeadEntries();
+        var parsed = ParseCopy(ownedBytes);
+        parseCache[signature] = new WeakReference<ParsedSource>(parsed);
+        foreach (var face in parsed.Faces)
+        {
+            faceRetention.Add(face, parsed);
         }
 
-        return ParseCopy(ReadFully(font));
+        return parsed;
+    }
+
+    private static bool TryGetLive((ulong, int) signature, out ParsedSource cached)
+    {
+        cached = null!;
+        return parseCache.TryGetValue(signature, out var entry) && entry.TryGetTarget(out cached!);
+    }
+
+    private static bool ContentEquals(MemoryStream ms, byte[] data, byte[] buffer)
+    {
+        if (ms.Length != data.Length)
+        {
+            return false;
+        }
+
+        ms.Position = 0;
+        var offset = 0;
+        while (offset < data.Length)
+        {
+            var count = Math.Min(buffer.Length, data.Length - offset);
+            ms.ReadExactly(buffer, 0, count);
+            if (!buffer.AsSpan(0, count).SequenceEqual(data.AsSpan(offset, count)))
+            {
+                return false;
+            }
+
+            offset += count;
+        }
+
+        return true;
+    }
+
+    private static void PruneDeadEntries()
+    {
+        List<(ulong, int)>? dead = null;
+        foreach (var pair in parseCache)
+        {
+            if (!pair.Value.TryGetTarget(out _))
+            {
+                (dead ??= []).Add(pair.Key);
+            }
+        }
+
+        if (dead is not null)
+        {
+            foreach (var key in dead)
+            {
+                parseCache.Remove(key);
+            }
+        }
+    }
+
+    // FNV-1a folded over 8-byte blocks of the head and tail windows. The windows keep
+    // hashing O(1) for multi-megabyte fonts; a candidate hit is verified byte-for-byte
+    // anyway, so hash quality only affects the collision (re-parse) rate.
+    private static ulong Signature(ReadOnlySpan<byte> head, ReadOnlySpan<byte> tail, ulong hash = 14695981039346656037)
+    {
+        hash = Fold(head, hash);
+        return Fold(tail, hash);
+
+        static ulong Fold(ReadOnlySpan<byte> data, ulong hash)
+        {
+            const ulong prime = 1099511628211;
+            var blocks = MemoryMarshal.Cast<byte, ulong>(data[..(data.Length & ~7)]);
+            foreach (var block in blocks)
+            {
+                hash = (hash ^ block) * prime;
+            }
+
+            foreach (var b in data[(data.Length & ~7)..])
+            {
+                hash = (hash ^ b) * prime;
+            }
+
+            return hash;
+        }
     }
 
     private static ParsedSource ParseCopy(byte[] bytes)
