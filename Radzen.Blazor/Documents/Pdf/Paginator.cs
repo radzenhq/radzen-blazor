@@ -36,6 +36,20 @@ internal readonly struct PositionedImage
     public double XOffset { get; init; }
 }
 
+internal readonly struct PositionedCode
+{
+    public required Block Source { get; init; }
+
+    public required double Y { get; init; }
+
+    public required double Width { get; init; }
+
+    public required double Height { get; init; }
+
+    /// <summary>Horizontal offset of the code from the container left edge (alignment).</summary>
+    public double XOffset { get; init; }
+}
+
 internal sealed class PaginatedPage
 {
     public required PageSize Size { get; init; }
@@ -67,6 +81,12 @@ internal sealed class PaginatedPage
     public IReadOnlyList<PositionedTableFragment> Tables { get; init; } = [];
 
     public IReadOnlyList<PositionedImage> Images { get; init; } = [];
+
+    public IReadOnlyList<PositionedCode> Codes { get; init; } = [];
+
+    public IReadOnlyList<PositionedCode> HeaderCodes { get; init; } = [];
+
+    public IReadOnlyList<PositionedCode> FooterCodes { get; init; } = [];
 }
 
 internal static class Paginator
@@ -128,8 +148,9 @@ internal static class Paginator
         List<PositionedLine> current = [];
         List<PositionedTableFragment> currentTables = [];
         List<PositionedImage> currentImages = [];
+        List<PositionedCode> currentCodes = [];
 
-        bool HasPageContent() => current.Count > 0 || currentTables.Count > 0 || currentImages.Count > 0;
+        bool HasPageContent() => current.Count > 0 || currentTables.Count > 0 || currentImages.Count > 0 || currentCodes.Count > 0;
 
         void Flush()
         {
@@ -149,10 +170,14 @@ internal static class Paginator
                 FooterTables = footer.Tables,
                 Tables = currentTables,
                 Images = currentImages,
+                Codes = currentCodes,
+                HeaderCodes = header.Codes,
+                FooterCodes = footer.Codes,
             });
             current = [];
             currentTables = [];
             currentImages = [];
+            currentCodes = [];
         }
 
         double cursor = 0;
@@ -242,6 +267,27 @@ internal static class Paginator
                     XOffset = AlignImage(image.Alignment, contentWidth, imageWidth),
                 });
                 cursor += imageHeight;
+                continue;
+            }
+
+            if (block is QrCode or Barcode)
+            {
+                var (codeWidth, codeHeight) = MeasureCode(block);
+                if (cursor + codeHeight > contentHeight + Eps && HasPageContent())
+                {
+                    Flush();
+                    cursor = 0;
+                }
+
+                currentCodes.Add(new PositionedCode
+                {
+                    Source = block,
+                    Y = cursor,
+                    Width = codeWidth,
+                    Height = codeHeight,
+                    XOffset = AlignImage(CodeAlignment(block), contentWidth, codeWidth),
+                });
+                cursor += codeHeight;
                 continue;
             }
 
@@ -375,6 +421,22 @@ internal static class Paginator
 
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
+
+    internal static (double Width, double Height) MeasureCode(Block block)
+        => block switch
+        {
+            QrCode qr => (qr.Size.Point, qr.Size.Point),
+            Barcode barcode => (barcode.Width.Point, barcode.Height.Point + barcode.TextBandHeight),
+            _ => (0, 0),
+        };
+
+    private static HorizontalAlignment CodeAlignment(Block block)
+        => block switch
+        {
+            QrCode qr => qr.Alignment,
+            Barcode barcode => barcode.Alignment,
+            _ => HorizontalAlignment.Left,
+        };
 
     private static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks)
     {
@@ -549,6 +611,9 @@ internal static class Paginator
                 var (_, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
                 height = imageHeight;
                 return true;
+            case QrCode or Barcode:
+                height = MeasureCode(blocks[next]).Height;
+                return true;
             default:
                 return false;
         }
@@ -570,6 +635,8 @@ internal static class Paginator
         public List<PositionedLine> Lines { get; } = [];
 
         public List<PositionedImage> Images { get; } = [];
+
+        public List<PositionedCode> Codes { get; } = [];
 
         public List<PositionedTableFragment> Tables { get; } = [];
 
@@ -616,6 +683,21 @@ internal static class Paginator
                     XOffset = AlignImage(image.Alignment, width, imageWidth),
                 });
                 cursor += imageHeight;
+                continue;
+            }
+
+            if (block is QrCode or Barcode)
+            {
+                var (codeWidth, codeHeight) = MeasureCode(block);
+                result.Codes.Add(new PositionedCode
+                {
+                    Source = block,
+                    Y = cursor,
+                    Width = codeWidth,
+                    Height = codeHeight,
+                    XOffset = AlignImage(CodeAlignment(block), width, codeWidth),
+                });
+                cursor += codeHeight;
                 continue;
             }
 
