@@ -144,14 +144,30 @@ internal static class Type0FontEmbedder
     }
 
     // gidMap (compact renumbering, monotonic in the original gid) keys W by the new gid.
+    // usedGids is sorted, so the compact CIDs it produces are ascending; consecutive
+    // CIDs collapse into a single "startCid [w0 w1 ...]" run instead of one c [w] pair
+    // per glyph, which is much smaller when the used glyphs fill a contiguous CID block.
     private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids, Dictionary<ushort, ushort> gidMap)
     {
         var w = new ArrayObject();
+        ArrayObject? run = null;
+        var prev = -1;
         foreach (var gid in usedGids)
         {
+            var cid = gidMap[gid];
             var width = (int)Math.Round(font.GetAdvanceWidth(gid) * 1000.0 / font.UnitsPerEm, MidpointRounding.AwayFromZero);
-            w.Add(new NumberObject(gidMap[gid]));
-            w.Add(new ArrayObject { new NumberObject(width) });
+            if (run is not null && cid == prev + 1)
+            {
+                run.Add(new NumberObject(width));
+            }
+            else
+            {
+                run = [new NumberObject(width)];
+                w.Add(new NumberObject(cid));
+                w.Add(run);
+            }
+
+            prev = cid;
         }
 
         return w;
