@@ -35,6 +35,10 @@ public sealed class Document
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
 
+    // PDF/A conformance level requested at build time; drives XMP metadata,
+    // the sRGB output intent, the trailer /ID and full-embedding enforcement.
+    internal PdfAConformance Conformance { get; set; }
+
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and
     /// parsed through the internal reader; each page's raw content-stream bytes
@@ -273,6 +277,11 @@ public sealed class Document
     {
         System.ArgumentNullException.ThrowIfNull(stream);
 
+        if (Conformance != PdfAConformance.None)
+        {
+            ValidateConformance();
+        }
+
         var writer = new DocumentWriter(stream);
 
         var catalog = new DictionaryObject();
@@ -380,6 +389,11 @@ public sealed class Document
             PreserveForm(importer, catalog, pageNodes);
         }
 
+        if (Conformance != PdfAConformance.None)
+        {
+            WriteConformance(writer, catalog);
+        }
+
         writer.Trailer["Root"] = catalogRef;
 
         var info = BuildInfo();
@@ -389,6 +403,67 @@ public sealed class Document
         }
 
         writer.Close();
+    }
+
+    private void ValidateConformance()
+    {
+        if (source is not null && source.IsEncrypted)
+        {
+            throw new InvalidOperationException("PDF/A forbids encryption; the source document is encrypted.");
+        }
+
+        if (Conformance == PdfAConformance.PdfA3A && Structure is null)
+        {
+            throw new InvalidOperationException(
+                "PDF/A-3 Level A requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder or use PdfAConformance.PdfA3B.");
+        }
+
+        foreach (var page in Pages)
+        {
+            if (page.Generated is not { } generated)
+            {
+                continue;
+            }
+
+            foreach (var font in generated.Fonts)
+            {
+                if (font.Sfnt is null)
+                {
+                    throw new InvalidOperationException(
+                        $"PDF/A forbids the standard-14 font '{font.Base14 ?? "Helvetica"}' referenced by name; register an embeddable font file with DocumentBuilder.Fonts instead.");
+                }
+            }
+        }
+    }
+
+    private void WriteConformance(DocumentWriter writer, DictionaryObject catalog)
+    {
+        var xmp = new XmpMetadata
+        {
+            Info = Info,
+            Producer = "Radzen.Documents.Pdf",
+            PdfAPart = 3,
+            PdfAConformance = Conformance == PdfAConformance.PdfA3A ? "A" : "B",
+        };
+
+        catalog["Metadata"] = writer.Add(xmp.BuildStream());
+
+        var intent = OutputIntentBuilder.BuildSrgb("sRGB IEC61966-2.1");
+        if (intent["DestOutputProfile"] is StreamObject profile)
+        {
+            intent["DestOutputProfile"] = writer.Add(profile);
+        }
+
+        writer.Trailer["ID"] = BuildDocumentId();
+        catalog["OutputIntents"] = new ArrayObject { writer.Add(intent) };
+    }
+
+    private ArrayObject BuildDocumentId()
+    {
+        var seed = $"{Info.Title}\n{Info.Author}\n{Pages.Count}\n{DateTime.UtcNow.Ticks}\n{Guid.NewGuid():N}";
+        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(seed));
+        var id = Convert.ToHexString(hash, 0, 16);
+        return [new StringObject(id), new StringObject(id)];
     }
 
     // Serializes the logical structure tree: one indirect StructElem per element

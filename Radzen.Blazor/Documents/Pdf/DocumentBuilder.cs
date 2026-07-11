@@ -20,6 +20,15 @@ public class DocumentBuilder
     public FontCollection Fonts { get; } = new();
 
     /// <summary>
+    /// Gets or sets the PDF/A conformance level of the output. When not
+    /// <see cref="PdfAConformance.None"/> the saved file carries an XMP
+    /// metadata stream with the PDF/A identification, an sRGB output intent
+    /// and a document identifier; every font must be an embedded subset, so
+    /// referencing a standard-14 font by name throws.
+    /// </summary>
+    public PdfAConformance Conformance { get; set; }
+
+    /// <summary>
     /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
     /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
     /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
