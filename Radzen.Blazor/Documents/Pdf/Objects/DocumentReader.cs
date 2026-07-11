@@ -23,6 +23,7 @@ public sealed class DocumentReader
     private readonly Dictionary<int, DocumentObject> cache = [];
     private readonly Dictionary<int, ObjectStream> objectStreams = [];
     private DictionaryObject trailer = new();
+    private readonly HashSet<int> parsing = [];
     private Dictionary<int, long>? scanned;
     private StandardSecurityHandler? security;
     private int encryptObjectNumber = -1;
@@ -130,18 +131,32 @@ public sealed class DocumentReader
             throw new DocumentParseException("Object not found.", -1);
         }
 
-        DocumentObject value;
-        if (entry.Type == 2)
+        // Guards cyclic references (e.g. a stream /Length pointing back at its own
+        // object) that would otherwise recurse without bound.
+        if (!parsing.Add(number))
         {
-            value = GetCompressedObject((int)entry.Field2, (int)entry.Field3);
+            throw new DocumentParseException("Cyclic object reference.", -1);
         }
-        else
+
+        DocumentObject value;
+        try
         {
-            value = GetUncompressedObject(number, entry.Field2, out var generation);
-            if (security is not null && number != encryptObjectNumber)
+            if (entry.Type == 2)
             {
-                value = DecryptObject(value, number, generation);
+                value = GetCompressedObject((int)entry.Field2, (int)entry.Field3);
             }
+            else
+            {
+                value = GetUncompressedObject(number, entry.Field2, out var generation);
+                if (security is not null && number != encryptObjectNumber)
+                {
+                    value = DecryptObject(value, number, generation);
+                }
+            }
+        }
+        finally
+        {
+            parsing.Remove(number);
         }
 
         cache[number] = value;
@@ -257,8 +272,9 @@ public sealed class DocumentReader
     }
 
     // Malformed cross-reference data throws plain BCL exceptions (a /Type /XRef
-    // stream missing /W, mistyped dictionary values, truncated entries); all of
-    // them mean the xref is unusable and the repair scan should run.
+    // stream missing /W, mistyped dictionary values, truncated entries, corrupt
+    // Flate payloads); all of them mean the xref is unusable and the repair scan
+    // should run.
     private static bool IsRecoverableParseFailure(Exception exception)
         => exception is DocumentParseException
             or KeyNotFoundException
@@ -268,7 +284,8 @@ public sealed class DocumentReader
             or IndexOutOfRangeException
             or FormatException
             or InvalidOperationException
-            or EndOfStreamException;
+            or EndOfStreamException
+            or InvalidDataException;
 
     private void LoadFromXref()
     {
@@ -645,7 +662,17 @@ public sealed class DocumentReader
             throw new DocumentParseException("Missing stream length.", -1);
         }
 
-        var resolved = Resolve(lengthObject);
+        DocumentObject resolved;
+        try
+        {
+            resolved = Resolve(lengthObject);
+        }
+        catch (DocumentParseException)
+        {
+            // A cyclic or dangling /Length reference; fall back to the endstream scan.
+            return -1;
+        }
+
         if (resolved is NumberObject number)
         {
             return number.IntValue;
@@ -808,12 +835,18 @@ public sealed class DocumentReader
         }
 
         trailer = new DictionaryObject();
-        foreach (var pair in offsets)
+
+        // Newest catalog wins: scan object numbers in descending order so a stale
+        // catalog left behind by an incremental update never shadows the current one.
+        var numbers = new List<int>(offsets.Keys);
+        numbers.Sort();
+        numbers.Reverse();
+        foreach (var number in numbers)
         {
             DictionaryObject? dictionary = null;
             try
             {
-                var obj = GetObject(pair.Key);
+                var obj = GetObject(number);
                 dictionary = obj as DictionaryObject ?? (obj as StreamObject)?.Dictionary;
             }
             catch (DocumentParseException)
@@ -824,7 +857,7 @@ public sealed class DocumentReader
             if (dictionary is not null && dictionary.TryGetValue("Type", out var type)
                 && type is NameObject name && string.Equals(name.Value, "Catalog", StringComparison.Ordinal))
             {
-                trailer["Root"] = new ReferenceObject(pair.Key, 0);
+                trailer["Root"] = new ReferenceObject(number, 0);
                 break;
             }
         }

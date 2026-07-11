@@ -59,9 +59,15 @@ internal static class CffSubsetter
             privateSizes[fd] = privateBlocks[fd].Length;
         }
 
-        var topDictLen = BuildTopDict(registrySid, orderingSid, font.Supplement, glyphCount, 0, 0, 0, 0).Length;
+        var fdMatrices = new double[]?[fdCount];
+        for (var fd = 0; fd < fdCount; fd++)
+        {
+            fdMatrices[fd] = font.GetFdFontMatrix(fd);
+        }
+
+        var topDictLen = BuildTopDict(registrySid, orderingSid, font.Supplement, font.FontMatrix, glyphCount, 0, 0, 0, 0).Length;
         var topDictIndexLen = CffIndex.Write([new byte[topDictLen]]).Length;
-        var fdArrayIndexLen = CffIndex.Write(BuildFontDicts(privateSizes, new int[fdCount])).Length;
+        var fdArrayIndexLen = CffIndex.Write(BuildFontDicts(privateSizes, new int[fdCount], fdMatrices)).Length;
 
         const int headerLen = 4;
         var pos = headerLen;
@@ -87,9 +93,9 @@ internal static class CffSubsetter
 
         var totalLen = pos;
 
-        var topDict = BuildTopDict(registrySid, orderingSid, font.Supplement, glyphCount, posCharset, posCharStrings, posFdArray, posFdSelect);
+        var topDict = BuildTopDict(registrySid, orderingSid, font.Supplement, font.FontMatrix, glyphCount, posCharset, posCharStrings, posFdArray, posFdSelect);
         var topDictIndex = CffIndex.Write([topDict]);
-        var fdArrayIndex = CffIndex.Write(BuildFontDicts(privateSizes, privateOffsets));
+        var fdArrayIndex = CffIndex.Write(BuildFontDicts(privateSizes, privateOffsets, fdMatrices));
 
         var result = new byte[totalLen];
         var p = 0;
@@ -176,12 +182,13 @@ internal static class CffSubsetter
         return [.. dict];
     }
 
-    private static byte[][] BuildFontDicts(int[] privateSizes, int[] privateOffsets)
+    private static byte[][] BuildFontDicts(int[] privateSizes, int[] privateOffsets, double[]?[] fontMatrices)
     {
         var result = new byte[privateSizes.Length][];
         for (var fd = 0; fd < privateSizes.Length; fd++)
         {
             var dict = new List<byte>();
+            WriteFontMatrix(dict, fontMatrices[fd]);
             CffDict.WriteOffset(dict, privateSizes[fd]);
             CffDict.WriteOffset(dict, privateOffsets[fd]);
             CffDict.WriteOperator(dict, 18);
@@ -191,10 +198,26 @@ internal static class CffSubsetter
         return result;
     }
 
+    private static void WriteFontMatrix(List<byte> dict, double[]? matrix)
+    {
+        if (matrix is null)
+        {
+            return;
+        }
+
+        foreach (var value in matrix)
+        {
+            CffDict.WriteNumber(dict, value);
+        }
+
+        CffDict.WriteOperator(dict, 1207);
+    }
+
     private static byte[] BuildTopDict(
         int registrySid,
         int orderingSid,
         int supplement,
+        double[]? fontMatrix,
         int glyphCount,
         int charsetOffset,
         int charStringsOffset,
@@ -207,6 +230,8 @@ internal static class CffSubsetter
         CffDict.WriteInteger(dict, orderingSid);
         CffDict.WriteInteger(dict, supplement);
         CffDict.WriteOperator(dict, 1230);
+
+        WriteFontMatrix(dict, fontMatrix);
 
         CffDict.WriteInteger(dict, glyphCount);
         CffDict.WriteOperator(dict, 1234);
