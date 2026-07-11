@@ -154,12 +154,16 @@ internal static class Paginator
 
         double cursor = 0;
 
+        // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
+        // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
+        var tableLayouts = new LaidOutTable?[section.Blocks.Count];
+
         // A table starts at the current cursor; its first fragment gets the remaining
         // height and only breaks early when the repeating header plus the first body
-        // row cannot fit. Every later fragment starts a fresh page at full height.
-        void PlaceTable(Table table)
+        // row group cannot fit. Every later fragment starts a fresh page at full height.
+        void PlaceTable(int index, Table table)
         {
-            var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+            var layout = tableLayouts[index] ??= TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
 
             if (HasPageContent() && cursor + TableFirstFragmentHeight(table, layout) > contentHeight + Eps)
             {
@@ -210,7 +214,7 @@ internal static class Paginator
 
             if (block is Table table)
             {
-                PlaceTable(table);
+                PlaceTable(i, table);
                 continue;
             }
 
@@ -270,7 +274,7 @@ internal static class Paginator
                 {
                     placeCount = nrem;
                     if (first && para.KeepWithNext && HasPageContent() &&
-                        NextBlockFirstHeight(blocks, broken, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
+                        NextBlockFirstHeight(blocks, broken, tableLayouts, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
                     {
                         var afterCursor = blockTop + SumHeights(lines, offset, placeCount) + spacingAfter;
                         if (afterCursor + nextSpacingBefore + nextHeight > contentHeight + Eps)
@@ -286,9 +290,15 @@ internal static class Paginator
                 }
                 else if (!first)
                 {
-                    // A continuation line taller than the page still makes progress:
-                    // place it alone on an empty page instead of looping forever.
-                    placeCount = k > 0 || HasPageContent() ? k : 1;
+                    var kept = k;
+                    if (nrem - kept < para.Widows)
+                    {
+                        kept = nrem - para.Widows;
+                    }
+
+                    // A continuation break still makes progress: never stall on an empty page
+                    // (a line taller than the page is placed alone) and never strand < 1 line.
+                    placeCount = kept >= 1 ? kept : (k > 0 || HasPageContent() ? k : 1);
                 }
                 else if (k < para.Orphans)
                 {
@@ -359,27 +369,62 @@ internal static class Paginator
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
-    // The required height of the header rows plus the first body row: the minimum a
-    // table needs on a page before its first fragment breaks early.
+    // The required height of the header rows plus the first body ROW GROUP: the minimum a
+    // table needs on a page before its first fragment breaks early. The first group is the
+    // rowspan closure TablePaginator force-places as one unit, so it must be measured whole
+    // or the flush check would let a tall group spill past the page bottom.
     private static double TableFirstFragmentHeight(Table table, LaidOutTable layout)
     {
         double headerHeight = 0;
-        double firstBodyHeight = 0;
-        var seenBody = false;
+        List<int> bodies = [];
         for (var r = 0; r < table.Rows.Count; r++)
         {
             if (table.Rows[r].IsHeader)
             {
                 headerHeight += layout.RowHeights[r];
             }
-            else if (!seenBody)
+            else
             {
-                firstBodyHeight = layout.RowHeights[r];
-                seenBody = true;
+                bodies.Add(r);
             }
         }
 
-        return headerHeight + firstBodyHeight;
+        if (bodies.Count == 0)
+        {
+            return headerHeight;
+        }
+
+        var reach = new int[table.Rows.Count];
+        for (var i = 0; i < reach.Length; i++)
+        {
+            reach[i] = i;
+        }
+
+        foreach (var cell in layout.Cells)
+        {
+            if (cell.RowSpan <= 1)
+            {
+                continue;
+            }
+
+            var end = cell.Row + cell.RowSpan - 1;
+            for (var r = cell.Row; r <= end && r < reach.Length; r++)
+            {
+                reach[r] = System.Math.Max(reach[r], end);
+            }
+        }
+
+        var last = 0;
+        var groupEnd = reach[bodies[0]];
+        var groupHeight = layout.RowHeights[bodies[0]];
+        while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
+        {
+            last++;
+            groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
+            groupHeight += layout.RowHeights[bodies[last]];
+        }
+
+        return headerHeight + groupHeight;
     }
 
     // The height the NEXT block needs at the top of a page: the first line of a
@@ -387,6 +432,7 @@ internal static class Paginator
     private static bool NextBlockFirstHeight(
         BlockCollection blocks,
         IReadOnlyList<LineBox>?[] broken,
+        LaidOutTable?[] tableLayouts,
         int index,
         double contentWidth,
         FontCollection fonts,
@@ -409,7 +455,7 @@ internal static class Paginator
                 height = lines[0].Height;
                 return true;
             case Table table:
-                var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+                var layout = tableLayouts[next] ??= TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
                 height = TableFirstFragmentHeight(table, layout);
                 return true;
             case Image image:
