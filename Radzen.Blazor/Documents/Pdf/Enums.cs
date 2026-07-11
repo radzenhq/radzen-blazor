@@ -76,6 +76,17 @@ public enum BorderStyle
 }
 
 /// <summary>
+/// The marker style of a <see cref="List"/>.
+/// </summary>
+public enum ListStyle
+{
+    /// <summary>Each item is preceded by a bullet glyph.</summary>
+    Bullet,
+    /// <summary>Each item is preceded by its 1-based ordinal followed by a period.</summary>
+    Number,
+}
+
+/// <summary>
 /// The base direction of inline content.
 /// </summary>
 public enum FlowDirection

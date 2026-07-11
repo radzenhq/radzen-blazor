@@ -27,4 +27,24 @@ public sealed class Image : Block
 
     /// <summary>Gets or sets the rendered height. When <see langword="null"/> the natural height is used.</summary>
     public Unit? Height { get; set; }
+
+    /// <summary>Gets or sets the horizontal alignment of the image within its container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
+    public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
+
+    internal (Unit Width, Unit Height)? FitBox { get; private set; }
+
+    /// <summary>
+    /// Scales the image to fit within a <paramref name="maxWidth"/> x <paramref name="maxHeight"/> box
+    /// while preserving aspect ratio, picking the smaller of the two scale factors so the image fits
+    /// both bounds. The base aspect is taken from any explicit <see cref="Width"/>/<see cref="Height"/>,
+    /// otherwise from the image's natural size.
+    /// </summary>
+    /// <param name="maxWidth">The maximum width of the fit box.</param>
+    /// <param name="maxHeight">The maximum height of the fit box.</param>
+    /// <returns>The same <see cref="Image"/> instance.</returns>
+    public Image FitInBox(Unit maxWidth, Unit maxHeight)
+    {
+        FitBox = (maxWidth, maxHeight);
+        return this;
+    }
 }

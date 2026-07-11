@@ -31,6 +31,9 @@ internal readonly struct PositionedImage
     public required double Width { get; init; }
 
     public required double Height { get; init; }
+
+    /// <summary>Horizontal offset of the image from the container left edge (alignment).</summary>
+    public double XOffset { get; init; }
 }
 
 internal sealed class PaginatedPage
@@ -154,9 +157,13 @@ internal static class Paginator
 
         double cursor = 0;
 
+        // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
+        // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
+        var blocks = ExpandBlocks(section.Blocks);
+
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
-        var tableLayouts = new LaidOutTable?[section.Blocks.Count];
+        var tableLayouts = new LaidOutTable?[blocks.Count];
 
         // A table starts at the current cursor; its first fragment gets the remaining
         // height and only breaks early when the repeating header plus the first body
@@ -190,7 +197,6 @@ internal static class Paginator
             }
         }
 
-        var blocks = section.Blocks;
         var broken = new IReadOnlyList<LineBox>?[blocks.Count];
         for (var i = 0; i < blocks.Count; i++)
         {
@@ -233,6 +239,7 @@ internal static class Paginator
                     Y = cursor,
                     Width = imageWidth,
                     Height = imageHeight,
+                    XOffset = AlignImage(image.Alignment, contentWidth, imageWidth),
                 });
                 cursor += imageHeight;
                 continue;
@@ -369,6 +376,86 @@ internal static class Paginator
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
+    private static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks)
+    {
+        var hasList = false;
+        foreach (var block in blocks)
+        {
+            if (block is List)
+            {
+                hasList = true;
+                break;
+            }
+        }
+
+        if (!hasList)
+        {
+            return blocks;
+        }
+
+        var expanded = new List<Block>(blocks.Count);
+        foreach (var block in blocks)
+        {
+            if (block is List list)
+            {
+                for (var i = 0; i < list.Items.Count; i++)
+                {
+                    expanded.Add(ExpandItem(list, i));
+                }
+            }
+            else
+            {
+                expanded.Add(block);
+            }
+        }
+
+        return expanded;
+    }
+
+    private static Paragraph ExpandItem(List list, int index)
+    {
+        var item = list.Items[index];
+
+        var itemFont = new Font();
+        itemFont.InheritFrom(item.Font);
+        itemFont.InheritFrom(list.Font);
+
+        var paragraph = new Paragraph
+        {
+            LeftIndent = Unit.FromPoint(list.LeftIndent.Point + list.HangingIndent.Point),
+            MarkerIndent = list.LeftIndent,
+            MarkerText = Marker(list, index),
+            EffectiveFont = itemFont,
+        };
+
+        foreach (var run in item.Inlines)
+        {
+            var effective = new Font();
+            effective.InheritFrom(run.Font);
+            effective.InheritFrom(item.Font);
+            effective.InheritFrom(list.Font);
+            run.EffectiveFont = effective;
+            paragraph.Inlines.Add(run);
+        }
+
+        return paragraph;
+    }
+
+    private const string BulletGlyph = "\u2022";
+
+    private static string Marker(List list, int index)
+        => list.Style == ListStyle.Number
+            ? (index + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) + "."
+            : BulletGlyph;
+
+    private static double AlignImage(HorizontalAlignment alignment, double containerWidth, double imageWidth)
+        => alignment switch
+        {
+            HorizontalAlignment.Center => (containerWidth - imageWidth) / 2.0,
+            HorizontalAlignment.Right or HorizontalAlignment.End => containerWidth - imageWidth,
+            _ => 0,
+        };
+
     // The required height of the header rows plus the first body ROW GROUP: the minimum a
     // table needs on a page before its first fragment breaks early. The first group is the
     // rowspan closure TablePaginator force-places as one unit, so it must be measured whole
@@ -430,7 +517,7 @@ internal static class Paginator
     // The height the NEXT block needs at the top of a page: the first line of a
     // paragraph, the header rows plus first body row of a table, or a whole image.
     private static bool NextBlockFirstHeight(
-        BlockCollection blocks,
+        IReadOnlyList<Block> blocks,
         IReadOnlyList<LineBox>?[] broken,
         LaidOutTable?[] tableLayouts,
         int index,
@@ -526,6 +613,7 @@ internal static class Paginator
                     Y = cursor,
                     Width = imageWidth,
                     Height = imageHeight,
+                    XOffset = AlignImage(image.Alignment, width, imageWidth),
                 });
                 cursor += imageHeight;
                 continue;

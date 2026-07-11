@@ -78,7 +78,8 @@ internal static class LineBreaker
             {
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
-                boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment));
+                var includeMarker = boxes.Count == 0;
+                boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker));
             }
         }
 
@@ -131,6 +132,32 @@ internal static class LineBreaker
 
         foreach (var run in paragraph.Inlines)
         {
+            if (run is InlineImage inlineImage)
+            {
+                if (hasCurrent)
+                {
+                    words.Add(current);
+                    hasCurrent = false;
+                }
+
+                var advance = inlineImage.EffectiveSize().Width;
+                words.Add(new Word
+                {
+                    PieceStart = pieces.Count,
+                    PieceCount = 1,
+                    Width = advance,
+                });
+                pieces.Add(new Piece
+                {
+                    Run = inlineImage,
+                    Start = 0,
+                    Length = 0,
+                    Text = string.Empty,
+                    Advance = advance,
+                });
+                continue;
+            }
+
             var text = run.Text;
             var i = 0;
             while (i < text.Length)
@@ -263,7 +290,8 @@ internal static class LineBreaker
         Paragraph paragraph,
         FontCollection fonts,
         bool isLast,
-        HorizontalAlignment? inheritedAlignment)
+        HorizontalAlignment? inheritedAlignment,
+        bool includeMarker)
     {
         var count = 0;
         for (var w = first; w <= last; w++)
@@ -398,6 +426,20 @@ internal static class LineBreaker
             {
                 span[f].XOffset += shift;
             }
+        }
+
+        if (includeMarker && paragraph.MarkerText is { Length: > 0 } markerText)
+        {
+            var markerFont = paragraph.EffectiveFont ?? paragraph.Font;
+            fragments.Insert(0, new LineFragment
+            {
+                Run = new Run(markerText) { EffectiveFont = markerFont },
+                Text = markerText,
+                Start = 0,
+                Length = markerText.Length,
+                XOffset = paragraph.MarkerIndent.Point,
+                Advance = fonts.MeasureText(markerText, markerFont),
+            });
         }
 
         var box = new LineBox { Fragments = fragments, Width = naturalWidth };
@@ -563,7 +605,10 @@ internal static class LineBreaker
         var fragments = box.Fragments;
         for (var i = 0; i < fragments.Count; i++)
         {
-            var (h, asc) = FontExtent(fragments[i].Run.ResolvedFont, fonts);
+            // An inline image sits on the baseline: its full height is both extent and ascent.
+            var (h, asc) = fragments[i].Run is InlineImage image
+                ? (image.EffectiveSize().Height, image.EffectiveSize().Height)
+                : FontExtent(fragments[i].Run.ResolvedFont, fonts);
             natural = System.Math.Max(natural, h);
             baseline = System.Math.Max(baseline, asc);
         }

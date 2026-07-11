@@ -57,6 +57,11 @@ public class Paragraph : Block
 
     internal Font? EffectiveFont { get; set; }
 
+    // A list-item marker drawn on the first line at MarkerIndent, outside the (hanging) LeftIndent.
+    internal string? MarkerText { get; set; }
+
+    internal Unit MarkerIndent { get; set; }
+
     /// <summary>Gets or sets the left indent applied to every line of the paragraph.</summary>
     public Unit LeftIndent { get; set; }
 

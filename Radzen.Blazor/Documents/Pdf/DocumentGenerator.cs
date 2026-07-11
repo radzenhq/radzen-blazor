@@ -125,7 +125,7 @@ internal sealed class DocumentGenerator
     private readonly List<GeneratedFont> allFonts = [];
     private readonly Dictionary<string, GeneratedFont> base14Fonts = new(System.StringComparer.Ordinal);
     private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
-    private readonly Dictionary<Image, GeneratedImage> images = [];
+    private readonly Dictionary<object, GeneratedImage> images = [];
     private readonly Dictionary<object, StructureElement> blockElements = [];
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
     private StructureElement documentElement = null!;
@@ -495,7 +495,7 @@ internal sealed class DocumentGenerator
         var xobject = Decode(positioned.Source);
         plan.Images.Add(new ImageDraw
         {
-            X = left,
+            X = left + positioned.XOffset,
             Y = top - positioned.Y - positioned.Height,
             Width = positioned.Width,
             Height = positioned.Height,
@@ -790,6 +790,12 @@ internal sealed class DocumentGenerator
         for (var fi = 0; fi < lineFragments.Count; fi++)
         {
             var fragment = lineFragments[fi];
+            if (fragment.Run is InlineImage inlineImage)
+            {
+                EmitInlineImage(plan, inlineImage, originX + fragment.XOffset, y, element);
+                continue;
+            }
+
             var text = fragment.Text;
             if (text.Length == 0)
             {
@@ -1139,20 +1145,40 @@ internal sealed class DocumentGenerator
         return [.. bytes];
     }
 
-    private GeneratedImage Decode(Image image)
+    private GeneratedImage Decode(Image image) => DecodeBytes(image, image.Data);
+
+    private GeneratedImage DecodeBytes(object key, byte[] data)
     {
-        if (!images.TryGetValue(image, out var generated))
+        if (!images.TryGetValue(key, out var generated))
         {
-            var xobject = ImageDecoder.Decode(image.Data);
+            var xobject = ImageDecoder.Decode(data);
             generated = new GeneratedImage
             {
                 Key = "Im" + images.Count.ToString(CultureInfo.InvariantCulture),
                 Image = xobject,
             };
-            images[image] = generated;
+            images[key] = generated;
         }
 
         return generated;
+    }
+
+    // Draws an inline image sitting on the line baseline: its bottom edge is at the baseline y,
+    // so it advances the line by its width and shares the line height computed by the breaker.
+    private void EmitInlineImage(PagePlan plan, InlineImage image, double x, double baseline, StructureElement? element)
+    {
+        var (width, height) = image.EffectiveSize();
+        var generated = DecodeBytes(image, image.Data);
+        plan.Images.Add(new ImageDraw
+        {
+            X = x,
+            Y = baseline,
+            Width = width,
+            Height = height,
+            Image = generated,
+            Element = element,
+        });
+        plan.UsedImages.Add(generated);
     }
 
     // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
