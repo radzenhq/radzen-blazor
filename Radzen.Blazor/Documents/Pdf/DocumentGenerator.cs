@@ -282,10 +282,13 @@ internal sealed class DocumentGenerator
     }
 
     // Consecutive runs of the same style merge into one fragment so the resolved
-    // line is drawn as one text run with its inter-word spaces intact.
+    // line is drawn as one text run with its inter-word spaces intact. Tabs split
+    // fragments and advance to the default left tab stops; when the paragraph opts
+    // into RightTabStop the text after the last tab is pushed flush right.
     private LineBox ResolveFields(Paragraph paragraph, LineBox template, double width, int pageNumber, int pageCount)
     {
-        var pieces = new List<(Run Run, System.Text.StringBuilder Text)>();
+        var pieces = new List<(Run Run, System.Text.StringBuilder Text, int TabsBefore)>();
+        var pendingTabs = 0;
         foreach (var run in paragraph.Inlines)
         {
             var text = run switch
@@ -295,25 +298,50 @@ internal sealed class DocumentGenerator
                 _ => run.Text,
             };
 
-            if (text.Length == 0)
+            var parts = text.Split('\t');
+            for (var pi = 0; pi < parts.Length; pi++)
             {
-                continue;
-            }
+                if (pi > 0)
+                {
+                    pendingTabs++;
+                }
 
-            if (pieces.Count > 0 && SameStyle(pieces[^1].Run, run))
-            {
-                pieces[^1].Text.Append(text);
+                var part = parts[pi];
+                if (part.Length == 0)
+                {
+                    continue;
+                }
+
+                if (pendingTabs == 0 && pieces.Count > 0 && SameStyle(pieces[^1].Run, run))
+                {
+                    pieces[^1].Text.Append(part);
+                }
+                else
+                {
+                    pieces.Add((run, new System.Text.StringBuilder(part), pendingTabs));
+                    pendingTabs = 0;
+                }
             }
-            else
+        }
+
+        var lastTab = -1;
+        for (var i = 0; i < pieces.Count; i++)
+        {
+            if (pieces[i].TabsBefore > 0)
             {
-                pieces.Add((run, new System.Text.StringBuilder(text)));
+                lastTab = i;
             }
         }
 
         var fragments = new List<LineFragment>();
         double advance = 0;
-        foreach (var (run, builderText) in pieces)
+        foreach (var (run, builderText, tabsBefore) in pieces)
         {
+            for (var t = 0; t < tabsBefore; t++)
+            {
+                advance = LineBreaker.AdvanceToTabStop(advance);
+            }
+
             var text = builderText.ToString();
             var measured = fonts.MeasureText(text, run.ResolvedFont);
             fragments.Add(new LineFragment
@@ -330,6 +358,18 @@ internal sealed class DocumentGenerator
 
         var indent = paragraph.LeftIndent.Point;
         var max = width - indent;
+
+        if (paragraph.RightTabStop && lastTab >= 0 && advance < max)
+        {
+            var delta = max - advance;
+            var trailing = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
+            for (var f = lastTab; f < trailing.Length; f++)
+            {
+                trailing[f].XOffset += delta;
+            }
+
+            advance = max;
+        }
         var x0 = paragraph.EffectiveAlignment switch
         {
             HorizontalAlignment.Right or HorizontalAlignment.End => max - advance,
@@ -532,10 +572,79 @@ internal sealed class DocumentGenerator
         });
     }
 
+    // Consecutive fragments of the same run whose positional gap equals the source
+    // whitespace between them collapse into one fragment with the spaces intact, so
+    // a plain line is drawn as one text run. Tabs and justified gaps never match the
+    // measured space width and keep their fragments separate.
+    private List<LineFragment> CoalesceFragments(IReadOnlyList<LineFragment> fragments)
+    {
+        var result = new List<LineFragment>(fragments.Count);
+        var i = 0;
+        while (i < fragments.Count)
+        {
+            var current = fragments[i];
+            var run = current.Run;
+            var text = run.Text;
+            var end = current.Start + current.Length;
+            var right = current.XOffset + current.Advance;
+            var j = i + 1;
+            while (j < fragments.Count && current.Length > 0)
+            {
+                var next = fragments[j];
+                if (next.Run != run || next.Length == 0 || next.Start < end || next.Start > text.Length)
+                {
+                    break;
+                }
+
+                var gap = text[end..next.Start];
+                var allSpaces = true;
+                foreach (var c in gap)
+                {
+                    if (c != ' ')
+                    {
+                        allSpaces = false;
+                        break;
+                    }
+                }
+
+                var gapWidth = gap.Length == 0 ? 0 : fonts.MeasureText(gap, run.ResolvedFont);
+                if (!allSpaces || System.Math.Abs(next.XOffset - right - gapWidth) > 0.001)
+                {
+                    break;
+                }
+
+                end = next.Start + next.Length;
+                right = next.XOffset + next.Advance;
+                j++;
+            }
+
+            if (j > i + 1)
+            {
+                result.Add(new LineFragment
+                {
+                    Run = run,
+                    Text = text[current.Start..end],
+                    Start = current.Start,
+                    Length = end - current.Start,
+                    XOffset = current.XOffset,
+                    Advance = right - current.XOffset,
+                });
+            }
+            else
+            {
+                result.Add(current);
+            }
+
+            i = j;
+        }
+
+        return result;
+    }
+
     private void EmitLine(PagePlan plan, LineBox line, double originX, double baseline)
     {
         var y = baseline - line.Baseline;
-        var lineFragments = line.Fragments;
+        var lineFragments = CoalesceFragments(line.Fragments);
         for (var fi = 0; fi < lineFragments.Count; fi++)
         {
             var fragment = lineFragments[fi];

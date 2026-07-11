@@ -53,6 +53,9 @@ internal static class LineBreaker
 
     private const double TabStop = 36.0;
 
+    internal static double AdvanceToTabStop(double position)
+        => (System.Math.Floor((position + 1e-6) / TabStop) + 1) * TabStop;
+
     public static IReadOnlyList<LineBox> Break(
         Paragraph paragraph,
         double maxWidthPoints,
@@ -104,7 +107,7 @@ internal static class LineBreaker
         var p = position + word.GapAfter;
         for (var t = 0; t < word.TabsAfter; t++)
         {
-            p = (System.Math.Floor((p + 1e-6) / TabStop) + 1) * TabStop;
+            p = AdvanceToTabStop(p);
         }
 
         return p;
@@ -315,6 +318,36 @@ internal static class LineBreaker
         }
 
         var naturalWidth = cursor;
+
+        if (paragraph.RightTabStop)
+        {
+            var lastTab = -1;
+            for (var w = first; w < last; w++)
+            {
+                if (words[w].TabsAfter > 0)
+                {
+                    lastTab = w;
+                }
+            }
+
+            var delta = max - naturalWidth;
+            if (lastTab >= 0 && delta > 0)
+            {
+                var skip = 0;
+                for (var w = first; w <= lastTab; w++)
+                {
+                    skip += words[w].PieceCount;
+                }
+
+                for (var f = skip; f < span.Length; f++)
+                {
+                    span[f].XOffset += delta;
+                }
+
+                naturalWidth = max;
+            }
+        }
+
         var wordCount = last - first + 1;
         var gapCount = wordCount - 1;
 
