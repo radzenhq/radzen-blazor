@@ -483,29 +483,41 @@ internal static class Paginator
     {
         var item = list.Items[index];
 
-        var itemFont = new Font();
-        itemFont.InheritFrom(item.Font);
-        itemFont.InheritFrom(list.Font);
-
+        // StyleResolver resolves the marker and run fonts through the full cascade (including the
+        // surrounding cell/row/table context and the Normal default); fall back to the item/list
+        // fonts only when the resolver has not run.
         var paragraph = new Paragraph
         {
             LeftIndent = Unit.FromPoint(list.LeftIndent.Point + list.HangingIndent.Point),
             MarkerIndent = list.LeftIndent,
             MarkerText = Marker(list, index),
-            EffectiveFont = itemFont,
+            EffectiveFont = StyleResolver.ItemFont(item) ?? ItemFont(item, list),
         };
 
         foreach (var run in item.Inlines)
         {
-            var effective = new Font();
-            effective.InheritFrom(run.Font);
-            effective.InheritFrom(item.Font);
-            effective.InheritFrom(list.Font);
-            run.EffectiveFont = effective;
+            run.EffectiveFont ??= RunFont(run, item, list);
             paragraph.Inlines.Add(run);
         }
 
         return paragraph;
+    }
+
+    private static Font ItemFont(ListItem item, List list)
+    {
+        var font = new Font();
+        font.InheritFrom(item.Font);
+        font.InheritFrom(list.Font);
+        return font;
+    }
+
+    private static Font RunFont(Run run, ListItem item, List list)
+    {
+        var font = new Font();
+        font.InheritFrom(run.Font);
+        font.InheritFrom(item.Font);
+        font.InheritFrom(list.Font);
+        return font;
     }
 
     private const string BulletGlyph = "\u2022";
