@@ -21,8 +21,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 //
 // Coverage (fontTools 4.60.2): U+4E2D '中' and U+4EA7 '产' are ABSENT from Liberation
 // Sans and present in Noto (gid 395 / 396, upem 1000, CFF/CIDFontType0C). Liberation
-// embeds as glyf/CIDFontType2 (no FontFile3), so a CID-keyed FontFile3 whose charset
-// carries those gids can only be the Noto fallback subset.
+// embeds as glyf/CIDFontType2 (no FontFile3), so a CID-keyed FontFile3 whose ToUnicode
+// recovers those characters can only be the Noto fallback subset. The CFF subset is
+// COMPACT: used + notdef glyphs renumbered 0..N-1 with an identity charset, and the
+// content stream emits the compact ids.
 public class FallbackEmbeddingTests
 {
     private const string Latin = "Liberation Sans";
@@ -68,32 +70,47 @@ public class FallbackEmbeddingTests
     }
 
     [Fact]
-    public void FallbackFace_IsEmbeddedAsCidKeyedCffSubsetWithCjkGlyphs()
+    public void FallbackFace_IsEmbeddedAsCompactCidKeyedCffSubset()
     {
         var reader = BuildTestSupport.Read(Author());
         var noto = Noto();
         var gids = NotoCjkGids();
 
         CffFont? fallback = null;
+        Dictionary<int, string>? toUnicode = null;
         foreach (var font in BuildTestSupport.Type0Fonts(reader))
         {
             var cff = CidKeyedCff(reader, font);
-            if (cff is not null && ContainsCids(cff, gids))
+            if (cff is null)
+            {
+                continue;
+            }
+
+            var cmap = ToUnicode(reader, font);
+            if (cmap is not null && cmap.ContainsValue("中") && cmap.ContainsValue("产"))
             {
                 fallback = cff;
+                toUnicode = cmap;
                 break;
             }
         }
 
         Assert.True(
             fallback is not null,
-            "fallback Noto face is not embedded: no CID-keyed FontFile3 carries the CJK glyphs");
+            "fallback Noto face is not embedded: no CID-keyed FontFile3 recovers the CJK text");
 
-        var localOfCid = LocalOfCid(fallback!);
-        foreach (var gid in gids)
+        // Compact subset: notdef + the two CJK glyphs, identity charset (CID == new gid).
+        Assert.Equal(Chinese.Length + 1, fallback!.GlyphCount);
+        for (var gid = 0; gid < fallback.GlyphCount; gid++)
         {
-            Assert.True(localOfCid.ContainsKey(gid), $"embedded fallback CFF missing CID {gid}");
-            Assert.Equal(noto.GetAdvanceWidth((ushort)gid), fallback!.GetAdvanceWidth(localOfCid[gid]));
+            Assert.Equal(gid, fallback.Charset[gid]);
+        }
+
+        for (var i = 0; i < Chinese.Length; i++)
+        {
+            var cid = Type0EmbedSupport.NewGid(toUnicode!, Chinese[i]);
+            Assert.InRange(cid, 0, fallback.GlyphCount - 1);
+            Assert.Equal(noto.GetAdvanceWidth((ushort)gids[i]), fallback.GetAdvanceWidth(cid));
         }
     }
 
@@ -101,7 +118,6 @@ public class FallbackEmbeddingTests
     public void FallbackCjk_EmittedUnderFallbackFontResource_NotPrimaryNotdef()
     {
         var reader = BuildTestSupport.Read(Author());
-        var gids = NotoCjkGids();
 
         var leaves = BuildTestSupport.PageLeaves(reader);
         Assert.Single(leaves);
@@ -111,13 +127,18 @@ public class FallbackEmbeddingTests
         Assert.NotEmpty(fontResources);
 
         string? fallbackKey = null;
+        CffFont? fallback = null;
+        Dictionary<int, string>? toUnicode = null;
         var primaryKeys = new List<string>();
         foreach (var (key, fontDict) in fontResources)
         {
             var cff = CidKeyedCff(reader, fontDict);
-            if (cff is not null && ContainsCids(cff, gids))
+            var cmap = cff is null ? null : ToUnicode(reader, fontDict);
+            if (cmap is not null && cmap.ContainsValue("中") && cmap.ContainsValue("产"))
             {
                 fallbackKey = key;
+                fallback = cff;
+                toUnicode = cmap;
             }
             else
             {
@@ -133,9 +154,17 @@ public class FallbackEmbeddingTests
 
         Assert.True(codesByFont.TryGetValue(fallbackKey!, out var fallbackCodes),
             "fallback font resource is never selected in the content stream");
-        foreach (var gid in gids)
+
+        // The fallback run must draw the compact ids of the CJK glyphs, and every
+        // emitted code must lie inside the compact subset.
+        foreach (var ch in Chinese)
         {
-            Assert.Contains(gid, fallbackCodes!);
+            Assert.Contains(Type0EmbedSupport.NewGid(toUnicode!, ch), fallbackCodes!);
+        }
+
+        foreach (var code in fallbackCodes!)
+        {
+            Assert.InRange(code, 0, fallback!.GlyphCount - 1);
         }
 
         // The CJK code points must not be dumped as the primary face's .notdef (gid 0).
@@ -173,29 +202,15 @@ public class FallbackEmbeddingTests
         return cff.IsCidKeyed ? cff : null;
     }
 
-    private static bool ContainsCids(CffFont cff, IReadOnlyList<int> cids)
+    private static Dictionary<int, string>? ToUnicode(DocumentReader reader, DictionaryObject fontDict)
     {
-        var charset = new HashSet<int>(cff.Charset);
-        foreach (var cid in cids)
+        if (!fontDict.TryGetValue("ToUnicode", out var toUnicodeObject)
+            || reader.Resolve(toUnicodeObject!) is not StreamObject stream)
         {
-            if (!charset.Contains(cid))
-            {
-                return false;
-            }
+            return null;
         }
 
-        return true;
-    }
-
-    private static Dictionary<int, int> LocalOfCid(CffFont cff)
-    {
-        var map = new Dictionary<int, int>();
-        for (var local = 0; local < cff.GlyphCount; local++)
-        {
-            map[cff.Charset[local]] = local;
-        }
-
-        return map;
+        return Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(reader, stream));
     }
 
     private static Dictionary<string, DictionaryObject> FontResources(DocumentReader reader, DictionaryObject? resources)

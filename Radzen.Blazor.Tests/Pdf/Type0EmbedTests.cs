@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf.Fonts.Cff;
@@ -22,6 +21,8 @@ namespace Radzen.Blazor.Pdf.Tests;
 //   recovered through ToUnicode rather than pinned.
 // CFF  fixture: NotoSansSC-Subset.otf (ROS Adobe-Identity-0), upem 1000,
 //   sample "Ab Мир 中产". '中' gid 395 adv 1000 ; 'М' gid 202 adv 812.
+//   The CFF subsetter also renumbers into a compact CID space (identity charset),
+//   so compact CIDs are recovered through ToUnicode rather than pinned.
 public class Type0EmbedTests
 {
     private const string LiberationSample = "Radzen Привет";
@@ -169,19 +170,32 @@ public class Type0EmbedTests
         var map = Type0EmbedSupport.BuildMap(font, NotoSample);
         var e = Type0EmbedSupport.Embed(font, map);
 
+        var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile3"]);
+        var cff = CffFont.Parse(Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
+
+        var stream = Type0EmbedSupport.Stream(e.Reader, e.Top["ToUnicode"]);
+        var toUnicode = Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(e.Reader, stream));
+
+        // W entries are keyed by the COMPACT CID and carry the original advance.
         var widths = Type0EmbedSupport.ParseWidths(e.Reader, (ArrayObject)e.Reader.Resolve(e.Descendant["W"]));
-        foreach (var gid in map.Keys)
+        foreach (var cid in widths.Keys)
         {
-            Assert.True(widths.ContainsKey(gid), $"W missing CID {gid}");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[gid]);
+            Assert.InRange(cid, 0, cff.GlyphCount - 1);
         }
 
-        Assert.Equal(1000, widths[395]);
-        Assert.Equal(812, widths[202]);
+        foreach (var (gid, cp) in map)
+        {
+            var newCid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
+            Assert.True(widths.ContainsKey(newCid), $"W missing compact CID {newCid}");
+            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[newCid]);
+        }
+
+        Assert.Equal(1000, widths[Type0EmbedSupport.NewGid(toUnicode, '中')]); // orig gid 395
+        Assert.Equal(812, widths[Type0EmbedSupport.NewGid(toUnicode, 'М')]); // orig gid 202
     }
 
     [Fact]
-    public void Noto_FontFile3IsCidKeyedSubsetPreservingAdvances()
+    public void Noto_FontFile3IsCidKeyedCompactSubsetPreservingAdvances()
     {
         var font = Type0EmbedSupport.LoadNoto();
         var map = Type0EmbedSupport.BuildMap(font, NotoSample);
@@ -192,18 +206,21 @@ public class Type0EmbedTests
 
         Assert.True(cff.IsCidKeyed);
 
-        // The CFF subset renumbers glyphs; charset preserves CID == original gid.
-        var localOfCid = new Dictionary<int, int>();
-        for (var local = 0; local < cff.GlyphCount; local++)
+        // Compact renumbering: used + notdef glyphs, identity charset (CID == new gid).
+        Assert.Equal(map.Count + 1, cff.GlyphCount);
+        for (var gid = 0; gid < cff.GlyphCount; gid++)
         {
-            localOfCid[cff.Charset[local]] = local;
+            Assert.Equal(gid, cff.Charset[gid]);
         }
 
-        foreach (var gid in map.Keys)
+        var stream = Type0EmbedSupport.Stream(e.Reader, e.Top["ToUnicode"]);
+        var toUnicode = Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(e.Reader, stream));
+
+        foreach (var (gid, cp) in map)
         {
-            Assert.True(localOfCid.ContainsKey(gid), $"subset CFF missing CID {gid}");
-            var local = localOfCid[gid];
-            Assert.Equal(font.GetAdvanceWidth((ushort)gid), cff.GetAdvanceWidth(local));
+            var newCid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
+            Assert.InRange(newCid, 0, cff.GlyphCount - 1);
+            Assert.Equal(font.GetAdvanceWidth((ushort)gid), cff.GetAdvanceWidth(newCid));
         }
     }
 }

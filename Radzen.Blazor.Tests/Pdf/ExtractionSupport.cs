@@ -79,21 +79,6 @@ internal static class ExtractionSupport
         return Encoding.ASCII.GetBytes(sb.ToString());
     }
 
-    // Encodes a string as Identity-H CID bytes: two big-endian bytes per glyph id,
-    // where under Identity-H the CID equals the sfnt glyph id.
-    public static byte[] IdentityCodes(Radzen.Documents.Pdf.Fonts.Sfnt.SfntFont font, string text)
-    {
-        var bytes = new byte[text.Length * 2];
-        for (var i = 0; i < text.Length; i++)
-        {
-            var gid = font.GetGlyphId(text[i]);
-            bytes[i * 2] = (byte)(gid >> 8);
-            bytes[(i * 2) + 1] = (byte)(gid & 0xFF);
-        }
-
-        return bytes;
-    }
-
     public static string Hex(byte[] bytes)
     {
         var sb = new StringBuilder(bytes.Length * 2);

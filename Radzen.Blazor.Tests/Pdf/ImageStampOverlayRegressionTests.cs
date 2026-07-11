@@ -186,7 +186,7 @@ public class ImageStampOverlayRegressionTests
     {
         var sfnt = Type0EmbedSupport.LoadLiberation();
         var map = Type0EmbedSupport.BuildMap(sfnt, "Hello");
-        var codes = ExtractionSupport.IdentityCodes(sfnt, "Hello");
+        var codes = Type0EmbedSupport.CompactCodes(sfnt, map, "Hello");
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
 
         var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, sfnt, map), content);

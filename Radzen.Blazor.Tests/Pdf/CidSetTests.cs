@@ -1,8 +1,7 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Linq;
+using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -10,42 +9,33 @@ namespace Radzen.Blazor.Pdf.Tests;
 // Contract for the /CIDSet stream inside the FontDescriptor: a bitmap whose set
 // bits mark the CIDs present in the subset.
 //
-// The CID-keyed CFF subsetter closes over exactly (requested gids) + {0} with no
-// component expansion and keeps CID == original gid, so the Noto case pins an
-// exact bit set. The TrueType glyf subsetter renumbers into a COMPACT contiguous
-// glyph space 0..N-1 (used + composite closure + notdef), so the Liberation case
-// pins CIDSet == exactly {0..N-1} where N is the embedded subset's numGlyphs.
+// Both subsetters renumber into a COMPACT contiguous space 0..N-1 whose members
+// are all present in the embedded font program (every glyf gid owns a loca entry;
+// every CFF gid owns a charstring), so both cases pin CIDSet == exactly {0..N-1}
+// where N is the embedded subset's glyph count (veraPDF 6.2.11.4.2).
 public class CidSetTests
 {
     private const string LiberationSample = "Radzen Привет";
     private const string NotoSample = "Ab Мир 中产";
 
     [Fact]
-    public void Noto_CidSetMarksExactlyUsedGlyphs()
+    public void Noto_CidSetMarksExactlyTheCompactCidSpace()
     {
         var font = Type0EmbedSupport.LoadNoto();
         var map = Type0EmbedSupport.BuildMap(font, NotoSample);
         var e = Type0EmbedSupport.Embed(font, map);
 
+        var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile3"]);
+        var subset = CffFont.Parse(Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
+
+        // CFF closure is used + notdef (no composite expansion), renumbered 0..N-1.
+        var n = subset.GlyphCount;
+        Assert.Equal(map.Count + 1, n);
+
         var stream = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["CIDSet"]);
         var bits = Type0EmbedSupport.SetBits(Type0EmbedSupport.DecodeStream(e.Reader, stream));
 
-        foreach (var gid in map.Keys)
-        {
-            Assert.Contains(gid, bits);
-        }
-
-        // The subset closure is the used gids plus notdef; notdef is optional.
-        var allowed = new HashSet<int> { 0 };
-        foreach (var gid in map.Keys)
-        {
-            allowed.Add(gid);
-        }
-
-        Assert.Subset(allowed, bits);
-
-        // A glyph well outside the sample must not be marked.
-        Assert.DoesNotContain(500, bits);
+        Assert.Equal(Enumerable.Range(0, n).ToHashSet(), bits);
     }
 
     [Fact]
