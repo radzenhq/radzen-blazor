@@ -240,7 +240,12 @@ internal sealed class DocumentGenerator
 
         foreach (var positioned in page.Tables)
         {
+            var mark = plan.Mark();
             tableEmitter.EmitFragment(context, positioned, left, contentTop);
+            if (positioned.Transform is { } transform)
+            {
+                plan.ApplyTransform(transform, mark);
+            }
         }
 
         foreach (var positioned in page.Images)
