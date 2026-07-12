@@ -1,14 +1,14 @@
 using System;
+using Radzen.Documents.Pdf.Objects;
 
-namespace Radzen.Documents.Pdf.Objects.Encryption;
+namespace Radzen.Documents.Crypto;
 
 /// <summary>
 /// Hand-rolled AES in CBC mode (FIPS-197). Supports 128- and 256-bit keys.
-/// Decryption drives PDF content recovery (AESV2/AESV3); a forward cipher is
-/// also provided because the ISO 32000-2 revision 6 hash (algorithm 2.B) uses
-/// AES-128-CBC encryption internally.
+/// Both a forward and an inverse cipher are provided; the implementation is
+/// pure-managed so it runs under Blazor WebAssembly.
 /// </summary>
-internal static class AesCbc
+public static class AesCbc
 {
     private static readonly byte[] SBox =
     [
@@ -38,6 +38,9 @@ internal static class AesCbc
     /// Decrypts <paramref name="data"/> laid out as a 16-byte IV followed by the
     /// ciphertext, returning the plaintext with its PKCS#7 padding removed.
     /// </summary>
+    /// <param name="key">The AES key (16 or 32 bytes).</param>
+    /// <param name="data">The IV (16 bytes) followed by the ciphertext.</param>
+    /// <returns>The decrypted plaintext with padding stripped.</returns>
     public static byte[] Decrypt(byte[] key, byte[] data)
     {
         ArgumentNullException.ThrowIfNull(key);
@@ -53,8 +56,18 @@ internal static class AesCbc
         return StripPadding(plain);
     }
 
+    /// <summary>
+    /// Decrypts <paramref name="cipher"/> in CBC mode without removing any padding.
+    /// </summary>
+    /// <param name="key">The AES key (16, 24, or 32 bytes).</param>
+    /// <param name="iv">The 16-byte initialization vector.</param>
+    /// <param name="cipher">The ciphertext (whole 16-byte blocks).</param>
+    /// <returns>The decrypted bytes.</returns>
     public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] cipher)
     {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(iv);
+        ArgumentNullException.ThrowIfNull(cipher);
         var roundKeys = ExpandKey(key, out var rounds);
         var whole = cipher.Length / 16 * 16;
         var result = new byte[whole];
@@ -75,8 +88,18 @@ internal static class AesCbc
         return result;
     }
 
+    /// <summary>
+    /// Encrypts <paramref name="plain"/> in CBC mode without adding any padding.
+    /// </summary>
+    /// <param name="key">The AES key (16, 24, or 32 bytes).</param>
+    /// <param name="iv">The 16-byte initialization vector.</param>
+    /// <param name="plain">The plaintext (whole 16-byte blocks).</param>
+    /// <returns>The encrypted bytes.</returns>
     public static byte[] EncryptCbcNoPadding(byte[] key, byte[] iv, byte[] plain)
     {
+        ArgumentNullException.ThrowIfNull(key);
+        ArgumentNullException.ThrowIfNull(iv);
+        ArgumentNullException.ThrowIfNull(plain);
         var roundKeys = ExpandKey(key, out var rounds);
         var result = new byte[plain.Length];
         var previous = (byte[])iv.Clone();

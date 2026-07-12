@@ -1,14 +1,13 @@
 using System;
 
-namespace Radzen.Documents.Pdf.Objects.Encryption;
+namespace Radzen.Documents.Crypto;
 
 /// <summary>
 /// Hand-rolled SHA-2 (FIPS 180-4): SHA-256, SHA-384 and SHA-512. The BCL
 /// implementations throw <see cref="PlatformNotSupportedException"/> under Blazor
-/// WebAssembly, so the PDF/A document /ID and the ISO 32000-2 revision 6 (AESV3)
-/// key derivation rely on these managed variants instead.
+/// WebAssembly, so these managed variants are used instead.
 /// </summary>
-internal static class Sha2
+public static class Sha2
 {
     private static readonly uint[] K256 =
     [
@@ -46,8 +45,14 @@ internal static class Sha2
         0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817,
     ];
 
+    /// <summary>
+    /// Computes the 32-byte SHA-256 digest of <paramref name="data"/>.
+    /// </summary>
+    /// <param name="data">The bytes to hash.</param>
+    /// <returns>The 32-byte digest.</returns>
     public static byte[] Sha256(byte[] data)
     {
+        ArgumentNullException.ThrowIfNull(data);
         Span<uint> h =
         [
             0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
@@ -107,6 +112,11 @@ internal static class Sha2
         return result;
     }
 
+    /// <summary>
+    /// Computes the 48-byte SHA-384 digest of <paramref name="data"/>.
+    /// </summary>
+    /// <param name="data">The bytes to hash.</param>
+    /// <returns>The 48-byte digest.</returns>
     public static byte[] Sha384(byte[] data)
         => Sha512Core(
             data,
@@ -116,6 +126,11 @@ internal static class Sha2
             ],
             48);
 
+    /// <summary>
+    /// Computes the 64-byte SHA-512 digest of <paramref name="data"/>.
+    /// </summary>
+    /// <param name="data">The bytes to hash.</param>
+    /// <returns>The 64-byte digest.</returns>
     public static byte[] Sha512(byte[] data)
         => Sha512Core(
             data,
