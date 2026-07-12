@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -37,6 +40,13 @@ public sealed class DocumentWriter(Stream stream)
     public DictionaryObject Trailer { get; } = new();
 
     /// <summary>
+    /// Gets or sets standard PDF encryption options. When non-null, <see cref="Close"/>
+    /// writes an <c>/Encrypt</c> dictionary and a document <c>/ID</c>, and encrypts
+    /// every string and stream. When null the output is unencrypted.
+    /// </summary>
+    public EncryptionOptions? Encryption { get; set; }
+
+    /// <summary>
     /// Registers <paramref name="value"/> as an indirect object and returns a
     /// reference to it. The object body is serialized later by <see cref="Close"/>.
     /// </summary>
@@ -59,13 +69,26 @@ public sealed class DocumentWriter(Stream stream)
         using var buffer = new CountingBufferedStream(stream);
         buffer.Write(Header, 0, Header.Length);
 
+        var (encryption, encryptNumber) = PrepareEncryption();
+
         var offsets = new long[objects.Count];
         for (var i = 0; i < objects.Count; i++)
         {
             offsets[i] = buffer.Position;
             PdfBytes.WriteInteger(buffer, i + 1);
             PdfBytes.WriteAscii(buffer, " 0 obj\n");
-            objects[i].Write(buffer);
+
+            // The /Encrypt dictionary and the document /ID are never themselves encrypted.
+            if (encryption is not null && i + 1 != encryptNumber)
+            {
+                using var scope = encryption.BeginObject(i + 1);
+                objects[i].Write(buffer);
+            }
+            else
+            {
+                objects[i].Write(buffer);
+            }
+
             PdfBytes.WriteAscii(buffer, "\nendobj\n");
         }
 
@@ -90,5 +113,25 @@ public sealed class DocumentWriter(Stream stream)
         PdfBytes.WriteAscii(buffer, "\n%%EOF\n");
 
         buffer.Flush();
+    }
+
+    // Builds the /Encrypt dictionary, wires it and a fresh /ID into the trailer,
+    // and returns the writer that will encrypt every other object's bytes.
+    private (EncryptionWriter? Writer, int EncryptNumber) PrepareEncryption()
+    {
+        if (Encryption is null)
+        {
+            return (null, -1);
+        }
+
+        var documentId = RandomNumberGenerator.GetBytes(16);
+        var writer = EncryptionWriter.Build(Encryption, documentId, out var dictionary);
+        var reference = Add(dictionary);
+        Trailer["Encrypt"] = reference;
+
+        var id = new StringObject(Encoding.Latin1.GetString(documentId));
+        Trailer["ID"] = new ArrayObject { id, id };
+
+        return (writer, reference.ObjectNumber);
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -34,8 +35,15 @@ public sealed class StreamObject : DocumentObject
     /// <inheritdoc />
     public override void Write(Stream stream)
     {
+        var data = Data;
+        var encryptor = EncryptionWriter.Current;
+        if (encryptor is not null)
+        {
+            data = encryptor.EncryptStream(Data, EncryptionWriter.CurrentObjectNumber, 0);
+        }
+
         PdfBytes.WriteAscii(stream, "<< /Length ");
-        PdfBytes.WriteInteger(stream, Data.Length);
+        PdfBytes.WriteInteger(stream, data.Length);
 
         foreach (var key in Dictionary.Keys)
         {
@@ -51,7 +59,7 @@ public sealed class StreamObject : DocumentObject
         }
 
         PdfBytes.WriteAscii(stream, " >>\nstream\n");
-        stream.Write(Data, 0, Data.Length);
+        stream.Write(data, 0, data.Length);
         PdfBytes.WriteAscii(stream, "\nendstream");
     }
 }

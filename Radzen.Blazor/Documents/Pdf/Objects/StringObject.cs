@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -26,10 +27,17 @@ public sealed class StringObject(string value) : DocumentObject
     /// <inheritdoc />
     public override void Write(Stream stream)
     {
-        var builder = new StringBuilder(Value.Length + 2);
+        var bytes = EncodeBytes(Value);
+        var encryptor = EncryptionWriter.Current;
+        if (encryptor is not null)
+        {
+            bytes = encryptor.EncryptString(bytes, EncryptionWriter.CurrentObjectNumber, 0);
+        }
+
+        var builder = new StringBuilder(bytes.Length + 2);
         builder.Append('(');
 
-        foreach (var b in EncodeBytes(Value))
+        foreach (var b in bytes)
         {
             var code = (int)b;
             switch (code)
