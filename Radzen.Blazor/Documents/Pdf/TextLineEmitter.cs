@@ -246,7 +246,10 @@ internal sealed class TextLineEmitter(
             var end = current.Start + current.Length;
             var right = current.XOffset + current.Advance;
             var j = i + 1;
-            while (j < fragments.Count && current.Length > 0)
+            // A styled run's inter-word gap is not a plain space width (Tc widens the
+            // space glyph; a script run draws it reduced), so its fragments stay separate.
+            var mergeable = run.LetterSpacing.Point == 0 && run.VerticalAlign == RunVerticalAlign.None;
+            while (j < fragments.Count && current.Length > 0 && mergeable)
             {
                 var next = fragments[j];
                 if (next.Run != run || next.Length == 0 || next.Start < end || next.Start > text.Length)
@@ -317,7 +320,10 @@ internal sealed class TextLineEmitter(
     private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element)
     {
         var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
-        var size = font.Size;
+        var run = fragment.Run;
+        var size = font.Size * run.ScriptScale;
+        var spacing = run.LetterSpacing.Point;
+        var rise = run.ScriptRise(font.Size);
         var text = fragment.Text;
         var x = startX;
 
@@ -359,9 +365,11 @@ internal sealed class TextLineEmitter(
                     Font = generated,
                     Bytes = [.. bytes],
                     Element = element,
+                    CharSpacing = spacing,
+                    Rise = rise,
                 });
 
-                x += advance;
+                x += spacing == 0 ? advance : advance + (spacing * (bytes.Count / 2));
             }
             else
             {
@@ -397,9 +405,11 @@ internal sealed class TextLineEmitter(
                     Font = generated,
                     Bytes = EncodeWinAnsi(segment),
                     Element = element,
+                    CharSpacing = spacing,
+                    Rise = rise,
                 });
 
-                x += metrics.MeasureString(segment, size);
+                x += metrics.MeasureString(segment, size) + (spacing * segment.Length);
             }
         }
     }
@@ -409,8 +419,11 @@ internal sealed class TextLineEmitter(
     // by the embedded subset that owns it - not the primary's .notdef.
     private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y, StructureElement? element)
     {
-        var font = fragment.Run.ResolvedFont;
-        var size = font.Size;
+        var run = fragment.Run;
+        var font = run.ResolvedFont;
+        var size = font.Size * run.ScriptScale;
+        var spacing = run.LetterSpacing.Point;
+        var rise = run.ScriptRise(font.Size);
         var text = fragment.Text;
         var runX = startX;
 
@@ -456,9 +469,13 @@ internal sealed class TextLineEmitter(
                 // Synthetic italic: no real italic face, so the run is slanted by a
                 // sheared text matrix (tan of about 12 degrees).
                 Shear = font.Italic && !face.Italic ? 0.21 : 0,
+                CharSpacing = spacing,
+                Rise = rise,
             });
 
-            runX += advance;
+            // Tc advances after every shown glyph, so a face switch inside the
+            // fragment continues one spacing gap past the sub-run's glyph advances.
+            runX += spacing == 0 ? advance : advance + (spacing * (bytes.Count / 2));
         }
     }
 

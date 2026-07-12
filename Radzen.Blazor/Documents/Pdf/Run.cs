@@ -34,10 +34,40 @@ public class Run(string text)
     /// </summary>
     public string? Anchor { get; set; }
 
+    /// <summary>
+    /// Gets or sets the extra spacing inserted between the glyphs of this run.
+    /// Rendered with the PDF character-spacing (Tc) operator and included in
+    /// measurement as spacing * (glyph count - 1).
+    /// </summary>
+    public Unit LetterSpacing { get; set; }
+
+    /// <summary>
+    /// Gets or sets the vertical alignment of this run. Superscript and subscript
+    /// runs render at <see cref="VerticalAlignScale"/> of the font size, raised or
+    /// lowered via the PDF text-rise (Ts) operator.
+    /// </summary>
+    public RunVerticalAlign VerticalAlign { get; set; }
+
+    /// <summary>
+    /// Gets or sets the font-size scale applied when <see cref="VerticalAlign"/> is
+    /// <see cref="RunVerticalAlign.Superscript"/> or <see cref="RunVerticalAlign.Subscript"/>.
+    /// </summary>
+    public double VerticalAlignScale { get; set; } = 0.583;
+
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
 
     internal Font? EffectiveFont { get; set; }
 
     internal Font ResolvedFont => EffectiveFont ?? Font;
+
+    internal double ScriptScale => VerticalAlign == RunVerticalAlign.None ? 1.0 : VerticalAlignScale;
+
+    // Rise fractions of the ORIGINAL font size, matching common typesetting defaults.
+    internal double ScriptRise(double size) => VerticalAlign switch
+    {
+        RunVerticalAlign.Superscript => size * 0.33,
+        RunVerticalAlign.Subscript => -size * 0.20,
+        _ => 0.0,
+    };
 }
