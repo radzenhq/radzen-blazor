@@ -26,7 +26,15 @@ namespace Radzen.Documents.Pdf.Signing;
 /// </remarks>
 public static class PdfSigner
 {
-    private const int ByteRangeInteriorWidth = 40;
+    internal const int ByteRangeInteriorWidth = 40;
+
+    // The fixed-width /ByteRange and /Contents placeholders, shared with the
+    // document time-stamper so the in-place patch logic sees an identical shape.
+    internal static DocumentObject ByteRangePlaceholder()
+        => new RawTokenObject("[" + "0 0 0 0".PadRight(ByteRangeInteriorWidth) + "]");
+
+    internal static DocumentObject ContentsPlaceholder(int reservedBytes)
+        => new RawTokenObject("<" + new string('0', reservedBytes * 2) + ">");
 
     /// <summary>
     /// Signs <paramref name="pdf"/> and returns the signed document. The
@@ -57,32 +65,40 @@ public static class PdfSigner
             throw new ArgumentException("SubFilter must not be empty.", nameof(options));
         }
 
+        var signature = BuildSignatureDictionary(options);
+        var appearance = options.Appearance is not null ? BuildAppearanceStream(options) : null;
+        var (bytes, sigStart, sigEnd) = AppendSignatureField(
+            pdf, signature, appearance, SignatureRect(options.Appearance), options.Appearance?.PageIndex ?? 0);
+
+        return Embed(bytes, sigStart, sigEnd, options.SignatureMaxSizeBytes,
+            content => signer.Sign(content) ?? throw new InvalidOperationException("The signer returned null."),
+            "Increase SignatureOptions.SignatureMaxSizeBytes.");
+    }
+
+    // Registers a caller-built signature dictionary as a signature field/widget
+    // via an incremental update: adds the sig dictionary, the widget annotation
+    // (with an optional appearance stream), merges the AcroForm and the page
+    // /Annots, serializes, and reports where the sig dictionary starts/ends so
+    // its /ByteRange and /Contents placeholders can be patched in isolation.
+    // Shared by ordinary signing and the document time-stamper.
+    internal static (byte[] Bytes, int SigStart, int SigEnd) AppendSignatureField(
+        byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
+    {
         var reader = DocumentReader.Parse(pdf);
         if (reader.IsEncrypted)
         {
             throw new NotSupportedException("Signing encrypted documents is not supported.");
         }
 
-        var writer = new IncrementalUpdateWriter(pdf, reader);
-
-        if (reader.Trailer.TryGetValue("Root", out var root) && root is ReferenceObject rootRef
-            && reader.Resolve(rootRef) is DictionaryObject catalog)
+        if (!(reader.Trailer.TryGetValue("Root", out var root) && root is ReferenceObject rootRef
+            && reader.Resolve(rootRef) is DictionaryObject catalog))
         {
-            var (bytes, sigStart, sigEnd) = Append(reader, writer, catalog, rootRef, options);
-            return EmbedSignature(bytes, sigStart, sigEnd, options, signer);
+            throw new DocumentParseException("The trailer /Root must reference the document catalog.", -1);
         }
 
-        throw new DocumentParseException("The trailer /Root must reference the document catalog.", -1);
-    }
+        var writer = new IncrementalUpdateWriter(pdf, reader);
+        var (pageRef, page) = FindPage(reader, catalog, pageIndex);
 
-    // Registers the signature dictionary, field/widget, AcroForm and page
-    // updates with the incremental writer and serializes them.
-    private static (byte[] Bytes, int SigStart, int SigEnd) Append(DocumentReader reader, IncrementalUpdateWriter writer,
-        DictionaryObject catalog, ReferenceObject rootRef, SignatureOptions options)
-    {
-        var (pageRef, page) = FindPage(reader, catalog, options.Appearance?.PageIndex ?? 0);
-
-        var signature = BuildSignatureDictionary(options);
         var signatureRef = writer.Add(signature);
 
         catalog.TryGetValue("AcroForm", out var acroFormValue);
@@ -96,16 +112,16 @@ public static class PdfSigner
             ["FT"] = new NameObject("Sig"),
             ["T"] = new StringObject(fieldName),
             ["V"] = signatureRef,
-            ["Rect"] = SignatureRect(options.Appearance),
+            ["Rect"] = rect,
             ["F"] = new NumberObject(132),
             ["P"] = pageRef,
         };
 
         // A visible signature carries a generated appearance; the invisible default
         // keeps the zero rect and no /AP so unchanged callers stay byte-identical.
-        if (options.Appearance is not null)
+        if (appearanceStream is not null)
         {
-            field["AP"] = new DictionaryObject { ["N"] = writer.Add(BuildAppearanceStream(options)) };
+            field["AP"] = new DictionaryObject { ["N"] = writer.Add(appearanceStream) };
         }
 
         var fieldRef = writer.Add(field);
@@ -142,8 +158,8 @@ public static class PdfSigner
             ["Type"] = new NameObject("Sig"),
             ["Filter"] = new NameObject("Adobe.PPKLite"),
             ["SubFilter"] = new NameObject(options.SubFilter),
-            ["ByteRange"] = new RawTokenObject("[" + "0 0 0 0".PadRight(ByteRangeInteriorWidth) + "]"),
-            ["Contents"] = new RawTokenObject("<" + new string('0', options.SignatureMaxSizeBytes * 2) + ">"),
+            ["ByteRange"] = ByteRangePlaceholder(),
+            ["Contents"] = ContentsPlaceholder(options.SignatureMaxSizeBytes),
         };
 
         if (options.SignerName is not null)
@@ -372,10 +388,13 @@ public static class PdfSigner
     }
 
     // Patches /ByteRange in place (length-preserving), collects the two byte
-    // ranges, obtains the CMS blob and hex-encodes it into the /Contents gap.
-    private static byte[] EmbedSignature(byte[] bytes, int sigStart, int sigEnd, SignatureOptions options, ISigner signer)
+    // ranges, obtains the detached blob from <paramref name="produceBlob"/> and
+    // hex-encodes it into the /Contents gap. Shared by ordinary signing (the blob
+    // is a CMS SignedData) and document time-stamping (an RFC 3161 token).
+    internal static byte[] Embed(byte[] bytes, int sigStart, int sigEnd, int reservedBytes,
+        Func<byte[], byte[]> produceBlob, string reservedHint)
     {
-        var hexDigits = options.SignatureMaxSizeBytes * 2;
+        var hexDigits = reservedBytes * 2;
         var (gapStart, gapEnd) = FindContentsGap(bytes, sigStart, sigEnd, hexDigits);
         PatchByteRange(bytes, sigStart, sigEnd, gapStart, gapEnd);
 
@@ -388,20 +407,18 @@ public static class PdfSigner
         Array.Copy(bytes, 0, content, 0, gapStart);
         Array.Copy(bytes, gapEnd, content, gapStart, bytes.Length - gapEnd);
 
-        var cms = signer.Sign(content)
-            ?? throw new InvalidOperationException("The signer returned null.");
-        if (cms.Length > options.SignatureMaxSizeBytes)
+        var blob = produceBlob(content);
+        if (blob.Length > reservedBytes)
         {
             throw new InvalidOperationException(
-                $"The signature is {cms.Length} bytes but only {options.SignatureMaxSizeBytes} bytes are reserved. " +
-                "Increase SignatureOptions.SignatureMaxSizeBytes.");
+                $"The signature is {blob.Length} bytes but only {reservedBytes} bytes are reserved. " + reservedHint);
         }
 
         const string hex = "0123456789abcdef";
-        for (var i = 0; i < cms.Length; i++)
+        for (var i = 0; i < blob.Length; i++)
         {
-            bytes[gapStart + 1 + 2 * i] = (byte)hex[cms[i] >> 4];
-            bytes[gapStart + 2 + 2 * i] = (byte)hex[cms[i] & 0xF];
+            bytes[gapStart + 1 + 2 * i] = (byte)hex[blob[i] >> 4];
+            bytes[gapStart + 2 + 2 * i] = (byte)hex[blob[i] & 0xF];
         }
 
         return bytes;
