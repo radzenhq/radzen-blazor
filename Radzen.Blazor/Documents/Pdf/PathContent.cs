@@ -27,6 +27,13 @@ public sealed class PathContent : ContentElement
     public Color FillColor { get; set; } = Color.Black;
 
     /// <summary>
+    /// Gets or sets a gradient the path is filled with, realized as a PDF shading pattern
+    /// (<c>/Pattern cs</c> + <c>scn</c>). When set it overrides <see cref="FillColor"/> and
+    /// <see cref="FillPaint"/> for the fill. Defaults to <see langword="null"/> (solid fill).
+    /// </summary>
+    public GradientBrush? FillGradient { get; set; }
+
+    /// <summary>
     /// Gets or sets the line cap style (the <c>J</c> operator). When null (the
     /// default), no cap operator is emitted and the viewer default (butt) applies.
     /// </summary>
@@ -158,6 +165,16 @@ public sealed class PathContent : ContentElement
 
     internal override void EmitBody(ContentWriter writer)
     {
+        // A path that intersects the clip region (W/W*) must be balanced by a q..Q so the
+        // clip is confined to this element; otherwise it leaks and shrinks the paintable
+        // region of every element that follows on the page. A pattern colour space also
+        // persists in the graphics state, so a gradient fill is scoped the same way.
+        var scoped = Clip != PathClipMode.None || FillGradient is not null;
+        if (scoped)
+        {
+            writer.WriteRaw("q\n");
+        }
+
         if (Stroke)
         {
             writer.WriteNumber(Thickness);
@@ -217,7 +234,13 @@ public sealed class PathContent : ContentElement
 
         if (Fill)
         {
-            if (FillPaint is { } fillPaint)
+            if (FillGradient is { } fillGradient)
+            {
+                writer.WriteRaw("/Pattern cs\n");
+                writer.WriteName(writer.RegisterPattern(ShadingBuilder.BuildPattern(fillGradient)));
+                writer.WriteRaw(" scn\n");
+            }
+            else if (FillPaint is { } fillPaint)
             {
                 EmitDeviceColor(writer, fillPaint, stroke: false);
             }
@@ -250,6 +273,10 @@ public sealed class PathContent : ContentElement
 
         writer.WriteRaw(Paint());
         writer.WriteRaw("\n");
+        if (scoped)
+        {
+            writer.WriteRaw("Q\n");
+        }
     }
 
     private string Paint() => (Stroke, Fill) switch

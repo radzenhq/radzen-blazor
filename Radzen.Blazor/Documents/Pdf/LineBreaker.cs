@@ -16,6 +16,9 @@ internal struct LineFragment
     public double XOffset { get; set; }
 
     public required double Advance { get; init; }
+
+    // A list-item marker fragment; in tagged output it is tagged into the item's Lbl element.
+    public bool IsMarker { get; init; }
 }
 
 internal sealed class LineBox
@@ -548,6 +551,7 @@ internal static class LineBreaker
                 Length = markerText.Length,
                 XOffset = paragraph.MarkerIndent.Point,
                 Advance = fonts.MeasureText(markerText, markerFont),
+                IsMarker = true,
             });
         }
 
@@ -744,6 +748,7 @@ internal static class LineBreaker
                 Length = markerText.Length,
                 XOffset = paragraph.MarkerIndent.Point,
                 Advance = fonts.MeasureText(markerText, markerFont),
+                IsMarker = true,
             });
         }
 

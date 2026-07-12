@@ -31,6 +31,20 @@ public sealed class Image : Block
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
 
     /// <summary>
+    /// Gets or sets the alternate (accessibility) description of the image, written as the
+    /// <c>/Alt</c> entry on its Figure structure element in tagged output. When
+    /// <see langword="null"/> (the default) no <c>/Alt</c> is written.
+    /// </summary>
+    public string? AlternateText { get; set; }
+
+    /// <summary>
+    /// Gets or sets the replacement text of the image, written as the <c>/ActualText</c>
+    /// entry on its Figure structure element in tagged output. When <see langword="null"/>
+    /// (the default) no <c>/ActualText</c> is written.
+    /// </summary>
+    public string? ActualText { get; set; }
+
+    /// <summary>
     /// Gets or sets the opacity the image is painted with, from 0 (fully transparent)
     /// to 1 (fully opaque). Defaults to 1.
     /// </summary>
@@ -50,6 +64,15 @@ public sealed class Image : Block
     /// grayscale image with no alpha channel. Defaults to <see langword="false"/>.
     /// </summary>
     public bool Stencil { get; set; }
+
+    /// <summary>
+    /// Gets or sets the colour a <see cref="Stencil"/> image is painted in. A stencil
+    /// mask carries no colour of its own, so this colour is set as the fill colour
+    /// inside the image's own graphics-state scope, making the stencil self-contained
+    /// and independent of whatever fill colour is otherwise live. Defaults to black.
+    /// Ignored when <see cref="Stencil"/> is <see langword="false"/>.
+    /// </summary>
+    public Color StencilColor { get; set; } = Color.Black;
 
     /// <summary>
     /// Gets or sets the colour-key masking ranges (<c>/Mask</c>, ISO 32000-1 8.9.6.4). The array

@@ -11,7 +11,21 @@ internal static class BoxRenderer
     public static void Paint(PagePlan plan, Rect bounds, in BoxStyle style)
     {
         var radius = ClampRadius(style.CornerRadius.Point, bounds.Width, bounds.Height);
-        if (style.Background is { } background)
+        if (style.BackgroundGradient is { } gradient)
+        {
+            plan.Fills.Add(new FillDraw
+            {
+                X = bounds.X,
+                Y = bounds.Y,
+                Width = bounds.Width,
+                Height = bounds.Height,
+                Color = style.Background ?? Color.Black,
+                Radius = radius,
+                ExtGState = style.ExtGState,
+                Gradient = gradient,
+            });
+        }
+        else if (style.Background is { } background)
         {
             plan.Fills.Add(new FillDraw
             {

@@ -59,6 +59,16 @@ internal static class StructureWriter
             ["P"] = parentRef,
         };
 
+        if (element.Alt is { } alt)
+        {
+            dictionary["Alt"] = new StringObject(alt);
+        }
+
+        if (element.ActualText is { } actualText)
+        {
+            dictionary["ActualText"] = new StringObject(actualText);
+        }
+
         // Header cells come from header rows, so their scope is the column
         // below them; PDF/UA (ISO 14289-1, 7.5) requires TH to carry a Scope.
         if (element.Type == "TH")

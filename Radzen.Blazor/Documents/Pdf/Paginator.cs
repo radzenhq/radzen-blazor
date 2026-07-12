@@ -868,6 +868,9 @@ internal static class Paginator
             MarkerIndent = Unit.FromPoint(indent + list.LeftIndent.Point),
             MarkerText = Marker(list, index),
             EffectiveFont = StyleResolver.ItemFont(item) ?? ItemFont(item, list, inherited),
+            // Null unless the tree was built for tagged output; carries the item's Lbl/LBody.
+            ListLabelElement = item.LabelElement,
+            ListBodyElement = item.BodyElement,
         };
 
         foreach (var run in item.Inlines)

@@ -40,6 +40,13 @@ public sealed class Container : Block
     public Color? Background { get; set; }
 
     /// <summary>
+    /// Gets or sets a gradient box background, realized as a PDF shading pattern
+    /// (<c>/Pattern cs</c> + <c>scn</c>). When set it takes precedence over
+    /// <see cref="Background"/>. Defaults to <see langword="null"/> (no gradient).
+    /// </summary>
+    public GradientBrush? BackgroundGradient { get; set; }
+
+    /// <summary>
     /// Gets or sets the corner radius of the box. When greater than zero the background is
     /// filled as a rounded rectangle (the effective radius is clamped to half of the smaller
     /// box dimension). The border is stroked as the same rounded path only when it is uniform -
@@ -72,6 +79,37 @@ public sealed class Container : Block
     /// Defaults to <see cref="ContainerLayout.Stack"/> (vertical stacking).
     /// </summary>
     public ContainerLayout Layout { get; set; }
+
+    /// <summary>
+    /// Gets or sets the blend mode the box decoration (background and borders) is painted
+    /// with, written as an <c>/ExtGState</c> <c>/BM</c> entry (ISO 32000-1 11.3.5). When
+    /// <see langword="null"/> (the default) no blend mode is set and the output is unchanged.
+    /// </summary>
+    public BlendMode? BlendMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the stroke overprint flag (<c>/ExtGState</c> <c>/OP</c>) for the box
+    /// decoration. When <see langword="null"/> (the default) no overprint entry is written.
+    /// </summary>
+    public bool? OverprintStroke { get; set; }
+
+    /// <summary>
+    /// Gets or sets the fill overprint flag (<c>/ExtGState</c> <c>/op</c>) for the box
+    /// decoration. When <see langword="null"/> (the default) no overprint entry is written.
+    /// </summary>
+    public bool? OverprintFill { get; set; }
+
+    /// <summary>
+    /// Gets or sets the overprint mode (<c>/ExtGState</c> <c>/OPM</c>, 0 or 1) for the box
+    /// decoration. When <see langword="null"/> (the default) no entry is written.
+    /// </summary>
+    public int? OverprintMode { get; set; }
+
+    /// <summary>
+    /// Gets or sets the colour rendering intent (<c>/ExtGState</c> <c>/RI</c>) for the box
+    /// decoration. When <see langword="null"/> (the default) no entry is written.
+    /// </summary>
+    public RenderingIntent? RenderingIntent { get; set; }
 
     /// <summary>
     /// Gets or sets the rotation of the whole container content in degrees, counterclockwise,

@@ -14,6 +14,24 @@ internal struct TextDraw
     public double Shear { get; init; }
     public double CharSpacing { get; init; }
     public double Rise { get; init; }
+
+    // Word spacing (Tw). Default 0 emits nothing, preserving byte-identity.
+    public double WordSpacing { get; init; }
+
+    // Horizontal scaling percent (Tz). 0 (unset) and 100 both emit nothing; only a
+    // genuinely non-100 scale emits a Tz operator.
+    public double HorizontalScale { get; init; }
+
+    // Text rendering mode (Tr). 0 (fill) emits nothing beyond the synthetic-bold path.
+    public int RenderMode { get; init; }
+
+    // A non-RGB device fill colour (Gray g, CMYK k or a named colorspace cs+scn) used
+    // instead of rg when set.
+    public DeviceColor? FillPaint { get; init; }
+
+    // Per-pair kern adjustments (TJ number convention, thousandths of text space:
+    // positive tightens) inserted between glyphs when kerning is enabled; null = plain Tj.
+    public double[]? Kerns { get; init; }
     public StructureElement? Element { get; init; }
     public Rect? Clip { get; set; }
 
@@ -38,6 +56,10 @@ internal struct ImageDraw
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; set; }
+
+    // Set for an /ImageMask stencil so its fill colour is emitted inside the image's own
+    // q..Q, making the painted colour deterministic instead of the ambient fill colour.
+    public Color? StencilColor { get; init; }
 }
 
 internal struct FillDraw
@@ -53,6 +75,10 @@ internal struct FillDraw
     public Rect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
+
+    // When set, the rectangle is painted with a shading pattern (/Pattern cs + scn)
+    // instead of the solid Color; opt-in, default null keeps the solid-fill path.
+    public GradientBrush? Gradient { get; init; }
 }
 
 // A uniform border stroked as a single rounded-rectangle path (one S, not four edges).
@@ -106,25 +132,71 @@ internal sealed class PagePlan
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
     public List<GeneratedExtGState> ExtGStates { get; } = [];
+    public List<GeneratedPattern> Patterns { get; } = [];
     public WatermarkDraw? Watermark { get; set; }
     public HashSet<GeneratedFont> UsedFonts { get; } = [];
     public HashSet<GeneratedImage> UsedImages { get; } = [];
 
     // One ExtGState per distinct (fill, stroke) alpha pair, keyed GS0, GS1, ...
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
+        => RegisterExtGState(fillAlpha, strokeAlpha, null, null, null, null, null);
+
+    // One ExtGState per distinct full (alpha + blend + overprint + intent) tuple. An
+    // alpha-only call reuses (and produces) exactly the same entries as before, so a
+    // document that sets none of the extra fields stays byte identical.
+    public string RegisterExtGState(
+        double fillAlpha,
+        double strokeAlpha,
+        BlendMode? blend,
+        bool? overprintStroke,
+        bool? overprintFill,
+        int? overprintMode,
+        RenderingIntent? intent)
     {
         fillAlpha = System.Math.Clamp(fillAlpha, 0, 1);
         strokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1);
         foreach (var state in ExtGStates)
         {
-            if (state.FillAlpha == fillAlpha && state.StrokeAlpha == strokeAlpha)
+            if (state.FillAlpha == fillAlpha
+                && state.StrokeAlpha == strokeAlpha
+                && state.Blend == blend
+                && state.OverprintStroke == overprintStroke
+                && state.OverprintFill == overprintFill
+                && state.OverprintMode == overprintMode
+                && state.Intent == intent)
             {
                 return state.Key;
             }
         }
 
         var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        ExtGStates.Add(new GeneratedExtGState { Key = key, FillAlpha = fillAlpha, StrokeAlpha = strokeAlpha });
+        ExtGStates.Add(new GeneratedExtGState
+        {
+            Key = key,
+            FillAlpha = fillAlpha,
+            StrokeAlpha = strokeAlpha,
+            Blend = blend,
+            OverprintStroke = overprintStroke,
+            OverprintFill = overprintFill,
+            OverprintMode = overprintMode,
+            Intent = intent,
+        });
+        return key;
+    }
+
+    // One shading pattern per gradient brush instance, keyed P0, P1, ...
+    public string RegisterPattern(GradientBrush gradient)
+    {
+        foreach (var pattern in Patterns)
+        {
+            if (ReferenceEquals(pattern.Gradient, gradient))
+            {
+                return pattern.Key;
+            }
+        }
+
+        var key = "P" + Patterns.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        Patterns.Add(new GeneratedPattern { Key = key, Gradient = gradient });
         return key;
     }
 

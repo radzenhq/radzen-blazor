@@ -64,6 +64,13 @@ public class DocumentBuilder
     public bool CompressOutput { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the saved file carries a deterministic trailer
+    /// <c>/ID</c>. Defaults to <c>false</c> so output stays byte identical unless
+    /// opted in. See <see cref="Document.IncludeDocumentId"/>.
+    /// </summary>
+    public bool IncludeDocumentId { get; set; }
+
+    /// <summary>
     /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
     /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
     /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
@@ -75,6 +82,7 @@ public class DocumentBuilder
         var document = DocumentGenerator.Generate(this);
         document.Encryption = Encryption;
         document.CompressOutput = CompressOutput;
+        document.IncludeDocumentId = IncludeDocumentId;
         document.PdfUA = PdfUA;
         document.Language = Language;
         return document;

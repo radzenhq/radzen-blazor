@@ -60,6 +60,50 @@ public class Run(string text)
     /// </summary>
     public double Opacity { get; set; } = 1;
 
+    /// <summary>
+    /// Gets or sets the extra spacing added to every ASCII-space (byte 32) glyph in this
+    /// run, rendered with the PDF word-spacing (Tw) operator. Defaults to zero.
+    /// </summary>
+    public Unit WordSpacing { get; set; }
+
+    /// <summary>
+    /// Gets or sets the horizontal scaling of this run as a percentage, rendered with the
+    /// PDF horizontal-scaling (Tz) operator. Defaults to 100 (no scaling).
+    /// </summary>
+    public double HorizontalScale { get; set; } = 100;
+
+    /// <summary>
+    /// Gets or sets whether this run is drawn invisibly (text rendering mode 3). The glyphs
+    /// still occupy space and remain selectable/searchable but paint nothing. Defaults to false.
+    /// </summary>
+    public bool Invisible { get; set; }
+
+    // A non-RGB device fill colour set through the SetFill* helpers; overrides the font
+    // colour's rg emission with g/k/scn. Null (default) keeps the rg path byte-identical.
+    internal DeviceColor? FillPaint { get; private set; }
+
+    /// <summary>
+    /// Sets the run fill colour to a DeviceGray level (the <c>g</c> operator), 0 (black)
+    /// to 1 (white). Overrides the font colour for filling.
+    /// </summary>
+    /// <param name="gray">The gray level, clamped to 0..1.</param>
+    public void SetFillGray(double gray)
+        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [ClampUnit(gray)]);
+
+    /// <summary>
+    /// Sets the run fill colour to a DeviceCMYK colour (the <c>k</c> operator). Each
+    /// component is clamped to 0..1. Overrides the font colour for filling.
+    /// </summary>
+    /// <param name="cyan">The cyan component.</param>
+    /// <param name="magenta">The magenta component.</param>
+    /// <param name="yellow">The yellow component.</param>
+    /// <param name="black">The black (key) component.</param>
+    public void SetFillCmyk(double cyan, double magenta, double yellow, double black)
+        => FillPaint = new DeviceColor(
+            DeviceColorKind.Cmyk, null, [ClampUnit(cyan), ClampUnit(magenta), ClampUnit(yellow), ClampUnit(black)]);
+
+    private static double ClampUnit(double value) => value < 0 ? 0 : value > 1 ? 1 : value;
+
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
 

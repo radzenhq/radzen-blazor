@@ -61,6 +61,15 @@ public sealed class Document
     public bool CompressOutput { get; set; }
 
     /// <summary>
+    /// Gets or sets whether a deterministic trailer <c>/ID</c> (ISO 32000-1 7.5.5)
+    /// is written on the unencrypted save path. The value derives only from the
+    /// document content and metadata, never from the clock or a random source.
+    /// Defaults to <c>false</c> so a document that does not opt in stays byte
+    /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless.
+    /// </summary>
+    public bool IncludeDocumentId { get; set; }
+
+    /// <summary>
     /// Gets or sets the viewer preferences written to the document catalog
     /// (page layout, page mode, and the <c>/ViewerPreferences</c> flags). When
     /// <c>null</c> no viewer-preference keys are written and the output is
@@ -460,10 +469,11 @@ public sealed class Document
 
         writer.Trailer["Root"] = catalogRef;
 
-        // A deterministic trailer /ID on every saved document (ISO 32000-1 7.5.5).
-        // The encrypted path derives its own /ID from the encryption seed inside
-        // DocumentWriter, so only the unencrypted path sets one here.
-        if (Encryption is null)
+        // A deterministic trailer /ID (ISO 32000-1 7.5.5). Opt-in for plain output so
+        // an untouched document stays byte identical; PDF/A and PDF/UA require a file
+        // identifier so they always carry one. The encrypted path derives its own /ID
+        // from the encryption seed inside DocumentWriter, so it is excluded here.
+        if (Encryption is null && (IncludeDocumentId || Conformance != PdfAConformance.None || PdfUA))
         {
             writer.Trailer["ID"] = BuildDocumentId();
         }

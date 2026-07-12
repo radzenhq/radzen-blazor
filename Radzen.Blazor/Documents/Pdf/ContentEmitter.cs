@@ -106,6 +106,11 @@ internal static class ContentEmitter
             WriteClip(writer, clip, image.ClipRadius);
         }
 
+        if (image.StencilColor is { } stencilColor)
+        {
+            writer.WriteColor(stencilColor, "rg");
+        }
+
         writer.WriteNumber(image.Width);
         writer.WriteRaw(" 0 0 ");
         writer.WriteNumber(image.Height);
@@ -143,7 +148,15 @@ internal static class ContentEmitter
         }
 
         writer.WriteRaw("BT\n");
-        writer.WriteColor(text.Color, "rg");
+        if (text.FillPaint is { } fillPaint)
+        {
+            WriteDeviceFill(writer, fillPaint);
+        }
+        else
+        {
+            writer.WriteColor(text.Color, "rg");
+        }
+
         writer.WriteName(text.Font.Key);
         writer.WriteRaw(" ");
         writer.WriteNumber(text.Size);
@@ -154,17 +167,42 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tc\n");
         }
 
+        var wordSpacing = text.WordSpacing != 0;
+        if (wordSpacing)
+        {
+            writer.WriteNumber(text.WordSpacing);
+            writer.WriteRaw(" Tw\n");
+        }
+
+        // 0 (the struct default for draws that never set it) means "unchanged"; only a
+        // genuinely non-100 scale emits Tz, so default text stays byte identical.
+        var horizontalScale = text.HorizontalScale != 0 && text.HorizontalScale != 100;
+        if (horizontalScale)
+        {
+            writer.WriteNumber(text.HorizontalScale);
+            writer.WriteRaw(" Tz\n");
+        }
+
         if (text.Rise != 0)
         {
             writer.WriteNumber(text.Rise);
             writer.WriteRaw(" Ts\n");
         }
 
-        if (text.StrokeWidth > 0)
+        // Synthetic bold draws in fill+stroke (mode 2); an explicit invisible/other mode
+        // wins. Both reset to 0 Tr after the show since Tr persists across BT/ET.
+        var renderMode = text.RenderMode != 0 ? text.RenderMode : text.StrokeWidth > 0 ? 2 : 0;
+        if (text.StrokeWidth > 0 && renderMode == 2)
         {
             writer.WriteColor(text.Color, "RG");
             writer.WriteNumber(text.StrokeWidth);
-            writer.WriteRaw(" w\n2 Tr\n");
+            writer.WriteRaw(" w\n");
+        }
+
+        if (renderMode != 0)
+        {
+            writer.WriteNumber(renderMode);
+            writer.WriteRaw(" Tr\n");
         }
 
         if (text.Shear != 0)
@@ -185,17 +223,35 @@ internal static class ContentEmitter
             writer.WriteRaw(" Td\n");
         }
 
-        writer.WriteString(RemapBytes(text));
-        writer.WriteRaw(" Tj\n");
-        if (text.StrokeWidth > 0)
+        if (text.Kerns is { } kerns)
+        {
+            WriteKernedShow(writer, RemapBytes(text), kerns, text.Font.Base14 is not null ? 1 : 2);
+        }
+        else
+        {
+            writer.WriteString(RemapBytes(text));
+            writer.WriteRaw(" Tj\n");
+        }
+
+        if (renderMode != 0)
         {
             writer.WriteRaw("0 Tr\n");
         }
 
-        // Tc/Ts persist across BT/ET, so non-default values are reset after the show.
+        // Tc/Ts/Tw/Tz persist across BT/ET, so non-default values are reset after the show.
         if (text.CharSpacing != 0)
         {
             writer.WriteRaw("0 Tc\n");
+        }
+
+        if (wordSpacing)
+        {
+            writer.WriteRaw("0 Tw\n");
+        }
+
+        if (horizontalScale)
+        {
+            writer.WriteRaw("100 Tz\n");
         }
 
         if (text.Rise != 0)
@@ -208,6 +264,51 @@ internal static class ContentEmitter
         {
             writer.WriteRaw("Q\n");
         }
+    }
+
+    // Emits a device fill colour (Gray g, CMYK k or a named colorspace cs+scn) in place of rg.
+    private static void WriteDeviceFill(ContentWriter writer, DeviceColor color)
+    {
+        if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
+        {
+            writer.WriteName(name);
+            writer.WriteRaw(" cs\n");
+        }
+
+        foreach (var operand in color.Operands)
+        {
+            writer.WriteNumber(operand);
+            writer.WriteRaw(" ");
+        }
+
+        writer.WriteRaw(color.Kind switch
+        {
+            DeviceColorKind.Named => "scn",
+            DeviceColorKind.Gray => "g",
+            _ => "k",
+        });
+        writer.WriteRaw("\n");
+    }
+
+    // Shows a glyph string as a TJ array with per-pair kern adjustments interleaved: each
+    // kern is a TJ number (positive tightens) placed between adjacent glyph codes. Glyph
+    // codes are 2 bytes for embedded Type0 subsets and 1 byte for WinAnsi base-14 faces.
+    private static void WriteKernedShow(ContentWriter writer, byte[] bytes, double[] kerns, int glyphWidth)
+    {
+        writer.WriteRaw("[");
+        var glyphs = bytes.Length / glyphWidth;
+        for (var g = 0; g < glyphs; g++)
+        {
+            if (g > 0 && kerns[g - 1] != 0)
+            {
+                writer.WriteNumber(kerns[g - 1]);
+                writer.WriteRaw(" ");
+            }
+
+            writer.WriteString(bytes[(g * glyphWidth)..((g + 1) * glyphWidth)]);
+        }
+
+        writer.WriteRaw("] TJ\n");
     }
 
     // Layout emits original gids; the compact map renumbers them into the embedded

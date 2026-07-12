@@ -11,6 +11,10 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
     // pages shares one XObject even when an option (e.g. a stencil mask) yields a fresh one.
     private readonly Dictionary<Image, GeneratedImage> prepared = [];
 
+    // Distinct resource keys for option-bearing XObjects so a plain use of the same bytes
+    // and an option-bearing use never collide on one resource name.
+    private int preparedCount;
+
     public (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, imageStore.Decode(image).Image, availableWidth);
 
@@ -29,6 +33,7 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
             ExtGState = positioned.Source.Opacity < 1
                 ? plan.RegisterExtGState(positioned.Source.Opacity, positioned.Source.Opacity)
                 : null,
+            StencilColor = positioned.Source.Stencil ? positioned.Source.StencilColor : null,
         });
         plan.UsedImages.Add(xobject);
     }
@@ -49,7 +54,11 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
         var applied = ImageDecoder.ApplyOptions(generated.Image, source);
         var result = ReferenceEquals(applied, generated.Image)
             ? generated
-            : new GeneratedImage { Key = generated.Key, Image = applied };
+            : new GeneratedImage
+            {
+                Key = "Imo" + preparedCount++.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                Image = applied,
+            };
         prepared[source] = result;
         return result;
     }

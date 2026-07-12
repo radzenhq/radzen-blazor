@@ -19,6 +19,21 @@ public sealed class FontCollection
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
     private readonly List<string> fallback = [];
 
+    /// <summary>
+    /// Gets or sets whether pair kerning is applied when measuring and drawing text.
+    /// When <see langword="true"/> consecutive same-face glyphs are tightened by the
+    /// font's kern data (sfnt <c>kern</c> table, base-14 AFM pairs). Defaults to
+    /// <see langword="false"/> so output stays byte identical unless opted in.
+    /// </summary>
+    public bool EnableKerning { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a font whose OS/2 fsType marks it as Restricted License
+    /// Embedding may still be embedded. Defaults to <see langword="false"/>, so
+    /// registering such a font throws unless the caller explicitly opts in.
+    /// </summary>
+    public bool AllowRestrictedEmbedding { get; set; }
+
     // Content-keyed parse cache: entries are keyed on a signature of the font bytes so
     // the same content hits regardless of how the caller wraps it. Values are weak and
     // dead entries are pruned on access, so nothing is rooted for the life of the
@@ -61,9 +76,14 @@ public sealed class FontCollection
         ArgumentNullException.ThrowIfNull(font);
 
         var parsed = ParseSource(font);
-        registered[(family, bold, italic)] = parsed.IsCollection
+        var face = parsed.IsCollection
             ? SelectCollectionFace(parsed.Faces, family, bold, italic)
             : parsed.Faces[0];
+
+        // ISO 32000-1 9.9 / OS/2 fsType: a Restricted License Embedding font must not be
+        // embedded unless the caller holds a license and explicitly opts in.
+        face.EnsureEmbeddable(AllowRestrictedEmbedding);
+        registered[(family, bold, italic)] = face;
     }
 
     // Faces are always parsed from a private copy, and a hit is verified byte-for-byte
@@ -302,11 +322,20 @@ public sealed class FontCollection
         {
             double sum = 0;
             var i = 0;
+            SfntFont? prevFace = null;
+            ushort prevGid = 0;
             while (i < text.Length)
             {
                 var codepoint = CodePointAt(text, i);
                 var (face, glyph) = ResolveGlyph(primary, codepoint);
+                if (EnableKerning && ReferenceEquals(prevFace, face))
+                {
+                    sum += face.GetKerning(prevGid, glyph) * font.Size / face.UnitsPerEm;
+                }
+
                 sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+                prevFace = face;
+                prevGid = glyph;
                 i += codepoint > 0xFFFF ? 2 : 1;
             }
 
@@ -326,20 +355,29 @@ public sealed class FontCollection
         WinAnsiEncoding.TryGetCode('?', out var question);
         double sum = 0;
         var i = 0;
+        char? prevBase14 = null;
         while (i < text.Length)
         {
             var codepoint = CodePointAt(text, i);
             if (codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out var code))
             {
+                if (EnableKerning && prevBase14 is { } prev)
+                {
+                    sum += metrics.GetKerning(prev, (char)codepoint) * font.Size / 1000.0;
+                }
+
                 sum += metrics.GetWidth(code) * font.Size / 1000.0;
+                prevBase14 = (char)codepoint;
             }
             else if (TryResolveFallbackGlyph(codepoint, out var face, out var glyph))
             {
                 sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+                prevBase14 = null;
             }
             else
             {
                 sum += metrics.GetWidth(question) * font.Size / 1000.0;
+                prevBase14 = null;
             }
 
             i += codepoint > 0xFFFF ? 2 : 1;
