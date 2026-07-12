@@ -60,6 +60,14 @@ public sealed class Document
     /// </summary>
     public bool CompressOutput { get; set; }
 
+    /// <summary>
+    /// Gets or sets the viewer preferences written to the document catalog
+    /// (page layout, page mode, and the <c>/ViewerPreferences</c> flags). When
+    /// <c>null</c> no viewer-preference keys are written and the output is
+    /// unchanged.
+    /// </summary>
+    public ViewerPreferences? ViewerPreferences { get; set; }
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -409,6 +417,11 @@ public sealed class Document
             catalog["Outlines"] = new NavigationWriter(this).WriteOutline(writer, pageNodes);
         }
 
+        if (ViewerPreferences is { } preferences)
+        {
+            WriteViewerPreferences(catalog, preferences);
+        }
+
         if (Conformance != PdfAConformance.None || PdfUA)
         {
             new ConformanceWriter(this).WriteConformance(writer, catalog);
@@ -478,6 +491,51 @@ public sealed class Document
         Set("ModDate", Info.ModificationDate is { } modified ? PdfDate(modified) : null);
 
         return info;
+    }
+
+    // PageLayout and PageMode are catalog entries (ISO 32000-1 Table 28); the rest are
+    // grouped in the /ViewerPreferences dictionary (Table 150). Only set options are
+    // written, and a dictionary is only added when at least one of its flags is present,
+    // so an all-default ViewerPreferences leaves the catalog untouched.
+    private static void WriteViewerPreferences(DictionaryObject catalog, ViewerPreferences preferences)
+    {
+        if (preferences.PageLayout is { } layout)
+        {
+            catalog["PageLayout"] = new NameObject(layout.ToString());
+        }
+
+        if (preferences.PageMode is { } mode)
+        {
+            catalog["PageMode"] = new NameObject(mode.ToString());
+        }
+
+        DictionaryObject? dictionary = null;
+
+        void Flag(string key, bool value)
+        {
+            if (value)
+            {
+                dictionary ??= new DictionaryObject();
+                dictionary[key] = new BooleanObject(true);
+            }
+        }
+
+        Flag("HideToolbar", preferences.HideToolbar);
+        Flag("HideMenubar", preferences.HideMenubar);
+        Flag("FitWindow", preferences.FitWindow);
+        Flag("CenterWindow", preferences.CenterWindow);
+        Flag("DisplayDocTitle", preferences.DisplayDocTitle);
+
+        if (preferences.Direction is { } direction)
+        {
+            dictionary ??= new DictionaryObject();
+            dictionary["Direction"] = new NameObject(direction == PdfReadingDirection.RightToLeft ? "R2L" : "L2R");
+        }
+
+        if (dictionary is not null)
+        {
+            catalog["ViewerPreferences"] = dictionary;
+        }
     }
 
     // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSS followed by the UTC offset as
