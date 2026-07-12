@@ -34,6 +34,15 @@ public sealed class FontCollection
     /// </summary>
     public bool AllowRestrictedEmbedding { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether a font that would render degraded - a variable font
+    /// (embedded only at its default instance) or a color font (COLR/sbix/SVG,
+    /// rendered monochrome) - may still be registered. Defaults to
+    /// <see langword="false"/>, so registering such a font fails loudly rather
+    /// than silently producing wrong output.
+    /// </summary>
+    public bool AllowDegradedFonts { get; set; }
+
     // Content-keyed parse cache: entries are keyed on a signature of the font bytes so
     // the same content hits regardless of how the caller wraps it. Values are weak and
     // dead entries are pruned on access, so nothing is rooted for the life of the
@@ -83,6 +92,7 @@ public sealed class FontCollection
         // ISO 32000-1 9.9 / OS/2 fsType: a Restricted License Embedding font must not be
         // embedded unless the caller holds a license and explicitly opts in.
         face.EnsureEmbeddable(AllowRestrictedEmbedding);
+        face.EnsureRenderable(AllowDegradedFonts);
         registered[(family, bold, italic)] = face;
     }
 
@@ -317,6 +327,7 @@ public sealed class FontCollection
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(font);
+        SimpleShaper.EnsureNoComplexScript(text);
 
         if (TryResolvePrimary(font, out var primary))
         {
