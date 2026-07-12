@@ -118,7 +118,7 @@ internal static class LineBreaker
         var p = position + word.GapAfter;
         for (var t = 0; t < word.TabsAfter; t++)
         {
-            p = stops is not null && TryNextStop(stops, p, out var stopPos, out _)
+            p = stops is not null && TryNextStop(stops, p, out var stopPos, out _, out _)
                 ? stopPos
                 : AdvanceToTabStop(p);
         }
@@ -678,6 +678,7 @@ internal static class LineBreaker
         var fi = 0;
         var w = first;
         var tabsBefore = 0;
+        List<LineFragment>? leaders = null;
         while (w <= last)
         {
             var segEnd = w;
@@ -686,19 +687,23 @@ internal static class LineBreaker
                 segEnd++;
             }
 
+            var gapStart = cursor;
             var alignment = TabAlignment.Left;
+            var leaderChar = '\0';
             var stopPos = cursor;
             for (var t = 0; t < tabsBefore; t++)
             {
-                if (TryNextStop(stops, cursor, out var nextPos, out var nextAlign))
+                if (TryNextStop(stops, cursor, out var nextPos, out var nextAlign, out var nextLeader))
                 {
                     stopPos = nextPos;
                     alignment = nextAlign;
+                    leaderChar = nextLeader;
                 }
                 else
                 {
                     stopPos = AdvanceToTabStop(cursor);
                     alignment = TabAlignment.Left;
+                    leaderChar = '\0';
                 }
 
                 cursor = stopPos;
@@ -715,6 +720,12 @@ internal static class LineBreaker
                     TabAlignment.Decimal => stopPos - decimalOffset,
                     _ => stopPos,
                 };
+
+            if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + 1e-6)
+            {
+                var leaderFont = fi < span.Length ? span[fi].Run.ResolvedFont : (paragraph.EffectiveFont ?? paragraph.Font);
+                (leaders ??= []).Add(BuildLeader(leaderChar, gapStart, start, indent, leaderFont, fonts));
+            }
 
             var x = start;
             for (var ww = w; ww <= segEnd; ww++)
@@ -746,9 +757,40 @@ internal static class LineBreaker
             }
         }
 
+        if (leaders is not null)
+        {
+            fragments.AddRange(leaders);
+        }
+
         var box = new LineBox { Fragments = fragments, Width = naturalWidth };
         Measure(box, paragraph.LineSpacing, fonts);
         return box;
+    }
+
+    // A run of the leader character right-aligned to the tab position (gapEnd), filling as
+    // much of [gapStart, gapEnd) as whole leader glyphs allow. XOffset already carries the
+    // paragraph indent so leaders share the segments' coordinate space.
+    private static LineFragment BuildLeader(char leader, double gapStart, double gapEnd, double indent, Font font, FontCollection fonts)
+    {
+        var text = leader.ToString();
+        var leaderWidth = fonts.MeasureText(text, font);
+        var count = leaderWidth > 0 ? (int)System.Math.Floor((gapEnd - gapStart) / leaderWidth) : 0;
+        if (count <= 0)
+        {
+            return new LineFragment { Run = new Run(string.Empty) { EffectiveFont = font }, Text = string.Empty, Start = 0, Length = 0, Advance = 0 };
+        }
+
+        var advance = count * leaderWidth;
+        var fill = new string(leader, count);
+        return new LineFragment
+        {
+            Run = new Run(fill) { EffectiveFont = font },
+            Text = fill,
+            Start = 0,
+            Length = count,
+            XOffset = indent + gapEnd - advance,
+            Advance = advance,
+        };
     }
 
     // Segment width (advances plus interior word gaps) and the offset from the segment start to its
@@ -786,7 +828,7 @@ internal static class LineBreaker
         return (width, decimalOffset < 0 ? width : decimalOffset);
     }
 
-    private static bool TryNextStop(List<TabStop> stops, double cursor, out double position, out TabAlignment alignment)
+    private static bool TryNextStop(List<TabStop> stops, double cursor, out double position, out TabAlignment alignment, out char leader)
     {
         for (var i = 0; i < stops.Count; i++)
         {
@@ -794,12 +836,14 @@ internal static class LineBreaker
             {
                 position = stops[i].Position.Point;
                 alignment = stops[i].Alignment;
+                leader = stops[i].Leader;
                 return true;
             }
         }
 
         position = 0;
         alignment = TabAlignment.Left;
+        leader = '\0';
         return false;
     }
 
