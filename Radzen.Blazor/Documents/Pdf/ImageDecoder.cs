@@ -88,9 +88,19 @@ internal static class ImageDecoder
     // keeping the default output byte-identical.
     public static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
     {
+        if (image.Stencil && image.ColorKeyMask is not null)
+        {
+            throw new InvalidOperationException("Colour-key masking cannot be combined with a stencil mask.");
+        }
+
         if (image.Stencil)
         {
             xobject = BuildStencilMask(xobject);
+        }
+
+        if (image.ColorKeyMask is { } ranges)
+        {
+            ApplyColorKeyMask(xobject, ranges);
         }
 
         if (image.Interpolate)
@@ -99,6 +109,55 @@ internal static class ImageDecoder
         }
 
         return xobject;
+    }
+
+    // Colour-key masking (ISO 32000-1 8.9.6.4): /Mask holds one inclusive [min max] pair per
+    // colour component; a pixel whose components all fall within their ranges is not painted.
+    private static void ApplyColorKeyMask(ImageXObject xobject, int[] ranges)
+    {
+        if (ranges.Length == 0 || (ranges.Length % 2) != 0)
+        {
+            throw new ArgumentException("A colour-key mask must be a non-empty sequence of [min max] pairs.", nameof(ranges));
+        }
+
+        if (xobject.SoftMask is not null)
+        {
+            throw new InvalidOperationException("Colour-key masking cannot be combined with an image that has an alpha channel.");
+        }
+
+        var dict = xobject.Image.Dictionary;
+        if (ColorComponents(dict) is { } components && ranges.Length != 2 * components)
+        {
+            throw new ArgumentException(
+                $"A colour-key mask needs one [min max] pair per colour component ({components}).", nameof(ranges));
+        }
+
+        var array = new ArrayObject();
+        foreach (var value in ranges)
+        {
+            array.Add(new NumberObject(value));
+        }
+
+        dict["Mask"] = array;
+    }
+
+    // Colour-component count of the image's colour space, or null when it cannot be told from
+    // the dictionary (a JPXDecode image carries its own colour space and has no /ColorSpace).
+    private static int? ColorComponents(DictionaryObject dict)
+    {
+        if (!dict.TryGetValue("ColorSpace", out var colorSpace) || colorSpace is null)
+        {
+            return null;
+        }
+
+        return colorSpace switch
+        {
+            NameObject { Value: "DeviceGray" } => 1,
+            NameObject { Value: "DeviceRGB" } => 3,
+            NameObject { Value: "DeviceCMYK" } => 4,
+            ArrayObject { Count: > 0 } array when array[0] is NameObject { Value: "Indexed" } => 1,
+            _ => null,
+        };
     }
 
     // Re-expresses a 1-bit grayscale image as a stencil mask (ISO 32000-1 8.9.6.2): the same

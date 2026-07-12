@@ -51,9 +51,17 @@ public sealed class Image : Block
     /// </summary>
     public bool Stencil { get; set; }
 
+    /// <summary>
+    /// Gets or sets the colour-key masking ranges (<c>/Mask</c>, ISO 32000-1 8.9.6.4). The array
+    /// holds one inclusive <c>[min max]</c> pair per colour component, in the image's own sample
+    /// range; a pixel whose components all fall within their ranges is left unpainted. When
+    /// <see langword="null"/> (the default) no colour-key mask is applied.
+    /// </summary>
+    public int[]? ColorKeyMask { get; set; }
+
     // True when the image opts into any XObject-dictionary option, so emission can keep the
     // default path (and its bytes) untouched for an image that uses none of them.
-    internal bool HasXObjectOptions => Interpolate || Stencil;
+    internal bool HasXObjectOptions => Interpolate || Stencil || ColorKeyMask is not null;
 
     internal (Unit Width, Unit Height)? FitBox { get; private set; }
 

@@ -56,6 +56,58 @@ public class ImageXObjectOptionTests
         Assert.False(dict.ContainsKey("Interpolate"), "default image must not carry /Interpolate");
     }
 
+    [Fact]
+    public void ColorKeyMask_WhenSet_EmitsMaskRangeArray()
+    {
+        var builder = new DocumentBuilder();
+        AddImage(builder, "Images/rgb.png").ColorKeyMask = [0, 0, 0, 0, 0, 0];
+
+        var dict = SingleImageDictionary(builder);
+
+        var mask = Assert.IsType<ArrayObject>(dict["Mask"]);
+        Assert.Equal(6, mask.Count);
+        foreach (var entry in mask)
+        {
+            Assert.Equal(0, ((NumberObject)entry).IntValue);
+        }
+
+        Assert.Equal("DeviceRGB", ((NameObject)dict["ColorSpace"]).Value);
+    }
+
+    [Fact]
+    public void ColorKeyMask_PreservesRangeValues()
+    {
+        var builder = new DocumentBuilder();
+        AddImage(builder, "Images/rgb.png").ColorKeyMask = [10, 20, 30, 40, 50, 60];
+
+        var mask = Assert.IsType<ArrayObject>(SingleImageDictionary(builder)["Mask"]);
+        var values = new int[mask.Count];
+        for (var i = 0; i < mask.Count; i++)
+        {
+            values[i] = ((NumberObject)mask[i]).IntValue;
+        }
+
+        Assert.Equal([10, 20, 30, 40, 50, 60], values);
+    }
+
+    [Fact]
+    public void ColorKeyMask_WhenUnset_OmitsMaskKey()
+    {
+        var builder = new DocumentBuilder();
+        AddImage(builder, "Images/rgb.png");
+
+        Assert.False(SingleImageDictionary(builder).ContainsKey("Mask"), "default image must not carry /Mask");
+    }
+
+    [Fact]
+    public void ColorKeyMask_WrongComponentCount_Throws()
+    {
+        var builder = new DocumentBuilder();
+        AddImage(builder, "Images/rgb.png").ColorKeyMask = [0, 0];
+
+        Assert.Throws<ArgumentException>(() => builder.ToArray());
+    }
+
     private static Image AddImage(DocumentBuilder builder, byte[] png)
     {
         var section = builder.Sections.Add();
