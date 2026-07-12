@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf.Signing;
 /// Adds a PAdES document time-stamp (the B-T building block, a
 /// <c>DocTimeStamp</c> per ISO 32000-2 section 12.8.5) to an existing PDF as an
 /// incremental update: a signature field whose value dictionary carries
-/// <c>/Type /Sig</c>, <c>/SubFilter /ETSI.RFC3161</c>, a <c>/ByteRange</c> over
+/// <c>/Type /DocTimeStamp</c>, <c>/SubFilter /ETSI.RFC3161</c>, a <c>/ByteRange</c> over
 /// the whole file except <c>/Contents</c>, and an RFC 3161 time-stamp token in
 /// <c>/Contents</c>.
 /// </summary>
@@ -60,7 +60,7 @@ public static class PdfTimestamper
 
         var signature = new DictionaryObject
         {
-            ["Type"] = new NameObject("Sig"),
+            ["Type"] = new NameObject("DocTimeStamp"),
             ["Filter"] = new NameObject("Adobe.PPKLite"),
             ["SubFilter"] = new NameObject("ETSI.RFC3161"),
             ["ByteRange"] = PdfSigner.ByteRangePlaceholder(),
