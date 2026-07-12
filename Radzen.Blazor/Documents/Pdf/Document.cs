@@ -44,6 +44,12 @@ public sealed class Document
     /// </summary>
     public IList<FormFieldDefinition> FormFields { get; } = [];
 
+    /// <summary>
+    /// Gets or sets the encryption to apply when saving. When <c>null</c> the
+    /// document is written unencrypted.
+    /// </summary>
+    public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -618,7 +624,7 @@ public sealed class Document
             ValidateConformance();
         }
 
-        var writer = new DocumentWriter(stream);
+        var writer = new DocumentWriter(stream) { Encryption = Encryption };
 
         var catalog = new DictionaryObject();
         var catalogRef = writer.Add(catalog);
