@@ -66,6 +66,13 @@ public sealed class Document
     // the sRGB output intent, the trailer /ID and full-embedding enforcement.
     internal PdfAConformance Conformance { get; set; }
 
+    // PDF/UA-1 identification requested at build time; drives the pdfuaid XMP
+    // entry, the DisplayDocTitle viewer preference and tagging enforcement.
+    internal bool PdfUA { get; set; }
+
+    // Natural language of the document (catalog /Lang); required by PDF/UA.
+    internal string? Language { get; set; }
+
     // Files embedded on save (EmbeddedFiles name tree + /AF associated files).
     internal List<Attachment> Attachments { get; } = [];
 
@@ -206,7 +213,7 @@ public sealed class Document
     {
         System.ArgumentNullException.ThrowIfNull(stream);
 
-        if (Conformance != PdfAConformance.None)
+        if (Conformance != PdfAConformance.None || PdfUA)
         {
             new ConformanceWriter(this).ValidateConformance();
         }
@@ -400,14 +407,17 @@ public sealed class Document
             catalog["Outlines"] = new NavigationWriter(this).WriteOutline(writer, pageNodes);
         }
 
-        if (Conformance != PdfAConformance.None)
+        if (Conformance != PdfAConformance.None || PdfUA)
         {
             new ConformanceWriter(this).WriteConformance(writer, catalog);
         }
 
         writer.Trailer["Root"] = catalogRef;
 
-        var info = BuildInfo();
+        // PDF/A-4 (ISO 19005-4, 6.1.3) forbids the trailer /Info key; the
+        // document metadata lives in the XMP stream instead.
+        var isPart4 = Conformance is PdfAConformance.PdfA4 or PdfAConformance.PdfA4E or PdfAConformance.PdfA4F;
+        var info = isPart4 ? null : BuildInfo();
         if (info is not null)
         {
             writer.Trailer["Info"] = writer.Add(info);
