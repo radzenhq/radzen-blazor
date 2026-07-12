@@ -33,12 +33,7 @@ internal static class PageResourceBuilder
         foreach (var state in page.ExtGStates)
         {
             extGStates ??= new DictionaryObject();
-            extGStates[state.Key] = new DictionaryObject
-            {
-                ["Type"] = new NameObject("ExtGState"),
-                ["ca"] = new NumberObject(state.FillAlpha),
-                ["CA"] = new NumberObject(state.StrokeAlpha),
-            };
+            extGStates[state.Key] = ExtGStateDictionary(state.FillAlpha, state.StrokeAlpha);
         }
 
         if (fonts is null && xobjects is null && extGStates is null)
@@ -63,6 +58,53 @@ internal static class PageResourceBuilder
         }
 
         return resources;
+    }
+
+    // Builds an /ExtGState parameter dictionary. Alpha (/ca, /CA) is always present;
+    // /BM (blend mode), /OP + /op + /OPM (overprint) and /RI (rendering intent) are
+    // appended only when requested, so an alpha-only state stays Type/ca/CA verbatim.
+    public static DictionaryObject ExtGStateDictionary(
+        double fillAlpha,
+        double strokeAlpha,
+        BlendMode? blend = null,
+        bool? overprintStroke = null,
+        bool? overprintFill = null,
+        int? overprintMode = null,
+        RenderingIntent? intent = null)
+    {
+        var dictionary = new DictionaryObject
+        {
+            ["Type"] = new NameObject("ExtGState"),
+            ["ca"] = new NumberObject(fillAlpha),
+            ["CA"] = new NumberObject(strokeAlpha),
+        };
+
+        if (blend is { } mode)
+        {
+            dictionary["BM"] = new NameObject(mode.PdfName());
+        }
+
+        if (overprintStroke is { } stroke)
+        {
+            dictionary["OP"] = new BooleanObject(stroke);
+        }
+
+        if (overprintFill is { } fill)
+        {
+            dictionary["op"] = new BooleanObject(fill);
+        }
+
+        if (overprintMode is { } opm)
+        {
+            dictionary["OPM"] = new NumberObject(opm);
+        }
+
+        if (intent is { } ri)
+        {
+            dictionary["RI"] = new NameObject(ri.PdfName());
+        }
+
+        return dictionary;
     }
 
     private static DocumentObject ResolveFont(DocumentWriter writer, GeneratedFont font, Dictionary<GeneratedFont, DocumentObject> cache)
