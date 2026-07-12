@@ -48,6 +48,14 @@ public sealed class Document
     // Files embedded on save (EmbeddedFiles name tree + /AF associated files).
     internal List<Attachment> Attachments { get; } = [];
 
+    // Outline (bookmark) tree copied from DocumentBuilder.Outline; emitted on
+    // save as the catalog /Outlines tree.
+    internal List<OutlineItem> Outline { get; } = [];
+
+    // Named destinations recorded at emit time (Run.Anchor); emitted on save as
+    // the catalog /Names /Dests name tree.
+    internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
+
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and
     /// parsed through the internal reader; each page's raw content-stream bytes
@@ -441,7 +449,11 @@ public sealed class Document
                 pageNode["CropBox"] = NumberBox(cropBox);
             }
 
-            if (sourceRotations.TryGetValue(page, out var rotation))
+            if (page.Rotate != 0)
+            {
+                pageNode["Rotate"] = new NumberObject(page.Rotate);
+            }
+            else if (sourceRotations.TryGetValue(page, out var rotation))
             {
                 pageNode["Rotate"] = new NumberObject(rotation);
             }
@@ -573,6 +585,16 @@ public sealed class Document
         if (Attachments.Count > 0)
         {
             WriteAttachments(writer, catalog);
+        }
+
+        if (Anchors.Count > 0)
+        {
+            WriteDestinations(writer, catalog, pageNodes);
+        }
+
+        if (Outline.Count > 0)
+        {
+            catalog["Outlines"] = WriteOutline(writer, pageNodes);
         }
 
         if (Conformance != PdfAConformance.None)
@@ -1120,6 +1142,125 @@ public sealed class Document
         }
     }
 
+    // Emits the /Names /Dests name tree mapping each anchor to [pageRef /XYZ 0 top 0],
+    // merging into a /Names dictionary the attachments block may already have set.
+    private void WriteDestinations(
+        DocumentWriter writer,
+        DictionaryObject catalog,
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        var sorted = new SortedDictionary<string, GeneratedAnchor>(Anchors, StringComparer.Ordinal);
+        var names = new ArrayObject();
+        foreach (var (name, anchor) in sorted)
+        {
+            names.Add(new StringObject(name));
+            names.Add(DestinationArray(pageNodes[anchor.PageIndex].Reference, anchor.Top));
+        }
+
+        var dests = writer.Add(new DictionaryObject { ["Names"] = names });
+        if (catalog.TryGetValue("Names", out var existing) && existing is DictionaryObject tree)
+        {
+            tree["Dests"] = dests;
+        }
+        else
+        {
+            catalog["Names"] = new DictionaryObject { ["Dests"] = dests };
+        }
+    }
+
+    private ReferenceObject WriteOutline(
+        DocumentWriter writer,
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        var root = new DictionaryObject { ["Type"] = new NameObject("Outlines") };
+        var rootRef = writer.Add(root);
+        root["Count"] = new NumberObject(WriteOutlineLevel(writer, Outline, root, rootRef, pageNodes));
+        return rootRef;
+    }
+
+    // Writes one sibling level and recurses into children; returns the number of
+    // items in the subtree so every /Count is positive (all levels open).
+    private int WriteOutlineLevel(
+        DocumentWriter writer,
+        IReadOnlyList<OutlineItem> items,
+        DictionaryObject parent,
+        ReferenceObject parentRef,
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        var nodes = new List<(DictionaryObject Node, ReferenceObject Reference)>(items.Count);
+        foreach (var item in items)
+        {
+            var node = new DictionaryObject
+            {
+                ["Title"] = new StringObject(item.Title),
+                ["Parent"] = parentRef,
+                ["Dest"] = OutlineDestination(item.Target, pageNodes),
+            };
+
+            nodes.Add((node, writer.Add(node)));
+        }
+
+        var total = items.Count;
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (i > 0)
+            {
+                nodes[i].Node["Prev"] = nodes[i - 1].Reference;
+            }
+
+            if (i < items.Count - 1)
+            {
+                nodes[i].Node["Next"] = nodes[i + 1].Reference;
+            }
+
+            if (items[i].Children.Count > 0)
+            {
+                var descendants = WriteOutlineLevel(writer, [.. items[i].Children], nodes[i].Node, nodes[i].Reference, pageNodes);
+                nodes[i].Node["Count"] = new NumberObject(descendants);
+                total += descendants;
+            }
+        }
+
+        parent["First"] = nodes[0].Reference;
+        parent["Last"] = nodes[^1].Reference;
+        return total;
+    }
+
+    // An anchor target navigates through the named-destination tree; a page target
+    // gets an explicit destination to the top of the page.
+    private DocumentObject OutlineDestination(
+        OutlineTarget target,
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        if (target.Anchor is { } anchor)
+        {
+            if (!Anchors.ContainsKey(anchor))
+            {
+                throw new InvalidOperationException($"Outline target anchor '{anchor}' does not exist; set Run.Anchor on the destination run.");
+            }
+
+            return new StringObject(anchor);
+        }
+
+        var pageIndex = target.PageIndex ?? 0;
+        if (pageIndex >= pageNodes.Count)
+        {
+            throw new InvalidOperationException($"Outline target page index {pageIndex} is out of range; the document has {pageNodes.Count} pages.");
+        }
+
+        var (page, _, reference) = pageNodes[pageIndex];
+        return DestinationArray(reference, page.Height.Point);
+    }
+
+    private static ArrayObject DestinationArray(ReferenceObject pageRef, double top) =>
+    [
+        pageRef,
+        new NameObject("XYZ"),
+        new NumberObject(0.0),
+        new NumberObject(top),
+        new NumberObject(0.0),
+    ];
+
     private static ArrayObject BuildLinkAnnotations(DocumentWriter writer, IReadOnlyList<GeneratedLink> links)
     {
         var annots = new ArrayObject();
@@ -1144,11 +1285,17 @@ public sealed class Document
                 // PDF/A (ISO 19005-3 6.3.2) requires the Print flag (bit 3 = 4) set
                 // and Hidden/NoView clear on every annotation.
                 ["F"] = new NumberObject(4),
-                ["A"] = new DictionaryObject
-                {
-                    ["S"] = new NameObject("URI"),
-                    ["URI"] = new StringObject(link.Uri),
-                },
+                ["A"] = link.Destination is { } destination
+                    ? new DictionaryObject
+                    {
+                        ["S"] = new NameObject("GoTo"),
+                        ["D"] = new StringObject(destination),
+                    }
+                    : new DictionaryObject
+                    {
+                        ["S"] = new NameObject("URI"),
+                        ["URI"] = new StringObject(link.Uri!),
+                    },
             }));
         }
 

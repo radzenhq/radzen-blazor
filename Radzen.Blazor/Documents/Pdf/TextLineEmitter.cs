@@ -16,6 +16,10 @@ internal sealed class TextLineEmitter(
 {
     private readonly List<byte> scratchBytes = [];
 
+    // Named destinations recorded at emit time: anchor name -> (page, line top).
+    // First occurrence wins so a run split across pages anchors where it starts.
+    public Dictionary<string, GeneratedAnchor> Anchors { get; } = new(System.StringComparer.Ordinal);
+
     // Header/footer bands are laid out once per section and reused on every page, so
     // a paragraph containing page-number fields is re-resolved here at emit time with
     // the actual page number and total count substituted.
@@ -58,6 +62,14 @@ internal sealed class TextLineEmitter(
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
+        foreach (var fragment in line.Fragments)
+        {
+            if (fragment.Run.Anchor is { Length: > 0 } anchor)
+            {
+                Anchors.TryAdd(anchor, new GeneratedAnchor(context.PageNumber - 1, baseline));
+            }
+        }
+
         var lineFragments = CoalesceFragments(line.Fragments);
         for (var fi = 0; fi < lineFragments.Count; fi++)
         {
@@ -99,7 +111,9 @@ internal sealed class TextLineEmitter(
         while (i < fragments.Count)
         {
             var run = fragments[i].Run;
-            if (run.Link is not { Length: > 0 } uri || fragments[i].Text.Length == 0)
+            var uri = run.Link is { Length: > 0 } link ? link : null;
+            var destination = uri is null && run.LinkToAnchor is { Length: > 0 } anchor ? anchor : null;
+            if ((uri is null && destination is null) || fragments[i].Text.Length == 0)
             {
                 i++;
                 continue;
@@ -122,6 +136,7 @@ internal sealed class TextLineEmitter(
                 X2 = originX + end,
                 Y2 = y + (size * 0.9),
                 Uri = uri,
+                Destination = destination,
             });
 
             i = j;

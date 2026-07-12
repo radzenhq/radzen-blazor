@@ -20,6 +20,20 @@ public class Run(string text)
     /// </summary>
     public string? Link { get; set; }
 
+    /// <summary>
+    /// Gets or sets the internal link target. When set, every laid-out fragment of
+    /// this run is covered by a link annotation that jumps to the anchor of the
+    /// same name (see <see cref="Anchor"/>).
+    /// </summary>
+    public string? LinkToAnchor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the anchor name marking this run's position as a named
+    /// destination. Outline entries (<see cref="OutlineTarget.ToAnchor"/>) and
+    /// internal links (<see cref="LinkToAnchor"/>) navigate to it.
+    /// </summary>
+    public string? Anchor { get; set; }
+
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
 
