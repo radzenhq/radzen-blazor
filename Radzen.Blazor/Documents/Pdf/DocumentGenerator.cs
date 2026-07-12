@@ -92,6 +92,7 @@ internal sealed class DocumentGenerator
     private readonly StyleResolution resolution;
     private readonly TextLineEmitter textEmitter;
     private readonly TableEmitter tableEmitter;
+    private readonly BoxEmitter boxEmitter;
     private readonly ImageEmitter imageEmitter;
     private readonly CodeEmitter codeEmitter;
     private readonly FieldResolver fieldResolver;
@@ -109,7 +110,9 @@ internal sealed class DocumentGenerator
         codeEmitter = new(fonts);
         imageEmitter = new(imageStore, structureTree);
         fieldResolver = new(fonts);
-        tableEmitter = new(imageStore, structureTree, resolution, new OpacityResolver(builder));
+        var opacities = new OpacityResolver(builder);
+        tableEmitter = new(imageStore, structureTree, resolution, opacities);
+        boxEmitter = new(tableEmitter, opacities);
         watermarkEmitter = new(fonts, fontResolver, imageStore);
     }
 
@@ -297,13 +300,30 @@ internal sealed class DocumentGenerator
             }
         }
 
-        foreach (var positioned in page.Tables)
+        // Boxes take the exact plan slot the lowered single-cell table used to occupy:
+        // table fragments and boxes merge by their shared placement Order (document
+        // order), so a page mixing containers and tables paints in the same relative
+        // order as before boxes became first-class. A page without boxes degenerates
+        // to the old tables-only loop and stays byte-identical.
+        var tables = page.Tables;
+        var boxes = page.Boxes;
+        var t = 0;
+        var bx = 0;
+        while (t < tables.Count || bx < boxes.Count)
         {
-            var mark = plan.Mark();
-            tableEmitter.EmitFragment(context, positioned, left, contentTop);
-            if (positioned.Transform is { } transform)
+            if (bx >= boxes.Count || (t < tables.Count && tables[t].Order <= boxes[bx].Order))
             {
-                plan.ApplyTransform(transform, mark);
+                var positioned = tables[t++];
+                var mark = plan.Mark();
+                tableEmitter.EmitFragment(context, positioned, left, contentTop);
+                if (positioned.Transform is { } transform)
+                {
+                    plan.ApplyTransform(transform, mark);
+                }
+            }
+            else
+            {
+                boxEmitter.EmitBox(context, boxes[bx++], left, contentTop);
             }
         }
 

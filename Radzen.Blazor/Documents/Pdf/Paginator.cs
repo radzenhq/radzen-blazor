@@ -25,6 +25,34 @@ internal readonly struct PositionedTableFragment
     /// container), or <see langword="null"/> for none.
     /// </summary>
     public Matrix? Transform { get; init; }
+
+    /// <summary>
+    /// Placement sequence within the section body, shared with <see cref="PositionedBox.Order"/>
+    /// so page emission can interleave boxes and table fragments in document order.
+    /// </summary>
+    public int Order { get; init; }
+}
+
+// A section-level Stack container placed as a first-class box: the decoration paints
+// through BoxRenderer and the laid-out content through TableEmitter.EmitBoxContent.
+// Bounds is in content space (X from the content-box left, Y from the content-box top,
+// Y == Bounds.Top). Style carries no ExtGState - the box's own opacity is registered
+// per page by the emitter. Rotation/overlay containers keep the table-lowering path.
+internal readonly struct PositionedBox
+{
+    public required Container Source { get; init; }
+
+    public required LaidOutBoxContent Content { get; init; }
+
+    public required Rect Bounds { get; init; }
+
+    public required BoxStyle Style { get; init; }
+
+    public required double Y { get; init; }
+
+    public required double Opacity { get; init; }
+
+    public int Order { get; init; }
 }
 
 internal readonly struct PositionedImage
@@ -84,6 +112,8 @@ internal sealed class PaginatedPage
     public IReadOnlyList<PositionedTableFragment> FooterTables { get; init; } = [];
 
     public IReadOnlyList<PositionedTableFragment> Tables { get; init; } = [];
+
+    public IReadOnlyList<PositionedBox> Boxes { get; init; } = [];
 
     public IReadOnlyList<PositionedImage> Images { get; init; } = [];
 
@@ -157,10 +187,11 @@ internal static class Paginator
 
         List<PositionedLine> current = [];
         List<PositionedTableFragment> currentTables = [];
+        List<PositionedBox> currentBoxes = [];
         List<PositionedImage> currentImages = [];
         List<PositionedCode> currentCodes = [];
 
-        bool HasPageContent() => current.Count > 0 || currentTables.Count > 0 || currentImages.Count > 0 || currentCodes.Count > 0;
+        bool HasPageContent() => current.Count > 0 || currentTables.Count > 0 || currentBoxes.Count > 0 || currentImages.Count > 0 || currentCodes.Count > 0;
 
         void Flush()
         {
@@ -179,6 +210,7 @@ internal static class Paginator
                 HeaderTables = header.Tables,
                 FooterTables = footer.Tables,
                 Tables = currentTables,
+                Boxes = currentBoxes,
                 Images = currentImages,
                 Codes = currentCodes,
                 HeaderCodes = header.Codes,
@@ -186,6 +218,7 @@ internal static class Paginator
             });
             current = [];
             currentTables = [];
+            currentBoxes = [];
             currentImages = [];
             currentCodes = [];
         }
@@ -194,12 +227,21 @@ internal static class Paginator
 
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
-        // Overlay/rotated containers stay unlowered and are placed by PlaceSpecialContainer.
+        // Containers stay unlowered: Stack containers are placed as first-class boxes by
+        // PlaceBox and overlay/rotated ones by PlaceSpecialContainer.
         var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
         var tableLayouts = new LaidOutTable?[blocks.Count];
+
+        // Stack container content is likewise measured at most once and shared between the
+        // KeepWithNext look-ahead and PlaceBox.
+        var boxMeasures = new BoxContentLayout.Measured?[blocks.Count];
+
+        // Placement sequence shared by table fragments and boxes so page emission can
+        // interleave them in document order.
+        var order = 0;
 
         // A table starts at the current cursor; its first fragment gets the remaining
         // height and only breaks early when the repeating header plus the first body
@@ -214,6 +256,7 @@ internal static class Paginator
                 cursor = 0;
             }
 
+            var tableOrder = order++;
             var fragments = TablePaginator.Paginate(layout, table, contentHeight - cursor, contentHeight);
             for (var f = 0; f < fragments.Count; f++)
             {
@@ -228,9 +271,54 @@ internal static class Paginator
                     Layout = layout,
                     Fragment = fragments[f],
                     Y = cursor,
+                    Order = tableOrder,
                 });
                 cursor += fragments[f].Height;
             }
+        }
+
+        // A Stack container is ONE unbreakable unit placed as a first-class box: its content
+        // lays out through BoxContentLayout (the cell primitive) at the box's inner width,
+        // and the whole box moves to the next page when it does not fit - it never splits.
+        void PlaceBox(int index, Container container)
+        {
+            var padding = container.Padding.Point;
+            var boxWidth = container.Width?.Point ?? contentWidth;
+            var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
+            var innerWidth = System.Math.Max(0, boxWidth - (2 * padding));
+            var measured = boxMeasures[index] ??= MeasureBox(container, contentWidth, fonts, measureImage);
+            var boxHeight = measured.Height + (2 * padding);
+
+            if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
+            {
+                Flush();
+                cursor = 0;
+            }
+
+            // Content is positioned box-local (Y from the box top); the emitter shifts it by
+            // the box's page Y. Align/vAlign match the lowered single-cell table's defaults.
+            var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
+            var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
+
+            currentBoxes.Add(new PositionedBox
+            {
+                Source = container,
+                Content = content,
+                Bounds = new Rect(indent, cursor, boxWidth, boxHeight),
+                Style = new BoxStyle
+                {
+                    Background = container.Background,
+                    Top = container.Borders.Top,
+                    Right = container.Borders.Right,
+                    Bottom = container.Borders.Bottom,
+                    Left = container.Borders.Left,
+                    CornerRadius = container.CornerRadius,
+                },
+                Y = cursor,
+                Opacity = container.Opacity,
+                Order = order++,
+            });
+            cursor += boxHeight;
         }
 
         // An overlay or rotated container is placed as one unit that never breaks across
@@ -294,6 +382,7 @@ internal static class Paginator
                     * Matrix.Translate(centerX, centerY);
             }
 
+            var boxOrder = order++;
             foreach (var (table, layout) in placements)
             {
                 foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
@@ -304,6 +393,7 @@ internal static class Paginator
                         Fragment = fragment,
                         Y = cursor,
                         Transform = transform,
+                        Order = boxOrder,
                     });
                 }
             }
@@ -338,9 +428,17 @@ internal static class Paginator
                 continue;
             }
 
-            if (block is Container special)
+            if (block is Container container)
             {
-                PlaceSpecialContainer(special);
+                if (IsSpecial(container))
+                {
+                    PlaceSpecialContainer(container);
+                }
+                else
+                {
+                    PlaceBox(i, container);
+                }
+
                 continue;
             }
 
@@ -438,7 +536,7 @@ internal static class Paginator
                 {
                     placeCount = nrem;
                     if (first && para.KeepWithNext && HasPageContent() &&
-                        NextBlockFirstHeight(blocks, broken, tableLayouts, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
+                        NextBlockFirstHeight(blocks, broken, tableLayouts, boxMeasures, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
                     {
                         var afterCursor = blockTop + SumHeights(lines, offset, placeCount) + spacingAfter;
                         if (afterCursor + nextSpacingBefore + nextHeight > contentHeight + Eps)
@@ -587,15 +685,18 @@ internal static class Paginator
             }
             else if (block is Container container)
             {
-                if (IsSpecial(container))
+                // The section body (keepSpecialContainers: true) keeps EVERY container as a
+                // Container block: Stack containers place as first-class boxes and
+                // overlay/rotated ones go through PlaceSpecialContainer. The cell and band
+                // paths (false) keep lowering Stack containers onto the table engine.
+                if (keepSpecialContainers)
                 {
-                    if (!keepSpecialContainers)
-                    {
-                        throw new System.NotSupportedException(
-                            "Overlay and rotated containers are only supported as direct section content.");
-                    }
-
                     expanded.Add(container);
+                }
+                else if (IsSpecial(container))
+                {
+                    throw new System.NotSupportedException(
+                        "Overlay and rotated containers are only supported as direct section content.");
                 }
                 else
                 {
@@ -871,6 +972,19 @@ internal static class Paginator
             _ => 0,
         };
 
+    // Measures a Stack container's content at the box's inner width (box width minus the
+    // padding on both sides), with the same null alignment the lowered single-cell table
+    // resolved for its synthetic cell.
+    private static BoxContentLayout.Measured MeasureBox(
+        Container container,
+        double contentWidth,
+        FontCollection fonts,
+        System.Func<Image, double, (double Width, double Height)>? measureImage)
+    {
+        var innerWidth = System.Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
+        return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage);
+    }
+
     // The required height of the header rows plus the first body ROW GROUP: the minimum a
     // table needs on a page before its first fragment breaks early. The first group is the
     // rowspan closure TablePaginator force-places as one unit, so it must be measured whole
@@ -935,6 +1049,7 @@ internal static class Paginator
         IReadOnlyList<Block> blocks,
         IReadOnlyList<LineBox>?[] broken,
         LaidOutTable?[] tableLayouts,
+        BoxContentLayout.Measured?[] boxMeasures,
         int index,
         double contentWidth,
         FontCollection fonts,
@@ -959,6 +1074,11 @@ internal static class Paginator
             case Table table:
                 var layout = tableLayouts[next] ??= TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
                 height = TableFirstFragmentHeight(table, layout);
+                return true;
+            case Container container when !IsSpecial(container):
+                // A Stack container never splits, so its first height is the whole box.
+                var measured = boxMeasures[next] ??= MeasureBox(container, contentWidth, fonts, measureImage);
+                height = measured.Height + (2 * container.Padding.Point);
                 return true;
             case Image image:
                 var (_, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
