@@ -73,8 +73,9 @@ public class OpacityWatermarkTests
         container.Borders.Width = 2;
         container.Blocks.Add(Text("Bordered"));
 
+        // Four border edges plus the child text draw share the container's opacity.
         var text = PageText(builder);
-        Assert.Equal(4, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
+        Assert.Equal(5, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
     }
 
     [Fact]
@@ -113,9 +114,10 @@ public class OpacityWatermarkTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
         Assert.Equal(0.3, Alpha(states!, "GS1", "ca"), 6);
 
+        // Each container wraps its background fill and its child text draw.
         var text = PageText(builder);
-        Assert.Equal(2, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
-        Assert.Equal(1, BuildTestSupport.CountOccurrences(text, "/GS1 gs"));
+        Assert.Equal(4, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
+        Assert.Equal(2, BuildTestSupport.CountOccurrences(text, "/GS1 gs"));
     }
 
     [Fact]

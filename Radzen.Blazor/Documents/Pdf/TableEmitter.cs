@@ -102,7 +102,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 var y = line.Y;
                 foreach (var box in context.Fields.ResolveFields(paragraph, cell.ContentBox.Width, pageNumber, pageCount, resolution.Alignment(paragraph)))
                 {
-                    context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), element);
+                    context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), element, opacity);
                     overflows |= box.Width > cell.ContentBox.Width + 0.01;
                     y += box.Height;
                 }
@@ -114,7 +114,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
             else
             {
-                context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), element);
+                context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), element, opacity);
                 overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
                 li++;
             }
@@ -147,6 +147,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
             var xobject = imageStore.Decode(image.Source);
+            var alpha = image.Source.Opacity * opacity;
             plan.Images.Add(new ImageDraw
             {
                 X = left + image.X,
@@ -155,9 +156,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Height = image.Height,
                 Image = xobject,
                 Element = element,
-                ExtGState = image.Source.Opacity < 1
-                    ? plan.RegisterExtGState(image.Source.Opacity, image.Source.Opacity)
-                    : null,
+                ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
             });
             plan.UsedImages.Add(xobject);
         }

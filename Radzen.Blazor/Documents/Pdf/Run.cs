@@ -54,6 +54,12 @@ public class Run(string text)
     /// </summary>
     public double VerticalAlignScale { get; set; } = 0.583;
 
+    /// <summary>
+    /// Gets or sets the opacity this run is painted with, from 0 (fully transparent)
+    /// to 1 (fully opaque). Defaults to 1.
+    /// </summary>
+    public double Opacity { get; set; } = 1;
+
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
 
