@@ -247,7 +247,7 @@ public sealed class DocumentReader
                 var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
                 return new StringObject(Encoding.Latin1.GetString(plain));
             case StreamObject stream:
-                var decrypted = security!.DecryptStream(stream.Data, number, generation);
+                var decrypted = security!.DecryptStream(stream.Data, number, generation, stream.Dictionary);
                 var result = new StreamObject(decrypted);
                 foreach (var key in stream.Dictionary.Keys)
                 {

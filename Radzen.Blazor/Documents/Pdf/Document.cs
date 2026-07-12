@@ -16,8 +16,13 @@ public sealed class Document
     private readonly Dictionary<Page, DictionaryObject> sourcePages = [];
     private readonly Dictionary<Page, DictionaryObject> sourceResources = [];
     private readonly Dictionary<Page, ArrayObject> sourceBoxes = [];
+    private readonly Dictionary<Page, ArrayObject> sourceCropBoxes = [];
+    private readonly Dictionary<Page, int> sourceRotations = [];
     private readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> appendedResources = [];
+    private readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Node)> appendedPages = [];
+    private readonly Dictionary<DocumentReader, DictionaryObject> appendedAcroForms = [];
     private DocumentReader? source;
+    private DictionaryObject? sourceCatalog;
     private DictionaryObject? sourceAcroForm;
 
     /// <summary>Gets the document metadata.</summary>
@@ -77,6 +82,7 @@ public sealed class Document
         var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
             ? c
             : null;
+        document.sourceCatalog = catalog;
         if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
@@ -86,7 +92,7 @@ public sealed class Document
                 visited.Add(pagesReference.ObjectNumber);
             }
 
-            CollectPages(reader, pagesNode, null, null, document, limits, visited, 0);
+            CollectPages(reader, pagesNode, new InheritedAttributes(), document, limits, visited, 0);
         }
 
         if (catalog is not null && catalog.TryGetValue("AcroForm", out var formObject)
@@ -158,6 +164,17 @@ public sealed class Document
                 page.SetTextFonts(BuildTextFonts(other.source, loadedResources));
             }
 
+            // A loaded appended page keeps a handle to its source node so its
+            // /Annots (and any widget-annotation form fields) survive the copy.
+            if (other.source is not null && other.sourcePages.TryGetValue(source, out var sourceNode))
+            {
+                appendedPages[page] = (other.source, sourceNode);
+                if (other.sourceAcroForm is not null)
+                {
+                    appendedAcroForms[other.source] = other.sourceAcroForm;
+                }
+            }
+
             if (other.sourceBoxes.TryGetValue(source, out var box))
             {
                 sourceBoxes[page] = box;
@@ -167,9 +184,22 @@ public sealed class Document
         }
     }
 
+    // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
+    // page tree so a leaf without its own entry re-saves the ancestor's value.
+    private readonly struct InheritedAttributes
+    {
+        public ArrayObject? Box { get; init; }
+
+        public DictionaryObject? Resources { get; init; }
+
+        public ArrayObject? CropBox { get; init; }
+
+        public int? Rotate { get; init; }
+    }
+
     // A visited-set of page-node object numbers is the primary guard against a
     // cyclic /Kids graph; MaxPageTreeDepth is a backstop for a deep acyclic tree.
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, DictionaryObject? inheritedResources, Document document, ReaderLimits limits, HashSet<int> visited, int depth)
+    private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, ReaderLimits limits, HashSet<int> visited, int depth)
     {
         if (depth > limits.MaxPageTreeDepth)
         {
@@ -178,11 +208,21 @@ public sealed class Document
 
         var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
             ? own
-            : inheritedBox;
+            : inherited.Box;
 
         var resources = node.TryGetValue("Resources", out var resourcesObject) && reader.Resolve(resourcesObject!) is DictionaryObject ownResources
             ? ownResources
-            : inheritedResources;
+            : inherited.Resources;
+
+        var cropBox = node.TryGetValue("CropBox", out var cropObject) && reader.Resolve(cropObject!) is ArrayObject ownCrop
+            ? ownCrop
+            : inherited.CropBox;
+
+        var rotate = node.TryGetValue("Rotate", out var rotateObject) && reader.Resolve(rotateObject!) is NumberObject ownRotate
+            ? ownRotate.IntValue
+            : inherited.Rotate;
+
+        var childInherited = new InheritedAttributes { Box = box, Resources = resources, CropBox = cropBox, Rotate = rotate };
 
         if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
         {
@@ -195,7 +235,7 @@ public sealed class Document
 
                 if (reader.Resolve(kid) is DictionaryObject child)
                 {
-                    CollectPages(reader, child, box, resources, document, limits, visited, depth + 1);
+                    CollectPages(reader, child, childInherited, document, limits, visited, depth + 1);
                 }
             }
 
@@ -221,6 +261,17 @@ public sealed class Document
         if (box is not null && box.Count >= 4)
         {
             document.sourceBoxes[page] = box;
+        }
+
+        if (cropBox is not null && cropBox.Count >= 4)
+        {
+            document.sourceCropBoxes[page] = cropBox;
+        }
+
+        // Only a rotation the viewer would actually apply is worth re-emitting.
+        if (rotate is { } degrees && degrees % 360 != 0)
+        {
+            document.sourceRotations[page] = degrees;
         }
     }
 
@@ -369,7 +420,7 @@ public sealed class Document
         var pagesRef = writer.Add(pagesNode);
 
         var importer = source is not null ? new GraphImporter(source, writer) : null;
-        Dictionary<DocumentReader, GraphImporter>? appendImporters = null;
+        var appendImporters = new Dictionary<DocumentReader, GraphImporter>();
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
         var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
@@ -384,6 +435,16 @@ public sealed class Document
                 ["Parent"] = pagesRef,
                 ["MediaBox"] = MediaBox(page),
             };
+
+            if (sourceCropBoxes.TryGetValue(page, out var cropBox))
+            {
+                pageNode["CropBox"] = NumberBox(cropBox);
+            }
+
+            if (sourceRotations.TryGetValue(page, out var rotation))
+            {
+                pageNode["Rotate"] = new NumberObject(rotation);
+            }
 
             var pageRef = writer.Add(pageNode);
             if (importer is not null && sourcePages.TryGetValue(page, out var sourceNode))
@@ -458,7 +519,6 @@ public sealed class Document
             }
             else if (appendedResources.TryGetValue(page, out var appended))
             {
-                appendImporters ??= [];
                 if (!appendImporters.TryGetValue(appended.Reader, out var appendImporter))
                 {
                     appendImporter = new GraphImporter(appended.Reader, writer);
@@ -491,9 +551,23 @@ public sealed class Document
             catalog["StructTreeRoot"] = WriteStructureTree(writer, structure, pageNodes);
         }
 
+        var appendedFields = AppendForms(pageNodes, appendImporters, writer);
+
         if (importer is not null)
         {
-            PreserveForm(importer, catalog, pageNodes);
+            var removed = PruneRemovedPages(importer);
+            PreserveCatalog(importer, catalog, pagesRef);
+            PreserveForm(importer, catalog, pageNodes, removed, appendedFields, writer);
+        }
+        else if (appendedFields.Count > 0)
+        {
+            var fields = new ArrayObject();
+            foreach (var field in appendedFields)
+            {
+                fields.Add(field);
+            }
+
+            catalog["AcroForm"] = writer.Add(new DictionaryObject { ["Fields"] = fields });
         }
 
         if (Attachments.Count > 0)
@@ -748,10 +822,71 @@ public sealed class Document
         return reference;
     }
 
+    // Catalog keys this writer builds itself; a preserved source catalog must not
+    // overwrite them (or drag in a duplicate sub-graph for them).
+    private static readonly HashSet<string> ManagedCatalogKeys = new(StringComparer.Ordinal)
+    {
+        "Type", "Pages", "AcroForm", "Names", "AF", "OutputIntents", "MarkInfo", "StructTreeRoot",
+    };
+
+    // Marks every source page node that was loaded but removed from Pages before
+    // saving so preserved destinations and annotation /P links that still point at
+    // them collapse to null instead of resurrecting the page (and its content).
+    private HashSet<DictionaryObject> PruneRemovedPages(GraphImporter importer)
+    {
+        var removed = new HashSet<DictionaryObject>();
+        var kept = new HashSet<Page>(Pages);
+        foreach (var pair in sourcePages)
+        {
+            if (!kept.Contains(pair.Key))
+            {
+                importer.Prune(pair.Value);
+                removed.Add(pair.Value);
+            }
+        }
+
+        return removed;
+    }
+
+    // Carries catalog-level features a loaded document declared - /Outlines,
+    // /PageLabels, /OpenAction, /ViewerPreferences, /Metadata, /Lang - that this
+    // writer does not build itself. Page-referencing entries repoint onto the new
+    // page tree; entries pointing at a removed page collapse to null.
+    private void PreserveCatalog(GraphImporter importer, DictionaryObject catalog, ReferenceObject pagesRef)
+    {
+        if (sourceCatalog is null || source is null)
+        {
+            return;
+        }
+
+        if (sourceCatalog.TryGetValue("Pages", out var sourcePagesObject)
+            && source.Resolve(sourcePagesObject!) is DictionaryObject sourcePagesNode)
+        {
+            importer.Seed(sourcePagesNode, pagesRef);
+        }
+
+        foreach (var key in sourceCatalog.Keys)
+        {
+            if (ManagedCatalogKeys.Contains(key) || catalog.ContainsKey(key))
+            {
+                continue;
+            }
+
+            // A conforming save writes its own XMP; keep the source's otherwise.
+            if (string.Equals(key, "Metadata", StringComparison.Ordinal) && Conformance != PdfAConformance.None)
+            {
+                continue;
+            }
+
+            catalog[key] = importer.ImportValue(sourceCatalog[key]);
+        }
+    }
+
     // Carries the loaded interactive form across a save: widget /Annots stay on
     // their pages and the catalog keeps its /AcroForm, both pointing at the same
-    // (possibly mutated) field objects.
-    private void PreserveForm(GraphImporter importer, DictionaryObject catalog, List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    // (possibly mutated) field objects. Fields whose widget lived on a removed
+    // page are dropped so the deleted page never re-enters through a /P link.
+    private void PreserveForm(GraphImporter importer, DictionaryObject catalog, List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes, HashSet<DictionaryObject> removed, List<DocumentObject> appendedFields, DocumentWriter writer)
     {
         foreach (var (page, node, _) in pageNodes)
         {
@@ -771,10 +906,148 @@ public sealed class Document
             node["Annots"] = imported;
         }
 
-        if (sourceAcroForm is not null)
+        if (sourceAcroForm is not null && source is not null)
         {
-            catalog["AcroForm"] = importer.ImportInstance(sourceAcroForm);
+            catalog["AcroForm"] = ImportAcroForm(importer, source, sourceAcroForm, removed, appendedFields, writer);
         }
+        else if (appendedFields.Count > 0)
+        {
+            var fields = new ArrayObject();
+            foreach (var field in appendedFields)
+            {
+                fields.Add(field);
+            }
+
+            catalog["AcroForm"] = writer.Add(new DictionaryObject { ["Fields"] = fields });
+        }
+    }
+
+    // Rebuilds the AcroForm field-by-field: source fields whose widget lived on a
+    // removed page are dropped, and already-imported fields from appended pages are
+    // added, so the merged form lists exactly the fields that still have a widget.
+    private static ReferenceObject ImportAcroForm(GraphImporter importer, DocumentReader reader, DictionaryObject acroForm, HashSet<DictionaryObject> removed, List<DocumentObject> appendedFields, DocumentWriter writer)
+    {
+        var result = new DictionaryObject();
+        ArrayObject? fieldsArray = null;
+        foreach (var key in acroForm.Keys)
+        {
+            if (string.Equals(key, "Fields", StringComparison.Ordinal))
+            {
+                fieldsArray = [];
+                if (reader.Resolve(acroForm[key]) is ArrayObject fields)
+                {
+                    foreach (var field in fields)
+                    {
+                        if (!FieldOnRemovedPage(reader, field, removed))
+                        {
+                            fieldsArray.Add(importer.ImportValue(field));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                result[key] = importer.ImportValue(acroForm[key]);
+            }
+        }
+
+        fieldsArray ??= [];
+        foreach (var field in appendedFields)
+        {
+            fieldsArray.Add(field);
+        }
+
+        result["Fields"] = fieldsArray;
+        return writer.Add(result);
+    }
+
+    // Imports the /Annots of every appended loaded page (seeding its new page ref
+    // so annotation /P links repoint) and returns the merged widget/field objects
+    // to add to the combined AcroForm.
+    private List<DocumentObject> AppendForms(List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes, Dictionary<DocumentReader, GraphImporter> appendImporters, DocumentWriter writer)
+    {
+        var fields = new List<DocumentObject>();
+        foreach (var (page, node, reference) in pageNodes)
+        {
+            if (!appendedPages.TryGetValue(page, out var appended))
+            {
+                continue;
+            }
+
+            var reader = appended.Reader;
+            if (!appendImporters.TryGetValue(reader, out var importer))
+            {
+                importer = new GraphImporter(reader, writer);
+                appendImporters[reader] = importer;
+            }
+
+            importer.Seed(appended.Node, reference);
+            if (!appended.Node.TryGetValue("Annots", out var annotsObject)
+                || reader.Resolve(annotsObject!) is not ArrayObject annots)
+            {
+                continue;
+            }
+
+            var imported = new ArrayObject();
+            foreach (var annot in annots)
+            {
+                imported.Add(importer.ImportValue(annot));
+            }
+
+            node["Annots"] = imported;
+
+            if (!appendedAcroForms.ContainsKey(reader))
+            {
+                continue;
+            }
+
+            for (var i = 0; i < annots.Count; i++)
+            {
+                if (reader.Resolve(annots[i]) is DictionaryObject annot && IsMergedFormField(annot))
+                {
+                    fields.Add(imported[i]);
+                }
+            }
+        }
+
+        return fields;
+    }
+
+    // A merged widget/field (ISO 32000-1 12.7.3.1): a /Widget annotation that also
+    // carries the field's /FT and is not a child of another field.
+    private static bool IsMergedFormField(DictionaryObject annot)
+        => annot.TryGetValue("Subtype", out var subtype) && subtype is NameObject name
+            && string.Equals(name.Value, "Widget", StringComparison.Ordinal)
+            && annot.ContainsKey("FT") && !annot.ContainsKey("Parent");
+
+    // A form field is bound to a page through the /P of its own widget (a merged
+    // field/widget) or of any widget in its /Kids.
+    private static bool FieldOnRemovedPage(DocumentReader reader, DocumentObject field, HashSet<DictionaryObject> removed)
+    {
+        if (reader.Resolve(field) is not DictionaryObject dict)
+        {
+            return false;
+        }
+
+        if (dict.TryGetValue("P", out var p) && reader.Resolve(p!) is DictionaryObject page && removed.Contains(page))
+        {
+            return true;
+        }
+
+        if (dict.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        {
+            foreach (var kid in kids)
+            {
+                if (reader.Resolve(kid) is DictionaryObject kidDict
+                    && kidDict.TryGetValue("P", out var kidP)
+                    && reader.Resolve(kidP!) is DictionaryObject kidPage && removed.Contains(kidPage))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     // Imports the loaded page's effective /Resources into the writer and overlays
@@ -1057,13 +1330,7 @@ public sealed class Document
         // content coordinates are preserved verbatim and would otherwise shift.
         if (sourceBoxes.TryGetValue(page, out var box))
         {
-            return
-            [
-                new NumberObject(Number(box[0])),
-                new NumberObject(Number(box[1])),
-                new NumberObject(Number(box[2])),
-                new NumberObject(Number(box[3])),
-            ];
+            return NumberBox(box);
         }
 
         return
@@ -1074,6 +1341,14 @@ public sealed class Document
             new NumberObject(page.Height.Point),
         ];
     }
+
+    private static ArrayObject NumberBox(ArrayObject box) =>
+    [
+        new NumberObject(Number(box[0])),
+        new NumberObject(Number(box[1])),
+        new NumberObject(Number(box[2])),
+        new NumberObject(Number(box[3])),
+    ];
 
     private DictionaryObject? BuildInfo()
     {
