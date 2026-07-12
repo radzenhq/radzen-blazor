@@ -715,7 +715,7 @@ public sealed class Document
     private ArrayObject BuildDocumentId()
     {
         var seed = $"{Info.Title}\n{Info.Author}\n{Pages.Count}\n{DateTime.UtcNow.Ticks}\n{Guid.NewGuid():N}";
-        var hash = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(seed));
+        var hash = Objects.Encryption.Sha2.Sha256(System.Text.Encoding.UTF8.GetBytes(seed));
         var id = Convert.ToHexString(hash, 0, 16);
         return [new StringObject(id), new StringObject(id)];
     }
