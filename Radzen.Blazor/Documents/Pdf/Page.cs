@@ -32,6 +32,31 @@ public sealed class Page
     public Unit Height { get; }
 
     /// <summary>
+    /// Gets or sets the bleed box (<c>/BleedBox</c>): the region to which page contents
+    /// are clipped when output in a production environment. The rectangle is in PDF user
+    /// space, where <c>X, Y</c> is the lower-left corner and the box spans to
+    /// <c>X + Width, Y + Height</c>. When <see langword="null"/> no bleed box is written
+    /// unless one was preserved from a loaded page.
+    /// </summary>
+    public Rect? BleedBox { get; set; }
+
+    /// <summary>
+    /// Gets or sets the trim box (<c>/TrimBox</c>): the intended finished dimensions of
+    /// the page after trimming. Coordinates follow the same convention as
+    /// <see cref="BleedBox"/>. When <see langword="null"/> no trim box is written unless
+    /// one was preserved from a loaded page.
+    /// </summary>
+    public Rect? TrimBox { get; set; }
+
+    /// <summary>
+    /// Gets or sets the art box (<c>/ArtBox</c>): the extent of the page's meaningful
+    /// content as intended by its creator. Coordinates follow the same convention as
+    /// <see cref="BleedBox"/>. When <see langword="null"/> no art box is written unless
+    /// one was preserved from a loaded page.
+    /// </summary>
+    public Rect? ArtBox { get; set; }
+
+    /// <summary>
     /// Gets or sets the clockwise viewing rotation of the page in degrees.
     /// Must be 0, 90, 180 or 270; the default 0 emits no <c>/Rotate</c> key.
     /// </summary>

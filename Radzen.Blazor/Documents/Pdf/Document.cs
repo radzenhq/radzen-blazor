@@ -266,6 +266,10 @@ public sealed class Document
                 pageNode["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
             }
 
+            WriteAuxiliaryBox(pageNode, page, "BleedBox", page.BleedBox);
+            WriteAuxiliaryBox(pageNode, page, "TrimBox", page.TrimBox);
+            WriteAuxiliaryBox(pageNode, page, "ArtBox", page.ArtBox);
+
             if (page.Rotate != 0)
             {
                 pageNode["Rotate"] = new NumberObject(page.Rotate);
@@ -504,6 +508,31 @@ public sealed class Document
         Set("ModDate", Info.ModificationDate is { } modified ? PdfDate(modified) : null);
 
         return info;
+    }
+
+    // Writes /BleedBox, /TrimBox or /ArtBox to a page node. An explicit value on the Page
+    // wins; otherwise a loaded page re-emits the box its source node carried (previously
+    // dropped). A page with neither adds nothing, so untouched output stays byte identical.
+    private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, Rect? value)
+    {
+        if (value is { } rect)
+        {
+            pageNode[key] = new ArrayObject
+            {
+                new NumberObject(rect.X),
+                new NumberObject(rect.Y),
+                new NumberObject(rect.X + rect.Width),
+                new NumberObject(rect.Y + rect.Height),
+            };
+            return;
+        }
+
+        if (source is not null && sourcePages.TryGetValue(page, out var sourceNode)
+            && sourceNode.TryGetValue(key, out var boxObject)
+            && source.Resolve(boxObject!) is ArrayObject box && box.Count >= 4)
+        {
+            pageNode[key] = PageResourceBuilder.NumberBox(box);
+        }
     }
 
     // PageLayout and PageMode are catalog entries (ISO 32000-1 Table 28); the rest are
