@@ -6,7 +6,12 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class FlateFilter
 {
-    public static byte[] Decode(byte[] data)
+    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
+
+    // maxOutput bounds the decompressed size so a compression bomb aborts with a
+    // recoverable DocumentParseException instead of exhausting memory. A fixed-size
+    // read loop is used rather than CopyTo so the cap is checked before each grow.
+    public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
 
@@ -18,7 +23,18 @@ internal static class FlateFilter
         using var input = new MemoryStream(data);
         using var zlib = new ZLibStream(input, CompressionMode.Decompress);
         using var output = new PooledBufferStream((int)Math.Min((long)data.Length * 4, 1 << 20));
-        zlib.CopyTo(output);
+        var buffer = new byte[64 * 1024];
+        int read;
+        while ((read = zlib.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            if (output.Length + read > maxOutput)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
+            }
+
+            output.Write(buffer, 0, read);
+        }
+
         return output.ToArray();
     }
 

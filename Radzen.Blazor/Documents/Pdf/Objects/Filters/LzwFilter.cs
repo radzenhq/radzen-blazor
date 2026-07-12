@@ -9,6 +9,12 @@ internal static class LzwFilter
     const int Eod = 257;
 
     public static byte[] Decode(byte[] data, int early)
+        => Decode(data, early, ReaderLimits.Default.MaxDecodedStreamBytes);
+
+    // maxOutput bounds the decoded size against an LZW bomb; codes are bounds-checked
+    // against the table so a code past the current dictionary raises a recoverable
+    // DocumentParseException instead of an IndexOutOfRangeException.
+    public static byte[] Decode(byte[] data, int early, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
 
@@ -66,13 +72,28 @@ internal static class LzwFilter
             byte[] entry;
             if (previous < 0)
             {
+                if (code < 0 || code >= table.Count)
+                {
+                    throw new DocumentParseException("Invalid LZW code.", -1);
+                }
+
                 entry = table[code];
             }
             else
             {
+                if (previous >= table.Count)
+                {
+                    throw new DocumentParseException("Invalid LZW code.", -1);
+                }
+
                 byte[] prevEntry = table[previous];
                 if (code < nextCode)
                 {
+                    if (code < 0 || code >= table.Count)
+                    {
+                        throw new DocumentParseException("Invalid LZW code.", -1);
+                    }
+
                     entry = table[code];
                 }
                 else
@@ -95,6 +116,11 @@ internal static class LzwFilter
             }
 
             output.AddRange(entry);
+            if (output.Count > maxOutput)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
+            }
+
             previous = code;
         }
 

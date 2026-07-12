@@ -262,6 +262,13 @@ internal static class AesCbc
 
     private static byte[] ExpandKey(byte[] key, out int rounds)
     {
+        // AES is defined only for 128/192/256-bit keys; reject anything else so a forged
+        // key length cannot divide-by-zero here or blow up the key schedule (FIPS-197 5.2).
+        if (key.Length is not (16 or 24 or 32))
+        {
+            throw new DocumentParseException("AES key length must be 16, 24, or 32 bytes.");
+        }
+
         var nk = key.Length / 4;
         rounds = nk + 6;
         var totalWords = 4 * (rounds + 1);

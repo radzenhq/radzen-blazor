@@ -6,7 +6,10 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class Ascii85Filter
 {
-    public static byte[] Decode(byte[] data)
+    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
+
+    // maxOutput bounds the decoded size for parity with the other filters in a chain.
+    public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
 
@@ -24,6 +27,11 @@ internal static class Ascii85Filter
             if (IsWhitespace(b))
             {
                 continue;
+            }
+
+            if (output.Count > maxOutput)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
             }
 
             if (b == (byte)'z' && count == 0)

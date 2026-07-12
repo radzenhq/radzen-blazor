@@ -3,7 +3,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// Options controlling how a document is loaded by
-/// <see cref="Document.LoadFromStream"/>.
+/// <see cref="Document.LoadFromStream(System.IO.Stream, LoadOptions)"/>.
 /// </summary>
 public sealed class LoadOptions
 {

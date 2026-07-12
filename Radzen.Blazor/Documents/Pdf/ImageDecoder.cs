@@ -104,42 +104,58 @@ internal static class ImageDecoder
         byte[]? transparency = null;
         using var idat = new MemoryStream();
 
-        var pos = PngSignature.Length;
+        long pos = PngSignature.Length;
         while (pos + 8 <= data.Length)
         {
-            var length = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(pos));
-            var type = Encoding.ASCII.GetString(data, pos + 4, 4);
-            var body = pos + 8;
+            // The chunk length is an unsigned 32-bit count; reject one that runs past the
+            // buffer so a hostile length (e.g. a 0x80000000 PLTE) cannot slice out of range.
+            uint length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)pos));
+            long body = pos + 8;
+            if (length > data.Length - body)
+            {
+                throw new InvalidDataException("PNG chunk length exceeds the available data.");
+            }
+
+            var type = Encoding.ASCII.GetString(data, (int)pos + 4, 4);
+            var start = (int)body;
+            var count = (int)length;
 
             switch (type)
             {
                 case "IHDR":
-                    width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(body));
-                    height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(body + 4));
-                    bitDepth = data[body + 8];
-                    colorType = data[body + 9];
-                    if (data[body + 12] != 0)
+                    if (count < 13)
+                    {
+                        throw new InvalidDataException("PNG IHDR chunk is truncated.");
+                    }
+
+                    width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(start));
+                    height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(start + 4));
+                    bitDepth = data[start + 8];
+                    colorType = data[start + 9];
+                    if (data[start + 12] != 0)
                     {
                         throw new NotSupportedException("Adam7 interlaced PNG images are not supported.");
                     }
 
                     break;
                 case "PLTE":
-                    palette = data[body..(body + length)];
+                    palette = data[start..(start + count)];
                     break;
                 case "tRNS":
-                    transparency = data[body..(body + length)];
+                    transparency = data[start..(start + count)];
                     break;
                 case "IDAT":
-                    idat.Write(data, body, length);
+                    idat.Write(data, start, count);
                     break;
                 case "IEND":
                     pos = data.Length;
                     continue;
             }
 
-            pos = body + length + 4;
+            pos = body + count + 4;
         }
+
+        ValidatePngDimensions(width, height);
 
         var channels = colorType switch
         {
@@ -163,6 +179,22 @@ internal static class ImageDecoder
             6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3, bitDepth),
             _ => throw new NotSupportedException($"Unsupported PNG colour type {colorType}."),
         };
+    }
+
+    // IHDR dimensions drive every downstream pixel buffer; reject non-positive or
+    // oversized geometry before allocating so a tiny header cannot request gigabytes
+    // or wrap width*height negative.
+    private static void ValidatePngDimensions(int width, int height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            throw new InvalidDataException("PNG image has invalid dimensions.");
+        }
+
+        if ((long)width * height > ReaderLimits.Default.MaxImagePixels)
+        {
+            throw new InvalidDataException("PNG image dimensions exceed the maximum decodable size.");
+        }
     }
 
     private static ImageXObject BuildPalettedPng(
@@ -331,9 +363,18 @@ internal static class ImageDecoder
             }
 
             var segmentLength = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos));
+            if (segmentLength < 2 || pos + segmentLength > data.Length)
+            {
+                throw new InvalidDataException("JPEG segment length is invalid.");
+            }
 
             if (IsStartOfFrame(marker))
             {
+                if (pos + 8 > data.Length)
+                {
+                    throw new InvalidDataException("JPEG start-of-frame segment is truncated.");
+                }
+
                 var precision = data[pos + 2];
                 var height = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 3));
                 var width = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 5));

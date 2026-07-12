@@ -7,6 +7,7 @@ internal sealed class ObjectParser
 {
     private readonly Lexer lexer;
     private readonly List<Token> lookahead = [];
+    private int depth;
 
     internal ObjectParser(Lexer lexer)
     {
@@ -71,47 +72,73 @@ internal sealed class ObjectParser
 
     private DocumentObject ParseArray()
     {
-        var array = new ArrayObject();
-        while (true)
+        EnterContainer();
+        try
         {
-            var token = Peek(0);
-            if (token.Kind == TokenKind.ArrayClose)
+            var array = new ArrayObject();
+            while (true)
             {
-                NextToken();
-                return array;
-            }
+                var token = Peek(0);
+                if (token.Kind == TokenKind.ArrayClose)
+                {
+                    NextToken();
+                    return array;
+                }
 
-            if (token.Kind == TokenKind.EndOfData)
-            {
-                throw new DocumentParseException("Unterminated array.", lexer.Position);
-            }
+                if (token.Kind == TokenKind.EndOfData)
+                {
+                    throw new DocumentParseException("Unterminated array.", lexer.Position);
+                }
 
-            array.Add(ParseValue());
+                array.Add(ParseValue());
+            }
+        }
+        finally
+        {
+            depth--;
         }
     }
 
     private DocumentObject ParseDictionary()
     {
-        var dictionary = new DictionaryObject();
-        while (true)
+        EnterContainer();
+        try
         {
-            var token = NextToken();
-            if (token.Kind == TokenKind.DictClose)
+            var dictionary = new DictionaryObject();
+            while (true)
             {
-                return dictionary;
-            }
+                var token = NextToken();
+                if (token.Kind == TokenKind.DictClose)
+                {
+                    return dictionary;
+                }
 
-            if (token.Kind != TokenKind.Name)
-            {
-                throw new DocumentParseException("Expected dictionary key.", lexer.Position);
-            }
+                if (token.Kind != TokenKind.Name)
+                {
+                    throw new DocumentParseException("Expected dictionary key.", lexer.Position);
+                }
 
-            if (Peek(0).Kind == TokenKind.EndOfData)
-            {
-                throw new DocumentParseException("Missing dictionary value.", lexer.Position);
-            }
+                if (Peek(0).Kind == TokenKind.EndOfData)
+                {
+                    throw new DocumentParseException("Missing dictionary value.", lexer.Position);
+                }
 
-            dictionary[token.Text] = ParseValue();
+                dictionary[token.Text] = ParseValue();
+            }
+        }
+        finally
+        {
+            depth--;
+        }
+    }
+
+    // Bounds mutual recursion through arrays and dictionaries so a body of nested
+    // openers ('[' or '<<') raises a recoverable error instead of overflowing the stack.
+    private void EnterContainer()
+    {
+        if (++depth > ReaderLimits.Default.MaxObjectNestingDepth)
+        {
+            throw new DocumentParseException("Maximum object nesting depth exceeded.", lexer.Position);
         }
     }
 

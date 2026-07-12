@@ -7,7 +7,11 @@ internal static class RunLengthFilter
 {
     const int Eod = 128;
 
-    public static byte[] Decode(byte[] data)
+    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
+
+    // maxOutput bounds the decoded size; run-length can expand up to 64x, so a small
+    // hostile stream aborts with a recoverable DocumentParseException.
+    public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
 
@@ -44,6 +48,11 @@ internal static class RunLengthFilter
                 {
                     output.Add(value);
                 }
+            }
+
+            if (output.Count > maxOutput)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
             }
         }
 
