@@ -113,13 +113,72 @@ internal sealed class DocumentGenerator
         watermarkEmitter = new(fonts, fontResolver, imageStore);
     }
 
+    // A document without a table of contents generates in the single pass it always had. With
+    // one, the first pass resolves every anchor's page and a second pass (on a fresh generator;
+    // the emitters are stateful) lays out again with the numbers substituted. The TOC line
+    // footprint is independent of the digits, so both passes paginate identically.
     public static Document Generate(DocumentBuilder builder)
     {
         var generator = new DocumentGenerator(builder);
-        return generator.Run();
+        var first = generator.Run();
+
+        if (!HasTableOfContents(builder))
+        {
+            return first;
+        }
+
+        var tocPages = new Dictionary<string, int>(System.StringComparer.Ordinal);
+        foreach (var (name, anchor) in first.Anchors)
+        {
+            tocPages[name] = anchor.PageIndex + 1;
+        }
+
+        ValidateTocAnchors(builder, tocPages);
+        return new DocumentGenerator(builder).Run(tocPages);
     }
 
-    private Document Run()
+    // A TableOfContents is only supported as direct section content, so a shallow scan decides
+    // whether the two-pass path runs at all.
+    private static bool HasTableOfContents(DocumentBuilder builder)
+    {
+        foreach (var section in builder.Sections)
+        {
+            foreach (var block in section.Blocks)
+            {
+                if (block is TableOfContents)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void ValidateTocAnchors(DocumentBuilder builder, Dictionary<string, int> tocPages)
+    {
+        foreach (var section in builder.Sections)
+        {
+            foreach (var block in section.Blocks)
+            {
+                if (block is not TableOfContents toc)
+                {
+                    continue;
+                }
+
+                foreach (var entry in toc.Entries)
+                {
+                    if (!tocPages.ContainsKey(entry.Anchor))
+                    {
+                        throw new System.InvalidOperationException(
+                            $"Table of contents entry anchor '{entry.Anchor}' does not exist; set Run.Anchor on the destination run.");
+                    }
+                }
+            }
+        }
+    }
+
+    private Document Run(IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var document = new Document { Conformance = builder.Conformance };
         document.Attachments.AddRange(builder.Attachments);
@@ -142,7 +201,7 @@ internal sealed class DocumentGenerator
                 throw new System.NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
             }
 
-            foreach (var page in Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution))
+            foreach (var page in Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution, tocPages))
             {
                 paginated.Add(page);
                 watermarks.Add(section.Watermark);

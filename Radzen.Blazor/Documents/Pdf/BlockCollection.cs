@@ -72,6 +72,12 @@ public class BlockCollection : IReadOnlyList<Block>
     public Table AddTable() => Add(new Table());
 
     /// <summary>
+    /// Appends an empty table of contents.
+    /// </summary>
+    /// <returns>The newly created table of contents.</returns>
+    public TableOfContents AddTableOfContents() => Add(new TableOfContents());
+
+    /// <summary>
     /// Appends a page break.
     /// </summary>
     /// <returns>The newly created page break.</returns>
