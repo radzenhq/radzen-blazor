@@ -48,6 +48,15 @@ internal static class LineBreaker
         public double Width { get; set; }
         public double GapAfter { get; set; }
         public int TabsAfter { get; set; }
+
+        // A zero-width break opportunity follows this word (soft hyphen U+00AD or ZWSP
+        // U+200B). Such a boundary carries no inter-word gap and is excluded from
+        // justification, so an unbroken word is placed exactly as if it were never split.
+        public bool OptionalBreakAfter { get; set; }
+
+        // The optional break after this word is a soft hyphen: a hyphen is rendered when
+        // the line breaks there, and nothing otherwise.
+        public bool SoftHyphenAfter { get; set; }
     }
 
     private const double DefaultTabStopWidth = 36.0;
@@ -158,9 +167,20 @@ internal static class LineBreaker
         return width;
     }
 
+    private const char SoftHyphen = '\u00AD';
+    private const char ZeroWidthSpace = '\u200B';
+    private const char EnDash = '\u2013';
+    private const char EmDash = '\u2014';
+
     private static bool IsInlineWhitespace(char c) => c is ' ' or '\t';
 
     private static bool IsLineBreak(char c) => c is '\n' or '\r';
+
+    // Zero-width conditional break characters removed from the rendered text.
+    private static bool IsConditionalBreak(char c) => c == SoftHyphen || c == ZeroWidthSpace;
+
+    // A break may be taken after these visible characters in the emergency word breaker.
+    private static bool IsHyphenBreak(char c) => c is '-' or EnDash or EmDash;
 
     // Splits the paragraph into forced-break segments ('\n', '\r' and "\r\n"), each a
     // list of words separated by breakable whitespace (' ' and '\t'). NBSP is a word
@@ -268,30 +288,62 @@ internal static class LineBreaker
                         i++;
                     }
 
-                    var segment = text[start..i];
-                    var advance = MeasureRun(fonts, run, segment);
-
-                    if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
+                    // A non-whitespace run is split at zero-width conditional breaks: soft
+                    // hyphen (U+00AD) and ZWSP (U+200B). Each split finalizes the current
+                    // word with an optional-break boundary; the special char is dropped from
+                    // the rendered text. A conditional char with no left context in the word
+                    // (q == sub) is not a valid hyphenation point and stays a literal char.
+                    // A run with no interior conditional char produces a single word,
+                    // byte-identical to the pre-split tokenizer.
+                    var sub = start;
+                    while (sub <= i)
                     {
-                        if (hasCurrent)
+                        var q = sub;
+                        while (q < i && !(IsConditionalBreak(text[q]) && q > sub))
                         {
-                            words.Add(current);
+                            q++;
                         }
 
-                        current = new Word { PieceStart = pieces.Count };
-                        hasCurrent = true;
-                    }
+                        if (q > sub)
+                        {
+                            var segment = text[sub..q];
+                            var advance = MeasureRun(fonts, run, segment);
+                            if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
+                            {
+                                if (hasCurrent)
+                                {
+                                    words.Add(current);
+                                }
 
-                    pieces.Add(new Piece
-                    {
-                        Run = run,
-                        Start = start,
-                        Length = i - start,
-                        Text = segment,
-                        Advance = advance,
-                    });
-                    current.PieceCount++;
-                    current.Width += advance;
+                                current = new Word { PieceStart = pieces.Count };
+                                hasCurrent = true;
+                            }
+
+                            pieces.Add(new Piece
+                            {
+                                Run = run,
+                                Start = sub,
+                                Length = q - sub,
+                                Text = segment,
+                                Advance = advance,
+                            });
+                            current.PieceCount++;
+                            current.Width += advance;
+                        }
+
+                        if (q == i)
+                        {
+                            break;
+                        }
+
+                        // The break attaches to the word just built from [sub, q).
+                        current.OptionalBreakAfter = true;
+                        current.SoftHyphenAfter = text[q] == SoftHyphen;
+                        words.Add(current);
+                        hasCurrent = false;
+
+                        sub = q + 1;
+                    }
                 }
             }
         }
@@ -375,6 +427,8 @@ internal static class LineBreaker
             var font = piece.Run.ResolvedFont;
             var fragStart = 0;
             var fragAdvance = 0.0;
+            var hyphenBreak = -1;      // char index just past the latest '-'/dash in [fragStart, i)
+            var hyphenAdvance = 0.0;   // fragAdvance accumulated up to hyphenBreak
             var i = 0;
             while (i < text.Length)
             {
@@ -385,6 +439,23 @@ internal static class LineBreaker
                 var step = fragAdvance > 0 ? advance + piece.Run.LetterSpacing.Point : advance;
                 if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
+                    // Prefer breaking just after a hyphen/dash over splitting mid-glyph; the
+                    // tail after the hyphen is re-measured fresh on the next line.
+                    if (hyphenBreak > fragStart && hyphenBreak <= i)
+                    {
+                        fragments.Add(MakeCharFragment(piece, fragStart, hyphenBreak, hyphenAdvance));
+                        lineWidth += hyphenAdvance;
+                        boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+                        fragments = [];
+                        lineWidth = 0.0;
+                        i = hyphenBreak;
+                        fragStart = hyphenBreak;
+                        fragAdvance = 0.0;
+                        hyphenBreak = -1;
+                        hyphenAdvance = 0.0;
+                        continue;
+                    }
+
                     if (i > fragStart)
                     {
                         fragments.Add(MakeCharFragment(piece, fragStart, i, fragAdvance));
@@ -396,10 +467,18 @@ internal static class LineBreaker
                     lineWidth = 0.0;
                     fragStart = i;
                     fragAdvance = 0.0;
+                    hyphenBreak = -1;
+                    hyphenAdvance = 0.0;
                     step = advance;
                 }
 
                 fragAdvance += step;
+                if (cpLen == 1 && IsHyphenBreak(text[i]))
+                {
+                    hyphenBreak = i + cpLen;
+                    hyphenAdvance = fragAdvance;
+                }
+
                 i += cpLen;
             }
 
@@ -580,8 +659,16 @@ internal static class LineBreaker
             }
         }
 
-        var wordCount = last - first + 1;
-        var gapCount = wordCount - 1;
+        // Optional-break boundaries (soft hyphen / ZWSP) carry no space and are not stretched
+        // by justification, so only real inter-word gaps are counted and widened.
+        var gapCount = 0;
+        for (var w = first; w < last; w++)
+        {
+            if (!words[w].OptionalBreakAfter)
+            {
+                gapCount++;
+            }
+        }
 
         var alignment = paragraph.ResolveAlignment(inheritedAlignment);
         var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0 && !hasTabs;
@@ -604,7 +691,7 @@ internal static class LineBreaker
 
                 if (w < last)
                 {
-                    cursor += justifiedGap;
+                    cursor += words[w].OptionalBreakAfter ? 0 : justifiedGap;
                 }
             }
         }
@@ -633,6 +720,19 @@ internal static class LineBreaker
             }
         }
 
+        // A break taken at a soft hyphen renders a hyphen at the end of the line, in the
+        // font of the preceding text. It is placed after the span shift (final positions)
+        // and before the marker insert (which shifts list indices, invalidating the span).
+        var breakHyphen = words[last].SoftHyphenAfter && last < words.Count - 1 && span.Length > 0;
+        var hyphenEnd = 0.0;
+        Font? hyphenFont = null;
+        if (breakHyphen)
+        {
+            var tail = span[^1];
+            hyphenEnd = tail.XOffset + tail.Advance;
+            hyphenFont = tail.Run.ResolvedFont;
+        }
+
         if (includeMarker && paragraph.MarkerText is { Length: > 0 } markerText)
         {
             var markerFont = paragraph.EffectiveFont ?? paragraph.Font;
@@ -644,6 +744,19 @@ internal static class LineBreaker
                 Length = markerText.Length,
                 XOffset = paragraph.MarkerIndent.Point,
                 Advance = fonts.MeasureText(markerText, markerFont),
+            });
+        }
+
+        if (breakHyphen)
+        {
+            fragments.Add(new LineFragment
+            {
+                Run = new Run("-") { EffectiveFont = hyphenFont },
+                Text = "-",
+                Start = 0,
+                Length = 1,
+                XOffset = hyphenEnd,
+                Advance = fonts.MeasureText("-", hyphenFont!),
             });
         }
 
