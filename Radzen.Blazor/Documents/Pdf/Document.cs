@@ -429,7 +429,17 @@ public sealed class Document
                 continue;
             }
 
-            var contentBytes = page.BuildContent(out var emitter, out var overlayBytes, out var pageOverlayEmitter);
+            HashSet<string>? reservedNames = null;
+            if (source is not null && sourceResources.TryGetValue(page, out var reservedFrom))
+            {
+                reservedNames = ResourceNames(source, reservedFrom);
+            }
+            else if (appendedResources.TryGetValue(page, out var reservedAppend))
+            {
+                reservedNames = ResourceNames(reservedAppend.Reader, reservedAppend.Resources);
+            }
+
+            var contentBytes = page.BuildContent(out var emitter, out var overlayBytes, out var pageOverlayEmitter, reservedNames);
             if (contentBytes is not null)
             {
                 var contentRef = writer.Add(new StreamObject(contentBytes));
@@ -816,6 +826,27 @@ public sealed class Document
         return result;
     }
 
+    // The /Font and /XObject names a loaded page already binds; a full re-emit must not
+    // reuse any of them for a freshly registered base-14 face or image XObject.
+    private static HashSet<string> ResourceNames(DocumentReader reader, DictionaryObject resources)
+    {
+        var names = new HashSet<string>(StringComparer.Ordinal);
+        CollectResourceKeys(reader, resources, "Font", names);
+        CollectResourceKeys(reader, resources, "XObject", names);
+        return names;
+    }
+
+    private static void CollectResourceKeys(DocumentReader reader, DictionaryObject resources, string category, HashSet<string> names)
+    {
+        if (resources.TryGetValue(category, out var value) && value is not null && reader.Resolve(value) is DictionaryObject dict)
+        {
+            foreach (var key in dict.Keys)
+            {
+                names.Add(key);
+            }
+        }
+    }
+
     private static ArrayObject BuildLinkAnnotations(DocumentWriter writer, IReadOnlyList<GeneratedLink> links)
     {
         var annots = new ArrayObject();
@@ -904,13 +935,7 @@ public sealed class Document
         }
         else
         {
-            reference = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Font"),
-                ["Subtype"] = new NameObject("Type1"),
-                ["BaseFont"] = new NameObject(font.Base14 ?? "Helvetica"),
-                ["Encoding"] = new NameObject("WinAnsiEncoding"),
-            };
+            reference = Base14FontDictionary(font.Base14 ?? "Helvetica");
         }
 
         cache[font] = reference;
@@ -966,19 +991,33 @@ public sealed class Document
         return resources;
     }
 
+    // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats are symbolic and carry a built-in
+    // encoding; declaring /Encoding /WinAnsiEncoding would remap their glyphs, so it is
+    // omitted for them and kept for the non-symbolic base-14 faces.
+    private static DictionaryObject Base14FontDictionary(string baseFont)
+    {
+        var dictionary = new DictionaryObject
+        {
+            ["Type"] = new NameObject("Font"),
+            ["Subtype"] = new NameObject("Type1"),
+            ["BaseFont"] = new NameObject(baseFont),
+        };
+
+        if (baseFont is not ("Symbol" or "ZapfDingbats"))
+        {
+            dictionary["Encoding"] = new NameObject("WinAnsiEncoding");
+        }
+
+        return dictionary;
+    }
+
     private static DictionaryObject? BuildResources(DocumentWriter writer, ContentWriter emitter)
     {
         DictionaryObject? fonts = null;
         foreach (var (baseFont, key) in emitter.Fonts)
         {
             fonts ??= new DictionaryObject();
-            fonts[key] = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Font"),
-                ["Subtype"] = new NameObject("Type1"),
-                ["BaseFont"] = new NameObject(baseFont),
-                ["Encoding"] = new NameObject("WinAnsiEncoding"),
-            };
+            fonts[key] = Base14FontDictionary(baseFont);
         }
 
         DictionaryObject? xobjects = null;
