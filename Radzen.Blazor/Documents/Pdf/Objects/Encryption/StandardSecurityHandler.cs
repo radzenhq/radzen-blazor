@@ -60,7 +60,7 @@ internal sealed class StandardSecurityHandler
         {
             1 => 5,
             5 => 32,
-            _ => Math.Max(5, GetInt(encrypt, "Length", 40) / 8),
+            _ => DeriveMd5KeyLength(GetInt(encrypt, "Length", 40)),
         };
 
         streamCipher = ResolveCipher(encrypt, "StmF");
@@ -270,7 +270,7 @@ internal sealed class StandardSecurityHandler
             {
                 IsUserPassword = true;
                 var intermediate = HashPassword(pw, u[40..48], []);
-                FileKey = AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted);
+                FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted));
                 return;
             }
         }
@@ -282,11 +282,19 @@ internal sealed class StandardSecurityHandler
             {
                 IsOwnerPassword = true;
                 var intermediate = HashPassword(pw, o[40..48], u[..48]);
-                FileKey = AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted);
+                FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted));
                 return;
             }
         }
     }
+
+    // The AESV3 file key comes straight from decrypting the attacker-supplied /UE or /OE.
+    // Anything but 32 bytes (an empty /UE gives a zero-length key that divides-by-zero in
+    // AES key expansion; an oversized /UE gives a huge key) is a forged dictionary.
+    private static byte[] RequireAes256Key(byte[] fileKey)
+        => fileKey.Length == 32
+            ? fileKey
+            : throw new DocumentParseException("Revision 6 file key must be exactly 32 bytes.");
 
     // Revision 5 (Acrobat 9 ExtensionLevel 3) hashes with a single SHA-256 pass;
     // the iterated algorithm 2.B loop applies to revision 6 only.
@@ -353,6 +361,20 @@ internal sealed class StandardSecurityHandler
         var hash = Md5.Hash(buffer);
         var length = Math.Min(FileKey.Length + 5, 16);
         return hash[..length];
+    }
+
+    // The MD5-derived V1/V2/V4 file key is sliced out of a 16-byte hash; a hostile
+    // /Length (e.g. 1000000000) would otherwise slice past the hash. RC4/AES key sizes
+    // are 5..16 bytes (ISO 32000-1 7.6.3.3), so anything else is a malformed dictionary.
+    private static int DeriveMd5KeyLength(int lengthBits)
+    {
+        var bytes = lengthBits / 8;
+        if (bytes is < 5 or > 16)
+        {
+            throw new DocumentParseException("Encryption /Length is out of the permitted 40..128 bit range.");
+        }
+
+        return bytes;
     }
 
     private static byte[] Pad(byte[] password)

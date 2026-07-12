@@ -52,12 +52,24 @@ public sealed class Document
     /// <param name="options">Load options such as the decryption password.</param>
     /// <returns>The loaded document.</returns>
     public static Document LoadFromStream(Stream stream, LoadOptions? options = null)
+        => LoadFromStream(stream, ReaderLimits.Default, options);
+
+    /// <summary>
+    /// Loads a physical document from a stream, applying the supplied resource
+    /// limits while parsing untrusted input. See <see cref="ReaderLimits"/>.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="limits">The resource limits to enforce while reading.</param>
+    /// <param name="options">Load options such as the decryption password.</param>
+    /// <returns>The loaded document.</returns>
+    public static Document LoadFromStream(Stream stream, ReaderLimits limits, LoadOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(limits);
 
         using var buffer = new MemoryStream();
         stream.CopyTo(buffer);
-        var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password);
+        var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password, limits);
 
         var document = new Document { source = reader };
         ReadInfo(reader, document.Info);
@@ -68,7 +80,13 @@ public sealed class Document
         if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
-            CollectPages(reader, pagesNode, null, null, document);
+            var visited = new HashSet<int>();
+            if (pagesRef is ReferenceObject pagesReference)
+            {
+                visited.Add(pagesReference.ObjectNumber);
+            }
+
+            CollectPages(reader, pagesNode, null, null, document, limits, visited, 0);
         }
 
         if (catalog is not null && catalog.TryGetValue("AcroForm", out var formObject)
@@ -149,8 +167,15 @@ public sealed class Document
         }
     }
 
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, DictionaryObject? inheritedResources, Document document)
+    // A visited-set of page-node object numbers is the primary guard against a
+    // cyclic /Kids graph; MaxPageTreeDepth is a backstop for a deep acyclic tree.
+    private static void CollectPages(DocumentReader reader, DictionaryObject node, ArrayObject? inheritedBox, DictionaryObject? inheritedResources, Document document, ReaderLimits limits, HashSet<int> visited, int depth)
     {
+        if (depth > limits.MaxPageTreeDepth)
+        {
+            throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
+        }
+
         var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
             ? own
             : inheritedBox;
@@ -163,9 +188,14 @@ public sealed class Document
         {
             foreach (var kid in kids)
             {
+                if (kid is ReferenceObject reference && !visited.Add(reference.ObjectNumber))
+                {
+                    throw new DocumentParseException("Cyclic page tree reference.", -1);
+                }
+
                 if (reader.Resolve(kid) is DictionaryObject child)
                 {
-                    CollectPages(reader, child, box, resources, document);
+                    CollectPages(reader, child, box, resources, document, limits, visited, depth + 1);
                 }
             }
 

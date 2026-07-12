@@ -19,6 +19,7 @@ namespace Radzen.Documents.Pdf.Objects;
 public sealed class DocumentReader
 {
     private readonly byte[] data;
+    private readonly ReaderLimits limits;
     private readonly Dictionary<int, XrefEntry> entries = [];
     private readonly Dictionary<int, DocumentObject> cache = [];
     private readonly Dictionary<int, ObjectStream> objectStreams = [];
@@ -29,9 +30,10 @@ public sealed class DocumentReader
     private int encryptObjectNumber = -1;
     private bool decryptionReady;
 
-    private DocumentReader(byte[] data)
+    private DocumentReader(byte[] data, ReaderLimits limits)
     {
         this.data = data;
+        this.limits = limits;
     }
 
     /// <summary>
@@ -83,10 +85,21 @@ public sealed class DocumentReader
     /// <param name="data">The complete document bytes.</param>
     /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
     /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
-    public static DocumentReader Parse(byte[] data, string? password)
+    public static DocumentReader Parse(byte[] data, string? password) => Parse(data, password, ReaderLimits.Default);
+
+    /// <summary>
+    /// Parses a PDF document from a byte array, supplying a password for an
+    /// encrypted document and the resource limits to enforce while reading.
+    /// </summary>
+    /// <param name="data">The complete document bytes.</param>
+    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
+    /// <param name="limits">The resource limits to enforce while reading.</param>
+    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
+    public static DocumentReader Parse(byte[] data, string? password, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(data);
-        var reader = new DocumentReader(data);
+        ArgumentNullException.ThrowIfNull(limits);
+        var reader = new DocumentReader(data, limits);
         reader.Load();
         reader.InitializeSecurity(password, throwOnFailure: true);
         return reader;
@@ -410,19 +423,39 @@ public sealed class DocumentReader
         var w1 = ((NumberObject)widths[1]).IntValue;
         var w2 = ((NumberObject)widths[2]).IntValue;
         var entryLength = w0 + w1 + w2;
+
+        // A zero or negative total width never advances `pos`, so an attacker-chosen
+        // /Size builds an unbounded table; reject it before the fill loop.
+        if (w0 < 0 || w1 < 0 || w2 < 0 || entryLength <= 0)
+        {
+            throw new DocumentParseException("Invalid cross-reference stream entry width.", -1);
+        }
+
         var size = ((NumberObject)dict["Size"]).IntValue;
         var index = BuildIndex(dict, size);
 
         var pos = 0;
+        var total = 0;
         for (var s = 0; s + 1 < index.Count; s += 2)
         {
             var start = index[s];
             var count = index[s + 1];
+            var available = (decoded.Length - pos) / entryLength;
+            if (count > available)
+            {
+                count = available;
+            }
+
             for (var i = 0; i < count; i++)
             {
                 if (pos + entryLength > decoded.Length)
                 {
                     break;
+                }
+
+                if (++total > limits.MaxXrefEntries)
+                {
+                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
                 }
 
                 var field1 = ReadField(decoded, ref pos, w0);
@@ -539,12 +572,37 @@ public sealed class DocumentReader
         var count = ((NumberObject)stream.Dictionary["N"]).IntValue;
         var first = ((NumberObject)stream.Dictionary["First"]).IntValue;
 
+        // A trusted /N would size the member list and drive the fill loop; clamp it
+        // to what the decoded payload can hold (each member occupies at least two
+        // bytes) and to the configured maximum before allocating.
+        if (count < 0)
+        {
+            count = 0;
+        }
+
+        var payload = first >= 0 && first <= decoded.Length ? decoded.Length - first : decoded.Length;
+        var available = payload / 2;
+        if (count > available)
+        {
+            count = available;
+        }
+
+        if (count > limits.MaxObjectStreamCount)
+        {
+            count = limits.MaxObjectStreamCount;
+        }
+
         var lexer = new Lexer(decoded, 0);
         var members = new List<ObjectStreamMember>(count);
         for (var i = 0; i < count; i++)
         {
             var numberToken = lexer.Next();
             var offsetToken = lexer.Next();
+            if (numberToken.Kind == TokenKind.EndOfData || offsetToken.Kind == TokenKind.EndOfData)
+            {
+                break;
+            }
+
             members.Add(new ObjectStreamMember((int)numberToken.IntValue, (int)offsetToken.IntValue));
         }
 
@@ -723,24 +781,45 @@ public sealed class DocumentReader
             return data;
         }
 
+        if (names.Count > limits.MaxFilterChainLength)
+        {
+            throw new DocumentParseException("Filter chain exceeds the maximum length.", -1);
+        }
+
         var parms = FilterParms(dictionary, names.Count);
         var result = data;
+        var inputLength = data.Length;
         for (var i = 0; i < names.Count; i++)
         {
-            result = ApplyFilter(names[i], result, parms[i]);
+            result = ApplyFilter(names[i], result, parms[i], limits.MaxDecodedStreamBytes);
+
+            // Cumulative per-stream cap plus a secondary expansion-ratio check that
+            // only engages once output clears the floor, so small streams are never
+            // rejected for a high ratio on tiny input.
+            if (result.LongLength > limits.MaxDecodedStreamBytes)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
+            }
+
+            if (result.LongLength > limits.ExpansionRatioFloorBytes
+                && inputLength > 0
+                && result.LongLength / inputLength > limits.MaxDecodeExpansionRatio)
+            {
+                throw new DocumentParseException("Decoded stream expansion ratio exceeds the maximum.", -1);
+            }
         }
 
         return result;
     }
 
-    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms) => name switch
+    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput) => name switch
     {
-        "FlateDecode" or "Fl" => ApplyPredictor(FlateFilter.Decode(data), parms),
+        "FlateDecode" or "Fl" => ApplyPredictor(FlateFilter.Decode(data, maxOutput), parms),
         "LZWDecode" or "LZW" => ApplyPredictor(
-            LzwFilter.Decode(data, parms is not null ? ParmInt(parms, "EarlyChange", 1) : 1), parms),
-        "RunLengthDecode" or "RL" => RunLengthFilter.Decode(data),
+            LzwFilter.Decode(data, parms is not null ? ParmInt(parms, "EarlyChange", 1) : 1, maxOutput), parms),
+        "RunLengthDecode" or "RL" => RunLengthFilter.Decode(data, maxOutput),
         "ASCIIHexDecode" or "AHx" => AsciiHexFilter.Decode(data),
-        "ASCII85Decode" or "A85" => Ascii85Filter.Decode(data),
+        "ASCII85Decode" or "A85" => Ascii85Filter.Decode(data, maxOutput),
         _ => throw new DocumentParseException($"Unsupported stream filter '{name}'.", -1),
     };
 

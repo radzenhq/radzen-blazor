@@ -4,17 +4,26 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class PngPredictor
 {
+    private const int MaxColors = 32;
+
     public static byte[] Decode(byte[] data, int colors, int bitsPerComponent, int columns)
     {
         ArgumentNullException.ThrowIfNull(data);
+        ValidateParameters(colors, bitsPerComponent, columns);
 
         int bpp = BytesPerPixel(colors, bitsPerComponent);
-        int rowLength = RowLength(colors, bitsPerComponent, columns);
-        if (rowLength == 0)
+
+        // Row length is attacker-controlled through /DecodeParms; compute it as a long so a
+        // hostile /Columns (e.g. 268435456) cannot wrap the int32 product, and require the
+        // decoded stream to hold at least one full row so a huge /Columns cannot force a giant
+        // scratch allocation for data that decodes to nothing.
+        long rowLengthLong = ((long)colors * bitsPerComponent * columns + 7) / 8;
+        if (rowLengthLong + 1 > data.Length)
         {
-            return [];
+            throw new DocumentParseException("PNG predictor row length exceeds the available data.");
         }
 
+        int rowLength = (int)rowLengthLong;
         int stride = rowLength + 1;
         int rows = data.Length / stride;
         var output = new byte[rows * rowLength];
@@ -104,6 +113,19 @@ internal static class PngPredictor
         }
 
         return output;
+    }
+
+    static void ValidateParameters(int colors, int bitsPerComponent, int columns)
+    {
+        if (columns <= 0 || colors <= 0 || colors > MaxColors)
+        {
+            throw new DocumentParseException("PNG predictor colors/columns are out of range.");
+        }
+
+        if (bitsPerComponent is not (1 or 2 or 4 or 8 or 16))
+        {
+            throw new DocumentParseException("PNG predictor bit depth must be 1, 2, 4, 8, or 16.");
+        }
     }
 
     static int BytesPerPixel(int colors, int bitsPerComponent) =>
