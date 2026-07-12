@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Radzen.Documents.Pdf;
 
 // Measures and paints block-level images: measurement feeds the paginator, emission
@@ -5,13 +7,17 @@ namespace Radzen.Documents.Pdf;
 // and tags it with its Figure structure element.
 internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
+    // Per-Image XObject after opt-in options are applied, cached so a picture reused across
+    // pages shares one XObject even when an option (e.g. a stencil mask) yields a fresh one.
+    private readonly Dictionary<Image, GeneratedImage> prepared = [];
+
     public (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, imageStore.Decode(image).Image, availableWidth);
 
     public void EmitImage(EmitContext context, PositionedImage positioned, double left, double top)
     {
         var plan = context.Plan;
-        var xobject = imageStore.Decode(positioned.Source);
+        var xobject = Prepare(positioned.Source);
         plan.Images.Add(new ImageDraw
         {
             X = left + positioned.XOffset,
@@ -25,5 +31,26 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
                 : null,
         });
         plan.UsedImages.Add(xobject);
+    }
+
+    private GeneratedImage Prepare(Image source)
+    {
+        var generated = imageStore.Decode(source);
+        if (!source.HasXObjectOptions)
+        {
+            return generated;
+        }
+
+        if (prepared.TryGetValue(source, out var cached))
+        {
+            return cached;
+        }
+
+        var applied = ImageDecoder.ApplyOptions(generated.Image, source);
+        var result = ReferenceEquals(applied, generated.Image)
+            ? generated
+            : new GeneratedImage { Key = generated.Key, Image = applied };
+        prepared[source] = result;
+        return result;
     }
 }
