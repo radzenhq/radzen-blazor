@@ -47,6 +47,32 @@ public sealed class TextFieldDefinition(string name) : FormFieldDefinition(name)
 
     /// <summary>Gets or sets the font the value renders with. Base-14 families only; defaults to Helvetica 10pt.</summary>
     public Font Font { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the field accepts multiple lines of
+    /// text (the Multiline flag, <c>/Ff</c> bit 13). Defaults to <c>false</c>.
+    /// </summary>
+    public bool Multiline { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the field masks its input (the
+    /// Password flag, <c>/Ff</c> bit 14). Defaults to <c>false</c>.
+    /// </summary>
+    public bool Password { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the value is laid out in equally
+    /// spaced comb cells (the Comb flag, <c>/Ff</c> bit 25). A comb field is only
+    /// meaningful together with <see cref="MaxLength"/>. Defaults to <c>false</c>.
+    /// </summary>
+    public bool Comb { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum number of characters the field accepts
+    /// (<c>/MaxLen</c>), or <c>null</c> to leave it unbounded (the default). It
+    /// also sets the number of comb cells when <see cref="Comb"/> is set.
+    /// </summary>
+    public int? MaxLength { get; set; }
 }
 
 

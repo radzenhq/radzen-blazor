@@ -10,9 +10,13 @@ namespace Radzen.Documents.Pdf;
 internal sealed class FormWriter(Document document)
 {
     // Field flags (ISO 32000-1 table 226/229): /Ff bit 16 marks a radio group,
-    // bit 18 a combo box.
+    // bit 18 a combo box. Text-field flags: bit 13 multiline, bit 14 password,
+    // bit 25 comb.
     private const int RadioFlag = 1 << 15;
     private const int ComboFlag = 1 << 17;
+    private const int MultilineFlag = 1 << 12;
+    private const int PasswordFlag = 1 << 13;
+    private const int CombFlag = 1 << 24;
 
     // Names already claimed by base-source or created fields, so appended nested
     // field trees can be disambiguated deterministically on collision.
@@ -452,6 +456,17 @@ internal sealed class FormWriter(Document document)
                 widget["FT"] = new NameObject("Tx");
                 widget["V"] = new StringObject(text.Value);
                 widget["DA"] = new StringObject(DefaultAppearanceOf(text.Font));
+                var flags = TextFieldFlags(text);
+                if (flags != 0)
+                {
+                    widget["Ff"] = new NumberObject(flags);
+                }
+
+                if (text.MaxLength is { } maxLength)
+                {
+                    widget["MaxLen"] = new NumberObject(maxLength);
+                }
+
                 if (FieldAppearances.CanEncode(text.Value))
                 {
                     widget["AP"] = new DictionaryObject
@@ -589,6 +604,27 @@ internal sealed class FormWriter(Document document)
 
         parent["Kids"] = kids;
         fields.Add(parentReference);
+    }
+
+    private static int TextFieldFlags(TextFieldDefinition text)
+    {
+        var flags = 0;
+        if (text.Multiline)
+        {
+            flags |= MultilineFlag;
+        }
+
+        if (text.Password)
+        {
+            flags |= PasswordFlag;
+        }
+
+        if (text.Comb)
+        {
+            flags |= CombFlag;
+        }
+
+        return flags;
     }
 
     private static string DefaultAppearanceOf(Font font)
