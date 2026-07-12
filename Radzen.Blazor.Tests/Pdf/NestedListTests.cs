@@ -130,9 +130,10 @@ public class NestedListTests
         using var stream = new MemoryStream();
         builder.SaveToStream(stream);
 
-        // SHA-256 of this exact document captured before nested-list support existed.
+        // SHA-256 of this exact document. Re-pinned when the deterministic trailer /ID
+        // was added (it derives only from content/info, so the value stays stable).
         Assert.Equal(
-            "52508AF33626BD972F78F37217ED1F2C8CCB38ECCD2FCC74A0D56CEFBB4DD09D",
+            "EAD3A70F04966251373CDB87295A7DAB74DA81931C3AE3F033F40E6E15BA9E64",
             Convert.ToHexString(SHA256.HashData(stream.ToArray())));
     }
 }
