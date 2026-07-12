@@ -112,6 +112,13 @@ public sealed class Container : Block
     public RenderingIntent? RenderingIntent { get; set; }
 
     /// <summary>
+    /// Gets or sets a blurred drop shadow painted underneath the box, or <see langword="null"/>
+    /// for none (the default). The shadow is decorative: it never affects layout. It is not
+    /// painted for a rotated container (<see cref="Rotation"/> is non-zero).
+    /// </summary>
+    public BoxShadow? Shadow { get; set; }
+
+    /// <summary>
     /// Gets or sets the rotation of the whole container content in degrees, counterclockwise,
     /// about the center of the container box. Defaults to 0 (no rotation). The rotated content
     /// is not clipped to the original box, so corners of a rotated box extend outside it.

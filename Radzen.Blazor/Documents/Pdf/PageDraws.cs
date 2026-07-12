@@ -184,6 +184,21 @@ internal sealed class PagePlan
         return key;
     }
 
+    // A soft-mask graphics state is never deduplicated: each carries its own transparency
+    // group, so a fresh GS entry is always appended.
+    public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
+    {
+        var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        ExtGStates.Add(new GeneratedExtGState
+        {
+            Key = key,
+            FillAlpha = System.Math.Clamp(fillAlpha, 0, 1),
+            StrokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1),
+            SoftMask = softMask,
+        });
+        return key;
+    }
+
     // One shading pattern per gradient brush instance, keyed P0, P1, ...
     public string RegisterPattern(GradientBrush gradient)
     {

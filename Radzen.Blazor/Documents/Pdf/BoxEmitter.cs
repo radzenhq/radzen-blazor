@@ -25,7 +25,11 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
                 box.Style.Blend, box.Style.OverprintStroke, box.Style.OverprintFill,
                 box.Style.OverprintMode, box.Style.Intent)
             : null;
-        var style = box.Style with { ExtGState = extGState };
+        // A rotated box bakes a page-space transform into its draws below; the shadow's soft
+        // mask cannot survive that (its masked fill would degrade to a stroked edge), so it is
+        // dropped for a rotated container.
+        var shadow = box.Transform is null ? box.Style.Shadow : null;
+        var style = box.Style with { ExtGState = extGState, Shadow = shadow };
         BoxRenderer.Paint(plan, bounds, style);
 
         var radius = BoxRenderer.ClampRadius(box.Style.CornerRadius.Point, bounds.Width, bounds.Height);
