@@ -163,7 +163,9 @@ internal sealed class PagePlan
                 && state.OverprintStroke == overprintStroke
                 && state.OverprintFill == overprintFill
                 && state.OverprintMode == overprintMode
-                && state.Intent == intent)
+                && state.Intent == intent
+                && state.SoftMask is null
+                && !state.ClearSoftMask)
             {
                 return state.Key;
             }

@@ -120,7 +120,7 @@ public class PdfLtvTests
 
         var reader = DocumentReader.Parse(stamped);
         var signature = SignatureValue(reader, 0);
-        Assert.Equal("Sig", ((NameObject)signature["Type"]).Value);
+        Assert.Equal("DocTimeStamp", ((NameObject)signature["Type"]).Value);
         Assert.Equal("Adobe.PPKLite", ((NameObject)signature["Filter"]).Value);
         Assert.Equal("ETSI.RFC3161", ((NameObject)signature["SubFilter"]).Value);
         Assert.Equal("Sig", ((NameObject)Field(reader, 0)["FT"]).Value);

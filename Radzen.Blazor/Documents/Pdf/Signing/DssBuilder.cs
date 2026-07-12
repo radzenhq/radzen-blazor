@@ -1,4 +1,5 @@
 using System;
+using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Signing;
@@ -20,7 +21,9 @@ namespace Radzen.Documents.Pdf.Signing;
 /// an exact prefix of the result. Combine with
 /// <see cref="PdfTimestamper.Timestamp(byte[], ITimestampProvider)"/> afterwards
 /// to produce a B-LTA (long-term archival) document. Any existing <c>/DSS</c> is
-/// replaced.
+/// merged with rather than replaced: its <c>/Certs</c>, <c>/OCSPs</c>, <c>/CRLs</c>
+/// arrays and <c>/VRI</c> entries are carried over so earlier validation material
+/// survives when a document is signed or augmented more than once.
 /// </remarks>
 public static class DssBuilder
 {
@@ -87,18 +90,32 @@ public static class DssBuilder
         var ocspRefs = AddStreams(writer, ocsps);
         var crlRefs = AddStreams(writer, crls);
 
-        var dss = new DictionaryObject { ["Type"] = new NameObject("DSS") };
-        AddArray(dss, "Certs", certRefs);
-        AddArray(dss, "OCSPs", ocspRefs);
-        AddArray(dss, "CRLs", crlRefs);
+        // Merge with any existing /DSS so a multi-signature document (or a later
+        // re-augmentation) keeps the earlier validation material instead of dropping it.
+        var existingDss = catalog.TryGetValue("DSS", out var dssObj) && dssObj is not null && reader.Resolve(dssObj) is DictionaryObject prior ? prior : null;
 
+        var dss = new DictionaryObject { ["Type"] = new NameObject("DSS") };
+        MergeArray(dss, "Certs", existingDss, reader, certRefs);
+        MergeArray(dss, "OCSPs", existingDss, reader, ocspRefs);
+        MergeArray(dss, "CRLs", existingDss, reader, crlRefs);
+
+        DictionaryObject? vri = existingDss is not null && existingDss.TryGetValue("VRI", out var vriObj) && vriObj is not null
+            && reader.Resolve(vriObj) is DictionaryObject priorVri
+                ? Copy(priorVri)
+                : null;
         if (signatureContents is not null)
         {
             var entry = new DictionaryObject { ["Type"] = new NameObject("VRI") };
             AddArray(entry, "Cert", certRefs);
             AddArray(entry, "OCSP", ocspRefs);
             AddArray(entry, "CRL", crlRefs);
-            dss["VRI"] = new DictionaryObject { [Sha1.HexUpper(signatureContents)] = entry };
+            vri ??= new DictionaryObject();
+            vri[Sha1.HexUpper(signatureContents)] = entry;
+        }
+
+        if (vri is not null && vri.Count > 0)
+        {
+            dss["VRI"] = vri;
         }
 
         var dssRef = writer.Add(dss);
@@ -138,6 +155,30 @@ public static class DssBuilder
         target[key] = array;
     }
 
+    // Union the existing /DSS array (its entries stay valid indirect references
+    // in the prior revision) with the freshly added streams, preserving order.
+    private static void MergeArray(DictionaryObject target, string key, DictionaryObject? existing, DocumentReader reader, ReferenceObject[] refs)
+    {
+        var array = new ArrayObject();
+        if (existing is not null && existing.TryGetValue(key, out var priorObj) && priorObj is not null && reader.Resolve(priorObj) is ArrayObject prior)
+        {
+            foreach (var item in prior)
+            {
+                array.Add(item);
+            }
+        }
+
+        foreach (var reference in refs)
+        {
+            array.Add(reference);
+        }
+
+        if (array.Count > 0)
+        {
+            target[key] = array;
+        }
+    }
+
     private static DictionaryObject Copy(DictionaryObject source)
     {
         var copy = new DictionaryObject();
@@ -147,121 +188,5 @@ public static class DssBuilder
         }
 
         return copy;
-    }
-
-    // Pure-managed SHA-1 (FIPS 180-4). SHA-1 is used only as the /VRI index key
-    // (a non-cryptographic lookup in this context, matching the PAdES/Adobe
-    // convention); the BCL implementation is unavailable under Blazor WebAssembly.
-    private static class Sha1
-    {
-        public static string HexUpper(byte[] data)
-        {
-            var digest = Hash(data);
-            const string hex = "0123456789ABCDEF";
-            var chars = new char[digest.Length * 2];
-            for (var i = 0; i < digest.Length; i++)
-            {
-                chars[i * 2] = hex[digest[i] >> 4];
-                chars[i * 2 + 1] = hex[digest[i] & 0xF];
-            }
-
-            return new string(chars);
-        }
-
-        private static byte[] Hash(byte[] data)
-        {
-            uint h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
-
-            var padded = Pad(data);
-            Span<uint> w = stackalloc uint[80];
-            for (var offset = 0; offset < padded.Length; offset += 64)
-            {
-                for (var i = 0; i < 16; i++)
-                {
-                    w[i] = ((uint)padded[offset + i * 4] << 24)
-                        | ((uint)padded[offset + i * 4 + 1] << 16)
-                        | ((uint)padded[offset + i * 4 + 2] << 8)
-                        | padded[offset + i * 4 + 3];
-                }
-
-                for (var i = 16; i < 80; i++)
-                {
-                    w[i] = RotL(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1);
-                }
-
-                uint a = h0, b = h1, c = h2, d = h3, e = h4;
-                for (var i = 0; i < 80; i++)
-                {
-                    uint f, k;
-                    if (i < 20)
-                    {
-                        f = (b & c) | (~b & d);
-                        k = 0x5A827999;
-                    }
-                    else if (i < 40)
-                    {
-                        f = b ^ c ^ d;
-                        k = 0x6ED9EBA1;
-                    }
-                    else if (i < 60)
-                    {
-                        f = (b & c) | (b & d) | (c & d);
-                        k = 0x8F1BBCDC;
-                    }
-                    else
-                    {
-                        f = b ^ c ^ d;
-                        k = 0xCA62C1D6;
-                    }
-
-                    var temp = RotL(a, 5) + f + e + k + w[i];
-                    e = d;
-                    d = c;
-                    c = RotL(b, 30);
-                    b = a;
-                    a = temp;
-                }
-
-                h0 += a;
-                h1 += b;
-                h2 += c;
-                h3 += d;
-                h4 += e;
-            }
-
-            var result = new byte[20];
-            Write(result, 0, h0);
-            Write(result, 4, h1);
-            Write(result, 8, h2);
-            Write(result, 12, h3);
-            Write(result, 16, h4);
-            return result;
-        }
-
-        private static byte[] Pad(byte[] data)
-        {
-            var bitLength = (ulong)data.Length * 8;
-            var total = data.Length + 1;
-            var padZeros = (56 - (total % 64) + 64) % 64;
-            var padded = new byte[total + padZeros + 8];
-            Array.Copy(data, padded, data.Length);
-            padded[data.Length] = 0x80;
-            for (var i = 0; i < 8; i++)
-            {
-                padded[padded.Length - 1 - i] = (byte)(bitLength >> (8 * i));
-            }
-
-            return padded;
-        }
-
-        private static uint RotL(uint value, int bits) => (value << bits) | (value >> (32 - bits));
-
-        private static void Write(byte[] data, int offset, uint value)
-        {
-            data[offset] = (byte)(value >> 24);
-            data[offset + 1] = (byte)(value >> 16);
-            data[offset + 2] = (byte)(value >> 8);
-            data[offset + 3] = (byte)value;
-        }
     }
 }
