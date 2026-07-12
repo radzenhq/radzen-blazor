@@ -69,9 +69,42 @@ internal sealed class SfntFont
 
     public bool Italic { get; private set; }
 
+    // OS/2 fsType embedding-permission flags (OpenType OS/2). 0 when the font has no
+    // OS/2 table, which the spec treats as installable (no embedding restriction).
+    public ushort FsType { get; private set; }
+
+    // Bit 1 (0x0002, RESTRICTED_LICENSE_EMBEDDING) forbids embedding the font. It is
+    // mutually exclusive with the Preview/Print (0x0004) and Editable (0x0008) bits.
+    public bool EmbeddingRestricted => (FsType & 0x0002) != 0;
+
+    // Throws unless the font may be embedded, or the caller opts past the restriction.
+    public void EnsureEmbeddable(bool allowRestricted)
+    {
+        if (EmbeddingRestricted && !allowRestricted)
+        {
+            throw new InvalidOperationException(
+                $"The font '{PostScriptName}' has OS/2 fsType 0x{FsType:X4} (Restricted License Embedding) and must not be embedded. "
+                + "Pass the embedding opt-in override to embed it anyway if you hold a license that permits it.");
+        }
+    }
+
     public ushort GetGlyphId(int codepoint) => cmap?.GetGlyphId(codepoint) ?? 0;
 
     public ushort GetAdvanceWidth(ushort glyphId) => metrics.GetAdvanceWidth(glyphId);
+
+    // Legacy 'kern' pair adjustments, parsed and cached on first use so a face that is
+    // never kerned pays nothing. Empty when there is no 'kern' table.
+    private Dictionary<int, int>? kerning;
+
+    // Pair-kerning adjustment (font design units, negative tightening) for the ordered
+    // glyph pair from the legacy 'kern' table; 0 when the pair is not kerned.
+    public int GetKerning(ushort left, ushort right)
+    {
+        kerning ??= directory.Contains("kern") && TryGetTable("kern", out var table)
+            ? KernTable.Parse(table)
+            : [];
+        return kerning.TryGetValue((left << 16) | right, out var value) ? value : 0;
+    }
 
     public bool TryGetTable(string tag, out byte[] data)
     {
@@ -226,6 +259,7 @@ internal sealed class SfntFont
 
         var reader = new SfntReader(data);
         var version = reader.ReadUInt16At((int)os2.Offset);
+        FsType = reader.ReadUInt16At((int)os2.Offset + 8);
         var fsSelection = reader.ReadUInt16At((int)os2.Offset + 62);
         Italic = (fsSelection & 0x01) != 0;
         Bold = (fsSelection & 0x20) != 0;
