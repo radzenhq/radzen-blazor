@@ -19,6 +19,12 @@ internal static class ContentEmitter
     public static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
     {
         writer.WriteRaw("q\n");
+        if (image.ExtGState is { } state)
+        {
+            writer.WriteName(state);
+            writer.WriteRaw(" gs\n");
+        }
+
         if (image.Clip is { } clip)
         {
             WriteClipRect(writer, clip);

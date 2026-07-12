@@ -5,7 +5,7 @@ namespace Radzen.Documents.Pdf;
 // Emits a positioned table fragment: row backgrounds, then each cell's background,
 // borders, text lines (with per-page field resolution), images, codes and nested
 // tables - clipping content that overflows the cell box.
-internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, StyleResolution resolution)
+internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, StyleResolution resolution, OpacityResolver opacities)
 {
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
 
@@ -71,6 +71,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var pageNumber = context.PageNumber;
         var pageCount = context.PageCount;
         var element = structureTree.ElementOf(cell.Cell) ?? inherited;
+        var opacity = opacities.CellOpacity(cell.Cell);
+        var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
         if (cell.Cell.Background is { } background)
         {
             plan.Fills.Add(new FillDraw
@@ -80,10 +82,11 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Width = cell.Bounds.Width,
                 Height = cell.Bounds.Height,
                 Color = background,
+                ExtGState = extGState,
             });
         }
 
-        EmitBorders(plan, layout, cell, left, contentTop, delta);
+        EmitBorders(plan, layout, cell, left, contentTop, delta, extGState);
 
         var firstText = plan.Texts.Count;
         var overflows = false;
@@ -152,6 +155,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Height = image.Height,
                 Image = xobject,
                 Element = element,
+                ExtGState = image.Source.Opacity < 1
+                    ? plan.RegisterExtGState(image.Source.Opacity, image.Source.Opacity)
+                    : null,
             });
             plan.UsedImages.Add(xobject);
         }
@@ -193,7 +199,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    private static void EmitBorders(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta)
+    private static void EmitBorders(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, string? extGState)
     {
         var cellBorders = cell.Cell.Borders;
         var rowBorders = layout.Source?.Rows[cell.Row].Borders;
@@ -204,10 +210,10 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var right = x + cell.Bounds.Width;
         var bottom = top - cell.Bounds.Height;
 
-        EmitEdge(plan, cellBorders.Top, rowBorders?.Top, tableBorders?.Top, x, top, right, top);
-        EmitEdge(plan, cellBorders.Right, rowBorders?.Right, tableBorders?.Right, right, bottom, right, top);
-        EmitEdge(plan, cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom, x, bottom, right, bottom);
-        EmitEdge(plan, cellBorders.Left, rowBorders?.Left, tableBorders?.Left, x, bottom, x, top);
+        EmitEdge(plan, cellBorders.Top, rowBorders?.Top, tableBorders?.Top, x, top, right, top, extGState);
+        EmitEdge(plan, cellBorders.Right, rowBorders?.Right, tableBorders?.Right, right, bottom, right, top, extGState);
+        EmitEdge(plan, cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom, x, bottom, right, bottom, extGState);
+        EmitEdge(plan, cellBorders.Left, rowBorders?.Left, tableBorders?.Left, x, bottom, x, top, extGState);
     }
 
     private static void EmitEdge(
@@ -218,7 +224,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double x1,
         double y1,
         double x2,
-        double y2)
+        double y2,
+        string? extGState)
     {
         var edge = cellEdge;
         if (!cellEdge.IsSet)
@@ -254,6 +261,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             LineWidth = edge.Width > 0 ? edge.Width : 0.5,
             Color = edge.Color,
             Style = style,
+            ExtGState = extGState,
         });
     }
 }

@@ -21,6 +21,12 @@ public sealed class Container : Block
     public Color? Background { get; set; }
 
     /// <summary>
+    /// Gets or sets the opacity the box background and borders are painted with, from 0
+    /// (fully transparent) to 1 (fully opaque). Defaults to 1.
+    /// </summary>
+    public double Opacity { get; set; } = 1;
+
+    /// <summary>
     /// Gets or sets the horizontal alignment of the box within the available width.
     /// Only observable when <see cref="Width"/> is narrower than the available width.
     /// Defaults to <see cref="HorizontalAlignment.Left"/>.

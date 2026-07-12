@@ -53,6 +53,17 @@ internal sealed class GeneratedLink
 // its line in PDF user space, emitted as an /XYZ named destination on save.
 internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
 
+// A page /ExtGState resource entry: constant fill (/ca) and stroke (/CA) alpha
+// selected in the content stream with the gs operator.
+internal sealed class GeneratedExtGState
+{
+    public required string Key { get; init; }
+
+    public required double FillAlpha { get; init; }
+
+    public required double StrokeAlpha { get; init; }
+}
+
 internal sealed class GeneratedPage
 {
     public required byte[] Content { get; init; }
@@ -62,6 +73,8 @@ internal sealed class GeneratedPage
     public required IReadOnlyList<GeneratedImage> Images { get; init; }
 
     public IReadOnlyList<GeneratedLink> Links { get; init; } = [];
+
+    public IReadOnlyList<GeneratedExtGState> ExtGStates { get; init; } = [];
 }
 
 // Orchestrates PDF generation: runs the merged layout engine (Paginator for paragraph
@@ -82,6 +95,7 @@ internal sealed class DocumentGenerator
     private readonly ImageEmitter imageEmitter;
     private readonly CodeEmitter codeEmitter;
     private readonly FieldResolver fieldResolver;
+    private readonly WatermarkEmitter watermarkEmitter;
 
     private DocumentGenerator(DocumentBuilder builder)
     {
@@ -95,7 +109,8 @@ internal sealed class DocumentGenerator
         codeEmitter = new(fonts);
         imageEmitter = new(imageStore, structureTree);
         fieldResolver = new(fonts);
-        tableEmitter = new(imageStore, structureTree, resolution);
+        tableEmitter = new(imageStore, structureTree, resolution, new OpacityResolver(builder));
+        watermarkEmitter = new(fonts, fontResolver, imageStore);
     }
 
     public static Document Generate(DocumentBuilder builder)
@@ -118,6 +133,7 @@ internal sealed class DocumentGenerator
         structureTree.Build();
 
         var paginated = new List<PaginatedPage>();
+        var watermarks = new List<Watermark?>();
         foreach (var section in builder.Sections)
         {
             // RTL / vertical shaping is not implemented; fail loudly rather than silently laying out LTR.
@@ -126,13 +142,17 @@ internal sealed class DocumentGenerator
                 throw new System.NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
             }
 
-            paginated.AddRange(Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution));
+            foreach (var page in Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution))
+            {
+                paginated.Add(page);
+                watermarks.Add(section.Watermark);
+            }
         }
 
         var plans = new List<PagePlan>();
         for (var i = 0; i < paginated.Count; i++)
         {
-            plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count));
+            plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count, watermarks[i]));
         }
 
         document.Structure = structureTree.DocumentElement;
@@ -170,7 +190,7 @@ internal sealed class DocumentGenerator
         return document;
     }
 
-    private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount)
+    private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount, Watermark? watermark)
     {
         var height = page.Size.Height.Point;
         var plan = new PagePlan { Size = page.Size };
@@ -269,6 +289,11 @@ internal sealed class DocumentGenerator
             tableEmitter.EmitFragment(context, positioned, left, bandTop);
         }
 
+        if (watermark is not null)
+        {
+            watermarkEmitter.Plan(plan, watermark);
+        }
+
         return plan;
     }
 
@@ -282,9 +307,20 @@ internal sealed class DocumentGenerator
 
         foreach (var fill in plan.Fills)
         {
-            if (fill.Clip is { } fillClip)
+            var grouped = fill.Clip is not null || fill.ExtGState is not null;
+            if (grouped)
             {
                 writer.WriteRaw("q\n");
+            }
+
+            if (fill.ExtGState is { } fillState)
+            {
+                writer.WriteName(fillState);
+                writer.WriteRaw(" gs\n");
+            }
+
+            if (fill.Clip is { } fillClip)
+            {
                 WriteClipRect(writer, fillClip);
             }
 
@@ -297,7 +333,7 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" ");
             writer.WriteNumber(fill.Height);
             writer.WriteRaw(" re f\n");
-            if (fill.Clip is not null)
+            if (grouped)
             {
                 writer.WriteRaw("Q\n");
             }
@@ -306,6 +342,12 @@ internal sealed class DocumentGenerator
         foreach (var edge in plan.Edges)
         {
             writer.WriteRaw("q\n");
+            if (edge.ExtGState is { } edgeState)
+            {
+                writer.WriteName(edgeState);
+                writer.WriteRaw(" gs\n");
+            }
+
             writer.WriteColor(edge.Color, "RG");
             writer.WriteNumber(edge.LineWidth);
             writer.WriteRaw(" w\n");
@@ -358,6 +400,11 @@ internal sealed class DocumentGenerator
 
         structureTree.WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
 
+        if (plan.Watermark is { } watermark)
+        {
+            WriteWatermark(writer, watermark);
+        }
+
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
         var usedImages = new List<GeneratedImage>(plan.UsedImages);
         return new GeneratedPage
@@ -366,7 +413,46 @@ internal sealed class DocumentGenerator
             Fonts = usedFonts,
             Images = usedImages,
             Links = [.. plan.Links],
+            ExtGStates = [.. plan.ExtGStates],
         };
+    }
+
+    private static void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)
+    {
+        writer.WriteRaw("q\n");
+        if (watermark.ExtGState is { } state)
+        {
+            writer.WriteName(state);
+            writer.WriteRaw(" gs\n");
+        }
+
+        var radians = watermark.Rotation * System.Math.PI / 180;
+        var cos = System.Math.Cos(radians);
+        var sin = System.Math.Sin(radians);
+        var negSin = sin == 0 ? 0 : -sin;
+        writer.WriteNumber(cos);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(sin);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(negSin);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(cos);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(watermark.CenterX);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(watermark.CenterY);
+        writer.WriteRaw(" cm\n");
+        if (watermark.Image is { } image)
+        {
+            WriteImageDraw(writer, image);
+        }
+
+        foreach (var text in watermark.Texts)
+        {
+            WriteTextDraw(writer, text);
+        }
+
+        writer.WriteRaw("Q\n");
     }
 
     private static void Accumulate<T>(Dictionary<StructureElement, List<T>> map, StructureElement element, T draw)

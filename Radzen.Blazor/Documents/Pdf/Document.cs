@@ -1669,7 +1669,19 @@ public sealed class Document
             xobjects[image.Key] = ResolveImage(writer, image, imageRefs);
         }
 
-        if (fonts is null && xobjects is null)
+        DictionaryObject? extGStates = null;
+        foreach (var state in page.ExtGStates)
+        {
+            extGStates ??= new DictionaryObject();
+            extGStates[state.Key] = new DictionaryObject
+            {
+                ["Type"] = new NameObject("ExtGState"),
+                ["ca"] = new NumberObject(state.FillAlpha),
+                ["CA"] = new NumberObject(state.StrokeAlpha),
+            };
+        }
+
+        if (fonts is null && xobjects is null && extGStates is null)
         {
             return null;
         }
@@ -1683,6 +1695,11 @@ public sealed class Document
         if (xobjects is not null)
         {
             resources["XObject"] = xobjects;
+        }
+
+        if (extGStates is not null)
+        {
+            resources["ExtGState"] = extGStates;
         }
 
         return resources;
