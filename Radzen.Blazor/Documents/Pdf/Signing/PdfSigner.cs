@@ -80,7 +80,7 @@ public static class PdfSigner
     private static (byte[] Bytes, int SigStart, int SigEnd) Append(DocumentReader reader, IncrementalUpdateWriter writer,
         DictionaryObject catalog, ReferenceObject rootRef, SignatureOptions options)
     {
-        var (pageRef, page) = FindFirstPage(reader, catalog);
+        var (pageRef, page) = FindPage(reader, catalog, options.Appearance?.PageIndex ?? 0);
 
         var signature = BuildSignatureDictionary(options);
         var signatureRef = writer.Add(signature);
@@ -96,13 +96,18 @@ public static class PdfSigner
             ["FT"] = new NameObject("Sig"),
             ["T"] = new StringObject(fieldName),
             ["V"] = signatureRef,
-            ["Rect"] = new ArrayObject
-            {
-                new NumberObject(0), new NumberObject(0), new NumberObject(0), new NumberObject(0),
-            },
+            ["Rect"] = SignatureRect(options.Appearance),
             ["F"] = new NumberObject(132),
             ["P"] = pageRef,
         };
+
+        // A visible signature carries a generated appearance; the invisible default
+        // keeps the zero rect and no /AP so unchanged callers stay byte-identical.
+        if (options.Appearance is not null)
+        {
+            field["AP"] = new DictionaryObject { ["N"] = writer.Add(BuildAppearanceStream(options)) };
+        }
+
         var fieldRef = writer.Add(field);
 
         var acroForm = BuildAcroForm(reader, existingAcroForm, fieldRef);
@@ -229,37 +234,114 @@ public static class PdfSigner
         }
     }
 
-    private static (ReferenceObject Reference, DictionaryObject Page) FindFirstPage(DocumentReader reader, DictionaryObject catalog)
+    // The signature widget's rectangle: the visible appearance rectangle, or the
+    // historic invisible [0 0 0 0] when no appearance is requested.
+    private static ArrayObject SignatureRect(SignatureAppearance? appearance)
     {
-        if (!catalog.TryGetValue("Pages", out var pages) || pages is not ReferenceObject nodeRef)
+        if (appearance is null)
+        {
+            return [new NumberObject(0), new NumberObject(0), new NumberObject(0), new NumberObject(0)];
+        }
+
+        return
+        [
+            new NumberObject(appearance.X),
+            new NumberObject(appearance.Y),
+            new NumberObject(appearance.X + appearance.Width),
+            new NumberObject(appearance.Y + appearance.Height),
+        ];
+    }
+
+    // Draws the signer name, reason and signing time into the appearance box.
+    private static StreamObject BuildAppearanceStream(SignatureOptions options)
+    {
+        var appearance = options.Appearance!;
+        var lines = new List<string>();
+        if (!string.IsNullOrEmpty(options.SignerName))
+        {
+            lines.Add(options.SignerName);
+        }
+
+        if (!string.IsNullOrEmpty(options.Reason))
+        {
+            lines.Add("Reason: " + options.Reason);
+        }
+
+        if (options.SigningTime is { } time)
+        {
+            lines.Add(time.ToUniversalTime().ToString("yyyy-MM-dd HH:mm 'UTC'", CultureInfo.InvariantCulture));
+        }
+
+        var font = new Font { Name = "Helvetica", Size = 9 };
+        return FieldAppearances.BuildSignatureAppearance(lines, appearance.Width, appearance.Height, font);
+    }
+
+    // Returns the page leaf at the given zero-based index in document order, so a
+    // visible signature can target a specific page (index 0 is the first page).
+    private static (ReferenceObject Reference, DictionaryObject Page) FindPage(DocumentReader reader, DictionaryObject catalog, int index)
+    {
+        if (index < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), index, "The signature page index must not be negative.");
+        }
+
+        if (!catalog.TryGetValue("Pages", out var pages) || pages is not ReferenceObject rootRef)
         {
             throw new DocumentParseException("The catalog /Pages must be an indirect reference.", -1);
         }
 
+        var counter = 0;
+        var found = FindLeaf(reader, rootRef, index, ref counter, 0);
+        return found ?? throw new ArgumentOutOfRangeException(
+            nameof(index), index, $"The signature page index is past the last page ({counter} pages).");
+    }
+
+    // Depth-first in-order walk of the page tree; returns the (ref, dict) when the
+    // running leaf counter reaches the target index.
+    private static (ReferenceObject, DictionaryObject)? FindLeaf(
+        DocumentReader reader, ReferenceObject nodeRef, int target, ref int counter, int depth)
+    {
+        if (depth > 64)
+        {
+            throw new DocumentParseException("The page tree is too deep.", -1);
+        }
+
         if (reader.Resolve(nodeRef) is not DictionaryObject node)
         {
-            throw new DocumentParseException("The page tree root is not a dictionary.", -1);
+            throw new DocumentParseException("A page tree node is not a dictionary.", -1);
         }
 
-        var depth = 0;
-        while (node.TryGetValue("Kids", out var kidsValue) && kidsValue is not null)
+        if (!node.TryGetValue("Kids", out var kidsValue) || kidsValue is null)
         {
-            if (++depth > 64)
+            if (counter == target)
             {
-                throw new DocumentParseException("The page tree is too deep.", -1);
+                return (nodeRef, node);
             }
 
-            if (reader.Resolve(kidsValue) is not ArrayObject kids || kids.Count == 0 || kids[0] is not ReferenceObject kidRef)
-            {
-                throw new DocumentParseException("The page tree /Kids must be a non-empty array of references.", -1);
-            }
-
-            nodeRef = kidRef;
-            node = reader.Resolve(kidRef) as DictionaryObject
-                ?? throw new DocumentParseException("A page tree node is not a dictionary.", -1);
+            counter++;
+            return null;
         }
 
-        return (nodeRef, node);
+        if (reader.Resolve(kidsValue) is not ArrayObject kids)
+        {
+            throw new DocumentParseException("The page tree /Kids must be an array.", -1);
+        }
+
+        foreach (var kid in kids)
+        {
+            if (kid is not ReferenceObject kidRef)
+            {
+                throw new DocumentParseException("The page tree /Kids must hold references.", -1);
+            }
+
+            var found = FindLeaf(reader, kidRef, target, ref counter, depth + 1);
+            if (found is not null)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     private static string UniqueFieldName(DocumentReader reader, DictionaryObject? acroForm)

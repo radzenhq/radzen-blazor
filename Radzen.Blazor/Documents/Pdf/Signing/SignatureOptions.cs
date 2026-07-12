@@ -53,4 +53,36 @@ public sealed class SignatureOptions
     /// PAdES signatures.
     /// </summary>
     public string SubFilter { get; set; } = "adbe.pkcs7.detached";
+
+    /// <summary>
+    /// Gets or sets the placement of a visible signature widget. When left
+    /// <c>null</c> (the default) the signature is invisible: the widget keeps a
+    /// zero <c>[0 0 0 0]</c> rectangle and carries no appearance stream. When set
+    /// the widget takes the given rectangle on the requested page and gets a
+    /// generated <c>/AP /N</c> appearance showing <see cref="SignerName"/>,
+    /// <see cref="Reason"/> and <see cref="SigningTime"/>.
+    /// </summary>
+    public SignatureAppearance? Appearance { get; set; }
+}
+
+/// <summary>
+/// Describes where a visible signature widget is drawn. Coordinates are in PDF
+/// user space points, with the origin at the bottom-left of the page.
+/// </summary>
+public sealed class SignatureAppearance
+{
+    /// <summary>Gets or sets the zero-based index of the page carrying the signature. Defaults to 0.</summary>
+    public int PageIndex { get; set; }
+
+    /// <summary>Gets or sets the left edge of the signature rectangle.</summary>
+    public double X { get; set; }
+
+    /// <summary>Gets or sets the bottom edge of the signature rectangle.</summary>
+    public double Y { get; set; }
+
+    /// <summary>Gets or sets the width of the signature rectangle.</summary>
+    public double Width { get; set; }
+
+    /// <summary>Gets or sets the height of the signature rectangle.</summary>
+    public double Height { get; set; }
 }
