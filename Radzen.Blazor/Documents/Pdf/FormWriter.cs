@@ -9,6 +9,11 @@ namespace Radzen.Documents.Pdf;
 // a re-save, imports appended-page form fields, and emits created form fields.
 internal sealed class FormWriter(Document document)
 {
+    // Field flags (ISO 32000-1 table 226/229): /Ff bit 16 marks a radio group,
+    // bit 18 a combo box.
+    private const int RadioFlag = 1 << 15;
+    private const int ComboFlag = 1 << 17;
+
     public void Flatten()
     {
         foreach (var definition in document.FormFields)
@@ -48,6 +53,28 @@ internal sealed class FormWriter(Document document)
         {
             page.Content.Add(FieldAppearances.CheckMark(
                 definition.X.Point, definition.Y.Point, definition.Width.Point, definition.Height.Point));
+        }
+        else if (definition is RadioGroupFieldDefinition radio)
+        {
+            var selected = radio.SelectedValue is null
+                ? null
+                : radio.Options.Find(option => string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal));
+            if (selected is not null)
+            {
+                page.Content.Add(FieldAppearances.RadioDot(
+                    selected.X.Point, selected.Y.Point, selected.Width.Point, selected.Height.Point));
+            }
+        }
+        else if (definition is ChoiceFieldDefinition choice && choice.Value.Length > 0)
+        {
+            var baseline = FieldAppearances.Baseline(definition.Height.Point, choice.Font.Size);
+            page.Content.Add(new TextContent(
+                choice.Value,
+                definition.X + Unit.FromPoint(2.0),
+                definition.Y + Unit.FromPoint(baseline))
+            {
+                Font = choice.Font,
+            });
         }
     }
 
@@ -133,7 +160,10 @@ internal sealed class FormWriter(Document document)
                 : (Inherited(widget, "V") as NameObject)?.Value;
             if (state is not null && !string.Equals(state, "Off", StringComparison.Ordinal))
             {
-                page.Content.Add(FieldAppearances.CheckMark(x, y, width, height));
+                var radio = Inherited(widget, "Ff") is NumberObject ff && (ff.IntValue & RadioFlag) != 0;
+                page.Content.Add(radio
+                    ? FieldAppearances.RadioDot(x, y, width, height)
+                    : FieldAppearances.CheckMark(x, y, width, height));
             }
 
             return;
@@ -312,9 +342,9 @@ internal sealed class FormWriter(Document document)
             var fonts = new DictionaryObject { ["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica") };
             foreach (var definition in document.FormFields)
             {
-                if (definition is TextFieldDefinition text)
+                if (TextAppearanceOf(definition) is (_, { } font))
                 {
-                    var baseFont = BaseFontOf(text.Font);
+                    var baseFont = BaseFontOf(font);
                     if (!fonts.ContainsKey(baseFont))
                     {
                         fonts[baseFont] = PageResourceBuilder.Base14FontDictionary(baseFont);
@@ -327,13 +357,20 @@ internal sealed class FormWriter(Document document)
 
         foreach (var definition in document.FormFields)
         {
-            if (definition is TextFieldDefinition text && !FieldAppearances.CanEncode(text.Value))
+            if (TextAppearanceOf(definition) is ({ } value, _) && !FieldAppearances.CanEncode(value))
             {
                 form["NeedAppearances"] = new BooleanObject(true);
                 break;
             }
         }
     }
+
+    private static (string Value, Font Font)? TextAppearanceOf(FormFieldDefinition definition) => definition switch
+    {
+        TextFieldDefinition text => (text.Value, text.Font),
+        ChoiceFieldDefinition choice => (choice.Value, choice.Font),
+        _ => null,
+    };
 
     private static string BaseFontOf(Font font)
         => Fonts.Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
@@ -354,6 +391,12 @@ internal sealed class FormWriter(Document document)
             {
                 throw new InvalidOperationException(
                     $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {pageNodes.Count} pages.");
+            }
+
+            if (definition is RadioGroupFieldDefinition radio)
+            {
+                WriteRadioGroup(writer, pageNodes[definition.PageIndex].Reference, radio, fields, created);
+                continue;
             }
 
             var x = definition.X.Point;
@@ -380,15 +423,37 @@ internal sealed class FormWriter(Document document)
             {
                 widget["FT"] = new NameObject("Tx");
                 widget["V"] = new StringObject(text.Value);
-                widget["DA"] = new StringObject(
-                    "/" + BaseFontOf(text.Font)
-                    + " " + text.Font.Size.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
-                    + " Tf 0 g");
+                widget["DA"] = new StringObject(DefaultAppearanceOf(text.Font));
                 if (FieldAppearances.CanEncode(text.Value))
                 {
                     widget["AP"] = new DictionaryObject
                     {
                         ["N"] = writer.Add(FieldAppearances.BuildText(text.Value, width, height, text.Font)),
+                    };
+                }
+            }
+            else if (definition is ChoiceFieldDefinition choice)
+            {
+                var options = new ArrayObject();
+                foreach (var option in choice.Options)
+                {
+                    options.Add(new StringObject(option));
+                }
+
+                widget["FT"] = new NameObject("Ch");
+                widget["Opt"] = options;
+                if (choice.ComboBox)
+                {
+                    widget["Ff"] = new NumberObject(ComboFlag);
+                }
+
+                widget["V"] = new StringObject(choice.Value);
+                widget["DA"] = new StringObject(DefaultAppearanceOf(choice.Font));
+                if (FieldAppearances.CanEncode(choice.Value))
+                {
+                    widget["AP"] = new DictionaryObject
+                    {
+                        ["N"] = writer.Add(FieldAppearances.BuildText(choice.Value, width, height, choice.Font)),
                     };
                 }
             }
@@ -415,6 +480,93 @@ internal sealed class FormWriter(Document document)
 
         return created;
     }
+
+    // Emits a radio group as a parent /Btn field (Radio flag, /V and /DV holding
+    // the selected on-state) with one kid widget per option, each carrying its own
+    // /AP /N keyed by the option value plus /Off and an /AS matching the selection.
+    private static void WriteRadioGroup(
+        DocumentWriter writer,
+        ReferenceObject pageReference,
+        RadioGroupFieldDefinition radio,
+        List<DocumentObject> fields,
+        List<(int, ReferenceObject)> created)
+    {
+        if (radio.Options.Count < 2)
+        {
+            throw new InvalidOperationException($"Radio group '{radio.Name}' needs at least two options.");
+        }
+
+        var values = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var option in radio.Options)
+        {
+            if (!values.Add(option.Value))
+            {
+                throw new InvalidOperationException($"Radio group '{radio.Name}' has duplicate option value '{option.Value}'.");
+            }
+        }
+
+        if (radio.SelectedValue is not null && !values.Contains(radio.SelectedValue))
+        {
+            throw new InvalidOperationException($"Radio group '{radio.Name}' selects '{radio.SelectedValue}' which is not among its options.");
+        }
+
+        var state = radio.SelectedValue ?? "Off";
+        var parent = new DictionaryObject
+        {
+            ["FT"] = new NameObject("Btn"),
+            ["T"] = new StringObject(radio.Name),
+            ["Ff"] = new NumberObject(RadioFlag),
+            ["V"] = new NameObject(state),
+            ["DV"] = new NameObject(state),
+        };
+        var parentReference = writer.Add(parent);
+
+        var kids = new ArrayObject();
+        foreach (var option in radio.Options)
+        {
+            var x = option.X.Point;
+            var y = option.Y.Point;
+            var width = option.Width.Point;
+            var height = option.Height.Point;
+            var selected = string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal);
+            var kid = new DictionaryObject
+            {
+                ["Type"] = new NameObject("Annot"),
+                ["Subtype"] = new NameObject("Widget"),
+                ["Rect"] = new ArrayObject
+                {
+                    new NumberObject(x),
+                    new NumberObject(y),
+                    new NumberObject(x + width),
+                    new NumberObject(y + height),
+                },
+                ["F"] = new NumberObject(4),
+                ["P"] = pageReference,
+                ["Parent"] = parentReference,
+                ["AS"] = new NameObject(selected ? option.Value : "Off"),
+                ["AP"] = new DictionaryObject
+                {
+                    ["N"] = new DictionaryObject
+                    {
+                        [option.Value] = writer.Add(FieldAppearances.BuildRadio(width, height, selected: true)),
+                        ["Off"] = writer.Add(FieldAppearances.BuildRadio(width, height, selected: false)),
+                    },
+                },
+            };
+
+            var kidReference = writer.Add(kid);
+            kids.Add(kidReference);
+            created.Add((radio.PageIndex, kidReference));
+        }
+
+        parent["Kids"] = kids;
+        fields.Add(parentReference);
+    }
+
+    private static string DefaultAppearanceOf(Font font)
+        => "/" + BaseFontOf(font)
+            + " " + font.Size.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+            + " Tf 0 g";
 
     // Imports the /Annots of every appended loaded page (seeding its new page ref
     // so annotation /P links repoint) and returns the merged widget/field objects

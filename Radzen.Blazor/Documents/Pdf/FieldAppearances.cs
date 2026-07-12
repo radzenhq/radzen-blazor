@@ -41,6 +41,66 @@ internal static class FieldAppearances
         return Wrap(writer, width, height);
     }
 
+    public static StreamObject BuildRadio(double width, double height, bool selected)
+    {
+        using var writer = new ContentWriter();
+        RadioBorder(0.0, 0.0, width, height).Emit(writer);
+        if (selected)
+        {
+            RadioDot(0.0, 0.0, width, height).Emit(writer);
+        }
+
+        return Wrap(writer, width, height);
+    }
+
+    // The circular outline every radio widget state draws, positioned inside the
+    // given rectangle in the target coordinate space (appearance bbox or page).
+    public static PathContent RadioBorder(double x, double y, double width, double height)
+    {
+        var extent = System.Math.Min(width, height);
+        var path = new PathContent
+        {
+            Stroke = true,
+            Thickness = System.Math.Max(1.0, extent * 0.08),
+        };
+        Circle(path, x + width / 2.0, y + height / 2.0, extent * 0.42);
+        return path;
+    }
+
+    // The filled dot drawn for the selected radio option; shared with form
+    // flattening so a flattened selection matches the widget appearance.
+    public static PathContent RadioDot(double x, double y, double width, double height)
+    {
+        var path = new PathContent { Fill = true };
+        Circle(path, x + width / 2.0, y + height / 2.0, System.Math.Min(width, height) * 0.22);
+        return path;
+    }
+
+    // Approximates a circle with four cubic Bezier arcs.
+    private static void Circle(PathContent path, double cx, double cy, double r)
+    {
+        const double Kappa = 0.5522847498307936;
+        var k = r * Kappa;
+        path.MoveTo(Unit.FromPoint(cx + r), Unit.FromPoint(cy));
+        path.CurveTo(
+            Unit.FromPoint(cx + r), Unit.FromPoint(cy + k),
+            Unit.FromPoint(cx + k), Unit.FromPoint(cy + r),
+            Unit.FromPoint(cx), Unit.FromPoint(cy + r));
+        path.CurveTo(
+            Unit.FromPoint(cx - k), Unit.FromPoint(cy + r),
+            Unit.FromPoint(cx - r), Unit.FromPoint(cy + k),
+            Unit.FromPoint(cx - r), Unit.FromPoint(cy));
+        path.CurveTo(
+            Unit.FromPoint(cx - r), Unit.FromPoint(cy - k),
+            Unit.FromPoint(cx - k), Unit.FromPoint(cy - r),
+            Unit.FromPoint(cx), Unit.FromPoint(cy - r));
+        path.CurveTo(
+            Unit.FromPoint(cx + k), Unit.FromPoint(cy - r),
+            Unit.FromPoint(cx + r), Unit.FromPoint(cy - k),
+            Unit.FromPoint(cx + r), Unit.FromPoint(cy));
+        path.Close();
+    }
+
     // The check-mark glyph drawn for a checked box, positioned inside the given
     // rectangle in the target coordinate space (appearance bbox or page).
     public static PathContent CheckMark(double x, double y, double width, double height)
