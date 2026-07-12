@@ -60,6 +60,7 @@ internal sealed class StandardSecurityHandler
         {
             1 => 5,
             5 => 32,
+            >= 4 => DeriveCryptFilterKeyLength(encrypt),
             _ => DeriveMd5KeyLength(GetInt(encrypt, "Length", 40)),
         };
 
@@ -88,6 +89,20 @@ internal sealed class StandardSecurityHandler
 
     public byte[] DecryptStream(byte[] data, int objectNumber, int generation)
         => Decrypt(streamCipher, data, objectNumber, generation);
+
+    // A /Metadata stream stays plaintext when /EncryptMetadata is false (ISO 32000-1
+    // 7.6.3.2); running it through the cipher would return corrupted XMP.
+    public byte[] DecryptStream(byte[] data, int objectNumber, int generation, DictionaryObject dictionary)
+    {
+        ArgumentNullException.ThrowIfNull(dictionary);
+        return !encryptMetadata && IsMetadataStream(dictionary)
+            ? data
+            : DecryptStream(data, objectNumber, generation);
+    }
+
+    private static bool IsMetadataStream(DictionaryObject dictionary)
+        => dictionary.TryGetValue("Type", out var type) && type is NameObject name
+            && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
 
     public byte[] DecryptString(byte[] data, int objectNumber, int generation)
         => Decrypt(stringCipher, data, objectNumber, generation);
@@ -361,6 +376,50 @@ internal sealed class StandardSecurityHandler
         var hash = Md5.Hash(buffer);
         var length = Math.Min(FileKey.Length + 5, 16);
         return hash[..length];
+    }
+
+    // For V>=4 the file-key length comes from the resolved crypt-filter dictionary,
+    // not the top-level /Length (ISO 32000-1 7.6.5). AESV2/AESV3 fix the size at
+    // 16/32 bytes regardless of a wrong or absent /Length.
+    private int DeriveCryptFilterKeyLength(DictionaryObject encrypt)
+    {
+        var filter = ResolveCryptFilterDictionary(encrypt);
+        if (filter is not null && filter.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
+        {
+            switch (method.Value)
+            {
+                case "AESV3":
+                    return 32;
+                case "AESV2":
+                    return 16;
+            }
+        }
+
+        if (filter is not null && filter.TryGetValue("Length", out var length) && length is NumberObject number)
+        {
+            // The crypt-filter /Length is bytes (ISO 32000-1 Table 25); some producers
+            // still write bits, so treat anything above 16 as a bit count.
+            var value = number.IntValue;
+            return DeriveMd5KeyLength(value > 16 ? value : value * 8);
+        }
+
+        return DeriveMd5KeyLength(GetInt(encrypt, "Length", 40));
+    }
+
+    private static DictionaryObject? ResolveCryptFilterDictionary(DictionaryObject encrypt)
+    {
+        var filterName = encrypt.TryGetValue("StmF", out var selected) && selected is NameObject chosen
+            ? chosen.Value
+            : "StdCF";
+        if (string.Equals(filterName, "Identity", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject cfDict
+            && cfDict.TryGetValue(filterName, out var filter) && filter is DictionaryObject filterDict
+            ? filterDict
+            : null;
     }
 
     // The MD5-derived V1/V2/V4 file key is sliced out of a 16-byte hash; a hostile
