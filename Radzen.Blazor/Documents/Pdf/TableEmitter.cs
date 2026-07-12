@@ -20,7 +20,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         if (layout.Source is { } table && table.CornerRadius.Point > 0)
         {
             tableBounds = FragmentBounds(positioned, x, contentTop);
-            tableRadius = ClampRadius(table.CornerRadius.Point, tableBounds.Width, tableBounds.Height);
+            tableRadius = BoxRenderer.ClampRadius(table.CornerRadius.Point, tableBounds.Width, tableBounds.Height);
             tableMark = plan.Mark();
         }
 
@@ -87,11 +87,14 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         plan.ApplyRoundedClip(bounds, radius, mark);
 
         var borders = source.Borders;
-        var uniform = ResolveEdge(borders.Top, null, null);
-        if (uniform is { } edge
-            && ResolveEdge(borders.Right, null, null) == uniform
-            && ResolveEdge(borders.Bottom, null, null) == uniform
-            && ResolveEdge(borders.Left, null, null) == uniform)
+        var style = new BoxStyle
+        {
+            Top = borders.Top,
+            Right = borders.Right,
+            Bottom = borders.Bottom,
+            Left = borders.Left,
+        };
+        if (style.TryGetUniform(out var edge))
         {
             plan.RoundedStrokes.Add(new RoundedStrokeDraw
             {
@@ -138,21 +141,12 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var opacity = opacities.CellOpacity(cell.Cell);
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
         var radius = CornerRadius(cell);
-        if (cell.Cell.Background is { } background)
-        {
-            plan.Fills.Add(new FillDraw
-            {
-                X = left + cell.Bounds.X,
-                Y = contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
-                Width = cell.Bounds.Width,
-                Height = cell.Bounds.Height,
-                Color = background,
-                Radius = radius,
-                ExtGState = extGState,
-            });
-        }
-
-        EmitBorders(plan, layout, cell, left, contentTop, delta, radius, extGState);
+        var bounds = new Rect(
+            left + cell.Bounds.X,
+            contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
+            cell.Bounds.Width,
+            cell.Bounds.Height);
+        BoxRenderer.Paint(plan, bounds, ResolveStyle(layout, cell, extGState));
 
         // The mark sits after the cell's own rounded background and border so only CHILD
         // content gets clipped to the rounded box - the border stroke stays unclipped.
@@ -192,11 +186,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         // An unbreakable token or oversized image/code wider than the cell is clipped to the
         // cell box so it never overpaints the neighboring cell.
-        var cellClip = new Rect(
-            left + cell.Bounds.X,
-            contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
-            cell.Bounds.Width,
-            cell.Bounds.Height);
+        var cellClip = bounds;
         if (overflows)
         {
             var texts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
@@ -271,7 +261,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                     contentTop - (delta + nested.Y) - nested.Layout.Height,
                     nested.Layout.Width,
                     nested.Layout.Height);
-                nestedRadius = ClampRadius(nestedTable.CornerRadius.Point, nestedBounds.Width, nestedBounds.Height);
+                nestedRadius = BoxRenderer.ClampRadius(nestedTable.CornerRadius.Point, nestedBounds.Width, nestedBounds.Height);
                 nestedMark = plan.Mark();
             }
 
@@ -294,121 +284,43 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
     // The effective corner radius, clamped so opposite corners never overlap.
     private static double CornerRadius(LaidOutCell cell)
-        => ClampRadius(cell.Cell.CornerRadius.Point, cell.Bounds.Width, cell.Bounds.Height);
+        => BoxRenderer.ClampRadius(cell.Cell.CornerRadius.Point, cell.Bounds.Width, cell.Bounds.Height);
 
-    private static double ClampRadius(double radius, double width, double height)
-    {
-        if (radius <= 0 || width <= 0 || height <= 0)
-        {
-            return 0;
-        }
-
-        return System.Math.Min(radius, System.Math.Min(width, height) / 2);
-    }
-
-    // A rounded cell with a UNIFORM border (same width, color and style resolve on all four
-    // edges) strokes one rounded-rectangle path. A non-uniform border falls back to the
-    // existing four square edges - only the background fill stays rounded in that case.
-    private static void EmitBorders(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, double radius, string? extGState)
+    // Resolves the cell/row/table border cascade (an edge falls back cell -> row -> table)
+    // into the box decoration BoxRenderer paints.
+    private static BoxStyle ResolveStyle(LaidOutTable layout, LaidOutCell cell, string? extGState)
     {
         var cellBorders = cell.Cell.Borders;
         var rowBorders = layout.Source?.Rows[cell.Row].Borders;
         var tableBorders = layout.Source?.Borders;
 
-        var x = left + cell.Bounds.X;
-        var top = contentTop - (cell.Bounds.Y + delta);
-        var right = x + cell.Bounds.Width;
-        var bottom = top - cell.Bounds.Height;
-
-        if (radius > 0)
+        return new BoxStyle
         {
-            var topEdge = ResolveEdge(cellBorders.Top, rowBorders?.Top, tableBorders?.Top);
-            var rightEdge = ResolveEdge(cellBorders.Right, rowBorders?.Right, tableBorders?.Right);
-            var bottomEdge = ResolveEdge(cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom);
-            var leftEdge = ResolveEdge(cellBorders.Left, rowBorders?.Left, tableBorders?.Left);
-            if (topEdge is { } uniform && rightEdge == uniform && bottomEdge == uniform && leftEdge == uniform)
-            {
-                plan.RoundedStrokes.Add(new RoundedStrokeDraw
-                {
-                    X = x,
-                    Y = bottom,
-                    Width = cell.Bounds.Width,
-                    Height = cell.Bounds.Height,
-                    Radius = radius,
-                    LineWidth = uniform.Width,
-                    Color = uniform.Color,
-                    Style = uniform.Style,
-                    ExtGState = extGState,
-                });
-                return;
-            }
-        }
-
-        EmitEdge(plan, cellBorders.Top, rowBorders?.Top, tableBorders?.Top, x, top, right, top, extGState);
-        EmitEdge(plan, cellBorders.Right, rowBorders?.Right, tableBorders?.Right, right, bottom, right, top, extGState);
-        EmitEdge(plan, cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom, x, bottom, right, bottom, extGState);
-        EmitEdge(plan, cellBorders.Left, rowBorders?.Left, tableBorders?.Left, x, bottom, x, top, extGState);
+            Background = cell.Cell.Background,
+            Top = CascadeEdge(cellBorders.Top, rowBorders?.Top, tableBorders?.Top),
+            Right = CascadeEdge(cellBorders.Right, rowBorders?.Right, tableBorders?.Right),
+            Bottom = CascadeEdge(cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom),
+            Left = CascadeEdge(cellBorders.Left, rowBorders?.Left, tableBorders?.Left),
+            CornerRadius = cell.Cell.CornerRadius,
+            ExtGState = extGState,
+        };
     }
 
-    private readonly record struct ResolvedEdge(Color Color, double Width, BorderStyle Style);
-
-    // Applies the cell/row/table cascade and returns the visible edge, or null when none draws.
-    private static ResolvedEdge? ResolveEdge(Border cellEdge, Border? rowEdge, Border? tableEdge)
+    private static Border CascadeEdge(Border cellEdge, Border? rowEdge, Border? tableEdge)
     {
-        var edge = cellEdge;
         if (!cellEdge.IsSet)
         {
             if (rowEdge?.IsSet == true)
             {
-                edge = rowEdge;
+                return rowEdge;
             }
-            else if (tableEdge is not null)
+
+            if (tableEdge is not null)
             {
-                edge = tableEdge;
+                return tableEdge;
             }
         }
 
-        // MigraDoc semantics: a positive width alone makes the edge a visible solid line.
-        var style = edge.Style;
-        if (style == BorderStyle.None && edge.Width > 0)
-        {
-            style = BorderStyle.Solid;
-        }
-
-        if (style == BorderStyle.None)
-        {
-            return null;
-        }
-
-        return new ResolvedEdge(edge.Color, edge.Width > 0 ? edge.Width : 0.5, style);
-    }
-
-    private static void EmitEdge(
-        PagePlan plan,
-        Border cellEdge,
-        Border? rowEdge,
-        Border? tableEdge,
-        double x1,
-        double y1,
-        double x2,
-        double y2,
-        string? extGState)
-    {
-        if (ResolveEdge(cellEdge, rowEdge, tableEdge) is not { } edge)
-        {
-            return;
-        }
-
-        plan.Edges.Add(new EdgeDraw
-        {
-            X1 = x1,
-            Y1 = y1,
-            X2 = x2,
-            Y2 = y2,
-            LineWidth = edge.Width,
-            Color = edge.Color,
-            Style = edge.Style,
-            ExtGState = extGState,
-        });
+        return cellEdge;
     }
 }
