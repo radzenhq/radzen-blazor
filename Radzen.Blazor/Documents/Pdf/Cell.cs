@@ -120,11 +120,11 @@ public class Cell
     public Borders Borders { get; } = new();
 
     /// <summary>
-    /// Gets or sets the corner radius of the cell box. When greater than zero the background
-    /// is filled as a rounded rectangle (the effective radius is clamped to half of the smaller
-    /// box dimension). The border is stroked as the same rounded path only when it is uniform -
-    /// the same width, color and style resolve on all four edges; a non-uniform border keeps the
-    /// square four-edge rendering while the background stays rounded. Defaults to 0 (square).
+    /// The corner radius of the cell box. Internal plumbing: a single grid cell cannot
+    /// round its own corners sensibly without clashing with its neighbours, so this is not
+    /// public API. It exists only so a <see cref="Container"/> - which lowers to a synthetic
+    /// single-cell table - can round. Round a whole table with <c>Table.CornerRadius</c> or a
+    /// box with <c>Container.CornerRadius</c>. Defaults to 0 (square).
     /// </summary>
-    public Unit CornerRadius { get; set; }
+    internal Unit CornerRadius { get; set; }
 }
