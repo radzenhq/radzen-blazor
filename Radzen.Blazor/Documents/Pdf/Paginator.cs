@@ -485,10 +485,7 @@ internal static class Paginator
         {
             if (block is List list)
             {
-                for (var i = 0; i < list.Items.Count; i++)
-                {
-                    expanded.Add(ExpandItem(list, i));
-                }
+                ExpandList(list, expanded, 0, null);
             }
             else if (block is Container container)
             {
@@ -541,44 +538,69 @@ internal static class Paginator
         target.Style = source.Style;
     }
 
-    private static Paragraph ExpandItem(List list, int index)
+    // Each nesting level shifts the marker column by the parent's LeftIndent + HangingIndent and
+    // inherits the parent item's resolved font, so nested runs cascade item -> list -> parent item.
+    private static void ExpandList(List list, List<Block> expanded, double indent, Font? inherited)
+    {
+        for (var i = 0; i < list.Items.Count; i++)
+        {
+            var paragraph = ExpandItem(list, i, indent, inherited);
+            expanded.Add(paragraph);
+            if (list.Items[i].NestedList is { } nested)
+            {
+                ExpandList(nested, expanded, indent + list.LeftIndent.Point + list.HangingIndent.Point, paragraph.EffectiveFont);
+            }
+        }
+    }
+
+    private static Paragraph ExpandItem(List list, int index, double indent, Font? inherited)
     {
         var item = list.Items[index];
 
         // StyleResolver resolves the marker and run fonts through the full cascade (including the
         // surrounding cell/row/table context and the Normal default); fall back to the item/list
-        // fonts only when the resolver has not run.
+        // fonts only when the resolver has not run (nested items always take this path).
         var paragraph = new Paragraph
         {
-            LeftIndent = Unit.FromPoint(list.LeftIndent.Point + list.HangingIndent.Point),
-            MarkerIndent = list.LeftIndent,
+            LeftIndent = Unit.FromPoint(indent + list.LeftIndent.Point + list.HangingIndent.Point),
+            MarkerIndent = Unit.FromPoint(indent + list.LeftIndent.Point),
             MarkerText = Marker(list, index),
-            EffectiveFont = StyleResolver.ItemFont(item) ?? ItemFont(item, list),
+            EffectiveFont = StyleResolver.ItemFont(item) ?? ItemFont(item, list, inherited),
         };
 
         foreach (var run in item.Inlines)
         {
-            run.EffectiveFont ??= RunFont(run, item, list);
+            run.EffectiveFont ??= RunFont(run, item, list, inherited);
             paragraph.Inlines.Add(run);
         }
 
         return paragraph;
     }
 
-    private static Font ItemFont(ListItem item, List list)
+    private static Font ItemFont(ListItem item, List list, Font? inherited)
     {
         var font = new Font();
         font.InheritFrom(item.Font);
         font.InheritFrom(list.Font);
+        if (inherited != null)
+        {
+            font.InheritFrom(inherited);
+        }
+
         return font;
     }
 
-    private static Font RunFont(Run run, ListItem item, List list)
+    private static Font RunFont(Run run, ListItem item, List list, Font? inherited)
     {
         var font = new Font();
         font.InheritFrom(run.Font);
         font.InheritFrom(item.Font);
         font.InheritFrom(list.Font);
+        if (inherited != null)
+        {
+            font.InheritFrom(inherited);
+        }
+
         return font;
     }
 
