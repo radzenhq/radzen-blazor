@@ -43,10 +43,13 @@ public static class PdfSigner
         ArgumentNullException.ThrowIfNull(pdf);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(signer);
-        if (options.SignatureMaxSizeBytes < 1)
+        // Upper bound keeps SignatureMaxSizeBytes * 2 (the reserved hex-digit
+        // count) well inside int range; real CMS blobs are a few KB.
+        const int maxReservation = 16 * 1024 * 1024;
+        if (options.SignatureMaxSizeBytes < 1 || options.SignatureMaxSizeBytes > maxReservation)
         {
             throw new ArgumentOutOfRangeException(nameof(options), options.SignatureMaxSizeBytes,
-                "SignatureMaxSizeBytes must be positive.");
+                $"SignatureMaxSizeBytes must be between 1 and {maxReservation}.");
         }
 
         if (string.IsNullOrEmpty(options.SubFilter))
