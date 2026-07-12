@@ -87,17 +87,6 @@ internal sealed class LaidOutTable
 
 internal static class TableLayout
 {
-    private readonly struct CellItem
-    {
-        public LineBox? Line { get; init; }
-        public Block? Source { get; init; }
-        public Image? Image { get; init; }
-        public Block? Code { get; init; }
-        public LaidOutTable? Table { get; init; }
-        public double Width { get; init; }
-        public required double Height { get; init; }
-    }
-
     private sealed class Placed
     {
         public required Cell Cell { get; init; }
@@ -106,8 +95,9 @@ internal static class TableLayout
         public required int ColumnSpan { get; init; }
         public required int RowSpan { get; init; }
         public required double ContentWidth { get; init; }
-        public required double ContentHeight { get; init; }
-        public required List<CellItem> Items { get; init; }
+        public required HorizontalAlignment? Align { get; init; }
+        public required BoxContentLayout.Measured Content { get; init; }
+        public double ContentHeight => Content.Height;
     }
 
     public static LaidOutTable Layout(
@@ -158,7 +148,7 @@ internal static class TableLayout
 
                 var contentWidth = cellWidth - cell.PaddingLeft.Point - cell.PaddingRight.Point;
                 var align = cell.AlignmentValue ?? ColumnAlignment(table, c) ?? table.Rows[r].AlignmentValue;
-                var (items, contentHeight) = LayoutContent(cell, contentWidth, align, fonts, measureImage);
+                var content = BoxContentLayout.Measure(cell.Blocks, contentWidth, align, fonts, measureImage);
 
                 placed.Add(new Placed
                 {
@@ -168,8 +158,8 @@ internal static class TableLayout
                     ColumnSpan = span,
                     RowSpan = rowSpan,
                     ContentWidth = contentWidth,
-                    ContentHeight = contentHeight,
-                    Items = items,
+                    Align = align,
+                    Content = content,
                 });
 
                 c += span;
@@ -243,68 +233,8 @@ internal static class TableLayout
                 width - padLeft - p.Cell.PaddingRight.Point,
                 height - padTop - p.Cell.PaddingBottom.Point);
 
-            var factor = p.Cell.VerticalAlignment switch
-            {
-                VerticalAlignment.Middle => 0.5,
-                VerticalAlignment.Bottom => 1.0,
-                _ => 0.0,
-            };
-            var offset = (contentBox.Height - p.ContentHeight) * factor;
-
-            var cellAlignment = p.Cell.AlignmentValue
-                ?? ColumnAlignment(table, p.Column)
-                ?? table.Rows[p.Row].AlignmentValue
-                ?? HorizontalAlignment.Left;
-
-            var lines = new List<LaidOutLine>();
-            var laidImages = new List<LaidOutImage>();
-            var laidCodes = new List<LaidOutCode>();
-            var nestedTables = new List<LaidOutNestedTable>();
-            var cursorY = contentBox.Top + offset;
-            foreach (var item in p.Items)
-            {
-                if (item.Line is { } line && item.Source is { } source)
-                {
-                    lines.Add(new LaidOutLine
-                    {
-                        Line = line,
-                        Source = source,
-                        X = contentBox.Left,
-                        Y = cursorY,
-                    });
-                }
-                else if (item.Image is { } image)
-                {
-                    laidImages.Add(new LaidOutImage
-                    {
-                        Source = image,
-                        X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(image.Alignment, cellAlignment)),
-                        Y = cursorY,
-                        Width = item.Width,
-                        Height = item.Height,
-                    });
-                }
-                else if (item.Code is { } code)
-                {
-                    laidCodes.Add(new LaidOutCode
-                    {
-                        Source = code,
-                        X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(BlockAlignment(code), cellAlignment)),
-                        Y = cursorY,
-                    });
-                }
-                else if (item.Table is { } nested)
-                {
-                    nestedTables.Add(new LaidOutNestedTable
-                    {
-                        Layout = nested,
-                        X = contentBox.Left,
-                        Y = cursorY,
-                    });
-                }
-
-                cursorY += item.Height;
-            }
+            var cellAlignment = p.Align ?? HorizontalAlignment.Left;
+            var content = BoxContentLayout.Position(p.Content, contentBox, cellAlignment, p.Cell.VerticalAlignment);
 
             cells.Add(new LaidOutCell
             {
@@ -315,10 +245,10 @@ internal static class TableLayout
                 RowSpan = p.RowSpan,
                 Bounds = bounds,
                 ContentBox = contentBox,
-                Lines = lines,
-                Images = laidImages,
-                Codes = laidCodes,
-                Tables = nestedTables,
+                Lines = content.Lines,
+                Images = content.Images,
+                Codes = content.Codes,
+                Tables = content.Tables,
             });
         }
 
@@ -347,24 +277,6 @@ internal static class TableLayout
 
     private static HorizontalAlignment? ColumnAlignment(Table table, int column)
         => column < table.Columns.Count ? table.Columns[column].Alignment : null;
-
-    private static HorizontalAlignment BlockAlignment(Block code) => code switch
-    {
-        QrCode qr => qr.Alignment,
-        Barcode barcode => barcode.Alignment,
-        _ => HorizontalAlignment.Left,
-    };
-
-    // Non-text content honors its OWN alignment, falling back to the cell's only when the
-    // block leaves it at the default Left. The factor matches how text resolves alignment
-    // (Right/End flush right, Center centered, Left/Start/Justify flush left).
-    private static double AlignFactor(HorizontalAlignment blockAlignment, HorizontalAlignment cellAlignment)
-        => (blockAlignment == HorizontalAlignment.Left ? cellAlignment : blockAlignment) switch
-        {
-            HorizontalAlignment.Right or HorizontalAlignment.End => 1.0,
-            HorizontalAlignment.Center => 0.5,
-            _ => 0.0,
-        };
 
     private static double[] ResolveColumnWidths(Table table, double availableWidth)
     {
@@ -431,73 +343,6 @@ internal static class TableLayout
         }
 
         return widths;
-    }
-
-    private static (List<CellItem> Items, double Height) LayoutContent(
-        Cell cell,
-        double contentWidth,
-        HorizontalAlignment? align,
-        FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
-    {
-        var items = new List<CellItem>();
-        double height = 0;
-        // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in Paginator.ExpandBlocks(cell.Blocks, contentWidth))
-        {
-            if (block is Paragraph paragraph)
-            {
-                var spacingBefore = paragraph.SpacingBefore.Point;
-                if (spacingBefore > 0)
-                {
-                    items.Add(new CellItem { Height = spacingBefore });
-                    height += spacingBefore;
-                }
-
-                foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, align))
-                {
-                    items.Add(new CellItem { Line = line, Source = block, Height = line.Height });
-                    height += line.Height;
-                }
-
-                var spacingAfter = paragraph.SpacingAfter.Point;
-                if (spacingAfter > 0)
-                {
-                    items.Add(new CellItem { Height = spacingAfter });
-                    height += spacingAfter;
-                }
-            }
-            else if (block is Image image)
-            {
-                var (imageWidth, imageHeight) = measureImage is null
-                    ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), contentWidth)
-                    : measureImage(image, contentWidth);
-                items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
-                height += imageHeight;
-            }
-            else if (block is QrCode or Barcode)
-            {
-                var (codeWidth, codeHeight) = Paginator.MeasureCode(block);
-                items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
-                height += codeHeight;
-            }
-            else if (block is Table nested)
-            {
-                var layout = Layout(nested, System.Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
-                items.Add(new CellItem { Table = layout, Height = layout.Height });
-                height += layout.Height;
-            }
-            else if (block is PageBreak)
-            {
-                // A cell cannot break across pages by itself, so a page break inside one is a no-op.
-            }
-            else
-            {
-                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
-            }
-        }
-
-        return (items, height);
     }
 
     private static double[] Prefix(double[] values)
