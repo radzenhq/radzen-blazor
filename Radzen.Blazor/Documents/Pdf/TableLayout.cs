@@ -402,7 +402,7 @@ internal static class TableLayout
 
         var widths = new double[count];
         double fixedSum = 0;
-        var autoCount = 0;
+        double weightSum = 0;
         for (var i = 0; i < count; i++)
         {
             if (table.Columns[i].Width is { } w)
@@ -412,22 +412,21 @@ internal static class TableLayout
             }
             else
             {
-                autoCount++;
+                weightSum += table.Columns[i].RelativeWidth ?? 1.0;
             }
         }
 
-        if (autoCount == 0)
+        if (weightSum == 0)
         {
             return widths;
         }
 
-        var remaining = table.Width?.Point ?? availableWidth;
-        var each = System.Math.Max(0, (remaining - fixedSum) / autoCount);
+        var remaining = System.Math.Max(0, (table.Width?.Point ?? availableWidth) - fixedSum);
         for (var i = 0; i < count; i++)
         {
             if (table.Columns[i].Width is null)
             {
-                widths[i] = each;
+                widths[i] = remaining * (table.Columns[i].RelativeWidth ?? 1.0) / weightSum;
             }
         }
 
@@ -444,7 +443,7 @@ internal static class TableLayout
         var items = new List<CellItem>();
         double height = 0;
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in Paginator.ExpandBlocks(cell.Blocks))
+        foreach (var block in Paginator.ExpandBlocks(cell.Blocks, contentWidth))
         {
             if (block is Paragraph paragraph)
             {
