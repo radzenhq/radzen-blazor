@@ -9,17 +9,24 @@ namespace Radzen.Documents.Pdf.Objects;
 internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer)
 {
     private readonly Dictionary<DocumentObject, ReferenceObject> map = [];
+    private readonly HashSet<DocumentObject> pruned = [];
 
     // Pins a loaded object to an already-emitted writer reference so it is not
     // re-imported (e.g. page dictionaries emitted before their widget annots).
     public void Seed(DocumentObject loaded, ReferenceObject reference) => map[loaded] = reference;
+
+    // Marks a loaded object so every reference to it imports as null rather than
+    // re-materializing it - used to collapse destinations and annotation /P links
+    // that point at a page removed before saving.
+    public void Prune(DocumentObject loaded) => pruned.Add(loaded);
 
     public DocumentObject ImportValue(DocumentObject value)
     {
         switch (value)
         {
             case ReferenceObject reference:
-                return ImportInstance(reader.Resolve(reference));
+                var resolved = reader.Resolve(reference);
+                return pruned.Contains(resolved) ? new NullObject() : ImportInstance(resolved);
             case StreamObject:
                 return ImportInstance(value);
             case DictionaryObject dictionary:
