@@ -12,6 +12,7 @@ public sealed class Page
     private bool materialized;
     private int materializedCount;
     private byte[]? snapshot;
+    private int rotate;
     private System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
 
     internal Page(Unit width, Unit height)
@@ -29,6 +30,24 @@ public sealed class Page
 
     /// <summary>Gets the page height in points.</summary>
     public Unit Height { get; }
+
+    /// <summary>
+    /// Gets or sets the clockwise viewing rotation of the page in degrees.
+    /// Must be 0, 90, 180 or 270; the default 0 emits no <c>/Rotate</c> key.
+    /// </summary>
+    public int Rotate
+    {
+        get => rotate;
+        set
+        {
+            if (value is not (0 or 90 or 180 or 270))
+            {
+                throw new System.ArgumentOutOfRangeException(nameof(value), value, "Page rotation must be 0, 90, 180 or 270 degrees.");
+            }
+
+            rotate = value;
+        }
+    }
 
     /// <summary>
     /// Gets the ordered collection of content elements. For a loaded page the raw

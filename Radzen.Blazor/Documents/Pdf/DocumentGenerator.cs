@@ -32,6 +32,8 @@ internal sealed class GeneratedImage
     public required ImageXObject Image { get; init; }
 }
 
+// Exactly one of Uri (external /URI action) and Destination (named destination
+// resolved through the /Names /Dests tree by a /GoTo action) is set.
 internal sealed class GeneratedLink
 {
     public required double X1 { get; init; }
@@ -42,8 +44,14 @@ internal sealed class GeneratedLink
 
     public required double Y2 { get; init; }
 
-    public required string Uri { get; init; }
+    public string? Uri { get; init; }
+
+    public string? Destination { get; init; }
 }
+
+// Where a named anchor landed at emit time: the zero-based page and the top of
+// its line in PDF user space, emitted as an /XYZ named destination on save.
+internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
 
 internal sealed class GeneratedPage
 {
@@ -100,6 +108,7 @@ internal sealed class DocumentGenerator
     {
         var document = new Document { Conformance = builder.Conformance };
         document.Attachments.AddRange(builder.Attachments);
+        document.Outline.AddRange(builder.Outline);
         document.Info.Title = builder.Info.Title;
         document.Info.Author = builder.Info.Author;
         document.Info.Subject = builder.Info.Subject;
@@ -151,6 +160,11 @@ internal sealed class DocumentGenerator
             page.SetContent(generated.Content);
             page.SetTextFonts(BuildExtractionFonts(generated));
             document.Pages.Insert(document.Pages.Count, page);
+        }
+
+        foreach (var (name, anchor) in textEmitter.Anchors)
+        {
+            document.Anchors[name] = anchor;
         }
 
         return document;
