@@ -125,6 +125,17 @@ public class ConformanceProfilesTests
         Assert.Equal("2.0", Assert.IsType<NameObject>(version).Value);
     }
 
+    [Theory]
+    [InlineData(PdfAConformance.PdfA4, "%PDF-2.0")]
+    [InlineData(PdfAConformance.PdfA4E, "%PDF-2.0")]
+    [InlineData(PdfAConformance.PdfA2B, "%PDF-1.7")]
+    [InlineData(PdfAConformance.PdfA3B, "%PDF-1.7")]
+    public void FileHeader_MatchesConformancePart(PdfAConformance level, string expectedHeader)
+    {
+        var bytes = Author(level).ToArray();
+        Assert.Equal(expectedHeader, Encoding.ASCII.GetString(bytes, 0, expectedHeader.Length));
+    }
+
     [Fact]
     public void PdfA2A_OutputIsTagged()
     {
