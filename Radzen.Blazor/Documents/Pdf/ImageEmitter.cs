@@ -20,6 +20,9 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
             Height = positioned.Height,
             Image = xobject,
             Element = structureTree.ElementOf(positioned.Source),
+            ExtGState = positioned.Source.Opacity < 1
+                ? plan.RegisterExtGState(positioned.Source.Opacity, positioned.Source.Opacity)
+                : null,
         });
         plan.UsedImages.Add(xobject);
     }

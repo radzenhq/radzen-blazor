@@ -62,4 +62,10 @@ public class Section
 
     /// <summary>Gets the body content blocks.</summary>
     public BlockCollection Blocks { get; } = [];
+
+    /// <summary>
+    /// Gets or sets the watermark stamped over every page of the section, or
+    /// <see langword="null"/> for none.
+    /// </summary>
+    public Watermark? Watermark { get; set; }
 }

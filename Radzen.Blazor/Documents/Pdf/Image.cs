@@ -30,6 +30,12 @@ public sealed class Image : Block
     /// <summary>Gets or sets the horizontal alignment of the image within its container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
 
+    /// <summary>
+    /// Gets or sets the opacity the image is painted with, from 0 (fully transparent)
+    /// to 1 (fully opaque). Defaults to 1.
+    /// </summary>
+    public double Opacity { get; set; } = 1;
+
     internal (Unit Width, Unit Height)? FitBox { get; private set; }
 
     /// <summary>
