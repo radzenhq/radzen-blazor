@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An ordered, read-only view of the sections in a document. Use <see cref="Add"/> to append a section.

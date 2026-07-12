@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The interactive type of an AcroForm field, taken from its <c>/FT</c> entry.

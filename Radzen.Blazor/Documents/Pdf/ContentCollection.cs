@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An ordered collection of <see cref="ContentElement"/> instances for a page.

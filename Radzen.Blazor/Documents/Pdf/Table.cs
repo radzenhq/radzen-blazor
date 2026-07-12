@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block that lays out content in a grid of columns, rows and cells.

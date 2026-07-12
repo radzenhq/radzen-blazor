@@ -2,7 +2,6 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A single terminal AcroForm field backed by its live widget dictionary.

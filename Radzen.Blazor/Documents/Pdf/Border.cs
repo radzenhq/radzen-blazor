@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A single border edge. When a property has not been set on the edge, it falls back to the

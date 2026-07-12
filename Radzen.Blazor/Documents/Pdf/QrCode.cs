@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block that renders a QR code as crisp vector squares - one filled black square per dark module.

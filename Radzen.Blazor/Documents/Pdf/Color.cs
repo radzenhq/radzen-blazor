@@ -2,7 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// Represents an RGBA color with 8 bits per channel.

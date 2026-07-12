@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A page section with its own page setup, header, footer and body content.

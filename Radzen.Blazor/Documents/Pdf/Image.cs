@@ -2,7 +2,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block that renders a raster image. The source bytes are buffered when the image is created,

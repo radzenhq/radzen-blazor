@@ -6,7 +6,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 // Accumulates a page content stream and the base-14 font and image XObject resources
 // it references. The key prefixes keep overlay streams from colliding with generated

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A run of text drawn at a fixed baseline position using a base-14 font and

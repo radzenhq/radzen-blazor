@@ -32,3 +32,6 @@ dotnet_diagnostic.IDE0031.severity = warning
 
 # Simplify member access
 dotnet_diagnostic.IDE0002.severity = warning
+
+# Redundant #nullable directive (project already enables nullable)
+dotnet_diagnostic.IDE0240.severity = warning

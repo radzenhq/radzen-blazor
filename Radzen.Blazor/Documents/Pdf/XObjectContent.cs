@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A named XObject (image or form) painted with the <c>Do</c> operator. The name

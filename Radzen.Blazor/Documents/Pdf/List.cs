@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block that renders a bulleted or numbered list. Each <see cref="ListItem"/> is preceded by a

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The named styles of a document. The built-in <see cref="Normal"/> style always exists and is the

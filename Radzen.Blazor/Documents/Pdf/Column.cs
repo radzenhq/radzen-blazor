@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A table column. A <see langword="null"/> <see cref="Width"/> means the column sizes automatically.

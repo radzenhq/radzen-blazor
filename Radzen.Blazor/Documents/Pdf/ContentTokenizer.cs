@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 // Shared content-stream tokenizer for the page-content grammar (operators, operands,
 // arrays/dicts and whitespace-bounded BI/ID/EI inline-image skipping). Both

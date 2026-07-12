@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An ordered, read-only view of the explicit tab stops defined on a paragraph.

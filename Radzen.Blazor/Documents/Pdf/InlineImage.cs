@@ -2,7 +2,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A raster image that flows inline within a paragraph line, sharing the line's baseline and

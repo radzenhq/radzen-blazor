@@ -2,7 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An axis-aligned rectangle defined by its top-left corner, width and height.

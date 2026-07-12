@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block that renders a 1D barcode as crisp vector bars - one filled black rectangle per bar.
