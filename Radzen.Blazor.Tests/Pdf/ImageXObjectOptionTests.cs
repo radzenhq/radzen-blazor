@@ -57,6 +57,21 @@ public class ImageXObjectOptionTests
     }
 
     [Fact]
+    public void DefaultImage_IsByteIdentical_AcrossBuilds()
+    {
+        static byte[] Build()
+        {
+            var builder = new DocumentBuilder();
+            AddImage(builder, "Images/rgb.png");
+            return builder.ToArray();
+        }
+
+        // An image that opts into none of the new XObject keys must take the unchanged
+        // emission path, so two identical documents produce byte-for-byte identical output.
+        Assert.Equal(Build(), Build());
+    }
+
+    [Fact]
     public void ColorKeyMask_WhenSet_EmitsMaskRangeArray()
     {
         var builder = new DocumentBuilder();
