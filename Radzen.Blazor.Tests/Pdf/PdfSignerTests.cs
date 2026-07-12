@@ -165,6 +165,78 @@ public class PdfSignerTests
         Pkcs.CheckSignature(content, der);
     }
 
+    // A one-page PDF whose page dictionary carries a string value that embeds a
+    // decoy "/Contents <0...0>" and "/ByteRange [0 0 0 0 ...]" matching the exact
+    // placeholder shapes the signer scans for. The page is copied verbatim into
+    // the incremental update, so a naive whole-appended-region scan would lock
+    // onto these decoys instead of the real signature dictionary.
+    private static byte[] HostilePdf()
+    {
+        var zeros = new string('0', 16384 * 2);
+        var byteRange = "[0 0 0 0" + new string(' ', 40 - "0 0 0 0".Length) + "]";
+        var decoy = "/Contents <" + zeros + "> /ByteRange " + byteRange;
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Decoy (" + decoy + ") >>\nendobj\n");
+        var count = 4;
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 " + count + "\n");
+        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number < count; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
+        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
+    public void Sign_HostileContentsDecoyInInput_DoesNotMisscopeSignature()
+    {
+        var original = HostilePdf();
+        using var certificate = CreateCertificate();
+
+        var signed = PdfSigner.Sign(original, Options(), CmsSigner(certificate));
+
+        Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
+
+        // The signature must be scoped to the REAL /Contents in the sig dict, so
+        // the CMS verifies over the declared /ByteRange. Under the pre-fix scan
+        // this would lock onto the decoy string and fail here.
+        var reader = DocumentReader.Parse(signed);
+        VerifySignature(signed, reader, 0);
+
+        // The decoy string in the copied page must remain untouched (all zeros).
+        var decoyStart = IndexOfAscii(signed, "/Decoy (/Contents <");
+        Assert.True(decoyStart >= 0);
+        var hexStart = decoyStart + "/Decoy (/Contents <".Length;
+        for (var i = 0; i < 32768; i++)
+        {
+            Assert.Equal((byte)'0', signed[hexStart + i]);
+        }
+    }
+
+    private static int IndexOfAscii(byte[] bytes, string pattern)
+    {
+        var needle = Encoding.ASCII.GetBytes(pattern);
+        for (var i = 0; i <= bytes.Length - needle.Length; i++)
+        {
+            var match = true;
+            for (var j = 0; j < needle.Length; j++)
+            {
+                if (bytes[i + j] != needle[j]) { match = false; break; }
+            }
+
+            if (match) { return i; }
+        }
+
+        return -1;
+    }
+
     [Fact]
     public void Sign_AddsSignatureFieldAsIncrementalUpdate()
     {
