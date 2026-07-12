@@ -54,7 +54,9 @@ internal sealed class GeneratedLink
 internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
 
 // A page /ExtGState resource entry: constant fill (/ca) and stroke (/CA) alpha
-// selected in the content stream with the gs operator.
+// selected in the content stream with the gs operator. The optional blend mode,
+// overprint and rendering-intent fields default to null and, when unset, emit
+// exactly the alpha-only dictionary they always did.
 internal sealed class GeneratedExtGState
 {
     public required string Key { get; init; }
@@ -62,6 +64,25 @@ internal sealed class GeneratedExtGState
     public required double FillAlpha { get; init; }
 
     public required double StrokeAlpha { get; init; }
+
+    public BlendMode? Blend { get; init; }
+
+    public bool? OverprintStroke { get; init; }
+
+    public bool? OverprintFill { get; init; }
+
+    public int? OverprintMode { get; init; }
+
+    public RenderingIntent? Intent { get; init; }
+}
+
+// A page /Pattern resource entry: a shading pattern (PatternType 2) built from a
+// public GradientBrush, selected in the content stream with /Pattern cs + scn.
+internal sealed class GeneratedPattern
+{
+    public required string Key { get; init; }
+
+    public required GradientBrush Gradient { get; init; }
 }
 
 internal sealed class GeneratedPage
@@ -75,6 +96,8 @@ internal sealed class GeneratedPage
     public IReadOnlyList<GeneratedLink> Links { get; init; } = [];
 
     public IReadOnlyList<GeneratedExtGState> ExtGStates { get; init; } = [];
+
+    public IReadOnlyList<GeneratedPattern> Patterns { get; init; } = [];
 }
 
 // Orchestrates PDF generation: runs the merged layout engine (Paginator for paragraph
@@ -295,7 +318,10 @@ internal sealed class DocumentGenerator
             }
             else
             {
-                textEmitter.EmitLine(context, line.Line, left, contentTop - line.Y, structureTree.ElementOf(line.Source));
+                textEmitter.EmitLine(
+                    context, line.Line, left, contentTop - line.Y,
+                    structureTree.ElementOf(line.Source),
+                    markerElement: structureTree.MarkerElementOf(line.Source));
                 b++;
             }
         }
@@ -396,7 +422,9 @@ internal sealed class DocumentGenerator
 
         foreach (var fill in plan.Fills)
         {
-            var grouped = fill.Clip is not null || fill.ExtGState is not null;
+            // A pattern colour space persists in the graphics state, so a gradient fill is
+            // always scoped by q..Q to keep it from leaking onto the fills that follow.
+            var grouped = fill.Clip is not null || fill.ExtGState is not null || fill.Gradient is not null;
             if (grouped)
             {
                 writer.WriteRaw("q\n");
@@ -413,7 +441,17 @@ internal sealed class DocumentGenerator
                 WriteClip(writer, fillClip, fill.ClipRadius);
             }
 
-            writer.WriteColor(fill.Color, "rg");
+            if (fill.Gradient is { } gradient)
+            {
+                writer.WriteRaw("/Pattern cs\n");
+                writer.WriteName(plan.RegisterPattern(gradient));
+                writer.WriteRaw(" scn\n");
+            }
+            else
+            {
+                writer.WriteColor(fill.Color, "rg");
+            }
+
             if (fill.Radius > 0)
             {
                 WriteRoundedRect(writer, fill.X, fill.Y, fill.Width, fill.Height, fill.Radius);
@@ -543,6 +581,7 @@ internal sealed class DocumentGenerator
             Images = usedImages,
             Links = [.. plan.Links],
             ExtGStates = [.. plan.ExtGStates],
+            Patterns = [.. plan.Patterns],
         };
     }
 

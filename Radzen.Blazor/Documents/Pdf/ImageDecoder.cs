@@ -95,7 +95,15 @@ internal static class ImageDecoder
 
         if (image.Stencil)
         {
+            // Yields a brand-new image-mask XObject; nothing of the shared decode is touched.
             xobject = BuildStencilMask(xobject);
+        }
+        else if (image.ColorKeyMask is not null || image.Interpolate)
+        {
+            // Copy the shared decode before stamping additive dictionary options so the
+            // cached plain XObject is never mutated in place (distinct-option uses of the
+            // same bytes must not leak /Mask or /Interpolate onto each other).
+            xobject = Copy(xobject);
         }
 
         if (image.ColorKeyMask is { } ranges)
@@ -109,6 +117,19 @@ internal static class ImageDecoder
         }
 
         return xobject;
+    }
+
+    // Shallow copy of an image XObject: a fresh stream over the same sample bytes carrying
+    // a fresh dictionary with the same entries, so additive options mutate the copy alone.
+    private static ImageXObject Copy(ImageXObject xobject)
+    {
+        var stream = new StreamObject(xobject.Image.Data);
+        foreach (var key in xobject.Image.Dictionary.Keys)
+        {
+            stream.Dictionary[key] = xobject.Image.Dictionary[key];
+        }
+
+        return new ImageXObject(stream, xobject.SoftMask);
     }
 
     // Colour-key masking (ISO 32000-1 8.9.6.4): /Mask holds one inclusive [min max] pair per

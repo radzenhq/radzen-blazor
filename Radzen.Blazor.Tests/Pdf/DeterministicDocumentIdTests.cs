@@ -17,7 +17,7 @@ public class DeterministicDocumentIdTests
 
     private static Document PlainDocument()
     {
-        var document = new Document();
+        var document = new Document { IncludeDocumentId = true };
         document.Info.Title = "Deterministic";
         document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (hello) Tj ET"));
         return document;
@@ -56,10 +56,10 @@ public class DeterministicDocumentIdTests
     [Fact]
     public void DocumentId_DependsOnContent()
     {
-        var a = new Document();
+        var a = new Document { IncludeDocumentId = true };
         a.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (alpha) Tj ET"));
 
-        var b = new Document();
+        var b = new Document { IncludeDocumentId = true };
         b.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (beta) Tj ET"));
 
         Assert.NotEqual(

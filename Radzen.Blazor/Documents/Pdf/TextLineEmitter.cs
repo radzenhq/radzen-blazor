@@ -16,6 +16,24 @@ internal sealed class TextLineEmitter(
 {
     private readonly List<byte> scratchBytes = [];
 
+    private static bool HasNonZero(List<double>? values)
+    {
+        if (values is null)
+        {
+            return false;
+        }
+
+        foreach (var value in values)
+        {
+            if (value != 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Named destinations recorded at emit time: anchor name -> (page, line top).
     // First occurrence wins so a run split across pages anchors where it starts.
     public Dictionary<string, GeneratedAnchor> Anchors { get; } = new(System.StringComparer.Ordinal);
@@ -58,7 +76,7 @@ internal sealed class TextLineEmitter(
         }
     }
 
-    public void EmitLine(EmitContext context, LineBox line, double originX, double baseline, StructureElement? element, double opacity = 1)
+    public void EmitLine(EmitContext context, LineBox line, double originX, double baseline, StructureElement? element, double opacity = 1, StructureElement? markerElement = null)
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
@@ -75,9 +93,12 @@ internal sealed class TextLineEmitter(
         {
             var fragment = lineFragments[fi];
             var alpha = opacity * fragment.Run.Opacity;
+            // In tagged list output the marker fragment tags into the item's Lbl element,
+            // the rest into its LBody (the passed-in element).
+            var fragElement = fragment.IsMarker && markerElement is not null ? markerElement : element;
             if (fragment.Run is InlineImage inlineImage)
             {
-                EmitInlineImage(plan, inlineImage, originX + fragment.XOffset, y, element, alpha);
+                EmitInlineImage(plan, inlineImage, originX + fragment.XOffset, y, fragElement, alpha);
                 continue;
             }
 
@@ -91,11 +112,11 @@ internal sealed class TextLineEmitter(
             var font = fragment.Run.ResolvedFont;
             if (fonts.TryResolvePrimary(font, out var primary))
             {
-                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, element, extGState);
+                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, fragElement, extGState);
             }
             else
             {
-                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y, element, extGState);
+                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y, fragElement, extGState);
             }
         }
 
@@ -374,6 +395,10 @@ internal sealed class TextLineEmitter(
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,
+                    WordSpacing = run.WordSpacing.Point,
+                    HorizontalScale = run.HorizontalScale,
+                    RenderMode = run.Invisible ? 3 : 0,
+                    FillPaint = run.FillPaint,
                     ExtGState = extGState,
                 });
 
@@ -404,6 +429,24 @@ internal sealed class TextLineEmitter(
                 var segment = builderText.ToString();
                 var generated = fontResolver.ResolveBase14(font);
                 plan.UsedFonts.Add(generated);
+
+                // AFM pair kerning (opt-in): one TJ entry per character gap (0 when the pair
+                // is not kerned), matching the kerned MeasureText width used to lay the line out.
+                double[]? kerns = null;
+                var kernPoints = 0.0;
+                if (fonts.EnableKerning && segment.Length > 1)
+                {
+                    var list = new List<double>(segment.Length - 1);
+                    for (var k = 1; k < segment.Length; k++)
+                    {
+                        var kern = metrics.GetKerning(segment[k - 1], segment[k]);
+                        kernPoints += kern * size / 1000.0;
+                        list.Add(-kern);
+                    }
+
+                    kerns = HasNonZero(list) ? [.. list] : null;
+                }
+
                 plan.Texts.Add(new TextDraw
                 {
                     X = x,
@@ -415,10 +458,15 @@ internal sealed class TextLineEmitter(
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,
+                    WordSpacing = run.WordSpacing.Point,
+                    HorizontalScale = run.HorizontalScale,
+                    RenderMode = run.Invisible ? 3 : 0,
+                    FillPaint = run.FillPaint,
                     ExtGState = extGState,
+                    Kerns = kerns,
                 });
 
-                x += metrics.MeasureString(segment, size) + (spacing * segment.Length);
+                x += metrics.MeasureString(segment, size) + kernPoints + (spacing * segment.Length);
             }
         }
     }
@@ -436,6 +484,7 @@ internal sealed class TextLineEmitter(
         var text = fragment.Text;
         var runX = startX;
 
+        var kerning = fonts.EnableKerning;
         var i = 0;
         while (i < text.Length)
         {
@@ -444,6 +493,9 @@ internal sealed class TextLineEmitter(
             var bytes = scratchBytes;
             bytes.Clear();
             var advance = 0.0;
+            List<double>? kernList = null;
+            ushort prevGid = 0;
+            var glyphCount = 0;
             while (i < text.Length)
             {
                 var codepoint = CodePointAt(text, i);
@@ -453,15 +505,29 @@ internal sealed class TextLineEmitter(
                     break;
                 }
 
+                if (kerning && glyphCount > 0)
+                {
+                    // One entry per glyph gap (0 when the pair is not kerned) so the TJ
+                    // adjustments stay aligned with the glyph codes. Measurement adds
+                    // kern*size/upem; the TJ number (-kern*1000/upem, positive tightens)
+                    // reproduces the same displacement when drawn.
+                    var kern = face.GetKerning(prevGid, gid);
+                    advance += kern * size / face.UnitsPerEm;
+                    (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
+                }
+
                 // First-seen codepoint wins so glyphs shared by several codepoints
                 // (e.g. hyphen/soft-hyphen) map deterministically, not by draw order.
                 generated.GidToUnicode.TryAdd(gid, codepoint);
                 bytes.Add((byte)(gid >> 8));
                 bytes.Add((byte)(gid & 0xFF));
                 advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
+                prevGid = gid;
+                glyphCount++;
                 i += codepoint > 0xFFFF ? 2 : 1;
             }
 
+            double[]? kerns = HasNonZero(kernList) ? [.. kernList!] : null;
             plan.UsedFonts.Add(generated);
             plan.Texts.Add(new TextDraw
             {
@@ -480,7 +546,12 @@ internal sealed class TextLineEmitter(
                 Shear = font.Italic && !face.Italic ? 0.21 : 0,
                 CharSpacing = spacing,
                 Rise = rise,
+                WordSpacing = run.WordSpacing.Point,
+                HorizontalScale = run.HorizontalScale,
+                RenderMode = run.Invisible ? 3 : 0,
+                FillPaint = run.FillPaint,
                 ExtGState = extGState,
+                Kerns = kerns,
             });
 
             // Tc advances after every shown glyph, so a face switch inside the

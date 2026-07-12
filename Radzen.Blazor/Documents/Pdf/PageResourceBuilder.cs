@@ -33,10 +33,24 @@ internal static class PageResourceBuilder
         foreach (var state in page.ExtGStates)
         {
             extGStates ??= new DictionaryObject();
-            extGStates[state.Key] = ExtGStateDictionary(state.FillAlpha, state.StrokeAlpha);
+            extGStates[state.Key] = ExtGStateDictionary(
+                state.FillAlpha,
+                state.StrokeAlpha,
+                state.Blend,
+                state.OverprintStroke,
+                state.OverprintFill,
+                state.OverprintMode,
+                state.Intent);
         }
 
-        if (fonts is null && xobjects is null && extGStates is null)
+        DictionaryObject? patterns = null;
+        foreach (var pattern in page.Patterns)
+        {
+            patterns ??= new DictionaryObject();
+            patterns[pattern.Key] = writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient));
+        }
+
+        if (fonts is null && xobjects is null && extGStates is null && patterns is null)
         {
             return null;
         }
@@ -55,6 +69,11 @@ internal static class PageResourceBuilder
         if (extGStates is not null)
         {
             resources["ExtGState"] = extGStates;
+        }
+
+        if (patterns is not null)
+        {
+            resources["Pattern"] = patterns;
         }
 
         return resources;
@@ -218,7 +237,14 @@ internal static class PageResourceBuilder
             xobjects[key] = writer.Add(image.Image);
         }
 
-        if (fonts is null && xobjects is null)
+        DictionaryObject? patterns = null;
+        foreach (var (key, pattern) in emitter.Patterns)
+        {
+            patterns ??= new DictionaryObject();
+            patterns[key] = writer.Add(pattern);
+        }
+
+        if (fonts is null && xobjects is null && patterns is null)
         {
             return null;
         }
@@ -232,6 +258,11 @@ internal static class PageResourceBuilder
         if (xobjects is not null)
         {
             resources["XObject"] = xobjects;
+        }
+
+        if (patterns is not null)
+        {
+            resources["Pattern"] = patterns;
         }
 
         return resources;

@@ -17,10 +17,22 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
     private bool returned;
     private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
     private readonly List<KeyValuePair<string, ImageXObject>> images = [];
+    private readonly List<KeyValuePair<string, DictionaryObject>> patterns = [];
 
     public IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
 
     public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
+
+    public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
+
+    // Registers a shading/pattern dictionary and returns its /Pattern resource name.
+    public string RegisterPattern(DictionaryObject pattern)
+    {
+        ArgumentNullException.ThrowIfNull(pattern);
+        var key = "P" + patterns.Count.ToString(CultureInfo.InvariantCulture);
+        patterns.Add(new KeyValuePair<string, DictionaryObject>(key, pattern));
+        return key;
+    }
 
     public byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 

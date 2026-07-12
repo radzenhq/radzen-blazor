@@ -9,6 +9,10 @@ internal readonly record struct ResolvedEdge(Color Color, double Width, BorderSt
 internal readonly struct BoxStyle
 {
     public Color? Background { get; init; }
+
+    // A gradient background wins over the solid Background when set; realized as a
+    // shading pattern selected with /Pattern cs + scn (opt-in, default null).
+    public GradientBrush? BackgroundGradient { get; init; }
     public required Border Top { get; init; }
     public required Border Right { get; init; }
     public required Border Bottom { get; init; }
@@ -16,16 +20,34 @@ internal readonly struct BoxStyle
     public Unit CornerRadius { get; init; }
     public string? ExtGState { get; init; }
 
+    // Optional blend/overprint/rendering-intent, folded into the box ExtGState alongside
+    // opacity at emit time. All null (the default) leaves output unchanged.
+    public BlendMode? Blend { get; init; }
+    public bool? OverprintStroke { get; init; }
+    public bool? OverprintFill { get; init; }
+    public int? OverprintMode { get; init; }
+    public RenderingIntent? Intent { get; init; }
+
+    public bool HasGraphicsStateOptions
+        => Blend is not null || OverprintStroke is not null || OverprintFill is not null
+            || OverprintMode is not null || Intent is not null;
+
     // A container's decoration has no border cascade - its four edges are its own.
     // Opacity is registered as an ExtGState later, at emit time, when a PagePlan exists.
     public static BoxStyle FromContainer(Container container) => new()
     {
         Background = container.Background,
+        BackgroundGradient = container.BackgroundGradient,
         Top = container.Borders.Top,
         Right = container.Borders.Right,
         Bottom = container.Borders.Bottom,
         Left = container.Borders.Left,
         CornerRadius = container.CornerRadius,
+        Blend = container.BlendMode,
+        OverprintStroke = container.OverprintStroke,
+        OverprintFill = container.OverprintFill,
+        OverprintMode = container.OverprintMode,
+        Intent = container.RenderingIntent,
     };
 
     // MigraDoc semantics: a positive width alone makes the edge a visible solid line,

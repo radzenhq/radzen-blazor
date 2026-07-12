@@ -39,7 +39,9 @@ public sealed class StreamObject : DocumentObject
         var encryptor = EncryptionWriter.Current;
         if (encryptor is not null)
         {
-            data = encryptor.EncryptStream(Data, EncryptionWriter.CurrentObjectNumber, 0);
+            // Pass the dictionary so a /Type /Metadata stream is left plaintext when the
+            // writer's /EncryptMetadata flag is false.
+            data = encryptor.EncryptStream(Data, EncryptionWriter.CurrentObjectNumber, 0, Dictionary);
         }
 
         PdfBytes.WriteAscii(stream, "<< /Length ");

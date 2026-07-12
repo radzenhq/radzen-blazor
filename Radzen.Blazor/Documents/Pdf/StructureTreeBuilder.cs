@@ -81,12 +81,45 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
 
                 break;
             case Image image:
-                var figure = new StructureElement { Type = "Figure" };
+                var figure = new StructureElement
+                {
+                    Type = "Figure",
+                    Alt = image.AlternateText,
+                    ActualText = image.ActualText,
+                };
                 parent.Children.Add(figure);
                 blockElements[image] = figure;
                 break;
+            case List list when builder.PdfUA:
+                MapList(list, parent);
+                break;
             default:
                 break;
+        }
+    }
+
+    // PDF/UA list structure (ISO 32000-1 14.8.4.3.3): L -> LI -> {Lbl, LBody}. Each item's
+    // Lbl and LBody are stashed on the ListItem so the paginator's synthesized marker
+    // paragraph can tag its marker into Lbl and its content into LBody. A nested list is
+    // built inside its parent item's LBody. Only built for tagged (PDF/UA) output.
+    private void MapList(List list, StructureElement parent)
+    {
+        var l = new StructureElement { Type = "L" };
+        parent.Children.Add(l);
+        foreach (var item in list.Items)
+        {
+            var li = new StructureElement { Type = "LI" };
+            l.Children.Add(li);
+            var lbl = new StructureElement { Type = "Lbl" };
+            var lbody = new StructureElement { Type = "LBody" };
+            li.Children.Add(lbl);
+            li.Children.Add(lbody);
+            item.LabelElement = lbl;
+            item.BodyElement = lbody;
+            if (item.NestedList is { } nested)
+            {
+                MapList(nested, lbody);
+            }
         }
     }
 
@@ -125,7 +158,19 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
     };
 
     public StructureElement? ElementOf(object block)
-        => blockElements.TryGetValue(block, out var element) ? element : null;
+    {
+        // A synthesized list-item paragraph tags its content into its LBody element.
+        if (block is Paragraph { ListBodyElement: { } body })
+        {
+            return body;
+        }
+
+        return blockElements.TryGetValue(block, out var element) ? element : null;
+    }
+
+    // The Lbl element a list-item paragraph's marker fragment tags into, or null.
+    public StructureElement? MarkerElementOf(object block)
+        => block is Paragraph { ListLabelElement: { } label } ? label : null;
 
     // Emits only the elements that carry content on this page, ordered by their DFS pre-order rank so
     // the byte output matches a full-tree pre-order walk without the per-page O(elements) recursion.

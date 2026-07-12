@@ -9,6 +9,12 @@ internal sealed class StructureElement
 {
     public required string Type { get; init; }
 
+    // Accessibility text emitted on the StructElem: /Alt (alternate description) and
+    // /ActualText (replacement text). Null leaves the entry off.
+    public string? Alt { get; init; }
+
+    public string? ActualText { get; init; }
+
     public List<StructureElement> Children { get; } = [];
 
     public List<(int PageIndex, int Mcid)> Marks { get; } = [];

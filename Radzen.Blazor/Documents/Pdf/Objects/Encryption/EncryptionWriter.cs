@@ -13,7 +13,7 @@ namespace Radzen.Documents.Pdf.Objects.Encryption;
 /// in a thread-static ambient so <see cref="StringObject"/> and
 /// <see cref="StreamObject"/> can route their bytes through it.
 /// </summary>
-internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method cipher)
+internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method cipher, bool encryptMetadata = true)
 {
     [ThreadStatic]
     private static EncryptionWriter? current;
@@ -23,6 +23,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
 
     private readonly byte[] fileKey = fileKey;
     private readonly Method cipher = cipher;
+    private readonly bool encryptMetadata = encryptMetadata;
 
     internal enum Method
     {
@@ -50,7 +51,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
                 var derived = StandardSecurityHandler.DeriveAes256(
                     options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata);
                 dictionary = BuildV5Dictionary(derived, permissions, encryptMetadata);
-                return new EncryptionWriter(fileKey, Method.AesV3);
+                return new EncryptionWriter(fileKey, Method.AesV3, encryptMetadata);
             }
 
             case EncryptionAlgorithm.Aes128:
@@ -58,7 +59,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 4, 16, permissions, documentId, encryptMetadata);
                 dictionary = BuildLegacyDictionary(derived, permissions, aes: true, encryptMetadata);
-                return new EncryptionWriter(derived.FileKey, Method.AesV2);
+                return new EncryptionWriter(derived.FileKey, Method.AesV2, encryptMetadata);
             }
 
             default:
@@ -86,6 +87,20 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
 
     public byte[] EncryptStream(byte[] data, int objectNumber, int generation)
         => Apply(data, objectNumber, generation);
+
+    // A /Type /Metadata stream is left plaintext when the writer's /EncryptMetadata flag
+    // is false (ISO 32000-1 7.6.3.2), mirroring the reader's DecryptStream dictionary path.
+    public byte[] EncryptStream(byte[] data, int objectNumber, int generation, DictionaryObject dictionary)
+    {
+        ArgumentNullException.ThrowIfNull(dictionary);
+        return !encryptMetadata && IsMetadataStream(dictionary)
+            ? data
+            : Apply(data, objectNumber, generation);
+    }
+
+    private static bool IsMetadataStream(DictionaryObject dictionary)
+        => dictionary.TryGetValue("Type", out var type) && type is NameObject name
+            && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
 
     private static DictionaryObject BuildLegacyDictionary(
         (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool aes, bool encryptMetadata)
