@@ -161,13 +161,16 @@ internal static class ContentTokenizer
             position++;
         }
 
+        // EI ends the payload when bounded by whitespace/delimiter/EOF on the trailing side.
+        // A preceding whitespace is the common case but not required: streams that pack the
+        // image data flush against EI ("dataEI") must still terminate here rather than
+        // swallowing the remainder of the content stream.
         while (position < data.Length)
         {
-            if (IsWhitespace(data[position]) && position + 2 < data.Length
-                && data[position + 1] == (byte)'E' && data[position + 2] == (byte)'I'
-                && (position + 3 >= data.Length || IsWhitespace(data[position + 3]) || IsDelimiter(data[position + 3])))
+            if (data[position] == (byte)'E' && position + 1 < data.Length && data[position + 1] == (byte)'I'
+                && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2])))
             {
-                position += 3;
+                position += 2;
                 return;
             }
 

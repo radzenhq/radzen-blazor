@@ -13,7 +13,7 @@ namespace Radzen.Documents.Pdf;
 // painted element. The inverse of the C3 emitter.
 internal static class ContentInterpreter
 {
-    public static void Materialize(byte[] content, ContentCollection target)
+    public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null)
     {
         var tokens = ContentTokenizer.Tokenize(content);
 
@@ -23,7 +23,9 @@ internal static class ContentInterpreter
         var textMatrix = Matrix.Identity;
         var lineMatrix = Matrix.Identity;
         var fontSize = 0.0;
+        var leading = 0.0;
         string? fontName = null;
+        ReverseFont? font = null;
 
         var currentX = 0.0;
         var currentY = 0.0;
@@ -172,10 +174,20 @@ internal static class ContentInterpreter
                 case "Tf":
                     fontName = LastName(operands);
                     fontSize = LastNumber(operands);
+                    font = fontName is not null && fonts is not null && fonts.TryGetValue(fontName, out var resolved)
+                        ? resolved
+                        : null;
                     break;
 
-                case "Td":
+                case "TL":
+                    leading = LastNumber(operands);
+                    break;
+
                 case "TD":
+                    leading = -Number(operands, 1);
+                    goto case "Td";
+
+                case "Td":
                     lineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * lineMatrix;
                     textMatrix = lineMatrix;
                     break;
@@ -185,11 +197,22 @@ internal static class ContentInterpreter
                     textMatrix = lineMatrix;
                     break;
 
+                case "T*":
+                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
+                    textMatrix = lineMatrix;
+                    break;
+
                 case "Tj":
                 case "TJ":
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font);
+                    break;
+
+                // ' and " advance to the next line by the leading before showing.
                 case "'":
                 case "\"":
-                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth);
+                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
+                    textMatrix = lineMatrix;
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font);
                     break;
 
                 case "m":
@@ -337,13 +360,25 @@ internal static class ContentInterpreter
                     }
 
                     break;
+
+                default:
+                    // Any operator the element model does not represent (gs, sh, J, j, M,
+                    // ri, i, ...) is carried through verbatim so a re-encode stays lossless.
+                    // Text-state operators are excluded: a materialized run re-emits its own
+                    // isolated BT/ET, so a stray Tr/Tc/Tz here would leak into unrelated text.
+                    if (token.Text is not null && !IsTextState(token.Text))
+                    {
+                        target.Add(new RawContent(token.Text, [.. operands]) { IsArtifact = artifactDepth > 0 });
+                    }
+
+                    break;
             }
 
             operands.Clear();
         }
     }
 
-    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth)
+    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth, ReverseFont? font)
     {
         var bytes = LastString(operands);
         if (bytes is null)
@@ -351,7 +386,10 @@ internal static class ContentInterpreter
             return;
         }
 
-        var decoded = Decode(bytes);
+        // A loaded run in an embedded/Type0 font carries multi-byte codes; decode Text via
+        // the font's reverse map (as text extraction does) instead of per-byte WinAnsi,
+        // which drops the 0x00 high bytes. SourceBytes still re-emits the run verbatim.
+        var decoded = font is not null ? font.Decode(bytes) : Decode(bytes);
         target.Add(new TextContent(decoded, 0, 0)
         {
             Font = new Font { Size = fontSize },
@@ -522,6 +560,11 @@ internal static class ContentInterpreter
         return null;
     }
 
+    // Text-state operators (char/word spacing, horizontal scale, leading, rise, render
+    // mode) set state that persists across BT/ET. The model re-emits each run in its own
+    // isolated BT/ET, so passing these through as standalone elements would misapply them.
+    private static bool IsTextState(string op) => op is "Tc" or "Tw" or "Tz" or "TL" or "Ts" or "Tr";
+
     private static byte[]? LastString(List<Token> operands)
     {
         for (var i = operands.Count - 1; i >= 0; i--)
@@ -586,5 +629,35 @@ internal static class ContentInterpreter
             DashArray = DashArray,
             DashPhase = DashPhase,
         };
+    }
+}
+
+// An operator with no element-model representation, captured verbatim from the decoded
+// token stream and re-emitted unchanged so a full re-encode does not silently drop it.
+internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : ContentElement
+{
+    internal override void EmitBody(ContentWriter writer)
+    {
+        foreach (var operand in operands)
+        {
+            switch (operand.Kind)
+            {
+                case TokenKind.Number:
+                    writer.WriteNumber(operand.Number);
+                    writer.WriteRaw(" ");
+                    break;
+                case TokenKind.Name:
+                    writer.WriteName(operand.Text!);
+                    writer.WriteRaw(" ");
+                    break;
+                case TokenKind.String when operand.Bytes is not null:
+                    writer.WriteString(operand.Bytes);
+                    writer.WriteRaw(" ");
+                    break;
+            }
+        }
+
+        writer.WriteRaw(op);
+        writer.WriteRaw("\n");
     }
 }

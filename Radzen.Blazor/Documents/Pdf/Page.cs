@@ -80,7 +80,7 @@ public sealed class Page
     // gained new elements keeps its raw bytes untouched and returns the additions as a
     // separate overlay stream. Any other modification (or a freshly authored page)
     // re-encodes from elements; the emitters carry the resources each stream needs.
-    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter)
+    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter, System.Collections.Generic.IReadOnlyCollection<string>? reservedNames = null)
     {
         emitter = null;
         overlay = null;
@@ -98,7 +98,7 @@ public sealed class Page
                 return content;
             }
 
-            var appended = new ContentWriter("SF", "SIm");
+            var appended = new ContentWriter(SafePrefix("SF", reservedNames), SafePrefix("SIm", reservedNames));
             for (var i = materializedCount; i < elements.Count; i++)
             {
                 elements[i].Emit(appended);
@@ -110,7 +110,9 @@ public sealed class Page
             return content;
         }
 
-        var writer = new ContentWriter();
+        // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
+        // dodge the loaded page's resource names so MergeResources cannot overwrite them.
+        var writer = new ContentWriter(SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames));
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -168,7 +170,7 @@ public sealed class Page
             return;
         }
 
-        ContentInterpreter.Materialize(content, elements);
+        ContentInterpreter.Materialize(content, elements, textFonts);
         materializedCount = elements.Count;
 
         using var writer = new ContentWriter();
@@ -178,6 +180,37 @@ public sealed class Page
         }
 
         snapshot = writer.ToArray();
+    }
+
+    // Emitter keys are prefix+index; a prefix that no reserved name begins with can never
+    // equal one, so extend it with a non-digit until it is disjoint from every loaded name.
+    private static string SafePrefix(string baseName, System.Collections.Generic.IReadOnlyCollection<string>? reserved)
+    {
+        if (reserved is null || reserved.Count == 0)
+        {
+            return baseName;
+        }
+
+        var prefix = baseName;
+        while (StartsWithAny(reserved, prefix))
+        {
+            prefix += "z";
+        }
+
+        return prefix;
+    }
+
+    private static bool StartsWithAny(System.Collections.Generic.IReadOnlyCollection<string> names, string prefix)
+    {
+        foreach (var name in names)
+        {
+            if (name.StartsWith(prefix, System.StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool Same(byte[] a, byte[] b)
