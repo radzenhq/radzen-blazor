@@ -28,6 +28,30 @@ internal static class FieldAppearances
         return Wrap(writer, width, height);
     }
 
+    // A visible signature widget appearance: the given text lines stacked from the
+    // top of the box down, each in the supplied base-14 font. Non-encodable glyphs
+    // are dropped by the WinAnsi text encoder rather than failing the whole stream.
+    public static StreamObject BuildSignatureAppearance(
+        System.Collections.Generic.IReadOnlyList<string> lines, double width, double height, Font font)
+    {
+        using var writer = new ContentWriter();
+        writer.WriteRaw("q\n");
+        var lineHeight = font.Size * 1.2;
+        var y = height - font.Size - 2.0;
+        foreach (var line in lines)
+        {
+            if (line.Length > 0 && y >= 0.0)
+            {
+                new TextContent(line, Unit.FromPoint(2.0), Unit.FromPoint(y)) { Font = font }.Emit(writer);
+            }
+
+            y -= lineHeight;
+        }
+
+        writer.WriteRaw("Q\n");
+        return Wrap(writer, width, height);
+    }
+
     public static StreamObject BuildCheck(double width, double height)
     {
         using var writer = new ContentWriter();
