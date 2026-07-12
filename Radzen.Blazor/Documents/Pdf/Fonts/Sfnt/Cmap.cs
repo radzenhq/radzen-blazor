@@ -13,9 +13,14 @@ internal sealed class Cmap
     private const int MemoSize = 0x800;
 
     private readonly ICmapSubtable subtable;
+    private readonly bool symbol;
     private int[]? memo;
 
-    private Cmap(ICmapSubtable subtable) => this.subtable = subtable;
+    private Cmap(ICmapSubtable subtable, bool symbol)
+    {
+        this.subtable = subtable;
+        this.symbol = symbol;
+    }
 
     public ushort GetGlyphId(int codepoint)
     {
@@ -25,13 +30,27 @@ internal sealed class Cmap
             var value = cache[codepoint];
             if (value == 0)
             {
-                cache[codepoint] = value = subtable.GetGlyphId(codepoint) + 1;
+                cache[codepoint] = value = Lookup(codepoint) + 1;
             }
 
             return (ushort)(value - 1);
         }
 
-        return subtable.GetGlyphId(codepoint);
+        return Lookup(codepoint);
+    }
+
+    private ushort Lookup(int codepoint)
+    {
+        var glyph = subtable.GetGlyphId(codepoint);
+
+        // Microsoft symbol (3,0) fonts key their cmap in the F000-F0FF PUA, so a raw
+        // .notdef miss on a 0x00-0xFF code is retried with the 0xF000 offset applied.
+        if (glyph == 0 && symbol && (uint)codepoint <= 0xFF)
+        {
+            glyph = subtable.GetGlyphId(0xF000 | codepoint);
+        }
+
+        return glyph;
     }
 
     public static Cmap Parse(byte[] cmapTable)
@@ -48,6 +67,7 @@ internal sealed class Cmap
 
         ICmapSubtable? best = null;
         var bestScore = -1;
+        var bestSymbol = false;
 
         for (var i = 0; i < numTables; i++)
         {
@@ -71,6 +91,7 @@ internal sealed class Cmap
                 {
                     best = parsed;
                     bestScore = score;
+                    bestSymbol = platformId == 3 && encodingId == 0;
                 }
             }
 
@@ -82,7 +103,7 @@ internal sealed class Cmap
             throw new InvalidDataException("No supported cmap subtable (format 4 or 12) found.");
         }
 
-        return new Cmap(best);
+        return new Cmap(best, bestSymbol);
     }
 
     private static int Score(int platformId, int encodingId, int format)
