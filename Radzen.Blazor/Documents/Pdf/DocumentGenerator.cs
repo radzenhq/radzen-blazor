@@ -131,6 +131,7 @@ internal sealed class DocumentGenerator
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
     private StructureElement documentElement = null!;
     private readonly Dictionary<StructureElement, int> structureOrder = [];
+    private StyleResolution resolution = StyleResolution.Empty;
 
     private DocumentGenerator(DocumentBuilder builder)
     {
@@ -146,7 +147,7 @@ internal sealed class DocumentGenerator
 
     private Document Run()
     {
-        StyleResolver.Resolve(builder);
+        resolution = StyleResolver.Resolve(builder);
 
         var document = new Document { Conformance = builder.Conformance };
         document.Attachments.AddRange(builder.Attachments);
@@ -168,7 +169,7 @@ internal sealed class DocumentGenerator
                 throw new System.NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
             }
 
-            paginated.AddRange(Paginator.Paginate(section, fonts, MeasureImage));
+            paginated.AddRange(Paginator.Paginate(section, fonts, MeasureImage, resolution));
         }
 
         var plans = new List<PagePlan>();
@@ -322,9 +323,33 @@ internal sealed class DocumentGenerator
         var contentTop = height - page.ContentBox.Y;
         var width = page.ContentBox.Width;
 
-        foreach (var line in page.Lines)
+        var bodyLines = page.Lines;
+        var b = 0;
+        while (b < bodyLines.Count)
         {
-            EmitLine(plan, line.Line, left, contentTop - line.Y, ElementOf(line.Source));
+            var line = bodyLines[b];
+            // A body paragraph carrying page-number/count fields resolves per page here,
+            // the same substitution the header/footer band and band-table cell paths run.
+            if (line.Source is Paragraph paragraph && HasField(paragraph))
+            {
+                var element = ElementOf(paragraph);
+                var y = line.Y;
+                foreach (var box in ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph)))
+                {
+                    EmitLine(plan, box, left, contentTop - y, element);
+                    y += box.Height;
+                }
+
+                while (b < bodyLines.Count && bodyLines[b].Source == paragraph)
+                {
+                    b++;
+                }
+            }
+            else
+            {
+                EmitLine(plan, line.Line, left, contentTop - line.Y, ElementOf(line.Source));
+                b++;
+            }
         }
 
         foreach (var positioned in page.Tables)
@@ -400,7 +425,7 @@ internal sealed class DocumentGenerator
             if (line.Source is Paragraph paragraph && HasField(paragraph))
             {
                 var y = line.Y;
-                foreach (var box in ResolveFields(paragraph, width, pageNumber, pageCount))
+                foreach (var box in ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph)))
                 {
                     EmitLine(plan, box, left, top - y, null);
                     y += box.Height;
@@ -532,7 +557,6 @@ internal sealed class DocumentGenerator
             LineSpacing = paragraph.LineSpacing,
             RightTabStop = paragraph.RightTabStop,
             AlignmentValue = paragraph.AlignmentValue,
-            StyleAlignment = paragraph.StyleAlignment,
             EffectiveFont = paragraph.EffectiveFont,
         };
 
@@ -753,7 +777,7 @@ internal sealed class DocumentGenerator
             if (line.Source is Paragraph paragraph && HasField(paragraph))
             {
                 var y = line.Y;
-                foreach (var box in ResolveFields(paragraph, cell.ContentBox.Width, pageNumber, pageCount))
+                foreach (var box in ResolveFields(paragraph, cell.ContentBox.Width, pageNumber, pageCount, resolution.Alignment(paragraph)))
                 {
                     EmitLine(plan, box, left + line.X, contentTop - (y + delta), element);
                     overflows |= box.Width > cell.ContentBox.Width + 0.01;

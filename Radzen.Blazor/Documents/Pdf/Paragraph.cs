@@ -47,9 +47,11 @@ public class Paragraph : Block
         set => alignment = value;
     }
 
+    // Style-derived alignment for cell paragraphs laid out by TableLayout, which reads it
+    // off the model. StyleResolver writes it with a single assignment (never null-then-set)
+    // so a concurrent Save never observes a transient value. Body/band/field paragraphs get
+    // the same value through the `inherited` argument (from the per-save StyleResolution).
     internal HorizontalAlignment? StyleAlignment { get; set; }
-
-    internal HorizontalAlignment EffectiveAlignment => alignment ?? StyleAlignment ?? HorizontalAlignment.Left;
 
     internal HorizontalAlignment ResolveAlignment(HorizontalAlignment? inherited)
         => alignment ?? StyleAlignment ?? inherited ?? HorizontalAlignment.Left;

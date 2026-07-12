@@ -95,12 +95,13 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         DocumentBuilder document,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
+        System.Func<Image, double, (double Width, double Height)>? measureImage = null,
+        StyleResolution? resolution = null)
     {
         var pages = new List<PaginatedPage>();
         foreach (var section in document.Sections)
         {
-            PaginateSection(section, fonts, pages, measureImage);
+            PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty);
         }
 
         return pages;
@@ -109,10 +110,11 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         Section section,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
+        System.Func<Image, double, (double Width, double Height)>? measureImage = null,
+        StyleResolution? resolution = null)
     {
         var pages = new List<PaginatedPage>();
-        PaginateSection(section, fonts, pages, measureImage);
+        PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty);
         return pages;
     }
 
@@ -120,7 +122,8 @@ internal static class Paginator
         Section section,
         FontCollection fonts,
         List<PaginatedPage> pages,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
+        System.Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
     {
         var (pageWidth, pageHeight) = EffectiveSize(section);
         var left = section.Margins.Left.Point;
@@ -131,8 +134,8 @@ internal static class Paginator
         var contentWidth = pageWidth - left - right;
         var size = new PageSize(Unit.FromPoint(pageWidth), Unit.FromPoint(pageHeight));
 
-        var header = LayoutBand(section.Header, contentWidth, fonts, measureImage);
-        var footer = LayoutBand(section.Footer, contentWidth, fonts, measureImage);
+        var header = LayoutBand(section.Header, contentWidth, fonts, measureImage, resolution);
+        var footer = LayoutBand(section.Footer, contentWidth, fonts, measureImage, resolution);
 
         // The header band starts HeaderDistance below the page top and the footer band
         // ends FooterDistance above the page bottom; a band whose extent exceeds its
@@ -226,7 +229,7 @@ internal static class Paginator
         {
             if (blocks[i] is Paragraph paragraph)
             {
-                broken[i] = LineBreaker.Break(paragraph, contentWidth, fonts);
+                broken[i] = LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph));
             }
         }
 
@@ -663,7 +666,8 @@ internal static class Paginator
         HeaderFooter band,
         double width,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
+        System.Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
     {
         var result = new BandLayout();
         var images = result.Images;
@@ -729,7 +733,7 @@ internal static class Paginator
                 throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
             }
 
-            var lines = LineBreaker.Break(paragraph, width, fonts);
+            var lines = LineBreaker.Break(paragraph, width, fonts, resolution.Alignment(paragraph));
             var y = cursor + paragraph.SpacingBefore.Point;
             foreach (var box in lines)
             {
