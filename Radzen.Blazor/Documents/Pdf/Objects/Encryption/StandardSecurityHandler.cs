@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
@@ -315,14 +314,14 @@ internal sealed class StandardSecurityHandler
     // the iterated algorithm 2.B loop applies to revision 6 only.
     private byte[] HashPassword(byte[] password, byte[] salt, byte[] userData)
         => revision == 5
-            ? SHA256.HashData(Concat(password, salt, userData))
+            ? Sha2.Sha256(Concat(password, salt, userData))
             : Hash2B(password, salt, userData);
 
     // ISO 32000-2 algorithm 2.B.
     private static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)
     {
         var input = Concat(password, salt, userData);
-        var k = SHA256.HashData(input);
+        var k = Sha2.Sha256(input);
         var round = 0;
         while (true)
         {
@@ -342,9 +341,9 @@ internal sealed class StandardSecurityHandler
 
             k = mod switch
             {
-                0 => SHA256.HashData(e),
-                1 => SHA384.HashData(e),
-                _ => SHA512.HashData(e),
+                0 => Sha2.Sha256(e),
+                1 => Sha2.Sha384(e),
+                _ => Sha2.Sha512(e),
             };
 
             round++;
