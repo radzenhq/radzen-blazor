@@ -148,13 +148,46 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             cell.Bounds.Height);
         BoxRenderer.Paint(plan, bounds, ResolveStyle(layout, cell, extGState));
 
+        EmitBoxContent(
+            context,
+            cell.Lines, cell.Images, cell.Codes, cell.Tables,
+            cell.ContentBox.Width, cell.Bounds.X, cell.Bounds.X + cell.Bounds.Width,
+            bounds, radius, opacity, element,
+            left, contentTop, delta);
+    }
+
+    // Emits a box's laid-out content (lines with per-page field resolution, images, codes,
+    // nested tables) with overflow clipping to the box and, for rounded boxes, a rounded
+    // clip over the content. Shared by table cells and (later) containers, so it takes the
+    // already-resolved pieces instead of a Cell/Table.
+    internal void EmitBoxContent(
+        EmitContext context,
+        IReadOnlyList<LaidOutLine> lines,
+        IReadOnlyList<LaidOutImage> images,
+        IReadOnlyList<LaidOutCode> codes,
+        IReadOnlyList<LaidOutNestedTable> tables,
+        double contentWidth,
+        double boundsLeft,
+        double boundsRight,
+        in Rect clip,
+        double radius,
+        double opacity,
+        StructureElement? element,
+        double left,
+        double contentTop,
+        double delta)
+    {
+        var plan = context.Plan;
+        var pageNumber = context.PageNumber;
+        var pageCount = context.PageCount;
+
         // The mark sits after the cell's own rounded background and border so only CHILD
         // content gets clipped to the rounded box - the border stroke stays unclipped.
         var contentMark = radius > 0 ? plan.Mark() : default;
 
         var firstText = plan.Texts.Count;
         var overflows = false;
-        var cellLines = cell.Lines;
+        var cellLines = lines;
         var li = 0;
         while (li < cellLines.Count)
         {
@@ -164,10 +197,10 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
                 var y = line.Y;
-                foreach (var box in context.Fields.ResolveFields(paragraph, cell.ContentBox.Width, pageNumber, pageCount, resolution.Alignment(paragraph)))
+                foreach (var box in context.Fields.ResolveFields(paragraph, contentWidth, pageNumber, pageCount, resolution.Alignment(paragraph)))
                 {
                     context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), element, opacity);
-                    overflows |= box.Width > cell.ContentBox.Width + 0.01;
+                    overflows |= box.Width > contentWidth + 0.01;
                     y += box.Height;
                 }
 
@@ -179,14 +212,14 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             else
             {
                 context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), element, opacity);
-                overflows |= line.Line.Width > cell.ContentBox.Width + 0.01;
+                overflows |= line.Line.Width > contentWidth + 0.01;
                 li++;
             }
         }
 
         // An unbreakable token or oversized image/code wider than the cell is clipped to the
         // cell box so it never overpaints the neighboring cell.
-        var cellClip = bounds;
+        var cellClip = clip;
         if (overflows)
         {
             var texts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
@@ -196,14 +229,12 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        var boundsLeft = cell.Bounds.X;
-        var boundsRight = cell.Bounds.X + cell.Bounds.Width;
         var contentOverflows = false;
         var firstImage = plan.Images.Count;
         var firstFill = plan.Fills.Count;
         var firstCodeText = plan.Texts.Count;
 
-        foreach (var image in cell.Images)
+        foreach (var image in images)
         {
             contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
             var xobject = imageStore.Decode(image.Source);
@@ -221,7 +252,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             plan.UsedImages.Add(xobject);
         }
 
-        foreach (var code in cell.Codes)
+        foreach (var code in codes)
         {
             contentOverflows |= code.X < boundsLeft - 0.01 || code.X + CodeEmitter.CodeWidth(code.Source) > boundsRight + 0.01;
             context.Codes.EmitCodeBlock(context, code.Source, left + code.X, contentTop - (code.Y + delta));
@@ -229,10 +260,10 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         if (contentOverflows)
         {
-            var images = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Images);
-            for (var im = firstImage; im < images.Length; im++)
+            var imageDraws = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Images);
+            for (var im = firstImage; im < imageDraws.Length; im++)
             {
-                images[im].Clip = cellClip;
+                imageDraws[im].Clip = cellClip;
             }
 
             var fills = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Fills);
@@ -248,7 +279,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        foreach (var nested in cell.Tables)
+        foreach (var nested in tables)
         {
             var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
             var nestedRadius = 0.0;
