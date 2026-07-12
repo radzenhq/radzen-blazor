@@ -43,6 +43,35 @@ internal readonly struct LaidOutNestedTable
     public required double X { get; init; }
 
     public required double Y { get; init; }
+
+    /// <summary>
+    /// Placement sequence within the parent box content, shared with
+    /// <see cref="LaidOutNestedBox.Order"/> so emission interleaves nested tables and
+    /// nested boxes in document order.
+    /// </summary>
+    public int Order { get; init; }
+}
+
+// A NON-special (Stack) container nested inside a table cell or another box, laid out as
+// a first-class nested box: the decoration paints through BoxRenderer and the child
+// content recurses through TableEmitter.EmitBoxContent. Bounds is in the parent's
+// content space (same space as LaidOutNestedTable.X/Y), Radius is already clamped to the
+// box, and Style carries no ExtGState - opacity resolves per page at emit time.
+internal readonly struct LaidOutNestedBox
+{
+    public required Container Source { get; init; }
+
+    public required LaidOutBoxContent Content { get; init; }
+
+    public required Rect Bounds { get; init; }
+
+    public required BoxStyle Style { get; init; }
+
+    public required double Radius { get; init; }
+
+    public required double Opacity { get; init; }
+
+    public int Order { get; init; }
 }
 
 internal sealed class LaidOutCell
@@ -68,6 +97,8 @@ internal sealed class LaidOutCell
     public IReadOnlyList<LaidOutCode> Codes { get; init; } = [];
 
     public IReadOnlyList<LaidOutNestedTable> Tables { get; init; } = [];
+
+    public IReadOnlyList<LaidOutNestedBox> Boxes { get; init; } = [];
 }
 
 internal sealed class LaidOutTable
@@ -249,6 +280,7 @@ internal static class TableLayout
                 Images = content.Images,
                 Codes = content.Codes,
                 Tables = content.Tables,
+                Boxes = content.Boxes,
             });
         }
 

@@ -150,7 +150,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         EmitBoxContent(
             context,
-            cell.Lines, cell.Images, cell.Codes, cell.Tables,
+            cell.Lines, cell.Images, cell.Codes, cell.Tables, cell.Boxes,
             cell.ContentBox.Width, cell.Bounds.X, cell.Bounds.X + cell.Bounds.Width,
             bounds, radius, opacity, element,
             left, contentTop, delta);
@@ -166,6 +166,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         IReadOnlyList<LaidOutImage> images,
         IReadOnlyList<LaidOutCode> codes,
         IReadOnlyList<LaidOutNestedTable> tables,
+        IReadOnlyList<LaidOutNestedBox> boxes,
         double contentWidth,
         double boundsLeft,
         double boundsRight,
@@ -279,31 +280,19 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        foreach (var nested in tables)
+        // Nested tables and nested boxes interleave in document order (the shared Order
+        // sequence assigned by BoxContentLayout.Position).
+        var ti = 0;
+        var bi = 0;
+        while (ti < tables.Count || bi < boxes.Count)
         {
-            var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
-            var nestedRadius = 0.0;
-            var nestedBounds = default(Rect);
-            var nestedMark = default(PlanMarks);
-            if (nested.Layout.Source is { } nestedTable && nestedTable.CornerRadius.Point > 0)
+            if (bi >= boxes.Count || (ti < tables.Count && tables[ti].Order <= boxes[bi].Order))
             {
-                nestedBounds = new Rect(
-                    nestedLeft,
-                    contentTop - (delta + nested.Y) - nested.Layout.Height,
-                    nested.Layout.Width,
-                    nested.Layout.Height);
-                nestedRadius = BoxRenderer.ClampRadius(nestedTable.CornerRadius.Point, nestedBounds.Width, nestedBounds.Height);
-                nestedMark = plan.Mark();
+                EmitNestedTable(context, tables[ti++], element, left, contentTop, delta);
             }
-
-            foreach (var nestedCell in nested.Layout.Cells)
+            else
             {
-                EmitCell(context, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
-            }
-
-            if (nestedRadius > 0)
-            {
-                EmitTableFrame(plan, nested.Layout.Source!, nestedBounds, nestedRadius, nestedMark);
+                EmitNestedBox(context, boxes[bi++], element, left, contentTop, delta);
             }
         }
 
@@ -311,6 +300,69 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             plan.ApplyRoundedClip(cellClip, radius, contentMark);
         }
+    }
+
+    private void EmitNestedTable(EmitContext context, in LaidOutNestedTable nested, StructureElement? element, double left, double contentTop, double delta)
+    {
+        var plan = context.Plan;
+        var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
+        var nestedRadius = 0.0;
+        var nestedBounds = default(Rect);
+        var nestedMark = default(PlanMarks);
+        if (nested.Layout.Source is { } nestedTable && nestedTable.CornerRadius.Point > 0)
+        {
+            nestedBounds = new Rect(
+                nestedLeft,
+                contentTop - (delta + nested.Y) - nested.Layout.Height,
+                nested.Layout.Width,
+                nested.Layout.Height);
+            nestedRadius = BoxRenderer.ClampRadius(nestedTable.CornerRadius.Point, nestedBounds.Width, nestedBounds.Height);
+            nestedMark = plan.Mark();
+        }
+
+        foreach (var nestedCell in nested.Layout.Cells)
+        {
+            EmitCell(context, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
+        }
+
+        if (nestedRadius > 0)
+        {
+            EmitTableFrame(plan, nested.Layout.Source!, nestedBounds, nestedRadius, nestedMark);
+        }
+    }
+
+    // A first-class nested box paints exactly like the synthetic single-cell table the
+    // container used to lower to: decoration first (opacity registered per page here, like
+    // BoxEmitter), then the child content recursing through EmitBoxContent with the box's
+    // clamped radius so rounded boxes clip their content.
+    private void EmitNestedBox(EmitContext context, in LaidOutNestedBox box, StructureElement? element, double left, double contentTop, double delta)
+    {
+        var plan = context.Plan;
+        var opacity = opacities.ContainerOpacity(box.Source);
+        var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
+        var bounds = new Rect(
+            left + box.Bounds.X,
+            contentTop - (box.Bounds.Y + delta) - box.Bounds.Height,
+            box.Bounds.Width,
+            box.Bounds.Height);
+        BoxRenderer.Paint(plan, bounds, new BoxStyle
+        {
+            Background = box.Style.Background,
+            Top = box.Style.Top,
+            Right = box.Style.Right,
+            Bottom = box.Style.Bottom,
+            Left = box.Style.Left,
+            CornerRadius = box.Style.CornerRadius,
+            ExtGState = extGState,
+        });
+
+        var innerWidth = System.Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
+        EmitBoxContent(
+            context,
+            box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,
+            innerWidth, 0, box.Bounds.Width,
+            bounds, box.Radius, opacity, element,
+            left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
     }
 
     // The effective corner radius, clamped so opposite corners never overlap.
