@@ -97,6 +97,19 @@ public enum FlowDirection
 }
 
 /// <summary>
+/// Vertical alignment of a run relative to the line baseline.
+/// </summary>
+public enum RunVerticalAlign
+{
+    /// <summary>Normal text on the baseline.</summary>
+    None,
+    /// <summary>Reduced-size text raised above the baseline.</summary>
+    Superscript,
+    /// <summary>Reduced-size text lowered below the baseline.</summary>
+    Subscript,
+}
+
+/// <summary>
 /// The writing mode used to lay out text.
 /// </summary>
 public enum WritingMode

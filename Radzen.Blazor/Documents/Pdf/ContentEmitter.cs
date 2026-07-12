@@ -50,6 +50,18 @@ internal static class ContentEmitter
         writer.WriteRaw(" ");
         writer.WriteNumber(text.Size);
         writer.WriteRaw(" Tf\n");
+        if (text.CharSpacing != 0)
+        {
+            writer.WriteNumber(text.CharSpacing);
+            writer.WriteRaw(" Tc\n");
+        }
+
+        if (text.Rise != 0)
+        {
+            writer.WriteNumber(text.Rise);
+            writer.WriteRaw(" Ts\n");
+        }
+
         if (text.StrokeWidth > 0)
         {
             writer.WriteColor(text.Color, "RG");
@@ -80,6 +92,17 @@ internal static class ContentEmitter
         if (text.StrokeWidth > 0)
         {
             writer.WriteRaw("0 Tr\n");
+        }
+
+        // Tc/Ts persist across BT/ET, so non-default values are reset after the show.
+        if (text.CharSpacing != 0)
+        {
+            writer.WriteRaw("0 Tc\n");
+        }
+
+        if (text.Rise != 0)
+        {
+            writer.WriteRaw("0 Ts\n");
         }
 
         writer.WriteRaw("ET\n");

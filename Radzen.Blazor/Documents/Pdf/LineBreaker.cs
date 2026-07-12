@@ -269,7 +269,7 @@ internal static class LineBreaker
                     }
 
                     var segment = text[start..i];
-                    var advance = fonts.MeasureText(segment, run.ResolvedFont);
+                    var advance = MeasureRun(fonts, run, segment);
 
                     if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
                     {
@@ -381,8 +381,9 @@ internal static class LineBreaker
                 var cpLen = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])
                     ? 2
                     : 1;
-                var advance = fonts.MeasureText(text.Substring(i, cpLen), font);
-                if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + advance > max)
+                var advance = fonts.MeasureText(text.Substring(i, cpLen), font) * piece.Run.ScriptScale;
+                var step = fragAdvance > 0 ? advance + piece.Run.LetterSpacing.Point : advance;
+                if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
                     if (i > fragStart)
                     {
@@ -395,9 +396,10 @@ internal static class LineBreaker
                     lineWidth = 0.0;
                     fragStart = i;
                     fragAdvance = 0.0;
+                    step = advance;
                 }
 
-                fragAdvance += advance;
+                fragAdvance += step;
                 i += cpLen;
             }
 
@@ -812,12 +814,56 @@ internal static class LineBreaker
             var (h, asc) = fragments[i].Run is InlineImage image
                 ? (image.EffectiveSize().Height, image.EffectiveSize().Height)
                 : FontExtent(fragments[i].Run.ResolvedFont, fonts);
+            if (fragments[i].Run.VerticalAlign != RunVerticalAlign.None)
+            {
+                (h, asc) = ScriptExtent(fragments[i].Run, h, asc);
+            }
+
             natural = System.Math.Max(natural, h);
             baseline = System.Math.Max(baseline, asc);
         }
 
         box.Height = natural * lineSpacing;
         box.Baseline = baseline;
+    }
+
+    // Scales the full-size extent down to the script size and grows it by the text
+    // rise (above the baseline for superscript, below for subscript) so the line
+    // reserves the risen glyphs' actual vertical span.
+    private static (double Height, double Ascent) ScriptExtent(Run run, double height, double ascent)
+    {
+        var scale = run.ScriptScale;
+        var rise = run.ScriptRise(run.ResolvedFont.Size);
+        var descent = (height - ascent) * scale;
+        ascent = (ascent * scale) + System.Math.Max(rise, 0);
+        return (ascent + descent + System.Math.Max(-rise, 0), ascent);
+    }
+
+    // A run's measured advance: the plain measurement scaled to the script size, plus
+    // letter spacing per inter-glyph gap (spacing * (code points - 1)).
+    private static double MeasureRun(FontCollection fonts, Run run, string text)
+    {
+        var advance = fonts.MeasureText(text, run.ResolvedFont) * run.ScriptScale;
+        var spacing = run.LetterSpacing.Point;
+        if (spacing != 0 && text.Length > 0)
+        {
+            advance += spacing * (CountCodePoints(text) - 1);
+        }
+
+        return advance;
+    }
+
+    private static int CountCodePoints(string text)
+    {
+        var count = 0;
+        var i = 0;
+        while (i < text.Length)
+        {
+            i += char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]) ? 2 : 1;
+            count++;
+        }
+
+        return count;
     }
 
     private static (double Height, double Ascent) FontExtent(Font font, FontCollection fonts)

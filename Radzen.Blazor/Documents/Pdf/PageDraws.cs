@@ -12,6 +12,8 @@ internal struct TextDraw
     public required byte[] Bytes { get; init; }
     public double StrokeWidth { get; init; }
     public double Shear { get; init; }
+    public double CharSpacing { get; init; }
+    public double Rise { get; init; }
     public StructureElement? Element { get; init; }
     public Rect? Clip { get; set; }
 }
