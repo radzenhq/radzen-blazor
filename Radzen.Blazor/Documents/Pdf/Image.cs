@@ -36,6 +36,17 @@ public sealed class Image : Block
     /// </summary>
     public double Opacity { get; set; } = 1;
 
+    /// <summary>
+    /// Gets or sets whether the viewer should smooth the image when it is drawn at a size
+    /// other than its natural pixel dimensions. When <see langword="true"/> the image XObject
+    /// carries <c>/Interpolate true</c> (ISO 32000-1 8.9.5.3). Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool Interpolate { get; set; }
+
+    // True when the image opts into any XObject-dictionary option, so emission can keep the
+    // default path (and its bytes) untouched for an image that uses none of them.
+    internal bool HasXObjectOptions => Interpolate;
+
     internal (Unit Width, Unit Height)? FitBox { get; private set; }
 
     /// <summary>

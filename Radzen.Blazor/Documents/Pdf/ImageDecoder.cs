@@ -82,6 +82,19 @@ internal static class ImageDecoder
         return (baseWidth, baseHeight);
     }
 
+    // Stamps the opt-in options a block Image carries onto its decoded XObject. The flag is
+    // purely additive so an image that opts into nothing is returned untouched, keeping the
+    // default output byte-identical.
+    public static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
+    {
+        if (image.Interpolate)
+        {
+            xobject.Image.Dictionary["Interpolate"] = new BooleanObject(true);
+        }
+
+        return xobject;
+    }
+
     private static bool IsPng(byte[] data)
     {
         if (data.Length < PngSignature.Length)
