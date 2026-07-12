@@ -14,9 +14,9 @@ internal sealed class OpacityResolver
     {
         foreach (var section in builder.Sections)
         {
-            Walk(section.Blocks);
-            Walk(section.Header.Blocks);
-            Walk(section.Footer.Blocks);
+            Walk(section.Blocks, 1);
+            Walk(section.Header.Blocks, 1);
+            Walk(section.Footer.Blocks, 1);
         }
     }
 
@@ -33,21 +33,20 @@ internal sealed class OpacityResolver
         return 1;
     }
 
-    private void Walk(BlockCollection blocks)
+    // Every block below a semi-transparent container maps to the product of its
+    // ancestor container opacities, so nested containers and tables inherit it.
+    private void Walk(BlockCollection blocks, double opacity)
     {
         foreach (var block in blocks)
         {
+            if (opacity < 1)
+            {
+                byBlock[block] = opacity;
+            }
+
             if (block is Container container)
             {
-                if (container.Opacity < 1)
-                {
-                    foreach (var child in container.Blocks)
-                    {
-                        byBlock[child] = container.Opacity;
-                    }
-                }
-
-                Walk(container.Blocks);
+                Walk(container.Blocks, opacity * container.Opacity);
             }
             else if (block is Table table)
             {
@@ -55,7 +54,7 @@ internal sealed class OpacityResolver
                 {
                     foreach (var cell in row.Cells)
                     {
-                        Walk(cell.Blocks);
+                        Walk(cell.Blocks, opacity);
                     }
                 }
             }

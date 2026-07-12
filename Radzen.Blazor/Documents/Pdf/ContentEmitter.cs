@@ -44,9 +44,20 @@ internal static class ContentEmitter
 
     public static void WriteTextDraw(ContentWriter writer, in TextDraw text)
     {
-        if (text.Clip is { } clip)
+        var wrapped = text.ExtGState is not null || text.Clip is not null;
+        if (wrapped)
         {
             writer.WriteRaw("q\n");
+        }
+
+        if (text.ExtGState is { } state)
+        {
+            writer.WriteName(state);
+            writer.WriteRaw(" gs\n");
+        }
+
+        if (text.Clip is { } clip)
+        {
             WriteClipRect(writer, clip);
         }
 
@@ -112,7 +123,7 @@ internal static class ContentEmitter
         }
 
         writer.WriteRaw("ET\n");
-        if (text.Clip is not null)
+        if (wrapped)
         {
             writer.WriteRaw("Q\n");
         }

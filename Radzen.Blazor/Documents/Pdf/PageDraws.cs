@@ -16,6 +16,7 @@ internal struct TextDraw
     public double Rise { get; init; }
     public StructureElement? Element { get; init; }
     public Rect? Clip { get; set; }
+    public string? ExtGState { get; init; }
 }
 
 internal struct ImageDraw

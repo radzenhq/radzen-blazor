@@ -58,7 +58,7 @@ internal sealed class TextLineEmitter(
         }
     }
 
-    public void EmitLine(EmitContext context, LineBox line, double originX, double baseline, StructureElement? element)
+    public void EmitLine(EmitContext context, LineBox line, double originX, double baseline, StructureElement? element, double opacity = 1)
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
@@ -74,9 +74,10 @@ internal sealed class TextLineEmitter(
         for (var fi = 0; fi < lineFragments.Count; fi++)
         {
             var fragment = lineFragments[fi];
+            var alpha = opacity * fragment.Run.Opacity;
             if (fragment.Run is InlineImage inlineImage)
             {
-                EmitInlineImage(plan, inlineImage, originX + fragment.XOffset, y, element);
+                EmitInlineImage(plan, inlineImage, originX + fragment.XOffset, y, element, alpha);
                 continue;
             }
 
@@ -86,19 +87,20 @@ internal sealed class TextLineEmitter(
                 continue;
             }
 
+            var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
             var font = fragment.Run.ResolvedFont;
             if (fonts.TryResolvePrimary(font, out var primary))
             {
-                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, element);
+                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, element, extGState);
             }
             else
             {
-                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y, element);
+                EmitBase14Fragment(plan, fragment, font, originX + fragment.XOffset, y, element, extGState);
             }
         }
 
-        EmitUnderlines(plan, line, originX, y);
-        EmitStrikethroughs(plan, line, originX, y);
+        EmitUnderlines(plan, line, originX, y, opacity);
+        EmitStrikethroughs(plan, line, originX, y, opacity);
         EmitLinks(plan, line, originX, y);
     }
 
@@ -146,7 +148,7 @@ internal sealed class TextLineEmitter(
     // One underline per maximal group of consecutive fragments of the same underlined
     // run, spanning from the first fragment's start to the last fragment's end so
     // inter-word gaps inside the run stay underlined.
-    private static void EmitUnderlines(PagePlan plan, LineBox line, double originX, double y)
+    private static void EmitUnderlines(PagePlan plan, LineBox line, double originX, double y, double opacity)
     {
         var fragments = line.Fragments;
         var i = 0;
@@ -170,6 +172,7 @@ internal sealed class TextLineEmitter(
             }
 
             var underlineY = y - (font.Size * 0.12);
+            var alpha = opacity * run.Opacity;
             plan.Edges.Add(new EdgeDraw
             {
                 X1 = originX + start,
@@ -179,6 +182,7 @@ internal sealed class TextLineEmitter(
                 LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
                 Color = font.Color,
                 Style = BorderStyle.Solid,
+                ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
             });
 
             i = j;
@@ -186,9 +190,9 @@ internal sealed class TextLineEmitter(
     }
 
     // One strike per maximal group of consecutive strikethrough fragments that share
-    // size and color (across runs), drawn at roughly the x-height midline above the
-    // baseline; a change in size or color starts a new correctly-styled line.
-    private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y)
+    // size, color and opacity (across runs), drawn at roughly the x-height midline
+    // above the baseline; a style change starts a new correctly-styled line.
+    private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y, double opacity)
     {
         var fragments = line.Fragments;
         var i = 0;
@@ -207,13 +211,15 @@ internal sealed class TextLineEmitter(
             while (j < fragments.Count
                 && fragments[j].Run.ResolvedFont.Strikethrough
                 && fragments[j].Run.ResolvedFont.Size == font.Size
-                && fragments[j].Run.ResolvedFont.Color.Equals(font.Color))
+                && fragments[j].Run.ResolvedFont.Color.Equals(font.Color)
+                && fragments[j].Run.Opacity == fragments[i].Run.Opacity)
             {
                 end = fragments[j].XOffset + fragments[j].Advance;
                 j++;
             }
 
             var strikeY = y + (font.Size * 0.3);
+            var alpha = opacity * fragments[i].Run.Opacity;
             plan.Edges.Add(new EdgeDraw
             {
                 X1 = originX + start,
@@ -223,6 +229,7 @@ internal sealed class TextLineEmitter(
                 LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
                 Color = font.Color,
                 Style = BorderStyle.Solid,
+                ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
             });
 
             i = j;
@@ -317,7 +324,7 @@ internal sealed class TextLineEmitter(
     // Base-14 WinAnsi path. Characters outside cp1252 are never dropped: they render
     // through the registered fallback chain when it supplies a glyph, otherwise a
     // visible '?' placeholder is substituted.
-    private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element)
+    private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element, string? extGState)
     {
         var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
         var run = fragment.Run;
@@ -367,6 +374,7 @@ internal sealed class TextLineEmitter(
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,
+                    ExtGState = extGState,
                 });
 
                 x += spacing == 0 ? advance : advance + (spacing * (bytes.Count / 2));
@@ -407,6 +415,7 @@ internal sealed class TextLineEmitter(
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,
+                    ExtGState = extGState,
                 });
 
                 x += metrics.MeasureString(segment, size) + (spacing * segment.Length);
@@ -417,7 +426,7 @@ internal sealed class TextLineEmitter(
     // Splits a fragment into maximal sub-runs by the physical face that actually
     // supplies each glyph (primary or a SetFallback face), so every glyph is drawn
     // by the embedded subset that owns it - not the primary's .notdef.
-    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y, StructureElement? element)
+    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y, StructureElement? element, string? extGState)
     {
         var run = fragment.Run;
         var font = run.ResolvedFont;
@@ -471,6 +480,7 @@ internal sealed class TextLineEmitter(
                 Shear = font.Italic && !face.Italic ? 0.21 : 0,
                 CharSpacing = spacing,
                 Rise = rise,
+                ExtGState = extGState,
             });
 
             // Tc advances after every shown glyph, so a face switch inside the
@@ -481,7 +491,7 @@ internal sealed class TextLineEmitter(
 
     // Draws an inline image sitting on the line baseline: its bottom edge is at the baseline y,
     // so it advances the line by its width and shares the line height computed by the breaker.
-    private void EmitInlineImage(PagePlan plan, InlineImage image, double x, double baseline, StructureElement? element)
+    private void EmitInlineImage(PagePlan plan, InlineImage image, double x, double baseline, StructureElement? element, double alpha)
     {
         var (width, height) = image.EffectiveSize();
         var generated = imageStore.DecodeBytes(image, image.Data);
@@ -493,6 +503,7 @@ internal sealed class TextLineEmitter(
             Height = height,
             Image = generated,
             Element = element,
+            ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
         });
         plan.UsedImages.Add(generated);
     }
