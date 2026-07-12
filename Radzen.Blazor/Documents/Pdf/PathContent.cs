@@ -119,14 +119,6 @@ public sealed class PathContent : ContentElement
 
     private static double Clamp(double value) => value < 0 ? 0 : value > 1 ? 1 : value;
 
-    private static string IntentName(RenderingIntent intent) => intent switch
-    {
-        RenderingIntent.AbsoluteColorimetric => "AbsoluteColorimetric",
-        RenderingIntent.RelativeColorimetric => "RelativeColorimetric",
-        RenderingIntent.Saturation => "Saturation",
-        _ => "Perceptual",
-    };
-
     /// <summary>
     /// Sets the dash pattern (the <c>d</c> operator). The pattern is a sequence of
     /// alternating on/off dash lengths in points; an empty pattern draws a solid line.
@@ -201,7 +193,7 @@ public sealed class PathContent : ContentElement
 
         if (Intent is { } intent)
         {
-            writer.WriteName(IntentName(intent));
+            writer.WriteName(intent.PdfName());
             writer.WriteRaw(" ri\n");
         }
 

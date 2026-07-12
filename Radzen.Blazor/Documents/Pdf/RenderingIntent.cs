@@ -19,3 +19,14 @@ public enum RenderingIntent
     /// <summary>Preserve overall appearance, compressing the gamut smoothly.</summary>
     Perceptual,
 }
+
+internal static class RenderingIntents
+{
+    public static string PdfName(this RenderingIntent intent) => intent switch
+    {
+        RenderingIntent.AbsoluteColorimetric => "AbsoluteColorimetric",
+        RenderingIntent.RelativeColorimetric => "RelativeColorimetric",
+        RenderingIntent.Saturation => "Saturation",
+        _ => "Perceptual",
+    };
+}
