@@ -34,6 +34,23 @@ public class DocumentBuilder
     public PdfAConformance Conformance { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the output identifies as PDF/UA-1 (ISO 14289-1,
+    /// accessibility). The saved file carries pdfuaid:part 1 in its XMP metadata,
+    /// is marked as Tagged PDF (/MarkInfo /Marked true with a /StructTreeRoot)
+    /// and sets the DisplayDocTitle viewer preference; every font must be an
+    /// embedded subset. Composable with <see cref="Conformance"/>.
+    /// </summary>
+    public bool PdfUA { get; set; }
+
+    /// <summary>
+    /// Gets or sets the natural language of the document as an RFC 3066 /
+    /// BCP 47 tag (e.g. <c>en-US</c>), written as the catalog <c>/Lang</c>.
+    /// Required when <see cref="PdfUA"/> is set, since PDF/UA demands that
+    /// the document language be determinable.
+    /// </summary>
+    public string? Language { get; set; }
+
+    /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
     /// document is written unencrypted.
     /// </summary>
@@ -58,6 +75,8 @@ public class DocumentBuilder
         var document = DocumentGenerator.Generate(this);
         document.Encryption = Encryption;
         document.CompressOutput = CompressOutput;
+        document.PdfUA = PdfUA;
+        document.Language = Language;
         return document;
     }
 

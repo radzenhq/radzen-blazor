@@ -58,6 +58,17 @@ internal static class StructureWriter
             ["S"] = new NameObject(element.Type),
             ["P"] = parentRef,
         };
+
+        // Header cells come from header rows, so their scope is the column
+        // below them; PDF/UA (ISO 14289-1, 7.5) requires TH to carry a Scope.
+        if (element.Type == "TH")
+        {
+            dictionary["A"] = new DictionaryObject
+            {
+                ["O"] = new NameObject("Table"),
+                ["Scope"] = new NameObject("Column"),
+            };
+        }
         var reference = writer.Add(dictionary);
 
         var kids = new ArrayObject();
