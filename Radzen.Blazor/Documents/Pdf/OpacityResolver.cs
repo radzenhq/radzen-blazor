@@ -20,6 +20,13 @@ internal sealed class OpacityResolver
         }
     }
 
+    // The decoration opacity of a FIRST-CLASS container box: the container's own
+    // opacity times the product of its ancestor container opacities. CellOpacity
+    // stays for the still-lowered (nested/overlay/rotated) path, which recovers
+    // the value through the synthetic cell's child blocks.
+    public double ContainerOpacity(Container container)
+        => (byBlock.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
+
     public double CellOpacity(Cell cell)
     {
         foreach (var block in cell.Blocks)

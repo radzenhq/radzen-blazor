@@ -7,9 +7,10 @@ using Xunit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Container is a decorated block: it wraps child blocks in a box with padding, background,
-// borders, an optional fixed width and horizontal alignment. It lowers onto the table engine
-// (a single-cell table), so its child content is inset by the padding and the box decoration
-// is drawn exactly like a cell's.
+// borders, an optional fixed width and horizontal alignment. A section-level Stack container
+// is placed as a first-class box (PaginatedPage.Boxes); nested, band, overlay and rotated
+// containers still lower onto the table engine. Child content is inset by the padding and
+// the box decoration is drawn exactly like a cell's.
 public class ContainerLayoutTests
 {
     private static Paragraph Text(string text, double size = 12)
@@ -36,21 +37,20 @@ public class ContainerLayoutTests
 
         var pages = Paginator.Paginate(section, fonts);
 
-        var fragment = Assert.Single(Assert.Single(pages).Tables);
-        var cell = Assert.Single(fragment.Layout.Cells);
-        Assert.Equal(400, fragment.Layout.Width, 6);
-        Assert.Equal(10, cell.ContentBox.Left - cell.Bounds.Left, 6);
-        Assert.Equal(10, cell.ContentBox.Top - cell.Bounds.Top, 6);
-        Assert.Equal(cell.Bounds.Width - 20, cell.ContentBox.Width, 6);
-        Assert.Equal(cell.Bounds.Height - 20, cell.ContentBox.Height, 6);
+        var page = Assert.Single(pages);
+        Assert.Empty(page.Tables);
+        var box = Assert.Single(page.Boxes);
+        Assert.Equal(400, box.Bounds.Width, 6);
+        Assert.Equal(0, box.Bounds.X, 6);
+        Assert.Equal(box.Content.Height + 20, box.Bounds.Height, 6);
 
-        var line = Assert.Single(cell.Lines);
-        Assert.Equal(cell.ContentBox.Left, line.X, 6);
-        Assert.Equal(cell.ContentBox.Top, line.Y, 6);
+        var line = Assert.Single(box.Content.Lines);
+        Assert.Equal(10, line.X, 6);
+        Assert.Equal(10, line.Y, 6);
 
-        Assert.Equal(container.Background, cell.Cell.Background);
-        Assert.Equal(2, cell.Cell.Borders.Top.Width, 6);
-        Assert.Equal(2, cell.Cell.Borders.Left.Width, 6);
+        Assert.Equal(container.Background, box.Style.Background);
+        Assert.Equal(2, box.Style.Top.Width, 6);
+        Assert.Equal(2, box.Style.Left.Width, 6);
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public class ContainerLayoutTests
 
         var pages = Paginator.Paginate(section, fonts);
 
-        var fragment = Assert.Single(Assert.Single(pages).Tables);
-        Assert.Equal(200, fragment.Layout.Width, 6);
-        Assert.Equal(100, fragment.Layout.Source!.LeftIndent.Point, 6);
+        var box = Assert.Single(Assert.Single(pages).Boxes);
+        Assert.Equal(200, box.Bounds.Width, 6);
+        Assert.Equal(100, box.Bounds.X, 6);
     }
 
     [Fact]
@@ -83,12 +83,11 @@ public class ContainerLayoutTests
 
         var pages = Paginator.Paginate(section, fonts);
 
-        var fragment = Assert.Single(Assert.Single(pages).Tables);
-        var outerCell = Assert.Single(fragment.Layout.Cells);
-        var nested = Assert.Single(outerCell.Tables);
+        var box = Assert.Single(Assert.Single(pages).Boxes);
+        var nested = Assert.Single(box.Content.Tables);
         var innerCell = Assert.Single(nested.Layout.Cells);
 
-        Assert.Equal(12, outerCell.ContentBox.Left, 6);
+        Assert.Equal(12, nested.X, 6);
         Assert.Equal(400 - 24, nested.Layout.Width, 6);
         Assert.Equal(5, innerCell.ContentBox.Left - innerCell.Bounds.Left, 6);
         var line = Assert.Single(innerCell.Lines);
@@ -132,6 +131,83 @@ public class ContainerLayoutTests
         StyleResolver.Resolve(builder);
 
         Assert.NotNull(run.EffectiveFont);
+    }
+
+    [Fact]
+    public void StackContainer_PaginatesAsBox_AndEmitsDecorationAndContent()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var section = PaginationSupport.Section(400, 600);
+        var container = section.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(6),
+            Background = Color.FromRgb(230, 240, 250),
+            CornerRadius = Unit.FromPoint(4),
+        });
+        container.Borders.Width = 1;
+        container.Blocks.Add(Text("First paragraph"));
+        container.Blocks.Add(Text("Second paragraph"));
+        var nested = container.Blocks.AddTable();
+        nested.Columns.Add(Unit.FromPoint(120));
+        var cellParagraph = nested.Rows.Add().Cells[0].Blocks.AddParagraph();
+        cellParagraph.Inlines.Add("nested cell").Font.Name = PaginationSupport.Family;
+
+        var pages = Paginator.Paginate(section, fonts);
+
+        var page = Assert.Single(pages);
+        Assert.Empty(page.Tables);
+        var box = Assert.Single(page.Boxes);
+        Assert.Equal(2, box.Content.Lines.Count);
+        Assert.Single(box.Content.Tables);
+        Assert.Equal(box.Content.Height + 12, box.Bounds.Height, 6);
+        Assert.Equal(container.Background, box.Style.Background);
+        Assert.Equal(4, box.Style.CornerRadius.Point, 6);
+
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        var buildSection = builder.Sections.Add();
+        var buildContainer = buildSection.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(6),
+            Background = Color.FromRgb(230, 240, 250),
+            CornerRadius = Unit.FromPoint(4),
+        });
+        buildContainer.Borders.Width = 1;
+        var first = buildContainer.Blocks.AddParagraph();
+        first.Inlines.Add("First paragraph").Font.Name = BuildTestSupport.Latin;
+        var buildNested = buildContainer.Blocks.AddTable();
+        buildNested.Columns.Add(Unit.FromPoint(120));
+        buildNested.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("nested cell").Font.Name = BuildTestSupport.Latin;
+
+        var document = builder.Build();
+
+        var pdfPage = Assert.Single(document.Pages);
+        var extracted = pdfPage.ExtractText();
+        Assert.Contains("First paragraph", extracted);
+        Assert.Contains("nested cell", extracted);
+        var content = Encoding.ASCII.GetString(pdfPage.GetContent()!);
+        Assert.Contains(" rg", content);
+        Assert.Contains(" RG", content);
+    }
+
+    [Fact]
+    public void NonContainerDocument_BuildsByteIdenticalTwice()
+    {
+        static byte[] Build()
+        {
+            var builder = new DocumentBuilder();
+            BuildTestSupport.RegisterLatin(builder);
+            var section = builder.Sections.Add();
+            var paragraph = section.Blocks.AddParagraph();
+            paragraph.Inlines.Add("Plain body text").Font.Name = BuildTestSupport.Latin;
+            var table = section.Blocks.AddTable();
+            table.Borders.Width = 0.5;
+            table.Columns.Add(Unit.FromPoint(120));
+            table.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("cell").Font.Name = BuildTestSupport.Latin;
+            return builder.ToArray();
+        }
+
+        Assert.Equal(Build(), Build());
     }
 
     [Fact]
