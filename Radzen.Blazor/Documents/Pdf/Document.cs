@@ -13,17 +13,17 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
-    private readonly Dictionary<Page, DictionaryObject> sourcePages = [];
-    private readonly Dictionary<Page, DictionaryObject> sourceResources = [];
-    private readonly Dictionary<Page, ArrayObject> sourceBoxes = [];
-    private readonly Dictionary<Page, ArrayObject> sourceCropBoxes = [];
-    private readonly Dictionary<Page, int> sourceRotations = [];
-    private readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> appendedResources = [];
-    private readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Node)> appendedPages = [];
-    private readonly Dictionary<DocumentReader, DictionaryObject> appendedAcroForms = [];
-    private DocumentReader? source;
-    private DictionaryObject? sourceCatalog;
-    private DictionaryObject? sourceAcroForm;
+    internal readonly Dictionary<Page, DictionaryObject> sourcePages = [];
+    internal readonly Dictionary<Page, DictionaryObject> sourceResources = [];
+    internal readonly Dictionary<Page, ArrayObject> sourceBoxes = [];
+    internal readonly Dictionary<Page, ArrayObject> sourceCropBoxes = [];
+    internal readonly Dictionary<Page, int> sourceRotations = [];
+    internal readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> appendedResources = [];
+    internal readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Node)> appendedPages = [];
+    internal readonly Dictionary<DocumentReader, DictionaryObject> appendedAcroForms = [];
+    internal DocumentReader? source;
+    internal DictionaryObject? sourceCatalog;
+    internal DictionaryObject? sourceAcroForm;
 
     /// <summary>Gets the document metadata.</summary>
     public DocumentInfo Info { get; } = new();
@@ -35,7 +35,7 @@ public sealed class Document
     /// Gets the interactive form of a loaded document, or <c>null</c> when the
     /// document has no AcroForm.
     /// </summary>
-    public AcroForm? AcroForm { get; private set; }
+    public AcroForm? AcroForm { get; internal set; }
 
     /// <summary>
     /// Gets the form fields to create on this document. Each definition is
@@ -89,42 +89,7 @@ public sealed class Document
     /// <param name="options">Load options such as the decryption password.</param>
     /// <returns>The loaded document.</returns>
     public static Document LoadFromStream(Stream stream, ReaderLimits limits, LoadOptions? options = null)
-    {
-        ArgumentNullException.ThrowIfNull(stream);
-        ArgumentNullException.ThrowIfNull(limits);
-
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password, limits);
-
-        var document = new Document { source = reader };
-        ReadInfo(reader, document.Info);
-
-        var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
-            ? c
-            : null;
-        document.sourceCatalog = catalog;
-        if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
-            && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
-        {
-            var visited = new HashSet<int>();
-            if (pagesRef is ReferenceObject pagesReference)
-            {
-                visited.Add(pagesReference.ObjectNumber);
-            }
-
-            CollectPages(reader, pagesNode, new InheritedAttributes(), document, limits, visited, 0);
-        }
-
-        if (catalog is not null && catalog.TryGetValue("AcroForm", out var formObject)
-            && reader.Resolve(formObject!) is DictionaryObject form)
-        {
-            document.sourceAcroForm = form;
-            document.AcroForm = new AcroForm(reader, form);
-        }
-
-        return document;
-    }
+        => DocumentLoader.Load(stream, limits, options);
 
     /// <summary>
     /// Extracts the visible text of every page in reading order, concatenated in
@@ -182,7 +147,7 @@ public sealed class Document
             else if (other.source is not null && other.sourceResources.TryGetValue(source, out var loadedResources))
             {
                 appendedResources[page] = (other.source, loadedResources);
-                page.SetTextFonts(BuildTextFonts(other.source, loadedResources));
+                page.SetTextFonts(DocumentLoader.BuildTextFonts(other.source, loadedResources));
             }
 
             // A loaded appended page keeps a handle to its source node so its
@@ -387,217 +352,14 @@ public sealed class Document
         if (widget.TryGetValue("Rect", out var rectObject) && source!.Resolve(rectObject!) is ArrayObject rect
             && rect.Count >= 4)
         {
-            var x0 = Number(source.Resolve(rect[0]));
-            var y0 = Number(source.Resolve(rect[1]));
-            var x1 = Number(source.Resolve(rect[2]));
-            var y1 = Number(source.Resolve(rect[3]));
+            var x0 = DocumentLoader.Number(source.Resolve(rect[0]));
+            var y0 = DocumentLoader.Number(source.Resolve(rect[1]));
+            var x1 = DocumentLoader.Number(source.Resolve(rect[2]));
+            var y1 = DocumentLoader.Number(source.Resolve(rect[3]));
             return (Math.Min(x0, x1), Math.Min(y0, y1), Math.Abs(x1 - x0), Math.Abs(y1 - y0));
         }
 
         return (0.0, 0.0, 0.0, 0.0);
-    }
-
-    // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
-    // page tree so a leaf without its own entry re-saves the ancestor's value.
-    private readonly struct InheritedAttributes
-    {
-        public ArrayObject? Box { get; init; }
-
-        public DictionaryObject? Resources { get; init; }
-
-        public ArrayObject? CropBox { get; init; }
-
-        public int? Rotate { get; init; }
-    }
-
-    // A visited-set of page-node object numbers is the primary guard against a
-    // cyclic /Kids graph; MaxPageTreeDepth is a backstop for a deep acyclic tree.
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, ReaderLimits limits, HashSet<int> visited, int depth)
-    {
-        if (depth > limits.MaxPageTreeDepth)
-        {
-            throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
-        }
-
-        var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
-            ? own
-            : inherited.Box;
-
-        var resources = node.TryGetValue("Resources", out var resourcesObject) && reader.Resolve(resourcesObject!) is DictionaryObject ownResources
-            ? ownResources
-            : inherited.Resources;
-
-        var cropBox = node.TryGetValue("CropBox", out var cropObject) && reader.Resolve(cropObject!) is ArrayObject ownCrop
-            ? ownCrop
-            : inherited.CropBox;
-
-        var rotate = node.TryGetValue("Rotate", out var rotateObject) && reader.Resolve(rotateObject!) is NumberObject ownRotate
-            ? ownRotate.IntValue
-            : inherited.Rotate;
-
-        var childInherited = new InheritedAttributes { Box = box, Resources = resources, CropBox = cropBox, Rotate = rotate };
-
-        if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
-        {
-            foreach (var kid in kids)
-            {
-                if (kid is ReferenceObject reference && !visited.Add(reference.ObjectNumber))
-                {
-                    throw new DocumentParseException("Cyclic page tree reference.", -1);
-                }
-
-                if (reader.Resolve(kid) is DictionaryObject child)
-                {
-                    CollectPages(reader, child, childInherited, document, limits, visited, depth + 1);
-                }
-            }
-
-            return;
-        }
-
-        var (width, height) = Dimensions(box);
-        var page = new Page(width, height);
-        var content = ReadContent(reader, node);
-        if (content is not null)
-        {
-            page.SetContent(content);
-        }
-
-        page.SetTextFonts(BuildTextFonts(reader, resources));
-        document.Pages.Insert(document.Pages.Count, page);
-        document.sourcePages[page] = node;
-        if (resources is not null)
-        {
-            document.sourceResources[page] = resources;
-        }
-
-        if (box is not null && box.Count >= 4)
-        {
-            document.sourceBoxes[page] = box;
-        }
-
-        if (cropBox is not null && cropBox.Count >= 4)
-        {
-            document.sourceCropBoxes[page] = cropBox;
-        }
-
-        // Only a rotation the viewer would actually apply is worth re-emitting.
-        if (rotate is { } degrees && degrees % 360 != 0)
-        {
-            document.sourceRotations[page] = degrees;
-        }
-    }
-
-    private static System.Collections.Generic.Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
-    {
-        var fonts = new System.Collections.Generic.Dictionary<string, Fonts.ReverseFont>(System.StringComparer.Ordinal);
-        if (resources is null
-            || !resources.TryGetValue("Font", out var fontObject)
-            || reader.Resolve(fontObject!) is not DictionaryObject fontDictionary)
-        {
-            return fonts;
-        }
-
-        foreach (var key in fontDictionary.Keys)
-        {
-            if (reader.Resolve(fontDictionary[key]) is DictionaryObject font)
-            {
-                fonts[key] = Fonts.ReverseFont.Build(reader, font);
-            }
-        }
-
-        return fonts;
-    }
-
-    private static (Unit Width, Unit Height) Dimensions(ArrayObject? box)
-    {
-        if (box is null || box.Count < 4)
-        {
-            return (PageSizes.A4.Width, PageSizes.A4.Height);
-        }
-
-        var llx = Number(box[0]);
-        var lly = Number(box[1]);
-        var urx = Number(box[2]);
-        var ury = Number(box[3]);
-        return (Unit.FromPoint(urx - llx), Unit.FromPoint(ury - lly));
-    }
-
-    private static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
-
-    private static byte[]? ReadContent(DocumentReader reader, DictionaryObject page)
-    {
-        if (!page.TryGetValue("Contents", out var contents))
-        {
-            return null;
-        }
-
-        var resolved = reader.Resolve(contents!);
-        if (resolved is StreamObject stream)
-        {
-            return reader.DecodeStream(stream);
-        }
-
-        if (resolved is ArrayObject array)
-        {
-            using var joined = new MemoryStream();
-            for (var i = 0; i < array.Count; i++)
-            {
-                if (reader.Resolve(array[i]) is StreamObject part)
-                {
-                    if (i > 0)
-                    {
-                        joined.WriteByte((byte)'\n');
-                    }
-
-                    var decoded = reader.DecodeStream(part);
-                    joined.Write(decoded, 0, decoded.Length);
-                }
-            }
-
-            return joined.ToArray();
-        }
-
-        return null;
-    }
-
-    private static void ReadInfo(DocumentReader reader, DocumentInfo target)
-    {
-        if (!reader.Trailer.TryGetValue("Info", out var infoObject)
-            || reader.Resolve(infoObject!) is not DictionaryObject info)
-        {
-            return;
-        }
-
-        target.Title = Text(reader, info, "Title");
-        target.Author = Text(reader, info, "Author");
-        target.Subject = Text(reader, info, "Subject");
-        target.Keywords = Text(reader, info, "Keywords");
-        target.Creator = Text(reader, info, "Creator");
-    }
-
-    private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
-        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
-            ? DecodeTextString(text.Value)
-            : null;
-
-    // A PDF text string (ISO 32000 7.9.2.2) whose raw bytes start with the FE FF
-    // byte order mark is UTF-16BE; otherwise the bytes are PDFDocEncoding/Latin1,
-    // which StringObject.Value already exposes verbatim as chars 0-255.
-    private static string DecodeTextString(string raw)
-    {
-        if (raw.Length < 2 || raw[0] != 0xFE || raw[1] != 0xFF)
-        {
-            return raw;
-        }
-
-        var bytes = new byte[raw.Length - 2];
-        for (var i = 0; i < bytes.Length; i++)
-        {
-            bytes[i] = (byte)raw[i + 2];
-        }
-
-        return System.Text.Encoding.BigEndianUnicode.GetString(bytes);
     }
 
     /// <summary>
@@ -621,7 +383,7 @@ public sealed class Document
 
         if (Conformance != PdfAConformance.None)
         {
-            ValidateConformance();
+            new ConformanceWriter(this).ValidateConformance();
         }
 
         var writer = new DocumentWriter(stream) { Encryption = Encryption };
@@ -646,12 +408,12 @@ public sealed class Document
             {
                 ["Type"] = new NameObject("Page"),
                 ["Parent"] = pagesRef,
-                ["MediaBox"] = MediaBox(page),
+                ["MediaBox"] = PageResourceBuilder.MediaBox(this, page),
             };
 
             if (sourceCropBoxes.TryGetValue(page, out var cropBox))
             {
-                pageNode["CropBox"] = NumberBox(cropBox);
+                pageNode["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
             }
 
             if (page.Rotate != 0)
@@ -688,10 +450,10 @@ public sealed class Document
                     pageNode["Contents"] = new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay)) };
                 }
 
-                var resources = BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
+                var resources = PageResourceBuilder.BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
                 if (overlayEmitter is not null)
                 {
-                    resources = OverlayResources(writer, resources, overlayEmitter);
+                    resources = PageResourceBuilder.OverlayResources(writer, resources, overlayEmitter);
                 }
 
                 if (resources is not null)
@@ -710,11 +472,11 @@ public sealed class Document
             HashSet<string>? reservedNames = null;
             if (source is not null && sourceResources.TryGetValue(page, out var reservedFrom))
             {
-                reservedNames = ResourceNames(source, reservedFrom);
+                reservedNames = PageResourceBuilder.ResourceNames(source, reservedFrom);
             }
             else if (appendedResources.TryGetValue(page, out var reservedAppend))
             {
-                reservedNames = ResourceNames(reservedAppend.Reader, reservedAppend.Resources);
+                reservedNames = PageResourceBuilder.ResourceNames(reservedAppend.Reader, reservedAppend.Resources);
             }
 
             var contentBytes = page.BuildContent(out var emitter, out var overlayBytes, out var pageOverlayEmitter, reservedNames);
@@ -727,12 +489,12 @@ public sealed class Document
             }
 
             var activeEmitter = emitter ?? pageOverlayEmitter;
-            var emitted = activeEmitter is not null ? BuildResources(writer, activeEmitter) : null;
+            var emitted = activeEmitter is not null ? PageResourceBuilder.BuildResources(writer, activeEmitter) : null;
             DictionaryObject? merged;
             if (importer is not null && source is not null
                 && sourceResources.TryGetValue(page, out var loadedResources))
             {
-                merged = MergeResources(importer, source, loadedResources, emitted);
+                merged = PageResourceBuilder.MergeResources(importer, source, loadedResources, emitted);
             }
             else if (appendedResources.TryGetValue(page, out var appended))
             {
@@ -742,7 +504,7 @@ public sealed class Document
                     appendImporters[appended.Reader] = appendImporter;
                 }
 
-                merged = MergeResources(appendImporter, appended.Reader, appended.Resources, emitted);
+                merged = PageResourceBuilder.MergeResources(appendImporter, appended.Reader, appended.Resources, emitted);
             }
             else
             {
@@ -765,7 +527,7 @@ public sealed class Document
         if (Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
-            catalog["StructTreeRoot"] = WriteStructureTree(writer, structure, pageNodes);
+            catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(writer, structure, pageNodes);
         }
 
         var appendedFields = AppendForms(pageNodes, appendImporters, writer);
@@ -798,7 +560,7 @@ public sealed class Document
 
         if (Attachments.Count > 0)
         {
-            WriteAttachments(writer, catalog);
+            new AttachmentWriter(this).WriteAttachments(writer, catalog);
         }
 
         if (Anchors.Count > 0)
@@ -813,7 +575,7 @@ public sealed class Document
 
         if (Conformance != PdfAConformance.None)
         {
-            WriteConformance(writer, catalog);
+            new ConformanceWriter(this).WriteConformance(writer, catalog);
         }
 
         writer.Trailer["Root"] = catalogRef;
@@ -825,237 +587,6 @@ public sealed class Document
         }
 
         writer.Close();
-    }
-
-    private void ValidateConformance()
-    {
-        if (source is not null && source.IsEncrypted)
-        {
-            throw new InvalidOperationException("PDF/A forbids encryption; the source document is encrypted.");
-        }
-
-        if (Conformance == PdfAConformance.PdfA3A && Structure is null)
-        {
-            throw new InvalidOperationException(
-                "PDF/A-3 Level A requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder or use PdfAConformance.PdfA3B.");
-        }
-
-        foreach (var page in Pages)
-        {
-            if (page.Generated is not { } generated)
-            {
-                continue;
-            }
-
-            foreach (var font in generated.Fonts)
-            {
-                if (font.Sfnt is null)
-                {
-                    throw new InvalidOperationException(
-                        $"PDF/A forbids the standard-14 font '{font.Base14 ?? "Helvetica"}' referenced by name; register an embeddable font file with DocumentBuilder.Fonts instead.");
-                }
-            }
-        }
-
-        // Overlay text added through Page.Content emits a non-embedded base-14 Type1
-        // font, which the generated.Fonts scan above cannot see; reject it with the
-        // same error the generator raises. Loaded original text keeps its own font
-        // reference (FontResourceName) and is not re-emitted as a base-14 face.
-        foreach (var page in Pages)
-        {
-            foreach (var element in page.Content)
-            {
-                if (element is not TextContent { FontResourceName: null } text)
-                {
-                    continue;
-                }
-
-                var name = Fonts.Base14Metrics.Resolve(text.Font)?.PostScriptName ?? "Helvetica";
-                throw new InvalidOperationException(
-                    $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{text.Font.Name}' with DocumentBuilder.Fonts instead.");
-            }
-        }
-    }
-
-    private void WriteAttachments(DocumentWriter writer, DictionaryObject catalog)
-    {
-        var filespecs = new SortedDictionary<string, ReferenceObject>(StringComparer.Ordinal);
-        var af = new ArrayObject();
-
-        foreach (var attachment in Attachments)
-        {
-            var file = FlateFilter.EncodeStream(attachment.Data);
-            file.Dictionary["Type"] = new NameObject("EmbeddedFile");
-            file.Dictionary["Subtype"] = new NameObject(attachment.MimeType);
-            file.Dictionary["Params"] = new DictionaryObject { ["Size"] = new NumberObject(attachment.Data.Length) };
-
-            var filespec = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Filespec"),
-                ["F"] = new StringObject(attachment.Name),
-                ["UF"] = new StringObject(attachment.Name),
-                ["AFRelationship"] = new NameObject(attachment.Relationship.ToString()),
-                ["EF"] = new DictionaryObject { ["F"] = writer.Add(file) },
-            };
-
-            var reference = writer.Add(filespec);
-            filespecs[attachment.Name] = reference;
-            af.Add(reference);
-        }
-
-        var names = new ArrayObject();
-        foreach (var (name, reference) in filespecs)
-        {
-            names.Add(new StringObject(name));
-            names.Add(reference);
-        }
-
-        catalog["Names"] = new DictionaryObject
-        {
-            ["EmbeddedFiles"] = writer.Add(new DictionaryObject { ["Names"] = names }),
-        };
-        catalog["AF"] = af;
-    }
-
-    private void WriteConformance(DocumentWriter writer, DictionaryObject catalog)
-    {
-        var xmp = new XmpMetadata
-        {
-            Info = Info,
-            Producer = "Radzen.Documents.Pdf",
-            PdfAPart = 3,
-            PdfAConformance = Conformance == PdfAConformance.PdfA3A ? "A" : "B",
-        };
-
-        foreach (var attachment in Attachments)
-        {
-            if (attachment.Name == "factur-x.xml")
-            {
-                xmp.FacturX = new FacturXMetadata();
-                break;
-            }
-        }
-
-        catalog["Metadata"] = writer.Add(xmp.BuildStream());
-
-        var intent = OutputIntentBuilder.BuildSrgb("sRGB IEC61966-2.1");
-        if (intent["DestOutputProfile"] is StreamObject profile)
-        {
-            intent["DestOutputProfile"] = writer.Add(profile);
-        }
-
-        writer.Trailer["ID"] = BuildDocumentId();
-        catalog["OutputIntents"] = new ArrayObject { writer.Add(intent) };
-    }
-
-    private ArrayObject BuildDocumentId()
-    {
-        var seed = $"{Info.Title}\n{Info.Author}\n{Pages.Count}\n{DateTime.UtcNow.Ticks}\n{Guid.NewGuid():N}";
-        var hash = Radzen.Documents.Crypto.Sha2.Sha256(System.Text.Encoding.UTF8.GetBytes(seed));
-        var id = Convert.ToHexString(hash, 0, 16);
-        return [new StringObject(id), new StringObject(id)];
-    }
-
-    // Serializes the logical structure tree: one indirect StructElem per element
-    // (marked-content kids before child elements), /Pg on elements with marks, a
-    // /StructParents key per marked page and a flat Nums ParentTree whose per-page
-    // arrays are indexed by MCID.
-    private static ReferenceObject WriteStructureTree(
-        DocumentWriter writer,
-        StructureElement structure,
-        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
-    {
-        var root = new DictionaryObject { ["Type"] = new NameObject("StructTreeRoot") };
-        var rootRef = writer.Add(root);
-
-        var parents = new Dictionary<int, List<DocumentObject>>();
-        root["K"] = WriteStructureElement(writer, structure, rootRef, pageNodes, parents);
-
-        var keys = new List<int>(parents.Keys);
-        keys.Sort();
-
-        var nums = new ArrayObject();
-        foreach (var pageIndex in keys)
-        {
-            var entries = new ArrayObject();
-            foreach (var entry in parents[pageIndex])
-            {
-                entries.Add(entry);
-            }
-
-            nums.Add(new NumberObject(pageIndex));
-            nums.Add(writer.Add(entries));
-            pageNodes[pageIndex].Node["StructParents"] = new NumberObject(pageIndex);
-        }
-
-        root["ParentTree"] = writer.Add(new DictionaryObject { ["Nums"] = nums });
-        root["ParentTreeNextKey"] = new NumberObject(keys.Count == 0 ? 0 : keys[^1] + 1);
-        return rootRef;
-    }
-
-    private static ReferenceObject WriteStructureElement(
-        DocumentWriter writer,
-        StructureElement element,
-        ReferenceObject parentRef,
-        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        Dictionary<int, List<DocumentObject>> parents)
-    {
-        var dictionary = new DictionaryObject
-        {
-            ["Type"] = new NameObject("StructElem"),
-            ["S"] = new NameObject(element.Type),
-            ["P"] = parentRef,
-        };
-        var reference = writer.Add(dictionary);
-
-        var kids = new ArrayObject();
-        var firstPage = element.Marks.Count > 0 ? element.Marks[0].PageIndex : -1;
-        if (firstPage >= 0)
-        {
-            dictionary["Pg"] = pageNodes[firstPage].Reference;
-        }
-
-        foreach (var (pageIndex, mcid) in element.Marks)
-        {
-            if (pageIndex == firstPage)
-            {
-                kids.Add(new NumberObject(mcid));
-            }
-            else
-            {
-                kids.Add(new DictionaryObject
-                {
-                    ["Type"] = new NameObject("MCR"),
-                    ["Pg"] = pageNodes[pageIndex].Reference,
-                    ["MCID"] = new NumberObject(mcid),
-                });
-            }
-
-            if (!parents.TryGetValue(pageIndex, out var entries))
-            {
-                entries = [];
-                parents[pageIndex] = entries;
-            }
-
-            while (entries.Count <= mcid)
-            {
-                entries.Add(new NullObject());
-            }
-
-            entries[mcid] = reference;
-        }
-
-        foreach (var child in element.Children)
-        {
-            kids.Add(WriteStructureElement(writer, child, reference, pageNodes, parents));
-        }
-
-        if (kids.Count > 0)
-        {
-            dictionary["K"] = kids;
-        }
-
-        return reference;
     }
 
     // Catalog keys this writer builds itself; a preserved source catalog must not
@@ -1223,7 +754,7 @@ public sealed class Document
 
         if (!form.ContainsKey("DR"))
         {
-            var fonts = new DictionaryObject { ["Helv"] = Base14FontDictionary("Helvetica") };
+            var fonts = new DictionaryObject { ["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica") };
             foreach (var definition in FormFields)
             {
                 if (definition is TextFieldDefinition text)
@@ -1231,7 +762,7 @@ public sealed class Document
                     var baseFont = BaseFontOf(text.Font);
                     if (!fonts.ContainsKey(baseFont))
                     {
-                        fonts[baseFont] = Base14FontDictionary(baseFont);
+                        fonts[baseFont] = PageResourceBuilder.Base14FontDictionary(baseFont);
                     }
                 }
             }
@@ -1419,76 +950,6 @@ public sealed class Document
         return false;
     }
 
-    // Imports the loaded page's effective /Resources into the writer and overlays
-    // any newly emitted entries (emitter keys win on collision) so a re-save keeps
-    // the source fonts, XObjects and graphics states.
-    private static DictionaryObject MergeResources(
-        GraphImporter importer,
-        DocumentReader reader,
-        DictionaryObject loaded,
-        DictionaryObject? emitted)
-    {
-        var result = new DictionaryObject();
-        foreach (var key in loaded.Keys)
-        {
-            result[key] = importer.ImportValue(loaded[key]);
-        }
-
-        if (emitted is null)
-        {
-            return result;
-        }
-
-        foreach (var key in emitted.Keys)
-        {
-            if (result.ContainsKey(key) && emitted[key] is DictionaryObject added)
-            {
-                var combined = new DictionaryObject();
-                if (reader.Resolve(loaded[key]) is DictionaryObject sub)
-                {
-                    foreach (var name in sub.Keys)
-                    {
-                        combined[name] = importer.ImportValue(sub[name]);
-                    }
-                }
-
-                foreach (var name in added.Keys)
-                {
-                    combined[name] = added[name];
-                }
-
-                result[key] = combined;
-            }
-            else
-            {
-                result[key] = emitted[key];
-            }
-        }
-
-        return result;
-    }
-
-    // The /Font and /XObject names a loaded page already binds; a full re-emit must not
-    // reuse any of them for a freshly registered base-14 face or image XObject.
-    private static HashSet<string> ResourceNames(DocumentReader reader, DictionaryObject resources)
-    {
-        var names = new HashSet<string>(StringComparer.Ordinal);
-        CollectResourceKeys(reader, resources, "Font", names);
-        CollectResourceKeys(reader, resources, "XObject", names);
-        return names;
-    }
-
-    private static void CollectResourceKeys(DocumentReader reader, DictionaryObject resources, string category, HashSet<string> names)
-    {
-        if (resources.TryGetValue(category, out var value) && value is not null && reader.Resolve(value) is DictionaryObject dict)
-        {
-            foreach (var key in dict.Keys)
-            {
-                names.Add(key);
-            }
-        }
-    }
-
     // Emits the /Names /Dests name tree mapping each anchor to [pageRef /XYZ 0 top 0],
     // merging into a /Names dictionary the attachments block may already have set.
     private void WriteDestinations(
@@ -1648,218 +1109,6 @@ public sealed class Document
 
         return annots;
     }
-
-    private static DictionaryObject? BuildGeneratedResources(
-        DocumentWriter writer,
-        GeneratedPage page,
-        Dictionary<GeneratedFont, DocumentObject> fontRefs,
-        Dictionary<GeneratedImage, ReferenceObject> imageRefs)
-    {
-        DictionaryObject? fonts = null;
-        foreach (var font in page.Fonts)
-        {
-            fonts ??= new DictionaryObject();
-            fonts[font.Key] = ResolveFont(writer, font, fontRefs);
-        }
-
-        DictionaryObject? xobjects = null;
-        foreach (var image in page.Images)
-        {
-            xobjects ??= new DictionaryObject();
-            xobjects[image.Key] = ResolveImage(writer, image, imageRefs);
-        }
-
-        DictionaryObject? extGStates = null;
-        foreach (var state in page.ExtGStates)
-        {
-            extGStates ??= new DictionaryObject();
-            extGStates[state.Key] = new DictionaryObject
-            {
-                ["Type"] = new NameObject("ExtGState"),
-                ["ca"] = new NumberObject(state.FillAlpha),
-                ["CA"] = new NumberObject(state.StrokeAlpha),
-            };
-        }
-
-        if (fonts is null && xobjects is null && extGStates is null)
-        {
-            return null;
-        }
-
-        var resources = new DictionaryObject();
-        if (fonts is not null)
-        {
-            resources["Font"] = fonts;
-        }
-
-        if (xobjects is not null)
-        {
-            resources["XObject"] = xobjects;
-        }
-
-        if (extGStates is not null)
-        {
-            resources["ExtGState"] = extGStates;
-        }
-
-        return resources;
-    }
-
-    private static DocumentObject ResolveFont(DocumentWriter writer, GeneratedFont font, Dictionary<GeneratedFont, DocumentObject> cache)
-    {
-        if (cache.TryGetValue(font, out var existing))
-        {
-            return existing;
-        }
-
-        DocumentObject reference;
-        if (font.Sfnt is { } sfnt)
-        {
-            reference = Fonts.Type0FontEmbedder.Embed(writer, sfnt, font.GidToUnicode, font.CompactGidMap);
-        }
-        else
-        {
-            reference = Base14FontDictionary(font.Base14 ?? "Helvetica");
-        }
-
-        cache[font] = reference;
-        return reference;
-    }
-
-    private static ReferenceObject ResolveImage(DocumentWriter writer, GeneratedImage image, Dictionary<GeneratedImage, ReferenceObject> cache)
-    {
-        if (cache.TryGetValue(image, out var existing))
-        {
-            return existing;
-        }
-
-        var xobject = image.Image;
-        if (xobject.SoftMask is { } mask)
-        {
-            xobject.Image.Dictionary["SMask"] = writer.Add(mask);
-        }
-
-        var reference = writer.Add(xobject.Image);
-        cache[image] = reference;
-        return reference;
-    }
-
-    // Adds the fonts and image XObjects referenced by an overlay stream to a built
-    // page's resources. Overlay keys use a distinct prefix so generated entries are
-    // never clobbered.
-    private static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentWriter emitter)
-    {
-        var emitted = BuildResources(writer, emitter);
-        if (emitted is null)
-        {
-            return resources;
-        }
-
-        resources ??= new DictionaryObject();
-        foreach (var key in emitted.Keys)
-        {
-            if (resources.TryGetValue(key, out var existing) && existing is DictionaryObject target
-                && emitted[key] is DictionaryObject added)
-            {
-                foreach (var name in added.Keys)
-                {
-                    target[name] = added[name];
-                }
-            }
-            else
-            {
-                resources[key] = emitted[key];
-            }
-        }
-
-        return resources;
-    }
-
-    // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats are symbolic and carry a built-in
-    // encoding; declaring /Encoding /WinAnsiEncoding would remap their glyphs, so it is
-    // omitted for them and kept for the non-symbolic base-14 faces.
-    private static DictionaryObject Base14FontDictionary(string baseFont)
-    {
-        var dictionary = new DictionaryObject
-        {
-            ["Type"] = new NameObject("Font"),
-            ["Subtype"] = new NameObject("Type1"),
-            ["BaseFont"] = new NameObject(baseFont),
-        };
-
-        if (baseFont is not ("Symbol" or "ZapfDingbats"))
-        {
-            dictionary["Encoding"] = new NameObject("WinAnsiEncoding");
-        }
-
-        return dictionary;
-    }
-
-    private static DictionaryObject? BuildResources(DocumentWriter writer, ContentWriter emitter)
-    {
-        DictionaryObject? fonts = null;
-        foreach (var (baseFont, key) in emitter.Fonts)
-        {
-            fonts ??= new DictionaryObject();
-            fonts[key] = Base14FontDictionary(baseFont);
-        }
-
-        DictionaryObject? xobjects = null;
-        foreach (var (key, image) in emitter.Images)
-        {
-            xobjects ??= new DictionaryObject();
-            if (image.SoftMask is { } mask)
-            {
-                image.Image.Dictionary["SMask"] = writer.Add(mask);
-            }
-
-            xobjects[key] = writer.Add(image.Image);
-        }
-
-        if (fonts is null && xobjects is null)
-        {
-            return null;
-        }
-
-        var resources = new DictionaryObject();
-        if (fonts is not null)
-        {
-            resources["Font"] = fonts;
-        }
-
-        if (xobjects is not null)
-        {
-            resources["XObject"] = xobjects;
-        }
-
-        return resources;
-    }
-
-    private ArrayObject MediaBox(Page page)
-    {
-        // Re-emit a loaded page's original box so a non-zero origin round-trips;
-        // content coordinates are preserved verbatim and would otherwise shift.
-        if (sourceBoxes.TryGetValue(page, out var box))
-        {
-            return NumberBox(box);
-        }
-
-        return
-        [
-            new NumberObject(0.0),
-            new NumberObject(0.0),
-            new NumberObject(page.Width.Point),
-            new NumberObject(page.Height.Point),
-        ];
-    }
-
-    private static ArrayObject NumberBox(ArrayObject box) =>
-    [
-        new NumberObject(Number(box[0])),
-        new NumberObject(Number(box[1])),
-        new NumberObject(Number(box[2])),
-        new NumberObject(Number(box[3])),
-    ];
 
     private DictionaryObject? BuildInfo()
     {
