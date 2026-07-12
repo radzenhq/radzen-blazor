@@ -1,8 +1,6 @@
-using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -17,9 +15,6 @@ public sealed class AcroForm
 {
     // Chosen on-state for a checkbox whose fixture carries no explicit /AP states.
     private const string OnState = "Yes";
-
-    // Fallback appearance size when the /DA carries none (a /DA size of 0 means auto).
-    private const double DefaultFontSize = 12.0;
 
     private readonly DocumentReader reader;
     private readonly List<FormField> fields = [];
@@ -134,7 +129,7 @@ public sealed class AcroForm
         var terminal = Find(name);
         terminal.Field["V"] = new StringObject(value);
 
-        if (CanEncode(value))
+        if (FieldAppearances.CanEncode(value))
         {
             // Write the appearance onto the widget so a separate-widget kid's stale /AP
             // does not override the new value in a viewer; when merged this is the field.
@@ -150,19 +145,6 @@ public sealed class AcroForm
                 terminal.Widget["AP"] = new NullObject();
             }
         }
-    }
-
-    private static bool CanEncode(string value)
-    {
-        foreach (var c in value)
-        {
-            if (!WinAnsiEncoding.CanEncode(c))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /// <summary>
@@ -206,37 +188,8 @@ public sealed class AcroForm
     {
         var (width, height) = RectSize(terminal.Widget);
         var (daFont, daSize) = DefaultAppearance(terminal);
-        var fontSize = daSize > 0.0 ? daSize : DefaultFontSize;
-        var baseline = height > fontSize ? (height - fontSize) / 2.0 : 2.0;
-
-        using var writer = new ContentWriter();
-        writer.WriteRaw("/Tx BMC\nq\n");
-        new TextContent(value, Unit.FromPoint(2.0), Unit.FromPoint(baseline))
-        {
-            Font = AppearanceFont(daFont, fontSize),
-        }.Emit(writer);
-        writer.WriteRaw("Q\nEMC\n");
-
-        ArrayObject bbox =
-        [
-            new NumberObject(0.0),
-            new NumberObject(0.0),
-            new NumberObject(width),
-            new NumberObject(height),
-        ];
-
-        var appearance = new StreamObject(writer.ToArray());
-        appearance.Dictionary["Type"] = new NameObject("XObject");
-        appearance.Dictionary["Subtype"] = new NameObject("Form");
-        appearance.Dictionary["BBox"] = bbox;
-
-        var resources = BuildFontResources(writer);
-        if (resources is not null)
-        {
-            appearance.Dictionary["Resources"] = resources;
-        }
-
-        return appearance;
+        var fontSize = daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize;
+        return FieldAppearances.BuildText(value, width, height, FieldAppearances.AppearanceFont(daFont, fontSize));
     }
 
     private (double Width, double Height) RectSize(DictionaryObject field)
@@ -259,61 +212,9 @@ public sealed class AcroForm
     // Resolves the /DA to draw the value with: the field's own /DA wins, else the widget's,
     // else the form default /DA. A /DA size of 0 (auto) is reported as 0 for the caller to map.
     private (string? Font, double Size) DefaultAppearance(Terminal terminal)
-        => ParseDefaultAppearance(DaString(terminal.Field) ?? DaString(terminal.Widget) ?? DaString(Dictionary));
+        => FieldAppearances.ParseDefaultAppearance(
+            DaString(terminal.Field) ?? DaString(terminal.Widget) ?? DaString(Dictionary));
 
     private string? DaString(DictionaryObject dict)
         => dict.TryGetValue("DA", out var da) && reader.Resolve(da!) is StringObject text ? text.Value : null;
-
-    // Reads the font resource name and size from a "/Font size Tf" default-appearance string.
-    private static (string? Font, double Size) ParseDefaultAppearance(string? da)
-    {
-        if (da is null)
-        {
-            return (null, 0.0);
-        }
-
-        var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-        for (var i = 2; i < tokens.Length; i++)
-        {
-            if (tokens[i] == "Tf")
-            {
-                var name = tokens[i - 2];
-                var font = name.StartsWith('/') ? name[1..] : name;
-                _ = double.TryParse(tokens[i - 1], NumberStyles.Float, CultureInfo.InvariantCulture, out var size);
-                return (font, size);
-            }
-        }
-
-        return (null, 0.0);
-    }
-
-    // Maps a standard AcroForm /DA font resource name to a base-14 family for the appearance.
-    private static Font AppearanceFont(string? daFont, double size) => new()
-    {
-        Name = daFont switch
-        {
-            "Cour" or "Courier" => "Courier",
-            "TiRo" or "Times" or "Times-Roman" => "Times-Roman",
-            _ => "Helvetica",
-        },
-        Size = size,
-    };
-
-    private static DictionaryObject? BuildFontResources(ContentWriter writer)
-    {
-        DictionaryObject? fonts = null;
-        foreach (var (baseFont, key) in writer.Fonts)
-        {
-            fonts ??= new DictionaryObject();
-            fonts[key] = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Font"),
-                ["Subtype"] = new NameObject("Type1"),
-                ["BaseFont"] = new NameObject(baseFont),
-                ["Encoding"] = new NameObject("WinAnsiEncoding"),
-            };
-        }
-
-        return fonts is null ? null : new DictionaryObject { ["Font"] = fonts };
-    }
 }
