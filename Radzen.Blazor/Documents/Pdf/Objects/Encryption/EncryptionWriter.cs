@@ -41,30 +41,33 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         ArgumentNullException.ThrowIfNull(documentId);
 
         var permissions = options.ToPermissions();
+        var encryptMetadata = options.EncryptMetadata;
         switch (options.Algorithm)
         {
             case EncryptionAlgorithm.Aes256:
             {
                 var fileKey = RandomNumberGenerator.GetBytes(32);
                 var derived = StandardSecurityHandler.DeriveAes256(
-                    options.UserPassword, options.OwnerPassword, fileKey, permissions, true);
-                dictionary = BuildV5Dictionary(derived, permissions);
+                    options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata);
+                dictionary = BuildV5Dictionary(derived, permissions, encryptMetadata);
                 return new EncryptionWriter(fileKey, Method.AesV3);
             }
 
             case EncryptionAlgorithm.Aes128:
             {
                 var derived = StandardSecurityHandler.DeriveLegacy(
-                    options.UserPassword, options.OwnerPassword, 4, 16, permissions, documentId, true);
-                dictionary = BuildLegacyDictionary(derived, permissions, aes: true);
+                    options.UserPassword, options.OwnerPassword, 4, 16, permissions, documentId, encryptMetadata);
+                dictionary = BuildLegacyDictionary(derived, permissions, aes: true, encryptMetadata);
                 return new EncryptionWriter(derived.FileKey, Method.AesV2);
             }
 
             default:
             {
+                // RC4 (V2/R3) predates the /EncryptMetadata flag, which is meaningful
+                // only for crypt-filter handlers, so the option is not surfaced here.
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 3, 16, permissions, documentId, true);
-                dictionary = BuildLegacyDictionary(derived, permissions, aes: false);
+                dictionary = BuildLegacyDictionary(derived, permissions, aes: false, encryptMetadata: true);
                 return new EncryptionWriter(derived.FileKey, Method.Rc4);
             }
         }
@@ -85,7 +88,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         => Apply(data, objectNumber, generation);
 
     private static DictionaryObject BuildLegacyDictionary(
-        (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool aes)
+        (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool aes, bool encryptMetadata)
     {
         var dictionary = new DictionaryObject
         {
@@ -103,12 +106,13 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         dictionary["O"] = FromBytes(derived.Owner);
         dictionary["U"] = FromBytes(derived.User);
         dictionary["P"] = new NumberObject(permissions);
+        AddEncryptMetadata(dictionary, aes, encryptMetadata);
         return dictionary;
     }
 
     private static DictionaryObject BuildV5Dictionary(
         (byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms) derived,
-        int permissions)
+        int permissions, bool encryptMetadata)
     {
         var dictionary = new DictionaryObject
         {
@@ -125,7 +129,19 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         dictionary["UE"] = FromBytes(derived.UserEncrypted);
         dictionary["Perms"] = FromBytes(derived.Perms);
         dictionary["P"] = new NumberObject(permissions);
+        AddEncryptMetadata(dictionary, aes: true, encryptMetadata);
         return dictionary;
+    }
+
+    // /EncryptMetadata is meaningful only for crypt-filter handlers (V >= 4) and its
+    // default is true, so the entry is written only for a false value under AES. This
+    // keeps every previously produced /Encrypt dictionary byte-for-byte unchanged.
+    private static void AddEncryptMetadata(DictionaryObject dictionary, bool aes, bool encryptMetadata)
+    {
+        if (aes && !encryptMetadata)
+        {
+            dictionary["EncryptMetadata"] = new BooleanObject(false);
+        }
     }
 
     private static void AddStandardCryptFilter(DictionaryObject dictionary, string method, int keyLength)

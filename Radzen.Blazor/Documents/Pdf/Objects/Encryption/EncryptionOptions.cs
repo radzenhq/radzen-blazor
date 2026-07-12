@@ -41,6 +41,17 @@ public sealed class EncryptionOptions
     /// </summary>
     public EncryptionAlgorithm Algorithm { get; set; } = EncryptionAlgorithm.Aes128;
 
+    /// <summary>
+    /// Gets or sets a value indicating whether the document metadata is encrypted
+    /// along with the rest of the file. Defaults to <c>true</c>. When set to
+    /// <c>false</c> with a crypt-filter handler (<see cref="EncryptionAlgorithm.Aes128"/>
+    /// or <see cref="EncryptionAlgorithm.Aes256"/>) the <c>/Encrypt</c> dictionary
+    /// carries <c>/EncryptMetadata false</c> and the flag is folded into the key
+    /// derivation (ISO 32000-1 7.6.3.2). It has no effect on
+    /// <see cref="EncryptionAlgorithm.Rc4"/>, whose handler predates the flag.
+    /// </summary>
+    public bool EncryptMetadata { get; set; } = true;
+
     /// <summary>Gets or sets a value indicating whether printing is permitted (/P bit 3).</summary>
     public bool AllowPrinting { get; set; } = true;
 
