@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Crypto;
 
@@ -358,11 +359,16 @@ internal sealed class StandardSecurityHandler
     }
 
     private byte[] ObjectKey(int objectNumber, int generation, bool aes)
+        => ComputeObjectKey(FileKey, objectNumber, generation, aes);
+
+    // ISO 32000-1 algorithm 1: the per-object key derived from the file key,
+    // the object number and generation (plus the "sAlT" bytes for AESV2).
+    internal static byte[] ComputeObjectKey(byte[] fileKey, int objectNumber, int generation, bool aes)
     {
         var extra = aes ? AesSalt.Length : 0;
-        var buffer = new byte[FileKey.Length + 5 + extra];
-        Array.Copy(FileKey, buffer, FileKey.Length);
-        var pos = FileKey.Length;
+        var buffer = new byte[fileKey.Length + 5 + extra];
+        Array.Copy(fileKey, buffer, fileKey.Length);
+        var pos = fileKey.Length;
         buffer[pos++] = (byte)objectNumber;
         buffer[pos++] = (byte)(objectNumber >> 8);
         buffer[pos++] = (byte)(objectNumber >> 16);
@@ -374,8 +380,153 @@ internal sealed class StandardSecurityHandler
         }
 
         var hash = Md5.Hash(buffer);
-        var length = Math.Min(FileKey.Length + 5, 16);
+        var length = Math.Min(fileKey.Length + 5, 16);
         return hash[..length];
+    }
+
+    // Write side: derive /O, /U and the file key for the RC4 (R3) and AESV2 (R4)
+    // handlers from the passwords, permissions and document /ID.
+    internal static (byte[] Owner, byte[] User, byte[] FileKey) DeriveLegacy(
+        string userPassword, string ownerPassword, int revision, int keyLength,
+        int permissions, byte[] documentId, bool encryptMetadata)
+    {
+        var userBytes = Encoding.Latin1.GetBytes(userPassword);
+        var ownerBytes = Encoding.Latin1.GetBytes(ownerPassword.Length > 0 ? ownerPassword : userPassword);
+        var owner = ComputeOwnerEntry(ownerBytes, userBytes, revision, keyLength);
+        var fileKey = ComputeWriteFileKey(userBytes, owner, permissions, documentId, revision, keyLength, encryptMetadata);
+        var user = ComputeUserEntry(fileKey, documentId, revision);
+        return (owner, user, fileKey);
+    }
+
+    // Write side: derive /O, /U, /OE, /UE and /Perms for the AESV3 (R6) handler
+    // from a freshly generated 32-byte file key (ISO 32000-2 algorithms 8-10).
+    internal static (byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms) DeriveAes256(
+        string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata)
+    {
+        var userPw = TruncateUtf8(userPassword);
+        var ownerPw = TruncateUtf8(ownerPassword.Length > 0 ? ownerPassword : userPassword);
+
+        var userValidation = RandomNumberGenerator.GetBytes(8);
+        var userKeySalt = RandomNumberGenerator.GetBytes(8);
+        var user = Concat(Hash2B(userPw, userValidation, []), userValidation, userKeySalt);
+        var userEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(userPw, userKeySalt, []), ZeroIv, fileKey);
+
+        var ownerValidation = RandomNumberGenerator.GetBytes(8);
+        var ownerKeySalt = RandomNumberGenerator.GetBytes(8);
+        var owner = Concat(Hash2B(ownerPw, ownerValidation, user), ownerValidation, ownerKeySalt);
+        var ownerEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(ownerPw, ownerKeySalt, user), ZeroIv, fileKey);
+
+        return (owner, user, ownerEncrypted, userEncrypted, ComputePerms(permissions, encryptMetadata, fileKey));
+    }
+
+    private static byte[] TruncateUtf8(string password)
+    {
+        var bytes = Encoding.UTF8.GetBytes(password);
+        return bytes.Length > 127 ? bytes[..127] : bytes;
+    }
+
+    // ISO 32000-1 algorithm 3.
+    private static byte[] ComputeOwnerEntry(byte[] ownerPassword, byte[] userPassword, int revision, int keyLength)
+    {
+        var hash = Md5.Hash(Pad(ownerPassword));
+        if (revision >= 3)
+        {
+            for (var i = 0; i < 50; i++)
+            {
+                hash = Md5.Hash(hash[..keyLength]);
+            }
+        }
+
+        var rc4Key = hash[..keyLength];
+        var value = Rc4.Transform(rc4Key, Pad(userPassword));
+        if (revision >= 3)
+        {
+            for (var i = 1; i <= 19; i++)
+            {
+                value = Rc4.Transform(Xor(rc4Key, i), value);
+            }
+        }
+
+        return value;
+    }
+
+    // ISO 32000-1 algorithm 2.
+    private static byte[] ComputeWriteFileKey(
+        byte[] userPassword, byte[] owner, int permissions, byte[] documentId,
+        int revision, int keyLength, bool encryptMetadata)
+    {
+        var padded = Pad(userPassword);
+        var extra = revision >= 4 && !encryptMetadata ? 4 : 0;
+        var buffer = new byte[padded.Length + 32 + 4 + documentId.Length + extra];
+        var pos = 0;
+        Array.Copy(padded, 0, buffer, pos, padded.Length);
+        pos += padded.Length;
+        Array.Copy(owner, 0, buffer, pos, 32);
+        pos += 32;
+        buffer[pos++] = (byte)permissions;
+        buffer[pos++] = (byte)(permissions >> 8);
+        buffer[pos++] = (byte)(permissions >> 16);
+        buffer[pos++] = (byte)(permissions >> 24);
+        Array.Copy(documentId, 0, buffer, pos, documentId.Length);
+        pos += documentId.Length;
+        for (var i = 0; i < extra; i++)
+        {
+            buffer[pos + i] = 0xFF;
+        }
+
+        var hash = Md5.Hash(buffer);
+        if (revision >= 3)
+        {
+            for (var i = 0; i < 50; i++)
+            {
+                hash = Md5.Hash(hash[..keyLength]);
+            }
+        }
+
+        return hash[..keyLength];
+    }
+
+    // ISO 32000-1 algorithm 4 (R2) and algorithm 5 (R >= 3, padded to 32 bytes).
+    private static byte[] ComputeUserEntry(byte[] fileKey, byte[] documentId, int revision)
+    {
+        if (revision == 2)
+        {
+            return Rc4.Transform(fileKey, Padding);
+        }
+
+        var seed = new byte[Padding.Length + documentId.Length];
+        Array.Copy(Padding, seed, Padding.Length);
+        Array.Copy(documentId, 0, seed, Padding.Length, documentId.Length);
+        var value = Rc4.Transform(fileKey, Md5.Hash(seed));
+        for (var i = 1; i <= 19; i++)
+        {
+            value = Rc4.Transform(Xor(fileKey, i), value);
+        }
+
+        var result = new byte[32];
+        Array.Copy(value, result, 16);
+        return result;
+    }
+
+    // ISO 32000-2 algorithm 10: the /Perms block is a single AES-256 ECB block,
+    // which for one 16-byte block equals CBC with a zero IV.
+    private static byte[] ComputePerms(int permissions, bool encryptMetadata, byte[] fileKey)
+    {
+        var perms = new byte[16];
+        perms[0] = (byte)permissions;
+        perms[1] = (byte)(permissions >> 8);
+        perms[2] = (byte)(permissions >> 16);
+        perms[3] = (byte)(permissions >> 24);
+        perms[4] = 0xFF;
+        perms[5] = 0xFF;
+        perms[6] = 0xFF;
+        perms[7] = 0xFF;
+        perms[8] = (byte)(encryptMetadata ? 'T' : 'F');
+        perms[9] = (byte)'a';
+        perms[10] = (byte)'d';
+        perms[11] = (byte)'b';
+        Array.Copy(RandomNumberGenerator.GetBytes(4), 0, perms, 12, 4);
+        return AesCbc.EncryptCbcNoPadding(fileKey, ZeroIv, perms);
     }
 
     // For V>=4 the file-key length comes from the resolved crypt-filter dictionary,
