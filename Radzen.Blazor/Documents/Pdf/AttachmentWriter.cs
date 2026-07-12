@@ -20,16 +20,26 @@ internal sealed class AttachmentWriter(Document document)
             var file = FlateFilter.EncodeStream(attachment.Data);
             file.Dictionary["Type"] = new NameObject("EmbeddedFile");
             file.Dictionary["Subtype"] = new NameObject(attachment.MimeType);
-            file.Dictionary["Params"] = new DictionaryObject { ["Size"] = new NumberObject(attachment.Data.Length) };
+            file.Dictionary["Params"] = new DictionaryObject
+            {
+                ["Size"] = new NumberObject(attachment.Data.Length),
+                ["ModDate"] = new StringObject(FormatDate(attachment.ModificationDate)),
+            };
 
+            var fileReference = writer.Add(file);
             var filespec = new DictionaryObject
             {
                 ["Type"] = new NameObject("Filespec"),
                 ["F"] = new StringObject(attachment.Name),
                 ["UF"] = new StringObject(attachment.Name),
                 ["AFRelationship"] = new NameObject(attachment.Relationship.ToString()),
-                ["EF"] = new DictionaryObject { ["F"] = writer.Add(file) },
+                ["EF"] = new DictionaryObject { ["F"] = fileReference, ["UF"] = fileReference },
             };
+
+            if (!string.IsNullOrEmpty(attachment.Description))
+            {
+                filespec["Desc"] = new StringObject(attachment.Description);
+            }
 
             var reference = writer.Add(filespec);
             filespecs[attachment.Name] = reference;
@@ -49,4 +59,7 @@ internal sealed class AttachmentWriter(Document document)
         };
         catalog["AF"] = af;
     }
+
+    internal static string FormatDate(DateTimeOffset date)
+        => "D:" + date.UtcDateTime.ToString("yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture) + "Z00'00'";
 }
