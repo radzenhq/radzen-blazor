@@ -2,10 +2,11 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-// Containers lower onto the table engine as synthetic single-cell tables
-// (Paginator.LowerContainer) whose cell shares the container's child Block
-// instances. Mapping each child to its container's opacity lets TableEmitter
-// recover the opacity of a lowered container's box decoration from the cell.
+// Maps every block below a semi-transparent container to the product of its ancestor
+// container opacities. First-class container boxes (section-level and nested) resolve
+// their decoration opacity through ContainerOpacity; CellOpacity recovers the value
+// through a synthetic cell's child blocks for the still-lowered paths (rotated
+// containers and header/footer bands) and for real cells under translucent containers.
 internal sealed class OpacityResolver
 {
     private readonly Dictionary<Block, double> byBlock = [];
@@ -20,10 +21,8 @@ internal sealed class OpacityResolver
         }
     }
 
-    // The decoration opacity of a FIRST-CLASS container box: the container's own
-    // opacity times the product of its ancestor container opacities. CellOpacity
-    // stays for the still-lowered (nested/overlay/rotated) path, which recovers
-    // the value through the synthetic cell's child blocks.
+    // The decoration opacity of a FIRST-CLASS container box (section-level or nested):
+    // the container's own opacity times the product of its ancestor container opacities.
     public double ContainerOpacity(Container container)
         => (byBlock.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
 

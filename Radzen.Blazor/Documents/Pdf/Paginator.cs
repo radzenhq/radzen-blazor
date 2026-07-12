@@ -685,23 +685,18 @@ internal static class Paginator
             }
             else if (block is Container container)
             {
-                // The section body (keepSpecialContainers: true) keeps EVERY container as a
-                // Container block: Stack containers place as first-class boxes and
-                // overlay/rotated ones go through PlaceSpecialContainer. The cell and band
-                // paths (false) keep lowering Stack containers onto the table engine.
-                if (keepSpecialContainers)
-                {
-                    expanded.Add(container);
-                }
-                else if (IsSpecial(container))
+                // A Stack container is never lowered anymore: the section body places it as
+                // a first-class box (PlaceBox) and cell/box content nests it as a first-class
+                // nested box (BoxContentLayout). Overlay/rotated containers are only allowed
+                // as direct section content (keepSpecialContainers: true), where
+                // PlaceSpecialContainer handles them.
+                if (!keepSpecialContainers && IsSpecial(container))
                 {
                     throw new System.NotSupportedException(
                         "Overlay and rotated containers are only supported as direct section content.");
                 }
-                else
-                {
-                    expanded.Add(LowerContainer(container, availableWidth));
-                }
+
+                expanded.Add(container);
             }
             else if (block is TableOfContents toc)
             {
@@ -853,8 +848,9 @@ internal static class Paginator
     }
 
     // A Container lowers to a synthetic single-cell table so measuring, pagination and box
-    // decoration (padding, background, borders) reuse the table engine unchanged. Nested
-    // containers lower recursively when the synthetic cell's content is itself expanded.
+    // decoration (padding, background, borders) reuse the table engine unchanged. Only the
+    // rotated special path and header/footer bands still lower; everywhere else a Stack
+    // container is a first-class box.
     private static Table LowerContainer(Container container, double availableWidth)
     {
         var table = new Table();
@@ -1127,8 +1123,11 @@ internal static class Paginator
         var images = result.Images;
         double cursor = 0;
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in ExpandBlocks(band.Blocks, width))
+        foreach (var expanded in ExpandBlocks(band.Blocks, width))
         {
+            // A band cannot host a first-class box (PaginatedPage has no header/footer box
+            // list), so Stack containers in bands keep the lowered-table path.
+            var block = expanded is Container container ? LowerContainer(container, width) : expanded;
             if (block is Table table)
             {
                 var layout = TableLayout.Layout(table, System.Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);

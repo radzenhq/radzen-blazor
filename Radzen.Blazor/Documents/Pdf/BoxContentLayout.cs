@@ -13,6 +13,8 @@ internal readonly struct LaidOutBoxContent
     public required IReadOnlyList<LaidOutCode> Codes { get; init; }
 
     public required IReadOnlyList<LaidOutNestedTable> Tables { get; init; }
+
+    public required IReadOnlyList<LaidOutNestedBox> Boxes { get; init; }
 }
 
 // Measures and positions a block sequence inside a fixed-width content box. Table cells
@@ -28,6 +30,8 @@ internal static class BoxContentLayout
         public Image? Image { get; init; }
         public Block? Code { get; init; }
         public LaidOutTable? Table { get; init; }
+        public Container? Box { get; init; }
+        public Measured? BoxContent { get; init; }
         public double Width { get; init; }
         public required double Height { get; init; }
     }
@@ -102,6 +106,19 @@ internal static class BoxContentLayout
                 items.Add(new CellItem { Table = layout, Height = layout.Height });
                 height += layout.Height;
             }
+            else if (block is Container container)
+            {
+                // A Stack container nests as a first-class box (ExpandBlocks throws for
+                // overlay/rotated ones before this point): its content measures at the box's
+                // inner width and the box adds the padding on both axes, exactly like the
+                // synthetic single-cell table it used to lower to.
+                var padding = container.Padding.Point;
+                var boxWidth = container.Width?.Point ?? contentWidth;
+                var inner = Measure(container.Blocks, System.Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
+                var boxHeight = inner.Height + (2 * padding);
+                items.Add(new CellItem { Box = container, BoxContent = inner, Width = boxWidth, Height = boxHeight });
+                height += boxHeight;
+            }
             else if (block is PageBreak)
             {
                 // A cell cannot break across pages by itself, so a page break inside one is a no-op.
@@ -133,6 +150,10 @@ internal static class BoxContentLayout
         var laidImages = new List<LaidOutImage>();
         var laidCodes = new List<LaidOutCode>();
         var nestedTables = new List<LaidOutNestedTable>();
+        var nestedBoxes = new List<LaidOutNestedBox>();
+        // Shared placement sequence so emission interleaves nested tables and boxes in
+        // document order.
+        var order = 0;
         var cursorY = contentBox.Top + offset;
         foreach (var item in measured.Items)
         {
@@ -173,6 +194,35 @@ internal static class BoxContentLayout
                     Layout = nested,
                     X = contentBox.Left,
                     Y = cursorY,
+                    Order = order++,
+                });
+            }
+            else if (item.Box is { } box && item.BoxContent is { } boxContent)
+            {
+                // The box honors its OWN alignment (never the cell's), like the LeftIndent
+                // the lowered single-cell table used to carry; content is positioned
+                // box-local (X/Y from the box's top-left corner) with the lowered cell's
+                // default alignment, and the emitter shifts it by the box position.
+                var padding = box.Padding.Point;
+                var indent = System.Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
+                var innerBox = new Rect(padding, padding, System.Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
+                nestedBoxes.Add(new LaidOutNestedBox
+                {
+                    Source = box,
+                    Content = Position(boxContent, innerBox, HorizontalAlignment.Left, VerticalAlignment.Top),
+                    Bounds = new Rect(contentBox.Left + indent, cursorY, item.Width, item.Height),
+                    Style = new BoxStyle
+                    {
+                        Background = box.Background,
+                        Top = box.Borders.Top,
+                        Right = box.Borders.Right,
+                        Bottom = box.Borders.Bottom,
+                        Left = box.Borders.Left,
+                        CornerRadius = box.CornerRadius,
+                    },
+                    Radius = BoxRenderer.ClampRadius(box.CornerRadius.Point, item.Width, item.Height),
+                    Opacity = box.Opacity,
+                    Order = order++,
                 });
             }
 
@@ -186,6 +236,7 @@ internal static class BoxContentLayout
             Images = laidImages,
             Codes = laidCodes,
             Tables = nestedTables,
+            Boxes = nestedBoxes,
         };
     }
 

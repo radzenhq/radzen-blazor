@@ -37,7 +37,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         // containers), matching the lowered path where the synthetic cell had no element.
         tables.EmitBoxContent(
             context,
-            box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables,
+            box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,
             innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
             bounds, radius, opacity, null,
             left, contentTop, box.Y);

@@ -8,9 +8,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 // Container is a decorated block: it wraps child blocks in a box with padding, background,
 // borders, an optional fixed width and horizontal alignment. A section-level Stack container
-// is placed as a first-class box (PaginatedPage.Boxes); nested, band, overlay and rotated
-// containers still lower onto the table engine. Child content is inset by the padding and
-// the box decoration is drawn exactly like a cell's.
+// is placed as a first-class box (PaginatedPage.Boxes) and a nested Stack container (inside
+// a cell or another box) as a first-class nested box (LaidOutBoxContent.Boxes); band, overlay
+// and rotated containers still lower onto the table engine. Child content is inset by the
+// padding and the box decoration is drawn exactly like a cell's.
 public class ContainerLayoutTests
 {
     private static Paragraph Text(string text, double size = 12)
@@ -84,14 +85,15 @@ public class ContainerLayoutTests
         var pages = Paginator.Paginate(section, fonts);
 
         var box = Assert.Single(Assert.Single(pages).Boxes);
-        var nested = Assert.Single(box.Content.Tables);
-        var innerCell = Assert.Single(nested.Layout.Cells);
+        Assert.Empty(box.Content.Tables);
+        var nested = Assert.Single(box.Content.Boxes);
 
-        Assert.Equal(12, nested.X, 6);
-        Assert.Equal(400 - 24, nested.Layout.Width, 6);
-        Assert.Equal(5, innerCell.ContentBox.Left - innerCell.Bounds.Left, 6);
-        var line = Assert.Single(innerCell.Lines);
-        Assert.Equal(innerCell.ContentBox.Left, line.X, 6);
+        Assert.Same(inner, nested.Source);
+        Assert.Equal(12, nested.Bounds.X, 6);
+        Assert.Equal(400 - 24, nested.Bounds.Width, 6);
+        var line = Assert.Single(nested.Content.Lines);
+        Assert.Equal(5, line.X, 6);
+        Assert.Equal(5, line.Y, 6);
     }
 
     [Fact]
@@ -188,6 +190,100 @@ public class ContainerLayoutTests
         var content = Encoding.ASCII.GetString(pdfPage.GetContent()!);
         Assert.Contains(" rg", content);
         Assert.Contains(" RG", content);
+    }
+
+    [Fact]
+    public void ContainerInTableCell_LaysOutAsNestedBox_AndBuildsDecorationAndContent()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(300));
+        var cell = table.Rows.Add().Cells[0];
+        cell.Blocks.Add(Text("before"));
+        var container = new Container
+        {
+            Padding = Unit.FromPoint(8),
+            Background = Color.FromRgb(230, 240, 250),
+            CornerRadius = Unit.FromPoint(4),
+        };
+        container.Borders.Width = 1;
+        container.Blocks.Add(Text("inside box"));
+        var innerTable = container.Blocks.AddTable();
+        innerTable.Columns.Add(Unit.FromPoint(100));
+        var deep = innerTable.Rows.Add().Cells[0].Blocks.AddParagraph();
+        deep.Inlines.Add("deep cell").Font.Name = PaginationSupport.Family;
+        cell.Blocks.Add(container);
+
+        var layout = TableLayout.Layout(table, 300, fonts);
+
+        var laidCell = Assert.Single(layout.Cells);
+        var box = Assert.Single(laidCell.Boxes);
+        Assert.Same(container, box.Source);
+        Assert.Equal(300, box.Bounds.Width, 6);
+        Assert.Equal(4, box.Radius, 6);
+        Assert.Equal(container.Background, box.Style.Background);
+        var line = Assert.Single(box.Content.Lines);
+        Assert.Equal(8, line.X, 6);
+        Assert.Equal(8, line.Y, 6);
+        var nestedTable = Assert.Single(box.Content.Tables);
+        Assert.Same(innerTable, nestedTable.Layout.Source);
+        Assert.Equal(box.Content.Height + 16, box.Bounds.Height, 6);
+
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        var section = builder.Sections.Add();
+        var buildTable = section.Blocks.AddTable();
+        buildTable.Borders.Width = 0.5;
+        buildTable.Columns.Add(Unit.FromPoint(300));
+        var buildCell = buildTable.Rows.Add().Cells[0];
+        var buildContainer = new Container
+        {
+            Padding = Unit.FromPoint(8),
+            Background = Color.FromRgb(230, 240, 250),
+            CornerRadius = Unit.FromPoint(4),
+        };
+        buildContainer.Borders.Width = 1;
+        var boxed = buildContainer.Blocks.AddParagraph();
+        boxed.Inlines.Add("inside box").Font.Name = BuildTestSupport.Latin;
+        var buildInner = buildContainer.Blocks.AddTable();
+        buildInner.Columns.Add(Unit.FromPoint(100));
+        buildInner.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("deep cell").Font.Name = BuildTestSupport.Latin;
+        buildCell.Blocks.Add(buildContainer);
+
+        var document = builder.Build();
+
+        var page = Assert.Single(document.Pages);
+        var extracted = page.ExtractText();
+        Assert.Contains("inside box", extracted);
+        Assert.Contains("deep cell", extracted);
+        var content = Encoding.ASCII.GetString(page.GetContent()!);
+        Assert.Contains(" rg", content);
+        Assert.Contains(" RG", content);
+    }
+
+    [Fact]
+    public void ContainerInContainer_InsideCell_NestsTwoLevelsOfBoxes()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(300));
+        var cell = table.Rows.Add().Cells[0];
+        var outer = new Container { Padding = Unit.FromPoint(10) };
+        var inner = new Container { Padding = Unit.FromPoint(5), Background = Color.FromRgb(255, 255, 200) };
+        inner.Blocks.Add(Text("two deep"));
+        outer.Blocks.Add(inner);
+        cell.Blocks.Add(outer);
+
+        var layout = TableLayout.Layout(table, 300, fonts);
+
+        var outerBox = Assert.Single(Assert.Single(layout.Cells).Boxes);
+        Assert.Same(outer, outerBox.Source);
+        var innerBox = Assert.Single(outerBox.Content.Boxes);
+        Assert.Same(inner, innerBox.Source);
+        Assert.Equal(300 - 20, innerBox.Bounds.Width, 6);
+        var line = Assert.Single(innerBox.Content.Lines);
+        Assert.Equal(5, line.X, 6);
+        Assert.Equal(5, line.Y, 6);
     }
 
     [Fact]
