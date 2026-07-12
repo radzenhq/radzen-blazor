@@ -300,32 +300,7 @@ internal sealed class DocumentGenerator
             }
         }
 
-        // Boxes take the exact plan slot the lowered single-cell table used to occupy:
-        // table fragments and boxes merge by their shared placement Order (document
-        // order), so a page mixing containers and tables paints in the same relative
-        // order as before boxes became first-class. A page without boxes degenerates
-        // to the old tables-only loop and stays byte-identical.
-        var tables = page.Tables;
-        var boxes = page.Boxes;
-        var t = 0;
-        var bx = 0;
-        while (t < tables.Count || bx < boxes.Count)
-        {
-            if (bx >= boxes.Count || (t < tables.Count && tables[t].Order <= boxes[bx].Order))
-            {
-                var positioned = tables[t++];
-                var mark = plan.Mark();
-                tableEmitter.EmitFragment(context, positioned, left, contentTop);
-                if (positioned.Transform is { } transform)
-                {
-                    plan.ApplyTransform(transform, mark);
-                }
-            }
-            else
-            {
-                boxEmitter.EmitBox(context, boxes[bx++], left, contentTop);
-            }
-        }
+        EmitTablesAndBoxes(context, page.Tables, page.Boxes, left, contentTop);
 
         foreach (var positioned in page.Images)
         {
@@ -350,10 +325,7 @@ internal sealed class DocumentGenerator
             codeEmitter.EmitCode(context, positioned, left, headerTop);
         }
 
-        foreach (var positioned in page.HeaderTables)
-        {
-            tableEmitter.EmitFragment(context, positioned, left, headerTop);
-        }
+        EmitTablesAndBoxes(context, page.HeaderTables, page.HeaderBoxes, left, headerTop);
 
         var bandTop = height - page.FooterTop;
         textEmitter.EmitBandLines(context, page.Footer, left, bandTop, width);
@@ -368,10 +340,7 @@ internal sealed class DocumentGenerator
             codeEmitter.EmitCode(context, positioned, left, bandTop);
         }
 
-        foreach (var positioned in page.FooterTables)
-        {
-            tableEmitter.EmitFragment(context, positioned, left, bandTop);
-        }
+        EmitTablesAndBoxes(context, page.FooterTables, page.FooterBoxes, left, bandTop);
 
         if (watermark is not null)
         {
@@ -379,6 +348,42 @@ internal sealed class DocumentGenerator
         }
 
         return plan;
+    }
+
+    // Boxes take the exact plan slot the lowered single-cell table used to occupy:
+    // table fragments and boxes merge by their shared placement Order (document
+    // order), so a body or band mixing containers and tables paints in the same
+    // relative order as before boxes became first-class. A page without boxes
+    // degenerates to the old tables-only loop and stays byte-identical. A rotated
+    // overlay fragment carries a page-space transform baked into its draws here;
+    // a rotated box bakes its own inside BoxEmitter.
+    private void EmitTablesAndBoxes(
+        EmitContext context,
+        IReadOnlyList<PositionedTableFragment> tables,
+        IReadOnlyList<PositionedBox> boxes,
+        double left,
+        double top)
+    {
+        var plan = context.Plan;
+        var t = 0;
+        var bx = 0;
+        while (t < tables.Count || bx < boxes.Count)
+        {
+            if (bx >= boxes.Count || (t < tables.Count && tables[t].Order <= boxes[bx].Order))
+            {
+                var positioned = tables[t++];
+                var mark = plan.Mark();
+                tableEmitter.EmitFragment(context, positioned, left, top);
+                if (positioned.Transform is { } transform)
+                {
+                    plan.ApplyTransform(transform, mark);
+                }
+            }
+            else
+            {
+                boxEmitter.EmitBox(context, boxes[bx++], left, top);
+            }
+        }
     }
 
     // Content emission order: fills and edges (untagged artifacts), untagged images

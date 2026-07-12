@@ -7,11 +7,11 @@ using Xunit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Container is a decorated block: it wraps child blocks in a box with padding, background,
-// borders, an optional fixed width and horizontal alignment. A section-level Stack container
-// is placed as a first-class box (PaginatedPage.Boxes) and a nested Stack container (inside
-// a cell or another box) as a first-class nested box (LaidOutBoxContent.Boxes); band, overlay
-// and rotated containers still lower onto the table engine. Child content is inset by the
-// padding and the box decoration is drawn exactly like a cell's.
+// borders, an optional fixed width and horizontal alignment. A Stack container is placed
+// as a first-class box everywhere: section body (PaginatedPage.Boxes), header/footer bands
+// (PaginatedPage.HeaderBoxes/FooterBoxes) and nested inside a cell or another box
+// (LaidOutBoxContent.Boxes); only overlay containers still lower onto the table engine.
+// Child content is inset by the padding and the box decoration is drawn exactly like a cell's.
 public class ContainerLayoutTests
 {
     private static Paragraph Text(string text, double size = 12)
@@ -52,6 +52,36 @@ public class ContainerLayoutTests
         Assert.Equal(container.Background, box.Style.Background);
         Assert.Equal(2, box.Style.Top.Width, 6);
         Assert.Equal(2, box.Style.Left.Width, 6);
+    }
+
+    [Fact]
+    public void ContainerInHeaderBand_PlacesAsBandBox_InterleavedWithBandTables()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var section = PaginationSupport.Section(400, 600);
+        var container = section.Header.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(6),
+            Background = Color.FromRgb(240, 240, 240),
+        });
+        container.Blocks.Add(Text("Band box"));
+        var table = section.Header.Blocks.AddTable();
+        table.Columns.Add();
+        table.Rows.Add().Cells[0].Blocks.Add(Text("Band table"));
+        section.Blocks.Add(Text("Body"));
+
+        var pages = Paginator.Paginate(section, fonts);
+        var page = Assert.Single(pages);
+
+        var box = Assert.Single(page.HeaderBoxes);
+        Assert.Equal(0, box.Y, 6);
+        Assert.Equal(box.Content.Height + 12, box.Bounds.Height, 6);
+        Assert.Null(box.Transform);
+
+        // The band table follows the box: placed below it and ordered after it.
+        var fragment = Assert.Single(page.HeaderTables);
+        Assert.Equal(box.Bounds.Height, fragment.Y, 6);
+        Assert.True(box.Order < fragment.Order, "band box precedes the band table");
     }
 
     [Fact]

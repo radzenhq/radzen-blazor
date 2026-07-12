@@ -22,7 +22,7 @@ internal readonly struct PositionedTableFragment
 
     /// <summary>
     /// Page-space transform to apply to every draw this fragment produces (a rotated
-    /// container), or <see langword="null"/> for none.
+    /// overlay container), or <see langword="null"/> for none.
     /// </summary>
     public Matrix? Transform { get; init; }
 
@@ -33,11 +33,12 @@ internal readonly struct PositionedTableFragment
     public int Order { get; init; }
 }
 
-// A section-level Stack container placed as a first-class box: the decoration paints
-// through BoxRenderer and the laid-out content through TableEmitter.EmitBoxContent.
-// Bounds is in content space (X from the content-box left, Y from the content-box top,
-// Y == Bounds.Top). Style carries no ExtGState - the box's own opacity is registered
-// per page by the emitter. Rotation/overlay containers keep the table-lowering path.
+// A Stack container placed as a first-class box (section body or header/footer band):
+// the decoration paints through BoxRenderer and the laid-out content through
+// TableEmitter.EmitBoxContent. Bounds is in content space (X from the content-box left,
+// Y from the content-box top, Y == Bounds.Top). Style carries no ExtGState - the box's
+// own opacity is registered per page by the emitter. Overlay containers keep the
+// table-lowering path.
 internal readonly struct PositionedBox
 {
     public required Container Source { get; init; }
@@ -51,6 +52,12 @@ internal readonly struct PositionedBox
     public required double Y { get; init; }
 
     public required double Opacity { get; init; }
+
+    /// <summary>
+    /// Page-space transform to apply to every draw this box produces (a rotated
+    /// container), or <see langword="null"/> for none.
+    /// </summary>
+    public Matrix? Transform { get; init; }
 
     public int Order { get; init; }
 }
@@ -110,6 +117,10 @@ internal sealed class PaginatedPage
     public IReadOnlyList<PositionedTableFragment> HeaderTables { get; init; } = [];
 
     public IReadOnlyList<PositionedTableFragment> FooterTables { get; init; } = [];
+
+    public IReadOnlyList<PositionedBox> HeaderBoxes { get; init; } = [];
+
+    public IReadOnlyList<PositionedBox> FooterBoxes { get; init; } = [];
 
     public IReadOnlyList<PositionedTableFragment> Tables { get; init; } = [];
 
@@ -209,6 +220,8 @@ internal static class Paginator
                 FooterImages = footer.Images,
                 HeaderTables = header.Tables,
                 FooterTables = footer.Tables,
+                HeaderBoxes = header.Boxes,
+                FooterBoxes = footer.Boxes,
                 Tables = currentTables,
                 Boxes = currentBoxes,
                 Images = currentImages,
@@ -228,7 +241,7 @@ internal static class Paginator
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
         // Containers stay unlowered: Stack containers are placed as first-class boxes by
-        // PlaceBox and overlay/rotated ones by PlaceSpecialContainer.
+        // PlaceBox and overlay ones by PlaceSpecialContainer.
         var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
@@ -280,12 +293,12 @@ internal static class Paginator
         // A Stack container is ONE unbreakable unit placed as a first-class box: its content
         // lays out through BoxContentLayout (the cell primitive) at the box's inner width,
         // and the whole box moves to the next page when it does not fit - it never splits.
+        // A rotated container additionally carries a page-space rotation about the box center.
         void PlaceBox(int index, Container container)
         {
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
             var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
-            var innerWidth = System.Math.Max(0, boxWidth - (2 * padding));
             var measured = boxMeasures[index] ??= MeasureBox(container, contentWidth, fonts, measureImage);
             var boxHeight = measured.Height + (2 * padding);
 
@@ -295,75 +308,47 @@ internal static class Paginator
                 cursor = 0;
             }
 
-            // Content is positioned box-local (Y from the box top); the emitter shifts it by
-            // the box's page Y. Align/vAlign match the lowered single-cell table's defaults.
-            var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
-            var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
-
-            currentBoxes.Add(new PositionedBox
+            Matrix? transform = null;
+            if (container.Rotation != 0)
             {
-                Source = container,
-                Content = content,
-                Bounds = new Rect(indent, cursor, boxWidth, boxHeight),
-                Style = new BoxStyle
-                {
-                    Background = container.Background,
-                    Top = container.Borders.Top,
-                    Right = container.Borders.Right,
-                    Bottom = container.Borders.Bottom,
-                    Left = container.Borders.Left,
-                    CornerRadius = container.CornerRadius,
-                },
-                Y = cursor,
-                Opacity = container.Opacity,
-                Order = order++,
-            });
+                var centerX = left + indent + boxWidth / 2;
+                var centerY = pageHeight - contentTop - cursor - boxHeight / 2;
+                transform = Matrix.Translate(-centerX, -centerY)
+                    * Matrix.Rotate(container.Rotation)
+                    * Matrix.Translate(centerX, centerY);
+            }
+
+            currentBoxes.Add(BuildBox(container, measured, contentWidth, cursor, order++, transform));
             cursor += boxHeight;
         }
 
-        // An overlay or rotated container is placed as one unit that never breaks across
-        // pages. Overlay children each lower to their own single-cell table sharing the box
+        // An overlay container is placed as one unit that never breaks across pages.
+        // Overlay children each lower to their own single-cell table sharing the box
         // origin (declaration order = paint order); the box decoration, when present, is a
         // separate empty table sized to the tallest child so it spans the whole box. A
-        // rotated container additionally carries a page-space rotation about the box center.
+        // rotated overlay additionally carries a page-space rotation about the box center.
         void PlaceSpecialContainer(Container container)
         {
             var placements = new List<(Table Table, LaidOutTable Layout)>();
-            double boxWidth;
-            double boxLeft;
-            double boxHeight;
+            var boxWidth = container.Width?.Point ?? contentWidth;
+            var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
+            var boxLeft = left + indent;
 
-            if (container.Layout == ContainerLayout.Overlay)
+            var boxHeight = 2 * container.Padding.Point;
+            foreach (var child in container.Blocks)
             {
-                boxWidth = container.Width?.Point ?? contentWidth;
-                var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
-                boxLeft = left + indent;
-
-                boxHeight = 2 * container.Padding.Point;
-                foreach (var child in container.Blocks)
-                {
-                    var table = OverlayChildTable(container, child, boxWidth, indent);
-                    var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage);
-                    boxHeight = System.Math.Max(boxHeight, layout.Height);
-                    placements.Add((table, layout));
-                }
-
-                if (container.Background is not null || container.Borders.Top.IsSet
-                    || container.Borders.Right.IsSet || container.Borders.Bottom.IsSet
-                    || container.Borders.Left.IsSet)
-                {
-                    var decoration = OverlayDecorationTable(container, boxWidth, indent, boxHeight);
-                    placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage)));
-                }
-            }
-            else
-            {
-                var table = LowerContainer(container, contentWidth);
-                var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+                var table = OverlayChildTable(container, child, boxWidth, indent);
+                var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage);
+                boxHeight = System.Math.Max(boxHeight, layout.Height);
                 placements.Add((table, layout));
-                boxWidth = layout.Width;
-                boxLeft = left + table.LeftIndent.Point;
-                boxHeight = layout.Height;
+            }
+
+            if (container.Background is not null || container.Borders.Top.IsSet
+                || container.Borders.Right.IsSet || container.Borders.Bottom.IsSet
+                || container.Borders.Left.IsSet)
+            {
+                var decoration = OverlayDecorationTable(container, boxWidth, indent, boxHeight);
+                placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage)));
             }
 
             if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
@@ -685,12 +670,13 @@ internal static class Paginator
             }
             else if (block is Container container)
             {
-                // A Stack container is never lowered anymore: the section body places it as
-                // a first-class box (PlaceBox) and cell/box content nests it as a first-class
-                // nested box (BoxContentLayout). Overlay/rotated containers are only allowed
-                // as direct section content (keepSpecialContainers: true), where
-                // PlaceSpecialContainer handles them.
-                if (!keepSpecialContainers && IsSpecial(container))
+                // A Stack container is never lowered anymore: the section body and the
+                // header/footer bands place it as a first-class box and cell/box content
+                // nests it as a first-class nested box (BoxContentLayout). Overlay and
+                // rotated containers are only allowed as direct section content
+                // (keepSpecialContainers: true), where PlaceSpecialContainer/PlaceBox
+                // handle them - nested content cannot host a page-space transform.
+                if (!keepSpecialContainers && (IsSpecial(container) || container.Rotation != 0))
                 {
                     throw new System.NotSupportedException(
                         "Overlay and rotated containers are only supported as direct section content.");
@@ -818,7 +804,7 @@ internal static class Paginator
     }
 
     private static bool IsSpecial(Container container)
-        => container.Layout == ContainerLayout.Overlay || container.Rotation != 0;
+        => container.Layout == ContainerLayout.Overlay;
 
     private static Table OverlayChildTable(Container container, Block child, double boxWidth, double indent)
     {
@@ -844,39 +830,6 @@ internal static class Paginator
         CopyEdge(container.Borders.Right, cell.Borders.Right);
         CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);
         CopyEdge(container.Borders.Left, cell.Borders.Left);
-        return table;
-    }
-
-    // A Container lowers to a synthetic single-cell table so measuring, pagination and box
-    // decoration (padding, background, borders) reuse the table engine unchanged. Only the
-    // rotated special path and header/footer bands still lower; everywhere else a Stack
-    // container is a first-class box.
-    private static Table LowerContainer(Container container, double availableWidth)
-    {
-        var table = new Table();
-        if (container.Width is { } width)
-        {
-            table.Columns.Add(width);
-            table.LeftIndent = Unit.FromPoint(System.Math.Max(0, AlignImage(container.Alignment, availableWidth, width.Point)));
-        }
-        else
-        {
-            table.Columns.Add();
-        }
-
-        var cell = table.Rows.Add().Cells[0];
-        cell.Padding = container.Padding;
-        cell.Background = container.Background;
-        cell.CornerRadius = container.CornerRadius;
-        CopyEdge(container.Borders.Top, cell.Borders.Top);
-        CopyEdge(container.Borders.Right, cell.Borders.Right);
-        CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);
-        CopyEdge(container.Borders.Left, cell.Borders.Left);
-        foreach (var block in container.Blocks)
-        {
-            cell.Blocks.Add(block);
-        }
-
         return table;
     }
 
@@ -979,6 +932,46 @@ internal static class Paginator
     {
         var innerWidth = System.Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
         return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage);
+    }
+
+    // Positions a measured Stack container as a first-class box at y. Content is
+    // positioned box-local (Y from the box top); the emitter shifts it by the box's
+    // page Y. Align/vAlign match the lowered single-cell table's defaults.
+    private static PositionedBox BuildBox(
+        Container container,
+        BoxContentLayout.Measured measured,
+        double availableWidth,
+        double y,
+        int order,
+        Matrix? transform)
+    {
+        var padding = container.Padding.Point;
+        var boxWidth = container.Width?.Point ?? availableWidth;
+        var indent = System.Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
+        var innerWidth = System.Math.Max(0, boxWidth - (2 * padding));
+        var boxHeight = measured.Height + (2 * padding);
+        var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
+        var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
+
+        return new PositionedBox
+        {
+            Source = container,
+            Content = content,
+            Bounds = new Rect(indent, y, boxWidth, boxHeight),
+            Style = new BoxStyle
+            {
+                Background = container.Background,
+                Top = container.Borders.Top,
+                Right = container.Borders.Right,
+                Bottom = container.Borders.Bottom,
+                Left = container.Borders.Left,
+                CornerRadius = container.CornerRadius,
+            },
+            Y = y,
+            Opacity = container.Opacity,
+            Transform = transform,
+            Order = order,
+        };
     }
 
     // The required height of the header rows plus the first body ROW GROUP: the minimum a
@@ -1109,6 +1102,8 @@ internal static class Paginator
 
         public List<PositionedTableFragment> Tables { get; } = [];
 
+        public List<PositionedBox> Boxes { get; } = [];
+
         public double Height { get; set; }
     }
 
@@ -1122,15 +1117,27 @@ internal static class Paginator
         var result = new BandLayout();
         var images = result.Images;
         double cursor = 0;
+        // Placement sequence shared by band table fragments and band boxes so page
+        // emission can interleave them in document order.
+        var order = 0;
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var expanded in ExpandBlocks(band.Blocks, width))
+        foreach (var block in ExpandBlocks(band.Blocks, width))
         {
-            // A band cannot host a first-class box (PaginatedPage has no header/footer box
-            // list), so Stack containers in bands keep the lowered-table path.
-            var block = expanded is Container container ? LowerContainer(container, width) : expanded;
+            // A Stack container in a band is a first-class box, like the section body;
+            // a band never page-breaks, so the box places whole at the running cursor.
+            if (block is Container container)
+            {
+                var measured = MeasureBox(container, width, fonts, measureImage);
+                var box = BuildBox(container, measured, width, cursor, order++, transform: null);
+                result.Boxes.Add(box);
+                cursor += box.Bounds.Height;
+                continue;
+            }
+
             if (block is Table table)
             {
                 var layout = TableLayout.Layout(table, System.Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
+                var tableOrder = order++;
                 foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
                 {
                     result.Tables.Add(new PositionedTableFragment
@@ -1138,6 +1145,7 @@ internal static class Paginator
                         Layout = layout,
                         Fragment = fragment,
                         Y = cursor,
+                        Order = tableOrder,
                     });
                     cursor += fragment.Height;
                 }

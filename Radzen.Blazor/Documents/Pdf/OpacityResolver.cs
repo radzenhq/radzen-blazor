@@ -3,10 +3,10 @@ using System.Collections.Generic;
 namespace Radzen.Documents.Pdf;
 
 // Maps every block below a semi-transparent container to the product of its ancestor
-// container opacities. First-class container boxes (section-level and nested) resolve
-// their decoration opacity through ContainerOpacity; CellOpacity recovers the value
-// through a synthetic cell's child blocks for the still-lowered paths (rotated
-// containers and header/footer bands) and for real cells under translucent containers.
+// container opacities. First-class container boxes (section-level, band-level and
+// nested) resolve their decoration opacity through ContainerOpacity; CellOpacity
+// recovers the value through a synthetic cell's child blocks for the still-lowered
+// overlay path and for real cells under translucent containers.
 internal sealed class OpacityResolver
 {
     private readonly Dictionary<Block, double> byBlock = [];

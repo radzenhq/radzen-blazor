@@ -16,11 +16,13 @@ namespace Radzen.Blazor.Pdf.Tests;
 // top within each draw kind), with an optional decoration table (background/borders)
 // sized to the tallest child inserted first.
 //
-// Rotation: the Paginator stamps a page-space rotation matrix (about the box center)
-// on every fragment the container produces; PagePlan.ApplyTransform bakes it into
-// edge endpoints, converts fills to equivalent solid strokes, and carries the matrix
-// on text/image draws which ContentEmitter wraps in a balanced q cm .. Q. Rotated
-// content is NOT clipped to the original box.
+// Rotation: a rotated Stack container places as a first-class box carrying a
+// page-space rotation matrix (about the box center); BoxEmitter bakes it into the
+// box's draws via PagePlan.ApplyTransform, which rotates edge endpoints, converts
+// fills to equivalent solid strokes, and carries the matrix on text/image draws
+// which ContentEmitter wraps in a balanced q cm .. Q. A rotated overlay keeps the
+// lowered-table path and stamps the same matrix on its fragments. Rotated content
+// is NOT clipped to the original box.
 public class ContainerOverlayRotationTests
 {
     // ---------------------------------------------------------------- overlay
@@ -115,7 +117,7 @@ public class ContainerOverlayRotationTests
     // --------------------------------------------------------------- rotation
 
     [Fact]
-    public void RotatedContainer_FragmentCarriesPivotCenteredRotationMatrix()
+    public void RotatedContainer_BoxCarriesPivotCenteredRotationMatrix()
     {
         var fonts = PaginationSupport.Fonts();
         var section = PaginationSupport.Section(400, 600);
@@ -127,9 +129,13 @@ public class ContainerOverlayRotationTests
         container.Blocks.Add(PaginationSupport.Text("Tilted"));
 
         var pages = Paginator.Paginate(section, fonts);
-        var fragment = Assert.Single(Assert.Single(pages).Tables);
-        Assert.True(fragment.Transform.HasValue, "fragment carries the rotation transform");
-        var transform = fragment.Transform!.Value;
+        var page = Assert.Single(pages);
+
+        // A rotated Stack container is a first-class box, not a lowered table.
+        Assert.Empty(page.Tables);
+        var box = Assert.Single(page.Boxes);
+        Assert.True(box.Transform.HasValue, "box carries the rotation transform");
+        var transform = box.Transform!.Value;
 
         var (cos, sin) = (Math.Cos(Math.PI / 6), Math.Sin(Math.PI / 6));
         Assert.Equal(cos, transform.A, 9);
@@ -140,7 +146,7 @@ public class ContainerOverlayRotationTests
         // Pivot = box center (page space, y up): the center maps to itself and a point
         // one unit to its right rotates by 30 degrees around it.
         var centerX = 100.0;
-        var centerY = 600 - fragment.Fragment.Height / 2;
+        var centerY = 600 - box.Bounds.Height / 2;
         var (px, py) = transform.Transform(centerX, centerY);
         Assert.Equal(centerX, px, 9);
         Assert.Equal(centerY, py, 9);

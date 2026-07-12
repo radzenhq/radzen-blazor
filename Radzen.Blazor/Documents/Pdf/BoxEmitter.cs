@@ -9,6 +9,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
     public void EmitBox(EmitContext context, in PositionedBox box, double left, double contentTop)
     {
         var plan = context.Plan;
+        var mark = plan.Mark();
         var bounds = new Rect(
             left + box.Bounds.X,
             contentTop - box.Bounds.Y - box.Bounds.Height,
@@ -41,5 +42,12 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
             innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
             bounds, radius, opacity, null,
             left, contentTop, box.Y);
+
+        // A rotated box bakes its page-space rotation into every draw it produced,
+        // exactly like DocumentGenerator wraps a transformed table fragment.
+        if (box.Transform is { } transform)
+        {
+            plan.ApplyTransform(transform, mark);
+        }
     }
 }
