@@ -32,6 +32,12 @@ public enum AttachmentRelationship
 /// </summary>
 public sealed class Attachment
 {
+    /// <summary>
+    /// The modification date written when <see cref="ModificationDate"/> is not set.
+    /// A fixed sentinel keeps the produced bytes reproducible.
+    /// </summary>
+    public static readonly DateTimeOffset DefaultModificationDate = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     internal Attachment(string name, byte[] data, AttachmentRelationship relationship, string mimeType)
     {
         Name = name;
@@ -48,6 +54,20 @@ public sealed class Attachment
 
     /// <summary>Gets the MIME type of the attachment, e.g. <c>text/xml</c>.</summary>
     public string MimeType { get; }
+
+    /// <summary>
+    /// Gets or sets the human-readable description written as the /Desc key of the
+    /// file specification. Omitted when null or empty.
+    /// </summary>
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Gets or sets the modification date of the embedded file, written as the
+    /// /Params /ModDate of the embedded file stream. Defaults to
+    /// <see cref="DefaultModificationDate"/> so output stays deterministic; set it
+    /// explicitly to record the real file timestamp.
+    /// </summary>
+    public DateTimeOffset ModificationDate { get; set; } = DefaultModificationDate;
 
     internal byte[] Data { get; }
 }
