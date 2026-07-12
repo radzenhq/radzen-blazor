@@ -209,6 +209,12 @@ public class TableCellBlockDispatchTests
 
         foreach (var type in blockTypes)
         {
+            if (type == typeof(TableOfContents))
+            {
+                // Only supported as direct section content; the cell path rejects it explicitly.
+                continue;
+            }
+
             var (table, cell) = CellTable();
             AddSample(cell, type);
             var exception = Record.Exception(() => TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()));
