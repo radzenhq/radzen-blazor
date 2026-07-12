@@ -68,6 +68,14 @@ public sealed class Document
     /// </summary>
     public ViewerPreferences? ViewerPreferences { get; set; }
 
+    /// <summary>
+    /// Gets the page-label ranges written to the catalog <c>/PageLabels</c> number
+    /// tree. Each <see cref="PageLabel"/> starts a range whose pages a viewer numbers
+    /// with the given style, prefix and start ordinal. When empty no <c>/PageLabels</c>
+    /// entry is written.
+    /// </summary>
+    public IList<PageLabel> PageLabels { get; } = [];
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -420,6 +428,11 @@ public sealed class Document
         if (ViewerPreferences is { } preferences)
         {
             WriteViewerPreferences(catalog, preferences);
+        }
+
+        if (PageLabels.Count > 0)
+        {
+            catalog["PageLabels"] = PageLabelsWriter.Build([.. PageLabels]);
         }
 
         if (Conformance != PdfAConformance.None || PdfUA)
