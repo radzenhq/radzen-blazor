@@ -319,6 +319,17 @@ internal static class Paginator
                 var nrem = lines.Count - offset;
                 var blockTop = cursor + (first ? spacingBefore : 0);
 
+                // A SpacingBefore taller than the page would drop the first line below the bottom
+                // and lose it; on an otherwise-empty page clamp it so the first line still fits.
+                if (first && !HasPageContent())
+                {
+                    var maxTop = contentHeight - lines[offset].Height;
+                    if (maxTop >= 0 && blockTop > maxTop)
+                    {
+                        blockTop = maxTop;
+                    }
+                }
+
                 var k = 0;
                 var y = blockTop;
                 while (offset + k < lines.Count && y + lines[offset + k].Height <= contentHeight + Eps)
@@ -382,6 +393,13 @@ internal static class Paginator
                     {
                         placeCount = kept;
                     }
+                }
+
+                // A page must always make progress: placing zero lines (e.g. Orphans=0 with a
+                // Widows pull-up) would flush a spurious blank page, so treat it as move-whole.
+                if (placeCount == 0 && !moveWhole)
+                {
+                    moveWhole = true;
                 }
 
                 if (moveWhole && !HasPageContent())

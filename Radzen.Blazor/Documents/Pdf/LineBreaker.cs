@@ -226,7 +226,6 @@ internal static class LineBreaker
                 }
                 else if (IsInlineWhitespace(text[i]))
                 {
-                    var spaces = 0;
                     while (i < text.Length && IsInlineWhitespace(text[i]))
                     {
                         if (text[i] == '\t')
@@ -241,15 +240,24 @@ internal static class LineBreaker
                         }
                         else
                         {
-                            spaces++;
+                            // A leading space (paragraph start / after '\n'), a space after an inline
+                            // image, or a space after a tab has no word to attach to (or would attach
+                            // ahead of the tab); start an empty word so the gap is honored in order.
+                            if (!hasCurrent || current.TabsAfter > 0)
+                            {
+                                if (hasCurrent)
+                                {
+                                    words.Add(current);
+                                }
+
+                                current = new Word { PieceStart = pieces.Count };
+                                hasCurrent = true;
+                            }
+
+                            current.GapAfter += SpaceWidth(fonts, run.ResolvedFont, spaceWidths);
                         }
 
                         i++;
-                    }
-
-                    if (spaces > 0 && hasCurrent)
-                    {
-                        current.GapAfter += spaces * SpaceWidth(fonts, run.ResolvedFont, spaceWidths);
                     }
                 }
                 else
@@ -606,6 +614,12 @@ internal static class LineBreaker
                 HorizontalAlignment.Center => (max - naturalWidth) / 2.0,
                 _ => 0,
             };
+
+            // An over-wide word would drive x0 negative; clamp so the line never shifts left of the indent.
+            if (x0 < 0)
+            {
+                x0 = 0;
+            }
         }
 
         var shift = indent + x0;
