@@ -1,13 +1,20 @@
 using System;
 
-namespace Radzen.Documents.Pdf.Objects.Encryption;
+namespace Radzen.Documents.Crypto;
 
 /// <summary>
 /// Hand-rolled RC4 stream cipher. The transform is symmetric: the same call
-/// both encrypts and decrypts (ISO 32000-1 uses it for the V1/V2 handlers).
+/// both encrypts and decrypts.
 /// </summary>
-internal static class Rc4
+public static class Rc4
 {
+    /// <summary>
+    /// Applies the RC4 keystream to <paramref name="data"/> under <paramref name="key"/>.
+    /// Symmetric: call again with the same key to reverse the transform.
+    /// </summary>
+    /// <param name="key">The RC4 key.</param>
+    /// <param name="data">The bytes to transform.</param>
+    /// <returns>The transformed bytes.</returns>
     public static byte[] Transform(byte[] key, byte[] data)
     {
         ArgumentNullException.ThrowIfNull(key);

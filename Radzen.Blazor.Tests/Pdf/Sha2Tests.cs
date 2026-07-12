@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Text;
-using Radzen.Documents.Pdf.Objects.Encryption;
+using Radzen.Documents.Crypto;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
