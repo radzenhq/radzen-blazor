@@ -232,6 +232,37 @@ public class PdfLtvTests
     }
 
     [Fact]
+    public void AddValidationData_MergesWithExistingDss()
+    {
+        var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
+        var cert1 = Enumerable.Range(0, 40).Select(i => (byte)(i + 1)).ToArray();
+        var cert2 = Enumerable.Range(0, 44).Select(i => (byte)(i + 9)).ToArray();
+
+        var contentsReader = DocumentReader.Parse(signed);
+        var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
+        var contents = DecodeContentsHex(signed, gapStart, gapEnd);
+
+        // Two successive augmentations must accumulate, not overwrite.
+        var first = DssBuilder.AddValidationData(signed, [cert1], null, null, contents);
+        var second = DssBuilder.AddValidationData(first, [cert2], null, null, contents);
+
+        var reader = DocumentReader.Parse(second);
+        var dss = Dss(reader);
+
+        var certs = StreamBytes(reader, dss, "Certs");
+        Assert.Equal(2, certs.Length);
+        Assert.True(certs[0].SequenceEqual(cert1));
+        Assert.True(certs[1].SequenceEqual(cert2));
+
+        var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
+        var key = Convert.ToHexString(SHA1.HashData(contents));
+        var entry = (DictionaryObject)reader.Resolve(vri[key]);
+        var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
+        Assert.Single(vriCerts);
+        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(cert2));
+    }
+
+    [Fact]
     public void AddValidationData_IsDeterministic()
     {
         var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
