@@ -2,7 +2,9 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -411,8 +413,30 @@ public sealed class Document
         {
             new ConformanceWriter(this).WriteConformance(writer, catalog);
         }
+        else if (Info.Producer is not null || Info.CreationDate is not null || Info.ModificationDate is not null)
+        {
+            // Producer and the creation/modification dates are mirrored into an XMP
+            // packet alongside the /Info dictionary. Absent all three, no metadata
+            // stream is written and the output stays byte identical.
+            var xmp = new XmpMetadata
+            {
+                Info = Info,
+                Producer = Info.Producer ?? "Radzen.Documents.Pdf",
+                CreationDate = Info.CreationDate,
+                ModificationDate = Info.ModificationDate,
+            };
+            catalog["Metadata"] = writer.Add(xmp.BuildStream());
+        }
 
         writer.Trailer["Root"] = catalogRef;
+
+        // A deterministic trailer /ID on every saved document (ISO 32000-1 7.5.5).
+        // The encrypted path derives its own /ID from the encryption seed inside
+        // DocumentWriter, so only the unencrypted path sets one here.
+        if (Encryption is null)
+        {
+            writer.Trailer["ID"] = BuildDocumentId();
+        }
 
         // PDF/A-4 (ISO 19005-4, 6.1.3) forbids the trailer /Info key; the
         // document metadata lives in the XMP stream instead.
@@ -449,7 +473,65 @@ public sealed class Document
         Set("Subject", Info.Subject);
         Set("Keywords", Info.Keywords);
         Set("Creator", Info.Creator);
+        Set("Producer", Info.Producer);
+        Set("CreationDate", Info.CreationDate is { } created ? PdfDate(created) : null);
+        Set("ModDate", Info.ModificationDate is { } modified ? PdfDate(modified) : null);
 
         return info;
+    }
+
+    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSS followed by the UTC offset as
+    // O HH ' mm ' (O is + or -). Caller-supplied offset only; no clock is read.
+    internal static string PdfDate(DateTimeOffset value)
+    {
+        var offset = value.Offset;
+        var sign = offset < TimeSpan.Zero ? '-' : '+';
+        return string.Create(CultureInfo.InvariantCulture,
+            $"D:{value:yyyyMMddHHmmss}{sign}{Math.Abs(offset.Hours):D2}'{Math.Abs(offset.Minutes):D2}'");
+    }
+
+    // A stable /ID derived only from the document metadata and page content, never from
+    // the clock or a random source, so repeated saves of the same document are byte
+    // identical. Both halves are equal at creation time (ISO 32000-1 14.4).
+    private ArrayObject BuildDocumentId()
+    {
+        using var seed = new MemoryStream();
+
+        void Text(string? value)
+        {
+            if (value is { Length: > 0 })
+            {
+                var bytes = Encoding.UTF8.GetBytes(value);
+                seed.Write(bytes, 0, bytes.Length);
+            }
+
+            seed.WriteByte(0);
+        }
+
+        Text(Info.Title);
+        Text(Info.Author);
+        Text(Info.Subject);
+        Text(Info.Keywords);
+        Text(Info.Creator);
+        Text(Info.Producer);
+        Text(Info.CreationDate?.ToString("O", CultureInfo.InvariantCulture));
+        Text(Info.ModificationDate?.ToString("O", CultureInfo.InvariantCulture));
+        Text(Pages.Count.ToString(CultureInfo.InvariantCulture));
+
+        foreach (var page in Pages)
+        {
+            Text(page.Width.Point.ToString("R", CultureInfo.InvariantCulture));
+            Text(page.Height.Point.ToString("R", CultureInfo.InvariantCulture));
+            if (page.GetContent() is { } content)
+            {
+                seed.Write(content, 0, content.Length);
+            }
+
+            seed.WriteByte(0);
+        }
+
+        var hash = Radzen.Documents.Crypto.Sha2.Sha256(seed.ToArray());
+        var id = Convert.ToHexString(hash, 0, 16);
+        return [new StringObject(id), new StringObject(id)];
     }
 }

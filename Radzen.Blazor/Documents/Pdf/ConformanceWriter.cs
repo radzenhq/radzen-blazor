@@ -122,7 +122,9 @@ internal sealed class ConformanceWriter(Document document)
         var xmp = new XmpMetadata
         {
             Info = document.Info,
-            Producer = "Radzen.Documents.Pdf",
+            Producer = document.Info.Producer ?? "Radzen.Documents.Pdf",
+            CreationDate = document.Info.CreationDate,
+            ModificationDate = document.Info.ModificationDate,
         };
 
         var part = 0;
@@ -152,7 +154,6 @@ internal sealed class ConformanceWriter(Document document)
                 intent["DestOutputProfile"] = writer.Add(profile);
             }
 
-            writer.Trailer["ID"] = BuildDocumentId();
             catalog["OutputIntents"] = new ArrayObject { writer.Add(intent) };
 
             if (part == 4)
@@ -249,13 +250,5 @@ internal sealed class ConformanceWriter(Document document)
     {
         var index = packet.IndexOf(anchor, StringComparison.Ordinal);
         return index < 0 ? packet : packet.Insert(index, insertion);
-    }
-
-    private ArrayObject BuildDocumentId()
-    {
-        var seed = $"{document.Info.Title}\n{document.Info.Author}\n{document.Pages.Count}\n{DateTime.UtcNow.Ticks}\n{Guid.NewGuid():N}";
-        var hash = Radzen.Documents.Crypto.Sha2.Sha256(System.Text.Encoding.UTF8.GetBytes(seed));
-        var id = Convert.ToHexString(hash, 0, 16);
-        return [new StringObject(id), new StringObject(id)];
     }
 }
