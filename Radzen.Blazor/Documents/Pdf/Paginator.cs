@@ -117,10 +117,11 @@ internal static class Paginator
         Section section,
         FontCollection fonts,
         System.Func<Image, double, (double Width, double Height)>? measureImage = null,
-        StyleResolution? resolution = null)
+        StyleResolution? resolution = null,
+        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var pages = new List<PaginatedPage>();
-        PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty);
+        PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty, tocPages);
         return pages;
     }
 
@@ -129,7 +130,8 @@ internal static class Paginator
         FontCollection fonts,
         List<PaginatedPage> pages,
         System.Func<Image, double, (double Width, double Height)>? measureImage,
-        StyleResolution resolution)
+        StyleResolution resolution,
+        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var (pageWidth, pageHeight) = EffectiveSize(section);
         var left = section.Margins.Left.Point;
@@ -193,7 +195,7 @@ internal static class Paginator
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
         // Overlay/rotated containers stay unlowered and are placed by PlaceSpecialContainer.
-        var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true);
+        var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
@@ -554,12 +556,17 @@ internal static class Paginator
             _ => HorizontalAlignment.Left,
         };
 
-    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks, double availableWidth, bool keepSpecialContainers = false)
+    internal static IReadOnlyList<Block> ExpandBlocks(
+        BlockCollection blocks,
+        double availableWidth,
+        bool keepSpecialContainers = false,
+        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null,
+        FontCollection? fonts = null)
     {
         var needsExpansion = false;
         foreach (var block in blocks)
         {
-            if (block is List or Container)
+            if (block is List or Container or TableOfContents)
             {
                 needsExpansion = true;
                 break;
@@ -595,6 +602,16 @@ internal static class Paginator
                     expanded.Add(LowerContainer(container, availableWidth));
                 }
             }
+            else if (block is TableOfContents toc)
+            {
+                if (!keepSpecialContainers)
+                {
+                    throw new System.NotSupportedException(
+                        "A table of contents is only supported as direct section content.");
+                }
+
+                ExpandTableOfContents(toc, expanded, availableWidth, tocPages, fonts);
+            }
             else
             {
                 expanded.Add(block);
@@ -602,6 +619,106 @@ internal static class Paginator
         }
 
         return expanded;
+    }
+
+    // The page-number column is sized for this placeholder (plus a small safety margin) and
+    // pass 1 renders it in place of the not-yet-known number, so the wrap fit of every entry
+    // line is identical in both layout passes regardless of the resolved digits.
+    private const string TocPagePlaceholder = "0000";
+
+    private const double TocLeaderGap = 2.0;
+
+    // A stop far beyond any line keeps a tab off the default 36pt grid when the entry text
+    // reaches past the page-number stop: the number word then wraps in both passes alike
+    // instead of depending on its (pass-varying) width against the grid.
+    private const double TocSentinelStop = 100000;
+
+    // Lowers a TableOfContents to one Paragraph per entry: linked text, a measured run of
+    // leader characters and the page number right-aligned at a tab stop. See the remarks on
+    // TableOfContents for why entries lower to paragraphs rather than a table.
+    private static void ExpandTableOfContents(
+        TableOfContents toc,
+        List<Block> expanded,
+        double availableWidth,
+        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages,
+        FontCollection? fonts)
+    {
+        if (fonts is null)
+        {
+            throw new System.InvalidOperationException("A table of contents requires font metrics to lower.");
+        }
+
+        foreach (var entry in toc.Entries)
+        {
+            expanded.Add(LowerTocEntry(toc, entry, availableWidth, tocPages, fonts));
+        }
+    }
+
+    private static Paragraph LowerTocEntry(
+        TableOfContents toc,
+        TocEntry entry,
+        double availableWidth,
+        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages,
+        FontCollection fonts)
+    {
+        var indent = toc.LevelIndent.Point * entry.Level;
+        var max = availableWidth - indent;
+        var reserve = fonts.MeasureText(TocPagePlaceholder, toc.Font) + 2;
+        var stop = System.Math.Max(0, max - reserve);
+
+        var paragraph = new Paragraph { LeftIndent = Unit.FromPoint(indent) };
+        paragraph.Font.InheritFrom(toc.Font);
+        paragraph.TabStops.AddTabStop(Unit.FromPoint(stop), TabAlignment.Right);
+        paragraph.TabStops.AddTabStop(Unit.FromPoint(TocSentinelStop));
+
+        var text = SanitizeTocText(entry.Text);
+        var textRun = paragraph.Inlines.Add(text);
+        textRun.LinkToAnchor = entry.Anchor;
+        textRun.Font.InheritFrom(toc.Font);
+
+        var leaderWidth = fonts.MeasureText(toc.Leader.ToString(), toc.Font);
+        if (leaderWidth > 0)
+        {
+            var textWidth = fonts.MeasureText(text, toc.Font);
+            var spaceWidth = fonts.MeasureText(" ", toc.Font);
+            var count = (int)System.Math.Floor((stop - TocLeaderGap - textWidth - spaceWidth) / leaderWidth);
+            if (count >= 1)
+            {
+                paragraph.Inlines.Add(" " + new string(toc.Leader, count)).Font.InheritFrom(toc.Font);
+            }
+        }
+
+        paragraph.Inlines.Add("\t").Font.InheritFrom(toc.Font);
+
+        var number = tocPages is not null && tocPages.TryGetValue(entry.Anchor, out var page)
+            ? page.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            : TocPagePlaceholder;
+        var numberRun = paragraph.Inlines.Add(number);
+        numberRun.LinkToAnchor = entry.Anchor;
+        numberRun.Font.InheritFrom(toc.Font);
+
+        return paragraph;
+    }
+
+    // Tabs and line breaks in entry text would defeat the single-line tab layout; they flatten
+    // to spaces.
+    private static string SanitizeTocText(string text)
+    {
+        if (text.IndexOfAny(['\t', '\r', '\n']) < 0)
+        {
+            return text;
+        }
+
+        var chars = text.ToCharArray();
+        for (var i = 0; i < chars.Length; i++)
+        {
+            if (chars[i] is '\t' or '\r' or '\n')
+            {
+                chars[i] = ' ';
+            }
+        }
+
+        return new string(chars);
     }
 
     private static bool IsSpecial(Container container)
