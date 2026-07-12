@@ -19,16 +19,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         // The container's OWN opacity (times any ancestor product), not recovered
         // through a child block like the lowered-table path.
         var opacity = opacities.ContainerOpacity(box.Source);
-        var style = new BoxStyle
-        {
-            Background = box.Style.Background,
-            Top = box.Style.Top,
-            Right = box.Style.Right,
-            Bottom = box.Style.Bottom,
-            Left = box.Style.Left,
-            CornerRadius = box.Style.CornerRadius,
-            ExtGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null,
-        };
+        var style = box.Style with { ExtGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null };
         BoxRenderer.Paint(plan, bounds, style);
 
         var radius = BoxRenderer.ClampRadius(box.Style.CornerRadius.Point, bounds.Width, bounds.Height);
