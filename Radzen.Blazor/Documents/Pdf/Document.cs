@@ -37,6 +37,13 @@ public sealed class Document
     /// </summary>
     public AcroForm? AcroForm { get; private set; }
 
+    /// <summary>
+    /// Gets the form fields to create on this document. Each definition is
+    /// saved as a widget annotation on its page and listed in the catalog
+    /// <c>/AcroForm /Fields</c> with a generated appearance stream.
+    /// </summary>
+    public IList<FormFieldDefinition> FormFields { get; } = [];
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -190,6 +197,198 @@ public sealed class Document
 
             Pages.Insert(Pages.Count, page);
         }
+    }
+
+    /// <summary>
+    /// Flattens the interactive form into static page content: each field's
+    /// current value renders onto its page, and the fields, their widget
+    /// annotations and the catalog <c>/AcroForm</c> are removed. Applies both
+    /// to a loaded form (<see cref="AcroForm"/>) and to pending
+    /// <see cref="FormFields"/> definitions.
+    /// </summary>
+    public void Flatten()
+    {
+        foreach (var definition in FormFields)
+        {
+            if (definition.PageIndex < 0 || definition.PageIndex >= Pages.Count)
+            {
+                throw new InvalidOperationException(
+                    $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {Pages.Count} pages.");
+            }
+
+            DrawDefinition(Pages[definition.PageIndex], definition);
+        }
+
+        FormFields.Clear();
+        FlattenLoadedForm();
+    }
+
+    private static void DrawDefinition(Page page, FormFieldDefinition definition)
+    {
+        if (definition is TextFieldDefinition text)
+        {
+            if (text.Value.Length == 0)
+            {
+                return;
+            }
+
+            var baseline = FieldAppearances.Baseline(definition.Height.Point, text.Font.Size);
+            page.Content.Add(new TextContent(
+                text.Value,
+                definition.X + Unit.FromPoint(2.0),
+                definition.Y + Unit.FromPoint(baseline))
+            {
+                Font = text.Font,
+            });
+        }
+        else if (definition is CheckBoxFieldDefinition { Checked: true })
+        {
+            page.Content.Add(FieldAppearances.CheckMark(
+                definition.X.Point, definition.Y.Point, definition.Width.Point, definition.Height.Point));
+        }
+    }
+
+    // Renders every loaded widget's current value into its page content, strips
+    // the widgets from the page /Annots and drops the form so the next save
+    // emits no /AcroForm.
+    private void FlattenLoadedForm()
+    {
+        if (source is null || sourceAcroForm is null)
+        {
+            return;
+        }
+
+        var formDa = sourceAcroForm.TryGetValue("DA", out var da) && source.Resolve(da!) is StringObject text
+            ? text.Value
+            : null;
+
+        foreach (var page in Pages)
+        {
+            if (!sourcePages.TryGetValue(page, out var node)
+                || !node.TryGetValue("Annots", out var annotsObject)
+                || source.Resolve(annotsObject!) is not ArrayObject annots)
+            {
+                continue;
+            }
+
+            var remaining = new ArrayObject();
+            var widgets = 0;
+            foreach (var entry in annots)
+            {
+                if (source.Resolve(entry) is DictionaryObject annot && IsWidget(annot))
+                {
+                    widgets++;
+                    DrawWidget(page, annot, formDa);
+                }
+                else
+                {
+                    remaining.Add(entry);
+                }
+            }
+
+            if (widgets > 0)
+            {
+                node["Annots"] = remaining.Count > 0 ? remaining : (DocumentObject)new NullObject();
+            }
+        }
+
+        sourceAcroForm = null;
+        AcroForm = null;
+    }
+
+    private bool IsWidget(DictionaryObject annot)
+        => annot.TryGetValue("Subtype", out var subtype) && source!.Resolve(subtype!) is NameObject name
+            && string.Equals(name.Value, "Widget", StringComparison.Ordinal);
+
+    // Draws a widget's current value as static content: a text or choice value
+    // in its /DA font, a non-Off button state as the check-mark glyph. A hidden
+    // widget (/F bit 2) contributes nothing but is still removed.
+    private void DrawWidget(Page page, DictionaryObject widget, string? formDa)
+    {
+        if (widget.TryGetValue("F", out var f) && source!.Resolve(f!) is NumberObject flags
+            && (flags.IntValue & 2) != 0)
+        {
+            return;
+        }
+
+        if (Inherited(widget, "FT") is not NameObject type)
+        {
+            return;
+        }
+
+        var (x, y, width, height) = WidgetRect(widget);
+        if (string.Equals(type.Value, "Btn", StringComparison.Ordinal))
+        {
+            var state = widget.TryGetValue("AS", out var asObject) && source!.Resolve(asObject!) is NameObject asName
+                ? asName.Value
+                : (Inherited(widget, "V") as NameObject)?.Value;
+            if (state is not null && !string.Equals(state, "Off", StringComparison.Ordinal))
+            {
+                page.Content.Add(FieldAppearances.CheckMark(x, y, width, height));
+            }
+
+            return;
+        }
+
+        if (type.Value is not ("Tx" or "Ch"))
+        {
+            return;
+        }
+
+        var value = Inherited(widget, "V") is StringObject stored
+            ? FormField.DecodeTextString(stored.Value)
+            : null;
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        var da = (Inherited(widget, "DA") as StringObject)?.Value ?? formDa;
+        var (daFont, daSize) = FieldAppearances.ParseDefaultAppearance(da);
+        var font = FieldAppearances.AppearanceFont(daFont, daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize);
+        page.Content.Add(new TextContent(
+            value,
+            Unit.FromPoint(x + 2.0),
+            Unit.FromPoint(y + FieldAppearances.Baseline(height, font.Size)))
+        {
+            Font = font,
+        });
+    }
+
+    // Walks the widget's /Parent chain for an inheritable field attribute
+    // (ISO 32000-1 12.7.3.1) and returns it resolved.
+    private DocumentObject? Inherited(DictionaryObject widget, string key)
+    {
+        var current = widget;
+        for (var depth = 0; current is not null && depth < 32; depth++)
+        {
+            if (current.TryGetValue(key, out var value))
+            {
+                return source!.Resolve(value!);
+            }
+
+            current = current.TryGetValue("Parent", out var parent)
+                && source!.Resolve(parent!) is DictionaryObject next
+                ? next
+                : null;
+        }
+
+        return null;
+    }
+
+    private (double X, double Y, double Width, double Height) WidgetRect(DictionaryObject widget)
+    {
+        if (widget.TryGetValue("Rect", out var rectObject) && source!.Resolve(rectObject!) is ArrayObject rect
+            && rect.Count >= 4)
+        {
+            var x0 = Number(source.Resolve(rect[0]));
+            var y0 = Number(source.Resolve(rect[1]));
+            var x1 = Number(source.Resolve(rect[2]));
+            var y1 = Number(source.Resolve(rect[3]));
+            return (Math.Min(x0, x1), Math.Min(y0, y1), Math.Abs(x1 - x0), Math.Abs(y1 - y0));
+        }
+
+        return (0.0, 0.0, 0.0, 0.0);
     }
 
     // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
@@ -564,6 +763,8 @@ public sealed class Document
         }
 
         var appendedFields = AppendForms(pageNodes, appendImporters, writer);
+        List<(int PageIndex, ReferenceObject Reference)> createdWidgets =
+            FormFields.Count > 0 ? WriteCreatedFields(writer, pageNodes, appendedFields) : [];
 
         if (importer is not null)
         {
@@ -573,13 +774,20 @@ public sealed class Document
         }
         else if (appendedFields.Count > 0)
         {
-            var fields = new ArrayObject();
-            foreach (var field in appendedFields)
-            {
-                fields.Add(field);
-            }
+            catalog["AcroForm"] = writer.Add(FieldsForm(appendedFields));
+        }
 
-            catalog["AcroForm"] = writer.Add(new DictionaryObject { ["Fields"] = fields });
+        foreach (var (pageIndex, reference) in createdWidgets)
+        {
+            var node = pageNodes[pageIndex].Node;
+            if (node.TryGetValue("Annots", out var annots) && annots is ArrayObject array)
+            {
+                array.Add(reference);
+            }
+            else
+            {
+                node["Annots"] = new ArrayObject { reference };
+            }
         }
 
         if (Attachments.Count > 0)
@@ -934,20 +1142,14 @@ public sealed class Document
         }
         else if (appendedFields.Count > 0)
         {
-            var fields = new ArrayObject();
-            foreach (var field in appendedFields)
-            {
-                fields.Add(field);
-            }
-
-            catalog["AcroForm"] = writer.Add(new DictionaryObject { ["Fields"] = fields });
+            catalog["AcroForm"] = writer.Add(FieldsForm(appendedFields));
         }
     }
 
     // Rebuilds the AcroForm field-by-field: source fields whose widget lived on a
     // removed page are dropped, and already-imported fields from appended pages are
     // added, so the merged form lists exactly the fields that still have a widget.
-    private static ReferenceObject ImportAcroForm(GraphImporter importer, DocumentReader reader, DictionaryObject acroForm, HashSet<DictionaryObject> removed, List<DocumentObject> appendedFields, DocumentWriter writer)
+    private ReferenceObject ImportAcroForm(GraphImporter importer, DocumentReader reader, DictionaryObject acroForm, HashSet<DictionaryObject> removed, List<DocumentObject> appendedFields, DocumentWriter writer)
     {
         var result = new DictionaryObject();
         ArrayObject? fieldsArray = null;
@@ -980,7 +1182,146 @@ public sealed class Document
         }
 
         result["Fields"] = fieldsArray;
+        ApplyCreatedFormDefaults(result);
         return writer.Add(result);
+    }
+
+    private DictionaryObject FieldsForm(List<DocumentObject> fieldRefs)
+    {
+        var fields = new ArrayObject();
+        foreach (var field in fieldRefs)
+        {
+            fields.Add(field);
+        }
+
+        var form = new DictionaryObject { ["Fields"] = fields };
+        ApplyCreatedFormDefaults(form);
+        return form;
+    }
+
+    // Gives a form holding created fields the defaults an editor needs: a form
+    // /DA, the /DR fonts the created field /DA strings name, and /NeedAppearances
+    // when a value falls outside WinAnsi so viewers regenerate it with a capable
+    // font. No-op when no fields were created, keeping untouched saves identical.
+    private void ApplyCreatedFormDefaults(DictionaryObject form)
+    {
+        if (FormFields.Count == 0)
+        {
+            return;
+        }
+
+        if (!form.ContainsKey("DA"))
+        {
+            form["DA"] = new StringObject("/Helv 0 Tf 0 g");
+        }
+
+        if (!form.ContainsKey("DR"))
+        {
+            var fonts = new DictionaryObject { ["Helv"] = Base14FontDictionary("Helvetica") };
+            foreach (var definition in FormFields)
+            {
+                if (definition is TextFieldDefinition text)
+                {
+                    var baseFont = BaseFontOf(text.Font);
+                    if (!fonts.ContainsKey(baseFont))
+                    {
+                        fonts[baseFont] = Base14FontDictionary(baseFont);
+                    }
+                }
+            }
+
+            form["DR"] = new DictionaryObject { ["Font"] = fonts };
+        }
+
+        foreach (var definition in FormFields)
+        {
+            if (definition is TextFieldDefinition text && !FieldAppearances.CanEncode(text.Value))
+            {
+                form["NeedAppearances"] = new BooleanObject(true);
+                break;
+            }
+        }
+    }
+
+    private static string BaseFontOf(Font font)
+        => Fonts.Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
+
+    // Emits one merged field/widget annotation per FormFields definition, each
+    // with a generated normal appearance, and lists it in the form fields. The
+    // returned page bindings attach to the page /Annots after any preserved
+    // form rebuilds them.
+    private List<(int PageIndex, ReferenceObject Reference)> WriteCreatedFields(
+        DocumentWriter writer,
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
+        List<DocumentObject> fields)
+    {
+        var created = new List<(int, ReferenceObject)>();
+        foreach (var definition in FormFields)
+        {
+            if (definition.PageIndex < 0 || definition.PageIndex >= pageNodes.Count)
+            {
+                throw new InvalidOperationException(
+                    $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {pageNodes.Count} pages.");
+            }
+
+            var x = definition.X.Point;
+            var y = definition.Y.Point;
+            var width = definition.Width.Point;
+            var height = definition.Height.Point;
+            var widget = new DictionaryObject
+            {
+                ["Type"] = new NameObject("Annot"),
+                ["Subtype"] = new NameObject("Widget"),
+                ["T"] = new StringObject(definition.Name),
+                ["Rect"] = new ArrayObject
+                {
+                    new NumberObject(x),
+                    new NumberObject(y),
+                    new NumberObject(x + width),
+                    new NumberObject(y + height),
+                },
+                ["F"] = new NumberObject(4),
+                ["P"] = pageNodes[definition.PageIndex].Reference,
+            };
+
+            if (definition is TextFieldDefinition text)
+            {
+                widget["FT"] = new NameObject("Tx");
+                widget["V"] = new StringObject(text.Value);
+                widget["DA"] = new StringObject(
+                    "/" + BaseFontOf(text.Font)
+                    + " " + text.Font.Size.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+                    + " Tf 0 g");
+                if (FieldAppearances.CanEncode(text.Value))
+                {
+                    widget["AP"] = new DictionaryObject
+                    {
+                        ["N"] = writer.Add(FieldAppearances.BuildText(text.Value, width, height, text.Font)),
+                    };
+                }
+            }
+            else if (definition is CheckBoxFieldDefinition checkBox)
+            {
+                var state = checkBox.Checked ? "Yes" : "Off";
+                widget["FT"] = new NameObject("Btn");
+                widget["V"] = new NameObject(state);
+                widget["AS"] = new NameObject(state);
+                widget["AP"] = new DictionaryObject
+                {
+                    ["N"] = new DictionaryObject
+                    {
+                        ["Yes"] = writer.Add(FieldAppearances.BuildCheck(width, height)),
+                        ["Off"] = writer.Add(FieldAppearances.BuildOff(width, height)),
+                    },
+                };
+            }
+
+            var reference = writer.Add(widget);
+            fields.Add(reference);
+            created.Add((definition.PageIndex, reference));
+        }
+
+        return created;
     }
 
     // Imports the /Annots of every appended loaded page (seeding its new page ref
