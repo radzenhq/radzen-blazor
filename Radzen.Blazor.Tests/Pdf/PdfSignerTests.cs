@@ -2,9 +2,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -17,9 +16,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 // End-to-end contract of PdfSigner: the original file stays a byte-for-byte
 // prefix, /ByteRange covers everything except the <...> /Contents token
 // (angle brackets included), and the embedded detached CMS verifies against
-// the covered bytes. The real-CMS tests drive Microsoft's SignedCms via
-// reflection because the test project cannot take a compile-time reference on
-// System.Security.Cryptography.Pkcs without modifying its csproj.
+// the covered bytes. The real-CMS tests drive Microsoft's SignedCms directly
+// (the test host is a desktop runtime; only the library itself must stay
+// WASM-safe, hence the ISigner delegation boundary).
 public class PdfSignerTests
 {
     private static readonly DateTimeOffset FixedTime = new(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);
@@ -69,74 +68,23 @@ public class PdfSignerTests
     private static DelegateSigner CmsSigner(X509Certificate2 certificate)
         => new(content => Pkcs.SignDetached(certificate, content));
 
-    // Reflection facade over System.Security.Cryptography.Pkcs loaded from the
-    // NuGet cache: the desktop test host may use it freely, only the library
-    // itself must stay WASM-safe.
+    // Microsoft's SignedCms runs on the desktop test host; only the library
+    // itself must stay WASM-safe, which is what the ISigner boundary enforces.
     private static class Pkcs
     {
-        private static readonly Lazy<Assembly> Assembly = new(Load);
-
-        private static Assembly Load()
-        {
-            var root = Environment.GetEnvironmentVariable("NUGET_PACKAGES")
-                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
-            var package = Path.Combine(root, "system.security.cryptography.pkcs");
-            var versions = Directory.Exists(package) ? Directory.GetDirectories(package) : [];
-            foreach (var version in versions.OrderByDescending(Path.GetFileName, StringComparer.OrdinalIgnoreCase))
-            {
-                foreach (var tfm in new[] { "net9.0", "net8.0", "netstandard2.1" })
-                {
-                    var path = Path.Combine(version, "lib", tfm, "System.Security.Cryptography.Pkcs.dll");
-                    if (File.Exists(path))
-                    {
-                        return System.Reflection.Assembly.LoadFrom(path);
-                    }
-                }
-            }
-
-            throw new InvalidOperationException(
-                "System.Security.Cryptography.Pkcs was not found in the NuGet cache; " +
-                "run `dotnet add package System.Security.Cryptography.Pkcs` in any project once to populate it.");
-        }
-
-        private static Type Get(string name)
-            => Assembly.Value.GetType("System.Security.Cryptography.Pkcs." + name, throwOnError: true)!;
-
-        private static object CreateDetachedCms(byte[] content)
-        {
-            var contentInfo = Activator.CreateInstance(Get("ContentInfo"), [content])!;
-            return Activator.CreateInstance(Get("SignedCms"), [contentInfo, true])!;
-        }
-
-        private static object? Invoke(object target, string method, Type[] signature, object?[] args)
-        {
-            try
-            {
-                return target.GetType().GetMethod(method, signature)!.Invoke(target, args);
-            }
-            catch (TargetInvocationException exception) when (exception.InnerException is not null)
-            {
-                ExceptionDispatchInfo.Capture(exception.InnerException).Throw();
-                throw;
-            }
-        }
-
         public static byte[] SignDetached(X509Certificate2 certificate, byte[] content)
         {
-            var cms = CreateDetachedCms(content);
-            var signerType = Get("CmsSigner");
-            var identifier = Enum.Parse(Get("SubjectIdentifierType"), "IssuerAndSerialNumber");
-            var signer = Activator.CreateInstance(signerType, [identifier, certificate])!;
-            Invoke(cms, "ComputeSignature", [signerType], [signer]);
-            return (byte[])Invoke(cms, "Encode", [], [])!;
+            var cms = new SignedCms(new ContentInfo(content), detached: true);
+            cms.ComputeSignature(new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, certificate));
+            return cms.Encode();
         }
 
         // Throws CryptographicException when the signature does not verify.
         public static void CheckSignature(byte[] content, byte[] der)
         {
-            var cms = CreateDetachedCms(content);
-            Invoke(cms, "Decode", [typeof(byte[])], [der]);
-            Invoke(cms, "CheckSignature", [typeof(bool)], [true]);
+            var cms = new SignedCms(new ContentInfo(content), detached: true);
+            cms.Decode(der);
+            cms.CheckSignature(true);
         }
     }
 
