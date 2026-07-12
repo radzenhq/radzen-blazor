@@ -40,6 +40,15 @@ public sealed class Container : Block
     public Color? Background { get; set; }
 
     /// <summary>
+    /// Gets or sets the corner radius of the box. When greater than zero the background is
+    /// filled as a rounded rectangle (the effective radius is clamped to half of the smaller
+    /// box dimension). The border is stroked as the same rounded path only when it is uniform -
+    /// the same width, color and style on all four edges; a non-uniform border keeps the square
+    /// four-edge rendering while the background stays rounded. Defaults to 0 (square).
+    /// </summary>
+    public Unit CornerRadius { get; set; }
+
+    /// <summary>
     /// Gets or sets the opacity the box background and borders are painted with, from 0
     /// (fully transparent) to 1 (fully opaque). Defaults to 1.
     /// </summary>

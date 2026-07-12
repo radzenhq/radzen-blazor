@@ -43,7 +43,24 @@ internal struct FillDraw
     public required double Width { get; init; }
     public required double Height { get; init; }
     public required Color Color { get; init; }
+
+    // Corner radius of the filled rounded rectangle; 0 fills a plain `re` rectangle.
+    public double Radius { get; init; }
     public Rect? Clip { get; set; }
+    public string? ExtGState { get; init; }
+}
+
+// A uniform border stroked as a single rounded-rectangle path (one S, not four edges).
+internal readonly struct RoundedStrokeDraw
+{
+    public required double X { get; init; }
+    public required double Y { get; init; }
+    public required double Width { get; init; }
+    public required double Height { get; init; }
+    public required double Radius { get; init; }
+    public required double LineWidth { get; init; }
+    public required Color Color { get; init; }
+    public required BorderStyle Style { get; init; }
     public string? ExtGState { get; init; }
 }
 
@@ -77,6 +94,7 @@ internal sealed class PagePlan
     public required PageSize Size { get; init; }
     public List<FillDraw> Fills { get; } = [];
     public List<EdgeDraw> Edges { get; } = [];
+    public List<RoundedStrokeDraw> RoundedStrokes { get; } = [];
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
@@ -103,7 +121,7 @@ internal sealed class PagePlan
         return key;
     }
 
-    public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count);
+    public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 
     // Applies an affine transform to every draw added after the mark. Texts and images
     // carry the matrix into ContentEmitter, which wraps them in q cm .. Q. Edges bake the
@@ -112,6 +130,8 @@ internal sealed class PagePlan
     // centerline with line width = rect height (exact under butt caps); the converted
     // strokes are inserted BEFORE the marked edges so backgrounds stay under borders.
     // Fill clips are dropped in the process - rotated overflow clipping is not supported.
+    // Rounded corners are also dropped under rotation: a rounded fill converts to the same
+    // plain centerline stroke, and a rounded uniform border falls back to four square edges.
     public void ApplyTransform(Matrix transform, PlanMarks mark)
     {
         for (var i = mark.Edges; i < Edges.Count; i++)
@@ -163,6 +183,24 @@ internal sealed class PagePlan
             Edges.InsertRange(mark.Edges, converted);
         }
 
+        if (RoundedStrokes.Count > mark.Rounded)
+        {
+            for (var i = mark.Rounded; i < RoundedStrokes.Count; i++)
+            {
+                var rounded = RoundedStrokes[i];
+                var left = rounded.X;
+                var bottom = rounded.Y;
+                var right = rounded.X + rounded.Width;
+                var top = rounded.Y + rounded.Height;
+                AddTransformedEdge(transform, left, top, right, top, rounded);
+                AddTransformedEdge(transform, right, bottom, right, top, rounded);
+                AddTransformedEdge(transform, left, bottom, right, bottom, rounded);
+                AddTransformedEdge(transform, left, bottom, left, top, rounded);
+            }
+
+            RoundedStrokes.RemoveRange(mark.Rounded, RoundedStrokes.Count - mark.Rounded);
+        }
+
         for (var i = mark.Images; i < Images.Count; i++)
         {
             var image = Images[i];
@@ -177,6 +215,23 @@ internal sealed class PagePlan
             Texts[i] = text;
         }
     }
+
+    private void AddTransformedEdge(Matrix transform, double x1, double y1, double x2, double y2, RoundedStrokeDraw rounded)
+    {
+        var (tx1, ty1) = transform.Transform(x1, y1);
+        var (tx2, ty2) = transform.Transform(x2, y2);
+        Edges.Add(new EdgeDraw
+        {
+            X1 = tx1,
+            Y1 = ty1,
+            X2 = tx2,
+            Y2 = ty2,
+            LineWidth = rounded.LineWidth,
+            Color = rounded.Color,
+            Style = rounded.Style,
+            ExtGState = rounded.ExtGState,
+        });
+    }
 }
 
-internal readonly record struct PlanMarks(int Fills, int Edges, int Images, int Texts);
+internal readonly record struct PlanMarks(int Fills, int Edges, int Images, int Texts, int Rounded);

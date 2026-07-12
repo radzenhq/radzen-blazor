@@ -389,14 +389,23 @@ internal sealed class DocumentGenerator
             }
 
             writer.WriteColor(fill.Color, "rg");
-            writer.WriteNumber(fill.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(fill.Y);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(fill.Width);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(fill.Height);
-            writer.WriteRaw(" re f\n");
+            if (fill.Radius > 0)
+            {
+                WriteRoundedRect(writer, fill.X, fill.Y, fill.Width, fill.Height, fill.Radius);
+                writer.WriteRaw("f\n");
+            }
+            else
+            {
+                writer.WriteNumber(fill.X);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(fill.Y);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(fill.Width);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(fill.Height);
+                writer.WriteRaw(" re f\n");
+            }
+
             if (grouped)
             {
                 writer.WriteRaw("Q\n");
@@ -433,6 +442,32 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" ");
             writer.WriteNumber(edge.Y2);
             writer.WriteRaw(" l\nS\nQ\n");
+        }
+
+        foreach (var rounded in plan.RoundedStrokes)
+        {
+            writer.WriteRaw("q\n");
+            if (rounded.ExtGState is { } roundedState)
+            {
+                writer.WriteName(roundedState);
+                writer.WriteRaw(" gs\n");
+            }
+
+            writer.WriteColor(rounded.Color, "RG");
+            writer.WriteNumber(rounded.LineWidth);
+            writer.WriteRaw(" w\n");
+            if (rounded.Style is BorderStyle.Dashed or BorderStyle.Dotted)
+            {
+                var on = rounded.Style == BorderStyle.Dashed ? 3.0 : 1.0;
+                writer.WriteRaw("[");
+                writer.WriteNumber(on * rounded.LineWidth);
+                writer.WriteRaw(" ");
+                writer.WriteNumber(on * rounded.LineWidth);
+                writer.WriteRaw("] 0 d\n");
+            }
+
+            WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
+            writer.WriteRaw("S\nQ\n");
         }
 
         var taggedImages = new Dictionary<StructureElement, List<ImageDraw>>();
@@ -479,6 +514,43 @@ internal sealed class DocumentGenerator
             Links = [.. plan.Links],
             ExtGStates = [.. plan.ExtGStates],
         };
+    }
+
+    // Circle-approximation constant for a quarter arc drawn as one cubic Bezier.
+    private const double BezierArcKappa = 0.5522847498307936;
+
+    // Writes a rounded-rectangle path (m/l/c ops, closed with h) starting at the bottom-left
+    // corner's end point and running counterclockwise. The caller appends the paint operator.
+    private static void WriteRoundedRect(ContentWriter writer, double x, double y, double width, double height, double radius)
+    {
+        var offset = radius * BezierArcKappa;
+        var right = x + width;
+        var top = y + height;
+        WritePoint(writer, x + radius, y, " m\n");
+        WritePoint(writer, right - radius, y, " l\n");
+        WriteCurve(writer, right - radius + offset, y, right, y + radius - offset, right, y + radius);
+        WritePoint(writer, right, top - radius, " l\n");
+        WriteCurve(writer, right, top - radius + offset, right - radius + offset, top, right - radius, top);
+        WritePoint(writer, x + radius, top, " l\n");
+        WriteCurve(writer, x + radius - offset, top, x, top - radius + offset, x, top - radius);
+        WritePoint(writer, x, y + radius, " l\n");
+        WriteCurve(writer, x, y + radius - offset, x + radius - offset, y, x + radius, y);
+        writer.WriteRaw("h\n");
+    }
+
+    private static void WritePoint(ContentWriter writer, double x, double y, string op)
+    {
+        writer.WriteNumber(x);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(y);
+        writer.WriteRaw(op);
+    }
+
+    private static void WriteCurve(ContentWriter writer, double x1, double y1, double x2, double y2, double x3, double y3)
+    {
+        WritePoint(writer, x1, y1, " ");
+        WritePoint(writer, x2, y2, " ");
+        WritePoint(writer, x3, y3, " c\n");
     }
 
     private static void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)
