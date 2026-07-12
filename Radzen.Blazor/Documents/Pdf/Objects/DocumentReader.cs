@@ -23,6 +23,7 @@ public sealed class DocumentReader
     private readonly Dictionary<int, XrefEntry> entries = [];
     private readonly Dictionary<int, DocumentObject> cache = [];
     private readonly Dictionary<int, ObjectStream> objectStreams = [];
+    private readonly NullObject nullObject = new();
     private DictionaryObject trailer = new();
     private readonly HashSet<int> parsing = [];
     private Dictionary<int, long>? scanned;
@@ -139,9 +140,12 @@ public sealed class DocumentReader
             return cached;
         }
 
+        // An indirect reference to a free or nonexistent object resolves to null
+        // (ISO 32000-1 7.3.10), so dangling refs left by incremental updates or
+        // annotation deletion never abort a load, save or merge.
         if (!entries.TryGetValue(number, out var entry) || !entry.InUse)
         {
-            throw new DocumentParseException("Object not found.", -1);
+            return nullObject;
         }
 
         // Guards cyclic references (e.g. a stream /Length pointing back at its own
@@ -751,6 +755,13 @@ public sealed class DocumentReader
         if (resolved is NumberObject number)
         {
             return number.IntValue;
+        }
+
+        // A /Length pointing at a free object now resolves to null; fall back to
+        // the endstream scan rather than treating it as a hard failure.
+        if (resolved is NullObject)
+        {
+            return -1;
         }
 
         throw new DocumentParseException("Invalid stream length.", -1);
