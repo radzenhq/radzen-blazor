@@ -128,7 +128,81 @@ public sealed class AcroForm
 
         var terminal = Find(name);
         terminal.Field["V"] = new StringObject(value);
+        WriteTextAppearance(terminal, value);
+    }
 
+    /// <summary>
+    /// Sets the selected value of a loaded choice field - a list box or combo box
+    /// (<c>/FT /Ch</c>) - to one of its <c>/Opt</c> options. Stores the export
+    /// value in <c>/V</c>, its position in <c>/I</c>, and regenerates the normal
+    /// appearance (<c>/AP /N</c>) so the selection renders without relying on
+    /// <c>/NeedAppearances</c>.
+    /// </summary>
+    /// <param name="name">The field name (<c>/T</c>).</param>
+    /// <param name="value">The export value of the option to select.</param>
+    /// <exception cref="ArgumentException">The field carries an <c>/Opt</c> list
+    /// that does not contain <paramref name="value"/>.</exception>
+    public void SelectOption(string name, string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var terminal = Find(name);
+        var options = OptionValues(terminal.Field);
+        if (options is not null)
+        {
+            var index = options.IndexOf(value);
+            if (index < 0)
+            {
+                throw new ArgumentException($"Field '{name}' has no option with value '{value}'.", nameof(value));
+            }
+
+            terminal.Field["I"] = new ArrayObject { new NumberObject(index) };
+        }
+
+        terminal.Field["V"] = new StringObject(value);
+        WriteTextAppearance(terminal, value);
+    }
+
+    /// <summary>
+    /// Selects an option of a loaded radio button group (<c>/FT /Btn</c> with the
+    /// Radio flag). Stores the option's on-state name in the group <c>/V</c> and
+    /// sets each kid widget's appearance state (<c>/AS</c>) to that name for the
+    /// matching kid and to <c>Off</c> for the rest.
+    /// </summary>
+    /// <param name="name">The field name (<c>/T</c>).</param>
+    /// <param name="value">The on-state name of the option to select.</param>
+    /// <exception cref="ArgumentException">No kid widget carries an appearance
+    /// state named <paramref name="value"/>.</exception>
+    public void SelectRadioOption(string name, string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var terminal = Find(name);
+        var widgets = RadioWidgets(terminal);
+        var matched = false;
+        foreach (var widget in widgets)
+        {
+            if (HasAppearanceState(widget, value))
+            {
+                matched = true;
+                break;
+            }
+        }
+
+        if (!matched)
+        {
+            throw new ArgumentException($"Radio field '{name}' has no option with value '{value}'.", nameof(value));
+        }
+
+        terminal.Field["V"] = new NameObject(value);
+        foreach (var widget in widgets)
+        {
+            widget["AS"] = new NameObject(HasAppearanceState(widget, value) ? value : "Off");
+        }
+    }
+
+    private void WriteTextAppearance(Terminal terminal, string value)
+    {
         if (FieldAppearances.CanEncode(value))
         {
             // Write the appearance onto the widget so a separate-widget kid's stale /AP
@@ -146,6 +220,57 @@ public sealed class AcroForm
             }
         }
     }
+
+    // The export values of a choice field's /Opt, or null when it carries none. An
+    // /Opt entry is either a text string or a [export, display] pair whose first
+    // element is the export value (ISO 32000-1 12.7.4.4).
+    private List<string>? OptionValues(DictionaryObject field)
+    {
+        if (!field.TryGetValue("Opt", out var optObject) || reader.Resolve(optObject!) is not ArrayObject options)
+        {
+            return null;
+        }
+
+        var values = new List<string>(options.Count);
+        foreach (var entry in options)
+        {
+            values.Add(reader.Resolve(entry) switch
+            {
+                StringObject text => FormField.DecodeTextString(text.Value),
+                ArrayObject pair when pair.Count > 0 && reader.Resolve(pair[0]) is StringObject export
+                    => FormField.DecodeTextString(export.Value),
+                _ => string.Empty,
+            });
+        }
+
+        return values;
+    }
+
+    // The kid widgets of a radio group; when field and its single widget are merged
+    // (no /Kids) the group is just that one widget.
+    private List<DictionaryObject> RadioWidgets(Terminal terminal)
+    {
+        var widgets = new List<DictionaryObject>();
+        foreach (var kid in Kids(terminal.Field))
+        {
+            if (reader.Resolve(kid) is DictionaryObject widget && !widget.ContainsKey("T"))
+            {
+                widgets.Add(widget);
+            }
+        }
+
+        if (widgets.Count == 0)
+        {
+            widgets.Add(terminal.Widget);
+        }
+
+        return widgets;
+    }
+
+    private bool HasAppearanceState(DictionaryObject widget, string state)
+        => widget.TryGetValue("AP", out var apObject) && reader.Resolve(apObject!) is DictionaryObject ap
+            && ap.TryGetValue("N", out var nObject) && reader.Resolve(nObject!) is DictionaryObject states
+            && states.ContainsKey(state);
 
     /// <summary>
     /// Turns a button (check box) field on: its value and appearance state
