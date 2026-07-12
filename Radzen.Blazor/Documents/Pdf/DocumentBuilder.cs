@@ -34,13 +34,24 @@ public class DocumentBuilder
     public PdfAConformance Conformance { get; set; }
 
     /// <summary>
+    /// Gets or sets the encryption to apply when saving. When <c>null</c> the
+    /// document is written unencrypted.
+    /// </summary>
+    public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
+
+    /// <summary>
     /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
     /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
     /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
     /// families embed by name.
     /// </summary>
     /// <returns>The generated document.</returns>
-    public Document Build() => DocumentGenerator.Generate(this);
+    public Document Build()
+    {
+        var document = DocumentGenerator.Generate(this);
+        document.Encryption = Encryption;
+        return document;
+    }
 
     /// <summary>Builds the document and serializes it to the given stream.</summary>
     /// <param name="stream">The destination stream.</param>
