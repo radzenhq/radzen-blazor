@@ -20,6 +20,15 @@ internal static class TextExtractor
     // rely on this for word breaks; the authoring path never emits TJ arrays.
     private const double TjSpaceThreshold = 200.0;
 
+    // No per-glyph widths are available to extraction, so the pen advance is estimated
+    // at half an em per code; this only feeds the same-line gap test, never the text.
+    private const double AverageGlyphEm = 0.5;
+
+    // Two same-line fragments read as separate words only when the X gap between the
+    // pen left by one and the origin of the next exceeds this fraction of an em, which
+    // sits below a space (~0.25 em) yet clears kerning and abutting fragments.
+    private const double SpaceGapEm = 0.2;
+
     public static string Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
         if (content is null || content.Length == 0)
@@ -35,6 +44,7 @@ internal static class TextExtractor
         var textMatrix = Matrix.Identity;
         var lineMatrix = Matrix.Identity;
         var leading = 0.0;
+        var fontSize = 0.0;
         ReverseFont? font = null;
 
         var operands = new List<Token>();
@@ -111,6 +121,7 @@ internal static class TextExtractor
                     font = LastName(operands) is { } key && fonts is not null && fonts.TryGetValue(key, out var f)
                         ? f
                         : ReverseFont.WinAnsi;
+                    fontSize = LastNumber(operands);
                     break;
                 case "TD":
                     leading = -Number(operands, 1);
@@ -131,16 +142,16 @@ internal static class TextExtractor
                     textMatrix = lineMatrix;
                     break;
                 case "Tj":
-                    Show(fragments, operands, textMatrix * ctm, font);
+                    textMatrix = Matrix.Translate(Show(fragments, operands, textMatrix * ctm, font, fontSize), 0) * textMatrix;
                     break;
                 case "TJ":
-                    ShowArray(fragments, array, textMatrix * ctm, font);
+                    textMatrix = Matrix.Translate(ShowArray(fragments, array, textMatrix * ctm, font, fontSize), 0) * textMatrix;
                     break;
                 case "'":
                 case "\"":
                     lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     textMatrix = lineMatrix;
-                    Show(fragments, operands, textMatrix * ctm, font);
+                    textMatrix = Matrix.Translate(Show(fragments, operands, textMatrix * ctm, font, fontSize), 0) * textMatrix;
                     break;
             }
 
@@ -150,50 +161,70 @@ internal static class TextExtractor
         return Compose(fragments);
     }
 
-    private static void Show(List<Fragment> fragments, List<Token> operands, Matrix matrix, ReverseFont? font)
+    // Emits one fragment and returns the text-space horizontal advance the pen moved,
+    // so the caller can step the text matrix and same-line fragments abut correctly.
+    private static double Show(List<Fragment> fragments, List<Token> operands, Matrix matrix, ReverseFont? font, double fontSize)
     {
         var bytes = LastString(operands);
         if (bytes is null || bytes.Length == 0)
         {
-            return;
+            return 0.0;
         }
 
         var text = (font ?? ReverseFont.WinAnsi).Decode(bytes);
         if (text.Length == 0)
         {
-            return;
+            return 0.0;
         }
 
-        var origin = matrix.Transform(0, 0);
-        fragments.Add(new Fragment(origin.Y, origin.X, text));
+        var advance = text.Length * AverageGlyphEm * fontSize;
+        AddFragment(fragments, matrix, text, advance, fontSize);
+        return advance;
     }
 
-    private static void ShowArray(List<Fragment> fragments, List<Token> array, Matrix matrix, ReverseFont? font)
+    private static double ShowArray(List<Fragment> fragments, List<Token> array, Matrix matrix, ReverseFont? font, double fontSize)
     {
         var reverse = font ?? ReverseFont.WinAnsi;
         var builder = new StringBuilder();
+        var glyphEms = 0.0;
+        var adjustEms = 0.0;
         foreach (var element in array)
         {
             if (element.Kind == TokenKind.String)
             {
                 if (element.Bytes is { Length: > 0 } bytes)
                 {
-                    builder.Append(reverse.Decode(bytes));
+                    var decoded = reverse.Decode(bytes);
+                    builder.Append(decoded);
+                    glyphEms += decoded.Length * AverageGlyphEm;
                 }
             }
-            else if (element.Number <= -TjSpaceThreshold)
+            else
             {
-                builder.Append(' ');
+                adjustEms += element.Number / 1000.0;
+                if (element.Number <= -TjSpaceThreshold)
+                {
+                    builder.Append(' ');
+                }
             }
         }
 
         if (builder.Length == 0)
         {
-            return;
+            return 0.0;
         }
 
+        var advance = (glyphEms - adjustEms) * fontSize;
+        AddFragment(fragments, matrix, builder.ToString(), advance, fontSize);
+        return advance;
+    }
+
+    private static void AddFragment(List<Fragment> fragments, Matrix matrix, string text, double textAdvance, double fontSize)
+    {
         var origin = matrix.Transform(0, 0);
-        fragments.Add(new Fragment(origin.Y, origin.X, builder.ToString()));
+        var pen = matrix.Transform(textAdvance, 0);
+        var emPoint = matrix.Transform(fontSize, 0);
+        fragments.Add(new Fragment(origin.Y, origin.X, pen.X - origin.X, emPoint.X - origin.X, text));
     }
 
     private static string Compose(List<Fragment> fragments)
@@ -214,23 +245,39 @@ internal static class TextExtractor
         });
 
         var builder = new StringBuilder();
-        double? lineY = null;
+        Fragment? previous = null;
         foreach (var fragment in fragments)
         {
-            if (lineY is { } y && Math.Abs(fragment.Y - y) > LineTolerance)
+            if (previous is { } prev)
             {
-                builder.Append('\n');
-            }
-            else if (lineY is not null)
-            {
-                builder.Append(' ');
+                if (Math.Abs(fragment.Y - prev.Y) > LineTolerance)
+                {
+                    builder.Append('\n');
+                }
+                else if (NeedsSpace(prev, fragment))
+                {
+                    builder.Append(' ');
+                }
             }
 
             builder.Append(fragment.Text);
-            lineY = fragment.Y;
+            previous = fragment;
         }
 
         return builder.ToString();
+    }
+
+    private static bool NeedsSpace(Fragment previous, Fragment current)
+    {
+        if (previous.Text.Length == 0 || current.Text.Length == 0
+            || char.IsWhiteSpace(previous.Text[^1]) || char.IsWhiteSpace(current.Text[0]))
+        {
+            return false;
+        }
+
+        var gap = current.X - (previous.X + previous.Advance);
+        var em = Math.Abs(current.Em != 0 ? current.Em : previous.Em);
+        return gap > SpaceGapEm * em;
     }
 
     private static Matrix Components(List<Token> operands)
@@ -293,6 +340,19 @@ internal static class TextExtractor
         return null;
     }
 
+    private static double LastNumber(List<Token> operands)
+    {
+        for (var i = operands.Count - 1; i >= 0; i--)
+        {
+            if (operands[i].Kind == TokenKind.Number)
+            {
+                return operands[i].Number;
+            }
+        }
+
+        return 0.0;
+    }
+
     private static byte[]? LastString(List<Token> operands)
     {
         for (var i = operands.Count - 1; i >= 0; i--)
@@ -306,5 +366,5 @@ internal static class TextExtractor
         return null;
     }
 
-    private readonly record struct Fragment(double Y, double X, string Text);
+    private readonly record struct Fragment(double Y, double X, double Advance, double Em, string Text);
 }
