@@ -50,6 +50,14 @@ public sealed class Document
     /// </summary>
     public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether to pack indirect objects into compressed object
+    /// streams (<c>/ObjStm</c>) with a cross-reference stream (<c>/XRef</c>),
+    /// which typically shrinks the output. Not compatible with PDF/A-1;
+    /// leave <c>false</c> for maximum reader compatibility.
+    /// </summary>
+    public bool CompressOutput { get; set; }
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -203,7 +211,7 @@ public sealed class Document
             new ConformanceWriter(this).ValidateConformance();
         }
 
-        var writer = new DocumentWriter(stream) { Encryption = Encryption };
+        var writer = new DocumentWriter(stream) { Encryption = Encryption, UseCompressedStreams = CompressOutput };
 
         var catalog = new DictionaryObject();
         var catalogRef = writer.Add(catalog);

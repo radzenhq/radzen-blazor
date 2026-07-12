@@ -40,6 +40,13 @@ public class DocumentBuilder
     public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the saved file packs its objects into compressed
+    /// object streams with a cross-reference stream, shrinking the output at
+    /// the cost of PDF/A-1 compatibility. Defaults to <c>false</c>.
+    /// </summary>
+    public bool CompressOutput { get; set; }
+
+    /// <summary>
     /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
     /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
     /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
@@ -50,6 +57,7 @@ public class DocumentBuilder
     {
         var document = DocumentGenerator.Generate(this);
         document.Encryption = Encryption;
+        document.CompressOutput = CompressOutput;
         return document;
     }
 
