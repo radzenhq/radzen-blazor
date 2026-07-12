@@ -41,12 +41,15 @@ internal sealed class NavigationWriter(Document document)
     {
         var root = new DictionaryObject { ["Type"] = new NameObject("Outlines") };
         var rootRef = writer.Add(root);
+        // The root is always open, so its /Count is the total number of visible items.
         root["Count"] = new NumberObject(WriteOutlineLevel(writer, document.Outline, root, rootRef, pageNodes));
         return rootRef;
     }
 
-    // Writes one sibling level and recurses into children; returns the number of
-    // items in the subtree so every /Count is positive (all levels open).
+    // Writes one sibling level and recurses into children. Returns the number of items
+    // this level contributes to its parent's visible count: each item counts once, plus
+    // its own visible descendants when the item is open. A collapsed item hides its
+    // descendants (they add nothing to ancestors) and is written with a negative /Count.
     private int WriteOutlineLevel(
         DocumentWriter writer,
         IReadOnlyList<OutlineItem> items,
@@ -64,10 +67,26 @@ internal sealed class NavigationWriter(Document document)
                 ["Dest"] = OutlineDestination(item.Target, pageNodes),
             };
 
+            if (item.Color is { } color)
+            {
+                node["C"] = new ArrayObject
+                {
+                    new NumberObject(color.R / 255.0),
+                    new NumberObject(color.G / 255.0),
+                    new NumberObject(color.B / 255.0),
+                };
+            }
+
+            var flags = (item.Italic ? 1 : 0) | (item.Bold ? 2 : 0);
+            if (flags != 0)
+            {
+                node["F"] = new NumberObject(flags);
+            }
+
             nodes.Add((node, writer.Add(node)));
         }
 
-        var total = items.Count;
+        var levelVisible = 0;
         for (var i = 0; i < items.Count; i++)
         {
             if (i > 0)
@@ -80,21 +99,23 @@ internal sealed class NavigationWriter(Document document)
                 nodes[i].Node["Next"] = nodes[i + 1].Reference;
             }
 
+            var visibleDescendants = 0;
             if (items[i].Children.Count > 0)
             {
-                var descendants = WriteOutlineLevel(writer, [.. items[i].Children], nodes[i].Node, nodes[i].Reference, pageNodes);
-                nodes[i].Node["Count"] = new NumberObject(descendants);
-                total += descendants;
+                visibleDescendants = WriteOutlineLevel(writer, [.. items[i].Children], nodes[i].Node, nodes[i].Reference, pageNodes);
+                nodes[i].Node["Count"] = new NumberObject(items[i].Collapsed ? -visibleDescendants : visibleDescendants);
             }
+
+            levelVisible += 1 + (items[i].Collapsed ? 0 : visibleDescendants);
         }
 
         parent["First"] = nodes[0].Reference;
         parent["Last"] = nodes[^1].Reference;
-        return total;
+        return levelVisible;
     }
 
-    // An anchor target navigates through the named-destination tree; a page target
-    // gets an explicit destination to the top of the page.
+    // An anchor target navigates through the named-destination tree; a page target gets
+    // an explicit destination whose fit mode is chosen by the target.
     private DocumentObject OutlineDestination(
         OutlineTarget target,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
@@ -116,7 +137,30 @@ internal sealed class NavigationWriter(Document document)
         }
 
         var (page, _, reference) = pageNodes[pageIndex];
-        return DestinationArray(reference, page.Height.Point);
+        var arguments = target.FitArguments;
+        return target.Fit switch
+        {
+            OutlineFit.Fit => [reference, new NameObject("Fit")],
+            OutlineFit.FitHorizontal => [reference, new NameObject("FitH"), new NumberObject(arguments[0])],
+            OutlineFit.Rectangle =>
+            [
+                reference,
+                new NameObject("FitR"),
+                new NumberObject(arguments[0]),
+                new NumberObject(arguments[1]),
+                new NumberObject(arguments[2]),
+                new NumberObject(arguments[3]),
+            ],
+            OutlineFit.Coordinates =>
+            [
+                reference,
+                new NameObject("XYZ"),
+                new NumberObject(arguments[0]),
+                new NumberObject(arguments[1]),
+                new NumberObject(arguments[2]),
+            ],
+            _ => DestinationArray(reference, page.Height.Point),
+        };
     }
 
     private static ArrayObject DestinationArray(ReferenceObject pageRef, double top) =>
