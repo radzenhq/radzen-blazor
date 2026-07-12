@@ -9,17 +9,20 @@ namespace Radzen.Documents.Pdf.Fonts;
 internal sealed class Base14Metrics
 {
     private static readonly Dictionary<string, Base14Data.Entry> EntryByName = BuildEntryIndex();
+    private static readonly Dictionary<string, string> KernByName = BuildKernIndex();
     private static readonly ConcurrentDictionary<string, Base14Metrics> Cache = new(StringComparer.Ordinal);
 
     private readonly Base14Data.Entry entry;
     private readonly Dictionary<string, int> widthByName;
     private readonly double[] widthByCode;
+    private readonly Dictionary<int, int> kernByPair;
 
     private Base14Metrics(Base14Data.Entry entry)
     {
         this.entry = entry;
         widthByName = ParseWidths(entry.Widths);
         widthByCode = BuildCodeWidths(entry.FontName, widthByName);
+        kernByPair = ParseKerning(entry.FontName);
     }
 
     public string PostScriptName => entry.FontName;
@@ -56,6 +59,14 @@ internal sealed class Base14Metrics
     }
 
     public double GetWidth(byte code) => widthByCode[code];
+
+    /// <summary>
+    /// Returns the AFM pair-kerning adjustment for the ordered glyph pair (in 1/1000 em,
+    /// negative tightening the pair), or 0 when the font defines no kern for the pair.
+    /// Fixed-pitch faces (Courier) and the symbol fonts define no pairs.
+    /// </summary>
+    public double GetKerning(char left, char right)
+        => kernByPair.TryGetValue((left << 16) | right, out var value) ? value : 0.0;
 
     public double MeasureString(string text, double size)
     {
@@ -146,6 +157,39 @@ internal sealed class Base14Metrics
         foreach (var entry in Base14Data.Fonts)
         {
             map[entry.FontName] = entry;
+        }
+
+        return map;
+    }
+
+    private static Dictionary<string, string> BuildKernIndex()
+    {
+        var map = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var (fontName, pairs) in Base14KernData.Fonts)
+        {
+            map[fontName] = pairs;
+        }
+
+        return map;
+    }
+
+    // Kern pairs are "left right value" triples of WinAnsi code points, '|'-separated;
+    // keyed by (left << 16) | right to match GetKerning's char-pair lookup.
+    private static Dictionary<int, int> ParseKerning(string fontName)
+    {
+        var map = new Dictionary<int, int>();
+        if (!KernByName.TryGetValue(fontName, out var pairs) || pairs.Length == 0)
+        {
+            return map;
+        }
+
+        foreach (var triple in pairs.Split('|'))
+        {
+            var parts = triple.Split(' ');
+            var left = int.Parse(parts[0], CultureInfo.InvariantCulture);
+            var right = int.Parse(parts[1], CultureInfo.InvariantCulture);
+            var value = int.Parse(parts[2], CultureInfo.InvariantCulture);
+            map[(left << 16) | right] = value;
         }
 
         return map;
