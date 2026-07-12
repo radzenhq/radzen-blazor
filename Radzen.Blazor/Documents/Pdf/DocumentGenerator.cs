@@ -214,6 +214,9 @@ internal sealed class DocumentGenerator
         document.Info.Subject = builder.Info.Subject;
         document.Info.Keywords = builder.Info.Keywords;
         document.Info.Creator = builder.Info.Creator;
+        document.Info.Producer = builder.Info.Producer;
+        document.Info.CreationDate = builder.Info.CreationDate;
+        document.Info.ModificationDate = builder.Info.ModificationDate;
 
         structureTree.Build();
 

@@ -88,6 +88,38 @@ internal sealed class SfntFont
         }
     }
 
+    // A variable font (has an 'fvar' axis table): only the default instance would be
+    // embedded, so a requested weight/width axis is silently ignored.
+    public bool IsVariable => directory.Contains("fvar");
+
+    // A color font (COLR/CPAL layered, sbix bitmap, or SVG-in-OpenType): color glyphs
+    // are not translated to PDF, so they degrade to monochrome outlines or .notdef.
+    public bool IsColorFont => directory.Contains("COLR") || directory.Contains("sbix") || directory.Contains("SVG ");
+
+    // Fails loud (rather than degrading silently) when the font uses features this
+    // library cannot honor, unless the caller opts to embed it degraded anyway.
+    public void EnsureRenderable(bool allowDegraded)
+    {
+        if (allowDegraded)
+        {
+            return;
+        }
+
+        if (IsVariable)
+        {
+            throw new NotSupportedException(
+                $"The font '{PostScriptName}' is a variable font; axis selection is not supported, so only its default instance "
+                + "would be embedded. Set AllowDegradedFonts to embed the default instance anyway.");
+        }
+
+        if (IsColorFont)
+        {
+            throw new NotSupportedException(
+                $"The font '{PostScriptName}' is a color font (COLR/sbix/SVG); color glyphs are not supported and would render as "
+                + "monochrome outlines or missing. Set AllowDegradedFonts to embed it anyway.");
+        }
+    }
+
     public ushort GetGlyphId(int codepoint) => cmap?.GetGlyphId(codepoint) ?? 0;
 
     public ushort GetAdvanceWidth(ushort glyphId) => metrics.GetAdvanceWidth(glyphId);
