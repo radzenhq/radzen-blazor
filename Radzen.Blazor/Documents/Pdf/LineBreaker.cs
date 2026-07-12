@@ -64,6 +64,7 @@ internal static class LineBreaker
         var boxes = new List<LineBox>();
         var indent = paragraph.LeftIndent.Point;
         var max = maxWidthPoints - indent;
+        var wrapStops = SortedTabStops(paragraph);
         foreach (var words in Tokenize(paragraph, fonts, out var pieces))
         {
             if (words.Count == 0)
@@ -72,7 +73,7 @@ internal static class LineBreaker
                 continue;
             }
 
-            var lineRanges = Wrap(words, max);
+            var lineRanges = Wrap(words, max, wrapStops);
             for (var li = 0; li < lineRanges.Count; li++)
             {
                 var (first, last) = lineRanges[li];
@@ -108,17 +109,40 @@ internal static class LineBreaker
         };
     }
 
-    // Position where the word after `word` starts, given `word` ends at `position`:
-    // the inter-word gap, then each tab advances to the next default tab stop.
-    private static double NextStart(double position, Word word)
+    // Position where the word after `word` starts, given `word` ends at `position`: the inter-word
+    // gap, then each tab advances to the next stop. With explicit `stops` this mirrors
+    // BuildTabStopLine's placement (next stop beyond the cursor, else the default grid) so wrapping
+    // fit and final placement agree; with no stops it is the plain 36pt-grid default.
+    private static double NextStart(double position, Word word, List<TabStop>? stops = null)
     {
         var p = position + word.GapAfter;
         for (var t = 0; t < word.TabsAfter; t++)
         {
-            p = AdvanceToTabStop(p);
+            p = stops is not null && TryNextStop(stops, p, out var stopPos, out _)
+                ? stopPos
+                : AdvanceToTabStop(p);
         }
 
         return p;
+    }
+
+    // Paragraph tab stops sorted by position for the wrap fit; null when there are none so the
+    // default-grid path stays byte-identical.
+    private static List<TabStop>? SortedTabStops(Paragraph paragraph)
+    {
+        if (paragraph.TabStops.Count == 0)
+        {
+            return null;
+        }
+
+        var stops = new List<TabStop>(paragraph.TabStops.Count);
+        for (var s = 0; s < paragraph.TabStops.Count; s++)
+        {
+            stops.Add(paragraph.TabStops[s]);
+        }
+
+        stops.Sort((a, b) => a.Position.Point.CompareTo(b.Position.Point));
+        return stops;
     }
 
     // Spaces carry no kerning, so a run of them measures as count * one space width; cache the
@@ -272,7 +296,7 @@ internal static class LineBreaker
         return segments;
     }
 
-    private static List<(int First, int Last)> Wrap(List<Word> words, double max)
+    private static List<(int First, int Last)> Wrap(List<Word> words, double max, List<TabStop>? stops)
     {
         var lines = new List<(int, int)>();
         var i = 0;
@@ -282,7 +306,7 @@ internal static class LineBreaker
             var end = words[i].Width;
             while (j + 1 < words.Count)
             {
-                var nextEnd = NextStart(end, words[j]) + words[j + 1].Width;
+                var nextEnd = NextStart(end, words[j], stops) + words[j + 1].Width;
                 if (nextEnd <= max)
                 {
                     end = nextEnd;
