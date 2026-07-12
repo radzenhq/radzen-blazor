@@ -82,17 +82,49 @@ internal static class ImageDecoder
         return (baseWidth, baseHeight);
     }
 
-    // Stamps the opt-in options a block Image carries onto its decoded XObject. The flag is
-    // purely additive so an image that opts into nothing is returned untouched, keeping the
-    // default output byte-identical.
+    // Stamps the opt-in options a block Image carries onto its decoded XObject. A stencil
+    // mask needs a dictionary without /ColorSpace, so it yields a fresh image-mask XObject;
+    // the remaining flags are additive. An image that opts into nothing is returned untouched,
+    // keeping the default output byte-identical.
     public static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
     {
+        if (image.Stencil)
+        {
+            xobject = BuildStencilMask(xobject);
+        }
+
         if (image.Interpolate)
         {
             xobject.Image.Dictionary["Interpolate"] = new BooleanObject(true);
         }
 
         return xobject;
+    }
+
+    // Re-expresses a 1-bit grayscale image as a stencil mask (ISO 32000-1 8.9.6.2): the same
+    // packed 1-bit sample stream, but with /ImageMask true and no /ColorSpace so its samples
+    // gate painting in the current fill colour (sample 0 paints, per the default /Decode [0 1]).
+    private static ImageXObject BuildStencilMask(ImageXObject xobject)
+    {
+        var source = xobject.Image.Dictionary;
+        if (xobject.SoftMask is not null
+            || source["ColorSpace"] is not NameObject { Value: "DeviceGray" }
+            || ((NumberObject)source["BitsPerComponent"]).IntValue != 1)
+        {
+            throw new InvalidOperationException(
+                "A stencil mask requires a 1-bit grayscale image with no alpha channel.");
+        }
+
+        var stream = new StreamObject(xobject.Image.Data);
+        var dict = stream.Dictionary;
+        dict["Type"] = new NameObject("XObject");
+        dict["Subtype"] = new NameObject("Image");
+        dict["Width"] = source["Width"];
+        dict["Height"] = source["Height"];
+        dict["ImageMask"] = new BooleanObject(true);
+        dict["BitsPerComponent"] = new NumberObject(1);
+        dict["Filter"] = source["Filter"];
+        return new ImageXObject(stream, null);
     }
 
     private static bool IsPng(byte[] data)

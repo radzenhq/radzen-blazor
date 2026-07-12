@@ -43,9 +43,17 @@ public sealed class Image : Block
     /// </summary>
     public bool Interpolate { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether the image is painted as a 1-bit stencil mask (<c>/ImageMask true</c>,
+    /// ISO 32000-1 8.9.6.2): its samples select which pixels are painted in the current fill
+    /// colour rather than carrying colour of their own. The source must decode to a 1-bit
+    /// grayscale image with no alpha channel. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool Stencil { get; set; }
+
     // True when the image opts into any XObject-dictionary option, so emission can keep the
     // default path (and its bytes) untouched for an image that uses none of them.
-    internal bool HasXObjectOptions => Interpolate;
+    internal bool HasXObjectOptions => Interpolate || Stencil;
 
     internal (Unit Width, Unit Height)? FitBox { get; private set; }
 
