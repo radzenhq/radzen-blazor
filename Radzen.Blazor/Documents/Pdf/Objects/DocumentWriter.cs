@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Encryption;
+using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -47,6 +48,15 @@ public sealed class DocumentWriter(Stream stream)
     public EncryptionOptions? Encryption { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether <see cref="Close"/> packs eligible
+    /// non-stream objects into a Flate-compressed <c>/Type /ObjStm</c> object stream
+    /// and writes a <c>/Type /XRef</c> cross-reference stream (ISO 32000-1 sections
+    /// 7.5.7 and 7.5.8) instead of the classic cross-reference table and trailer.
+    /// Defaults to <c>false</c>, which keeps the classic output unchanged.
+    /// </summary>
+    public bool UseCompressedStreams { get; set; }
+
+    /// <summary>
     /// Registers <paramref name="value"/> as an indirect object and returns a
     /// reference to it. The object body is serialized later by <see cref="Close"/>.
     /// </summary>
@@ -71,25 +81,17 @@ public sealed class DocumentWriter(Stream stream)
 
         var (encryption, encryptNumber) = PrepareEncryption();
 
+        if (UseCompressedStreams)
+        {
+            CloseCompressed(buffer, encryption, encryptNumber);
+            buffer.Flush();
+            return;
+        }
+
         var offsets = new long[objects.Count];
         for (var i = 0; i < objects.Count; i++)
         {
-            offsets[i] = buffer.Position;
-            PdfBytes.WriteInteger(buffer, i + 1);
-            PdfBytes.WriteAscii(buffer, " 0 obj\n");
-
-            // The /Encrypt dictionary and the document /ID are never themselves encrypted.
-            if (encryption is not null && i + 1 != encryptNumber)
-            {
-                using var scope = encryption.BeginObject(i + 1);
-                objects[i].Write(buffer);
-            }
-            else
-            {
-                objects[i].Write(buffer);
-            }
-
-            PdfBytes.WriteAscii(buffer, "\nendobj\n");
+            offsets[i] = WriteIndirectObject(buffer, i + 1, objects[i], encryption, encryptNumber);
         }
 
         var xrefOffset = buffer.Position;
@@ -113,6 +115,164 @@ public sealed class DocumentWriter(Stream stream)
         PdfBytes.WriteAscii(buffer, "\n%%EOF\n");
 
         buffer.Flush();
+    }
+
+    private static long WriteIndirectObject(CountingBufferedStream buffer, int number, DocumentObject value, EncryptionWriter? encryption, int encryptNumber)
+    {
+        var offset = buffer.Position;
+        PdfBytes.WriteInteger(buffer, number);
+        PdfBytes.WriteAscii(buffer, " 0 obj\n");
+
+        // The /Encrypt dictionary and the document /ID are never themselves encrypted.
+        if (encryption is not null && number != encryptNumber)
+        {
+            using var scope = encryption.BeginObject(number);
+            value.Write(buffer);
+        }
+        else
+        {
+            value.Write(buffer);
+        }
+
+        PdfBytes.WriteAscii(buffer, "\nendobj\n");
+        return offset;
+    }
+
+    // Packs eligible objects into an object stream, writes the remaining objects
+    // top-level, then emits a cross-reference stream in place of the classic
+    // table and trailer. Stream objects, the /Encrypt dictionary and the
+    // cross-reference stream itself are never packed.
+    private void CloseCompressed(CountingBufferedStream buffer, EncryptionWriter? encryption, int encryptNumber)
+    {
+        var builder = new ObjectStreamBuilder();
+        var count = objects.Count;
+        var offsets = new long[count];
+        var packedIndex = new int[count];
+
+        // Packed bodies are serialized outside any encryption scope: strings
+        // inside an object stream are protected by encrypting the stream data,
+        // not individually (ISO 32000-1 7.6.1).
+        for (var i = 0; i < count; i++)
+        {
+            packedIndex[i] = objects[i] is not StreamObject && i + 1 != encryptNumber
+                ? builder.Add(i + 1, objects[i])
+                : -1;
+        }
+
+        var objStmNumber = builder.Count > 0 ? count + 1 : -1;
+        var xrefNumber = builder.Count > 0 ? count + 2 : count + 1;
+
+        for (var i = 0; i < count; i++)
+        {
+            if (packedIndex[i] < 0)
+            {
+                offsets[i] = WriteIndirectObject(buffer, i + 1, objects[i], encryption, encryptNumber);
+            }
+        }
+
+        long objStmOffset = 0;
+        if (objStmNumber > 0)
+        {
+            objStmOffset = WriteIndirectObject(buffer, objStmNumber, builder.Build(), encryption, encryptNumber);
+        }
+
+        var xrefOffset = buffer.Position;
+        WriteXrefStream(buffer, xrefNumber, xrefOffset, offsets, packedIndex, objStmNumber, objStmOffset);
+
+        PdfBytes.WriteAscii(buffer, "startxref\n");
+        PdfBytes.WriteInteger(buffer, xrefOffset);
+        PdfBytes.WriteAscii(buffer, "\n%%EOF\n");
+    }
+
+    private void WriteXrefStream(CountingBufferedStream buffer, int xrefNumber, long xrefOffset, long[] offsets, int[] packedIndex, int objStmNumber, long objStmOffset)
+    {
+        var size = xrefNumber + 1;
+        var types = new byte[size];
+        var field2 = new long[size];
+        var field3 = new long[size];
+
+        field3[0] = 65535;
+        for (var i = 0; i < offsets.Length; i++)
+        {
+            var number = i + 1;
+            if (packedIndex[i] >= 0)
+            {
+                types[number] = 2;
+                field2[number] = objStmNumber;
+                field3[number] = packedIndex[i];
+            }
+            else
+            {
+                types[number] = 1;
+                field2[number] = offsets[i];
+            }
+        }
+
+        if (objStmNumber > 0)
+        {
+            types[objStmNumber] = 1;
+            field2[objStmNumber] = objStmOffset;
+        }
+
+        types[xrefNumber] = 1;
+        field2[xrefNumber] = xrefOffset;
+
+        var w1 = 1;
+        var w2 = 1;
+        for (var i = 0; i < size; i++)
+        {
+            w1 = Math.Max(w1, FieldWidth(field2[i]));
+            w2 = Math.Max(w2, FieldWidth(field3[i]));
+        }
+
+        var data = new byte[size * (1 + w1 + w2)];
+        var pos = 0;
+        for (var i = 0; i < size; i++)
+        {
+            data[pos++] = types[i];
+            WriteBigEndian(data, ref pos, field2[i], w1);
+            WriteBigEndian(data, ref pos, field3[i], w2);
+        }
+
+        var xref = new StreamObject(FlateFilter.Encode(data));
+        xref.Dictionary["Type"] = new NameObject("XRef");
+        xref.Dictionary["Size"] = new NumberObject(size);
+        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
+        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
+
+        foreach (var key in Trailer.Keys)
+        {
+            if (!xref.Dictionary.ContainsKey(key))
+            {
+                xref.Dictionary[key] = Trailer[key];
+            }
+        }
+
+        // Cross-reference streams are never encrypted (ISO 32000-1 7.5.8.2).
+        WriteIndirectObject(buffer, xrefNumber, xref, null, -1);
+    }
+
+    private static int FieldWidth(long value)
+    {
+        var width = 1;
+        while (value > 0xFF)
+        {
+            value >>= 8;
+            width++;
+        }
+
+        return width;
+    }
+
+    private static void WriteBigEndian(byte[] data, ref int pos, long value, int width)
+    {
+        for (var i = width - 1; i >= 0; i--)
+        {
+            data[pos + i] = (byte)value;
+            value >>= 8;
+        }
+
+        pos += width;
     }
 
     // Builds the /Encrypt dictionary, wires it and a fresh /ID into the trailer,
