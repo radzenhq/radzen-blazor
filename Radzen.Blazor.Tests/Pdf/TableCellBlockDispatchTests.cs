@@ -245,6 +245,12 @@ public class TableCellBlockDispatchTests
             case nameof(PageBreak):
                 cell.Blocks.AddPageBreak();
                 break;
+            case nameof(Container):
+                var container = cell.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
+                var boxed = container.Blocks.AddParagraph();
+                var run = boxed.Inlines.Add("Boxed");
+                run.Font.Name = TableLayoutSupport.Family;
+                break;
             default:
                 Assert.Fail($"No cell sample for block type '{type.Name}'. Wire it into TableLayout.LayoutContent (and Paginator) and add a sample here.");
                 break;

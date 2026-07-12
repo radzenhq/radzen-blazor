@@ -77,6 +77,10 @@ internal static class StyleResolver
             {
                 ResolveList(list, styles, inherited);
             }
+            else if (block is Container container)
+            {
+                ResolveBlocks(container.Blocks, styles, inherited, resolution);
+            }
         }
     }
 

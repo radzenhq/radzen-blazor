@@ -186,7 +186,7 @@ internal static class Paginator
 
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
-        var blocks = ExpandBlocks(section.Blocks);
+        var blocks = ExpandBlocks(section.Blocks, contentWidth);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
@@ -463,19 +463,19 @@ internal static class Paginator
             _ => HorizontalAlignment.Left,
         };
 
-    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks)
+    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks, double availableWidth)
     {
-        var hasList = false;
+        var needsExpansion = false;
         foreach (var block in blocks)
         {
-            if (block is List)
+            if (block is List or Container)
             {
-                hasList = true;
+                needsExpansion = true;
                 break;
             }
         }
 
-        if (!hasList)
+        if (!needsExpansion)
         {
             return blocks;
         }
@@ -490,6 +490,10 @@ internal static class Paginator
                     expanded.Add(ExpandItem(list, i));
                 }
             }
+            else if (block is Container container)
+            {
+                expanded.Add(LowerContainer(container, availableWidth));
+            }
             else
             {
                 expanded.Add(block);
@@ -497,6 +501,44 @@ internal static class Paginator
         }
 
         return expanded;
+    }
+
+    // A Container lowers to a synthetic single-cell table so measuring, pagination and box
+    // decoration (padding, background, borders) reuse the table engine unchanged. Nested
+    // containers lower recursively when the synthetic cell's content is itself expanded.
+    private static Table LowerContainer(Container container, double availableWidth)
+    {
+        var table = new Table();
+        if (container.Width is { } width)
+        {
+            table.Columns.Add(width);
+            table.LeftIndent = Unit.FromPoint(System.Math.Max(0, AlignImage(container.Alignment, availableWidth, width.Point)));
+        }
+        else
+        {
+            table.Columns.Add();
+        }
+
+        var cell = table.Rows.Add().Cells[0];
+        cell.Padding = container.Padding;
+        cell.Background = container.Background;
+        CopyEdge(container.Borders.Top, cell.Borders.Top);
+        CopyEdge(container.Borders.Right, cell.Borders.Right);
+        CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);
+        CopyEdge(container.Borders.Left, cell.Borders.Left);
+        foreach (var block in container.Blocks)
+        {
+            cell.Blocks.Add(block);
+        }
+
+        return table;
+    }
+
+    private static void CopyEdge(Border source, Border target)
+    {
+        target.Width = source.Width;
+        target.Color = source.Color;
+        target.Style = source.Style;
     }
 
     private static Paragraph ExpandItem(List list, int index)
@@ -691,7 +733,7 @@ internal static class Paginator
         var images = result.Images;
         double cursor = 0;
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in ExpandBlocks(band.Blocks))
+        foreach (var block in ExpandBlocks(band.Blocks, width))
         {
             if (block is Table table)
             {
