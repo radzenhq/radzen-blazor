@@ -16,6 +16,18 @@ internal readonly struct BoxStyle
     public Unit CornerRadius { get; init; }
     public string? ExtGState { get; init; }
 
+    // A container's decoration has no border cascade - its four edges are its own.
+    // Opacity is registered as an ExtGState later, at emit time, when a PagePlan exists.
+    public static BoxStyle FromContainer(Container container) => new()
+    {
+        Background = container.Background,
+        Top = container.Borders.Top,
+        Right = container.Borders.Right,
+        Bottom = container.Borders.Bottom,
+        Left = container.Borders.Left,
+        CornerRadius = container.CornerRadius,
+    };
+
     // MigraDoc semantics: a positive width alone makes the edge a visible solid line,
     // and a visible edge without a width draws at 0.5pt.
     public static ResolvedEdge? Resolve(Border edge)

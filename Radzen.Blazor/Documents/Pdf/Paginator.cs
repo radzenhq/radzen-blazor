@@ -958,15 +958,7 @@ internal static class Paginator
             Source = container,
             Content = content,
             Bounds = new Rect(indent, y, boxWidth, boxHeight),
-            Style = new BoxStyle
-            {
-                Background = container.Background,
-                Top = container.Borders.Top,
-                Right = container.Borders.Right,
-                Bottom = container.Borders.Bottom,
-                Left = container.Borders.Left,
-                CornerRadius = container.CornerRadius,
-            },
+            Style = BoxStyle.FromContainer(container),
             Y = y,
             Opacity = container.Opacity,
             Transform = transform,

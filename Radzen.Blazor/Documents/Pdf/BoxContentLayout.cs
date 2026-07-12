@@ -211,15 +211,7 @@ internal static class BoxContentLayout
                     Source = box,
                     Content = Position(boxContent, innerBox, HorizontalAlignment.Left, VerticalAlignment.Top),
                     Bounds = new Rect(contentBox.Left + indent, cursorY, item.Width, item.Height),
-                    Style = new BoxStyle
-                    {
-                        Background = box.Background,
-                        Top = box.Borders.Top,
-                        Right = box.Borders.Right,
-                        Bottom = box.Borders.Bottom,
-                        Left = box.Borders.Left,
-                        CornerRadius = box.CornerRadius,
-                    },
+                    Style = BoxStyle.FromContainer(box),
                     Radius = BoxRenderer.ClampRadius(box.CornerRadius.Point, item.Width, item.Height),
                     Opacity = box.Opacity,
                     Order = order++,
