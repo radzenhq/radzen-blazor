@@ -2,7 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A single table cell containing block-level content.

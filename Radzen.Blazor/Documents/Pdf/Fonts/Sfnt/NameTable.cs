@@ -1,4 +1,3 @@
-#nullable enable
 using System.Text;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;

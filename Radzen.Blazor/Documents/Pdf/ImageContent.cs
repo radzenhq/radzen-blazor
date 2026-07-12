@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An image placed into a rectangle. Holds a pre-encoded image XObject payload.

@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The abstract base of all block-level content (paragraphs, tables, images, page breaks).

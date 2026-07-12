@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// Predefined page sizes. ISO A sizes are derived from their millimeter dimensions; US sizes are exact points.

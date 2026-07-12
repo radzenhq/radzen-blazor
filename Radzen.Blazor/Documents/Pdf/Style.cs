@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A named style definition. Inheritance is resolved at layout time; this type only stores the structure.

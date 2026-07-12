@@ -2,7 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The width and height of a page.

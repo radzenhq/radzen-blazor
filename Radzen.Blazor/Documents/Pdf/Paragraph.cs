@@ -2,7 +2,6 @@ using System.Linq;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A block of inline text runs with paragraph-level formatting.

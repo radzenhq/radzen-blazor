@@ -2,7 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A 2D affine transform in the PDF matrix convention <c>[a b c d e f]</c>, mapping

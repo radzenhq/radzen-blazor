@@ -4,7 +4,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-#nullable enable
 
 // Write-only growable buffer backed by ArrayPool. Collapses the MemoryStream
 // double buffering on the save path: growth swaps pooled arrays and ToArray

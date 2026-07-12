@@ -6,7 +6,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A physical PDF document: an ordered collection of pages plus document

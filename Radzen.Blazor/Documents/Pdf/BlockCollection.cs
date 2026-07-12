@@ -5,7 +5,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An ordered, read-only view of block-level content with typed helpers for appending blocks.

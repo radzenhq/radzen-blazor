@@ -4,7 +4,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-#nullable enable
 
 // Write-only stream that batches small writes into a pooled buffer before
 // forwarding them to the destination, while tracking the total byte count so

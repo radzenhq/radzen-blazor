@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The interactive form of a loaded <see cref="Document"/>. Exposes the terminal

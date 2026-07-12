@@ -3,7 +3,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// Represents a measurement expressed in typographic points (1/72 inch). Stored culture-invariantly.

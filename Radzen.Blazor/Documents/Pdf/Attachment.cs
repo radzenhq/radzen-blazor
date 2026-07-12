@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The relationship between an embedded file and the document, written as the

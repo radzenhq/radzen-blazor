@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// An explicit tab stop: a position and the alignment applied to the text that follows the tab.

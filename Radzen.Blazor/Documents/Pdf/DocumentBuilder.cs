@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The root of the document authoring model. Holds metadata, named styles and the ordered sections.

@@ -2,7 +2,6 @@ using System.Linq;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A single item of a <see cref="List"/>, holding inline content that flows after the item marker.

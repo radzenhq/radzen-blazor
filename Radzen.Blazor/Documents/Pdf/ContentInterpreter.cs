@@ -7,7 +7,6 @@ using TokenKind = Radzen.Documents.Pdf.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 // Parses a page content stream back into ContentElement objects, folding the
 // graphics-state (q/Q, cm) and text (Tm/Td) stacks into an absolute Transform per

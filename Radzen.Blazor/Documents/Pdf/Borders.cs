@@ -1,6 +1,5 @@
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// The four border edges of a box. Box-level <see cref="Width"/>, <see cref="Color"/> and <see cref="Style"/>

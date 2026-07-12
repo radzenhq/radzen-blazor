@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 /// <summary>
 /// A vector path built from move, line, curve and close segments, painted by

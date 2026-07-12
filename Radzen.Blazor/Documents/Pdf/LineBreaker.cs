@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-#nullable enable
 
 internal struct LineFragment
 {
