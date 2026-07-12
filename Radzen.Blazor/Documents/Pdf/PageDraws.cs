@@ -16,6 +16,9 @@ internal struct TextDraw
     public double Rise { get; init; }
     public StructureElement? Element { get; init; }
     public Rect? Clip { get; set; }
+
+    // Corner radius of the clip path; 0 clips to the plain `re` rectangle.
+    public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 
     // Applied as a q .. cm wrap around the whole draw (clip included), so the clip
@@ -32,6 +35,7 @@ internal struct ImageDraw
     public required GeneratedImage Image { get; init; }
     public StructureElement? Element { get; init; }
     public Rect? Clip { get; set; }
+    public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; set; }
 }
@@ -47,6 +51,7 @@ internal struct FillDraw
     // Corner radius of the filled rounded rectangle; 0 fills a plain `re` rectangle.
     public double Radius { get; init; }
     public Rect? Clip { get; set; }
+    public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 }
 
@@ -64,7 +69,7 @@ internal readonly struct RoundedStrokeDraw
     public string? ExtGState { get; init; }
 }
 
-internal readonly struct EdgeDraw
+internal struct EdgeDraw
 {
     public required double X1 { get; init; }
     public required double Y1 { get; init; }
@@ -73,6 +78,8 @@ internal readonly struct EdgeDraw
     public required double LineWidth { get; init; }
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
+    public Rect? Clip { get; set; }
+    public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 }
 
@@ -122,6 +129,56 @@ internal sealed class PagePlan
     }
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
+
+    // Clips every fill, edge, image and text added after the mark to a rounded rectangle,
+    // so a rounded container/cell/table confines its children to the rounded shape. Draws
+    // that already carry a clip keep it - an inner rounded box wins over an outer one.
+    public void ApplyRoundedClip(Rect bounds, double radius, PlanMarks mark)
+    {
+        for (var i = mark.Fills; i < Fills.Count; i++)
+        {
+            var fill = Fills[i];
+            if (fill.Clip is null)
+            {
+                fill.Clip = bounds;
+                fill.ClipRadius = radius;
+                Fills[i] = fill;
+            }
+        }
+
+        for (var i = mark.Edges; i < Edges.Count; i++)
+        {
+            var edge = Edges[i];
+            if (edge.Clip is null)
+            {
+                edge.Clip = bounds;
+                edge.ClipRadius = radius;
+                Edges[i] = edge;
+            }
+        }
+
+        for (var i = mark.Images; i < Images.Count; i++)
+        {
+            var image = Images[i];
+            if (image.Clip is null)
+            {
+                image.Clip = bounds;
+                image.ClipRadius = radius;
+                Images[i] = image;
+            }
+        }
+
+        for (var i = mark.Texts; i < Texts.Count; i++)
+        {
+            var text = Texts[i];
+            if (text.Clip is null)
+            {
+                text.Clip = bounds;
+                text.ClipRadius = radius;
+                Texts[i] = text;
+            }
+        }
+    }
 
     // Applies an affine transform to every draw added after the mark. Texts and images
     // carry the matrix into ContentEmitter, which wraps them in q cm .. Q. Edges bake the

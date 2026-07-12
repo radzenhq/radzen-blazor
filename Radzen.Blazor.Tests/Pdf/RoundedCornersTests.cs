@@ -62,7 +62,8 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        Assert.Equal(8, Count(content, " c\n"));
+        // Fill path + border path + the rounded clip around the child paragraph text.
+        Assert.Equal(12, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(1, Count(content, "h\nS\n"));
         Assert.DoesNotContain("re f", content);
@@ -92,7 +93,8 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        Assert.Equal(4, Count(content, " c\n"));
+        // Fill path + the rounded clip around the child paragraph text.
+        Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(0, Count(content, "h\nS\n"));
     }
@@ -109,7 +111,8 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        Assert.Equal(4, Count(content, " c\n"));
+        // Fill path + the rounded clip around the child paragraph text.
+        Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(0, Count(content, "h\nS\n"));
         Assert.Equal(4, Count(content, " l\nS\nQ\n"));
@@ -161,7 +164,8 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        Assert.Equal(4, Count(content, " c\n"));
+        // Fill path + the rounded clip around the cell's paragraph text.
+        Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
     }
 

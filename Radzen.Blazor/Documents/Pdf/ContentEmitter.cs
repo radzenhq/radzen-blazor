@@ -16,6 +16,57 @@ internal static class ContentEmitter
         writer.WriteRaw(" re W n\n");
     }
 
+    // Sets the clip to a rounded rectangle when radius > 0, otherwise to the plain rectangle.
+    public static void WriteClip(ContentWriter writer, in Rect clip, double radius)
+    {
+        if (radius > 0)
+        {
+            WriteRoundedRect(writer, clip.X, clip.Y, clip.Width, clip.Height, radius);
+            writer.WriteRaw("W n\n");
+        }
+        else
+        {
+            WriteClipRect(writer, clip);
+        }
+    }
+
+    // Circle-approximation constant for a quarter arc drawn as one cubic Bezier.
+    private const double BezierArcKappa = 0.5522847498307936;
+
+    // Writes a rounded-rectangle path (m/l/c ops, closed with h) starting at the bottom-left
+    // corner's end point and running counterclockwise. The caller appends the paint operator.
+    public static void WriteRoundedRect(ContentWriter writer, double x, double y, double width, double height, double radius)
+    {
+        var offset = radius * BezierArcKappa;
+        var right = x + width;
+        var top = y + height;
+        WritePoint(writer, x + radius, y, " m\n");
+        WritePoint(writer, right - radius, y, " l\n");
+        WriteCurve(writer, right - radius + offset, y, right, y + radius - offset, right, y + radius);
+        WritePoint(writer, right, top - radius, " l\n");
+        WriteCurve(writer, right, top - radius + offset, right - radius + offset, top, right - radius, top);
+        WritePoint(writer, x + radius, top, " l\n");
+        WriteCurve(writer, x + radius - offset, top, x, top - radius + offset, x, top - radius);
+        WritePoint(writer, x, y + radius, " l\n");
+        WriteCurve(writer, x, y + radius - offset, x + radius - offset, y, x + radius, y);
+        writer.WriteRaw("h\n");
+    }
+
+    private static void WritePoint(ContentWriter writer, double x, double y, string op)
+    {
+        writer.WriteNumber(x);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(y);
+        writer.WriteRaw(op);
+    }
+
+    private static void WriteCurve(ContentWriter writer, double x1, double y1, double x2, double y2, double x3, double y3)
+    {
+        WritePoint(writer, x1, y1, " ");
+        WritePoint(writer, x2, y2, " ");
+        WritePoint(writer, x3, y3, " c\n");
+    }
+
     // Emits "a b c d e f cm" concatenating the transform with the CTM. Must sit inside a
     // caller-managed q .. Q pair so the surrounding graphics state stays untouched.
     public static void WriteTransform(ContentWriter writer, in Matrix matrix)
@@ -52,7 +103,7 @@ internal static class ContentEmitter
 
         if (image.Clip is { } clip)
         {
-            WriteClipRect(writer, clip);
+            WriteClip(writer, clip, image.ClipRadius);
         }
 
         writer.WriteNumber(image.Width);
@@ -88,7 +139,7 @@ internal static class ContentEmitter
 
         if (text.Clip is { } clip)
         {
-            WriteClipRect(writer, clip);
+            WriteClip(writer, clip, text.ClipRadius);
         }
 
         writer.WriteRaw("BT\n");

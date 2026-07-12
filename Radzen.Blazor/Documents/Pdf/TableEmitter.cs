@@ -14,6 +14,16 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var plan = context.Plan;
         var layout = positioned.Layout;
         var x = left + (layout.Source?.LeftIndent.Point ?? 0);
+        var tableRadius = 0.0;
+        var tableBounds = default(Rect);
+        var tableMark = default(PlanMarks);
+        if (layout.Source is { } table && table.CornerRadius.Point > 0)
+        {
+            tableBounds = FragmentBounds(positioned, x, contentTop);
+            tableRadius = ClampRadius(table.CornerRadius.Point, tableBounds.Width, tableBounds.Height);
+            tableMark = plan.Mark();
+        }
+
         var rowIndex = RowIndex(layout);
         foreach (var row in positioned.Fragment.Rows)
         {
@@ -40,6 +50,60 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 var delta = positioned.Y + row.Y - cell.Bounds.Y;
                 EmitCell(context, layout, cell, x, contentTop, delta, null);
             }
+        }
+
+        if (tableRadius > 0)
+        {
+            EmitTableFrame(plan, layout.Source!, tableBounds, tableRadius, tableMark);
+        }
+    }
+
+    // The page-space box of one on-page table fragment. A table that splits across pages
+    // rounds each fragment to its own box, so every fragment gets four rounded corners.
+    private static Rect FragmentBounds(in PositionedTableFragment positioned, double x, double contentTop)
+    {
+        var top = double.MaxValue;
+        var bottom = double.MinValue;
+        foreach (var row in positioned.Fragment.Rows)
+        {
+            top = System.Math.Min(top, row.Y);
+            bottom = System.Math.Max(bottom, row.Y + row.Height);
+        }
+
+        if (bottom <= top)
+        {
+            return default;
+        }
+
+        return new Rect(x, contentTop - positioned.Y - bottom, positioned.Layout.Width, bottom - top);
+    }
+
+    // Draws the rounded frame of a whole table: clips everything the table emitted (corner
+    // cell backgrounds and outer border edges included; interior grid lines are only touched
+    // where they meet the rounded corners) and, when the table-level borders resolve to one
+    // uniform edge, strokes a single rounded-rectangle border around the perimeter.
+    private static void EmitTableFrame(PagePlan plan, Table source, in Rect bounds, double radius, PlanMarks mark)
+    {
+        plan.ApplyRoundedClip(bounds, radius, mark);
+
+        var borders = source.Borders;
+        var uniform = ResolveEdge(borders.Top, null, null);
+        if (uniform is { } edge
+            && ResolveEdge(borders.Right, null, null) == uniform
+            && ResolveEdge(borders.Bottom, null, null) == uniform
+            && ResolveEdge(borders.Left, null, null) == uniform)
+        {
+            plan.RoundedStrokes.Add(new RoundedStrokeDraw
+            {
+                X = bounds.X,
+                Y = bounds.Y,
+                Width = bounds.Width,
+                Height = bounds.Height,
+                Radius = radius,
+                LineWidth = edge.Width,
+                Color = edge.Color,
+                Style = edge.Style,
+            });
         }
     }
 
@@ -89,6 +153,10 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
 
         EmitBorders(plan, layout, cell, left, contentTop, delta, radius, extGState);
+
+        // The mark sits after the cell's own rounded background and border so only CHILD
+        // content gets clipped to the rounded box - the border stroke stays unclipped.
+        var contentMark = radius > 0 ? plan.Mark() : default;
 
         var firstText = plan.Texts.Count;
         var overflows = false;
@@ -193,23 +261,49 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         foreach (var nested in cell.Tables)
         {
             var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
+            var nestedRadius = 0.0;
+            var nestedBounds = default(Rect);
+            var nestedMark = default(PlanMarks);
+            if (nested.Layout.Source is { } nestedTable && nestedTable.CornerRadius.Point > 0)
+            {
+                nestedBounds = new Rect(
+                    nestedLeft,
+                    contentTop - (delta + nested.Y) - nested.Layout.Height,
+                    nested.Layout.Width,
+                    nested.Layout.Height);
+                nestedRadius = ClampRadius(nestedTable.CornerRadius.Point, nestedBounds.Width, nestedBounds.Height);
+                nestedMark = plan.Mark();
+            }
+
             foreach (var nestedCell in nested.Layout.Cells)
             {
                 EmitCell(context, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
             }
+
+            if (nestedRadius > 0)
+            {
+                EmitTableFrame(plan, nested.Layout.Source!, nestedBounds, nestedRadius, nestedMark);
+            }
+        }
+
+        if (radius > 0)
+        {
+            plan.ApplyRoundedClip(cellClip, radius, contentMark);
         }
     }
 
     // The effective corner radius, clamped so opposite corners never overlap.
     private static double CornerRadius(LaidOutCell cell)
+        => ClampRadius(cell.Cell.CornerRadius.Point, cell.Bounds.Width, cell.Bounds.Height);
+
+    private static double ClampRadius(double radius, double width, double height)
     {
-        var radius = cell.Cell.CornerRadius.Point;
-        if (radius <= 0)
+        if (radius <= 0 || width <= 0 || height <= 0)
         {
             return 0;
         }
 
-        return System.Math.Min(radius, System.Math.Min(cell.Bounds.Width, cell.Bounds.Height) / 2);
+        return System.Math.Min(radius, System.Math.Min(width, height) / 2);
     }
 
     // A rounded cell with a UNIFORM border (same width, color and style resolve on all four

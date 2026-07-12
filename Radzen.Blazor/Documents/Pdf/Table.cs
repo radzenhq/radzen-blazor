@@ -32,4 +32,13 @@ public sealed class Table : Block
 
     /// <summary>Gets or sets the horizontal offset of the table from the left content edge.</summary>
     public Unit LeftIndent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the corner radius of the table. When positive, the table strokes a single
+    /// rounded-rectangle border around its outer perimeter (when the table-level
+    /// <see cref="Borders"/> are uniform) and clips its content - including the corner cells'
+    /// backgrounds - to the rounded shape. The radius is clamped to half the smaller table
+    /// dimension. A table that breaks across pages rounds each per-page fragment independently.
+    /// </summary>
+    public Unit CornerRadius { get; set; }
 }
