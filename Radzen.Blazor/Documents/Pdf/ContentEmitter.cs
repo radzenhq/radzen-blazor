@@ -16,6 +16,24 @@ internal static class ContentEmitter
         writer.WriteRaw(" re W n\n");
     }
 
+    // Emits "a b c d e f cm" concatenating the transform with the CTM. Must sit inside a
+    // caller-managed q .. Q pair so the surrounding graphics state stays untouched.
+    public static void WriteTransform(ContentWriter writer, in Matrix matrix)
+    {
+        writer.WriteNumber(matrix.A);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(matrix.B);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(matrix.C);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(matrix.D);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(matrix.E);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(matrix.F);
+        writer.WriteRaw(" cm\n");
+    }
+
     public static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
     {
         writer.WriteRaw("q\n");
@@ -23,6 +41,13 @@ internal static class ContentEmitter
         {
             writer.WriteName(state);
             writer.WriteRaw(" gs\n");
+        }
+
+        // The transform precedes the clip so the clip rectangle (given in the same
+        // pre-transform coordinates as the image box) rotates with the image.
+        if (image.Transform is { } transform)
+        {
+            WriteTransform(writer, transform);
         }
 
         if (image.Clip is { } clip)
@@ -44,7 +69,7 @@ internal static class ContentEmitter
 
     public static void WriteTextDraw(ContentWriter writer, in TextDraw text)
     {
-        var wrapped = text.ExtGState is not null || text.Clip is not null;
+        var wrapped = text.ExtGState is not null || text.Clip is not null || text.Transform is not null;
         if (wrapped)
         {
             writer.WriteRaw("q\n");
@@ -54,6 +79,11 @@ internal static class ContentEmitter
         {
             writer.WriteName(state);
             writer.WriteRaw(" gs\n");
+        }
+
+        if (text.Transform is { } transform)
+        {
+            WriteTransform(writer, transform);
         }
 
         if (text.Clip is { } clip)

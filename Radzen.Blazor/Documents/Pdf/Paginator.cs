@@ -19,6 +19,12 @@ internal readonly struct PositionedTableFragment
     public required TableFragment Fragment { get; init; }
 
     public required double Y { get; init; }
+
+    /// <summary>
+    /// Page-space transform to apply to every draw this fragment produces (a rotated
+    /// container), or <see langword="null"/> for none.
+    /// </summary>
+    public Matrix? Transform { get; init; }
 }
 
 internal readonly struct PositionedImage
@@ -186,7 +192,8 @@ internal static class Paginator
 
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
-        var blocks = ExpandBlocks(section.Blocks, contentWidth);
+        // Overlay/rotated containers stay unlowered and are placed by PlaceSpecialContainer.
+        var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
@@ -224,6 +231,84 @@ internal static class Paginator
             }
         }
 
+        // An overlay or rotated container is placed as one unit that never breaks across
+        // pages. Overlay children each lower to their own single-cell table sharing the box
+        // origin (declaration order = paint order); the box decoration, when present, is a
+        // separate empty table sized to the tallest child so it spans the whole box. A
+        // rotated container additionally carries a page-space rotation about the box center.
+        void PlaceSpecialContainer(Container container)
+        {
+            var placements = new List<(Table Table, LaidOutTable Layout)>();
+            double boxWidth;
+            double boxLeft;
+            double boxHeight;
+
+            if (container.Layout == ContainerLayout.Overlay)
+            {
+                boxWidth = container.Width?.Point ?? contentWidth;
+                var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
+                boxLeft = left + indent;
+
+                boxHeight = 2 * container.Padding.Point;
+                foreach (var child in container.Blocks)
+                {
+                    var table = OverlayChildTable(container, child, boxWidth, indent);
+                    var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage);
+                    boxHeight = System.Math.Max(boxHeight, layout.Height);
+                    placements.Add((table, layout));
+                }
+
+                if (container.Background is not null || container.Borders.Top.IsSet
+                    || container.Borders.Right.IsSet || container.Borders.Bottom.IsSet
+                    || container.Borders.Left.IsSet)
+                {
+                    var decoration = OverlayDecorationTable(container, boxWidth, indent, boxHeight);
+                    placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage)));
+                }
+            }
+            else
+            {
+                var table = LowerContainer(container, contentWidth);
+                var layout = TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+                placements.Add((table, layout));
+                boxWidth = layout.Width;
+                boxLeft = left + table.LeftIndent.Point;
+                boxHeight = layout.Height;
+            }
+
+            if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
+            {
+                Flush();
+                cursor = 0;
+            }
+
+            Matrix? transform = null;
+            if (container.Rotation != 0)
+            {
+                var centerX = boxLeft + boxWidth / 2;
+                var centerY = pageHeight - contentBox.Y - cursor - boxHeight / 2;
+                transform = Matrix.Translate(-centerX, -centerY)
+                    * Matrix.Rotate(container.Rotation)
+                    * Matrix.Translate(centerX, centerY);
+            }
+
+            foreach (var (table, layout) in placements)
+            {
+                foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
+                {
+                    currentTables.Add(new PositionedTableFragment
+                    {
+                        Layout = layout,
+                        Fragment = fragment,
+                        Y = cursor,
+                        Transform = transform,
+                    });
+                }
+            }
+
+            cursor += boxHeight;
+        }
+
         var broken = new IReadOnlyList<LineBox>?[blocks.Count];
         for (var i = 0; i < blocks.Count; i++)
         {
@@ -248,6 +333,12 @@ internal static class Paginator
             if (block is Table table)
             {
                 PlaceTable(i, table);
+                continue;
+            }
+
+            if (block is Container special)
+            {
+                PlaceSpecialContainer(special);
                 continue;
             }
 
@@ -463,7 +554,7 @@ internal static class Paginator
             _ => HorizontalAlignment.Left,
         };
 
-    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks, double availableWidth)
+    internal static IReadOnlyList<Block> ExpandBlocks(BlockCollection blocks, double availableWidth, bool keepSpecialContainers = false)
     {
         var needsExpansion = false;
         foreach (var block in blocks)
@@ -489,7 +580,20 @@ internal static class Paginator
             }
             else if (block is Container container)
             {
-                expanded.Add(LowerContainer(container, availableWidth));
+                if (IsSpecial(container))
+                {
+                    if (!keepSpecialContainers)
+                    {
+                        throw new System.NotSupportedException(
+                            "Overlay and rotated containers are only supported as direct section content.");
+                    }
+
+                    expanded.Add(container);
+                }
+                else
+                {
+                    expanded.Add(LowerContainer(container, availableWidth));
+                }
             }
             else
             {
@@ -498,6 +602,35 @@ internal static class Paginator
         }
 
         return expanded;
+    }
+
+    private static bool IsSpecial(Container container)
+        => container.Layout == ContainerLayout.Overlay || container.Rotation != 0;
+
+    private static Table OverlayChildTable(Container container, Block child, double boxWidth, double indent)
+    {
+        var table = new Table { LeftIndent = Unit.FromPoint(indent) };
+        table.Columns.Add(Unit.FromPoint(boxWidth));
+        var cell = table.Rows.Add().Cells[0];
+        cell.Padding = container.Padding;
+        cell.Blocks.Add(child);
+        return table;
+    }
+
+    // Background and borders of an overlay box are drawn by an empty single-cell table
+    // whose height is forced through the top padding (empty content + padding = box height).
+    private static Table OverlayDecorationTable(Container container, double boxWidth, double indent, double boxHeight)
+    {
+        var table = new Table { LeftIndent = Unit.FromPoint(indent) };
+        table.Columns.Add(Unit.FromPoint(boxWidth));
+        var cell = table.Rows.Add().Cells[0];
+        cell.Background = container.Background;
+        cell.PaddingTop = Unit.FromPoint(boxHeight);
+        CopyEdge(container.Borders.Top, cell.Borders.Top);
+        CopyEdge(container.Borders.Right, cell.Borders.Right);
+        CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);
+        CopyEdge(container.Borders.Left, cell.Borders.Left);
+        return table;
     }
 
     // A Container lowers to a synthetic single-cell table so measuring, pagination and box
