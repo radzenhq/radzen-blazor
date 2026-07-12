@@ -1,0 +1,380 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using Radzen.Documents.Pdf.Objects.Filters;
+
+namespace Radzen.Documents.Pdf.Objects;
+
+/// <summary>
+/// Appends an incremental update (ISO 32000-1 section 7.5.6) to an existing PDF
+/// file: new and overridden indirect objects are written after the original
+/// end-of-file, followed by a cross-reference section chained to the previous
+/// one via <c>/Prev</c>, a trailer, <c>startxref</c> and <c>%%EOF</c>. The
+/// original bytes are preserved verbatim as a prefix of the output, which is
+/// what digital signatures over a byte range require.
+/// </summary>
+/// <remarks>
+/// The style of the appended cross-reference section matches the original
+/// file: a classic <c>xref</c> table and trailer when the original ends with
+/// one, or a <c>/Type /XRef</c> cross-reference stream when the original uses
+/// one. Overridden objects keep their object number with generation 0 - per
+/// section 7.5.6 an updated object reuses its number, and a generation bump is
+/// only required when a number from the free list is reused, which this writer
+/// never does. Output is deterministic: identical inputs produce identical bytes.
+/// </remarks>
+public sealed class IncrementalUpdateWriter
+{
+    private readonly byte[] original;
+    private readonly DocumentReader reader;
+    private readonly SortedDictionary<int, DocumentObject> objects = [];
+    private readonly long previousStartXref;
+    private readonly bool classicXref;
+    private readonly int originalMaxNumber;
+    private int nextNumber;
+
+    /// <summary>
+    /// Initializes a new instance over the bytes of an existing, valid PDF file.
+    /// The bytes are parsed with <see cref="DocumentReader"/> to obtain the
+    /// trailer entries (<c>/Root</c>, <c>/ID</c>, <c>/Size</c>) the update must carry.
+    /// </summary>
+    /// <param name="original">The complete bytes of the existing document.</param>
+    public IncrementalUpdateWriter(byte[] original)
+        : this(original, DocumentReader.Parse(original ?? throw new ArgumentNullException(nameof(original))))
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance over the bytes of an existing, valid PDF file
+    /// and an already-parsed reader for those same bytes.
+    /// </summary>
+    /// <param name="original">The complete bytes of the existing document.</param>
+    /// <param name="reader">A reader parsed from <paramref name="original"/>.</param>
+    public IncrementalUpdateWriter(byte[] original, DocumentReader reader)
+    {
+        ArgumentNullException.ThrowIfNull(original);
+        ArgumentNullException.ThrowIfNull(reader);
+
+        this.original = original;
+        this.reader = reader;
+
+        previousStartXref = FindStartXref(original);
+        classicXref = IsClassicXref(original, previousStartXref);
+
+        originalMaxNumber = reader.Trailer.TryGetValue("Size", out var size) && size is NumberObject sizeNumber
+            ? sizeNumber.IntValue - 1
+            : throw new DocumentParseException("Trailer is missing /Size.", -1);
+        nextNumber = originalMaxNumber + 1;
+    }
+
+    /// <summary>
+    /// Gets additional trailer entries to carry in the appended trailer (for
+    /// example an <c>/Encrypt</c> passthrough). <c>/Root</c>, <c>/Info</c> and
+    /// <c>/ID</c> are copied from the original trailer automatically but may be
+    /// overridden here; <c>/Size</c> and <c>/Prev</c> are always computed by the
+    /// writer and cannot be overridden.
+    /// </summary>
+    public DictionaryObject Trailer { get; } = new();
+
+    /// <summary>
+    /// Registers a new indirect object. It receives the next unused object
+    /// number in the chain (starting at the original <c>/Size</c>) with
+    /// generation 0.
+    /// </summary>
+    /// <param name="value">The object to append.</param>
+    /// <returns>An indirect reference to the new object.</returns>
+    public ReferenceObject Add(DocumentObject value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        var number = nextNumber++;
+        objects[number] = value;
+        return new ReferenceObject(number, 0);
+    }
+
+    /// <summary>
+    /// Registers a replacement for an existing indirect object. The replacement
+    /// keeps the object number with generation 0; readers resolve it instead of
+    /// the original because the appended cross-reference section is newer.
+    /// </summary>
+    /// <param name="objectNumber">The number of the object to override.</param>
+    /// <param name="value">The replacement object.</param>
+    /// <returns>An indirect reference to the overridden object.</returns>
+    public ReferenceObject Override(int objectNumber, DocumentObject value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        if (objectNumber < 1 || objectNumber > originalMaxNumber)
+        {
+            throw new ArgumentOutOfRangeException(nameof(objectNumber), objectNumber,
+                $"Object number must be between 1 and {originalMaxNumber} to override an existing object.");
+        }
+
+        objects[objectNumber] = value;
+        return new ReferenceObject(objectNumber, 0);
+    }
+
+    /// <summary>
+    /// Writes the original bytes followed by the incremental update section and
+    /// returns the complete new document.
+    /// </summary>
+    /// <returns>The bytes of the updated document.</returns>
+    public byte[] ToArray()
+    {
+        using var buffer = new MemoryStream();
+        WriteTo(buffer);
+        return buffer.ToArray();
+    }
+
+    /// <summary>
+    /// Writes the original bytes followed by the incremental update section to
+    /// <paramref name="stream"/>.
+    /// </summary>
+    /// <param name="stream">The destination stream.</param>
+    public void WriteTo(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        if (objects.Count == 0)
+        {
+            throw new InvalidOperationException("The incremental update contains no objects.");
+        }
+
+        using var buffer = new CountingBufferedStream(stream);
+        buffer.Write(original, 0, original.Length);
+        if (original.Length > 0 && original[^1] != (byte)'\n' && original[^1] != (byte)'\r')
+        {
+            buffer.WriteByte((byte)'\n');
+        }
+
+        var offsets = new SortedDictionary<int, long>();
+        foreach (var pair in objects)
+        {
+            offsets[pair.Key] = buffer.Position;
+            PdfBytes.WriteInteger(buffer, pair.Key);
+            PdfBytes.WriteAscii(buffer, " 0 obj\n");
+            pair.Value.Write(buffer);
+            PdfBytes.WriteAscii(buffer, "\nendobj\n");
+        }
+
+        long xrefOffset;
+        if (classicXref)
+        {
+            xrefOffset = buffer.Position;
+            WriteClassicXref(buffer, offsets);
+        }
+        else
+        {
+            xrefOffset = WriteXrefStream(buffer, offsets);
+        }
+
+        PdfBytes.WriteAscii(buffer, "startxref\n");
+        PdfBytes.WriteInteger(buffer, xrefOffset);
+        PdfBytes.WriteAscii(buffer, "\n%%EOF\n");
+        buffer.Flush();
+    }
+
+    private void WriteClassicXref(CountingBufferedStream buffer, SortedDictionary<int, long> offsets)
+    {
+        PdfBytes.WriteAscii(buffer, "xref\n");
+        Span<char> padded = stackalloc char[20];
+        foreach (var (start, count) in Subsections(offsets))
+        {
+            PdfBytes.WriteInteger(buffer, start);
+            PdfBytes.WriteAscii(buffer, " ");
+            PdfBytes.WriteInteger(buffer, count);
+            PdfBytes.WriteAscii(buffer, "\n");
+            for (var number = start; number < start + count; number++)
+            {
+                offsets[number].TryFormat(padded, out var written, "D10", CultureInfo.InvariantCulture);
+                PdfBytes.WriteAscii(buffer, padded[..written]);
+                PdfBytes.WriteAscii(buffer, " 00000 n \n");
+            }
+        }
+
+        PdfBytes.WriteAscii(buffer, "trailer\n");
+        BuildTrailer(nextNumber).Write(buffer);
+        PdfBytes.WriteAscii(buffer, "\n");
+    }
+
+    private long WriteXrefStream(CountingBufferedStream buffer, SortedDictionary<int, long> offsets)
+    {
+        var xrefNumber = nextNumber;
+        var xrefOffset = buffer.Position;
+        offsets[xrefNumber] = xrefOffset;
+
+        var w1 = 1;
+        foreach (var offset in offsets.Values)
+        {
+            w1 = Math.Max(w1, FieldWidth(offset));
+        }
+
+        var index = new ArrayObject();
+        using var data = new MemoryStream();
+        foreach (var (start, count) in Subsections(offsets))
+        {
+            index.Add(new NumberObject(start));
+            index.Add(new NumberObject(count));
+            for (var number = start; number < start + count; number++)
+            {
+                data.WriteByte(1);
+                WriteBigEndian(data, offsets[number], w1);
+                data.WriteByte(0);
+            }
+        }
+
+        var xref = new StreamObject(FlateFilter.Encode(data.ToArray()));
+        xref.Dictionary["Type"] = new NameObject("XRef");
+        xref.Dictionary["Index"] = index;
+        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(1) };
+        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
+        foreach (var pair in BuildTrailer(xrefNumber + 1))
+        {
+            if (!xref.Dictionary.ContainsKey(pair.Key))
+            {
+                xref.Dictionary[pair.Key] = pair.Value;
+            }
+        }
+
+        PdfBytes.WriteInteger(buffer, xrefNumber);
+        PdfBytes.WriteAscii(buffer, " 0 obj\n");
+        xref.Write(buffer);
+        PdfBytes.WriteAscii(buffer, "\nendobj\n");
+        return xrefOffset;
+    }
+
+    // /Size covers the whole chain: the original objects plus everything added
+    // by this update (and the cross-reference stream itself when one is written).
+    private DictionaryObject BuildTrailer(int size)
+    {
+        var result = new DictionaryObject();
+        foreach (var key in (string[])["Root", "Info", "ID"])
+        {
+            if (reader.Trailer.TryGetValue(key, out var value) && value is not null)
+            {
+                result[key] = value;
+            }
+        }
+
+        foreach (var pair in Trailer)
+        {
+            result[pair.Key] = pair.Value;
+        }
+
+        result["Size"] = new NumberObject(size);
+        result["Prev"] = new NumberObject(previousStartXref);
+        return result;
+    }
+
+    private static IEnumerable<(int Start, int Count)> Subsections(SortedDictionary<int, long> offsets)
+    {
+        var start = -1;
+        var count = 0;
+        foreach (var number in offsets.Keys)
+        {
+            if (start >= 0 && number == start + count)
+            {
+                count++;
+                continue;
+            }
+
+            if (start >= 0)
+            {
+                yield return (start, count);
+            }
+
+            start = number;
+            count = 1;
+        }
+
+        if (start >= 0)
+        {
+            yield return (start, count);
+        }
+    }
+
+    private static long FindStartXref(byte[] data)
+    {
+        const string pattern = "startxref";
+        for (var i = data.Length - pattern.Length; i >= 0; i--)
+        {
+            if (!Matches(data, i, pattern))
+            {
+                continue;
+            }
+
+            var index = i + pattern.Length;
+            while (index < data.Length && Lexer.IsWhitespace(data[index]))
+            {
+                index++;
+            }
+
+            var start = index;
+            while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
+            {
+                index++;
+            }
+
+            if (index == start)
+            {
+                throw new DocumentParseException("Expected integer after startxref.", start);
+            }
+
+            return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
+        }
+
+        throw new DocumentParseException("Missing startxref.", -1);
+    }
+
+    private static bool IsClassicXref(byte[] data, long offset)
+    {
+        var index = (int)offset;
+        if (index < 0 || index >= data.Length)
+        {
+            throw new DocumentParseException("startxref offset is outside the file.", index);
+        }
+
+        while (index < data.Length && Lexer.IsWhitespace(data[index]))
+        {
+            index++;
+        }
+
+        return Matches(data, index, "xref");
+    }
+
+    private static bool Matches(byte[] data, int index, string pattern)
+    {
+        if (index < 0 || index + pattern.Length > data.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < pattern.Length; i++)
+        {
+            if (data[index + i] != (byte)pattern[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static int FieldWidth(long value)
+    {
+        var width = 1;
+        while (value > 0xFF)
+        {
+            value >>= 8;
+            width++;
+        }
+
+        return width;
+    }
+
+    private static void WriteBigEndian(Stream stream, long value, int width)
+    {
+        for (var i = width - 1; i >= 0; i--)
+        {
+            stream.WriteByte((byte)(value >> (8 * i)));
+        }
+    }
+}
