@@ -117,7 +117,7 @@ public sealed class AcroForm
 
     private string PartialName(DictionaryObject dict)
         => dict.TryGetValue("T", out var value) && reader.Resolve(value!) is StringObject text
-            ? text.Value
+            ? FormField.DecodeTextString(text.Value)
             : string.Empty;
 
     /// <summary>
