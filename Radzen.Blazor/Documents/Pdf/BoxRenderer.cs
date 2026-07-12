@@ -11,6 +11,13 @@ internal static class BoxRenderer
     public static void Paint(PagePlan plan, Rect bounds, in BoxStyle style)
     {
         var radius = ClampRadius(style.CornerRadius.Point, bounds.Width, bounds.Height);
+
+        // The shadow is painted first so it sits under the box background and borders.
+        if (style.Shadow is { } shadow)
+        {
+            SoftMask.EmitBoxShadow(plan, bounds, radius, shadow);
+        }
+
         if (style.BackgroundGradient is { } gradient)
         {
             plan.Fills.Add(new FillDraw

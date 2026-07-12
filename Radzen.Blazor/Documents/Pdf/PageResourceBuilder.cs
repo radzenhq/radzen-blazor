@@ -33,6 +33,16 @@ internal static class PageResourceBuilder
         foreach (var state in page.ExtGStates)
         {
             extGStates ??= new DictionaryObject();
+            DocumentObject? softMask = null;
+            if (state.SoftMask is { } mask)
+            {
+                softMask = SoftMask.BuildDictionary(writer, mask);
+            }
+            else if (state.ClearSoftMask)
+            {
+                softMask = new NameObject("None");
+            }
+
             extGStates[state.Key] = ExtGStateDictionary(
                 state.FillAlpha,
                 state.StrokeAlpha,
@@ -40,7 +50,8 @@ internal static class PageResourceBuilder
                 state.OverprintStroke,
                 state.OverprintFill,
                 state.OverprintMode,
-                state.Intent);
+                state.Intent,
+                softMask);
         }
 
         DictionaryObject? patterns = null;
@@ -89,7 +100,8 @@ internal static class PageResourceBuilder
         bool? overprintStroke = null,
         bool? overprintFill = null,
         int? overprintMode = null,
-        RenderingIntent? intent = null)
+        RenderingIntent? intent = null,
+        DocumentObject? softMask = null)
     {
         var dictionary = new DictionaryObject
         {
@@ -121,6 +133,11 @@ internal static class PageResourceBuilder
         if (intent is { } ri)
         {
             dictionary["RI"] = new NameObject(ri.PdfName());
+        }
+
+        if (softMask is not null)
+        {
+            dictionary["SMask"] = softMask;
         }
 
         return dictionary;

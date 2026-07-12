@@ -74,6 +74,13 @@ internal sealed class GeneratedExtGState
     public int? OverprintMode { get; init; }
 
     public RenderingIntent? Intent { get; init; }
+
+    // A luminosity/alpha soft mask (/SMask << ... >>) built from a transparency group; null
+    // (the default) writes no /SMask so an alpha-only state stays byte-identical.
+    public GeneratedSoftMask? SoftMask { get; init; }
+
+    // When true and SoftMask is null, writes /SMask /None to clear an inherited soft mask.
+    public bool ClearSoftMask { get; init; }
 }
 
 // A page /Pattern resource entry: a shading pattern (PatternType 2) built from a

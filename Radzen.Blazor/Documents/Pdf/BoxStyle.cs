@@ -20,6 +20,10 @@ internal readonly struct BoxStyle
     public Unit CornerRadius { get; init; }
     public string? ExtGState { get; init; }
 
+    // An optional blurred drop shadow painted underneath the box (via a luminosity soft mask).
+    // Null (the default) paints no shadow and leaves output unchanged.
+    public BoxShadow? Shadow { get; init; }
+
     // Optional blend/overprint/rendering-intent, folded into the box ExtGState alongside
     // opacity at emit time. All null (the default) leaves output unchanged.
     public BlendMode? Blend { get; init; }
@@ -43,6 +47,7 @@ internal readonly struct BoxStyle
         Bottom = container.Borders.Bottom,
         Left = container.Borders.Left,
         CornerRadius = container.CornerRadius,
+        Shadow = container.Shadow,
         Blend = container.BlendMode,
         OverprintStroke = container.OverprintStroke,
         OverprintFill = container.OverprintFill,
