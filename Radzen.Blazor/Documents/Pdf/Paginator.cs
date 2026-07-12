@@ -742,6 +742,7 @@ internal static class Paginator
         table.Columns.Add(Unit.FromPoint(boxWidth));
         var cell = table.Rows.Add().Cells[0];
         cell.Background = container.Background;
+        cell.CornerRadius = container.CornerRadius;
         cell.PaddingTop = Unit.FromPoint(boxHeight);
         CopyEdge(container.Borders.Top, cell.Borders.Top);
         CopyEdge(container.Borders.Right, cell.Borders.Right);
@@ -769,6 +770,7 @@ internal static class Paginator
         var cell = table.Rows.Add().Cells[0];
         cell.Padding = container.Padding;
         cell.Background = container.Background;
+        cell.CornerRadius = container.CornerRadius;
         CopyEdge(container.Borders.Top, cell.Borders.Top);
         CopyEdge(container.Borders.Right, cell.Borders.Right);
         CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);

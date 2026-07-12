@@ -118,4 +118,13 @@ public class Cell
 
     /// <summary>Gets the cell borders.</summary>
     public Borders Borders { get; } = new();
+
+    /// <summary>
+    /// Gets or sets the corner radius of the cell box. When greater than zero the background
+    /// is filled as a rounded rectangle (the effective radius is clamped to half of the smaller
+    /// box dimension). The border is stroked as the same rounded path only when it is uniform -
+    /// the same width, color and style resolve on all four edges; a non-uniform border keeps the
+    /// square four-edge rendering while the background stays rounded. Defaults to 0 (square).
+    /// </summary>
+    public Unit CornerRadius { get; set; }
 }
