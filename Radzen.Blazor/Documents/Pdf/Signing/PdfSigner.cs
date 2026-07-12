@@ -65,8 +65,8 @@ public static class PdfSigner
         if (reader.Trailer.TryGetValue("Root", out var root) && root is ReferenceObject rootRef
             && reader.Resolve(rootRef) is DictionaryObject catalog)
         {
-            var bytes = Append(reader, writer, catalog, rootRef, options);
-            return EmbedSignature(bytes, pdf.Length, options, signer);
+            var (bytes, sigStart, sigEnd) = Append(reader, writer, catalog, rootRef, options);
+            return EmbedSignature(bytes, sigStart, sigEnd, options, signer);
         }
 
         throw new DocumentParseException("The trailer /Root must reference the document catalog.", -1);
@@ -74,7 +74,7 @@ public static class PdfSigner
 
     // Registers the signature dictionary, field/widget, AcroForm and page
     // updates with the incremental writer and serializes them.
-    private static byte[] Append(DocumentReader reader, IncrementalUpdateWriter writer,
+    private static (byte[] Bytes, int SigStart, int SigEnd) Append(DocumentReader reader, IncrementalUpdateWriter writer,
         DictionaryObject catalog, ReferenceObject rootRef, SignatureOptions options)
     {
         var (pageRef, page) = FindFirstPage(reader, catalog);
@@ -115,7 +115,16 @@ public static class PdfSigner
         }
 
         AppendAnnotation(reader, writer, pageRef, page, fieldRef);
-        return writer.ToArray();
+        var bytes = writer.ToArray();
+
+        // Bound the placeholder scan to the signature dictionary's own serialized
+        // bytes. The sig dict is the first appended object and the field is the
+        // next; every object copied from the (possibly hostile) input is an
+        // override with a lower number, so it is written before sigStart and
+        // cannot be mistaken for the real /Contents or /ByteRange placeholder.
+        var sigStart = checked((int)writer.OffsetOf(signatureRef));
+        var sigEnd = checked((int)writer.OffsetOf(fieldRef));
+        return (bytes, sigStart, sigEnd);
     }
 
     private static DictionaryObject BuildSignatureDictionary(SignatureOptions options)
@@ -279,11 +288,11 @@ public static class PdfSigner
 
     // Patches /ByteRange in place (length-preserving), collects the two byte
     // ranges, obtains the CMS blob and hex-encodes it into the /Contents gap.
-    private static byte[] EmbedSignature(byte[] bytes, int originalLength, SignatureOptions options, ISigner signer)
+    private static byte[] EmbedSignature(byte[] bytes, int sigStart, int sigEnd, SignatureOptions options, ISigner signer)
     {
         var hexDigits = options.SignatureMaxSizeBytes * 2;
-        var (gapStart, gapEnd) = FindContentsGap(bytes, originalLength, hexDigits);
-        PatchByteRange(bytes, originalLength, gapStart, gapEnd);
+        var (gapStart, gapEnd) = FindContentsGap(bytes, sigStart, sigEnd, hexDigits);
+        PatchByteRange(bytes, sigStart, sigEnd, gapStart, gapEnd);
 
         if (bytes[gapStart] != (byte)'<' || bytes[gapEnd - 1] != (byte)'>')
         {
@@ -313,21 +322,23 @@ public static class PdfSigner
         return bytes;
     }
 
-    // The placeholder is the only run of exactly 2N zero hex digits following
-    // a /Contents key in the appended section, so a pattern check is unambiguous.
-    private static (int Start, int End) FindContentsGap(byte[] bytes, int from, int hexDigits)
+    // The placeholder is the only run of exactly 2N zero hex digits following a
+    // /Contents key WITHIN the signature dictionary's own bytes [from, end). The
+    // scan is bounded to that object so a /Contents string an attacker planted in
+    // a copied input object (always written before the sig dict) cannot match.
+    private static (int Start, int End) FindContentsGap(byte[] bytes, int from, int end, int hexDigits)
     {
         const string key = "/Contents";
         var index = from;
-        while ((index = IndexOf(bytes, index, key)) >= 0)
+        while ((index = IndexOf(bytes, index, end, key)) >= 0)
         {
             var i = index + key.Length;
-            while (i < bytes.Length && Lexer.IsWhitespace(bytes[i]))
+            while (i < end && Lexer.IsWhitespace(bytes[i]))
             {
                 i++;
             }
 
-            if (i + hexDigits + 1 < bytes.Length && bytes[i] == (byte)'<' && bytes[i + hexDigits + 1] == (byte)'>'
+            if (i + hexDigits + 1 < end && bytes[i] == (byte)'<' && bytes[i + hexDigits + 1] == (byte)'>'
                 && AllZeros(bytes, i + 1, hexDigits))
             {
                 return (i, i + hexDigits + 2);
@@ -339,19 +350,19 @@ public static class PdfSigner
         throw new InvalidOperationException("Could not locate the /Contents placeholder.");
     }
 
-    private static void PatchByteRange(byte[] bytes, int from, int gapStart, int gapEnd)
+    private static void PatchByteRange(byte[] bytes, int from, int end, int gapStart, int gapEnd)
     {
         const string key = "/ByteRange";
-        var index = IndexOf(bytes, from, key);
+        var index = IndexOf(bytes, from, end, key);
         while (index >= 0)
         {
             var open = index + key.Length;
-            while (open < bytes.Length && Lexer.IsWhitespace(bytes[open]))
+            while (open < end && Lexer.IsWhitespace(bytes[open]))
             {
                 open++;
             }
 
-            if (open + ByteRangeInteriorWidth + 1 < bytes.Length && bytes[open] == (byte)'['
+            if (open + ByteRangeInteriorWidth + 1 < end && bytes[open] == (byte)'['
                 && bytes[open + ByteRangeInteriorWidth + 1] == (byte)']'
                 && IsByteRangePlaceholder(bytes, open + 1))
             {
@@ -370,7 +381,7 @@ public static class PdfSigner
                 return;
             }
 
-            index = IndexOf(bytes, index + key.Length, key);
+            index = IndexOf(bytes, index + key.Length, end, key);
         }
 
         throw new InvalidOperationException("Could not locate the /ByteRange placeholder.");
@@ -411,9 +422,10 @@ public static class PdfSigner
         return true;
     }
 
-    private static int IndexOf(byte[] bytes, int from, string pattern)
+    private static int IndexOf(byte[] bytes, int from, int end, string pattern)
     {
-        for (var i = Math.Max(from, 0); i <= bytes.Length - pattern.Length; i++)
+        var last = Math.Min(end, bytes.Length) - pattern.Length;
+        for (var i = Math.Max(from, 0); i <= last; i++)
         {
             var match = true;
             for (var j = 0; j < pattern.Length; j++)

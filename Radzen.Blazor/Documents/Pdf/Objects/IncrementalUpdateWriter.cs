@@ -33,6 +33,7 @@ public sealed class IncrementalUpdateWriter
     private readonly bool classicXref;
     private readonly int originalMaxNumber;
     private int nextNumber;
+    private IReadOnlyDictionary<int, long>? writtenOffsets;
 
     /// <summary>
     /// Initializes a new instance over the bytes of an existing, valid PDF file.
@@ -126,6 +127,31 @@ public sealed class IncrementalUpdateWriter
     }
 
     /// <summary>
+    /// Gets the absolute byte offset at which the given object was written in the
+    /// most recent <see cref="ToArray"/> / <see cref="WriteTo"/>. Valid only after
+    /// one of those has run. Used to bound in-place patching (e.g. a signature's
+    /// <c>/ByteRange</c> and <c>/Contents</c>) to a single object's own bytes.
+    /// </summary>
+    /// <param name="reference">A reference returned by <see cref="Add"/> or <see cref="Override"/>.</param>
+    /// <returns>The object's absolute start offset in the output.</returns>
+    public long OffsetOf(ReferenceObject reference)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        if (writtenOffsets is null)
+        {
+            throw new InvalidOperationException("OffsetOf is only available after ToArray or WriteTo.");
+        }
+
+        if (!writtenOffsets.TryGetValue(reference.ObjectNumber, out var offset))
+        {
+            throw new ArgumentException(
+                $"Object {reference.ObjectNumber} was not written by this update.", nameof(reference));
+        }
+
+        return offset;
+    }
+
+    /// <summary>
     /// Writes the original bytes followed by the incremental update section to
     /// <paramref name="stream"/>.
     /// </summary>
@@ -154,6 +180,8 @@ public sealed class IncrementalUpdateWriter
             pair.Value.Write(buffer);
             PdfBytes.WriteAscii(buffer, "\nendobj\n");
         }
+
+        writtenOffsets = offsets;
 
         long xrefOffset;
         if (classicXref)
