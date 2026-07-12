@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
+using static Radzen.Documents.Pdf.ContentEmitter;
+using static Radzen.Documents.Pdf.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf;
 
@@ -62,81 +64,22 @@ internal sealed class GeneratedPage
 // images and stroked cell borders - never materializing ContentElement objects.
 internal sealed class DocumentGenerator
 {
-    private struct TextDraw
-    {
-        public required double X { get; init; }
-        public required double Baseline { get; init; }
-        public required double Size { get; init; }
-        public required Color Color { get; init; }
-        public required GeneratedFont Font { get; init; }
-        public required byte[] Bytes { get; init; }
-        public double StrokeWidth { get; init; }
-        public double Shear { get; init; }
-        public StructureElement? Element { get; init; }
-        public Rect? Clip { get; set; }
-    }
-
-    private struct ImageDraw
-    {
-        public required double X { get; init; }
-        public required double Y { get; init; }
-        public required double Width { get; init; }
-        public required double Height { get; init; }
-        public required GeneratedImage Image { get; init; }
-        public StructureElement? Element { get; init; }
-        public Rect? Clip { get; set; }
-    }
-
-    private struct FillDraw
-    {
-        public required double X { get; init; }
-        public required double Y { get; init; }
-        public required double Width { get; init; }
-        public required double Height { get; init; }
-        public required Color Color { get; init; }
-        public Rect? Clip { get; set; }
-    }
-
-    private readonly struct EdgeDraw
-    {
-        public required double X1 { get; init; }
-        public required double Y1 { get; init; }
-        public required double X2 { get; init; }
-        public required double Y2 { get; init; }
-        public required double LineWidth { get; init; }
-        public required Color Color { get; init; }
-        public required BorderStyle Style { get; init; }
-    }
-
-    private sealed class PagePlan
-    {
-        public required PageSize Size { get; init; }
-        public List<FillDraw> Fills { get; } = [];
-        public List<EdgeDraw> Edges { get; } = [];
-        public List<ImageDraw> Images { get; } = [];
-        public List<TextDraw> Texts { get; } = [];
-        public List<GeneratedLink> Links { get; } = [];
-        public HashSet<GeneratedFont> UsedFonts { get; } = [];
-        public HashSet<GeneratedImage> UsedImages { get; } = [];
-    }
-
     private readonly DocumentBuilder builder;
     private readonly FontCollection fonts;
     private readonly List<byte> scratchBytes = [];
-    private readonly List<GeneratedFont> allFonts = [];
-    private readonly Dictionary<string, GeneratedFont> base14Fonts = new(System.StringComparer.Ordinal);
-    private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
-    private readonly Dictionary<object, GeneratedImage> images = [];
-    private readonly Dictionary<object, StructureElement> blockElements = [];
+    private readonly GeneratorFontResolver fontResolver;
+    private readonly ImageStore imageStore;
+    private readonly StructureTreeBuilder structureTree;
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
-    private StructureElement documentElement = null!;
-    private readonly Dictionary<StructureElement, int> structureOrder = [];
     private StyleResolution resolution = StyleResolution.Empty;
 
     private DocumentGenerator(DocumentBuilder builder)
     {
         this.builder = builder;
         fonts = builder.Fonts;
+        fontResolver = new(builder.Conformance);
+        imageStore = new();
+        structureTree = new(builder);
     }
 
     public static Document Generate(DocumentBuilder builder)
@@ -157,8 +100,7 @@ internal sealed class DocumentGenerator
         document.Info.Keywords = builder.Info.Keywords;
         document.Info.Creator = builder.Info.Creator;
 
-        BuildStructureTree();
-        IndexStructure();
+        structureTree.Build();
 
         var paginated = new List<PaginatedPage>();
         foreach (var section in builder.Sections)
@@ -178,9 +120,9 @@ internal sealed class DocumentGenerator
             plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count));
         }
 
-        document.Structure = documentElement;
+        document.Structure = structureTree.DocumentElement;
 
-        foreach (var font in allFonts)
+        foreach (var font in fontResolver.AllFonts)
         {
             if (font.Sfnt is { IsCff: false } sfnt)
             {
@@ -208,113 +150,6 @@ internal sealed class DocumentGenerator
         return document;
     }
 
-    // The logical structure tree mirrors the authoring DOM in authoring order:
-    // Document -> Sect per Section -> P (or H1..H6 by StyleName), Table -> TR ->
-    // TH/TD, Figure per image. Header and footer content stays unmapped (untagged).
-    private void BuildStructureTree()
-    {
-        documentElement = new StructureElement { Type = "Document" };
-        foreach (var section in builder.Sections)
-        {
-            var sect = new StructureElement { Type = "Sect" };
-            documentElement.Children.Add(sect);
-            foreach (var block in section.Blocks)
-            {
-                MapBlock(block, sect);
-            }
-        }
-    }
-
-    // Assign each structure element its DFS pre-order rank once so per-page tagged emission can
-    // order that page's content-bearing elements without re-walking the whole tree per page.
-    private void IndexStructure()
-    {
-        var index = 0;
-        var stack = new Stack<StructureElement>();
-        stack.Push(documentElement);
-        while (stack.Count > 0)
-        {
-            var element = stack.Pop();
-            structureOrder[element] = index++;
-            for (var c = element.Children.Count - 1; c >= 0; c--)
-            {
-                stack.Push(element.Children[c]);
-            }
-        }
-    }
-
-    private void MapBlock(Block block, StructureElement parent)
-    {
-        switch (block)
-        {
-            case Paragraph paragraph:
-                var p = new StructureElement { Type = HeadingType(paragraph.StyleName) };
-                parent.Children.Add(p);
-                blockElements[paragraph] = p;
-                break;
-            case Table table:
-                var element = new StructureElement { Type = "Table" };
-                parent.Children.Add(element);
-                foreach (var row in table.Rows)
-                {
-                    var tr = new StructureElement { Type = "TR" };
-                    element.Children.Add(tr);
-                    foreach (var cell in row.Cells)
-                    {
-                        var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
-                        tr.Children.Add(td);
-                        blockElements[cell] = td;
-                    }
-                }
-
-                break;
-            case Image image:
-                var figure = new StructureElement { Type = "Figure" };
-                parent.Children.Add(figure);
-                blockElements[image] = figure;
-                break;
-            default:
-                break;
-        }
-    }
-
-    private static string HeadingType(string? styleName)
-    {
-        if (styleName is null)
-        {
-            return "P";
-        }
-
-        if (styleName.Length == 8
-            && styleName.StartsWith("Heading", System.StringComparison.OrdinalIgnoreCase)
-            && styleName[7] is >= '1' and <= '6')
-        {
-            return Heading(styleName[7]);
-        }
-
-        if (styleName.Length == 2
-            && (styleName[0] == 'H' || styleName[0] == 'h')
-            && styleName[1] is >= '1' and <= '6')
-        {
-            return Heading(styleName[1]);
-        }
-
-        return "P";
-    }
-
-    private static string Heading(char level) => level switch
-    {
-        '1' => "H1",
-        '2' => "H2",
-        '3' => "H3",
-        '4' => "H4",
-        '5' => "H5",
-        _ => "H6",
-    };
-
-    private StructureElement? ElementOf(object block)
-        => blockElements.TryGetValue(block, out var element) ? element : null;
-
     private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount)
     {
         var height = page.Size.Height.Point;
@@ -332,7 +167,7 @@ internal sealed class DocumentGenerator
             // the same substitution the header/footer band and band-table cell paths run.
             if (line.Source is Paragraph paragraph && HasField(paragraph))
             {
-                var element = ElementOf(paragraph);
+                var element = structureTree.ElementOf(paragraph);
                 var y = line.Y;
                 foreach (var box in ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph)))
                 {
@@ -347,7 +182,7 @@ internal sealed class DocumentGenerator
             }
             else
             {
-                EmitLine(plan, line.Line, left, contentTop - line.Y, ElementOf(line.Source));
+                EmitLine(plan, line.Line, left, contentTop - line.Y, structureTree.ElementOf(line.Source));
                 b++;
             }
         }
@@ -584,11 +419,11 @@ internal sealed class DocumentGenerator
     }
 
     private (double Width, double Height) MeasureImage(Image image, double availableWidth)
-        => ImageDecoder.Measure(image, Decode(image).Image, availableWidth);
+        => ImageDecoder.Measure(image, imageStore.Decode(image).Image, availableWidth);
 
     private void EmitImage(PagePlan plan, PositionedImage positioned, double left, double top)
     {
-        var xobject = Decode(positioned.Source);
+        var xobject = imageStore.Decode(positioned.Source);
         plan.Images.Add(new ImageDraw
         {
             X = left + positioned.XOffset,
@@ -596,7 +431,7 @@ internal sealed class DocumentGenerator
             Width = positioned.Width,
             Height = positioned.Height,
             Image = xobject,
-            Element = ElementOf(positioned.Source),
+            Element = structureTree.ElementOf(positioned.Source),
         });
         plan.UsedImages.Add(xobject);
     }
@@ -750,7 +585,7 @@ internal sealed class DocumentGenerator
 
     private void EmitCell(PagePlan plan, LaidOutTable layout, LaidOutCell cell, double left, double contentTop, double delta, StructureElement? inherited, int pageNumber, int pageCount)
     {
-        var element = ElementOf(cell.Cell) ?? inherited;
+        var element = structureTree.ElementOf(cell.Cell) ?? inherited;
         if (cell.Cell.Background is { } background)
         {
             plan.Fills.Add(new FillDraw
@@ -823,7 +658,7 @@ internal sealed class DocumentGenerator
         foreach (var image in cell.Images)
         {
             contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
-            var xobject = Decode(image.Source);
+            var xobject = imageStore.Decode(image.Source);
             plan.Images.Add(new ImageDraw
             {
                 X = left + image.X,
@@ -1193,7 +1028,7 @@ internal sealed class DocumentGenerator
         {
             if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
-                var generated = ResolveSfnt(face);
+                var generated = fontResolver.ResolveSfnt(face);
                 var bytes = scratchBytes;
                 bytes.Clear();
                 var advance = 0.0;
@@ -1253,7 +1088,7 @@ internal sealed class DocumentGenerator
                 }
 
                 var segment = builderText.ToString();
-                var generated = ResolveBase14(font);
+                var generated = fontResolver.ResolveBase14(font);
                 plan.UsedFonts.Add(generated);
                 plan.Texts.Add(new TextDraw
                 {
@@ -1285,7 +1120,7 @@ internal sealed class DocumentGenerator
         while (i < text.Length)
         {
             var (face, _) = fonts.ResolveGlyph(primary, CodePointAt(text, i));
-            var generated = ResolveSfnt(face);
+            var generated = fontResolver.ResolveSfnt(face);
             var bytes = scratchBytes;
             bytes.Clear();
             var advance = 0.0;
@@ -1329,82 +1164,12 @@ internal sealed class DocumentGenerator
         }
     }
 
-    private static int CodePointAt(string text, int index) => FontCollection.CodePointAt(text, index);
-
-    private static bool IsWinAnsi(int codepoint)
-        => codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out _);
-
-    private GeneratedFont ResolveSfnt(SfntFont sfnt)
-    {
-        if (sfntFonts.TryGetValue(sfnt, out var existing))
-        {
-            return existing;
-        }
-
-        var generated = new GeneratedFont { Key = "F" + allFonts.Count.ToString(CultureInfo.InvariantCulture), Sfnt = sfnt };
-        sfntFonts[sfnt] = generated;
-        allFonts.Add(generated);
-        return generated;
-    }
-
-    private GeneratedFont ResolveBase14(Font font)
-    {
-        var name = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
-        if (builder.Conformance != PdfAConformance.None)
-        {
-            throw new System.InvalidOperationException(
-                $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{font.Name}' with DocumentBuilder.Fonts instead.");
-        }
-
-        if (base14Fonts.TryGetValue(name, out var existing))
-        {
-            return existing;
-        }
-
-        var generated = new GeneratedFont { Key = "F" + allFonts.Count.ToString(CultureInfo.InvariantCulture), Base14 = name };
-        base14Fonts[name] = generated;
-        allFonts.Add(generated);
-        return generated;
-    }
-
-    private static byte[] EncodeWinAnsi(string text)
-    {
-        var bytes = new List<byte>(text.Length);
-        foreach (var c in text)
-        {
-            if (WinAnsiEncoding.TryGetCode(c, out var code))
-            {
-                bytes.Add(code);
-            }
-        }
-
-        return [.. bytes];
-    }
-
-    private GeneratedImage Decode(Image image) => DecodeBytes(image, image.Data);
-
-    private GeneratedImage DecodeBytes(object key, byte[] data)
-    {
-        if (!images.TryGetValue(key, out var generated))
-        {
-            var xobject = ImageDecoder.Decode(data);
-            generated = new GeneratedImage
-            {
-                Key = "Im" + images.Count.ToString(CultureInfo.InvariantCulture),
-                Image = xobject,
-            };
-            images[key] = generated;
-        }
-
-        return generated;
-    }
-
     // Draws an inline image sitting on the line baseline: its bottom edge is at the baseline y,
     // so it advances the line by its width and shares the line height computed by the breaker.
     private void EmitInlineImage(PagePlan plan, InlineImage image, double x, double baseline, StructureElement? element)
     {
         var (width, height) = image.EffectiveSize();
-        var generated = DecodeBytes(image, image.Data);
+        var generated = imageStore.DecodeBytes(image, image.Data);
         plan.Images.Add(new ImageDraw
         {
             X = x,
@@ -1416,25 +1181,6 @@ internal sealed class DocumentGenerator
         });
         plan.UsedImages.Add(generated);
     }
-
-    // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
-    // their glyph-id codes through the accumulated gid-to-Unicode table, mirroring
-    // the /ToUnicode CMap the embedder writes on save.
-    private static Dictionary<string, ReverseFont> BuildExtractionFonts(GeneratedPage generated)
-    {
-        var map = new Dictionary<string, ReverseFont>(System.StringComparer.Ordinal);
-        foreach (var font in generated.Fonts)
-        {
-            map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
-        }
-
-        return map;
-    }
-
-    private static Dictionary<ushort, int> RemapGidToUnicode(GeneratedFont font)
-        => font.CompactGidMap is { } gidMap
-            ? Fonts.Type0FontEmbedder.RemapToCompactGids(font.GidToUnicode, gidMap)
-            : font.GidToUnicode;
 
     // Content emission order: fills and edges (untagged artifacts), untagged images
     // and texts (headers/footers), then tagged content grouped per structure element
@@ -1520,7 +1266,7 @@ internal sealed class DocumentGenerator
             }
         }
 
-        WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
+        structureTree.WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
 
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
         var usedImages = new List<GeneratedImage>(plan.UsedImages);
@@ -1542,167 +1288,5 @@ internal sealed class DocumentGenerator
         }
 
         list.Add(draw);
-    }
-
-    // Emits only the elements that carry content on this page, ordered by their DFS pre-order rank so
-    // the byte output matches a full-tree pre-order walk without the per-page O(elements) recursion.
-    private void WriteTaggedContent(
-        ContentWriter writer,
-        int pageIndex,
-        Dictionary<StructureElement, List<ImageDraw>> taggedImages,
-        Dictionary<StructureElement, List<TextDraw>> taggedTexts)
-    {
-        var elements = new List<StructureElement>(taggedImages.Count + taggedTexts.Count);
-        foreach (var element in taggedImages.Keys)
-        {
-            elements.Add(element);
-        }
-
-        foreach (var element in taggedTexts.Keys)
-        {
-            if (!taggedImages.ContainsKey(element))
-            {
-                elements.Add(element);
-            }
-        }
-
-        elements.Sort((a, b) => structureOrder[a].CompareTo(structureOrder[b]));
-
-        var mcid = 0;
-        foreach (var element in elements)
-        {
-            var hasImages = taggedImages.TryGetValue(element, out var elementImages);
-            var hasTexts = taggedTexts.TryGetValue(element, out var elementTexts);
-            writer.WriteName(element.Type);
-            writer.WriteRaw(" <</MCID ");
-            writer.WriteRaw(mcid.ToString(CultureInfo.InvariantCulture));
-            writer.WriteRaw(">> BDC\n");
-
-            if (hasImages)
-            {
-                foreach (var image in elementImages!)
-                {
-                    WriteImageDraw(writer, image);
-                }
-            }
-
-            if (hasTexts)
-            {
-                foreach (var text in elementTexts!)
-                {
-                    WriteTextDraw(writer, text);
-                }
-            }
-
-            writer.WriteRaw("EMC\n");
-            element.Marks.Add((pageIndex, mcid));
-            mcid++;
-        }
-    }
-
-    private static void WriteClipRect(ContentWriter writer, in Rect clip)
-    {
-        writer.WriteNumber(clip.X);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Y);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Width);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Height);
-        writer.WriteRaw(" re W n\n");
-    }
-
-    private static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
-    {
-        writer.WriteRaw("q\n");
-        if (image.Clip is { } clip)
-        {
-            WriteClipRect(writer, clip);
-        }
-
-        writer.WriteNumber(image.Width);
-        writer.WriteRaw(" 0 0 ");
-        writer.WriteNumber(image.Height);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(image.X);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(image.Y);
-        writer.WriteRaw(" cm\n");
-        writer.WriteName(image.Image.Key);
-        writer.WriteRaw(" Do\nQ\n");
-    }
-
-    private static void WriteTextDraw(ContentWriter writer, in TextDraw text)
-    {
-        if (text.Clip is { } clip)
-        {
-            writer.WriteRaw("q\n");
-            WriteClipRect(writer, clip);
-        }
-
-        writer.WriteRaw("BT\n");
-        writer.WriteColor(text.Color, "rg");
-        writer.WriteName(text.Font.Key);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(text.Size);
-        writer.WriteRaw(" Tf\n");
-        if (text.StrokeWidth > 0)
-        {
-            writer.WriteColor(text.Color, "RG");
-            writer.WriteNumber(text.StrokeWidth);
-            writer.WriteRaw(" w\n2 Tr\n");
-        }
-
-        if (text.Shear != 0)
-        {
-            writer.WriteRaw("1 0 ");
-            writer.WriteNumber(text.Shear);
-            writer.WriteRaw(" 1 ");
-            writer.WriteNumber(text.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(text.Baseline);
-            writer.WriteRaw(" Tm\n");
-        }
-        else
-        {
-            writer.WriteNumber(text.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(text.Baseline);
-            writer.WriteRaw(" Td\n");
-        }
-
-        writer.WriteString(RemapBytes(text));
-        writer.WriteRaw(" Tj\n");
-        if (text.StrokeWidth > 0)
-        {
-            writer.WriteRaw("0 Tr\n");
-        }
-
-        writer.WriteRaw("ET\n");
-        if (text.Clip is not null)
-        {
-            writer.WriteRaw("Q\n");
-        }
-    }
-
-    // Layout emits original gids; the compact map renumbers them into the embedded
-    // subset's 0..N-1 space so the 2-byte Identity-H code equals the new gid.
-    private static byte[] RemapBytes(in TextDraw text)
-    {
-        if (text.Font.CompactGidMap is not { } gidMap)
-        {
-            return text.Bytes;
-        }
-
-        var bytes = text.Bytes;
-        var remapped = new byte[bytes.Length];
-        for (var i = 0; i + 1 < bytes.Length; i += 2)
-        {
-            var gid = gidMap[(ushort)((bytes[i] << 8) | bytes[i + 1])];
-            remapped[i] = (byte)(gid >> 8);
-            remapped[i + 1] = (byte)gid;
-        }
-
-        return remapped;
     }
 }
