@@ -14,6 +14,14 @@ internal sealed class FormWriter(Document document)
     private const int RadioFlag = 1 << 15;
     private const int ComboFlag = 1 << 17;
 
+    // Names already claimed by base-source or created fields, so appended nested
+    // field trees can be disambiguated deterministically on collision.
+    private readonly HashSet<string> usedFieldNames = new(StringComparer.Ordinal);
+
+    // Appended sources whose /DR, /DA and /NeedAppearances must merge into the
+    // final AcroForm once its dictionary is assembled.
+    private readonly List<(GraphImporter Importer, DictionaryObject Form)> appendedFormDefaults = [];
+
     public void Flatten()
     {
         foreach (var definition in document.FormFields)
@@ -305,7 +313,26 @@ internal sealed class FormWriter(Document document)
 
         result["Fields"] = fieldsArray;
         ApplyCreatedFormDefaults(result);
+
+        // Re-inline the base /DR so appended sources can union their fonts into it
+        // (MergeFormDefaults no-ops when /DR is an indirect reference).
+        if (appendedFormDefaults.Count > 0 && acroForm.ContainsKey("DR"))
+        {
+            result["DR"] = importer.ImportValue(reader.Resolve(acroForm["DR"]));
+        }
+
+        MergeAppendedFormDefaults(result);
         return writer.Add(result);
+    }
+
+    // Unions the /DR, /DA and /NeedAppearances of every appended source form into
+    // the final AcroForm dictionary.
+    private void MergeAppendedFormDefaults(DictionaryObject form)
+    {
+        foreach (var (importer, sourceForm) in appendedFormDefaults)
+        {
+            importer.MergeFormDefaults(form, sourceForm);
+        }
     }
 
     public DictionaryObject FieldsForm(List<DocumentObject> fieldRefs)
@@ -318,6 +345,7 @@ internal sealed class FormWriter(Document document)
 
         var form = new DictionaryObject { ["Fields"] = fields };
         ApplyCreatedFormDefaults(form);
+        MergeAppendedFormDefaults(form);
         return form;
     }
 
@@ -574,6 +602,7 @@ internal sealed class FormWriter(Document document)
     public List<DocumentObject> AppendForms(List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes, Dictionary<DocumentReader, GraphImporter> appendImporters, DocumentWriter writer)
     {
         var fields = new List<DocumentObject>();
+        RegisterExistingFieldNames();
         foreach (var (page, node, reference) in pageNodes)
         {
             if (!document.appendedPages.TryGetValue(page, out var appended))
@@ -603,16 +632,20 @@ internal sealed class FormWriter(Document document)
 
             node["Annots"] = imported;
 
-            if (!document.appendedAcroForms.ContainsKey(reader))
+            if (!document.appendedAcroForms.TryGetValue(reader, out var sourceForm))
             {
                 continue;
             }
 
+            appendedFormDefaults.Add((importer, sourceForm));
+
             for (var i = 0; i < annots.Count; i++)
             {
-                if (reader.Resolve(annots[i]) is DictionaryObject annot && IsMergedFormField(annot))
+                if (reader.Resolve(annots[i]) is DictionaryObject annot
+                    && importer.TryImportFieldRoot(annot, out var root, out var field, out var name))
                 {
-                    fields.Add(imported[i]);
+                    GraphImporter.DisambiguateFieldName(field!, name, usedFieldNames);
+                    fields.Add(root);
                 }
             }
         }
@@ -620,12 +653,32 @@ internal sealed class FormWriter(Document document)
         return fields;
     }
 
-    // A merged widget/field (ISO 32000-1 12.7.3.1): a /Widget annotation that also
-    // carries the field's /FT and is not a child of another field.
-    private static bool IsMergedFormField(DictionaryObject annot)
-        => annot.TryGetValue("Subtype", out var subtype) && subtype is NameObject name
-            && string.Equals(name.Value, "Widget", StringComparison.Ordinal)
-            && annot.ContainsKey("FT") && !annot.ContainsKey("Parent");
+    // Seeds usedFieldNames with the top-level /T names already committed by the
+    // base source form and the created field definitions, so appended trees are
+    // the ones renamed on collision (base/created names stay stable).
+    private void RegisterExistingFieldNames()
+    {
+        foreach (var definition in document.FormFields)
+        {
+            usedFieldNames.Add(definition.Name);
+        }
+
+        var source = document.source;
+        if (source is not null && document.sourceAcroForm is { } sourceForm
+            && sourceForm.TryGetValue("Fields", out var fieldsObject)
+            && source.Resolve(fieldsObject!) is ArrayObject rootFields)
+        {
+            foreach (var field in rootFields)
+            {
+                if (source.Resolve(field) is DictionaryObject dict
+                    && dict.TryGetValue("T", out var title)
+                    && source.Resolve(title!) is StringObject text)
+                {
+                    usedFieldNames.Add(text.Value);
+                }
+            }
+        }
+    }
 
     // A form field is bound to a page through the /P of its own widget (a merged
     // field/widget) or of any widget in its /Kids.

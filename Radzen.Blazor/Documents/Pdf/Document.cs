@@ -423,6 +423,9 @@ public sealed class Document
             writer.Trailer["Info"] = writer.Add(info);
         }
 
+        // ISO 19005-4 (6.1.2) requires the PDF 2.0 header for PDF/A-4.
+        writer.Version = isPart4 ? "2.0" : "1.7";
+
         writer.Close();
     }
 

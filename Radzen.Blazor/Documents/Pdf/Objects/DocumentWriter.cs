@@ -25,11 +25,32 @@ namespace Radzen.Documents.Pdf.Objects;
 /// <param name="stream">The destination stream.</param>
 public sealed class DocumentWriter(Stream stream)
 {
-    private static readonly byte[] Header =
+    private static readonly byte[] HeaderSuffix =
     [
-        (byte)'%', (byte)'P', (byte)'D', (byte)'F', (byte)'-', (byte)'1', (byte)'.', (byte)'7', (byte)'\n',
-        (byte)'%', 0xE2, 0xE3, 0xCF, 0xD3, (byte)'\n',
+        (byte)'\n', (byte)'%', 0xE2, 0xE3, 0xCF, 0xD3, (byte)'\n',
     ];
+
+    /// <summary>
+    /// Gets or sets the PDF version written in the file header (e.g. "1.7" or
+    /// "2.0"). PDF/A-4 requires "2.0".
+    /// </summary>
+    public string Version { get; set; } = "1.7";
+
+    private byte[] BuildHeader()
+    {
+        var header = new byte[5 + Version.Length + HeaderSuffix.Length];
+        header[0] = (byte)'%';
+        header[1] = (byte)'P';
+        header[2] = (byte)'D';
+        header[3] = (byte)'F';
+        header[4] = (byte)'-';
+        for (var i = 0; i < Version.Length; i++)
+        {
+            header[5 + i] = (byte)Version[i];
+        }
+        System.Array.Copy(HeaderSuffix, 0, header, 5 + Version.Length, HeaderSuffix.Length);
+        return header;
+    }
 
     private readonly Stream stream = stream ?? throw new ArgumentNullException(nameof(stream));
     private readonly List<DocumentObject> objects = [];
@@ -77,7 +98,8 @@ public sealed class DocumentWriter(Stream stream)
     public void Close()
     {
         using var buffer = new CountingBufferedStream(stream);
-        buffer.Write(Header, 0, Header.Length);
+        var header = BuildHeader();
+        buffer.Write(header, 0, header.Length);
 
         var (encryption, encryptNumber) = PrepareEncryption();
 
