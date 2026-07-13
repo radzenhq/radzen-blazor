@@ -1,0 +1,8 @@
+is_global = true
+
+# Silence the WASM-safety/determinism BannedApiAnalyzers guard everywhere by default, including
+# Razor source-generated code whose virtual file paths fall outside .editorconfig's directory tree.
+# The path-scoped [**/Documents/Pdf/**.cs] and [**/Documents/Crypto/**.cs] sections in .editorconfig
+# re-enable it as 'error' for the PDF library; a regular .editorconfig section overrides this global config.
+dotnet_diagnostic.RS0030.severity = none
+dotnet_diagnostic.RS0031.severity = none
