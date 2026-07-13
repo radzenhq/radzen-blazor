@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
-using Token = Radzen.Documents.Pdf.ContentTokenizer.Token;
-using TokenKind = Radzen.Documents.Pdf.ContentTokenizer.TokenKind;
+using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
+using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf;
 
 // Resource-aware text extraction: re-walks a page content stream tracking the text

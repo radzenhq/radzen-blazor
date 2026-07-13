@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // R3 layout-correctness regressions: pagination progress guards, column-span clamping,

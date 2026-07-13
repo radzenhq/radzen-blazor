@@ -3,6 +3,7 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // The pure-managed rounded-rectangle coverage rasterizer and separable Gaussian blur that

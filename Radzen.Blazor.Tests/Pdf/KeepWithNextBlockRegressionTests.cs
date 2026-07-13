@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Regression tests for KeepWithNext when the NEXT block is a Table or an Image.

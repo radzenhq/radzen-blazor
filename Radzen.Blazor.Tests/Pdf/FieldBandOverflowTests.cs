@@ -3,6 +3,7 @@ using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // #48: a header/footer band reserves lines by laying the field paragraph out once with the

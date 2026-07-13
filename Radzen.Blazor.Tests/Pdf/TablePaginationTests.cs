@@ -3,6 +3,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // L4b: how a laid-out table splits across page fragments given a uniform available height.

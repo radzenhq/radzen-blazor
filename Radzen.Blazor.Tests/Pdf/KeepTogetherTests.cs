@@ -2,6 +2,7 @@
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // KeepTogether: a paragraph that does not fit whole in the remaining space moves as a

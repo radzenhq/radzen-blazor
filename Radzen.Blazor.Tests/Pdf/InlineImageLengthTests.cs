@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Lane cq-reader, finding #43: an inline image's binary payload is skipped by its exact

@@ -4,6 +4,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Identical box shadows rasterize to the same luminosity soft mask, so they must share a

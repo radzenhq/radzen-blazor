@@ -2,6 +2,7 @@
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Widows/Orphans (default 2). Orphans bound the minimum lines kept at the BOTTOM of a

@@ -7,6 +7,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // JPEG2000 rides the PDF /JPXDecode filter as a raw pass-through, mirroring the

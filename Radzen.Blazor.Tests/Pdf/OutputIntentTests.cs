@@ -3,6 +3,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for the sRGB /OutputIntent dictionary (PDF/A GTS_PDFA1).

@@ -2,6 +2,7 @@
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Item 3: multi-space gaps measure as count * single-space width (spaces carry no kerning).

@@ -2,6 +2,7 @@
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Mixed-run layout + line-height contract. A paragraph whose Inlines carry different

@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Fail-loud hardening for the (colour type, bit depth) table, PLTE/tRNS well-formedness,

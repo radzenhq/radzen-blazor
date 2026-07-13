@@ -2,6 +2,7 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // A KeepWithNext block before a table triggers a first-height look-ahead on that table.

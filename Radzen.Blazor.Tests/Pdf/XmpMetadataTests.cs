@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for the XMP metadata packet + /Metadata stream (PDF/A-3 + Factur-X layer).

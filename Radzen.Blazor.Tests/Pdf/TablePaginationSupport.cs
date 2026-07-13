@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Shared fixture for the L4b table-pagination contract tests. Builds on the already-merged

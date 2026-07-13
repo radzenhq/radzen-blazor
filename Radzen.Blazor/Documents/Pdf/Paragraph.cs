@@ -1,5 +1,6 @@
 using System.Linq;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf;
 
 

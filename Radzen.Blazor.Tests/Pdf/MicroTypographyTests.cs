@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Micro-typography contract: Run.LetterSpacing renders via the Tc operator (reset

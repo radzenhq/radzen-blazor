@@ -3,6 +3,7 @@ using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Star (relative) column widths: columns without a fixed Width share the remaining

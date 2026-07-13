@@ -3,6 +3,7 @@ using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // StructureTreeBuilder.MapBlock must fail loud on a block type it does not map

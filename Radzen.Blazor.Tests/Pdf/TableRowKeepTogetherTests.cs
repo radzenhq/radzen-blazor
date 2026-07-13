@@ -3,6 +3,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Row.KeepTogether: a marked row whose atomic height overflows the partial first

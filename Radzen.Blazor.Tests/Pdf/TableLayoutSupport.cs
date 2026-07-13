@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Shared fixture for the L4a table-layout contract tests. Everything numeric is

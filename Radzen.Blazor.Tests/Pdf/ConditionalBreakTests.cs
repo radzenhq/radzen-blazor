@@ -4,6 +4,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Soft hyphen (U+00AD) as a zero-width conditional break, ZWSP (U+200B) as a zero-width

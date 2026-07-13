@@ -4,6 +4,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract for explicit, variable-position tab stops on a paragraph. Tab stops are

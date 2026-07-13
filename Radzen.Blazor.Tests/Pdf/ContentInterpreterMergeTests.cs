@@ -5,6 +5,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Lane cq-reader: text-showing round-trip fidelity in ContentInterpreter.

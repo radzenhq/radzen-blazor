@@ -4,6 +4,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // P3(c): LineBreaker treats '\n' as a forced line break, "\r\n" as a single forced
