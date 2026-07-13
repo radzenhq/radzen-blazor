@@ -9,7 +9,8 @@ using Xunit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Crypto robustness contract:
-// - AesCbc must tolerate ciphertext that is not a whole number of blocks.
+// - AesCbc must reject ciphertext that is not a whole number of blocks (fail loud
+//   rather than silently dropping the trailing partial block).
 // - Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3), not Latin-1.
 // - /StmF and /StrF select the crypt filter by name from /CF; /Identity means
 //   the data is not encrypted at all (ISO 32000-1 7.6.5).
@@ -21,17 +22,18 @@ public class ReaderCryptoRobustnessTests
 
     // ---- AesCbc odd-length ciphertext ----
 
+    // IV(16) + a ciphertext whose length is not a multiple of 16: the trailing partial
+    // block cannot be decrypted, so fail loud instead of silently truncating.
     [Theory]
     [InlineData(17)]
     [InlineData(20)]
     [InlineData(31)]
-    public void AesCbcDecrypt_OddLengthCiphertext_DoesNotThrow(int length)
+    public void AesCbcDecrypt_OddLengthCiphertext_Throws(int length)
     {
         var key = CryptoFixtureSupport.FixedBytes(32, 9);
         var data = CryptoFixtureSupport.FixedBytes(length, 3);
 
-        var exception = Record.Exception(() => AesCbc.Decrypt(key, data));
-        Assert.Null(exception);
+        Assert.Throws<DocumentParseException>(() => AesCbc.Decrypt(key, data));
     }
 
     // ---- crafted encrypted single-page files ----

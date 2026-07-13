@@ -15,7 +15,7 @@ internal static class RunLengthFilter
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        var output = new List<byte>();
+        using var output = new PooledBufferStream();
         int i = 0;
 
         while (i < data.Length)
@@ -32,7 +32,7 @@ internal static class RunLengthFilter
                 int copy = length + 1;
                 for (int k = 0; k < copy && i < data.Length; k++)
                 {
-                    output.Add(data[i++]);
+                    output.WriteByte(data[i++]);
                 }
             }
             else
@@ -46,17 +46,17 @@ internal static class RunLengthFilter
                 int repeat = 257 - length;
                 for (int k = 0; k < repeat; k++)
                 {
-                    output.Add(value);
+                    output.WriteByte(value);
                 }
             }
 
-            if (output.Count > maxOutput)
+            if (output.Length > maxOutput)
             {
                 throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
             }
         }
 
-        return [.. output];
+        return output.ToArray();
     }
 
     public static byte[] Encode(byte[] data)

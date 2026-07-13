@@ -51,4 +51,46 @@ public class PredictorHardeningTests
         var expected = new byte[] { 10, 20, 30, 40 };
         Assert.Equal(expected, PngPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
     }
+
+    // TIFF: /Colors 65536 wraps the int32 rowLength=colors*columns product; the colors
+    // bound rejects it before any row math (mirrors PngPredictor's MaxColors guard).
+    [Fact]
+    public void Tiff_ColorsOutOfRange_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => TiffPredictor.Decode(new byte[16], colors: 65536, bitsPerComponent: 8, columns: 65536));
+    }
+
+    [Fact]
+    public void Tiff_NonPositiveColumns_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => TiffPredictor.Decode(new byte[16], colors: 1, bitsPerComponent: 8, columns: 0));
+    }
+
+    // A /Columns wider than the data leaves no whole row: reject rather than silently
+    // returning the stream unmodified (predictor not applied).
+    [Fact]
+    public void Tiff_ColumnsWiderThanData_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => TiffPredictor.Decode(new byte[4], colors: 1, bitsPerComponent: 8, columns: 260000000));
+    }
+
+    // A trailing partial row (5 bytes over a 4-byte row) is corrupt input; fail loud
+    // instead of passing the dangling bytes through untouched.
+    [Fact]
+    public void Tiff_PartialTrailingRow_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => TiffPredictor.Decode(new byte[5], colors: 1, bitsPerComponent: 8, columns: 4));
+    }
+
+    [Fact]
+    public void Tiff_ValidRow_StillDecodes()
+    {
+        var input = new byte[] { 10, 1, 1, 1 };
+        var expected = new byte[] { 10, 11, 12, 13 };
+        Assert.Equal(expected, TiffPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
+    }
 }

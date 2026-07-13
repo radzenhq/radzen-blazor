@@ -13,7 +13,7 @@ internal static class Ascii85Filter
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        var output = new List<byte>();
+        using var output = new PooledBufferStream();
         ulong tuple = 0;
         int count = 0;
 
@@ -29,17 +29,17 @@ internal static class Ascii85Filter
                 continue;
             }
 
-            if (output.Count > maxOutput)
+            if (output.Length > maxOutput)
             {
                 throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
             }
 
             if (b == (byte)'z' && count == 0)
             {
-                output.Add(0);
-                output.Add(0);
-                output.Add(0);
-                output.Add(0);
+                output.WriteByte(0);
+                output.WriteByte(0);
+                output.WriteByte(0);
+                output.WriteByte(0);
                 continue;
             }
 
@@ -60,10 +60,10 @@ internal static class Ascii85Filter
                     throw new InvalidDataException("ASCII85 5-tuple exceeds the 32-bit maximum.");
                 }
 
-                output.Add((byte)(tuple >> 24));
-                output.Add((byte)(tuple >> 16));
-                output.Add((byte)(tuple >> 8));
-                output.Add((byte)tuple);
+                output.WriteByte((byte)(tuple >> 24));
+                output.WriteByte((byte)(tuple >> 16));
+                output.WriteByte((byte)(tuple >> 8));
+                output.WriteByte((byte)tuple);
                 tuple = 0;
                 count = 0;
             }
@@ -71,6 +71,13 @@ internal static class Ascii85Filter
 
         if (count > 0)
         {
+            // A final group of a single character cannot encode any bytes (it would emit
+            // count-1 == 0 bytes); a truncated stream ending in one stray char is corrupt.
+            if (count == 1)
+            {
+                throw new InvalidDataException("ASCII85 stream ends with a dangling single character.");
+            }
+
             for (int i = count; i < 5; i++)
             {
                 tuple = tuple * 85 + 84;
@@ -78,11 +85,11 @@ internal static class Ascii85Filter
 
             for (int i = 0; i < count - 1; i++)
             {
-                output.Add((byte)(tuple >> (24 - i * 8)));
+                output.WriteByte((byte)(tuple >> (24 - i * 8)));
             }
         }
 
-        return [.. output];
+        return output.ToArray();
     }
 
     public static byte[] Encode(byte[] data)

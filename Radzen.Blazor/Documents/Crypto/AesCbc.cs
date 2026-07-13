@@ -47,11 +47,16 @@ public static class AesCbc
         ArgumentNullException.ThrowIfNull(data);
         if (data.Length < 16)
         {
-            return [];
+            throw new DocumentParseException("AES data is shorter than the required 16-byte IV.");
         }
 
         var iv = data[..16];
         var cipher = data[16..];
+        if (cipher.Length == 0)
+        {
+            throw new DocumentParseException("AES ciphertext after the IV is empty.");
+        }
+
         var plain = DecryptCbcNoPadding(key, iv, cipher);
         return StripPadding(plain);
     }
@@ -68,8 +73,15 @@ public static class AesCbc
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(iv);
         ArgumentNullException.ThrowIfNull(cipher);
+        // A trailing partial block cannot be decrypted; silently dropping it (whole = n/16*16)
+        // would return truncated plaintext, so reject a non-block-aligned ciphertext instead.
+        if (cipher.Length % 16 != 0)
+        {
+            throw new DocumentParseException("AES ciphertext length must be a whole number of 16-byte blocks.");
+        }
+
         var roundKeys = ExpandKey(key, out var rounds);
-        var whole = cipher.Length / 16 * 16;
+        var whole = cipher.Length;
         var result = new byte[whole];
         var previous = (byte[])iv.Clone();
         var block = new byte[16];
@@ -119,17 +131,28 @@ public static class AesCbc
         return result;
     }
 
+    // PKCS#7: the final byte is the pad length (1..16) and every padding byte must equal it.
+    // Returning the padding as plaintext on a bad key/corrupt stream hides the failure, so
+    // fail loud instead of emitting padding-polluted content.
     private static byte[] StripPadding(byte[] plain)
     {
         if (plain.Length == 0)
         {
-            return plain;
+            throw new DocumentParseException("AES plaintext is empty.");
         }
 
         var pad = plain[^1];
         if (pad < 1 || pad > 16 || pad > plain.Length)
         {
-            return plain;
+            throw new DocumentParseException("Invalid PKCS#7 padding.");
+        }
+
+        for (var i = plain.Length - pad; i < plain.Length; i++)
+        {
+            if (plain[i] != pad)
+            {
+                throw new DocumentParseException("Invalid PKCS#7 padding.");
+            }
         }
 
         return plain[..^pad];

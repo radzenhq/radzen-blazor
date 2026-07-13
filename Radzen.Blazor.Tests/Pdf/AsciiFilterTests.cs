@@ -136,6 +136,14 @@ public class Ascii85FilterTests
         Assert.ThrowsAny<Exception>(() => Ascii85Filter.Decode(Encoding.ASCII.GetBytes("9jqv^~>")));
     }
 
+    // A final group of exactly one character cannot encode any bytes; a truncated stream
+    // ending in one stray char is corrupt and must fail loud, not silently drop it.
+    [Fact]
+    public void Decode_DanglingSingleChar_Throws()
+    {
+        Assert.ThrowsAny<Exception>(() => Ascii85Filter.Decode(Encoding.ASCII.GetBytes("9jqo^9~>")));
+    }
+
     [Fact]
     public void Encode_Decode_RoundTrip()
     {

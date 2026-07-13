@@ -27,6 +27,7 @@ internal sealed class StandardSecurityHandler
     private readonly byte[] userEntry;
     private readonly byte[] ownerEncrypted;
     private readonly byte[] userEncrypted;
+    private readonly byte[] permsEntry;
     private readonly byte[] documentId;
     private readonly int permissions;
     private readonly int keyLength;
@@ -53,6 +54,7 @@ internal sealed class StandardSecurityHandler
         userEntry = GetStringBytes(encrypt, "U") ?? [];
         ownerEncrypted = GetStringBytes(encrypt, "OE") ?? [];
         userEncrypted = GetStringBytes(encrypt, "UE") ?? [];
+        permsEntry = GetStringBytes(encrypt, "Perms") ?? [];
         encryptMetadata = !(encrypt.TryGetValue("EncryptMetadata", out var meta)
             && meta is BooleanObject flag && !flag.Value);
 
@@ -68,9 +70,9 @@ internal sealed class StandardSecurityHandler
         stringCipher = ResolveCipher(encrypt, "StrF");
         FileKey = [];
 
-        // Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3); earlier
-        // revisions use the PDFDocEncoding/Latin-1 byte interpretation.
-        Authenticate(revision >= 5 ? Encoding.UTF8.GetBytes(password) : Encoding.Latin1.GetBytes(password));
+        // Revision 6 passwords are SASLprep-normalized UTF-8 (ISO 32000-2 7.6.4.3.3);
+        // earlier revisions use the PDFDocEncoding/Latin-1 byte interpretation.
+        Authenticate(revision >= 5 ? EncodeR6Password(password) : Encoding.Latin1.GetBytes(password));
     }
 
     private enum CryptMethod
@@ -296,6 +298,7 @@ internal sealed class StandardSecurityHandler
                 IsUserPassword = true;
                 var intermediate = HashPassword(pw, u[40..48], []);
                 FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted));
+                VerifyPerms();
                 return;
             }
         }
@@ -308,10 +311,41 @@ internal sealed class StandardSecurityHandler
                 IsOwnerPassword = true;
                 var intermediate = HashPassword(pw, o[40..48], u[..48]);
                 FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted));
+                VerifyPerms();
                 return;
             }
         }
     }
+
+    // ISO 32000-2 algorithm 13: decrypt /Perms with the file key (a single AES-256 ECB
+    // block, i.e. CBC with a zero IV) and confirm the 'adb' magic plus that the embedded
+    // /P equals the declared /P. A tampered /P that grants extra permissions would
+    // otherwise authenticate cleanly; fail loud on the mismatch.
+    private void VerifyPerms()
+    {
+        if (permsEntry.Length < 16)
+        {
+            return;
+        }
+
+        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry[..16]);
+        if (decoded[9] != (byte)'a' || decoded[10] != (byte)'d' || decoded[11] != (byte)'b')
+        {
+            throw new DocumentParseException("Encryption /Perms block failed its integrity check.");
+        }
+
+        var embedded = decoded[0] | (decoded[1] << 8) | (decoded[2] << 16) | (decoded[3] << 24);
+        if (embedded != permissions)
+        {
+            throw new DocumentParseException("Encryption /Perms permissions do not match /P.");
+        }
+    }
+
+    // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-processed before UTF-8
+    // encoding. NFKC covers the normalization SASLprep mandates; ASCII passwords are
+    // unaffected, so this only changes behavior for composed/decomposed Unicode input.
+    private static byte[] EncodeR6Password(string password)
+        => Encoding.UTF8.GetBytes(password.Normalize(NormalizationForm.FormKC));
 
     // The AESV3 file key comes straight from decrypting the attacker-supplied /UE or /OE.
     // Anything but 32 bytes (an empty /UE gives a zero-length key that divides-by-zero in
@@ -429,7 +463,7 @@ internal sealed class StandardSecurityHandler
 
     private static byte[] TruncateUtf8(string password)
     {
-        var bytes = Encoding.UTF8.GetBytes(password);
+        var bytes = EncodeR6Password(password);
         return bytes.Length > 127 ? bytes[..127] : bytes;
     }
 
