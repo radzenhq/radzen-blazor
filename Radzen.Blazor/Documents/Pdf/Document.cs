@@ -26,6 +26,23 @@ public sealed class Document
     internal DictionaryObject? sourceCatalog;
     internal DictionaryObject? sourceAcroForm;
 
+    // The exact original file bytes retained by DocumentLoader, so SaveIncremental can
+    // preserve them verbatim as the prefix of the incremental output. Null unless loaded.
+    internal byte[]? sourceBytes;
+
+    // The document metadata as read at load time, so SaveIncremental emits an /Info
+    // override only when the caller actually changed a modeled metadata field.
+    internal string?[]? loadedInfoSnapshot;
+
+    // The eight modeled /Info fields captured as strings, for a cheap value comparison
+    // between the load-time metadata and the current metadata on the incremental path.
+    internal static string?[] InfoSnapshot(DocumentInfo info) =>
+    [
+        info.Title, info.Author, info.Subject, info.Keywords, info.Creator, info.Producer,
+        info.CreationDate?.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+        info.ModificationDate?.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
+    ];
+
     /// <summary>Gets the document metadata.</summary>
     public DocumentInfo Info { get; } = new();
 
@@ -206,5 +223,33 @@ public sealed class Document
         ArgumentNullException.ThrowIfNull(stream);
 
         new DocumentSaver(this).Save(stream);
+    }
+
+    /// <summary>
+    /// Saves the document as a PDF incremental update (ISO 32000-1 section 7.5.6):
+    /// the original file bytes are preserved verbatim as an exact prefix of the
+    /// output, and only the objects the caller changed since loading - edited
+    /// metadata, filled form fields, and appended pages - are written afterwards,
+    /// followed by a new cross-reference section chained to the original via
+    /// <c>/Prev</c>. Valid only for a document obtained from
+    /// <see cref="LoadFromStream(Stream, LoadOptions)"/>; a freshly built document
+    /// has no original revision to increment and must be written with
+    /// <see cref="SaveToStream"/>. The output is deterministic: identical edits on
+    /// identical input produce identical bytes.
+    /// </summary>
+    /// <param name="stream">The destination stream.</param>
+    /// <exception cref="InvalidOperationException">The document was not loaded from
+    /// an existing PDF, or no supported change was made since it was loaded.</exception>
+    public void SaveIncremental(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        if (source is null || sourceBytes is null)
+        {
+            throw new InvalidOperationException(
+                "SaveIncremental is only valid for a document loaded from an existing PDF via LoadFromStream. "
+                + "Use SaveToStream to write a newly built document.");
+        }
+
+        new IncrementalDocumentSaver(this).Save(stream);
     }
 }

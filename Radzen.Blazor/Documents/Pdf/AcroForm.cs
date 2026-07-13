@@ -27,6 +27,12 @@ public sealed class AcroForm
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
 
+    // The field/widget/form dictionaries a caller has mutated through this form,
+    // recorded for the incremental save path (Document.SaveIncremental) so it can
+    // re-emit only the objects that actually changed. Inert on the full-save path,
+    // which re-imports the whole form graph regardless.
+    internal HashSet<DocumentObject> ChangedObjects { get; } = new(ReferenceEqualityComparer.Instance);
+
     // Terminal fields keyed by their fully qualified dotted name, each paired with
     // the widget annotation that renders it (the field dict itself when merged).
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
@@ -160,6 +166,7 @@ public sealed class AcroForm
         var terminal = Find(name);
         RequireFieldType(name, terminal.Field, "Tx", allowUntyped: true);
         terminal.Field["V"] = new StringObject(value);
+        ChangedObjects.Add(terminal.Field);
         WriteTextAppearance(terminal, value);
     }
 
@@ -193,6 +200,7 @@ public sealed class AcroForm
         }
 
         terminal.Field["V"] = new StringObject(value);
+        ChangedObjects.Add(terminal.Field);
         WriteTextAppearance(terminal, value);
     }
 
@@ -229,9 +237,11 @@ public sealed class AcroForm
         }
 
         terminal.Field["V"] = new NameObject(value);
+        ChangedObjects.Add(terminal.Field);
         foreach (var widget in widgets)
         {
             widget["AS"] = new NameObject(HasAppearanceState(widget, value) ? value : "Off");
+            ChangedObjects.Add(widget);
         }
     }
 
@@ -242,6 +252,7 @@ public sealed class AcroForm
             // Write the appearance onto the widget so a separate-widget kid's stale /AP
             // does not override the new value in a viewer; when merged this is the field.
             terminal.Widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal, value) };
+            ChangedObjects.Add(terminal.Widget);
         }
         else
         {
@@ -250,9 +261,11 @@ public sealed class AcroForm
             // password whose value must render masked, not in cleartext - leave /AP to the
             // viewer via /NeedAppearances rather than emit a wrong or password-leaking stream.
             Dictionary["NeedAppearances"] = new BooleanObject(true);
+            ChangedObjects.Add(Dictionary);
             if (terminal.Widget.ContainsKey("AP"))
             {
                 terminal.Widget["AP"] = new NullObject();
+                ChangedObjects.Add(terminal.Widget);
             }
         }
     }
@@ -373,6 +386,8 @@ public sealed class AcroForm
         var on = OnStateName(terminal.Widget);
         terminal.Field["V"] = new NameObject(on);
         terminal.Widget["AS"] = new NameObject(on);
+        ChangedObjects.Add(terminal.Field);
+        ChangedObjects.Add(terminal.Widget);
     }
 
     // The on-state is the first non-/Off appearance in the widget's /AP /N; only when
