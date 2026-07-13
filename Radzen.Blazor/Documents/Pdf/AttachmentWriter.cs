@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -70,5 +71,5 @@ internal sealed class AttachmentWriter(Document document)
     }
 
     internal static string FormatDate(DateTimeOffset date)
-        => "D:" + date.UtcDateTime.ToString("yyyyMMddHHmmss", System.Globalization.CultureInfo.InvariantCulture) + "Z00'00'";
+        => "D:" + date.UtcDateTime.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + "Z00'00'";
 }

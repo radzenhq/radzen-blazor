@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -75,7 +77,7 @@ internal static class LineBreaker
     private const double DefaultTabStopWidth = 36.0;
 
     internal static double AdvanceToTabStop(double position)
-        => (System.Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
+        => (Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
     public static IReadOnlyList<LineBox> Break(
         Paragraph paragraph,
@@ -448,7 +450,7 @@ internal static class LineBreaker
         for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
         {
             var piece = pieces[p];
-            if (piece.Run is InlineImage || piece.Text.Length == 0 || piece.Text.Contains('\u00A0', System.StringComparison.Ordinal))
+            if (piece.Run is InlineImage || piece.Text.Length == 0 || piece.Text.Contains('\u00A0', StringComparison.Ordinal))
             {
                 return false;
             }
@@ -595,7 +597,7 @@ internal static class LineBreaker
             x0 = 0;
         }
 
-        var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
+        var span = CollectionsMarshal.AsSpan(fragments);
         var cursor = indent + x0;
         for (var f = 0; f < span.Length; f++)
         {
@@ -671,7 +673,7 @@ internal static class LineBreaker
             }
         }
 
-        var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(fragments);
+        var span = CollectionsMarshal.AsSpan(fragments);
 
         if (paragraph.TabStops.Count > 0)
         {
@@ -846,7 +848,7 @@ internal static class LineBreaker
     // cursor, applying that stop's alignment. Paragraph-alignment shifting is not applied here so the
     // stops stay put; wrapped lines with no tabs still land left at the indent.
     private static LineBox BuildTabStopLine(
-        System.Span<LineFragment> span,
+        Span<LineFragment> span,
         List<LineFragment> fragments,
         List<Word> words,
         int first,
@@ -935,7 +937,7 @@ internal static class LineBreaker
             }
 
             cursor = x;
-            naturalWidth = System.Math.Max(naturalWidth, cursor);
+            naturalWidth = Math.Max(naturalWidth, cursor);
             tabsBefore = segEnd < last ? words[segEnd].TabsAfter : 0;
             w = segEnd + 1;
         }
@@ -965,7 +967,7 @@ internal static class LineBreaker
     {
         var text = leader.ToString();
         var leaderWidth = fonts.MeasureText(text, font);
-        var count = leaderWidth > 0 ? (int)System.Math.Floor((gapEnd - gapStart) / leaderWidth) : 0;
+        var count = leaderWidth > 0 ? (int)Math.Floor((gapEnd - gapStart) / leaderWidth) : 0;
         if (count <= 0)
         {
             return new LineFragment { Run = new Run(string.Empty) { EffectiveFont = font }, Text = string.Empty, Start = 0, Length = 0, Advance = 0 };
@@ -987,7 +989,7 @@ internal static class LineBreaker
     // Segment width (advances plus interior word gaps) and the offset from the segment start to its
     // first '.' (decimal alignment); falls back to the full width when there is no separator.
     private static (double Width, double DecimalOffset) MeasureSegment(
-        System.Span<LineFragment> span, List<Word> words, int wStart, int wEnd, int fiStart, FontCollection fonts)
+        Span<LineFragment> span, List<Word> words, int wStart, int wEnd, int fiStart, FontCollection fonts)
     {
         double width = 0;
         double decimalOffset = -1;
@@ -999,7 +1001,7 @@ internal static class LineBreaker
                 var fragment = span[f];
                 if (decimalOffset < 0)
                 {
-                    var dot = fragment.Text.IndexOf('.', System.StringComparison.Ordinal);
+                    var dot = fragment.Text.IndexOf('.', StringComparison.Ordinal);
                     if (dot >= 0)
                     {
                         decimalOffset = width + fonts.MeasureText(fragment.Text[..dot], fragment.Run.ResolvedFont);
@@ -1054,8 +1056,8 @@ internal static class LineBreaker
                 (h, asc) = ScriptExtent(fragments[i].Run, h, asc);
             }
 
-            natural = System.Math.Max(natural, h);
-            baseline = System.Math.Max(baseline, asc);
+            natural = Math.Max(natural, h);
+            baseline = Math.Max(baseline, asc);
         }
 
         box.Height = natural * lineSpacing;
@@ -1070,8 +1072,8 @@ internal static class LineBreaker
         var scale = run.ScriptScale;
         var rise = run.ScriptRise(run.ResolvedFont.Size);
         var descent = (height - ascent) * scale;
-        ascent = (ascent * scale) + System.Math.Max(rise, 0);
-        return (ascent + descent + System.Math.Max(-rise, 0), ascent);
+        ascent = (ascent * scale) + Math.Max(rise, 0);
+        return (ascent + descent + Math.Max(-rise, 0), ascent);
     }
 
     // A run's measured advance: the plain measurement scaled to the script size, plus

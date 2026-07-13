@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Text;
 
 namespace Radzen.Documents.Crypto;
 
@@ -51,7 +52,7 @@ public static class Md5
     public static string Calculate(byte[] input)
     {
         var digest = Hash(input);
-        var result = new System.Text.StringBuilder(32);
+        var result = new StringBuilder(32);
         foreach (var b in digest)
         {
             result.Append(b.ToString("x2", CultureInfo.InvariantCulture));

@@ -1,5 +1,7 @@
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
@@ -32,7 +34,7 @@ internal static class FieldAppearances
     // top of the box down, each in the supplied base-14 font. Non-encodable glyphs
     // are dropped by the WinAnsi text encoder rather than failing the whole stream.
     public static StreamObject BuildSignatureAppearance(
-        System.Collections.Generic.IReadOnlyList<string> lines, double width, double height, Font font)
+        IReadOnlyList<string> lines, double width, double height, Font font)
     {
         using var writer = new ContentWriter();
         writer.WriteRaw("q\n");
@@ -81,11 +83,11 @@ internal static class FieldAppearances
     // given rectangle in the target coordinate space (appearance bbox or page).
     public static PathContent RadioBorder(double x, double y, double width, double height)
     {
-        var extent = System.Math.Min(width, height);
+        var extent = Math.Min(width, height);
         var path = new PathContent
         {
             Stroke = true,
-            Thickness = System.Math.Max(1.0, extent * 0.08),
+            Thickness = Math.Max(1.0, extent * 0.08),
         };
         Circle(path, x + width / 2.0, y + height / 2.0, extent * 0.42);
         return path;
@@ -96,7 +98,7 @@ internal static class FieldAppearances
     public static PathContent RadioDot(double x, double y, double width, double height)
     {
         var path = new PathContent { Fill = true };
-        Circle(path, x + width / 2.0, y + height / 2.0, System.Math.Min(width, height) * 0.22);
+        Circle(path, x + width / 2.0, y + height / 2.0, Math.Min(width, height) * 0.22);
         return path;
     }
 
@@ -132,7 +134,7 @@ internal static class FieldAppearances
         var path = new PathContent
         {
             Stroke = true,
-            Thickness = System.Math.Max(1.0, System.Math.Min(width, height) * 0.12),
+            Thickness = Math.Max(1.0, Math.Min(width, height) * 0.12),
         };
         path.MoveTo(Unit.FromPoint(x + width * 0.22), Unit.FromPoint(y + height * 0.52));
         path.LineTo(Unit.FromPoint(x + width * 0.44), Unit.FromPoint(y + height * 0.28));
@@ -161,7 +163,7 @@ internal static class FieldAppearances
             return (null, 0.0);
         }
 
-        var tokens = da.Split((char[]?)null, System.StringSplitOptions.RemoveEmptyEntries);
+        var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
         for (var i = 2; i < tokens.Length; i++)
         {
             if (tokens[i] == "Tf")

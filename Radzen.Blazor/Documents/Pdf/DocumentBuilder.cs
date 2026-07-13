@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.IO;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -22,7 +25,7 @@ public class DocumentBuilder
     public AttachmentCollection Attachments { get; } = [];
 
     /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
-    public System.Collections.Generic.IList<OutlineItem> Outline { get; } = [];
+    public IList<OutlineItem> Outline { get; } = [];
 
     /// <summary>
     /// Gets or sets the PDF/A conformance level of the output. When not
@@ -90,7 +93,7 @@ public class DocumentBuilder
 
     /// <summary>Builds the document and serializes it to the given stream.</summary>
     /// <param name="stream">The destination stream.</param>
-    public void SaveToStream(System.IO.Stream stream) => Build().SaveToStream(stream);
+    public void SaveToStream(Stream stream) => Build().SaveToStream(stream);
 
     /// <summary>Builds the document and serializes it to a byte array.</summary>
     /// <returns>The complete PDF file bytes.</returns>

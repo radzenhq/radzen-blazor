@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -49,7 +50,7 @@ internal static class BoxContentLayout
         HorizontalAlignment align,
         VerticalAlignment vAlign,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage)
         => Position(Measure(blocks, contentBox.Width, align, fonts, measureImage), contentBox, align, vAlign);
 
     public static Measured Measure(
@@ -57,7 +58,7 @@ internal static class BoxContentLayout
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage)
     {
         var items = new List<CellItem>();
         double height = 0;
@@ -102,7 +103,7 @@ internal static class BoxContentLayout
             }
             else if (block is Table nested)
             {
-                var layout = TableLayout.Layout(nested, System.Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
+                var layout = TableLayout.Layout(nested, Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
                 items.Add(new CellItem { Table = layout, Height = layout.Height });
                 height += layout.Height;
             }
@@ -114,7 +115,7 @@ internal static class BoxContentLayout
                 // synthetic single-cell table it used to lower to.
                 var padding = container.Padding.Point;
                 var boxWidth = container.Width?.Point ?? contentWidth;
-                var inner = Measure(container.Blocks, System.Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
+                var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
                 var boxHeight = inner.Height + (2 * padding);
                 items.Add(new CellItem { Box = container, BoxContent = inner, Width = boxWidth, Height = boxHeight });
                 height += boxHeight;
@@ -125,7 +126,7 @@ internal static class BoxContentLayout
             }
             else
             {
-                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
+                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
             }
         }
 
@@ -204,8 +205,8 @@ internal static class BoxContentLayout
                 // box-local (X/Y from the box's top-left corner) with the lowered cell's
                 // default alignment, and the emitter shifts it by the box position.
                 var padding = box.Padding.Point;
-                var indent = System.Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
-                var innerBox = new Rect(padding, padding, System.Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
+                var indent = Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
+                var innerBox = new Rect(padding, padding, Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
                 nestedBoxes.Add(new LaidOutNestedBox
                 {
                     Source = box,

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Radzen.Documents.Pdf.Markdown;
 
@@ -333,12 +334,12 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
     // Flattens an image's inline alt-text children to plain text for the Figure's alternate description.
     private static string AltText(Radzen.Documents.Markdown.Image image)
     {
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         CollectText(image.Children, builder);
         return builder.ToString();
     }
 
-    private static void CollectText(IEnumerable<Radzen.Documents.Markdown.Inline> nodes, System.Text.StringBuilder builder)
+    private static void CollectText(IEnumerable<Radzen.Documents.Markdown.Inline> nodes, StringBuilder builder)
     {
         foreach (var node in nodes)
         {

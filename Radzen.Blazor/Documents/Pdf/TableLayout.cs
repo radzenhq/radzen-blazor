@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -135,7 +136,7 @@ internal static class TableLayout
         Table table,
         double availableWidth,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage = null)
+        Func<Image, double, (double Width, double Height)>? measureImage = null)
     {
         var columnWidths = ResolveColumnWidths(table, availableWidth);
         var columnX = Prefix(columnWidths);
@@ -160,8 +161,8 @@ internal static class TableLayout
                     break;
                 }
 
-                var span = System.Math.Min(cell.ColumnSpan, nCols - c);
-                var rowSpan = System.Math.Min(cell.RowSpan, nRows - r);
+                var span = Math.Min(cell.ColumnSpan, nCols - c);
+                var rowSpan = Math.Min(cell.RowSpan, nRows - r);
                 var lastRow = r + rowSpan;
                 for (var rr = r; rr < lastRow; rr++)
                 {
@@ -247,7 +248,7 @@ internal static class TableLayout
             }
 
             double height = 0;
-            var lastRow = System.Math.Min(nRows, p.Row + p.RowSpan);
+            var lastRow = Math.Min(nRows, p.Row + p.RowSpan);
             for (var rr = p.Row; rr < lastRow; rr++)
             {
                 height += rowHeights[rr];
@@ -322,10 +323,10 @@ internal static class TableLayout
                 var cells = 0;
                 foreach (var cell in row.Cells)
                 {
-                    cells += System.Math.Max(1, cell.ColumnSpan);
+                    cells += Math.Max(1, cell.ColumnSpan);
                 }
 
-                count = System.Math.Max(count, cells);
+                count = Math.Max(count, cells);
             }
 
             if (count == 0)
@@ -335,7 +336,7 @@ internal static class TableLayout
 
             var total = table.Width?.Point ?? availableWidth;
             var derived = new double[count];
-            var share = System.Math.Max(0, total / count);
+            var share = Math.Max(0, total / count);
             for (var i = 0; i < count; i++)
             {
                 derived[i] = share;
@@ -365,7 +366,7 @@ internal static class TableLayout
             return widths;
         }
 
-        var remaining = System.Math.Max(0, (table.Width?.Point ?? availableWidth) - fixedSum);
+        var remaining = Math.Max(0, (table.Width?.Point ?? availableWidth) - fixedSum);
         for (var i = 0; i < count; i++)
         {
             if (table.Columns[i].Width is null)

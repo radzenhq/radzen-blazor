@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 // Compact sRGB v2 ICC profile (CC0, saucecontrol/Compact-ICC-Profiles "magic" variant).
@@ -16,5 +18,5 @@ internal static class SrgbIccProfile
         "Wr5chF5MYBth72PHZaZniWlxa19tUW9KcUZzSnVRd155cXuIfaZ/yIHwhB6GUIiJisWNCY9RkZ+T85ZLmKubDp14n+eiW6TWp1ap" +
         "26xnrvexj7Qqtsy5dLwhvtXBjcRMxxDJ2syrz3/SXNU92CTbEt4E4P7j/OcB6gztHPA081D2c/mb/Mr//w==";
 
-    internal static byte[] GetBytes() => System.Convert.FromBase64String(Base64);
+    internal static byte[] GetBytes() => Convert.FromBase64String(Base64);
 }

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -66,8 +68,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var bottom = double.MinValue;
         foreach (var row in positioned.Fragment.Rows)
         {
-            top = System.Math.Min(top, row.Y);
-            bottom = System.Math.Max(bottom, row.Y + row.Height);
+            top = Math.Min(top, row.Y);
+            bottom = Math.Max(bottom, row.Y + row.Height);
         }
 
         if (bottom <= top)
@@ -223,7 +225,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var cellClip = clip;
         if (overflows)
         {
-            var texts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
+            var texts = CollectionsMarshal.AsSpan(plan.Texts);
             for (var t = firstText; t < texts.Length; t++)
             {
                 texts[t].Clip = cellClip;
@@ -261,19 +263,19 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         if (contentOverflows)
         {
-            var imageDraws = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Images);
+            var imageDraws = CollectionsMarshal.AsSpan(plan.Images);
             for (var im = firstImage; im < imageDraws.Length; im++)
             {
                 imageDraws[im].Clip = cellClip;
             }
 
-            var fills = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Fills);
+            var fills = CollectionsMarshal.AsSpan(plan.Fills);
             for (var f = firstFill; f < fills.Length; f++)
             {
                 fills[f].Clip = cellClip;
             }
 
-            var codeTexts = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(plan.Texts);
+            var codeTexts = CollectionsMarshal.AsSpan(plan.Texts);
             for (var t = firstCodeText; t < codeTexts.Length; t++)
             {
                 codeTexts[t].Clip = cellClip;
@@ -356,7 +358,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             ExtGState = extGState,
         });
 
-        var innerWidth = System.Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
+        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
         EmitBoxContent(
             context,
             box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,

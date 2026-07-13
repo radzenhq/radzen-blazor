@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -58,7 +59,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <param name="page">The page to insert.</param>
     public void Insert(int index, Page page)
     {
-        System.ArgumentNullException.ThrowIfNull(page);
+        ArgumentNullException.ThrowIfNull(page);
         pages.Insert(index, page);
     }
 

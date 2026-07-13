@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -80,7 +81,7 @@ public sealed class OutlineTarget
     /// <returns>The anchor target.</returns>
     public static OutlineTarget ToAnchor(string name)
     {
-        System.ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(name);
         return new OutlineTarget { Anchor = name };
     }
 
@@ -89,7 +90,7 @@ public sealed class OutlineTarget
     /// <returns>The page target.</returns>
     public static OutlineTarget ToPage(int pageIndex)
     {
-        System.ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex };
     }
 
@@ -101,7 +102,7 @@ public sealed class OutlineTarget
     /// <returns>The page target.</returns>
     public static OutlineTarget ToPageFit(int pageIndex)
     {
-        System.ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex, Fit = OutlineFit.Fit };
     }
 
@@ -114,7 +115,7 @@ public sealed class OutlineTarget
     /// <returns>The page target.</returns>
     public static OutlineTarget ToPageFitHorizontal(int pageIndex, double top)
     {
-        System.ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex, Fit = OutlineFit.FitHorizontal, FitArguments = [top] };
     }
 
@@ -130,7 +131,7 @@ public sealed class OutlineTarget
     /// <returns>The page target.</returns>
     public static OutlineTarget ToPageRectangle(int pageIndex, double left, double bottom, double right, double top)
     {
-        System.ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex, Fit = OutlineFit.Rectangle, FitArguments = [left, bottom, right, top] };
     }
 
@@ -145,7 +146,7 @@ public sealed class OutlineTarget
     /// <returns>The page target.</returns>
     public static OutlineTarget ToPageXYZ(int pageIndex, double left, double top, double zoom)
     {
-        System.ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
+        ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex, Fit = OutlineFit.Coordinates, FitArguments = [left, top, zoom] };
     }
 }

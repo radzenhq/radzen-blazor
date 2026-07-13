@@ -38,7 +38,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     // The TJ show array a loaded run carried (interleaved string chunks and numeric
     // displacements). Re-emitted verbatim so kerning/inter-word gaps survive a re-encode;
     // null for an authored run or an edited one, which re-encode through the Tj path.
-    internal System.Collections.Generic.IReadOnlyList<TextAdjustment>? SourceAdjustments { get; set; }
+    internal IReadOnlyList<TextAdjustment>? SourceAdjustments { get; set; }
 
     // Non-RGB fill (CMYK/gray/named color space) captured when materializing a loaded run.
     // When set it overrides Color so a re-encode preserves the original color space instead

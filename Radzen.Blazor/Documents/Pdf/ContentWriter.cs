@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -12,7 +13,7 @@ namespace Radzen.Documents.Pdf;
 // resources.
 internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im") : IDisposable
 {
-    private byte[] buffer = System.Buffers.ArrayPool<byte>.Shared.Rent(1024);
+    private byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
     private int length;
     private bool returned;
     private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
@@ -196,7 +197,7 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
 
     private void Grow(int size)
     {
-        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var pool = ArrayPool<byte>.Shared;
         var replacement = pool.Rent(Math.Max(buffer.Length * 2, length + size));
         buffer.AsSpan(0, length).CopyTo(replacement);
         pool.Return(buffer);
@@ -213,6 +214,6 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         }
 
         returned = true;
-        System.Buffers.ArrayPool<byte>.Shared.Return(buffer);
+        ArrayPool<byte>.Shared.Return(buffer);
     }
 }

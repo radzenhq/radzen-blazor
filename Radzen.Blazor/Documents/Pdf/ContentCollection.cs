@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -29,7 +30,7 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     public T Add<T>(T element)
         where T : ContentElement
     {
-        System.ArgumentNullException.ThrowIfNull(element);
+        ArgumentNullException.ThrowIfNull(element);
         items.Add(element);
         return element;
     }

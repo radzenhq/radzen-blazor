@@ -46,7 +46,7 @@ public sealed class DocumentWriter(Stream stream)
         {
             header[5 + i] = (byte)Version[i];
         }
-        System.Array.Copy(HeaderSuffix, 0, header, 5 + Version.Length, HeaderSuffix.Length);
+        Array.Copy(HeaderSuffix, 0, header, 5 + Version.Length, HeaderSuffix.Length);
         return header;
     }
 

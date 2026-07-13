@@ -1,5 +1,7 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -60,7 +62,7 @@ internal static class Type0FontEmbedder
         else
         {
             var glyfMap = EmbedGlyf(writer, font, usedGids, descriptor);
-            System.Diagnostics.Debug.Assert(compactGidMap is null || SameMap(compactGidMap, glyfMap),
+            Debug.Assert(compactGidMap is null || SameMap(compactGidMap, glyfMap),
                 "Generator and glyf-subsetter compact gid maps diverged.");
             gidMap = compactGidMap ?? glyfMap;
         }
@@ -121,7 +123,7 @@ internal static class Type0FontEmbedder
         }
         finally
         {
-            System.Buffers.ArrayPool<byte>.Shared.Return(subset);
+            ArrayPool<byte>.Shared.Return(subset);
         }
     }
 

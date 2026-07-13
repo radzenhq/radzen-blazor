@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 // Emits a first-class section-level container box: paints the box decoration through
@@ -30,7 +32,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         // rotated container carrying a shadow fails loud rather than silently dropping it.
         if (box.Transform is not null && box.Style.Shadow is not null)
         {
-            throw new System.NotSupportedException(
+            throw new NotSupportedException(
                 "A rotated box cannot preserve a box shadow; remove the shadow or the rotation.");
         }
 
@@ -38,7 +40,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         BoxRenderer.Paint(plan, bounds, style);
 
         var radius = BoxRenderer.ClampRadius(box.Style.CornerRadius.Point, bounds.Width, bounds.Height);
-        var innerWidth = System.Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
+        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
 
         // Container children are untagged (StructureTreeBuilder does not descend into
         // containers), matching the lowered path where the synthetic cell had no element.

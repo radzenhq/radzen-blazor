@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -35,7 +37,7 @@ public class DocumentInfo
     /// supplies the value; no system clock is read. When <see langword="null"/> no
     /// creation date is written.
     /// </summary>
-    public System.DateTimeOffset? CreationDate { get; set; }
+    public DateTimeOffset? CreationDate { get; set; }
 
     /// <summary>
     /// Gets or sets the date the document was last modified, written to the <c>/Info
@@ -43,5 +45,5 @@ public class DocumentInfo
     /// the value; no system clock is read. When <see langword="null"/> no modification
     /// date is written.
     /// </summary>
-    public System.DateTimeOffset? ModificationDate { get; set; }
+    public DateTimeOffset? ModificationDate { get; set; }
 }

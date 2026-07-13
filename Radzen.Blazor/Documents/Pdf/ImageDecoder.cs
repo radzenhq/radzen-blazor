@@ -70,7 +70,7 @@ internal static class ImageDecoder
 
         if (image.FitBox is { } box)
         {
-            var scale = System.Math.Min(box.Width.Point / baseWidth, box.Height.Point / baseHeight);
+            var scale = Math.Min(box.Width.Point / baseWidth, box.Height.Point / baseHeight);
             return (baseWidth * scale, baseHeight * scale);
         }
 

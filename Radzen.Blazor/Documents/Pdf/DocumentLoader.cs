@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -75,7 +76,7 @@ internal static class DocumentLoader
 
             if (offset != buffer.Length)
             {
-                System.Array.Resize(ref buffer, offset);
+                Array.Resize(ref buffer, offset);
             }
 
             return buffer;
@@ -188,9 +189,9 @@ internal static class DocumentLoader
         }
     }
 
-    public static System.Collections.Generic.Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
+    public static Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
     {
-        var fonts = new System.Collections.Generic.Dictionary<string, Fonts.ReverseFont>(System.StringComparer.Ordinal);
+        var fonts = new Dictionary<string, Fonts.ReverseFont>(StringComparer.Ordinal);
         if (resources is null
             || !resources.TryGetValue("Font", out var fontObject)
             || reader.Resolve(fontObject!) is not DictionaryObject fontDictionary)
@@ -279,7 +280,7 @@ internal static class DocumentLoader
         target.ModificationDate = Date(reader, info, "ModDate");
     }
 
-    private static System.DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
+    private static DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
         => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
             ? ParseDate(DecodeTextString(text.Value))
             : null;
@@ -287,7 +288,7 @@ internal static class DocumentLoader
     // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSSOHH'mm'. Every field after the
     // year is optional; the offset O is +, -, or Z (or absent). A value that does not
     // parse is dropped rather than throwing so a re-save keeps every other Info entry.
-    private static System.DateTimeOffset? ParseDate(string raw)
+    private static DateTimeOffset? ParseDate(string raw)
     {
         var s = raw.StartsWith("D:", StringComparison.Ordinal) ? raw[2..] : raw;
         if (s.Length < 4 || !int.TryParse(s.AsSpan(0, 4), out var year))
@@ -304,18 +305,18 @@ internal static class DocumentLoader
         var minute = Part(10, 2, 0);
         var second = Part(12, 2, 0);
 
-        var offset = System.TimeSpan.Zero;
+        var offset = TimeSpan.Zero;
         if (s.Length > 14 && s[14] is '+' or '-')
         {
             var sign = s[14] == '-' ? -1 : 1;
-            offset = new System.TimeSpan(sign * Part(15, 2, 0), sign * Part(18, 2, 0), 0);
+            offset = new TimeSpan(sign * Part(15, 2, 0), sign * Part(18, 2, 0), 0);
         }
 
         try
         {
-            return new System.DateTimeOffset(year, month, day, hour, minute, second, offset);
+            return new DateTimeOffset(year, month, day, hour, minute, second, offset);
         }
-        catch (System.ArgumentOutOfRangeException)
+        catch (ArgumentOutOfRangeException)
         {
             return null;
         }
@@ -430,7 +431,7 @@ internal static class DocumentLoader
 
     private static AttachmentRelationship Relationship(DocumentReader reader, DictionaryObject filespec)
         => filespec.TryGetValue("AFRelationship", out var value) && reader.Resolve(value!) is NameObject name
-            && System.Enum.TryParse<AttachmentRelationship>(name.Value, out var relationship)
+            && Enum.TryParse<AttachmentRelationship>(name.Value, out var relationship)
             ? relationship
             : AttachmentRelationship.Unspecified;
 
@@ -455,6 +456,6 @@ internal static class DocumentLoader
             bytes[i] = (byte)raw[i + 2];
         }
 
-        return System.Text.Encoding.BigEndianUnicode.GetString(bytes);
+        return Encoding.BigEndianUnicode.GetString(bytes);
     }
 }

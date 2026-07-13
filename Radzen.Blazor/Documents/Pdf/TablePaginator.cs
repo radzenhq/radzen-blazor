@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -78,7 +79,7 @@ internal static class TablePaginator
                 while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
                 {
                     last++;
-                    groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
+                    groupEnd = Math.Max(groupEnd, reach[bodies[last]]);
                     groupHeight += layout.RowHeights[bodies[last]];
                 }
 
@@ -159,7 +160,7 @@ internal static class TablePaginator
             var end = cell.Row + cell.RowSpan - 1;
             for (var r = cell.Row; r <= end && r < reach.Length; r++)
             {
-                reach[r] = System.Math.Max(reach[r], end);
+                reach[r] = Math.Max(reach[r], end);
             }
         }
 
@@ -197,7 +198,7 @@ internal static class TablePaginator
         while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
         {
             last++;
-            groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
+            groupEnd = Math.Max(groupEnd, reach[bodies[last]]);
             groupHeight += layout.RowHeights[bodies[last]];
         }
 

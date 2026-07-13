@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using static Radzen.Documents.Pdf.GeneratorFontResolver;
@@ -36,7 +38,7 @@ internal sealed class TextLineEmitter(
 
     // Named destinations recorded at emit time: anchor name -> (page, line top).
     // First occurrence wins so a run split across pages anchors where it starts.
-    public Dictionary<string, GeneratedAnchor> Anchors { get; } = new(System.StringComparer.Ordinal);
+    public Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
 
     // Header/footer bands are laid out once per section and reused on every page, so
     // a paragraph containing page-number fields is re-resolved here at emit time with
@@ -203,7 +205,7 @@ internal sealed class TextLineEmitter(
                 Y1 = underlineY,
                 X2 = originX + end,
                 Y2 = underlineY,
-                LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
+                LineWidth = Math.Max(font.Size * 0.06, 0.5),
                 Color = font.Color,
                 Style = BorderStyle.Solid,
                 ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
@@ -250,7 +252,7 @@ internal sealed class TextLineEmitter(
                 Y1 = strikeY,
                 X2 = originX + end,
                 Y2 = strikeY,
-                LineWidth = System.Math.Max(font.Size * 0.06, 0.5),
+                LineWidth = Math.Max(font.Size * 0.06, 0.5),
                 Color = font.Color,
                 Style = BorderStyle.Solid,
                 ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
@@ -299,7 +301,7 @@ internal sealed class TextLineEmitter(
                 }
 
                 var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidth(run.ResolvedFont, spaceWidths);
-                if (!allSpaces || System.Math.Abs(next.XOffset - right - gapWidth) > 0.001)
+                if (!allSpaces || Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
                     break;
                 }
@@ -409,7 +411,7 @@ internal sealed class TextLineEmitter(
             }
             else
             {
-                var builderText = new System.Text.StringBuilder();
+                var builderText = new StringBuilder();
                 while (i < text.Length)
                 {
                     var codepoint = CodePointAt(text, i);

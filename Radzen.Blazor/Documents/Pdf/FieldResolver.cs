@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -52,7 +54,7 @@ internal sealed class FieldResolver(FontCollection fonts)
         // Text == null marks a passthrough piece: a non-text run (e.g. InlineImage) re-emitted
         // as its ORIGINAL instance so the line breaker lays it out instead of coercing it to
         // empty text.
-        var pieces = new List<(Run Run, System.Text.StringBuilder? Text, int TabsBefore)>();
+        var pieces = new List<(Run Run, StringBuilder? Text, int TabsBefore)>();
         var pendingTabs = 0;
         foreach (var run in paragraph.Inlines)
         {
@@ -70,7 +72,7 @@ internal sealed class FieldResolver(FontCollection fonts)
                     // the image itself rather than dropping it as its (empty) Text.
                     if (pendingTabs > 0)
                     {
-                        pieces.Add((run, new System.Text.StringBuilder(), pendingTabs));
+                        pieces.Add((run, new StringBuilder(), pendingTabs));
                         pendingTabs = 0;
                     }
 
@@ -80,7 +82,7 @@ internal sealed class FieldResolver(FontCollection fonts)
                     text = run.Text;
                     break;
                 default:
-                    throw new System.NotSupportedException(
+                    throw new NotSupportedException(
                         $"ResolveFields cannot resolve inline run of type '{run!.GetType().Name}'.");
             }
 
@@ -104,7 +106,7 @@ internal sealed class FieldResolver(FontCollection fonts)
                 }
                 else
                 {
-                    pieces.Add((run, new System.Text.StringBuilder(part), pendingTabs));
+                    pieces.Add((run, new StringBuilder(part), pendingTabs));
                     pendingTabs = 0;
                 }
             }
@@ -113,7 +115,7 @@ internal sealed class FieldResolver(FontCollection fonts)
         // A trailing tab (no piece follows it) survives as a final tabs-only piece.
         if (pendingTabs > 0 && pieces.Count > 0)
         {
-            pieces.Add((pieces[^1].Run, new System.Text.StringBuilder(), pendingTabs));
+            pieces.Add((pieces[^1].Run, new StringBuilder(), pendingTabs));
         }
 
         var resolved = new Paragraph
@@ -152,7 +154,7 @@ internal sealed class FieldResolver(FontCollection fonts)
         // would overprint the content below it, so fail loud instead of drawing over it.
         if (lines.Count > reservedLines)
         {
-            throw new System.InvalidOperationException(
+            throw new InvalidOperationException(
                 $"A header/footer field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
                 $"but only {reservedLines} were reserved; widen the band or shorten the text.");
         }

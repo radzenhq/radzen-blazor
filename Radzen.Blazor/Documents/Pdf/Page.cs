@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -13,7 +16,7 @@ public sealed class Page
     private int materializedCount;
     private byte[]? snapshot;
     private int rotate;
-    private System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
+    private IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
 
     internal Page(Unit width, Unit height)
     {
@@ -67,7 +70,7 @@ public sealed class Page
         {
             if (value is not (0 or 90 or 180 or 270))
             {
-                throw new System.ArgumentOutOfRangeException(nameof(value), value, "Page rotation must be 0, 90, 180 or 270 degrees.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Page rotation must be 0, 90, 180 or 270 degrees.");
             }
 
             rotate = value;
@@ -95,7 +98,7 @@ public sealed class Page
     /// <param name="value">The raw content stream bytes.</param>
     public void SetContent(byte[] value)
     {
-        System.ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(value);
         content = value;
     }
 
@@ -114,21 +117,21 @@ public sealed class Page
     /// <returns>The page text, or an empty string when the page has no text.</returns>
     public string ExtractText() => TextExtractor.Extract(content, textFonts);
 
-    internal void SetTextFonts(System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
+    internal void SetTextFonts(IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
     {
         textFonts = fonts;
     }
 
     // The reverse char-code -> Unicode maps used by ExtractText, exposed so Document.Append
     // can carry them onto a copied page (a Type0/Identity-H stream is not reversible without them).
-    internal System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
+    internal IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
 
     // Resolves the content-stream bytes to write. An untouched loaded page reuses its
     // retained raw bytes. A loaded page whose original elements are intact but that
     // gained new elements keeps its raw bytes untouched and returns the additions as a
     // separate overlay stream. Any other modification (or a freshly authored page)
     // re-encodes from elements; the emitters carry the resources each stream needs.
-    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter, System.Collections.Generic.IReadOnlyCollection<string>? reservedNames = null)
+    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter, IReadOnlyCollection<string>? reservedNames = null)
     {
         emitter = null;
         overlay = null;
@@ -232,7 +235,7 @@ public sealed class Page
 
     // Emitter keys are prefix+index; a prefix that no reserved name begins with can never
     // equal one, so extend it with a non-digit until it is disjoint from every loaded name.
-    private static string SafePrefix(string baseName, System.Collections.Generic.IReadOnlyCollection<string>? reserved)
+    private static string SafePrefix(string baseName, IReadOnlyCollection<string>? reserved)
     {
         if (reserved is null || reserved.Count == 0)
         {
@@ -248,11 +251,11 @@ public sealed class Page
         return prefix;
     }
 
-    private static bool StartsWithAny(System.Collections.Generic.IReadOnlyCollection<string> names, string prefix)
+    private static bool StartsWithAny(IReadOnlyCollection<string> names, string prefix)
     {
         foreach (var name in names)
         {
-            if (name.StartsWith(prefix, System.StringComparison.Ordinal))
+            if (name.StartsWith(prefix, StringComparison.Ordinal))
             {
                 return true;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using static Radzen.Documents.Pdf.ContentEmitter;
@@ -140,7 +141,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
         }
 
         if (styleName.Length == 8
-            && styleName.StartsWith("Heading", System.StringComparison.OrdinalIgnoreCase)
+            && styleName.StartsWith("Heading", StringComparison.OrdinalIgnoreCase)
             && styleName[7] is >= '1' and <= '6')
         {
             return Heading(styleName[7]);

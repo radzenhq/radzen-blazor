@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -29,7 +31,7 @@ public abstract class ContentElement
         // fail loud rather than silently emitting untagged real content (PDF/UA hazard).
         if (Tag is not null)
         {
-            throw new System.NotSupportedException(
+            throw new NotSupportedException(
                 "ContentElement.Tag is not yet supported; remove the tag or emit the element as an artifact.");
         }
 

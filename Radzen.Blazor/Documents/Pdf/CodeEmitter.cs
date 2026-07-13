@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 // Rasterizes QR codes and barcodes into filled rectangles (one per dark module/bar) and
@@ -46,7 +48,7 @@ internal sealed class CodeEmitter(FontCollection fonts)
     {
         var matrix = Radzen.Documents.QrEncoder.EncodeUtf8(qr.Value, qr.ErrorCorrection);
         var modules = matrix.GetLength(0);
-        var quiet = System.Math.Max(0, qr.QuietZoneModules);
+        var quiet = Math.Max(0, qr.QuietZoneModules);
         var module = qr.Size.Point / (modules + (2 * quiet));
 
         for (var row = 0; row < modules; row++)

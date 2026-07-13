@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class ListItemCollection : IReadOnlyList<ListItem>
 {
-    private readonly System.Collections.Generic.List<ListItem> items = [];
+    private readonly List<ListItem> items = [];
 
     /// <inheritdoc/>
     public int Count => items.Count;
@@ -35,7 +36,7 @@ public sealed class ListItemCollection : IReadOnlyList<ListItem>
     /// <returns>The same <paramref name="item"/> instance.</returns>
     public ListItem Add(ListItem item)
     {
-        System.ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(item);
         items.Add(item);
         return item;
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -135,7 +136,7 @@ public sealed class PathContent : ContentElement
     /// <exception cref="System.ArgumentNullException"><paramref name="pattern"/> is null.</exception>
     public void SetDash(double[] pattern, double phase = 0)
     {
-        System.ArgumentNullException.ThrowIfNull(pattern);
+        ArgumentNullException.ThrowIfNull(pattern);
         DashArray = (double[])pattern.Clone();
         DashPhase = phase;
     }
