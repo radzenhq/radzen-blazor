@@ -524,6 +524,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       height: auto;
     }
 
+    .rz-month-view .rz-view-content {
+      height: 0;
+    }
+
     .rz-month-view,
     .rz-planner-view,
     .rz-timeline-view,
