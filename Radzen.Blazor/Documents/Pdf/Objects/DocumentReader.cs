@@ -1,7 +1,6 @@
 using Radzen.Documents.Pdf.Objects.Encryption;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -17,30 +16,24 @@ namespace Radzen.Documents.Pdf.Objects;
 /// </summary>
 public sealed class DocumentReader
 {
-    private readonly byte[] data;
     private readonly ReaderLimits limits;
 
     // The resource limits this reader enforces, so read-path helpers (font/ToUnicode
     // reconstruction) honor a caller-tightened budget instead of ReaderLimits.Default.
     internal ReaderLimits Limits => limits;
-    private readonly Dictionary<int, XrefEntry> entries = [];
-    private readonly Dictionary<int, DocumentObject> cache = [];
-    private readonly Dictionary<int, ObjectStream> objectStreams = [];
-    private readonly NullObject nullObject = new();
     private DictionaryObject trailer = new();
-    private readonly HashSet<int> parsing = [];
     private readonly StreamDecoder decoder;
+    private readonly XrefLoader xrefLoader;
+    private readonly IndirectObjectStore store;
     private readonly DocumentRepairer repairer;
-    private StandardSecurityHandler? security;
-    private int encryptObjectNumber = -1;
 
     private DocumentReader(byte[] data, ReaderLimits limits)
     {
-        this.data = data;
         this.limits = limits;
         decoder = new StreamDecoder(limits, Resolve);
-        repairer = new DocumentRepairer(
-            data, limits, entries, cache, objectStreams, GetObject, IsObjectStream, GetObjectStream);
+        repairer = new DocumentRepairer(data, limits);
+        xrefLoader = new XrefLoader(data, limits, decoder);
+        store = new IndirectObjectStore(data, limits, xrefLoader.Entries, decoder, repairer);
     }
 
     /// <summary>
@@ -58,7 +51,7 @@ public sealed class DocumentReader
         get
         {
             var count = 0;
-            foreach (var entry in entries.Values)
+            foreach (var entry in xrefLoader.Entries.Values)
             {
                 if (entry.InUse)
                 {
@@ -74,7 +67,7 @@ public sealed class DocumentReader
     /// Gets a value indicating whether the document is encrypted (its trailer
     /// carries an <c>/Encrypt</c> entry and a security handler was constructed).
     /// </summary>
-    public bool IsEncrypted => security is not null;
+    public bool IsEncrypted => store.IsEncrypted;
 
     /// <summary>
     /// Parses a PDF document from a byte array.
@@ -208,13 +201,13 @@ public sealed class DocumentReader
             return catalog;
         }
 
-        trailer = repairer.Repair();
+        trailer = repairer.Repair(store);
         return FindCatalogWithPages();
     }
 
     private DictionaryObject? FindCatalogWithPages()
     {
-        var numbers = new List<int>(entries.Keys);
+        var numbers = new List<int>(xrefLoader.Entries.Keys);
         numbers.Sort();
         numbers.Reverse();
         foreach (var number in numbers)
@@ -249,52 +242,7 @@ public sealed class DocumentReader
     /// </summary>
     /// <param name="number">The object number.</param>
     /// <returns>The parsed object.</returns>
-    public DocumentObject GetObject(int number)
-    {
-        if (cache.TryGetValue(number, out var cached))
-        {
-            return cached;
-        }
-
-        // An indirect reference to a free or nonexistent object resolves to null
-        // (ISO 32000-1 7.3.10), so dangling refs left by incremental updates or
-        // annotation deletion never abort a load, save or merge.
-        if (!entries.TryGetValue(number, out var entry) || !entry.InUse)
-        {
-            return nullObject;
-        }
-
-        // Guards cyclic references (e.g. a stream /Length pointing back at its own
-        // object) that would otherwise recurse without bound.
-        if (!parsing.Add(number))
-        {
-            throw new DocumentParseException("Cyclic object reference.", -1);
-        }
-
-        DocumentObject value;
-        try
-        {
-            if (entry.Type == 2)
-            {
-                value = GetCompressedObject(number, (int)entry.Field2, (int)entry.Field3);
-            }
-            else
-            {
-                value = GetUncompressedObject(number, entry.Field2, out var generation);
-                if (security is not null && number != encryptObjectNumber)
-                {
-                    value = DecryptObject(value, number, generation);
-                }
-            }
-        }
-        finally
-        {
-            parsing.Remove(number);
-        }
-
-        cache[number] = value;
-        return value;
-    }
+    public DocumentObject GetObject(int number) => store.GetObject(number);
 
     // A reverse map from each already-resolved (cached) object instance to its
     // indirect object number. The incremental save path uses it to Override in
@@ -303,13 +251,7 @@ public sealed class DocumentReader
     // the set the model exposes for editing.
     internal IReadOnlyDictionary<DocumentObject, int> BuildObjectNumberIndex()
     {
-        var index = new Dictionary<DocumentObject, int>(ReferenceEqualityComparer.Instance);
-        foreach (var pair in cache)
-        {
-            index[pair.Value] = pair.Key;
-        }
-
-        return index;
+        return store.BuildObjectNumberIndex();
     }
 
     /// <summary>
@@ -321,12 +263,7 @@ public sealed class DocumentReader
     public DocumentObject Resolve(DocumentObject value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        if (value is ReferenceObject reference)
-        {
-            return GetObject(reference.ObjectNumber);
-        }
-
-        return value;
+        return store.Resolve(value);
     }
 
     private void InitializeSecurity(string? password)
@@ -336,10 +273,7 @@ public sealed class DocumentReader
             return;
         }
 
-        if (encryptObject is ReferenceObject reference)
-        {
-            encryptObjectNumber = reference.ObjectNumber;
-        }
+        var encryptObjectNumber = encryptObject is ReferenceObject reference ? reference.ObjectNumber : -1;
 
         // A present /Encrypt that does not resolve to a dictionary (an array, a dangling
         // reference resolving to null, a corrupt value) cannot be honored; processing the
@@ -355,11 +289,7 @@ public sealed class DocumentReader
             throw new InvalidPasswordException();
         }
 
-        security = handler;
-
-        // Objects cached before the handler existed were not decrypted.
-        cache.Clear();
-        objectStreams.Clear();
+        store.SetSecurity(handler, encryptObjectNumber);
     }
 
     private byte[] ReadDocumentId()
@@ -373,43 +303,6 @@ public sealed class DocumentReader
         return [];
     }
 
-    private DocumentObject DecryptObject(DocumentObject value, int number, int generation)
-    {
-        switch (value)
-        {
-            case StringObject text:
-                var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
-                return new StringObject(Encoding.Latin1.GetString(plain));
-            case StreamObject stream:
-                var decrypted = security!.DecryptStream(stream.Data, number, generation, stream.Dictionary);
-                var result = new StreamObject(decrypted);
-                foreach (var key in stream.Dictionary.Keys)
-                {
-                    result.Dictionary[key] = DecryptObject(stream.Dictionary[key], number, generation);
-                }
-
-                return result;
-            case DictionaryObject dictionary:
-                var mapped = new DictionaryObject();
-                foreach (var key in dictionary.Keys)
-                {
-                    mapped[key] = DecryptObject(dictionary[key], number, generation);
-                }
-
-                return mapped;
-            case ArrayObject array:
-                var items = new ArrayObject();
-                foreach (var item in array)
-                {
-                    items.Add(DecryptObject(item, number, generation));
-                }
-
-                return items;
-            default:
-                return value;
-        }
-    }
-
     private void Load()
     {
         try
@@ -418,7 +311,7 @@ public sealed class DocumentReader
         }
         catch (Exception exception) when (IsRecoverableParseFailure(exception))
         {
-            trailer = repairer.Repair();
+            trailer = repairer.Repair(store);
         }
     }
 
@@ -440,448 +333,7 @@ public sealed class DocumentReader
 
     private void LoadFromXref()
     {
-        var offset = PdfBytes.FindStartXref(data);
-        var visited = new HashSet<long>();
-        DictionaryObject? newest = null;
-        while (visited.Add(offset))
-        {
-            var section = ReadXrefSectionAt(offset);
-            newest ??= section;
-            if (section.TryGetValue("Prev", out var prev) && prev is NumberObject prevNumber)
-            {
-                offset = prevNumber.IntValue;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        trailer = newest ?? throw new DocumentParseException("Missing trailer.", -1);
-    }
-
-    private DictionaryObject ReadXrefSectionAt(long offset)
-    {
-        var index = (int)offset;
-        SkipWhitespace(ref index);
-        return Matches(index, "xref")
-            ? ParseClassicXref(index + 4)
-            : ParseXrefStreamAt(offset);
-    }
-
-    private DictionaryObject ParseClassicXref(int index)
-    {
-        var section = new Dictionary<int, XrefEntry>();
-        var total = 0;
-        while (true)
-        {
-            SkipWhitespace(ref index);
-            if (Matches(index, "trailer"))
-            {
-                index += 7;
-                var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index, limits);
-
-                // Hybrid-reference file (ISO 32000-1 7.5.8.4): the /XRefStm
-                // cross-reference stream takes precedence over this classic
-                // section, which lists compressed objects as free for the
-                // benefit of pre-1.5 readers.
-                if (trailerDict.TryGetValue("XRefStm", out var hybrid) && hybrid is NumberObject hybridOffset)
-                {
-                    ParseXrefStreamAt((long)hybridOffset.DoubleValue);
-                }
-
-                foreach (var pair in section)
-                {
-                    if (!entries.ContainsKey(pair.Key))
-                    {
-                        entries[pair.Key] = pair.Value;
-                    }
-                }
-
-                return trailerDict;
-            }
-
-            var start = (int)ReadLong(ref index);
-            var count = (int)ReadLong(ref index);
-            for (var i = 0; i < count; i++)
-            {
-                // The xref-stream path caps entries; the classic table did not, so a hostile
-                // subsection count could build an unbounded section dictionary.
-                if (++total > limits.MaxXrefEntries)
-                {
-                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
-                }
-
-                var entryOffset = ReadLong(ref index);
-                ReadLong(ref index);
-                SkipWhitespace(ref index);
-                var type = data[index];
-                index++;
-                var number = start + i;
-                if (!entries.ContainsKey(number) && !section.ContainsKey(number))
-                {
-                    section[number] = type == (byte)'n'
-                        ? new XrefEntry(1, entryOffset, 0)
-                        : new XrefEntry(0, 0, 0);
-                }
-            }
-        }
-    }
-
-    private DictionaryObject ParseXrefStreamAt(long offset)
-    {
-        if (!TryParseObjectAt(offset, null, out var value, out _) || value is not StreamObject stream)
-        {
-            throw new DocumentParseException("Expected cross-reference stream.", (int)offset);
-        }
-
-        if (!(stream.Dictionary.TryGetValue("Type", out var type) && type is NameObject name
-            && string.Equals(name.Value, "XRef", StringComparison.Ordinal)))
-        {
-            throw new DocumentParseException("Not a cross-reference stream.", (int)offset);
-        }
-
-        return ParseXrefStream(stream);
-    }
-
-    private DictionaryObject ParseXrefStream(StreamObject stream)
-    {
-        var dict = stream.Dictionary;
-        var decoded = decoder.Decode(dict, stream.Data);
-
-        var widths = (ArrayObject)dict["W"];
-        var w0 = ((NumberObject)widths[0]).IntValue;
-        var w1 = ((NumberObject)widths[1]).IntValue;
-        var w2 = ((NumberObject)widths[2]).IntValue;
-        var entryLength = w0 + w1 + w2;
-
-        // A zero or negative total width never advances `pos`, so an attacker-chosen
-        // /Size builds an unbounded table; reject it before the fill loop.
-        if (w0 < 0 || w1 < 0 || w2 < 0 || entryLength <= 0)
-        {
-            throw new DocumentParseException("Invalid cross-reference stream entry width.", -1);
-        }
-
-        var size = ((NumberObject)dict["Size"]).IntValue;
-        var index = BuildIndex(dict, size);
-
-        var pos = 0;
-        var total = 0;
-        for (var s = 0; s + 1 < index.Count; s += 2)
-        {
-            var start = index[s];
-            var count = index[s + 1];
-
-            // A subsection whose declared count exceeds the decoded payload is a truncated
-            // or corrupt xref stream. Silently dropping the missing entries turns their
-            // objects into blank pages / lost annotations; fail loud so IsRecoverableParseFailure
-            // routes into the Repair() header scan instead (matching the classic-xref path).
-            var available = (decoded.Length - pos) / entryLength;
-            if (count > available)
-            {
-                throw new DocumentParseException("Cross-reference stream is shorter than its /Index declares.", -1);
-            }
-
-            for (var i = 0; i < count; i++)
-            {
-                if (++total > limits.MaxXrefEntries)
-                {
-                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
-                }
-
-                var field1 = ReadField(decoded, ref pos, w0);
-                var field2 = ReadField(decoded, ref pos, w1);
-                var field3 = ReadField(decoded, ref pos, w2);
-                var type = w0 == 0 ? 1 : (int)field1;
-                var number = start + i;
-                if (!entries.ContainsKey(number))
-                {
-                    entries[number] = type switch
-                    {
-                        0 => new XrefEntry(0, 0, 0),
-                        2 => new XrefEntry(2, field2, field3),
-                        _ => new XrefEntry(1, field2, field3),
-                    };
-                }
-            }
-        }
-
-        return dict;
-    }
-
-    private static List<int> BuildIndex(DictionaryObject dict, int size)
-    {
-        var result = new List<int>();
-        if (dict.TryGetValue("Index", out var index) && index is ArrayObject array)
-        {
-            foreach (var item in array)
-            {
-                result.Add(((NumberObject)item).IntValue);
-            }
-        }
-        else
-        {
-            result.Add(0);
-            result.Add(size);
-        }
-
-        return result;
-    }
-
-    private static long ReadField(byte[] data, ref int pos, int width)
-    {
-        long value = 0;
-        for (var i = 0; i < width; i++)
-        {
-            value = (value << 8) | data[pos];
-            pos++;
-        }
-
-        return value;
-    }
-
-    private DocumentObject GetUncompressedObject(int number, long offset, out int generation)
-    {
-        if (TryParseObjectAt(offset, number, out var value, out generation))
-        {
-            return value!;
-        }
-
-        var offsets = repairer.ScannedOffsets();
-        if (offsets.TryGetValue(number, out var recovered) && recovered != offset
-            && TryParseObjectAt(recovered, number, out value, out generation))
-        {
-            return value!;
-        }
-
-        throw new DocumentParseException("Object not found at recorded offset.", (int)offset);
-    }
-
-    private DocumentObject GetCompressedObject(int expectedNumber, int streamNumber, int index)
-    {
-        var container = GetObjectStream(streamNumber);
-        if (index < 0 || index >= container.Members.Count)
-        {
-            throw new DocumentParseException("Object stream index out of range.", -1);
-        }
-
-        // The ObjStm header pairs (object number, offset) are attacker-controlled; if the
-        // member at this index is not the object we were asked for, the xref table and the
-        // stream header disagree and honoring the offset would serve an arbitrary object.
-        if (container.Members[index].Number != expectedNumber)
-        {
-            throw new DocumentParseException("Object stream member number does not match the requested object.", -1);
-        }
-
-        var offset = container.Members[index].Offset;
-
-        // First and the member offset are attacker-controlled; a negative or out-of-range
-        // start would surface as a raw IndexOutOfRangeException from the lexer after Load.
-        var start = (long)container.First + offset;
-        if (offset < 0 || start < 0 || start > container.Data.Length)
-        {
-            throw new DocumentParseException("Object stream member offset out of range.", -1);
-        }
-
-        var lexer = new Lexer(container.Data, (int)start);
-        return new ObjectParser(lexer, limits).ParseValue();
-    }
-
-    private bool IsObjectStream(int number)
-    {
-        DocumentObject value;
-        try
-        {
-            value = GetObject(number);
-        }
-        catch (DocumentParseException)
-        {
-            return false;
-        }
-
-        return value is StreamObject stream
-            && stream.Dictionary.TryGetValue("Type", out var type) && type is NameObject name
-            && string.Equals(name.Value, "ObjStm", StringComparison.Ordinal);
-    }
-
-    private ObjectStream GetObjectStream(int streamNumber)
-    {
-        if (objectStreams.TryGetValue(streamNumber, out var cached))
-        {
-            return cached;
-        }
-
-        if (GetObject(streamNumber) is not StreamObject stream)
-        {
-            throw new DocumentParseException("Object stream is not a stream.", -1);
-        }
-
-        var decoded = decoder.Decode(stream.Dictionary, stream.Data);
-        var count = ((NumberObject)stream.Dictionary["N"]).IntValue;
-        var first = ((NumberObject)stream.Dictionary["First"]).IntValue;
-
-        // A trusted /N would size the member list and drive the fill loop; clamp it
-        // to what the decoded payload can hold (each member occupies at least two
-        // bytes) and to the configured maximum before allocating.
-        if (count < 0)
-        {
-            count = 0;
-        }
-
-        var payload = first >= 0 && first <= decoded.Length ? decoded.Length - first : decoded.Length;
-        var available = payload / 2;
-        if (count > available)
-        {
-            count = available;
-        }
-
-        if (count > limits.MaxObjectStreamCount)
-        {
-            count = limits.MaxObjectStreamCount;
-        }
-
-        var lexer = new Lexer(decoded, 0);
-        var members = new List<ObjectStreamMember>(count);
-        for (var i = 0; i < count; i++)
-        {
-            var numberToken = lexer.Next();
-            var offsetToken = lexer.Next();
-            if (numberToken.Kind == TokenKind.EndOfData || offsetToken.Kind == TokenKind.EndOfData)
-            {
-                break;
-            }
-
-            members.Add(new ObjectStreamMember((int)numberToken.IntValue, (int)offsetToken.IntValue));
-        }
-
-        var container = new ObjectStream(decoded, first, members);
-        objectStreams[streamNumber] = container;
-        return container;
-    }
-
-    private bool TryParseObjectAt(long offset, int? expected, out DocumentObject? value, out int generation)
-    {
-        value = null;
-        generation = 0;
-        if (offset < 0 || offset >= data.Length)
-        {
-            return false;
-        }
-
-        try
-        {
-            var lexer = new Lexer(data, (int)offset);
-            var numberToken = lexer.Next();
-            if (numberToken.Kind != TokenKind.Integer)
-            {
-                return false;
-            }
-
-            if (expected.HasValue && numberToken.IntValue != expected.Value)
-            {
-                return false;
-            }
-
-            var generationToken = lexer.Next();
-            if (generationToken.Kind != TokenKind.Integer)
-            {
-                return false;
-            }
-
-            generation = (int)generationToken.IntValue;
-
-            var keyword = lexer.Next();
-            if (keyword.Kind != TokenKind.Keyword || keyword.Text != "obj")
-            {
-                return false;
-            }
-
-            value = ParseBody(lexer);
-            return true;
-        }
-        catch (DocumentParseException)
-        {
-            return false;
-        }
-    }
-
-    private DocumentObject ParseBody(Lexer lexer)
-    {
-        var parser = new ObjectParser(lexer, limits);
-        var value = parser.ParseValue();
-        if (value is not DictionaryObject dictionary)
-        {
-            return value;
-        }
-
-        var next = parser.NextToken();
-        if (next.Kind != TokenKind.Keyword || next.Text != "stream")
-        {
-            return dictionary;
-        }
-
-        var dataStart = lexer.Position;
-        if (dataStart < data.Length && data[dataStart] == 13)
-        {
-            dataStart++;
-            if (dataStart < data.Length && data[dataStart] == 10)
-            {
-                dataStart++;
-            }
-        }
-        else if (dataStart < data.Length && data[dataStart] == 10)
-        {
-            dataStart++;
-        }
-
-        var length = ResolveLength(dictionary);
-        if (length < 0 || dataStart + (long)length > data.Length)
-        {
-            length = repairer.RecoverStreamLength(dataStart);
-        }
-
-        var payload = new byte[length];
-        Array.Copy(data, dataStart, payload, 0, length);
-        var stream = new StreamObject(payload);
-        foreach (var key in dictionary.Keys)
-        {
-            stream.Dictionary[key] = dictionary[key];
-        }
-
-        return stream;
-    }
-
-    private int ResolveLength(DictionaryObject dictionary)
-    {
-        if (!dictionary.TryGetValue("Length", out var lengthObject) || lengthObject is null)
-        {
-            throw new DocumentParseException("Missing stream length.", -1);
-        }
-
-        DocumentObject resolved;
-        try
-        {
-            resolved = Resolve(lengthObject);
-        }
-        catch (DocumentParseException)
-        {
-            // A cyclic or dangling /Length reference; fall back to the endstream scan.
-            return -1;
-        }
-
-        if (resolved is NumberObject number)
-        {
-            return number.IntValue;
-        }
-
-        // A /Length pointing at a free object now resolves to null; fall back to
-        // the endstream scan rather than treating it as a hard failure.
-        if (resolved is NullObject)
-        {
-            return -1;
-        }
-
-        throw new DocumentParseException("Invalid stream length.", -1);
+        trailer = xrefLoader.Load(store);
     }
 
     /// <summary>
@@ -898,67 +350,4 @@ public sealed class DocumentReader
         return decoder.Decode(stream.Dictionary, stream.Data);
     }
 
-    private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
-
-    private void SkipWhitespace(ref int index)
-    {
-        while (index < data.Length && Lexer.IsWhitespace(data[index]))
-        {
-            index++;
-        }
-    }
-
-    private long ReadLong(ref int index)
-    {
-        SkipWhitespace(ref index);
-        var start = index;
-        if (index < data.Length && (data[index] == (byte)'+' || data[index] == (byte)'-'))
-        {
-            index++;
-        }
-
-        while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
-        {
-            index++;
-        }
-
-        if (index == start)
-        {
-            throw new DocumentParseException("Expected integer.", start);
-        }
-
-        return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
-    }
-
-    internal readonly struct XrefEntry(byte type, long field2, long field3)
-    {
-        public XrefEntry(int type, long field2, long field3)
-            : this((byte)type, field2, field3)
-        {
-        }
-
-        public byte Type { get; } = type;
-
-        public long Field2 { get; } = field2;
-
-        public long Field3 { get; } = field3;
-
-        public bool InUse => Type != 0;
-    }
-
-    internal sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMember> members)
-    {
-        public byte[] Data { get; } = data;
-
-        public int First { get; } = first;
-
-        public List<ObjectStreamMember> Members { get; } = members;
-    }
-
-    internal readonly struct ObjectStreamMember(int number, int offset)
-    {
-        public int Number { get; } = number;
-
-        public int Offset { get; } = offset;
-    }
 }
