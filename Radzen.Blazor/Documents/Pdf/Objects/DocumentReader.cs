@@ -353,13 +353,14 @@ public sealed class DocumentReader
     private DictionaryObject ParseClassicXref(int index)
     {
         var section = new Dictionary<int, XrefEntry>();
+        var total = 0;
         while (true)
         {
             SkipWhitespace(ref index);
             if (Matches(index, "trailer"))
             {
                 index += 7;
-                var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index);
+                var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index, limits);
 
                 // Hybrid-reference file (ISO 32000-1 7.5.8.4): the /XRefStm
                 // cross-reference stream takes precedence over this classic
@@ -385,6 +386,13 @@ public sealed class DocumentReader
             var count = (int)ReadLong(ref index);
             for (var i = 0; i < count; i++)
             {
+                // The xref-stream path caps entries; the classic table did not, so a hostile
+                // subsection count could build an unbounded section dictionary.
+                if (++total > limits.MaxXrefEntries)
+                {
+                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
+                }
+
                 var entryOffset = ReadLong(ref index);
                 ReadLong(ref index);
                 SkipWhitespace(ref index);
@@ -539,8 +547,17 @@ public sealed class DocumentReader
         }
 
         var offset = container.Members[index].Offset;
-        var lexer = new Lexer(container.Data, container.First + offset);
-        return new ObjectParser(lexer).ParseValue();
+
+        // First and the member offset are attacker-controlled; a negative or out-of-range
+        // start would surface as a raw IndexOutOfRangeException from the lexer after Load.
+        var start = (long)container.First + offset;
+        if (offset < 0 || start < 0 || start > container.Data.Length)
+        {
+            throw new DocumentParseException("Object stream member offset out of range.", -1);
+        }
+
+        var lexer = new Lexer(container.Data, (int)start);
+        return new ObjectParser(lexer, limits).ParseValue();
     }
 
     private bool IsObjectStream(int number)
@@ -663,7 +680,7 @@ public sealed class DocumentReader
 
     private DocumentObject ParseBody(Lexer lexer)
     {
-        var parser = new ObjectParser(lexer);
+        var parser = new ObjectParser(lexer, limits);
         var value = parser.ParseValue();
         if (value is not DictionaryObject dictionary)
         {
@@ -1039,7 +1056,7 @@ public sealed class DocumentReader
 
             try
             {
-                if (ObjectParser.Parse(data, i + pattern.Length) is DictionaryObject dictionary)
+                if (ObjectParser.Parse(data, i + pattern.Length, limits) is DictionaryObject dictionary)
                 {
                     return dictionary;
                 }

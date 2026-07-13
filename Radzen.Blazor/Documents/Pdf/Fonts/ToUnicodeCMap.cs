@@ -9,6 +9,9 @@ namespace Radzen.Documents.Pdf.Fonts;
 internal static class ToUnicodeCMap
 {
     public static (IReadOnlyDictionary<int, string> Map, int CodeBytes) Parse(byte[] data)
+        => Parse(data, ReaderLimits.Default);
+
+    public static (IReadOnlyDictionary<int, string> Map, int CodeBytes) Parse(byte[] data, ReaderLimits limits)
     {
         var map = new Dictionary<int, string>();
         var tokens = Tokenize(data);
@@ -42,7 +45,7 @@ internal static class ToUnicodeCMap
                     break;
 
                 case "beginbfrange":
-                    i = ParseRange(tokens, i, map);
+                    i = ParseRange(tokens, i, map, limits);
                     break;
             }
         }
@@ -50,7 +53,7 @@ internal static class ToUnicodeCMap
         return (map, codeBytes);
     }
 
-    private static int ParseRange(List<Token> tokens, int index, Dictionary<int, string> map)
+    private static int ParseRange(List<Token> tokens, int index, Dictionary<int, string> map, ReaderLimits limits)
     {
         for (index++; index < tokens.Count && tokens[index].Keyword != "endbfrange";)
         {
@@ -95,7 +98,7 @@ internal static class ToUnicodeCMap
                 // otherwise materialize billions of dictionary entries and exhaust memory.
                 var span = (long)high - low + 1;
                 if (span > MaxCodespaceSpan(lowBytes.Length)
-                    || (long)map.Count + span > ReaderLimits.Default.MaxCMapEntries)
+                    || (long)map.Count + span > limits.MaxCMapEntries)
                 {
                     throw new DocumentParseException("ToUnicode bfrange exceeds the permitted CMap size.");
                 }

@@ -143,6 +143,13 @@ internal sealed class SfntFont
         ArgumentNullException.ThrowIfNull(tag);
         if (directory.TryGet(tag, out var record))
         {
+            // Offset/Length come from the table directory; a hostile record would size an
+            // arbitrary buffer and the copy would read past the font. Validate before allocating.
+            if ((long)record.Offset + record.Length > this.data.Length)
+            {
+                throw new InvalidDataException($"Font table '{tag}' extends past the end of the font.");
+            }
+
             var result = new byte[record.Length];
             Array.Copy(this.data, (int)record.Offset, result, 0, (int)record.Length);
             data = result;

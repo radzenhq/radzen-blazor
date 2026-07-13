@@ -14,7 +14,7 @@ internal static class Ascii85Filter
         ArgumentNullException.ThrowIfNull(data);
 
         var output = new List<byte>();
-        uint tuple = 0;
+        ulong tuple = 0;
         int count = 0;
 
         foreach (byte b in data)
@@ -53,6 +53,13 @@ internal static class Ascii85Filter
 
             if (count == 5)
             {
+                // A 5-tuple encodes a 32-bit value; a group like "s8W-#" exceeds 0xFFFFFFFF.
+                // Fail loud rather than silently truncating to the low 32 bits.
+                if (tuple > uint.MaxValue)
+                {
+                    throw new InvalidDataException("ASCII85 5-tuple exceeds the 32-bit maximum.");
+                }
+
                 output.Add((byte)(tuple >> 24));
                 output.Add((byte)(tuple >> 16));
                 output.Add((byte)(tuple >> 8));

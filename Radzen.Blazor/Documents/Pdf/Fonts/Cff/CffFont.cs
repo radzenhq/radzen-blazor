@@ -308,6 +308,14 @@ internal sealed class CffFont
 
         var size = (int)op[0];
         var offset = (int)op[1];
+
+        // size/offset come straight from the Top DICT; a hostile size would allocate an
+        // arbitrary buffer and the copy would read past the font. Validate against the data.
+        if (size < 0 || offset < 0 || (long)offset + size > data.Length)
+        {
+            throw new InvalidDataException("CFF Private DICT extends past the end of the font.");
+        }
+
         var privateBytes = new byte[size];
         Array.Copy(data, offset, privateBytes, 0, size);
         var privateDict = CffDict.Parse(privateBytes);

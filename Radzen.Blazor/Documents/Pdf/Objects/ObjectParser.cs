@@ -6,18 +6,28 @@ namespace Radzen.Documents.Pdf.Objects;
 internal sealed class ObjectParser
 {
     private readonly Lexer lexer;
+    private readonly ReaderLimits limits;
     private readonly List<Token> lookahead = [];
     private int depth;
 
     internal ObjectParser(Lexer lexer)
+        : this(lexer, ReaderLimits.Default)
+    {
+    }
+
+    internal ObjectParser(Lexer lexer, ReaderLimits limits)
     {
         this.lexer = lexer;
+        this.limits = limits;
     }
 
     internal Lexer Lexer => lexer;
 
     internal static DocumentObject Parse(byte[] data, int position)
-        => new ObjectParser(new Lexer(data, position)).ParseValue();
+        => Parse(data, position, ReaderLimits.Default);
+
+    internal static DocumentObject Parse(byte[] data, int position, ReaderLimits limits)
+        => new ObjectParser(new Lexer(data, position), limits).ParseValue();
 
     internal Token NextToken()
     {
@@ -136,7 +146,7 @@ internal sealed class ObjectParser
     // openers ('[' or '<<') raises a recoverable error instead of overflowing the stack.
     private void EnterContainer()
     {
-        if (++depth > ReaderLimits.Default.MaxObjectNestingDepth)
+        if (++depth > limits.MaxObjectNestingDepth)
         {
             throw new DocumentParseException("Maximum object nesting depth exceeded.", lexer.Position);
         }

@@ -12,13 +12,16 @@ internal static class ImageDecoder
     private static readonly byte[] PngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
     private static readonly byte[] Jp2Signature = [0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20, 0x0D, 0x0A, 0x87, 0x0A];
 
-    public static ImageXObject Decode(byte[] imageBytes)
+    public static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
+
+    public static ImageXObject Decode(byte[] imageBytes, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(imageBytes);
+        ArgumentNullException.ThrowIfNull(limits);
 
         if (IsPng(imageBytes))
         {
-            return DecodePng(imageBytes);
+            return DecodePng(imageBytes, limits);
         }
 
         if (imageBytes.Length >= 2 && imageBytes[0] == 0xFF && imageBytes[1] == 0xD8)
@@ -28,7 +31,7 @@ internal static class ImageDecoder
 
         if (IsJpeg2000(imageBytes))
         {
-            return DecodeJpeg2000(imageBytes);
+            return DecodeJpeg2000(imageBytes, limits);
         }
 
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
@@ -225,7 +228,7 @@ internal static class ImageDecoder
         return true;
     }
 
-    private static ImageXObject DecodePng(byte[] data)
+    private static ImageXObject DecodePng(byte[] data, ReaderLimits limits)
     {
         var width = 0;
         var height = 0;
@@ -286,7 +289,7 @@ internal static class ImageDecoder
             pos = body + count + 4;
         }
 
-        ValidatePngDimensions(width, height);
+        ValidatePngDimensions(width, height, limits);
 
         var channels = colorType switch
         {
@@ -300,6 +303,15 @@ internal static class ImageDecoder
 
         var raw = FlateFilter.Decode(idat.ToArray());
         var samples = PngPredictor.Decode(raw, channels, bitDepth, width);
+
+        // A truncated IDAT decodes to fewer scanlines than IHDR promises; the downstream
+        // per-pixel unpackers index samples by the header dimensions and would read out of
+        // range. Reject a short sample buffer rather than crashing or emitting garbage.
+        var bytesPerRow = (((long)width * channels * bitDepth) + 7) / 8;
+        if (samples.Length < (long)height * bytesPerRow)
+        {
+            throw new InvalidDataException("PNG image data is truncated.");
+        }
 
         return colorType switch
         {
@@ -315,14 +327,14 @@ internal static class ImageDecoder
     // IHDR dimensions drive every downstream pixel buffer; reject non-positive or
     // oversized geometry before allocating so a tiny header cannot request gigabytes
     // or wrap width*height negative.
-    private static void ValidatePngDimensions(int width, int height)
+    private static void ValidatePngDimensions(int width, int height, ReaderLimits limits)
     {
         if (width <= 0 || height <= 0)
         {
             throw new InvalidDataException("PNG image has invalid dimensions.");
         }
 
-        if ((long)width * height > ReaderLimits.Default.MaxImagePixels)
+        if ((long)width * height > limits.MaxImagePixels)
         {
             throw new InvalidDataException("PNG image dimensions exceed the maximum decodable size.");
         }
@@ -537,13 +549,13 @@ internal static class ImageDecoder
     // JPEG path: only the header is parsed for geometry and no /ColorSpace is written, so
     // the JPX stream's own colour space applies (PDF 32000-1 7.4.9). BitsPerComponent is
     // informational for JPXDecode; a conforming producer writes 8.
-    private static ImageXObject DecodeJpeg2000(byte[] data)
+    private static ImageXObject DecodeJpeg2000(byte[] data, ReaderLimits limits)
     {
         var (width, height, components) = StartsWith(data, Jp2Signature)
             ? ReadJp2Header(data)
             : ReadCodestreamSiz(data, 2);
 
-        ValidateJpeg2000Dimensions(width, height, components);
+        ValidateJpeg2000Dimensions(width, height, components, limits);
 
         var stream = new StreamObject(data);
         var dict = stream.Dictionary;
@@ -656,14 +668,14 @@ internal static class ImageDecoder
         return ((int)width, (int)height, components);
     }
 
-    private static void ValidateJpeg2000Dimensions(int width, int height, int components)
+    private static void ValidateJpeg2000Dimensions(int width, int height, int components, ReaderLimits limits)
     {
         if (width <= 0 || height <= 0 || components <= 0)
         {
             throw new InvalidDataException("JPEG2000 image has invalid dimensions.");
         }
 
-        if ((long)width * height > ReaderLimits.Default.MaxImagePixels)
+        if ((long)width * height > limits.MaxImagePixels)
         {
             throw new InvalidDataException("JPEG2000 image dimensions exceed the maximum decodable size.");
         }
