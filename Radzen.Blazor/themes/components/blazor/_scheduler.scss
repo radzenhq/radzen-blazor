@@ -557,6 +557,14 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       .rz-view {
         min-width: var(--rz-scheduler-resource-group-min-width);
       }
+
+      .rz-month-view,
+      .rz-planner-view,
+      .rz-timeline-view,
+      .rz-year-view {
+        height: auto;
+        flex: auto;
+      }
     }
   }
 }
