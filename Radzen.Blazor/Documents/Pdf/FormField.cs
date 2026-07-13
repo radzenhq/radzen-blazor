@@ -24,8 +24,8 @@ public sealed class FormField
 
     /// <summary>Gets the fully qualified field name from its <c>/T</c> entry.</summary>
     public string Name
-        => Dictionary.TryGetValue("T", out var value) && reader.Resolve(value!) is StringObject text
-            ? DecodeTextString(text.Value)
+        => reader.GetString(Dictionary, "T") is { } text
+            ? DecodeTextString(text)
             : string.Empty;
 
     /// <summary>
@@ -65,10 +65,7 @@ public sealed class FormField
                 return value;
             }
 
-            current = current.TryGetValue("Parent", out var parent)
-                && reader.Resolve(parent!) is DictionaryObject next
-                ? next
-                : null;
+            current = reader.GetDictionary(current, "Parent");
         }
 
         return null;
@@ -79,9 +76,9 @@ public sealed class FormField
         var parts = new List<string>();
         foreach (var item in items)
         {
-            if (reader.Resolve(item) is StringObject text)
+            if (reader.AsString(item) is { } text)
             {
-                parts.Add(DecodeTextString(text.Value));
+                parts.Add(DecodeTextString(text));
             }
         }
 
@@ -109,8 +106,8 @@ public sealed class FormField
 
     /// <summary>Gets the field type from its <c>/FT</c> entry.</summary>
     public FormFieldType Type
-        => Dictionary.TryGetValue("FT", out var value) && reader.Resolve(value!) is NameObject name
-            ? name.Value switch
+        => reader.GetName(Dictionary, "FT") is { } name
+            ? name switch
             {
                 "Btn" => FormFieldType.Button,
                 "Ch" => FormFieldType.Choice,

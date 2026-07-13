@@ -123,7 +123,7 @@ internal sealed class IncrementalDocumentSaver
 
         var updated = Copy(pagesNode);
         var kids = new ArrayObject();
-        if (pagesNode.TryGetValue("Kids", out var kidsValue) && reader.Resolve(kidsValue!) is ArrayObject existingKids)
+        if (reader.GetArray(pagesNode, "Kids") is { } existingKids)
         {
             foreach (var kid in existingKids)
             {
@@ -138,9 +138,7 @@ internal sealed class IncrementalDocumentSaver
 
         updated["Kids"] = kids;
 
-        var count = pagesNode.TryGetValue("Count", out var countValue) && reader.Resolve(countValue!) is NumberObject number
-            ? number.IntValue
-            : kids.Count - newRefs.Count;
+        var count = reader.GetInt(pagesNode, "Count") ?? (kids.Count - newRefs.Count);
         updated["Count"] = new NumberObject(count + newRefs.Count);
 
         writer.Override(pagesRef.ObjectNumber, updated);
@@ -209,7 +207,7 @@ internal sealed class IncrementalDocumentSaver
                 number = infoRef.ObjectNumber;
             }
 
-            original = reader.Resolve(infoValue) as DictionaryObject;
+            original = reader.AsDictionary(infoValue);
         }
 
         var info = original is null ? new DictionaryObject() : Copy(original);

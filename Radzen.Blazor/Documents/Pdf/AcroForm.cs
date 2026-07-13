@@ -46,8 +46,7 @@ public sealed class AcroForm
         this.reader = reader;
         Dictionary = dictionary;
 
-        if (dictionary.TryGetValue("Fields", out var fieldsObject)
-            && reader.Resolve(fieldsObject!) is ArrayObject entries)
+        if (reader.GetArray(dictionary, "Fields") is { } entries)
         {
             foreach (var entry in entries)
             {
@@ -75,7 +74,7 @@ public sealed class AcroForm
     // no /Kids, or whose /Kids are only widget annotations, is itself the terminal.
     private void Collect(DocumentObject entry, string prefix)
     {
-        if (reader.Resolve(entry) is not DictionaryObject dict)
+        if (reader.AsDictionary(entry) is not { } dict)
         {
             return;
         }
@@ -93,7 +92,7 @@ public sealed class AcroForm
             var fieldKids = new List<DocumentObject>();
             foreach (var kid in Kids(dict))
             {
-                if (reader.Resolve(kid) is DictionaryObject kidDict && kidDict.ContainsKey("T"))
+                if (reader.AsDictionary(kid) is { } kidDict && kidDict.ContainsKey("T"))
                 {
                     fieldKids.Add(kid);
                 }
@@ -128,9 +127,7 @@ public sealed class AcroForm
     }
 
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
-        => dict.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids
-            ? kids
-            : [];
+        => reader.GetArray(dict, "Kids") is { } kids ? kids : [];
 
     // The annotation that renders a terminal: its first widget-only kid (a separate
     // widget carries no field /T), or the field dict itself when field and widget merge.
@@ -138,7 +135,7 @@ public sealed class AcroForm
     {
         foreach (var kid in Kids(dict))
         {
-            if (reader.Resolve(kid) is DictionaryObject kidDict && !kidDict.ContainsKey("T"))
+            if (reader.AsDictionary(kid) is { } kidDict && !kidDict.ContainsKey("T"))
             {
                 return kidDict;
             }
@@ -148,8 +145,8 @@ public sealed class AcroForm
     }
 
     private string PartialName(DictionaryObject dict)
-        => dict.TryGetValue("T", out var value) && reader.Resolve(value!) is StringObject text
-            ? FormField.DecodeTextString(text.Value)
+        => reader.GetString(dict, "T") is { } text
+            ? FormField.DecodeTextString(text)
             : string.Empty;
 
     /// <summary>
@@ -295,10 +292,7 @@ public sealed class AcroForm
                 return reader.Resolve(value!);
             }
 
-            current = current.TryGetValue("Parent", out var parent)
-                && reader.Resolve(parent!) is DictionaryObject next
-                ? next
-                : null;
+            current = reader.GetDictionary(current, "Parent");
         }
 
         return null;
@@ -328,7 +322,7 @@ public sealed class AcroForm
     // element is the export value (ISO 32000-1 12.7.4.4).
     private List<string>? OptionValues(DictionaryObject field)
     {
-        if (!field.TryGetValue("Opt", out var optObject) || reader.Resolve(optObject!) is not ArrayObject options)
+        if (reader.GetArray(field, "Opt") is not { } options)
         {
             return null;
         }
@@ -339,8 +333,8 @@ public sealed class AcroForm
             values.Add(reader.Resolve(entry) switch
             {
                 StringObject text => FormField.DecodeTextString(text.Value),
-                ArrayObject pair when pair.Count > 0 && reader.Resolve(pair[0]) is StringObject export
-                    => FormField.DecodeTextString(export.Value),
+                ArrayObject pair when pair.Count > 0 && reader.AsString(pair[0]) is { } export
+                    => FormField.DecodeTextString(export),
                 _ => string.Empty,
             });
         }
@@ -355,7 +349,7 @@ public sealed class AcroForm
         var widgets = new List<DictionaryObject>();
         foreach (var kid in Kids(terminal.Field))
         {
-            if (reader.Resolve(kid) is DictionaryObject widget && !widget.ContainsKey("T"))
+            if (reader.AsDictionary(kid) is { } widget && !widget.ContainsKey("T"))
             {
                 widgets.Add(widget);
             }
@@ -370,8 +364,8 @@ public sealed class AcroForm
     }
 
     private bool HasAppearanceState(DictionaryObject widget, string state)
-        => widget.TryGetValue("AP", out var apObject) && reader.Resolve(apObject!) is DictionaryObject ap
-            && ap.TryGetValue("N", out var nObject) && reader.Resolve(nObject!) is DictionaryObject states
+        => reader.GetDictionary(widget, "AP") is { } ap
+            && reader.GetDictionary(ap, "N") is { } states
             && states.ContainsKey(state);
 
     /// <summary>
@@ -394,8 +388,7 @@ public sealed class AcroForm
     // the widget has no /AP states do we fall back to the conventional "Yes".
     private string OnStateName(DictionaryObject widget)
     {
-        if (widget.TryGetValue("AP", out var apObject) && reader.Resolve(apObject!) is DictionaryObject ap
-            && ap.TryGetValue("N", out var nObject) && reader.Resolve(nObject!) is DictionaryObject states)
+        if (reader.GetDictionary(widget, "AP") is { } ap && reader.GetDictionary(ap, "N") is { } states)
         {
             foreach (var key in states.Keys)
             {
@@ -424,15 +417,14 @@ public sealed class AcroForm
 
     private (double Width, double Height) RectSize(DictionaryObject field)
     {
-        if (field.TryGetValue("Rect", out var rectObject) && reader.Resolve(rectObject!) is ArrayObject rect
-            && rect.Count >= 4)
+        if (reader.GetArray(field, "Rect") is { } rect && rect.Count >= 4)
         {
             // Resolve each coordinate: a legal /Rect may hold indirect references, which
             // read as 0 unless resolved and would collapse the appearance box to nothing.
-            var x0 = DocumentLoader.Number(reader.Resolve(rect[0]));
-            var y0 = DocumentLoader.Number(reader.Resolve(rect[1]));
-            var x1 = DocumentLoader.Number(reader.Resolve(rect[2]));
-            var y1 = DocumentLoader.Number(reader.Resolve(rect[3]));
+            var x0 = reader.AsNumber(rect[0]) ?? 0.0;
+            var y0 = reader.AsNumber(rect[1]) ?? 0.0;
+            var x1 = reader.AsNumber(rect[2]) ?? 0.0;
+            var y1 = reader.AsNumber(rect[3]) ?? 0.0;
             return (Math.Abs(x1 - x0), Math.Abs(y1 - y0));
         }
 
@@ -446,5 +438,5 @@ public sealed class AcroForm
             DaString(terminal.Field) ?? DaString(terminal.Widget) ?? DaString(Dictionary));
 
     private string? DaString(DictionaryObject dict)
-        => dict.TryGetValue("DA", out var da) && reader.Resolve(da!) is StringObject text ? text.Value : null;
+        => reader.GetString(dict, "DA");
 }

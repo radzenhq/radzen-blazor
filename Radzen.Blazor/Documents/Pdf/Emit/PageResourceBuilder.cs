@@ -311,7 +311,7 @@ internal static class PageResourceBuilder
             if (result.ContainsKey(key) && emitted[key] is DictionaryObject added)
             {
                 var combined = new DictionaryObject();
-                if (reader.Resolve(loaded[key]) is DictionaryObject sub)
+                if (reader.AsDictionary(loaded[key]) is { } sub)
                 {
                     foreach (var name in sub.Keys)
                     {
@@ -347,7 +347,7 @@ internal static class PageResourceBuilder
 
     private static void CollectResourceKeys(DocumentReader reader, DictionaryObject resources, string category, HashSet<string> names)
     {
-        if (resources.TryGetValue(category, out var value) && value is not null && reader.Resolve(value) is DictionaryObject dict)
+        if (reader.GetDictionary(resources, category) is { } dict)
         {
             foreach (var key in dict.Keys)
             {

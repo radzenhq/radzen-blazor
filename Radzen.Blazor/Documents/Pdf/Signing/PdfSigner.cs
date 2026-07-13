@@ -108,7 +108,7 @@ public static class PdfSigner
         var signatureRef = writer.Add(signature);
 
         catalog.TryGetValue("AcroForm", out var acroFormValue);
-        var existingAcroForm = acroFormValue is null ? null : reader.Resolve(acroFormValue) as DictionaryObject;
+        var existingAcroForm = acroFormValue is null ? null : reader.AsDictionary(acroFormValue);
         var fieldName = UniqueFieldName(reader, existingAcroForm);
 
         var field = new DictionaryObject
@@ -205,8 +205,7 @@ public static class PdfSigner
         var acroForm = existing is null ? new DictionaryObject() : Copy(existing);
 
         var fields = new ArrayObject();
-        if (existing is not null && existing.TryGetValue("Fields", out var fieldsValue)
-            && fieldsValue is not null && reader.Resolve(fieldsValue) is ArrayObject existingFields)
+        if (existing is not null && reader.GetArray(existing, "Fields") is { } existingFields)
         {
             foreach (var item in existingFields)
             {
@@ -218,10 +217,9 @@ public static class PdfSigner
         acroForm["Fields"] = fields;
 
         var sigFlags = 3;
-        if (existing is not null && existing.TryGetValue("SigFlags", out var flagsValue)
-            && flagsValue is not null && reader.Resolve(flagsValue) is NumberObject flags)
+        if (existing is not null && reader.GetInt(existing, "SigFlags") is { } flags)
         {
-            sigFlags |= flags.IntValue;
+            sigFlags |= flags;
         }
 
         acroForm["SigFlags"] = new NumberObject(sigFlags);
@@ -234,7 +232,7 @@ public static class PdfSigner
         page.TryGetValue("Annots", out var annotsValue);
 
         var annots = new ArrayObject();
-        if (annotsValue is not null && reader.Resolve(annotsValue) is ArrayObject existing)
+        if (annotsValue is not null && reader.AsArray(annotsValue) is { } existing)
         {
             foreach (var item in existing)
             {
@@ -355,7 +353,7 @@ public static class PdfSigner
             throw new DocumentParseException("The page tree is too deep.", -1);
         }
 
-        if (reader.Resolve(nodeRef) is not DictionaryObject node)
+        if (reader.AsDictionary(nodeRef) is not { } node)
         {
             throw new DocumentParseException("A page tree node is not a dictionary.", -1);
         }
@@ -371,7 +369,7 @@ public static class PdfSigner
             return null;
         }
 
-        if (reader.Resolve(kidsValue) is not ArrayObject kids)
+        if (reader.AsArray(kidsValue) is not { } kids)
         {
             throw new DocumentParseException("The page tree /Kids must be an array.", -1);
         }
@@ -396,16 +394,13 @@ public static class PdfSigner
     private static string UniqueFieldName(DocumentReader reader, DictionaryObject? acroForm)
     {
         var names = new HashSet<string>(StringComparer.Ordinal);
-        if (acroForm is not null && acroForm.TryGetValue("Fields", out var fieldsValue)
-            && fieldsValue is not null && reader.Resolve(fieldsValue) is ArrayObject fields)
+        if (acroForm is not null && reader.GetArray(acroForm, "Fields") is { } fields)
         {
             foreach (var item in fields)
             {
-                if (reader.Resolve(item) is DictionaryObject field
-                    && field.TryGetValue("T", out var title) && title is not null
-                    && reader.Resolve(title) is StringObject name)
+                if (reader.AsDictionary(item) is { } field && reader.GetString(field, "T") is { } name)
                 {
-                    names.Add(name.Value);
+                    names.Add(name);
                 }
             }
         }

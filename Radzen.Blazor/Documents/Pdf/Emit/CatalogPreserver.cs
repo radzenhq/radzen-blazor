@@ -48,8 +48,7 @@ internal sealed class CatalogPreserver(Document document)
             return;
         }
 
-        if (sourceCatalog.TryGetValue("Pages", out var sourcePagesObject)
-            && source.Resolve(sourcePagesObject!) is DictionaryObject sourcePagesNode)
+        if (source.GetDictionary(sourceCatalog, "Pages") is { } sourcePagesNode)
         {
             importer.Seed(sourcePagesNode, pagesRef);
         }
