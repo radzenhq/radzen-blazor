@@ -1,0 +1,85 @@
+@inject DialogService DialogService
+
+<RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="RoomBooking" Data=@bookings StartProperty="Start" EndProperty="End" TextProperty="Text"
+    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentMove=@OnAppointmentMove>
+    <RadzenResourceDayView Data=@rooms TextProperty="Name" ValueProperty="Id" ResourceProperty="RoomId" />
+    <RadzenDayView />
+    <RadzenWeekView />
+</RadzenScheduler>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenScheduler<RoomBooking> scheduler;
+    EventConsole console;
+
+    public class Room
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class RoomBooking
+    {
+        public int RoomId { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Text { get; set; }
+    }
+
+    IList<Room> rooms = new List<Room>
+    {
+        new Room { Id = 1, Name = "Meeting Room" },
+        new Room { Id = 2, Name = "Conference Hall" },
+        new Room { Id = 3, Name = "Projector" },
+        new Room { Id = 4, Name = "Company Car" }
+    };
+
+    IList<RoomBooking> bookings = new List<RoomBooking>
+    {
+        new RoomBooking { RoomId = 1, Start = DateTime.Today.AddHours(9), End = DateTime.Today.AddHours(10), Text = "Daily stand-up" },
+        new RoomBooking { RoomId = 1, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
+        new RoomBooking { RoomId = 2, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
+        new RoomBooking { RoomId = 3, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
+        new RoomBooking { RoomId = 4, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
+    };
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        var room = args.Resource as Room;
+
+        console.Log($"SlotSelect: Start={args.Start} End={args.End} Room={room?.Name ?? "(none)"}");
+
+        if (room != null)
+        {
+            bookings.Add(new RoomBooking { RoomId = room.Id, Start = args.Start, End = args.End, Text = "New booking" });
+
+            await scheduler.Reload();
+        }
+    }
+
+    void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<RoomBooking> args)
+    {
+        var room = rooms.FirstOrDefault(r => r.Id == args.Data.RoomId);
+
+        console.Log($"AppointmentSelect: Text={args.Data.Text} Room={room?.Name}");
+    }
+
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        var booking = bookings.FirstOrDefault(b => b == args.Appointment.Data);
+
+        if (booking != null)
+        {
+            booking.Start = booking.Start + args.TimeSpan;
+            booking.End = booking.End + args.TimeSpan;
+
+            if (args.Resource is Room room)
+            {
+                booking.RoomId = room.Id;
+            }
+
+            await scheduler.Reload();
+        }
+    }
+}

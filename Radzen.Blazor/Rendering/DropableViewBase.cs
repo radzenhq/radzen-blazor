@@ -25,11 +25,22 @@ namespace Radzen.Blazor.Rendering
         /// <returns>Task</returns>
         public async Task OnDrop(DateTime slotDate)
         {
+            await OnDrop(slotDate, null);
+        }
+
+        /// <summary>
+        /// Handles on slot drop on a slot of the specified resource.
+        /// </summary>
+        /// <param name="slotDate"></param>
+        /// <param name="resource">The resource the slot belongs to.</param>
+        /// <returns>Task</returns>
+        public async Task OnDrop(DateTime slotDate, object? resource)
+        {
             if (draggedAppointment != null)
             {
                 TimeSpan timespan = slotDate - draggedAppointment.Start;
 
-                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { SlotDate = slotDate, Appointment = draggedAppointment, TimeSpan = timespan });
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { SlotDate = slotDate, Appointment = draggedAppointment, TimeSpan = timespan, Resource = resource });
 
                 draggedAppointment = null;
             }
