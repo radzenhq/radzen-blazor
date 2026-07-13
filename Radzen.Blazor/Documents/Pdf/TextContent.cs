@@ -40,16 +40,46 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     // null for an authored run or an edited one, which re-encode through the Tj path.
     internal System.Collections.Generic.IReadOnlyList<TextAdjustment>? SourceAdjustments { get; set; }
 
+    // Non-RGB fill (CMYK/gray/named color space) captured when materializing a loaded run.
+    // When set it overrides Color so a re-encode preserves the original color space instead
+    // of collapsing to the last rg color or black. Null for authored runs (which use Color).
+    internal DeviceColor? FillPaint { get; set; }
+
+    // Word spacing (Tw) and character spacing (Tc) captured from a loaded run (the "
+    // operator or a preceding Tc/Tw). Zero for authored runs, which keep the defaults.
+    internal double WordSpacing { get; set; }
+
+    internal double CharSpacing { get; set; }
+
     internal override void EmitBody(ContentWriter writer)
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
 
         writer.WriteRaw("BT\n");
-        writer.WriteColor(Color, "rg");
+        if (FillPaint is { } fillPaint)
+        {
+            WriteDeviceFill(writer, fillPaint);
+        }
+        else
+        {
+            writer.WriteColor(Color, "rg");
+        }
+
         writer.WriteName(key);
         writer.WriteRaw(" ");
         writer.WriteNumber(Font.Size);
         writer.WriteRaw(" Tf\n");
+        if (CharSpacing != 0)
+        {
+            writer.WriteNumber(CharSpacing);
+            writer.WriteRaw(" Tc\n");
+        }
+
+        if (WordSpacing != 0)
+        {
+            writer.WriteNumber(WordSpacing);
+            writer.WriteRaw(" Tw\n");
+        }
         writer.WriteNumber(x.Point);
         writer.WriteRaw(" ");
         writer.WriteNumber(y.Point);
@@ -80,6 +110,29 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
 
         writer.WriteRaw("ET\n");
+    }
+
+    private static void WriteDeviceFill(ContentWriter writer, DeviceColor color)
+    {
+        if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
+        {
+            writer.WriteName(name);
+            writer.WriteRaw(" cs\n");
+        }
+
+        foreach (var operand in color.Operands)
+        {
+            writer.WriteNumber(operand);
+            writer.WriteRaw(" ");
+        }
+
+        writer.WriteRaw(color.Kind switch
+        {
+            DeviceColorKind.Named => "scn",
+            DeviceColorKind.Gray => "g",
+            _ => "k",
+        });
+        writer.WriteRaw("\n");
     }
 
     private static byte[] Encode(string text)

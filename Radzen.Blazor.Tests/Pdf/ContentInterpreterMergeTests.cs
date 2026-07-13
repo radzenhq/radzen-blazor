@@ -1,0 +1,122 @@
+#nullable enable
+
+using System.Linq;
+using System.Text;
+using Radzen.Documents.Pdf;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// Lane cq-reader: text-showing round-trip fidelity in ContentInterpreter.
+//   - consecutive shows with no intervening Td/Tm advance the text matrix in the spec,
+//     so they must not collapse onto one origin (finding #7);
+//   - a non-RGB text fill and the " operator's word/char spacing must survive (finding #42);
+//   - the dash array must come only from the array immediately preceding d (finding #98).
+public class ContentInterpreterMergeTests
+{
+    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
+
+    private static ContentCollection Materialize(string stream)
+    {
+        var target = new ContentCollection();
+        ContentInterpreter.Materialize(Ascii(stream), target);
+        return target;
+    }
+
+    private static string Emit(ContentElement element)
+    {
+        using var writer = new ContentWriter();
+        element.Emit(writer);
+        return Encoding.Latin1.GetString(writer.ToArray());
+    }
+
+    [Fact]
+    public void ConsecutiveShows_NoPositionBetween_FoldIntoOneRun()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td (Hello) Tj ( world) Tj ET");
+
+        var text = Assert.IsType<TextContent>(Assert.Single(content));
+        Assert.Equal("Hello world", text.Text);
+    }
+
+    [Fact]
+    public void FoldedRun_ReEmitsAsSingleShow_KeepingBothChunks()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td (Hello) Tj ( world) Tj ET");
+
+        var body = Emit(content[0]);
+
+        // One show, both chunks present in order: the renderer advances between them
+        // using the font's own widths instead of overprinting at the same origin.
+        Assert.Equal(1, body.Split("BT").Length - 1);
+        Assert.Contains("(Hello)", body);
+        Assert.Contains("( world)", body);
+        Assert.Contains("] TJ", body);
+    }
+
+    [Fact]
+    public void ConsecutiveShows_WithTdBetween_StaySeparateRuns()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td (Hello) Tj 0 -14 Td (world) Tj ET");
+
+        Assert.Equal(2, content.Count);
+        Assert.Equal("Hello", Assert.IsType<TextContent>(content[0]).Text);
+        Assert.Equal("world", Assert.IsType<TextContent>(content[1]).Text);
+    }
+
+    [Fact]
+    public void ShowsAtDifferentColors_DoNotFold()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td 1 0 0 rg (a) Tj 0 1 0 rg (b) Tj ET");
+
+        Assert.Equal(2, content.Count);
+    }
+
+    [Fact]
+    public void CmykTextFill_IsCarriedAsFillPaint()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td 0 1 0 0 k (x) Tj ET");
+
+        var text = Assert.IsType<TextContent>(Assert.Single(content));
+        Assert.True(text.FillPaint.HasValue);
+        var paint = text.FillPaint.Value;
+        Assert.Equal(DeviceColorKind.Cmyk, paint.Kind);
+        Assert.Equal(new[] { 0.0, 1.0, 0.0, 0.0 }, paint.Operands);
+    }
+
+    [Fact]
+    public void CmykTextFill_ReEmitsAsK_NotRg()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td 0 1 0 0 k (x) Tj ET");
+
+        var body = Emit(content[0]);
+
+        Assert.Contains(" k\n", body);
+        Assert.DoesNotContain(" rg\n", body);
+    }
+
+    [Fact]
+    public void DoubleQuoteOperator_MapsWordAndCharSpacing()
+    {
+        var content = Materialize("BT /F1 12 Tf 10 700 Td 2 1 (word) \" ET");
+
+        var text = Assert.IsType<TextContent>(Assert.Single(content));
+        Assert.Equal(2, text.WordSpacing);
+        Assert.Equal(1, text.CharSpacing);
+
+        var body = Emit(text);
+        Assert.Contains("2 Tw", body);
+        Assert.Contains("1 Tc", body);
+    }
+
+    [Fact]
+    public void DashArray_TakesOnlyTheImmediatelyPrecedingArray()
+    {
+        // The TJ array must not leak into the following d operator's dash pattern.
+        var content = Materialize("[(a) -20 (b)] TJ 0 d 0 0 m 10 10 l S");
+
+        var path = Assert.IsType<PathContent>(content.Last());
+        Assert.NotNull(path.DashArray);
+        Assert.Empty(path.DashArray!);
+    }
+}

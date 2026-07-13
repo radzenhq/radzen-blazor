@@ -31,9 +31,9 @@ public sealed class DocumentReader
     private DictionaryObject trailer = new();
     private readonly HashSet<int> parsing = [];
     private Dictionary<int, long>? scanned;
+    private int[]? endstreamOffsets;
     private StandardSecurityHandler? security;
     private int encryptObjectNumber = -1;
-    private bool decryptionReady;
 
     private DocumentReader(byte[] data, ReaderLimits limits)
     {
@@ -106,7 +106,7 @@ public sealed class DocumentReader
         ArgumentNullException.ThrowIfNull(limits);
         var reader = new DocumentReader(data, limits);
         reader.Load();
-        reader.InitializeSecurity(password, throwOnFailure: true);
+        reader.InitializeSecurity(password);
         return reader;
     }
 
@@ -127,9 +127,31 @@ public sealed class DocumentReader
     public static DocumentReader Parse(Stream stream, string? password)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return Parse(buffer.ToArray(), password);
+        return Parse(ReadFully(stream), password);
+    }
+
+    // A seekable stream is read straight into an exact-size buffer (one copy); a
+    // non-seekable stream grows a pooled buffer and is copied out once. Either way the
+    // document is never held in two full-size buffers at the same time, which matters
+    // for large files under a constrained (WASM) heap.
+    private static byte[] ReadFully(Stream stream)
+    {
+        if (stream.CanSeek)
+        {
+            var remaining = stream.Length - stream.Position;
+            if (remaining < 0)
+            {
+                remaining = 0;
+            }
+
+            var buffer = new byte[remaining];
+            stream.ReadExactly(buffer, 0, buffer.Length);
+            return buffer;
+        }
+
+        using var pooled = new PooledBufferStream();
+        stream.CopyTo(pooled);
+        return pooled.ToArray();
     }
 
     /// <summary>
@@ -164,7 +186,7 @@ public sealed class DocumentReader
         {
             if (entry.Type == 2)
             {
-                value = GetCompressedObject((int)entry.Field2, (int)entry.Field3);
+                value = GetCompressedObject(number, (int)entry.Field2, (int)entry.Field3);
             }
             else
             {
@@ -201,7 +223,7 @@ public sealed class DocumentReader
         return value;
     }
 
-    private void InitializeSecurity(string? password, bool throwOnFailure)
+    private void InitializeSecurity(string? password)
     {
         if (!trailer.TryGetValue("Encrypt", out var encryptObject) || encryptObject is null)
         {
@@ -213,14 +235,16 @@ public sealed class DocumentReader
             encryptObjectNumber = reference.ObjectNumber;
         }
 
+        // A present /Encrypt that does not resolve to a dictionary (an array, a dangling
+        // reference resolving to null, a corrupt value) cannot be honored; processing the
+        // document as plaintext would feed ciphertext into the filters and emit garbage.
         if (Resolve(encryptObject) is not DictionaryObject encrypt)
         {
-            return;
+            throw new DocumentParseException("The /Encrypt entry is not a dictionary.", -1);
         }
 
         var handler = new StandardSecurityHandler(encrypt, ReadDocumentId(), password ?? "");
-        decryptionReady = handler.IsUserPassword || handler.IsOwnerPassword;
-        if (!decryptionReady && throwOnFailure)
+        if (!handler.IsUserPassword && !handler.IsOwnerPassword)
         {
             throw new InvalidPasswordException();
         }
@@ -310,7 +334,7 @@ public sealed class DocumentReader
 
     private void LoadFromXref()
     {
-        var offset = FindStartXref();
+        var offset = PdfBytes.FindStartXref(data);
         var visited = new HashSet<long>();
         DictionaryObject? newest = null;
         while (visited.Add(offset))
@@ -328,21 +352,6 @@ public sealed class DocumentReader
         }
 
         trailer = newest ?? throw new DocumentParseException("Missing trailer.", -1);
-    }
-
-    private long FindStartXref()
-    {
-        const string pattern = "startxref";
-        for (var i = data.Length - pattern.Length; i >= 0; i--)
-        {
-            if (Matches(i, pattern))
-            {
-                var index = i + pattern.Length;
-                return ReadLong(ref index);
-            }
-        }
-
-        throw new DocumentParseException("Missing startxref.", -1);
     }
 
     private DictionaryObject ReadXrefSectionAt(long offset)
@@ -456,19 +465,19 @@ public sealed class DocumentReader
         {
             var start = index[s];
             var count = index[s + 1];
+
+            // A subsection whose declared count exceeds the decoded payload is a truncated
+            // or corrupt xref stream. Silently dropping the missing entries turns their
+            // objects into blank pages / lost annotations; fail loud so IsRecoverableParseFailure
+            // routes into the Repair() header scan instead (matching the classic-xref path).
             var available = (decoded.Length - pos) / entryLength;
             if (count > available)
             {
-                count = available;
+                throw new DocumentParseException("Cross-reference stream is shorter than its /Index declares.", -1);
             }
 
             for (var i = 0; i < count; i++)
             {
-                if (pos + entryLength > decoded.Length)
-                {
-                    break;
-                }
-
                 if (++total > limits.MaxXrefEntries)
                 {
                     throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
@@ -542,12 +551,20 @@ public sealed class DocumentReader
         throw new DocumentParseException("Object not found at recorded offset.", (int)offset);
     }
 
-    private DocumentObject GetCompressedObject(int streamNumber, int index)
+    private DocumentObject GetCompressedObject(int expectedNumber, int streamNumber, int index)
     {
         var container = GetObjectStream(streamNumber);
         if (index < 0 || index >= container.Members.Count)
         {
             throw new DocumentParseException("Object stream index out of range.", -1);
+        }
+
+        // The ObjStm header pairs (object number, offset) are attacker-controlled; if the
+        // member at this index is not the object we were asked for, the xref table and the
+        // stream header disagree and honoring the offset would serve an arbitrary object.
+        if (container.Members[index].Number != expectedNumber)
+        {
+            throw new DocumentParseException("Object stream member number does not match the requested object.", -1);
         }
 
         var offset = container.Members[index].Offset;
@@ -728,31 +745,67 @@ public sealed class DocumentReader
         return stream;
     }
 
-    // A wrong /Length (negative or past the end of the file) falls back to
-    // scanning for the "endstream" keyword instead of throwing a BCL exception.
+    // A wrong /Length (negative or past the end of the file) falls back to the nearest
+    // "endstream" keyword at or after the payload start. The keyword positions are
+    // precomputed in a single pass and binary-searched, so a hostile file full of streams
+    // with bogus lengths cannot force a quadratic per-stream scan to end-of-file.
     private int RecoverStreamLength(int dataStart)
     {
-        const string keyword = "endstream";
-        for (var i = dataStart; i <= data.Length - keyword.Length; i++)
+        var offsets = EndstreamOffsets();
+        var lo = 0;
+        var hi = offsets.Length;
+        while (lo < hi)
         {
-            if (Matches(i, keyword))
+            var mid = (lo + hi) / 2;
+            if (offsets[mid] < dataStart)
             {
-                var end = i;
-                if (end > dataStart && data[end - 1] == 10)
-                {
-                    end--;
-                }
-
-                if (end > dataStart && data[end - 1] == 13)
-                {
-                    end--;
-                }
-
-                return end - dataStart;
+                lo = mid + 1;
+            }
+            else
+            {
+                hi = mid;
             }
         }
 
-        throw new DocumentParseException("Invalid stream length.", dataStart);
+        if (lo >= offsets.Length)
+        {
+            throw new DocumentParseException("Invalid stream length.", dataStart);
+        }
+
+        var end = offsets[lo];
+        if (end > dataStart && data[end - 1] == 10)
+        {
+            end--;
+        }
+
+        if (end > dataStart && data[end - 1] == 13)
+        {
+            end--;
+        }
+
+        return end - dataStart;
+    }
+
+    private int[] EndstreamOffsets()
+    {
+        if (endstreamOffsets is not null)
+        {
+            return endstreamOffsets;
+        }
+
+        const string keyword = "endstream";
+        var offsets = new List<int>();
+        for (var i = 0; i <= data.Length - keyword.Length; i++)
+        {
+            if (Matches(i, keyword))
+            {
+                offsets.Add(i);
+                i += keyword.Length - 1;
+            }
+        }
+
+        endstreamOffsets = [.. offsets];
+        return endstreamOffsets;
     }
 
     private int ResolveLength(DictionaryObject dictionary)
@@ -1156,23 +1209,7 @@ public sealed class DocumentReader
 
     private static bool IsDigit(byte b) => b >= (byte)'0' && b <= (byte)'9';
 
-    private bool Matches(int index, string pattern)
-    {
-        if (index < 0 || index + pattern.Length > data.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < pattern.Length; i++)
-        {
-            if (data[index + i] != (byte)pattern[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
 
     private void SkipWhitespace(ref int index)
     {

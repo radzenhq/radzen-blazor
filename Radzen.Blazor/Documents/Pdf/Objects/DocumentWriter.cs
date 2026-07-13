@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Encryption;
@@ -120,12 +119,9 @@ public sealed class DocumentWriter(Stream stream)
         PdfBytes.WriteAscii(buffer, "xref\n0 ");
         PdfBytes.WriteInteger(buffer, size);
         PdfBytes.WriteAscii(buffer, "\n0000000000 65535 f \n");
-        Span<char> padded = stackalloc char[20];
         foreach (var offset in offsets)
         {
-            offset.TryFormat(padded, out var written, "D10", CultureInfo.InvariantCulture);
-            PdfBytes.WriteAscii(buffer, padded[..written]);
-            PdfBytes.WriteAscii(buffer, " 00000 n \n");
+            PdfBytes.WriteXrefEntry(buffer, offset);
         }
 
         Trailer["Size"] = new NumberObject(size);
@@ -242,8 +238,8 @@ public sealed class DocumentWriter(Stream stream)
         var w2 = 1;
         for (var i = 0; i < size; i++)
         {
-            w1 = Math.Max(w1, FieldWidth(field2[i]));
-            w2 = Math.Max(w2, FieldWidth(field3[i]));
+            w1 = Math.Max(w1, PdfBytes.FieldWidth(field2[i]));
+            w2 = Math.Max(w2, PdfBytes.FieldWidth(field3[i]));
         }
 
         var data = new byte[size * (1 + w1 + w2)];
@@ -251,8 +247,8 @@ public sealed class DocumentWriter(Stream stream)
         for (var i = 0; i < size; i++)
         {
             data[pos++] = types[i];
-            WriteBigEndian(data, ref pos, field2[i], w1);
-            WriteBigEndian(data, ref pos, field3[i], w2);
+            PdfBytes.WriteBigEndian(data, ref pos, field2[i], w1);
+            PdfBytes.WriteBigEndian(data, ref pos, field3[i], w2);
         }
 
         var xref = new StreamObject(FlateFilter.Encode(data));
@@ -271,29 +267,6 @@ public sealed class DocumentWriter(Stream stream)
 
         // Cross-reference streams are never encrypted (ISO 32000-1 7.5.8.2).
         WriteIndirectObject(buffer, xrefNumber, xref, null, -1);
-    }
-
-    private static int FieldWidth(long value)
-    {
-        var width = 1;
-        while (value > 0xFF)
-        {
-            value >>= 8;
-            width++;
-        }
-
-        return width;
-    }
-
-    private static void WriteBigEndian(byte[] data, ref int pos, long value, int width)
-    {
-        for (var i = width - 1; i >= 0; i--)
-        {
-            data[pos + i] = (byte)value;
-            value >>= 8;
-        }
-
-        pos += width;
     }
 
     // Builds the /Encrypt dictionary, wires it and a fresh /ID into the trailer,
