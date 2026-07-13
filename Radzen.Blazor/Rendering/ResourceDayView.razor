@@ -4,13 +4,13 @@
 <div class="rz-view rz-resource-view">
     <div class="rz-view-header">
         <div class="rz-slot-hour-header"></div>
-        @foreach (var resource in Resources ?? new List<object>())
+        @foreach (var resource in Resources)
         {
-            var text = GetResourceText(resource);
+            var text = Scheduler!.ResourceText(resource);
             <div class="rz-slot-header" title="@text">
-                @if (HeaderTemplate != null)
+                @if (Scheduler.ResourceHeaderTemplate != null)
                 {
-                    @HeaderTemplate(resource)
+                    @Scheduler.ResourceHeaderTemplate(resource)
                 }
                 else
                 {
@@ -23,9 +23,9 @@
     {
         <div class="rz-view-header rz-resource-all-day">
             <div class="rz-slot-hour-header rz-resource-all-day-label">@AllDayText</div>
-            @for (var i = 0; i < (Resources?.Count ?? 0); i++)
+            @for (var i = 0; i < Resources.Count; i++)
             {
-                var resource = Resources![i];
+                var resource = Resources[i];
                 var index = i;
                 <div class="@ClassList.Create("rz-slot-header rz-resource-all-day-slot").Add("rz-state-focused", allDayFocused && index == currentResource).ToString()"
                      @onclick=@(args => OnAllDaySlotClick(resource)) @ondragover:preventDefault @ondrop=@(args => OnDrop(StartDate.Date, resource)) dropzone="move">
@@ -44,9 +44,9 @@
         <div @ref=view class="rz-week-view-content rz-resource-view-content" tabindex="0" aria-label="@AriaLabel"
              @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
              @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
-            @for (var i = 0; i < (Resources?.Count ?? 0); i++)
+            @for (var i = 0; i < Resources.Count; i++)
             {
-                var resource = Resources![i];
+                var resource = Resources[i];
                 var index = i;
                 <div class="@ClassList.Create("rz-slots").Add("rz-state-focused", !allDayFocused && index == currentResource).ToString()">
                     <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate Appointments=@AppointmentsForResource(resource) CurrentDate="@(index == currentResource && !allDayFocused ? currentSlot : default)" AppointmentDragStart=@OnAppointmentDragStart />

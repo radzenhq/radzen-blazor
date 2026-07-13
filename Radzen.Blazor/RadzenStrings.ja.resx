@@ -1698,9 +1698,6 @@
   <data name="Scheduler_PrevText" xml:space="preserve">
     <value>前へ</value>
   </data>
-  <data name="Scheduler_ResourcesText" xml:space="preserve">
-    <value>リソース</value>
-  </data>
   <data name="Scheduler_AllDayText" xml:space="preserve">
     <value>終日</value>
   </data>

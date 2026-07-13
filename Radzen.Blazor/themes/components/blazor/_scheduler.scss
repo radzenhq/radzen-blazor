@@ -70,6 +70,7 @@ $scheduler-year-slot-title-width: 100% !default;
 $scheduler-year-slot-title-border-radius: 0.25rem !default;
 $scheduler-planner-slot-width: 3rem !default;
 $scheduler-planner-slot-height: 4.5rem !default;
+$scheduler-resource-group-height: 24rem !default;
 $scheduler-focus-outline: var(--rz-outline-focus) !default;
 $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
@@ -498,6 +499,54 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     scrollbar-width: auto;
   }
   
+}
+
+// Resource groups (GroupByResource)
+
+.rz-resource-groups {
+  flex: auto;
+  height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+
+  .rz-resource-group {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+
+    .rz-view {
+      flex: none;
+    }
+
+    .rz-view-content {
+      height: auto;
+    }
+
+    .rz-month-view,
+    .rz-planner-view,
+    .rz-timeline-view,
+    .rz-year-view {
+      height: var(--rz-scheduler-resource-group-height);
+    }
+  }
+}
+
+.rz-resource-group-header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 3;
+  padding: 0.5rem;
+  font-size: var(--rz-scheduler-header-font-size);
+  font-weight: 600;
+  text-transform: var(--rz-scheduler-header-text-transform);
+  background-color: var(--rz-scheduler-header-background-color);
+  border-block-start: var(--rz-scheduler-header-border);
+  border-block-end: var(--rz-scheduler-header-border);
+  color: var(--rz-scheduler-header-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // Resource View
