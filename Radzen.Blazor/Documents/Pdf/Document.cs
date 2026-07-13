@@ -213,6 +213,20 @@ public sealed class Document
                 sourceBoxes[page] = box;
             }
 
+            // Carry the appended page's crop box and rotation too; serialization reads
+            // these dictionaries, so without the copy a merged loaded page loses its
+            // /CropBox and /Rotate. Also carries through a chained append, since a
+            // document produced by Append records the same entries under its own keys.
+            if (other.sourceCropBoxes.TryGetValue(source, out var cropBox))
+            {
+                sourceCropBoxes[page] = cropBox;
+            }
+
+            if (other.sourceRotations.TryGetValue(source, out var rotation))
+            {
+                sourceRotations[page] = rotation;
+            }
+
             Pages.Insert(Pages.Count, page);
         }
     }

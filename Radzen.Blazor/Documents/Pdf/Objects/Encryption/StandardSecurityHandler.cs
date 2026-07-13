@@ -141,20 +141,30 @@ internal sealed class StandardSecurityHandler
             return CryptMethod.Identity;
         }
 
-        if (encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject cfDict
-            && cfDict.TryGetValue(filterName, out var filter) && filter is DictionaryObject filterDict
-            && filterDict.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
+        if (encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject cfDict)
         {
-            return method.Value switch
+            if (cfDict.TryGetValue(filterName, out var filter) && filter is DictionaryObject filterDict
+                && filterDict.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
             {
-                "AESV3" => CryptMethod.AesV3,
-                "AESV2" => CryptMethod.AesV2,
-                "V2" => CryptMethod.Rc4,
-                "Identity" => CryptMethod.Identity,
-                _ => CryptMethod.Rc4,
-            };
+                return method.Value switch
+                {
+                    "AESV3" => CryptMethod.AesV3,
+                    "AESV2" => CryptMethod.AesV2,
+                    "V2" => CryptMethod.Rc4,
+                    "Identity" => CryptMethod.Identity,
+                    // An unrecognized /CFM would otherwise decrypt to garbage under a
+                    // guessed RC4 key; fail loud instead of silently emitting wrong bytes.
+                    _ => throw new DocumentParseException(
+                        $"Unsupported crypt filter method /CFM /{method.Value}."),
+                };
+            }
+
+            // The named (non-Identity) crypt filter has no matching /CF entry or no /CFM.
+            // Falling back to RC4 here would silently decrypt to garbage.
+            throw new DocumentParseException($"Crypt filter '{filterName}' is not defined in /CF.");
         }
 
+        // No /CF dictionary at all: the standard-handler default (RC4 for V4, AESV3 for V5).
         return version == 5 ? CryptMethod.AesV3 : CryptMethod.Rc4;
     }
 
