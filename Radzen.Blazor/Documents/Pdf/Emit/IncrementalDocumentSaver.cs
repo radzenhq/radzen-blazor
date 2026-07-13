@@ -155,8 +155,8 @@ internal sealed class IncrementalDocumentSaver
                 "Appending a generated (DocumentBuilder) page incrementally is not supported.");
         }
 
-        var content = page.BuildContent(out var emitter, out var overlay, out var overlayEmitter);
-        if (emitter is not null || overlay is not null || overlayEmitter is not null)
+        var emission = page.BuildContent();
+        if (emission.IsEmitted || emission.Overlay is not null)
         {
             throw new NotSupportedException(
                 "Appending a page with authored content elements incrementally is not supported; "
@@ -181,9 +181,9 @@ internal sealed class IncrementalDocumentSaver
             node["Rotate"] = new NumberObject(page.Rotate);
         }
 
-        if (content is not null)
+        if (emission.Bytes is not null)
         {
-            node["Contents"] = writer.Add(new StreamObject(content));
+            node["Contents"] = writer.Add(new StreamObject(emission.Bytes));
         }
 
         return writer.Add(node);

@@ -133,14 +133,11 @@ public sealed class Page
     // gained new elements keeps its raw bytes untouched and returns the additions as a
     // separate overlay stream. Any other modification (or a freshly authored page)
     // re-encodes from elements; the emitters carry the resources each stream needs.
-    internal byte[]? BuildContent(out ContentWriter? emitter, out byte[]? overlay, out ContentWriter? overlayEmitter, IReadOnlyCollection<string>? reservedNames = null)
+    internal ContentEmissionResult BuildContent(IReadOnlyCollection<string>? reservedNames = null)
     {
-        emitter = null;
-        overlay = null;
-        overlayEmitter = null;
         if (elements.Count == 0)
         {
-            return content;
+            return new ContentEmissionResult(content, ContentResourceManifest.Empty);
         }
 
         if (content is not null && snapshot is not null && elements.Count >= materializedCount
@@ -148,33 +145,27 @@ public sealed class Page
         {
             if (elements.Count == materializedCount)
             {
-                return content;
+                return new ContentEmissionResult(content, ContentResourceManifest.Empty);
             }
 
-            var appended = new ContentWriter(SafePrefix("SF", reservedNames), SafePrefix("SIm", reservedNames));
+            using var appended = new ContentWriter(SafePrefix("SF", reservedNames), SafePrefix("SIm", reservedNames));
             for (var i = materializedCount; i < elements.Count; i++)
             {
                 elements[i].Emit(appended);
             }
 
-            overlay = appended.ToArray();
-            appended.Dispose();
-            overlayEmitter = appended;
-            return content;
+            return new ContentEmissionResult(content, ContentResourceManifest.Empty, appended.DetachResult());
         }
 
         // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
         // dodge the loaded page's resource names so MergeResources cannot overwrite them.
-        var writer = new ContentWriter(SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames));
+        using var writer = new ContentWriter(SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames));
         foreach (var element in elements)
         {
             element.Emit(writer);
         }
 
-        var bytes = writer.ToArray();
-        writer.Dispose();
-        emitter = writer;
-        return bytes;
+        return writer.DetachResult();
     }
 
     private bool OriginalElementsIntact()
@@ -190,24 +181,20 @@ public sealed class Page
 
     // A built page keeps the generator's bytes as its base; Content holds only the
     // user's additions, emitted here as a second content stream appended on save.
-    internal byte[]? BuildOverlay(out ContentWriter? emitter)
+    internal ContentEmissionResult? BuildOverlay()
     {
-        emitter = null;
         if (elements.Count == 0)
         {
             return null;
         }
 
-        var writer = new ContentWriter("SF", "SIm");
+        using var writer = new ContentWriter("SF", "SIm");
         foreach (var element in elements)
         {
             element.Emit(writer);
         }
 
-        var bytes = writer.ToArray();
-        writer.Dispose();
-        emitter = writer;
-        return bytes;
+        return writer.DetachResult();
     }
 
     private void EnsureMaterialized()

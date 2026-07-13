@@ -117,6 +117,7 @@ internal sealed class GeneratedPage
 internal sealed class DocumentGenerator
 {
     private readonly DocumentBuilder builder;
+    private readonly BuilderSettingsSnapshot settings;
     private readonly FontCollection fonts;
     private readonly GeneratorFontResolver fontResolver;
     private readonly ImageStore imageStore;
@@ -135,13 +136,14 @@ internal sealed class DocumentGenerator
     // and Level-B output, which stays byte-identical.
     private readonly bool markArtifacts;
 
-    private DocumentGenerator(DocumentBuilder builder)
+    private DocumentGenerator(DocumentBuilder builder, BuilderSettingsSnapshot settings)
     {
         this.builder = builder;
-        markArtifacts = builder.PdfUA
-            || builder.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
+        this.settings = settings;
+        markArtifacts = settings.PdfUA
+            || settings.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
         fonts = builder.Fonts;
-        fontResolver = new(builder.Conformance);
+        fontResolver = new(settings.Conformance);
         imageStore = new();
         resolution = StyleResolver.Resolve(builder);
         structureTree = new(builder, resolution);
@@ -159,9 +161,9 @@ internal sealed class DocumentGenerator
     // one, the first pass resolves every anchor's page and a second pass (on a fresh generator;
     // the emitters are stateful) lays out again with the numbers substituted. The TOC line
     // footprint is independent of the digits, so both passes paginate identically.
-    public static Document Generate(DocumentBuilder builder)
+    public static Document Generate(DocumentBuilder builder, BuilderSettingsSnapshot settings)
     {
-        var generator = new DocumentGenerator(builder);
+        var generator = new DocumentGenerator(builder, settings);
         var first = generator.Run();
 
         if (!HasTableOfContents(builder))
@@ -176,7 +178,7 @@ internal sealed class DocumentGenerator
         }
 
         ValidateTocAnchors(builder, tocPages);
-        return new DocumentGenerator(builder).Run(tocPages);
+        return new DocumentGenerator(builder, settings).Run(tocPages);
     }
 
     // A TableOfContents is only supported as direct section content, so a shallow scan decides
@@ -222,17 +224,7 @@ internal sealed class DocumentGenerator
 
     private Document Run(IReadOnlyDictionary<string, int>? tocPages = null)
     {
-        var document = new Document { Conformance = builder.Conformance };
-        document.Attachments.AddRange(builder.Attachments);
-        document.Outline.AddRange(builder.Outline);
-        document.Info.Title = builder.Info.Title;
-        document.Info.Author = builder.Info.Author;
-        document.Info.Subject = builder.Info.Subject;
-        document.Info.Keywords = builder.Info.Keywords;
-        document.Info.Creator = builder.Info.Creator;
-        document.Info.Producer = builder.Info.Producer;
-        document.Info.CreationDate = builder.Info.CreationDate;
-        document.Info.ModificationDate = builder.Info.ModificationDate;
+        var document = settings.CreateDocument();
 
         structureTree.Build();
 
@@ -261,8 +253,6 @@ internal sealed class DocumentGenerator
 
         document.Structure = structureTree.DocumentElement;
         document.HasUntaggedListContent = structureTree.HasUntaggedList;
-        document.RoleMap = builder.RoleMap;
-
         foreach (var font in fontResolver.AllFonts)
         {
             if (font.Sfnt is { IsCff: false } sfnt)
@@ -315,7 +305,44 @@ internal sealed class DocumentGenerator
         var contentTop = height - page.ContentBox.Y;
         var width = page.ContentBox.Width;
 
-        var bodyLines = page.Lines;
+        foreach (var (layer, top, body) in new[]
+        {
+            (page.Body, contentTop, true),
+            (page.HeaderLayer, height - page.HeaderTop, false),
+            (page.FooterLayer, height - page.FooterTop, false),
+        })
+        {
+            EmitLayer(context, layer, left, top, width, body);
+        }
+
+        if (watermark is not null)
+        {
+            watermarkEmitter.Plan(plan, watermark);
+        }
+
+        return plan;
+    }
+
+    private void EmitLayer(EmitContext context, PageLayer layer, double left, double top, double width, bool body)
+    {
+        if (!body)
+        {
+            textEmitter.EmitBandLines(context, layer.Lines, left, top, width);
+            foreach (var positioned in layer.Images)
+            {
+                imageEmitter.EmitImage(context, positioned, left, top);
+            }
+
+            foreach (var positioned in layer.Codes)
+            {
+                codeEmitter.EmitCode(context, positioned, left, top);
+            }
+
+            EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
+            return;
+        }
+
+        var bodyLines = layer.Lines;
         var b = 0;
         while (b < bodyLines.Count)
         {
@@ -326,9 +353,9 @@ internal sealed class DocumentGenerator
             {
                 var element = structureTree.ElementOf(paragraph);
                 var y = line.Y;
-                foreach (var box in fieldResolver.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph)))
+                foreach (var box in fieldResolver.ResolveFields(paragraph, width, context.PageNumber, context.PageCount, resolution.Alignment(paragraph)))
                 {
-                    textEmitter.EmitLine(context, box, left, contentTop - y, element);
+                    textEmitter.EmitLine(context, box, left, top - y, element);
                     y += box.Height;
                 }
 
@@ -340,61 +367,24 @@ internal sealed class DocumentGenerator
             else
             {
                 textEmitter.EmitLine(
-                    context, line.Line, left, contentTop - line.Y,
+                    context, line.Line, left, top - line.Y,
                     structureTree.ElementOf(line.Source),
                     markerElement: structureTree.MarkerElementOf(line.Source));
                 b++;
             }
         }
 
-        EmitTablesAndBoxes(context, page.Tables, page.Boxes, left, contentTop);
+        EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
 
-        foreach (var positioned in page.Images)
+        foreach (var positioned in layer.Images)
         {
-            imageEmitter.EmitImage(context, positioned, left, contentTop);
+            imageEmitter.EmitImage(context, positioned, left, top);
         }
 
-        foreach (var positioned in page.Codes)
+        foreach (var positioned in layer.Codes)
         {
-            codeEmitter.EmitCode(context, positioned, left, contentTop);
+            codeEmitter.EmitCode(context, positioned, left, top);
         }
-
-        var headerTop = height - page.HeaderTop;
-        textEmitter.EmitBandLines(context, page.Header, left, headerTop, width);
-
-        foreach (var positioned in page.HeaderImages)
-        {
-            imageEmitter.EmitImage(context, positioned, left, headerTop);
-        }
-
-        foreach (var positioned in page.HeaderCodes)
-        {
-            codeEmitter.EmitCode(context, positioned, left, headerTop);
-        }
-
-        EmitTablesAndBoxes(context, page.HeaderTables, page.HeaderBoxes, left, headerTop);
-
-        var bandTop = height - page.FooterTop;
-        textEmitter.EmitBandLines(context, page.Footer, left, bandTop, width);
-
-        foreach (var positioned in page.FooterImages)
-        {
-            imageEmitter.EmitImage(context, positioned, left, bandTop);
-        }
-
-        foreach (var positioned in page.FooterCodes)
-        {
-            codeEmitter.EmitCode(context, positioned, left, bandTop);
-        }
-
-        EmitTablesAndBoxes(context, page.FooterTables, page.FooterBoxes, left, bandTop);
-
-        if (watermark is not null)
-        {
-            watermarkEmitter.Plan(plan, watermark);
-        }
-
-        return plan;
     }
 
     // Table fragments and boxes interleave by their shared placement Order (document

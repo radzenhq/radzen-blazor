@@ -13,15 +13,11 @@ using Xunit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // End-to-end tests for the "cheap win" features wired into the content pipeline. Every
-// feature is opt-in: a document that uses none of them is byte-identical to before, which
-// the last test pins directly.
+// feature is opt-in. The last test verifies that an unchanged build is repeatable.
 public class CheapWinWiringTests
 {
     private static string Content(DocumentBuilder builder)
         => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
-
-    private static DictionaryObject? Resources(DocumentBuilder builder)
-        => BuildTestSupport.PageLeaves(BuildTestSupport.Read(builder))[0].Resources;
 
     private static Paragraph Text(string text)
     {
@@ -350,10 +346,10 @@ public class CheapWinWiringTests
         return document.ToArray();
     }
 
-    // ---- Byte identity: a document using none of the new features is stable across builds ----
+    // ---- Build repeatability when none of the new features is used ----
 
     [Fact]
-    public void NoNewFeatures_IsByteIdenticalAcrossBuilds()
+    public void NoNewFeatures_ProducesRepeatableBuilds()
     {
         static byte[] Build()
         {

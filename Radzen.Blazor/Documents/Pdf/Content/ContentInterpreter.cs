@@ -16,392 +16,442 @@ internal static class ContentInterpreter
     public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null)
     {
         var tokens = ContentTokenizer.Tokenize(content);
-
-        var state = new GraphicsState();
-        var stack = new Stack<GraphicsState>();
-
-        var textMatrix = Matrix.Identity;
-        var lineMatrix = Matrix.Identity;
-        var fontSize = 0.0;
-        var leading = 0.0;
-        string? fontName = null;
-        ReverseFont? font = null;
-
-        var currentX = 0.0;
-        var currentY = 0.0;
-        var startX = 0.0;
-        var startY = 0.0;
-
-        var pathOps = new List<PathOp>();
-        var operands = new List<Token>();
-        var stringBuffer = new List<byte>();
-        var arrayNumbers = new List<double>();
-        List<TextAdjustment>? tjSegments = null;
-        var clipMode = PathClipMode.None;
-        var artifactDepth = 0;
-        var markedContent = new Stack<bool>();
-
-        // The run produced by the immediately preceding show operator, or null when the
-        // last operator was anything else. Lets consecutive shows that share a text
-        // matrix fold into one run (see EmitText).
-        TextContent? pendingMerge = null;
+        var interpreter = new InterpreterState();
 
         for (var i = 0; i < tokens.Count; i++)
         {
             var token = tokens[i];
-
             switch (token.Kind)
             {
                 case TokenKind.Number:
                 case TokenKind.Name:
                 case TokenKind.String:
-                    operands.Add(token);
+                    interpreter.Operands.Add(token);
                     continue;
-
                 case TokenKind.ArrayStart:
-                    stringBuffer.Clear();
-                    arrayNumbers.Clear();
-                    tjSegments = [];
+                    interpreter.StringBuffer.Clear();
+                    interpreter.ArrayNumbers.Clear();
+                    interpreter.TjSegments = [];
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
                     {
                         if (tokens[i].Kind == TokenKind.String)
                         {
-                            stringBuffer.AddRange(tokens[i].Bytes!);
-                            tjSegments.Add(new TextAdjustment(tokens[i].Bytes!, 0));
+                            interpreter.StringBuffer.AddRange(tokens[i].Bytes!);
+                            interpreter.TjSegments.Add(new TextAdjustment(tokens[i].Bytes!, 0));
                         }
                         else if (tokens[i].Kind == TokenKind.Number)
                         {
-                            arrayNumbers.Add(tokens[i].Number);
-                            tjSegments.Add(new TextAdjustment(null, tokens[i].Number));
+                            interpreter.ArrayNumbers.Add(tokens[i].Number);
+                            interpreter.TjSegments.Add(new TextAdjustment(null, tokens[i].Number));
                         }
                     }
 
-                    operands.Add(new Token(TokenKind.String, 0, null, [.. stringBuffer]));
+                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer]));
                     continue;
-
                 case TokenKind.DictStart:
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.DictEnd; i++)
                     {
                     }
 
                     continue;
-
                 case TokenKind.ArrayEnd:
                 case TokenKind.DictEnd:
                     continue;
             }
 
-            switch (token.Text)
+            var op = token.Text;
+            if (!HandleGraphicsOperators(op, interpreter, target)
+                && !HandleTextOperators(op, interpreter, target, fonts)
+                && !HandlePathOperators(op, interpreter, target)
+                && !HandleMarkedContentOperators(op, interpreter))
             {
-                case "q":
-                    stack.Push(state.Clone());
-                    break;
+                HandlePassthroughOperator(op, interpreter, target);
+            }
 
-                case "Q":
-                    if (stack.Count > 0)
+            if (op is not ("Tj" or "TJ" or "'" or "\""))
+            {
+                interpreter.PendingMerge = null;
+            }
+
+            interpreter.ResetOperandFrame();
+        }
+    }
+
+    private static bool HandleGraphicsOperators(string? op, InterpreterState interpreter, ContentCollection target)
+    {
+        var operands = interpreter.Operands;
+        ref var state = ref interpreter.Graphics;
+        switch (op)
+        {
+            case "q":
+                interpreter.Stack.Push(state.Clone());
+                break;
+
+            case "Q":
+                if (interpreter.Stack.Count > 0)
+                {
+                    state = interpreter.Stack.Pop();
+                }
+
+                break;
+
+            case "cm":
+                state.Ctm = Components(operands) * state.Ctm;
+                break;
+
+            case "w":
+                state.LineWidth = LastNumber(operands);
+                break;
+
+            case "rg":
+                state.Fill = Rgb(operands);
+                state.FillPaint = null;
+                break;
+
+            case "RG":
+                state.Stroke = Rgb(operands);
+                state.StrokePaint = null;
+                break;
+
+            case "g":
+                state.Fill = Gray(operands);
+                state.FillPaint = null;
+                break;
+
+            case "G":
+                state.Stroke = Gray(operands);
+                state.StrokePaint = null;
+                break;
+
+            case "k":
+                state.FillPaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
+                break;
+
+            case "K":
+                state.StrokePaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
+                break;
+
+            case "cs":
+                state.FillColorSpace = LastName(operands);
+                break;
+
+            case "CS":
+                state.StrokeColorSpace = LastName(operands);
+                break;
+
+            case "scn":
+            case "sc":
+                state.FillPaint = new DeviceColor(DeviceColorKind.Named, state.FillColorSpace, AllNumbers(operands));
+                break;
+
+            case "SCN":
+            case "SC":
+                state.StrokePaint = new DeviceColor(DeviceColorKind.Named, state.StrokeColorSpace, AllNumbers(operands));
+                break;
+
+            case "d":
+                state.DashArray = [.. interpreter.ArrayNumbers];
+                state.DashPhase = LastNumber(operands);
+                break;
+
+            case "Do":
+                if (LastName(operands) is { } xobject)
+                {
+                    target.Add(new XObjectContent(xobject)
                     {
-                        state = stack.Pop();
-                    }
+                        Transform = state.Ctm,
+                        IsArtifact = interpreter.ArtifactDepth > 0,
+                    });
+                }
 
-                    break;
+                break;
 
-                case "cm":
-                    state.Ctm = Components(operands) * state.Ctm;
-                    break;
+            default:
+                return false;
+        }
 
-                case "w":
-                    state.LineWidth = LastNumber(operands);
-                    break;
+        return true;
+    }
 
-                case "rg":
-                    state.Fill = Rgb(operands);
-                    state.FillPaint = null;
-                    break;
+    private static bool HandleTextOperators(string? op, InterpreterState interpreter, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? reverseFonts)
+    {
+        var operands = interpreter.Operands;
+        ref var state = ref interpreter.Graphics;
+        switch (op)
+        {
+            case "BT":
+                interpreter.TextMatrix = Matrix.Identity;
+                interpreter.LineMatrix = Matrix.Identity;
+                break;
 
-                case "RG":
-                    state.Stroke = Rgb(operands);
-                    state.StrokePaint = null;
-                    break;
+            case "ET":
+                break;
 
-                case "g":
-                    state.Fill = Gray(operands);
-                    state.FillPaint = null;
-                    break;
+            case "Tf":
+                interpreter.FontName = LastName(operands);
+                interpreter.FontSize = LastNumber(operands);
+                interpreter.Font = interpreter.FontName is not null && reverseFonts is not null && reverseFonts.TryGetValue(interpreter.FontName, out var resolved)
+                    ? resolved
+                    : null;
+                break;
 
-                case "G":
-                    state.Stroke = Gray(operands);
-                    state.StrokePaint = null;
-                    break;
+            case "TL":
+                interpreter.Leading = LastNumber(operands);
+                break;
 
-                case "k":
-                    state.FillPaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
-                    break;
+            case "TD":
+                interpreter.Leading = -Number(operands, 1);
+                goto case "Td";
 
-                case "K":
-                    state.StrokePaint = new DeviceColor(DeviceColorKind.Cmyk, null, Numbers(operands, 4));
-                    break;
+            case "Td":
+                interpreter.LineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * interpreter.LineMatrix;
+                interpreter.TextMatrix = interpreter.LineMatrix;
+                break;
 
-                case "cs":
-                    state.FillColorSpace = LastName(operands);
-                    break;
+            case "Tm":
+                interpreter.LineMatrix = Components(operands);
+                interpreter.TextMatrix = interpreter.LineMatrix;
+                break;
 
-                case "CS":
-                    state.StrokeColorSpace = LastName(operands);
-                    break;
+            case "T*":
+                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
+                interpreter.TextMatrix = interpreter.LineMatrix;
+                break;
 
-                case "scn":
-                case "sc":
-                    state.FillPaint = new DeviceColor(DeviceColorKind.Named, state.FillColorSpace, AllNumbers(operands));
-                    break;
+            case "Tj":
+            case "TJ":
+                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                break;
 
-                case "SCN":
-                case "SC":
-                    state.StrokePaint = new DeviceColor(DeviceColorKind.Named, state.StrokeColorSpace, AllNumbers(operands));
-                    break;
+            // ' advances to the next line by the interpreter.Leading before showing.
+            case "'":
+                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
+                interpreter.TextMatrix = interpreter.LineMatrix;
+                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                break;
 
-                case "d":
-                    state.DashArray = [.. arrayNumbers];
-                    state.DashPhase = LastNumber(operands);
-                    break;
+            // " advances the line then shows, and additionally sets word spacing (aw)
+            // and character spacing (ac) from its first two operands.
+            case "\"":
+                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
+                interpreter.TextMatrix = interpreter.LineMatrix;
+                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, Number(operands, 0), Number(operands, 1)), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                break;
 
-                case "W":
-                    clipMode = PathClipMode.NonZero;
-                    break;
+            default:
+                return false;
+        }
 
-                case "W*":
-                    clipMode = PathClipMode.EvenOdd;
-                    break;
+        return true;
+    }
 
-                case "BT":
-                    textMatrix = Matrix.Identity;
-                    lineMatrix = Matrix.Identity;
-                    break;
+    private static bool HandlePathOperators(string? op, InterpreterState interpreter, ContentCollection target)
+    {
+        var operands = interpreter.Operands;
+        ref var state = ref interpreter.Graphics;
+        switch (op)
+        {
+            case "W":
+                interpreter.ClipMode = PathClipMode.NonZero;
+                break;
 
-                case "ET":
-                    break;
+            case "W*":
+                interpreter.ClipMode = PathClipMode.EvenOdd;
+                break;
 
-                case "Tf":
-                    fontName = LastName(operands);
-                    fontSize = LastNumber(operands);
-                    font = fontName is not null && fonts is not null && fonts.TryGetValue(fontName, out var resolved)
-                        ? resolved
-                        : null;
-                    break;
-
-                case "TL":
-                    leading = LastNumber(operands);
-                    break;
-
-                case "TD":
-                    leading = -Number(operands, 1);
-                    goto case "Td";
-
-                case "Td":
-                    lineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    break;
-
-                case "Tm":
-                    lineMatrix = Components(operands);
-                    textMatrix = lineMatrix;
-                    break;
-
-                case "T*":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    break;
-
-                case "Tj":
-                case "TJ":
-                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, 0, 0), artifactDepth, tjSegments, pendingMerge);
-                    break;
-
-                // ' advances to the next line by the leading before showing.
-                case "'":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, 0, 0), artifactDepth, tjSegments, pendingMerge);
-                    break;
-
-                // " advances the line then shows, and additionally sets word spacing (aw)
-                // and character spacing (ac) from its first two operands.
-                case "\"":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, Number(operands, 0), Number(operands, 1)), artifactDepth, tjSegments, pendingMerge);
-                    break;
-
-                case "m":
+            case "m":
                 {
                     var x = Number(operands, 0);
                     var y = Number(operands, 1);
-                    pathOps.Add(new PathOp("m", [x, y]));
-                    startX = currentX = x;
-                    startY = currentY = y;
+                    interpreter.PathOps.Add(new PathOp("m", [x, y]));
+                    interpreter.StartX = interpreter.CurrentX = x;
+                    interpreter.StartY = interpreter.CurrentY = y;
                     break;
                 }
 
-                case "l":
-                    currentX = Number(operands, 0);
-                    currentY = Number(operands, 1);
-                    pathOps.Add(new PathOp("l", [currentX, currentY]));
-                    break;
+            case "l":
+                interpreter.CurrentX = Number(operands, 0);
+                interpreter.CurrentY = Number(operands, 1);
+                interpreter.PathOps.Add(new PathOp("l", [interpreter.CurrentX, interpreter.CurrentY]));
+                break;
 
-                case "c":
+            case "c":
                 {
                     var n = Numbers(operands, 6);
-                    pathOps.Add(new PathOp("c", n));
-                    currentX = n[4];
-                    currentY = n[5];
+                    interpreter.PathOps.Add(new PathOp("c", n));
+                    interpreter.CurrentX = n[4];
+                    interpreter.CurrentY = n[5];
                     break;
                 }
 
-                case "v":
+            case "v":
                 {
                     var n = Numbers(operands, 4);
-                    pathOps.Add(new PathOp("c", [currentX, currentY, n[0], n[1], n[2], n[3]]));
-                    currentX = n[2];
-                    currentY = n[3];
+                    interpreter.PathOps.Add(new PathOp("c", [interpreter.CurrentX, interpreter.CurrentY, n[0], n[1], n[2], n[3]]));
+                    interpreter.CurrentX = n[2];
+                    interpreter.CurrentY = n[3];
                     break;
                 }
 
-                case "y":
+            case "y":
                 {
                     var n = Numbers(operands, 4);
-                    pathOps.Add(new PathOp("c", [n[0], n[1], n[2], n[3], n[2], n[3]]));
-                    currentX = n[2];
-                    currentY = n[3];
+                    interpreter.PathOps.Add(new PathOp("c", [n[0], n[1], n[2], n[3], n[2], n[3]]));
+                    interpreter.CurrentX = n[2];
+                    interpreter.CurrentY = n[3];
                     break;
                 }
 
-                case "re":
+            case "re":
                 {
                     var n = Numbers(operands, 4);
-                    pathOps.Add(new PathOp("m", [n[0], n[1]]));
-                    pathOps.Add(new PathOp("l", [n[0] + n[2], n[1]]));
-                    pathOps.Add(new PathOp("l", [n[0] + n[2], n[1] + n[3]]));
-                    pathOps.Add(new PathOp("l", [n[0], n[1] + n[3]]));
-                    pathOps.Add(new PathOp("h", []));
-                    startX = currentX = n[0];
-                    startY = currentY = n[1];
+                    interpreter.PathOps.Add(new PathOp("m", [n[0], n[1]]));
+                    interpreter.PathOps.Add(new PathOp("l", [n[0] + n[2], n[1]]));
+                    interpreter.PathOps.Add(new PathOp("l", [n[0] + n[2], n[1] + n[3]]));
+                    interpreter.PathOps.Add(new PathOp("l", [n[0], n[1] + n[3]]));
+                    interpreter.PathOps.Add(new PathOp("h", []));
+                    interpreter.StartX = interpreter.CurrentX = n[0];
+                    interpreter.StartY = interpreter.CurrentY = n[1];
                     break;
                 }
 
-                case "h":
-                    pathOps.Add(new PathOp("h", []));
-                    currentX = startX;
-                    currentY = startY;
-                    break;
+            case "h":
+                interpreter.PathOps.Add(new PathOp("h", []));
+                interpreter.CurrentX = interpreter.StartX;
+                interpreter.CurrentY = interpreter.StartY;
+                break;
 
-                case "Do":
-                    if (LastName(operands) is { } xobject)
-                    {
-                        target.Add(new XObjectContent(xobject)
-                        {
-                            Transform = state.Ctm,
-                            IsArtifact = artifactDepth > 0,
-                        });
-                    }
+            case "S":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                    break;
+            case "s":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: false, Close: true, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "S":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: false, Close: false, EvenOdd: false), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "f":
+            case "F":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "s":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: false, Close: true, EvenOdd: false), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "f*":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "f":
-                case "F":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: false), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "B":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "f*":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: true), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "B*":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "B":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: false), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "b":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "B*":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: true), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "b*":
+                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "b":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: false), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+            case "n":
+                if (interpreter.ClipMode != PathClipMode.None)
+                {
+                    EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                }
 
-                case "b*":
-                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: true), clipMode, artifactDepth);
-                    clipMode = PathClipMode.None;
-                    break;
+                interpreter.PathOps.Clear();
+                interpreter.ClipMode = PathClipMode.None;
+                break;
 
-                case "n":
-                    if (clipMode != PathClipMode.None)
-                    {
-                        EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: false, Close: false, EvenOdd: false), clipMode, artifactDepth);
-                    }
+            default:
+                return false;
+        }
 
-                    pathOps.Clear();
-                    clipMode = PathClipMode.None;
-                    break;
+        return true;
+    }
 
-                case "BDC":
-                case "BMC":
+    private static bool HandleMarkedContentOperators(string? op, InterpreterState interpreter)
+    {
+        var operands = interpreter.Operands;
+        switch (op)
+        {
+            case "BDC":
+            case "BMC":
                 {
                     var isArtifact = FirstName(operands) == "Artifact";
-                    markedContent.Push(isArtifact);
+                    interpreter.MarkedContent.Push(isArtifact);
                     if (isArtifact)
                     {
-                        artifactDepth++;
+                        interpreter.ArtifactDepth++;
                     }
 
                     break;
                 }
 
-                case "EMC":
-                    if (markedContent.Count > 0 && markedContent.Pop())
-                    {
-                        artifactDepth--;
-                    }
+            case "EMC":
+                if (interpreter.MarkedContent.Count > 0 && interpreter.MarkedContent.Pop())
+                {
+                    interpreter.ArtifactDepth--;
+                }
 
-                    break;
+                break;
 
-                default:
-                    // Any operator the element model does not represent (gs, sh, J, j, M,
-                    // ri, i, ...) is carried through verbatim so a re-encode stays lossless.
-                    // Text-state operators are excluded: a materialized run re-emits its own
-                    // isolated BT/ET, so a stray Tr/Tc/Tz here would leak into unrelated text.
-                    if (token.Text is not null && !IsTextState(token.Text))
-                    {
-                        target.Add(new RawContent(token.Text, [.. operands]) { IsArtifact = artifactDepth > 0 });
-                    }
+            default:
+                return false;
+        }
 
-                    break;
-            }
+        return true;
+    }
 
-            // Only a show operator keeps the merge candidate alive; any other operator
-            // (a position change, state change or raw passthrough) ends the run.
-            if (token.Text is not ("Tj" or "TJ" or "'" or "\""))
-            {
-                pendingMerge = null;
-            }
-
-            operands.Clear();
-            arrayNumbers.Clear();
-            tjSegments = null;
+    private static void HandlePassthroughOperator(string? op, InterpreterState interpreter, ContentCollection target)
+    {
+        if (op is not null && !IsTextState(op))
+        {
+            target.Add(new RawContent(op, [.. interpreter.Operands]) { IsArtifact = interpreter.ArtifactDepth > 0 });
         }
     }
+
+    private sealed class InterpreterState
+    {
+        public GraphicsState Graphics = new();
+        public Stack<GraphicsState> Stack { get; } = new();
+        public Matrix TextMatrix { get; set; } = Matrix.Identity;
+        public Matrix LineMatrix { get; set; } = Matrix.Identity;
+        public double FontSize { get; set; }
+        public double Leading { get; set; }
+        public string? FontName { get; set; }
+        public ReverseFont? Font { get; set; }
+        public double CurrentX { get; set; }
+        public double CurrentY { get; set; }
+        public double StartX { get; set; }
+        public double StartY { get; set; }
+        public List<PathOp> PathOps { get; } = [];
+        public List<Token> Operands { get; } = [];
+        public List<byte> StringBuffer { get; } = [];
+        public List<double> ArrayNumbers { get; } = [];
+        public List<TextAdjustment>? TjSegments { get; set; }
+        public PathClipMode ClipMode { get; set; }
+        public int ArtifactDepth { get; set; }
+        public Stack<bool> MarkedContent { get; } = new();
+        public TextContent? PendingMerge { get; set; }
+
+        public void ResetOperandFrame()
+        {
+            Operands.Clear();
+            ArrayNumbers.Clear();
+            TjSegments = null;
+        }
+    }
+
 
     private static TextContent? EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, TextState text, int artifactDepth, List<TextAdjustment>? tjSegments, TextContent? pendingMerge)
     {

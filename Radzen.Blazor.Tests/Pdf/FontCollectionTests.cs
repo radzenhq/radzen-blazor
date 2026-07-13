@@ -24,7 +24,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 //  - Registering the same family twice: last registration wins (overwrite).
 //  - MeasureText(text, font) returns width in POINTS at font.Size: base-14 uses
 //    Base14Metrics.MeasureString; a registered sfnt font sums hmtx advances scaled by
-//    font.Size / UnitsPerEm. No kerning is applied by MeasureText (see SimpleShaperTests).
+//    font.Size / UnitsPerEm. Kerning is applied only when EnableKerning is true.
 //  - Unknown family (not base-14, not registered) => InvalidOperationException whose
 //    Message contains the offending family name.
 public class FontCollectionTests

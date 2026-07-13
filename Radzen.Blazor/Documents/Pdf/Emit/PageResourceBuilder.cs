@@ -186,9 +186,9 @@ internal static class PageResourceBuilder
     // Adds the fonts and image XObjects referenced by an overlay stream to a built
     // page's resources. Overlay keys use a distinct prefix so generated entries are
     // never clobbered.
-    public static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentWriter emitter)
+    public static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentResourceManifest manifest)
     {
-        var emitted = BuildResources(writer, emitter);
+        var emitted = BuildResources(writer, manifest);
         if (emitted is null)
         {
             return resources;
@@ -234,17 +234,17 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    public static DictionaryObject? BuildResources(DocumentWriter writer, ContentWriter emitter)
+    public static DictionaryObject? BuildResources(DocumentWriter writer, ContentResourceManifest manifest)
     {
         DictionaryObject? fonts = null;
-        foreach (var (baseFont, key) in emitter.Fonts)
+        foreach (var (baseFont, key) in manifest.Fonts)
         {
             fonts ??= new DictionaryObject();
             fonts[key] = Base14FontDictionary(baseFont);
         }
 
         DictionaryObject? xobjects = null;
-        foreach (var (key, image) in emitter.Images)
+        foreach (var (key, image) in manifest.Images)
         {
             xobjects ??= new DictionaryObject();
             if (image.SoftMask is { } mask)
@@ -256,7 +256,7 @@ internal static class PageResourceBuilder
         }
 
         DictionaryObject? patterns = null;
-        foreach (var (key, pattern) in emitter.Patterns)
+        foreach (var (key, pattern) in manifest.Patterns)
         {
             patterns ??= new DictionaryObject();
             patterns[key] = writer.Add(pattern);

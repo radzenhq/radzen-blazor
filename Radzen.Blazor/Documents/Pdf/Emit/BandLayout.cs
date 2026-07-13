@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -7,15 +6,7 @@ namespace Radzen.Documents.Pdf.Emit;
 // places whole at a running cursor and the band's Height is the final cursor.
 internal sealed class BandLayout
 {
-    public List<PositionedLine> Lines { get; } = [];
-
-    public List<PositionedImage> Images { get; } = [];
-
-    public List<PositionedCode> Codes { get; } = [];
-
-    public List<PositionedTableFragment> Tables { get; } = [];
-
-    public List<PositionedBox> Boxes { get; } = [];
+    public PageLayer Content { get; } = new();
 
     public double Height { get; set; }
 }
@@ -69,7 +60,7 @@ internal static class BandLayouter
             // a band never page-breaks, so the box places whole at the running cursor.
             var measured = OverlayBoxPlacer.MeasureBox(container, width, fonts, measureImage, resolution);
             var box = OverlayBoxPlacer.BuildBox(container, measured, width, Cursor, order++, transform: null);
-            result.Boxes.Add(box);
+            result.Content.Boxes.Add(box);
             Cursor += box.Bounds.Height;
             return default;
         }
@@ -80,7 +71,7 @@ internal static class BandLayouter
             var tableOrder = order++;
             foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
             {
-                result.Tables.Add(new PositionedTableFragment
+                result.Content.Tables.Add(new PositionedTableFragment
                 {
                     Layout = layout,
                     Fragment = fragment,
@@ -96,7 +87,7 @@ internal static class BandLayouter
         public override Nothing Visit(Image image, Nothing context)
         {
             var (imageWidth, imageHeight) = measureImage is null ? Paginator.MeasureImage(image, width) : measureImage(image, width);
-            result.Images.Add(new PositionedImage
+            result.Content.Images.Add(new PositionedImage
             {
                 Source = image,
                 Y = Cursor,
@@ -115,7 +106,7 @@ internal static class BandLayouter
         private Nothing VisitCode(Block block)
         {
             var (codeWidth, codeHeight) = Paginator.MeasureCode(block, resolution);
-            result.Codes.Add(new PositionedCode
+            result.Content.Codes.Add(new PositionedCode
             {
                 Source = block,
                 Y = Cursor,
@@ -136,7 +127,7 @@ internal static class BandLayouter
             var y = Cursor + paragraph.SpacingBefore.Point;
             foreach (var box in lines)
             {
-                result.Lines.Add(new PositionedLine { Line = box, Source = paragraph, Y = y });
+                result.Content.Lines.Add(new PositionedLine { Line = box, Source = paragraph, Y = y });
                 y += box.Height;
             }
 

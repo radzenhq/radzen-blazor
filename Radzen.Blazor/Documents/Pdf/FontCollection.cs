@@ -321,8 +321,8 @@ public sealed class FontCollection
     /// iterating Unicode codepoints. A registered family (matched by <see cref="Font.Name"/> and
     /// style) is measured from its hmtx advances with per-codepoint fallback; a base-14 font is
     /// measured from its WinAnsi widths, with fallback-served codepoints measured by the fallback
-    /// face and unmapped codepoints measured as the '?' substitute that emission draws. No
-    /// kerning is applied.
+    /// face and unmapped codepoints measured as the '?' substitute that emission draws. When
+    /// <see cref="EnableKerning"/> is enabled, registered and base-14 fonts apply kerning.
     /// </summary>
     /// <param name="text">The text to measure.</param>
     /// <param name="font">The font to measure with.</param>
