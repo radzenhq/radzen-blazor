@@ -61,10 +61,9 @@ public sealed class NumberObject : DocumentObject
     /// </summary>
     public double DoubleValue => IsInteger ? integerValue : realValue;
 
-    /// <inheritdoc />
     /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
     /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         if (!IsInteger && !double.IsFinite(realValue))
         {

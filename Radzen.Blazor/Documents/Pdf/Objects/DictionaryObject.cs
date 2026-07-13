@@ -59,8 +59,7 @@ public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<
     /// <returns><c>true</c> if the key is present; otherwise <c>false</c>.</returns>
     public bool TryGetValue(string key, out DocumentObject? value) => values.TryGetValue(key, out value);
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         PdfBytes.WriteAscii(stream, "<<");
         foreach (var key in keys)
@@ -68,7 +67,7 @@ public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<
             stream.WriteByte((byte)' ');
             NameObject.WriteEscaped(stream, key);
             stream.WriteByte((byte)' ');
-            values[key].Write(stream);
+            values[key].Write(stream, context);
         }
 
         PdfBytes.WriteAscii(stream, " >>");

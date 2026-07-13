@@ -8,19 +8,13 @@ namespace Radzen.Documents.Pdf.Objects.Encryption;
 /// Write-side counterpart of <see cref="StandardSecurityHandler"/>. Builds the
 /// <c>/Encrypt</c> dictionary for a chosen <see cref="EncryptionOptions"/> and
 /// encrypts each string and stream with its per-object key (ISO 32000-1
-/// algorithm 1). While an object is being serialized the active writer is held
-/// in a thread-static ambient so <see cref="StringObject"/> and
+/// algorithm 1). The active writer and current object number are passed
+/// explicitly via <see cref="WriteContext"/> so <see cref="StringObject"/> and
 /// <see cref="StreamObject"/> can route their bytes through it.
 /// </summary>
 internal sealed class EncryptionWriter(
     byte[] fileKey, EncryptionWriter.Method cipher, MaterialSequence material, bool encryptMetadata = true)
 {
-    [ThreadStatic]
-    private static EncryptionWriter? current;
-
-    [ThreadStatic]
-    private static int currentObjectNumber;
-
     private readonly byte[] fileKey = fileKey;
     private readonly Method cipher = cipher;
     private readonly MaterialSequence material = material;
@@ -32,10 +26,6 @@ internal sealed class EncryptionWriter(
         AesV2,
         AesV3,
     }
-
-    public static EncryptionWriter? Current => current;
-
-    public static int CurrentObjectNumber => currentObjectNumber;
 
     public static EncryptionWriter Build(
         EncryptionOptions options, byte[] documentId, MaterialSequence material, out DictionaryObject dictionary)
@@ -78,14 +68,6 @@ internal sealed class EncryptionWriter(
                 return new EncryptionWriter(derived.FileKey, Method.Rc4, material);
             }
         }
-    }
-
-    // Establishes the ambient writer for the duration of one indirect object.
-    public ObjectScope BeginObject(int objectNumber)
-    {
-        current = this;
-        currentObjectNumber = objectNumber;
-        return default;
     }
 
     public byte[] EncryptString(byte[] data, int objectNumber, int generation)
@@ -220,11 +202,5 @@ internal sealed class EncryptionWriter(
         }
 
         return result;
-    }
-
-    // Clears the ambient writer once an indirect object has been serialized.
-    internal readonly struct ObjectScope : IDisposable
-    {
-        public void Dispose() => current = null;
     }
 }

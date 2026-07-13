@@ -148,15 +148,10 @@ public sealed class DocumentWriter(Stream stream)
         PdfBytes.WriteAscii(buffer, " 0 obj\n");
 
         // The /Encrypt dictionary and the document /ID are never themselves encrypted.
-        if (encryption is not null && number != encryptNumber)
-        {
-            using var scope = encryption.BeginObject(number);
-            value.Write(buffer);
-        }
-        else
-        {
-            value.Write(buffer);
-        }
+        var context = encryption is not null && number != encryptNumber
+            ? new WriteContext(encryption, number, 0)
+            : WriteContext.None;
+        value.Write(buffer, context);
 
         PdfBytes.WriteAscii(buffer, "\nendobj\n");
         return offset;

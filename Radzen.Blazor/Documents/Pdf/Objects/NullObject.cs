@@ -7,8 +7,7 @@ namespace Radzen.Documents.Pdf.Objects;
 /// </summary>
 public sealed class NullObject : DocumentObject
 {
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         PdfBytes.WriteAscii(stream, "null");
     }

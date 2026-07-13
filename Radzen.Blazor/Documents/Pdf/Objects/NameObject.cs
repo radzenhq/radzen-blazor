@@ -22,8 +22,7 @@ public sealed class NameObject(string value) : DocumentObject
     /// </summary>
     public string Value { get; } = value;
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         WriteEscaped(stream, Value);
     }

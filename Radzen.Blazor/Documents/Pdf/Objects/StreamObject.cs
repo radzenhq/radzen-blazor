@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -32,16 +31,15 @@ public sealed class StreamObject : DocumentObject
     /// </summary>
     public DictionaryObject Dictionary { get; } = new();
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         var data = Data;
-        var encryptor = EncryptionWriter.Current;
+        var encryptor = context.Encryptor;
         if (encryptor is not null)
         {
             // Pass the dictionary so a /Type /Metadata stream is left plaintext when the
             // writer's /EncryptMetadata flag is false.
-            data = encryptor.EncryptStream(Data, EncryptionWriter.CurrentObjectNumber, 0, Dictionary);
+            data = encryptor.EncryptStream(Data, context.ObjectNumber, context.Generation, Dictionary);
         }
 
         PdfBytes.WriteAscii(stream, "<< /Length ");
@@ -57,7 +55,7 @@ public sealed class StreamObject : DocumentObject
             stream.WriteByte((byte)' ');
             NameObject.WriteEscaped(stream, key);
             stream.WriteByte((byte)' ');
-            Dictionary[key].Write(stream);
+            Dictionary[key].Write(stream, context);
         }
 
         PdfBytes.WriteAscii(stream, " >>\nstream\n");
