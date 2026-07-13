@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
 
@@ -175,9 +176,14 @@ internal sealed class XmpMetadata
         builder.Append("  </rdf:Description>\n");
     }
 
-    public StreamObject BuildStream()
+    public StreamObject BuildStream() => WrapPacket(BuildPacket());
+
+    // Wraps a (possibly amended) XMP packet as the /Metadata stream object. Shared
+    // so the conformance writer, which splices identification entries into the raw
+    // packet, produces a stream dictionary identical to BuildStream's.
+    public static StreamObject WrapPacket(byte[] packet)
     {
-        var stream = new StreamObject(BuildPacket());
+        var stream = new StreamObject(packet);
         stream.Dictionary["Type"] = new NameObject("Metadata");
         stream.Dictionary["Subtype"] = new NameObject("XML");
         return stream;
@@ -193,6 +199,12 @@ internal sealed class XmpMetadata
         var builder = new StringBuilder(value.Length);
         foreach (var ch in value)
         {
+            if (IsInvalidXmlChar(ch))
+            {
+                throw new InvalidDataException(
+                    $"XMP metadata value contains U+{(int)ch:X4}, which is not a legal XML 1.0 character; remove control characters from the document metadata.");
+            }
+
             switch (ch)
             {
                 case '&':
@@ -218,4 +230,10 @@ internal sealed class XmpMetadata
 
         return builder.ToString();
     }
+
+    // XML 1.0 Char production (2.2): tab, LF, CR, then U+0020..U+D7FF, U+E000..U+FFFD,
+    // U+10000..U+10FFFF. Surrogate code units pass through here; a lone surrogate is
+    // caught by UTF-8 encoding of the packet, valid pairs form a legal U+10000+ char.
+    private static bool IsInvalidXmlChar(char ch)
+        => ch < 0x20 ? ch is not ('\t' or '\n' or '\r') : ch is '\uFFFE' or '\uFFFF';
 }

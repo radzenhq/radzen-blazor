@@ -110,6 +110,47 @@ public class FacturXXmpExtensionSchemaTests
     }
 
     [Fact]
+    public void FacturX_Xmp_DeclaresProfileSetOnAttachment()
+    {
+        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(builder);
+        builder.Info.Title = "Invoice 42";
+        BuildTestSupport.AddText(builder.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
+
+        var attachment = builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        attachment.FacturX = new FacturXProfile
+        {
+            DocumentType = "INVOICE",
+            Version = "1.0",
+            ConformanceLevel = "EN 16931",
+        };
+
+        var reader = BuildTestSupport.Read(builder);
+        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+        var metadata = Assert.IsType<StreamObject>(reader.Resolve(catalog["Metadata"]));
+        var xmp = XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
+
+        XNamespace fx = FxNamespace;
+        var descriptions = xmp.Descendants(Rdf + "Description").ToList();
+        Assert.Equal("EN 16931",
+            descriptions.Select(d => Value(d, fx + "ConformanceLevel")).Single(v => v is not null));
+    }
+
+    [Fact]
+    public void FacturX_Xmp_ThrowsWhenAttachmentProfileFieldIsEmpty()
+    {
+        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(builder);
+        builder.Info.Title = "Invoice 42";
+        BuildTestSupport.AddText(builder.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
+
+        var attachment = builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        attachment.FacturX = new FacturXProfile { ConformanceLevel = "" };
+
+        Assert.Throws<InvalidOperationException>(() => BuildTestSupport.Read(builder));
+    }
+
+    [Fact]
     public void FacturX_Xmp_KeepsPdfaidAndFxValuesIntact()
     {
         var xmp = BuildMetadata();

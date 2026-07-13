@@ -28,6 +28,24 @@ public enum AttachmentRelationship
 }
 
 /// <summary>
+/// The Factur-X / ZUGFeRD profile of an embedded <c>factur-x.xml</c> invoice,
+/// written into the document XMP metadata (<c>fx:DocumentType</c>,
+/// <c>fx:Version</c>, <c>fx:ConformanceLevel</c>). Set it on the attachment so the
+/// XMP declares the invoice's real profile instead of the BASIC 1.0 defaults.
+/// </summary>
+public sealed class FacturXProfile
+{
+    /// <summary>Gets or sets the document type (<c>fx:DocumentType</c>), e.g. <c>INVOICE</c> or <c>ORDER</c>.</summary>
+    public string DocumentType { get; set; } = "INVOICE";
+
+    /// <summary>Gets or sets the standard version (<c>fx:Version</c>), e.g. <c>1.0</c>.</summary>
+    public string Version { get; set; } = "1.0";
+
+    /// <summary>Gets or sets the conformance level (<c>fx:ConformanceLevel</c>), e.g. <c>BASIC</c>, <c>EN 16931</c> or <c>EXTENDED</c>.</summary>
+    public string ConformanceLevel { get; set; } = "BASIC";
+}
+
+/// <summary>
 /// A file embedded into the produced PDF: name, payload, relationship and MIME type.
 /// </summary>
 public sealed class Attachment
@@ -68,6 +86,14 @@ public sealed class Attachment
     /// explicitly to record the real file timestamp.
     /// </summary>
     public DateTimeOffset ModificationDate { get; set; } = DefaultModificationDate;
+
+    /// <summary>
+    /// Gets or sets the Factur-X / ZUGFeRD profile declared in the document XMP for a
+    /// <c>factur-x.xml</c> attachment of a PDF/A document. When null the XMP declares
+    /// the BASIC 1.0 INVOICE defaults; set it to embed an EN 16931 or EXTENDED invoice.
+    /// Ignored for attachments not named <c>factur-x.xml</c>.
+    /// </summary>
+    public FacturXProfile? FacturX { get; set; }
 
     internal byte[] Data { get; }
 }
