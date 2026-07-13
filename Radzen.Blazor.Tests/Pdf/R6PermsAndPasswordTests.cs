@@ -1,5 +1,7 @@
 #nullable enable
+using System;
 using System.Text;
+using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
@@ -38,6 +40,44 @@ public class R6PermsAndPasswordTests
             () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
     }
 
+    [Fact]
+    public void MissingPerms_UserPasswordAuthenticates()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions, includePerms: false);
+
+        Assert.True(new StandardSecurityHandler(encrypt, DocumentId, "secret").IsUserPassword);
+    }
+
+    [Fact]
+    public void ShortPerms_Throws()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions);
+        encrypt["Perms"] = Str(new byte[15]);
+
+        Assert.Throws<DocumentParseException>(
+            () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
+    }
+
+    [Fact]
+    public void PermsWrongFixedBytes_Throws()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions);
+        RewritePerms(encrypt, decoded => decoded[4] = 0);
+
+        Assert.Throws<DocumentParseException>(
+            () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
+    }
+
+    [Fact]
+    public void PermsMetadataFlagMismatch_Throws()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions);
+        RewritePerms(encrypt, decoded => decoded[8] = (byte)'F');
+
+        Assert.Throws<DocumentParseException>(
+            () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
+    }
+
     // #72: "cafe"+acute as a single composed codepoint (U+00E9) and as "e" + combining
     // acute (U+0301) are the same password after NFKC; either form must open a file
     // whose key was derived from the other.
@@ -53,14 +93,14 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
-    private static DictionaryObject BuildEncrypt(string userPassword, string ownerPassword, int permissions)
+    private static DictionaryObject BuildEncrypt(string userPassword, string ownerPassword, int permissions, bool includePerms = true)
     {
         var (owner, user, ownerEncrypted, userEncrypted, perms) = StandardSecurityHandler.DeriveAes256(
             userPassword, ownerPassword, FileKey, permissions, encryptMetadata: true,
             userValidation: Fixed(8, 1), userKeySalt: Fixed(8, 2),
             ownerValidation: Fixed(8, 4), ownerKeySalt: Fixed(8, 5), permsNoise: Fixed(4, 6));
 
-        return new DictionaryObject
+        var encrypt = new DictionaryObject
         {
             ["V"] = new NumberObject(5),
             ["R"] = new NumberObject(6),
@@ -69,11 +109,25 @@ public class R6PermsAndPasswordTests
             ["U"] = Str(user),
             ["OE"] = Str(ownerEncrypted),
             ["UE"] = Str(userEncrypted),
-            ["Perms"] = Str(perms),
         };
+
+        if (includePerms)
+        {
+            encrypt["Perms"] = Str(perms);
+        }
+
+        return encrypt;
     }
 
     private static StringObject Str(byte[] bytes) => new(Encoding.Latin1.GetString(bytes));
+
+    private static void RewritePerms(DictionaryObject encrypt, Action<byte[]> rewrite)
+    {
+        var encrypted = Encoding.Latin1.GetBytes(Assert.IsType<StringObject>(encrypt["Perms"]).Value);
+        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, new byte[16], encrypted);
+        rewrite(decoded);
+        encrypt["Perms"] = Str(AesCbc.EncryptCbcNoPadding(FileKey, new byte[16], decoded));
+    }
 
     private static byte[] Fixed(int length, int seed)
     {

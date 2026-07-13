@@ -79,6 +79,11 @@ internal sealed class DocumentRepairer(
                 var member = container.Members[index];
                 if (!entries.ContainsKey(member.Number))
                 {
+                    if (entries.Count >= limits.MaxXrefEntries)
+                    {
+                        throw new DocumentParseException("Recovered cross-reference table exceeds the maximum number of entries.", -1);
+                    }
+
                     entries[member.Number] = new DocumentReader.XrefEntry(2, number, index);
                     if (member.Number > maxNumber)
                     {
@@ -230,6 +235,11 @@ internal sealed class DocumentRepairer(
             if (after < data.Length && !Lexer.IsWhitespace(data[after]) && !Lexer.IsDelimiter(data[after]))
             {
                 continue;
+            }
+
+            if (!map.ContainsKey(objectNumber) && map.Count >= limits.MaxXrefEntries)
+            {
+                throw new DocumentParseException("Recovered cross-reference table exceeds the maximum number of entries.", -1);
             }
 
             map[objectNumber] = i;

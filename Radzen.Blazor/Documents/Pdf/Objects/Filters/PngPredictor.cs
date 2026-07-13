@@ -25,6 +25,11 @@ internal static class PngPredictor
 
         int rowLength = (int)rowLengthLong;
         int stride = rowLength + 1;
+        if (data.Length % stride != 0)
+        {
+            throw new DocumentParseException("PNG predictor data contains a partial row.");
+        }
+
         int rows = data.Length / stride;
         var output = new byte[rows * rowLength];
 

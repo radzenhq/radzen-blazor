@@ -106,7 +106,13 @@ public sealed class DocumentReader
     {
         ArgumentNullException.ThrowIfNull(data);
         ArgumentNullException.ThrowIfNull(limits);
-        var reader = new DocumentReader(data, limits);
+        var snapshot = limits.Snapshot();
+        if (data.LongLength > snapshot.MaxFileBytes)
+        {
+            throw new DocumentParseException("Maximum file size exceeded.", -1);
+        }
+
+        var reader = new DocumentReader(data, snapshot);
         reader.Load();
         reader.InitializeSecurity(password);
         return reader;
@@ -127,16 +133,28 @@ public sealed class DocumentReader
     /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
     /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(Stream stream, string? password)
+        => Parse(stream, password, ReaderLimits.Default);
+
+    /// <summary>
+    /// Parses a PDF document from a stream with resource limits.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
+    /// <param name="limits">The resource limits to enforce while reading.</param>
+    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
+    public static DocumentReader Parse(Stream stream, string? password, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        return Parse(ReadFully(stream), password);
+        ArgumentNullException.ThrowIfNull(limits);
+        var snapshot = limits.Snapshot();
+        return Parse(ReadFully(stream, snapshot.MaxFileBytes), password, snapshot);
     }
 
     // A seekable stream is read straight into an exact-size buffer (one copy); a
     // non-seekable stream grows a pooled buffer and is copied out once. Either way the
     // document is never held in two full-size buffers at the same time, which matters
     // for large files under a constrained (WASM) heap.
-    private static byte[] ReadFully(Stream stream)
+    private static byte[] ReadFully(Stream stream, long maxFileBytes)
     {
         if (stream.CanSeek)
         {
@@ -146,14 +164,84 @@ public sealed class DocumentReader
                 remaining = 0;
             }
 
+            if (remaining > maxFileBytes || remaining > int.MaxValue)
+            {
+                throw new DocumentParseException("Maximum file size exceeded.", -1);
+            }
+
             var buffer = new byte[remaining];
             stream.ReadExactly(buffer, 0, buffer.Length);
             return buffer;
         }
 
         using var pooled = new PooledBufferStream();
-        stream.CopyTo(pooled);
+        var chunk = new byte[81920];
+        long total = 0;
+        int read;
+        while ((read = stream.Read(chunk, 0, chunk.Length)) > 0)
+        {
+            try
+            {
+                total = checked(total + read);
+            }
+            catch (OverflowException)
+            {
+                throw new DocumentParseException("Maximum file size exceeded.", -1);
+            }
+
+            if (total > maxFileBytes || total > int.MaxValue)
+            {
+                throw new DocumentParseException("Maximum file size exceeded.", -1);
+            }
+
+            pooled.Write(chunk, 0, read);
+        }
+
         return pooled.ToArray();
+    }
+
+    internal DictionaryObject? ReconstructCatalogWithPages()
+    {
+        var catalog = FindCatalogWithPages();
+        if (catalog is not null)
+        {
+            return catalog;
+        }
+
+        trailer = repairer.Repair();
+        return FindCatalogWithPages();
+    }
+
+    private DictionaryObject? FindCatalogWithPages()
+    {
+        var numbers = new List<int>(entries.Keys);
+        numbers.Sort();
+        numbers.Reverse();
+        foreach (var number in numbers)
+        {
+            DictionaryObject? candidate;
+            try
+            {
+                candidate = GetObject(number) as DictionaryObject;
+            }
+            catch (DocumentParseException)
+            {
+                continue;
+            }
+
+            if (candidate is not null
+                && candidate.TryGetValue("Type", out var type)
+                && type is NameObject name
+                && string.Equals(name.Value, "Catalog", StringComparison.Ordinal)
+                && candidate.TryGetValue("Pages", out var pages)
+                && pages is not null
+                && Resolve(pages) is DictionaryObject)
+            {
+                return candidate;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

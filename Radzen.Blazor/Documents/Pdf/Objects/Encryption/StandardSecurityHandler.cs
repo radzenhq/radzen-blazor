@@ -28,6 +28,7 @@ internal sealed class StandardSecurityHandler
     private readonly byte[] ownerEncrypted;
     private readonly byte[] userEncrypted;
     private readonly byte[] permsEntry;
+    private readonly bool hasPermsEntry;
     private readonly byte[] documentId;
     private readonly int permissions;
     private readonly int keyLength;
@@ -54,6 +55,7 @@ internal sealed class StandardSecurityHandler
         userEntry = GetStringBytes(encrypt, "U") ?? [];
         ownerEncrypted = GetStringBytes(encrypt, "OE") ?? [];
         userEncrypted = GetStringBytes(encrypt, "UE") ?? [];
+        hasPermsEntry = encrypt.TryGetValue("Perms", out _);
         permsEntry = GetStringBytes(encrypt, "Perms") ?? [];
         encryptMetadata = !(encrypt.TryGetValue("EncryptMetadata", out var meta)
             && meta is BooleanObject flag && !flag.Value);
@@ -318,17 +320,20 @@ internal sealed class StandardSecurityHandler
     }
 
     // ISO 32000-2 algorithm 13: decrypt /Perms with the file key (a single AES-256 ECB
-    // block, i.e. CBC with a zero IV) and confirm the 'adb' magic plus that the embedded
-    // /P equals the declared /P. A tampered /P that grants extra permissions would
-    // otherwise authenticate cleanly; fail loud on the mismatch.
+    // block, i.e. CBC with a zero IV) and validate its fixed permission binding.
     private void VerifyPerms()
     {
-        if (permsEntry.Length < 16)
+        if (!hasPermsEntry)
         {
             return;
         }
 
-        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry[..16]);
+        if (permsEntry.Length != 16)
+        {
+            throw new DocumentParseException("Encryption /Perms must be exactly 16 bytes.");
+        }
+
+        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry);
         if (decoded[9] != (byte)'a' || decoded[10] != (byte)'d' || decoded[11] != (byte)'b')
         {
             throw new DocumentParseException("Encryption /Perms block failed its integrity check.");
@@ -338,6 +343,17 @@ internal sealed class StandardSecurityHandler
         if (embedded != permissions)
         {
             throw new DocumentParseException("Encryption /Perms permissions do not match /P.");
+        }
+
+        if (decoded[4] != 0xFF || decoded[5] != 0xFF || decoded[6] != 0xFF || decoded[7] != 0xFF)
+        {
+            throw new DocumentParseException("Encryption /Perms reserved bytes are invalid.");
+        }
+
+        var metadataFlag = encryptMetadata ? (byte)'T' : (byte)'F';
+        if (decoded[8] != metadataFlag)
+        {
+            throw new DocumentParseException("Encryption /Perms metadata flag does not match /EncryptMetadata.");
         }
     }
 
