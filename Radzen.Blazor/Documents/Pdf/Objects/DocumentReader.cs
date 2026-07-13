@@ -1,5 +1,4 @@
 using Radzen.Documents.Pdf.Objects.Encryption;
-using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,8 +29,8 @@ public sealed class DocumentReader
     private readonly NullObject nullObject = new();
     private DictionaryObject trailer = new();
     private readonly HashSet<int> parsing = [];
-    private Dictionary<int, long>? scanned;
-    private int[]? endstreamOffsets;
+    private readonly StreamDecoder decoder;
+    private readonly DocumentRepairer repairer;
     private StandardSecurityHandler? security;
     private int encryptObjectNumber = -1;
 
@@ -39,6 +38,9 @@ public sealed class DocumentReader
     {
         this.data = data;
         this.limits = limits;
+        decoder = new StreamDecoder(limits, Resolve);
+        repairer = new DocumentRepairer(
+            data, limits, entries, cache, objectStreams, GetObject, IsObjectStream, GetObjectStream);
     }
 
     /// <summary>
@@ -312,7 +314,7 @@ public sealed class DocumentReader
         }
         catch (Exception exception) when (IsRecoverableParseFailure(exception))
         {
-            Repair();
+            trailer = repairer.Repair();
         }
     }
 
@@ -441,7 +443,7 @@ public sealed class DocumentReader
     private DictionaryObject ParseXrefStream(StreamObject stream)
     {
         var dict = stream.Dictionary;
-        var decoded = DecodeStreamData(dict, stream.Data);
+        var decoded = decoder.Decode(dict, stream.Data);
 
         var widths = (ArrayObject)dict["W"];
         var w0 = ((NumberObject)widths[0]).IntValue;
@@ -541,7 +543,7 @@ public sealed class DocumentReader
             return value!;
         }
 
-        var offsets = ScannedOffsets();
+        var offsets = repairer.ScannedOffsets();
         if (offsets.TryGetValue(number, out var recovered) && recovered != offset
             && TryParseObjectAt(recovered, number, out value, out generation))
         {
@@ -610,7 +612,7 @@ public sealed class DocumentReader
             throw new DocumentParseException("Object stream is not a stream.", -1);
         }
 
-        var decoded = DecodeStreamData(stream.Dictionary, stream.Data);
+        var decoded = decoder.Decode(stream.Dictionary, stream.Data);
         var count = ((NumberObject)stream.Dictionary["N"]).IntValue;
         var first = ((NumberObject)stream.Dictionary["First"]).IntValue;
 
@@ -731,7 +733,7 @@ public sealed class DocumentReader
         var length = ResolveLength(dictionary);
         if (length < 0 || dataStart + (long)length > data.Length)
         {
-            length = RecoverStreamLength(dataStart);
+            length = repairer.RecoverStreamLength(dataStart);
         }
 
         var payload = new byte[length];
@@ -743,69 +745,6 @@ public sealed class DocumentReader
         }
 
         return stream;
-    }
-
-    // A wrong /Length (negative or past the end of the file) falls back to the nearest
-    // "endstream" keyword at or after the payload start. The keyword positions are
-    // precomputed in a single pass and binary-searched, so a hostile file full of streams
-    // with bogus lengths cannot force a quadratic per-stream scan to end-of-file.
-    private int RecoverStreamLength(int dataStart)
-    {
-        var offsets = EndstreamOffsets();
-        var lo = 0;
-        var hi = offsets.Length;
-        while (lo < hi)
-        {
-            var mid = (lo + hi) / 2;
-            if (offsets[mid] < dataStart)
-            {
-                lo = mid + 1;
-            }
-            else
-            {
-                hi = mid;
-            }
-        }
-
-        if (lo >= offsets.Length)
-        {
-            throw new DocumentParseException("Invalid stream length.", dataStart);
-        }
-
-        var end = offsets[lo];
-        if (end > dataStart && data[end - 1] == 10)
-        {
-            end--;
-        }
-
-        if (end > dataStart && data[end - 1] == 13)
-        {
-            end--;
-        }
-
-        return end - dataStart;
-    }
-
-    private int[] EndstreamOffsets()
-    {
-        if (endstreamOffsets is not null)
-        {
-            return endstreamOffsets;
-        }
-
-        const string keyword = "endstream";
-        var offsets = new List<int>();
-        for (var i = 0; i <= data.Length - keyword.Length; i++)
-        {
-            if (Matches(i, keyword))
-            {
-                offsets.Add(i);
-                i += keyword.Length - 1;
-            }
-        }
-
-        endstreamOffsets = [.. offsets];
-        return endstreamOffsets;
     }
 
     private int ResolveLength(DictionaryObject dictionary)
@@ -852,362 +791,8 @@ public sealed class DocumentReader
     public byte[] DecodeStream(StreamObject stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        return DecodeStreamData(stream.Dictionary, stream.Data);
+        return decoder.Decode(stream.Dictionary, stream.Data);
     }
-
-    private byte[] DecodeStreamData(DictionaryObject dictionary, byte[] data)
-    {
-        var filter = dictionary.TryGetValue("Filter", out var filterObject) && filterObject is not null
-            ? Resolve(filterObject)
-            : null;
-        var names = FilterNames(filter);
-        if (names.Count == 0)
-        {
-            return data;
-        }
-
-        if (names.Count > limits.MaxFilterChainLength)
-        {
-            throw new DocumentParseException("Filter chain exceeds the maximum length.", -1);
-        }
-
-        var parms = FilterParms(dictionary, names.Count);
-        var result = data;
-        var inputLength = data.Length;
-        for (var i = 0; i < names.Count; i++)
-        {
-            result = ApplyFilter(names[i], result, parms[i], limits.MaxDecodedStreamBytes);
-
-            // Cumulative per-stream cap plus a secondary expansion-ratio check that
-            // only engages once output clears the floor, so small streams are never
-            // rejected for a high ratio on tiny input.
-            if (result.LongLength > limits.MaxDecodedStreamBytes)
-            {
-                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
-            }
-
-            if (result.LongLength > limits.ExpansionRatioFloorBytes
-                && inputLength > 0
-                && result.LongLength / inputLength > limits.MaxDecodeExpansionRatio)
-            {
-                throw new DocumentParseException("Decoded stream expansion ratio exceeds the maximum.", -1);
-            }
-        }
-
-        return result;
-    }
-
-    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput) => name switch
-    {
-        "FlateDecode" or "Fl" => ApplyPredictor(FlateFilter.Decode(data, maxOutput), parms),
-        "LZWDecode" or "LZW" => ApplyPredictor(
-            LzwFilter.Decode(data, parms is not null ? ParmInt(parms, "EarlyChange", 1) : 1, maxOutput), parms),
-        "RunLengthDecode" or "RL" => RunLengthFilter.Decode(data, maxOutput),
-        "ASCIIHexDecode" or "AHx" => AsciiHexFilter.Decode(data),
-        "ASCII85Decode" or "A85" => Ascii85Filter.Decode(data, maxOutput),
-        _ => throw new DocumentParseException($"Unsupported stream filter '{name}'.", -1),
-    };
-
-    private static byte[] ApplyPredictor(byte[] data, DictionaryObject? parms)
-    {
-        if (parms is null)
-        {
-            return data;
-        }
-
-        var predictor = ParmInt(parms, "Predictor", 1);
-        if (predictor <= 1)
-        {
-            return data;
-        }
-
-        var columns = ParmInt(parms, "Columns", 1);
-        var colors = ParmInt(parms, "Colors", 1);
-        var bits = ParmInt(parms, "BitsPerComponent", 8);
-        if (predictor >= 10)
-        {
-            return PngPredictor.Decode(data, colors, bits, columns);
-        }
-
-        return predictor == 2 ? TiffPredictor.Decode(data, colors, bits, columns) : data;
-    }
-
-    private static int ParmInt(DictionaryObject parms, string key, int fallback)
-        => parms.TryGetValue(key, out var value) && value is NumberObject number ? number.IntValue : fallback;
-
-    private List<string> FilterNames(DocumentObject? filter)
-    {
-        var names = new List<string>();
-        if (filter is NameObject name)
-        {
-            names.Add(name.Value);
-        }
-        else if (filter is ArrayObject array)
-        {
-            foreach (var item in array)
-            {
-                if (Resolve(item) is NameObject entryName)
-                {
-                    names.Add(entryName.Value);
-                }
-            }
-        }
-
-        return names;
-    }
-
-    private List<DictionaryObject?> FilterParms(DictionaryObject dictionary, int count)
-    {
-        var parms = new List<DictionaryObject?>(count);
-        DocumentObject? source = null;
-        if (dictionary.TryGetValue("DecodeParms", out var direct))
-        {
-            source = direct;
-        }
-        else if (dictionary.TryGetValue("DP", out var abbreviated))
-        {
-            source = abbreviated;
-        }
-
-        if (source is not null)
-        {
-            source = Resolve(source);
-        }
-
-        if (source is ArrayObject array)
-        {
-            for (var i = 0; i < count; i++)
-            {
-                parms.Add(i < array.Count ? Resolve(array[i]) as DictionaryObject : null);
-            }
-        }
-        else
-        {
-            parms.Add(source as DictionaryObject);
-            for (var i = 1; i < count; i++)
-            {
-                parms.Add(null);
-            }
-        }
-
-        return parms;
-    }
-
-    private void Repair()
-    {
-        entries.Clear();
-        cache.Clear();
-        objectStreams.Clear();
-
-        var offsets = ScannedOffsets();
-        if (offsets.Count == 0)
-        {
-            throw new DocumentParseException("No recoverable objects found.", -1);
-        }
-
-        var maxNumber = 0;
-        foreach (var pair in offsets)
-        {
-            entries[pair.Key] = new XrefEntry(1, pair.Value, 0);
-            if (pair.Key > maxNumber)
-            {
-                maxNumber = pair.Key;
-            }
-        }
-
-        // The header scan only sees each ObjStm container's "N G obj"; register
-        // type-2 entries for its members so compressed objects and /Root resolve.
-        foreach (var number in new List<int>(entries.Keys))
-        {
-            if (!IsObjectStream(number))
-            {
-                continue;
-            }
-
-            ObjectStream container;
-            try
-            {
-                container = GetObjectStream(number);
-            }
-            catch (DocumentParseException)
-            {
-                continue;
-            }
-
-            for (var index = 0; index < container.Members.Count; index++)
-            {
-                var member = container.Members[index];
-                if (!entries.ContainsKey(member.Number))
-                {
-                    entries[member.Number] = new XrefEntry(2, number, index);
-                    if (member.Number > maxNumber)
-                    {
-                        maxNumber = member.Number;
-                    }
-                }
-            }
-        }
-
-        trailer = new DictionaryObject();
-
-        // Newest catalog wins: scan object numbers in descending order so a stale
-        // catalog left behind by an incremental update never shadows the current one.
-        var numbers = new List<int>(entries.Keys);
-        numbers.Sort();
-        numbers.Reverse();
-        foreach (var number in numbers)
-        {
-            DictionaryObject? dictionary = null;
-            try
-            {
-                var obj = GetObject(number);
-                dictionary = obj as DictionaryObject ?? (obj as StreamObject)?.Dictionary;
-            }
-            catch (DocumentParseException)
-            {
-                continue;
-            }
-
-            if (dictionary is not null && dictionary.TryGetValue("Type", out var type)
-                && type is NameObject name && string.Equals(name.Value, "Catalog", StringComparison.Ordinal))
-            {
-                trailer["Root"] = new ReferenceObject(number, 0);
-                break;
-            }
-        }
-
-        trailer["Size"] = new NumberObject(maxNumber + 1);
-
-        var preserved = FindRawTrailer();
-        if (preserved is not null)
-        {
-            foreach (var key in (string[])["Encrypt", "ID", "Info"])
-            {
-                if (preserved.TryGetValue(key, out var value) && value is not null)
-                {
-                    trailer[key] = value;
-                }
-            }
-
-            if (!trailer.TryGetValue("Root", out var root) || root is null)
-            {
-                if (preserved.TryGetValue("Root", out var preservedRoot) && preservedRoot is not null)
-                {
-                    trailer["Root"] = preservedRoot;
-                }
-            }
-        }
-    }
-
-    // Locates the last parseable trailer dictionary in the raw bytes so a
-    // repaired document keeps /Encrypt, /ID and /Info.
-    private DictionaryObject? FindRawTrailer()
-    {
-        const string pattern = "trailer";
-        for (var i = data.Length - pattern.Length; i >= 0; i--)
-        {
-            if (!Matches(i, pattern))
-            {
-                continue;
-            }
-
-            try
-            {
-                if (ObjectParser.Parse(data, i + pattern.Length, limits) is DictionaryObject dictionary)
-                {
-                    return dictionary;
-                }
-            }
-            catch (DocumentParseException)
-            {
-            }
-        }
-
-        return null;
-    }
-
-    private Dictionary<int, long> ScannedOffsets()
-    {
-        scanned ??= ScanObjects();
-        return scanned;
-    }
-
-    private Dictionary<int, long> ScanObjects()
-    {
-        var map = new Dictionary<int, long>();
-        for (var i = 0; i < data.Length; i++)
-        {
-            if (!IsDigit(data[i]))
-            {
-                continue;
-            }
-
-            if (i > 0 && !Lexer.IsWhitespace(data[i - 1]) && !Lexer.IsDelimiter(data[i - 1]))
-            {
-                continue;
-            }
-
-            var p = i;
-            while (p < data.Length && IsDigit(data[p]))
-            {
-                p++;
-            }
-
-            if (!int.TryParse(Encoding.Latin1.GetString(data, i, p - i),
-                NumberStyles.None, CultureInfo.InvariantCulture, out var objectNumber))
-            {
-                continue;
-            }
-
-            var afterNumber = p;
-            p = SkipSpaces(p);
-            if (p == afterNumber)
-            {
-                continue;
-            }
-
-            var genStart = p;
-            while (p < data.Length && IsDigit(data[p]))
-            {
-                p++;
-            }
-
-            if (p == genStart)
-            {
-                continue;
-            }
-
-            var afterGen = p;
-            p = SkipSpaces(p);
-            if (p == afterGen || !Matches(p, "obj"))
-            {
-                continue;
-            }
-
-            var after = p + 3;
-            if (after < data.Length && !Lexer.IsWhitespace(data[after]) && !Lexer.IsDelimiter(data[after]))
-            {
-                continue;
-            }
-
-            map[objectNumber] = i;
-            i = p + 2;
-        }
-
-        return map;
-    }
-
-    private int SkipSpaces(int index)
-    {
-        while (index < data.Length && Lexer.IsWhitespace(data[index]))
-        {
-            index++;
-        }
-
-        return index;
-    }
-
-    private static bool IsDigit(byte b) => b >= (byte)'0' && b <= (byte)'9';
 
     private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
 
@@ -1241,7 +826,7 @@ public sealed class DocumentReader
         return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
     }
 
-    private readonly struct XrefEntry(byte type, long field2, long field3)
+    internal readonly struct XrefEntry(byte type, long field2, long field3)
     {
         public XrefEntry(int type, long field2, long field3)
             : this((byte)type, field2, field3)
@@ -1257,7 +842,7 @@ public sealed class DocumentReader
         public bool InUse => Type != 0;
     }
 
-    private sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMember> members)
+    internal sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMember> members)
     {
         public byte[] Data { get; } = data;
 
@@ -1266,7 +851,7 @@ public sealed class DocumentReader
         public List<ObjectStreamMember> Members { get; } = members;
     }
 
-    private readonly struct ObjectStreamMember(int number, int offset)
+    internal readonly struct ObjectStreamMember(int number, int offset)
     {
         public int Number { get; } = number;
 
