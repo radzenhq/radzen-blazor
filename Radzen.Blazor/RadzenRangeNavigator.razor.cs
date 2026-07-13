@@ -56,6 +56,14 @@ namespace Radzen.Blazor
         public string? HandleLabelFormatString { get; set; }
 
         /// <summary>
+        /// Gets or sets a formatter function that formats the handle label values.
+        /// Receives a <see cref="DateTime" /> for date ranges or a <see cref="double" /> for numeric ranges.
+        /// Takes precedence over <see cref="HandleLabelFormatString" /> when set.
+        /// </summary>
+        [Parameter]
+        public Func<object, string>? HandleLabelFormatter { get; set; }
+
+        /// <summary>
         /// Gets or sets whether an axis with tick labels is displayed below the navigator.
         /// </summary>
         [Parameter]
@@ -303,8 +311,19 @@ namespace Radzen.Blazor
             if (CategoryScale is DateScale)
             {
                 var date = new DateTime((long)value);
+
+                if (HandleLabelFormatter != null)
+                {
+                    return HandleLabelFormatter(date);
+                }
+
                 var format = HandleLabelFormatString ?? "{0:MM/dd/yyyy}";
                 return string.Format(CultureInfo.InvariantCulture, format, date);
+            }
+
+            if (HandleLabelFormatter != null)
+            {
+                return HandleLabelFormatter(value);
             }
 
             var format2 = HandleLabelFormatString ?? "{0:N0}";

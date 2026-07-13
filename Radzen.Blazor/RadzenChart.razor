@@ -80,6 +80,7 @@
         EndChanged="@(async end => await OnRangeNavigatorViewChanged(ZoomStart, end))"
         ShowHandleLabels="@RangeNavigator.ShowHandleLabels"
         HandleLabelFormatString="@RangeNavigator.HandleLabelFormatString"
+        HandleLabelFormatter="@RangeNavigator.HandleLabelFormatter"
         Style="@($"height: {RangeNavigator.Height.ToInvariantString()}px; margin-top: 0.5rem; margin-inline-start: {MarginLeft.ToInvariantString()}px; margin-inline-end: {MarginRight.ToInvariantString()}px;")">
         @RangeNavigator.ChildContent
     </RadzenRangeNavigator>

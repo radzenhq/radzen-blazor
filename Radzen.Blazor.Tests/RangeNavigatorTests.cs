@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using Bunit;
 using Xunit;
 using static Radzen.Blazor.Tests.ChartTestHelper;
@@ -94,6 +96,68 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(component.Instance.ShowHandleLabels);
             Assert.True(component.Instance.ShowAxis);
+        }
+
+        [Fact]
+        public void RangeNavigator_HandleLabelFormatter_FormatsNumericValues()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            {
+                parameters.Add(p => p.HandleLabelFormatter, value => $"#{value}");
+                parameters.Add(p => p.HandleLabelFormatString, "{0:N2}");
+            });
+
+            component.Instance.CategoryScale = new LinearScale
+            {
+                Input = new ScaleRange { Start = 0, End = 100 }
+            };
+
+            Assert.Equal("#50", component.Instance.GetHandleLabel(0.5));
+        }
+
+        [Fact]
+        public void RangeNavigator_HandleLabelFormatter_ReceivesDateTimeForDateScale()
+        {
+            using var ctx = CreateChartContext();
+
+            var start = new DateTime(2024, 1, 1);
+            var end = new DateTime(2024, 12, 31);
+
+            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            {
+                parameters.Add(p => p.HandleLabelFormatter, value =>
+                {
+                    var date = (DateTime)value;
+                    return date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                });
+            });
+
+            component.Instance.CategoryScale = new DateScale
+            {
+                Input = new ScaleRange { Start = start.Ticks, End = end.Ticks }
+            };
+
+            Assert.Equal("2024-01-01", component.Instance.GetHandleLabel(0));
+        }
+
+        [Fact]
+        public void RangeNavigator_HandleLabelFormatString_UsedWhenNoFormatter()
+        {
+            using var ctx = CreateChartContext();
+
+            var component = ctx.RenderComponent<RadzenRangeNavigator>(parameters =>
+            {
+                parameters.Add(p => p.HandleLabelFormatString, "{0:N2}");
+            });
+
+            component.Instance.CategoryScale = new LinearScale
+            {
+                Input = new ScaleRange { Start = 0, End = 100 }
+            };
+
+            Assert.Equal("50.00", component.Instance.GetHandleLabel(0.5));
         }
     }
 }

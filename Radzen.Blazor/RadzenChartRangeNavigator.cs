@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
@@ -46,6 +47,15 @@ namespace Radzen.Blazor
         /// <value>The handle label format string.</value>
         [Parameter]
         public string? HandleLabelFormatString { get; set; }
+
+        /// <summary>
+        /// Gets or sets a formatter function that formats the handle label values.
+        /// Receives a <see cref="DateTime" /> for date ranges or a <see cref="double" /> for numeric ranges.
+        /// Takes precedence over <see cref="HandleLabelFormatString" /> when set.
+        /// </summary>
+        /// <value>The handle label formatter.</value>
+        [Parameter]
+        public Func<object, string>? HandleLabelFormatter { get; set; }
 
         /// <summary>
         /// Gets or sets the child content. Used to declare <see cref="RadzenRangeNavigatorLineSeries{TItem}" /> preview series.
