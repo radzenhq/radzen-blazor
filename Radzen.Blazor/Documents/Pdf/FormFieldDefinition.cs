@@ -14,7 +14,9 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class FormFieldDefinition
 {
-    private protected FormFieldDefinition(string name)
+    /// <summary>Initializes the shared field state with the given field name.</summary>
+    /// <param name="name">The field name (<c>/T</c>); must not be null or empty.</param>
+    protected FormFieldDefinition(string name)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         Name = name;
@@ -38,24 +40,38 @@ public abstract class FormFieldDefinition
     /// <summary>Gets or sets the height of the field rectangle.</summary>
     public Unit Height { get; set; }
 
-    // Draws this field's flattened static appearance onto its page (the redraw a viewer
-    // would otherwise generate from /V), replacing the per-type dispatch in FormWriter.
-    internal abstract void WriteFlattenedContent(Page page);
+    /// <summary>
+    /// Draws this field's flattened static appearance onto <paramref name="page"/> (the redraw a
+    /// viewer would otherwise generate from <c>/V</c>) when the form is flattened.
+    /// </summary>
+    /// <param name="page">The page carrying the field.</param>
+    protected internal abstract void WriteFlattenedContent(Page page);
 
-    // The (value, font) a text-bearing field renders, used to seed the created form's
-    // /DR fonts and /NeedAppearances; null for a field that carries no such text.
-    internal virtual (string Value, Font Font)? TextAppearance => null;
+    /// <summary>
+    /// Gets the value and font a text-bearing field renders, used to seed the created form's
+    /// <c>/DR</c> fonts and <c>/NeedAppearances</c>; <c>null</c> for a field that carries no such text.
+    /// </summary>
+    protected internal virtual (string Value, Font Font)? TextAppearance => null;
 
-    // Emits this definition as one or more field/widget annotations on save, adding each
-    // to the AcroForm fields list and to the created page bindings. The common single-widget
-    // scaffolding lives here; per-type entries go through PopulateWidget, and a field with a
-    // different structure (a radio group) overrides this outright.
-    internal virtual void EmitCreatedField(
+    /// <summary>
+    /// Emits this definition as one or more field/widget annotations on save, adding each to
+    /// <paramref name="fields"/> (the AcroForm field list) and to <paramref name="created"/> (the
+    /// per-page widget bindings). The base emits a single widget whose type-specific entries come
+    /// from <see cref="PopulateWidget"/>; a field with a different structure overrides this outright.
+    /// </summary>
+    /// <param name="writer">The document writer that assigns object references.</param>
+    /// <param name="pageReference">The reference to the page the field is placed on.</param>
+    /// <param name="fields">The AcroForm field list to append this field to.</param>
+    /// <param name="created">The per-page widget bindings to append created widgets to.</param>
+    protected internal virtual void EmitCreatedField(
         DocumentWriter writer,
         ReferenceObject pageReference,
         List<DocumentObject> fields,
         List<(int, ReferenceObject)> created)
     {
+        ArgumentNullException.ThrowIfNull(writer);
+        ArgumentNullException.ThrowIfNull(fields);
+        ArgumentNullException.ThrowIfNull(created);
         var x = X.Point;
         var y = Y.Point;
         var width = Width.Point;
@@ -83,9 +99,15 @@ public abstract class FormFieldDefinition
         created.Add((PageIndex, reference));
     }
 
-    // Stamps the type-specific /FT, /V, /DA, appearance and flag entries onto the shared
-    // widget dictionary. No-op on the base; each single-widget field type overrides it.
-    private protected virtual void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
+    /// <summary>
+    /// Stamps the type-specific <c>/FT</c>, <c>/V</c>, <c>/DA</c>, appearance and flag entries onto
+    /// the shared single-widget dictionary built by <see cref="EmitCreatedField"/>. No-op on the base.
+    /// </summary>
+    /// <param name="widget">The widget annotation dictionary to populate.</param>
+    /// <param name="writer">The document writer that assigns object references.</param>
+    /// <param name="width">The widget width, in points.</param>
+    /// <param name="height">The widget height, in points.</param>
+    protected virtual void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
     {
     }
 }
@@ -130,9 +152,11 @@ public sealed class TextFieldDefinition(string name) : FormFieldDefinition(name)
     /// </summary>
     public int? MaxLength { get; set; }
 
-    internal override (string Value, Font Font)? TextAppearance => (Value, Font);
+    /// <inheritdoc/>
+    protected internal override (string Value, Font Font)? TextAppearance => (Value, Font);
 
-    internal override void WriteFlattenedContent(Page page)
+    /// <inheritdoc/>
+    protected internal override void WriteFlattenedContent(Page page)
     {
         if (Value.Length == 0)
         {
@@ -149,7 +173,8 @@ public sealed class TextFieldDefinition(string name) : FormFieldDefinition(name)
         });
     }
 
-    private protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
+    /// <inheritdoc/>
+    protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
     {
         widget["FT"] = new NameObject("Tx");
         widget["V"] = new StringObject(Value);
@@ -185,7 +210,8 @@ public sealed class CheckBoxFieldDefinition(string name) : FormFieldDefinition(n
     /// <summary>Gets or sets a value indicating whether the box is initially checked.</summary>
     public bool Checked { get; set; }
 
-    internal override void WriteFlattenedContent(Page page)
+    /// <inheritdoc/>
+    protected internal override void WriteFlattenedContent(Page page)
     {
         if (!Checked)
         {
@@ -196,7 +222,8 @@ public sealed class CheckBoxFieldDefinition(string name) : FormFieldDefinition(n
             X.Point, Y.Point, Width.Point, Height.Point));
     }
 
-    private protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
+    /// <inheritdoc/>
+    protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
     {
         var state = Checked ? "Yes" : "Off";
         widget["FT"] = new NameObject("Btn");
@@ -272,7 +299,8 @@ public sealed class RadioGroupFieldDefinition(string name) : FormFieldDefinition
     /// </summary>
     public string? SelectedValue { get; set; }
 
-    internal override void WriteFlattenedContent(Page page)
+    /// <inheritdoc/>
+    protected internal override void WriteFlattenedContent(Page page)
     {
         var selected = SelectedValue is null
             ? null
@@ -287,7 +315,8 @@ public sealed class RadioGroupFieldDefinition(string name) : FormFieldDefinition
     // Emits a radio group as a parent /Btn field (Radio flag, /V and /DV holding
     // the selected on-state) with one kid widget per option, each carrying its own
     // /AP /N keyed by the option value plus /Off and an /AS matching the selection.
-    internal override void EmitCreatedField(
+    /// <inheritdoc/>
+    protected internal override void EmitCreatedField(
         DocumentWriter writer,
         ReferenceObject pageReference,
         List<DocumentObject> fields,
@@ -389,9 +418,11 @@ public sealed class ChoiceFieldDefinition(string name) : FormFieldDefinition(nam
     /// <summary>Gets or sets the font the value renders with. Base-14 families only; defaults to Helvetica 10pt.</summary>
     public Font Font { get; set; } = new();
 
-    internal override (string Value, Font Font)? TextAppearance => (Value, Font);
+    /// <inheritdoc/>
+    protected internal override (string Value, Font Font)? TextAppearance => (Value, Font);
 
-    internal override void WriteFlattenedContent(Page page)
+    /// <inheritdoc/>
+    protected internal override void WriteFlattenedContent(Page page)
     {
         if (Value.Length == 0)
         {
@@ -408,7 +439,8 @@ public sealed class ChoiceFieldDefinition(string name) : FormFieldDefinition(nam
         });
     }
 
-    private protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
+    /// <inheritdoc/>
+    protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
     {
         var options = new ArrayObject();
         foreach (var option in Options)

@@ -736,7 +736,8 @@ internal readonly record struct TextAdjustment(byte[]? Text, double Adjustment);
 // token stream and re-emitted unchanged so a full re-encode does not silently drop it.
 internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : ContentElement
 {
-    internal override void EmitBody(ContentWriter writer)
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
     {
         foreach (var operand in operands)
         {

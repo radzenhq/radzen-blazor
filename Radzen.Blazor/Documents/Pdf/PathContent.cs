@@ -165,7 +165,8 @@ public sealed class PathContent : ContentElement
     /// <summary>Closes the current subpath.</summary>
     public void Close() => segments.Add(new Segment("h", []));
 
-    internal override void EmitBody(ContentWriter writer)
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
     {
         // A path that intersects the clip region (W/W*) must be balanced by a q..Q so the
         // clip is confined to this element; otherwise it leaks and shrinks the paintable

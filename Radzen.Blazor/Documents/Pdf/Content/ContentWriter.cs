@@ -9,11 +9,15 @@ using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
 
 
-// Accumulates a page content stream and the base-14 font and image XObject resources
-// it references. The key prefixes keep overlay streams from colliding with generated
-// resources.
-internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im") : IDisposable
+/// <summary>
+/// The write surface for a page content stream, passed to <see cref="ContentElement.EmitBody"/>.
+/// Emits content-stream operators and registers the base-14 fonts, image XObjects and shading
+/// patterns an element references, returning the resource name each is reached by.
+/// </summary>
+public sealed class ContentWriter : IDisposable
 {
+    private readonly string fontKeyPrefix;
+    private readonly string imageKeyPrefix;
     private byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
     private int length;
     private bool returned;
@@ -22,15 +26,25 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
     private readonly List<KeyValuePair<string, DictionaryObject>> patterns = [];
     private readonly List<GradientBrush> patternBrushes = [];
 
-    public IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
+    // The key prefixes keep overlay streams from colliding with generated resources.
+    internal ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im")
+    {
+        this.fontKeyPrefix = fontKeyPrefix;
+        this.imageKeyPrefix = imageKeyPrefix;
+    }
 
-    public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
+    internal IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
 
-    public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
+    internal IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
 
-    // Registers a shading pattern for a gradient brush and returns its /Pattern resource name.
-    // Deduplicates by brush reference so one brush reused across elements emits a single pattern
-    // dictionary, matching PagePlan.RegisterPattern in the page-generation path.
+    internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
+
+    /// <summary>
+    /// Registers a shading pattern for <paramref name="gradient"/> and returns its <c>/Pattern</c>
+    /// resource name. One brush reused across elements emits a single pattern dictionary.
+    /// </summary>
+    /// <param name="gradient">The gradient brush to register.</param>
+    /// <returns>The resource name the pattern is selected by.</returns>
     public string RegisterPattern(GradientBrush gradient)
     {
         ArgumentNullException.ThrowIfNull(gradient);
@@ -48,11 +62,14 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         return key;
     }
 
-    public byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
+    internal byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 
-    // Decodes and registers an image XObject, returning its resource name. An undecodable
-    // payload throws (ImageDecoder.Decode) instead of silently emitting nothing: dropping
-    // content would violate the fail-loud invariant.
+    /// <summary>
+    /// Decodes and registers an image XObject for <paramref name="encodedImage"/> and returns its
+    /// resource name. An undecodable payload throws rather than silently emitting nothing.
+    /// </summary>
+    /// <param name="encodedImage">The encoded image bytes (PNG, JPEG or JPEG2000).</param>
+    /// <returns>The resource name the image is painted by.</returns>
     public string RegisterImage(byte[] encodedImage)
     {
         var decoded = ImageDecoder.Decode(encodedImage);
@@ -61,6 +78,9 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         return key;
     }
 
+    /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>
+    /// <param name="font">The font whose base-14 face to register.</param>
+    /// <returns>The resource name the font is selected by.</returns>
     public string RegisterFont(Font font)
     {
         var baseFont = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
@@ -73,8 +93,12 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         return key;
     }
 
+    /// <summary>Appends <paramref name="text"/> to the content stream verbatim, one byte per character.</summary>
+    /// <param name="text">The raw content-stream text; every character must be within the Latin-1 range.</param>
     public void WriteRaw(string text) => WriteRaw(text.AsSpan());
 
+    /// <summary>Appends <paramref name="text"/> to the content stream verbatim, one byte per character.</summary>
+    /// <param name="text">The raw content-stream text; every character must be within the Latin-1 range.</param>
     public void WriteRaw(ReadOnlySpan<char> text)
     {
         var destination = Reserve(text.Length);
@@ -86,8 +110,11 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         length += text.Length;
     }
 
+    /// <summary>Writes <paramref name="name"/> as a PDF name object, escaping characters that require it.</summary>
+    /// <param name="name">The name to write, without the leading solidus.</param>
     public void WriteName(string name)
     {
+        ArgumentNullException.ThrowIfNull(name);
         foreach (var ch in name)
         {
             // Names are byte sequences; a code point above Latin-1 cannot be represented
@@ -109,8 +136,9 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         WriteRaw(name);
     }
 
-    // Content-stream operands are emitted at 1/1000-unit precision: sub-0.001pt
-    // coordinate rounding is invisible, and 3-decimal color/matrix values quantize
+    /// <summary>Writes <paramref name="value"/> as a content-stream number at 1/1000-unit precision.</summary>
+    /// <param name="value">The number to write.</param>
+    // Sub-0.001pt coordinate rounding is invisible, and 3-decimal color/matrix values quantize
     // to the same 8-bit channels and glyph positions while shrinking the stream.
     public void WriteNumber(double value)
     {
@@ -125,6 +153,9 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         }
     }
 
+    /// <summary>Writes <paramref name="color"/> as an RGB triple followed by <paramref name="operatorName"/> and a newline.</summary>
+    /// <param name="color">The colour to write, emitted as three 0..1 components.</param>
+    /// <param name="operatorName">The colour operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
     public void WriteColor(Color color, string operatorName)
     {
         WriteNumber(color.R / 255.0);
@@ -137,8 +168,11 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         WriteRaw("\n");
     }
 
+    /// <summary>Writes <paramref name="bytes"/> as a parenthesised PDF literal string, escaping as required.</summary>
+    /// <param name="bytes">The raw string bytes to write.</param>
     public void WriteString(byte[] bytes)
     {
+        ArgumentNullException.ThrowIfNull(bytes);
         Append((byte)'(');
         foreach (var b in bytes)
         {
@@ -205,8 +239,7 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
         buffer = replacement;
     }
 
-    // Returns the live buffer to the pool. Callers dispose only after ToArray has copied
-    // out the bytes they need; the Fonts/Images maps stay valid for later resource emit.
+    /// <summary>Returns the pooled internal buffer. Call only after the emitted bytes have been read out.</summary>
     public void Dispose()
     {
         if (returned)

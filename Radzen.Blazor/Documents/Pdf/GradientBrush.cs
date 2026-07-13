@@ -27,7 +27,9 @@ public sealed class GradientStop(double offset, Color color)
 /// </summary>
 public abstract class GradientBrush
 {
-    private protected GradientBrush(GradientStop[] stops)
+    /// <summary>Initializes the shared gradient state from <paramref name="stops"/>.</summary>
+    /// <param name="stops">The colour stops, in non-decreasing offset order within [0, 1].</param>
+    protected GradientBrush(GradientStop[] stops)
     {
         ArgumentNullException.ThrowIfNull(stops);
         if (stops.Length == 0)
@@ -70,11 +72,15 @@ public abstract class GradientBrush
     /// </summary>
     public bool ExtendEnd { get; set; } = true;
 
-    // The shading /ShadingType of this gradient kind (ISO 32000-1 8.7.4.5): 2 axial, 3 radial.
-    internal abstract int ShadingType { get; }
+    /// <summary>
+    /// Gets the shading <c>/ShadingType</c> of this gradient kind (ISO 32000-1 8.7.4.5):
+    /// 2 for an axial gradient, 3 for a radial one.
+    /// </summary>
+    protected internal abstract int ShadingType { get; }
 
-    // The shading /Coords array in this gradient's own coordinate space (points).
-    internal abstract ArrayObject BuildCoords();
+    /// <summary>Builds the shading <c>/Coords</c> array in this gradient's own coordinate space (points).</summary>
+    /// <returns>The coordinate array for the shading dictionary.</returns>
+    protected internal abstract ArrayObject BuildCoords();
 }
 
 /// <summary>
@@ -102,9 +108,11 @@ public sealed class LinearGradient(double x0, double y0, double x1, double y1, p
     /// <summary>Gets the gradient axis end Y, in points.</summary>
     public double Y1 { get; } = y1;
 
-    internal override int ShadingType => 2;
+    /// <inheritdoc/>
+    protected internal override int ShadingType => 2;
 
-    internal override ArrayObject BuildCoords() =>
+    /// <inheritdoc/>
+    protected internal override ArrayObject BuildCoords() =>
     [
         new NumberObject(X0), new NumberObject(Y0),
         new NumberObject(X1), new NumberObject(Y1),
@@ -145,9 +153,11 @@ public sealed class RadialGradient(double x0, double y0, double r0, double x1, d
     /// <summary>Gets the end circle radius, in points.</summary>
     public double R1 { get; } = r1;
 
-    internal override int ShadingType => 3;
+    /// <inheritdoc/>
+    protected internal override int ShadingType => 3;
 
-    internal override ArrayObject BuildCoords() =>
+    /// <inheritdoc/>
+    protected internal override ArrayObject BuildCoords() =>
     [
         new NumberObject(X0), new NumberObject(Y0), new NumberObject(R0),
         new NumberObject(X1), new NumberObject(Y1), new NumberObject(R1),

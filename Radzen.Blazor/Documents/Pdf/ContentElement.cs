@@ -73,5 +73,11 @@ public abstract class ContentElement
         }
     }
 
-    internal abstract void EmitBody(ContentWriter writer);
+    /// <summary>
+    /// Emits this element's content-stream body into <paramref name="writer"/>. The transform
+    /// and artifact/marked-content wrapping are applied by the base class around this call, so an
+    /// override writes only the element's own operators.
+    /// </summary>
+    /// <param name="writer">The content-stream writer to emit into.</param>
+    protected abstract void EmitBody(ContentWriter writer);
 }

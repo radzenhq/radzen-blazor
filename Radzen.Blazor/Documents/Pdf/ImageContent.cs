@@ -24,7 +24,8 @@ public sealed class ImageContent : ContentElement
 
     internal byte[] EncodedXObject { get; }
 
-    internal override void EmitBody(ContentWriter writer)
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
     {
         var key = writer.RegisterImage(EncodedXObject);
 
