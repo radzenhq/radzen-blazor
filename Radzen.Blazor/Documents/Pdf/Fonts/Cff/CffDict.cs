@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
@@ -24,6 +25,7 @@ internal static class CffDict
                 i++;
                 if (b0 == TwoByteOperator)
                 {
+                    Require(data, i);
                     op = 1200 + data[i];
                     i++;
                 }
@@ -33,11 +35,13 @@ internal static class CffDict
             }
             else if (b0 == 28)
             {
+                Require(data, i + 2);
                 operands.Add((short)((data[i + 1] << 8) | data[i + 2]));
                 i += 3;
             }
             else if (b0 == 29)
             {
+                Require(data, i + 4);
                 operands.Add((data[i + 1] << 24) | (data[i + 2] << 16) | (data[i + 3] << 8) | data[i + 4]);
                 i += 5;
             }
@@ -53,11 +57,13 @@ internal static class CffDict
             }
             else if (b0 <= 250)
             {
+                Require(data, i + 1);
                 operands.Add(((b0 - 247) * 256) + data[i + 1] + 108);
                 i += 2;
             }
             else if (b0 <= 254)
             {
+                Require(data, i + 1);
                 operands.Add((-(b0 - 251) * 256) - data[i + 1] - 108);
                 i += 2;
             }
@@ -68,6 +74,16 @@ internal static class CffDict
         }
 
         return result;
+    }
+
+    // A truncated DICT (e.g. a bare operand prefix at the end of the buffer) must fail
+    // with the parser's diagnosable exception, not a bare IndexOutOfRangeException.
+    private static void Require(byte[] data, int index)
+    {
+        if (index >= data.Length)
+        {
+            throw new InvalidDataException("CFF DICT operand runs past the end of the data.");
+        }
     }
 
     public static void WriteInteger(List<byte> dst, int value)

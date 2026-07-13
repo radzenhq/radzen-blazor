@@ -70,4 +70,16 @@ public class CffSubsetterFontMatrixTests
         Assert.Equal(2, subset.GlyphCount);
         Assert.Equal(500, subset.GetAdvanceWidth(1));
     }
+
+    // A name-keyed source carries FontMatrix only in its Top DICT. The subset must emit it
+    // exactly once (in the Top DICT); writing it into the FD dict too would make a viewer
+    // that concatenates the two matrices scale glyphs by the square of the intended factor.
+    [Fact]
+    public void Subset_DoesNotAlsoWriteFontMatrixIntoFdDict()
+    {
+        var subset = CffFont.Parse(CffSubsetter.Subset(CffFont.Parse(SourceWithFontMatrix()), [1]));
+
+        Assert.NotNull(subset.FontMatrix);
+        Assert.Null(subset.GetFdFontMatrix(0));
+    }
 }

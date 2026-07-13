@@ -34,7 +34,10 @@ internal static class KernTable
             var minimum = (coverage & 0x0002) != 0;
             if (format == 0 && horizontal && !minimum)
             {
-                ParseFormat0(ref reader, pos + 6, map);
+                // Bound the pair loop by this subtable, not the whole table: an overstated
+                // nPairs must not read the following subtable's bytes as kern pairs.
+                var end = length > 0 ? System.Math.Min(reader.Length, pos + length) : reader.Length;
+                ParseFormat0(ref reader, pos + 6, end, map);
             }
 
             if (length == 0)
@@ -48,16 +51,22 @@ internal static class KernTable
         return map;
     }
 
-    private static void ParseFormat0(ref SfntReader reader, int offset, Dictionary<int, int> map)
+    private static void ParseFormat0(ref SfntReader reader, int offset, int end, Dictionary<int, int> map)
     {
-        if (offset + 8 > reader.Length)
+        if (offset + 8 > end)
         {
             return;
         }
 
         var nPairs = reader.ReadUInt16At(offset);
+        var maxPairs = (end - (offset + 8)) / 6;
+        if (nPairs > maxPairs)
+        {
+            nPairs = (ushort)maxPairs;
+        }
+
         var p = offset + 8; // skip searchRange, entrySelector, rangeShift
-        for (var i = 0; i < nPairs && p + 6 <= reader.Length; i++)
+        for (var i = 0; i < nPairs && p + 6 <= end; i++)
         {
             var left = reader.ReadUInt16At(p);
             var right = reader.ReadUInt16At(p + 2);

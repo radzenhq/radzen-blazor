@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 
@@ -176,7 +177,18 @@ internal static class GlyfSubsetter
             while (true)
             {
                 var flags = ReadUInt16(glyf, pos);
-                Enqueue(ReadUInt16(glyf, pos + 2));
+                var component = ReadUInt16(glyf, pos + 2);
+
+                // A component past the glyph count cannot be renumbered; fail loud here (as
+                // the requested-gid guard does) rather than skip it and later throw an opaque
+                // KeyNotFoundException from the gidMap lookup while copying the composite.
+                if (component >= numGlyphs)
+                {
+                    throw new InvalidDataException(
+                        $"Composite glyph references component {component} outside the font's glyph range [0, {numGlyphs}).");
+                }
+
+                Enqueue(component);
                 pos += ComponentRecordTail(flags) + 4;
 
                 if ((flags & MoreComponents) == 0)
@@ -484,28 +496,17 @@ internal static class GlyfSubsetter
         return sum;
     }
 
-    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => (ushort)((d[o] << 8) | d[o + 1]);
+    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadUInt16BigEndian(d[o..]);
 
-    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => (short)((d[o] << 8) | d[o + 1]);
+    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadInt16BigEndian(d[o..]);
 
-    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o)
-        => ((uint)d[o] << 24) | ((uint)d[o + 1] << 16) | ((uint)d[o + 2] << 8) | d[o + 3];
+    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadUInt32BigEndian(d[o..]);
 
-    private static void WriteUInt16(byte[] d, int o, ushort v)
-    {
-        d[o] = (byte)(v >> 8);
-        d[o + 1] = (byte)v;
-    }
+    private static void WriteUInt16(byte[] d, int o, ushort v) => BinaryPrimitives.WriteUInt16BigEndian(d.AsSpan(o), v);
 
-    private static void WriteInt16(byte[] d, int o, short v) => WriteUInt16(d, o, (ushort)v);
+    private static void WriteInt16(byte[] d, int o, short v) => BinaryPrimitives.WriteInt16BigEndian(d.AsSpan(o), v);
 
-    private static void WriteUInt32(byte[] d, int o, uint v)
-    {
-        d[o] = (byte)(v >> 24);
-        d[o + 1] = (byte)(v >> 16);
-        d[o + 2] = (byte)(v >> 8);
-        d[o + 3] = (byte)v;
-    }
+    private static void WriteUInt32(byte[] d, int o, uint v) => BinaryPrimitives.WriteUInt32BigEndian(d.AsSpan(o), v);
 
     private static void WriteTag(byte[] d, int o, string tag)
     {

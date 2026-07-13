@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -88,6 +89,18 @@ internal sealed class CffFont
 
     internal byte[] GetCharStringBytes(int glyphIndex) => charStrings.GetBytes(glyphIndex);
 
+    // True when the glyph is composed with an endchar seac (4 or 5 operands): its base and
+    // accent are addressed through the source charset/Standard Encoding. A compact subset
+    // renumbers glyphs and rewrites the charset to identity, which silently breaks that
+    // reference, so the subsetter rejects such glyphs rather than emit a wrong composition.
+    internal bool UsesSeacEndchar(int glyphIndex)
+    {
+        var fd = fdArray[GetFd(glyphIndex)];
+        var context = new SeacContext(fd, globalSubrs, globalBias);
+        context.Run(charStrings.GetBytes(glyphIndex), 0);
+        return context.Seac;
+    }
+
     internal byte[][] GetGlobalSubrBytes() => Extract(globalSubrs);
 
     internal byte[][] GetLocalSubrBytes(int fd)
@@ -164,7 +177,10 @@ internal sealed class CffFont
         }
         else
         {
-            fdArray = [ReadPrivate(cffData, topDict)];
+            // A name-keyed font carries its FontMatrix only in the Top DICT. Do not also
+            // surface it as the FD's matrix: the subsetter writes both, and a viewer that
+            // concatenates Top-DICT and FD-DICT matrices would then scale glyphs twice.
+            fdArray = [ReadPrivate(cffData, topDict, includeFontMatrix: false)];
             fdSelect = [];
         }
 
@@ -187,7 +203,7 @@ internal sealed class CffFont
             return charset;
         }
 
-        var format = data[offset];
+        var format = ReadByteAt(data, offset);
         var p = offset + 1;
         var glyph = 1;
         switch (format)
@@ -204,7 +220,7 @@ internal sealed class CffFont
                 while (glyph < glyphCount)
                 {
                     var first = ReadCard16(data, p);
-                    int left = data[p + 2];
+                    int left = ReadByteAt(data, p + 2);
                     p += 3;
                     for (var i = 0; i <= left && glyph < glyphCount; i++)
                     {
@@ -242,13 +258,13 @@ internal sealed class CffFont
 
         var offset = (int)op[0];
         var result = new int[glyphCount];
-        var format = data[offset];
+        var format = ReadByteAt(data, offset);
         switch (format)
         {
             case 0:
                 for (var gid = 0; gid < glyphCount; gid++)
                 {
-                    result[gid] = data[offset + 1 + gid];
+                    result[gid] = ReadByteAt(data, offset + 1 + gid);
                 }
 
                 break;
@@ -258,7 +274,7 @@ internal sealed class CffFont
                 for (var r = 0; r < nRanges; r++)
                 {
                     var first = ReadCard16(data, p);
-                    int fd = data[p + 2];
+                    int fd = ReadByteAt(data, p + 2);
                     var next = ReadCard16(data, p + 3);
                     for (var gid = first; gid < next && gid < glyphCount; gid++)
                     {
@@ -293,9 +309,9 @@ internal sealed class CffFont
         return result;
     }
 
-    private static FdInfo ReadPrivate(byte[] data, Dictionary<int, double[]> dict)
+    private static FdInfo ReadPrivate(byte[] data, Dictionary<int, double[]> dict, bool includeFontMatrix = true)
     {
-        var fontMatrix = dict.TryGetValue(1207, out var matrix) && matrix.Length == 6 ? matrix : null;
+        var fontMatrix = includeFontMatrix && dict.TryGetValue(1207, out var matrix) && matrix.Length == 6 ? matrix : null;
         if (!dict.TryGetValue(18, out var op))
         {
             return new FdInfo(0, 0, null, 0, fontMatrix);
@@ -346,7 +362,28 @@ internal sealed class CffFont
 
     private static string Ascii(byte[] bytes) => Encoding.ASCII.GetString(bytes);
 
-    private static int ReadCard16(byte[] data, int offset) => (data[offset] << 8) | data[offset + 1];
+    // Attacker-controlled offsets from the Top DICT reach these raw readers; surface a
+    // diagnosable InvalidDataException (as the rest of the parser does) instead of a bare
+    // IndexOutOfRangeException from deep inside charset/FDSelect parsing.
+    private static byte ReadByteAt(byte[] data, int offset)
+    {
+        if (offset < 0 || offset >= data.Length)
+        {
+            throw new InvalidDataException("CFF table read past the end of the font.");
+        }
+
+        return data[offset];
+    }
+
+    private static int ReadCard16(byte[] data, int offset)
+    {
+        if (offset < 0 || offset + 2 > data.Length)
+        {
+            throw new InvalidDataException("CFF table read past the end of the font.");
+        }
+
+        return BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(offset));
+    }
 
     private static int Bias(int subrCount) => subrCount < 1240 ? 107 : subrCount < 33900 ? 1131 : 32768;
 
@@ -495,6 +532,125 @@ internal sealed class CffFont
 
             var value = (cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4];
             stack.Add(value / 65536.0);
+            return i + 5;
+        }
+    }
+
+    // Walks a Type 2 charstring far enough to decide whether it terminates in an endchar
+    // seac (an endchar with 4 or 5 operands). Tracks stem hints so hintmask/cntrmask mask
+    // bytes are skipped correctly, and follows local/global subrs, so a residual operand
+    // count at endchar is not mistaken for a seac.
+    private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
+    {
+        private readonly List<double> stack = [];
+        private int hintCount;
+        private bool done;
+
+        public bool Seac { get; private set; }
+
+        public void Run(byte[] cs, int depth)
+        {
+            if (depth > 10)
+            {
+                done = true;
+                return;
+            }
+
+            var i = 0;
+            while (i < cs.Length && !done)
+            {
+                int b = cs[i];
+                if (b >= 32 || b == 28)
+                {
+                    i = ReadOperand(cs, i, b);
+                    continue;
+                }
+
+                i++;
+                switch (b)
+                {
+                    case 1:
+                    case 3:
+                    case 18:
+                    case 23:
+                        hintCount += stack.Count / 2;
+                        stack.Clear();
+                        break;
+                    case 19:
+                    case 20:
+                        hintCount += stack.Count / 2;
+                        stack.Clear();
+                        i += (hintCount + 7) / 8; // skip the mask bytes
+                        break;
+                    case 14:
+                        Seac = stack.Count >= 4;
+                        done = true;
+                        return;
+                    case 10:
+                        RunSubr(fd.LocalSubrs, fd.LocalBias, depth);
+                        break;
+                    case 29:
+                        RunSubr(globalSubrs, globalBias, depth);
+                        break;
+                    case 11:
+                        return;
+                    case 12:
+                        i++;
+                        stack.Clear();
+                        break;
+                    default:
+                        stack.Clear();
+                        break;
+                }
+            }
+        }
+
+        private void RunSubr(CffIndex? subrs, int bias, int depth)
+        {
+            if (subrs is null || stack.Count == 0)
+            {
+                stack.Clear();
+                return;
+            }
+
+            var index = (int)stack[^1] + bias;
+            stack.RemoveAt(stack.Count - 1);
+            if (index < 0 || index >= subrs.Count)
+            {
+                done = true;
+                return;
+            }
+
+            Run(subrs.GetBytes(index), depth + 1);
+        }
+
+        private int ReadOperand(byte[] cs, int i, int b)
+        {
+            if (b == 28)
+            {
+                stack.Add((short)((cs[i + 1] << 8) | cs[i + 2]));
+                return i + 3;
+            }
+
+            if (b < 247)
+            {
+                stack.Add(b - 139);
+                return i + 1;
+            }
+
+            if (b < 251)
+            {
+                stack.Add(((b - 247) * 256) + cs[i + 1] + 108);
+                return i + 2;
+            }
+
+            if (b < 255)
+            {
+                stack.Add((-(b - 251) * 256) - cs[i + 1] - 108);
+                return i + 2;
+            }
+
+            stack.Add(((cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4]) / 65536.0);
             return i + 5;
         }
     }

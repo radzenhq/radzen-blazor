@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -197,6 +198,64 @@ public class FontSubsetHardeningTests
         Assert.False(subset.TryGetTable("fpgm", out _));
         Assert.False(subset.TryGetTable("prep", out _));
         Assert.True(subset.GlyphCount >= 3);
+    }
+
+    [Fact]
+    public void Parse_FontMissingHmtx_Throws()
+    {
+        // hmtx is required whenever hhea is present; without it every glyph silently
+        // measures zero-width. Parsing must fail loud like a missing head/maxp/hhea.
+        var stripped = StripTables(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"), "hmtx");
+
+        var ex = Assert.Throws<InvalidDataException>(() => SfntFont.Parse(stripped));
+        Assert.Contains("hmtx", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Glyf_CompositeComponentOutOfRange_ThrowsInvalidData()
+    {
+        // Corrupt eacute (a composite referencing 'e' + acute) so its first component id
+        // points past numGlyphs. The subsetter must fail loud rather than skip the component
+        // and later throw an opaque KeyNotFoundException while remapping the composite.
+        var bytes = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
+        var dir = SfntChecksumValidator.ReadDirectory(bytes);
+        var loca = SfntChecksumValidator.ReadLocaOffsets(bytes);
+        const int eacute = 171;
+        var start = (int)dir["glyf"].Offset + (int)loca[eacute];
+        Assert.True((short)((bytes[start] << 8) | bytes[start + 1]) < 0, "eacute fixture must be composite");
+
+        // First component record: flags at +10, componentGlyphId at +12.
+        bytes[start + 12] = 0xEA; // 60000, well past numGlyphs (2620)
+        bytes[start + 13] = 0x60;
+
+        var font = SfntFont.Parse(bytes);
+        var ex = Assert.Throws<InvalidDataException>(() => GlyfSubsetter.Subset(font, new ushort[] { eacute }));
+        Assert.Contains("60000", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Cff_SeacEndcharGlyph_ThrowsNotSupported()
+    {
+        // Glyph 1 is a seac composition: operands adx=0 ady=0 bchar=65 achar=65 then endchar.
+        // The compact identity-charset rewrite would break its base/accent reference, so the
+        // subsetter rejects it rather than emit a wrong glyph.
+        byte[] privateBody = [0x8B, 20]; // defaultWidthX 0
+        byte[][] charStrings = [[0x0E], [0x8B, 0x8B, 0xCC, 0xCC, 0x0E]];
+        var font = CffFont.Parse(CffFixtureBuilder.Build(privateBody, charStrings));
+
+        Assert.Throws<NotSupportedException>(() => CffSubsetter.Subset(font, new[] { 1 }));
+    }
+
+    [Fact]
+    public void Cff_PlainEndcharGlyph_SubsetsFine()
+    {
+        // Control: a normal endchar (0 operands) must NOT be misdetected as seac.
+        byte[] privateBody = [0x8B, 20];
+        byte[][] charStrings = [[0x0E], [0x0E]];
+        var font = CffFont.Parse(CffFixtureBuilder.Build(privateBody, charStrings));
+
+        var subset = CffFont.Parse(CffSubsetter.Subset(font, new[] { 1 }));
+        Assert.Equal(2, subset.GlyphCount);
     }
 
     private static ushort[] GlyphIds(SfntFont font, string text)

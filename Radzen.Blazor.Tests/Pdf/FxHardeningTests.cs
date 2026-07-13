@@ -112,21 +112,42 @@ public class FxHardeningTests
         Assert.Equal(4, table.Length);
     }
 
+    [Fact]
+    public void SfntTableRecordPastEnd_MemoryVariant_Throws()
+    {
+        // The zero-copy accessor must fail with the same diagnosable exception as its
+        // byte[] twin, not an opaque ArgumentOutOfRangeException from AsMemory.
+        var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 0xFFFF_FFF0u));
+        Assert.Throws<InvalidDataException>(() => font.TryGetTableMemory("TEST", out _));
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 29 })]             // bare 32-bit integer prefix, no payload
+    [InlineData(new byte[] { 28 })]             // bare 16-bit integer prefix, no payload
+    [InlineData(new byte[] { 12 })]             // escape operator with no second byte
+    [InlineData(new byte[] { 0xF7 })]           // 2-byte positive integer, second byte missing
+    public void CffDictTruncatedOperand_ThrowsInvalidData(byte[] dict)
+    {
+        Assert.Throws<InvalidDataException>(() => CffDict.Parse(dict));
+    }
+
     // Minimal TrueType sfnt carrying the required head/maxp/hhea tables plus one "TEST"
     // table whose record length is caller-supplied so an out-of-range record can be forged.
     private static byte[] MinimalSfnt(uint bogusTableLength)
     {
-        const int numTables = 4;
+        const int numTables = 5;
         var dirLen = 12 + (numTables * 16);
         var head = new byte[54];
         var maxp = new byte[6];
         var hhea = new byte[36];
+        var hmtx = new byte[4];
         var test = new byte[] { 1, 2, 3, 4 };
 
         var headOffset = dirLen;
         var maxpOffset = headOffset + head.Length;
         var hheaOffset = maxpOffset + maxp.Length;
-        var testOffset = hheaOffset + hhea.Length;
+        var hmtxOffset = hheaOffset + hhea.Length;
+        var testOffset = hmtxOffset + hmtx.Length;
 
         var buffer = new List<byte>();
         void U16(int v) { buffer.Add((byte)(v >> 8)); buffer.Add((byte)v); }
@@ -152,11 +173,13 @@ public class FxHardeningTests
         Record("head", headOffset, head.Length);
         Record("maxp", maxpOffset, maxp.Length);
         Record("hhea", hheaOffset, hhea.Length);
+        Record("hmtx", hmtxOffset, hmtx.Length);
         Record("TEST", testOffset, bogusTableLength);
 
         buffer.AddRange(head);
         buffer.AddRange(maxp);
         buffer.AddRange(hhea);
+        buffer.AddRange(hmtx);
         buffer.AddRange(test);
         return buffer.ToArray();
     }
