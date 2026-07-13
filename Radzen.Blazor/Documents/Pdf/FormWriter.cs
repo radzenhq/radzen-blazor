@@ -183,12 +183,18 @@ internal sealed class FormWriter(Document document)
 
         if (type.Value is not ("Tx" or "Ch"))
         {
+            // A /Sig (or other) widget's visible appearance cannot be reproduced by the
+            // redraw heuristic; flattening it would silently erase what the viewer showed.
+            if (HasVisibleAppearance(widget))
+            {
+                throw new NotSupportedException(
+                    $"Cannot flatten a /{type.Value} field with a visible appearance.");
+            }
+
             return;
         }
 
-        var value = Inherited(widget, "V") is StringObject stored
-            ? FormField.DecodeTextString(stored.Value)
-            : null;
+        var value = ChoiceOrTextValue(Inherited(widget, "V"));
         if (string.IsNullOrEmpty(value))
         {
             return;
@@ -204,6 +210,39 @@ internal sealed class FormWriter(Document document)
         {
             Font = font,
         });
+    }
+
+    // The flattenable text of a /Tx or /Ch value: a string, or a multi-select list box's
+    // array of selected export values joined onto one line so the selections are not lost.
+    private string? ChoiceOrTextValue(DocumentObject? value)
+    {
+        var source = document.source;
+        switch (value)
+        {
+            case StringObject stored:
+                return FormField.DecodeTextString(stored.Value);
+            case ArrayObject items:
+                var parts = new List<string>();
+                foreach (var item in items)
+                {
+                    if (source!.Resolve(item) is StringObject text)
+                    {
+                        parts.Add(FormField.DecodeTextString(text.Value));
+                    }
+                }
+
+                return string.Join(", ", parts);
+            default:
+                return null;
+        }
+    }
+
+    private bool HasVisibleAppearance(DictionaryObject widget)
+    {
+        var source = document.source;
+        return widget.TryGetValue("AP", out var apObject) && source!.Resolve(apObject!) is DictionaryObject ap
+            && ap.TryGetValue("N", out var nObject) && source.Resolve(nObject!) is StreamObject stream
+            && stream.Data.Length > 0;
     }
 
     // Walks the widget's /Parent chain for an inheritable field attribute

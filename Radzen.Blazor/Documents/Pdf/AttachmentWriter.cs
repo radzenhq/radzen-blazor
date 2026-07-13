@@ -17,6 +17,15 @@ internal sealed class AttachmentWriter(Document document)
 
         foreach (var attachment in document.Attachments)
         {
+            // The /EmbeddedFiles name tree keys by name and would keep only the last of a
+            // duplicate, while /AF lists both filespecs - fail loud rather than emit a file
+            // unreachable from the attachments panel whose winner depends on insertion order.
+            if (filespecs.ContainsKey(attachment.Name))
+            {
+                throw new InvalidOperationException(
+                    $"Duplicate attachment name '{attachment.Name}'; embedded file names must be unique.");
+            }
+
             var file = FlateFilter.EncodeStream(attachment.Data);
             file.Dictionary["Type"] = new NameObject("EmbeddedFile");
             file.Dictionary["Subtype"] = new NameObject(attachment.MimeType);
