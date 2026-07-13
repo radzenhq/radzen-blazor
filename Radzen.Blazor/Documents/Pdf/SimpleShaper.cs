@@ -4,25 +4,20 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf;
 
-/// <summary>
-/// A minimal left-to-right, horizontal text shaper: identity codepoint-to-glyph mapping via the
-/// resolved font's cmap with per-character fallback, and hmtx-based advances. Optional legacy
-/// 'kern'-table pair kerning is applied to adjacent glyphs of the same face; it is off by default
-/// so shaped advances match <see cref="FontCollection.MeasureText"/> unless kerning is requested.
-/// </summary>
-/// <param name="fonts">The font collection used to resolve families and glyphs.</param>
-/// <param name="enableKerning">Whether to apply legacy 'kern'-table pair kerning to adjacent glyphs.</param>
-public sealed class SimpleShaper(FontCollection fonts, bool enableKerning = false) : ITextShaper
+// A minimal left-to-right, horizontal text shaper: identity codepoint-to-glyph mapping via the
+// resolved font's cmap with per-character fallback, and hmtx-based advances. Optional legacy
+// 'kern'-table pair kerning is applied to adjacent glyphs of the same face; it is off by default
+// so shaped advances match FontCollection.MeasureText unless kerning is requested. Both the
+// measure (FontCollection) and emit (TextLineEmitter) paths map text through this one helper so
+// the glyph/cluster sequence they draw is the one measurement summed.
+internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = false)
 {
-    /// <inheritdoc/>
-    public GlyphRun Shape(ReadOnlySpan<char> text, Font font, FlowDirection direction, WritingMode mode)
+    // Returns the shaped glyphs in visual order; advance is their total width in points. Since
+    // any kern is folded into both a glyph's advance and the running total, advance always
+    // equals the sum of the returned glyph advances.
+    public List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
     {
         ArgumentNullException.ThrowIfNull(font);
-
-        if (direction != FlowDirection.LeftToRight || mode != WritingMode.HorizontalTopToBottom)
-        {
-            throw new NotSupportedException("SimpleShaper supports only left-to-right, horizontal text.");
-        }
 
         EnsureNoComplexScript(text);
 
@@ -60,7 +55,8 @@ public sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fals
             i += codepoint > 0xFFFF ? 2 : 1;
         }
 
-        return new GlyphRun(glyphs, font, total);
+        totalAdvance = total;
+        return glyphs;
     }
 
     // Fails loud when text needs OpenType shaping or bidirectional reordering the identity

@@ -134,10 +134,10 @@ public class MeasureEmitRegressionTests
         var shaper = new SimpleShaper(fonts);
         var font = LineLayoutSupport.FontAt(12);
 
-        var run = shaper.Shape("A\U0001F600", font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var glyphs = shaper.Shape("A\U0001F600", font, out var advance);
 
-        Assert.Equal(2, run.Glyphs.Count);
-        Assert.Equal(fonts.MeasureText("A\U0001F600", font), run.Advance, 6);
+        Assert.Equal(2, glyphs.Count);
+        Assert.Equal(fonts.MeasureText("A\U0001F600", font), advance, 6);
     }
 
     // MeasureText itself must resolve by codepoint: the surrogate pair is one
@@ -173,9 +173,8 @@ public class MeasureEmitRegressionTests
         var drawn = Cids(shows[0].Bytes);
 
         var shaper = new SimpleShaper(LineLayoutSupport.Fonts());
-        var run = shaper.Shape(word, LineLayoutSupport.FontAt(12),
-            FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
-        var shaped = run.Glyphs.Select(glyph => glyph.GlyphId).ToArray();
+        var glyphs = shaper.Shape(word, LineLayoutSupport.FontAt(12), out _);
+        var shaped = glyphs.Select(glyph => glyph.GlyphId).ToArray();
 
         Assert.Equal(shaped.Length, drawn.Length);
         Assert.Equal(shaped[2], shaped[7]); // the two 'p' glyphs, so the isomorphism is not vacuous
