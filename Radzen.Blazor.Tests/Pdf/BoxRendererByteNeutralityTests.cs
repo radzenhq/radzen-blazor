@@ -7,10 +7,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 // Layer 1 guard: BoxRenderer.Paint must be a byte-neutral extraction of the cell
 // background + border painting. This decoration-heavy document exercises every box
 // path: per-cell backgrounds, uniform and non-uniform borders, the cell/row/table
-// cascade, rounded cells (uniform -> one rounded stroke; non-uniform -> rounded
-// fill + square edges), a whole-table rounded frame, a rounded translucent
-// container (ExtGState) and a nested rounded table. The generator emits no /ID or
-// dates, so two independent builds must produce identical bytes.
+// cascade, a whole-table rounded frame, a rounded translucent container (uniform
+// rounded stroke + ExtGState) and a nested rounded table. The generator emits no /ID
+// or dates, so two independent builds must produce identical bytes.
 public class BoxRendererByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)
@@ -52,20 +51,18 @@ public class BoxRendererByteNeutralityTests
         first.Borders.Bottom.Width = 1.5;
         first.Borders.Bottom.Color = Color.FromRgb(200, 0, 0);
 
-        var uniformRounded = first.Cells[0];
-        uniformRounded.Background = Color.FromRgb(255, 235, 205);
-        uniformRounded.CornerRadius = Unit.FromPoint(5);
-        uniformRounded.Borders.Width = 1;
-        uniformRounded.Borders.Color = Color.FromRgb(0, 100, 0);
-        Fill(uniformRounded, "uniform rounded");
+        var uniformCell = first.Cells[0];
+        uniformCell.Background = Color.FromRgb(255, 235, 205);
+        uniformCell.Borders.Width = 1;
+        uniformCell.Borders.Color = Color.FromRgb(0, 100, 0);
+        Fill(uniformCell, "uniform border");
 
-        var mixedRounded = first.Cells[1];
-        mixedRounded.Background = Color.FromRgb(220, 255, 220);
-        mixedRounded.CornerRadius = Unit.FromPoint(5);
-        mixedRounded.Borders.Top.Width = 2;
-        mixedRounded.Borders.Left.Width = 0.5;
-        mixedRounded.Borders.Left.Style = BorderStyle.Dashed;
-        Fill(mixedRounded, "non-uniform rounded");
+        var mixedCell = first.Cells[1];
+        mixedCell.Background = Color.FromRgb(220, 255, 220);
+        mixedCell.Borders.Top.Width = 2;
+        mixedCell.Borders.Left.Width = 0.5;
+        mixedCell.Borders.Left.Style = BorderStyle.Dashed;
+        Fill(mixedCell, "non-uniform border");
 
         var second = table.Rows.Add();
         second.Cells[0].Background = Color.FromRgb(255, 250, 240);

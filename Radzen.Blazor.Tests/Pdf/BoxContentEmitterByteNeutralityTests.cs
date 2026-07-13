@@ -8,8 +8,8 @@ namespace Radzen.Blazor.Pdf.Tests;
 // Layer 2 guard: extracting TableEmitter.EmitCell's content emission into the shared
 // EmitBoxContent helper must be byte-neutral. This document exercises every path the
 // helper owns: band cells with per-page page-number/count field resolution, cell
-// images, nested tables and rounded cells (rounded content clip), across two pages.
-// The generator emits no /ID or dates, so two independent builds must match exactly.
+// images and nested tables, across two pages. The generator emits no /ID or dates, so
+// two independent builds must match exactly.
 public class BoxContentEmitterByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)
@@ -36,7 +36,6 @@ public class BoxContentEmitterByteNeutralityTests
         var band = footer.Rows.Add();
 
         var rounded = band.Cells[0];
-        rounded.CornerRadius = Unit.FromPoint(6);
         rounded.Background = Color.FromRgb(230, 240, 250);
         rounded.Borders.Width = 0.5;
         var field = rounded.Blocks.AddParagraph();
@@ -66,7 +65,6 @@ public class BoxContentEmitterByteNeutralityTests
         var row = body.Rows.Add();
 
         var host = row.Cells[0];
-        host.CornerRadius = Unit.FromPoint(4);
         host.Background = Color.FromRgb(250, 235, 235);
         Fill(host, "rounded host");
         var nested = host.Blocks.AddTable();

@@ -23,8 +23,9 @@ internal readonly struct PositionedTableFragment
     public required double Y { get; init; }
 
     /// <summary>
-    /// Page-space transform to apply to every draw this fragment produces (a rotated
-    /// overlay container), or <see langword="null"/> for none.
+    /// Page-space transform to apply to every draw this fragment produces, or
+    /// <see langword="null"/> for none. Always null now that a rotated container places as
+    /// a first-class box; retained so page emission can carry a per-fragment transform.
     /// </summary>
     public Matrix? Transform { get; init; }
 
@@ -35,12 +36,13 @@ internal readonly struct PositionedTableFragment
     public int Order { get; init; }
 }
 
-// A Stack container placed as a first-class box (section body or header/footer band):
-// the decoration paints through BoxRenderer and the laid-out content through
+// A container placed as a first-class box (section body or header/footer band): the
+// decoration paints through BoxRenderer and the laid-out content through
 // TableEmitter.EmitBoxContent. Bounds is in content space (X from the content-box left,
 // Y from the content-box top, Y == Bounds.Top). Style carries no ExtGState - the box's
-// own opacity is registered per page by the emitter. Overlay containers keep the
-// table-lowering path.
+// own opacity is registered per page by the emitter. A Stack container stacks its content
+// vertically; an overlay container overlays its children at the box top-left (both routed
+// here via PlaceBox and PlaceSpecialContainer respectively).
 internal readonly struct PositionedBox
 {
     public required Container Source { get; init; }
@@ -324,34 +326,16 @@ internal static class Paginator
             cursor += boxHeight;
         }
 
-        // An overlay container is placed as one unit that never breaks across pages.
-        // Overlay children each lower to their own single-cell table sharing the box
-        // origin (declaration order = paint order); the box decoration, when present, is a
-        // separate empty table sized to the tallest child so it spans the whole box. A
-        // rotated overlay additionally carries a page-space rotation about the box center.
+        // An overlay container is ONE unbreakable first-class box: its decoration
+        // (background/gradient/borders/rounded corners/shadow) paints through the same
+        // BoxStyle/BoxEmitter/BoxRenderer path a Stack container uses, and its children
+        // share the box origin - each laid out from the box top-left (inset by the
+        // padding) and merged in declaration order (later children on top within each
+        // draw kind) so the box height is the tallest child's. A rotated overlay
+        // additionally carries a page-space rotation about the box center.
         void PlaceSpecialContainer(Container container)
         {
-            var placements = new List<(Table Table, LaidOutTable Layout)>();
-            var boxWidth = container.Width?.Point ?? contentWidth;
-            var indent = Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
-            var boxLeft = left + indent;
-
-            var boxHeight = 2 * container.Padding.Point;
-            foreach (var child in container.Blocks)
-            {
-                var table = OverlayChildTable(container, child, boxWidth, indent);
-                var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage, resolution);
-                boxHeight = Math.Max(boxHeight, layout.Height);
-                placements.Add((table, layout));
-            }
-
-            if (container.Background is not null || container.Borders.Top.IsSet
-                || container.Borders.Right.IsSet || container.Borders.Bottom.IsSet
-                || container.Borders.Left.IsSet)
-            {
-                var decoration = OverlayDecorationTable(container, boxWidth, indent, boxHeight);
-                placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage, resolution)));
-            }
+            var (content, indent, boxWidth, boxHeight) = LayoutOverlay(container, contentWidth, fonts, measureImage, resolution);
 
             if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
             {
@@ -362,29 +346,24 @@ internal static class Paginator
             Matrix? transform = null;
             if (container.Rotation != 0)
             {
-                var centerX = boxLeft + boxWidth / 2;
+                var centerX = left + indent + boxWidth / 2;
                 var centerY = pageHeight - contentBox.Y - cursor - boxHeight / 2;
                 transform = Matrix.Translate(-centerX, -centerY)
                     * Matrix.Rotate(container.Rotation)
                     * Matrix.Translate(centerX, centerY);
             }
 
-            var boxOrder = order++;
-            foreach (var (table, layout) in placements)
+            currentBoxes.Add(new PositionedBox
             {
-                foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
-                {
-                    currentTables.Add(new PositionedTableFragment
-                    {
-                        Layout = layout,
-                        Fragment = fragment,
-                        Y = cursor,
-                        Transform = transform,
-                        Order = boxOrder,
-                    });
-                }
-            }
-
+                Source = container,
+                Content = content,
+                Bounds = new Rect(indent, cursor, boxWidth, boxHeight),
+                Style = BoxStyle.FromContainer(container),
+                Y = cursor,
+                Opacity = container.Opacity,
+                Transform = transform,
+                Order = order++,
+            });
             cursor += boxHeight;
         }
 
@@ -840,38 +819,80 @@ internal static class Paginator
     private static bool IsSpecial(Container container)
         => container.Layout == ContainerLayout.Overlay;
 
-    private static Table OverlayChildTable(Container container, Block child, double boxWidth, double indent)
+    // Lays out an overlay container as a first-class box: each child is measured and
+    // positioned independently at the box top-left (inset by the padding), exactly like
+    // the single-cell table each child used to lower to, and the results are merged in
+    // declaration order (nested tables/boxes reordered onto one increasing sequence so
+    // emission interleaves them in that order). The box inner height is the tallest
+    // child's; content positions are box-local (the emitter shifts them by the box Y).
+    private static (LaidOutBoxContent Content, double Indent, double BoxWidth, double BoxHeight) LayoutOverlay(
+        Container container,
+        double availableWidth,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
     {
-        var table = new Table { LeftIndent = Unit.FromPoint(indent) };
-        table.Columns.Add(Unit.FromPoint(boxWidth));
-        var cell = table.Rows.Add().Cells[0];
-        cell.Padding = container.Padding;
-        cell.Blocks.Add(child);
-        return table;
+        var padding = container.Padding.Point;
+        var boxWidth = container.Width?.Point ?? availableWidth;
+        var indent = Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
+        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
+
+        var lines = new List<LaidOutLine>();
+        var images = new List<LaidOutImage>();
+        var codes = new List<LaidOutCode>();
+        var tables = new List<LaidOutNestedTable>();
+        var boxes = new List<LaidOutNestedBox>();
+        var order = 0;
+        var innerHeight = 0.0;
+        foreach (var child in container.Blocks)
+        {
+            var single = new BlockCollection { child };
+            var measured = BoxContentLayout.Measure(single, innerWidth, null, fonts, measureImage, resolution);
+            innerHeight = Math.Max(innerHeight, measured.Height);
+            var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
+            var positioned = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
+            lines.AddRange(positioned.Lines);
+            images.AddRange(positioned.Images);
+            codes.AddRange(positioned.Codes);
+            order = MergeNested(positioned, tables, boxes, order);
+        }
+
+        var content = new LaidOutBoxContent
+        {
+            Height = innerHeight,
+            Lines = lines,
+            Images = images,
+            Codes = codes,
+            Tables = tables,
+            Boxes = boxes,
+        };
+        return (content, indent, boxWidth, innerHeight + (2 * padding));
     }
 
-    // Background and borders of an overlay box are drawn by an empty single-cell table
-    // whose height is forced through the top padding (empty content + padding = box height).
-    private static Table OverlayDecorationTable(Container container, double boxWidth, double indent, double boxHeight)
+    // Appends one overlay child's nested tables and boxes onto the shared sequence,
+    // renumbering their Order to keep declaration order (later children on top) while
+    // preserving each child's own table/box interleave.
+    private static int MergeNested(
+        LaidOutBoxContent child,
+        List<LaidOutNestedTable> tables,
+        List<LaidOutNestedBox> boxes,
+        int order)
     {
-        var table = new Table { LeftIndent = Unit.FromPoint(indent) };
-        table.Columns.Add(Unit.FromPoint(boxWidth));
-        var cell = table.Rows.Add().Cells[0];
-        cell.Background = container.Background;
-        cell.CornerRadius = container.CornerRadius;
-        cell.PaddingTop = Unit.FromPoint(boxHeight);
-        CopyEdge(container.Borders.Top, cell.Borders.Top);
-        CopyEdge(container.Borders.Right, cell.Borders.Right);
-        CopyEdge(container.Borders.Bottom, cell.Borders.Bottom);
-        CopyEdge(container.Borders.Left, cell.Borders.Left);
-        return table;
-    }
+        var ti = 0;
+        var bi = 0;
+        while (ti < child.Tables.Count || bi < child.Boxes.Count)
+        {
+            if (bi >= child.Boxes.Count || (ti < child.Tables.Count && child.Tables[ti].Order <= child.Boxes[bi].Order))
+            {
+                tables.Add(child.Tables[ti++] with { Order = order++ });
+            }
+            else
+            {
+                boxes.Add(child.Boxes[bi++] with { Order = order++ });
+            }
+        }
 
-    private static void CopyEdge(Border source, Border target)
-    {
-        target.Width = source.Width;
-        target.Color = source.Color;
-        target.Style = source.Style;
+        return order;
     }
 
     // Each nesting level shifts the marker column by the parent's LeftIndent + HangingIndent and

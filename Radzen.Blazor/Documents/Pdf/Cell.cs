@@ -121,13 +121,4 @@ public class Cell
 
     /// <summary>Gets the cell borders.</summary>
     public Borders Borders { get; } = new();
-
-    /// <summary>
-    /// The corner radius of the cell box. Internal plumbing: a single grid cell cannot
-    /// round its own corners sensibly without clashing with its neighbours, so this is not
-    /// public API. It exists only so a <see cref="Container"/> - which lowers to a synthetic
-    /// single-cell table - can round. Round a whole table with <c>Table.CornerRadius</c> or a
-    /// box with <c>Container.CornerRadius</c>. Defaults to 0 (square).
-    /// </summary>
-    internal Unit CornerRadius { get; set; }
 }
