@@ -1,6 +1,13 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
 
+# BannedApiAnalyzers (RS0030 banned symbol, RS0031 banned symbol from BannedSymbols file).
+# The symbol list is assembly-global, but Radzen.Blazor legitimately uses DateTime.Now/Guid/etc.
+# outside the PDF library. The guard is silenced globally in BannedApi.globalconfig (which also
+# reaches Razor source-generated code, whose virtual paths fall outside this file's directory tree)
+# and re-enabled as 'error' only for the PDF/Crypto trees in the path-scoped sections at the end of
+# this file. A regular .editorconfig section always overrides the global config, so those win.
+
 # C# files
 [*.cs]
 
@@ -283,3 +290,13 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix = 
 dotnet_naming_style.begins_with_i.word_separator = 
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# WASM-safety / determinism guard: enforce BannedApiAnalyzers as errors only in the PDF library trees.
+# Anchored to this .editorconfig's directory (Documents/ is a direct child), so no leading '**/'.
+[Documents/Pdf/**.cs]
+dotnet_diagnostic.RS0030.severity = error
+dotnet_diagnostic.RS0031.severity = error
+
+[Documents/Crypto/**.cs]
+dotnet_diagnostic.RS0030.severity = error
+dotnet_diagnostic.RS0031.severity = error

@@ -61,6 +61,13 @@
 
   <ItemGroup>
     <PackageReference Include="Radzen.MSBuild" Version="0.0.6" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="4.14.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WASM-safety/determinism guard for the PDF library. Scoped to Documents/Pdf and Documents/Crypto via .editorconfig (RS0030/RS0031). -->
+    <AdditionalFiles Include="BannedSymbols.txt" />
+    <GlobalAnalyzerConfigFiles Include="BannedApi.globalconfig" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
