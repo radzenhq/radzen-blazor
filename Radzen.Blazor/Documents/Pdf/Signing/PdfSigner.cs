@@ -598,7 +598,7 @@ public static class PdfSigner
     // /ByteRange and /Contents placeholders that are patched in place later.
     private sealed class RawTokenObject(string token) : DocumentObject
     {
-        public override void Write(Stream stream)
+        internal override void Write(Stream stream, WriteContext context)
         {
             PdfBytes.WriteAscii(stream, token);
         }

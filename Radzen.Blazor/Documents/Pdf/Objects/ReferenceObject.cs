@@ -24,8 +24,7 @@ public sealed class ReferenceObject(int objectNumber, int generation) : Document
     /// </summary>
     public int Generation { get; } = generation;
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         PdfBytes.WriteInteger(stream, ObjectNumber);
         stream.WriteByte((byte)' ');

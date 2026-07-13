@@ -1,6 +1,5 @@
 using System.IO;
 using System.Text;
-using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -24,14 +23,13 @@ public sealed class StringObject(string value) : DocumentObject
     /// </summary>
     public string Value { get; } = value;
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         var bytes = EncodeBytes(Value);
-        var encryptor = EncryptionWriter.Current;
+        var encryptor = context.Encryptor;
         if (encryptor is not null)
         {
-            bytes = encryptor.EncryptString(bytes, EncryptionWriter.CurrentObjectNumber, 0);
+            bytes = encryptor.EncryptString(bytes, context.ObjectNumber, context.Generation);
         }
 
         var builder = new StringBuilder(bytes.Length + 2);

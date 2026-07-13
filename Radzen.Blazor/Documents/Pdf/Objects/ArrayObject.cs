@@ -33,8 +33,7 @@ public sealed class ArrayObject : DocumentObject, IEnumerable<DocumentObject>
         items.Add(item);
     }
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         stream.WriteByte((byte)'[');
         for (var i = 0; i < items.Count; i++)
@@ -44,7 +43,7 @@ public sealed class ArrayObject : DocumentObject, IEnumerable<DocumentObject>
                 stream.WriteByte((byte)' ');
             }
 
-            items[i].Write(stream);
+            items[i].Write(stream, context);
         }
 
         stream.WriteByte((byte)']');

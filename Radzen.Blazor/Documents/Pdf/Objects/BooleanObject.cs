@@ -18,8 +18,7 @@ public sealed class BooleanObject(bool value) : DocumentObject
     /// </summary>
     public bool Value { get; } = value;
 
-    /// <inheritdoc />
-    public override void Write(Stream stream)
+    internal override void Write(Stream stream, WriteContext context)
     {
         PdfBytes.WriteAscii(stream, Value ? "true" : "false");
     }
