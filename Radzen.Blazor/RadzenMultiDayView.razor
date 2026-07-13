@@ -11,9 +11,9 @@
         if (HasResourceGroups)
         {
             return @<CascadingValue Value=@Scheduler>
-                <ResourceGroups>
-                    <ChildContent Context="resource">
-                        <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource TimeFormat="@TimeFormat" AppointmentMove=OnAppointmentMove />
+                <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
+                    <ChildContent Context="path">
+                        <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResources(appointments, path) Resources=@path TimeFormat="@TimeFormat" ShowHours=@(GroupOrientation == Orientation.Vertical || IsFirstResourcePath(path)) AppointmentMove=OnAppointmentMove />
                     </ChildContent>
                 </ResourceGroups>
             </CascadingValue>;

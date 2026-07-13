@@ -10,12 +10,27 @@
 
         if (HasResourceGroups)
         {
-            return
+            if (GroupOrientation == Orientation.Horizontal)
+            {
+                return
     @<CascadingValue Value=@Scheduler>
         <ResourceDayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
-            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
+            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot Types=@ResourceTypes
             ShowAllDay=@ShowAllDay AllDayText=@AllDayText AriaLabel=@($"{Text} {Title}")
             AppointmentMove=OnAppointmentMove />
+    </CascadingValue>
+    ;
+            }
+
+            return
+    @<CascadingValue Value=@Scheduler>
+        <ResourceGroups Types=@ResourceTypes Orientation=@Orientation.Vertical>
+            <ChildContent Context="path">
+                <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResources(appointments, path)
+                    Resources=@path TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
+                    AppointmentMove=OnAppointmentMove />
+            </ChildContent>
+        </ResourceGroups>
     </CascadingValue>
     ;
         }

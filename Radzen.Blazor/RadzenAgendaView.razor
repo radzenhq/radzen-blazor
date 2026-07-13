@@ -12,9 +12,9 @@
         {
             return
     @<CascadingValue Value=@Scheduler>
-        <ResourceGroups>
-            <ChildContent Context="resource">
-                <AgendaView StartDate=@StartDate EndDate=@EndDate Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource TimeFormat=@TimeFormat MultiDayText=@MultiDayText AppointmentMove=OnAppointmentMove />
+        <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
+            <ChildContent Context="path">
+                <AgendaView StartDate=@StartDate EndDate=@EndDate Appointments=@AppointmentsForResources(appointments, path) Resources=@path TimeFormat=@TimeFormat MultiDayText=@MultiDayText AppointmentMove=OnAppointmentMove />
             </ChildContent>
         </ResourceGroups>
     </CascadingValue>
