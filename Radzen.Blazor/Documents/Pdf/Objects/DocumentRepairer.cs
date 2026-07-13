@@ -12,32 +12,16 @@ namespace Radzen.Documents.Pdf.Objects;
 /// endstream caches are also consulted by the reader's normal object-retrieval path
 /// (a single object recorded at the wrong offset, a stream with a bogus length).
 /// </summary>
-internal sealed class DocumentRepairer(
-    byte[] data,
-    ReaderLimits limits,
-    Dictionary<int, DocumentReader.XrefEntry> entries,
-    Dictionary<int, DocumentObject> cache,
-    Dictionary<int, DocumentReader.ObjectStream> objectStreams,
-    Func<int, DocumentObject> getObject,
-    Func<int, bool> isObjectStream,
-    Func<int, DocumentReader.ObjectStream> getObjectStream)
+internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
 {
     private readonly byte[] data = data;
     private readonly ReaderLimits limits = limits;
-    private readonly Dictionary<int, DocumentReader.XrefEntry> entries = entries;
-    private readonly Dictionary<int, DocumentObject> cache = cache;
-    private readonly Dictionary<int, DocumentReader.ObjectStream> objectStreams = objectStreams;
-    private readonly Func<int, DocumentObject> getObject = getObject;
-    private readonly Func<int, bool> isObjectStream = isObjectStream;
-    private readonly Func<int, DocumentReader.ObjectStream> getObjectStream = getObjectStream;
     private Dictionary<int, long>? scanned;
     private int[]? endstreamOffsets;
 
-    public DictionaryObject Repair()
+    public DictionaryObject Repair(IDocumentRepairStore store)
     {
-        entries.Clear();
-        cache.Clear();
-        objectStreams.Clear();
+        store.ResetForRepair();
 
         var offsets = ScannedOffsets();
         if (offsets.Count == 0)
@@ -48,7 +32,7 @@ internal sealed class DocumentRepairer(
         var maxNumber = 0;
         foreach (var pair in offsets)
         {
-            entries[pair.Key] = new DocumentReader.XrefEntry(1, pair.Value, 0);
+            store.SetEntry(pair.Key, new XrefEntry(1, pair.Value, 0));
             if (pair.Key > maxNumber)
             {
                 maxNumber = pair.Key;
@@ -57,17 +41,17 @@ internal sealed class DocumentRepairer(
 
         // The header scan only sees each ObjStm container's "N G obj"; register
         // type-2 entries for its members so compressed objects and /Root resolve.
-        foreach (var number in new List<int>(entries.Keys))
+        foreach (var number in store.GetEntryNumbers())
         {
-            if (!isObjectStream(number))
+            if (!store.IsObjectStream(number))
             {
                 continue;
             }
 
-            DocumentReader.ObjectStream container;
+            ObjectStream container;
             try
             {
-                container = getObjectStream(number);
+                container = store.GetObjectStream(number);
             }
             catch (DocumentParseException)
             {
@@ -77,14 +61,14 @@ internal sealed class DocumentRepairer(
             for (var index = 0; index < container.Members.Count; index++)
             {
                 var member = container.Members[index];
-                if (!entries.ContainsKey(member.Number))
+                if (!store.ContainsEntry(member.Number))
                 {
-                    if (entries.Count >= limits.MaxXrefEntries)
+                    if (store.EntryCount >= limits.MaxXrefEntries)
                     {
                         throw new DocumentParseException("Recovered cross-reference table exceeds the maximum number of entries.", -1);
                     }
 
-                    entries[member.Number] = new DocumentReader.XrefEntry(2, number, index);
+                    store.SetEntry(member.Number, new XrefEntry(2, number, index));
                     if (member.Number > maxNumber)
                     {
                         maxNumber = member.Number;
@@ -97,7 +81,7 @@ internal sealed class DocumentRepairer(
 
         // Newest catalog wins: scan object numbers in descending order so a stale
         // catalog left behind by an incremental update never shadows the current one.
-        var numbers = new List<int>(entries.Keys);
+        var numbers = store.GetEntryNumbers();
         numbers.Sort();
         numbers.Reverse();
         foreach (var number in numbers)
@@ -105,7 +89,7 @@ internal sealed class DocumentRepairer(
             DictionaryObject? dictionary = null;
             try
             {
-                var obj = getObject(number);
+                var obj = store.GetObject(number);
                 dictionary = obj as DictionaryObject ?? (obj as StreamObject)?.Dictionary;
             }
             catch (DocumentParseException)
@@ -325,4 +309,26 @@ internal sealed class DocumentRepairer(
     private static bool IsDigit(byte b) => b >= (byte)'0' && b <= (byte)'9';
 
     private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
+}
+
+/// <summary>
+/// Exposes only the object-store operations needed while repairing a document.
+/// </summary>
+internal interface IDocumentRepairStore
+{
+    void ResetForRepair();
+
+    List<int> GetEntryNumbers();
+
+    int EntryCount { get; }
+
+    bool ContainsEntry(int number);
+
+    void SetEntry(int number, XrefEntry entry);
+
+    DocumentObject GetObject(int number);
+
+    bool IsObjectStream(int number);
+
+    ObjectStream GetObjectStream(int streamNumber);
 }
