@@ -16,9 +16,9 @@ internal static class ShadingBuilder
         ArrayObject extend = [new BooleanObject(brush.ExtendStart), new BooleanObject(brush.ExtendEnd)];
         return new DictionaryObject
         {
-            ["ShadingType"] = new NumberObject(brush is RadialGradient ? 3 : 2),
+            ["ShadingType"] = new NumberObject(brush.ShadingType),
             ["ColorSpace"] = new NameObject("DeviceRGB"),
-            ["Coords"] = Coords(brush),
+            ["Coords"] = brush.BuildCoords(),
             ["Function"] = BuildFunction(brush.Stops),
             ["Extend"] = extend,
         };
@@ -119,21 +119,6 @@ internal static class ShadingBuilder
         ["C0"] = Rgb(from),
         ["C1"] = Rgb(to),
         ["N"] = new NumberObject(1),
-    };
-
-    private static ArrayObject Coords(GradientBrush brush) => brush switch
-    {
-        RadialGradient r =>
-        [
-            new NumberObject(r.X0), new NumberObject(r.Y0), new NumberObject(r.R0),
-            new NumberObject(r.X1), new NumberObject(r.Y1), new NumberObject(r.R1),
-        ],
-        LinearGradient l =>
-        [
-            new NumberObject(l.X0), new NumberObject(l.Y0),
-            new NumberObject(l.X1), new NumberObject(l.Y1),
-        ],
-        _ => throw new NotSupportedException($"Unsupported gradient brush '{brush.GetType().Name}'."),
     };
 
     private static ArrayObject Rgb(Color color) =>
