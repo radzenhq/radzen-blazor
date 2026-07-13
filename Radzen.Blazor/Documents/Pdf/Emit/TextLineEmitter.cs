@@ -113,7 +113,7 @@ internal sealed class TextLineEmitter(
             }
 
             var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
-            var font = fragment.Run.ResolvedFont;
+            var font = fragment.Font;
             if (fonts.TryResolvePrimary(font, out _))
             {
                 EmitSfntFragment(plan, fragment, originX + fragment.XOffset, y, fragElement, extGState);
@@ -155,7 +155,7 @@ internal sealed class TextLineEmitter(
                 j++;
             }
 
-            var size = run.ResolvedFont.Size;
+            var size = fragments[i].Font.Size;
             plan.Links.Add(new GeneratedLink
             {
                 X1 = originX + start,
@@ -180,7 +180,7 @@ internal sealed class TextLineEmitter(
         while (i < fragments.Count)
         {
             var run = fragments[i].Run;
-            var font = run.ResolvedFont;
+            var font = fragments[i].Font;
             if (!font.Underline || fragments[i].Text.Length == 0)
             {
                 i++;
@@ -223,7 +223,7 @@ internal sealed class TextLineEmitter(
         var i = 0;
         while (i < fragments.Count)
         {
-            var font = fragments[i].Run.ResolvedFont;
+            var font = fragments[i].Font;
             if (!font.Strikethrough || fragments[i].Text.Length == 0)
             {
                 i++;
@@ -234,9 +234,9 @@ internal sealed class TextLineEmitter(
             var end = fragments[i].XOffset + fragments[i].Advance;
             var j = i + 1;
             while (j < fragments.Count
-                && fragments[j].Run.ResolvedFont.Strikethrough
-                && fragments[j].Run.ResolvedFont.Size == font.Size
-                && fragments[j].Run.ResolvedFont.Color.Equals(font.Color)
+                && fragments[j].Font.Strikethrough
+                && fragments[j].Font.Size == font.Size
+                && fragments[j].Font.Color.Equals(font.Color)
                 && fragments[j].Run.Opacity == fragments[i].Run.Opacity)
             {
                 end = fragments[j].XOffset + fragments[j].Advance;
@@ -299,7 +299,7 @@ internal sealed class TextLineEmitter(
                     }
                 }
 
-                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidth(run.ResolvedFont, spaceWidths);
+                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidth(current.Font, spaceWidths);
                 if (!allSpaces || Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
                     break;
@@ -315,6 +315,7 @@ internal sealed class TextLineEmitter(
                 result.Add(new LineFragment
                 {
                     Run = run,
+                    Font = current.Font,
                     Text = text[current.Start..end],
                     Start = current.Start,
                     Length = end - current.Start,
@@ -485,7 +486,7 @@ internal sealed class TextLineEmitter(
     private void EmitSfntFragment(PagePlan plan, LineFragment fragment, double startX, double y, StructureElement? element, string? extGState)
     {
         var run = fragment.Run;
-        var font = run.ResolvedFont;
+        var font = fragment.Font;
         var size = font.Size * run.ScriptScale;
         var spacing = run.LetterSpacing.Point;
         var rise = run.ScriptRise(font.Size);

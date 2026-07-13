@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 // Rasterizes QR codes and barcodes into filled rectangles (one per dark module/bar) and
 // emits an optional human-readable caption line under a barcode.
-internal sealed class CodeEmitter(FontCollection fonts)
+internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resolution)
 {
     private static readonly Color CodeBlack = Color.FromRgb(0, 0, 0);
 
@@ -99,9 +99,13 @@ internal sealed class CodeEmitter(FontCollection fonts)
             return;
         }
 
-        var font = barcode.EffectiveFont ?? barcode.Font;
-        var run = new Run(barcode.Value) { EffectiveFont = font };
-        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center, EffectiveFont = font };
+        var font = resolution.BarcodeFont(barcode) ?? barcode.Font;
+        // The synthesized caption run/paragraph carry the resolved barcode font as their authored
+        // font, so the line breaker reads exactly the font the caption is measured and drawn with.
+        var run = new Run(barcode.Value);
+        run.Font.InheritFrom(font);
+        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center };
+        paragraph.Font.InheritFrom(font);
         paragraph.Inlines.Add(run);
 
         var textTop = topY - barcode.Height.Point;

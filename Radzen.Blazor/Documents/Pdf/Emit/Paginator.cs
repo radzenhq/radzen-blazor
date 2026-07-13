@@ -150,7 +150,7 @@ internal static class Paginator
         var pages = new List<PaginatedPage>();
         foreach (var section in document.Sections)
         {
-            PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty);
+            PaginateSection(section, fonts, pages, measureImage, resolution ?? new StyleResolution());
         }
 
         return pages;
@@ -164,7 +164,7 @@ internal static class Paginator
         IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var pages = new List<PaginatedPage>();
-        PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty, tocPages);
+        PaginateSection(section, fonts, pages, measureImage, resolution ?? new StyleResolution(), tocPages);
         return pages;
     }
 
@@ -244,7 +244,7 @@ internal static class Paginator
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
         // Containers stay unlowered: Stack containers are placed as first-class boxes by
         // PlaceBox and overlay ones by PlaceSpecialContainer.
-        var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts);
+        var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts, resolution);
 
         // A LaidOutTable is expensive (it line-breaks every cell), so each Table block is
         // laid out at most once and shared between the KeepWithNext look-ahead and PlaceTable.
@@ -428,7 +428,7 @@ internal static class Paginator
 
         void PlaceCode(Block block)
         {
-            var (codeWidth, codeHeight) = MeasureCode(block);
+            var (codeWidth, codeHeight) = MeasureCode(block, resolution);
             if (cursor + codeHeight > contentHeight + Eps && HasPageContent())
             {
                 Flush();
@@ -634,7 +634,7 @@ internal static class Paginator
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
-    internal static (double Width, double Height) MeasureCode(Block block) => CodeBlockDispatch.Measure(block);
+    internal static (double Width, double Height) MeasureCode(Block block, StyleResolution resolution) => CodeBlockDispatch.Measure(block, resolution);
 
     private static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 
@@ -646,7 +646,7 @@ internal static class Paginator
         protected override IReadOnlyList<LineBox>? Default(Block block, Nothing context) => null;
 
         public override IReadOnlyList<LineBox>? Visit(Paragraph paragraph, Nothing context)
-            => LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph));
+            => LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph), resolution);
     }
 
     internal static IReadOnlyList<Block> ExpandBlocks(
@@ -654,7 +654,8 @@ internal static class Paginator
         double availableWidth,
         bool keepSpecialContainers = false,
         IReadOnlyDictionary<string, int>? tocPages = null,
-        FontCollection? fonts = null)
+        FontCollection? fonts = null,
+        StyleResolution? resolution = null)
     {
         var needsExpansion = false;
         foreach (var block in blocks)
@@ -672,7 +673,7 @@ internal static class Paginator
         }
 
         var expanded = new List<Block>(blocks.Count);
-        var visitor = new ExpandVisitor(expanded, availableWidth, keepSpecialContainers, tocPages, fonts);
+        var visitor = new ExpandVisitor(expanded, availableWidth, keepSpecialContainers, tocPages, fonts, resolution ?? new StyleResolution());
         foreach (var block in blocks)
         {
             block.Accept(visitor, default);
@@ -689,7 +690,8 @@ internal static class Paginator
         double availableWidth,
         bool keepSpecialContainers,
         IReadOnlyDictionary<string, int>? tocPages,
-        FontCollection? fonts)
+        FontCollection? fonts,
+        StyleResolution resolution)
         : BlockVisitor<Nothing, Nothing>
     {
         protected override Nothing Default(Block block, Nothing context)
@@ -700,7 +702,7 @@ internal static class Paginator
 
         public override Nothing Visit(List list, Nothing context)
         {
-            ExpandList(list, expanded, 0, null);
+            ExpandList(list, expanded, 0, null, resolution);
             return default;
         }
 
@@ -874,40 +876,47 @@ internal static class Paginator
 
     // Each nesting level shifts the marker column by the parent's LeftIndent + HangingIndent and
     // inherits the parent item's resolved font, so nested runs cascade item -> list -> parent item.
-    private static void ExpandList(List list, List<Block> expanded, double indent, Font? inherited)
+    private static void ExpandList(List list, List<Block> expanded, double indent, Font? inherited, StyleResolution resolution)
     {
         for (var i = 0; i < list.Items.Count; i++)
         {
-            var paragraph = ExpandItem(list, i, indent, inherited);
+            var paragraph = ExpandItem(list, i, indent, inherited, resolution);
             expanded.Add(paragraph);
             if (list.Items[i].NestedList is { } nested)
             {
-                ExpandList(nested, expanded, indent + list.LeftIndent.Point + list.HangingIndent.Point, paragraph.EffectiveFont);
+                ExpandList(nested, expanded, indent + list.LeftIndent.Point + list.HangingIndent.Point, resolution.ParagraphFont(paragraph), resolution);
             }
         }
     }
 
-    private static Paragraph ExpandItem(List list, int index, double indent, Font? inherited)
+    private static Paragraph ExpandItem(List list, int index, double indent, Font? inherited, StyleResolution resolution)
     {
         var item = list.Items[index];
 
         // StyleResolver resolves the marker and run fonts through the full cascade (including the
-        // surrounding cell/row/table context and the Normal default); fall back to the item/list
-        // fonts only when the resolver has not run (nested items always take this path).
+        // surrounding cell/row/table context and the Normal default) and stores them in the
+        // per-save StyleResolution; fall back to the item/list cascade only when the resolver has
+        // not run (nested items always take this path). The resolved fonts live in the resolution
+        // (keyed by the shared run and by this synthesized paragraph), never on the model.
+        var itemFont = resolution.ItemFont(item) ?? ItemFont(item, list, inherited);
         var paragraph = new Paragraph
         {
             LeftIndent = Unit.FromPoint(indent + list.LeftIndent.Point + list.HangingIndent.Point),
             MarkerIndent = Unit.FromPoint(indent + list.LeftIndent.Point),
             MarkerText = Marker(list, index),
-            EffectiveFont = StyleResolver.ItemFont(item) ?? ItemFont(item, list, inherited),
-            // Null unless the tree was built for tagged output; carries the item's Lbl/LBody.
-            ListLabelElement = item.LabelElement,
-            ListBodyElement = item.BodyElement,
         };
+        resolution.SetParagraphFont(paragraph, itemFont);
+
+        // Null unless the tree was built for tagged output; carries the item's Lbl/LBody so the
+        // synthesized paragraph tags its marker and content into the right structure elements.
+        if (resolution.ListItemElements(item) is { } elements)
+        {
+            resolution.SetListParagraphElements(paragraph, elements.Label, elements.Body);
+        }
 
         foreach (var run in item.Inlines)
         {
-            run.EffectiveFont ??= RunFont(run, item, list, inherited);
+            resolution.SetRunFont(run, resolution.RunFont(run) ?? RunFont(run, item, list, inherited));
             paragraph.Inlines.Add(run);
         }
 
@@ -1096,7 +1105,7 @@ internal static class Paginator
 
         public override NextBlockHeight Visit(Barcode block, int next) => VisitCode(block);
 
-        private static NextBlockHeight VisitCode(Block block) => new() { Found = true, Height = MeasureCode(block).Height };
+        private NextBlockHeight VisitCode(Block block) => new() { Found = true, Height = MeasureCode(block, resolution).Height };
     }
 
     private static double SumHeights(IReadOnlyList<LineBox> lines, int start, int count)
@@ -1135,7 +1144,7 @@ internal static class Paginator
         var result = new BandLayout();
         var visitor = new BandVisitor(result, width, fonts, measureImage, resolution);
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in ExpandBlocks(band.Blocks, width))
+        foreach (var block in ExpandBlocks(band.Blocks, width, resolution: resolution))
         {
             block.Accept(visitor, default);
         }
@@ -1215,7 +1224,7 @@ internal static class Paginator
 
         private Nothing VisitCode(Block block)
         {
-            var (codeWidth, codeHeight) = MeasureCode(block);
+            var (codeWidth, codeHeight) = MeasureCode(block, resolution);
             result.Codes.Add(new PositionedCode
             {
                 Source = block,
@@ -1233,7 +1242,7 @@ internal static class Paginator
 
         public override Nothing Visit(Paragraph paragraph, Nothing context)
         {
-            var lines = LineBreaker.Break(paragraph, width, fonts, resolution.Alignment(paragraph));
+            var lines = LineBreaker.Break(paragraph, width, fonts, resolution.Alignment(paragraph), resolution);
             var y = Cursor + paragraph.SpacingBefore.Point;
             foreach (var box in lines)
             {

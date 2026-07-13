@@ -143,12 +143,12 @@ internal sealed class DocumentGenerator
         fonts = builder.Fonts;
         fontResolver = new(builder.Conformance);
         imageStore = new();
-        structureTree = new(builder);
         resolution = StyleResolver.Resolve(builder);
+        structureTree = new(builder, resolution);
         textEmitter = new(fonts, fontResolver, imageStore, resolution);
-        codeEmitter = new(fonts);
+        codeEmitter = new(fonts, resolution);
         imageEmitter = new(imageStore, structureTree);
-        fieldResolver = new(fonts);
+        fieldResolver = new(fonts, resolution);
         var opacities = new OpacityResolver(builder);
         tableEmitter = new(imageStore, structureTree, resolution, opacities);
         boxEmitter = new(tableEmitter, opacities);

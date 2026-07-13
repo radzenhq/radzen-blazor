@@ -29,7 +29,7 @@ public class FieldBandOverflowTests
     public void ResolveFields_ResolvedNumberWrapsBeyondReserved_Throws()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var resolver = new FieldResolver(fonts);
+        var resolver = new FieldResolver(fonts, new StyleResolution());
 
         // Width fits "ending on page 0" (the placeholder) on one line but not "ending on page
         // 1000", which wraps its number to a second line.
@@ -46,7 +46,7 @@ public class FieldBandOverflowTests
     public void ResolveFields_SingleDigitNumberFitsReserved_DoesNotThrow()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var resolver = new FieldResolver(fonts);
+        var resolver = new FieldResolver(fonts, new StyleResolution());
         var width = fonts.MeasureText("ending on page 0", LineLayoutSupport.FontAt(12)) + 1;
         var reserved = LineBreaker.Break(FieldParagraph(), width, fonts).Count;
 

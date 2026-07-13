@@ -9,6 +9,11 @@ internal struct LineFragment
 {
     public required Run Run { get; init; }
 
+    // The resolved font of this fragment (the run's font run through the style cascade, or the
+    // synthesized font of a marker/hyphen/leader fragment). Carried on the display-list layer so
+    // emission never reads a resolved font off the shared authoring model.
+    public required Font Font { get; init; }
+
     public required string Text { get; init; }
 
     public required int Start { get; init; }
@@ -39,6 +44,7 @@ internal static class LineBreaker
     private readonly struct Piece
     {
         public required Run Run { get; init; }
+        public required Font Font { get; init; }
         public required int Start { get; init; }
         public required int Length { get; init; }
         public required string Text { get; init; }
@@ -79,11 +85,22 @@ internal static class LineBreaker
     internal static double AdvanceToTabStop(double position)
         => (Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
+    // The resolved font of a run (its authored font run through the style cascade), from the
+    // per-save StyleResolution when present. Falls back to the authored font, matching the
+    // former `EffectiveFont ?? Font`: a synthesized run (TOC, field, barcode) carries its
+    // resolved font as its authored Font, and a direct-test paragraph has no resolution at all.
+    private static Font ResolvedFont(StyleResolution? resolution, Run run)
+        => resolution?.RunFont(run) ?? run.Font;
+
+    private static Font ResolvedFont(StyleResolution? resolution, Paragraph paragraph)
+        => resolution?.ParagraphFont(paragraph) ?? paragraph.Font;
+
     public static IReadOnlyList<LineBox> Break(
         Paragraph paragraph,
         double maxWidthPoints,
         FontCollection fonts,
-        HorizontalAlignment? inheritedAlignment = null)
+        HorizontalAlignment? inheritedAlignment = null,
+        StyleResolution? resolution = null)
     {
         var boxes = new List<LineBox>();
         var indent = paragraph.LeftIndent.Point;
@@ -93,11 +110,11 @@ internal static class LineBreaker
         // an item whose text starts with a break produces a leading empty line that cannot hold
         // it, so the marker stays pending until a non-empty line is built.
         var markerPending = true;
-        foreach (var words in Tokenize(paragraph, fonts, out var pieces))
+        foreach (var words in Tokenize(paragraph, fonts, resolution, out var pieces))
         {
             if (words.Count == 0)
             {
-                boxes.Add(EmptyLine(paragraph, fonts));
+                boxes.Add(EmptyLine(paragraph, fonts, resolution));
                 continue;
             }
 
@@ -111,11 +128,11 @@ internal static class LineBreaker
                 if (paragraph.TabStops.Count == 0 && first == last && words[first].Width > max
                     && IsBreakable(words[first], pieces))
                 {
-                    BreakOversizedWord(boxes, words[first], pieces, max, indent, paragraph, fonts, inheritedAlignment, includeMarker);
+                    BreakOversizedWord(boxes, words[first], pieces, max, indent, paragraph, fonts, inheritedAlignment, includeMarker, resolution);
                 }
                 else
                 {
-                    boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker, wrapStops));
+                    boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker, wrapStops, resolution));
                 }
             }
         }
@@ -125,9 +142,9 @@ internal static class LineBreaker
 
     // An empty segment (empty paragraph or blank forced-break line) occupies one line
     // of the paragraph's resolved font instead of collapsing to zero height.
-    private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts)
+    private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts, StyleResolution? resolution)
     {
-        var font = paragraph.EffectiveFont ?? paragraph.Font;
+        var font = ResolvedFont(resolution, paragraph);
         var (height, ascent) = FontExtent(font, fonts);
         return new LineBox
         {
@@ -205,7 +222,7 @@ internal static class LineBreaker
     // Splits the paragraph into forced-break segments ('\n', '\r' and "\r\n"), each a
     // list of words separated by breakable whitespace (' ' and '\t'). NBSP is a word
     // character; control characters never enter fragment text.
-    private static List<List<Word>> Tokenize(Paragraph paragraph, FontCollection fonts, out List<Piece> pieces)
+    private static List<List<Word>> Tokenize(Paragraph paragraph, FontCollection fonts, StyleResolution? resolution, out List<Piece> pieces)
     {
         var segments = new List<List<Word>>();
         var words = new List<Word>();
@@ -217,6 +234,7 @@ internal static class LineBreaker
 
         foreach (var run in paragraph.Inlines)
         {
+            var runFont = ResolvedFont(resolution, run);
             if (run is InlineImage inlineImage)
             {
                 if (hasCurrent)
@@ -245,6 +263,7 @@ internal static class LineBreaker
                 pieces.Add(new Piece
                 {
                     Run = inlineImage,
+                    Font = runFont,
                     Start = 0,
                     Length = 0,
                     Text = string.Empty,
@@ -304,7 +323,7 @@ internal static class LineBreaker
                                 hasCurrent = true;
                             }
 
-                            current.GapAfter += SpaceWidth(fonts, run.ResolvedFont, spaceWidths);
+                            current.GapAfter += SpaceWidth(fonts, runFont, spaceWidths);
                         }
 
                         i++;
@@ -337,7 +356,7 @@ internal static class LineBreaker
                         if (q > sub)
                         {
                             var segment = text[sub..q];
-                            var advance = MeasureRun(fonts, run, segment);
+                            var advance = MeasureRun(fonts, run, runFont, segment);
                             if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
                             {
                                 if (hasCurrent)
@@ -352,6 +371,7 @@ internal static class LineBreaker
                             pieces.Add(new Piece
                             {
                                 Run = run,
+                                Font = runFont,
                                 Start = sub,
                                 Length = q - sub,
                                 Text = segment,
@@ -371,7 +391,7 @@ internal static class LineBreaker
                         current.SoftHyphenAfter = text[q] == SoftHyphen;
                         if (current.SoftHyphenAfter)
                         {
-                            current.HyphenWidth = fonts.MeasureText("-", run.ResolvedFont);
+                            current.HyphenWidth = fonts.MeasureText("-", runFont);
                         }
 
                         words.Add(current);
@@ -471,7 +491,8 @@ internal static class LineBreaker
         Paragraph paragraph,
         FontCollection fonts,
         HorizontalAlignment? inheritedAlignment,
-        bool includeMarker)
+        bool includeMarker,
+        StyleResolution? resolution)
     {
         var fragments = new List<LineFragment>();
         var lineWidth = 0.0;
@@ -485,7 +506,7 @@ internal static class LineBreaker
         {
             var piece = pieces[p];
             var text = piece.Text;
-            var font = piece.Run.ResolvedFont;
+            var font = piece.Font;
             var fragStart = 0;
             var fragAdvance = 0.0;
             var hyphenBreak = -1;      // char index just past the latest '-'/dash in [fragStart, i)
@@ -513,7 +534,7 @@ internal static class LineBreaker
                     {
                         fragments.Add(MakeCharFragment(piece, fragStart, hyphenBreak, hyphenAdvance));
                         lineWidth += hyphenAdvance;
-                        boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+                        boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending, resolution));
                         fragments = [];
                         lineWidth = 0.0;
                         i = hyphenBreak;
@@ -530,7 +551,7 @@ internal static class LineBreaker
                         lineWidth += fragAdvance;
                     }
 
-                    boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+                    boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending, resolution));
                     fragments = [];
                     lineWidth = 0.0;
                     fragStart = i;
@@ -559,7 +580,7 @@ internal static class LineBreaker
 
         if (fragments.Count > 0)
         {
-            boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending));
+            boxes.Add(FinishOversizedLine(fragments, lineWidth, max, indent, paragraph, fonts, inheritedAlignment, ref markerPending, resolution));
         }
     }
 
@@ -567,6 +588,7 @@ internal static class LineBreaker
         => new()
         {
             Run = piece.Run,
+            Font = piece.Font,
             Text = piece.Text[startInText..endInText],
             Start = piece.Start + startInText,
             Length = endInText - startInText,
@@ -581,7 +603,8 @@ internal static class LineBreaker
         Paragraph paragraph,
         FontCollection fonts,
         HorizontalAlignment? inheritedAlignment,
-        ref bool markerPending)
+        ref bool markerPending,
+        StyleResolution? resolution)
     {
         var alignment = paragraph.ResolveAlignment(inheritedAlignment);
         var x0 = alignment switch
@@ -607,10 +630,11 @@ internal static class LineBreaker
 
         if (markerPending && paragraph.MarkerText is { Length: > 0 } markerText)
         {
-            var markerFont = paragraph.EffectiveFont ?? paragraph.Font;
+            var markerFont = ResolvedFont(resolution, paragraph);
             fragments.Insert(0, new LineFragment
             {
-                Run = new Run(markerText) { EffectiveFont = markerFont },
+                Run = new Run(markerText),
+                Font = markerFont,
                 Text = markerText,
                 Start = 0,
                 Length = markerText.Length,
@@ -639,7 +663,8 @@ internal static class LineBreaker
         bool isLast,
         HorizontalAlignment? inheritedAlignment,
         bool includeMarker,
-        List<TabStop>? sortedStops)
+        List<TabStop>? sortedStops,
+        StyleResolution? resolution)
     {
         var count = 0;
         for (var w = first; w <= last; w++)
@@ -659,6 +684,7 @@ internal static class LineBreaker
                 fragments.Add(new LineFragment
                 {
                     Run = piece.Run,
+                    Font = piece.Font,
                     Text = piece.Text,
                     Start = piece.Start,
                     Length = piece.Length,
@@ -677,7 +703,7 @@ internal static class LineBreaker
 
         if (paragraph.TabStops.Count > 0)
         {
-            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts, sortedStops!);
+            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts, sortedStops!, resolution);
         }
 
         // Natural placement from 0; tab stops are relative to the line origin.
@@ -808,15 +834,16 @@ internal static class LineBreaker
         {
             var tail = span[^1];
             hyphenEnd = tail.XOffset + tail.Advance;
-            hyphenFont = tail.Run.ResolvedFont;
+            hyphenFont = tail.Font;
         }
 
         if (includeMarker && paragraph.MarkerText is { Length: > 0 } markerText)
         {
-            var markerFont = paragraph.EffectiveFont ?? paragraph.Font;
+            var markerFont = ResolvedFont(resolution, paragraph);
             fragments.Insert(0, new LineFragment
             {
-                Run = new Run(markerText) { EffectiveFont = markerFont },
+                Run = new Run(markerText),
+                Font = markerFont,
                 Text = markerText,
                 Start = 0,
                 Length = markerText.Length,
@@ -830,7 +857,8 @@ internal static class LineBreaker
         {
             fragments.Add(new LineFragment
             {
-                Run = new Run("-") { EffectiveFont = hyphenFont },
+                Run = new Run("-"),
+                Font = hyphenFont!,
                 Text = "-",
                 Start = 0,
                 Length = 1,
@@ -856,7 +884,8 @@ internal static class LineBreaker
         double indent,
         Paragraph paragraph,
         FontCollection fonts,
-        List<TabStop> stops)
+        List<TabStop> stops,
+        StyleResolution? resolution)
     {
         double naturalWidth = 0;
         var cursor = 0.0;
@@ -916,7 +945,7 @@ internal static class LineBreaker
 
             if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + 1e-6)
             {
-                var leaderFont = fi < span.Length ? span[fi].Run.ResolvedFont : (paragraph.EffectiveFont ?? paragraph.Font);
+                var leaderFont = fi < span.Length ? span[fi].Font : ResolvedFont(resolution, paragraph);
                 (leaders ??= []).Add(BuildLeader(leaderChar, gapStart, start, indent, leaderFont, fonts));
             }
 
@@ -970,14 +999,15 @@ internal static class LineBreaker
         var count = leaderWidth > 0 ? (int)Math.Floor((gapEnd - gapStart) / leaderWidth) : 0;
         if (count <= 0)
         {
-            return new LineFragment { Run = new Run(string.Empty) { EffectiveFont = font }, Text = string.Empty, Start = 0, Length = 0, Advance = 0 };
+            return new LineFragment { Run = new Run(string.Empty), Font = font, Text = string.Empty, Start = 0, Length = 0, Advance = 0 };
         }
 
         var advance = count * leaderWidth;
         var fill = new string(leader, count);
         return new LineFragment
         {
-            Run = new Run(fill) { EffectiveFont = font },
+            Run = new Run(fill),
+            Font = font,
             Text = fill,
             Start = 0,
             Length = count,
@@ -1004,7 +1034,7 @@ internal static class LineBreaker
                     var dot = fragment.Text.IndexOf('.', StringComparison.Ordinal);
                     if (dot >= 0)
                     {
-                        decimalOffset = width + fonts.MeasureText(fragment.Text[..dot], fragment.Run.ResolvedFont);
+                        decimalOffset = width + fonts.MeasureText(fragment.Text[..dot], fragment.Font);
                     }
                 }
 
@@ -1050,10 +1080,10 @@ internal static class LineBreaker
             // An inline image sits on the baseline: its full height is both extent and ascent.
             var (h, asc) = fragments[i].Run is InlineImage image
                 ? (image.EffectiveSize().Height, image.EffectiveSize().Height)
-                : FontExtent(fragments[i].Run.ResolvedFont, fonts);
+                : FontExtent(fragments[i].Font, fonts);
             if (fragments[i].Run.VerticalAlign != RunVerticalAlign.None)
             {
-                (h, asc) = ScriptExtent(fragments[i].Run, h, asc);
+                (h, asc) = ScriptExtent(fragments[i].Run, fragments[i].Font, h, asc);
             }
 
             natural = Math.Max(natural, h);
@@ -1067,10 +1097,10 @@ internal static class LineBreaker
     // Scales the full-size extent down to the script size and grows it by the text
     // rise (above the baseline for superscript, below for subscript) so the line
     // reserves the risen glyphs' actual vertical span.
-    private static (double Height, double Ascent) ScriptExtent(Run run, double height, double ascent)
+    private static (double Height, double Ascent) ScriptExtent(Run run, Font font, double height, double ascent)
     {
         var scale = run.ScriptScale;
-        var rise = run.ScriptRise(run.ResolvedFont.Size);
+        var rise = run.ScriptRise(font.Size);
         var descent = (height - ascent) * scale;
         ascent = (ascent * scale) + Math.Max(rise, 0);
         return (ascent + descent + Math.Max(-rise, 0), ascent);
@@ -1078,9 +1108,9 @@ internal static class LineBreaker
 
     // A run's measured advance: the plain measurement scaled to the script size, plus
     // letter spacing per inter-glyph gap (spacing * (code points - 1)).
-    private static double MeasureRun(FontCollection fonts, Run run, string text)
+    private static double MeasureRun(FontCollection fonts, Run run, Font font, string text)
     {
-        var advance = fonts.MeasureText(text, run.ResolvedFont) * run.ScriptScale;
+        var advance = fonts.MeasureText(text, font) * run.ScriptScale;
         var spacing = run.LetterSpacing.Point;
         if (spacing != 0 && text.Length > 0)
         {

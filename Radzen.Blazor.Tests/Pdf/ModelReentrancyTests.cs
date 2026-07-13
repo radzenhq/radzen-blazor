@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -62,6 +64,36 @@ public class ModelReentrancyTests
             styled.StyleName = CellStyle;
             row.Cells[1].Blocks.AddParagraph("row " + r + " right");
         }
+
+        // A barcode with a human-readable caption exercises the resolved-barcode-font path.
+        var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "REENTRANT-1", Unit.FromPoint(160), Unit.FromPoint(40), showText: true);
+        barcode.Font.Size = 9;
+
+        return builder;
+    }
+
+    // A PDF/UA document tags its lists into L -> LI -> {Lbl, LBody}; the Lbl/LBody elements
+    // used to be stashed on the ListItem as per-save scratch and now live only in the
+    // generator-owned StyleResolution, so a tagged list must also generate byte-identically.
+    private static DocumentBuilder AuthorTaggedList()
+    {
+        var builder = new DocumentBuilder { PdfUA = true };
+        builder.Info.Title = "Tagged";
+        builder.Language = "en-US";
+        BuildTestSupport.RegisterLatin(builder);
+        var section = builder.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(800));
+        section.Margin = Unit.FromPoint(40);
+
+        // PDF/UA forbids the standard-14 fonts, so the list cascades to an embeddable family.
+        var list = section.Blocks.AddList(ListStyle.Bullet);
+        list.Font.Name = BuildTestSupport.Latin;
+        list.AddItem("first tagged item");
+        var second = list.AddItem("second tagged item");
+        var nested = second.AddList(ListStyle.Number);
+        nested.Font.Name = BuildTestSupport.Latin;
+        nested.AddItem("nested tagged one");
+        nested.AddItem("nested tagged two");
 
         return builder;
     }
@@ -143,5 +175,48 @@ public class ModelReentrancyTests
         Assert.All(alignmentsAfter, a => Assert.Equal(HorizontalAlignment.Left, a));
         Assert.Equal(alignmentsBefore, alignmentsAfter);
         Assert.Equal(styleNamesBefore, styleNamesAfter);
+    }
+
+    [Fact]
+    public void TaggedListGeneratingTwiceIsByteIdentical()
+    {
+        var builder = AuthorTaggedList();
+        var first = builder.ToArray();
+        var second = builder.ToArray();
+
+        // The Lbl/LBody structure elements the tagged list resolves are per-save side state; a
+        // second save must reproduce the first byte-for-byte, and a fresh equivalent must match.
+        Assert.True(first.AsSpan().SequenceEqual(second), "tagged-list second generation diverged");
+
+        var fresh = AuthorTaggedList().ToArray();
+        Assert.True(first.AsSpan().SequenceEqual(fresh), "tagged list left scratch behind after generation");
+    }
+
+    // The authoring model must expose only authored state: the resolved font and the list
+    // structure elements moved into the generator-owned StyleResolution, so no per-save scratch
+    // property may survive on any model type. This pins that removal so it cannot regress.
+    [Theory]
+    [InlineData(typeof(Run))]
+    [InlineData(typeof(Paragraph))]
+    [InlineData(typeof(Barcode))]
+    [InlineData(typeof(ListItem))]
+    public void ModelTypesHaveNoPerSaveScratchProperty(Type modelType)
+    {
+        string[] forbidden =
+        [
+            "EffectiveFont", "ResolvedFont", "LabelElement", "BodyElement",
+            "ListLabelElement", "ListBodyElement",
+        ];
+
+        var members = modelType
+            .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+            .Select(m => m.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        foreach (var name in forbidden)
+        {
+            Assert.False(members.Contains(name),
+                $"{modelType.Name} still exposes per-save scratch member '{name}'");
+        }
     }
 }

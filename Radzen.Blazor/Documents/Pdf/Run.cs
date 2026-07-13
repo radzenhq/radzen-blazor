@@ -107,10 +107,6 @@ public class Run(string text)
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
 
-    internal Font? EffectiveFont { get; set; }
-
-    internal Font ResolvedFont => EffectiveFont ?? Font;
-
     internal double ScriptScale => VerticalAlign == RunVerticalAlign.None ? 1.0 : VerticalAlignScale;
 
     // Rise fractions of the ORIGINAL font size, matching common typesetting defaults.
