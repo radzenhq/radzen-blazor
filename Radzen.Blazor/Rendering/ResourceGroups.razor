@@ -1,0 +1,29 @@
+@using Radzen.Blazor
+
+<div class="rz-resource-groups">
+    @foreach (var resource in Scheduler?.Resources ?? Array.Empty<object>())
+    {
+        var text = Scheduler!.ResourceText(resource);
+        <div class="rz-resource-group">
+            <div class="rz-resource-group-header" title="@text">
+                @if (Scheduler.ResourceHeaderTemplate != null)
+                {
+                    @Scheduler.ResourceHeaderTemplate(resource)
+                }
+                else
+                {
+                    @text
+                }
+            </div>
+            @ChildContent(resource)
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public IScheduler? Scheduler { get; set; }
+
+    [Parameter]
+    public RenderFragment<object> ChildContent { get; set; } = default!;
+}
