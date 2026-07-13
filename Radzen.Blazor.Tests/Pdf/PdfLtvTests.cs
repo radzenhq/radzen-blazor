@@ -254,12 +254,102 @@ public class PdfLtvTests
         Assert.True(certs[0].SequenceEqual(cert1));
         Assert.True(certs[1].SequenceEqual(cert2));
 
+        // The VRI entry for this signature accumulates references from both
+        // passes rather than dropping the first pass's certificate.
         var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
         var key = Convert.ToHexString(SHA1.HashData(contents));
         var entry = (DictionaryObject)reader.Resolve(vri[key]);
         var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
+        Assert.Equal(2, vriCerts.Count);
+        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(cert1));
+        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[1])).SequenceEqual(cert2));
+    }
+
+    [Fact]
+    public void AddValidationData_MergingSameSignatureUnionsVriInsteadOfReplacing()
+    {
+        var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
+        var certA = Enumerable.Range(0, 40).Select(i => (byte)(i + 1)).ToArray();
+        var crlB = Enumerable.Range(0, 50).Select(i => (byte)(i + 2)).ToArray();
+
+        var contentsReader = DocumentReader.Parse(signed);
+        var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
+        var contents = DecodeContentsHex(signed, gapStart, gapEnd);
+
+        // First pass indexes a cert under the signature; second pass indexes a CRL
+        // under the SAME signature. Both must survive in that signature's VRI entry.
+        var first = DssBuilder.AddValidationData(signed, [certA], null, null, contents);
+        var second = DssBuilder.AddValidationData(first, null, null, [crlB], contents);
+
+        var reader = DocumentReader.Parse(second);
+        var dss = Dss(reader);
+        var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
+        var key = Convert.ToHexString(SHA1.HashData(contents));
+        var entry = (DictionaryObject)reader.Resolve(vri[key]);
+
+        var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
         Assert.Single(vriCerts);
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(cert2));
+        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(certA));
+
+        var vriCrls = (ArrayObject)reader.Resolve(entry["CRL"]);
+        Assert.Single(vriCrls);
+        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCrls[0])).SequenceEqual(crlB));
+    }
+
+    [Fact]
+    public void AddValidationData_ReAddingIdenticalMaterialDoesNotDuplicateStreams()
+    {
+        var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
+        var cert = Enumerable.Range(0, 40).Select(i => (byte)i).ToArray();
+
+        var first = DssBuilder.AddValidationData(signed, [cert], null, null);
+        var second = DssBuilder.AddValidationData(first, [cert], null, null);
+
+        var reader = DocumentReader.Parse(second);
+        var certs = StreamBytes(reader, Dss(reader), "Certs");
+        Assert.Single(certs);
+        Assert.True(certs[0].SequenceEqual(cert));
+    }
+
+    [Fact]
+    public void AddValidationData_PreservesNonStandardKeysOfExistingDss()
+    {
+        var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
+
+        // Craft a prior /DSS carrying a proprietary key another tool might have written.
+        var withDss = InjectDssWithCustomKey(signed);
+
+        var augmented = DssBuilder.AddValidationData(withDss, [Enumerable.Range(0, 10).Select(i => (byte)i).ToArray()], null, null);
+
+        var augmentedReader = DocumentReader.Parse(augmented);
+        var dss = Dss(augmentedReader);
+        Assert.True(dss.ContainsKey("TU"));
+        Assert.Equal(7, ((NumberObject)augmentedReader.Resolve(dss["TU"])).IntValue);
+    }
+
+    private static byte[] InjectDssWithCustomKey(byte[] pdf)
+    {
+        var reader = DocumentReader.Parse(pdf);
+        var rootRef = (ReferenceObject)reader.Trailer["Root"];
+        var catalog = (DictionaryObject)reader.Resolve(rootRef);
+
+        var writer = new IncrementalUpdateWriter(pdf, reader);
+        var dss = new DictionaryObject
+        {
+            ["Type"] = new NameObject("DSS"),
+            ["TU"] = new NumberObject(7),
+        };
+        var dssRef = writer.Add(dss);
+
+        var newCatalog = new DictionaryObject();
+        foreach (var pair in catalog)
+        {
+            newCatalog[pair.Key] = pair.Value;
+        }
+
+        newCatalog["DSS"] = dssRef;
+        writer.Override(rootRef.ObjectNumber, newCatalog);
+        return writer.ToArray();
     }
 
     [Fact]

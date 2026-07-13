@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 
@@ -86,31 +87,37 @@ public static class DssBuilder
 
         var writer = new IncrementalUpdateWriter(pdf, reader);
 
-        var certRefs = AddStreams(writer, certs);
-        var ocspRefs = AddStreams(writer, ocsps);
-        var crlRefs = AddStreams(writer, crls);
-
         // Merge with any existing /DSS so a multi-signature document (or a later
         // re-augmentation) keeps the earlier validation material instead of dropping it.
         var existingDss = catalog.TryGetValue("DSS", out var dssObj) && dssObj is not null && reader.Resolve(dssObj) is DictionaryObject prior ? prior : null;
 
-        var dss = new DictionaryObject { ["Type"] = new NameObject("DSS") };
-        MergeArray(dss, "Certs", existingDss, reader, certRefs);
-        MergeArray(dss, "OCSPs", existingDss, reader, ocspRefs);
-        MergeArray(dss, "CRLs", existingDss, reader, crlRefs);
+        // Start from a copy of the prior /DSS so any keys beyond the four managed
+        // arrays (e.g. proprietary entries from another tool) survive augmentation.
+        var dss = existingDss is not null ? PdfSigner.Copy(existingDss) : new DictionaryObject();
+        dss["Type"] = new NameObject("DSS");
+
+        var certRefs = MergeStreams(writer, reader, existingDss, dss, "Certs", certs);
+        var ocspRefs = MergeStreams(writer, reader, existingDss, dss, "OCSPs", ocsps);
+        var crlRefs = MergeStreams(writer, reader, existingDss, dss, "CRLs", crls);
 
         DictionaryObject? vri = existingDss is not null && existingDss.TryGetValue("VRI", out var vriObj) && vriObj is not null
             && reader.Resolve(vriObj) is DictionaryObject priorVri
-                ? Copy(priorVri)
+                ? PdfSigner.Copy(priorVri)
                 : null;
         if (signatureContents is not null)
         {
-            var entry = new DictionaryObject { ["Type"] = new NameObject("VRI") };
-            AddArray(entry, "Cert", certRefs);
-            AddArray(entry, "OCSP", ocspRefs);
-            AddArray(entry, "CRL", crlRefs);
             vri ??= new DictionaryObject();
-            vri[Sha1.HexUpper(signatureContents)] = entry;
+            var key = Sha1.HexUpper(signatureContents);
+            // Merge into any prior entry for this same signature rather than
+            // replacing it, so references gathered in earlier passes survive.
+            var entry = vri.TryGetValue(key, out var priorEntryObj) && priorEntryObj is not null
+                && reader.Resolve(priorEntryObj) is DictionaryObject priorEntry
+                    ? PdfSigner.Copy(priorEntry)
+                    : new DictionaryObject { ["Type"] = new NameObject("VRI") };
+            UnionArray(entry, "Cert", reader, certRefs);
+            UnionArray(entry, "OCSP", reader, ocspRefs);
+            UnionArray(entry, "CRL", reader, crlRefs);
+            vri[key] = entry;
         }
 
         if (vri is not null && vri.Count > 0)
@@ -120,73 +127,91 @@ public static class DssBuilder
 
         var dssRef = writer.Add(dss);
 
-        var newCatalog = Copy(catalog);
+        var newCatalog = PdfSigner.Copy(catalog);
         newCatalog["DSS"] = dssRef;
         writer.Override(rootRef.ObjectNumber, newCatalog);
 
         return writer.ToArray();
     }
 
-    private static ReferenceObject[] AddStreams(IncrementalUpdateWriter writer, byte[][] items)
-    {
-        var refs = new ReferenceObject[items.Length];
-        for (var i = 0; i < items.Length; i++)
-        {
-            ArgumentNullException.ThrowIfNull(items[i]);
-            refs[i] = writer.Add(new StreamObject(items[i]));
-        }
-
-        return refs;
-    }
-
-    private static void AddArray(DictionaryObject target, string key, ReferenceObject[] refs)
-    {
-        if (refs.Length == 0)
-        {
-            return;
-        }
-
-        var array = new ArrayObject();
-        foreach (var reference in refs)
-        {
-            array.Add(reference);
-        }
-
-        target[key] = array;
-    }
-
-    // Union the existing /DSS array (its entries stay valid indirect references
-    // in the prior revision) with the freshly added streams, preserving order.
-    private static void MergeArray(DictionaryObject target, string key, DictionaryObject? existing, DocumentReader reader, ReferenceObject[] refs)
+    // Carries the existing /DSS array for <paramref name="key"/> over into
+    // <paramref name="target"/>, appends a stream for each new item, and returns
+    // the reference for every item. A new item whose bytes match a stream already
+    // present is not stored again - its existing reference is reused - so repeated
+    // B-LTA refreshes with the same material do not grow the file without bound.
+    private static ReferenceObject[] MergeStreams(
+        IncrementalUpdateWriter writer, DocumentReader reader, DictionaryObject? existing,
+        DictionaryObject target, string key, byte[][] items)
     {
         var array = new ArrayObject();
-        if (existing is not null && existing.TryGetValue(key, out var priorObj) && priorObj is not null && reader.Resolve(priorObj) is ArrayObject prior)
+        var byContent = new Dictionary<string, ReferenceObject>(StringComparer.Ordinal);
+        if (existing is not null && existing.TryGetValue(key, out var priorObj) && priorObj is not null
+            && reader.Resolve(priorObj) is ArrayObject prior)
         {
             foreach (var item in prior)
             {
                 array.Add(item);
+                if (item is ReferenceObject priorRef && reader.Resolve(priorRef) is StreamObject stream)
+                {
+                    byContent.TryAdd(Sha1.HexUpper(reader.DecodeStream(stream)), priorRef);
+                }
             }
         }
 
-        foreach (var reference in refs)
+        var refs = new ReferenceObject[items.Length];
+        for (var i = 0; i < items.Length; i++)
         {
-            array.Add(reference);
+            ArgumentNullException.ThrowIfNull(items[i]);
+            var digest = Sha1.HexUpper(items[i]);
+            if (byContent.TryGetValue(digest, out var reused))
+            {
+                refs[i] = reused;
+                continue;
+            }
+
+            var added = writer.Add(new StreamObject(items[i]));
+            byContent[digest] = added;
+            array.Add(added);
+            refs[i] = added;
         }
 
         if (array.Count > 0)
         {
             target[key] = array;
         }
+
+        return refs;
     }
 
-    private static DictionaryObject Copy(DictionaryObject source)
+    // Appends the references to a /VRI entry's array, carrying any prior entries
+    // and skipping references already present so re-runs stay idempotent.
+    private static void UnionArray(DictionaryObject entry, string key, DocumentReader reader, ReferenceObject[] refs)
     {
-        var copy = new DictionaryObject();
-        foreach (var pair in source)
+        var array = new ArrayObject();
+        var seen = new HashSet<(int, int)>();
+        if (entry.TryGetValue(key, out var priorObj) && priorObj is not null && reader.Resolve(priorObj) is ArrayObject prior)
         {
-            copy[pair.Key] = pair.Value;
+            foreach (var item in prior)
+            {
+                array.Add(item);
+                if (item is ReferenceObject r)
+                {
+                    seen.Add((r.ObjectNumber, r.Generation));
+                }
+            }
         }
 
-        return copy;
+        foreach (var reference in refs)
+        {
+            if (seen.Add((reference.ObjectNumber, reference.Generation)))
+            {
+                array.Add(reference);
+            }
+        }
+
+        if (array.Count > 0)
+        {
+            entry[key] = array;
+        }
     }
 }
