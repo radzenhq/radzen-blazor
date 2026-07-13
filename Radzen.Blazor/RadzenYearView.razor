@@ -15,10 +15,10 @@
             var maxInSlot = maxAppointmentsInSlot;
 
             return @<CascadingValue Value=@Scheduler>
-                <ResourceGroups>
-                    <ChildContent Context="resource">
+                <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
+                    <ChildContent Context="path">
                         <YearView StartDate=@StartDate EndDate=@EndDate StartMonth=@StartMonth MaxAppointmentsInSlot=@maxInSlot MoreText=@MoreText
-                                  NoDayEventsText=@NoDayEventsText Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource />
+                                  NoDayEventsText=@NoDayEventsText Appointments=@AppointmentsForResources(appointments, path) Resources=@path />
                     </ChildContent>
                 </ResourceGroups>
             </CascadingValue>;

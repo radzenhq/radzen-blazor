@@ -2,35 +2,48 @@
 @inherits DropableViewBase
 
 <div class="rz-view rz-resource-view">
-    <div class="rz-view-header">
-        <div class="rz-slot-hour-header"></div>
-        @foreach (var resource in Resources)
-        {
-            var text = Scheduler!.ResourceText(resource);
-            <div class="rz-slot-header" title="@text">
-                @if (Scheduler.ResourceHeaderTemplate != null)
+    @{
+        var levels = Levels;
+        var paths = Paths;
+    }
+    @for (var level = 0; level < levels.Count; level++)
+    {
+        var type = levels[level];
+        var span = SpanOfLevel(level);
+        var repeats = RepeatsOfLevel(level);
+        <div class="rz-view-header">
+            <div class="rz-slot-hour-header"></div>
+            @for (var repeat = 0; repeat < repeats; repeat++)
+            {
+                @foreach (var item in type.Items)
                 {
-                    @Scheduler.ResourceHeaderTemplate(resource)
+                    var text = type.GetText(item);
+                    <div class="rz-slot-header" style="flex: @span" title="@text">
+                        @if (type.HeaderTemplate != null)
+                        {
+                            @type.HeaderTemplate(item)
+                        }
+                        else
+                        {
+                            @text
+                        }
+                    </div>
                 }
-                else
-                {
-                    @text
-                }
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
     @if (ShowAllDay)
     {
         <div class="rz-view-header rz-resource-all-day">
             <div class="rz-slot-hour-header rz-resource-all-day-label">@AllDayText</div>
-            @for (var i = 0; i < Resources.Count; i++)
+            @for (var i = 0; i < paths.Count; i++)
             {
-                var resource = Resources[i];
+                var path = paths[i];
                 var index = i;
                 <div class="@ClassList.Create("rz-slot-header rz-resource-all-day-slot").Add("rz-state-focused", allDayFocused && index == currentResource).ToString()"
-                     @onclick=@(args => OnAllDaySlotClick(resource)) @ondragover:preventDefault @ondrop=@(args => OnDrop(StartDate.Date, resource)) dropzone="move">
+                     @onclick=@(args => OnAllDaySlotClick(path)) @ondragover:preventDefault @ondrop=@(args => OnDrop(StartDate.Date, path)) dropzone="move">
                     <div class="rz-events" @onclick:stopPropagation>
-                        @foreach (var appointment in AllDayAppointments(resource))
+                        @foreach (var appointment in AllDayAppointments(path))
                         {
                             <Appointment Data=@appointment Click=@OnAppointmentSelect DragStart=@OnAppointmentDragStart />
                         }
@@ -44,16 +57,16 @@
         <div @ref=view class="rz-week-view-content rz-resource-view-content" tabindex="0" aria-label="@AriaLabel"
              @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
              @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
-            @for (var i = 0; i < Resources.Count; i++)
+            @for (var i = 0; i < paths.Count; i++)
             {
-                var resource = Resources[i];
+                var path = paths[i];
                 var index = i;
                 <div class="@ClassList.Create("rz-slots").Add("rz-state-focused", !allDayFocused && index == currentResource).ToString()">
-                    <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate Appointments=@AppointmentsForResource(resource) CurrentDate="@(index == currentResource && !allDayFocused ? currentSlot : default)" AppointmentDragStart=@OnAppointmentDragStart />
+                    <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate Appointments=@AppointmentsForPath(path) CurrentDate="@(index == currentResource && !allDayFocused ? currentSlot : default)" AppointmentDragStart=@OnAppointmentDragStart />
                     @for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
                     {
                         var slotDate = date;
-                        <div @onclick=@(args => OnSlotClick(slotDate, resource)) @ondragover:preventDefault @ondrop=@(args => OnDrop(slotDate, resource)) @attributes=@Attributes(slotDate, resource, index)></div>
+                        <div @onclick=@(args => OnSlotClick(slotDate, path)) @ondragover:preventDefault @ondrop=@(args => OnDrop(slotDate, path)) @attributes=@Attributes(slotDate, path, index)></div>
                     }
                 </div>
             }

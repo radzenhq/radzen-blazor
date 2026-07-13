@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -29,18 +31,18 @@ namespace Radzen.Blazor.Rendering
         }
 
         /// <summary>
-        /// Handles on slot drop on a slot of the specified resource.
+        /// Handles on slot drop on a slot of the specified resources.
         /// </summary>
         /// <param name="slotDate"></param>
-        /// <param name="resource">The resource the slot belongs to.</param>
+        /// <param name="resources">The resource items the slot belongs to keyed by resource type name.</param>
         /// <returns>Task</returns>
-        public async Task OnDrop(DateTime slotDate, object? resource)
+        public async Task OnDrop(DateTime slotDate, IDictionary<string, object>? resources)
         {
             if (draggedAppointment != null)
             {
                 TimeSpan timespan = slotDate - draggedAppointment.Start;
 
-                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { SlotDate = slotDate, Appointment = draggedAppointment, TimeSpan = timespan, Resource = resource });
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { SlotDate = slotDate, Appointment = draggedAppointment, TimeSpan = timespan, Resources = resources, Resource = resources?.Values.LastOrDefault() });
 
                 draggedAppointment = null;
             }
