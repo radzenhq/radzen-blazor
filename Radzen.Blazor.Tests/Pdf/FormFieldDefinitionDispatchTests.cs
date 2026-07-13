@@ -2,53 +2,50 @@
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// FormWriter no longer type-tests FormFieldDefinition: each field kind routes its own
-// flattened appearance, text-appearance metadata and created-widget emission through the
-// polymorphic members, so a new field type is a new subclass rather than edits across
-// the writer. These assert the dispatch each subtype implements.
+// Public field definitions carry intent only; internal form services translate that intent
+// into flattened content and COS objects.
 public class FormFieldDefinitionDispatchTests
 {
-    private static Page NewPage() => new(Unit.FromPoint(200), Unit.FromPoint(200));
-
     [Fact]
-    public void TextAppearance_IsPresentOnlyForTextBearingFields()
+    public void Definitions_ExposeNoCosEmissionHooks()
     {
-        Assert.NotNull(new TextFieldDefinition("t") { Value = "hi" }.TextAppearance);
-        Assert.NotNull(new ChoiceFieldDefinition("c") { Value = "x" }.TextAppearance);
-        Assert.Null(new CheckBoxFieldDefinition("b").TextAppearance);
-        Assert.Null(new RadioGroupFieldDefinition("r").TextAppearance);
+        var methods = typeof(FormFieldDefinition).GetMethods(
+            System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.Public);
+
+        Assert.DoesNotContain(methods, method => method.Name is "EmitCreatedField" or "PopulateWidget" or "WriteFlattenedContent");
+        Assert.False(typeof(RadioGroupFieldDefinition).IsAssignableTo(typeof(PositionedFieldDefinition)));
+        Assert.True(typeof(TextFieldDefinition).IsAssignableTo(typeof(PositionedFieldDefinition)));
     }
 
     [Fact]
     public void WriteFlattenedContent_TextField_AddsTextContent()
     {
-        var page = NewPage();
-        new TextFieldDefinition("t") { Value = "hi", Width = 80, Height = 20 }.WriteFlattenedContent(page);
+        var page = Flatten(new TextFieldDefinition("t") { Value = "hi", Width = 80, Height = 20 });
         Assert.IsType<TextContent>(Assert.Single(page.Content));
     }
 
     [Fact]
     public void WriteFlattenedContent_EmptyTextField_AddsNothing()
     {
-        var page = NewPage();
-        new TextFieldDefinition("t").WriteFlattenedContent(page);
+        var page = Flatten(new TextFieldDefinition("t"));
         Assert.Empty(page.Content);
     }
 
     [Fact]
     public void WriteFlattenedContent_CheckBox_DrawsOnlyWhenChecked()
     {
-        var unchecked_ = NewPage();
-        new CheckBoxFieldDefinition("b") { Width = 12, Height = 12 }.WriteFlattenedContent(unchecked_);
+        var unchecked_ = Flatten(new CheckBoxFieldDefinition("b") { Width = 12, Height = 12 });
         Assert.Empty(unchecked_.Content);
 
-        var checked_ = NewPage();
-        new CheckBoxFieldDefinition("b") { Checked = true, Width = 12, Height = 12 }.WriteFlattenedContent(checked_);
+        var checked_ = Flatten(new CheckBoxFieldDefinition("b") { Checked = true, Width = 12, Height = 12 });
         Assert.IsType<PathContent>(Assert.Single(checked_.Content));
     }
 
@@ -82,9 +79,20 @@ public class FormFieldDefinitionDispatchTests
         var fields = new List<DocumentObject>();
         var created = new List<(int, ReferenceObject)>();
 
-        definition.EmitCreatedField(writer, page, fields, created);
+        FormFieldEmitter.Emit(
+            definition,
+            new FormEmitContext(writer, page, fields, created, new FormAppearanceService(new Document())));
 
         var reference = Assert.IsType<ReferenceObject>(Assert.Single(fields));
         return Assert.IsType<DictionaryObject>(writer.Resolve(reference));
+    }
+
+    private static Page Flatten(FormFieldDefinition definition)
+    {
+        var document = new Document();
+        var page = document.Pages.Add(PageSizes.A4);
+        document.FormFields.Add(definition);
+        new FormFlattener(document).Flatten();
+        return page;
     }
 }

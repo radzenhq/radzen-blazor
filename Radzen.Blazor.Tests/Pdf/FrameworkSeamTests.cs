@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
@@ -10,11 +9,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The polymorphic PDF bases expose their extension hooks as protected/protected-internal so a
-// consumer in another assembly can subclass them, and new image formats plug in through the
-// public ImageDecoder.Register. These subclasses/decoders use only externally reachable members
-// (protected hooks, public ctors, public writer primitives) and assert the pipeline dispatches
-// to them.
+// The polymorphic PDF bases expose their extension hooks as protected/protected-internal and new
+// image formats plug in through the public ImageDecoder.Register. These subclasses/decoders use
+// only externally reachable members and assert the pipeline dispatches to them.
 public class FrameworkSeamTests
 {
     // An external ContentElement whose protected EmitBody paints a distinctive rectangle
@@ -97,48 +94,30 @@ public class FrameworkSeamTests
         Assert.Equal(3, Assert.IsType<NumberObject>(coords[2]).DoubleValue, 3);
     }
 
-    // An external form field type: it subclasses through the now-protected constructor, overrides
-    // the protected WriteFlattenedContent/TextAppearance hooks, and reuses the base single-widget
-    // EmitCreatedField scaffolding by overriding the protected PopulateWidget.
     private sealed class StampFieldDefinition(string name) : FormFieldDefinition(name)
     {
         public string Text { get; init; } = string.Empty;
-
-        protected internal override (string Value, Font Font)? TextAppearance => (Text, new Font());
-
-        protected internal override void WriteFlattenedContent(Page page)
-            => page.Content.Add(new TextContent(Text, X, Y));
-
-        protected override void PopulateWidget(DictionaryObject widget, DocumentWriter writer, double width, double height)
-            => widget["FT"] = new NameObject("Stamp");
     }
 
     [Fact]
-    public void FormFieldDefinition_ExternalSubclass_FlattenedContentIsDispatched()
+    public void FormFieldDefinition_ExternalSubclass_CarriesDeclarativeState()
     {
-        var page = new Page(Unit.FromPoint(200), Unit.FromPoint(200));
+        var definition = new StampFieldDefinition("s") { PageIndex = 2, Text = "seal" };
 
-        new StampFieldDefinition("s") { Text = "seal", Width = 40, Height = 20 }.WriteFlattenedContent(page);
-
-        Assert.IsType<TextContent>(Assert.Single(page.Content));
+        Assert.Equal("s", definition.Name);
+        Assert.Equal(2, definition.PageIndex);
+        Assert.Equal("seal", definition.Text);
     }
 
     [Fact]
-    public void FormFieldDefinition_ExternalSubclass_EmitsWidgetThroughBaseScaffolding()
+    public void FormFieldDefinition_ProtectedSurface_HasNoCosTypes()
     {
-        using var stream = new MemoryStream();
-        var writer = new DocumentWriter(stream);
-        var pageReference = writer.Add(new DictionaryObject());
-        var fields = new List<DocumentObject>();
-        var created = new List<(int, ReferenceObject)>();
+        var members = typeof(FormFieldDefinition).GetMembers(
+            System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.DeclaredOnly);
 
-        new StampFieldDefinition("s") { Text = "seal", Width = 40, Height = 20 }
-            .EmitCreatedField(writer, pageReference, fields, created);
-
-        var reference = Assert.IsType<ReferenceObject>(Assert.Single(fields));
-        var widget = Assert.IsType<DictionaryObject>(writer.Resolve(reference));
-        Assert.Equal("Stamp", Assert.IsType<NameObject>(widget["FT"]!).Value);
-        Assert.Equal("Widget", Assert.IsType<NameObject>(widget["Subtype"]!).Value);
+        Assert.DoesNotContain(members, member => member.Name is "EmitCreatedField" or "PopulateWidget");
     }
 
     // A custom image format ("RZIM" magic) decoding to a 1x1 grayscale image XObject.

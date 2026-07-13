@@ -186,7 +186,15 @@ internal sealed class DocumentSaver
             var catalogPreserver = new CatalogPreserver(doc);
             var removed = catalogPreserver.PruneRemovedPages(importer);
             catalogPreserver.PreserveCatalog(importer, catalog, pagesRef);
-            formWriter.PreserveForm(importer, catalog, pageNodes, removed, appendedFields, writer);
+            formWriter.PreserveForm(new PreserveFormRequest
+            {
+                Importer = importer,
+                Catalog = catalog,
+                PageNodes = pageNodes,
+                RemovedPages = removed,
+                AppendedFields = appendedFields,
+                Writer = writer,
+            });
         }
         else if (appendedFields.Count > 0)
         {
