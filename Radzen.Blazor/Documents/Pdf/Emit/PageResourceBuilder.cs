@@ -360,7 +360,7 @@ internal static class PageResourceBuilder
     {
         // Re-emit a loaded page's original box so a non-zero origin round-trips;
         // content coordinates are preserved verbatim and would otherwise shift.
-        if (document.sourceBoxes.TryGetValue(page, out var box))
+        if (document.Loaded is { } loaded && loaded.SourceBoxes.TryGetValue(page, out var box))
         {
             return NumberBox(box);
         }

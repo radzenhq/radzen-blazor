@@ -19,12 +19,13 @@ internal static class DocumentLoader
         var bytes = ReadAll(stream, limits);
         var reader = DocumentReader.Parse(bytes, options?.Password, limits);
 
-        var document = new Document { source = reader, sourceBytes = bytes };
+        var state = new LoadedState(reader, bytes);
+        var document = Document.CreateLoaded(state);
         ReadInfo(reader, document.Info);
-        document.loadedInfoSnapshot = Document.InfoSnapshot(document.Info);
+        state.LoadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
-        document.sourceCatalog = catalog;
+        state.SourceCatalog = catalog;
         if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
@@ -34,12 +35,12 @@ internal static class DocumentLoader
                 visited.Add(pagesReference.ObjectNumber);
             }
 
-            CollectPages(reader, pagesNode, new InheritedAttributes(), document, limits, visited, 0);
+            CollectPages(reader, pagesNode, new InheritedAttributes(), document, state, limits, visited, 0);
         }
 
         if (catalog is not null && reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
-            document.sourceAcroForm = form;
+            state.SourceAcroForm = form;
             document.AcroForm = new AcroForm(reader, form);
         }
 
@@ -112,7 +113,7 @@ internal static class DocumentLoader
 
     // A visited-set of page-node object numbers is the primary guard against a
     // cyclic /Kids graph; MaxPageTreeDepth is a backstop for a deep acyclic tree.
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, ReaderLimits limits, HashSet<int> visited, int depth)
+    private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, LoadedState state, ReaderLimits limits, HashSet<int> visited, int depth)
     {
         if (depth > limits.MaxPageTreeDepth)
         {
@@ -140,7 +141,7 @@ internal static class DocumentLoader
 
                 if (reader.AsDictionary(kid) is { } child)
                 {
-                    CollectPages(reader, child, childInherited, document, limits, visited, depth + 1);
+                    CollectPages(reader, child, childInherited, document, state, limits, visited, depth + 1);
                 }
             }
 
@@ -157,26 +158,26 @@ internal static class DocumentLoader
 
         page.SetTextFonts(BuildTextFonts(reader, resources));
         document.Pages.Insert(document.Pages.Count, page);
-        document.sourcePages[page] = node;
+        state.SourcePages[page] = node;
         if (resources is not null)
         {
-            document.sourceResources[page] = resources;
+            state.SourceResources[page] = resources;
         }
 
         if (box is not null && box.Count >= 4)
         {
-            document.sourceBoxes[page] = box;
+            state.SourceBoxes[page] = box;
         }
 
         if (cropBox is not null && cropBox.Count >= 4)
         {
-            document.sourceCropBoxes[page] = cropBox;
+            state.SourceCropBoxes[page] = cropBox;
         }
 
         // Only a rotation the viewer would actually apply is worth re-emitting.
         if (rotate is { } degrees && degrees % 360 != 0)
         {
-            document.sourceRotations[page] = degrees;
+            state.SourceRotations[page] = degrees;
         }
     }
 

@@ -27,6 +27,10 @@ internal sealed class FormWriter(Document document)
     // final AcroForm once its dictionary is assembled.
     private readonly List<(GraphImporter Importer, DictionaryObject Form)> appendedFormDefaults = [];
 
+    private LoadedState? Loaded => document.Loaded;
+
+    private DocumentReader? Source => document.Loaded?.Source;
+
     public void Flatten()
     {
         foreach (var definition in document.FormFields)
@@ -49,8 +53,8 @@ internal sealed class FormWriter(Document document)
     // emits no /AcroForm.
     private void FlattenLoadedForm()
     {
-        var source = document.source;
-        var sourceAcroForm = document.sourceAcroForm;
+        var source = Source;
+        var sourceAcroForm = Loaded?.SourceAcroForm;
         if (source is null || sourceAcroForm is null)
         {
             return;
@@ -60,7 +64,7 @@ internal sealed class FormWriter(Document document)
 
         foreach (var page in document.Pages)
         {
-            if (!document.sourcePages.TryGetValue(page, out var node)
+            if (!Loaded!.SourcePages.TryGetValue(page, out var node)
                 || source.GetArray(node, "Annots") is not { } annots)
             {
                 continue;
@@ -87,13 +91,13 @@ internal sealed class FormWriter(Document document)
             }
         }
 
-        document.sourceAcroForm = null;
+        Loaded!.ClearAcroForm();
         document.AcroForm = null;
     }
 
     private bool IsWidget(DictionaryObject annot)
     {
-        var source = document.source;
+        var source = Source;
         return string.Equals(source!.GetName(annot, "Subtype"), "Widget", StringComparison.Ordinal);
     }
 
@@ -102,7 +106,7 @@ internal sealed class FormWriter(Document document)
     // widget (/F bit 2) contributes nothing but is still removed.
     private void DrawWidget(Page page, DictionaryObject widget, string? formDa)
     {
-        var source = document.source;
+        var source = Source;
         if (source!.GetInt(widget, "F") is { } flags && (flags & 2) != 0)
         {
             return;
@@ -163,7 +167,7 @@ internal sealed class FormWriter(Document document)
     // array of selected export values joined onto one line so the selections are not lost.
     private string? ChoiceOrTextValue(DocumentObject? value)
     {
-        var source = document.source;
+        var source = Source;
         switch (value)
         {
             case StringObject stored:
@@ -186,7 +190,7 @@ internal sealed class FormWriter(Document document)
 
     private bool HasVisibleAppearance(DictionaryObject widget)
     {
-        var source = document.source;
+        var source = Source;
         return source!.GetDictionary(widget, "AP") is { } ap
             && source!.GetStream(ap, "N") is { } stream
             && stream.Data.Length > 0;
@@ -196,7 +200,7 @@ internal sealed class FormWriter(Document document)
     // (ISO 32000-1 12.7.3.1) and returns it resolved.
     private DocumentObject? Inherited(DictionaryObject widget, string key)
     {
-        var source = document.source;
+        var source = Source;
         var current = widget;
         for (var depth = 0; current is not null && depth < 32; depth++)
         {
@@ -213,7 +217,7 @@ internal sealed class FormWriter(Document document)
 
     private (double X, double Y, double Width, double Height) WidgetRect(DictionaryObject widget)
     {
-        var source = document.source;
+        var source = Source;
         if (source!.GetArray(widget, "Rect") is { } rect && rect.Count >= 4)
         {
             var x0 = source!.AsNumber(rect[0]) ?? 0.0;
@@ -232,11 +236,11 @@ internal sealed class FormWriter(Document document)
     // page are dropped so the deleted page never re-enters through a /P link.
     public void PreserveForm(GraphImporter importer, DictionaryObject catalog, List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes, HashSet<DictionaryObject> removed, List<DocumentObject> appendedFields, DocumentWriter writer)
     {
-        var source = document.source;
-        var sourceAcroForm = document.sourceAcroForm;
+        var source = Source;
+        var sourceAcroForm = Loaded?.SourceAcroForm;
         foreach (var (page, node, _) in pageNodes)
         {
-            if (source is null || !document.sourcePages.TryGetValue(page, out var sourceNode)
+            if (source is null || !Loaded!.SourcePages.TryGetValue(page, out var sourceNode)
                 || source.GetArray(sourceNode, "Annots") is not { } annots)
             {
                 continue;
@@ -440,7 +444,7 @@ internal sealed class FormWriter(Document document)
         RegisterExistingFieldNames();
         foreach (var (page, node, reference) in pageNodes)
         {
-            if (!document.appendedPages.TryGetValue(page, out var appended))
+            if (Loaded is not { } loaded || !loaded.AppendedPages.TryGetValue(page, out var appended))
             {
                 continue;
             }
@@ -466,7 +470,7 @@ internal sealed class FormWriter(Document document)
 
             node["Annots"] = imported;
 
-            if (!document.appendedAcroForms.TryGetValue(reader, out var sourceForm))
+            if (!loaded.AppendedAcroForms.TryGetValue(reader, out var sourceForm))
             {
                 continue;
             }
@@ -497,8 +501,8 @@ internal sealed class FormWriter(Document document)
             usedFieldNames.Add(definition.Name);
         }
 
-        var source = document.source;
-        if (source is not null && document.sourceAcroForm is { } sourceForm
+        var source = Source;
+        if (source is not null && Loaded!.SourceAcroForm is { } sourceForm
             && source.GetArray(sourceForm, "Fields") is { } rootFields)
         {
             foreach (var field in rootFields)

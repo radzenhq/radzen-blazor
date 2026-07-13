@@ -10,6 +10,7 @@ internal static class DocumentMerger
 {
     internal static void Append(Document target, Document other)
     {
+        var origin = other.Loaded;
         foreach (var source in other.Pages)
         {
             var page = new Page(source.Width, source.Height);
@@ -30,40 +31,19 @@ internal static class DocumentMerger
                     page.SetTextFonts(generatedFonts);
                 }
             }
-            else if (other.source is not null && other.sourceResources.TryGetValue(source, out var loadedResources))
+            else if (origin?.Source is { } reader && origin.SourceResources.TryGetValue(source, out var loadedResources))
             {
-                target.appendedResources[page] = (other.source, loadedResources);
-                page.SetTextFonts(DocumentLoader.BuildTextFonts(other.source, loadedResources));
+                target.EnsureLoaded().RecordAppendedResources(page, reader, loadedResources);
+                page.SetTextFonts(DocumentLoader.BuildTextFonts(reader, loadedResources));
             }
 
-            // A loaded appended page keeps a handle to its source node so its
-            // /Annots (and any widget-annotation form fields) survive the copy.
-            if (other.source is not null && other.sourcePages.TryGetValue(source, out var sourceNode))
+            // Carry each appended page's source node (for its /Annots and any widget
+            // form fields), donor AcroForm, and its media/crop boxes and rotation, so a
+            // merged loaded page re-serializes identically. Delegates to the target's
+            // own LoadedState rather than reaching into raw dictionaries.
+            if (origin is not null)
             {
-                target.appendedPages[page] = (other.source, sourceNode);
-                if (other.sourceAcroForm is not null)
-                {
-                    target.appendedAcroForms[other.source] = other.sourceAcroForm;
-                }
-            }
-
-            if (other.sourceBoxes.TryGetValue(source, out var box))
-            {
-                target.sourceBoxes[page] = box;
-            }
-
-            // Carry the appended page's crop box and rotation too; serialization reads
-            // these dictionaries, so without the copy a merged loaded page loses its
-            // /CropBox and /Rotate. Also carries through a chained append, since a
-            // document produced by Append records the same entries under its own keys.
-            if (other.sourceCropBoxes.TryGetValue(source, out var cropBox))
-            {
-                target.sourceCropBoxes[page] = cropBox;
-            }
-
-            if (other.sourceRotations.TryGetValue(source, out var rotation))
-            {
-                target.sourceRotations[page] = rotation;
+                target.EnsureLoaded().CarryAppended(page, source, origin);
             }
 
             target.Pages.Insert(target.Pages.Count, page);

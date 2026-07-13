@@ -22,8 +22,13 @@ internal sealed class CatalogPreserver(Document document)
     public HashSet<DictionaryObject> PruneRemovedPages(GraphImporter importer)
     {
         var removed = new HashSet<DictionaryObject>();
+        if (document.Loaded is not { } loaded)
+        {
+            return removed;
+        }
+
         var kept = new HashSet<Page>(document.Pages);
-        foreach (var pair in document.sourcePages)
+        foreach (var pair in loaded.SourcePages)
         {
             if (!kept.Contains(pair.Key))
             {
@@ -41,8 +46,8 @@ internal sealed class CatalogPreserver(Document document)
     // page tree; entries pointing at a removed page collapse to null.
     public void PreserveCatalog(GraphImporter importer, DictionaryObject catalog, ReferenceObject pagesRef)
     {
-        var source = document.source;
-        var sourceCatalog = document.sourceCatalog;
+        var source = document.Loaded?.Source;
+        var sourceCatalog = document.Loaded?.SourceCatalog;
         if (sourceCatalog is null || source is null)
         {
             return;

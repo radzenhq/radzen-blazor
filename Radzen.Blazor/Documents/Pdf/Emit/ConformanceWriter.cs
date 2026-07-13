@@ -104,7 +104,7 @@ internal sealed class ConformanceWriter(Document document)
 
     private void ValidatePdfA()
     {
-        if (document.source is not null && document.source.IsEncrypted)
+        if (document.Loaded?.Source is { } source && source.IsEncrypted)
         {
             throw new InvalidOperationException("PDF/A forbids encryption; the source document is encrypted.");
         }
