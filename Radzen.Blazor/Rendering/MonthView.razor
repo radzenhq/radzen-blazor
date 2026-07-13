@@ -53,7 +53,7 @@
                 {
                     var dayOfWeek = StartDate.AddDays(days++);
                     var slot = week.Days[day];
-                    <div @onclick="@(args => OnSlotClick(dayOfWeek))" @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resource)) @attributes=@Attributes(dayOfWeek)>
+                    <div @onclick="@(args => OnSlotClick(dayOfWeek))" @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resources)) @attributes=@Attributes(dayOfWeek)>
                         <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
                              @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
                              @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
@@ -289,13 +289,13 @@
     public IEnumerable<AppointmentData>? Appointments { get; set; }
 
     [Parameter]
-    public object? Resource { get; set; }
+    public IDictionary<string, object>? Resources { get; set; }
 
     IDictionary<string, object> Attributes(DateTime start)
     {
         if (Scheduler == null)
             return new Dictionary<string, object>();
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInSlot(start, start.AddDays(1)), Resource);
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInSlot(start, start.AddDays(1)), Resources);
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;
@@ -304,7 +304,7 @@
     async Task OnSlotClick(DateTime date)
     {
         if (Scheduler != null)
-            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)), Resource);
+            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)), Resources);
     }
 
     async Task OnDayClick(DateTime day)

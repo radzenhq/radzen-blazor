@@ -169,43 +169,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string? TextProperty { get; set; }
 
-        /// <summary>
-        /// Gets or sets the resources of the scheduler (rooms, people, equipment). Views group appointments by resource when their
-        /// <see cref="SchedulerViewBase.GroupByResource" /> property is set to <c>true</c>.
-        /// </summary>
-        /// <value>The resources.</value>
-        [Parameter]
-        public IEnumerable? Resources { get; set; }
-
-        /// <summary>
-        /// Specifies the property of a resource item which contains its display text. The resource item itself is used when not set.
-        /// </summary>
-        /// <value>The name of the property.</value>
-        [Parameter]
-        public string? ResourceTextProperty { get; set; }
-
-        /// <summary>
-        /// Specifies the property of a resource item which contains its unique value. The resource item itself is used when not set.
-        /// </summary>
-        /// <value>The name of the property.</value>
-        [Parameter]
-        public string? ResourceValueProperty { get; set; }
-
-        /// <summary>
-        /// Specifies the property of <typeparamref name="TItem" /> which contains the value of the resource an appointment belongs to.
-        /// The property value is compared to the value of <see cref="ResourceValueProperty" /> of every resource. Collection properties are
-        /// supported - the appointment is displayed for every resource whose value the collection contains.
-        /// </summary>
-        /// <value>The name of the property.</value>
-        [Parameter]
-        public string? ResourceProperty { get; set; }
-
-        /// <summary>
-        /// Gets or sets the template used to render resource headers in views which group appointments by resource. The resource item is passed as context.
-        /// </summary>
-        /// <value>The resource header template.</value>
-        [Parameter]
-        public RenderFragment<object>? ResourceHeaderTemplate { get; set; }
 
         /// <summary>
         /// Specifies whether to Show or Hide the Scheduler Header. Defaults to true />.
@@ -462,9 +425,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, object? resource)
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, IDictionary<string, object>? resources)
         {
-            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView, Resource = resource };
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView, Resources = resources, Resource = resources?.Values.LastOrDefault() };
 
             SlotRender?.Invoke(args);
 
@@ -498,9 +461,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, object? resource)
+        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, IDictionary<string, object>? resources)
         {
-            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView, Resource = resource };
+            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView, Resources = resources, Resource = resources?.Values.LastOrDefault() };
             await SlotSelect.InvokeAsync(args);
 
             return args.IsDefaultPrevented;
@@ -693,11 +656,6 @@ namespace Radzen.Blazor
                 appointments = null;
             }
 
-            if (parameters.DidParameterChange(nameof(Resources), Resources))
-            {
-                resolvedResources = null;
-            }
-
             if (parameters.DidParameterChange(nameof(StartProperty), StartProperty))
             {
                 startGetter = PropertyAccess.Getter<TItem, DateTime>(parameters.GetValueOrDefault<string>(nameof(StartProperty))!);
@@ -870,37 +828,30 @@ namespace Radzen.Blazor
             return AppointmentMove.HasDelegate;
         }
 
-        IList<object>? resolvedResources;
+        IList<RadzenSchedulerResource> resources = new List<RadzenSchedulerResource>();
 
-        IList<object> IScheduler.Resources => resolvedResources ??= Resources?.Cast<object>().ToList() ?? new List<object>();
-
-        RenderFragment<object>? IScheduler.ResourceHeaderTemplate => ResourceHeaderTemplate;
+        /// <summary>
+        /// Gets the resource types of the scheduler in order of declaration. Declared as <see cref="RadzenSchedulerResource" /> child content.
+        /// </summary>
+        public IList<RadzenSchedulerResource> Resources => resources;
 
         /// <inheritdoc />
-        public string ResourceText(object resource)
+        public Task AddResource(RadzenSchedulerResource resource)
         {
-            var value = string.IsNullOrEmpty(ResourceTextProperty) ? resource : PropertyAccess.GetItemOrValueFromProperty(resource, ResourceTextProperty);
+            if (!resources.Contains(resource))
+            {
+                resources.Add(resource);
 
-            return value?.ToString() ?? string.Empty;
+                StateHasChanged();
+            }
+
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public bool IsAppointmentInResource(AppointmentData item, object? resource)
+        public void RemoveResource(RadzenSchedulerResource resource)
         {
-            if (item == null || resource == null || string.IsNullOrEmpty(ResourceProperty))
-            {
-                return false;
-            }
-
-            var value = PropertyAccess.GetItemOrValueFromProperty(item.Data, ResourceProperty);
-            var resourceValue = string.IsNullOrEmpty(ResourceValueProperty) ? resource : PropertyAccess.GetItemOrValueFromProperty(resource, ResourceValueProperty);
-
-            if (value is IEnumerable enumerable && value is not string)
-            {
-                return enumerable.Cast<object>().Any(entry => object.Equals(entry, resourceValue));
-            }
-
-            return object.Equals(value, resourceValue);
+            resources.Remove(resource);
         }
     }
 }

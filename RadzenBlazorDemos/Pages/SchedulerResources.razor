@@ -1,12 +1,36 @@
 @inject DialogService DialogService
 
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Group by resource" Component="GroupByResource" />
+        <RadzenSwitch @bind-Value=@groupByResource Name="GroupByResource" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Group by" Component="GroupBy" />
+        <RadzenDropDown @bind-Value=@groupBy Data=@groupByOptions Name="GroupBy" Disabled=@(!groupByResource) Style="width: 11rem;" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="Orientation" Component="GroupOrientation" />
+        <RadzenSelectBar @bind-Value=@groupOrientation TValue="Orientation" Name="GroupOrientation" Disabled=@(!groupByResource) Size="ButtonSize.Small">
+            <Items>
+                <RadzenSelectBarItem Text="Horizontal" Value="@Orientation.Horizontal" />
+                <RadzenSelectBarItem Text="Vertical" Value="@Orientation.Vertical" />
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <RadzenLabel Text="All-day row" Component="ShowAllDay" />
+        <RadzenSwitch @bind-Value=@showAllDay Name="ShowAllDay" Disabled=@(!groupByResource) />
+    </RadzenStack>
+</RadzenStack>
+
 <RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="RoomBooking" Data=@bookings StartProperty="Start" EndProperty="End" TextProperty="Text"
-    Resources=@rooms ResourceTextProperty="Name" ResourceValueProperty="Id" ResourceProperty="RoomIds"
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentMove=@OnAppointmentMove>
-    <RadzenDayView GroupByResource="true" />
-    <RadzenWeekView GroupByResource="true" />
-    <RadzenMonthView GroupByResource="true" />
-    <RadzenWeekView Text="Plain Week" />
+    <RadzenSchedulerResource Name="Room" Data=@rooms Property="RoomIds" TextProperty="Name" ValueProperty="Id" />
+    <RadzenSchedulerResource Name="Employee" Data=@employees Property="StaffId" TextProperty="Name" ValueProperty="Id" />
+    <RadzenDayView GroupByResource=@groupByResource GroupBy=@groupBy GroupOrientation=@groupOrientation ShowAllDay=@showAllDay />
+    <RadzenWeekView GroupByResource=@groupByResource GroupBy=@groupBy GroupOrientation=@groupOrientation />
+    <RadzenMonthView GroupByResource=@groupByResource GroupBy=@groupBy GroupOrientation=@groupOrientation />
 </RadzenScheduler>
 
 <EventConsole @ref=@console />
@@ -15,28 +39,41 @@
     RadzenScheduler<RoomBooking> scheduler;
     EventConsole console;
 
+    bool groupByResource = true;
+    bool showAllDay = true;
+    string groupBy = "Room, Employee";
+    Orientation groupOrientation = Orientation.Horizontal;
+
+    IEnumerable<string> groupByOptions = new[] { "Room, Employee", "Employee, Room", "Room", "Employee" };
+
     IList<Room> rooms = new List<Room>
     {
         new Room { Id = 1, Name = "Meeting Room" },
-        new Room { Id = 2, Name = "Conference Hall" },
-        new Room { Id = 3, Name = "Projector" },
-        new Room { Id = 4, Name = "Company Car" }
+        new Room { Id = 2, Name = "Conference Hall" }
+    };
+
+    IList<Staff> employees = new List<Staff>
+    {
+        new Staff { Id = 1, Name = "Nancy Davolio" },
+        new Staff { Id = 2, Name = "Andrew Fuller" },
+        new Staff { Id = 3, Name = "Janet Leverling" }
     };
 
     IList<RoomBooking> bookings = new List<RoomBooking>
     {
-        new RoomBooking { RoomIds = new List<int> { 1 }, Start = DateTime.Today.AddHours(9), End = DateTime.Today.AddHours(10), Text = "Daily stand-up" },
-        new RoomBooking { RoomIds = new List<int> { 1 }, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
-        new RoomBooking { RoomIds = new List<int> { 2, 3 }, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
-        new RoomBooking { RoomIds = new List<int> { 2 }, Start = DateTime.Today.AddDays(1).AddHours(11), End = DateTime.Today.AddDays(1).AddHours(12), Text = "Interview" },
-        new RoomBooking { RoomIds = new List<int> { 4 }, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
+        new RoomBooking { RoomIds = new List<int> { 1 }, StaffId = 1, Start = DateTime.Today.AddHours(9), End = DateTime.Today.AddHours(10), Text = "Daily stand-up" },
+        new RoomBooking { RoomIds = new List<int> { 1 }, StaffId = 2, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
+        new RoomBooking { RoomIds = new List<int> { 1, 2 }, StaffId = 3, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
+        new RoomBooking { RoomIds = new List<int> { 2 }, StaffId = 1, Start = DateTime.Today.AddDays(1).AddHours(11), End = DateTime.Today.AddDays(1).AddHours(12), Text = "Interview" },
+        new RoomBooking { RoomIds = new List<int> { 2 }, StaffId = 2, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
     };
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
     {
-        var room = args.Resource as Room;
+        var room = args.Resources?.TryGetValue("Room", out var roomValue) == true ? roomValue as Room : null;
+        var employee = args.Resources?.TryGetValue("Employee", out var employeeValue) == true ? employeeValue as Staff : null;
 
-        console.Log($"SlotSelect: Start={args.Start} End={args.End} Room={room?.Name ?? "(none)"}");
+        console.Log($"SlotSelect: Start={args.Start} End={args.End} Room={room?.Name ?? "(none)"} Employee={employee?.Name ?? "(none)"}");
 
         var booking = new RoomBooking { Start = args.Start, End = args.End };
 
@@ -45,8 +82,13 @@
             booking.RoomIds.Add(room.Id);
         }
 
+        if (employee != null)
+        {
+            booking.StaffId = employee.Id;
+        }
+
         var result = await DialogService.OpenAsync<EditBookingPage>("Add Booking",
-            new Dictionary<string, object> { { "Booking", booking }, { "Rooms", rooms } });
+            new Dictionary<string, object> { { "Booking", booking }, { "Rooms", rooms }, { "Employees", employees } });
 
         if (result != null)
         {
@@ -58,10 +100,10 @@
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<RoomBooking> args)
     {
-        console.Log($"AppointmentSelect: Text={args.Data.Text} Rooms={string.Join(", ", rooms.Where(r => args.Data.RoomIds.Contains(r.Id)).Select(r => r.Name))}");
+        console.Log($"AppointmentSelect: Text={args.Data.Text}");
 
         var result = await DialogService.OpenAsync<EditBookingPage>("Edit Booking",
-            new Dictionary<string, object> { { "Booking", args.Data }, { "Rooms", rooms } });
+            new Dictionary<string, object> { { "Booking", args.Data }, { "Rooms", rooms }, { "Employees", employees } });
 
         if (result != null)
         {
@@ -69,6 +111,7 @@
             args.Data.Start = result.Start;
             args.Data.End = result.End;
             args.Data.RoomIds = result.RoomIds;
+            args.Data.StaffId = result.StaffId;
 
             await scheduler.Reload();
         }
@@ -83,9 +126,14 @@
             booking.Start = booking.Start + args.TimeSpan;
             booking.End = booking.End + args.TimeSpan;
 
-            if (args.Resource is Room room && !booking.RoomIds.Contains(room.Id))
+            if (args.Resources?.TryGetValue("Room", out var roomValue) == true && roomValue is Room room && !booking.RoomIds.Contains(room.Id))
             {
                 booking.RoomIds = new List<int> { room.Id };
+            }
+
+            if (args.Resources?.TryGetValue("Employee", out var employeeValue) == true && employeeValue is Staff employee)
+            {
+                booking.StaffId = employee.Id;
             }
 
             await scheduler.Reload();

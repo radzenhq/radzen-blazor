@@ -117,7 +117,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resource))>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resources))>
                             <div class="rz-slot-title">
                                 @calendar.GetDayOfMonth(dayOfWeek)
                                 @if (excessCounts.TryGetValue(dayOfWeek, out var excess))
@@ -131,7 +131,7 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resource))>
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) @ondragover:preventDefault @ondrop=@(args => @OnDrop(dayOfWeek, Resources))>
                             <div class="rz-slot-title">
                             </div>
                         </div>
@@ -170,13 +170,13 @@
     public IEnumerable<AppointmentData>? Appointments { get; set; }
 
     [Parameter]
-    public object? Resource { get; set; }
+    public IDictionary<string, object>? Resources { get; set; }
 
     IDictionary<string, object> Attributes(DateTime start, string className, bool slotInMonth)
     {
         if (Scheduler == null)
             return new Dictionary<string, object>();
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)), Resource);
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)), Resources);
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         if (!slotInMonth)
@@ -189,7 +189,7 @@
     async Task OnSlotClick(DateTime date)
     {
         if (Scheduler != null)
-            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInRange(date, date.AddDays(1)), Resource);
+            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInRange(date, date.AddDays(1)), Resources);
     }
 
     double DetermineTop(HashSet<double> existingTops)

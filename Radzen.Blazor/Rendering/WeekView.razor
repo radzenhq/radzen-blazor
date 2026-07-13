@@ -5,7 +5,10 @@
 
 <div class="rz-view rz-week-view">
     <div class="rz-view-header">
-        <div class="rz-slot-hour-header"></div>
+        @if (ShowHours)
+        {
+            <div class="rz-slot-hour-header"></div>
+        }
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         var loopDay = day;
@@ -17,7 +20,10 @@
     }
     </div>
     <div class="rz-view-content">
-        <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
+        @if (ShowHours)
+        {
+            <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
+        }
         <div @ref=view class="rz-week-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation="stopKeydownPropagation"
              @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
@@ -29,7 +35,7 @@
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) @ondragover:preventDefault @ondrop=@(args => @OnDrop(slotDate, Resource)) @attributes=@Attributes(date)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) @ondragover:preventDefault @ondrop=@(args => @OnDrop(slotDate, Resources)) @attributes=@Attributes(date)></div>
                 }
             </div>
         }
@@ -72,7 +78,10 @@
     public IList<AppointmentData>? Appointments { get; set; }
 
     [Parameter]
-    public object? Resource { get; set; }
+    public IDictionary<string, object>? Resources { get; set; }
+
+    [Parameter]
+    public bool ShowHours { get; set; } = true;
 
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
@@ -90,7 +99,7 @@
     async Task OnSlotClick(DateTime date)
     {
         if (Scheduler != null)
-            await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resource);
+            await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resources);
     }
 
     async Task OnDayClick(DateTime day)
@@ -116,7 +125,7 @@
     {
         if (Scheduler == null)
             return new Dictionary<string, object>();
-        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resource);
+        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resources);
         attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;

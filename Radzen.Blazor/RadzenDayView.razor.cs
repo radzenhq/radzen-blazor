@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -16,6 +17,14 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenDayView : SchedulerViewBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RadzenDayView"/> class.
+        /// </summary>
+        public RadzenDayView()
+        {
+            GroupOrientation = Orientation.Horizontal;
+        }
+
         /// <inheritdoc />
         public override string Icon => "calendar_view_day";
 
@@ -71,6 +80,23 @@ namespace Radzen.Blazor
         {
             get => allDayText ?? Localize(nameof(RadzenStrings.Scheduler_AllDayText));
             set => allDayText = value;
+        }
+
+        /// <summary>
+        /// Called by the Blazor runtime when parameters are set.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var allDayChanged = parameters.DidParameterChange(nameof(ShowAllDay), ShowAllDay) ||
+                parameters.DidParameterChange(nameof(AllDayText), AllDayText);
+
+            await base.SetParametersAsync(parameters);
+
+            if (allDayChanged && Scheduler != null)
+            {
+                await Scheduler.Reload();
+            }
         }
 
         /// <inheritdoc />

@@ -48,10 +48,11 @@
     Group appointments by resource
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Define the resources of the scheduler (rooms, people, equipment) via <code>Resources</code>, <code>ResourceTextProperty</code>, <code>ResourceValueProperty</code> and <code>ResourceProperty</code>
-    and set <code>GroupByResource</code> on any view. The day view displays the resources as columns with a dedicated all-day row; the other views display a section per resource.
-    An appointment may belong to multiple resources when <code>ResourceProperty</code> is a collection. Click a slot to book a resource, drag a booking to another resource to reassign it,
-    or click a booking to edit it and change its resources.
+    Declare one <code>&lt;RadzenSchedulerResource&gt;</code> per resource type (rooms, people, equipment) and set <code>GroupByResource</code> on any view.
+    Declaring multiple resource types creates a grouping hierarchy in order of declaration; use <code>GroupBy</code> to group a view by specific resource types
+    and <code>GroupOrientation</code> to render the groups side by side or one below the other. The day view displays the resource combinations as columns with a
+    dedicated all-day row. An appointment may belong to multiple resources of the same type when the property is a collection. Click a slot to book a resource,
+    drag a booking to another resource to reassign it, or click a booking to edit its resources.
 </RadzenText>
 <RadzenExample ComponentName="Scheduler" Example="SchedulerResources" AdditionalSourceCodePages=@(new [] { "/demos/Models/RoomBooking.cs", "EditBookingPage.razor" })>
     <SchedulerResources />

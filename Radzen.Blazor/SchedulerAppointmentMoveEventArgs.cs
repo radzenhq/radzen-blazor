@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 
@@ -25,9 +26,15 @@ public class SchedulerAppointmentMoveEventArgs
     public DateTime SlotDate { get; set; }
 
     /// <summary>
-    /// Gets or sets the resource of the slot where the appointment is moved. Set when the slot belongs to a resource in a view which groups
+    /// Gets or sets the innermost resource item of the slot where the appointment is moved. Set when the slot belongs to a resource in a view which groups
     /// appointments by resource via <see cref="SchedulerViewBase.GroupByResource" />; otherwise <c>null</c>.
     /// </summary>
     public object? Resource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the resource items of the slot where the appointment is moved keyed by resource type <see cref="RadzenSchedulerResource.Name" /> -
+    /// one entry per grouping level. Set when the slot belongs to a resource in a view which groups appointments by resource; otherwise <c>null</c>.
+    /// </summary>
+    public IDictionary<string, object>? Resources { get; set; }
 }
 
