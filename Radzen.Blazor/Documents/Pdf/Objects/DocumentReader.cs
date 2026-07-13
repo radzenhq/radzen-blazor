@@ -20,6 +20,10 @@ public sealed class DocumentReader
 {
     private readonly byte[] data;
     private readonly ReaderLimits limits;
+
+    // The resource limits this reader enforces, so read-path helpers (font/ToUnicode
+    // reconstruction) honor a caller-tightened budget instead of ReaderLimits.Default.
+    internal ReaderLimits Limits => limits;
     private readonly Dictionary<int, XrefEntry> entries = [];
     private readonly Dictionary<int, DocumentObject> cache = [];
     private readonly Dictionary<int, ObjectStream> objectStreams = [];
