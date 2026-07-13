@@ -172,3 +172,13 @@ internal static class LzwFilter
         return output.ToArray();
     }
 }
+
+internal sealed class LzwStreamFilter : IStreamFilter
+{
+    public string Name => "LZWDecode";
+
+    public byte[] Decode(byte[] data, DictionaryObject? parms, long maxOutput)
+        => StreamPredictor.Apply(
+            LzwFilter.Decode(data, parms is not null ? StreamPredictor.ParmInt(parms, "EarlyChange", 1) : 1, maxOutput),
+            parms);
+}

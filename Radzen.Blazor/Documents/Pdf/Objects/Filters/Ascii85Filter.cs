@@ -142,3 +142,11 @@ internal static class Ascii85Filter
     static bool IsWhitespace(byte b) =>
         b is 0 or 9 or 10 or 12 or 13 or 32;
 }
+
+internal sealed class Ascii85StreamFilter : IStreamFilter
+{
+    public string Name => "ASCII85Decode";
+
+    public byte[] Decode(byte[] data, DictionaryObject? parms, long maxOutput)
+        => Ascii85Filter.Decode(data, maxOutput);
+}

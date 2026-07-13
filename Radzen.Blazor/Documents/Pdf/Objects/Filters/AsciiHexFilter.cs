@@ -80,3 +80,11 @@ internal static class AsciiHexFilter
         _ => -1,
     };
 }
+
+internal sealed class AsciiHexStreamFilter : IStreamFilter
+{
+    public string Name => "ASCIIHexDecode";
+
+    public byte[] Decode(byte[] data, DictionaryObject? parms, long maxOutput)
+        => AsciiHexFilter.Decode(data);
+}
