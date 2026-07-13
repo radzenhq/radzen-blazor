@@ -24,6 +24,10 @@ public sealed class AcroForm
     // the widget annotation that renders it (the field dict itself when merged).
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
 
+    // Field dictionaries on the current root-to-node path, to fail loud on a
+    // self-referencing /Kids tree instead of recursing into a StackOverflow.
+    private readonly HashSet<DictionaryObject> visiting = [];
+
     internal AcroForm(DocumentReader reader, DictionaryObject dictionary)
     {
         this.reader = reader;
@@ -63,31 +67,43 @@ public sealed class AcroForm
             return;
         }
 
-        var partial = PartialName(dict);
-        var qualified = prefix.Length == 0 ? partial : prefix + "." + partial;
-
-        var fieldKids = new List<DocumentObject>();
-        foreach (var kid in Kids(dict))
+        if (!visiting.Add(dict))
         {
-            if (reader.Resolve(kid) is DictionaryObject kidDict && kidDict.ContainsKey("T"))
-            {
-                fieldKids.Add(kid);
-            }
+            throw new DocumentParseException("Cyclic /Kids reference in the field tree.");
         }
 
-        if (fieldKids.Count > 0)
+        try
         {
-            foreach (var kid in fieldKids)
+            var partial = PartialName(dict);
+            var qualified = prefix.Length == 0 ? partial : prefix + "." + partial;
+
+            var fieldKids = new List<DocumentObject>();
+            foreach (var kid in Kids(dict))
             {
-                Collect(kid, qualified);
+                if (reader.Resolve(kid) is DictionaryObject kidDict && kidDict.ContainsKey("T"))
+                {
+                    fieldKids.Add(kid);
+                }
             }
 
-            return;
-        }
+            if (fieldKids.Count > 0)
+            {
+                foreach (var kid in fieldKids)
+                {
+                    Collect(kid, qualified);
+                }
 
-        terminals[qualified] = new Terminal(dict, WidgetOf(dict));
-        fieldNames.Add(qualified);
-        fields.Add(new FormField(reader, dict));
+                return;
+            }
+
+            terminals[qualified] = new Terminal(dict, WidgetOf(dict));
+            fieldNames.Add(qualified);
+            fields.Add(new FormField(reader, dict));
+        }
+        finally
+        {
+            visiting.Remove(dict);
+        }
     }
 
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
