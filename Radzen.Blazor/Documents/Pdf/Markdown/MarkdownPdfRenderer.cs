@@ -292,6 +292,8 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         var data = options.ImageResolver?.Invoke(image.Destination);
         if (data is null)
         {
+            // Render the alt text so an unresolved image does not vanish without a trace.
+            VisitChildren(image.Children);
             return;
         }
 
@@ -308,10 +310,51 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         var data = options.ImageResolver?.Invoke(image.Destination);
         if (data is null)
         {
+            // Fall back to the alt text as a paragraph rather than dropping the block silently.
+            if (AltText(image).Length > 0)
+            {
+                var paragraph = target.AddParagraph();
+                paragraph.Font.Name = options.BodyFontName;
+                paragraph.LeftIndent = Unit.FromPoint(quoteIndent);
+                RenderInlines(image.Children, paragraph.Inlines);
+            }
+
             return;
         }
 
-        target.AddImage(new MemoryStream(data));
+        var pdfImage = target.AddImage(new MemoryStream(data));
+        var alt = AltText(image);
+        if (alt.Length > 0)
+        {
+            pdfImage.AlternateText = alt;
+        }
+    }
+
+    // Flattens an image's inline alt-text children to plain text for the Figure's alternate description.
+    private static string AltText(Radzen.Documents.Markdown.Image image)
+    {
+        var builder = new System.Text.StringBuilder();
+        CollectText(image.Children, builder);
+        return builder.ToString();
+    }
+
+    private static void CollectText(IEnumerable<Radzen.Documents.Markdown.Inline> nodes, System.Text.StringBuilder builder)
+    {
+        foreach (var node in nodes)
+        {
+            switch (node)
+            {
+                case Radzen.Documents.Markdown.Text text:
+                    builder.Append(text.Value);
+                    break;
+                case Radzen.Documents.Markdown.Code code:
+                    builder.Append(code.Value);
+                    break;
+                case Radzen.Documents.Markdown.InlineContainer container:
+                    CollectText(container.Children, builder);
+                    break;
+            }
+        }
     }
 
     private Run? AddRun(string text)

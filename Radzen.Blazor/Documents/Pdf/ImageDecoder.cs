@@ -26,7 +26,7 @@ internal static class ImageDecoder
 
         if (imageBytes.Length >= 2 && imageBytes[0] == 0xFF && imageBytes[1] == 0xD8)
         {
-            return DecodeJpeg(imageBytes);
+            return DecodeJpeg(imageBytes, limits);
         }
 
         if (IsJpeg2000(imageBytes))
@@ -289,7 +289,7 @@ internal static class ImageDecoder
             pos = body + count + 4;
         }
 
-        ValidatePngDimensions(width, height, limits);
+        ValidateImageDimensions(width, height, limits, "PNG");
 
         var channels = colorType switch
         {
@@ -301,7 +301,20 @@ internal static class ImageDecoder
             _ => throw new NotSupportedException($"Unsupported PNG colour type {colorType}."),
         };
 
-        var raw = FlateFilter.Decode(idat.ToArray());
+        ValidatePngBitDepth(colorType, bitDepth);
+
+        var compressed = idat.ToArray();
+        var raw = FlateFilter.Decode(compressed, limits.MaxDecodedStreamBytes);
+
+        // Secondary compression-bomb guard mirroring DocumentReader: a tiny IDAT that inflates
+        // past the ratio ceiling is rejected once the decoded output clears the floor.
+        if (raw.LongLength > limits.ExpansionRatioFloorBytes
+            && compressed.Length > 0
+            && raw.LongLength / compressed.Length > limits.MaxDecodeExpansionRatio)
+        {
+            throw new InvalidDataException("PNG image data expansion ratio exceeds the maximum.");
+        }
+
         var samples = PngPredictor.Decode(raw, channels, bitDepth, width);
 
         // A truncated IDAT decodes to fewer scanlines than IHDR promises; the downstream
@@ -315,8 +328,8 @@ internal static class ImageDecoder
 
         return colorType switch
         {
-            0 => new ImageXObject(BuildImage(width, height, bitDepth, new NameObject("DeviceGray"), samples), null),
-            2 => new ImageXObject(BuildImage(width, height, bitDepth, new NameObject("DeviceRGB"), samples), null),
+            0 => BuildColorKeyedPng(width, height, bitDepth, new NameObject("DeviceGray"), samples, transparency, 1),
+            2 => BuildColorKeyedPng(width, height, bitDepth, new NameObject("DeviceRGB"), samples, transparency, 3),
             3 => BuildPalettedPng(width, height, bitDepth, samples, palette, transparency),
             4 => BuildAlphaPng(width, height, new NameObject("DeviceGray"), samples, 1, bitDepth),
             6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3, bitDepth),
@@ -324,19 +337,70 @@ internal static class ImageDecoder
         };
     }
 
-    // IHDR dimensions drive every downstream pixel buffer; reject non-positive or
+    // PNG restricts which bit depths a colour type may use (ISO/IEC 15948 Table 11.1);
+    // an out-of-table pair (e.g. RGBA at 4-bit) yields a zero-stride sample layout that
+    // would silently decode to garbage, so reject it up front.
+    private static void ValidatePngBitDepth(int colorType, int bitDepth)
+    {
+        var valid = colorType switch
+        {
+            0 => bitDepth is 1 or 2 or 4 or 8 or 16,
+            2 => bitDepth is 8 or 16,
+            3 => bitDepth is 1 or 2 or 4 or 8,
+            4 => bitDepth is 8 or 16,
+            6 => bitDepth is 8 or 16,
+            _ => false,
+        };
+
+        if (!valid)
+        {
+            throw new InvalidDataException($"PNG bit depth {bitDepth} is not allowed for colour type {colorType}.");
+        }
+    }
+
+    // Grayscale/truecolor samples pass straight through; a tRNS chunk on these colour types
+    // is a colour key rather than an alpha channel, mapped to /Mask per ISO 32000-1 8.9.6.4.
+    private static ImageXObject BuildColorKeyedPng(
+        int width, int height, int bitDepth, NameObject colorSpace, byte[] samples, byte[]? transparency, int components)
+    {
+        var image = BuildImage(width, height, bitDepth, colorSpace, samples);
+
+        if (transparency is not null)
+        {
+            if (transparency.Length < 2 * components)
+            {
+                throw new InvalidDataException("PNG tRNS chunk is truncated for the colour type.");
+            }
+
+            // tRNS stores one 16-bit key per component regardless of bit depth; the key value
+            // is already in the sample's integer range, so it maps directly to a [key key] pair.
+            var mask = new ArrayObject();
+            for (var c = 0; c < components; c++)
+            {
+                var value = BinaryPrimitives.ReadUInt16BigEndian(transparency.AsSpan(c * 2));
+                mask.Add(new NumberObject(value));
+                mask.Add(new NumberObject(value));
+            }
+
+            image.Dictionary["Mask"] = mask;
+        }
+
+        return new ImageXObject(image, null);
+    }
+
+    // Header dimensions drive every downstream pixel buffer; reject non-positive or
     // oversized geometry before allocating so a tiny header cannot request gigabytes
     // or wrap width*height negative.
-    private static void ValidatePngDimensions(int width, int height, ReaderLimits limits)
+    private static void ValidateImageDimensions(long width, long height, ReaderLimits limits, string format)
     {
         if (width <= 0 || height <= 0)
         {
-            throw new InvalidDataException("PNG image has invalid dimensions.");
+            throw new InvalidDataException($"{format} image has invalid dimensions.");
         }
 
-        if ((long)width * height > limits.MaxImagePixels)
+        if (width * height > limits.MaxImagePixels)
         {
-            throw new InvalidDataException("PNG image dimensions exceed the maximum decodable size.");
+            throw new InvalidDataException($"{format} image dimensions exceed the maximum decodable size.");
         }
     }
 
@@ -351,6 +415,11 @@ internal static class ImageDecoder
         if (palette is null)
         {
             throw new InvalidDataException("Paletted PNG is missing its PLTE chunk.");
+        }
+
+        if (palette.Length == 0 || palette.Length % 3 != 0 || palette.Length / 3 > 256)
+        {
+            throw new InvalidDataException("PNG PLTE chunk must hold 1 to 256 RGB triples.");
         }
 
         var hival = (palette.Length / 3) - 1;
@@ -445,9 +514,11 @@ internal static class ImageDecoder
         return stream;
     }
 
-    private static ImageXObject DecodeJpeg(byte[] data)
+    private static ImageXObject DecodeJpeg(byte[] data, ReaderLimits limits)
     {
-        var (width, height, precision, components) = ReadJpegFrame(data);
+        var (width, height, precision, components, adobe) = ReadJpegFrame(data);
+
+        ValidateImageDimensions(width, height, limits, "JPEG");
 
         var colorSpace = components switch
         {
@@ -467,7 +538,10 @@ internal static class ImageDecoder
         dict["BitsPerComponent"] = new NumberObject(precision);
         dict["Filter"] = new NameObject("DCTDecode");
 
-        if (components == 4)
+        // The inverted /Decode is correct only for Adobe CMYK JPEGs, which store inverted
+        // samples and are flagged by an APP14 'Adobe' marker; a non-Adobe CMYK JPEG holds
+        // normal samples and would render inverted if we forced the same array.
+        if (components == 4 && adobe)
         {
             dict["Decode"] = new ArrayObject
             {
@@ -481,8 +555,9 @@ internal static class ImageDecoder
         return new ImageXObject(stream, null);
     }
 
-    private static (int Width, int Height, int Precision, int Components) ReadJpegFrame(byte[] data)
+    private static (int Width, int Height, int Precision, int Components, bool Adobe) ReadJpegFrame(byte[] data)
     {
+        var adobe = false;
         var pos = 2;
         while (pos + 1 < data.Length)
         {
@@ -511,8 +586,22 @@ internal static class ImageDecoder
                 throw new InvalidDataException("JPEG segment length is invalid.");
             }
 
+            if (marker == 0xEE && IsAdobeApp14(data, pos, segmentLength))
+            {
+                adobe = true;
+            }
+
             if (IsStartOfFrame(marker))
             {
+                // SOF3 (lossless), SOF5-7 (differential) and SOF9-15 (arithmetic-coded) cannot be
+                // shown by a /DCTDecode viewer, which supports only baseline/extended-sequential/
+                // progressive Huffman; embedding them verbatim would render blank. Fail loud.
+                if (marker is not (0xC0 or 0xC1 or 0xC2))
+                {
+                    throw new NotSupportedException(
+                        $"JPEG start-of-frame marker 0xFF{marker:X2} is not supported by DCTDecode.");
+                }
+
                 if (pos + 8 > data.Length)
                 {
                     throw new InvalidDataException("JPEG start-of-frame segment is truncated.");
@@ -522,7 +611,7 @@ internal static class ImageDecoder
                 var height = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 3));
                 var width = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 5));
                 var components = data[pos + 7];
-                return (width, height, precision, components);
+                return (width, height, precision, components, adobe);
             }
 
             pos += segmentLength;
@@ -530,6 +619,14 @@ internal static class ImageDecoder
 
         throw new InvalidDataException("No JPEG start-of-frame marker was found.");
     }
+
+    private static bool IsAdobeApp14(byte[] data, int pos, int segmentLength)
+        => segmentLength >= 8
+            && data[pos + 2] == (byte)'A'
+            && data[pos + 3] == (byte)'d'
+            && data[pos + 4] == (byte)'o'
+            && data[pos + 5] == (byte)'b'
+            && data[pos + 6] == (byte)'e';
 
     private static bool IsStartOfFrame(byte marker) => marker switch
     {
@@ -670,15 +767,12 @@ internal static class ImageDecoder
 
     private static void ValidateJpeg2000Dimensions(int width, int height, int components, ReaderLimits limits)
     {
-        if (width <= 0 || height <= 0 || components <= 0)
+        if (components <= 0)
         {
             throw new InvalidDataException("JPEG2000 image has invalid dimensions.");
         }
 
-        if ((long)width * height > limits.MaxImagePixels)
-        {
-            throw new InvalidDataException("JPEG2000 image dimensions exceed the maximum decodable size.");
-        }
+        ValidateImageDimensions(width, height, limits, "JPEG2000");
     }
 
     private static bool StartsWith(byte[] data, byte[] prefix)
