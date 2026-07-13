@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -76,7 +77,7 @@ public sealed class NameObject(string value) : DocumentObject
     {
         if (ch > 0xFF)
         {
-            throw new System.NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
+            throw new NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
         }
     }
 
