@@ -29,6 +29,29 @@ public class DocumentBuilder
     public IList<OutlineItem> Outline { get; } = [];
 
     /// <summary>
+    /// Gets or sets the viewer preferences applied to the produced document
+    /// (initial page layout and page mode plus the <c>/ViewerPreferences</c>
+    /// flags). When <c>null</c> no viewer-preference keys are written and the
+    /// output is unchanged. Surfaces <see cref="Document.ViewerPreferences"/>.
+    /// </summary>
+    public ViewerPreferences? ViewerPreferences { get; set; }
+
+    /// <summary>
+    /// Gets the page-label ranges applied to the produced document, written as
+    /// the catalog <c>/PageLabels</c> number tree. When empty no <c>/PageLabels</c>
+    /// entry is written. Surfaces <see cref="Document.PageLabels"/>.
+    /// </summary>
+    public IList<PageLabel> PageLabels { get; } = [];
+
+    /// <summary>
+    /// Gets the interactive form fields to create on the produced document. Each
+    /// definition is saved as a widget annotation on its page and listed in the
+    /// catalog <c>/AcroForm /Fields</c>. When empty no form is written. Surfaces
+    /// <see cref="Document.FormFields"/>.
+    /// </summary>
+    public IList<FormFieldDefinition> FormFields { get; } = [];
+
+    /// <summary>
     /// Gets or sets the PDF/A conformance level of the output. When not
     /// <see cref="PdfAConformance.None"/> the saved file carries an XMP
     /// metadata stream with the PDF/A identification, an sRGB output intent
@@ -89,6 +112,17 @@ public class DocumentBuilder
         document.IncludeDocumentId = IncludeDocumentId;
         document.PdfUA = PdfUA;
         document.Language = Language;
+        document.ViewerPreferences = ViewerPreferences;
+        foreach (var label in PageLabels)
+        {
+            document.PageLabels.Add(label);
+        }
+
+        foreach (var field in FormFields)
+        {
+            document.FormFields.Add(field);
+        }
+
         return document;
     }
 
