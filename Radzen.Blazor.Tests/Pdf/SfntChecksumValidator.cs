@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,7 +19,7 @@ internal static class SfntChecksumValidator
         for (var i = 0; i < numTables; i++)
         {
             var rec = 12 + i * 16;
-            var tag = System.Text.Encoding.ASCII.GetString(data, rec, 4);
+            var tag = Encoding.ASCII.GetString(data, rec, 4);
             tables[tag] = new Entry(ReadUInt32(data, rec + 4), ReadUInt32(data, rec + 8), ReadUInt32(data, rec + 12));
         }
 

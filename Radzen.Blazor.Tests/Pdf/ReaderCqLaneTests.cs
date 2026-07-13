@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
@@ -158,12 +159,12 @@ public class ReaderCqLaneTests
 
         public override bool CanWrite => false;
 
-        public override long Length => throw new System.NotSupportedException();
+        public override long Length => throw new NotSupportedException();
 
         public override long Position
         {
-            get => throw new System.NotSupportedException();
-            set => throw new System.NotSupportedException();
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -174,8 +175,8 @@ public class ReaderCqLaneTests
                 return 0;
             }
 
-            var take = System.Math.Min(count, remaining);
-            System.Array.Copy(data, position, buffer, offset, take);
+            var take = Math.Min(count, remaining);
+            Array.Copy(data, position, buffer, offset, take);
             position += take;
             return take;
         }
@@ -184,10 +185,10 @@ public class ReaderCqLaneTests
         {
         }
 
-        public override long Seek(long offset, SeekOrigin origin) => throw new System.NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
-        public override void SetLength(long value) => throw new System.NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
 
-        public override void Write(byte[] buffer, int offset, int count) => throw new System.NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 }

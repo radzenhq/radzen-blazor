@@ -1,7 +1,9 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
@@ -94,16 +96,16 @@ public class PngAlphaBitDepthTests
 
     private static void WriteChunk(Stream stream, string type, byte[] data)
     {
-        var typeBytes = System.Text.Encoding.ASCII.GetBytes(type);
+        var typeBytes = Encoding.ASCII.GetBytes(type);
         Span<byte> len = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(len, (uint)data.Length);
+        BinaryPrimitives.WriteUInt32BigEndian(len, (uint)data.Length);
         stream.Write(len);
         stream.Write(typeBytes);
         stream.Write(data);
 
         var crc = Crc32(typeBytes, data);
         Span<byte> crcBytes = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
+        BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
         stream.Write(crcBytes);
     }
 

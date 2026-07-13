@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
@@ -87,12 +88,12 @@ public class NameEscapingTests
     [Fact]
     public void CodePointAboveLatin1_Throws()
     {
-        Assert.Throws<System.NotSupportedException>(() => Serialize("A\u0141"));
+        Assert.Throws<NotSupportedException>(() => Serialize("A\u0141"));
     }
 
     [Fact]
     public void CodePointAboveLatin1_AfterEscapableChar_Throws()
     {
-        Assert.Throws<System.NotSupportedException>(() => Serialize(" \u0141"));
+        Assert.Throws<NotSupportedException>(() => Serialize(" \u0141"));
     }
 }

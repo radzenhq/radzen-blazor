@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
@@ -31,7 +32,7 @@ public class Base14KerningTests
             var p = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (p.Length == 4 && p[1] == leftGlyph && p[2] == rightGlyph)
             {
-                return int.Parse(p[3], System.Globalization.CultureInfo.InvariantCulture);
+                return int.Parse(p[3], CultureInfo.InvariantCulture);
             }
         }
 

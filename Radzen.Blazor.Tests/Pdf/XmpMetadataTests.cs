@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -226,7 +227,7 @@ public class XmpMetadataTests
     {
         var xmp = Sample();
         xmp.Info.Title = title;
-        Assert.Throws<System.IO.InvalidDataException>(() => xmp.BuildPacket());
+        Assert.Throws<InvalidDataException>(() => xmp.BuildPacket());
     }
 
     [Theory]

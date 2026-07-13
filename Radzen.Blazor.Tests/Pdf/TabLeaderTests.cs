@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
@@ -15,7 +16,7 @@ public class TabLeaderTests
     private static double Width(FontCollection fonts, string text)
         => fonts.MeasureText(text, LineLayoutSupport.FontAt(12));
 
-    private static LineFragment Fragment(System.Collections.Generic.IReadOnlyList<LineBox> lines, string text)
+    private static LineFragment Fragment(IReadOnlyList<LineBox> lines, string text)
         => lines.SelectMany(l => l.Fragments).Single(f => f.Text == text);
 
     [Fact]

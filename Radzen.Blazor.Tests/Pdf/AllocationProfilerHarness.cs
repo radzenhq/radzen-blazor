@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -174,7 +175,7 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         return gids;
     }
 
-    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static (WeakReference Font, WeakReference Bytes) BuildAndRelease(string fontPath)
     {
         var bytes = File.ReadAllBytes(fontPath);

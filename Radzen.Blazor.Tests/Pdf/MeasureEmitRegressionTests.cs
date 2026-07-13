@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -71,8 +72,8 @@ public class MeasureEmitRegressionTests
         var shows = ShowsSortedTopDown(builder);
 
         Assert.Equal(2, shows.Count);
-        Assert.Equal("?????", System.Text.Encoding.Latin1.GetString(shows[0].Bytes));
-        Assert.Equal("?????", System.Text.Encoding.Latin1.GetString(shows[1].Bytes));
+        Assert.Equal("?????", Encoding.Latin1.GetString(shows[0].Bytes));
+        Assert.Equal("?????", Encoding.Latin1.GetString(shows[1].Bytes));
         Assert.True(Math.Abs(shows[0].X - shows[1].X) < 0.2,
             $"right-aligned substitute line at x={shows[0].X} but literal '?????' line at x={shows[1].X}");
     }

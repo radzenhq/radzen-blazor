@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -102,7 +103,7 @@ public class UnitTests
     [Fact]
     public void Parse_InvalidText_Throws()
     {
-        Assert.Throws<System.FormatException>(() => Unit.Parse("abc"));
+        Assert.Throws<FormatException>(() => Unit.Parse("abc"));
     }
 
     [Fact]

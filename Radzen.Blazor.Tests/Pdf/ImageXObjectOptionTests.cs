@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -215,14 +216,14 @@ public class ImageXObjectOptionTests
     {
         var typeBytes = Encoding.ASCII.GetBytes(type);
         Span<byte> length = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(length, (uint)data.Length);
+        BinaryPrimitives.WriteUInt32BigEndian(length, (uint)data.Length);
         stream.Write(length);
         stream.Write(typeBytes);
         stream.Write(data);
 
         var crc = Crc32(typeBytes, data);
         Span<byte> crcBytes = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
+        BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
         stream.Write(crcBytes);
     }
 

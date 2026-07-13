@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -38,8 +39,8 @@ public class FlowUnificationTests
         Assert.Equal(1, reloaded.Pages.Count);
 
         var text = reloaded.Pages[0].ExtractText();
-        Assert.Contains("Intro", text, System.StringComparison.Ordinal);
-        Assert.Contains("CellText", text, System.StringComparison.Ordinal);
+        Assert.Contains("Intro", text, StringComparison.Ordinal);
+        Assert.Contains("CellText", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -69,8 +70,8 @@ public class FlowUnificationTests
         for (var i = 0; i < reloaded.Pages.Count; i++)
         {
             var text = reloaded.Pages[i].ExtractText();
-            Assert.True(text.Contains("HDRBAND", System.StringComparison.Ordinal), $"header band on page {i + 1}");
-            Assert.True(text.Contains("FTRBAND", System.StringComparison.Ordinal), $"footer band on page {i + 1}");
+            Assert.True(text.Contains("HDRBAND", StringComparison.Ordinal), $"header band on page {i + 1}");
+            Assert.True(text.Contains("FTRBAND", StringComparison.Ordinal), $"footer band on page {i + 1}");
         }
     }
 
@@ -102,12 +103,12 @@ public class FlowUnificationTests
         Assert.True(reloaded.Pages.Count > 1, "table overflows the first page");
 
         var first = reloaded.Pages[0].ExtractText();
-        Assert.Contains("Fa", first, System.StringComparison.Ordinal);
-        Assert.True(first.Contains("H0", System.StringComparison.Ordinal),
+        Assert.Contains("Fa", first, StringComparison.Ordinal);
+        Assert.True(first.Contains("H0", StringComparison.Ordinal),
             "table header starts in the space remaining after the paragraphs");
-        Assert.True(first.Contains("R0", System.StringComparison.Ordinal),
+        Assert.True(first.Contains("R0", StringComparison.Ordinal),
             "first body row shares the page with the paragraphs");
-        Assert.Contains("H0", reloaded.Pages[1].ExtractText(), System.StringComparison.Ordinal);
+        Assert.Contains("H0", reloaded.Pages[1].ExtractText(), StringComparison.Ordinal);
     }
 
     private static (DocumentBuilder Builder, Paragraph Tail) AuthorSplitSection(int fillerLines)

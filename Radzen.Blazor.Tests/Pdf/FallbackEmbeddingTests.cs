@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -58,9 +59,9 @@ public class FallbackEmbeddingTests
         }
 
         var builder = new DocumentBuilder();
-        builder.Fonts.Register(Latin, new System.IO.MemoryStream(
+        builder.Fonts.Register(Latin, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        builder.Fonts.Register(Cjk, new System.IO.MemoryStream(
+        builder.Fonts.Register(Cjk, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf")));
         builder.Fonts.SetFallback(Latin, Cjk);
 

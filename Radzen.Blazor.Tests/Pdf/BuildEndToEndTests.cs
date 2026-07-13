@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -54,8 +56,8 @@ public class BuildEndToEndTests
         }
 
         var text = BuildTestSupport.Reload(builder).ExtractText();
-        var first = text.IndexOf("Line0", System.StringComparison.Ordinal);
-        var last = text.IndexOf("Line12", System.StringComparison.Ordinal);
+        var first = text.IndexOf("Line0", StringComparison.Ordinal);
+        var last = text.IndexOf("Line12", StringComparison.Ordinal);
         Assert.True(first >= 0, "first line present");
         Assert.True(last >= 0, "last line present");
         Assert.True(first < last, "lines preserved in flow order");
@@ -119,19 +121,19 @@ public class BuildEndToEndTests
         var section = builder.Sections.Add();
         BuildTestSupport.AddText(section, "Convenience", BuildTestSupport.Latin);
 
-        using var stream = new System.IO.MemoryStream();
+        using var stream = new MemoryStream();
         builder.SaveToStream(stream);
         var viaSave = stream.ToArray();
 
-        using var expected = new System.IO.MemoryStream();
+        using var expected = new MemoryStream();
         builder.Build().SaveToStream(expected);
 
         Assert.NotEmpty(viaSave);
         Assert.Equal(expected.ToArray().Length, viaSave.Length);
 
-        using var buffer = new System.IO.MemoryStream(viaSave);
+        using var buffer = new MemoryStream(viaSave);
         var reloaded = Document.LoadFromStream(buffer);
-        Assert.Contains("Convenience", reloaded.ExtractText(), System.StringComparison.Ordinal);
+        Assert.Contains("Convenience", reloaded.ExtractText(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -144,7 +146,7 @@ public class BuildEndToEndTests
 
         var reloaded = BuildTestSupport.Reload(builder);
         Assert.Equal(1, reloaded.Pages.Count);
-        Assert.Contains(text, reloaded.ExtractText(), System.StringComparison.Ordinal);
+        Assert.Contains(text, reloaded.ExtractText(), StringComparison.Ordinal);
     }
 
     [Fact]

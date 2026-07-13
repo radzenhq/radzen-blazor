@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
 
@@ -28,7 +29,7 @@ public class CffSubsetterFontMatrixTests
         return CffFixtureBuilder.Build(privateDict, charStrings, fontMatrix);
     }
 
-    private static System.Collections.Generic.Dictionary<int, double[]> SubsetTopDict()
+    private static Dictionary<int, double[]> SubsetTopDict()
     {
         var source = CffFont.Parse(SourceWithFontMatrix());
         var subset = CffSubsetter.Subset(source, [1]);

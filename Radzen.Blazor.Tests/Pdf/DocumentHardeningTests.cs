@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -161,7 +162,7 @@ public class DocumentHardeningTests
 
     private static byte[] StreamObjectFile(string dictionary, byte[] payload)
     {
-        var dict = dictionary.Replace("LEN", payload.Length.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        var dict = dictionary.Replace("LEN", payload.Length.ToString(CultureInfo.InvariantCulture));
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
         pdf.Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");

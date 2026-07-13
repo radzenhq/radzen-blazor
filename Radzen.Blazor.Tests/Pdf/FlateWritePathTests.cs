@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -56,8 +57,8 @@ public class FlateWritePathTests
         var decoded = RequireFlate(reader, contents);
 
         var text = Encoding.Latin1.GetString(decoded);
-        Assert.Contains("BT", text, System.StringComparison.Ordinal);
-        Assert.Contains("Tf", text, System.StringComparison.Ordinal);
+        Assert.Contains("BT", text, StringComparison.Ordinal);
+        Assert.Contains("Tf", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -109,8 +110,8 @@ public class FlateWritePathTests
         var decoded = RequireFlate(reader, toUnicode);
 
         var text = Encoding.Latin1.GetString(decoded);
-        Assert.Contains("begincmap", text, System.StringComparison.Ordinal);
-        Assert.Contains("beginbfchar", text, System.StringComparison.Ordinal);
+        Assert.Contains("begincmap", text, StringComparison.Ordinal);
+        Assert.Contains("beginbfchar", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -133,7 +134,7 @@ public class FlateWritePathTests
 
         var text = BuildTestSupport.Reload(builder).ExtractText();
 
-        Assert.Contains("Flate round trip payload", text, System.StringComparison.Ordinal);
+        Assert.Contains("Flate round trip payload", text, StringComparison.Ordinal);
     }
 
     [Fact]

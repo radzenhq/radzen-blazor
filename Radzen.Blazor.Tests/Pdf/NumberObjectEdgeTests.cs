@@ -1,4 +1,5 @@
 #nullable enable
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -31,7 +32,7 @@ public class NumberObjectEdgeTests
     {
         var number = Parse(text);
 
-        Assert.Equal(double.Parse(text, System.Globalization.CultureInfo.InvariantCulture), number.DoubleValue);
+        Assert.Equal(double.Parse(text, CultureInfo.InvariantCulture), number.DoubleValue);
         Assert.Equal(text, Written(number));
     }
 

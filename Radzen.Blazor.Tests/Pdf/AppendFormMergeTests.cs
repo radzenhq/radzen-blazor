@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO;
 using System.Linq;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -84,7 +85,7 @@ public class AppendFormMergeTests
     public void Append_NestedSourceForm_KeepsTreeIntact()
     {
         var a = new Document();
-        a.Pages.Add().SetContent(System.Text.Encoding.ASCII.GetBytes("base"));
+        a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         a.Append(Document.LoadFromStream(new MemoryStream(NestedForm())));
 
         var reader = DocumentReader.Parse(a.ToArray());
@@ -108,7 +109,7 @@ public class AppendFormMergeTests
     public void Append_NestedSourceForm_UnionsDefaultResourceFonts()
     {
         var a = new Document();
-        a.Pages.Add().SetContent(System.Text.Encoding.ASCII.GetBytes("base"));
+        a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         a.Append(Document.LoadFromStream(new MemoryStream(NestedForm())));
 
         var reader = DocumentReader.Parse(a.ToArray());
@@ -123,7 +124,7 @@ public class AppendFormMergeTests
     {
         var a = new Document();
         var page = a.Pages.Add();
-        page.SetContent(System.Text.Encoding.ASCII.GetBytes("base"));
+        page.SetContent(Encoding.ASCII.GetBytes("base"));
         a.FormFields.Add(new TextFieldDefinition("Name")
         {
             PageIndex = 0,

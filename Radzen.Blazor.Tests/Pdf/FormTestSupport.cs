@@ -1,5 +1,6 @@
 #nullable enable
 using System.IO;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
@@ -110,7 +111,7 @@ internal static class FormTestSupport
             data = FlateFilter.Decode(data);
         }
 
-        return System.Text.Encoding.Latin1.GetString(data);
+        return Encoding.Latin1.GetString(data);
     }
 
     public static string PageContentText(DocumentReader reader)

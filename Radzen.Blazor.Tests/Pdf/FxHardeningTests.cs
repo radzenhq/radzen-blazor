@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -210,8 +211,8 @@ public class FxHardeningTests
     private static byte[] Ihdr(int width, int height, byte bitDepth, byte colorType)
     {
         var body = new byte[13];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(body.AsSpan(0), (uint)width);
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(body.AsSpan(4), (uint)height);
+        BinaryPrimitives.WriteUInt32BigEndian(body.AsSpan(0), (uint)width);
+        BinaryPrimitives.WriteUInt32BigEndian(body.AsSpan(4), (uint)height);
         body[8] = bitDepth;
         body[9] = colorType;
         return body;
@@ -220,7 +221,7 @@ public class FxHardeningTests
     private static void WriteChunk(Stream stream, string type, byte[] body)
     {
         Span<byte> length = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(length, (uint)body.Length);
+        BinaryPrimitives.WriteUInt32BigEndian(length, (uint)body.Length);
         stream.Write(length);
         stream.Write(Encoding.ASCII.GetBytes(type));
         stream.Write(body);

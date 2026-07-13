@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
@@ -71,7 +72,7 @@ public class ImageLayoutTests
             content,
             @"100(?:\.0+)?\s+0\S*\s+0\S*\s+100(?:\.0+)?\s+([-\d.]+)\s+([-\d.]+)\s+cm");
         Assert.True(match.Success, "image placement matrix present");
-        return double.Parse(match.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+        return double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 
     private static DocumentBuilder AlignedImage(HorizontalAlignment alignment)

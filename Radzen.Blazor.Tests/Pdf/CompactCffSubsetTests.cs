@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -223,8 +224,8 @@ public class CompactCffSubsetTests
         var reloaded = BuildTestSupport.Reload(Builder());
         var text = reloaded.ExtractText();
 
-        Assert.Contains("Ab", text, System.StringComparison.Ordinal);
-        Assert.Contains("Мир", text, System.StringComparison.Ordinal);
-        Assert.Contains("中产", text, System.StringComparison.Ordinal);
+        Assert.Contains("Ab", text, StringComparison.Ordinal);
+        Assert.Contains("Мир", text, StringComparison.Ordinal);
+        Assert.Contains("中产", text, StringComparison.Ordinal);
     }
 }

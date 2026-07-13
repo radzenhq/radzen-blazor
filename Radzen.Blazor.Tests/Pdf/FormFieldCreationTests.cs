@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO;
 using System.Linq;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -66,7 +67,7 @@ public class FormFieldCreationTests
         }
 
         var parts = (ArrayObject)resolved;
-        var text = new System.Text.StringBuilder();
+        var text = new StringBuilder();
         foreach (var part in parts)
         {
             text.Append(FormTestSupport.Decode((StreamObject)reader.Resolve(part)));

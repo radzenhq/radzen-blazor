@@ -1,6 +1,8 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
@@ -47,7 +49,7 @@ public class ImageStampOverlayRegressionTests
     // Finds the operand of the first "/<name> Do" in the content text.
     private static string? DoName(string content)
     {
-        var match = System.Text.RegularExpressions.Regex.Match(content, @"/(\S+)\s+Do\b");
+        var match = Regex.Match(content, @"/(\S+)\s+Do\b");
         return match.Success ? match.Groups[1].Value : null;
     }
 
@@ -64,8 +66,8 @@ public class ImageStampOverlayRegressionTests
         var content = AllContentText(reader, page);
         var key = DoName(content);
         Assert.True(key is not null, "no /Name Do operator emitted for the ImageContent stamp");
-        Assert.Contains(" cm", content, System.StringComparison.Ordinal);
-        Assert.Contains("q", content, System.StringComparison.Ordinal);
+        Assert.Contains(" cm", content, StringComparison.Ordinal);
+        Assert.Contains("q", content, StringComparison.Ordinal);
 
         var xobjects = XObjects(reader, page);
         Assert.True(xobjects.TryGetValue(key!, out var imageObject),
@@ -124,7 +126,7 @@ public class ImageStampOverlayRegressionTests
 
         // Image space is the unit square, so the cm matrix must carry the Rect
         // width/height as scale and the Rect origin as translation.
-        var cm = System.Text.RegularExpressions.Regex.Match(
+        var cm = Regex.Match(
             content, @"([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) cm");
         Assert.True(cm.Success, "no cm operator emitted for the ImageContent stamp");
         Assert.Equal("96", cm.Groups[1].Value);
@@ -159,8 +161,8 @@ public class ImageStampOverlayRegressionTests
 
         var overlay = Encoding.Latin1.GetString(
             reader.DecodeStream(Assert.IsType<StreamObject>(reader.Resolve(contents[1]))));
-        Assert.Contains("STAMP", overlay, System.StringComparison.Ordinal);
-        Assert.Contains("Tj", overlay, System.StringComparison.Ordinal);
+        Assert.Contains("STAMP", overlay, StringComparison.Ordinal);
+        Assert.Contains("Tj", overlay, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -198,7 +200,7 @@ public class ImageStampOverlayRegressionTests
         var reloaded = Document.LoadFromStream(buffer);
         var text = reloaded.Pages[0].ExtractText();
 
-        Assert.Contains("Hello", text, System.StringComparison.Ordinal);
-        Assert.Contains("STAMP", text, System.StringComparison.Ordinal);
+        Assert.Contains("Hello", text, StringComparison.Ordinal);
+        Assert.Contains("STAMP", text, StringComparison.Ordinal);
     }
 }

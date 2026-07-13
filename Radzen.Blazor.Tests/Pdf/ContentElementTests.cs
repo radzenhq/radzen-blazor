@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -292,7 +293,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent([0, 0, 0, 0]) { Rect = new Rect(0, 0, 10, 10) });
 
-        Assert.Throws<System.NotSupportedException>(() => document.ToArray());
+        Assert.Throws<NotSupportedException>(() => document.ToArray());
     }
 
     [Fact]
@@ -302,7 +303,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("x", 0, 0) { Tag = new Tag { Role = "P" } });
 
-        Assert.Throws<System.NotSupportedException>(() => document.ToArray());
+        Assert.Throws<NotSupportedException>(() => document.ToArray());
     }
 }
 

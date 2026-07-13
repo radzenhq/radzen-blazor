@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -121,7 +122,7 @@ public class TableOfContentsTests
     [Fact]
     public void Toc_IndentsEntries_ByLevel()
     {
-        var content = System.Text.Encoding.Latin1.GetString(
+        var content = Encoding.Latin1.GetString(
             ContentTestHelpers.PageContent(BuildTestSupport.Read(ChapterDocument()), 0));
 
         // Both entry lines start at the left content edge (x = 40) plus the level indent (12pt).

@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -67,15 +69,15 @@ public class ReverseEncodingTests
 
         var map = Type0EmbedSupport.BuildMap(font, top + bottom);
 
-        var content = new System.Collections.Generic.List<byte>();
+        var content = new List<byte>();
         // bottom run authored first, at a lower baseline; extraction must reorder.
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 600, Type0EmbedSupport.CompactCodes(font, map, bottom)));
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 700, Type0EmbedSupport.CompactCodes(font, map, top)));
         var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), [.. content]);
 
         var text = document.Pages[0].ExtractText();
-        var topIndex = text.IndexOf(top, System.StringComparison.Ordinal);
-        var bottomIndex = text.IndexOf(bottom, System.StringComparison.Ordinal);
+        var topIndex = text.IndexOf(top, StringComparison.Ordinal);
+        var bottomIndex = text.IndexOf(bottom, StringComparison.Ordinal);
 
         Assert.True(topIndex >= 0, "top run extracted");
         Assert.True(bottomIndex >= 0, "bottom run extracted");
