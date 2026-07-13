@@ -263,7 +263,7 @@ internal static class Paginator
         // row group cannot fit. Every later fragment starts a fresh page at full height.
         void PlaceTable(int index, Table table)
         {
-            var layout = tableLayouts[index] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+            var layout = tableLayouts[index] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage, resolution);
 
             if (HasPageContent() && cursor + TableFirstFragmentHeight(table, layout) > contentHeight + Eps)
             {
@@ -301,7 +301,7 @@ internal static class Paginator
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
             var indent = Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
-            var measured = boxMeasures[index] ??= MeasureBox(container, contentWidth, fonts, measureImage);
+            var measured = boxMeasures[index] ??= MeasureBox(container, contentWidth, fonts, measureImage, resolution);
             var boxHeight = measured.Height + (2 * padding);
 
             if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
@@ -340,7 +340,7 @@ internal static class Paginator
             foreach (var child in container.Blocks)
             {
                 var table = OverlayChildTable(container, child, boxWidth, indent);
-                var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage);
+                var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage, resolution);
                 boxHeight = Math.Max(boxHeight, layout.Height);
                 placements.Add((table, layout));
             }
@@ -350,7 +350,7 @@ internal static class Paginator
                 || container.Borders.Left.IsSet)
             {
                 var decoration = OverlayDecorationTable(container, boxWidth, indent, boxHeight);
-                placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage)));
+                placements.Insert(0, (decoration, TableLayout.Layout(decoration, boxWidth, fonts, measureImage, resolution)));
             }
 
             if (HasPageContent() && cursor + boxHeight > contentHeight + Eps)
@@ -496,7 +496,7 @@ internal static class Paginator
                 double afterCursor = 0;
                 double nextLeadingHeight = 0;
                 if (k >= nrem && first && para.KeepWithNext && HasPageContent() &&
-                    NextBlockFirstHeight(blocks, broken, tableLayouts, boxMeasures, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
+                    NextBlockFirstHeight(blocks, broken, tableLayouts, boxMeasures, i, contentWidth, fonts, measureImage, resolution, out var nextSpacingBefore, out var nextHeight))
                 {
                     hasNextBlock = true;
                     afterCursor = blockTop + SumHeights(lines, offset, nrem) + spacingAfter;
@@ -963,10 +963,11 @@ internal static class Paginator
         Container container,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
     {
         var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
-        return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage);
+        return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage, resolution);
     }
 
     // Positions a measured Stack container as a first-class box at y. Content is
@@ -1028,6 +1029,7 @@ internal static class Paginator
         double contentWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution,
         out double spacingBefore,
         out double height)
     {
@@ -1039,7 +1041,7 @@ internal static class Paginator
             return false;
         }
 
-        var visitor = new NextHeightVisitor(broken, tableLayouts, boxMeasures, contentWidth, fonts, measureImage);
+        var visitor = new NextHeightVisitor(broken, tableLayouts, boxMeasures, contentWidth, fonts, measureImage, resolution);
         var result = blocks[next].Accept(visitor, next);
         spacingBefore = result.SpacingBefore;
         height = result.Height;
@@ -1055,7 +1057,8 @@ internal static class Paginator
         BoxContentLayout.Measured?[] boxMeasures,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
         : BlockVisitor<int, NextBlockHeight>
     {
         protected override NextBlockHeight Default(Block block, int next) => default;
@@ -1067,7 +1070,7 @@ internal static class Paginator
 
         public override NextBlockHeight Visit(Table table, int next)
         {
-            var layout = tableLayouts[next] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+            var layout = tableLayouts[next] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage, resolution);
             return new NextBlockHeight { Found = true, Height = TableFirstFragmentHeight(table, layout) };
         }
 
@@ -1079,7 +1082,7 @@ internal static class Paginator
             }
 
             // A Stack container never splits, so its first height is the whole box.
-            var measured = boxMeasures[next] ??= MeasureBox(container, contentWidth, fonts, measureImage);
+            var measured = boxMeasures[next] ??= MeasureBox(container, contentWidth, fonts, measureImage, resolution);
             return new NextBlockHeight { Found = true, Height = measured.Height + (2 * container.Padding.Point) };
         }
 
@@ -1165,7 +1168,7 @@ internal static class Paginator
         {
             // A Stack container in a band is a first-class box, like the section body;
             // a band never page-breaks, so the box places whole at the running cursor.
-            var measured = MeasureBox(container, width, fonts, measureImage);
+            var measured = MeasureBox(container, width, fonts, measureImage, resolution);
             var box = BuildBox(container, measured, width, Cursor, order++, transform: null);
             result.Boxes.Add(box);
             Cursor += box.Bounds.Height;
@@ -1174,7 +1177,7 @@ internal static class Paginator
 
         public override Nothing Visit(Table table, Nothing context)
         {
-            var layout = TableLayout.Layout(table, Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
+            var layout = TableLayout.Layout(table, Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage, resolution);
             var tableOrder = order++;
             foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
             {
