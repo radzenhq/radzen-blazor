@@ -208,6 +208,22 @@ public sealed class DocumentReader
         return value;
     }
 
+    // A reverse map from each already-resolved (cached) object instance to its
+    // indirect object number. The incremental save path uses it to Override in
+    // place the loaded objects a caller mutated (a filled form field, the page
+    // tree root); only objects this reader has resolved appear, which is exactly
+    // the set the model exposes for editing.
+    internal IReadOnlyDictionary<DocumentObject, int> BuildObjectNumberIndex()
+    {
+        var index = new Dictionary<DocumentObject, int>(ReferenceEqualityComparer.Instance);
+        foreach (var pair in cache)
+        {
+            index[pair.Value] = pair.Key;
+        }
+
+        return index;
+    }
+
     /// <summary>
     /// Resolves an indirect reference to the object it points at. Non-reference
     /// objects are returned unchanged.

@@ -16,10 +16,12 @@ internal static class DocumentLoader
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(limits);
 
-        var reader = DocumentReader.Parse(ReadAll(stream, limits), options?.Password, limits);
+        var bytes = ReadAll(stream, limits);
+        var reader = DocumentReader.Parse(bytes, options?.Password, limits);
 
-        var document = new Document { source = reader };
+        var document = new Document { source = reader, sourceBytes = bytes };
         ReadInfo(reader, document.Info);
+        document.loadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
         var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
             ? c
