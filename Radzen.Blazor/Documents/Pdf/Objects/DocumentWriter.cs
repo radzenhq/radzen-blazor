@@ -89,6 +89,13 @@ public sealed class DocumentWriter(Stream stream)
         return new ReferenceObject(objects.Count, 0);
     }
 
+    // Resolves a reference returned by Add back to the registered object so a later
+    // writer (e.g. conformance metadata) can amend an imported dictionary in place.
+    internal DocumentObject? Resolve(ReferenceObject reference)
+        => reference.ObjectNumber >= 1 && reference.ObjectNumber <= objects.Count
+            ? objects[reference.ObjectNumber - 1]
+            : null;
+
     /// <summary>
     /// Serializes all registered objects, the cross-reference table, and the
     /// trailer to the destination stream.

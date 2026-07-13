@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -65,9 +66,31 @@ internal static class PageLabelsWriter
         var sorted = new List<PageLabel>(labels);
         sorted.Sort((a, b) => a.StartPage.CompareTo(b.StartPage));
 
+        // ISO 32000-1 12.4.2: the number tree must define a label for page index 0,
+        // start pages must be distinct, and /St ordinals are integers >= 1. Emitting
+        // any of these malformed produces a tree viewers ignore, so fail loud.
+        if (sorted[0].StartPage != 0)
+        {
+            throw new InvalidOperationException(
+                "A /PageLabels number tree must define a label for page index 0 (ISO 32000-1 12.4.2); add a PageLabel(0).");
+        }
+
+        var starts = new HashSet<int>();
         var nums = new ArrayObject();
         foreach (var label in sorted)
         {
+            if (!starts.Add(label.StartPage))
+            {
+                throw new InvalidOperationException(
+                    $"Duplicate PageLabel start page {label.StartPage}; each range must start on a distinct page.");
+            }
+
+            if (label.Start < 1)
+            {
+                throw new InvalidOperationException(
+                    $"PageLabel.Start must be >= 1 (ISO 32000-1 Table 159 /St), but was {label.Start} for the range starting at page {label.StartPage}.");
+            }
+
             var dictionary = new DictionaryObject();
             if (label.Style is { } style)
             {

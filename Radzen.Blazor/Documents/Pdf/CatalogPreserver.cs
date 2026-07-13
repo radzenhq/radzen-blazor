@@ -61,8 +61,11 @@ internal sealed class CatalogPreserver(Document document)
                 continue;
             }
 
-            // A conforming save writes its own XMP; keep the source's otherwise.
-            if (string.Equals(key, "Metadata", StringComparison.Ordinal) && document.Conformance != PdfAConformance.None)
+            // A conforming save (PDF/A or PDF/UA) writes its own XMP and overwrites
+            // catalog["Metadata"]; importing the source stream first would leave it
+            // orphaned. Keep the source's XMP only when neither is requested.
+            if (string.Equals(key, "Metadata", StringComparison.Ordinal)
+                && (document.Conformance != PdfAConformance.None || document.PdfUA))
             {
                 continue;
             }

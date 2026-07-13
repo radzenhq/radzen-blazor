@@ -216,4 +216,26 @@ public class XmpMetadataTests
         var sample = Sample();
         Assert.Equal(sample.BuildPacket(), sample.BuildStream().Data);
     }
+
+    [Theory]
+    [InlineData("null\u0000char")]
+    [InlineData("bell\u0007char")]
+    [InlineData("esc\u001bchar")]
+    [InlineData("noncharacter\uFFFF")]
+    public void BuildPacket_ThrowsOnXmlInvalidControlCharacters(string title)
+    {
+        var xmp = Sample();
+        xmp.Info.Title = title;
+        Assert.Throws<System.IO.InvalidDataException>(() => xmp.BuildPacket());
+    }
+
+    [Theory]
+    [InlineData("tab\there")]
+    [InlineData("line\nbreak")]
+    public void BuildPacket_AllowsXmlLegalWhitespaceControls(string title)
+    {
+        var xmp = Sample();
+        xmp.Info.Title = title;
+        Assert.NotNull(xmp.BuildPacket());
+    }
 }

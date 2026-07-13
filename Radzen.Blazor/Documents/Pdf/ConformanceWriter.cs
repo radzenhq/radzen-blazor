@@ -191,7 +191,7 @@ internal sealed class ConformanceWriter(Document document)
             {
                 if (attachment.Name == "factur-x.xml")
                 {
-                    xmp.FacturX = new FacturXMetadata();
+                    xmp.FacturX = BuildFacturX(attachment.FacturX);
                     break;
                 }
             }
@@ -219,12 +219,7 @@ internal sealed class ConformanceWriter(Document document)
 
         if (document.PdfUA)
         {
-            var preferences = catalog.TryGetValue("ViewerPreferences", out var existing)
-                && existing is DictionaryObject dictionary
-                ? dictionary
-                : new DictionaryObject();
-            preferences["DisplayDocTitle"] = new BooleanObject(true);
-            catalog["ViewerPreferences"] = preferences;
+            ResolveViewerPreferences(writer, catalog)["DisplayDocTitle"] = new BooleanObject(true);
         }
 
         if (!string.IsNullOrEmpty(document.Language))
@@ -261,10 +256,56 @@ internal sealed class ConformanceWriter(Document document)
             }
         }
 
-        var stream = new StreamObject(Encoding.UTF8.GetBytes(packet));
-        stream.Dictionary["Type"] = new NameObject("Metadata");
-        stream.Dictionary["Subtype"] = new NameObject("XML");
-        return stream;
+        return XmpMetadata.WrapPacket(Encoding.UTF8.GetBytes(packet));
+    }
+
+    // factur-x.xml with no declared profile keeps the historic BASIC 1.0 INVOICE
+    // defaults; a caller that sets a profile must fill every field so the XMP never
+    // declares a blank fx:ConformanceLevel.
+    private static FacturXMetadata BuildFacturX(FacturXProfile? profile)
+    {
+        if (profile is null)
+        {
+            return new FacturXMetadata();
+        }
+
+        if (string.IsNullOrEmpty(profile.DocumentType)
+            || string.IsNullOrEmpty(profile.Version)
+            || string.IsNullOrEmpty(profile.ConformanceLevel))
+        {
+            throw new InvalidOperationException(
+                "Attachment.FacturX requires DocumentType, Version and ConformanceLevel; leave the profile null to use the BASIC 1.0 INVOICE defaults.");
+        }
+
+        return new FacturXMetadata
+        {
+            DocumentType = profile.DocumentType,
+            Version = profile.Version,
+            ConformanceLevel = profile.ConformanceLevel,
+        };
+    }
+
+    // PreserveCatalog imports an indirect source /ViewerPreferences as a reference
+    // into the writer; resolve it so preserved entries (Direction, HideToolbar, ...)
+    // survive alongside the DisplayDocTitle PDF/UA requires instead of being replaced.
+    private static DictionaryObject ResolveViewerPreferences(DocumentWriter writer, DictionaryObject catalog)
+    {
+        if (catalog.TryGetValue("ViewerPreferences", out var existing))
+        {
+            if (existing is DictionaryObject dictionary)
+            {
+                return dictionary;
+            }
+
+            if (existing is ReferenceObject reference && writer.Resolve(reference) is DictionaryObject referenced)
+            {
+                return referenced;
+            }
+        }
+
+        var preferences = new DictionaryObject();
+        catalog["ViewerPreferences"] = preferences;
+        return preferences;
     }
 
     private const string PdfUaExtensionSchema =
@@ -294,14 +335,24 @@ internal sealed class ConformanceWriter(Document document)
         + "  </rdf:Description>\n";
 
     private static string InsertAfter(string packet, string anchor, string insertion)
-    {
-        var index = packet.IndexOf(anchor, StringComparison.Ordinal);
-        return index < 0 ? packet : packet.Insert(index + anchor.Length, insertion);
-    }
+        => packet.Insert(RequireAnchor(packet, anchor) + anchor.Length, insertion);
 
     private static string InsertBefore(string packet, string anchor, string insertion)
+        => packet.Insert(RequireAnchor(packet, anchor), insertion);
+
+    // The identification entries PDF/A-4 and PDF/UA require are spliced into the raw
+    // XMP packet by anchor. A missing anchor means XmpMetadata's format drifted and
+    // the amendment would silently drop; fail loud rather than emit a non-conforming
+    // packet that still reports success.
+    private static int RequireAnchor(string packet, string anchor)
     {
         var index = packet.IndexOf(anchor, StringComparison.Ordinal);
-        return index < 0 ? packet : packet.Insert(index, insertion);
+        if (index < 0)
+        {
+            throw new InvalidOperationException(
+                $"XMP conformance amendment anchor not found: '{anchor}'.");
+        }
+
+        return index;
     }
 }

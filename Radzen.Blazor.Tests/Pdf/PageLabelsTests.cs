@@ -88,6 +88,34 @@ public class PageLabelsTests
     }
 
     [Fact]
+    public void MissingPageZeroRange_Throws()
+    {
+        var document = Document(4);
+        document.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal });
+
+        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+    }
+
+    [Fact]
+    public void DuplicateStartPage_Throws()
+    {
+        var document = Document(4);
+        document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.Decimal });
+        document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.UppercaseRoman });
+
+        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+    }
+
+    [Fact]
+    public void StartOrdinalBelowOne_Throws()
+    {
+        var document = Document(2);
+        document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.Decimal, Start = 0 });
+
+        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+    }
+
+    [Fact]
     public void NoPageLabels_EmitsNothing_AndByteIdentical()
     {
         var bytes = Document(2).ToArray();
