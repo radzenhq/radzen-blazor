@@ -11,9 +11,9 @@
         if (HasResourceGroups)
         {
             return @<CascadingValue Value=@Scheduler>
-                <ResourceGroups>
-                    <ChildContent Context="resource">
-                        <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@MaxAppointmentsInSlot MoreText=@MoreText Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource AppointmentMove=OnAppointmentMove />
+                <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
+                    <ChildContent Context="path">
+                        <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@MaxAppointmentsInSlot MoreText=@MoreText Appointments=@AppointmentsForResources(appointments, path) Resources=@path AppointmentMove=OnAppointmentMove />
                     </ChildContent>
                 </ResourceGroups>
             </CascadingValue>;

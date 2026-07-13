@@ -71,13 +71,13 @@ namespace Radzen.Blazor
         /// <param name="appointments">The appointments for this range.</param>
         Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
         /// <summary>
-        /// Selects the specified slot of the specified resource.
+        /// Selects the specified slot of the specified resources.
         /// </summary>
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
         /// <param name="appointments">The appointments for this range.</param>
-        /// <param name="resource">The resource the slot belongs to.</param>
-        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, object? resource)
+        /// <param name="resources">The resource items the slot belongs to keyed by resource type name.</param>
+        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, IDictionary<string, object>? resources)
         {
             return SelectSlot(start, end, appointments);
         }
@@ -115,14 +115,14 @@ namespace Radzen.Blazor
         /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
         IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments);
         /// <summary>
-        /// Gets the slot HTML attributes for a slot of the specified resource.
+        /// Gets the slot HTML attributes for a slot of the specified resources.
         /// </summary>
         /// <param name="start">The start of the slot.</param>
         /// <param name="end">The end of the slot.</param>
         /// <param name="getAppointments">Function to return appointments for this range.</param>
-        /// <param name="resource">The resource the slot belongs to.</param>
+        /// <param name="resources">The resource items the slot belongs to keyed by resource type name.</param>
         /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
-        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, object? resource)
+        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, IDictionary<string, object>? resources)
         {
             return GetSlotAttributes(start, end, getAppointments);
         }
@@ -182,32 +182,24 @@ namespace Radzen.Blazor
             return MouseLeaveAppointment(reference, data);
         }
         /// <summary>
-        /// Gets the resources of the scheduler. Views use them when grouping appointments by resource.
+        /// Gets the resource types of the scheduler in order of declaration. Views use them when grouping appointments by resource.
         /// </summary>
-        /// <value>The resources. Empty when the scheduler has no resources.</value>
-        IList<object> Resources => Array.Empty<object>();
+        /// <value>The resource types. Empty when the scheduler has no resources.</value>
+        IList<RadzenSchedulerResource> Resources => Array.Empty<RadzenSchedulerResource>();
         /// <summary>
-        /// Gets the display text of the specified resource.
+        /// Adds a resource type. Called when a <see cref="RadzenSchedulerResource" /> is initialized.
         /// </summary>
-        /// <param name="resource">The resource.</param>
-        /// <returns>The display text.</returns>
-        string ResourceText(object resource)
+        /// <param name="resource">The resource type to add.</param>
+        Task AddResource(RadzenSchedulerResource resource)
         {
-            return resource?.ToString() ?? string.Empty;
+            return Task.CompletedTask;
         }
         /// <summary>
-        /// Gets the template used to render resource headers in views which group appointments by resource.
+        /// Removes a resource type. Called when a <see cref="RadzenSchedulerResource" /> is disposed.
         /// </summary>
-        RenderFragment<object>? ResourceHeaderTemplate => null;
-        /// <summary>
-        /// Determines whether the specified appointment belongs to the specified resource.
-        /// </summary>
-        /// <param name="item">The appointment to check.</param>
-        /// <param name="resource">The resource.</param>
-        /// <returns><c>true</c> if the appointment belongs to the resource; otherwise, <c>false</c>.</returns>
-        bool IsAppointmentInResource(AppointmentData item, object? resource)
+        /// <param name="resource">The resource type to remove.</param>
+        void RemoveResource(RadzenSchedulerResource resource)
         {
-            return false;
         }
         /// <summary>
         /// Reloads this instance.
