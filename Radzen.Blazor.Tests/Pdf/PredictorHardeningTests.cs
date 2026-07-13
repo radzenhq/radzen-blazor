@@ -14,6 +14,17 @@ public class PredictorHardeningTests
 {
     private static readonly byte[] SmallData = new byte[16];
 
+    [Theory]
+    [InlineData(3)]
+    [InlineData(9)]
+    [InlineData(16)]
+    public void UnsupportedPredictor_Throws(int predictor)
+    {
+        var parms = new DictionaryObject { ["Predictor"] = new NumberObject(predictor) };
+
+        Assert.Throws<DocumentParseException>(() => StreamPredictor.Apply(SmallData, parms));
+    }
+
     // /Columns 260000000 would allocate a ~260MB scratch row for 16 bytes of data.
     [Fact]
     public void GiantColumns_ThrowsFast()
@@ -50,6 +61,13 @@ public class PredictorHardeningTests
         var input = new byte[] { 1, 10, 10, 10, 10 };
         var expected = new byte[] { 10, 20, 30, 40 };
         Assert.Equal(expected, PngPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
+    }
+
+    [Fact]
+    public void Png_PartialTrailingRow_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => PngPredictor.Decode(new byte[6], colors: 1, bitsPerComponent: 8, columns: 4));
     }
 
     // TIFF: /Colors 65536 wraps the int32 rowLength=colors*columns product; the colors

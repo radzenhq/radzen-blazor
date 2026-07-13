@@ -349,20 +349,16 @@ public class FxHardeningTests
     }
 
     // --- Classic xref table has no entry cap unlike the xref-stream path ----
-    // The cap makes ParseClassicXref bail before building an unbounded section
-    // dictionary; the reader then recovers through the repair scan, so the hostile
-    // file still loads (bounded) rather than throwing at the Parse boundary. Under
-    // default limits the classic xref is used directly.
+    // The cap applies both to ParseClassicXref and the repair scan, so recovery
+    // cannot bypass a caller-tightened budget. Defaults still use the xref directly.
 
     [Fact]
-    public void ClassicXref_TightenedMaxXrefEntries_RecoversGracefully()
+    public void ClassicXref_TightenedMaxXrefEntries_Throws()
     {
         var file = ClassicXrefFile();
         var tight = new ReaderLimits { MaxXrefEntries = 2 }; // below the 4 declared entries
 
-        var reader = DocumentReader.Parse(file, null, tight);
-        var catalog = Assert.IsType<DictionaryObject>(reader.GetObject(1));
-        Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
+        Assert.Throws<DocumentParseException>(() => DocumentReader.Parse(file, null, tight));
     }
 
     [Fact]

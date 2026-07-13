@@ -37,6 +37,25 @@ public class StreamDecoderTests
     }
 
     [Fact]
+    public void NumericFilter_Throws()
+    {
+        var dictionary = new DictionaryObject { ["Filter"] = new NumberObject(7) };
+
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [1, 2, 3]));
+    }
+
+    [Fact]
+    public void FilterArrayWithNumericMember_Throws()
+    {
+        var dictionary = new DictionaryObject
+        {
+            ["Filter"] = new ArrayObject { new NameObject("FlateDecode"), new NumberObject(7) },
+        };
+
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [1, 2, 3]));
+    }
+
+    [Fact]
     public void FlateDecode_RoundTrips()
     {
         var plain = Encoding.ASCII.GetBytes("BT /F1 12 Tf (hello) Tj ET");

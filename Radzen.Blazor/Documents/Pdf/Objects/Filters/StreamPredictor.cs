@@ -15,9 +15,14 @@ internal static class StreamPredictor
         }
 
         var predictor = ParmInt(parms, "Predictor", 1);
-        if (predictor <= 1)
+        if (predictor == 1)
         {
             return data;
+        }
+
+        if (predictor is not (2 or >= 10 and <= 15))
+        {
+            throw new DocumentParseException("Unsupported stream predictor.");
         }
 
         var columns = ParmInt(parms, "Columns", 1);
@@ -28,7 +33,7 @@ internal static class StreamPredictor
             return PngPredictor.Decode(data, colors, bits, columns);
         }
 
-        return predictor == 2 ? TiffPredictor.Decode(data, colors, bits, columns) : data;
+        return TiffPredictor.Decode(data, colors, bits, columns);
     }
 
     public static int ParmInt(DictionaryObject parms, string key, int fallback)

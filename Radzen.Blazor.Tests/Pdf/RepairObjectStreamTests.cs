@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text;
+using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
@@ -82,6 +83,14 @@ public class RepairObjectStreamTests
         var dict = Assert.IsType<DictionaryObject>(reader.GetObject(2));
         Assert.Equal(1, Assert.IsType<NumberObject>(dict["A"]).IntValue);
         Assert.Equal("x", Assert.IsType<StringObject>(dict["B"]).Value);
+    }
+
+    [Fact]
+    public void CorruptXref_RepairObjectMembersExceedingXrefBudget_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => DocumentReader.Parse(
+                ObjStmFile(withXref: false), null, new ReaderLimits { MaxXrefEntries = 3 }));
     }
 
     private static void Copy(byte[] target, int at, byte[] source)

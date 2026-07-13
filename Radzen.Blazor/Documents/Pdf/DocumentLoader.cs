@@ -15,6 +15,7 @@ internal static class DocumentLoader
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(limits);
+        limits = limits.Snapshot();
 
         var bytes = ReadAll(stream, limits);
         var reader = DocumentReader.Parse(bytes, options?.Password, limits);
@@ -25,8 +26,15 @@ internal static class DocumentLoader
         state.LoadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
+        if (catalog is null || !catalog.TryGetValue("Pages", out var candidatePages)
+            || candidatePages is null || reader.Resolve(candidatePages) is not DictionaryObject)
+        {
+            catalog = reader.ReconstructCatalogWithPages()
+                ?? throw new DocumentParseException("A catalog with a valid /Pages dictionary could not be reconstructed.", -1);
+        }
+
         state.SourceCatalog = catalog;
-        if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
+        if (catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
         {
             var visited = new HashSet<int>();
@@ -38,16 +46,13 @@ internal static class DocumentLoader
             CollectPages(reader, pagesNode, new InheritedAttributes(), document, state, limits, visited, 0);
         }
 
-        if (catalog is not null && reader.GetDictionary(catalog, "AcroForm") is { } form)
+        if (reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
             state.SourceAcroForm = form;
             document.AcroForm = new AcroForm(reader, form);
         }
 
-        if (catalog is not null)
-        {
-            ReadAttachments(reader, catalog, document, limits);
-        }
+        ReadAttachments(reader, catalog, document, limits);
 
         return document;
     }
@@ -61,7 +66,7 @@ internal static class DocumentLoader
         if (stream.CanSeek)
         {
             var length = stream.Length - stream.Position;
-            if (length > limits.MaxFileBytes)
+            if (length > limits.MaxFileBytes || length > int.MaxValue)
             {
                 throw new DocumentParseException("Maximum file size exceeded.", -1);
             }
@@ -232,16 +237,32 @@ internal static class DocumentLoader
         if (resolved is ArrayObject array)
         {
             using var joined = new MemoryStream();
+            long total = 0;
             for (var i = 0; i < array.Count; i++)
             {
                 if (reader.AsStream(array[i]) is { } part)
                 {
-                    if (i > 0)
+                    var decoded = reader.DecodeStream(part);
+                    var separator = i > 0 ? 1 : 0;
+                    try
+                    {
+                        total = checked(total + separator + decoded.LongLength);
+                    }
+                    catch (OverflowException)
+                    {
+                        throw new DocumentParseException("Aggregate decoded content exceeds the maximum allowed size.", -1);
+                    }
+
+                    if (total > reader.Limits.MaxAggregateDecodedBytes)
+                    {
+                        throw new DocumentParseException("Aggregate decoded content exceeds the maximum allowed size.", -1);
+                    }
+
+                    if (separator != 0)
                     {
                         joined.WriteByte((byte)'\n');
                     }
 
-                    var decoded = reader.DecodeStream(part);
                     joined.Write(decoded, 0, decoded.Length);
                 }
             }

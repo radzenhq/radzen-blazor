@@ -16,9 +16,13 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
 
     public byte[] Decode(DictionaryObject dictionary, byte[] data)
     {
-        var filter = dictionary.TryGetValue("Filter", out var filterObject) && filterObject is not null
-            ? resolve(filterObject)
-            : null;
+        var hasFilter = dictionary.TryGetValue("Filter", out var filterObject);
+        var filter = hasFilter && filterObject is not null ? resolve(filterObject) : null;
+        if (hasFilter && filter is not NameObject && filter is not ArrayObject)
+        {
+            throw new DocumentParseException("Stream /Filter must be a name or an array of names.", -1);
+        }
+
         var names = FilterNames(filter);
         if (names.Count == 0)
         {
@@ -73,6 +77,10 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
                 if (resolve(item) is NameObject entryName)
                 {
                     names.Add(entryName.Value);
+                }
+                else
+                {
+                    throw new DocumentParseException("Every stream /Filter array member must be a name.", -1);
                 }
             }
         }
