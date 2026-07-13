@@ -2,9 +2,10 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class BuilderSettingsSnapshot
+// Captures the builder's top-level settings by reference at build time; only DocumentInfo is cloned.
+internal sealed class CapturedBuilderSettings
 {
-    private BuilderSettingsSnapshot(DocumentBuilder builder)
+    private CapturedBuilderSettings(DocumentBuilder builder)
     {
         Info = builder.Info.Clone();
         Attachments = [.. builder.Attachments];
@@ -47,7 +48,7 @@ internal sealed class BuilderSettingsSnapshot
 
     public IReadOnlyList<FormFieldDefinition> FormFields { get; }
 
-    public static BuilderSettingsSnapshot Capture(DocumentBuilder builder) => new(builder);
+    public static CapturedBuilderSettings Capture(DocumentBuilder builder) => new(builder);
 
     public Document CreateDocument()
     {

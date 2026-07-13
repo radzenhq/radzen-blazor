@@ -223,12 +223,12 @@ internal sealed class StandardSecurityHandler
             buffer[pos + i] = 0xFF;
         }
 
-        var hash = Md5.Hash(buffer);
+        var hash = Md5.ComputeHash(buffer);
         if (revision >= 3)
         {
             for (var i = 0; i < 50; i++)
             {
-                hash = Md5.Hash(hash[..keyLength]);
+                hash = Md5.ComputeHash(hash[..keyLength]);
             }
         }
 
@@ -247,7 +247,7 @@ internal sealed class StandardSecurityHandler
         var seed = new byte[Padding.Length + documentId.Length];
         Array.Copy(Padding, seed, Padding.Length);
         Array.Copy(documentId, 0, seed, Padding.Length, documentId.Length);
-        var value = Rc4.Transform(fileKey, Md5.Hash(seed));
+        var value = Rc4.Transform(fileKey, Md5.ComputeHash(seed));
         for (var i = 1; i <= 19; i++)
         {
             value = Rc4.Transform(Xor(fileKey, i), value);
@@ -260,12 +260,12 @@ internal sealed class StandardSecurityHandler
     private byte[] RecoverUserPassword(byte[] password)
     {
         var padded = Pad(password);
-        var hash = Md5.Hash(padded);
+        var hash = Md5.ComputeHash(padded);
         if (revision >= 3)
         {
             for (var i = 0; i < 50; i++)
             {
-                hash = Md5.Hash(hash[..keyLength]);
+                hash = Md5.ComputeHash(hash[..keyLength]);
             }
         }
 
@@ -375,14 +375,14 @@ internal sealed class StandardSecurityHandler
     // the iterated algorithm 2.B loop applies to revision 6 only.
     private byte[] HashPassword(byte[] password, byte[] salt, byte[] userData)
         => revision == 5
-            ? Sha2.Sha256(Concat(password, salt, userData))
+            ? Sha2.ComputeHash256(Concat(password, salt, userData))
             : Hash2B(password, salt, userData);
 
     // ISO 32000-2 algorithm 2.B.
     private static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)
     {
         var input = Concat(password, salt, userData);
-        var k = Sha2.Sha256(input);
+        var k = Sha2.ComputeHash256(input);
         var round = 0;
         while (true)
         {
@@ -402,9 +402,9 @@ internal sealed class StandardSecurityHandler
 
             k = mod switch
             {
-                0 => Sha2.Sha256(e),
-                1 => Sha2.Sha384(e),
-                _ => Sha2.Sha512(e),
+                0 => Sha2.ComputeHash256(e),
+                1 => Sha2.ComputeHash384(e),
+                _ => Sha2.ComputeHash512(e),
             };
 
             round++;
@@ -438,7 +438,7 @@ internal sealed class StandardSecurityHandler
             Array.Copy(AesSalt, 0, buffer, pos, AesSalt.Length);
         }
 
-        var hash = Md5.Hash(buffer);
+        var hash = Md5.ComputeHash(buffer);
         var length = Math.Min(fileKey.Length + 5, 16);
         return hash[..length];
     }
@@ -486,12 +486,12 @@ internal sealed class StandardSecurityHandler
     // ISO 32000-1 algorithm 3.
     private static byte[] ComputeOwnerEntry(byte[] ownerPassword, byte[] userPassword, int revision, int keyLength)
     {
-        var hash = Md5.Hash(Pad(ownerPassword));
+        var hash = Md5.ComputeHash(Pad(ownerPassword));
         if (revision >= 3)
         {
             for (var i = 0; i < 50; i++)
             {
-                hash = Md5.Hash(hash[..keyLength]);
+                hash = Md5.ComputeHash(hash[..keyLength]);
             }
         }
 
@@ -532,12 +532,12 @@ internal sealed class StandardSecurityHandler
             buffer[pos + i] = 0xFF;
         }
 
-        var hash = Md5.Hash(buffer);
+        var hash = Md5.ComputeHash(buffer);
         if (revision >= 3)
         {
             for (var i = 0; i < 50; i++)
             {
-                hash = Md5.Hash(hash[..keyLength]);
+                hash = Md5.ComputeHash(hash[..keyLength]);
             }
         }
 
@@ -555,7 +555,7 @@ internal sealed class StandardSecurityHandler
         var seed = new byte[Padding.Length + documentId.Length];
         Array.Copy(Padding, seed, Padding.Length);
         Array.Copy(documentId, 0, seed, Padding.Length, documentId.Length);
-        var value = Rc4.Transform(fileKey, Md5.Hash(seed));
+        var value = Rc4.Transform(fileKey, Md5.ComputeHash(seed));
         for (var i = 1; i <= 19; i++)
         {
             value = Rc4.Transform(Xor(fileKey, i), value);

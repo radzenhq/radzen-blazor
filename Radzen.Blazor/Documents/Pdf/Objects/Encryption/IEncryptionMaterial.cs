@@ -69,7 +69,7 @@ public sealed class SeededEncryptionMaterial : IEncryptionMaterial
             Array.Copy(seed, prefix, seed.Length);
             WriteInt(prefix, seed.Length, index);
             WriteInt(prefix, seed.Length + 4, block);
-            var hash = Sha2.Sha256(prefix);
+            var hash = Sha2.ComputeHash256(prefix);
             var take = Math.Min(hash.Length, count - written);
             Array.Copy(hash, 0, result, written, take);
             written += take;

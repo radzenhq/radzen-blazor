@@ -15,7 +15,7 @@ namespace Radzen.Documents.Pdf.Signing;
 /// server-side (web API, HSM, KMS, ...) and returns only the completed CMS
 /// blob. The library always passes the raw covered bytes; implementations may
 /// hash them by any means - for example with the pure-managed
-/// <c>Radzen.Documents.Crypto.Sha2.Sha256</c> - before forwarding the digest
+/// <c>Radzen.Documents.Crypto.Sha2.ComputeHash256</c> - before forwarding the digest
 /// to a remote signing service.
 /// </remarks>
 public interface ISigner

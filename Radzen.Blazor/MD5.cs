@@ -22,7 +22,7 @@ public class MD5
     /// </summary>
     /// <param name="input">The input bytes.</param>
     /// <returns>The MD5 hash as a string.</returns>
-    public static string Calculate(byte[] input) => Radzen.Documents.Crypto.Md5.Calculate(input);
+        public static string Calculate(byte[] input) => Radzen.Documents.Crypto.Md5.ComputeHashHex(input);
 
     /// <summary>
     /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).

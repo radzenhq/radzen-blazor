@@ -106,7 +106,7 @@ public static class DssBuilder
         if (signatureContents is not null)
         {
             vri ??= new DictionaryObject();
-            var key = Sha1.HexUpper(signatureContents);
+            var key = Sha1.ComputeHashHex(signatureContents);
             // Merge into any prior entry for this same signature rather than
             // replacing it, so references gathered in earlier passes survive.
             var entry = reader.GetDictionary(vri, key) is { } priorEntry
@@ -150,7 +150,7 @@ public static class DssBuilder
                 array.Add(item);
                 if (item is ReferenceObject priorRef && reader.AsStream(priorRef) is { } stream)
                 {
-                    byContent.TryAdd(Sha1.HexUpper(reader.DecodeStream(stream)), priorRef);
+                    byContent.TryAdd(Sha1.ComputeHashHex(reader.DecodeStream(stream)), priorRef);
                 }
             }
         }
@@ -159,7 +159,7 @@ public static class DssBuilder
         for (var i = 0; i < items.Length; i++)
         {
             ArgumentNullException.ThrowIfNull(items[i]);
-            var digest = Sha1.HexUpper(items[i]);
+            var digest = Sha1.ComputeHashHex(items[i]);
             if (byContent.TryGetValue(digest, out var reused))
             {
                 refs[i] = reused;

@@ -63,7 +63,7 @@ internal static class LineLayouter
                 if (paragraph.TabStops.Count == 0 && first == last && words[first].Width > max
                     && IsBreakable(words[first], pieces))
                 {
-                    BreakOversizedWord(boxes, words[first], pieces, context, includeMarker);
+                    OversizedWordPlacement(boxes, words[first], pieces, context, includeMarker);
                 }
                 else
                 {
@@ -92,7 +92,7 @@ internal static class LineLayouter
 
     // Position where the word after `word` starts, given `word` ends at `position`: the inter-word
     // gap, then each tab advances to the next stop. With explicit `stops` this mirrors
-    // BuildTabStopLine's placement (next stop beyond the cursor, else the default grid) so wrapping
+    // ExplicitTabPlacement's placement (next stop beyond the cursor, else the default grid) so wrapping
     // fit and final placement agree; with no stops it is the plain 36pt-grid default.
     private static double NextStart(double position, LineWord word, List<TabStop>? stops = null)
     {
@@ -199,7 +199,7 @@ internal static class LineLayouter
     // A single token wider than the measure is split at character (code point) granularity so no
     // line exceeds max. Surrogate pairs stay intact; at least one code point is placed per line so
     // progress is guaranteed even when a single glyph is wider than max.
-    private static void BreakOversizedWord(
+    private static void OversizedWordPlacement(
         List<LineBox> boxes,
         LineWord word,
         List<LinePiece> pieces,
@@ -318,10 +318,8 @@ internal static class LineLayouter
     {
         var max = context.MaxWidth;
         var indent = context.Indent;
-        var paragraph = context.Paragraph;
-        var fonts = context.Fonts;
         var inheritedAlignment = context.InheritedAlignment;
-        var resolution = context.Resolution;
+        var paragraph = context.Paragraph;
         var alignment = paragraph.ResolveAlignment(inheritedAlignment);
         var x0 = alignment switch
         {
@@ -344,27 +342,9 @@ internal static class LineLayouter
             cursor += span[f].Advance;
         }
 
-        if (markerPending && paragraph.MarkerText is { Length: > 0 } markerText)
-        {
-            var markerFont = ResolvedFont(resolution, paragraph);
-            fragments.Insert(0, new LineFragment
-            {
-                Run = new Run(markerText),
-                Font = markerFont,
-                Text = markerText,
-                Start = 0,
-                Length = markerText.Length,
-                XOffset = paragraph.MarkerIndent.Point,
-                Advance = fonts.MeasureText(markerText, markerFont),
-                IsMarker = true,
-            });
-        }
-
+        var includeMarker = markerPending;
         markerPending = false;
-
-        var box = new LineBox { Fragments = fragments, Width = width };
-        Measure(box, paragraph.LineSpacing, fonts);
-        return box;
+        return FinalizeLine(fragments, width, context, includeMarker, default);
     }
 
     private static LineBox BuildLine(
@@ -375,15 +355,23 @@ internal static class LineLayouter
     {
         var first = request.First;
         var last = request.Last;
-        var max = context.MaxWidth;
-        var indent = context.Indent;
         var paragraph = context.Paragraph;
-        var fonts = context.Fonts;
-        var isLast = request.IsLast;
-        var inheritedAlignment = context.InheritedAlignment;
-        var includeMarker = request.IncludeMarker;
-        var sortedStops = context.SortedTabStops;
-        var resolution = context.Resolution;
+        var fragments = CreateFragments(words, pieces, first, last, out var advances, out var hasTabs);
+        var span = CollectionsMarshal.AsSpan(fragments);
+        var placement = paragraph.TabStops.Count > 0
+            ? ExplicitTabPlacement(span, fragments, words, first, last, context)
+            : PlainLinePlacement(span, words, request, context, advances, hasTabs);
+        return FinalizeLine(fragments, placement.Width, context, request.IncludeMarker, placement.Hyphen);
+    }
+
+    private static List<LineFragment> CreateFragments(
+        List<LineWord> words,
+        List<LinePiece> pieces,
+        int first,
+        int last,
+        out double advances,
+        out bool hasTabs)
+    {
         var count = 0;
         for (var w = first; w <= last; w++)
         {
@@ -391,8 +379,8 @@ internal static class LineLayouter
         }
 
         var fragments = new List<LineFragment>(count);
-        double advances = 0;
-        var hasTabs = false;
+        advances = 0;
+        hasTabs = false;
         for (var w = first; w <= last; w++)
         {
             var word = words[w];
@@ -417,12 +405,21 @@ internal static class LineLayouter
             }
         }
 
-        var span = CollectionsMarshal.AsSpan(fragments);
+        return fragments;
+    }
 
-        if (paragraph.TabStops.Count > 0)
-        {
-            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts, sortedStops!, resolution);
-        }
+    private static LinePlacement PlainLinePlacement(
+        Span<LineFragment> span,
+        List<LineWord> words,
+        LineBuildRequest request,
+        LineLayoutContext context,
+        double advances,
+        bool hasTabs)
+    {
+        var first = request.First;
+        var last = request.Last;
+        var max = context.MaxWidth;
+        var paragraph = context.Paragraph;
 
         // Natural placement from 0; tab stops are relative to the line origin.
         var cursor = 0.0;
@@ -491,8 +488,8 @@ internal static class LineLayouter
             }
         }
 
-        var alignment = paragraph.ResolveAlignment(inheritedAlignment);
-        var justify = alignment == HorizontalAlignment.Justify && !isLast && gapCount > 0 && !hasTabs;
+        var alignment = paragraph.ResolveAlignment(context.InheritedAlignment);
+        var justify = alignment == HorizontalAlignment.Justify && !request.IsLast && gapCount > 0 && !hasTabs;
 
         double x0;
         if (justify)
@@ -535,7 +532,7 @@ internal static class LineLayouter
             }
         }
 
-        var shift = indent + x0;
+        var shift = context.Indent + x0;
         if (shift != 0)
         {
             for (var f = 0; f < span.Length; f++)
@@ -546,18 +543,29 @@ internal static class LineLayouter
 
         // The hyphen is placed after the span shift (final positions) and before the marker
         // insert (which shifts list indices, invalidating the span).
-        var hyphenEnd = 0.0;
-        Font? hyphenFont = null;
         if (breakHyphen)
         {
             var tail = span[^1];
-            hyphenEnd = tail.XOffset + tail.Advance;
-            hyphenFont = tail.Font;
+            return new LinePlacement(
+                naturalWidth,
+                new HyphenPlacement(true, tail.XOffset + tail.Advance, tail.Font, hyphenWidth));
         }
 
+        return new LinePlacement(naturalWidth, default);
+    }
+
+    private static LineBox FinalizeLine(
+        List<LineFragment> fragments,
+        double width,
+        LineLayoutContext context,
+        bool includeMarker,
+        HyphenPlacement hyphen)
+    {
+        var paragraph = context.Paragraph;
+        var fonts = context.Fonts;
         if (includeMarker && paragraph.MarkerText is { Length: > 0 } markerText)
         {
-            var markerFont = ResolvedFont(resolution, paragraph);
+            var markerFont = ResolvedFont(context.Resolution, paragraph);
             fragments.Insert(0, new LineFragment
             {
                 Run = new Run(markerText),
@@ -571,21 +579,21 @@ internal static class LineLayouter
             });
         }
 
-        if (breakHyphen)
+        if (hyphen.Include)
         {
             fragments.Add(new LineFragment
             {
                 Run = new Run("-"),
-                Font = hyphenFont!,
+                Font = hyphen.Font!,
                 Text = "-",
                 Start = 0,
                 Length = 1,
-                XOffset = hyphenEnd,
-                Advance = hyphenWidth,
+                XOffset = hyphen.XOffset,
+                Advance = hyphen.Width,
             });
         }
 
-        var box = new LineBox { Fragments = fragments, Width = naturalWidth };
+        var box = new LineBox { Fragments = fragments, Width = width };
         Measure(box, paragraph.LineSpacing, fonts);
         return box;
     }
@@ -593,18 +601,19 @@ internal static class LineLayouter
     // Explicit tab stops: place each tab-delimited segment against the next stop at or beyond the
     // cursor, applying that stop's alignment. Paragraph-alignment shifting is not applied here so the
     // stops stay put; wrapped lines with no tabs still land left at the indent.
-    private static LineBox BuildTabStopLine(
+    private static LinePlacement ExplicitTabPlacement(
         Span<LineFragment> span,
         List<LineFragment> fragments,
         List<LineWord> words,
         int first,
         int last,
-        double indent,
-        Paragraph paragraph,
-        FontCollection fonts,
-        List<TabStop> stops,
-        StyleResolution? resolution)
+        LineLayoutContext context)
     {
+        var indent = context.Indent;
+        var paragraph = context.Paragraph;
+        var fonts = context.Fonts;
+        var stops = context.SortedTabStops!;
+        var resolution = context.Resolution;
         double naturalWidth = 0;
         var cursor = 0.0;
         var fi = 0;
@@ -702,9 +711,7 @@ internal static class LineLayouter
             fragments.AddRange(leaders);
         }
 
-        var box = new LineBox { Fragments = fragments, Width = naturalWidth };
-        Measure(box, paragraph.LineSpacing, fonts);
-        return box;
+        return new LinePlacement(naturalWidth, default);
     }
 
     // A run of the leader character right-aligned to the tab position (gapEnd), filling as
@@ -835,4 +842,8 @@ internal static class LineLayouter
 
         return (size * 1.2, size * 0.9);
     }
+
+    private readonly record struct LinePlacement(double Width, HyphenPlacement Hyphen);
+
+    private readonly record struct HyphenPlacement(bool Include, double XOffset, Font? Font, double Width);
 }
