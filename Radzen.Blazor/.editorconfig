@@ -5,8 +5,9 @@ root = true
 # The symbol list is assembly-global, but Radzen.Blazor legitimately uses DateTime.Now/Guid/etc.
 # outside the PDF library. The guard is silenced globally in BannedApi.globalconfig (which also
 # reaches Razor source-generated code, whose virtual paths fall outside this file's directory tree)
-# and re-enabled as 'error' only for the PDF/Crypto trees in the path-scoped sections at the end of
-# this file. A regular .editorconfig section always overrides the global config, so those win.
+# and re-enabled as 'error' only for the PDF library trees (Pdf/Crypto/Codes/Markdown) in the
+# path-scoped sections at the end of this file. A regular .editorconfig section always overrides the
+# global config, so those win.
 
 # C# files
 [*.cs]
@@ -293,10 +294,24 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 # WASM-safety / determinism guard: enforce BannedApiAnalyzers as errors only in the PDF library trees.
 # Anchored to this .editorconfig's directory (Documents/ is a direct child), so no leading '**/'.
+# CA1305 (IFormatProvider) is also raised to error here so culture-sensitive formatting - which would
+# make the deterministic PDF/barcode/markdown output vary by machine locale - is caught at build time.
 [Documents/Pdf/**.cs]
 dotnet_diagnostic.RS0030.severity = error
 dotnet_diagnostic.RS0031.severity = error
+dotnet_diagnostic.CA1305.severity = error
 
 [Documents/Crypto/**.cs]
 dotnet_diagnostic.RS0030.severity = error
 dotnet_diagnostic.RS0031.severity = error
+dotnet_diagnostic.CA1305.severity = error
+
+[Documents/Codes/**.cs]
+dotnet_diagnostic.RS0030.severity = error
+dotnet_diagnostic.RS0031.severity = error
+dotnet_diagnostic.CA1305.severity = error
+
+[Documents/Markdown/**.cs]
+dotnet_diagnostic.RS0030.severity = error
+dotnet_diagnostic.RS0031.severity = error
+dotnet_diagnostic.CA1305.severity = error

@@ -1,5 +1,6 @@
 ; WASM-safety / determinism guard for Radzen.Documents.Pdf.
-; Enforced only under Documents/Pdf and Documents/Crypto (RS0030/RS0031 scoped via .editorconfig).
+; Enforced only under Documents/Pdf, Documents/Crypto, Documents/Codes and Documents/Markdown
+; (RS0030/RS0031 scoped to error in those trees via .editorconfig).
 ; The PDF library must reimplement crypto in pure managed code and stay deterministic:
 ; no System.Security.Cryptography algorithms/RNG, no wall-clock time, no Guid/Random entropy.
 
@@ -18,3 +19,22 @@ M:System.Guid.NewGuid(); Non-deterministic. Do not generate Guids in the PDF lib
 M:System.Random.#ctor(); Non-deterministic. Do not use System.Random in the PDF library.
 M:System.Random.#ctor(System.Int32); Seeded Random is still banned to keep the PDF library RNG-free.
 P:System.Random.Shared; Non-deterministic. Do not use System.Random in the PDF library.
+
+; --- Networking: the PDF library must be self-contained and WASM/offline-safe (no sockets/HTTP) ---
+N:System.Net; No network access in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.Http; No HTTP access in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.Sockets; No socket access in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.Security; No network security stack in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.NetworkInformation; No network access in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.WebSockets; No network access in the PDF library - it must be self-contained and WASM-safe.
+N:System.Net.Mail; No network access in the PDF library - it must be self-contained and WASM-safe.
+T:System.Net.Http.HttpClient; No HTTP access in the PDF library - it must be self-contained and WASM-safe.
+
+; --- Non-deterministic wall-clock / high-resolution timers ---
+T:System.Diagnostics.Stopwatch; Non-deterministic timing. Do not measure wall-clock time in the PDF library.
+P:System.Environment.TickCount; Non-deterministic. Do not read the system tick counter in the PDF library.
+P:System.Environment.TickCount64; Non-deterministic. Do not read the system tick counter in the PDF library.
+
+; --- Filesystem entropy / temp files (non-deterministic, not WASM-safe) ---
+M:System.IO.Path.GetRandomFileName(); Non-deterministic. Do not generate random file names in the PDF library.
+M:System.IO.Path.GetTempFileName(); Non-deterministic and not WASM-safe. Do not create temp files in the PDF library.
