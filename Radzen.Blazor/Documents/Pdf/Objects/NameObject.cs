@@ -33,6 +33,8 @@ public sealed class NameObject(string value) : DocumentObject
     {
         foreach (var ch in name)
         {
+            ThrowIfUnencodable(ch, name);
+
             var code = ch & 0xFF;
             if (code <= 0x20 || code >= 0x7F || IsDelimiter(code) || code == '#')
             {
@@ -52,6 +54,8 @@ public sealed class NameObject(string value) : DocumentObject
 
         foreach (var ch in name)
         {
+            ThrowIfUnencodable(ch, name);
+
             var code = ch & 0xFF;
             if (code > 0x20 && code < 0x7F && !IsDelimiter(code) && code != '#')
             {
@@ -64,6 +68,16 @@ public sealed class NameObject(string value) : DocumentObject
         }
 
         return builder.ToString();
+    }
+
+    // Names are byte sequences; a code point above Latin-1 cannot be represented without
+    // silently aliasing to a different name (e.g. U+0141 -> 'A'), so fail loud instead.
+    private static void ThrowIfUnencodable(char ch, string name)
+    {
+        if (ch > 0xFF)
+        {
+            throw new System.NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
+        }
     }
 
     private static bool IsDelimiter(int code)

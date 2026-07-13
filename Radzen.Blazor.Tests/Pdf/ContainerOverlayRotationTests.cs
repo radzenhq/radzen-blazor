@@ -236,6 +236,73 @@ public class ContainerOverlayRotationTests
         Assert.True(content.IndexOf(" cm\n", StringComparison.Ordinal) < content.IndexOf("BT\n", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void RotatedContainer_WithShadow_Throws()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Width = Unit.FromPoint(200),
+            Rotation = 30,
+            Background = Color.FromRgb(255, 255, 255),
+            Shadow = new BoxShadow
+            {
+                Color = Color.FromArgb(160, 0, 0, 0),
+                BlurRadius = Unit.FromPoint(8),
+                OffsetX = Unit.FromPoint(2),
+                OffsetY = Unit.FromPoint(3),
+            },
+        });
+        container.Blocks.AddParagraph().Inlines.Add("Tilted");
+
+        Assert.Throws<NotSupportedException>(() => builder.Build());
+    }
+
+    [Fact]
+    public void RotatedContainer_WithoutShadow_Builds()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Width = Unit.FromPoint(200),
+            Rotation = 30,
+            Background = Color.FromRgb(255, 255, 255),
+        });
+        container.Blocks.AddParagraph().Inlines.Add("Tilted");
+
+        var document = builder.Build();
+        var page = Assert.Single(document.Pages);
+        Assert.NotNull(page.GetContent());
+    }
+
+    [Fact]
+    public void UnrotatedContainer_WithShadow_EmitsShadow()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Width = Unit.FromPoint(200),
+            Background = Color.FromRgb(255, 255, 255),
+            Shadow = new BoxShadow
+            {
+                Color = Color.FromArgb(160, 0, 0, 0),
+                BlurRadius = Unit.FromPoint(8),
+                OffsetX = Unit.FromPoint(2),
+                OffsetY = Unit.FromPoint(3),
+            },
+        });
+        container.Blocks.AddParagraph().Inlines.Add("Panel");
+
+        var document = builder.Build();
+        var page = Assert.Single(document.Pages);
+        var content = Encoding.ASCII.GetString(page.GetContent()!);
+        // The blurred drop shadow installs a luminosity soft mask through an ExtGState (gs).
+        Assert.Contains(" gs", content);
+    }
+
     // ------------------------------------------------------------- regression
 
     // Built with the pre-change generator (commit ce34920e): a paragraph, a plain
