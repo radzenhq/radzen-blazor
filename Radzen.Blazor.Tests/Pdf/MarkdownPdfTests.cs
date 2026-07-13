@@ -187,26 +187,50 @@ public class MarkdownPdfTests
     }
 
     [Fact]
-    public void UnresolvedImage_IsSkippedWithoutThrowing()
+    public void UnresolvedImage_FallsBackToAltTextParagraph()
     {
         var blocks = new BlockCollection();
         var options = new MarkdownPdfOptions { ImageResolver = _ => null };
 
-        var exception = Record.Exception(() => MarkdownPdf.Render(blocks, "![alt](missing.png)", options));
+        MarkdownPdf.Render(blocks, "![alt text](missing.png)", options);
 
-        Assert.Null(exception);
+        var paragraph = Assert.IsType<Paragraph>(Assert.Single(blocks));
+        Assert.Equal("alt text", paragraph.Text);
+    }
+
+    [Fact]
+    public void UnresolvedImageWithoutAltText_IsSkipped()
+    {
+        var blocks = new BlockCollection();
+        var options = new MarkdownPdfOptions { ImageResolver = _ => null };
+
+        MarkdownPdf.Render(blocks, "![](missing.png)", options);
+
         Assert.Empty(blocks);
     }
 
     [Fact]
-    public void ResolvedImage_AddsImageBlock()
+    public void UnresolvedInlineImage_RendersAltTextInline()
+    {
+        var blocks = new BlockCollection();
+        var options = new MarkdownPdfOptions { ImageResolver = _ => null };
+
+        MarkdownPdf.Render(blocks, "before ![alt](missing.png) after", options);
+
+        var paragraph = Assert.IsType<Paragraph>(Assert.Single(blocks));
+        Assert.Contains("alt", string.Concat(paragraph.Inlines.Select(run => run.Text)));
+    }
+
+    [Fact]
+    public void ResolvedImage_AddsImageBlockWithAltText()
     {
         var blocks = new BlockCollection();
         var bytes = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
         var options = new MarkdownPdfOptions { ImageResolver = _ => bytes };
 
-        MarkdownPdf.Render(blocks, "![alt](photo.jpg)", options);
+        MarkdownPdf.Render(blocks, "![alt text](photo.jpg)", options);
 
-        Assert.IsType<Image>(Assert.Single(blocks));
+        var image = Assert.IsType<Image>(Assert.Single(blocks));
+        Assert.Equal("alt text", image.AlternateText);
     }
 }
