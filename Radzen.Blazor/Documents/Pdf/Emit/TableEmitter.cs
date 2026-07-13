@@ -151,9 +151,18 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         // A grid cell never rounds its own corners against its neighbours, so its content is
         // never rounded-clipped (radius 0); only whole tables and containers round.
+        // Height is unused by the emit path; the cell stores no content height to carry.
         EmitBoxContent(
             context,
-            cell.Lines, cell.Images, cell.Codes, cell.Tables, cell.Boxes,
+            new LaidOutBoxContent
+            {
+                Height = 0,
+                Lines = cell.Lines,
+                Images = cell.Images,
+                Codes = cell.Codes,
+                Tables = cell.Tables,
+                Boxes = cell.Boxes,
+            },
             cell.ContentBox.Width, cell.Bounds.X, cell.Bounds.X + cell.Bounds.Width,
             bounds, 0, opacity, element,
             left, contentTop, delta);
@@ -165,11 +174,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
     // already-resolved pieces instead of a Cell/Table.
     internal void EmitBoxContent(
         EmitContext context,
-        IReadOnlyList<LaidOutLine> lines,
-        IReadOnlyList<LaidOutImage> images,
-        IReadOnlyList<LaidOutCode> codes,
-        IReadOnlyList<LaidOutNestedTable> tables,
-        IReadOnlyList<LaidOutNestedBox> boxes,
+        in LaidOutBoxContent content,
         double contentWidth,
         double boundsLeft,
         double boundsRight,
@@ -181,6 +186,11 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double contentTop,
         double delta)
     {
+        var lines = content.Lines;
+        var images = content.Images;
+        var codes = content.Codes;
+        var tables = content.Tables;
+        var boxes = content.Boxes;
         var plan = context.Plan;
         var pageNumber = context.PageNumber;
         var pageCount = context.PageCount;
@@ -361,7 +371,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
         EmitBoxContent(
             context,
-            box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,
+            box.Content,
             innerWidth, 0, box.Bounds.Width,
             bounds, box.Radius, opacity, element,
             left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
