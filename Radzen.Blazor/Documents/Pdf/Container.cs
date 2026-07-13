@@ -27,6 +27,8 @@ public enum ContainerLayout
 /// </summary>
 public sealed class Container : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>Gets the block-level content of the container.</summary>
     public BlockCollection Blocks { get; } = [];
 

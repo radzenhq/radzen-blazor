@@ -60,77 +60,105 @@ internal static class BoxContentLayout
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage)
     {
-        var items = new List<CellItem>();
-        double height = 0;
+        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage);
         // Lists expand to marker paragraphs exactly as in section content.
         foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth))
         {
-            if (block is Paragraph paragraph)
-            {
-                var spacingBefore = paragraph.SpacingBefore.Point;
-                if (spacingBefore > 0)
-                {
-                    items.Add(new CellItem { Height = spacingBefore });
-                    height += spacingBefore;
-                }
-
-                foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, align))
-                {
-                    items.Add(new CellItem { Line = line, Source = block, Height = line.Height });
-                    height += line.Height;
-                }
-
-                var spacingAfter = paragraph.SpacingAfter.Point;
-                if (spacingAfter > 0)
-                {
-                    items.Add(new CellItem { Height = spacingAfter });
-                    height += spacingAfter;
-                }
-            }
-            else if (block is Image image)
-            {
-                var (imageWidth, imageHeight) = measureImage is null
-                    ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), contentWidth)
-                    : measureImage(image, contentWidth);
-                items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
-                height += imageHeight;
-            }
-            else if (block is QrCode or Barcode)
-            {
-                var (codeWidth, codeHeight) = Paginator.MeasureCode(block);
-                items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
-                height += codeHeight;
-            }
-            else if (block is Table nested)
-            {
-                var layout = TableLayout.Layout(nested, Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
-                items.Add(new CellItem { Table = layout, Height = layout.Height });
-                height += layout.Height;
-            }
-            else if (block is Container container)
-            {
-                // A Stack container nests as a first-class box (ExpandBlocks throws for
-                // overlay/rotated ones before this point): its content measures at the box's
-                // inner width and the box adds the padding on both axes, exactly like the
-                // synthetic single-cell table it used to lower to.
-                var padding = container.Padding.Point;
-                var boxWidth = container.Width?.Point ?? contentWidth;
-                var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
-                var boxHeight = inner.Height + (2 * padding);
-                items.Add(new CellItem { Box = container, BoxContent = inner, Width = boxWidth, Height = boxHeight });
-                height += boxHeight;
-            }
-            else if (block is PageBreak)
-            {
-                // A cell cannot break across pages by itself, so a page break inside one is a no-op.
-            }
-            else
-            {
-                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
-            }
+            block.Accept(visitor, default);
         }
 
-        return new Measured { Items = items, Height = height };
+        return new Measured { Items = visitor.Items, Height = visitor.Height };
+    }
+
+    // Measures each block into the flat CellItem list, accumulating the running height.
+    // A page break inside a cell is a no-op (a cell cannot break across pages by itself);
+    // any other unsupported block type fails loud through Default. Lists and special
+    // containers never reach here - ExpandBlocks expands or rejects them first.
+    private sealed class MeasureVisitor(
+        double contentWidth,
+        HorizontalAlignment? align,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage)
+        : BlockVisitor<Nothing, Nothing>
+    {
+        public List<CellItem> Items { get; } = [];
+
+        public double Height { get; private set; }
+
+        protected override Nothing Default(Block block, Nothing context)
+            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
+
+        public override Nothing Visit(Paragraph paragraph, Nothing context)
+        {
+            var spacingBefore = paragraph.SpacingBefore.Point;
+            if (spacingBefore > 0)
+            {
+                Items.Add(new CellItem { Height = spacingBefore });
+                Height += spacingBefore;
+            }
+
+            foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, align))
+            {
+                Items.Add(new CellItem { Line = line, Source = paragraph, Height = line.Height });
+                Height += line.Height;
+            }
+
+            var spacingAfter = paragraph.SpacingAfter.Point;
+            if (spacingAfter > 0)
+            {
+                Items.Add(new CellItem { Height = spacingAfter });
+                Height += spacingAfter;
+            }
+
+            return default;
+        }
+
+        public override Nothing Visit(Image image, Nothing context)
+        {
+            var (imageWidth, imageHeight) = measureImage is null
+                ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), contentWidth)
+                : measureImage(image, contentWidth);
+            Items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
+            Height += imageHeight;
+            return default;
+        }
+
+        public override Nothing Visit(QrCode block, Nothing context) => VisitCode(block);
+
+        public override Nothing Visit(Barcode block, Nothing context) => VisitCode(block);
+
+        private Nothing VisitCode(Block block)
+        {
+            var (codeWidth, codeHeight) = Paginator.MeasureCode(block);
+            Items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
+            Height += codeHeight;
+            return default;
+        }
+
+        public override Nothing Visit(Table nested, Nothing context)
+        {
+            var layout = TableLayout.Layout(nested, Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
+            Items.Add(new CellItem { Table = layout, Height = layout.Height });
+            Height += layout.Height;
+            return default;
+        }
+
+        public override Nothing Visit(Container container, Nothing context)
+        {
+            // A Stack container nests as a first-class box (ExpandBlocks throws for
+            // overlay/rotated ones before this point): its content measures at the box's
+            // inner width and the box adds the padding on both axes, exactly like the
+            // synthetic single-cell table it used to lower to.
+            var padding = container.Padding.Point;
+            var boxWidth = container.Width?.Point ?? contentWidth;
+            var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
+            var boxHeight = inner.Height + (2 * padding);
+            Items.Add(new CellItem { Box = container, BoxContent = inner, Width = boxWidth, Height = boxHeight });
+            Height += boxHeight;
+            return default;
+        }
+
+        public override Nothing Visit(PageBreak block, Nothing context) => default;
     }
 
     public static LaidOutBoxContent Position(
@@ -233,12 +261,7 @@ internal static class BoxContentLayout
         };
     }
 
-    private static HorizontalAlignment BlockAlignment(Block code) => code switch
-    {
-        QrCode qr => qr.Alignment,
-        Barcode barcode => barcode.Alignment,
-        _ => HorizontalAlignment.Left,
-    };
+    private static HorizontalAlignment BlockAlignment(Block code) => CodeBlockDispatch.Alignment(code);
 
     // Non-text content honors its OWN alignment, falling back to the cell's only when the
     // block leaves it at the default Left. The factor matches how text resolves alignment

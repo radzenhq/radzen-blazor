@@ -8,6 +8,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class List : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     private Unit? hangingIndent;
 
     /// <summary>Gets or sets the marker style. Defaults to <see cref="ListStyle.Bullet"/>.</summary>
