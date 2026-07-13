@@ -533,6 +533,7 @@ namespace Radzen.Blazor {
         public static string PickList_SourceAriaLabel { get { return ResourceManager.GetString("PickList_SourceAriaLabel", resourceCulture); } }
         public static string PickList_TargetAriaLabel { get { return ResourceManager.GetString("PickList_TargetAriaLabel", resourceCulture); } }
         public static string PivotDataGrid_EmptyText { get { return ResourceManager.GetString("PivotDataGrid_EmptyText", resourceCulture); } }
+        public static string PivotDataGrid_OthersText { get { return ResourceManager.GetString("PivotDataGrid_OthersText", resourceCulture); } }
         public static string PivotDataGrid_FieldsPickerHeaderText { get { return ResourceManager.GetString("PivotDataGrid_FieldsPickerHeaderText", resourceCulture); } }
         public static string PivotDataGrid_RowsText { get { return ResourceManager.GetString("PivotDataGrid_RowsText", resourceCulture); } }
         public static string PivotDataGrid_ColumnsText { get { return ResourceManager.GetString("PivotDataGrid_ColumnsText", resourceCulture); } }

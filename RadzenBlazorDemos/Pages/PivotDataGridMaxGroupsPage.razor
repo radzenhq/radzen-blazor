@@ -1,0 +1,17 @@
+@page "/pivot-data-grid-max-groups"
+
+<PageTitle>Pivot DataGrid Top N Groups - Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PivotDataGrid <strong>Top N groups</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Limit the number of row or column groups with <code>MaxGroups</code>. The most significant groups are kept and the remaining items are combined into a single group labeled via <code>OthersLabel</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-my-6">
+    Set <code>MaxGroups</code> on <code>RadzenPivotRow</code> or <code>RadzenPivotColumn</code> to keep large datasets readable. Groups are ranked by the sorted aggregate or the first aggregate. Call <code>Reload()</code> after changing the value at runtime.
+</RadzenText>
+
+<RadzenExample ComponentName="PivotDataGrid" Example="PivotDataGridMaxGroups">
+    <PivotDataGridMaxGroups />
+</RadzenExample>

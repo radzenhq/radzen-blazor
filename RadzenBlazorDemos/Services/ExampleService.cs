@@ -3130,6 +3130,21 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Top N groups",
+                    Path = "/pivot-data-grid-max-groups",
+                    New = true,
+                    Title = "Blazor Pivot DataGrid - Top N Groups with Others | Free UI Components by Radzen",
+                    Description = "Limit the number of row and column groups in the Blazor Pivot DataGrid with MaxGroups and combine the remaining items into a single Others group.",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "top", "top n", "others", "maxgroups", "limit", "datagrid", "table" },
+                    Related = new [] { "pivot-data-grid", "pivot-data-grid-load-data", "pivot-data-grid-dynamic" },
+                    Faq = new []
+                    {
+                        new FaqItem { Question = "How do I show only the top N groups in the Pivot DataGrid?", Answer = "Set MaxGroups on RadzenPivotRow or RadzenPivotColumn; the most significant groups are kept and the rest are combined into a single group labeled via OthersLabel." },
+                        new FaqItem { Question = "How are the top groups selected?", Answer = "Groups are ranked by the value of the sorted aggregate, or the first aggregate when no aggregate sorting is applied, in descending order." }
+                    }
+                },
+                new Example
+                {
                     Name = "LoadData",
                     Path = "/pivot-data-grid-load-data",
                     Title = "Blazor Pivot DataGrid - LoadData Binding | Free UI Components by Radzen",

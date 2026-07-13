@@ -16,6 +16,21 @@ namespace Radzen.Blazor
         public string? Width { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum number of column groups to display at this level. When the number of distinct values exceeds this limit
+        /// the most significant groups (ranked by the sorted aggregate or the first aggregate) are kept and the remaining items
+        /// are combined into a single group labeled with <see cref="OthersLabel"/>. Set to <c>null</c> (the default) to display all groups.
+        /// </summary>
+        [Parameter]
+        public int? MaxGroups { get; set; }
+
+        /// <summary>
+        /// Gets or sets the label of the group that combines the remaining items when <see cref="MaxGroups"/> is exceeded.
+        /// Set to <c>null</c> by default - the localized <see cref="RadzenPivotDataGrid{TItem}.OthersText"/> of the parent pivot grid is used.
+        /// </summary>
+        [Parameter]
+        public string? OthersLabel { get; set; }
+
+        /// <summary>
         /// Called when the component is initialized. Registers this column with the parent pivot grid.
         /// </summary>
         protected override void OnInitialized()

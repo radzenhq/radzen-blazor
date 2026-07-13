@@ -1552,6 +1552,9 @@
   <data name="PivotDataGrid_EmptyText" xml:space="preserve">
     <value>No records to display.</value>
   </data>
+  <data name="PivotDataGrid_OthersText" xml:space="preserve">
+    <value>Others</value>
+  </data>
   <data name="PivotDataGrid_FieldsPickerHeaderText" xml:space="preserve">
     <value>Settings</value>
   </data>

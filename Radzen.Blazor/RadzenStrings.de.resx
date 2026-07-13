@@ -1552,6 +1552,9 @@
   <data name="PivotDataGrid_EmptyText" xml:space="preserve">
     <value>Keine Datensätze zum Anzeigen.</value>
   </data>
+  <data name="PivotDataGrid_OthersText" xml:space="preserve">
+    <value>Sonstige</value>
+  </data>
   <data name="PivotDataGrid_FieldsPickerHeaderText" xml:space="preserve">
     <value>Einstellungen</value>
   </data>

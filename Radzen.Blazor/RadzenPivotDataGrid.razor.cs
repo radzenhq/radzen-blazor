@@ -108,6 +108,15 @@ namespace Radzen.Blazor
         [Parameter]
         public string EmptyText { get => emptyText ?? Localize(nameof(RadzenStrings.PivotDataGrid_EmptyText)); set => emptyText = value; }
 
+        private string? othersText;
+
+        /// <summary>
+        /// Gets or sets the default label of the group that combines the remaining items when the <c>MaxGroups</c> limit of a pivot row or column is exceeded.
+        /// Used when <see cref="RadzenPivotRow{TItem}.OthersLabel"/> or <see cref="RadzenPivotColumn{TItem}.OthersLabel"/> is not set.
+        /// </summary>
+        [Parameter]
+        public string OthersText { get => othersText ?? Localize(nameof(RadzenStrings.PivotDataGrid_OthersText)); set => othersText = value; }
+
         /// <summary>
         /// Gets or sets the empty template shown when Data is empty collection.
         /// </summary>
@@ -651,7 +660,9 @@ namespace Radzen.Blazor
                : (col.GetSortOrder() == SortOrder.Descending) ? groups.OrderByDescending(g => g.Key)
                : groups;
 
-            foreach (var group in sortedGroups)
+            var finalGroups = ApplyMaxGroups(sortedGroups, col.MaxGroups, out var othersItems);
+
+            foreach (var group in finalGroups)
             {
                 var currentPath = new List<object>(path) { group.Key };
                 var pathKey = string.Join("|", currentPath);
@@ -675,6 +686,90 @@ namespace Radzen.Blazor
                 }
                 node.Children.Add(child);
             }
+
+            if (othersItems != null)
+            {
+                var currentPath = new List<object>(path) { OthersGroupKey };
+                var pathKey = string.Join("|", currentPath);
+                var isCollapsed = AllowDrillDown && (!_collapsedColumnGroups.ContainsKey(pathKey) || _collapsedColumnGroups[pathKey]);
+
+                var othersLabel = col.OthersLabel ?? OthersText;
+
+                var child = new ColumnHeaderNode
+                {
+                    Value = othersLabel,
+                    Title = othersLabel,
+                    Level = level + 1,
+                    Width = col.Width,
+                    IsCollapsed = isCollapsed,
+                    PathKey = pathKey,
+                    IsOthers = true
+                };
+
+                if (!isCollapsed)
+                {
+                    BuildColumnHeaderTreeRecursive(child, othersItems.AsQueryable(), level + 1, currentPath);
+                }
+                node.Children.Add(child);
+            }
+        }
+
+        private const string OthersGroupKey = "__rz_pivot_others__";
+
+        private static IEnumerable<TItem> GetGroupItems(GroupResult group)
+        {
+            return group.Items?.Cast<TItem>() ?? Enumerable.Empty<TItem>();
+        }
+
+        private static double? ToSortKey(object? value)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            try { return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture); } catch { return null; }
+        }
+
+        /// <summary>
+        /// Keeps the most significant groups when their number exceeds the configured limit and collects the items of the remaining groups.
+        /// Groups are ranked by the sorted aggregate or the first aggregate; the kept groups preserve their current order.
+        /// </summary>
+        private List<GroupResult> ApplyMaxGroups(IEnumerable<GroupResult> groups, int? maxGroups, out List<TItem>? othersItems)
+        {
+            othersItems = null;
+
+            var groupList = groups as List<GroupResult> ?? groups.ToList();
+
+            if (maxGroups == null || maxGroups.Value <= 0 || groupList.Count <= maxGroups.Value)
+            {
+                return groupList;
+            }
+
+            var rankingAggregate = pivotAggregates.FirstOrDefault(a => a.GetSortOrder() != null) ?? pivotAggregates.FirstOrDefault();
+
+            var keptGroups = rankingAggregate != null
+                ? groupList.OrderByDescending(g => ToSortKey(GetAggregateValue(GetGroupItems(g).AsQueryable(), rankingAggregate)) ?? double.MinValue).Take(maxGroups.Value).ToHashSet()
+                : groupList.Take(maxGroups.Value).ToHashSet();
+
+            var result = new List<GroupResult>(maxGroups.Value);
+            var remainingItems = new List<TItem>();
+
+            foreach (var group in groupList)
+            {
+                if (keptGroups.Contains(group))
+                {
+                    result.Add(group);
+                }
+                else
+                {
+                    remainingItems.AddRange(GetGroupItems(group));
+                }
+            }
+
+            othersItems = remainingItems;
+
+            return result;
         }
 
         List<List<ColumnHeaderCell>> FlattenColumnHeaderTree(ColumnHeaderNode root)
@@ -1007,11 +1102,15 @@ namespace Radzen.Blazor
                             builder.AddAttribute(9, "class", $"notranslate rz-tree-toggler rzi rzi-caret-{(rowHeaderCell.IsCollapsed ? "right" : "down")}");
                             builder.AddAttribute(10, "onclick", EventCallback.Factory.Create(this, () => ToggleRowDrillDown(rowHeaderCell.PathKey)));
                             builder.AddAttribute(11, "style", "margin-inline-start:0");
+                            builder.AddAttribute(12, "role", "button");
+                            builder.AddAttribute(13, "tabindex", "0");
+                            builder.AddAttribute(14, "aria-expanded", (!rowHeaderCell.IsCollapsed).ToString().ToLowerInvariant());
+                            builder.AddAttribute(15, "onkeydown", EventCallback.Factory.Create<KeyboardEventArgs>(this, args => OnRowDrillDownKeyDown(args, rowHeaderCell.PathKey)));
                             builder.CloseElement();
 
-                            builder.OpenElement(13, "span");
-                            builder.AddAttribute(14, "class", "rz-pivot-header-text");
-                            builder.AddContent(15, rowHeaderCell.Title);
+                            builder.OpenElement(16, "span");
+                            builder.AddAttribute(17, "class", "rz-pivot-header-text");
+                            builder.AddContent(18, rowHeaderCell.Title);
                             builder.CloseElement();
 
                             builder.CloseElement();
@@ -1441,16 +1540,6 @@ namespace Radzen.Blazor
             IEnumerable<GroupResult> sortedGroups;
             if (sortedAggregate != null)
             {
-                static double? ToSortKey(object? value)
-                {
-                    if (value == null)
-                    {
-                        return null;
-                    }
-
-                    try { return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture); } catch { return null; }
-                }
-
                 var groupsWithValues = groups.AsEnumerable().Select(g => new
                 {
                     Group = g,
@@ -1468,7 +1557,9 @@ namespace Radzen.Blazor
                     : groups;
             }
 
-            foreach (var group in sortedGroups)
+            var finalGroups = ApplyMaxGroups(sortedGroups, row.MaxGroups, out var othersItems);
+
+            foreach (var group in finalGroups)
             {
                 var currentPath = new List<object>(path) { group.Key };
                 var pathKey = string.Join("|", currentPath);
@@ -1490,6 +1581,34 @@ namespace Radzen.Blazor
                 else
                 {
                     child.Items = group.Items?.Cast<TItem>().AsQueryable() ?? Enumerable.Empty<TItem>().AsQueryable();
+                }
+                node.Children.Add(child);
+            }
+
+            if (othersItems != null)
+            {
+                var currentPath = new List<object>(path) { OthersGroupKey };
+                var pathKey = string.Join("|", currentPath);
+                var isCollapsed = AllowDrillDown && (!_collapsedRowGroups.ContainsKey(pathKey) || _collapsedRowGroups[pathKey]);
+
+                var othersLabel = row.OthersLabel ?? OthersText;
+
+                var child = new RowHeaderNode
+                {
+                    Value = othersLabel,
+                    Title = othersLabel,
+                    Level = level + 1,
+                    IsCollapsed = isCollapsed,
+                    PathKey = pathKey
+                };
+
+                if (!isCollapsed)
+                {
+                    BuildRowHeaderTreeRecursive(child, othersItems.AsQueryable(), level + 1, currentPath);
+                }
+                else
+                {
+                    child.Items = othersItems.AsQueryable();
                 }
                 node.Children.Add(child);
             }
@@ -1607,19 +1726,29 @@ namespace Radzen.Blazor
                 columnValues.Add(values);
             }
 
+            var hasOthersGroups = pivotColumns.Any(c => c.MaxGroups > 0);
+
             var path = new List<object?>(pivotColumns.Count);
             for (int i = 0; i < items.Count; i++)
             {
-                path.Clear();
                 string? matchKey = null;
-                for (int level = 0; level < pivotColumns.Count; level++)
+
+                if (hasOthersGroups)
                 {
-                    path.Add(columnValues[level][i]);
-                    var key = ColumnPathKey(path);
-                    if (leafKeys.Contains(key))
+                    matchKey = FindColumnLeafKey(i, columnValues);
+                }
+                else
+                {
+                    path.Clear();
+                    for (int level = 0; level < pivotColumns.Count; level++)
                     {
-                        matchKey = key;
-                        break;
+                        path.Add(columnValues[level][i]);
+                        var key = ColumnPathKey(path);
+                        if (leafKeys.Contains(key))
+                        {
+                            matchKey = key;
+                            break;
+                        }
                     }
                 }
 
@@ -1637,6 +1766,49 @@ namespace Radzen.Blazor
             }
 
             return buckets;
+        }
+
+        /// <summary>
+        /// Resolves the column leaf an item belongs to by walking the column header tree. Items whose value does not match
+        /// a kept group at some level fall into the synthetic Others group produced by <see cref="RadzenPivotColumn{TItem}.MaxGroups"/>.
+        /// </summary>
+        private string? FindColumnLeafKey(int itemIndex, List<List<object?>> columnValues)
+        {
+            var node = ColumnHeaderTreeRoot;
+            var path = new List<object?>(pivotColumns.Count);
+            var level = 0;
+
+            while (node.Children.Count > 0 && level < pivotColumns.Count)
+            {
+                var valueKey = columnValues[level][itemIndex]?.ToString() ?? string.Empty;
+                ColumnHeaderNode? match = null;
+                ColumnHeaderNode? others = null;
+
+                foreach (var child in node.Children)
+                {
+                    if (child.IsOthers)
+                    {
+                        others = child;
+                    }
+                    else if ((child.Value?.ToString() ?? string.Empty) == valueKey)
+                    {
+                        match = child;
+                        break;
+                    }
+                }
+
+                var next = match ?? others;
+                if (next == null)
+                {
+                    return null;
+                }
+
+                path.Add(next.Value);
+                node = next;
+                level++;
+            }
+
+            return node.Children.Count == 0 && path.Count > 0 ? ColumnPathKey(path) : null;
         }
 
         private static string ColumnPathKey(System.Collections.IEnumerable path)
@@ -1764,6 +1936,7 @@ namespace Radzen.Blazor
             public bool IsCollapsed { get; set; }
             public string? PathKey { get; set; }
             public bool HasChildren { get; set; }
+            public bool IsOthers { get; set; }
             public RenderFragment<GroupResult>? HeaderTemplate { get; set; }
             public GroupResult? Group { get; set; }
         }
@@ -1857,6 +2030,15 @@ namespace Radzen.Blazor
             if (key == "Enter" || key == "Space")
             {
                 await ToggleColumnDrillDown(pathKey);
+            }
+        }
+
+        async Task OnRowDrillDownKeyDown(KeyboardEventArgs args, string pathKey)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await ToggleRowDrillDown(pathKey);
             }
         }
 
