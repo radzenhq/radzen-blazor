@@ -79,7 +79,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         protected override Nothing Default(Block block, StructureElement parent)
             => throw new NotSupportedException(
                 $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
-                + "Add an explicit case to StructureTreeBuilder.MapBlock so it cannot silently vanish from accessible output.");
+                + "Add a Visit overload for it to this block visitor so it cannot silently vanish from accessible output.");
 
         public override Nothing Visit(Paragraph paragraph, StructureElement parent)
         {

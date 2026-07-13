@@ -334,10 +334,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    // A first-class nested box paints exactly like the synthetic single-cell table the
-    // container used to lower to: decoration first (opacity registered per page here, like
-    // BoxEmitter), then the child content recursing through EmitBoxContent with the box's
-    // clamped radius so rounded boxes clip their content.
+    // A first-class nested box paints decoration first (opacity registered per page here,
+    // like BoxEmitter), then the child content recursing through EmitBoxContent with the
+    // box's clamped radius so rounded boxes clip their content.
     private void EmitNestedBox(EmitContext context, in LaidOutNestedBox box, StructureElement? element, double left, double contentTop, double delta)
     {
         var plan = context.Plan;

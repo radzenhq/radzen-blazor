@@ -86,9 +86,9 @@ internal static class LineBreaker
         => (Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
     // The resolved font of a run (its authored font run through the style cascade), from the
-    // per-save StyleResolution when present. Falls back to the authored font, matching the
-    // former `EffectiveFont ?? Font`: a synthesized run (TOC, field, barcode) carries its
-    // resolved font as its authored Font, and a direct-test paragraph has no resolution at all.
+    // per-save StyleResolution when present, else the authored font: a synthesized run (TOC,
+    // field, barcode) carries its resolved font as its authored Font, and a direct-test
+    // paragraph has no resolution at all.
     private static Font ResolvedFont(StyleResolution? resolution, Run run)
         => resolution?.RunFont(run) ?? run.Font;
 

@@ -23,13 +23,6 @@ internal readonly struct PositionedTableFragment
     public required double Y { get; init; }
 
     /// <summary>
-    /// Page-space transform to apply to every draw this fragment produces, or
-    /// <see langword="null"/> for none. Always null now that a rotated container places as
-    /// a first-class box; retained so page emission can carry a per-fragment transform.
-    /// </summary>
-    public Matrix? Transform { get; init; }
-
-    /// <summary>
     /// Placement sequence within the section body, shared with <see cref="PositionedBox.Order"/>
     /// so page emission can interleave boxes and table fragments in document order.
     /// </summary>
@@ -244,7 +237,7 @@ internal static class Paginator
 
         // List blocks expand to hanging-indented marker paragraphs before layout so the rest of
         // the pipeline sees only paragraphs; a section with no lists returns its blocks unchanged.
-        // Containers stay unlowered: Stack containers are placed as first-class boxes by
+        // Containers pass through intact: Stack containers are placed as first-class boxes by
         // PlaceBox and overlay ones by PlaceSpecialContainer.
         var blocks = ExpandBlocks(section.Blocks, contentWidth, keepSpecialContainers: true, tocPages, fonts, resolution);
 
@@ -687,7 +680,7 @@ internal static class Paginator
 
         public override Nothing Visit(Container container, Nothing context)
         {
-            // A Stack container is never lowered anymore: the section body and the
+            // A Stack container is a first-class box: the section body and the
             // header/footer bands place it as a first-class box and cell/box content
             // nests it as a first-class nested box (BoxContentLayout). Overlay and
             // rotated containers are only allowed as direct section content
@@ -820,11 +813,11 @@ internal static class Paginator
         => container.Layout == ContainerLayout.Overlay;
 
     // Lays out an overlay container as a first-class box: each child is measured and
-    // positioned independently at the box top-left (inset by the padding), exactly like
-    // the single-cell table each child used to lower to, and the results are merged in
-    // declaration order (nested tables/boxes reordered onto one increasing sequence so
-    // emission interleaves them in that order). The box inner height is the tallest
-    // child's; content positions are box-local (the emitter shifts them by the box Y).
+    // positioned independently at the box top-left (inset by the padding), and the
+    // results are merged in declaration order (nested tables/boxes reordered onto one
+    // increasing sequence so emission interleaves them in that order). The box inner
+    // height is the tallest child's; content positions are box-local (the emitter shifts
+    // them by the box Y).
     private static (LaidOutBoxContent Content, double Indent, double BoxWidth, double BoxHeight) LayoutOverlay(
         Container container,
         double availableWidth,
@@ -987,8 +980,7 @@ internal static class Paginator
         };
 
     // Measures a Stack container's content at the box's inner width (box width minus the
-    // padding on both sides), with the same null alignment the lowered single-cell table
-    // resolved for its synthetic cell.
+    // padding on both sides); content measures with no inherited alignment.
     private static BoxContentLayout.Measured MeasureBox(
         Container container,
         double contentWidth,
@@ -1002,7 +994,7 @@ internal static class Paginator
 
     // Positions a measured Stack container as a first-class box at y. Content is
     // positioned box-local (Y from the box top); the emitter shifts it by the box's
-    // page Y. Align/vAlign match the lowered single-cell table's defaults.
+    // page Y, with left/top content alignment defaults.
     private static PositionedBox BuildBox(
         Container container,
         BoxContentLayout.Measured measured,
