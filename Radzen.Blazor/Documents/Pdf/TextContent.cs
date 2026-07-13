@@ -52,7 +52,8 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
 
     internal double CharSpacing { get; set; }
 
-    internal override void EmitBody(ContentWriter writer)
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
 

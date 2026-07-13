@@ -23,7 +23,8 @@ public sealed class XObjectContent : ContentElement
     /// <summary>Gets the XObject resource name, without the leading slash.</summary>
     public string Name { get; }
 
-    internal override void EmitBody(ContentWriter writer)
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
     {
         writer.WriteName(Name);
         writer.WriteRaw(" Do\n");

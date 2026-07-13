@@ -4,7 +4,12 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal static class ImageDecoder
+/// <summary>
+/// Decodes an encoded image payload into an <see cref="ImageXObject"/>. Additional image
+/// formats plug in through <see cref="Register(IImageDecoder)"/>; the built-in PNG, JPEG and
+/// JPEG2000 decoders are tried first, then registered decoders in registration order.
+/// </summary>
+public static class ImageDecoder
 {
     // The built-in format decoders, tried in order; a new format is a new IImageDecoder
     // registered here rather than an added arm in a central magic-byte switch.
@@ -15,9 +20,30 @@ internal static class ImageDecoder
         new Jpeg2000ImageDecoder(),
     ];
 
-    public static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
+    // Registered custom decoders, tried after the built-ins so a third party cannot shadow a
+    // built-in format. Held as an immutable snapshot swapped on register, so a concurrent Decode
+    // enumerates a stable array rather than a list being mutated under it.
+    private static volatile IImageDecoder[] registered = [];
 
-    public static ImageXObject Decode(byte[] imageBytes, ReaderLimits limits)
+    /// <summary>
+    /// Registers a custom <see cref="IImageDecoder"/> so a new image format can be decoded.
+    /// The built-in PNG, JPEG and JPEG2000 decoders are tried first; registered decoders are
+    /// tried after them in registration order.
+    /// </summary>
+    /// <param name="decoder">The decoder to register.</param>
+    public static void Register(IImageDecoder decoder)
+    {
+        ArgumentNullException.ThrowIfNull(decoder);
+        var snapshot = registered;
+        var updated = new IImageDecoder[snapshot.Length + 1];
+        snapshot.CopyTo(updated, 0);
+        updated[^1] = decoder;
+        registered = updated;
+    }
+
+    internal static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
+
+    internal static ImageXObject Decode(byte[] imageBytes, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(imageBytes);
         ArgumentNullException.ThrowIfNull(limits);
@@ -30,12 +56,20 @@ internal static class ImageDecoder
             }
         }
 
+        foreach (var decoder in registered)
+        {
+            if (decoder.TryDecode(imageBytes, limits, out var xobject))
+            {
+                return xobject;
+            }
+        }
+
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
     }
 
     // Rendered size honoring explicit Width/Height, keeping aspect when one is omitted.
     // A fully unsized image renders at 96dpi and is clamped to the available width.
-    public static (double Width, double Height) Measure(Image image, ImageXObject xobject, double availableWidth)
+    internal static (double Width, double Height) Measure(Image image, ImageXObject xobject, double availableWidth)
     {
         var dict = xobject.Image.Dictionary;
         var pixelWidth = ((NumberObject)dict["Width"]).DoubleValue;
@@ -85,7 +119,7 @@ internal static class ImageDecoder
     // mask needs a dictionary without /ColorSpace, so it yields a fresh image-mask XObject;
     // the remaining flags are additive. An image that opts into nothing is returned untouched,
     // keeping the default output byte-identical.
-    public static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
+    internal static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
     {
         if (image.Stencil && image.ColorKeyMask is not null)
         {
