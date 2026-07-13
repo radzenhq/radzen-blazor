@@ -77,4 +77,22 @@ public class NameEscapingTests
     {
         Assert.Equal("/Type1-Bold.007", Serialize("Type1-Bold.007"));
     }
+
+    [Fact]
+    public void HighByteBoundary_EscapedNotAliased()
+    {
+        Assert.Equal("/#80#FF", Serialize("\u0080\u00FF"));
+    }
+
+    [Fact]
+    public void CodePointAboveLatin1_Throws()
+    {
+        Assert.Throws<System.NotSupportedException>(() => Serialize("A\u0141"));
+    }
+
+    [Fact]
+    public void CodePointAboveLatin1_AfterEscapableChar_Throws()
+    {
+        Assert.Throws<System.NotSupportedException>(() => Serialize(" \u0141"));
+    }
 }
