@@ -48,12 +48,12 @@ public sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fals
                 {
                     var last = glyphs.Count - 1;
                     var previous = glyphs[last];
-                    glyphs[last] = new PositionedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster);
+                    glyphs[last] = new PositionedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster, previous.Face);
                     total += kern;
                 }
             }
 
-            glyphs.Add(new PositionedGlyph(glyph, advance, i));
+            glyphs.Add(new PositionedGlyph(glyph, advance, i, face));
             total += advance;
             previousFace = face;
             previousGlyph = glyph;

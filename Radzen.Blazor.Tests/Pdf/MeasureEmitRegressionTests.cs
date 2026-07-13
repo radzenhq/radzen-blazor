@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -148,5 +149,53 @@ public class MeasureEmitRegressionTests
         var font = LineLayoutSupport.FontAt(12);
 
         Assert.Equal(fonts.MeasureText("A中B", font), fonts.MeasureText("A\U0001F600B", font), 6);
+    }
+
+    // Emission now maps its glyphs through the same shaper measurement uses, so the CIDs
+    // drawn in the content stream ARE the shaper's glyph-id sequence, in order - measure
+    // and emit agree by construction rather than by two hand-kept-in-sync loops. The
+    // embedded subset renumbers glyph ids, so the drawn CIDs are a consistent renaming of
+    // the shaped gids: same length, and two positions draw the same CID exactly when the
+    // shaper mapped them to the same glyph (so order, repeats and clustering are preserved).
+    // 'Typographic' repeats 'p', pinning that the isomorphism is real, not vacuous.
+    [Fact]
+    public void SfntEmission_DrawsExactlyTheShaperGlyphSequence()
+    {
+        const string word = "Typographic";
+
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, word, BuildTestSupport.Latin);
+
+        var shows = ShowsSortedTopDown(builder);
+        Assert.Single(shows);
+        var drawn = Cids(shows[0].Bytes);
+
+        var shaper = new SimpleShaper(LineLayoutSupport.Fonts());
+        var run = shaper.Shape(word, LineLayoutSupport.FontAt(12),
+            FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var shaped = run.Glyphs.Select(glyph => glyph.GlyphId).ToArray();
+
+        Assert.Equal(shaped.Length, drawn.Length);
+        Assert.Equal(shaped[2], shaped[7]); // the two 'p' glyphs, so the isomorphism is not vacuous
+        for (var a = 0; a < shaped.Length; a++)
+        {
+            for (var b = 0; b < shaped.Length; b++)
+            {
+                Assert.Equal(shaped[a] == shaped[b], drawn[a] == drawn[b]);
+            }
+        }
+    }
+
+    private static ushort[] Cids(byte[] bytes)
+    {
+        var cids = new ushort[bytes.Length / 2];
+        for (var i = 0; i < cids.Length; i++)
+        {
+            cids[i] = (ushort)((bytes[(2 * i)] << 8) | bytes[(2 * i) + 1]);
+        }
+
+        return cids;
     }
 }

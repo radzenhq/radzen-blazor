@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
 using static Radzen.Documents.Pdf.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf;
@@ -115,9 +114,9 @@ internal sealed class TextLineEmitter(
 
             var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
             var font = fragment.Run.ResolvedFont;
-            if (fonts.TryResolvePrimary(font, out var primary))
+            if (fonts.TryResolvePrimary(font, out _))
             {
-                EmitSfntFragment(plan, fragment, primary, originX + fragment.XOffset, y, fragElement, extGState);
+                EmitSfntFragment(plan, fragment, originX + fragment.XOffset, y, fragElement, extGState);
             }
             else
             {
@@ -483,7 +482,7 @@ internal sealed class TextLineEmitter(
     // Splits a fragment into maximal sub-runs by the physical face that actually
     // supplies each glyph (primary or a SetFallback face), so every glyph is drawn
     // by the embedded subset that owns it - not the primary's .notdef.
-    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, SfntFont primary, double startX, double y, StructureElement? element, string? extGState)
+    private void EmitSfntFragment(PagePlan plan, LineFragment fragment, double startX, double y, StructureElement? element, string? extGState)
     {
         var run = fragment.Run;
         var font = run.ResolvedFont;
@@ -494,10 +493,17 @@ internal sealed class TextLineEmitter(
         var runX = startX;
 
         var kerning = fonts.EnableKerning;
-        var i = 0;
-        while (i < text.Length)
+        // The shaper produces the same per-codepoint (face, glyph, cluster) mapping the line
+        // was measured through, so the drawn glyphs are the measured glyphs by construction.
+        // Advances and kern are recomputed here at the script-scaled size (and with the
+        // space-straddle guard) that measurement does not model, so the bytes are unchanged.
+        var glyphs = fonts.Shaper()
+            .Shape(text, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom)
+            .Glyphs;
+        var g = 0;
+        while (g < glyphs.Count)
         {
-            var (face, _) = fonts.ResolveGlyph(primary, CodePointAt(text, i));
+            var face = glyphs[g].Face!;
             var generated = fontResolver.ResolveSfnt(face);
             var bytes = scratchBytes;
             bytes.Clear();
@@ -506,14 +512,10 @@ internal sealed class TextLineEmitter(
             ushort prevGid = 0;
             var prevCodepoint = 0;
             var glyphCount = 0;
-            while (i < text.Length)
+            while (g < glyphs.Count && ReferenceEquals(glyphs[g].Face, face))
             {
-                var codepoint = CodePointAt(text, i);
-                var (candidate, gid) = fonts.ResolveGlyph(primary, codepoint);
-                if (candidate != face)
-                {
-                    break;
-                }
+                var gid = glyphs[g].GlyphId;
+                var codepoint = CodePointAt(text, glyphs[g].Cluster);
 
                 if (kerning && glyphCount > 0)
                 {
@@ -537,7 +539,7 @@ internal sealed class TextLineEmitter(
                 prevGid = gid;
                 prevCodepoint = codepoint;
                 glyphCount++;
-                i += codepoint > 0xFFFF ? 2 : 1;
+                g++;
             }
 
             double[]? kerns = HasNonZero(kernList) ? [.. kernList!] : null;

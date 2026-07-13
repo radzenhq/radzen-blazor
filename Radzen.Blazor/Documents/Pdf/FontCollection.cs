@@ -19,6 +19,11 @@ public sealed class FontCollection
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
     private readonly List<string> fallback = [];
 
+    // The single shaping seam both measurement and emission map text through. Cached and
+    // recreated only when EnableKerning toggles, since a SimpleShaper captures the flag.
+    private SimpleShaper? shaper;
+    private bool shaperKerning;
+
     /// <summary>
     /// Gets or sets whether pair kerning is applied when measuring and drawing text.
     /// When <see langword="true"/> consecutive same-face glyphs are tightened by the
@@ -329,33 +334,28 @@ public sealed class FontCollection
         ArgumentNullException.ThrowIfNull(font);
         SimpleShaper.EnsureNoComplexScript(text);
 
-        if (TryResolvePrimary(font, out var primary))
+        if (TryResolvePrimary(font, out _))
         {
-            double sum = 0;
-            var i = 0;
-            SfntFont? prevFace = null;
-            ushort prevGid = 0;
-            while (i < text.Length)
-            {
-                var codepoint = CodePointAt(text, i);
-                var (face, glyph) = ResolveGlyph(primary, codepoint);
-                if (EnableKerning && ReferenceEquals(prevFace, face))
-                {
-                    sum += face.GetKerning(prevGid, glyph) * font.Size / face.UnitsPerEm;
-                }
-
-                sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
-                prevFace = face;
-                prevGid = glyph;
-                i += codepoint > 0xFFFF ? 2 : 1;
-            }
-
-            return sum;
+            return Shaper().Shape(text, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom).Advance;
         }
 
         var base14 = Base14Metrics.Resolve(font)
             ?? throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
         return MeasureBase14(text, font, base14);
+    }
+
+    // The shared text-shaping seam. Emission maps its runs through the same instance so the
+    // glyph/cluster sequence it draws is the one measurement summed - measure and emit by
+    // construction agree. Recreated only when EnableKerning changes, since the flag is captured.
+    internal SimpleShaper Shaper()
+    {
+        if (shaper is null || shaperKerning != EnableKerning)
+        {
+            shaper = new SimpleShaper(this, EnableKerning);
+            shaperKerning = EnableKerning;
+        }
+
+        return shaper;
     }
 
     // Mirrors DocumentGenerator.EmitBase14Fragment: WinAnsi codepoints use base-14
