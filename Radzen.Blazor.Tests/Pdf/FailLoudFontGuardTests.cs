@@ -26,6 +26,11 @@ public class FailLoudFontGuardTests
     [InlineData("שׁוּוֹ")] // Hebrew presentation forms
     [InlineData("ᠠᠷᠠ")] // Mongolian
     [InlineData("ߊߕߜ")] // N'Ko
+    [InlineData("ࠀࠁ")] // Samaritan (RTL) - was outside the old BMP range list
+    [InlineData("ࡰࡱ")] // Arabic Extended-B - was in the gap between the old ranges
+    [InlineData("A‏B")] // RIGHT-TO-LEFT MARK bidi control
+    [InlineData("A⁦B")] // LEFT-TO-RIGHT ISOLATE bidi control
+    [InlineData("\U0001E900\U0001E921")] // Adlam (RTL) supplementary plane - surrogate pair
     public void ComplexOrRtlScript_ThrowsInsteadOfRenderingBroken(string text)
     {
         var builder = WithText(text);

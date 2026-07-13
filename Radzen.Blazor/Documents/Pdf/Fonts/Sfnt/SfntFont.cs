@@ -29,9 +29,11 @@ internal sealed class SfntFont
             ? NameTable.Parse(data, (int)name.Offset)
             : new NameTable();
 
+        // hmtx is required whenever hhea is present (and hhea is required above); without it
+        // every glyph would silently measure zero-width. Fail loud like head/maxp/hhea.
         metrics = directory.TryGet("hmtx", out var hmtx)
             ? HorizontalMetrics.Parse(data, (int)hmtx.Offset, numberOfHMetrics)
-            : HorizontalMetrics.Parse(data, 0, 0);
+            : throw new InvalidDataException("Required 'hmtx' table is missing.");
 
         cmap = directory.TryGet("cmap", out var cmapTable)
             ? Cmap.Parse(data, (int)cmapTable.Offset)
@@ -143,13 +145,7 @@ internal sealed class SfntFont
         ArgumentNullException.ThrowIfNull(tag);
         if (directory.TryGet(tag, out var record))
         {
-            // Offset/Length come from the table directory; a hostile record would size an
-            // arbitrary buffer and the copy would read past the font. Validate before allocating.
-            if ((long)record.Offset + record.Length > this.data.Length)
-            {
-                throw new InvalidDataException($"Font table '{tag}' extends past the end of the font.");
-            }
-
+            ValidateTableExtent(record.Offset, record.Length, tag);
             var result = new byte[record.Length];
             Array.Copy(this.data, (int)record.Offset, result, 0, (int)record.Length);
             data = result;
@@ -167,12 +163,24 @@ internal sealed class SfntFont
         ArgumentNullException.ThrowIfNull(tag);
         if (directory.TryGet(tag, out var record))
         {
+            ValidateTableExtent(record.Offset, record.Length, tag);
             table = data.AsMemory((int)record.Offset, (int)record.Length);
             return true;
         }
 
         table = default;
         return false;
+    }
+
+    // Offset/Length come from the table directory; a hostile record would address a buffer
+    // past the font (or, via an int overflow in AsMemory, throw an opaque exception). Both
+    // table accessors validate here so they share one diagnosable contract.
+    private void ValidateTableExtent(uint offset, uint length, string tag)
+    {
+        if ((long)offset + length > data.Length)
+        {
+            throw new InvalidDataException($"Font table '{tag}' extends past the end of the font.");
+        }
     }
 
     public static SfntFont Parse(byte[] data)
@@ -213,6 +221,14 @@ internal sealed class SfntFont
             reader.ReadUInt16(); // majorVersion
             reader.ReadUInt16(); // minorVersion
             var numFonts = reader.ReadUInt32();
+
+            // numFonts is attacker-controlled; a 16-byte header claiming billions of faces
+            // would size a multi-GB list before a single face offset is read. The offset
+            // table (4 bytes per face) must fit after the 12-byte collection header.
+            if (numFonts > int.MaxValue || 12 + ((long)numFonts * 4) > data.Length)
+            {
+                throw new InvalidDataException("TrueType collection font count exceeds the header bounds.");
+            }
 
             var faces = new List<SfntFont>((int)numFonts);
             for (var i = 0; i < numFonts; i++)

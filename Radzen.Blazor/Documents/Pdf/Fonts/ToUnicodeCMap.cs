@@ -26,6 +26,16 @@ internal static class ToUnicodeCMap
                     {
                         if (tokens[i].Hex is { } low)
                         {
+                            // ReverseFont decodes every code at one fixed width. A CMap that
+                            // mixes widths (e.g. a 1-byte and a 2-byte range, common in CJK)
+                            // cannot be decoded correctly at a single width, so fail loud
+                            // rather than pairwise-merge or split codes into garbage text.
+                            if (codeBytes != 0 && codeBytes != low.Length)
+                            {
+                                throw new DocumentParseException(
+                                    "ToUnicode CMap declares codespace ranges of differing byte widths, which are not supported.");
+                            }
+
                             codeBytes = low.Length;
                             i++;
                         }

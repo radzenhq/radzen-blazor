@@ -68,40 +68,61 @@ public sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fals
     // shaper and by text measuring.
     internal static void EnsureNoComplexScript(ReadOnlySpan<char> text)
     {
-        foreach (var c in text)
+        var i = 0;
+        while (i < text.Length)
         {
-            if (RequiresComplexShaping(c))
+            var codepoint = FontCollection.CodePointAt(text, i);
+            if (RequiresComplexShaping(codepoint))
             {
                 throw new NotSupportedException(
-                    $"The text contains U+{(int)c:X4}, which belongs to a complex or right-to-left script (Arabic, Hebrew, "
-                    + "Syriac, Thaana, N'Ko, Indic, Thai/Lao, Tibetan, Myanmar, Khmer or Mongolian) that requires shaping "
-                    + "(joining/reordering) or bidirectional reordering. This library would emit unshaped, unjoined or "
-                    + "visually reversed glyphs, so it fails rather than produce linguistically broken output. Provide "
-                    + "pre-shaped glyph runs if you need these scripts.");
+                    $"The text contains U+{codepoint:X4}, which belongs to a complex or right-to-left script (Arabic, Hebrew, "
+                    + "Syriac, Thaana, N'Ko, Samaritan, Indic, Thai/Lao, Tibetan, Myanmar, Khmer, Mongolian, Adlam or another "
+                    + "script), or is a bidirectional control, that requires shaping (joining/reordering) or bidirectional "
+                    + "reordering. This library would emit unshaped, unjoined or visually reversed glyphs, so it fails rather "
+                    + "than produce linguistically broken output. Provide pre-shaped glyph runs if you need these scripts.");
             }
+
+            i += codepoint > 0xFFFF ? 2 : 1;
         }
     }
 
     // Scripts whose correct rendering requires joining/reordering (OpenType shaping) or
     // bidirectional reordering, neither of which the identity LTR mapper can do. Emitting them
     // as-is yields unjoined or visually reversed text, so they fail loud regardless of the
-    // section Direction flag (which is never derived from the text). Latin/Cyrillic/Greek/CJK/
-    // Hangul are NOT here - they render correctly without shaping.
-    private static bool RequiresComplexShaping(char c)
-        => c is >= '֐' and <= '׿'   // Hebrew (RTL)
-            or >= '؀' and <= 'ۿ'     // Arabic
-            or >= '߀' and <= '߿'     // N'Ko (RTL)
-            or >= '܀' and <= 'ݏ'     // Syriac
-            or >= 'ݐ' and <= 'ݿ'     // Arabic Supplement
-            or >= 'ހ' and <= '޿'     // Thaana (RTL)
-            or >= 'ࢠ' and <= 'ࣿ'     // Arabic Extended-A
-            or >= 'ऀ' and <= '෿'     // Devanagari .. Malayalam / Sinhala (Indic)
-            or >= '฀' and <= '໿'     // Thai, Lao
-            or >= 'ༀ' and <= '࿿'     // Tibetan
-            or >= 'က' and <= '႟'     // Myanmar
-            or >= 'ក' and <= '៿'     // Khmer
-            or >= '᠀' and <= '᢯'     // Mongolian
-            or >= 'יִ' and <= 'ﭏ'     // Hebrew Presentation Forms (RTL)
-            or >= 'ﭐ' and <= '﷿'     // Arabic Presentation Forms-A
-            or >= 'ﹰ' and <= '﻿';    // Arabic Presentation Forms-B
+    // section Direction flag (which is never derived from the text). Tested against code points
+    // (not UTF-16 code units) so supplementary-plane scripts and bidi controls are caught.
+    // Latin/Cyrillic/Greek/CJK/Hangul are NOT here - they render correctly without shaping.
+    private static bool RequiresComplexShaping(int c)
+        => c is (>= 0x0590 and <= 0x05FF)  // Hebrew (RTL)
+            or (>= 0x0600 and <= 0x06FF)    // Arabic
+            or (>= 0x0700 and <= 0x074F)    // Syriac
+            or (>= 0x0750 and <= 0x077F)    // Arabic Supplement
+            or (>= 0x0780 and <= 0x07BF)    // Thaana (RTL)
+            or (>= 0x07C0 and <= 0x07FF)    // N'Ko (RTL)
+            or (>= 0x0800 and <= 0x085F)    // Samaritan, Mandaic (RTL)
+            or (>= 0x0860 and <= 0x086F)    // Syriac Supplement
+            or (>= 0x0870 and <= 0x089F)    // Arabic Extended-B
+            or (>= 0x08A0 and <= 0x08FF)    // Arabic Extended-A
+            or (>= 0x0900 and <= 0x0DFF)    // Devanagari .. Malayalam / Sinhala (Indic)
+            or (>= 0x0E00 and <= 0x0EFF)    // Thai, Lao
+            or (>= 0x0F00 and <= 0x0FFF)    // Tibetan
+            or (>= 0x1000 and <= 0x109F)    // Myanmar
+            or (>= 0x1780 and <= 0x17FF)    // Khmer
+            or (>= 0x1800 and <= 0x18AF)    // Mongolian
+            or 0x200F                       // RIGHT-TO-LEFT MARK
+            or (>= 0x202A and <= 0x202E)    // LRE/RLE/PDF/LRO/RLO embedding + override controls
+            or (>= 0x2066 and <= 0x2069)    // LRI/RLI/FSI/PDI isolate controls
+            or (>= 0xFB1D and <= 0xFB4F)    // Hebrew Presentation Forms (RTL)
+            or (>= 0xFB50 and <= 0xFDFF)    // Arabic Presentation Forms-A
+            or (>= 0xFE70 and <= 0xFEFF)    // Arabic Presentation Forms-B
+            or (>= 0x10A00 and <= 0x10A5F)  // Kharoshthi (RTL)
+            or (>= 0x10AC0 and <= 0x10AFF)  // Manichaean (RTL)
+            or (>= 0x10B80 and <= 0x10BAF)  // Psalter Pahlavi (RTL)
+            or (>= 0x10D00 and <= 0x10D3F)  // Hanifi Rohingya (RTL)
+            or (>= 0x10E80 and <= 0x10EFF)  // Yezidi, Arabic Extended-C (RTL)
+            or (>= 0x10F00 and <= 0x10F6F)  // Sogdian, Old Sogdian (RTL)
+            or (>= 0x11000 and <= 0x11FFF)  // Brahmic supplementary (Brahmi, Kaithi, Chakma, ...)
+            or (>= 0x1E800 and <= 0x1E8DF)  // Mende Kikakui (RTL)
+            or (>= 0x1E900 and <= 0x1E95F)  // Adlam (RTL)
+            or (>= 0x1EE00 and <= 0x1EEFF); // Arabic Mathematical Alphabetic Symbols (RTL)
 }

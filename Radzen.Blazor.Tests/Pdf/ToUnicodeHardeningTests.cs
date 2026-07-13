@@ -48,6 +48,19 @@ public class ToUnicodeHardeningTests
         Assert.Equal("b", map[0x0009]);
     }
 
+    [Fact]
+    public void MixedWidthCodespaceRange_Throws()
+    {
+        // A CMap declaring both a 1-byte and a 2-byte codespace range cannot be decoded at
+        // one fixed width; ReverseFont would garble every code of the other width, so reject.
+        var cmap = Encoding.ASCII.GetBytes(
+            "begincmap\n" +
+            "2 begincodespacerange <00> <80> <8140> <FCFC> endcodespacerange\n" +
+            "endcmap\n");
+
+        Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
+    }
+
     private static byte[] Cmap(string body) => Encoding.ASCII.GetBytes(
         "/CIDInit /ProcSet findresource begin 12 dict begin begincmap\n" +
         "1 begincodespacerange <0000> <FFFF> endcodespacerange\n" +

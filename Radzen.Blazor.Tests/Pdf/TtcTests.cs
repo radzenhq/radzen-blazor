@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -44,6 +45,22 @@ public class TtcTests
     {
         var ex = Assert.ThrowsAny<Exception>(() => SfntFont.Parse(Ttc(), "Nonexistent"));
         Assert.Contains("Nonexistent", ex.Message);
+    }
+
+    [Fact]
+    public void ParseCollection_HostileNumFonts_ThrowsBeforeAllocating()
+    {
+        // 16-byte 'ttcf' blob claiming int.MaxValue faces: the offset table cannot fit,
+        // so parsing must reject it rather than size a multi-GB face list (OutOfMemory).
+        byte[] header =
+        [
+            0x74, 0x74, 0x63, 0x66, // 'ttcf'
+            0x00, 0x01, 0x00, 0x00, // version 1.0
+            0x7F, 0xFF, 0xFF, 0xFF, // numFonts = int.MaxValue
+            0x00, 0x00, 0x00, 0x00, // one (bogus) face offset
+        ];
+
+        Assert.Throws<InvalidDataException>(() => SfntFont.ParseCollection(header));
     }
 
     [Fact]

@@ -28,6 +28,16 @@ internal static class CffSubsetter
         for (var i = 0; i < glyphCount; i++)
         {
             var gid = closure[i];
+
+            // seac composes a glyph from base+accent addressed through the source charset;
+            // the compact identity-charset rewrite would silently break that reference.
+            if (font.UsesSeacEndchar(gid))
+            {
+                throw new NotSupportedException(
+                    $"Glyph {gid} uses an endchar seac (accent composition), which the compact CFF subsetter cannot renumber. "
+                    + "Re-save the font without seac composition to embed it.");
+            }
+
             charStrings[i] = font.GetCharStringBytes(gid);
             fdSelect[i] = font.GetFd(gid);
         }
