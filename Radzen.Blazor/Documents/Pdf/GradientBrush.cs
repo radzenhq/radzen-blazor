@@ -34,6 +34,23 @@ public abstract class GradientBrush
             throw new ArgumentException("A gradient requires at least one colour stop.", nameof(stops));
         }
 
+        // A Type 3 stitching function requires a non-decreasing offset sequence within [0 1];
+        // equal adjacent offsets (CSS hard stops) are allowed and split by an epsilon at build.
+        for (var i = 0; i < stops.Length; i++)
+        {
+            var stop = stops[i];
+            ArgumentNullException.ThrowIfNull(stop);
+            if (stop.Offset < 0 || stop.Offset > 1)
+            {
+                throw new ArgumentException($"Gradient stop offset {stop.Offset} is outside the range [0, 1].", nameof(stops));
+            }
+
+            if (i > 0 && stop.Offset < stops[i - 1].Offset)
+            {
+                throw new ArgumentException("Gradient stop offsets must be in non-decreasing order.", nameof(stops));
+            }
+        }
+
         Stops = (GradientStop[])stops.Clone();
     }
 

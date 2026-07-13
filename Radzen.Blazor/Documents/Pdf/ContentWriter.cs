@@ -18,6 +18,7 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
     private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
     private readonly List<KeyValuePair<string, ImageXObject>> images = [];
     private readonly List<KeyValuePair<string, DictionaryObject>> patterns = [];
+    private readonly List<GradientBrush> patternBrushes = [];
 
     public IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
 
@@ -25,31 +26,34 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
 
     public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
 
-    // Registers a shading/pattern dictionary and returns its /Pattern resource name.
-    public string RegisterPattern(DictionaryObject pattern)
+    // Registers a shading pattern for a gradient brush and returns its /Pattern resource name.
+    // Deduplicates by brush reference so one brush reused across elements emits a single pattern
+    // dictionary, matching PagePlan.RegisterPattern in the page-generation path.
+    public string RegisterPattern(GradientBrush gradient)
     {
-        ArgumentNullException.ThrowIfNull(pattern);
+        ArgumentNullException.ThrowIfNull(gradient);
+        for (var i = 0; i < patternBrushes.Count; i++)
+        {
+            if (ReferenceEquals(patternBrushes[i], gradient))
+            {
+                return patterns[i].Key;
+            }
+        }
+
         var key = "P" + patterns.Count.ToString(CultureInfo.InvariantCulture);
-        patterns.Add(new KeyValuePair<string, DictionaryObject>(key, pattern));
+        patterns.Add(new KeyValuePair<string, DictionaryObject>(key, ShadingBuilder.BuildPattern(gradient)));
+        patternBrushes.Add(gradient);
         return key;
     }
 
     public byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 
-    // Returns null when the payload is not a decodable PNG/JPEG so the element can
-    // degrade to emitting nothing instead of failing the whole save.
-    public string? RegisterImage(byte[] encodedImage)
+    // Decodes and registers an image XObject, returning its resource name. An undecodable
+    // payload throws (ImageDecoder.Decode) instead of silently emitting nothing: dropping
+    // content would violate the fail-loud invariant.
+    public string RegisterImage(byte[] encodedImage)
     {
-        ImageXObject decoded;
-        try
-        {
-            decoded = ImageDecoder.Decode(encodedImage);
-        }
-        catch (NotSupportedException)
-        {
-            return null;
-        }
-
+        var decoded = ImageDecoder.Decode(encodedImage);
         var key = imageKeyPrefix + images.Count.ToString(CultureInfo.InvariantCulture);
         images.Add(new KeyValuePair<string, ImageXObject>(key, decoded));
         return key;
@@ -84,6 +88,13 @@ internal sealed class ContentWriter(string fontKeyPrefix = "F", string imageKeyP
     {
         foreach (var ch in name)
         {
+            // Names are byte sequences; a code point above Latin-1 cannot be represented
+            // without silently aliasing to a different resource (e.g. U+0141 -> 'A').
+            if (ch > 0xFF)
+            {
+                throw new NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
+            }
+
             var code = ch & 0xFF;
             if (code <= 0x20 || code >= 0x7F || code == '#' || IsDelimiter(code))
             {

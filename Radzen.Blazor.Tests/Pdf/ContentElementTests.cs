@@ -286,15 +286,23 @@ public class ContentElementTests
     }
 
     [Fact]
-    public void ImageContent_CanBeAddedAndSavedWithoutError()
+    public void ImageContent_UndecodablePayload_ThrowsOnSave()
     {
         var document = new Document();
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent([0, 0, 0, 0]) { Rect = new Rect(0, 0, 10, 10) });
 
-        var bytes = document.ToArray();
+        Assert.Throws<System.NotSupportedException>(() => document.ToArray());
+    }
 
-        Assert.NotEmpty(bytes);
+    [Fact]
+    public void Tag_SetOnElement_ThrowsOnSave()
+    {
+        var document = new Document();
+        var page = document.Pages.Add();
+        page.Content.Add(new TextContent("x", 0, 0) { Tag = new Tag { Role = "P" } });
+
+        Assert.Throws<System.NotSupportedException>(() => document.ToArray());
     }
 }
 

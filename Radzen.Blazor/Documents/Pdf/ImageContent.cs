@@ -24,10 +24,6 @@ public sealed class ImageContent : ContentElement
     internal override void EmitBody(ContentWriter writer)
     {
         var key = writer.RegisterImage(EncodedXObject);
-        if (key is null)
-        {
-            return;
-        }
 
         writer.WriteRaw("q\n");
         writer.WriteNumber(Rect.Width);
