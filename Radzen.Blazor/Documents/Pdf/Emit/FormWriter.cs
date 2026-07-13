@@ -56,15 +56,12 @@ internal sealed class FormWriter(Document document)
             return;
         }
 
-        var formDa = sourceAcroForm.TryGetValue("DA", out var da) && source.Resolve(da!) is StringObject text
-            ? text.Value
-            : null;
+        var formDa = source.GetString(sourceAcroForm, "DA");
 
         foreach (var page in document.Pages)
         {
             if (!document.sourcePages.TryGetValue(page, out var node)
-                || !node.TryGetValue("Annots", out var annotsObject)
-                || source.Resolve(annotsObject!) is not ArrayObject annots)
+                || source.GetArray(node, "Annots") is not { } annots)
             {
                 continue;
             }
@@ -73,7 +70,7 @@ internal sealed class FormWriter(Document document)
             var widgets = 0;
             foreach (var entry in annots)
             {
-                if (source.Resolve(entry) is DictionaryObject annot && IsWidget(annot))
+                if (source.AsDictionary(entry) is { } annot && IsWidget(annot))
                 {
                     widgets++;
                     DrawWidget(page, annot, formDa);
@@ -97,8 +94,7 @@ internal sealed class FormWriter(Document document)
     private bool IsWidget(DictionaryObject annot)
     {
         var source = document.source;
-        return annot.TryGetValue("Subtype", out var subtype) && source!.Resolve(subtype!) is NameObject name
-            && string.Equals(name.Value, "Widget", StringComparison.Ordinal);
+        return string.Equals(source!.GetName(annot, "Subtype"), "Widget", StringComparison.Ordinal);
     }
 
     // Draws a widget's current value as static content: a text or choice value
@@ -107,8 +103,7 @@ internal sealed class FormWriter(Document document)
     private void DrawWidget(Page page, DictionaryObject widget, string? formDa)
     {
         var source = document.source;
-        if (widget.TryGetValue("F", out var f) && source!.Resolve(f!) is NumberObject flags
-            && (flags.IntValue & 2) != 0)
+        if (source!.GetInt(widget, "F") is { } flags && (flags & 2) != 0)
         {
             return;
         }
@@ -121,9 +116,7 @@ internal sealed class FormWriter(Document document)
         var (x, y, width, height) = WidgetRect(widget);
         if (string.Equals(type.Value, "Btn", StringComparison.Ordinal))
         {
-            var state = widget.TryGetValue("AS", out var asObject) && source!.Resolve(asObject!) is NameObject asName
-                ? asName.Value
-                : (Inherited(widget, "V") as NameObject)?.Value;
+            var state = source!.GetName(widget, "AS") ?? (Inherited(widget, "V") as NameObject)?.Value;
             if (state is not null && !string.Equals(state, "Off", StringComparison.Ordinal))
             {
                 var radio = Inherited(widget, "Ff") is NumberObject ff && (ff.IntValue & RadioFlag) != 0;
@@ -179,9 +172,9 @@ internal sealed class FormWriter(Document document)
                 var parts = new List<string>();
                 foreach (var item in items)
                 {
-                    if (source!.Resolve(item) is StringObject text)
+                    if (source!.AsString(item) is { } text)
                     {
-                        parts.Add(FormField.DecodeTextString(text.Value));
+                        parts.Add(FormField.DecodeTextString(text));
                     }
                 }
 
@@ -194,8 +187,8 @@ internal sealed class FormWriter(Document document)
     private bool HasVisibleAppearance(DictionaryObject widget)
     {
         var source = document.source;
-        return widget.TryGetValue("AP", out var apObject) && source!.Resolve(apObject!) is DictionaryObject ap
-            && ap.TryGetValue("N", out var nObject) && source.Resolve(nObject!) is StreamObject stream
+        return source!.GetDictionary(widget, "AP") is { } ap
+            && source!.GetStream(ap, "N") is { } stream
             && stream.Data.Length > 0;
     }
 
@@ -212,10 +205,7 @@ internal sealed class FormWriter(Document document)
                 return source!.Resolve(value!);
             }
 
-            current = current.TryGetValue("Parent", out var parent)
-                && source!.Resolve(parent!) is DictionaryObject next
-                ? next
-                : null;
+            current = source!.GetDictionary(current, "Parent");
         }
 
         return null;
@@ -224,13 +214,12 @@ internal sealed class FormWriter(Document document)
     private (double X, double Y, double Width, double Height) WidgetRect(DictionaryObject widget)
     {
         var source = document.source;
-        if (widget.TryGetValue("Rect", out var rectObject) && source!.Resolve(rectObject!) is ArrayObject rect
-            && rect.Count >= 4)
+        if (source!.GetArray(widget, "Rect") is { } rect && rect.Count >= 4)
         {
-            var x0 = DocumentLoader.Number(source.Resolve(rect[0]));
-            var y0 = DocumentLoader.Number(source.Resolve(rect[1]));
-            var x1 = DocumentLoader.Number(source.Resolve(rect[2]));
-            var y1 = DocumentLoader.Number(source.Resolve(rect[3]));
+            var x0 = source!.AsNumber(rect[0]) ?? 0.0;
+            var y0 = source!.AsNumber(rect[1]) ?? 0.0;
+            var x1 = source!.AsNumber(rect[2]) ?? 0.0;
+            var y1 = source!.AsNumber(rect[3]) ?? 0.0;
             return (Math.Min(x0, x1), Math.Min(y0, y1), Math.Abs(x1 - x0), Math.Abs(y1 - y0));
         }
 
@@ -248,8 +237,7 @@ internal sealed class FormWriter(Document document)
         foreach (var (page, node, _) in pageNodes)
         {
             if (source is null || !document.sourcePages.TryGetValue(page, out var sourceNode)
-                || !sourceNode.TryGetValue("Annots", out var annotsObject)
-                || source.Resolve(annotsObject!) is not ArrayObject annots)
+                || source.GetArray(sourceNode, "Annots") is not { } annots)
             {
                 continue;
             }
@@ -285,7 +273,7 @@ internal sealed class FormWriter(Document document)
             if (string.Equals(key, "Fields", StringComparison.Ordinal))
             {
                 fieldsArray = [];
-                if (reader.Resolve(acroForm[key]) is ArrayObject fields)
+                if (reader.AsArray(acroForm[key]) is { } fields)
                 {
                     foreach (var field in fields)
                     {
@@ -465,8 +453,7 @@ internal sealed class FormWriter(Document document)
             }
 
             importer.Seed(appended.Node, reference);
-            if (!appended.Node.TryGetValue("Annots", out var annotsObject)
-                || reader.Resolve(annotsObject!) is not ArrayObject annots)
+            if (reader.GetArray(appended.Node, "Annots") is not { } annots)
             {
                 continue;
             }
@@ -488,7 +475,7 @@ internal sealed class FormWriter(Document document)
 
             for (var i = 0; i < annots.Count; i++)
             {
-                if (reader.Resolve(annots[i]) is DictionaryObject annot
+                if (reader.AsDictionary(annots[i]) is { } annot
                     && importer.TryImportFieldRoot(annot, out var root, out var field, out var name))
                 {
                     GraphImporter.DisambiguateFieldName(field!, name, usedFieldNames);
@@ -512,16 +499,13 @@ internal sealed class FormWriter(Document document)
 
         var source = document.source;
         if (source is not null && document.sourceAcroForm is { } sourceForm
-            && sourceForm.TryGetValue("Fields", out var fieldsObject)
-            && source.Resolve(fieldsObject!) is ArrayObject rootFields)
+            && source.GetArray(sourceForm, "Fields") is { } rootFields)
         {
             foreach (var field in rootFields)
             {
-                if (source.Resolve(field) is DictionaryObject dict
-                    && dict.TryGetValue("T", out var title)
-                    && source.Resolve(title!) is StringObject text)
+                if (source.AsDictionary(field) is { } dict && source.GetString(dict, "T") is { } text)
                 {
-                    usedFieldNames.Add(text.Value);
+                    usedFieldNames.Add(text);
                 }
             }
         }
@@ -531,23 +515,22 @@ internal sealed class FormWriter(Document document)
     // field/widget) or of any widget in its /Kids.
     private static bool FieldOnRemovedPage(DocumentReader reader, DocumentObject field, HashSet<DictionaryObject> removed)
     {
-        if (reader.Resolve(field) is not DictionaryObject dict)
+        if (reader.AsDictionary(field) is not { } dict)
         {
             return false;
         }
 
-        if (dict.TryGetValue("P", out var p) && reader.Resolve(p!) is DictionaryObject page && removed.Contains(page))
+        if (reader.GetDictionary(dict, "P") is { } page && removed.Contains(page))
         {
             return true;
         }
 
-        if (dict.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        if (reader.GetArray(dict, "Kids") is { } kids)
         {
             foreach (var kid in kids)
             {
-                if (reader.Resolve(kid) is DictionaryObject kidDict
-                    && kidDict.TryGetValue("P", out var kidP)
-                    && reader.Resolve(kidP!) is DictionaryObject kidPage && removed.Contains(kidPage))
+                if (reader.AsDictionary(kid) is { } kidDict
+                    && reader.GetDictionary(kidDict, "P") is { } kidPage && removed.Contains(kidPage))
                 {
                     return true;
                 }

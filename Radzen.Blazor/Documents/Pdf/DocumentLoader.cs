@@ -23,9 +23,7 @@ internal static class DocumentLoader
         ReadInfo(reader, document.Info);
         document.loadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
-        var catalog = reader.Trailer.TryGetValue("Root", out var root) && reader.Resolve(root!) is DictionaryObject c
-            ? c
-            : null;
+        var catalog = reader.GetDictionary(reader.Trailer, "Root");
         document.sourceCatalog = catalog;
         if (catalog is not null && catalog.TryGetValue("Pages", out var pagesRef)
             && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
@@ -39,8 +37,7 @@ internal static class DocumentLoader
             CollectPages(reader, pagesNode, new InheritedAttributes(), document, limits, visited, 0);
         }
 
-        if (catalog is not null && catalog.TryGetValue("AcroForm", out var formObject)
-            && reader.Resolve(formObject!) is DictionaryObject form)
+        if (catalog is not null && reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
             document.sourceAcroForm = form;
             document.AcroForm = new AcroForm(reader, form);
@@ -122,25 +119,17 @@ internal static class DocumentLoader
             throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
         }
 
-        var box = node.TryGetValue("MediaBox", out var mediaBox) && reader.Resolve(mediaBox!) is ArrayObject own
-            ? own
-            : inherited.Box;
+        var box = reader.GetArray(node, "MediaBox") ?? inherited.Box;
 
-        var resources = node.TryGetValue("Resources", out var resourcesObject) && reader.Resolve(resourcesObject!) is DictionaryObject ownResources
-            ? ownResources
-            : inherited.Resources;
+        var resources = reader.GetDictionary(node, "Resources") ?? inherited.Resources;
 
-        var cropBox = node.TryGetValue("CropBox", out var cropObject) && reader.Resolve(cropObject!) is ArrayObject ownCrop
-            ? ownCrop
-            : inherited.CropBox;
+        var cropBox = reader.GetArray(node, "CropBox") ?? inherited.CropBox;
 
-        var rotate = node.TryGetValue("Rotate", out var rotateObject) && reader.Resolve(rotateObject!) is NumberObject ownRotate
-            ? ownRotate.IntValue
-            : inherited.Rotate;
+        var rotate = reader.GetInt(node, "Rotate") ?? inherited.Rotate;
 
         var childInherited = new InheritedAttributes { Box = box, Resources = resources, CropBox = cropBox, Rotate = rotate };
 
-        if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        if (reader.TryGet<ArrayObject>(node, "Kids", out var kids))
         {
             foreach (var kid in kids)
             {
@@ -149,7 +138,7 @@ internal static class DocumentLoader
                     throw new DocumentParseException("Cyclic page tree reference.", -1);
                 }
 
-                if (reader.Resolve(kid) is DictionaryObject child)
+                if (reader.AsDictionary(kid) is { } child)
                 {
                     CollectPages(reader, child, childInherited, document, limits, visited, depth + 1);
                 }
@@ -194,16 +183,14 @@ internal static class DocumentLoader
     public static Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
     {
         var fonts = new Dictionary<string, Fonts.ReverseFont>(StringComparer.Ordinal);
-        if (resources is null
-            || !resources.TryGetValue("Font", out var fontObject)
-            || reader.Resolve(fontObject!) is not DictionaryObject fontDictionary)
+        if (resources is null || reader.GetDictionary(resources, "Font") is not { } fontDictionary)
         {
             return fonts;
         }
 
         foreach (var key in fontDictionary.Keys)
         {
-            if (reader.Resolve(fontDictionary[key]) is DictionaryObject font)
+            if (reader.AsDictionary(fontDictionary[key]) is { } font)
             {
                 fonts[key] = Fonts.ReverseFont.Build(reader, font);
             }
@@ -246,7 +233,7 @@ internal static class DocumentLoader
             using var joined = new MemoryStream();
             for (var i = 0; i < array.Count; i++)
             {
-                if (reader.Resolve(array[i]) is StreamObject part)
+                if (reader.AsStream(array[i]) is { } part)
                 {
                     if (i > 0)
                     {
@@ -266,8 +253,7 @@ internal static class DocumentLoader
 
     private static void ReadInfo(DocumentReader reader, DocumentInfo target)
     {
-        if (!reader.Trailer.TryGetValue("Info", out var infoObject)
-            || reader.Resolve(infoObject!) is not DictionaryObject info)
+        if (reader.GetDictionary(reader.Trailer, "Info") is not { } info)
         {
             return;
         }
@@ -283,8 +269,8 @@ internal static class DocumentLoader
     }
 
     private static DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
-        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
-            ? ParseDate(DecodeTextString(text.Value))
+        => reader.GetString(dictionary, key) is { } text
+            ? ParseDate(DecodeTextString(text))
             : null;
 
     // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSSOHH'mm'. Every field after the
@@ -332,20 +318,17 @@ internal static class DocumentLoader
     {
         var seen = new HashSet<DictionaryObject>();
 
-        if (catalog.TryGetValue("Names", out var namesObject)
-            && reader.Resolve(namesObject!) is DictionaryObject names
-            && names.TryGetValue("EmbeddedFiles", out var treeObject)
-            && reader.Resolve(treeObject!) is DictionaryObject tree)
+        if (reader.GetDictionary(catalog, "Names") is { } names
+            && reader.GetDictionary(names, "EmbeddedFiles") is { } tree)
         {
             CollectEmbeddedFiles(reader, tree, document, seen, limits, 0);
         }
 
-        if (catalog.TryGetValue("AF", out var afObject)
-            && reader.Resolve(afObject!) is ArrayObject af)
+        if (reader.GetArray(catalog, "AF") is { } af)
         {
             foreach (var entry in af)
             {
-                if (reader.Resolve(entry) is DictionaryObject filespec)
+                if (reader.AsDictionary(entry) is { } filespec)
                 {
                     AddAttachment(reader, filespec, document, seen);
                 }
@@ -360,11 +343,11 @@ internal static class DocumentLoader
             throw new DocumentParseException("Maximum name tree depth exceeded.", -1);
         }
 
-        if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        if (reader.TryGet<ArrayObject>(node, "Kids", out var kids))
         {
             foreach (var kid in kids)
             {
-                if (reader.Resolve(kid) is DictionaryObject child)
+                if (reader.AsDictionary(kid) is { } child)
                 {
                     CollectEmbeddedFiles(reader, child, document, seen, limits, depth + 1);
                 }
@@ -373,14 +356,14 @@ internal static class DocumentLoader
             return;
         }
 
-        if (!node.TryGetValue("Names", out var pairsObject) || reader.Resolve(pairsObject!) is not ArrayObject pairs)
+        if (reader.GetArray(node, "Names") is not { } pairs)
         {
             return;
         }
 
         for (var i = 1; i < pairs.Count; i += 2)
         {
-            if (reader.Resolve(pairs[i]) is DictionaryObject filespec)
+            if (reader.AsDictionary(pairs[i]) is { } filespec)
             {
                 AddAttachment(reader, filespec, document, seen);
             }
@@ -389,9 +372,7 @@ internal static class DocumentLoader
 
     private static void AddAttachment(DocumentReader reader, DictionaryObject filespec, Document document, HashSet<DictionaryObject> seen)
     {
-        if (!seen.Add(filespec)
-            || !filespec.TryGetValue("EF", out var efObject)
-            || reader.Resolve(efObject!) is not DictionaryObject ef)
+        if (!seen.Add(filespec) || reader.GetDictionary(filespec, "EF") is not { } ef)
         {
             return;
         }
@@ -409,17 +390,14 @@ internal static class DocumentLoader
             return;
         }
 
-        var mime = stream.Dictionary.TryGetValue("Subtype", out var subtype) && reader.Resolve(subtype!) is NameObject mimeName
-            ? mimeName.Value
-            : "application/octet-stream";
+        var mime = reader.GetName(stream.Dictionary, "Subtype") ?? "application/octet-stream";
 
         var attachment = new Attachment(name, reader.DecodeStream(stream), Relationship(reader, filespec), mime)
         {
             Description = Text(reader, filespec, "Desc"),
         };
 
-        if (stream.Dictionary.TryGetValue("Params", out var paramsObject)
-            && reader.Resolve(paramsObject!) is DictionaryObject parameters
+        if (reader.GetDictionary(stream.Dictionary, "Params") is { } parameters
             && Date(reader, parameters, "ModDate") is { } modified)
         {
             attachment.ModificationDate = modified;
@@ -432,14 +410,14 @@ internal static class DocumentLoader
         => Text(reader, filespec, "UF") ?? Text(reader, filespec, "F");
 
     private static AttachmentRelationship Relationship(DocumentReader reader, DictionaryObject filespec)
-        => filespec.TryGetValue("AFRelationship", out var value) && reader.Resolve(value!) is NameObject name
-            && Enum.TryParse<AttachmentRelationship>(name.Value, out var relationship)
+        => reader.GetName(filespec, "AFRelationship") is { } name
+            && Enum.TryParse<AttachmentRelationship>(name, out var relationship)
             ? relationship
             : AttachmentRelationship.Unspecified;
 
     private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
-        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
-            ? DecodeTextString(text.Value)
+        => reader.GetString(dictionary, key) is { } text
+            ? DecodeTextString(text)
             : null;
 
     // A PDF text string (ISO 32000 7.9.2.2) whose raw bytes start with the FE FF

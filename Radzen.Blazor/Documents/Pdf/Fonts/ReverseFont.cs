@@ -86,10 +86,8 @@ internal sealed class ReverseFont
 
     private static void ApplyEncoding(DocumentReader reader, DictionaryObject fontDict, Dictionary<int, string> map)
     {
-        if (!fontDict.TryGetValue("Encoding", out var encodingObject)
-            || reader.Resolve(encodingObject!) is not DictionaryObject encoding
-            || !encoding.TryGetValue("Differences", out var differencesObject)
-            || reader.Resolve(differencesObject!) is not ArrayObject differences)
+        if (reader.GetDictionary(fontDict, "Encoding") is not { } encoding
+            || reader.GetArray(encoding, "Differences") is not { } differences)
         {
             return;
         }
@@ -120,8 +118,7 @@ internal sealed class ReverseFont
 
     private static (IReadOnlyDictionary<int, string> Map, int CodeBytes) ToUnicode(DocumentReader reader, DictionaryObject fontDict)
     {
-        if (!fontDict.TryGetValue("ToUnicode", out var toUnicodeObject)
-            || reader.Resolve(toUnicodeObject!) is not StreamObject stream)
+        if (reader.GetStream(fontDict, "ToUnicode") is not { } stream)
         {
             return (EmptyMap, 0);
         }

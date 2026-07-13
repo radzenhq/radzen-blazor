@@ -319,8 +319,7 @@ internal sealed class DocumentSaver
         }
 
         if (doc.source is not null && doc.sourcePages.TryGetValue(page, out var sourceNode)
-            && sourceNode.TryGetValue(key, out var boxObject)
-            && doc.source.Resolve(boxObject!) is ArrayObject box && box.Count >= 4)
+            && doc.source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
         {
             pageNode[key] = PageResourceBuilder.NumberBox(box);
         }

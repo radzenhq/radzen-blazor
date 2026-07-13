@@ -106,8 +106,7 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         }
 
         var root = annotation;
-        for (var depth = 0; depth < 32 && root.TryGetValue("Parent", out var parent)
-            && reader.Resolve(parent!) is DictionaryObject next; depth++)
+        for (var depth = 0; depth < 32 && reader.GetDictionary(root, "Parent") is { } next; depth++)
         {
             root = next;
         }
@@ -119,9 +118,7 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
 
         reference = ImportInstance(root);
         field = instances.TryGetValue(root, out var shell) ? shell as DictionaryObject : null;
-        name = root.TryGetValue("T", out var title) && reader.Resolve(title!) is StringObject text
-            ? text.Value
-            : null;
+        name = reader.GetString(root, "T");
         return true;
     }
 
@@ -138,16 +135,14 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
             form["DA"] = ImportValue(da!);
         }
 
-        if (sourceForm.TryGetValue("NeedAppearances", out var needed)
-            && reader.Resolve(needed!) is BooleanObject { Value: true }
+        if (reader.GetBool(sourceForm, "NeedAppearances") == true
             && (!form.TryGetValue("NeedAppearances", out var existing)
                 || existing is not BooleanObject { Value: true }))
         {
             form["NeedAppearances"] = new BooleanObject(true);
         }
 
-        if (!sourceForm.TryGetValue("DR", out var drObject)
-            || reader.Resolve(drObject!) is not DictionaryObject sourceResources)
+        if (reader.GetDictionary(sourceForm, "DR") is not { } sourceResources)
         {
             return;
         }
@@ -170,7 +165,7 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
                 resources[category] = ImportValue(reader.Resolve(sourceResources[category]));
             }
             else if (destinationCategory is DictionaryObject entries
-                && reader.Resolve(sourceResources[category]) is DictionaryObject sourceEntries)
+                && reader.AsDictionary(sourceResources[category]) is { } sourceEntries)
             {
                 foreach (var entry in sourceEntries.Keys)
                 {
@@ -206,9 +201,7 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
     }
 
     private bool IsWidget(DictionaryObject annotation)
-        => annotation.TryGetValue("Subtype", out var subtype)
-            && reader.Resolve(subtype!) is NameObject name
-            && string.Equals(name.Value, "Widget", StringComparison.Ordinal);
+        => string.Equals(reader.GetName(annotation, "Subtype"), "Widget", StringComparison.Ordinal);
 
     private void Populate(DocumentObject shell, DocumentObject target)
     {

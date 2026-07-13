@@ -89,7 +89,7 @@ public static class DssBuilder
 
         // Merge with any existing /DSS so a multi-signature document (or a later
         // re-augmentation) keeps the earlier validation material instead of dropping it.
-        var existingDss = catalog.TryGetValue("DSS", out var dssObj) && dssObj is not null && reader.Resolve(dssObj) is DictionaryObject prior ? prior : null;
+        var existingDss = reader.GetDictionary(catalog, "DSS");
 
         // Start from a copy of the prior /DSS so any keys beyond the four managed
         // arrays (e.g. proprietary entries from another tool) survive augmentation.
@@ -100,8 +100,7 @@ public static class DssBuilder
         var ocspRefs = MergeStreams(writer, reader, existingDss, dss, "OCSPs", ocsps);
         var crlRefs = MergeStreams(writer, reader, existingDss, dss, "CRLs", crls);
 
-        DictionaryObject? vri = existingDss is not null && existingDss.TryGetValue("VRI", out var vriObj) && vriObj is not null
-            && reader.Resolve(vriObj) is DictionaryObject priorVri
+        DictionaryObject? vri = existingDss is not null && reader.GetDictionary(existingDss, "VRI") is { } priorVri
                 ? PdfSigner.Copy(priorVri)
                 : null;
         if (signatureContents is not null)
@@ -110,8 +109,7 @@ public static class DssBuilder
             var key = Sha1.HexUpper(signatureContents);
             // Merge into any prior entry for this same signature rather than
             // replacing it, so references gathered in earlier passes survive.
-            var entry = vri.TryGetValue(key, out var priorEntryObj) && priorEntryObj is not null
-                && reader.Resolve(priorEntryObj) is DictionaryObject priorEntry
+            var entry = reader.GetDictionary(vri, key) is { } priorEntry
                     ? PdfSigner.Copy(priorEntry)
                     : new DictionaryObject { ["Type"] = new NameObject("VRI") };
             UnionArray(entry, "Cert", reader, certRefs);
@@ -145,13 +143,12 @@ public static class DssBuilder
     {
         var array = new ArrayObject();
         var byContent = new Dictionary<string, ReferenceObject>(StringComparer.Ordinal);
-        if (existing is not null && existing.TryGetValue(key, out var priorObj) && priorObj is not null
-            && reader.Resolve(priorObj) is ArrayObject prior)
+        if (existing is not null && reader.GetArray(existing, key) is { } prior)
         {
             foreach (var item in prior)
             {
                 array.Add(item);
-                if (item is ReferenceObject priorRef && reader.Resolve(priorRef) is StreamObject stream)
+                if (item is ReferenceObject priorRef && reader.AsStream(priorRef) is { } stream)
                 {
                     byContent.TryAdd(Sha1.HexUpper(reader.DecodeStream(stream)), priorRef);
                 }
@@ -189,7 +186,7 @@ public static class DssBuilder
     {
         var array = new ArrayObject();
         var seen = new HashSet<(int, int)>();
-        if (entry.TryGetValue(key, out var priorObj) && priorObj is not null && reader.Resolve(priorObj) is ArrayObject prior)
+        if (reader.GetArray(entry, key) is { } prior)
         {
             foreach (var item in prior)
             {
