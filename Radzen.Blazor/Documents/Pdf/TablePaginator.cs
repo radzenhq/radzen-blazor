@@ -56,25 +56,7 @@ internal static class TablePaginator
         }
 
         // Rows covered by a RowSpan > 1 cell move between fragments as one group.
-        var reach = new int[source.Rows.Count];
-        for (var i = 0; i < reach.Length; i++)
-        {
-            reach[i] = i;
-        }
-
-        foreach (var cell in layout.Cells)
-        {
-            if (cell.RowSpan <= 1)
-            {
-                continue;
-            }
-
-            var end = cell.Row + cell.RowSpan - 1;
-            for (var r = cell.Row; r <= end && r < reach.Length; r++)
-            {
-                reach[r] = System.Math.Max(reach[r], end);
-            }
-        }
+        var reach = BuildReach(layout, source.Rows.Count);
 
         List<TableFragment> fragments = [];
         var body = 0;
@@ -155,6 +137,71 @@ internal static class TablePaginator
         }
 
         return fragments;
+    }
+
+    // reach[r] is the last row the group starting at r must include: every row spanned by a
+    // RowSpan > 1 cell moves between fragments as one unit.
+    private static int[] BuildReach(LaidOutTable layout, int rowCount)
+    {
+        var reach = new int[rowCount];
+        for (var i = 0; i < reach.Length; i++)
+        {
+            reach[i] = i;
+        }
+
+        foreach (var cell in layout.Cells)
+        {
+            if (cell.RowSpan <= 1)
+            {
+                continue;
+            }
+
+            var end = cell.Row + cell.RowSpan - 1;
+            for (var r = cell.Row; r <= end && r < reach.Length; r++)
+            {
+                reach[r] = System.Math.Max(reach[r], end);
+            }
+        }
+
+        return reach;
+    }
+
+    // Height of the header rows plus the first body row group - the rowspan closure Paginate
+    // force-places as one unit. Paginator's page-flush check needs the identical measurement,
+    // so both consume this one helper instead of duplicating the reach/group computation.
+    internal static double FirstBodyGroupHeight(LaidOutTable layout, Table source)
+    {
+        double headerHeight = 0;
+        List<int> bodies = [];
+        for (var r = 0; r < source.Rows.Count; r++)
+        {
+            if (source.Rows[r].IsHeader)
+            {
+                headerHeight += layout.RowHeights[r];
+            }
+            else
+            {
+                bodies.Add(r);
+            }
+        }
+
+        if (bodies.Count == 0)
+        {
+            return headerHeight;
+        }
+
+        var reach = BuildReach(layout, source.Rows.Count);
+        var last = 0;
+        var groupEnd = reach[bodies[0]];
+        var groupHeight = layout.RowHeights[bodies[0]];
+        while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
+        {
+            last++;
+            groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
+            groupHeight += layout.RowHeights[bodies[last]];
+        }
+
+        return headerHeight + groupHeight;
     }
 
     private static bool GroupKeepTogether(Table source, List<int> bodies, int first, int last)

@@ -190,6 +190,21 @@ public class TextContentTests
     }
 
     [Fact]
+    public void NonWinAnsiChar_EmitsQuestionMarkPlaceholder_NotDropped()
+    {
+        var document = new Document();
+        var page = document.Pages.Add();
+        // U+03A9 (Greek capital omega) is not WinAnsi-encodable; it must render as a visible
+        // '?' like the main text pipeline, never be silently dropped.
+        page.Content.Add(new TextContent("AΩz", 0, 0));
+
+        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
+        var tj = Find(content, "Tj");
+
+        Assert.Equal([0x41, 0x3F, 0x7A], tj.Operands[0].Bytes); // A ? z
+    }
+
+    [Fact]
     public void TextPosition_XAndYEmitted()
     {
         var document = new Document();

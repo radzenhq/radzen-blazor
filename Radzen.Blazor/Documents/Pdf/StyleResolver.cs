@@ -175,18 +175,25 @@ internal static class StyleResolver
         // every Save. Body/band/field paths read the alignment from the resolution instead.
         paragraph.StyleAlignment = styleAlignment;
 
+        // An explicit paragraph style outranks the ambient cell/row/table context: the
+        // named-style chain (Normal excluded) is applied before the inherited fonts, so a
+        // requested style wins over table defaults just as it does outside a table. Normal
+        // stays the final document-default fallback. Matches word-processing semantics.
+        var namedChain = StyleChain(paragraph.StyleName, styles, includeNormal: false);
+
         var paragraphFont = new Font();
         paragraphFont.InheritFrom(paragraph.Font);
+        foreach (var style in namedChain)
+        {
+            paragraphFont.InheritFrom(style.Font);
+        }
+
         foreach (var font in inherited)
         {
             paragraphFont.InheritFrom(font);
         }
 
-        foreach (var style in chain)
-        {
-            paragraphFont.InheritFrom(style.Font);
-        }
-
+        paragraphFont.InheritFrom(styles.Normal.Font);
         paragraph.EffectiveFont = paragraphFont;
 
         foreach (var run in paragraph.Inlines)
@@ -194,16 +201,17 @@ internal static class StyleResolver
             var effective = new Font();
             effective.InheritFrom(run.Font);
             effective.InheritFrom(paragraph.Font);
+            foreach (var style in namedChain)
+            {
+                effective.InheritFrom(style.Font);
+            }
+
             foreach (var font in inherited)
             {
                 effective.InheritFrom(font);
             }
 
-            foreach (var style in chain)
-            {
-                effective.InheritFrom(style.Font);
-            }
-
+            effective.InheritFrom(styles.Normal.Font);
             run.EffectiveFont = effective;
         }
     }
