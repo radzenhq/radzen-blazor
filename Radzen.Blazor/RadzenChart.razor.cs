@@ -1299,7 +1299,7 @@ namespace Radzen.Blazor
 
         internal async Task DisplayTooltip()
         {
-            if (Tooltip.Visible)
+            if (Tooltip.Visible && MouseInside)
             {
                 var queryX = mouseX - MarginLeft;
                 var queryY = mouseY - MarginTop;

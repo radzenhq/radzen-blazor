@@ -30,13 +30,20 @@
 
         var tooltip = tooltips.LastOrDefault();
 
-        if (tooltip != null)
+        if (tooltip != null && IsJSRuntimeAvailable)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.openChartTooltip",
-                tooltip.Chart,
-                x,
-                y,
-                UniqueID);
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.openChartTooltip",
+                    tooltip.Chart,
+                    x,
+                    y,
+                    UniqueID);
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 
@@ -93,11 +100,12 @@ private DotNetObjectReference<RadzenChartTooltip>? reference;
         var lastTooltip = tooltips.LastOrDefault();
         if (lastTooltip != null)
         {
+            tooltips.Remove(lastTooltip);
+
             if (IsJSRuntimeAvailable)
             {
                 try
                 {
-                    tooltips.Remove(lastTooltip);
                     await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
                 }
                 catch
@@ -105,7 +113,6 @@ private DotNetObjectReference<RadzenChartTooltip>? reference;
                     // ignored
                 }
             }
-
         }
 
         await InvokeAsync(StateHasChanged);
@@ -113,9 +120,21 @@ private DotNetObjectReference<RadzenChartTooltip>? reference;
 
     public async ValueTask DisposeAsync()
     {
-        while (tooltips.Count != 0)
+        if (tooltips.Count != 0)
         {
-            await Close();
+            tooltips.Clear();
+
+            if (IsJSRuntimeAvailable)
+            {
+                try
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
         }
         reference?.Dispose();
         reference = null;
