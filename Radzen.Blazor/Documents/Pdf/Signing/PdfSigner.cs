@@ -65,6 +65,11 @@ public static class PdfSigner
             throw new ArgumentException("SubFilter must not be empty.", nameof(options));
         }
 
+        if (options.Appearance is { } appearanceOptions)
+        {
+            ValidateAppearance(appearanceOptions);
+        }
+
         var signature = BuildSignatureDictionary(options);
         var appearance = options.Appearance is not null ? BuildAppearanceStream(options) : null;
         var (bytes, sigStart, sigEnd) = AppendSignatureField(
@@ -247,6 +252,33 @@ public static class PdfSigner
             var newPage = Copy(page);
             newPage["Annots"] = annots;
             writer.Override(pageRef.ObjectNumber, newPage);
+        }
+    }
+
+    // A visible signature's rectangle and appearance BBox derive directly from
+    // these numbers, so reject values that would yield a degenerate, inverted or
+    // non-finite widget the viewer renders as nothing or garbage.
+    private static void ValidateAppearance(SignatureAppearance appearance)
+    {
+        RequireFinite(appearance.X, nameof(appearance.X));
+        RequireFinite(appearance.Y, nameof(appearance.Y));
+        RequirePositive(appearance.Width, nameof(appearance.Width));
+        RequirePositive(appearance.Height, nameof(appearance.Height));
+    }
+
+    private static void RequireFinite(double value, string name)
+    {
+        if (!double.IsFinite(value))
+        {
+            throw new ArgumentOutOfRangeException(name, value, "The signature appearance coordinate must be a finite number.");
+        }
+    }
+
+    private static void RequirePositive(double value, string name)
+    {
+        if (!double.IsFinite(value) || value <= 0)
+        {
+            throw new ArgumentOutOfRangeException(name, value, "The signature appearance dimension must be a finite positive number.");
         }
     }
 
@@ -548,7 +580,9 @@ public static class PdfSigner
         return -1;
     }
 
-    private static DictionaryObject Copy(DictionaryObject source)
+    // Shallow copy preserving key order. Shared with DssBuilder so a merged
+    // dictionary can be rebuilt without mutating the object read from the input.
+    internal static DictionaryObject Copy(DictionaryObject source)
     {
         var copy = new DictionaryObject();
         foreach (var pair in source)

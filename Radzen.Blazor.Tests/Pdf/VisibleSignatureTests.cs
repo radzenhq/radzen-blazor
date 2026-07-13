@@ -201,6 +201,35 @@ public class VisibleSignatureTests
         VerifyCms(signed);
     }
 
+    [Theory]
+    [InlineData(0, 60)]
+    [InlineData(-20, 60)]
+    [InlineData(200, 0)]
+    [InlineData(200, -60)]
+    [InlineData(double.NaN, 60)]
+    [InlineData(200, double.PositiveInfinity)]
+    public void VisibleSignatureRejectsNonPositiveOrNonFiniteDimensions(double width, double height)
+    {
+        var original = BuildPdf();
+        var appearance = new SignatureAppearance { X = 72, Y = 700, Width = width, Height = height };
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => PdfSigner.Sign(original, Options(appearance), new FixedSigner(new byte[100])));
+    }
+
+    [Theory]
+    [InlineData(double.NaN, 700)]
+    [InlineData(72, double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity, 700)]
+    public void VisibleSignatureRejectsNonFinitePosition(double x, double y)
+    {
+        var original = BuildPdf();
+        var appearance = new SignatureAppearance { X = x, Y = y, Width = 200, Height = 60 };
+
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => PdfSigner.Sign(original, Options(appearance), new FixedSigner(new byte[100])));
+    }
+
     [Fact]
     public void VisibleSignatureLandsOnRequestedPage()
     {
