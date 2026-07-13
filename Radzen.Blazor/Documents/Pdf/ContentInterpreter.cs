@@ -213,14 +213,14 @@ internal static class ContentInterpreter
 
                 case "Tj":
                 case "TJ":
-                    pendingMerge = EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font, tjSegments, 0, 0, pendingMerge);
+                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, 0, 0), artifactDepth, tjSegments, pendingMerge);
                     break;
 
                 // ' advances to the next line by the leading before showing.
                 case "'":
                     lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     textMatrix = lineMatrix;
-                    pendingMerge = EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font, tjSegments, 0, 0, pendingMerge);
+                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, 0, 0), artifactDepth, tjSegments, pendingMerge);
                     break;
 
                 // " advances the line then shows, and additionally sets word spacing (aw)
@@ -228,7 +228,7 @@ internal static class ContentInterpreter
                 case "\"":
                     lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     textMatrix = lineMatrix;
-                    pendingMerge = EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font, tjSegments, Number(operands, 0), Number(operands, 1), pendingMerge);
+                    pendingMerge = EmitText(target, operands, textMatrix, state, new TextState(fontName, fontSize, font, Number(operands, 0), Number(operands, 1)), artifactDepth, tjSegments, pendingMerge);
                     break;
 
                 case "m":
@@ -306,50 +306,50 @@ internal static class ContentInterpreter
                     break;
 
                 case "S":
-                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: false, evenOdd: false, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: false, Close: false, EvenOdd: false), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "s":
-                    EmitPath(target, pathOps, state, stroke: true, fill: false, close: true, evenOdd: false, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: false, Close: true, EvenOdd: false), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "f":
                 case "F":
-                    EmitPath(target, pathOps, state, stroke: false, fill: true, close: false, evenOdd: false, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: false), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "f*":
-                    EmitPath(target, pathOps, state, stroke: false, fill: true, close: false, evenOdd: true, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: true), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "B":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: false, evenOdd: false, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: false), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "B*":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: false, evenOdd: true, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: true), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "b":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: true, evenOdd: false, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: false), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "b*":
-                    EmitPath(target, pathOps, state, stroke: true, fill: true, close: true, evenOdd: true, clipMode, artifactDepth);
+                    EmitPath(target, pathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: true), clipMode, artifactDepth);
                     clipMode = PathClipMode.None;
                     break;
 
                 case "n":
                     if (clipMode != PathClipMode.None)
                     {
-                        EmitPath(target, pathOps, state, stroke: false, fill: false, close: false, evenOdd: false, clipMode, artifactDepth);
+                        EmitPath(target, pathOps, state, new PathPaint(Stroke: false, Fill: false, Close: false, EvenOdd: false), clipMode, artifactDepth);
                     }
 
                     pathOps.Clear();
@@ -403,7 +403,7 @@ internal static class ContentInterpreter
         }
     }
 
-    private static TextContent? EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth, ReverseFont? font, List<TextAdjustment>? tjSegments, double wordSpacing, double charSpacing, TextContent? pendingMerge)
+    private static TextContent? EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, TextState text, int artifactDepth, List<TextAdjustment>? tjSegments, TextContent? pendingMerge)
     {
         var bytes = LastString(operands);
         if (bytes is null)
@@ -414,7 +414,7 @@ internal static class ContentInterpreter
         // A loaded run in an embedded/Type0 font carries multi-byte codes; decode Text via
         // the font's reverse map (as text extraction does) instead of per-byte WinAnsi,
         // which drops the 0x00 high bytes. SourceBytes still re-emits the run verbatim.
-        var decoded = font is not null ? font.Decode(bytes) : Decode(bytes);
+        var decoded = text.Font is not null ? text.Font.Decode(bytes) : Decode(bytes);
         var transform = textMatrix * state.Ctm;
 
         // The spec advances the text matrix by each shown glyph's width, but the element
@@ -424,12 +424,12 @@ internal static class ContentInterpreter
         // the chunks using the font's own widths.
         if (pendingMerge is { SourceBytes: not null, SourceText: not null }
             && pendingMerge.Transform == transform
-            && pendingMerge.FontResourceName == fontName
-            && pendingMerge.Font.Size == fontSize
+            && pendingMerge.FontResourceName == text.FontName
+            && pendingMerge.Font.Size == text.FontSize
             && pendingMerge.Color == state.Fill
             && pendingMerge.FillPaint == state.FillPaint
-            && pendingMerge.WordSpacing == wordSpacing
-            && pendingMerge.CharSpacing == charSpacing
+            && pendingMerge.WordSpacing == text.WordSpacing
+            && pendingMerge.CharSpacing == text.CharSpacing
             && pendingMerge.IsArtifact == (artifactDepth > 0))
         {
             var segments = new List<TextAdjustment>(
@@ -445,8 +445,8 @@ internal static class ContentInterpreter
 
         var run = new TextContent(decoded, 0, 0)
         {
-            Font = new Font { Size = fontSize },
-            FontResourceName = fontName,
+            Font = new Font { Size = text.FontSize },
+            FontResourceName = text.FontName,
             SourceBytes = bytes,
             SourceText = decoded,
             // Only carry the TJ array when it holds a numeric adjustment; a plain string
@@ -454,8 +454,8 @@ internal static class ContentInterpreter
             SourceAdjustments = HasAdjustment(tjSegments) ? tjSegments : null,
             Color = state.Fill,
             FillPaint = state.FillPaint,
-            WordSpacing = wordSpacing,
-            CharSpacing = charSpacing,
+            WordSpacing = text.WordSpacing,
+            CharSpacing = text.CharSpacing,
             Transform = transform,
             IsArtifact = artifactDepth > 0,
         };
@@ -489,13 +489,13 @@ internal static class ContentInterpreter
         return false;
     }
 
-    private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, bool stroke, bool fill, bool close, bool evenOdd, PathClipMode clip, int artifactDepth)
+    private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, PathPaint paint, PathClipMode clip, int artifactDepth)
     {
         var path = new PathContent
         {
-            Stroke = stroke,
-            Fill = fill,
-            EvenOdd = evenOdd,
+            Stroke = paint.Stroke,
+            Fill = paint.Fill,
+            EvenOdd = paint.EvenOdd,
             Clip = clip,
             Thickness = state.LineWidth,
             StrokeColor = state.Stroke,
@@ -527,7 +527,7 @@ internal static class ContentInterpreter
             }
         }
 
-        if (close)
+        if (paint.Close)
         {
             path.Close();
         }
@@ -680,6 +680,14 @@ internal static class ContentInterpreter
     }
 
     private readonly record struct PathOp(string Operator, double[] Operands);
+
+    // The text-show state a show operator carries: the selected font resource and size,
+    // its resolved reverse map, and the word/character spacing an inline " sets.
+    private readonly record struct TextState(string? FontName, double FontSize, ReverseFont? Font, double WordSpacing, double CharSpacing);
+
+    // The paint disposition of a path operator: stroke/fill, whether it closes the last
+    // subpath, and even-odd vs nonzero fill.
+    private readonly record struct PathPaint(bool Stroke, bool Fill, bool Close, bool EvenOdd);
 
     private sealed class GraphicsState
     {

@@ -515,19 +515,7 @@ internal sealed class DocumentGenerator
                 WriteClip(writer, edgeClip, edge.ClipRadius);
             }
 
-            writer.WriteColor(edge.Color, "RG");
-            writer.WriteNumber(edge.LineWidth);
-            writer.WriteRaw(" w\n");
-            if (edge.Style is BorderStyle.Dashed or BorderStyle.Dotted)
-            {
-                var on = edge.Style == BorderStyle.Dashed ? 3.0 : 1.0;
-                writer.WriteRaw("[");
-                writer.WriteNumber(on * edge.LineWidth);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(on * edge.LineWidth);
-                writer.WriteRaw("] 0 d\n");
-            }
-
+            WriteStrokeState(writer, edge.Color, edge.LineWidth, edge.Style);
             writer.WriteNumber(edge.X1);
             writer.WriteRaw(" ");
             writer.WriteNumber(edge.Y1);
@@ -547,19 +535,7 @@ internal sealed class DocumentGenerator
                 writer.WriteRaw(" gs\n");
             }
 
-            writer.WriteColor(rounded.Color, "RG");
-            writer.WriteNumber(rounded.LineWidth);
-            writer.WriteRaw(" w\n");
-            if (rounded.Style is BorderStyle.Dashed or BorderStyle.Dotted)
-            {
-                var on = rounded.Style == BorderStyle.Dashed ? 3.0 : 1.0;
-                writer.WriteRaw("[");
-                writer.WriteNumber(on * rounded.LineWidth);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(on * rounded.LineWidth);
-                writer.WriteRaw("] 0 d\n");
-            }
-
+            WriteStrokeState(writer, rounded.Color, rounded.LineWidth, rounded.Style);
             WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
             writer.WriteRaw("S\nQ\n");
         }
@@ -625,6 +601,31 @@ internal sealed class DocumentGenerator
             ExtGStates = [.. plan.ExtGStates],
             Patterns = [.. plan.Patterns],
         };
+    }
+
+    // Stroke colour + line width, then any dash pattern. Edges and rounded strokes must
+    // emit this byte-for-byte identically, so both go through here.
+    private static void WriteStrokeState(ContentWriter writer, Color color, double lineWidth, BorderStyle style)
+    {
+        writer.WriteColor(color, "RG");
+        writer.WriteNumber(lineWidth);
+        writer.WriteRaw(" w\n");
+        WriteDashPattern(writer, style, lineWidth);
+    }
+
+    private static void WriteDashPattern(ContentWriter writer, BorderStyle style, double lineWidth)
+    {
+        if (style is not (BorderStyle.Dashed or BorderStyle.Dotted))
+        {
+            return;
+        }
+
+        var on = style == BorderStyle.Dashed ? 3.0 : 1.0;
+        writer.WriteRaw("[");
+        writer.WriteNumber(on * lineWidth);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(on * lineWidth);
+        writer.WriteRaw("] 0 d\n");
     }
 
     private static void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)
