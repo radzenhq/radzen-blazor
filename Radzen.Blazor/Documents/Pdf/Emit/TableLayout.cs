@@ -136,7 +136,8 @@ internal static class TableLayout
         Table table,
         double availableWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage = null)
+        Func<Image, double, (double Width, double Height)>? measureImage = null,
+        StyleResolution? resolution = null)
     {
         var columnWidths = ResolveColumnWidths(table, availableWidth);
         var columnX = Prefix(columnWidths);
@@ -180,7 +181,7 @@ internal static class TableLayout
 
                 var contentWidth = cellWidth - cell.PaddingLeft.Point - cell.PaddingRight.Point;
                 var align = cell.AlignmentValue ?? ColumnAlignment(table, c) ?? table.Rows[r].AlignmentValue;
-                var content = BoxContentLayout.Measure(cell.Blocks, contentWidth, align, fonts, measureImage);
+                var content = BoxContentLayout.Measure(cell.Blocks, contentWidth, align, fonts, measureImage, resolution);
 
                 placed.Add(new Placed
                 {

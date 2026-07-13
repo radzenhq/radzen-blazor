@@ -190,11 +190,6 @@ internal static class StyleResolver
 
         resolution.SetAlignment(paragraph, styleAlignment);
 
-        // Single assignment (no null-then-set window) so a concurrent Save reading this for a
-        // cell paragraph via TableLayout never sees a transient value; the value is the same
-        // every Save. Body/band/field paths read the alignment from the resolution instead.
-        paragraph.StyleAlignment = styleAlignment;
-
         // An explicit paragraph style outranks the ambient cell/row/table context: the
         // named-style chain (Normal excluded) is applied before the inherited fonts, so a
         // requested style wins over table defaults just as it does outside a table. Normal

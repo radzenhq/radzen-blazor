@@ -50,17 +50,19 @@ internal static class BoxContentLayout
         HorizontalAlignment align,
         VerticalAlignment vAlign,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage)
-        => Position(Measure(blocks, contentBox.Width, align, fonts, measureImage), contentBox, align, vAlign);
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution? resolution = null)
+        => Position(Measure(blocks, contentBox.Width, align, fonts, measureImage, resolution), contentBox, align, vAlign);
 
     public static Measured Measure(
         BlockCollection blocks,
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution? resolution = null)
     {
-        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage);
+        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, resolution ?? StyleResolution.Empty);
         // Lists expand to marker paragraphs exactly as in section content.
         foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth))
         {
@@ -78,7 +80,8 @@ internal static class BoxContentLayout
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
         : BlockVisitor<Nothing, Nothing>
     {
         public List<CellItem> Items { get; } = [];
@@ -97,7 +100,7 @@ internal static class BoxContentLayout
                 Height += spacingBefore;
             }
 
-            foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, align))
+            foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph) ?? align))
             {
                 Items.Add(new CellItem { Line = line, Source = paragraph, Height = line.Height });
                 Height += line.Height;
@@ -137,7 +140,7 @@ internal static class BoxContentLayout
 
         public override Nothing Visit(Table nested, Nothing context)
         {
-            var layout = TableLayout.Layout(nested, Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage);
+            var layout = TableLayout.Layout(nested, Math.Max(0, contentWidth - nested.LeftIndent.Point), fonts, measureImage, resolution);
             Items.Add(new CellItem { Table = layout, Height = layout.Height });
             Height += layout.Height;
             return default;
@@ -151,7 +154,7 @@ internal static class BoxContentLayout
             // synthetic single-cell table it used to lower to.
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
-            var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage);
+            var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage, resolution);
             var boxHeight = inner.Height + (2 * padding);
             Items.Add(new CellItem { Box = container, BoxContent = inner, Width = boxWidth, Height = boxHeight });
             Height += boxHeight;
