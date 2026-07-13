@@ -44,6 +44,18 @@
     <SchedulerMultiDay />
 </RadzenExample>
 
+<RadzenText Anchor="scheduler#resources" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Display bookings of multiple resources side-by-side
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>&lt;RadzenResourceDayView /&gt;</code> to display the appointments of multiple resources (rooms, people, equipment) in separate columns for a single day.
+    Appointments are matched to a resource by comparing <code>ResourceProperty</code> of the appointment with <code>ValueProperty</code> of the resource.
+    Appointments which span the entire day are displayed in a dedicated all-day row. Click a slot to book a resource or drag a booking to another resource column to reassign it.
+</RadzenText>
+<RadzenExample ComponentName="Scheduler" Example="SchedulerResources">
+    <SchedulerResources />
+</RadzenExample>
+
 <RadzenText Anchor="scheduler#agenda" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Display scheduler as an agenda
 </RadzenText>
@@ -75,6 +87,8 @@
         new KeyboardShortcut { Key = "DownArrow on week/month view or year view selected month", Action = "Focus same day from next week." },
         new KeyboardShortcut { Key = "UpArrow on day view", Action = "Focus previous hour." },
         new KeyboardShortcut { Key = "DownArrow on day view", Action = "Focus next hour." },
+        new KeyboardShortcut { Key = "LeftArrow or RightArrow on resource day view", Action = "Focus previous or next resource." },
+        new KeyboardShortcut { Key = "UpArrow or DownArrow on resource day view", Action = "Focus previous or next slot. Focus the all-day row from the first slot." },
         new KeyboardShortcut { Key = "UpArrow on appointment", Action = "Focus previous appointment." },
         new KeyboardShortcut { Key = "DownArrow on appointment", Action = "Focus next appointment." },
         new KeyboardShortcut { Key = "Space on appointment", Action = "Edit appointment." },

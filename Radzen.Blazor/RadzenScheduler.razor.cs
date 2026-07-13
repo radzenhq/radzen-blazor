@@ -419,7 +419,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments)
         {
-            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView };
+            return GetSlotAttributes(start, end, getAppointments, null);
+        }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, object? resource)
+        {
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, getAppointments = getAppointments, View = SelectedView, Resource = resource };
 
             SlotRender?.Invoke(args);
 
@@ -449,7 +455,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
         {
-            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
+            return await SelectSlot(start, end, appointments, null);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, object? resource)
+        {
+            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView, Resource = resource };
             await SlotSelect.InvokeAsync(args);
 
             return args.IsDefaultPrevented;
