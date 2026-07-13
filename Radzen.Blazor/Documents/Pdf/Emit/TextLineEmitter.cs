@@ -498,13 +498,11 @@ internal sealed class TextLineEmitter(
         // was measured through, so the drawn glyphs are the measured glyphs by construction.
         // Advances and kern are recomputed here at the script-scaled size (and with the
         // space-straddle guard) that measurement does not model, so the bytes are unchanged.
-        var glyphs = fonts.Shaper()
-            .Shape(text, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom)
-            .Glyphs;
+        var glyphs = fonts.Shaper().Shape(text, font, out _);
         var g = 0;
         while (g < glyphs.Count)
         {
-            var face = glyphs[g].Face!;
+            var face = glyphs[g].Face;
             var generated = fontResolver.ResolveSfnt(face);
             var bytes = scratchBytes;
             bytes.Clear();

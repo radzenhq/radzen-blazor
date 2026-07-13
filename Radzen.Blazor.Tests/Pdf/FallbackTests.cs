@@ -46,17 +46,17 @@ public class FallbackTests
         var shaper = new SimpleShaper(fonts);
         var font = new Font { Name = "Liberation Sans", Size = 12 };
 
-        var run = shaper.Shape(new[] { 'A', Cjk }, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
-        Assert.Equal(2, run.Glyphs.Count);
+        Assert.Equal(2, glyphs.Count);
 
         // 'A' resolved by the primary (Liberation gid 36, not Noto's 34).
-        Assert.Equal(Sans().GetGlyphId('A'), run.Glyphs[0].GlyphId);
+        Assert.Equal(Sans().GetGlyphId('A'), glyphs[0].GlyphId);
 
         // CJK resolved via the fallback: non-notdef and equal to Noto's glyph id.
         var notoGid = Noto().GetGlyphId(Cjk);
         Assert.NotEqual(0, notoGid);
-        Assert.Equal(notoGid, run.Glyphs[1].GlyphId);
+        Assert.Equal(notoGid, glyphs[1].GlyphId);
     }
 
     [Fact]
@@ -67,11 +67,11 @@ public class FallbackTests
         var shaper = new SimpleShaper(fonts);
         var font = new Font { Name = "Liberation Sans", Size = 12 };
 
-        var run = shaper.Shape(new[] { 'A', Cjk }, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
         var noto = Noto();
         var expected = noto.GetAdvanceWidth(noto.GetGlyphId(Cjk)) * 12.0 / noto.UnitsPerEm;
-        Assert.Equal(expected, run.Glyphs[1].Advance, 10);
+        Assert.Equal(expected, glyphs[1].Advance, 10);
     }
 
     [Fact]
@@ -94,10 +94,10 @@ public class FallbackTests
         var shaper = new SimpleShaper(fonts);
         var font = new Font { Name = "Liberation Sans", Size = 12 };
 
-        var run = shaper.Shape("A", font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var glyphs = shaper.Shape("A", font, out _);
 
-        Assert.Equal(Sans().GetGlyphId('A'), run.Glyphs[0].GlyphId);
-        Assert.NotEqual(Noto().GetGlyphId('A'), run.Glyphs[0].GlyphId);
+        Assert.Equal(Sans().GetGlyphId('A'), glyphs[0].GlyphId);
+        Assert.NotEqual(Noto().GetGlyphId('A'), glyphs[0].GlyphId);
 
         var sans = Sans();
         var expected = sans.GetAdvanceWidth(sans.GetGlyphId('A')) * 12.0 / sans.UnitsPerEm;
@@ -111,9 +111,9 @@ public class FallbackTests
         var shaper = new SimpleShaper(fonts);
         var font = new Font { Name = "Liberation Sans", Size = 12 };
 
-        var run = shaper.Shape(new[] { 'A', Cjk }, font, FlowDirection.LeftToRight, WritingMode.HorizontalTopToBottom);
+        var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
-        Assert.Equal(Sans().GetGlyphId('A'), run.Glyphs[0].GlyphId);
-        Assert.Equal(0, run.Glyphs[1].GlyphId); // notdef: no fallback configured
+        Assert.Equal(Sans().GetGlyphId('A'), glyphs[0].GlyphId);
+        Assert.Equal(0, glyphs[1].GlyphId); // notdef: no fallback configured
     }
 }
