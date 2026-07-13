@@ -71,6 +71,7 @@ $scheduler-year-slot-title-border-radius: 0.25rem !default;
 $scheduler-planner-slot-width: 3rem !default;
 $scheduler-planner-slot-height: 4.5rem !default;
 $scheduler-resource-group-height: 24rem !default;
+$scheduler-resource-group-min-width: 40rem !default;
 $scheduler-focus-outline: var(--rz-outline-focus) !default;
 $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
@@ -530,13 +531,39 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       height: var(--rz-scheduler-resource-group-height);
     }
   }
+
+  .rz-resource-group-children {
+    display: flex;
+    flex-direction: column;
+    flex: auto;
+  }
+
+  &.rz-resource-groups-horizontal,
+  .rz-resource-group-children.rz-resource-groups-horizontal {
+    flex-direction: row;
+
+    > .rz-resource-group {
+      flex: 1;
+      border-inline-end: 1px solid var(--rz-scheduler-border-color);
+
+      &:last-child {
+        border-inline-end: none;
+      }
+
+      .rz-view {
+        min-width: var(--rz-scheduler-resource-group-min-width);
+      }
+    }
+  }
 }
 
 .rz-resource-group-header {
   position: sticky;
   inset-block-start: 0;
   z-index: 3;
+  flex: none;
   padding: 0.5rem;
+  padding-inline-start: calc(0.5rem + var(--rz-scheduler-resource-group-depth, 0) * 1rem);
   font-size: var(--rz-scheduler-header-font-size);
   font-weight: 600;
   text-transform: var(--rz-scheduler-header-text-transform);
@@ -544,6 +571,17 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   border-block-start: var(--rz-scheduler-header-border);
   border-block-end: var(--rz-scheduler-header-border);
   color: var(--rz-scheduler-header-color);
+}
+
+.rz-resource-group .rz-resource-group .rz-resource-group-header {
+  position: static;
+}
+
+.rz-resource-group-title {
+  position: sticky;
+  inset-inline-start: calc(0.5rem + var(--rz-scheduler-resource-group-depth, 0) * 1rem);
+  display: inline-block;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
