@@ -60,6 +60,16 @@ internal static class LineBreaker
         // The optional break after this word is a soft hyphen: a hyphen is rendered when
         // the line breaks there, and nothing otherwise.
         public bool SoftHyphenAfter { get; set; }
+
+        // The advance of the '-' rendered when a soft-hyphen break is taken after this word,
+        // measured in the preceding text's font. Reserved by the wrap fit and by alignment
+        // so the hyphen never spills past the measure.
+        public double HyphenWidth { get; set; }
+
+        // The boundary after this word carries no inter-word whitespace and is not a word
+        // space (an inline-image edge: text[img] or [img]text with no space). Excluded from
+        // justification like an optional break so no stretch gap is inserted there.
+        public bool NoGapBoundary { get; set; }
     }
 
     private const double DefaultTabStopWidth = 36.0;
@@ -77,6 +87,10 @@ internal static class LineBreaker
         var indent = paragraph.LeftIndent.Point;
         var max = maxWidthPoints - indent;
         var wrapStops = SortedTabStops(paragraph);
+        // The marker (bullet/number) is carried by the first CONTENT line, not the first box:
+        // an item whose text starts with a break produces a leading empty line that cannot hold
+        // it, so the marker stays pending until a non-empty line is built.
+        var markerPending = true;
         foreach (var words in Tokenize(paragraph, fonts, out var pieces))
         {
             if (words.Count == 0)
@@ -90,7 +104,8 @@ internal static class LineBreaker
             {
                 var (first, last) = lineRanges[li];
                 var isLast = li == lineRanges.Count - 1;
-                var includeMarker = boxes.Count == 0;
+                var includeMarker = markerPending;
+                markerPending = false;
                 if (paragraph.TabStops.Count == 0 && first == last && words[first].Width > max
                     && IsBreakable(words[first], pieces))
                 {
@@ -98,7 +113,7 @@ internal static class LineBreaker
                 }
                 else
                 {
-                    boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker));
+                    boxes.Add(BuildLine(words, pieces, first, last, max, indent, paragraph, fonts, isLast, inheritedAlignment, includeMarker, wrapStops));
                 }
             }
         }
@@ -204,16 +219,26 @@ internal static class LineBreaker
             {
                 if (hasCurrent)
                 {
+                    // A word butting directly against the image (no space, no tab) forms a
+                    // no-gap boundary; a spaced boundary keeps its real gap.
+                    if (current.GapAfter == 0 && current.TabsAfter == 0)
+                    {
+                        current.NoGapBoundary = true;
+                    }
+
                     words.Add(current);
                     hasCurrent = false;
                 }
 
                 var advance = inlineImage.EffectiveSize().Width;
+                // Any whitespace after the image is held by a separate empty word, so the
+                // boundary immediately after an image never carries a word space.
                 words.Add(new Word
                 {
                     PieceStart = pieces.Count,
                     PieceCount = 1,
                     Width = advance,
+                    NoGapBoundary = true,
                 });
                 pieces.Add(new Piece
                 {
@@ -342,6 +367,11 @@ internal static class LineBreaker
                         // The break attaches to the word just built from [sub, q).
                         current.OptionalBreakAfter = true;
                         current.SoftHyphenAfter = text[q] == SoftHyphen;
+                        if (current.SoftHyphenAfter)
+                        {
+                            current.HyphenWidth = fonts.MeasureText("-", run.ResolvedFont);
+                        }
+
                         words.Add(current);
                         hasCurrent = false;
 
@@ -381,11 +411,33 @@ internal static class LineBreaker
                 }
             }
 
+            // If the break after the terminal word renders a soft hyphen, its width must fit
+            // within the measure too; back off words that no longer fit with it (a lone word
+            // at i cannot be moved and overflows only by the tiny hyphen).
+            while (j > i && words[j].SoftHyphenAfter && j < words.Count - 1
+                && LineNaturalWidth(words, i, j, stops) + words[j].HyphenWidth > max)
+            {
+                j--;
+            }
+
             lines.Add((i, j));
             i = j + 1;
         }
 
         return lines;
+    }
+
+    // Natural end position of words[i..j] (advances, inter-word gaps and tab advances), the
+    // same accumulation Wrap's inner loop performs; used to re-test a soft-hyphen terminal.
+    private static double LineNaturalWidth(List<Word> words, int i, int j, List<TabStop>? stops)
+    {
+        var end = words[i].Width;
+        for (var w = i; w < j; w++)
+        {
+            end = NextStart(end, words[w], stops) + words[w + 1].Width;
+        }
+
+        return end;
     }
 
     // A word is emergency-breakable only when every piece carries real text; inline images and
@@ -422,6 +474,10 @@ internal static class LineBreaker
         var fragments = new List<LineFragment>();
         var lineWidth = 0.0;
         var markerPending = includeMarker;
+        // A long oversized token (e.g. a URL) is measured one code point at a time; cache the
+        // per-(font, code point) advance so a repeated character is measured once, not per
+        // occurrence with a fresh substring each time.
+        var advances = new Dictionary<(Font, int), double>();
 
         for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
         {
@@ -438,7 +494,14 @@ internal static class LineBreaker
                 var cpLen = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])
                     ? 2
                     : 1;
-                var advance = fonts.MeasureText(text.Substring(i, cpLen), font) * piece.Run.ScriptScale;
+                var codepoint = cpLen == 2 ? char.ConvertToUtf32(text[i], text[i + 1]) : text[i];
+                if (!advances.TryGetValue((font, codepoint), out var baseAdvance))
+                {
+                    baseAdvance = fonts.MeasureText(text.Substring(i, cpLen), font);
+                    advances[(font, codepoint)] = baseAdvance;
+                }
+
+                var advance = baseAdvance * piece.Run.ScriptScale;
                 var step = fragAdvance > 0 ? advance + piece.Run.LetterSpacing.Point : advance;
                 if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
@@ -573,7 +636,8 @@ internal static class LineBreaker
         FontCollection fonts,
         bool isLast,
         HorizontalAlignment? inheritedAlignment,
-        bool includeMarker)
+        bool includeMarker,
+        List<TabStop>? sortedStops)
     {
         var count = 0;
         for (var w = first; w <= last; w++)
@@ -611,7 +675,7 @@ internal static class LineBreaker
 
         if (paragraph.TabStops.Count > 0)
         {
-            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts);
+            return BuildTabStopLine(span, fragments, words, first, last, indent, paragraph, fonts, sortedStops!);
         }
 
         // Natural placement from 0; tab stops are relative to the line origin.
@@ -663,12 +727,19 @@ internal static class LineBreaker
             }
         }
 
-        // Optional-break boundaries (soft hyphen / ZWSP) carry no space and are not stretched
-        // by justification, so only real inter-word gaps are counted and widened.
+        // A soft-hyphen break renders a trailing '-' in the preceding text's font; its width is
+        // reserved here so right/center alignment and justification account for it and it never
+        // spills past the measure.
+        var breakHyphen = words[last].SoftHyphenAfter && last < words.Count - 1 && span.Length > 0;
+        var hyphenWidth = breakHyphen ? words[last].HyphenWidth : 0.0;
+
+        // Optional-break boundaries (soft hyphen / ZWSP) and no-gap boundaries (inline-image
+        // edges with no space) carry no word space and are not stretched by justification, so
+        // only real inter-word gaps are counted and widened.
         var gapCount = 0;
         for (var w = first; w < last; w++)
         {
-            if (!words[w].OptionalBreakAfter)
+            if (!words[w].OptionalBreakAfter && !words[w].NoGapBoundary)
             {
                 gapCount++;
             }
@@ -681,7 +752,7 @@ internal static class LineBreaker
         if (justify)
         {
             x0 = 0;
-            var justifiedGap = (max - advances) / gapCount;
+            var justifiedGap = (max - advances - hyphenWidth) / gapCount;
             cursor = 0;
             fi = 0;
             for (var w = first; w <= last; w++)
@@ -695,16 +766,19 @@ internal static class LineBreaker
 
                 if (w < last)
                 {
-                    cursor += words[w].OptionalBreakAfter ? 0 : justifiedGap;
+                    cursor += words[w].OptionalBreakAfter || words[w].NoGapBoundary ? 0 : justifiedGap;
                 }
             }
         }
         else
         {
+            // The reserved hyphen widens the line for right/center placement so the glyphs shift
+            // left by its width and the hyphen ends exactly at the measure.
+            var alignWidth = naturalWidth + hyphenWidth;
             x0 = alignment switch
             {
-                HorizontalAlignment.Right or HorizontalAlignment.End => max - naturalWidth,
-                HorizontalAlignment.Center => (max - naturalWidth) / 2.0,
+                HorizontalAlignment.Right or HorizontalAlignment.End => max - alignWidth,
+                HorizontalAlignment.Center => (max - alignWidth) / 2.0,
                 _ => 0,
             };
 
@@ -724,10 +798,8 @@ internal static class LineBreaker
             }
         }
 
-        // A break taken at a soft hyphen renders a hyphen at the end of the line, in the
-        // font of the preceding text. It is placed after the span shift (final positions)
-        // and before the marker insert (which shifts list indices, invalidating the span).
-        var breakHyphen = words[last].SoftHyphenAfter && last < words.Count - 1 && span.Length > 0;
+        // The hyphen is placed after the span shift (final positions) and before the marker
+        // insert (which shifts list indices, invalidating the span).
         var hyphenEnd = 0.0;
         Font? hyphenFont = null;
         if (breakHyphen)
@@ -761,7 +833,7 @@ internal static class LineBreaker
                 Start = 0,
                 Length = 1,
                 XOffset = hyphenEnd,
-                Advance = fonts.MeasureText("-", hyphenFont!),
+                Advance = hyphenWidth,
             });
         }
 
@@ -781,16 +853,9 @@ internal static class LineBreaker
         int last,
         double indent,
         Paragraph paragraph,
-        FontCollection fonts)
+        FontCollection fonts,
+        List<TabStop> stops)
     {
-        var stops = new List<TabStop>(paragraph.TabStops.Count);
-        for (var s = 0; s < paragraph.TabStops.Count; s++)
-        {
-            stops.Add(paragraph.TabStops[s]);
-        }
-
-        stops.Sort((a, b) => a.Position.Point.CompareTo(b.Position.Point));
-
         double naturalWidth = 0;
         var cursor = 0.0;
         var fi = 0;
@@ -838,6 +903,14 @@ internal static class LineBreaker
                     TabAlignment.Decimal => stopPos - decimalOffset,
                     _ => stopPos,
                 };
+
+            // A right/center/decimal segment wider than the space before its stop would start
+            // left of where the previous segment ended and paint over it; clamp to gapStart so
+            // it flows left-aligned from the cursor instead, matching word-processor behavior.
+            if (tabsBefore > 0 && start < gapStart)
+            {
+                start = gapStart;
+            }
 
             if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + 1e-6)
             {

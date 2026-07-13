@@ -46,7 +46,8 @@ internal sealed class FieldResolver(FontCollection fonts)
         double width,
         int pageNumber,
         int pageCount,
-        HorizontalAlignment? inheritedAlignment = null)
+        HorizontalAlignment? inheritedAlignment = null,
+        int reservedLines = int.MaxValue)
     {
         // Text == null marks a passthrough piece: a non-text run (e.g. InlineImage) re-emitted
         // as its ORIGINAL instance so the line breaker lays it out instead of coercing it to
@@ -144,6 +145,18 @@ internal sealed class FieldResolver(FontCollection fonts)
             });
         }
 
-        return LineBreaker.Break(resolved, width, fonts, inheritedAlignment);
+        var lines = LineBreaker.Break(resolved, width, fonts, inheritedAlignment);
+
+        // The band reserved exactly `reservedLines` for this paragraph (laid out once with the
+        // field's single-digit placeholder). A wider resolved number that wraps to more lines
+        // would overprint the content below it, so fail loud instead of drawing over it.
+        if (lines.Count > reservedLines)
+        {
+            throw new System.InvalidOperationException(
+                $"A header/footer field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
+                $"but only {reservedLines} were reserved; widen the band or shorten the text.");
+        }
+
+        return lines;
     }
 }

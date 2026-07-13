@@ -135,15 +135,15 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         writer.WriteRaw("\n");
     }
 
+    // A character outside WinAnsi is drawn as a visible '?' rather than dropped, matching the
+    // main text pipeline (EmitBase14Fragment) and honoring the fail-loud invariant.
     private static byte[] Encode(string text)
     {
+        WinAnsiEncoding.TryGetCode('?', out var question);
         var bytes = new List<byte>(text.Length);
         foreach (var c in text)
         {
-            if (WinAnsiEncoding.TryGetCode(c, out var code))
-            {
-                bytes.Add(code);
-            }
+            bytes.Add(WinAnsiEncoding.TryGetCode(c, out var code) ? code : question);
         }
 
         return [.. bytes];

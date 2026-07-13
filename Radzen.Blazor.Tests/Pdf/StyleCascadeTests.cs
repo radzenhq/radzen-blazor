@@ -220,6 +220,26 @@ public class StyleCascadeTests
     }
 
     [Fact]
+    public void ParagraphStyleName_WinsOverAmbientTableFont()
+    {
+        // An explicit paragraph style must outrank the ambient table font, exactly as it does
+        // outside a table: the 20pt style wins over the 8pt table default.
+        var builder = Builder(out var section);
+        var style = builder.Styles.Add("Title");
+        style.Font.Size = 20;
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Font.Size = 8;
+        var paragraph = table.Rows.Add().Cells[0].Blocks.AddParagraph("Heading");
+        paragraph.StyleName = "Title";
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(20.0, sizes);
+        Assert.DoesNotContain(8.0, sizes);
+    }
+
+    [Fact]
     public void ExplicitRunFont_WinsOverParagraphAndCellFonts()
     {
         var builder = Builder(out var section);

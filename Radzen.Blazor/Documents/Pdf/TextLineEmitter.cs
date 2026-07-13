@@ -56,17 +56,20 @@ internal sealed class TextLineEmitter(
             var line = lines[i];
             if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
+                var reserved = 0;
+                while (i + reserved < lines.Count && lines[i + reserved].Source == paragraph)
+                {
+                    reserved++;
+                }
+
                 var y = line.Y;
-                foreach (var box in context.Fields.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph)))
+                foreach (var box in context.Fields.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph), reserved))
                 {
                     EmitLine(context, box, left, top - y, null);
                     y += box.Height;
                 }
 
-                while (i < lines.Count && lines[i].Source == paragraph)
-                {
-                    i++;
-                }
+                i += reserved;
             }
             else
             {
@@ -439,7 +442,11 @@ internal sealed class TextLineEmitter(
                     var list = new List<double>(segment.Length - 1);
                     for (var k = 1; k < segment.Length; k++)
                     {
-                        var kern = metrics.GetKerning(segment[k - 1], segment[k]);
+                        // A pair straddling a space is never kerned: coalescing joined
+                        // separately-measured words across the space, so layout never saw it.
+                        var kern = segment[k - 1] == ' ' || segment[k] == ' '
+                            ? 0
+                            : metrics.GetKerning(segment[k - 1], segment[k]);
                         kernPoints += kern * size / 1000.0;
                         list.Add(-kern);
                     }
@@ -495,6 +502,7 @@ internal sealed class TextLineEmitter(
             var advance = 0.0;
             List<double>? kernList = null;
             ushort prevGid = 0;
+            var prevCodepoint = 0;
             var glyphCount = 0;
             while (i < text.Length)
             {
@@ -510,8 +518,10 @@ internal sealed class TextLineEmitter(
                     // One entry per glyph gap (0 when the pair is not kerned) so the TJ
                     // adjustments stay aligned with the glyph codes. Measurement adds
                     // kern*size/upem; the TJ number (-kern*1000/upem, positive tightens)
-                    // reproduces the same displacement when drawn.
-                    var kern = face.GetKerning(prevGid, gid);
+                    // reproduces the same displacement when drawn. A pair straddling a space
+                    // is never kerned: coalescing joined separately-measured words across the
+                    // space, so layout never saw this pair and kerning it here would drift.
+                    var kern = codepoint == ' ' || prevCodepoint == ' ' ? 0 : face.GetKerning(prevGid, gid);
                     advance += kern * size / face.UnitsPerEm;
                     (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
                 }
@@ -523,6 +533,7 @@ internal sealed class TextLineEmitter(
                 bytes.Add((byte)(gid & 0xFF));
                 advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
                 prevGid = gid;
+                prevCodepoint = codepoint;
                 glyphCount++;
                 i += codepoint > 0xFFFF ? 2 : 1;
             }

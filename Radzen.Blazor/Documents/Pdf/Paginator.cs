@@ -974,58 +974,7 @@ internal static class Paginator
     // rowspan closure TablePaginator force-places as one unit, so it must be measured whole
     // or the flush check would let a tall group spill past the page bottom.
     private static double TableFirstFragmentHeight(Table table, LaidOutTable layout)
-    {
-        double headerHeight = 0;
-        List<int> bodies = [];
-        for (var r = 0; r < table.Rows.Count; r++)
-        {
-            if (table.Rows[r].IsHeader)
-            {
-                headerHeight += layout.RowHeights[r];
-            }
-            else
-            {
-                bodies.Add(r);
-            }
-        }
-
-        if (bodies.Count == 0)
-        {
-            return headerHeight;
-        }
-
-        var reach = new int[table.Rows.Count];
-        for (var i = 0; i < reach.Length; i++)
-        {
-            reach[i] = i;
-        }
-
-        foreach (var cell in layout.Cells)
-        {
-            if (cell.RowSpan <= 1)
-            {
-                continue;
-            }
-
-            var end = cell.Row + cell.RowSpan - 1;
-            for (var r = cell.Row; r <= end && r < reach.Length; r++)
-            {
-                reach[r] = System.Math.Max(reach[r], end);
-            }
-        }
-
-        var last = 0;
-        var groupEnd = reach[bodies[0]];
-        var groupHeight = layout.RowHeights[bodies[0]];
-        while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
-        {
-            last++;
-            groupEnd = System.Math.Max(groupEnd, reach[bodies[last]]);
-            groupHeight += layout.RowHeights[bodies[last]];
-        }
-
-        return headerHeight + groupHeight;
-    }
+        => TablePaginator.FirstBodyGroupHeight(layout, table);
 
     // The height the NEXT block needs at the top of a page: the first line of a
     // paragraph, the header rows plus first body row of a table, or a whole image.
