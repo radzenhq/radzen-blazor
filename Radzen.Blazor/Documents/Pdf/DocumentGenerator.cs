@@ -128,9 +128,16 @@ internal sealed class DocumentGenerator
     private readonly FieldResolver fieldResolver;
     private readonly WatermarkEmitter watermarkEmitter;
 
+    // Fully tagged conformance (PDF/UA or PDF/A Level-A) forbids untagged real content, so
+    // pagination and decorative draws are wrapped in /Artifact marked content. Off for plain
+    // and Level-B output, which stays byte-identical.
+    private readonly bool markArtifacts;
+
     private DocumentGenerator(DocumentBuilder builder)
     {
         this.builder = builder;
+        markArtifacts = builder.PdfUA
+            || builder.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
         fonts = builder.Fonts;
         fontResolver = new(builder.Conformance);
         imageStore = new();
@@ -251,6 +258,7 @@ internal sealed class DocumentGenerator
         }
 
         document.Structure = structureTree.DocumentElement;
+        document.HasUntaggedListContent = structureTree.HasUntaggedList;
 
         foreach (var font in fontResolver.AllFonts)
         {
@@ -430,6 +438,13 @@ internal sealed class DocumentGenerator
     {
         using var writer = new ContentWriter();
 
+        var wrapArtifacts = markArtifacts && HasArtifactContent(plan);
+        if (wrapArtifacts)
+        {
+            writer.WriteName("Artifact");
+            writer.WriteRaw(" BDC\n");
+        }
+
         foreach (var fill in plan.Fills)
         {
             // A pattern colour space persists in the graphics state, so a gradient fill is
@@ -575,11 +590,27 @@ internal sealed class DocumentGenerator
             }
         }
 
+        if (wrapArtifacts)
+        {
+            writer.WriteRaw("EMC\n");
+        }
+
         structureTree.WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
 
         if (plan.Watermark is { } watermark)
         {
+            if (markArtifacts)
+            {
+                writer.WriteName("Artifact");
+                writer.WriteRaw(" BDC\n");
+            }
+
             WriteWatermark(writer, watermark);
+
+            if (markArtifacts)
+            {
+                writer.WriteRaw("EMC\n");
+            }
         }
 
         var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
@@ -631,6 +662,35 @@ internal sealed class DocumentGenerator
         }
 
         writer.WriteRaw("Q\n");
+    }
+
+    // Whether the page carries any non-structure (pagination/decorative) content that a
+    // fully tagged document must wrap in /Artifact: backgrounds, borders, or header/footer
+    // images and texts (the draws left untagged because they have no structure element).
+    private static bool HasArtifactContent(PagePlan plan)
+    {
+        if (plan.Fills.Count > 0 || plan.Edges.Count > 0 || plan.RoundedStrokes.Count > 0)
+        {
+            return true;
+        }
+
+        foreach (var image in plan.Images)
+        {
+            if (image.Element is null)
+            {
+                return true;
+            }
+        }
+
+        foreach (var text in plan.Texts)
+        {
+            if (text.Element is null)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void Accumulate<T>(Dictionary<StructureElement, List<T>> map, StructureElement element, T draw)

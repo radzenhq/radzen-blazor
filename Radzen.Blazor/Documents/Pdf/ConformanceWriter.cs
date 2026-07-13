@@ -47,6 +47,59 @@ internal sealed class ConformanceWriter(Document document)
             throw new InvalidOperationException(
                 "PDF/UA requires the document's natural language to be determinable; set DocumentBuilder.Language (e.g. \"en-US\").");
         }
+
+        if (document.PdfUA && string.IsNullOrEmpty(document.Info.Title))
+        {
+            throw new InvalidOperationException(
+                "PDF/UA requires a document title displayed by the viewer (DisplayDocTitle); set DocumentBuilder.Info.Title.");
+        }
+
+        ValidateTagging();
+    }
+
+    // Fully tagged conformance (PDF/UA, PDF/A Level-A) forbids untagged real content and
+    // requires alternate descriptions and structure-linked annotations. These are checked
+    // here so the writer fails loud instead of advertising a conformance it does not meet.
+    private void ValidateTagging()
+    {
+        if (!document.PdfUA && !IsLevelA(document.Conformance))
+        {
+            return;
+        }
+
+        if (document.Structure is { } structure)
+        {
+            ValidateFigureAltText(structure);
+        }
+
+        if (!document.PdfUA && document.HasUntaggedListContent)
+        {
+            throw new InvalidOperationException(
+                $"{Label} requires every list to be tagged, but the document has an untagged list; set DocumentBuilder.PdfUA to tag lists or remove them.");
+        }
+
+        foreach (var page in document.Pages)
+        {
+            if (page.Generated is { Links.Count: > 0 })
+            {
+                throw new InvalidOperationException(
+                    $"{Label} requires every link annotation to be referenced from the structure tree, which this library does not yet emit; remove the hyperlinks (Run.Link / Run.LinkToAnchor) to produce a conforming document.");
+            }
+        }
+    }
+
+    private void ValidateFigureAltText(StructureElement element)
+    {
+        if (element.Type == "Figure" && element.Alt is null && element.ActualText is null)
+        {
+            throw new InvalidOperationException(
+                $"{Label} requires every Figure to carry an alternate description; set Image.AlternateText or Image.ActualText.");
+        }
+
+        foreach (var child in element.Children)
+        {
+            ValidateFigureAltText(child);
+        }
     }
 
     private void ValidatePdfA()

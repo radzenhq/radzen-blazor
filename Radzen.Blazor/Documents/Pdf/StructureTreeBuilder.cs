@@ -11,8 +11,14 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
     private readonly Dictionary<object, StructureElement> blockElements = [];
     private readonly Dictionary<StructureElement, int> structureOrder = [];
     private StructureElement documentElement = null!;
+    private bool hasUntaggedList;
 
     public StructureElement DocumentElement => documentElement;
+
+    // True when the authoring DOM has a List the tree left untagged (lists are only mapped
+    // for PDF/UA). PDF/A Level-A rejects such untagged content, so the conformance writer
+    // fails loud instead of advertising a conformance it does not meet.
+    public bool HasUntaggedList => hasUntaggedList;
 
     public void Build()
     {
@@ -92,6 +98,9 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
                 break;
             case List list when builder.PdfUA:
                 MapList(list, parent);
+                break;
+            case List:
+                hasUntaggedList = true;
                 break;
             default:
                 break;

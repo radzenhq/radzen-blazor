@@ -100,6 +100,11 @@ public sealed class Document
     // Natural language of the document (catalog /Lang); required by PDF/UA.
     internal string? Language { get; set; }
 
+    // Set by the generator when the authoring DOM has a List the structure tree left
+    // untagged (lists are only tagged for PDF/UA). PDF/A Level-A rejects untagged real
+    // content, so the conformance writer fails loud rather than claim conformance.
+    internal bool HasUntaggedListContent { get; set; }
+
     // Files embedded on save (EmbeddedFiles name tree + /AF associated files).
     internal List<Attachment> Attachments { get; } = [];
 
