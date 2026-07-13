@@ -22,6 +22,11 @@ internal sealed class GeneratedSoftMask
 
     // Backdrop colour components in the group's colour space; null omits /BC.
     public double[]? Backdrop { get; init; }
+
+    // Content identity for deduplication: soft masks with an equal, non-null key produce the
+    // same SMask dictionary, so they can share one ExtGState and transparency group. Null opts
+    // out (the mask is always registered fresh).
+    public string? ContentKey { get; init; }
 }
 
 internal static class SoftMask
@@ -103,11 +108,13 @@ internal static class SoftMask
         };
 
         var alpha = shadow.Color.A / 255.0;
-        var extGState = plan.RegisterSoftMaskExtGState(alpha, alpha, new GeneratedSoftMask
+        var softMask = new GeneratedSoftMask
         {
             Type = SoftMaskType.Luminosity,
             Group = group,
-        });
+            ContentKey = ShadowKey(mask, left, bottom, rectWidth, rectHeight, alpha),
+        };
+        var extGState = Register(plan, alpha, softMask);
 
         plan.Fills.Add(new FillDraw
         {
@@ -118,5 +125,36 @@ internal static class SoftMask
             Color = shadow.Color,
             ExtGState = extGState,
         });
+    }
+
+    // Reuses an already-registered soft-mask ExtGState with the same content key so identical
+    // shadows share one mask; otherwise registers a fresh one.
+    private static string Register(PagePlan plan, double alpha, GeneratedSoftMask softMask)
+    {
+        if (softMask.ContentKey is { } key)
+        {
+            foreach (var state in plan.ExtGStates)
+            {
+                if (state.SoftMask is { ContentKey: { } existing } && existing == key)
+                {
+                    return state.Key;
+                }
+            }
+        }
+
+        return plan.RegisterSoftMaskExtGState(alpha, alpha, softMask);
+    }
+
+    // FNV-1a over the blurred raster pins pixel identity; placement and alpha complete it.
+    private static string ShadowKey(ShadowMask mask, double left, double bottom, double rectWidth, double rectHeight, double alpha)
+    {
+        var hash = 1469598103934665603UL;
+        foreach (var pixel in mask.Pixels)
+        {
+            hash = (hash ^ pixel) * 1099511628211UL;
+        }
+
+        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        return string.Create(culture, $"{mask.Width}x{mask.Height}:{hash:x}:{left}:{bottom}:{rectWidth}:{rectHeight}:{alpha}");
     }
 }

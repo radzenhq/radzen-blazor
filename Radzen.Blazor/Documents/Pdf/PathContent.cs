@@ -168,8 +168,12 @@ public sealed class PathContent : ContentElement
         // A path that intersects the clip region (W/W*) must be balanced by a q..Q so the
         // clip is confined to this element; otherwise it leaks and shrinks the paintable
         // region of every element that follows on the page. A pattern colour space also
-        // persists in the graphics state, so a gradient fill is scoped the same way.
-        var scoped = Clip != PathClipMode.None || FillGradient is not null;
+        // persists in the graphics state, so a gradient fill is scoped the same way. The
+        // optional stroke state (cap J, join j, miter M, intent ri, dash d) likewise persists,
+        // so a path that sets any of it is scoped too, keeping later paths at the viewer defaults.
+        var leaksStrokeState = Cap is not null || Join is not null || MiterLimit is not null
+            || Intent is not null || DashArray is not null;
+        var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState;
         if (scoped)
         {
             writer.WriteRaw("q\n");
