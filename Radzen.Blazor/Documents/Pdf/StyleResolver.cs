@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -219,7 +220,7 @@ internal static class StyleResolver
     private static List<Style> StyleChain(string? name, StyleCollection styles, bool includeNormal = true)
     {
         var chain = new List<Style>();
-        var visited = new HashSet<string>(System.StringComparer.Ordinal);
+        var visited = new HashSet<string>(StringComparer.Ordinal);
         while (name != null && styles.Contains(name) && visited.Add(name))
         {
             var style = styles[name];

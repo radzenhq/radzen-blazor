@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -12,7 +14,7 @@ public sealed class ImageContent : ContentElement
     /// <param name="encodedXObject">The pre-encoded image XObject bytes.</param>
     public ImageContent(byte[] encodedXObject)
     {
-        System.ArgumentNullException.ThrowIfNull(encodedXObject);
+        ArgumentNullException.ThrowIfNull(encodedXObject);
         EncodedXObject = encodedXObject;
     }
 

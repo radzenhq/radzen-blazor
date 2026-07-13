@@ -145,7 +145,7 @@ public sealed class Document
     /// <returns>The document text, or an empty string when there is no text.</returns>
     public string ExtractText()
     {
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         foreach (var page in Pages)
         {
             var text = page.ExtractText();
@@ -261,7 +261,7 @@ public sealed class Document
     /// <param name="stream">The destination stream.</param>
     public void SaveToStream(Stream stream)
     {
-        System.ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(stream);
 
         if (Conformance != PdfAConformance.None || PdfUA)
         {

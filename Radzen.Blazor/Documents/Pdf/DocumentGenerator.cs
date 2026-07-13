@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using static Radzen.Documents.Pdf.ContentEmitter;
@@ -167,7 +168,7 @@ internal sealed class DocumentGenerator
             return first;
         }
 
-        var tocPages = new Dictionary<string, int>(System.StringComparer.Ordinal);
+        var tocPages = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var (name, anchor) in first.Anchors)
         {
             tocPages[name] = anchor.PageIndex + 1;
@@ -210,7 +211,7 @@ internal sealed class DocumentGenerator
                 {
                     if (!tocPages.ContainsKey(entry.Anchor))
                     {
-                        throw new System.InvalidOperationException(
+                        throw new InvalidOperationException(
                             $"Table of contents entry anchor '{entry.Anchor}' does not exist; set Run.Anchor on the destination run.");
                     }
                 }
@@ -241,7 +242,7 @@ internal sealed class DocumentGenerator
             // RTL / vertical shaping is not implemented; fail loudly rather than silently laying out LTR.
             if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
             {
-                throw new System.NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
+                throw new NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
             }
 
             foreach (var page in Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution, tocPages))
@@ -635,9 +636,9 @@ internal sealed class DocumentGenerator
             writer.WriteRaw(" gs\n");
         }
 
-        var radians = watermark.Rotation * System.Math.PI / 180;
-        var cos = System.Math.Cos(radians);
-        var sin = System.Math.Sin(radians);
+        var radians = watermark.Rotation * Math.PI / 180;
+        var cos = Math.Cos(radians);
+        var sin = Math.Sin(radians);
         var negSin = sin == 0 ? 0 : -sin;
         writer.WriteNumber(cos);
         writer.WriteRaw(" ");

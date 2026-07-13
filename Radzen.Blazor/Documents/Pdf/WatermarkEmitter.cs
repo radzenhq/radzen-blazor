@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using static Radzen.Documents.Pdf.GeneratorFontResolver;
 
@@ -97,7 +98,7 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
             {
                 if (!IsWinAnsi(c))
                 {
-                    throw new System.NotSupportedException(
+                    throw new NotSupportedException(
                         $"Watermark text contains a character (U+{(int)c:X4}) not representable in the base-14 WinAnsi encoding; register a font that covers it.");
                 }
             }

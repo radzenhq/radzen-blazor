@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -13,7 +15,7 @@ public sealed class XObjectContent : ContentElement
     /// <param name="name">The XObject resource name, without the leading slash.</param>
     public XObjectContent(string name)
     {
-        System.ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(name);
         Name = name;
     }
 

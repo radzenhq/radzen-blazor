@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
@@ -23,9 +25,9 @@ internal sealed class XmpMetadata
 
     public string Producer { get; set; } = "";
 
-    public System.DateTimeOffset? CreationDate { get; set; }
+    public DateTimeOffset? CreationDate { get; set; }
 
-    public System.DateTimeOffset? ModificationDate { get; set; }
+    public DateTimeOffset? ModificationDate { get; set; }
 
     public int? PdfAPart { get; set; }
 
@@ -191,8 +193,8 @@ internal sealed class XmpMetadata
 
     // XMP dates are ISO 8601 (yyyy-MM-ddThh:mm:ss+hh:mm); the caller-supplied offset
     // is preserved verbatim so the value round-trips without reading any clock.
-    private static string FormatDate(System.DateTimeOffset value)
-        => value.ToString("yyyy-MM-dd'T'HH:mm:sszzz", System.Globalization.CultureInfo.InvariantCulture);
+    private static string FormatDate(DateTimeOffset value)
+        => value.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);
 
     private static string Escape(string value)
     {

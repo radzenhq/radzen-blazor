@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +32,7 @@ internal static class GlyfSubsetter
         }
         finally
         {
-            System.Buffers.ArrayPool<byte>.Shared.Return(rented);
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 
@@ -74,7 +75,7 @@ internal static class GlyfSubsetter
             glyfUpperBound += (int)(loca[gid + 1] - loca[gid]) + 1;
         }
 
-        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var pool = ArrayPool<byte>.Shared;
         var newGlyf = pool.Rent(Math.Max(glyfUpperBound, 1));
         var newLoca = new byte[(count + 1) * 4];
         try
@@ -444,7 +445,7 @@ internal static class GlyfSubsetter
         }
 
         length = cursor;
-        var pool = System.Buffers.ArrayPool<byte>.Shared;
+        var pool = ArrayPool<byte>.Shared;
         var file = pool.Rent(cursor);
 
         // The caller owns the buffer on success; a throw before that must return it.

@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -162,8 +164,8 @@ internal sealed class PagePlan
     // Dedup indexes over ExtGStates: plain (alpha/blend/overprint/intent) states by their
     // composite tuple, soft-mask states by their content key. Both back the linear scans that
     // otherwise made registration O(n^2) on pages with many distinct states or shadows.
-    private readonly Dictionary<string, string> extGStateKeys = new(System.StringComparer.Ordinal);
-    private readonly Dictionary<string, string> softMaskKeys = new(System.StringComparer.Ordinal);
+    private readonly Dictionary<string, string> extGStateKeys = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> softMaskKeys = new(StringComparer.Ordinal);
 
     // Caches the blurred coverage raster by geometry so a grid of identically shaped shadows
     // (differing only in position) runs the Coverage+Blur passes once instead of per placement.
@@ -202,17 +204,17 @@ internal sealed class PagePlan
         int? overprintMode,
         RenderingIntent? intent)
     {
-        fillAlpha = System.Math.Clamp(fillAlpha, 0, 1);
-        strokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1);
+        fillAlpha = Math.Clamp(fillAlpha, 0, 1);
+        strokeAlpha = Math.Clamp(strokeAlpha, 0, 1);
         var dedupKey = string.Create(
-            System.Globalization.CultureInfo.InvariantCulture,
+            CultureInfo.InvariantCulture,
             $"{fillAlpha}|{strokeAlpha}|{blend}|{overprintStroke}|{overprintFill}|{overprintMode}|{intent}");
         if (extGStateKeys.TryGetValue(dedupKey, out var existing))
         {
             return existing;
         }
 
-        var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
         ExtGStates.Add(new GeneratedExtGState
         {
             Key = key,
@@ -238,12 +240,12 @@ internal sealed class PagePlan
             return existing;
         }
 
-        var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
         ExtGStates.Add(new GeneratedExtGState
         {
             Key = key,
-            FillAlpha = System.Math.Clamp(fillAlpha, 0, 1),
-            StrokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1),
+            FillAlpha = Math.Clamp(fillAlpha, 0, 1),
+            StrokeAlpha = Math.Clamp(strokeAlpha, 0, 1),
             SoftMask = softMask,
         });
         if (softMask.ContentKey is { } key2)
@@ -265,7 +267,7 @@ internal sealed class PagePlan
             }
         }
 
-        var key = "P" + Patterns.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        var key = "P" + Patterns.Count.ToString(CultureInfo.InvariantCulture);
         Patterns.Add(new GeneratedPattern { Key = key, Gradient = gradient });
         return key;
     }
@@ -341,7 +343,7 @@ internal sealed class PagePlan
             var fill = Fills[i];
             if (fill.Radius > 0 || (fill.Clip is not null && fill.ClipRadius > 0))
             {
-                throw new System.NotSupportedException(
+                throw new NotSupportedException(
                     "A rotated box cannot preserve rounded corners or a rounded clip; remove the corner radius or the rotation.");
             }
         }
@@ -350,7 +352,7 @@ internal sealed class PagePlan
         {
             if (RoundedStrokes[i].Radius > 0)
             {
-                throw new System.NotSupportedException(
+                throw new NotSupportedException(
                     "A rotated box cannot preserve a rounded border; remove the corner radius or the rotation.");
             }
         }

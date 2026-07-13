@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -56,7 +57,7 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
             ? generated
             : new GeneratedImage
             {
-                Key = "Imo" + preparedCount++.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                Key = "Imo" + preparedCount++.ToString(CultureInfo.InvariantCulture),
                 Image = applied,
             };
         prepared[source] = result;

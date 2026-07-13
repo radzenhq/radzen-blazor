@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -24,7 +26,7 @@ public class Column
         {
             if (value is { } weight && !(weight > 0))
             {
-                throw new System.ArgumentOutOfRangeException(nameof(value), value, "The relative width must be positive.");
+                throw new ArgumentOutOfRangeException(nameof(value), value, "The relative width must be positive.");
             }
 
             relativeWidth = value;

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace Radzen.Documents.Pdf;
@@ -37,7 +38,7 @@ public sealed class Watermark
     /// <returns>The buffered <see cref="Pdf.Image"/>; its sizing members control the drawn size.</returns>
     public Image SetImage(Stream image)
     {
-        System.ArgumentNullException.ThrowIfNull(image);
+        ArgumentNullException.ThrowIfNull(image);
         Image = Image.FromStream(image);
         return Image;
     }

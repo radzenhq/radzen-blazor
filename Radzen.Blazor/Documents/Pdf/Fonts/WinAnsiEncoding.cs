@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
@@ -127,14 +128,14 @@ internal static class WinAnsiEncoding
         }
 
         if (name.Length == 7 && name.StartsWith("uni", StringComparison.Ordinal)
-            && int.TryParse(name.AsSpan(3), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var uni))
+            && int.TryParse(name.AsSpan(3), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var uni))
         {
             codePoint = uni;
             return true;
         }
 
         if (name.Length is >= 5 and <= 7 && name[0] == 'u'
-            && int.TryParse(name.AsSpan(1), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out var u))
+            && int.TryParse(name.AsSpan(1), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var u))
         {
             codePoint = u;
             return true;

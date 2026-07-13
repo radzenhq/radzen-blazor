@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
@@ -122,7 +124,7 @@ internal static class CffDict
 
     public static void WriteNumber(List<byte> dst, double value)
     {
-        if (value == System.Math.Floor(value) && value is >= int.MinValue and <= int.MaxValue)
+        if (value == Math.Floor(value) && value is >= int.MinValue and <= int.MaxValue)
         {
             WriteInteger(dst, (int)value);
         }
@@ -206,7 +208,7 @@ internal static class CffDict
 
     private static int ParseReal(byte[] data, int i, out double value)
     {
-        var text = new System.Text.StringBuilder();
+        var text = new StringBuilder();
         var done = false;
         while (i < data.Length && !done)
         {

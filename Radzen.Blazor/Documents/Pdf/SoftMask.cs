@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf;
@@ -136,7 +137,7 @@ internal static class SoftMask
             hash = (hash ^ pixel) * 1099511628211UL;
         }
 
-        var culture = System.Globalization.CultureInfo.InvariantCulture;
+        var culture = CultureInfo.InvariantCulture;
         return string.Create(culture, $"{mask.Width}x{mask.Height}:{hash:x}:{left}:{bottom}:{rectWidth}:{rectHeight}:{alpha}");
     }
 }

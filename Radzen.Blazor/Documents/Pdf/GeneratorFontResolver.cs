@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf.Fonts;
@@ -11,7 +12,7 @@ namespace Radzen.Documents.Pdf;
 internal sealed class GeneratorFontResolver(PdfAConformance conformance)
 {
     private readonly List<GeneratedFont> allFonts = [];
-    private readonly Dictionary<string, GeneratedFont> base14Fonts = new(System.StringComparer.Ordinal);
+    private readonly Dictionary<string, GeneratedFont> base14Fonts = new(StringComparer.Ordinal);
     private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
 
     public IReadOnlyList<GeneratedFont> AllFonts => allFonts;
@@ -34,7 +35,7 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
         var name = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
         if (conformance != PdfAConformance.None)
         {
-            throw new System.InvalidOperationException(
+            throw new InvalidOperationException(
                 $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{font.Name}' with DocumentBuilder.Fonts instead.");
         }
 
@@ -73,7 +74,7 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     // the /ToUnicode CMap the embedder writes on save.
     public static Dictionary<string, ReverseFont> BuildExtractionFonts(GeneratedPage generated)
     {
-        var map = new Dictionary<string, ReverseFont>(System.StringComparer.Ordinal);
+        var map = new Dictionary<string, ReverseFont>(StringComparer.Ordinal);
         foreach (var font in generated.Fonts)
         {
             map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));

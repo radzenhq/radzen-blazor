@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -668,7 +669,7 @@ internal sealed class FormWriter(Document document)
 
     private static string DefaultAppearanceOf(Font font)
         => "/" + BaseFontOf(font)
-            + " " + font.Size.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)
+            + " " + font.Size.ToString("0.###", CultureInfo.InvariantCulture)
             + " Tf 0 g";
 
     // Imports the /Annots of every appended loaded page (seeding its new page ref

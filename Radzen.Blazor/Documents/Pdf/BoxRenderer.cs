@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Documents.Pdf;
 
 // Paints a box's background fill and borders into a page plan - the single code path
@@ -82,7 +84,7 @@ internal static class BoxRenderer
             return 0;
         }
 
-        return System.Math.Min(radius, System.Math.Min(width, height) / 2);
+        return Math.Min(radius, Math.Min(width, height) / 2);
     }
 
     private static void EmitEdge(PagePlan plan, Border border, double x1, double y1, double x2, double y2, string? extGState)

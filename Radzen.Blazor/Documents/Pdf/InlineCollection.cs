@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
@@ -37,7 +39,7 @@ public class InlineCollection : IReadOnlyList<Run>
     /// <exception cref="System.ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
     public Run Add(Run run)
     {
-        System.ArgumentNullException.ThrowIfNull(run);
+        ArgumentNullException.ThrowIfNull(run);
         items.Add(run);
         return run;
     }
@@ -49,9 +51,9 @@ public class InlineCollection : IReadOnlyList<Run>
     /// <param name="stream">The source image stream.</param>
     /// <returns>The newly created inline image.</returns>
     /// <exception cref="System.ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public InlineImage AddImage(System.IO.Stream stream)
+    public InlineImage AddImage(Stream stream)
     {
-        System.ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(stream);
         var image = InlineImage.FromStream(stream);
         items.Add(image);
         return image;

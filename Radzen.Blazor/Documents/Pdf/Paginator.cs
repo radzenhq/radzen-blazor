@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -142,7 +144,7 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         DocumentBuilder document,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage = null,
+        Func<Image, double, (double Width, double Height)>? measureImage = null,
         StyleResolution? resolution = null)
     {
         var pages = new List<PaginatedPage>();
@@ -157,9 +159,9 @@ internal static class Paginator
     public static IReadOnlyList<PaginatedPage> Paginate(
         Section section,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage = null,
+        Func<Image, double, (double Width, double Height)>? measureImage = null,
         StyleResolution? resolution = null,
-        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null)
+        IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var pages = new List<PaginatedPage>();
         PaginateSection(section, fonts, pages, measureImage, resolution ?? StyleResolution.Empty, tocPages);
@@ -170,9 +172,9 @@ internal static class Paginator
         Section section,
         FontCollection fonts,
         List<PaginatedPage> pages,
-        System.Func<Image, double, (double Width, double Height)>? measureImage,
+        Func<Image, double, (double Width, double Height)>? measureImage,
         StyleResolution resolution,
-        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null)
+        IReadOnlyDictionary<string, int>? tocPages = null)
     {
         var (pageWidth, pageHeight) = EffectiveSize(section);
         var left = section.Margins.Left.Point;
@@ -191,8 +193,8 @@ internal static class Paginator
         // margin shrinks the body so they never overlap.
         var headerDistance = section.HeaderDistance.Point;
         var footerDistance = section.FooterDistance.Point;
-        var contentTop = System.Math.Max(top, header.Height > 0 ? headerDistance + header.Height : 0);
-        var contentBottom = System.Math.Max(bottom, footer.Height > 0 ? footerDistance + footer.Height : 0);
+        var contentTop = Math.Max(top, header.Height > 0 ? headerDistance + header.Height : 0);
+        var contentBottom = Math.Max(bottom, footer.Height > 0 ? footerDistance + footer.Height : 0);
         var contentBox = new Rect(left, contentTop, contentWidth, pageHeight - contentTop - contentBottom);
         var contentHeight = contentBox.Height;
 
@@ -261,7 +263,7 @@ internal static class Paginator
         // row group cannot fit. Every later fragment starts a fresh page at full height.
         void PlaceTable(int index, Table table)
         {
-            var layout = tableLayouts[index] ??= TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+            var layout = tableLayouts[index] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
 
             if (HasPageContent() && cursor + TableFirstFragmentHeight(table, layout) > contentHeight + Eps)
             {
@@ -298,7 +300,7 @@ internal static class Paginator
         {
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
-            var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
+            var indent = Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
             var measured = boxMeasures[index] ??= MeasureBox(container, contentWidth, fonts, measureImage);
             var boxHeight = measured.Height + (2 * padding);
 
@@ -331,7 +333,7 @@ internal static class Paginator
         {
             var placements = new List<(Table Table, LaidOutTable Layout)>();
             var boxWidth = container.Width?.Point ?? contentWidth;
-            var indent = System.Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
+            var indent = Math.Max(0, AlignImage(container.Alignment, contentWidth, boxWidth));
             var boxLeft = left + indent;
 
             var boxHeight = 2 * container.Padding.Point;
@@ -339,7 +341,7 @@ internal static class Paginator
             {
                 var table = OverlayChildTable(container, child, boxWidth, indent);
                 var layout = TableLayout.Layout(table, boxWidth, fonts, measureImage);
-                boxHeight = System.Math.Max(boxHeight, layout.Height);
+                boxHeight = Math.Max(boxHeight, layout.Height);
                 placements.Add((table, layout));
             }
 
@@ -471,7 +473,7 @@ internal static class Paginator
 
             if (block is not Paragraph para)
             {
-                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
+                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
             }
 
             if (broken[i] is not { } lines)
@@ -643,7 +645,7 @@ internal static class Paginator
         BlockCollection blocks,
         double availableWidth,
         bool keepSpecialContainers = false,
-        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages = null,
+        IReadOnlyDictionary<string, int>? tocPages = null,
         FontCollection? fonts = null)
     {
         var needsExpansion = false;
@@ -678,7 +680,7 @@ internal static class Paginator
                 // handle them - nested content cannot host a page-space transform.
                 if (!keepSpecialContainers && (IsSpecial(container) || container.Rotation != 0))
                 {
-                    throw new System.NotSupportedException(
+                    throw new NotSupportedException(
                         "Overlay and rotated containers are only supported as direct section content.");
                 }
 
@@ -688,7 +690,7 @@ internal static class Paginator
             {
                 if (!keepSpecialContainers)
                 {
-                    throw new System.NotSupportedException(
+                    throw new NotSupportedException(
                         "A table of contents is only supported as direct section content.");
                 }
 
@@ -722,12 +724,12 @@ internal static class Paginator
         TableOfContents toc,
         List<Block> expanded,
         double availableWidth,
-        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages,
+        IReadOnlyDictionary<string, int>? tocPages,
         FontCollection? fonts)
     {
         if (fonts is null)
         {
-            throw new System.InvalidOperationException("A table of contents requires font metrics to lower.");
+            throw new InvalidOperationException("A table of contents requires font metrics to lower.");
         }
 
         foreach (var entry in toc.Entries)
@@ -740,13 +742,13 @@ internal static class Paginator
         TableOfContents toc,
         TocEntry entry,
         double availableWidth,
-        System.Collections.Generic.IReadOnlyDictionary<string, int>? tocPages,
+        IReadOnlyDictionary<string, int>? tocPages,
         FontCollection fonts)
     {
         var indent = toc.LevelIndent.Point * entry.Level;
         var max = availableWidth - indent;
         var reserve = fonts.MeasureText(TocPagePlaceholder, toc.Font) + 2;
-        var stop = System.Math.Max(0, max - reserve);
+        var stop = Math.Max(0, max - reserve);
 
         var paragraph = new Paragraph { LeftIndent = Unit.FromPoint(indent) };
         paragraph.Font.InheritFrom(toc.Font);
@@ -763,7 +765,7 @@ internal static class Paginator
         {
             var textWidth = fonts.MeasureText(text, toc.Font);
             var spaceWidth = fonts.MeasureText(" ", toc.Font);
-            var count = (int)System.Math.Floor((stop - TocLeaderGap - textWidth - spaceWidth) / leaderWidth);
+            var count = (int)Math.Floor((stop - TocLeaderGap - textWidth - spaceWidth) / leaderWidth);
             if (count >= 1)
             {
                 paragraph.Inlines.Add(" " + new string(toc.Leader, count)).Font.InheritFrom(toc.Font);
@@ -773,7 +775,7 @@ internal static class Paginator
         paragraph.Inlines.Add("\t").Font.InheritFrom(toc.Font);
 
         var number = tocPages is not null && tocPages.TryGetValue(entry.Anchor, out var page)
-            ? page.ToString(System.Globalization.CultureInfo.InvariantCulture)
+            ? page.ToString(CultureInfo.InvariantCulture)
             : TocPagePlaceholder;
         var numberRun = paragraph.Inlines.Add(number);
         numberRun.LinkToAnchor = entry.Anchor;
@@ -913,7 +915,7 @@ internal static class Paginator
 
     private static string Marker(List list, int index)
         => list.Style == ListStyle.Number
-            ? (index + 1).ToString(System.Globalization.CultureInfo.InvariantCulture) + "."
+            ? (index + 1).ToString(CultureInfo.InvariantCulture) + "."
             : BulletGlyph;
 
     private static double AlignImage(HorizontalAlignment alignment, double containerWidth, double imageWidth)
@@ -931,9 +933,9 @@ internal static class Paginator
         Container container,
         double contentWidth,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage)
+        Func<Image, double, (double Width, double Height)>? measureImage)
     {
-        var innerWidth = System.Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
+        var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
         return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage);
     }
 
@@ -950,8 +952,8 @@ internal static class Paginator
     {
         var padding = container.Padding.Point;
         var boxWidth = container.Width?.Point ?? availableWidth;
-        var indent = System.Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
-        var innerWidth = System.Math.Max(0, boxWidth - (2 * padding));
+        var indent = Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
+        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
         var boxHeight = measured.Height + (2 * padding);
         var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
         var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
@@ -986,7 +988,7 @@ internal static class Paginator
         int index,
         double contentWidth,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage,
+        Func<Image, double, (double Width, double Height)>? measureImage,
         out double spacingBefore,
         out double height)
     {
@@ -1005,7 +1007,7 @@ internal static class Paginator
                 height = lines[0].Height;
                 return true;
             case Table table:
-                var layout = tableLayouts[next] ??= TableLayout.Layout(table, System.Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+                var layout = tableLayouts[next] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
                 height = TableFirstFragmentHeight(table, layout);
                 return true;
             case Container container when !IsSpecial(container):
@@ -1055,7 +1057,7 @@ internal static class Paginator
         HeaderFooter band,
         double width,
         FontCollection fonts,
-        System.Func<Image, double, (double Width, double Height)>? measureImage,
+        Func<Image, double, (double Width, double Height)>? measureImage,
         StyleResolution resolution)
     {
         var result = new BandLayout();
@@ -1080,7 +1082,7 @@ internal static class Paginator
 
             if (block is Table table)
             {
-                var layout = TableLayout.Layout(table, System.Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
+                var layout = TableLayout.Layout(table, Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
                 var tableOrder = order++;
                 foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
                 {
@@ -1135,7 +1137,7 @@ internal static class Paginator
 
             if (block is not Paragraph paragraph)
             {
-                throw new System.NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
+                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
             }
 
             var lines = LineBreaker.Break(paragraph, width, fonts, resolution.Alignment(paragraph));

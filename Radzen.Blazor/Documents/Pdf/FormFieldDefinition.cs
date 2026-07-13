@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace Radzen.Documents.Pdf;
 
 
@@ -11,7 +14,7 @@ public abstract class FormFieldDefinition
 {
     private protected FormFieldDefinition(string name)
     {
-        System.ArgumentException.ThrowIfNullOrEmpty(name);
+        ArgumentException.ThrowIfNullOrEmpty(name);
         Name = name;
     }
 
@@ -98,10 +101,10 @@ public sealed class RadioOptionDefinition
     /// <param name="value">The export value; also the widget's on-state name. Must not be <c>Off</c>.</param>
     public RadioOptionDefinition(string value)
     {
-        System.ArgumentException.ThrowIfNullOrEmpty(value);
-        if (string.Equals(value, "Off", System.StringComparison.Ordinal))
+        ArgumentException.ThrowIfNullOrEmpty(value);
+        if (string.Equals(value, "Off", StringComparison.Ordinal))
         {
-            throw new System.ArgumentException("A radio option value cannot be 'Off'; that name is reserved for the unselected state.", nameof(value));
+            throw new ArgumentException("A radio option value cannot be 'Off'; that name is reserved for the unselected state.", nameof(value));
         }
 
         Value = value;
@@ -136,7 +139,7 @@ public sealed class RadioOptionDefinition
 public sealed class RadioGroupFieldDefinition(string name) : FormFieldDefinition(name)
 {
     /// <summary>Gets the selectable options. At least two, with distinct values.</summary>
-    public System.Collections.Generic.List<RadioOptionDefinition> Options { get; } = [];
+    public List<RadioOptionDefinition> Options { get; } = [];
 
     /// <summary>
     /// Gets or sets the value of the initially selected option, or <c>null</c> when
@@ -158,7 +161,7 @@ public sealed class RadioGroupFieldDefinition(string name) : FormFieldDefinition
 public sealed class ChoiceFieldDefinition(string name) : FormFieldDefinition(name)
 {
     /// <summary>Gets the options exported to <c>/Opt</c>.</summary>
-    public System.Collections.Generic.List<string> Options { get; } = [];
+    public List<string> Options { get; } = [];
 
     /// <summary>Gets or sets the selected value (<c>/V</c>). Defaults to empty.</summary>
     public string Value { get; set; } = string.Empty;
