@@ -74,72 +74,7 @@ public static class QrEncoder
 {
     /// <summary>Encode a UTF-8 string into a QR module matrix.</summary>
     public static bool[,] EncodeUtf8(string value, QrErrorCorrection ecc, int minVersion = 1, int maxVersion = 40)
-    {
-        var data = Encoding.UTF8.GetBytes(value ?? string.Empty);
-
-        for (int ver = minVersion; ver <= maxVersion; ver++)
-        {
-            // --- Compute capacity from EC params
-            var (dataCwCount, ecPerBlock, g1, g1dcw, g2, g2dcw) = EcParams(ver, ecc);
-            int capacityBits = dataCwCount * 8;
-
-            // --- Build header (BYTE mode) exactly as per spec
-            int charCountBits = ver <= 9 ? 8 : 16;
-            var bb = new BitBuffer();
-            bb.AppendBits(0b0100, 4);                     // mode: BYTE
-            bb.AppendBits(data.Length, charCountBits);    // char count
-            foreach (var b in data)
-            {
-                bb.AppendBits(b, 8);  // payload
-            }
-
-            // --- Fit math (this is the authoritative acceptance test)
-            int baseBits = bb.Length;                     // header+data bits
-            if (baseBits > capacityBits)                  // early reject
-            {
-                continue;
-            }
-
-            int needed = baseBits + Math.Min(4, capacityBits - baseBits); // add up to 4-bit terminator
-            needed += (8 - (needed % 8)) % 8;            // pad to byte boundary
-
-            if (needed > capacityBits)
-            {
-                continue; // try next version
-            }
-
-            // --- Build data codewords (pads 0xEC/0x11 as needed)
-            var dataCwBytes = BuildDataCodewords(bb, dataCwCount);
-
-            // --- Split into blocks, make EC, interleave
-            var blocks = BuildBlocks(dataCwBytes, ecPerBlock, g1, g1dcw, g2, g2dcw);
-            var final = Interleave(blocks);
-
-            // --- Base matrix + place + mask + format (+version if v>=7)
-            var (m, reserved) = BuildBaseMatrix(ver);
-            PlaceData(m, reserved, final);
-
-            int bestMask = ChooseBestMask(m, reserved);  // or force 0 while testing
-            ApplyMask(m, reserved, bestMask);            // mask only NON-reserved
-            WriteFormatInfo(m, reserved, ecc, bestMask); // write both copies
-            if (ver >= 7)
-            {
-                WriteVersionInfo(m, reserved, ver);
-            }
-
-            //var sb = new StringBuilder();
-            //sb.AppendLine("DATA: " + BitConverter.ToString(dataCwBytes));
-            //sb.AppendLine("EC  : " + BitConverter.ToString(blocks[0].Ec));
-            //int ecl = 0; // M=00
-            //int fmt = BchEncode((ecl << 3) | 0 /*mask 0*/, 0x537, 15, 5) ^ 0x5412;
-            //sb.AppendLine("FMT : " + Convert.ToString(fmt, 2).PadLeft(15, '0'));
-
-            return m;
-        }
-
-        // If we get here, nothing fit. Throw with diagnostics so you see why.
-        throw new ArgumentException($"Data too long for versions {minVersion}..{maxVersion} at ECC={ecc}.");
-    }
+        => EncodeBytes(Encoding.UTF8.GetBytes(value ?? string.Empty), ecc, minVersion, maxVersion);
 
     /// <summary>Encode raw bytes into a QR module matrix.</summary>
     public static bool[,] EncodeBytes(byte[] data, QrErrorCorrection ecc = QrErrorCorrection.Medium, int minVersion = 1, int maxVersion = 40)
@@ -151,65 +86,55 @@ public static class QrEncoder
             throw new ArgumentOutOfRangeException(nameof(minVersion), "Version range must be within 1..40");
         }
 
-        // Try versions until payload (with headers) fits into available data bits
+        // Try versions until payload (with headers) fits into available data bits.
         for (int ver = minVersion; ver <= maxVersion; ver++)
         {
-            int charCountBits = (ver <= 9) ? 8 : 16; // byte mode: v1-9:8, v10-40:16
+            int charCountBits = ver <= 9 ? 8 : 16; // byte mode: v1-9:8, v10-40:16
             var bb = new BitBuffer();
-            // Mode = Byte (0100)
-            bb.AppendBits(0b0100, 4);
-            bb.AppendBits(data.Length, charCountBits);
+            bb.AppendBits(0b0100, 4);                  // mode: BYTE
+            bb.AppendBits(data.Length, charCountBits); // char count
             foreach (byte b in data)
             {
-                bb.AppendBits(b, 8);
+                bb.AppendBits(b, 8);                   // payload
             }
 
             var (dataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw) = EcParams(ver, ecc);
             int capacityBits = dataCw * 8;
 
-            // Terminator up to 4 bits
-            int needed = bb.Length + Math.Min(4, Math.Max(0, capacityBits - bb.Length));
-            // Pad to byte
-            needed += (8 - (needed % 8)) % 8;
-
-            if (needed <= capacityBits)
+            if (bb.Length > capacityBits)
             {
-                // Build final data codewords (with pad bytes 0xEC, 0x11)
-                var dataCwBytes = BuildDataCodewords(bb, dataCw);
-
-                // Split into blocks and generate EC codewords
-                var blocks = BuildBlocks(dataCwBytes, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw);
-
-                // Interleave data & EC codewords
-                var final = Interleave(blocks);
-
-                // Build base matrix with patterns
-                var (m, reserved) = BuildBaseMatrix(ver);
-
-                // Place data bits (zig-zag)
-                PlaceData(m, reserved, final);
-
-                // Choose best mask and apply
-                int bestMask = ChooseBestMask(m, reserved);
-                ApplyMask(m, reserved, bestMask);
-                WriteFormatInfo(m, reserved, ecc, bestMask);
-
-                ApplyMask(m, reserved, bestMask);
-
-                // Write format info (depends on ECC + mask)
-                WriteFormatInfo(m, reserved, ecc, bestMask);
-
-                // Write version info for v7+
-                if (ver >= 7)
-                {
-                    WriteVersionInfo(m, reserved, ver);
-                }
-
-                return m;
+                continue; // header+data already overflow this version
             }
+
+            int needed = bb.Length + Math.Min(4, capacityBits - bb.Length); // add up to 4-bit terminator
+            needed += (8 - (needed % 8)) % 8;                               // pad to byte boundary
+
+            if (needed > capacityBits)
+            {
+                continue; // try next version
+            }
+
+            var dataCwBytes = BuildDataCodewords(bb, dataCw);
+            var blocks = BuildBlocks(dataCwBytes, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw);
+            var final = Interleave(blocks);
+
+            var (m, reserved) = BuildBaseMatrix(ver);
+            PlaceData(m, reserved, final);
+
+            // Apply the chosen data mask exactly once; the format bits below record which mask
+            // was used. Masking twice would XOR-cancel and leave an undecodable matrix.
+            int bestMask = ChooseBestMask(m, reserved);
+            ApplyMask(m, reserved, bestMask);
+            WriteFormatInfo(m, reserved, ecc, bestMask);
+            if (ver >= 7)
+            {
+                WriteVersionInfo(m, reserved, ver);
+            }
+
+            return m;
         }
 
-        throw new ArgumentException("Data too long for the given version range and ECC.");
+        throw new ArgumentException($"Data too long for versions {minVersion}..{maxVersion} at ECC={ecc}.");
     }
 
     /// <summary>Render a module matrix into an SVG string with a 4-module quiet zone.</summary>

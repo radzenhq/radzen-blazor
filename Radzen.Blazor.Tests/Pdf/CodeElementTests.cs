@@ -89,7 +89,7 @@ public class CodeElementTests
     }
 
     [Fact]
-    public void Barcode_Code128_EmitsBarRects_SpanningDeclaredWidth()
+    public void Barcode_Code128_EmitsBarRects_WithinDeclaredWidth()
     {
         const string value = "RADZEN";
         var builder = new DocumentBuilder();
@@ -116,8 +116,36 @@ public class CodeElementTests
         Assert.Equal(expectedBars, rects.Count);
         Assert.All(rects, r => Assert.Equal(40.0, r.H, 3));
 
+        // The symbol plus its quiet zones spans exactly the declared width; the bars alone fit inside.
         var span = rects.Max(r => r.X + r.W) - rects.Min(r => r.X);
-        Assert.Equal(200.0, span, 2);
+        Assert.True(span < 200.0, $"bars span {span} should be narrower than the declared width once quiet zones are added");
+    }
+
+    [Fact]
+    public void Barcode_Code128_LeavesSpecQuietZoneWithinDeclaredWidth()
+    {
+        const string value = "RADZEN";
+        const double width = 200.0;
+        const int quiet = 10; // Code128 minimum quiet zone in modules
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(width), Unit.FromPoint(40));
+
+        // Symbol width in modules (no quiet zone), and the total the emitter scales into `width`.
+        var (_, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Code128, value, 40, 0);
+        var total = symbolModules + 2 * quiet;
+        var scaleX = width / total;
+
+        var reader = BuildTestSupport.Read(builder);
+        var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
+
+        // Bars occupy only the symbol modules; the remaining declared width is the quiet zone,
+        // split evenly on both sides. These are independent of the block's page position.
+        var barsSpan = rects.Max(r => r.X + r.W) - rects.Min(r => r.X);
+        var totalQuiet = width - barsSpan;
+
+        Assert.Equal(symbolModules * scaleX, barsSpan, 2);
+        Assert.Equal(2 * quiet * scaleX, totalQuiet, 2);
     }
 
     [Fact]
