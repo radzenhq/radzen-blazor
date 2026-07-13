@@ -31,28 +31,50 @@ internal static class ShadingBuilder
         ["Shading"] = BuildShading(brush),
     };
 
-    // A single stop is a constant colour; two stops interpolate directly; more stops
-    // stitch one exponential subfunction per adjacent pair over the [0 1] domain.
+    // A single stop is a constant colour. Stops that span the full [0 1] domain interpolate
+    // directly (two stops) or stitch one exponential per adjacent pair; stops that start after
+    // 0 or end before 1 hold the endpoint colour constant over the leading/trailing sub-range,
+    // so the stop offsets are honoured instead of being stretched across the whole axis.
     public static DictionaryObject BuildFunction(IReadOnlyList<GradientStop> stops)
     {
-        if (stops.Count <= 2)
+        if (stops.Count == 1)
+        {
+            return Exponential(stops[0].Color, stops[0].Color);
+        }
+
+        var leading = stops[0].Offset > 0;
+        var trailing = stops[stops.Count - 1].Offset < 1;
+        if (stops.Count == 2 && !leading && !trailing)
         {
             return Exponential(stops[0].Color, stops[stops.Count - 1].Color);
         }
 
         ArrayObject functions = [];
+        ArrayObject bounds = [];
         ArrayObject encode = [];
+
+        if (leading)
+        {
+            functions.Add(Exponential(stops[0].Color, stops[0].Color));
+            AddUnitEncode(encode);
+            bounds.Add(new NumberObject(stops[0].Offset));
+        }
+
         for (var i = 0; i < stops.Count - 1; i++)
         {
             functions.Add(Exponential(stops[i].Color, stops[i + 1].Color));
-            encode.Add(new NumberObject(0));
-            encode.Add(new NumberObject(1));
+            AddUnitEncode(encode);
+            if (i < stops.Count - 2)
+            {
+                bounds.Add(new NumberObject(stops[i + 1].Offset));
+            }
         }
 
-        ArrayObject bounds = [];
-        for (var i = 1; i < stops.Count - 1; i++)
+        if (trailing)
         {
-            bounds.Add(new NumberObject(stops[i].Offset));
+            bounds.Add(new NumberObject(stops[stops.Count - 1].Offset));
+            functions.Add(Exponential(stops[stops.Count - 1].Color, stops[stops.Count - 1].Color));
+            AddUnitEncode(encode);
         }
 
         return new DictionaryObject
@@ -63,6 +85,12 @@ internal static class ShadingBuilder
             ["Bounds"] = bounds,
             ["Encode"] = encode,
         };
+    }
+
+    private static void AddUnitEncode(ArrayObject encode)
+    {
+        encode.Add(new NumberObject(0));
+        encode.Add(new NumberObject(1));
     }
 
     private static DictionaryObject Exponential(Color from, Color to) => new()
