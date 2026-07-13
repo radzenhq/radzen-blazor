@@ -8,6 +8,18 @@
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
 
+        if (HasResourceGroups)
+        {
+            return
+    @<CascadingValue Value=@Scheduler>
+        <ResourceDayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
+            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
+            ShowAllDay=@ShowAllDay AllDayText=@AllDayText AriaLabel=@($"{Text} {Title}")
+            AppointmentMove=OnAppointmentMove />
+    </CascadingValue>
+    ;
+        }
+
         return
     @<CascadingValue Value=@Scheduler>
         <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments

@@ -105,11 +105,14 @@
     [Parameter]
     public IEnumerable<AppointmentData>? Appointments { get; set; }
 
+    [Parameter]
+    public object? Resource { get; set; }
+
     IDictionary<string, object> Attributes(DateTime start, string className)
     {
         if (Scheduler == null)
             return new Dictionary<string, object>();
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)));
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)), Resource);
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         return attributes;
     }
@@ -148,7 +151,7 @@
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
         if (Scheduler == null) return;
-        bool preventDefault = await Scheduler.SelectSlot(date, date.AddDays(1), appointments);
+        bool preventDefault = await Scheduler.SelectSlot(date, date.AddDays(1), appointments, Resource);
 
         if(!preventDefault)
         {

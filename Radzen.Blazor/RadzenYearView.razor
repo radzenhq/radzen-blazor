@@ -10,6 +10,20 @@
 
         var maxAppointmentsInSlot = 0;
 
+        if (HasResourceGroups)
+        {
+            var maxInSlot = maxAppointmentsInSlot;
+
+            return @<CascadingValue Value=@Scheduler>
+                <ResourceGroups>
+                    <ChildContent Context="resource">
+                        <YearView StartDate=@StartDate EndDate=@EndDate StartMonth=@StartMonth MaxAppointmentsInSlot=@maxInSlot MoreText=@MoreText
+                                  NoDayEventsText=@NoDayEventsText Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource />
+                    </ChildContent>
+                </ResourceGroups>
+            </CascadingValue>;
+        }
+
         return @<CascadingValue Value=@Scheduler>
                 <YearView StartDate=@StartDate EndDate=@EndDate StartMonth=@StartMonth MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText
                           NoDayEventsText=@NoDayEventsText Appointments=@appointments />

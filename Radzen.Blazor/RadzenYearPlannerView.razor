@@ -20,6 +20,26 @@
             maxAppointmentsInSlot = Convert.ToInt32(Math.Floor(slotHeight / 16)) - 1;
         }
 
+        if (HasResourceGroups)
+        {
+            var maxInSlot = maxAppointmentsInSlot;
+
+            return @<CascadingValue Value=@Scheduler>
+                <ResourceGroups>
+                    <ChildContent Context="resource">
+                        <YearPlannerView StartDate=@StartDate
+                            EndDate=@EndDate
+                            StartMonth=@StartMonth
+                            MaxAppointmentsInSlot=@maxInSlot
+                            MoreText=@MoreText
+                            Appointments=@AppointmentsForResource(appointments, resource)
+                            Resource=@resource
+                            AppointmentMove=OnAppointmentMove />
+                    </ChildContent>
+                </ResourceGroups>
+            </CascadingValue>;
+        }
+
         return @<CascadingValue Value=@Scheduler>
                     <YearPlannerView StartDate=@StartDate
                         EndDate=@EndDate

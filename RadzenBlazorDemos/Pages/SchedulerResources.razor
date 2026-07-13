@@ -1,10 +1,12 @@
 @inject DialogService DialogService
 
 <RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="RoomBooking" Data=@bookings StartProperty="Start" EndProperty="End" TextProperty="Text"
+    Resources=@rooms ResourceTextProperty="Name" ResourceValueProperty="Id" ResourceProperty="RoomIds"
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentMove=@OnAppointmentMove>
-    <RadzenResourceDayView Data=@rooms TextProperty="Name" ValueProperty="Id" ResourceProperty="RoomId" />
-    <RadzenDayView />
-    <RadzenWeekView />
+    <RadzenDayView GroupByResource="true" />
+    <RadzenWeekView GroupByResource="true" />
+    <RadzenMonthView GroupByResource="true" />
+    <RadzenWeekView Text="Plain Week" />
 </RadzenScheduler>
 
 <EventConsole @ref=@console />
@@ -12,20 +14,6 @@
 @code {
     RadzenScheduler<RoomBooking> scheduler;
     EventConsole console;
-
-    public class Room
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class RoomBooking
-    {
-        public int RoomId { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public string Text { get; set; }
-    }
 
     IList<Room> rooms = new List<Room>
     {
@@ -37,11 +25,11 @@
 
     IList<RoomBooking> bookings = new List<RoomBooking>
     {
-        new RoomBooking { RoomId = 1, Start = DateTime.Today.AddHours(9), End = DateTime.Today.AddHours(10), Text = "Daily stand-up" },
-        new RoomBooking { RoomId = 1, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
-        new RoomBooking { RoomId = 2, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
-        new RoomBooking { RoomId = 3, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
-        new RoomBooking { RoomId = 4, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
+        new RoomBooking { RoomIds = new List<int> { 1 }, Start = DateTime.Today.AddHours(9), End = DateTime.Today.AddHours(10), Text = "Daily stand-up" },
+        new RoomBooking { RoomIds = new List<int> { 1 }, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
+        new RoomBooking { RoomIds = new List<int> { 2, 3 }, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
+        new RoomBooking { RoomIds = new List<int> { 2 }, Start = DateTime.Today.AddDays(1).AddHours(11), End = DateTime.Today.AddDays(1).AddHours(12), Text = "Interview" },
+        new RoomBooking { RoomIds = new List<int> { 4 }, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
     };
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
@@ -50,19 +38,40 @@
 
         console.Log($"SlotSelect: Start={args.Start} End={args.End} Room={room?.Name ?? "(none)"}");
 
+        var booking = new RoomBooking { Start = args.Start, End = args.End };
+
         if (room != null)
         {
-            bookings.Add(new RoomBooking { RoomId = room.Id, Start = args.Start, End = args.End, Text = "New booking" });
+            booking.RoomIds.Add(room.Id);
+        }
+
+        var result = await DialogService.OpenAsync<EditBookingPage>("Add Booking",
+            new Dictionary<string, object> { { "Booking", booking }, { "Rooms", rooms } });
+
+        if (result != null)
+        {
+            bookings.Add(result);
 
             await scheduler.Reload();
         }
     }
 
-    void OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<RoomBooking> args)
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<RoomBooking> args)
     {
-        var room = rooms.FirstOrDefault(r => r.Id == args.Data.RoomId);
+        console.Log($"AppointmentSelect: Text={args.Data.Text} Rooms={string.Join(", ", rooms.Where(r => args.Data.RoomIds.Contains(r.Id)).Select(r => r.Name))}");
 
-        console.Log($"AppointmentSelect: Text={args.Data.Text} Room={room?.Name}");
+        var result = await DialogService.OpenAsync<EditBookingPage>("Edit Booking",
+            new Dictionary<string, object> { { "Booking", args.Data }, { "Rooms", rooms } });
+
+        if (result != null)
+        {
+            args.Data.Text = result.Text;
+            args.Data.Start = result.Start;
+            args.Data.End = result.End;
+            args.Data.RoomIds = result.RoomIds;
+
+            await scheduler.Reload();
+        }
     }
 
     async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
@@ -74,9 +83,9 @@
             booking.Start = booking.Start + args.TimeSpan;
             booking.End = booking.End + args.TimeSpan;
 
-            if (args.Resource is Room room)
+            if (args.Resource is Room room && !booking.RoomIds.Contains(room.Id))
             {
-                booking.RoomId = room.Id;
+                booking.RoomIds = new List<int> { room.Id };
             }
 
             await scheduler.Reload();
