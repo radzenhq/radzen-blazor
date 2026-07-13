@@ -3348,7 +3348,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Day, week and month views", Anchor="#views"}, new () { Text = "Year Planner and Timeline views", Anchor = "#timeline" }, new () { Text = "Display additional content when the user hovers an appointment", Anchor = "#tooltips" }, new () { Text = "Display any number of days side-by-side", Anchor = "#multiday" }, new () { Text = "Display bookings of multiple resources side-by-side", Anchor = "#resources" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Scheduler",
                     Title = "Blazor Scheduler & Calendar Component | Free UI Components by Radzen",
                     Path = "scheduler",
@@ -3357,7 +3357,7 @@ namespace RadzenBlazorDemos
                     Faq = new []
                     {
                         new FaqItem { Question = "Can I use the Blazor Scheduler as a calendar?", Answer = "Yes. The Scheduler is a calendar with day, week, month, year planner, and timeline views; bind your appointments to its Data and it renders them on the calendar." },
-                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side." },
+                        new FaqItem { Question = "What views does the Blazor Scheduler support?", Answer = "Day, week, month, year planner, and timeline views, and you can show any number of days side by side. A resource day view displays the appointments of multiple resources such as rooms or people in separate columns." },
                         new FaqItem { Question = "How do I add and edit appointments in the Scheduler?", Answer = "Handle the slot and appointment events (such as SlotSelect and AppointmentSelect) to open a dialog where users create or edit events bound to your data." }
                     },
                     Icon = "\ue616",

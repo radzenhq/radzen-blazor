@@ -26,6 +26,10 @@ namespace Radzen
         /// </summary>
         public ISchedulerView? View { get; set; }
         /// <summary>
+        /// The resource associated with the slot. Set when the slot belongs to a resource in a resource view such as <see cref="RadzenResourceDayView" />; otherwise <c>null</c>.
+        /// </summary>
+        public object? Resource { get; set; }
+        /// <summary>
         /// Has default action been prevented from occuring?
         /// </summary>
         public bool IsDefaultPrevented { get; private set; }

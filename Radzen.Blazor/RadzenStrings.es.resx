@@ -1695,6 +1695,12 @@
   <data name="Scheduler_PrevText" xml:space="preserve">
     <value>Anterior</value>
   </data>
+  <data name="Scheduler_ResourcesText" xml:space="preserve">
+    <value>Recursos</value>
+  </data>
+  <data name="Scheduler_AllDayText" xml:space="preserve">
+    <value>Todo el día</value>
+  </data>
   <!-- SecurityCode -->
   <data name="SecurityCode_AriaLabel" xml:space="preserve">
     <value>Código de seguridad</value>

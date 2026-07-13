@@ -71,6 +71,17 @@ namespace Radzen.Blazor
         /// <param name="appointments">The appointments for this range.</param>
         Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
         /// <summary>
+        /// Selects the specified slot of the specified resource.
+        /// </summary>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <param name="appointments">The appointments for this range.</param>
+        /// <param name="resource">The resource the slot belongs to.</param>
+        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, object? resource)
+        {
+            return SelectSlot(start, end, appointments);
+        }
+        /// <summary>
         /// Selects the specified month.
         /// </summary>
         /// <param name="monthStart">The start of the month.</param>
@@ -103,6 +114,18 @@ namespace Radzen.Blazor
         /// <param name="getAppointments">Function to return appointments for this range.</param>
         /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
         IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments);
+        /// <summary>
+        /// Gets the slot HTML attributes for a slot of the specified resource.
+        /// </summary>
+        /// <param name="start">The start of the slot.</param>
+        /// <param name="end">The end of the slot.</param>
+        /// <param name="getAppointments">Function to return appointments for this range.</param>
+        /// <param name="resource">The resource the slot belongs to.</param>
+        /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
+        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, Func<IEnumerable<AppointmentData>> getAppointments, object? resource)
+        {
+            return GetSlotAttributes(start, end, getAppointments);
+        }
         /// <summary>
         /// Renders the appointment.
         /// </summary>
