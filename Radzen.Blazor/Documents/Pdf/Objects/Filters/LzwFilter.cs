@@ -96,11 +96,17 @@ internal static class LzwFilter
 
                     entry = table[code];
                 }
-                else
+                else if (code == nextCode)
                 {
+                    // KwKwK: the only code the decoder is allowed to see before adding it.
                     entry = new byte[prevEntry.Length + 1];
                     Array.Copy(prevEntry, entry, prevEntry.Length);
                     entry[prevEntry.Length] = prevEntry[0];
+                }
+                else
+                {
+                    // A code beyond the next slot cannot be reconstructed; reject it.
+                    throw new DocumentParseException("Invalid LZW code.", -1);
                 }
 
                 var newEntry = new byte[prevEntry.Length + 1];

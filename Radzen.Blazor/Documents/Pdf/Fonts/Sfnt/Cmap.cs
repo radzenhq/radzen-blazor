@@ -273,6 +273,14 @@ internal sealed class Format12Subtable : ICmapSubtable
         reader.ReadUInt32(); // language
         var numGroups = reader.ReadUInt32();
 
+        // numGroups is attacker-controlled; three uint[] of that count would allocate
+        // up to ~48 GB. Require the three groups (12 bytes each) after the 16-byte
+        // header to fit the subtable data before allocating.
+        if (numGroups > int.MaxValue || (long)offset + 16 + ((long)numGroups * 12) > data.Length)
+        {
+            throw new InvalidDataException("cmap format 12 group count exceeds the subtable bounds.");
+        }
+
         var startCharCode = new uint[numGroups];
         var endCharCode = new uint[numGroups];
         var startGlyphId = new uint[numGroups];
