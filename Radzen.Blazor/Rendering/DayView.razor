@@ -16,7 +16,7 @@
             @for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
             {
                 var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) @ondragover:preventDefault @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) @ondragover:preventDefault @ondrop=@(args => @OnDrop(slotDate, Resource)) @attributes=@Attributes(date)></div>
             }
         </div>
     </div>
@@ -54,6 +54,9 @@
     [Parameter]
     public IList<AppointmentData>? Appointments { get; set; }
 
+    [Parameter]
+    public object? Resource { get; set; }
+
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
 
@@ -72,7 +75,7 @@
     {
         if (Scheduler != null)
         {
-            await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+            await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resource);
         }
     }
 
@@ -97,7 +100,7 @@
 
     IDictionary<string, object> Attributes(DateTime date)
     {
-        var attributes = Scheduler?.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot))) ?? new Dictionary<string, object>();
+        var attributes = Scheduler?.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), Resource) ?? new Dictionary<string, object>();
         attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add("rz-state-focused", date == CurrentDate && !currentAppointments.Any()).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;

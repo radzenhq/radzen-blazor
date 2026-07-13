@@ -579,7 +579,6 @@ namespace Radzen.Blazor {
         public static string Scheduler_TodayText { get { return ResourceManager.GetString("Scheduler_TodayText", resourceCulture); } }
         public static string Scheduler_NextText { get { return ResourceManager.GetString("Scheduler_NextText", resourceCulture); } }
         public static string Scheduler_PrevText { get { return ResourceManager.GetString("Scheduler_PrevText", resourceCulture); } }
-        public static string Scheduler_ResourcesText { get { return ResourceManager.GetString("Scheduler_ResourcesText", resourceCulture); } }
         public static string Scheduler_AllDayText { get { return ResourceManager.GetString("Scheduler_AllDayText", resourceCulture); } }
         public static string SecurityCode_AriaLabel { get { return ResourceManager.GetString("SecurityCode_AriaLabel", resourceCulture); } }
         public static string SecurityCode_InputAriaLabelFormat { get { return ResourceManager.GetString("SecurityCode_InputAriaLabelFormat", resourceCulture); } }

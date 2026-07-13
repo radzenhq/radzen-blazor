@@ -27,7 +27,7 @@
                     </RadzenStack>
                 </div>
                 <div class="rz-slot-agenda">
-                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(slotDate)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate, Resource)) @attributes=@Attributes(slotDate)></div>
                     <AgendaSlotEvents Appointments=@appointments MultiDayText=@MultiDayText CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart />
                 </div>
             </RadzenStack>
@@ -61,6 +61,9 @@
     [Parameter]
     public IList<AppointmentData>? Appointments { get; set; }
 
+    [Parameter]
+    public object? Resource { get; set; }
+
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
 
@@ -78,7 +81,7 @@
     {
         if (Scheduler != null)
         {
-            await Scheduler.SelectSlot(date, date, AppointmentsInSlot(date, date.AddDays(1)));
+            await Scheduler.SelectSlot(date, date, AppointmentsInSlot(date, date.AddDays(1)), Resource);
         }
     }
 
@@ -101,7 +104,7 @@
 
     IDictionary<string, object> Attributes(DateTime date)
     {
-        var attributes = Scheduler?.GetSlotAttributes(date, date.AddDays(1), () => AppointmentsInSlot(date, date.AddDays(1))) ?? new Dictionary<string, object>();
+        var attributes = Scheduler?.GetSlotAttributes(date, date.AddDays(1), () => AppointmentsInSlot(date, date.AddDays(1)), Resource) ?? new Dictionary<string, object>();
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;

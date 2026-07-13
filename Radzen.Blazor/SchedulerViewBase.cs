@@ -1,5 +1,7 @@
 using System;
 using Radzen;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
@@ -50,6 +52,35 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public IScheduler? Scheduler { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the view groups appointments by the resources of the scheduler
+        /// (set via <see cref="RadzenScheduler{TItem}.Resources" />). Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the view groups appointments by resource; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool GroupByResource { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the view should render resource groups - <see cref="GroupByResource" /> is set and the scheduler has resources.
+        /// </summary>
+        protected bool HasResourceGroups => GroupByResource && Scheduler?.Resources.Count > 0;
+
+        /// <summary>
+        /// Returns the appointments which belong to the specified resource.
+        /// </summary>
+        /// <param name="appointments">The appointments to filter.</param>
+        /// <param name="resource">The resource.</param>
+        /// <returns>The appointments of the specified resource.</returns>
+        protected IList<AppointmentData> AppointmentsForResource(IEnumerable<AppointmentData> appointments, object resource)
+        {
+            if (Scheduler == null)
+            {
+                return new List<AppointmentData>();
+            }
+
+            return appointments.Where(item => Scheduler.IsAppointmentInResource(item, resource)).ToList();
+        }
+
 
         /// <summary>
         /// Disposes this instance.
@@ -67,10 +98,11 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var textChanged = parameters.DidParameterChange(nameof(Text), Text);
+            var groupByResourceChanged = parameters.DidParameterChange(nameof(GroupByResource), GroupByResource);
 
             await base.SetParametersAsync(parameters);
 
-            if (textChanged && Scheduler != null)
+            if ((textChanged || groupByResourceChanged) && Scheduler != null)
             {
                 await Scheduler.Reload();
             }

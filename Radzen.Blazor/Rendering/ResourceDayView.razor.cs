@@ -1,18 +1,16 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Rendering
 {
     /// <summary>
-    /// Renders the resource day view of <see cref="RadzenResourceDayView" />.
+    /// Renders the resources of the scheduler as columns for a single day. Used by <see cref="RadzenDayView" /> when
+    /// <see cref="SchedulerViewBase.GroupByResource" /> is set to <c>true</c>.
     /// </summary>
-    [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
     public partial class ResourceDayView : DropableViewBase
     {
         /// <summary>
@@ -58,36 +56,6 @@ namespace Radzen.Blazor.Rendering
         public IList<AppointmentData>? Appointments { get; set; }
 
         /// <summary>
-        /// Gets or sets the resources displayed as columns.
-        /// </summary>
-        [Parameter]
-        public IList<object>? Resources { get; set; }
-
-        /// <summary>
-        /// Gets or sets the property of a resource item which contains its display text.
-        /// </summary>
-        [Parameter]
-        public string? TextProperty { get; set; }
-
-        /// <summary>
-        /// Gets or sets the property of a resource item which contains its unique value.
-        /// </summary>
-        [Parameter]
-        public string? ValueProperty { get; set; }
-
-        /// <summary>
-        /// Gets or sets the property of an appointment data item which contains the value of the resource it belongs to.
-        /// </summary>
-        [Parameter]
-        public string? ResourceProperty { get; set; }
-
-        /// <summary>
-        /// Gets or sets the template used to render the resource column headers.
-        /// </summary>
-        [Parameter]
-        public RenderFragment<object>? HeaderTemplate { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the all-day row is displayed.
         /// </summary>
         [Parameter]
@@ -118,34 +86,7 @@ namespace Radzen.Blazor.Rendering
         bool preventKeyPress;
         bool stopKeydownPropagation;
 
-        internal object? GetResourceValue(object resource)
-        {
-            return string.IsNullOrEmpty(ValueProperty) ? resource : PropertyAccess.GetItemOrValueFromProperty(resource, ValueProperty);
-        }
-
-        internal string GetResourceText(object resource)
-        {
-            var value = string.IsNullOrEmpty(TextProperty) ? resource : PropertyAccess.GetItemOrValueFromProperty(resource, TextProperty);
-
-            return value?.ToString() ?? string.Empty;
-        }
-
-        bool BelongsToResource(AppointmentData appointment, object? resourceValue)
-        {
-            if (string.IsNullOrEmpty(ResourceProperty))
-            {
-                return false;
-            }
-
-            var value = PropertyAccess.GetItemOrValueFromProperty(appointment.Data, ResourceProperty);
-
-            if (value is IEnumerable enumerable && value is not string)
-            {
-                return enumerable.Cast<object>().Any(item => object.Equals(item, resourceValue));
-            }
-
-            return object.Equals(value, resourceValue);
-        }
+        IList<object> Resources => Scheduler?.Resources ?? Array.Empty<object>();
 
         bool IsAllDay(AppointmentData appointment)
         {
@@ -154,26 +95,22 @@ namespace Radzen.Blazor.Rendering
 
         IList<AppointmentData> AppointmentsForResource(object resource)
         {
-            if (Appointments == null)
+            if (Appointments == null || Scheduler == null)
             {
                 return Array.Empty<AppointmentData>();
             }
 
-            var resourceValue = GetResourceValue(resource);
-
-            return Appointments.Where(item => BelongsToResource(item, resourceValue) && !(ShowAllDay && IsAllDay(item))).ToList();
+            return Appointments.Where(item => Scheduler.IsAppointmentInResource(item, resource) && !(ShowAllDay && IsAllDay(item))).ToList();
         }
 
         internal AppointmentData[] AllDayAppointments(object resource)
         {
-            if (Appointments == null)
+            if (Appointments == null || Scheduler == null)
             {
                 return Array.Empty<AppointmentData>();
             }
 
-            var resourceValue = GetResourceValue(resource);
-
-            return Appointments.Where(item => BelongsToResource(item, resourceValue) && IsAllDay(item)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+            return Appointments.Where(item => Scheduler.IsAppointmentInResource(item, resource) && IsAllDay(item)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
         }
 
         AppointmentData[] AppointmentsInSlot(object resource, DateTime start, DateTime end)
@@ -183,9 +120,7 @@ namespace Radzen.Blazor.Rendering
                 return Array.Empty<AppointmentData>();
             }
 
-            var resourceValue = GetResourceValue(resource);
-
-            return Appointments.Where(item => BelongsToResource(item, resourceValue) && Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+            return Appointments.Where(item => Scheduler.IsAppointmentInResource(item, resource) && Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
         }
 
         async Task OnSlotClick(DateTime date, object resource)
@@ -236,7 +171,7 @@ namespace Radzen.Blazor.Rendering
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
-            var resourceCount = Resources?.Count ?? 0;
+            var resourceCount = Resources.Count;
 
             if (key == "ArrowUp" || key == "ArrowDown")
             {
@@ -282,7 +217,7 @@ namespace Radzen.Blazor.Rendering
             }
             else if (key == "Enter")
             {
-                var resource = Resources?.ElementAtOrDefault(currentResource);
+                var resource = Resources.ElementAtOrDefault(currentResource);
 
                 if (resource != null)
                 {
@@ -303,7 +238,7 @@ namespace Radzen.Blazor.Rendering
             }
             else if (key == "Space")
             {
-                var resource = Resources?.ElementAtOrDefault(currentResource);
+                var resource = Resources.ElementAtOrDefault(currentResource);
 
                 if (resource != null && Scheduler != null)
                 {

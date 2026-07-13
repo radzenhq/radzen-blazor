@@ -1695,9 +1695,6 @@
   <data name="Scheduler_PrevText" xml:space="preserve">
     <value>Zurück</value>
   </data>
-  <data name="Scheduler_ResourcesText" xml:space="preserve">
-    <value>Ressourcen</value>
-  </data>
   <data name="Scheduler_AllDayText" xml:space="preserve">
     <value>Ganztägig</value>
   </data>
