@@ -15,10 +15,22 @@ internal static class StructureWriter
     public static ReferenceObject WriteStructureTree(
         DocumentWriter writer,
         StructureElement structure,
-        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
+        RoleMap roleMap)
     {
         var root = new DictionaryObject { ["Type"] = new NameObject("StructTreeRoot") };
         var rootRef = writer.Add(root);
+
+        if (roleMap.Count > 0)
+        {
+            var map = new DictionaryObject();
+            foreach (var (role, structureType) in roleMap.Entries)
+            {
+                map[role] = new NameObject(structureType);
+            }
+
+            root["RoleMap"] = map;
+        }
 
         var parents = new Dictionary<int, List<DocumentObject>>();
         root["K"] = WriteStructureElement(writer, structure, rootRef, pageNodes, parents);

@@ -170,7 +170,7 @@ internal sealed class DocumentSaver
         if (doc.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
-            catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(writer, structure, pageNodes);
+            catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(writer, structure, pageNodes, doc.RoleMap);
         }
 
         var formWriter = new FormWriter(doc);

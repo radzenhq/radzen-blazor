@@ -261,6 +261,7 @@ internal sealed class DocumentGenerator
 
         document.Structure = structureTree.DocumentElement;
         document.HasUntaggedListContent = structureTree.HasUntaggedList;
+        document.RoleMap = builder.RoleMap;
 
         foreach (var font in fontResolver.AllFonts)
         {

@@ -78,6 +78,16 @@ public class DocumentBuilder
     public string? Language { get; set; }
 
     /// <summary>
+    /// Gets the map of non-standard structure roles to standard ISO 32000-1
+    /// structure types. A paragraph whose <see cref="Paragraph.StyleName"/>
+    /// matches a declared role is tagged with that role, and the produced
+    /// document carries a <c>/StructTreeRoot /RoleMap</c> so tagged output
+    /// (PDF/UA, PDF/A Level A) stays conformant. Empty by default, in which
+    /// case no <c>/RoleMap</c> is written and the output is unchanged.
+    /// </summary>
+    public RoleMap RoleMap { get; } = new();
+
+    /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
     /// document is written unencrypted.
     /// </summary>
