@@ -9,20 +9,16 @@ namespace Radzen.Documents.Crypto;
 /// </summary>
 public static class Md5
 {
-    /*
-     * Round shift values
-     */
-    private static int[] s = new int[64] {
+    // Per-round left-rotation amounts (RFC 1321).
+    private static readonly int[] Shifts = new int[64] {
         7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
         5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
         4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
         6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21
     };
 
-    /*
-     * Constant K Values
-     */
-    private static uint[] k = new uint[64] {
+    // Per-round additive constants K (RFC 1321).
+    private static readonly uint[] K = new uint[64] {
         0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
         0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
         0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -41,7 +37,7 @@ public static class Md5
         0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
     };
 
-    private static uint leftRotate(uint x, int c)
+    private static uint LeftRotate(uint x, int c)
     {
         return (x << c) | (x >> (32 - c));
     }
@@ -54,7 +50,7 @@ public static class Md5
     /// <returns>The MD5 hash as a string.</returns>
     public static string Calculate(byte[] input)
     {
-        var digest = ComputeHash(input);
+        var digest = Hash(input);
         var result = new System.Text.StringBuilder(32);
         foreach (var b in digest)
         {
@@ -69,7 +65,14 @@ public static class Md5
     /// </summary>
     /// <param name="input">The bytes to hash.</param>
     /// <returns>The 16-byte digest.</returns>
-    public static byte[] ComputeHash(byte[] input)
+    public static byte[] ComputeHash(byte[] input) => Hash(input);
+
+    /// <summary>
+    /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
+    /// </summary>
+    /// <param name="input">The bytes to hash.</param>
+    /// <returns>The 16-byte digest.</returns>
+    public static byte[] Hash(byte[] input)
     {
         ArgumentNullException.ThrowIfNull(input);
 
@@ -84,8 +87,10 @@ public static class Md5
         Array.Copy(input, processedInput, input.Length);
         processedInput[input.Length] = 0x80; // add 1
 
-        byte[] length = BitConverter.GetBytes(input.Length * 8); // bit converter returns little-endian
-        Array.Copy(length, 0, processedInput, processedInput.Length - 8, 4); // add length in bits
+        // Length in bits as a 64-bit little-endian value; (ulong) avoids the int32 overflow
+        // that produced a wrong digest for inputs >= 256 MB and drops all 8 length bytes.
+        byte[] length = BitConverter.GetBytes((ulong)input.Length * 8);
+        Array.Copy(length, 0, processedInput, processedInput.Length - 8, 8);
 
         for (int i = 0; i < processedInput.Length / 64; ++i)
         {
@@ -126,7 +131,7 @@ public static class Md5
                 var dtemp = D;
                 D = C;
                 C = B;
-                B = B + leftRotate((A + F + k[ki] + M[g]), s[ki]);
+                B = B + LeftRotate((A + F + K[ki] + M[g]), Shifts[ki]);
                 A = dtemp;
             }
 
@@ -143,11 +148,4 @@ public static class Md5
         Array.Copy(BitConverter.GetBytes(d0), 0, digest, 12, 4);
         return digest;
     }
-
-    /// <summary>
-    /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
-    /// </summary>
-    /// <param name="data">The bytes to hash.</param>
-    /// <returns>The 16-byte digest.</returns>
-    public static byte[] Hash(byte[] data) => ComputeHash(data);
 }
