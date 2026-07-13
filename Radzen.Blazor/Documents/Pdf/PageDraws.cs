@@ -1,6 +1,31 @@
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
+
+// A set that preserves first-insertion order on enumeration. Used where the collected
+// members reach the serialized page /Resources: HashSet enumeration order is not
+// contractual across runtimes, and byte-identical output requires a stable order.
+internal sealed class OrderedSet<T> : IEnumerable<T>
+    where T : notnull
+{
+    private readonly List<T> items = [];
+    private readonly HashSet<T> seen = [];
+
+    public int Count => items.Count;
+
+    public void Add(T item)
+    {
+        if (seen.Add(item))
+        {
+            items.Add(item);
+        }
+    }
+
+    public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
 
 internal struct TextDraw
 {
@@ -134,8 +159,8 @@ internal sealed class PagePlan
     public List<GeneratedExtGState> ExtGStates { get; } = [];
     public List<GeneratedPattern> Patterns { get; } = [];
     public WatermarkDraw? Watermark { get; set; }
-    public HashSet<GeneratedFont> UsedFonts { get; } = [];
-    public HashSet<GeneratedImage> UsedImages { get; } = [];
+    public OrderedSet<GeneratedFont> UsedFonts { get; } = [];
+    public OrderedSet<GeneratedImage> UsedImages { get; } = [];
 
     // One ExtGState per distinct (fill, stroke) alpha pair, keyed GS0, GS1, ...
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)

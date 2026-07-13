@@ -190,6 +190,10 @@ public sealed class Document
             if (source.Generated is { } generated)
             {
                 page.Generated = generated;
+                if (source.TextFonts is { } generatedFonts)
+                {
+                    page.SetTextFonts(generatedFonts);
+                }
             }
             else if (other.source is not null && other.sourceResources.TryGetValue(source, out var loadedResources))
             {

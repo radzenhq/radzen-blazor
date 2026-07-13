@@ -119,6 +119,10 @@ public sealed class Page
         textFonts = fonts;
     }
 
+    // The reverse char-code -> Unicode maps used by ExtractText, exposed so Document.Append
+    // can carry them onto a copied page (a Type0/Identity-H stream is not reversible without them).
+    internal System.Collections.Generic.IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
+
     // Resolves the content-stream bytes to write. An untouched loaded page reuses its
     // retained raw bytes. A loaded page whose original elements are intact but that
     // gained new elements keeps its raw bytes untouched and returns the additions as a

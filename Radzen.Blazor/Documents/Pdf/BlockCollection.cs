@@ -12,6 +12,7 @@ namespace Radzen.Documents.Pdf;
 public class BlockCollection : IReadOnlyList<Block>
 {
     private readonly List<Block> items = [];
+    private readonly HashSet<Block> membership = new(ReferenceEqualityComparer.Instance);
 
     /// <inheritdoc/>
     public int Count => items.Count;
@@ -32,7 +33,7 @@ public class BlockCollection : IReadOnlyList<Block>
     {
         ArgumentNullException.ThrowIfNull(block);
 
-        if (Contains(block))
+        if (!membership.Add(block))
         {
             throw new ArgumentException("The block is already in the collection.", nameof(block));
         }
@@ -132,20 +133,11 @@ public class BlockCollection : IReadOnlyList<Block>
         return Add(new Barcode(type, value, width, height) { ShowText = showText });
     }
 
-    private bool Contains(Block block)
+    internal void Clear()
     {
-        foreach (var item in items)
-        {
-            if (ReferenceEquals(item, block))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        items.Clear();
+        membership.Clear();
     }
-
-    internal void Clear() => items.Clear();
 
     /// <inheritdoc/>
     public IEnumerator<Block> GetEnumerator() => items.GetEnumerator();

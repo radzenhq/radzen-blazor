@@ -34,8 +34,10 @@ public class InlineCollection : IReadOnlyList<Run>
     /// </summary>
     /// <param name="run">The run to append.</param>
     /// <returns>The same <paramref name="run"/> instance.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
     public Run Add(Run run)
     {
+        System.ArgumentNullException.ThrowIfNull(run);
         items.Add(run);
         return run;
     }
