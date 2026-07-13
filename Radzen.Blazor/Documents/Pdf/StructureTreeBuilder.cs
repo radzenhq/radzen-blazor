@@ -103,8 +103,20 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
             case List:
                 hasUntaggedList = true;
                 break;
-            default:
+            // These carry no logical structure of their own: PageBreak is pure
+            // pagination, and Container/Barcode/QrCode/TableOfContents render as
+            // decorative /Artifact content in fully tagged output. Listed explicitly
+            // so the default arm can fail loud on a block type nobody mapped.
+            case PageBreak:
+            case Container:
+            case Barcode:
+            case QrCode:
+            case TableOfContents:
                 break;
+            default:
+                throw new NotSupportedException(
+                    $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
+                    + "Add an explicit case to StructureTreeBuilder.MapBlock so it cannot silently vanish from accessible output.");
         }
     }
 
