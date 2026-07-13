@@ -21,11 +21,16 @@ public class FailLoudFontGuardTests
     [InlineData("مرحبا")] // Arabic "marhaba"
     [InlineData("नमस्ते")] // Devanagari "namaste"
     [InlineData("สวัสดี")] // Thai "sawasdee"
-    public void ComplexScript_ThrowsInsteadOfRenderingUnshaped(string text)
+    [InlineData("שלום")] // Hebrew "shalom" - RTL, was silently reversed before the guard
+    [InlineData("מזלטוב")] // Hebrew "mazel tov"
+    [InlineData("שׁוּוֹ")] // Hebrew presentation forms
+    [InlineData("ᠠᠷᠠ")] // Mongolian
+    [InlineData("ߊߕߜ")] // N'Ko
+    public void ComplexOrRtlScript_ThrowsInsteadOfRenderingBroken(string text)
     {
         var builder = WithText(text);
         var ex = Assert.Throws<NotSupportedException>(() => builder.ToArray());
-        Assert.Contains("complex script", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("script", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Theory]
@@ -35,6 +40,19 @@ public class FailLoudFontGuardTests
     public void NonShapingScript_RendersWithoutThrowing(string text)
     {
         var bytes = WithText(text).ToArray();
+        Assert.True(bytes.Length > 0);
+    }
+
+    [Theory]
+    [InlineData("中文")]  // CJK Han
+    [InlineData("가나")] // Hangul
+    public void CjkAndHangul_RenderWithoutThrowing(string text)
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterCjk(builder);
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, text, BuildTestSupport.Cjk);
+        var bytes = builder.ToArray();
         Assert.True(bytes.Length > 0);
     }
 }
