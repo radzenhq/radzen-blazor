@@ -1,3 +1,4 @@
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -22,7 +23,7 @@ public class SectionDirectionSupportTests
     {
         var builder = new DocumentBuilder();
         builder.Sections.Add().Direction = FlowDirection.RightToLeft;
-        Assert.Throws<System.NotSupportedException>(() => builder.ToArray());
+        Assert.Throws<NotSupportedException>(() => builder.ToArray());
     }
 
     [Fact]
@@ -30,6 +31,6 @@ public class SectionDirectionSupportTests
     {
         var builder = new DocumentBuilder();
         builder.Sections.Add().WritingMode = WritingMode.VerticalRightToLeft;
-        Assert.Throws<System.NotSupportedException>(() => builder.ToArray());
+        Assert.Throws<NotSupportedException>(() => builder.ToArray());
     }
 }

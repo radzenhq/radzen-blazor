@@ -1,6 +1,9 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -100,7 +103,7 @@ public class RadioAndChoiceFieldTests
         }
 
         var parts = (ArrayObject)resolved;
-        var text = new System.Text.StringBuilder();
+        var text = new StringBuilder();
         foreach (var part in parts)
         {
             text.Append(FormTestSupport.Decode((StreamObject)reader.Resolve(part)));
@@ -124,7 +127,7 @@ public class RadioAndChoiceFieldTests
         var kids = Assert.IsType<ArrayObject>(reader.Resolve(kidsObject!));
         Assert.Equal(3, kids.Count);
 
-        var states = new System.Collections.Generic.List<string?>();
+        var states = new List<string?>();
         foreach (var entry in kids)
         {
             var kid = Assert.IsType<DictionaryObject>(reader.Resolve(entry));
@@ -293,7 +296,7 @@ public class RadioAndChoiceFieldTests
         group.Options.Add(new RadioOptionDefinition("Only") { X = 100, Y = 700, Width = 16, Height = 16 });
         document.FormFields.Add(group);
 
-        Assert.Throws<System.InvalidOperationException>(document.ToArray);
+        Assert.Throws<InvalidOperationException>(document.ToArray);
     }
 
     [Fact]
@@ -305,7 +308,7 @@ public class RadioAndChoiceFieldTests
         group.Options.Add(new RadioOptionDefinition("Same") { X = 100, Y = 670, Width = 16, Height = 16 });
         document.FormFields.Add(group);
 
-        Assert.Throws<System.InvalidOperationException>(document.ToArray);
+        Assert.Throws<InvalidOperationException>(document.ToArray);
     }
 
     [Fact]
@@ -316,13 +319,13 @@ public class RadioAndChoiceFieldTests
         group.SelectedValue = "ExtraLarge";
         document.FormFields.Add(group);
 
-        Assert.Throws<System.InvalidOperationException>(document.ToArray);
+        Assert.Throws<InvalidOperationException>(document.ToArray);
     }
 
     [Fact]
     public void RadioOptionValueCannotBeOffOrEmpty()
     {
-        Assert.Throws<System.ArgumentException>(() => new RadioOptionDefinition("Off"));
-        Assert.Throws<System.ArgumentException>(() => new RadioOptionDefinition(string.Empty));
+        Assert.Throws<ArgumentException>(() => new RadioOptionDefinition("Off"));
+        Assert.Throws<ArgumentException>(() => new RadioOptionDefinition(string.Empty));
     }
 }

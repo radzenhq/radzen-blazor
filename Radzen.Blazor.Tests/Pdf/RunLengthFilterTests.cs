@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
@@ -57,7 +58,7 @@ public class RunLengthFilterTests
     [Fact]
     public void Decode_Empty_ReturnsEmpty()
     {
-        Assert.Empty(RunLengthFilter.Decode(System.Array.Empty<byte>()));
+        Assert.Empty(RunLengthFilter.Decode(Array.Empty<byte>()));
     }
 
     [Fact]

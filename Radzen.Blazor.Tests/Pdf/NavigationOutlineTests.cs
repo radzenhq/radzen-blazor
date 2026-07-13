@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -195,7 +196,7 @@ public class NavigationOutlineTests
         var bytes = PlainDocument().ToArray();
         Assert.Equal(bytes, PlainDocument().ToArray());
 
-        var text = System.Text.Encoding.Latin1.GetString(bytes);
+        var text = Encoding.Latin1.GetString(bytes);
         Assert.DoesNotContain("/Outlines", text);
         Assert.DoesNotContain("/Dests", text);
         Assert.DoesNotContain("/GoTo", text);

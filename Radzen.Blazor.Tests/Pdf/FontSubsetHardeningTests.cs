@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Fonts.Cff;
@@ -397,7 +398,7 @@ public class FontSubsetHardeningTests
         for (var i = 0; i < numTables; i++)
         {
             var rec = 12 + i * 16;
-            var tag = System.Text.Encoding.ASCII.GetString(result, rec, 4);
+            var tag = Encoding.ASCII.GetString(result, rec, 4);
             if (strip.Contains(tag))
             {
                 continue;

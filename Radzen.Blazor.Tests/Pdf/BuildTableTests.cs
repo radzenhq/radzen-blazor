@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -10,7 +11,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class BuildTableTests
 {
     private static int Index(string text, string needle)
-        => text.IndexOf(needle, System.StringComparison.Ordinal);
+        => text.IndexOf(needle, StringComparison.Ordinal);
 
     [Fact]
     public void SinglePageTable_RoundTripsHeaderAndCellsInOrder()
@@ -89,7 +90,7 @@ public class BuildTableTests
 
         foreach (var page in reloaded.Pages)
         {
-            Assert.Contains("H0", page.ExtractText(), System.StringComparison.Ordinal);
+            Assert.Contains("H0", page.ExtractText(), StringComparison.Ordinal);
         }
 
         // The header text appears at least once per page (repeated across fragments).

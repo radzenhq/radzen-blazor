@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Text;
 using Radzen.Documents.Crypto;
 using Xunit;
@@ -41,7 +42,7 @@ public class CryptoPrimitiveTests
     [Fact]
     public void Md5_LongInput()
     {
-        var input = Ascii(string.Concat(System.Linq.Enumerable.Repeat("1234567890", 8)));
+        var input = Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
         Assert.Equal(80, input.Length);
         Assert.Equal("57edf4a22be3c955ac49da2e2107b67a", Hex(Md5.Hash(input)));
     }

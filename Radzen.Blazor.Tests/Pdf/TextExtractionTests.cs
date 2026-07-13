@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -10,7 +12,7 @@ public class TextExtractionTests
 {
     private static Document Reload(Document document)
     {
-        using var buffer = new System.IO.MemoryStream(document.ToArray());
+        using var buffer = new MemoryStream(document.ToArray());
         return Document.LoadFromStream(buffer);
     }
 
@@ -66,11 +68,11 @@ public class TextExtractionTests
 
         var text = Reload(document).Pages[0].ExtractText();
 
-        var alpha = text.IndexOf("Alpha", System.StringComparison.Ordinal);
-        var bravo = text.IndexOf("Bravo", System.StringComparison.Ordinal);
-        var charlie = text.IndexOf("Charlie", System.StringComparison.Ordinal);
-        var left = text.IndexOf("Left", System.StringComparison.Ordinal);
-        var right = text.IndexOf("Right", System.StringComparison.Ordinal);
+        var alpha = text.IndexOf("Alpha", StringComparison.Ordinal);
+        var bravo = text.IndexOf("Bravo", StringComparison.Ordinal);
+        var charlie = text.IndexOf("Charlie", StringComparison.Ordinal);
+        var left = text.IndexOf("Left", StringComparison.Ordinal);
+        var right = text.IndexOf("Right", StringComparison.Ordinal);
 
         Assert.True(alpha >= 0 && bravo >= 0 && charlie >= 0 && left >= 0 && right >= 0);
         Assert.True(alpha < bravo, "Alpha (y=700) before Bravo (y=650)");
@@ -100,8 +102,8 @@ public class TextExtractionTests
 
         var text = Reload(document).ExtractText();
 
-        var one = text.IndexOf("PageOneBody", System.StringComparison.Ordinal);
-        var two = text.IndexOf("PageTwoBody", System.StringComparison.Ordinal);
+        var one = text.IndexOf("PageOneBody", StringComparison.Ordinal);
+        var two = text.IndexOf("PageTwoBody", StringComparison.Ordinal);
 
         Assert.True(one >= 0, "page one text present");
         Assert.True(two >= 0, "page two text present");

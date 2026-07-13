@@ -1,4 +1,5 @@
 #nullable enable
+using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -28,7 +29,7 @@ public class MetadataEditTests
         document.Info.Title = "Signed Agreement";
         document.Info.Author = "Radzen Ltd";
 
-        var reloaded = Document.LoadFromStream(new System.IO.MemoryStream(FormTestSupport.Save(document)));
+        var reloaded = Document.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
 
         Assert.Equal("Signed Agreement", reloaded.Info.Title);
         Assert.Equal("Radzen Ltd", reloaded.Info.Author);

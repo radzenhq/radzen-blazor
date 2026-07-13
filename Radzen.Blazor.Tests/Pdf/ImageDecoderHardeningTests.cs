@@ -2,6 +2,7 @@
 using System;
 using System.Buffers.Binary;
 using System.IO;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -107,7 +108,7 @@ public class ImageDecoderHardeningTests
         Span<byte> length = stackalloc byte[4];
         BinaryPrimitives.WriteUInt32BigEndian(length, declaredLength);
         stream.Write(length);
-        stream.Write(System.Text.Encoding.ASCII.GetBytes(type));
+        stream.Write(Encoding.ASCII.GetBytes(type));
         stream.Write(body);
         stream.Write(stackalloc byte[4]); // CRC placeholder; the decoder does not verify it.
     }

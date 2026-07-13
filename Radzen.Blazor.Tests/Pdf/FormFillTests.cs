@@ -1,4 +1,5 @@
 #nullable enable
+using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -59,7 +60,7 @@ public class FormFillTests
         var document = FormTestSupport.LoadFixture();
         document.AcroForm!.FillField("Name", "Radzen Ltd");
 
-        var reloaded = Document.LoadFromStream(new System.IO.MemoryStream(FormTestSupport.Save(document)));
+        var reloaded = Document.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
 
         Assert.NotNull(reloaded.AcroForm);
         var name = reloaded.AcroForm!.Fields.Single(f => f.Name == "Name");

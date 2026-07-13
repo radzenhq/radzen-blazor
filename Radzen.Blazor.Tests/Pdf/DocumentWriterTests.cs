@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -16,7 +17,7 @@ public class DocumentWriterTests
 {
     private sealed class WrittenPdf
     {
-        public byte[] Bytes = System.Array.Empty<byte>();
+        public byte[] Bytes = Array.Empty<byte>();
         public string Text = "";
     }
 
@@ -116,7 +117,7 @@ public class DocumentWriterTests
     public void Xref_FirstEntryIsFreeHead()
     {
         var pdf = WriteMinimalDocument();
-        var start = pdf.Text.IndexOf("xref\n0 4\n", System.StringComparison.Ordinal) + "xref\n0 4\n".Length;
+        var start = pdf.Text.IndexOf("xref\n0 4\n", StringComparison.Ordinal) + "xref\n0 4\n".Length;
         var firstEntry = pdf.Text.Substring(start, 20);
         Assert.Equal("0000000000 65535 f \n", firstEntry);
     }
@@ -125,7 +126,7 @@ public class DocumentWriterTests
     public void Xref_EntriesAreTwentyBytesAndPointAtObjects()
     {
         var pdf = WriteMinimalDocument();
-        var dataStart = pdf.Text.IndexOf("xref\n0 4\n", System.StringComparison.Ordinal) + "xref\n0 4\n".Length;
+        var dataStart = pdf.Text.IndexOf("xref\n0 4\n", StringComparison.Ordinal) + "xref\n0 4\n".Length;
 
         for (var objNumber = 1; objNumber <= 3; objNumber++)
         {
@@ -134,7 +135,7 @@ public class DocumentWriterTests
             Assert.Equal(" 00000 n \n", entry.Substring(10));
 
             var parsedOffset = int.Parse(entry.Substring(0, 10), CultureInfo.InvariantCulture);
-            var actualOffset = pdf.Text.IndexOf($"\n{objNumber} 0 obj\n", System.StringComparison.Ordinal) + 1;
+            var actualOffset = pdf.Text.IndexOf($"\n{objNumber} 0 obj\n", StringComparison.Ordinal) + 1;
             Assert.Equal(actualOffset, parsedOffset);
         }
     }
@@ -152,10 +153,10 @@ public class DocumentWriterTests
     public void StartXref_PointsAtXrefTableAndEndsWithEof()
     {
         var pdf = WriteMinimalDocument();
-        var xrefOffset = pdf.Text.IndexOf("xref\n0 4\n", System.StringComparison.Ordinal);
+        var xrefOffset = pdf.Text.IndexOf("xref\n0 4\n", StringComparison.Ordinal);
 
         var marker = "startxref\n";
-        var markerIndex = pdf.Text.IndexOf(marker, System.StringComparison.Ordinal);
+        var markerIndex = pdf.Text.IndexOf(marker, StringComparison.Ordinal);
         Assert.True(markerIndex > xrefOffset, "startxref must follow the xref table");
 
         var rest = pdf.Text.Substring(markerIndex + marker.Length);
@@ -184,7 +185,7 @@ public class DocumentWriterTests
     {
         var count = 0;
         var index = 0;
-        while ((index = haystack.IndexOf(needle, index, System.StringComparison.Ordinal)) >= 0)
+        while ((index = haystack.IndexOf(needle, index, StringComparison.Ordinal)) >= 0)
         {
             count++;
             index += needle.Length;

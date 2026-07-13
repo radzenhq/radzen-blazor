@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -93,7 +94,7 @@ public class PageLabelsTests
         var document = Document(4);
         document.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal });
 
-        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+        Assert.Throws<InvalidOperationException>(() => document.ToArray());
     }
 
     [Fact]
@@ -103,7 +104,7 @@ public class PageLabelsTests
         document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.Decimal });
         document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.UppercaseRoman });
 
-        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+        Assert.Throws<InvalidOperationException>(() => document.ToArray());
     }
 
     [Fact]
@@ -112,7 +113,7 @@ public class PageLabelsTests
         var document = Document(2);
         document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.Decimal, Start = 0 });
 
-        Assert.Throws<System.InvalidOperationException>(() => document.ToArray());
+        Assert.Throws<InvalidOperationException>(() => document.ToArray());
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -63,8 +64,8 @@ public class StyledFaceRegistrationTests
 
         Assert.Equal(2, type0.Count);
         var names = type0.Select(f => BuildTestSupport.Name(reader, f, "BaseFont")).ToList();
-        Assert.Contains(names, n => n.Contains("Bold", System.StringComparison.Ordinal));
-        Assert.Contains(names, n => !n.Contains("Bold", System.StringComparison.Ordinal));
+        Assert.Contains(names, n => n.Contains("Bold", StringComparison.Ordinal));
+        Assert.Contains(names, n => !n.Contains("Bold", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -95,6 +96,6 @@ public class StyledFaceRegistrationTests
         Assert.Single(BuildTestSupport.Type0Fonts(reader));
 
         var reloaded = BuildTestSupport.Reload(builder);
-        Assert.Contains("Bold wanted", reloaded.ExtractText(), System.StringComparison.Ordinal);
+        Assert.Contains("Bold wanted", reloaded.ExtractText(), StringComparison.Ordinal);
     }
 }

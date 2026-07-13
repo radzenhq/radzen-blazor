@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Globalization;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -58,9 +60,9 @@ public class OpacityWatermarkTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "CA"), 6);
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        var fill = text.IndexOf(" re f", gs, System.StringComparison.Ordinal);
+        var fill = text.IndexOf(" re f", gs, StringComparison.Ordinal);
         Assert.True(fill > gs);
     }
 
@@ -91,9 +93,9 @@ public class OpacityWatermarkTests
         Assert.Equal(0.25, Alpha(states!, "GS0", "ca"), 6);
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        Assert.True(text.IndexOf(" Do", gs, System.StringComparison.Ordinal) > gs);
+        Assert.True(text.IndexOf(" Do", gs, StringComparison.Ordinal) > gs);
     }
 
     [Fact]
@@ -130,7 +132,7 @@ public class OpacityWatermarkTests
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
         Assert.Null(ExtGStates(builder));
-        Assert.DoesNotContain(" gs\n", PageText(builder), System.StringComparison.Ordinal);
+        Assert.DoesNotContain(" gs\n", PageText(builder), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -152,9 +154,9 @@ public class OpacityWatermarkTests
         for (var i = 0; i < pages.Count; i++)
         {
             var text = PageText(builder, i);
-            Assert.Contains("0.707 0.707 -0.707 0.707 200 100 cm", text, System.StringComparison.Ordinal);
-            Assert.Contains("(DRAFT) Tj", text, System.StringComparison.Ordinal);
-            Assert.Contains("/GS0 gs", text, System.StringComparison.Ordinal);
+            Assert.Contains("0.707 0.707 -0.707 0.707 200 100 cm", text, StringComparison.Ordinal);
+            Assert.Contains("(DRAFT) Tj", text, StringComparison.Ordinal);
+            Assert.Contains("/GS0 gs", text, StringComparison.Ordinal);
 
             var states = ExtGStates(builder, i);
             Assert.NotNull(states);
@@ -172,15 +174,15 @@ public class OpacityWatermarkTests
 
         var text = PageText(builder);
         var width = new FontCollection().MeasureText("X", section.Watermark.Font);
-        var index = text.IndexOf("(X) Tj", System.StringComparison.Ordinal);
+        var index = text.IndexOf("(X) Tj", StringComparison.Ordinal);
         Assert.True(index >= 0);
         var expected = string.Format(
-            System.Globalization.CultureInfo.InvariantCulture,
+            CultureInfo.InvariantCulture,
             "{0:0.###} {1:0.###} Td",
             -width / 2,
             -section.Watermark.Font.Size * 0.35);
-        Assert.Contains(expected, text, System.StringComparison.Ordinal);
-        Assert.DoesNotContain(" gs\n", text, System.StringComparison.Ordinal);
+        Assert.Contains(expected, text, StringComparison.Ordinal);
+        Assert.DoesNotContain(" gs\n", text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -197,9 +199,9 @@ public class OpacityWatermarkTests
         Assert.Single(BuildTestSupport.ImageXObjects(reader));
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        Assert.Contains("0.866 0.5 -0.5 0.866", text, System.StringComparison.Ordinal);
-        Assert.True(text.IndexOf(" Do", gs, System.StringComparison.Ordinal) > gs);
+        Assert.Contains("0.866 0.5 -0.5 0.866", text, StringComparison.Ordinal);
+        Assert.True(text.IndexOf(" Do", gs, StringComparison.Ordinal) > gs);
     }
 }

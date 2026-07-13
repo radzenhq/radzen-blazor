@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -34,8 +35,8 @@ public class StampTests
 
         Assert.Contains("FIRST", content);
         Assert.Contains("SECOND", content);
-        Assert.True(content.IndexOf("FIRST", System.StringComparison.Ordinal)
-            < content.IndexOf("SECOND", System.StringComparison.Ordinal));
+        Assert.True(content.IndexOf("FIRST", StringComparison.Ordinal)
+            < content.IndexOf("SECOND", StringComparison.Ordinal));
     }
 
     [Fact]

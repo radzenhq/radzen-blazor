@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -56,11 +57,11 @@ public class TextOpacityTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "CA"), 6);
 
         var text = PageText(builder);
-        var gs = text.IndexOf("q\n/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("q\n/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        var show = text.IndexOf(" Tj", gs, System.StringComparison.Ordinal);
+        var show = text.IndexOf(" Tj", gs, StringComparison.Ordinal);
         Assert.True(show > gs);
-        Assert.True(text.IndexOf("Q\n", show, System.StringComparison.Ordinal) > show);
+        Assert.True(text.IndexOf("Q\n", show, StringComparison.Ordinal) > show);
         Assert.Equal(1, BuildTestSupport.CountOccurrences(text, " gs"));
     }
 
@@ -93,9 +94,9 @@ public class TextOpacityTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        Assert.True(text.IndexOf(" Tj", gs, System.StringComparison.Ordinal) > gs);
+        Assert.True(text.IndexOf(" Tj", gs, StringComparison.Ordinal) > gs);
     }
 
     [Fact]
@@ -111,9 +112,9 @@ public class TextOpacityTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        Assert.True(text.IndexOf(" Do", gs, System.StringComparison.Ordinal) > gs);
+        Assert.True(text.IndexOf(" Do", gs, StringComparison.Ordinal) > gs);
     }
 
     [Fact]
@@ -142,10 +143,10 @@ public class TextOpacityTests
         cell.Blocks.Add(Text("Nested"));
 
         var text = PageText(builder);
-        var gs = text.IndexOf("/GS0 gs", System.StringComparison.Ordinal);
+        var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
-        Assert.True(text.IndexOf(" re f", gs, System.StringComparison.Ordinal) > gs);
-        Assert.True(text.IndexOf(" Tj", gs, System.StringComparison.Ordinal) > gs);
+        Assert.True(text.IndexOf(" re f", gs, StringComparison.Ordinal) > gs);
+        Assert.True(text.IndexOf(" Tj", gs, StringComparison.Ordinal) > gs);
     }
 
     [Fact]
@@ -187,6 +188,6 @@ public class TextOpacityTests
         }
 
         Assert.Equal(Content(set: false), Content(set: true));
-        Assert.DoesNotContain(" gs\n", Encoding.ASCII.GetString(Content(set: true)), System.StringComparison.Ordinal);
+        Assert.DoesNotContain(" gs\n", Encoding.ASCII.GetString(Content(set: true)), StringComparison.Ordinal);
     }
 }

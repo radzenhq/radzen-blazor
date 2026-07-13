@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -80,7 +81,7 @@ public class HeaderFooterBandRegressionTests
         section.Blocks.Add(Text("BODY", BodyFontSize));
 
         var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
-        var headerYs = runs.Where(r => r.Text.StartsWith("HDR", System.StringComparison.Ordinal)).Select(r => r.Y).ToList();
+        var headerYs = runs.Where(r => r.Text.StartsWith("HDR", StringComparison.Ordinal)).Select(r => r.Y).ToList();
         var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;
 
         Assert.Equal(3, headerYs.Count);
@@ -115,8 +116,8 @@ public class HeaderFooterBandRegressionTests
         }
 
         var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
-        var footerYs = runs.Where(r => r.Text.StartsWith("FTR", System.StringComparison.Ordinal)).Select(r => r.Y).ToList();
-        var bodyYs = runs.Where(r => r.Text.StartsWith("B", System.StringComparison.Ordinal)).Select(r => r.Y).ToList();
+        var footerYs = runs.Where(r => r.Text.StartsWith("FTR", StringComparison.Ordinal)).Select(r => r.Y).ToList();
+        var bodyYs = runs.Where(r => r.Text.StartsWith("B", StringComparison.Ordinal)).Select(r => r.Y).ToList();
 
         Assert.Equal(3, footerYs.Count);
         Assert.NotEmpty(bodyYs);
@@ -186,12 +187,12 @@ public class HeaderFooterBandRegressionTests
 
         var text = BuildTestSupport.Reload(builder).ExtractText();
 
-        Assert.Contains("HeadLogo", text, System.StringComparison.Ordinal);
-        Assert.Contains("HeadTitle", text, System.StringComparison.Ordinal);
-        Assert.Contains("BodyLine", text, System.StringComparison.Ordinal);
+        Assert.Contains("HeadLogo", text, StringComparison.Ordinal);
+        Assert.Contains("HeadTitle", text, StringComparison.Ordinal);
+        Assert.Contains("BodyLine", text, StringComparison.Ordinal);
         Assert.True(
-            text.IndexOf("HeadLogo", System.StringComparison.Ordinal)
-                < text.IndexOf("BodyLine", System.StringComparison.Ordinal),
+            text.IndexOf("HeadLogo", StringComparison.Ordinal)
+                < text.IndexOf("BodyLine", StringComparison.Ordinal),
             "header table text reads above the body");
     }
 
@@ -206,12 +207,12 @@ public class HeaderFooterBandRegressionTests
 
         var text = BuildTestSupport.Reload(builder).ExtractText();
 
-        Assert.Contains("FootLeft", text, System.StringComparison.Ordinal);
-        Assert.Contains("FootRight", text, System.StringComparison.Ordinal);
-        Assert.Contains("BodyLine", text, System.StringComparison.Ordinal);
+        Assert.Contains("FootLeft", text, StringComparison.Ordinal);
+        Assert.Contains("FootRight", text, StringComparison.Ordinal);
+        Assert.Contains("BodyLine", text, StringComparison.Ordinal);
         Assert.True(
-            text.IndexOf("BodyLine", System.StringComparison.Ordinal)
-                < text.IndexOf("FootLeft", System.StringComparison.Ordinal),
+            text.IndexOf("BodyLine", StringComparison.Ordinal)
+                < text.IndexOf("FootLeft", StringComparison.Ordinal),
             "footer table text reads below the body");
     }
 }

@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -305,7 +306,7 @@ internal static class ContentStreamTokenizer
             i++;
         }
 
-        var text = System.Text.Encoding.ASCII.GetString(data, start, i - start);
+        var text = Encoding.ASCII.GetString(data, start, i - start);
         if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
         {
             return new ContentToken { Kind = ContentTokenKind.Number, Text = text, Number = value };
@@ -330,7 +331,7 @@ internal static class ContentStreamTokenizer
         return new ContentToken
         {
             Kind = ContentTokenKind.Operator,
-            Text = System.Text.Encoding.ASCII.GetString(data, start, i - start),
+            Text = Encoding.ASCII.GetString(data, start, i - start),
         };
     }
 

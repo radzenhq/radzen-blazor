@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf;
@@ -60,7 +61,7 @@ public class ContentStreamCompactionTests
 
     private static int FractionDigits(string text)
     {
-        var dot = text.IndexOf('.', System.StringComparison.Ordinal);
+        var dot = text.IndexOf('.', StringComparison.Ordinal);
         return dot < 0 ? 0 : text.Length - dot - 1;
     }
 
@@ -148,7 +149,7 @@ public class ContentStreamCompactionTests
 
         foreach (var expected in new[] { "Invoice INV-42", "Description", "Amount", "Consulting", "1234.50", "Hosting", "89.99", "Support", "375.00" })
         {
-            Assert.True(text.Contains(expected, System.StringComparison.Ordinal), $"extracted text missing '{expected}'");
+            Assert.True(text.Contains(expected, StringComparison.Ordinal), $"extracted text missing '{expected}'");
         }
     }
 }

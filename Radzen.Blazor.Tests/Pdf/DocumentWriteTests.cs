@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -36,10 +37,10 @@ public class DocumentWriteTests
     {
         var box = Assert.IsType<ArrayObject>(reader.Resolve(page["MediaBox"]));
         Assert.Equal(4, box.Count);
-        Assert.True(System.Math.Abs(0.0 - Assert.IsType<NumberObject>(box[0]).DoubleValue) < 0.01);
-        Assert.True(System.Math.Abs(0.0 - Assert.IsType<NumberObject>(box[1]).DoubleValue) < 0.01);
-        Assert.True(System.Math.Abs(width - Assert.IsType<NumberObject>(box[2]).DoubleValue) < 0.01);
-        Assert.True(System.Math.Abs(height - Assert.IsType<NumberObject>(box[3]).DoubleValue) < 0.01);
+        Assert.True(Math.Abs(0.0 - Assert.IsType<NumberObject>(box[0]).DoubleValue) < 0.01);
+        Assert.True(Math.Abs(0.0 - Assert.IsType<NumberObject>(box[1]).DoubleValue) < 0.01);
+        Assert.True(Math.Abs(width - Assert.IsType<NumberObject>(box[2]).DoubleValue) < 0.01);
+        Assert.True(Math.Abs(height - Assert.IsType<NumberObject>(box[3]).DoubleValue) < 0.01);
     }
 
     [Fact]

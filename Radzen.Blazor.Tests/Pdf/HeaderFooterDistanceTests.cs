@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -130,7 +131,7 @@ public class HeaderFooterDistanceTests
         var (lineHeight, baseline) = LineMetrics(FontSize);
 
         Assert.True(
-            System.Math.Abs(headerY - (PageHeight - distance - baseline)) <= Tol,
+            Math.Abs(headerY - (PageHeight - distance - baseline)) <= Tol,
             $"header baseline {headerY:F2} must start HeaderDistance {distance:F2} below the page top");
 
         var bandBottomEdge = PageHeight - distance - lineHeight;
@@ -158,12 +159,12 @@ public class HeaderFooterDistanceTests
 
         var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
         var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
-        var bodyYs = runs.Where(r => r.Text.StartsWith("B", System.StringComparison.Ordinal)).Select(r => r.Y).ToList();
+        var bodyYs = runs.Where(r => r.Text.StartsWith("B", StringComparison.Ordinal)).Select(r => r.Y).ToList();
         Assert.NotEmpty(bodyYs);
 
         var bandTopEdge = distance + lineHeight;
         Assert.True(
-            System.Math.Abs(footerY - (bandTopEdge - baseline)) <= Tol,
+            Math.Abs(footerY - (bandTopEdge - baseline)) <= Tol,
             $"footer baseline {footerY:F2} must end FooterDistance {distance:F2} above the page bottom");
 
         Assert.All(bodyYs, y => Assert.True(
@@ -193,15 +194,15 @@ public class HeaderFooterDistanceTests
         var (lineHeight, baseline) = LineMetrics(FontSize);
 
         Assert.True(
-            System.Math.Abs(headerY - (PageHeight - headerDistance - baseline)) <= Tol,
+            Math.Abs(headerY - (PageHeight - headerDistance - baseline)) <= Tol,
             $"header baseline {headerY:F2} must reflect HeaderDistance {headerDistance}");
         Assert.True(
-            System.Math.Abs(footerY - (footerDistance + lineHeight - baseline)) <= Tol,
+            Math.Abs(footerY - (footerDistance + lineHeight - baseline)) <= Tol,
             $"footer baseline {footerY:F2} must reflect FooterDistance {footerDistance}");
 
         // Bands plus distances fit inside the 60pt margins, so the body keeps them.
         Assert.True(
-            System.Math.Abs(bodyY - (PageHeight - margin - baseline)) <= Tol,
+            Math.Abs(bodyY - (PageHeight - margin - baseline)) <= Tol,
             $"body baseline {bodyY:F2} must stay at the margin when the bands fit inside it");
     }
 }

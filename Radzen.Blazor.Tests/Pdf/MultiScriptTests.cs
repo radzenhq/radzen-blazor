@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -48,9 +49,9 @@ public class MultiScriptTests
         var reloaded = BuildTestSupport.Reload(AuthorThreeScripts());
         var text = reloaded.ExtractText();
 
-        var en = text.IndexOf(English, System.StringComparison.Ordinal);
-        var bg = text.IndexOf(Bulgarian, System.StringComparison.Ordinal);
-        var cjk = text.IndexOf(Chinese, System.StringComparison.Ordinal);
+        var en = text.IndexOf(English, StringComparison.Ordinal);
+        var bg = text.IndexOf(Bulgarian, StringComparison.Ordinal);
+        var cjk = text.IndexOf(Chinese, StringComparison.Ordinal);
 
         Assert.True(en >= 0, "English line present");
         Assert.True(bg >= 0, "Cyrillic line present");

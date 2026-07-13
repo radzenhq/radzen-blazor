@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -260,13 +261,13 @@ internal static class Type0EmbedSupport
         Assert.True(font.TryGetTable("glyf", out var glyf), "font has glyf");
         Assert.True(font.TryGetTable("loca", out var loca), "font has loca");
         Assert.True(font.TryGetTable("head", out var head), "font has head");
-        var longLoca = System.Buffers.Binary.BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
+        var longLoca = BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
 
         uint Offset(int index) => longLoca
-            ? System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
-            : System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
+            ? BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
+            : BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
 
-        ushort U16(int offset) => System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(glyf.AsSpan(offset));
+        ushort U16(int offset) => BinaryPrimitives.ReadUInt16BigEndian(glyf.AsSpan(offset));
 
         var closure = new HashSet<int> { 0 };
         var pending = new Stack<int>();
@@ -330,11 +331,11 @@ internal static class Type0EmbedSupport
         Assert.True(font.TryGetTable("glyf", out var glyf));
         Assert.True(font.TryGetTable("loca", out var loca));
         Assert.True(font.TryGetTable("head", out var head));
-        var longLoca = System.Buffers.Binary.BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
+        var longLoca = BinaryPrimitives.ReadInt16BigEndian(head.AsSpan(50)) != 0;
 
         uint Offset(int index) => longLoca
-            ? System.Buffers.Binary.BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
-            : System.Buffers.Binary.BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
+            ? BinaryPrimitives.ReadUInt32BigEndian(loca.AsSpan(index * 4))
+            : BinaryPrimitives.ReadUInt16BigEndian(loca.AsSpan(index * 2)) * 2u;
 
         return glyf[(int)Offset(gid)..(int)Offset(gid + 1)];
     }

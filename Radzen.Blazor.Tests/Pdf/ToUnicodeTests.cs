@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
@@ -73,7 +74,7 @@ public class ToUnicodeTests
         var e = Type0EmbedSupport.Embed(font, Type0EmbedSupport.BuildMap(font, NotoSample));
 
         var stream = Type0EmbedSupport.Stream(e.Reader, e.Top["ToUnicode"]);
-        var text = System.Text.Encoding.Latin1.GetString(Type0EmbedSupport.DecodeStream(e.Reader, stream));
+        var text = Encoding.Latin1.GetString(Type0EmbedSupport.DecodeStream(e.Reader, stream));
 
         Assert.Contains("begincodespacerange", text);
         Assert.Contains("endcodespacerange", text);

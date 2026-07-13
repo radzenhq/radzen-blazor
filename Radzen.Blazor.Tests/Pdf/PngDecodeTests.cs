@@ -1,6 +1,9 @@
 #nullable enable
 using System;
+using System.Buffers.Binary;
+using System.IO;
 using System.IO.Compression;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
@@ -126,7 +129,7 @@ public class PngDecodeTests
 
     private static byte[] BuildInterlacedPngHeader()
     {
-        using var ms = new System.IO.MemoryStream();
+        using var ms = new MemoryStream();
         ms.Write([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
         // IHDR: 1x1, 8-bit, truecolor, no compression/filter method flags, interlace = 1 (Adam7).
@@ -149,24 +152,24 @@ public class PngDecodeTests
         return ms.ToArray();
     }
 
-    private static void WriteChunk(System.IO.Stream stream, string type, byte[] data)
+    private static void WriteChunk(Stream stream, string type, byte[] data)
     {
-        var typeBytes = System.Text.Encoding.ASCII.GetBytes(type);
+        var typeBytes = Encoding.ASCII.GetBytes(type);
         Span<byte> len = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(len, (uint)data.Length);
+        BinaryPrimitives.WriteUInt32BigEndian(len, (uint)data.Length);
         stream.Write(len);
         stream.Write(typeBytes);
         stream.Write(data);
 
         var crc = Crc32(typeBytes, data);
         Span<byte> crcBytes = stackalloc byte[4];
-        System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
+        BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
         stream.Write(crcBytes);
     }
 
     private static byte[] Deflate(byte[] data)
     {
-        using var output = new System.IO.MemoryStream();
+        using var output = new MemoryStream();
         using (var zlib = new ZLibStream(output, CompressionMode.Compress, leaveOpen: true))
         {
             zlib.Write(data, 0, data.Length);

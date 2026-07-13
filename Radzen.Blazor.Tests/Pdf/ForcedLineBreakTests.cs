@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -87,7 +88,7 @@ public class ForcedLineBreakTests
 
         var content = CascadeTestSupport.FirstPageContent(builder);
         var baselines = CascadeTestSupport.TdPositions(content)
-            .Select(p => System.Math.Round(p.Y, 2))
+            .Select(p => Math.Round(p.Y, 2))
             .Distinct()
             .ToList();
 

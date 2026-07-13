@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Buffers.Binary;
+using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -22,7 +23,7 @@ public class FontEmbedPermissionTests
         for (var i = 0; i < numTables; i++)
         {
             var rec = 12 + i * 16;
-            var t = System.Text.Encoding.ASCII.GetString(data, rec, 4);
+            var t = Encoding.ASCII.GetString(data, rec, 4);
             if (t == tag)
             {
                 return (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(rec + 8));

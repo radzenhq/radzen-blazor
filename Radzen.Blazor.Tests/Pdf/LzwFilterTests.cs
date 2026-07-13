@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
@@ -21,7 +22,7 @@ public class LzwFilterTests
     [Fact]
     public void Decode_Empty_ReturnsEmpty()
     {
-        Assert.Empty(LzwFilter.Decode(System.Array.Empty<byte>(), early: 1));
+        Assert.Empty(LzwFilter.Decode(Array.Empty<byte>(), early: 1));
     }
 
     // Round-trip with the default early-change (1). The encoder helper below is part of

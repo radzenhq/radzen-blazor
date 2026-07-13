@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -246,7 +247,7 @@ public class CompactGlyfSubsetTests
         var reloaded = BuildTestSupport.Reload(Builder());
         var text = reloaded.ExtractText();
 
-        Assert.Contains("Naïve café fjord", text, System.StringComparison.Ordinal);
-        Assert.Contains("Мой рай", text, System.StringComparison.Ordinal);
+        Assert.Contains("Naïve café fjord", text, StringComparison.Ordinal);
+        Assert.Contains("Мой рай", text, StringComparison.Ordinal);
     }
 }
