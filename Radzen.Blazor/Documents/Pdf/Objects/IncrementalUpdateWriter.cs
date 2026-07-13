@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -57,10 +55,21 @@ public sealed class IncrementalUpdateWriter
         ArgumentNullException.ThrowIfNull(original);
         ArgumentNullException.ThrowIfNull(reader);
 
+        // An incremental update over an encrypted original would either drop /Encrypt from
+        // the newest trailer (readers then treat the still-encrypted originals as plaintext)
+        // or write the appended objects in plaintext under a passthrough /Encrypt (readers
+        // then "decrypt" them into garbage). This writer has no encryption scope, so both
+        // outcomes corrupt silently; refuse the input as PdfSigner/DssBuilder already do.
+        if (reader.IsEncrypted)
+        {
+            throw new NotSupportedException(
+                "Incremental update of an encrypted document is not supported.");
+        }
+
         this.original = original;
         this.reader = reader;
 
-        previousStartXref = FindStartXref(original);
+        previousStartXref = PdfBytes.FindStartXref(original);
         classicXref = IsClassicXref(original, previousStartXref);
 
         originalMaxNumber = reader.Trailer.TryGetValue("Size", out var size) && size is NumberObject sizeNumber
@@ -203,7 +212,6 @@ public sealed class IncrementalUpdateWriter
     private void WriteClassicXref(CountingBufferedStream buffer, SortedDictionary<int, long> offsets)
     {
         PdfBytes.WriteAscii(buffer, "xref\n");
-        Span<char> padded = stackalloc char[20];
         foreach (var (start, count) in Subsections(offsets))
         {
             PdfBytes.WriteInteger(buffer, start);
@@ -212,9 +220,7 @@ public sealed class IncrementalUpdateWriter
             PdfBytes.WriteAscii(buffer, "\n");
             for (var number = start; number < start + count; number++)
             {
-                offsets[number].TryFormat(padded, out var written, "D10", CultureInfo.InvariantCulture);
-                PdfBytes.WriteAscii(buffer, padded[..written]);
-                PdfBytes.WriteAscii(buffer, " 00000 n \n");
+                PdfBytes.WriteXrefEntry(buffer, offsets[number]);
             }
         }
 
@@ -232,7 +238,7 @@ public sealed class IncrementalUpdateWriter
         var w1 = 1;
         foreach (var offset in offsets.Values)
         {
-            w1 = Math.Max(w1, FieldWidth(offset));
+            w1 = Math.Max(w1, PdfBytes.FieldWidth(offset));
         }
 
         var index = new ArrayObject();
@@ -244,7 +250,7 @@ public sealed class IncrementalUpdateWriter
             for (var number = start; number < start + count; number++)
             {
                 data.WriteByte(1);
-                WriteBigEndian(data, offsets[number], w1);
+                PdfBytes.WriteBigEndian(data, offsets[number], w1);
                 data.WriteByte(0);
             }
         }
@@ -319,39 +325,6 @@ public sealed class IncrementalUpdateWriter
         }
     }
 
-    private static long FindStartXref(byte[] data)
-    {
-        const string pattern = "startxref";
-        for (var i = data.Length - pattern.Length; i >= 0; i--)
-        {
-            if (!Matches(data, i, pattern))
-            {
-                continue;
-            }
-
-            var index = i + pattern.Length;
-            while (index < data.Length && Lexer.IsWhitespace(data[index]))
-            {
-                index++;
-            }
-
-            var start = index;
-            while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
-            {
-                index++;
-            }
-
-            if (index == start)
-            {
-                throw new DocumentParseException("Expected integer after startxref.", start);
-            }
-
-            return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
-        }
-
-        throw new DocumentParseException("Missing startxref.", -1);
-    }
-
     private static bool IsClassicXref(byte[] data, long offset)
     {
         var index = (int)offset;
@@ -365,44 +338,6 @@ public sealed class IncrementalUpdateWriter
             index++;
         }
 
-        return Matches(data, index, "xref");
-    }
-
-    private static bool Matches(byte[] data, int index, string pattern)
-    {
-        if (index < 0 || index + pattern.Length > data.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < pattern.Length; i++)
-        {
-            if (data[index + i] != (byte)pattern[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static int FieldWidth(long value)
-    {
-        var width = 1;
-        while (value > 0xFF)
-        {
-            value >>= 8;
-            width++;
-        }
-
-        return width;
-    }
-
-    private static void WriteBigEndian(Stream stream, long value, int width)
-    {
-        for (var i = width - 1; i >= 0; i--)
-        {
-            stream.WriteByte((byte)(value >> (8 * i)));
-        }
+        return PdfBytes.Matches(data, index, "xref");
     }
 }

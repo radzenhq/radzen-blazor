@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf;
 
@@ -139,26 +140,43 @@ internal static class ContentTokenizer
     }
 
     // After a BI operator, skip the inline-image dict and its binary payload, resuming
-    // past the whitespace-delimited EI so the binary is not lexed as operators. EI may
-    // occur inside the binary, so it only terminates when bounded by whitespace/EOF.
+    // past the EI that ends the image. The exact payload length is computed from the
+    // dictionary (an explicit /L, or /W /H /BPC and the color-space component count for
+    // an unfiltered image) so a payload that happens to contain the bytes "EI" is not
+    // mistaken for the terminator. Only a filtered image with no /L - whose decoded
+    // length the tokenizer cannot know - falls back to the whitespace-bounded EI scan.
     private static void SkipInlineImage(byte[] data, ref int position)
     {
-        while (position < data.Length)
+        var image = ParseInlineImageDictionary(data, ref position);
+        if (position >= data.Length)
         {
-            if (data[position] == (byte)'I' && position + 1 < data.Length && data[position + 1] == (byte)'D'
-                && (position == 0 || IsWhitespace(data[position - 1]) || IsDelimiter(data[position - 1]))
-                && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2])))
-            {
-                position += 2;
-                break;
-            }
+            return;
+        }
 
+        // Exactly one whitespace byte separates ID from the binary payload.
+        if (IsWhitespace(data[position]))
+        {
             position++;
         }
 
-        if (position < data.Length && IsWhitespace(data[position]))
+        // When the payload length is known, jump straight to it - but only commit if an EI
+        // actually follows. A declared geometry that disagrees with the real payload (a
+        // malformed image) falls through to the whitespace-bounded EI scan instead.
+        var length = InlineImagePayloadLength(image);
+        if (length >= 0 && position + length <= data.Length)
         {
-            position++;
+            var probe = position + (int)length;
+            while (probe < data.Length && IsWhitespace(data[probe]))
+            {
+                probe++;
+            }
+
+            if (probe + 1 < data.Length && data[probe] == (byte)'E' && data[probe + 1] == (byte)'I'
+                && (probe + 2 >= data.Length || IsWhitespace(data[probe + 2]) || IsDelimiter(data[probe + 2])))
+            {
+                position = probe + 2;
+                return;
+            }
         }
 
         // EI ends the payload when bounded by whitespace/delimiter/EOF on the trailing side.
@@ -176,6 +194,227 @@ internal static class ContentTokenizer
 
             position++;
         }
+    }
+
+    // Reads the key/value pairs between BI and ID into the fields needed to size the
+    // payload; leaves position just past the ID keyword.
+    private static InlineImage ParseInlineImageDictionary(byte[] data, ref int position)
+    {
+        var image = new InlineImage();
+        while (position < data.Length)
+        {
+            SkipTokenWhitespace(data, ref position);
+            if (position >= data.Length)
+            {
+                break;
+            }
+
+            if (data[position] == (byte)'/')
+            {
+                var key = ReadName(data, ref position);
+                SkipTokenWhitespace(data, ref position);
+                var value = ReadInlineToken(data, ref position);
+                image.Set(key, value);
+                continue;
+            }
+
+            var keyword = ReadInlineToken(data, ref position);
+            if (keyword == "ID")
+            {
+                return image;
+            }
+        }
+
+        return image;
+    }
+
+    private static void SkipTokenWhitespace(byte[] data, ref int position)
+    {
+        while (position < data.Length)
+        {
+            if (IsWhitespace(data[position]))
+            {
+                position++;
+            }
+            else if (data[position] == (byte)'%')
+            {
+                while (position < data.Length && data[position] != (byte)'\n' && data[position] != (byte)'\r')
+                {
+                    position++;
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
+    // Reads a single dictionary value: a name (returned with a leading '/'), an
+    // array/dictionary (skipped and returned as null), or a bare token (number, boolean
+    // or keyword). Only the shapes the payload-length computation needs are distinguished.
+    private static string? ReadInlineToken(byte[] data, ref int position)
+    {
+        if (position >= data.Length)
+        {
+            return null;
+        }
+
+        var b = data[position];
+        if (b == (byte)'/')
+        {
+            return "/" + ReadName(data, ref position);
+        }
+
+        if (b == (byte)'[' || b == (byte)'<')
+        {
+            SkipInlineComposite(data, ref position);
+            return null;
+        }
+
+        var start = position;
+        while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
+        {
+            position++;
+        }
+
+        if (position > start)
+        {
+            return Latin1(data, start, position - start);
+        }
+
+        // A stray delimiter that is not a name/array/dict start: consume one byte so the
+        // dictionary scan always makes progress and never spins to EOF.
+        position++;
+        return null;
+    }
+
+    private static void SkipInlineComposite(byte[] data, ref int position)
+    {
+        var depth = 0;
+        while (position < data.Length)
+        {
+            var b = data[position];
+            if (b == (byte)'[' || (b == (byte)'<' && position + 1 < data.Length && data[position + 1] == (byte)'<'))
+            {
+                depth++;
+                position += b == (byte)'<' ? 2 : 1;
+            }
+            else if (b == (byte)']' || (b == (byte)'>' && position + 1 < data.Length && data[position + 1] == (byte)'>'))
+            {
+                depth--;
+                position += b == (byte)'>' ? 2 : 1;
+                if (depth <= 0)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                position++;
+            }
+        }
+    }
+
+    private static long InlineImagePayloadLength(InlineImage image)
+    {
+        if (image.Length >= 0)
+        {
+            return image.Length;
+        }
+
+        // A filtered image's on-disk length is its compressed size, which cannot be
+        // derived from the geometry; defer to the EI scan.
+        if (image.Filtered)
+        {
+            return -1;
+        }
+
+        if (image.Width <= 0 || image.Height <= 0)
+        {
+            return -1;
+        }
+
+        var components = image.Components();
+        if (components <= 0)
+        {
+            return -1;
+        }
+
+        var bits = image.ImageMask ? 1 : image.BitsPerComponent;
+        if (bits <= 0)
+        {
+            return -1;
+        }
+
+        var bitsPerRow = (long)image.Width * components * bits;
+        var bytesPerRow = (bitsPerRow + 7) / 8;
+        return bytesPerRow * image.Height;
+    }
+
+    private sealed class InlineImage
+    {
+        public int Width { get; private set; } = -1;
+
+        public int Height { get; private set; } = -1;
+
+        public int BitsPerComponent { get; private set; } = -1;
+
+        public long Length { get; private set; } = -1;
+
+        public bool ImageMask { get; private set; }
+
+        public bool Filtered { get; private set; }
+
+        private string? colorSpace;
+
+        public void Set(string key, string? value)
+        {
+            switch (key)
+            {
+                case "W" or "Width":
+                    Width = ParseInt(value, Width);
+                    break;
+                case "H" or "Height":
+                    Height = ParseInt(value, Height);
+                    break;
+                case "BPC" or "BitsPerComponent":
+                    BitsPerComponent = ParseInt(value, BitsPerComponent);
+                    break;
+                case "L" or "Length":
+                    if (value is not null && long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var len))
+                    {
+                        Length = len;
+                    }
+
+                    break;
+                case "IM" or "ImageMask":
+                    ImageMask = value == "true";
+                    break;
+                case "CS" or "ColorSpace":
+                    colorSpace = value;
+                    break;
+                case "F" or "Filter":
+                    // A null value means an array/dict filter list; a slash name is a
+                    // single filter. Either way the payload is compressed.
+                    Filtered = value is null || value.StartsWith('/');
+                    break;
+            }
+        }
+
+        public int Components() => colorSpace switch
+        {
+            "/G" or "/DeviceGray" or "/CalGray" or "/I" or "/Indexed" => 1,
+            "/RGB" or "/DeviceRGB" or "/CalRGB" or "/Lab" => 3,
+            "/CMYK" or "/DeviceCMYK" => 4,
+            null when ImageMask => 1,
+            _ => -1,
+        };
+
+        private static int ParseInt(string? value, int fallback)
+            => value is not null && int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed)
+                ? parsed
+                : fallback;
     }
 
     private static byte[] ReadLiteralString(byte[] data, ref int position)
@@ -338,21 +577,11 @@ internal static class ContentTokenizer
         _ => -1,
     };
 
-    private static string Latin1(byte[] data, int start, int length)
-    {
-        var chars = new char[length];
-        for (var i = 0; i < length; i++)
-        {
-            chars[i] = (char)data[start + i];
-        }
+    private static string Latin1(byte[] data, int start, int length) => Encoding.Latin1.GetString(data, start, length);
 
-        return new string(chars);
-    }
+    private static bool IsWhitespace(byte b) => Lexer.IsWhitespace(b);
 
-    private static bool IsWhitespace(byte b) => b is 0 or 9 or 10 or 12 or 13 or 32;
-
-    private static bool IsDelimiter(byte b) => b is (byte)'(' or (byte)')' or (byte)'<' or (byte)'>'
-        or (byte)'[' or (byte)']' or (byte)'{' or (byte)'}' or (byte)'/' or (byte)'%';
+    private static bool IsDelimiter(byte b) => Lexer.IsDelimiter(b);
 
     private static bool IsNumberStart(byte b) => b is (byte)'+' or (byte)'-' or (byte)'.' or (>= (byte)'0' and <= (byte)'9');
 
