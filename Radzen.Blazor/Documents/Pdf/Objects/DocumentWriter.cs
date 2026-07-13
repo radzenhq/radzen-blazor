@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Radzen.Documents.Pdf.Objects.Filters;
@@ -306,8 +305,15 @@ public sealed class DocumentWriter(Stream stream)
             return (null, -1);
         }
 
-        var documentId = RandomNumberGenerator.GetBytes(16);
-        var writer = EncryptionWriter.Build(Encryption, documentId, out var dictionary);
+        if (Encryption.Material is null)
+        {
+            throw new InvalidOperationException(
+                "EncryptionOptions.Material must be set to write an encrypted document; the library generates no randomness of its own.");
+        }
+
+        var sequence = new MaterialSequence(Encryption.Material);
+        var documentId = sequence.Next(16);
+        var writer = EncryptionWriter.Build(Encryption, documentId, sequence, out var dictionary);
         var reference = Add(dictionary);
         Trailer["Encrypt"] = reference;
 

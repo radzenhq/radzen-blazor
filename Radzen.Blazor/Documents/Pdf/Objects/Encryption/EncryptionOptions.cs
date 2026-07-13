@@ -42,6 +42,16 @@ public sealed class EncryptionOptions
     public EncryptionAlgorithm Algorithm { get; set; } = EncryptionAlgorithm.Aes128;
 
     /// <summary>
+    /// Gets or sets the source of the unpredictable bytes encryption requires - the
+    /// document <c>/ID</c>, the AES-256 file key, per-stream AES initialisation
+    /// vectors and the revision 6 salts. The library generates no randomness of its
+    /// own, so this must be set whenever encryption is used; writing an encrypted
+    /// document without it throws. See <see cref="IEncryptionMaterial"/> and the
+    /// deterministic <see cref="SeededEncryptionMaterial"/>.
+    /// </summary>
+    public IEncryptionMaterial? Material { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the document metadata is encrypted
     /// along with the rest of the file. Defaults to <c>true</c>. When set to
     /// <c>false</c> with a crypt-filter handler (<see cref="EncryptionAlgorithm.Aes128"/>

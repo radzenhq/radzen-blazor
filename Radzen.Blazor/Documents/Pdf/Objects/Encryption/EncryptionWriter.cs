@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Crypto;
 
@@ -13,7 +12,8 @@ namespace Radzen.Documents.Pdf.Objects.Encryption;
 /// in a thread-static ambient so <see cref="StringObject"/> and
 /// <see cref="StreamObject"/> can route their bytes through it.
 /// </summary>
-internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method cipher, bool encryptMetadata = true)
+internal sealed class EncryptionWriter(
+    byte[] fileKey, EncryptionWriter.Method cipher, MaterialSequence material, bool encryptMetadata = true)
 {
     [ThreadStatic]
     private static EncryptionWriter? current;
@@ -23,6 +23,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
 
     private readonly byte[] fileKey = fileKey;
     private readonly Method cipher = cipher;
+    private readonly MaterialSequence material = material;
     private readonly bool encryptMetadata = encryptMetadata;
 
     internal enum Method
@@ -36,10 +37,12 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
 
     public static int CurrentObjectNumber => currentObjectNumber;
 
-    public static EncryptionWriter Build(EncryptionOptions options, byte[] documentId, out DictionaryObject dictionary)
+    public static EncryptionWriter Build(
+        EncryptionOptions options, byte[] documentId, MaterialSequence material, out DictionaryObject dictionary)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(documentId);
+        ArgumentNullException.ThrowIfNull(material);
 
         var permissions = options.ToPermissions();
         var encryptMetadata = options.EncryptMetadata;
@@ -47,11 +50,14 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         {
             case EncryptionAlgorithm.Aes256:
             {
-                var fileKey = RandomNumberGenerator.GetBytes(32);
+                var fileKey = material.Next(32);
                 var derived = StandardSecurityHandler.DeriveAes256(
-                    options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata);
+                    options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata,
+                    userValidation: material.Next(8), userKeySalt: material.Next(8),
+                    ownerValidation: material.Next(8), ownerKeySalt: material.Next(8),
+                    permsNoise: material.Next(4));
                 dictionary = BuildV5Dictionary(derived, permissions, encryptMetadata);
-                return new EncryptionWriter(fileKey, Method.AesV3, encryptMetadata);
+                return new EncryptionWriter(fileKey, Method.AesV3, material, encryptMetadata);
             }
 
             case EncryptionAlgorithm.Aes128:
@@ -59,7 +65,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 4, 16, permissions, documentId, encryptMetadata);
                 dictionary = BuildLegacyDictionary(derived, permissions, aes: true, encryptMetadata);
-                return new EncryptionWriter(derived.FileKey, Method.AesV2, encryptMetadata);
+                return new EncryptionWriter(derived.FileKey, Method.AesV2, material, encryptMetadata);
             }
 
             default:
@@ -69,7 +75,7 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 3, 16, permissions, documentId, true);
                 dictionary = BuildLegacyDictionary(derived, permissions, aes: false, encryptMetadata: true);
-                return new EncryptionWriter(derived.FileKey, Method.Rc4);
+                return new EncryptionWriter(derived.FileKey, Method.Rc4, material);
             }
         }
     }
@@ -192,10 +198,10 @@ internal sealed class EncryptionWriter(byte[] fileKey, EncryptionWriter.Method c
         };
     }
 
-    // ISO 32000-1 algorithm 1.a: PKCS#7 pad, encrypt with a random IV, prepend the IV.
-    private static byte[] AesEncrypt(byte[] key, byte[] data)
+    // ISO 32000-1 algorithm 1.a: PKCS#7 pad, encrypt with a caller-supplied IV, prepend the IV.
+    private byte[] AesEncrypt(byte[] key, byte[] data)
     {
-        var iv = RandomNumberGenerator.GetBytes(16);
+        var iv = material.Next(16);
         var cipher = AesCbc.EncryptCbcNoPadding(key, iv, Pkcs7(data));
         var result = new byte[iv.Length + cipher.Length];
         Array.Copy(iv, result, iv.Length);

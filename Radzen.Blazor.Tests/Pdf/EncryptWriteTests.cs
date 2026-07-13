@@ -65,7 +65,7 @@ public class EncryptWriteTests
     [InlineData(EncryptionAlgorithm.Aes256)]
     public void EmptyUserPassword_RoundTripsStringAndStream(EncryptionAlgorithm algorithm)
     {
-        var pdf = WriteGraph(new EncryptionOptions { Algorithm = algorithm });
+        var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm });
         var (page, reader) = OpenPage(pdf, string.Empty);
 
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
@@ -81,7 +81,7 @@ public class EncryptWriteTests
     [InlineData(EncryptionAlgorithm.Aes256)]
     public void UserPassword_RoundTrips(EncryptionAlgorithm algorithm)
     {
-        var pdf = WriteGraph(new EncryptionOptions { Algorithm = algorithm, UserPassword = "s3cret" });
+        var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm, UserPassword = "s3cret" });
         var (page, reader) = OpenPage(pdf, "s3cret");
 
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
@@ -96,6 +96,7 @@ public class EncryptWriteTests
     {
         var pdf = WriteGraph(new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = algorithm,
             UserPassword = "user-pw",
             OwnerPassword = "owner-pw",
@@ -112,7 +113,7 @@ public class EncryptWriteTests
     [InlineData(EncryptionAlgorithm.Aes256)]
     public void WrongPassword_Throws(EncryptionAlgorithm algorithm)
     {
-        var pdf = WriteGraph(new EncryptionOptions { Algorithm = algorithm, UserPassword = "correct" });
+        var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm, UserPassword = "correct" });
         Assert.Throws<InvalidPasswordException>(() => DocumentReader.Parse(pdf, "wrong"));
     }
 
@@ -125,6 +126,7 @@ public class EncryptWriteTests
     {
         var pdf = WriteGraph(new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = algorithm,
             AllowModification = false,
             AllowContentCopy = false,
