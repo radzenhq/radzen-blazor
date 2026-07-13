@@ -1,29 +1,74 @@
 @using Radzen.Blazor
 
-<div class="rz-resource-groups">
-    @foreach (var resource in Scheduler?.Resources ?? Array.Empty<object>())
-    {
-        var text = Scheduler!.ResourceText(resource);
-        <div class="rz-resource-group">
-            <div class="rz-resource-group-header" title="@text">
-                @if (Scheduler.ResourceHeaderTemplate != null)
-                {
-                    @Scheduler.ResourceHeaderTemplate(resource)
-                }
-                else
-                {
-                    @text
-                }
-            </div>
-            @ChildContent(resource)
-        </div>
-    }
-</div>
+@if (Depth == 0)
+{
+    <div class="@ClassList.Create("rz-resource-groups").Add("rz-resource-groups-horizontal", Orientation == Radzen.Orientation.Horizontal).ToString()">
+        @Render()
+    </div>
+}
+else
+{
+    @Render()
+}
 
 @code {
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
 
     [Parameter]
-    public RenderFragment<object> ChildContent { get; set; } = default!;
+    public IList<RadzenSchedulerResource> Types { get; set; } = new List<RadzenSchedulerResource>();
+
+    [Parameter]
+    public Radzen.Orientation Orientation { get; set; } = Radzen.Orientation.Vertical;
+
+    [Parameter]
+    public int Depth { get; set; }
+
+    [Parameter]
+    public IDictionary<string, object>? Path { get; set; }
+
+    [Parameter]
+    public RenderFragment<IDictionary<string, object>> ChildContent { get; set; } = default!;
+
+    RenderFragment Render() => __builder =>
+    {
+        var levels = Types.Where(type => type.Items.Count > 0).ToList();
+
+        if (Depth < levels.Count)
+        {
+            var type = levels[Depth];
+
+            foreach (var item in type.Items)
+            {
+                var text = type.GetText(item);
+                IDictionary<string, object> path = Path != null ? new Dictionary<string, object>(Path) : new Dictionary<string, object>();
+                path[type.Name] = item;
+
+                <div class="rz-resource-group" style="--rz-scheduler-resource-group-depth: @Depth">
+                    <div class="rz-resource-group-header" title="@text">
+                        <span class="rz-resource-group-title">
+                            @if (type.HeaderTemplate != null)
+                            {
+                                @type.HeaderTemplate(item)
+                            }
+                            else
+                            {
+                                @text
+                            }
+                        </span>
+                    </div>
+                    @if (Depth + 1 < levels.Count)
+                    {
+                        <div class="@ClassList.Create("rz-resource-group-children").Add("rz-resource-groups-horizontal", Orientation == Radzen.Orientation.Horizontal).ToString()">
+                            <ResourceGroups Types=@Types Orientation=@Orientation Depth=@(Depth + 1) Path=@path ChildContent=@ChildContent />
+                        </div>
+                    }
+                    else
+                    {
+                        @ChildContent(path)
+                    }
+                </div>
+            }
+        }
+    };
 }

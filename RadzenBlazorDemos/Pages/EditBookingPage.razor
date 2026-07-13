@@ -3,22 +3,27 @@
 <RadzenTemplateForm TItem="RoomBooking" Data="@model" Submit=@OnSubmit>
     <RadzenStack Gap="1rem">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Title" Style="width: 5rem;" />
+            <RadzenLabel Text="Title" Style="width: 6rem;" />
             <RadzenTextBox @bind-Value="@model.Text" Name="Text" Style="width: 14rem;" />
             <RadzenRequiredValidator Component="Text" Text="Title is required" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Rooms" Style="width: 5rem;" />
+            <RadzenLabel Text="Rooms" Style="width: 6rem;" />
             <RadzenDropDown @bind-Value="@roomIds" Data="@Rooms" TextProperty="Name" ValueProperty="Id" Multiple="true" Chips="true" Name="Rooms" Style="width: 14rem;" />
             <RadzenRequiredValidator Component="Rooms" Text="Select at least one room" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="Start" Style="width: 5rem;" />
+            <RadzenLabel Text="Employee" Style="width: 6rem;" />
+            <RadzenDropDown @bind-Value="@model.StaffId" Data="@Employees" TextProperty="Name" ValueProperty="Id" Name="Employee" Style="width: 14rem;" />
+            <RadzenNumericRangeValidator Component="Employee" Min="1" Text="Employee is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 6rem;" />
             <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" Style="width: 14rem;" />
             <RadzenRequiredValidator Component="Start" Text="Start is required" />
         </RadzenStack>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenLabel Text="End" Style="width: 5rem;" />
+            <RadzenLabel Text="End" Style="width: 6rem;" />
             <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" Style="width: 14rem;" />
             <RadzenRequiredValidator Component="End" Text="End is required" />
         </RadzenStack>
@@ -35,6 +40,9 @@
     [Parameter]
     public IEnumerable<Room> Rooms { get; set; }
 
+    [Parameter]
+    public IEnumerable<Staff> Employees { get; set; }
+
     RoomBooking model = new RoomBooking();
     IEnumerable<int> roomIds = Array.Empty<int>();
 
@@ -43,6 +51,7 @@
         model.Text = Booking.Text;
         model.Start = Booking.Start;
         model.End = Booking.End;
+        model.StaffId = Booking.StaffId;
         roomIds = Booking.RoomIds.ToArray();
     }
 

@@ -93,32 +93,114 @@ namespace Radzen.Blazor
         public IScheduler? Scheduler { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the view groups appointments by the resources of the scheduler
-        /// (set via <see cref="RadzenScheduler{TItem}.Resources" />). Set to <c>false</c> by default.
+        /// Gets or sets a value indicating whether the view groups appointments by the resource types of the scheduler
+        /// (declared as <see cref="RadzenSchedulerResource" /> child content). Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if the view groups appointments by resource; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool GroupByResource { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether the view should render resource groups - <see cref="GroupByResource" /> is set and the scheduler has resources.
+        /// Gets or sets a comma-separated list of resource type names (<see cref="RadzenSchedulerResource.Name" />) to group by, in nesting order.
+        /// All declared resource types in order of declaration are used when not set.
         /// </summary>
-        protected bool HasResourceGroups => GroupByResource && Scheduler?.Resources.Count > 0;
+        /// <value>The resource type names to group by.</value>
+        [Parameter]
+        public string? GroupBy { get; set; }
 
         /// <summary>
-        /// Returns the appointments which belong to the specified resource.
+        /// Gets or sets the orientation of the resource groups. Horizontal renders the groups side by side, vertical renders them one below the other.
+        /// Set to <c>Vertical</c> by default. The day view uses <c>Horizontal</c> by default and renders the resources as columns which share the time ruler.
+        /// </summary>
+        /// <value>The group orientation.</value>
+        [Parameter]
+        public Orientation GroupOrientation { get; set; } = Orientation.Vertical;
+
+        /// <summary>
+        /// Gets the resource types the view groups by - the declared resource types filtered and ordered by <see cref="GroupBy" />.
+        /// </summary>
+        protected IList<RadzenSchedulerResource> ResourceTypes
+        {
+            get
+            {
+                var all = Scheduler?.Resources ?? Array.Empty<RadzenSchedulerResource>();
+
+                if (string.IsNullOrEmpty(GroupBy))
+                {
+                    return all;
+                }
+
+                return GroupBy.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                              .Select(name => all.FirstOrDefault(resource => resource.Name == name))
+                              .Where(resource => resource != null)
+                              .Cast<RadzenSchedulerResource>()
+                              .ToList();
+            }
+        }
+
+        /// <summary>
+        /// Gets every combination of resource items the view groups by - the cartesian product of the items of <see cref="ResourceTypes" />,
+        /// each keyed by resource type <see cref="RadzenSchedulerResource.Name" />.
+        /// </summary>
+        protected IList<IDictionary<string, object>> ResourcePaths
+        {
+            get
+            {
+                var types = ResourceTypes.Where(type => type.Items.Count > 0).ToList();
+
+                if (types.Count == 0)
+                {
+                    return new List<IDictionary<string, object>>();
+                }
+
+                IEnumerable<IDictionary<string, object>> paths = new List<IDictionary<string, object>> { new Dictionary<string, object>() };
+
+                foreach (var type in types)
+                {
+                    paths = paths.SelectMany(path => type.Items.Select(item =>
+                    {
+                        IDictionary<string, object> next = new Dictionary<string, object>(path)
+                        {
+                            [type.Name] = item
+                        };
+                        return next;
+                    }));
+                }
+
+                return paths.ToList();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the view should render resource groups - <see cref="GroupByResource" /> is set and the scheduler has resources with items.
+        /// </summary>
+        protected bool HasResourceGroups => GroupByResource && ResourcePaths.Count > 0;
+
+        /// <summary>
+        /// Determines whether the specified combination is the first combination of <see cref="ResourcePaths" />. Used to render
+        /// shared chrome such as the time ruler only once when the groups are rendered side by side.
+        /// </summary>
+        /// <param name="resources">The resource items keyed by resource type name.</param>
+        /// <returns><c>true</c> if the combination consists of the first item of every resource type; otherwise, <c>false</c>.</returns>
+        protected bool IsFirstResourcePath(IDictionary<string, object> resources)
+        {
+            var types = ResourceTypes;
+
+            return resources.All(entry => ReferenceEquals(types.FirstOrDefault(type => type.Name == entry.Key)?.Items.FirstOrDefault(), entry.Value));
+        }
+
+        /// <summary>
+        /// Returns the appointments which belong to every resource item of the specified combination.
         /// </summary>
         /// <param name="appointments">The appointments to filter.</param>
-        /// <param name="resource">The resource.</param>
-        /// <returns>The appointments of the specified resource.</returns>
-        protected IList<AppointmentData> AppointmentsForResource(IEnumerable<AppointmentData> appointments, object resource)
+        /// <param name="resources">The resource items keyed by resource type name.</param>
+        /// <returns>The appointments of the specified resource combination.</returns>
+        protected IList<AppointmentData> AppointmentsForResources(IEnumerable<AppointmentData> appointments, IDictionary<string, object> resources)
         {
-            if (Scheduler == null)
-            {
-                return new List<AppointmentData>();
-            }
+            var types = ResourceTypes;
 
-            return appointments.Where(item => Scheduler.IsAppointmentInResource(item, resource)).ToList();
+            return appointments.Where(item => resources.All(entry =>
+                types.FirstOrDefault(type => type.Name == entry.Key)?.IsAppointmentInResource(item, entry.Value) == true)).ToList();
         }
 
 
@@ -139,11 +221,13 @@ namespace Radzen.Blazor
         {
             var textChanged = parameters.DidParameterChange(nameof(Text), Text);
             var titleChanged = parameters.DidParameterChange(nameof(TitleFormat), TitleFormat);
-            var groupByResourceChanged = parameters.DidParameterChange(nameof(GroupByResource), GroupByResource);
+            var groupChanged = parameters.DidParameterChange(nameof(GroupByResource), GroupByResource) ||
+                parameters.DidParameterChange(nameof(GroupBy), GroupBy) ||
+                parameters.DidParameterChange(nameof(GroupOrientation), GroupOrientation);
 
             await base.SetParametersAsync(parameters);
 
-            if ((textChanged || titleChanged || groupByResourceChanged) && Scheduler != null)
+            if ((textChanged || titleChanged || groupChanged) && Scheduler != null)
             {
                 await Scheduler.Reload();
             }
