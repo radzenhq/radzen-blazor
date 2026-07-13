@@ -76,7 +76,7 @@ internal static class SoftMask
 
         var shapeRadius = Math.Max(0, cornerRadius + spread);
         var blur = Math.Max(0, shadow.BlurRadius.Point);
-        var mask = GaussianBlur.Render(shapeWidth, shapeHeight, shapeRadius, blur);
+        var mask = plan.RenderShadowMask(shapeWidth, shapeHeight, shapeRadius, blur);
 
         var margin = mask.MarginPoints;
         var rectWidth = shapeWidth + (2 * margin);
@@ -114,7 +114,7 @@ internal static class SoftMask
             Group = group,
             ContentKey = ShadowKey(mask, left, bottom, rectWidth, rectHeight, alpha),
         };
-        var extGState = Register(plan, alpha, softMask);
+        var extGState = plan.RegisterSoftMaskExtGState(alpha, alpha, softMask);
 
         plan.Fills.Add(new FillDraw
         {
@@ -125,24 +125,6 @@ internal static class SoftMask
             Color = shadow.Color,
             ExtGState = extGState,
         });
-    }
-
-    // Reuses an already-registered soft-mask ExtGState with the same content key so identical
-    // shadows share one mask; otherwise registers a fresh one.
-    private static string Register(PagePlan plan, double alpha, GeneratedSoftMask softMask)
-    {
-        if (softMask.ContentKey is { } key)
-        {
-            foreach (var state in plan.ExtGStates)
-            {
-                if (state.SoftMask is { ContentKey: { } existing } && existing == key)
-                {
-                    return state.Key;
-                }
-            }
-        }
-
-        return plan.RegisterSoftMaskExtGState(alpha, alpha, softMask);
     }
 
     // FNV-1a over the blurred raster pins pixel identity; placement and alpha complete it.

@@ -241,7 +241,7 @@ public sealed class PathContent : ContentElement
             if (FillGradient is { } fillGradient)
             {
                 writer.WriteRaw("/Pattern cs\n");
-                writer.WriteName(writer.RegisterPattern(ShadingBuilder.BuildPattern(fillGradient)));
+                writer.WriteName(writer.RegisterPattern(fillGradient));
                 writer.WriteRaw(" scn\n");
             }
             else if (FillPaint is { } fillPaint)

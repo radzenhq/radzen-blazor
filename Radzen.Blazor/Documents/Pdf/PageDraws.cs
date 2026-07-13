@@ -158,6 +158,30 @@ internal sealed class PagePlan
     public List<GeneratedLink> Links { get; } = [];
     public List<GeneratedExtGState> ExtGStates { get; } = [];
     public List<GeneratedPattern> Patterns { get; } = [];
+
+    // Dedup indexes over ExtGStates: plain (alpha/blend/overprint/intent) states by their
+    // composite tuple, soft-mask states by their content key. Both back the linear scans that
+    // otherwise made registration O(n^2) on pages with many distinct states or shadows.
+    private readonly Dictionary<string, string> extGStateKeys = new(System.StringComparer.Ordinal);
+    private readonly Dictionary<string, string> softMaskKeys = new(System.StringComparer.Ordinal);
+
+    // Caches the blurred coverage raster by geometry so a grid of identically shaped shadows
+    // (differing only in position) runs the Coverage+Blur passes once instead of per placement.
+    private readonly Dictionary<(double Width, double Height, double Radius, double Blur), ShadowMask> shadowMasks = [];
+
+    // Renders (or returns the cached) blurred shadow coverage for the given geometry. Placement
+    // is intentionally not part of the key: identical shapes share one raster.
+    public ShadowMask RenderShadowMask(double shapeWidthPt, double shapeHeightPt, double radiusPt, double blurPt)
+    {
+        var key = (shapeWidthPt, shapeHeightPt, radiusPt, blurPt);
+        if (!shadowMasks.TryGetValue(key, out var mask))
+        {
+            mask = GaussianBlur.Render(shapeWidthPt, shapeHeightPt, radiusPt, blurPt);
+            shadowMasks[key] = mask;
+        }
+
+        return mask;
+    }
     public WatermarkDraw? Watermark { get; set; }
     public OrderedSet<GeneratedFont> UsedFonts { get; } = [];
     public OrderedSet<GeneratedImage> UsedImages { get; } = [];
@@ -180,20 +204,12 @@ internal sealed class PagePlan
     {
         fillAlpha = System.Math.Clamp(fillAlpha, 0, 1);
         strokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1);
-        foreach (var state in ExtGStates)
+        var dedupKey = string.Create(
+            System.Globalization.CultureInfo.InvariantCulture,
+            $"{fillAlpha}|{strokeAlpha}|{blend}|{overprintStroke}|{overprintFill}|{overprintMode}|{intent}");
+        if (extGStateKeys.TryGetValue(dedupKey, out var existing))
         {
-            if (state.FillAlpha == fillAlpha
-                && state.StrokeAlpha == strokeAlpha
-                && state.Blend == blend
-                && state.OverprintStroke == overprintStroke
-                && state.OverprintFill == overprintFill
-                && state.OverprintMode == overprintMode
-                && state.Intent == intent
-                && state.SoftMask is null
-                && !state.ClearSoftMask)
-            {
-                return state.Key;
-            }
+            return existing;
         }
 
         var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -208,13 +224,20 @@ internal sealed class PagePlan
             OverprintMode = overprintMode,
             Intent = intent,
         });
+        extGStateKeys[dedupKey] = key;
         return key;
     }
 
-    // A soft-mask graphics state is never deduplicated: each carries its own transparency
-    // group, so a fresh GS entry is always appended.
+    // A soft-mask graphics state carries its own transparency group. States with an equal,
+    // non-null soft-mask content key share one GS entry (keyed by that content key); a null
+    // content key opts out and always appends a fresh entry.
     public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
     {
+        if (softMask.ContentKey is { } contentKey && softMaskKeys.TryGetValue(contentKey, out var existing))
+        {
+            return existing;
+        }
+
         var key = "GS" + ExtGStates.Count.ToString(System.Globalization.CultureInfo.InvariantCulture);
         ExtGStates.Add(new GeneratedExtGState
         {
@@ -223,6 +246,11 @@ internal sealed class PagePlan
             StrokeAlpha = System.Math.Clamp(strokeAlpha, 0, 1),
             SoftMask = softMask,
         });
+        if (softMask.ContentKey is { } key2)
+        {
+            softMaskKeys[key2] = key;
+        }
+
         return key;
     }
 
@@ -305,6 +333,28 @@ internal sealed class PagePlan
     // plain centerline stroke, and a rounded uniform border falls back to four square edges.
     public void ApplyTransform(Matrix transform, PlanMarks mark)
     {
+        // Fills degrade to centerline strokes and rounded strokes to square edges under rotation
+        // (see remarks). Rounded geometry cannot survive that conversion, so fail loud rather
+        // than silently emitting square corners or dropping a rounded clip.
+        for (var i = mark.Fills; i < Fills.Count; i++)
+        {
+            var fill = Fills[i];
+            if (fill.Radius > 0 || (fill.Clip is not null && fill.ClipRadius > 0))
+            {
+                throw new System.NotSupportedException(
+                    "A rotated box cannot preserve rounded corners or a rounded clip; remove the corner radius or the rotation.");
+            }
+        }
+
+        for (var i = mark.Rounded; i < RoundedStrokes.Count; i++)
+        {
+            if (RoundedStrokes[i].Radius > 0)
+            {
+                throw new System.NotSupportedException(
+                    "A rotated box cannot preserve a rounded border; remove the corner radius or the rotation.");
+            }
+        }
+
         for (var i = mark.Edges; i < Edges.Count; i++)
         {
             var edge = Edges[i];

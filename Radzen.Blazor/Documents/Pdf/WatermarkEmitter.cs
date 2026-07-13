@@ -91,18 +91,19 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         }
         else
         {
-            // Base-14 watermarks are WinAnsi-only; codepoints outside the encoding drop.
-            var encodable = new System.Text.StringBuilder(text.Length);
+            // Base-14 watermarks are WinAnsi-only; fail loud rather than silently dropping
+            // unrepresentable codepoints (which would blank or mangle the watermark).
             foreach (var c in text)
             {
-                if (IsWinAnsi(c))
+                if (!IsWinAnsi(c))
                 {
-                    encodable.Append(c);
+                    throw new System.NotSupportedException(
+                        $"Watermark text contains a character (U+{(int)c:X4}) not representable in the base-14 WinAnsi encoding; register a font that covers it.");
                 }
             }
 
             var metrics = Fonts.Base14Metrics.Resolve(font) ?? Fonts.Base14Metrics.Resolve(new Font())!;
-            var segment = encodable.ToString();
+            var segment = text;
             var generated = fontResolver.ResolveBase14(font);
             plan.UsedFonts.Add(generated);
             draw.Texts.Add(new TextDraw

@@ -19,6 +19,12 @@ internal static class GaussianBlur
     private const double MaxShapePixels = 512;
     private const double BaseScale = 2.0;
 
+    // Caps direct-convolution cost: kernelRadius = ceil(3*sigma) and sigma = blurPt*scale/2,
+    // so an uncapped blur is O((shape+2r)^2 * (2r+1)) and can pin a WASM thread for seconds.
+    // When a blur would exceed this radius the raster scale is reduced so work stays bounded;
+    // small blurs are unaffected and their output is byte-identical.
+    private const int MaxKernelRadius = 64;
+
     // Rasterizes a rounded rectangle of the given point size (analytic 1px anti-aliasing via
     // signed distance) then blurs it. The buffer is padded by the blur's kernel radius on every
     // side so the softened edge fully fades inside it; that padding is returned as MarginPoints.
@@ -29,6 +35,16 @@ internal static class GaussianBlur
         if (maxShape > 0 && maxShape * scale > MaxShapePixels)
         {
             scale = MaxShapePixels / maxShape;
+        }
+
+        // kernelRadius = ceil(3 * blurPt * scale / 2) <= MaxKernelRadius bounds the convolution.
+        if (blurPt > 0)
+        {
+            var kernelScale = 2.0 * MaxKernelRadius / (3.0 * blurPt);
+            if (kernelScale < scale)
+            {
+                scale = kernelScale;
+            }
         }
 
         var shapeW = Math.Max(1, (int)Math.Round(shapeWidthPt * scale));

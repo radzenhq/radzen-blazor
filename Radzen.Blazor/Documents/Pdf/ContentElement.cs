@@ -25,6 +25,14 @@ public abstract class ContentElement
 
     internal void Emit(ContentWriter writer)
     {
+        // Structure tags are not yet wired into the marked-content/structure-tree pipeline;
+        // fail loud rather than silently emitting untagged real content (PDF/UA hazard).
+        if (Tag is not null)
+        {
+            throw new System.NotSupportedException(
+                "ContentElement.Tag is not yet supported; remove the tag or emit the element as an artifact.");
+        }
+
         if (IsArtifact)
         {
             writer.WriteName("Artifact");

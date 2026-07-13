@@ -50,14 +50,14 @@ internal static class ShadingBuilder
         }
 
         ArrayObject functions = [];
-        ArrayObject bounds = [];
+        var bounds = new List<double>();
         ArrayObject encode = [];
 
         if (leading)
         {
             functions.Add(Exponential(stops[0].Color, stops[0].Color));
             AddUnitEncode(encode);
-            bounds.Add(new NumberObject(stops[0].Offset));
+            bounds.Add(stops[0].Offset);
         }
 
         for (var i = 0; i < stops.Count - 1; i++)
@@ -66,13 +66,13 @@ internal static class ShadingBuilder
             AddUnitEncode(encode);
             if (i < stops.Count - 2)
             {
-                bounds.Add(new NumberObject(stops[i + 1].Offset));
+                bounds.Add(stops[i + 1].Offset);
             }
         }
 
         if (trailing)
         {
-            bounds.Add(new NumberObject(stops[stops.Count - 1].Offset));
+            bounds.Add(stops[stops.Count - 1].Offset);
             functions.Add(Exponential(stops[stops.Count - 1].Color, stops[stops.Count - 1].Color));
             AddUnitEncode(encode);
         }
@@ -82,9 +82,28 @@ internal static class ShadingBuilder
             ["FunctionType"] = new NumberObject(3),
             ["Domain"] = Domain(),
             ["Functions"] = functions,
-            ["Bounds"] = bounds,
+            ["Bounds"] = StrictlyIncreasing(bounds),
             ["Encode"] = encode,
         };
+    }
+
+    // Type 3 /Bounds must be strictly increasing (ISO 32000-1 7.10.4). CSS hard stops produce
+    // equal adjacent offsets; nudge each colliding bound just past its predecessor so Acrobat
+    // accepts the function instead of rendering the fill blank. The epsilon is below content
+    // stream (0.001) precision, so a valid strictly-increasing gradient is unaffected.
+    private static ArrayObject StrictlyIncreasing(List<double> bounds)
+    {
+        const double epsilon = 1e-6;
+        ArrayObject result = [];
+        var previous = double.NegativeInfinity;
+        foreach (var value in bounds)
+        {
+            var bound = value <= previous ? previous + epsilon : value;
+            result.Add(new NumberObject(bound));
+            previous = bound;
+        }
+
+        return result;
     }
 
     private static void AddUnitEncode(ArrayObject encode)
