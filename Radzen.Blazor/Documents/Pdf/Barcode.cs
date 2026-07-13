@@ -10,6 +10,8 @@ namespace Radzen.Documents.Pdf;
 /// <param name="height">The rendered height of the bars, excluding the optional human-readable line.</param>
 public sealed class Barcode(BarcodeType type, string value, Unit width, Unit height) : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>Gets the barcode symbology.</summary>
     public BarcodeType Type { get; } = type;
 

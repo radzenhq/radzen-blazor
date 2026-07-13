@@ -6,6 +6,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Table : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>
     /// Initializes a new empty <see cref="Table"/>.
     /// </summary>

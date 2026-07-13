@@ -10,9 +10,11 @@ namespace Radzen.Documents.Pdf;
 internal sealed class OpacityResolver
 {
     private readonly Dictionary<Block, double> byBlock = [];
+    private readonly Walker walker;
 
     public OpacityResolver(DocumentBuilder builder)
     {
+        walker = new Walker(this);
         foreach (var section in builder.Sections)
         {
             Walk(section.Blocks, 1);
@@ -50,20 +52,33 @@ internal sealed class OpacityResolver
                 byBlock[block] = opacity;
             }
 
-            if (block is Container container)
+            block.Accept(walker, opacity);
+        }
+    }
+
+    // Only containers and tables carry descendants that inherit the ambient opacity; every
+    // other block kind has none to recurse into (the identity Default).
+    private sealed class Walker(OpacityResolver owner) : BlockVisitor<double, Nothing>
+    {
+        protected override Nothing Default(Block block, double opacity) => default;
+
+        public override Nothing Visit(Container container, double opacity)
+        {
+            owner.Walk(container.Blocks, opacity * container.Opacity);
+            return default;
+        }
+
+        public override Nothing Visit(Table table, double opacity)
+        {
+            foreach (var row in table.Rows)
             {
-                Walk(container.Blocks, opacity * container.Opacity);
-            }
-            else if (block is Table table)
-            {
-                foreach (var row in table.Rows)
+                foreach (var cell in row.Cells)
                 {
-                    foreach (var cell in row.Cells)
-                    {
-                        Walk(cell.Blocks, opacity);
-                    }
+                    owner.Walk(cell.Blocks, opacity);
                 }
             }
+
+            return default;
         }
     }
 }

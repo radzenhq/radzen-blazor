@@ -62,62 +62,87 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
         }
     }
 
-    private void MapBlock(Block block, StructureElement parent)
-    {
-        switch (block)
-        {
-            case Paragraph paragraph:
-                var p = new StructureElement { Type = HeadingType(paragraph.StyleName) };
-                parent.Children.Add(p);
-                blockElements[paragraph] = p;
-                break;
-            case Table table:
-                var element = new StructureElement { Type = "Table" };
-                parent.Children.Add(element);
-                foreach (var row in table.Rows)
-                {
-                    var tr = new StructureElement { Type = "TR" };
-                    element.Children.Add(tr);
-                    foreach (var cell in row.Cells)
-                    {
-                        var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
-                        tr.Children.Add(td);
-                        blockElements[cell] = td;
-                    }
-                }
+    private void MapBlock(Block block, StructureElement parent) => block.Accept(mapper, parent);
 
-                break;
-            case Image image:
-                var figure = new StructureElement
-                {
-                    Type = "Figure",
-                    Alt = image.AlternateText,
-                    ActualText = image.ActualText,
-                };
-                parent.Children.Add(figure);
-                blockElements[image] = figure;
-                break;
-            case List list when builder.PdfUA:
-                MapList(list, parent);
-                break;
-            case List:
-                hasUntaggedList = true;
-                break;
-            // These carry no logical structure of their own: PageBreak is pure
-            // pagination, and Container/Barcode/QrCode/TableOfContents render as
-            // decorative /Artifact content in fully tagged output. Listed explicitly
-            // so the default arm can fail loud on a block type nobody mapped.
-            case PageBreak:
-            case Container:
-            case Barcode:
-            case QrCode:
-            case TableOfContents:
-                break;
-            default:
-                throw new NotSupportedException(
-                    $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
-                    + "Add an explicit case to StructureTreeBuilder.MapBlock so it cannot silently vanish from accessible output.");
+    private Mapper? cachedMapper;
+
+    private Mapper mapper => cachedMapper ??= new Mapper(this, builder);
+
+    // Maps each block into the tagged structure tree. The types that carry no logical
+    // structure of their own (PageBreak is pure pagination; Container/Barcode/QrCode/
+    // TableOfContents render as decorative /Artifact content in fully tagged output) map
+    // to nothing but are overridden explicitly so Default can fail loud on a block type
+    // nobody mapped - it must never silently vanish from accessible output.
+    private sealed class Mapper(StructureTreeBuilder tree, DocumentBuilder builder) : BlockVisitor<StructureElement, Nothing>
+    {
+        protected override Nothing Default(Block block, StructureElement parent)
+            => throw new NotSupportedException(
+                $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
+                + "Add an explicit case to StructureTreeBuilder.MapBlock so it cannot silently vanish from accessible output.");
+
+        public override Nothing Visit(Paragraph paragraph, StructureElement parent)
+        {
+            var p = new StructureElement { Type = HeadingType(paragraph.StyleName) };
+            parent.Children.Add(p);
+            tree.blockElements[paragraph] = p;
+            return default;
         }
+
+        public override Nothing Visit(Table table, StructureElement parent)
+        {
+            var element = new StructureElement { Type = "Table" };
+            parent.Children.Add(element);
+            foreach (var row in table.Rows)
+            {
+                var tr = new StructureElement { Type = "TR" };
+                element.Children.Add(tr);
+                foreach (var cell in row.Cells)
+                {
+                    var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
+                    tr.Children.Add(td);
+                    tree.blockElements[cell] = td;
+                }
+            }
+
+            return default;
+        }
+
+        public override Nothing Visit(Image image, StructureElement parent)
+        {
+            var figure = new StructureElement
+            {
+                Type = "Figure",
+                Alt = image.AlternateText,
+                ActualText = image.ActualText,
+            };
+            parent.Children.Add(figure);
+            tree.blockElements[image] = figure;
+            return default;
+        }
+
+        public override Nothing Visit(List list, StructureElement parent)
+        {
+            if (builder.PdfUA)
+            {
+                tree.MapList(list, parent);
+            }
+            else
+            {
+                tree.hasUntaggedList = true;
+            }
+
+            return default;
+        }
+
+        public override Nothing Visit(PageBreak block, StructureElement parent) => default;
+
+        public override Nothing Visit(Container block, StructureElement parent) => default;
+
+        public override Nothing Visit(Barcode block, StructureElement parent) => default;
+
+        public override Nothing Visit(QrCode block, StructureElement parent) => default;
+
+        public override Nothing Visit(TableOfContents block, StructureElement parent) => default;
     }
 
     // PDF/UA list structure (ISO 32000-1 14.8.4.3.3): L -> LI -> {Lbl, LBody}. Each item's

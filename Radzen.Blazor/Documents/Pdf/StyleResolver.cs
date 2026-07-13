@@ -48,40 +48,59 @@ internal static class StyleResolver
     public static StyleResolution Resolve(DocumentBuilder builder)
     {
         var resolution = new StyleResolution();
+        var visitor = new StyleVisitor(builder.Styles, resolution);
         foreach (var section in builder.Sections)
         {
-            ResolveBlocks(section.Blocks, builder.Styles, [], resolution);
-            ResolveBlocks(section.Header.Blocks, builder.Styles, [], resolution);
-            ResolveBlocks(section.Footer.Blocks, builder.Styles, [], resolution);
+            ResolveBlocks(section.Blocks, [], visitor);
+            ResolveBlocks(section.Header.Blocks, [], visitor);
+            ResolveBlocks(section.Footer.Blocks, [], visitor);
         }
 
         return resolution;
     }
 
-    private static void ResolveBlocks(BlockCollection blocks, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
+    private static void ResolveBlocks(BlockCollection blocks, List<Font> inherited, StyleVisitor visitor)
     {
         foreach (var block in blocks)
         {
-            if (block is Paragraph paragraph)
-            {
-                ResolveParagraph(paragraph, styles, inherited, resolution);
-            }
-            else if (block is Table table)
-            {
-                ResolveTable(table, styles, inherited, resolution);
-            }
-            else if (block is Barcode barcode)
-            {
-                ResolveBarcode(barcode, styles, inherited);
-            }
-            else if (block is List list)
-            {
-                ResolveList(list, styles, inherited);
-            }
-            else if (block is Container container)
-            {
-                ResolveBlocks(container.Blocks, styles, inherited, resolution);
-            }
+            block.Accept(visitor, inherited);
+        }
+    }
+
+    // Only paragraphs, tables, barcodes, lists and (recursively) containers carry font
+    // context to resolve; images, page breaks and code blocks inherit nothing (Default).
+    private sealed class StyleVisitor(StyleCollection styles, StyleResolution resolution) : BlockVisitor<List<Font>, Nothing>
+    {
+        protected override Nothing Default(Block block, List<Font> inherited) => default;
+
+        public override Nothing Visit(Paragraph paragraph, List<Font> inherited)
+        {
+            ResolveParagraph(paragraph, styles, inherited, resolution);
+            return default;
+        }
+
+        public override Nothing Visit(Table table, List<Font> inherited)
+        {
+            ResolveTable(table, styles, inherited, this);
+            return default;
+        }
+
+        public override Nothing Visit(Barcode barcode, List<Font> inherited)
+        {
+            ResolveBarcode(barcode, styles, inherited);
+            return default;
+        }
+
+        public override Nothing Visit(List list, List<Font> inherited)
+        {
+            ResolveList(list, styles, inherited);
+            return default;
+        }
+
+        public override Nothing Visit(Container container, List<Font> inherited)
+        {
+            ResolveBlocks(container.Blocks, inherited, this);
+            return default;
         }
     }
 
@@ -120,7 +139,7 @@ internal static class StyleResolver
         }
     }
 
-    private static void ResolveTable(Table table, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
+    private static void ResolveTable(Table table, StyleCollection styles, List<Font> inherited, StyleVisitor visitor)
     {
         foreach (var row in table.Rows)
         {
@@ -137,7 +156,7 @@ internal static class StyleResolver
                 context.Add(row.Font);
                 context.Add(table.Font);
                 context.AddRange(inherited);
-                ResolveBlocks(cell.Blocks, styles, context, resolution);
+                ResolveBlocks(cell.Blocks, context, visitor);
             }
         }
     }

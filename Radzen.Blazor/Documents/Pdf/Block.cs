@@ -12,4 +12,7 @@ public abstract class Block
     protected Block()
     {
     }
+
+    // Double-dispatch entry point: routes to the visitor overload for this concrete type.
+    internal abstract TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context);
 }

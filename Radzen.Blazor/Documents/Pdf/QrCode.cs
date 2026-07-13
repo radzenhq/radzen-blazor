@@ -8,6 +8,8 @@ namespace Radzen.Documents.Pdf;
 /// <param name="size">The rendered width and height of the code, quiet zone included.</param>
 public sealed class QrCode(string value, Unit size) : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>Gets the encoded text.</summary>
     public string Value { get; } = value;
 

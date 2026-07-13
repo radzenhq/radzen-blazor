@@ -625,21 +625,9 @@ internal static class Paginator
     private static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
-    internal static (double Width, double Height) MeasureCode(Block block)
-        => block switch
-        {
-            QrCode qr => (qr.Size.Point, qr.Size.Point),
-            Barcode barcode => (barcode.Width.Point, barcode.Height.Point + barcode.TextBandHeight),
-            _ => (0, 0),
-        };
+    internal static (double Width, double Height) MeasureCode(Block block) => CodeBlockDispatch.Measure(block);
 
-    private static HorizontalAlignment CodeAlignment(Block block)
-        => block switch
-        {
-            QrCode qr => qr.Alignment,
-            Barcode barcode => barcode.Alignment,
-            _ => HorizontalAlignment.Left,
-        };
+    private static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 
     internal static IReadOnlyList<Block> ExpandBlocks(
         BlockCollection blocks,
@@ -664,45 +652,67 @@ internal static class Paginator
         }
 
         var expanded = new List<Block>(blocks.Count);
+        var visitor = new ExpandVisitor(expanded, availableWidth, keepSpecialContainers, tocPages, fonts);
         foreach (var block in blocks)
         {
-            if (block is List list)
-            {
-                ExpandList(list, expanded, 0, null);
-            }
-            else if (block is Container container)
-            {
-                // A Stack container is never lowered anymore: the section body and the
-                // header/footer bands place it as a first-class box and cell/box content
-                // nests it as a first-class nested box (BoxContentLayout). Overlay and
-                // rotated containers are only allowed as direct section content
-                // (keepSpecialContainers: true), where PlaceSpecialContainer/PlaceBox
-                // handle them - nested content cannot host a page-space transform.
-                if (!keepSpecialContainers && (IsSpecial(container) || container.Rotation != 0))
-                {
-                    throw new NotSupportedException(
-                        "Overlay and rotated containers are only supported as direct section content.");
-                }
-
-                expanded.Add(container);
-            }
-            else if (block is TableOfContents toc)
-            {
-                if (!keepSpecialContainers)
-                {
-                    throw new NotSupportedException(
-                        "A table of contents is only supported as direct section content.");
-                }
-
-                ExpandTableOfContents(toc, expanded, availableWidth, tocPages, fonts);
-            }
-            else
-            {
-                expanded.Add(block);
-            }
+            block.Accept(visitor, default);
         }
 
         return expanded;
+    }
+
+    // Lowers lists to marker paragraphs and a table of contents to entry paragraphs, keeps
+    // containers first-class (rejecting overlay/rotated ones outside direct section content),
+    // and passes every other block through unchanged (Default).
+    private sealed class ExpandVisitor(
+        List<Block> expanded,
+        double availableWidth,
+        bool keepSpecialContainers,
+        IReadOnlyDictionary<string, int>? tocPages,
+        FontCollection? fonts)
+        : BlockVisitor<Nothing, Nothing>
+    {
+        protected override Nothing Default(Block block, Nothing context)
+        {
+            expanded.Add(block);
+            return default;
+        }
+
+        public override Nothing Visit(List list, Nothing context)
+        {
+            ExpandList(list, expanded, 0, null);
+            return default;
+        }
+
+        public override Nothing Visit(Container container, Nothing context)
+        {
+            // A Stack container is never lowered anymore: the section body and the
+            // header/footer bands place it as a first-class box and cell/box content
+            // nests it as a first-class nested box (BoxContentLayout). Overlay and
+            // rotated containers are only allowed as direct section content
+            // (keepSpecialContainers: true), where PlaceSpecialContainer/PlaceBox
+            // handle them - nested content cannot host a page-space transform.
+            if (!keepSpecialContainers && (IsSpecial(container) || container.Rotation != 0))
+            {
+                throw new NotSupportedException(
+                    "Overlay and rotated containers are only supported as direct section content.");
+            }
+
+            expanded.Add(container);
+            return default;
+        }
+
+        public override Nothing Visit(TableOfContents toc, Nothing context)
+        {
+            if (!keepSpecialContainers)
+            {
+                throw new NotSupportedException(
+                    "A table of contents is only supported as direct section content.");
+            }
+
+            ExpandTableOfContents(toc, expanded, availableWidth, tocPages, fonts);
+            return default;
+        }
     }
 
     // The page-number column is sized for this placeholder (plus a small safety margin) and
@@ -978,6 +988,15 @@ internal static class Paginator
     private static double TableFirstFragmentHeight(Table table, LaidOutTable layout)
         => TablePaginator.FirstBodyGroupHeight(layout, table);
 
+    private readonly struct NextBlockHeight
+    {
+        public bool Found { get; init; }
+
+        public double SpacingBefore { get; init; }
+
+        public double Height { get; init; }
+    }
+
     // The height the NEXT block needs at the top of a page: the first line of a
     // paragraph, the header rows plus first body row of a table, or a whole image.
     private static bool NextBlockFirstHeight(
@@ -1000,31 +1019,61 @@ internal static class Paginator
             return false;
         }
 
-        switch (blocks[next])
+        var visitor = new NextHeightVisitor(broken, tableLayouts, boxMeasures, contentWidth, fonts, measureImage);
+        var result = blocks[next].Accept(visitor, next);
+        spacingBefore = result.SpacingBefore;
+        height = result.Height;
+        return result.Found;
+    }
+
+    // Resolves the leading height of the block at the given index, keyed off the same
+    // per-section layout caches the main loop shares. A block kind that a page can start
+    // mid-way (or that never breaks meaningfully here) reports no minimum (Default).
+    private sealed class NextHeightVisitor(
+        IReadOnlyList<LineBox>?[] broken,
+        LaidOutTable?[] tableLayouts,
+        BoxContentLayout.Measured?[] boxMeasures,
+        double contentWidth,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage)
+        : BlockVisitor<int, NextBlockHeight>
+    {
+        protected override NextBlockHeight Default(Block block, int next) => default;
+
+        public override NextBlockHeight Visit(Paragraph paragraph, int next)
+            => broken[next] is { Count: > 0 } lines
+                ? new NextBlockHeight { Found = true, SpacingBefore = paragraph.SpacingBefore.Point, Height = lines[0].Height }
+                : default;
+
+        public override NextBlockHeight Visit(Table table, int next)
         {
-            case Paragraph paragraph when broken[next] is { Count: > 0 } lines:
-                spacingBefore = paragraph.SpacingBefore.Point;
-                height = lines[0].Height;
-                return true;
-            case Table table:
-                var layout = tableLayouts[next] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
-                height = TableFirstFragmentHeight(table, layout);
-                return true;
-            case Container container when !IsSpecial(container):
-                // A Stack container never splits, so its first height is the whole box.
-                var measured = boxMeasures[next] ??= MeasureBox(container, contentWidth, fonts, measureImage);
-                height = measured.Height + (2 * container.Padding.Point);
-                return true;
-            case Image image:
-                var (_, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
-                height = imageHeight;
-                return true;
-            case QrCode or Barcode:
-                height = MeasureCode(blocks[next]).Height;
-                return true;
-            default:
-                return false;
+            var layout = tableLayouts[next] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage);
+            return new NextBlockHeight { Found = true, Height = TableFirstFragmentHeight(table, layout) };
         }
+
+        public override NextBlockHeight Visit(Container container, int next)
+        {
+            if (IsSpecial(container))
+            {
+                return default;
+            }
+
+            // A Stack container never splits, so its first height is the whole box.
+            var measured = boxMeasures[next] ??= MeasureBox(container, contentWidth, fonts, measureImage);
+            return new NextBlockHeight { Found = true, Height = measured.Height + (2 * container.Padding.Point) };
+        }
+
+        public override NextBlockHeight Visit(Image image, int next)
+        {
+            var (_, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
+            return new NextBlockHeight { Found = true, Height = imageHeight };
+        }
+
+        public override NextBlockHeight Visit(QrCode block, int next) => VisitCode(block);
+
+        public override NextBlockHeight Visit(Barcode block, int next) => VisitCode(block);
+
+        private static NextBlockHeight VisitCode(Block block) => new() { Found = true, Height = MeasureCode(block).Height };
     }
 
     private static double SumHeights(IReadOnlyList<LineBox> lines, int start, int count)

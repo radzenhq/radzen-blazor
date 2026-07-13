@@ -8,6 +8,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public class Paragraph : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>Gets the inline text runs.</summary>
     public InlineCollection Inlines { get; } = [];
 

@@ -55,6 +55,8 @@ public sealed class TocEntry
 /// </remarks>
 public sealed class TableOfContents : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     /// <summary>Gets the entries, in the order their lines are rendered.</summary>
     public IList<TocEntry> Entries { get; } = [];
 

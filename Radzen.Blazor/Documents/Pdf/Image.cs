@@ -9,6 +9,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Image : Block
 {
+    internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
+
     internal Image(byte[] data) => Data = data;
 
     internal static Image FromStream(Stream stream)
