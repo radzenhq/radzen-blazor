@@ -170,10 +170,7 @@ public class TableCellBlockDispatchTests
         Assert.Equal(withoutBreakHeight, TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()).RowHeights[0], 6);
     }
 
-    private sealed class UnknownBlock : Block
-    {
-        internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
-    }
+    private sealed class UnknownBlock : Block;
 
     [Fact]
     public void UnhandledBlockInCell_Throws()

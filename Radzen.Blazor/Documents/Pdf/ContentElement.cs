@@ -1,5 +1,3 @@
-using System;
-
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf;
 
@@ -23,19 +21,8 @@ public abstract class ContentElement
     /// </summary>
     public bool IsArtifact { get; set; }
 
-    /// <summary>Gets or sets the optional structure tag for this element.</summary>
-    public Tag? Tag { get; set; }
-
     internal void Emit(ContentWriter writer)
     {
-        // Structure tags are not yet wired into the marked-content/structure-tree pipeline;
-        // fail loud rather than silently emitting untagged real content (PDF/UA hazard).
-        if (Tag is not null)
-        {
-            throw new NotSupportedException(
-                "ContentElement.Tag is not yet supported; remove the tag or emit the element as an artifact.");
-        }
-
         if (IsArtifact)
         {
             writer.WriteName("Artifact");

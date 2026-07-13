@@ -90,26 +90,6 @@ public class ContentElementTests
     }
 
     [Fact]
-    public void ContentElement_HasNoTagByDefault()
-    {
-        var element = new TextContent("x", 0, 0);
-
-        Assert.Null(element.Tag);
-    }
-
-    [Fact]
-    public void Tag_RoleIsCarriedOnElement()
-    {
-        var element = new TextContent("x", 0, 0)
-        {
-            Tag = new Tag { Role = "P" },
-        };
-
-        Assert.NotNull(element.Tag);
-        Assert.Equal("P", element.Tag!.Role);
-    }
-
-    [Fact]
     public void NonEmptyContent_EmitsContentStream()
     {
         var document = new Document();
@@ -296,14 +276,4 @@ public class ContentElementTests
         Assert.Throws<NotSupportedException>(() => document.ToArray());
     }
 
-    [Fact]
-    public void Tag_SetOnElement_ThrowsOnSave()
-    {
-        var document = new Document();
-        var page = document.Pages.Add();
-        page.Content.Add(new TextContent("x", 0, 0) { Tag = new Tag { Role = "P" } });
-
-        Assert.Throws<NotSupportedException>(() => document.ToArray());
-    }
 }
-

@@ -10,10 +10,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 // rather than silently dropping it from the tagged / PDF-UA structure tree.
 public class StructureTreeMapBlockFailLoudTests
 {
-    private sealed class UnmappedBlock : Block
-    {
-        internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
-    }
+    private sealed class UnmappedBlock : Block;
 
     [Fact]
     public void Build_UnmappedBlockType_ThrowsNamingTheType()

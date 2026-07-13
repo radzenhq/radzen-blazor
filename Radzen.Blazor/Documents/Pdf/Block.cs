@@ -14,6 +14,7 @@ public abstract class Block
     {
     }
 
-    // Double-dispatch entry point: routes to the visitor overload for this concrete type.
-    internal abstract TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context);
+    // External subclasses inherit the catch-all because BlockVisitor remains internal.
+    internal virtual TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context)
+        => visitor.Visit(this, context);
 }

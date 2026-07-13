@@ -84,20 +84,20 @@ internal sealed class DocumentSaver
             if (page.Generated is { } generated)
             {
                 var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content));
-                var overlay = page.BuildOverlay(out var overlayEmitter);
+                var overlay = page.BuildOverlay();
                 if (overlay is null)
                 {
                     pageNode["Contents"] = generatedRef;
                 }
                 else
                 {
-                    pageNode["Contents"] = new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay)) };
+                    pageNode["Contents"] = new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay.Bytes!)) };
                 }
 
                 var resources = PageResourceBuilder.BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
-                if (overlayEmitter is not null)
+                if (overlay is not null)
                 {
-                    resources = PageResourceBuilder.OverlayResources(writer, resources, overlayEmitter);
+                    resources = PageResourceBuilder.OverlayResources(writer, resources, overlay.Resources);
                 }
 
                 if (resources is not null)
@@ -123,17 +123,19 @@ internal sealed class DocumentSaver
                 reservedNames = PageResourceBuilder.ResourceNames(reservedAppend.Reader, reservedAppend.Resources);
             }
 
-            var contentBytes = page.BuildContent(out var emitter, out var overlayBytes, out var pageOverlayEmitter, reservedNames);
-            if (contentBytes is not null)
+            var emission = page.BuildContent(reservedNames);
+            if (emission.Bytes is not null)
             {
-                var contentRef = writer.Add(new StreamObject(contentBytes));
-                pageNode["Contents"] = overlayBytes is null
+                var contentRef = writer.Add(new StreamObject(emission.Bytes));
+                pageNode["Contents"] = emission.Overlay is null
                     ? contentRef
-                    : new ArrayObject { contentRef, writer.Add(new StreamObject(overlayBytes)) };
+                    : new ArrayObject { contentRef, writer.Add(new StreamObject(emission.Overlay.Bytes!)) };
             }
 
-            var activeEmitter = emitter ?? pageOverlayEmitter;
-            var emitted = activeEmitter is not null ? PageResourceBuilder.BuildResources(writer, activeEmitter) : null;
+            var activeResources = emission.Resources.IsEmpty && emission.Overlay is not null
+                ? emission.Overlay.Resources
+                : emission.Resources;
+            var emitted = activeResources.IsEmpty ? null : PageResourceBuilder.BuildResources(writer, activeResources);
             DictionaryObject? merged;
             if (importer is not null && loaded?.Source is { } mergeSource
                 && loaded.SourceResources.TryGetValue(page, out var loadedResources))

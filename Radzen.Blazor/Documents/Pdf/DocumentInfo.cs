@@ -46,4 +46,28 @@ public class DocumentInfo
     /// date is written.
     /// </summary>
     public DateTimeOffset? ModificationDate { get; set; }
+
+    internal DocumentInfo Clone() => new()
+    {
+        Title = Title,
+        Author = Author,
+        Subject = Subject,
+        Keywords = Keywords,
+        Creator = Creator,
+        Producer = Producer,
+        CreationDate = CreationDate,
+        ModificationDate = ModificationDate,
+    };
+
+    internal void CopyTo(DocumentInfo target)
+    {
+        target.Title = Title;
+        target.Author = Author;
+        target.Subject = Subject;
+        target.Keywords = Keywords;
+        target.Creator = Creator;
+        target.Producer = Producer;
+        target.CreationDate = CreationDate;
+        target.ModificationDate = ModificationDate;
+    }
 }

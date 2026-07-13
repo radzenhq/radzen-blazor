@@ -64,6 +64,11 @@ public sealed class ContentWriter : IDisposable
 
     internal byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 
+    internal ContentEmissionResult DetachResult() => new(
+        ToArray(),
+        new ContentResourceManifest([.. keysByBaseFont], [.. images], [.. patterns]),
+        isEmitted: true);
+
     /// <summary>
     /// Decodes and registers an image XObject for <paramref name="encodedImage"/> and returns its
     /// resource name. An undecodable payload throws rather than silently emitting nothing.

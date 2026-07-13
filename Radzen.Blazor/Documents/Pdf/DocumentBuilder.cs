@@ -116,24 +116,8 @@ public class DocumentBuilder
     /// <returns>The generated document.</returns>
     public Document Build()
     {
-        var document = DocumentGenerator.Generate(this);
-        document.Encryption = Encryption;
-        document.CompressOutput = CompressOutput;
-        document.IncludeDocumentId = IncludeDocumentId;
-        document.PdfUA = PdfUA;
-        document.Language = Language;
-        document.ViewerPreferences = ViewerPreferences;
-        foreach (var label in PageLabels)
-        {
-            document.PageLabels.Add(label);
-        }
-
-        foreach (var field in FormFields)
-        {
-            document.FormFields.Add(field);
-        }
-
-        return document;
+        var settings = BuilderSettingsSnapshot.Capture(this);
+        return DocumentGenerator.Generate(this, settings);
     }
 
     /// <summary>Builds the document and serializes it to the given stream.</summary>
