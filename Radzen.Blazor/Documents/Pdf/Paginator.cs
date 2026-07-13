@@ -488,75 +488,39 @@ internal static class Paginator
                     k++;
                 }
 
-                var moveWhole = false;
-                int placeCount;
-
-                if (k >= nrem)
+                // The keep-with-next look-ahead is the only branch that needs paginator
+                // state (it force-fills the shared layout caches for the next block); its
+                // gated result feeds the pure placement policy. Kept identical to the old
+                // inline `first && KeepWithNext && HasPageContent && NextBlockFirstHeight`.
+                var hasNextBlock = false;
+                double afterCursor = 0;
+                double nextLeadingHeight = 0;
+                if (k >= nrem && first && para.KeepWithNext && HasPageContent() &&
+                    NextBlockFirstHeight(blocks, broken, tableLayouts, boxMeasures, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
                 {
-                    placeCount = nrem;
-                    if (first && para.KeepWithNext && HasPageContent() &&
-                        NextBlockFirstHeight(blocks, broken, tableLayouts, boxMeasures, i, contentWidth, fonts, measureImage, out var nextSpacingBefore, out var nextHeight))
-                    {
-                        var afterCursor = blockTop + SumHeights(lines, offset, placeCount) + spacingAfter;
-                        if (afterCursor + nextSpacingBefore + nextHeight > contentHeight + Eps)
-                        {
-                            moveWhole = true;
-                        }
-                    }
-                }
-                else if (first && para.KeepTogether)
-                {
-                    moveWhole = true;
-                    placeCount = 0;
-                }
-                else if (!first)
-                {
-                    var kept = k;
-                    if (nrem - kept < para.Widows)
-                    {
-                        kept = nrem - para.Widows;
-                    }
-
-                    // A continuation break still makes progress: never stall on an empty page
-                    // (a line taller than the page is placed alone) and never strand < 1 line.
-                    placeCount = kept >= 1 ? kept : (k > 0 || HasPageContent() ? k : 1);
-                }
-                else if (k < para.Orphans)
-                {
-                    moveWhole = true;
-                    placeCount = 0;
-                }
-                else
-                {
-                    var kept = k;
-                    if (nrem - kept < para.Widows)
-                    {
-                        kept = nrem - para.Widows;
-                    }
-
-                    if (kept < para.Orphans)
-                    {
-                        moveWhole = true;
-                        placeCount = 0;
-                    }
-                    else
-                    {
-                        placeCount = kept;
-                    }
+                    hasNextBlock = true;
+                    afterCursor = blockTop + SumHeights(lines, offset, nrem) + spacingAfter;
+                    nextLeadingHeight = nextSpacingBefore + nextHeight;
                 }
 
-                // A page must always make progress: placing zero lines (e.g. Orphans=0 with a
-                // Widows pull-up) would flush a spurious blank page, so treat it as move-whole.
-                if (placeCount == 0 && !moveWhole)
+                var decision = LinePlacer.Decide(new LinePlacementRequest
                 {
-                    moveWhole = true;
-                }
+                    LinesThatFit = k,
+                    RemainingLines = nrem,
+                    IsFirst = first,
+                    HasPageContent = HasPageContent(),
+                    Widows = para.Widows,
+                    Orphans = para.Orphans,
+                    KeepTogether = para.KeepTogether,
+                    KeepWithNext = para.KeepWithNext,
+                    HasNextBlock = hasNextBlock,
+                    AfterCursor = afterCursor,
+                    NextBlockLeadingHeight = nextLeadingHeight,
+                    ContentHeight = contentHeight,
+                });
 
-                if (moveWhole && !HasPageContent())
-                {
-                    moveWhole = false;
-                    placeCount = k >= nrem ? nrem : (k > 0 ? k : 1);
-                }
+                var moveWhole = decision.MoveWhole;
+                var placeCount = decision.PlaceCount;
 
                 if (moveWhole)
                 {
