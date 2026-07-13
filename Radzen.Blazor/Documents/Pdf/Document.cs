@@ -105,6 +105,10 @@ public sealed class Document
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
 
+    // Non-standard structure roles mapped to standard types, emitted as the
+    // /StructTreeRoot /RoleMap. Set by the generator; empty maps write no /RoleMap.
+    internal RoleMap RoleMap { get; set; } = new();
+
     // PDF/A conformance level requested at build time; drives XMP metadata,
     // the sRGB output intent, the trailer /ID and full-embedding enforcement.
     internal PdfAConformance Conformance { get; set; }

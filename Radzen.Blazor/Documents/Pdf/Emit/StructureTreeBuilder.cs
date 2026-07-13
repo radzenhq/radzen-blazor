@@ -83,7 +83,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
         public override Nothing Visit(Paragraph paragraph, StructureElement parent)
         {
-            var p = new StructureElement { Type = HeadingType(paragraph.StyleName) };
+            var p = new StructureElement { Type = tree.StructureTypeFor(paragraph.StyleName) };
             parent.Children.Add(p);
             tree.blockElements[paragraph] = p;
             return default;
@@ -168,6 +168,21 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
                 MapList(nested, lbody);
             }
         }
+    }
+
+    // A recognized heading style keeps its H1..H6 mapping. Otherwise a style name declared
+    // as a custom role becomes that role verbatim (emitted with a /RoleMap to its standard
+    // type); everything else stays P. With no declared roles this is exactly HeadingType, so
+    // default output is unchanged.
+    private string StructureTypeFor(string? styleName)
+    {
+        var type = HeadingType(styleName);
+        if (type == "P" && styleName is not null && builder.RoleMap.Contains(styleName))
+        {
+            return styleName;
+        }
+
+        return type;
     }
 
     private static string HeadingType(string? styleName)
