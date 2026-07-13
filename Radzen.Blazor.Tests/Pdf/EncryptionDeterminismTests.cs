@@ -104,46 +104,30 @@ public class EncryptionDeterminismTests
     [Fact]
     public void PerStreamIvs_AreUnique()
     {
-        // Two distinct AESV3 streams under the same file key must not share an IV
-        // (the first 16 bytes of each encrypted stream), or identical plaintext
-        // prefixes would leak.
-        using var buffer = new MemoryStream();
-        var writer = new DocumentWriter(buffer)
+        // Two AESV3 streams under one file key must get distinct IVs: identical
+        // plaintext encrypted with a reused IV yields identical ciphertext and
+        // leaks. Drive the real writer path and compare the two encrypted blobs
+        // (AESV3 layout is IV(16) || ciphertext) rather than round-tripping,
+        // because the reader strips the IV on decrypt.
+        var sequence = new MaterialSequence(new SeededEncryptionMaterial([42]));
+        var options = new EncryptionOptions
         {
-            Encryption = new EncryptionOptions
-            {
-                Algorithm = EncryptionAlgorithm.Aes256,
-                Material = new SeededEncryptionMaterial([42]),
-            },
+            Algorithm = EncryptionAlgorithm.Aes256,
+            Material = new SeededEncryptionMaterial([42]),
         };
+        var writer = EncryptionWriter.Build(options, new byte[16], sequence, out _);
 
-        var catalog = new DictionaryObject { ["Type"] = new NameObject("Catalog") };
-        var pages = new DictionaryObject { ["Type"] = new NameObject("Pages"), ["Count"] = new NumberObject(1) };
-        var page = new DictionaryObject { ["Type"] = new NameObject("Page") };
-        var one = new StreamObject(Encoding.Latin1.GetBytes(new string('A', 64)));
-        var two = new StreamObject(Encoding.Latin1.GetBytes(new string('A', 64)));
+        // AESV3 encrypts every object under the file key directly, so the object
+        // number does not vary the IV - the uniqueness comes solely from the
+        // material sequence advancing one fresh IV per stream. Use one object
+        // number so the sequence advance is unmistakably the only difference.
+        var plaintext = Encoding.Latin1.GetBytes(new string('A', 64));
+        var first = writer.EncryptStream(plaintext, objectNumber: 3, generation: 0);
+        var second = writer.EncryptStream(plaintext, objectNumber: 3, generation: 0);
 
-        var catalogRef = writer.Add(catalog);
-        var pagesRef = writer.Add(pages);
-        var pageRef = writer.Add(page);
-        var oneRef = writer.Add(one);
-        var twoRef = writer.Add(two);
-
-        catalog["Pages"] = pagesRef;
-        pages["Kids"] = new ArrayObject { pageRef };
-        page["Parent"] = pagesRef;
-        page["MediaBox"] = new ArrayObject
-        {
-            new NumberObject(0), new NumberObject(0), new NumberObject(612), new NumberObject(792),
-        };
-        page["Contents"] = oneRef;
-        page["Extra"] = twoRef;
-        writer.Trailer["Root"] = catalogRef;
-        writer.Close();
-
-        var reader = DocumentReader.Parse(buffer.ToArray(), string.Empty);
-        var text = Encoding.Latin1.GetString(buffer.ToArray());
-        Assert.Contains("/AESV3", text);
-        Assert.True(reader.IsEncrypted);
+        // Identical plaintext must not produce identical output, and the 16-byte
+        // IV prefixes must differ.
+        Assert.False(first.AsSpan().SequenceEqual(second));
+        Assert.False(first.AsSpan(0, 16).SequenceEqual(second.AsSpan(0, 16)));
     }
 }
