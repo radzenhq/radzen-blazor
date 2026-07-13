@@ -15,25 +15,22 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
-    internal readonly Dictionary<Page, DictionaryObject> sourcePages = [];
-    internal readonly Dictionary<Page, DictionaryObject> sourceResources = [];
-    internal readonly Dictionary<Page, ArrayObject> sourceBoxes = [];
-    internal readonly Dictionary<Page, ArrayObject> sourceCropBoxes = [];
-    internal readonly Dictionary<Page, int> sourceRotations = [];
-    internal readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> appendedResources = [];
-    internal readonly Dictionary<Page, (DocumentReader Reader, DictionaryObject Node)> appendedPages = [];
-    internal readonly Dictionary<DocumentReader, DictionaryObject> appendedAcroForms = [];
-    internal DocumentReader? source;
-    internal DictionaryObject? sourceCatalog;
-    internal DictionaryObject? sourceAcroForm;
+    // The document's load/merge/incremental state, encapsulated in one owned object.
+    // Null for a freshly built document that carries no loaded or appended source
+    // pages; set by DocumentLoader (fully loaded) or lazily by Append (carry only).
+    internal LoadedState? Loaded { get; private set; }
 
-    // The exact original file bytes retained by DocumentLoader, so SaveIncremental can
-    // preserve them verbatim as the prefix of the incremental output. Null unless loaded.
-    internal byte[]? sourceBytes;
+    // Builds a loaded document around the state DocumentLoader constructed, instead of
+    // letting the loader set the document's fields one by one from outside.
+    internal static Document CreateLoaded(LoadedState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        return new Document { Loaded = state };
+    }
 
-    // The document metadata as read at load time, so SaveIncremental emits an /Info
-    // override only when the caller actually changed a modeled metadata field.
-    internal string?[]? loadedInfoSnapshot;
+    // Lazily creates the append-only carry state so Document.Append can record merged
+    // loaded pages on a document that was not itself loaded.
+    internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
     // The eight modeled /Info fields captured as strings, for a cheap value comparison
     // between the load-time metadata and the current metadata on the incremental path.
@@ -248,7 +245,7 @@ public sealed class Document
     public void SaveIncremental(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        if (source is null || sourceBytes is null)
+        if (Loaded?.Source is null || Loaded.SourceBytes is null)
         {
             throw new InvalidOperationException(
                 "SaveIncremental is only valid for a document loaded from an existing PDF via LoadFromStream. "

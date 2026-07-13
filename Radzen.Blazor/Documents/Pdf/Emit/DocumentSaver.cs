@@ -33,7 +33,8 @@ internal sealed class DocumentSaver
         var pagesNode = new DictionaryObject();
         var pagesRef = writer.Add(pagesNode);
 
-        var importer = doc.source is not null ? new GraphImporter(doc.source, writer) : null;
+        var loaded = doc.Loaded;
+        var importer = loaded?.Source is { } docSource ? new GraphImporter(docSource, writer) : null;
         var appendImporters = new Dictionary<DocumentReader, GraphImporter>();
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
@@ -50,7 +51,7 @@ internal sealed class DocumentSaver
                 ["MediaBox"] = PageResourceBuilder.MediaBox(doc, page),
             };
 
-            if (doc.sourceCropBoxes.TryGetValue(page, out var cropBox))
+            if (loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
             {
                 pageNode["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
             }
@@ -63,13 +64,13 @@ internal sealed class DocumentSaver
             {
                 pageNode["Rotate"] = new NumberObject(page.Rotate);
             }
-            else if (doc.sourceRotations.TryGetValue(page, out var rotation))
+            else if (loaded is not null && loaded.SourceRotations.TryGetValue(page, out var rotation))
             {
                 pageNode["Rotate"] = new NumberObject(rotation);
             }
 
             var pageRef = writer.Add(pageNode);
-            if (importer is not null && doc.sourcePages.TryGetValue(page, out var sourceNode))
+            if (importer is not null && loaded!.SourcePages.TryGetValue(page, out var sourceNode))
             {
                 importer.Seed(sourceNode, pageRef);
             }
@@ -113,11 +114,11 @@ internal sealed class DocumentSaver
             }
 
             HashSet<string>? reservedNames = null;
-            if (doc.source is not null && doc.sourceResources.TryGetValue(page, out var reservedFrom))
+            if (loaded?.Source is { } reservedSource && loaded.SourceResources.TryGetValue(page, out var reservedFrom))
             {
-                reservedNames = PageResourceBuilder.ResourceNames(doc.source, reservedFrom);
+                reservedNames = PageResourceBuilder.ResourceNames(reservedSource, reservedFrom);
             }
-            else if (doc.appendedResources.TryGetValue(page, out var reservedAppend))
+            else if (loaded is not null && loaded.AppendedResources.TryGetValue(page, out var reservedAppend))
             {
                 reservedNames = PageResourceBuilder.ResourceNames(reservedAppend.Reader, reservedAppend.Resources);
             }
@@ -134,12 +135,12 @@ internal sealed class DocumentSaver
             var activeEmitter = emitter ?? pageOverlayEmitter;
             var emitted = activeEmitter is not null ? PageResourceBuilder.BuildResources(writer, activeEmitter) : null;
             DictionaryObject? merged;
-            if (importer is not null && doc.source is not null
-                && doc.sourceResources.TryGetValue(page, out var loadedResources))
+            if (importer is not null && loaded?.Source is { } mergeSource
+                && loaded.SourceResources.TryGetValue(page, out var loadedResources))
             {
-                merged = PageResourceBuilder.MergeResources(importer, doc.source, loadedResources, emitted);
+                merged = PageResourceBuilder.MergeResources(importer, mergeSource, loadedResources, emitted);
             }
-            else if (doc.appendedResources.TryGetValue(page, out var appended))
+            else if (loaded is not null && loaded.AppendedResources.TryGetValue(page, out var appended))
             {
                 if (!appendImporters.TryGetValue(appended.Reader, out var appendImporter))
                 {
@@ -318,8 +319,8 @@ internal sealed class DocumentSaver
             return;
         }
 
-        if (doc.source is not null && doc.sourcePages.TryGetValue(page, out var sourceNode)
-            && doc.source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
+        if (doc.Loaded?.Source is { } source && doc.Loaded.SourcePages.TryGetValue(page, out var sourceNode)
+            && source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
         {
             pageNode[key] = PageResourceBuilder.NumberBox(box);
         }

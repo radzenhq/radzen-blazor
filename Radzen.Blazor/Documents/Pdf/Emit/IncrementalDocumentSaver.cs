@@ -24,7 +24,8 @@ internal sealed class IncrementalDocumentSaver
 
     internal void Save(Stream stream)
     {
-        var reader = doc.source!;
+        var loaded = doc.Loaded!;
+        var reader = loaded.Source!;
         if (doc.FormFields.Count > 0)
         {
             throw new NotSupportedException(
@@ -32,7 +33,7 @@ internal sealed class IncrementalDocumentSaver
                 + "Fill existing fields through Document.AcroForm, or use SaveToStream.");
         }
 
-        var writer = new IncrementalUpdateWriter(doc.sourceBytes!, reader);
+        var writer = new IncrementalUpdateWriter(loaded.SourceBytes!, reader);
         var index = reader.BuildObjectNumberIndex();
 
         var changed = WriteFieldEdits(writer, index);
@@ -91,11 +92,12 @@ internal sealed class IncrementalDocumentSaver
     // carry the grown /Count.
     private bool WriteAppendedPages(IncrementalUpdateWriter writer)
     {
-        var reader = doc.source!;
+        var loaded = doc.Loaded!;
+        var reader = loaded.Source!;
         var newPages = new List<Page>();
         foreach (var page in doc.Pages)
         {
-            if (!doc.sourcePages.ContainsKey(page))
+            if (!loaded.SourcePages.ContainsKey(page))
             {
                 newPages.Add(page);
             }
@@ -106,8 +108,8 @@ internal sealed class IncrementalDocumentSaver
             return false;
         }
 
-        if (doc.sourceCatalog is null
-            || !doc.sourceCatalog.TryGetValue("Pages", out var pagesValue)
+        if (loaded.SourceCatalog is null
+            || !loaded.SourceCatalog.TryGetValue("Pages", out var pagesValue)
             || pagesValue is not ReferenceObject pagesRef
             || reader.Resolve(pagesRef) is not DictionaryObject pagesNode)
         {
@@ -193,7 +195,7 @@ internal sealed class IncrementalDocumentSaver
     private bool WriteMetadata(IncrementalUpdateWriter writer, DocumentReader reader)
     {
         var current = Document.InfoSnapshot(doc.Info);
-        if (doc.loadedInfoSnapshot is { } snapshot && Same(snapshot, current))
+        if (doc.Loaded!.LoadedInfoSnapshot is { } snapshot && Same(snapshot, current))
         {
             return false;
         }
