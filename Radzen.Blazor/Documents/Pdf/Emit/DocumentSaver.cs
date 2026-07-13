@@ -424,7 +424,7 @@ internal sealed class DocumentSaver
             seed.WriteByte(0);
         }
 
-        var hash = Radzen.Documents.Crypto.Sha2.Sha256(seed.ToArray());
+        var hash = Radzen.Documents.Crypto.Sha2.ComputeHash256(seed.ToArray());
         var id = Convert.ToHexString(hash, 0, 16);
         return [new StringObject(id), new StringObject(id)];
     }

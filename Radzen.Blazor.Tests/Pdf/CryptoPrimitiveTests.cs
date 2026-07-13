@@ -9,7 +9,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 // Known-answer tests for the hand-rolled crypto primitives used by the PDF
 // standard security handler. Pins:
-//   internal static byte[] Md5.Hash(byte[] data)
+//   public static byte[] Md5.ComputeHash(byte[] data)
 //   internal static byte[] Rc4.Transform(byte[] key, byte[] data)
 //   internal static byte[] AesCbc.Decrypt(byte[] key, byte[] data)  // data = IV(16) || ciphertext, PKCS7 stripped
 public class CryptoPrimitiveTests
@@ -26,7 +26,7 @@ public class CryptoPrimitiveTests
     [InlineData("message digest", "f96b697d7cb7938d525a2f31aaf161d0")]
     public void Md5_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Md5.Hash(Ascii(input))));
+        Assert.Equal(expected, Hex(Md5.ComputeHash(Ascii(input))));
     }
 
     // Block-boundary inputs (55/56 force one vs two MD5 blocks; 64 exercises exact block fill).
@@ -36,7 +36,7 @@ public class CryptoPrimitiveTests
     [InlineData(64, "014842d480b571495a4a0363793f7367")]
     public void Md5_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Md5.Hash(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Md5.ComputeHash(Ascii(new string('a', count)))));
     }
 
     [Fact]
@@ -44,13 +44,21 @@ public class CryptoPrimitiveTests
     {
         var input = Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
         Assert.Equal(80, input.Length);
-        Assert.Equal("57edf4a22be3c955ac49da2e2107b67a", Hex(Md5.Hash(input)));
+        Assert.Equal("57edf4a22be3c955ac49da2e2107b67a", Hex(Md5.ComputeHash(input)));
     }
 
     [Fact]
     public void Md5_EmptyArray()
     {
-        Assert.Equal("d41d8cd98f00b204e9800998ecf8427e", Hex(Md5.Hash([])));
+        Assert.Equal("d41d8cd98f00b204e9800998ecf8427e", Hex(Md5.ComputeHash([])));
+    }
+
+    [Fact]
+    public void HashHexApis_PreserveTheirEstablishedCasing()
+    {
+        Assert.Equal("900150983cd24fb0d6963f7d28e17f72", Md5.ComputeHashHex(Ascii("abc")));
+        Assert.Equal("A9993E364706816ABA3E25717850C26C9CD0D89D", Sha1.ComputeHashHex(Ascii("abc")));
+        Assert.Equal(Convert.FromHexString("A9993E364706816ABA3E25717850C26C9CD0D89D"), Sha1.ComputeHash(Ascii("abc")));
     }
 
     // RC4 is symmetric; Transform decrypts and encrypts. Classic vectors verified

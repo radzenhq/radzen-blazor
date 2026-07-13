@@ -116,7 +116,7 @@ public class DocumentBuilder
     /// <returns>The generated document.</returns>
     public Document Build()
     {
-        var settings = BuilderSettingsSnapshot.Capture(this);
+        var settings = CapturedBuilderSettings.Capture(this);
         return DocumentGenerator.Generate(this, settings);
     }
 

@@ -50,7 +50,7 @@ public static class Sha2
     /// </summary>
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 32-byte digest.</returns>
-    public static byte[] Sha256(byte[] data)
+    public static byte[] ComputeHash256(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
         Span<uint> h =
@@ -117,7 +117,7 @@ public static class Sha2
     /// </summary>
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 48-byte digest.</returns>
-    public static byte[] Sha384(byte[] data)
+    public static byte[] ComputeHash384(byte[] data)
         => Sha512Core(
             data,
             [
@@ -131,7 +131,7 @@ public static class Sha2
     /// </summary>
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 64-byte digest.</returns>
-    public static byte[] Sha512(byte[] data)
+    public static byte[] ComputeHash512(byte[] data)
         => Sha512Core(
             data,
             [
@@ -139,6 +139,21 @@ public static class Sha2
                 0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b, 0x5be0cd19137e2179,
             ],
             64);
+
+    /// <summary>
+    /// Computes the SHA-256 digest as a lowercase hexadecimal string.
+    /// </summary>
+    public static string ComputeHashHex256(byte[] data) => ToHex(ComputeHash256(data));
+
+    /// <summary>
+    /// Computes the SHA-384 digest as a lowercase hexadecimal string.
+    /// </summary>
+    public static string ComputeHashHex384(byte[] data) => ToHex(ComputeHash384(data));
+
+    /// <summary>
+    /// Computes the SHA-512 digest as a lowercase hexadecimal string.
+    /// </summary>
+    public static string ComputeHashHex512(byte[] data) => ToHex(ComputeHash512(data));
 
     private static byte[] Sha512Core(byte[] data, ReadOnlySpan<ulong> init, int outputBytes)
     {
@@ -253,5 +268,18 @@ public static class Sha2
     {
         WriteUInt32(data, offset, (uint)(value >> 32));
         WriteUInt32(data, offset + 4, (uint)value);
+    }
+
+    private static string ToHex(byte[] digest)
+    {
+        const string hex = "0123456789abcdef";
+        var chars = new char[digest.Length * 2];
+        for (var i = 0; i < digest.Length; i++)
+        {
+            chars[i * 2] = hex[digest[i] >> 4];
+            chars[i * 2 + 1] = hex[digest[i] & 0xF];
+        }
+
+        return new string(chars);
     }
 }

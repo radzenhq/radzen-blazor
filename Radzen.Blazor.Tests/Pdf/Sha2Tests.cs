@@ -9,14 +9,23 @@ namespace Radzen.Blazor.Pdf.Tests;
 // Known-answer tests for the hand-rolled SHA-2 primitives that back the PDF/A
 // document /ID and the ISO 32000-2 revision 6 (AESV3) key derivation. Vectors are
 // the FIPS 180-4 / NIST CAVP published digests, verified with python3 hashlib.
-//   internal static byte[] Sha2.Sha256(byte[] data)
-//   internal static byte[] Sha2.Sha384(byte[] data)
-//   internal static byte[] Sha2.Sha512(byte[] data)
+//   public static byte[] Sha2.ComputeHash256(byte[] data)
+//   public static byte[] Sha2.ComputeHash384(byte[] data)
+//   public static byte[] Sha2.ComputeHash512(byte[] data)
 public class Sha2Tests
 {
     private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
+
+    [Fact]
+    public void HexApis_RouteToTheirSelectedDigests()
+    {
+        var input = Ascii("abc");
+        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Sha2.ComputeHashHex256(input));
+        Assert.Equal(Hex(Sha2.ComputeHash384(input)), Sha2.ComputeHashHex384(input));
+        Assert.Equal(Hex(Sha2.ComputeHash512(input)), Sha2.ComputeHashHex512(input));
+    }
 
     [Theory]
     [InlineData("", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")]
@@ -26,7 +35,7 @@ public class Sha2Tests
         "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1")]
     public void Sha256_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha256(Ascii(input))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash256(Ascii(input))));
     }
 
     // 55 fits with the length word in one block; 56 forces a second block; 64 is an
@@ -37,14 +46,14 @@ public class Sha2Tests
     [InlineData(64, "ffe054fe7ae0cb6dc65c3af9b61d5209f439851db43d0ba5997337df154668eb")]
     public void Sha256_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha256(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash256(Ascii(new string('a', count)))));
     }
 
     [Fact]
     public void Sha256_LongMultiBlock()
     {
         var input = Ascii(new string('a', 1000000));
-        Assert.Equal("cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", Hex(Sha2.Sha256(input)));
+        Assert.Equal("cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", Hex(Sha2.ComputeHash256(input)));
     }
 
     [Theory]
@@ -59,7 +68,7 @@ public class Sha2Tests
         "09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039")]
     public void Sha384_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha384(Ascii(input))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash384(Ascii(input))));
     }
 
     [Theory]
@@ -74,7 +83,7 @@ public class Sha2Tests
         "8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909")]
     public void Sha512_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha512(Ascii(input))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash512(Ascii(input))));
     }
 
     // SHA-384/512 pad to a 1024-bit block with a 128-bit length: 111 keeps a single
@@ -85,7 +94,7 @@ public class Sha2Tests
     [InlineData(128, "edb12730a366098b3b2beac75a3bef1b0969b15c48e2163c23d96994f8d1bef760c7e27f3c464d3829f56c0d53808b0b")]
     public void Sha384_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha384(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash384(Ascii(new string('a', count)))));
     }
 
     [Theory]
@@ -100,6 +109,6 @@ public class Sha2Tests
         "b73d1929aa615934e61a871596b3f3b33359f42b8175602e89f7e06e5f658a243667807ed300314b95cacdd579f3e33abdfbe351909519a846d465c59582f321")]
     public void Sha512_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Sha2.Sha512(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Sha2.ComputeHash512(Ascii(new string('a', count)))));
     }
 }

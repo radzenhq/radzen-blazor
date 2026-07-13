@@ -15,7 +15,7 @@ public static class Sha1
     /// </summary>
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 20-byte digest.</returns>
-    public static byte[] Hash(byte[] data)
+    public static byte[] ComputeHash(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
 
@@ -93,9 +93,9 @@ public static class Sha1
     /// </summary>
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 40-character uppercase hexadecimal digest.</returns>
-    public static string HexUpper(byte[] data)
+    public static string ComputeHashHex(byte[] data)
     {
-        var digest = Hash(data);
+        var digest = ComputeHash(data);
         const string hex = "0123456789ABCDEF";
         var chars = new char[digest.Length * 2];
         for (var i = 0; i < digest.Length; i++)

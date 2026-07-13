@@ -48,10 +48,10 @@ public static class Md5
     /// Calculates the MD5 hash.
     /// </summary>
     /// <param name="input">The input bytes.</param>
-    /// <returns>The MD5 hash as a string.</returns>
-    public static string Calculate(byte[] input)
+    /// <returns>The lowercase hexadecimal MD5 digest.</returns>
+    public static string ComputeHashHex(byte[] input)
     {
-        var digest = Hash(input);
+        var digest = ComputeHash(input);
         var result = new StringBuilder(32);
         foreach (var b in digest)
         {
@@ -66,14 +66,7 @@ public static class Md5
     /// </summary>
     /// <param name="input">The bytes to hash.</param>
     /// <returns>The 16-byte digest.</returns>
-    public static byte[] ComputeHash(byte[] input) => Hash(input);
-
-    /// <summary>
-    /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
-    /// </summary>
-    /// <param name="input">The bytes to hash.</param>
-    /// <returns>The 16-byte digest.</returns>
-    public static byte[] Hash(byte[] input)
+    public static byte[] ComputeHash(byte[] input)
     {
         ArgumentNullException.ThrowIfNull(input);
 

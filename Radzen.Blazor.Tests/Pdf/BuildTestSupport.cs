@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -52,44 +51,7 @@ internal static class BuildTestSupport
         => DocumentReader.Parse(builder.ToArray());
 
     public static List<(DictionaryObject Page, DictionaryObject? Resources)> PageLeaves(DocumentReader reader)
-    {
-        var acc = new List<(DictionaryObject, DictionaryObject?)>();
-        if (reader.Trailer.TryGetValue("Root", out var rootObject)
-            && reader.Resolve(rootObject!) is DictionaryObject catalog
-            && catalog.TryGetValue("Pages", out var pagesObject)
-            && reader.Resolve(pagesObject!) is DictionaryObject pages)
-        {
-            Collect(reader, pages, null, acc);
-        }
-
-        return acc;
-    }
-
-    private static void Collect(
-        DocumentReader reader,
-        DictionaryObject node,
-        DictionaryObject? inherited,
-        List<(DictionaryObject, DictionaryObject?)> acc)
-    {
-        var resources = node.TryGetValue("Resources", out var ro) && reader.Resolve(ro!) is DictionaryObject own
-            ? own
-            : inherited;
-
-        if (node.TryGetValue("Kids", out var ko) && reader.Resolve(ko!) is ArrayObject kids)
-        {
-            foreach (var kid in kids)
-            {
-                if (reader.Resolve(kid) is DictionaryObject child)
-                {
-                    Collect(reader, child, resources, acc);
-                }
-            }
-
-            return;
-        }
-
-        acc.Add((node, resources));
-    }
+        => PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false);
 
     public static List<DictionaryObject> Fonts(DocumentReader reader)
     {
@@ -167,51 +129,8 @@ internal static class BuildTestSupport
         => ((NumberObject)dict[key]).IntValue;
 
     public static byte[] Content(DocumentReader reader, DictionaryObject page)
-    {
-        if (!page.TryGetValue("Contents", out var contents))
-        {
-            return Array.Empty<byte>();
-        }
-
-        var resolved = reader.Resolve(contents!);
-        if (resolved is StreamObject stream)
-        {
-            return Decode(stream);
-        }
-
-        if (resolved is ArrayObject array)
-        {
-            using var joined = new MemoryStream();
-            foreach (var part in array)
-            {
-                if (reader.Resolve(part) is StreamObject piece)
-                {
-                    var bytes = Decode(piece);
-                    joined.Write(bytes, 0, bytes.Length);
-                    joined.WriteByte((byte)'\n');
-                }
-            }
-
-            return joined.ToArray();
-        }
-
-        return Array.Empty<byte>();
-    }
-
-    private static byte[] Decode(StreamObject stream)
-    {
-        if (!stream.Dictionary.TryGetValue("Filter", out var filter) || filter is null)
-        {
-            return stream.Data;
-        }
-
-        if (filter is NameObject name && name.Value == "FlateDecode")
-        {
-            return FlateFilter.Decode(stream.Data);
-        }
-
-        return stream.Data;
-    }
+        => PdfPageContentTestHelper.Content(
+            reader, page, assertStreams: false, appendSeparatorAfterEveryStream: false);
 
     public static int CountOccurrences(string haystack, string needle)
     {
