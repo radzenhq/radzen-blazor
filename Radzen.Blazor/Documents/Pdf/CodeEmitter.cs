@@ -11,26 +11,28 @@ internal sealed class CodeEmitter(FontCollection fonts)
     public void EmitCode(EmitContext context, PositionedCode positioned, double left, double top)
         => EmitCodeBlock(context, positioned.Source, left + positioned.XOffset, top - positioned.Y);
 
-    public static double CodeWidth(Block code) => code switch
-    {
-        QrCode qr => qr.Size.Point,
-        Barcode barcode => barcode.Width.Point,
-        _ => 0,
-    };
+    public static double CodeWidth(Block code) => CodeBlockDispatch.Measure(code).Width;
+
+    private EmitVisitor? emitVisitor;
 
     public void EmitCodeBlock(EmitContext context, Block source, double x, double topY)
+        => source.Accept(emitVisitor ??= new EmitVisitor(this), (context, x, topY));
+
+    // Rasterizes a code block; a non-code block emits nothing (Default).
+    private sealed class EmitVisitor(CodeEmitter owner) : BlockVisitor<(EmitContext Context, double X, double TopY), Nothing>
     {
-        var plan = context.Plan;
-        switch (source)
+        protected override Nothing Default(Block block, (EmitContext Context, double X, double TopY) args) => default;
+
+        public override Nothing Visit(QrCode qr, (EmitContext Context, double X, double TopY) args)
         {
-            case QrCode qr:
-                EmitQrCode(plan, qr, x, topY);
-                break;
-            case Barcode barcode:
-                EmitBarcode(context, barcode, x, topY);
-                break;
-            default:
-                break;
+            EmitQrCode(args.Context.Plan, qr, args.X, args.TopY);
+            return default;
+        }
+
+        public override Nothing Visit(Barcode barcode, (EmitContext Context, double X, double TopY) args)
+        {
+            owner.EmitBarcode(args.Context, barcode, args.X, args.TopY);
+            return default;
         }
     }
 

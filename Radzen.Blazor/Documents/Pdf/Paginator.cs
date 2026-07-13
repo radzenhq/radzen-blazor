@@ -389,102 +389,74 @@ internal static class Paginator
         }
 
         var broken = new IReadOnlyList<LineBox>?[blocks.Count];
+        var breaker = new LineBreakVisitor(contentWidth, fonts, resolution);
         for (var i = 0; i < blocks.Count; i++)
         {
-            if (blocks[i] is Paragraph paragraph)
-            {
-                broken[i] = LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph));
-            }
+            broken[i] = blocks[i].Accept(breaker, default);
         }
 
         var startPageCount = pages.Count;
 
-        for (var i = 0; i < blocks.Count; i++)
+        // Placement bodies stay local functions closing over the running pagination state
+        // (cursor, the current-page lists, Flush/HasPageContent); the block dispatch itself
+        // moves to the polymorphic SectionPlacer so each block kind routes to its own body.
+        void PlaceBreak()
         {
-            var block = blocks[i];
-            if (block is PageBreak)
+            Flush();
+            cursor = 0;
+        }
+
+        void PlaceImage(Image image)
+        {
+            var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
+            if (cursor + imageHeight > contentHeight + Eps && HasPageContent())
             {
                 Flush();
                 cursor = 0;
-                continue;
             }
 
-            if (block is Table table)
+            currentImages.Add(new PositionedImage
             {
-                PlaceTable(i, table);
-                continue;
-            }
+                Source = image,
+                Y = cursor,
+                Width = imageWidth,
+                Height = imageHeight,
+                XOffset = AlignImage(image.Alignment, contentWidth, imageWidth),
+            });
+            cursor += imageHeight;
+        }
 
-            if (block is Container container)
+        void PlaceCode(Block block)
+        {
+            var (codeWidth, codeHeight) = MeasureCode(block);
+            if (cursor + codeHeight > contentHeight + Eps && HasPageContent())
             {
-                if (IsSpecial(container))
-                {
-                    PlaceSpecialContainer(container);
-                }
-                else
-                {
-                    PlaceBox(i, container);
-                }
-
-                continue;
+                Flush();
+                cursor = 0;
             }
 
-            if (block is Image image)
+            currentCodes.Add(new PositionedCode
             {
-                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
-                if (cursor + imageHeight > contentHeight + Eps && HasPageContent())
-                {
-                    Flush();
-                    cursor = 0;
-                }
+                Source = block,
+                Y = cursor,
+                Width = codeWidth,
+                Height = codeHeight,
+                XOffset = AlignImage(CodeAlignment(block), contentWidth, codeWidth),
+            });
+            cursor += codeHeight;
+        }
 
-                currentImages.Add(new PositionedImage
-                {
-                    Source = image,
-                    Y = cursor,
-                    Width = imageWidth,
-                    Height = imageHeight,
-                    XOffset = AlignImage(image.Alignment, contentWidth, imageWidth),
-                });
-                cursor += imageHeight;
-                continue;
-            }
-
-            if (block is QrCode or Barcode)
-            {
-                var (codeWidth, codeHeight) = MeasureCode(block);
-                if (cursor + codeHeight > contentHeight + Eps && HasPageContent())
-                {
-                    Flush();
-                    cursor = 0;
-                }
-
-                currentCodes.Add(new PositionedCode
-                {
-                    Source = block,
-                    Y = cursor,
-                    Width = codeWidth,
-                    Height = codeHeight,
-                    XOffset = AlignImage(CodeAlignment(block), contentWidth, codeWidth),
-                });
-                cursor += codeHeight;
-                continue;
-            }
-
-            if (block is not Paragraph para)
-            {
-                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
-            }
-
+        void PlaceParagraph(int i, Paragraph para)
+        {
             if (broken[i] is not { } lines)
             {
-                continue;
+                return;
             }
 
             if (lines.Count == 0)
             {
                 cursor += para.SpacingBefore.Point + para.SpacingAfter.Point;
-                continue;
+                return;
             }
 
             var spacingBefore = para.SpacingBefore.Point;
@@ -616,9 +588,82 @@ internal static class Paginator
             }
         }
 
+        var placer = new SectionPlacer(PlaceBreak, PlaceTable, PlaceSpecialContainer, PlaceBox, PlaceImage, PlaceCode, PlaceParagraph);
+        for (var i = 0; i < blocks.Count; i++)
+        {
+            blocks[i].Accept(placer, i);
+        }
+
         if (HasPageContent() || pages.Count == startPageCount)
         {
             Flush();
+        }
+    }
+
+    // Routes each section-body block to its placement function. A block kind not valid as
+    // direct section content (e.g. a List that escaped expansion) fails loud through Default,
+    // exactly as the former is-not-Paragraph throw did.
+    private sealed class SectionPlacer(
+        Action placeBreak,
+        Action<int, Table> placeTable,
+        Action<Container> placeSpecial,
+        Action<int, Container> placeBox,
+        Action<Image> placeImage,
+        Action<Block> placeCode,
+        Action<int, Paragraph> placeParagraph)
+        : BlockVisitor<int, Nothing>
+    {
+        protected override Nothing Default(Block block, int index)
+            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
+
+        public override Nothing Visit(PageBreak block, int index)
+        {
+            placeBreak();
+            return default;
+        }
+
+        public override Nothing Visit(Table table, int index)
+        {
+            placeTable(index, table);
+            return default;
+        }
+
+        public override Nothing Visit(Container container, int index)
+        {
+            if (IsSpecial(container))
+            {
+                placeSpecial(container);
+            }
+            else
+            {
+                placeBox(index, container);
+            }
+
+            return default;
+        }
+
+        public override Nothing Visit(Image image, int index)
+        {
+            placeImage(image);
+            return default;
+        }
+
+        public override Nothing Visit(QrCode block, int index)
+        {
+            placeCode(block);
+            return default;
+        }
+
+        public override Nothing Visit(Barcode block, int index)
+        {
+            placeCode(block);
+            return default;
+        }
+
+        public override Nothing Visit(Paragraph para, int index)
+        {
+            placeParagraph(index, para);
+            return default;
         }
     }
 
@@ -628,6 +673,17 @@ internal static class Paginator
     internal static (double Width, double Height) MeasureCode(Block block) => CodeBlockDispatch.Measure(block);
 
     private static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
+
+    // Pre-breaks each paragraph into its lines at the content width; a non-paragraph block
+    // has no lines to break (Default returns null).
+    private sealed class LineBreakVisitor(double contentWidth, FontCollection fonts, StyleResolution resolution)
+        : BlockVisitor<Nothing, IReadOnlyList<LineBox>?>
+    {
+        protected override IReadOnlyList<LineBox>? Default(Block block, Nothing context) => null;
+
+        public override IReadOnlyList<LineBox>? Visit(Paragraph paragraph, Nothing context)
+            => LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph));
+    }
 
     internal static IReadOnlyList<Block> ExpandBlocks(
         BlockCollection blocks,
@@ -1110,98 +1166,117 @@ internal static class Paginator
         StyleResolution resolution)
     {
         var result = new BandLayout();
-        var images = result.Images;
-        double cursor = 0;
-        // Placement sequence shared by band table fragments and band boxes so page
-        // emission can interleave them in document order.
-        var order = 0;
+        var visitor = new BandVisitor(result, width, fonts, measureImage, resolution);
         // Lists expand to marker paragraphs exactly as in section content.
         foreach (var block in ExpandBlocks(band.Blocks, width))
         {
+            block.Accept(visitor, default);
+        }
+
+        result.Height = visitor.Cursor;
+        return result;
+    }
+
+    // Lays a header/footer band out at a running cursor: a band never page-breaks, so a
+    // container/table/image/code/paragraph places whole and a page break is a no-op. Any
+    // other block type is unsupported in a band (Default fails loud).
+    private sealed class BandVisitor(
+        BandLayout result,
+        double width,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        StyleResolution resolution)
+        : BlockVisitor<Nothing, Nothing>
+    {
+        // Placement sequence shared by band table fragments and band boxes so page
+        // emission can interleave them in document order.
+        private int order;
+
+        public double Cursor { get; private set; }
+
+        protected override Nothing Default(Block block, Nothing context)
+            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
+
+        public override Nothing Visit(Container container, Nothing context)
+        {
             // A Stack container in a band is a first-class box, like the section body;
             // a band never page-breaks, so the box places whole at the running cursor.
-            if (block is Container container)
-            {
-                var measured = MeasureBox(container, width, fonts, measureImage);
-                var box = BuildBox(container, measured, width, cursor, order++, transform: null);
-                result.Boxes.Add(box);
-                cursor += box.Bounds.Height;
-                continue;
-            }
+            var measured = MeasureBox(container, width, fonts, measureImage);
+            var box = BuildBox(container, measured, width, Cursor, order++, transform: null);
+            result.Boxes.Add(box);
+            Cursor += box.Bounds.Height;
+            return default;
+        }
 
-            if (block is Table table)
+        public override Nothing Visit(Table table, Nothing context)
+        {
+            var layout = TableLayout.Layout(table, Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
+            var tableOrder = order++;
+            foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
             {
-                var layout = TableLayout.Layout(table, Math.Max(0, width - table.LeftIndent.Point), fonts, measureImage);
-                var tableOrder = order++;
-                foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
+                result.Tables.Add(new PositionedTableFragment
                 {
-                    result.Tables.Add(new PositionedTableFragment
-                    {
-                        Layout = layout,
-                        Fragment = fragment,
-                        Y = cursor,
-                        Order = tableOrder,
-                    });
-                    cursor += fragment.Height;
-                }
-
-                continue;
-            }
-
-            if (block is Image image)
-            {
-                var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, width) : measureImage(image, width);
-                images.Add(new PositionedImage
-                {
-                    Source = image,
-                    Y = cursor,
-                    Width = imageWidth,
-                    Height = imageHeight,
-                    XOffset = AlignImage(image.Alignment, width, imageWidth),
+                    Layout = layout,
+                    Fragment = fragment,
+                    Y = Cursor,
+                    Order = tableOrder,
                 });
-                cursor += imageHeight;
-                continue;
+                Cursor += fragment.Height;
             }
 
-            if (block is QrCode or Barcode)
+            return default;
+        }
+
+        public override Nothing Visit(Image image, Nothing context)
+        {
+            var (imageWidth, imageHeight) = measureImage is null ? MeasureImage(image, width) : measureImage(image, width);
+            result.Images.Add(new PositionedImage
             {
-                var (codeWidth, codeHeight) = MeasureCode(block);
-                result.Codes.Add(new PositionedCode
-                {
-                    Source = block,
-                    Y = cursor,
-                    Width = codeWidth,
-                    Height = codeHeight,
-                    XOffset = AlignImage(CodeAlignment(block), width, codeWidth),
-                });
-                cursor += codeHeight;
-                continue;
-            }
+                Source = image,
+                Y = Cursor,
+                Width = imageWidth,
+                Height = imageHeight,
+                XOffset = AlignImage(image.Alignment, width, imageWidth),
+            });
+            Cursor += imageHeight;
+            return default;
+        }
 
-            if (block is PageBreak)
+        public override Nothing Visit(QrCode block, Nothing context) => VisitCode(block);
+
+        public override Nothing Visit(Barcode block, Nothing context) => VisitCode(block);
+
+        private Nothing VisitCode(Block block)
+        {
+            var (codeWidth, codeHeight) = MeasureCode(block);
+            result.Codes.Add(new PositionedCode
             {
-                // A header/footer band cannot page-break, so a page break inside one is a no-op.
-                continue;
-            }
+                Source = block,
+                Y = Cursor,
+                Width = codeWidth,
+                Height = codeHeight,
+                XOffset = AlignImage(CodeAlignment(block), width, codeWidth),
+            });
+            Cursor += codeHeight;
+            return default;
+        }
 
-            if (block is not Paragraph paragraph)
-            {
-                throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
-            }
+        // A header/footer band cannot page-break, so a page break inside one is a no-op.
+        public override Nothing Visit(PageBreak block, Nothing context) => default;
 
+        public override Nothing Visit(Paragraph paragraph, Nothing context)
+        {
             var lines = LineBreaker.Break(paragraph, width, fonts, resolution.Alignment(paragraph));
-            var y = cursor + paragraph.SpacingBefore.Point;
+            var y = Cursor + paragraph.SpacingBefore.Point;
             foreach (var box in lines)
             {
                 result.Lines.Add(new PositionedLine { Line = box, Source = paragraph, Y = y });
                 y += box.Height;
             }
 
-            cursor = y + paragraph.SpacingAfter.Point;
+            Cursor = y + paragraph.SpacingAfter.Point;
+            return default;
         }
-
-        result.Height = cursor;
-        return result;
     }
 
     private static (double Width, double Height) EffectiveSize(Section section)
