@@ -142,7 +142,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var element = structureTree.ElementOf(cell.Cell) ?? inherited;
         var opacity = opacities.CellOpacity(cell.Cell);
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
-        var radius = CornerRadius(cell);
         var bounds = new Rect(
             left + cell.Bounds.X,
             contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
@@ -150,11 +149,13 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             cell.Bounds.Height);
         BoxRenderer.Paint(plan, bounds, ResolveStyle(layout, cell, extGState));
 
+        // A grid cell never rounds its own corners against its neighbours, so its content is
+        // never rounded-clipped (radius 0); only whole tables and containers round.
         EmitBoxContent(
             context,
             cell.Lines, cell.Images, cell.Codes, cell.Tables, cell.Boxes,
             cell.ContentBox.Width, cell.Bounds.X, cell.Bounds.X + cell.Bounds.Width,
-            bounds, radius, opacity, element,
+            bounds, 0, opacity, element,
             left, contentTop, delta);
     }
 
@@ -367,10 +368,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
     }
 
-    // The effective corner radius, clamped so opposite corners never overlap.
-    private static double CornerRadius(LaidOutCell cell)
-        => BoxRenderer.ClampRadius(cell.Cell.CornerRadius.Point, cell.Bounds.Width, cell.Bounds.Height);
-
     // Resolves the cell/row/table border cascade (an edge falls back cell -> row -> table)
     // into the box decoration BoxRenderer paints.
     private static BoxStyle ResolveStyle(LaidOutTable layout, LaidOutCell cell, string? extGState)
@@ -386,7 +383,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             Right = CascadeEdge(cellBorders.Right, rowBorders?.Right, tableBorders?.Right),
             Bottom = CascadeEdge(cellBorders.Bottom, rowBorders?.Bottom, tableBorders?.Bottom),
             Left = CascadeEdge(cellBorders.Left, rowBorders?.Left, tableBorders?.Left),
-            CornerRadius = cell.Cell.CornerRadius,
             ExtGState = extGState,
         };
     }

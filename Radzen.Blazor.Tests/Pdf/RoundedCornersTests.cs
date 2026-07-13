@@ -147,28 +147,6 @@ public class RoundedCornersTests
         Assert.Equal(untouched, zeroed);
     }
 
-    [Fact]
-    public void TableCell_CornerRadius_RoundsTheCellBackground()
-    {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
-        var table = section.Blocks.Add(new Table());
-        table.Columns.Add(Unit.FromPoint(150));
-        var cell = table.Rows.Add().Cells[0];
-        cell.Background = Color.FromRgb(200, 220, 255);
-        cell.CornerRadius = Unit.FromPoint(5);
-        cell.Padding = Unit.FromPoint(6);
-        var run = cell.Blocks.AddParagraph().Inlines.Add("Rounded");
-        run.Font.Name = BuildTestSupport.Latin;
-
-        var content = FirstPageContent(builder);
-
-        // Fill path + the rounded clip around the cell's paragraph text.
-        Assert.Equal(8, Count(content, " c\n"));
-        Assert.Equal(1, Count(content, "h\nf\n"));
-    }
-
     // Reconstructs (radius, width, height) from the emitted rounded fill path, whose
     // first segment is: (x+r) y m, (x+w-r) y l, ... c ending at (x+w) (y+r), then
     // l to (x+w) (y+h-r), c ..., l to (x+r) (y+h).

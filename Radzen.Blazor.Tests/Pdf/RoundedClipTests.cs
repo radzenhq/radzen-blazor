@@ -238,7 +238,6 @@ public class RoundedClipTests
             {
                 container.CornerRadius = Unit.FromPoint(0);
                 table.CornerRadius = Unit.FromPoint(0);
-                row.Cells[0].CornerRadius = Unit.FromPoint(0);
             }
 
             return builder.ToArray();

@@ -13,18 +13,16 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 // Container overlay (z-stack) layout and content rotation.
 //
-// Overlay: children share the container box origin; each child lowers to its own
-// single-cell table placed at the same Y, in declaration order (later children on
-// top within each draw kind), with an optional decoration table (background/borders)
-// sized to the tallest child inserted first.
+// Overlay: a first-class box (like a Stack container) whose decoration paints through
+// BoxRenderer; its children share the box origin, each laid out from the box top-left
+// (inset by the padding) and merged in declaration order (later children on top within
+// each draw kind). The box height is the tallest child's.
 //
-// Rotation: a rotated Stack container places as a first-class box carrying a
-// page-space rotation matrix (about the box center); BoxEmitter bakes it into the
-// box's draws via PagePlan.ApplyTransform, which rotates edge endpoints, converts
-// fills to equivalent solid strokes, and carries the matrix on text/image draws
-// which ContentEmitter wraps in a balanced q cm .. Q. A rotated overlay keeps the
-// lowered-table path and stamps the same matrix on its fragments. Rotated content
-// is NOT clipped to the original box.
+// Rotation: a rotated container places as a first-class box carrying a page-space
+// rotation matrix (about the box center); BoxEmitter bakes it into the box's draws via
+// PagePlan.ApplyTransform, which rotates edge endpoints, converts fills to equivalent
+// solid strokes, and carries the matrix on text/image draws which ContentEmitter wraps
+// in a balanced q cm .. Q. Rotated content is NOT clipped to the original box.
 public class ContainerOverlayRotationTests
 {
     // ---------------------------------------------------------------- overlay
@@ -40,35 +38,43 @@ public class ContainerOverlayRotationTests
             Padding = Unit.FromPoint(10),
             Background = Color.FromRgb(230, 230, 230),
         });
-        container.Blocks.Add(PaginationSupport.Text("Short"));
-        container.Blocks.Add(PaginationSupport.Text("Tall child that wraps onto multiple lines because the box is only four hundred points wide and this text is long"));
+        var shortText = container.Blocks.Add(PaginationSupport.Text("Short"));
+        var tallText = container.Blocks.Add(PaginationSupport.Text("Tall child that wraps onto multiple lines because the box is only four hundred points wide and this text is long"));
 
         var pages = Paginator.Paginate(section, fonts);
         var page = Assert.Single(pages);
 
-        // Decoration + one table per child, all sharing the same Y origin.
-        Assert.Equal(3, page.Tables.Count);
-        Assert.All(page.Tables, fragment => Assert.Equal(0, fragment.Y, 6));
-        Assert.All(page.Tables, fragment => Assert.Null(fragment.Transform));
+        // The overlay is a single first-class box - no lowered tables.
+        Assert.Empty(page.Tables);
+        var box = Assert.Single(page.Boxes);
+        Assert.Same(container, box.Source);
+        Assert.Null(box.Transform);
+        Assert.Equal(0, box.Y, 6);
+        Assert.Equal(0, box.Bounds.X, 6);
+        Assert.Equal(400, box.Bounds.Width, 6);
 
-        var decoration = page.Tables[0];
-        var first = page.Tables[1];
-        var second = page.Tables[2];
+        // The decoration carries the container background/borders through BoxStyle.
+        Assert.Equal(container.Background, box.Style.Background);
 
-        // Children are inset by the padding and laid out within the same box.
-        var firstCell = Assert.Single(first.Layout.Cells);
-        var secondCell = Assert.Single(second.Layout.Cells);
-        Assert.Equal(10, firstCell.ContentBox.Left - firstCell.Bounds.Left, 6);
-        Assert.Equal(10, secondCell.ContentBox.Left - secondCell.Bounds.Left, 6);
-        Assert.Equal(firstCell.Bounds.Left, secondCell.Bounds.Left, 6);
-        Assert.Equal(400, first.Layout.Width, 6);
-        Assert.Equal(400, second.Layout.Width, 6);
+        // Both children's lines are inset by the padding (X = 10) and share the box top
+        // (first line of each child at Y = padding), in declaration order.
+        var firstShort = box.Content.Lines.First(l => ReferenceEquals(l.Source, shortText));
+        var firstTall = box.Content.Lines.First(l => ReferenceEquals(l.Source, tallText));
+        Assert.Equal(10, firstShort.X, 6);
+        Assert.Equal(10, firstTall.X, 6);
+        Assert.Equal(10, firstShort.Y, 6);
+        Assert.Equal(firstShort.Y, firstTall.Y, 6);
 
-        // The decoration box spans the tallest child.
-        var tallest = Math.Max(first.Fragment.Height, second.Fragment.Height);
-        Assert.True(second.Fragment.Height > first.Fragment.Height);
-        Assert.Equal(tallest, decoration.Fragment.Height, 6);
-        Assert.Equal(container.Background, Assert.Single(decoration.Layout.Cells).Cell.Background);
+        // The short child precedes the tall child in the merged line list (later on top).
+        Assert.True(
+            box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, shortText))
+            < box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, tallText)));
+
+        // The box spans the tallest child: its inner height is the multi-line child's.
+        var tallHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, tallText)).Sum(l => l.Line.Height);
+        var shortHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, shortText)).Sum(l => l.Line.Height);
+        Assert.True(tallHeight > shortHeight);
+        Assert.Equal(tallHeight + 20, box.Bounds.Height, 6);
     }
 
     [Fact]
@@ -352,6 +358,83 @@ public class ContainerOverlayRotationTests
         var bytes = builder.Build().ToArray();
 
         Assert.Equal(Convert.FromBase64String(PlainContainerBaseline), bytes);
+    }
+
+    // Built with the pre-change generator (commit 7174dca7, overlay still lowered to a
+    // synthetic single-cell decoration table + one child table each): a paragraph, an
+    // OVERLAY container (padding 8, gray background, 1pt borders, two paragraphs sharing
+    // the box origin) and a closing paragraph on a default A4 section. The first-class
+    // overlay box must reproduce these bytes exactly for the decoration + children.
+    private const string PlainOverlayBaseline =
+        "JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgL01hcmtJbmZvIDw8IC9NYXJrZWQg" +
+        "dHJ1ZSA+PiAvU3RydWN0VHJlZVJvb3QgNSAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAg" +
+        "Ul0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1" +
+        "OTUuMjc1NTkwNTUxMTgxMiA4NDEuODg5NzYzNzc5NTI3N10gL0NvbnRlbnRzIDQgMCBSIC9SZXNvdXJjZXMgPDwgL0ZvbnQgPDwg" +
+        "L0YwIDw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQmFzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lF" +
+        "bmNvZGluZyA+PiA+PiA+PiAvU3RydWN0UGFyZW50cyAwID4+CmVuZG9iago0IDAgb2JqCjw8IC9MZW5ndGggMjAzIC9GaWx0ZXIg" +
+        "L0ZsYXRlRGVjb2RlID4+CnN0cmVhbQp4nI2OywrCMBBF9/MVs9RNOk2TPkAKtlZxIb7iD4hpRXxgKOrnixrbUhTKwCyGe85cYhFx" +
+        "pMY2BQTEQt/HwHMZcYFCekwKD3mIRmMOVyB8zWoCLt6rtIze6RNILpigqLocYQ3LNlWF7JOOWKtag7KXblSr8wdKlKVMAc6Y0CVU" +
+        "OQThJyr4O6p20Nucd9r0UR0gU92p+a2GnAUOBs4snY6Q4hiTUfrPY4v6tSfR+cVoLPcat5fH15jN0qbV7WTltXWYl9r8kj4B7+xz" +
+        "iAplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKPDwgL1R5cGUgL1N0cnVjdFRyZWVSb290IC9LIDYgMCBSIC9QYXJlbnRUcmVlIDEx" +
+        "IDAgUiAvUGFyZW50VHJlZU5leHRLZXkgMSA+PgplbmRvYmoKNiAwIG9iago8PCAvVHlwZSAvU3RydWN0RWxlbSAvUyAvRG9jdW1l" +
+        "bnQgL1AgNSAwIFIgL0sgWzcgMCBSXSA+PgplbmRvYmoKNyAwIG9iago8PCAvVHlwZSAvU3RydWN0RWxlbSAvUyAvU2VjdCAvUCA2" +
+        "IDAgUiAvSyBbOCAwIFIgOSAwIFJdID4+CmVuZG9iago4IDAgb2JqCjw8IC9UeXBlIC9TdHJ1Y3RFbGVtIC9TIC9QIC9QIDcgMCBS" +
+        "IC9QZyAzIDAgUiAvSyBbMF0gPj4KZW5kb2JqCjkgMCBvYmoKPDwgL1R5cGUgL1N0cnVjdEVsZW0gL1MgL1AgL1AgNyAwIFIgL1Bn" +
+        "IDMgMCBSIC9LIFsxXSA+PgplbmRvYmoKMTAgMCBvYmoKWzggMCBSIDkgMCBSXQplbmRvYmoKMTEgMCBvYmoKPDwgL051bXMgWzAg" +
+        "MTAgMCBSXSA+PgplbmRvYmoKeHJlZgowIDEyCjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAw" +
+        "MTE1IDAwMDAwIG4gCjAwMDAwMDAxNzIgMDAwMDAgbiAKMDAwMDAwMDQxOSAwMDAwMCBuIAowMDAwMDAwNjk0IDAwMDAwIG4gCjAw" +
+        "MDAwMDA3ODYgMDAwMDAgbiAKMDAwMDAwMDg1OCAwMDAwMCBuIAowMDAwMDAwOTMyIDAwMDAwIG4gCjAwMDAwMDEwMDMgMDAwMDAg" +
+        "biAKMDAwMDAwMTA3NCAwMDAwMCBuIAowMDAwMDAxMTA0IDAwMDAwIG4gCnRyYWlsZXIKPDwgL1Jvb3QgMSAwIFIgL1NpemUgMTIg" +
+        "Pj4Kc3RhcnR4cmVmCjExNDMKJSVFT0YK";
+
+    [Fact]
+    public void PlainOverlayContainer_BuildBytes_IdenticalToPreChangeBaseline()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        section.Blocks.AddParagraph().Inlines.Add("Before the box");
+        var container = section.Blocks.Add(new Container
+        {
+            Layout = ContainerLayout.Overlay,
+            Padding = Unit.FromPoint(8),
+            Background = Color.FromRgb(230, 230, 230),
+        });
+        container.Borders.Width = 1;
+        container.Blocks.AddParagraph().Inlines.Add("Under");
+        container.Blocks.AddParagraph().Inlines.Add("Over");
+        section.Blocks.AddParagraph().Inlines.Add("After the box");
+
+        var bytes = builder.Build().ToArray();
+
+        Assert.Equal(Convert.FromBase64String(PlainOverlayBaseline), bytes);
+    }
+
+    [Fact]
+    public void RoundedOverlayContainer_WithBackgroundAndBorder_RendersRoundedDecoration()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Layout = ContainerLayout.Overlay,
+            Padding = Unit.FromPoint(8),
+            Background = Color.FromRgb(230, 230, 230),
+            CornerRadius = Unit.FromPoint(6),
+        });
+        container.Borders.Width = 1;
+        container.Blocks.AddParagraph().Inlines.Add("Rounded overlay");
+
+        var document = builder.Build();
+        var page = Assert.Single(document.Pages);
+        var content = Encoding.ASCII.GetString(page.GetContent()!);
+
+        // The rounded background fills a Bezier path (h f) and the uniform border strokes
+        // the same rounded path (h S) - both through BoxRenderer, no square "re f" fill.
+        Assert.Contains("h\nf\n", content);
+        Assert.Contains("h\nS\n", content);
+        Assert.DoesNotContain("re f", content);
+        var over = content.IndexOf("(Rounded overlay) Tj", StringComparison.Ordinal);
+        Assert.True(over >= 0, "child text present over the rounded decoration");
     }
 
     // ----------------------------------------------------------------- helpers
