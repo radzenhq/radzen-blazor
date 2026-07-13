@@ -500,6 +500,71 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   
 }
 
+// Resource View
+
+.rz-resource-view {
+  .rz-slot:nth-of-type(2) {
+    border-block-start: none;
+  }
+
+  .rz-view-header {
+    overflow-y: scroll;
+    scrollbar-width: auto;
+  }
+
+  .rz-resource-all-day {
+    border-block-start: none;
+
+    .rz-slot-header {
+      cursor: pointer;
+      min-height: 1.75rem;
+      padding: 1px;
+      border-inline-start: 1px solid var(--rz-scheduler-border-color);
+      text-transform: none;
+    }
+
+    .rz-resource-all-day-label {
+      cursor: default;
+      align-self: center;
+      text-align: end;
+      font-size: var(--rz-scheduler-header-font-size);
+      padding: 0 0.25rem;
+      text-transform: var(--rz-scheduler-header-text-transform);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rz-events {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-height: 100%;
+    }
+
+    .rz-event {
+      position: static;
+      text-align: start;
+    }
+  }
+}
+
+.rz-resource-view:has(.rz-resource-view-content:focus-visible) {
+  .rz-resource-all-day {
+    .rz-slot-header.rz-state-focused {
+      outline: var(--rz-scheduler-focus-outline);
+      outline-offset: var(--rz-scheduler-focus-outline-offset);
+    }
+  }
+}
+
+.rz-resource-view-content:focus-visible {
+  .rz-slot.rz-state-focused {
+    outline: var(--rz-scheduler-focus-outline);
+    outline-offset: var(--rz-scheduler-focus-outline-offset);
+  }
+}
+
 // Month View
 
 .rz-month-view {

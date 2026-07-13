@@ -23,5 +23,10 @@ public class SchedulerAppointmentMoveEventArgs
     /// Gets or sets the date of the slot where the appointment is moved.
     /// </summary>
     public DateTime SlotDate { get; set; }
+
+    /// <summary>
+    /// Gets or sets the resource of the slot where the appointment is moved. Set when the slot belongs to a resource in a resource view such as <see cref="RadzenResourceDayView" />; otherwise <c>null</c>.
+    /// </summary>
+    public object? Resource { get; set; }
 }
 
