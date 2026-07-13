@@ -77,3 +77,11 @@ internal static class FlateFilter
         return stream;
     }
 }
+
+internal sealed class FlateStreamFilter : IStreamFilter
+{
+    public string Name => "FlateDecode";
+
+    public byte[] Decode(byte[] data, DictionaryObject? parms, long maxOutput)
+        => StreamPredictor.Apply(FlateFilter.Decode(data, maxOutput), parms);
+}

@@ -56,43 +56,8 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         return result;
     }
 
-    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput) => name switch
-    {
-        "FlateDecode" or "Fl" => ApplyPredictor(FlateFilter.Decode(data, maxOutput), parms),
-        "LZWDecode" or "LZW" => ApplyPredictor(
-            LzwFilter.Decode(data, parms is not null ? ParmInt(parms, "EarlyChange", 1) : 1, maxOutput), parms),
-        "RunLengthDecode" or "RL" => RunLengthFilter.Decode(data, maxOutput),
-        "ASCIIHexDecode" or "AHx" => AsciiHexFilter.Decode(data),
-        "ASCII85Decode" or "A85" => Ascii85Filter.Decode(data, maxOutput),
-        _ => throw new DocumentParseException($"Unsupported stream filter '{name}'.", -1),
-    };
-
-    private static byte[] ApplyPredictor(byte[] data, DictionaryObject? parms)
-    {
-        if (parms is null)
-        {
-            return data;
-        }
-
-        var predictor = ParmInt(parms, "Predictor", 1);
-        if (predictor <= 1)
-        {
-            return data;
-        }
-
-        var columns = ParmInt(parms, "Columns", 1);
-        var colors = ParmInt(parms, "Colors", 1);
-        var bits = ParmInt(parms, "BitsPerComponent", 8);
-        if (predictor >= 10)
-        {
-            return PngPredictor.Decode(data, colors, bits, columns);
-        }
-
-        return predictor == 2 ? TiffPredictor.Decode(data, colors, bits, columns) : data;
-    }
-
-    private static int ParmInt(DictionaryObject parms, string key, int fallback)
-        => parms.TryGetValue(key, out var value) && value is NumberObject number ? number.IntValue : fallback;
+    private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput)
+        => StreamFilterRegistry.Get(name).Decode(data, parms, maxOutput);
 
     private List<string> FilterNames(DocumentObject? filter)
     {

@@ -108,3 +108,11 @@ internal static class RunLengthFilter
         return [.. output];
     }
 }
+
+internal sealed class RunLengthStreamFilter : IStreamFilter
+{
+    public string Name => "RunLengthDecode";
+
+    public byte[] Decode(byte[] data, DictionaryObject? parms, long maxOutput)
+        => RunLengthFilter.Decode(data, maxOutput);
+}
