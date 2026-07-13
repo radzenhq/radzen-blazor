@@ -16,6 +16,12 @@ public sealed class AcroForm
     // Chosen on-state for a checkbox whose fixture carries no explicit /AP states.
     private const string OnState = "Yes";
 
+    // Text-field /Ff flags (ISO 32000-1 table 228): bit 13 multiline, bit 14 password,
+    // bit 25 comb. A baked single left-aligned line is faithful for none of these.
+    private const int MultilineFlag = 1 << 12;
+    private const int PasswordFlag = 1 << 13;
+    private const int CombFlag = 1 << 24;
+
     private readonly DocumentReader reader;
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
@@ -96,8 +102,16 @@ public sealed class AcroForm
                 return;
             }
 
-            terminals[qualified] = new Terminal(dict, WidgetOf(dict));
-            fieldNames.Add(qualified);
+            // Two root fields legally may share a /T in malformed-but-real PDFs; keep both
+            // reachable by suffixing the collision so terminals, FieldNames and Fields agree.
+            var key = qualified;
+            for (var index = 2; terminals.ContainsKey(key); index++)
+            {
+                key = qualified + "_" + index;
+            }
+
+            terminals[key] = new Terminal(dict, WidgetOf(dict));
+            fieldNames.Add(key);
             fields.Add(new FormField(reader, dict));
         }
         finally
@@ -143,6 +157,7 @@ public sealed class AcroForm
         ArgumentNullException.ThrowIfNull(value);
 
         var terminal = Find(name);
+        RequireFieldType(name, terminal.Field, "Tx", allowUntyped: true);
         terminal.Field["V"] = new StringObject(value);
         WriteTextAppearance(terminal, value);
     }
@@ -163,6 +178,7 @@ public sealed class AcroForm
         ArgumentNullException.ThrowIfNull(value);
 
         var terminal = Find(name);
+        RequireFieldType(name, terminal.Field, "Ch", allowUntyped: false);
         var options = OptionValues(terminal.Field);
         if (options is not null)
         {
@@ -194,6 +210,7 @@ public sealed class AcroForm
         ArgumentNullException.ThrowIfNull(value);
 
         var terminal = Find(name);
+        RequireFieldType(name, terminal.Field, "Btn", allowUntyped: false);
         var widgets = RadioWidgets(terminal);
         var matched = false;
         foreach (var widget in widgets)
@@ -219,7 +236,7 @@ public sealed class AcroForm
 
     private void WriteTextAppearance(Terminal terminal, string value)
     {
-        if (FieldAppearances.CanEncode(value))
+        if (FieldAppearances.CanEncode(value) && CanBakeAppearance(terminal.Field))
         {
             // Write the appearance onto the widget so a separate-widget kid's stale /AP
             // does not override the new value in a viewer; when merged this is the field.
@@ -227,13 +244,68 @@ public sealed class AcroForm
         }
         else
         {
-            // A base-14 WinAnsi appearance would silently drop these glyphs, so let viewers
-            // regenerate from /V with a capable font instead of emitting missing glyphs.
+            // The baked appearance is a single left-aligned WinAnsi line. When that would be
+            // wrong - a non-WinAnsi glyph, a multiline/comb layout, a centered/right /Q, or a
+            // password whose value must render masked, not in cleartext - leave /AP to the
+            // viewer via /NeedAppearances rather than emit a wrong or password-leaking stream.
             Dictionary["NeedAppearances"] = new BooleanObject(true);
             if (terminal.Widget.ContainsKey("AP"))
             {
                 terminal.Widget["AP"] = new NullObject();
             }
+        }
+    }
+
+    // The baked single left-aligned line is faithful only for a plain text field: not for a
+    // multiline, comb or password field, nor a centered/right /Q. Those defer to the viewer.
+    private bool CanBakeAppearance(DictionaryObject field)
+    {
+        var flags = Inherited(field, "Ff") is NumberObject ff ? ff.IntValue : 0;
+        if ((flags & (MultilineFlag | PasswordFlag | CombFlag)) != 0)
+        {
+            return false;
+        }
+
+        return Inherited(field, "Q") is not NumberObject quad || quad.IntValue == 0;
+    }
+
+    // Walks a field/widget's /Parent chain for an inheritable attribute (ISO 32000-1
+    // 12.7.3.1) and returns it resolved, bounding the walk against a cyclic chain.
+    private DocumentObject? Inherited(DictionaryObject dict, string key)
+    {
+        var current = dict;
+        for (var depth = 0; current is not null && depth < 32; depth++)
+        {
+            if (current.TryGetValue(key, out var value))
+            {
+                return reader.Resolve(value!);
+            }
+
+            current = current.TryGetValue("Parent", out var parent)
+                && reader.Resolve(parent!) is DictionaryObject next
+                ? next
+                : null;
+        }
+
+        return null;
+    }
+
+    // Throws when a mutator is applied to the wrong /FT: writing a text /V onto a button,
+    // a name /V onto a text field, etc., would emit a spec-invalid field viewers mishandle.
+    private void RequireFieldType(string name, DictionaryObject field, string expected, bool allowUntyped)
+    {
+        if (Inherited(field, "FT") is NameObject ft)
+        {
+            if (!string.Equals(ft.Value, expected, StringComparison.Ordinal))
+            {
+                throw new ArgumentException(
+                    $"Field '{name}' is a /{ft.Value} field; this operation requires a /{expected} field.", nameof(name));
+            }
+        }
+        else if (!allowUntyped)
+        {
+            throw new ArgumentException(
+                $"Field '{name}' has no /FT; this operation requires a /{expected} field.", nameof(name));
         }
     }
 
@@ -296,6 +368,7 @@ public sealed class AcroForm
     public void CheckField(string name)
     {
         var terminal = Find(name);
+        RequireFieldType(name, terminal.Field, "Btn", allowUntyped: false);
         var on = OnStateName(terminal.Widget);
         terminal.Field["V"] = new NameObject(on);
         terminal.Widget["AS"] = new NameObject(on);
@@ -338,17 +411,17 @@ public sealed class AcroForm
         if (field.TryGetValue("Rect", out var rectObject) && reader.Resolve(rectObject!) is ArrayObject rect
             && rect.Count >= 4)
         {
-            var x0 = Number(rect[0]);
-            var y0 = Number(rect[1]);
-            var x1 = Number(rect[2]);
-            var y1 = Number(rect[3]);
+            // Resolve each coordinate: a legal /Rect may hold indirect references, which
+            // read as 0 unless resolved and would collapse the appearance box to nothing.
+            var x0 = DocumentLoader.Number(reader.Resolve(rect[0]));
+            var y0 = DocumentLoader.Number(reader.Resolve(rect[1]));
+            var x1 = DocumentLoader.Number(reader.Resolve(rect[2]));
+            var y1 = DocumentLoader.Number(reader.Resolve(rect[3]));
             return (Math.Abs(x1 - x0), Math.Abs(y1 - y0));
         }
 
         return (200.0, 14.0);
     }
-
-    private static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
 
     // Resolves the /DA to draw the value with: the field's own /DA wins, else the widget's,
     // else the form default /DA. A /DA size of 0 (auto) is reported as 0 for the caller to map.
