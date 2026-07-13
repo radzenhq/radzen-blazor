@@ -341,6 +341,7 @@ public class CheapWinWiringTests
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (secret) Tj ET"));
         document.Encryption = new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = EncryptionAlgorithm.Aes128,
             OwnerPassword = "owner",
             EncryptMetadata = encryptMetadata,

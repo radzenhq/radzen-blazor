@@ -25,6 +25,7 @@ public class EncryptionPublicApiTests
     {
         var bytes = BuildEncrypted(new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = EncryptionAlgorithm.Aes128,
             UserPassword = "secret",
         });
@@ -39,6 +40,7 @@ public class EncryptionPublicApiTests
     {
         var bytes = BuildEncrypted(new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = EncryptionAlgorithm.Rc4,
             UserPassword = "secret",
         });

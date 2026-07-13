@@ -1,5 +1,4 @@
 using System;
-using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Crypto;
 
@@ -399,24 +398,23 @@ internal sealed class StandardSecurityHandler
     }
 
     // Write side: derive /O, /U, /OE, /UE and /Perms for the AESV3 (R6) handler
-    // from a freshly generated 32-byte file key (ISO 32000-2 algorithms 8-10).
+    // from a caller-supplied 32-byte file key (ISO 32000-2 algorithms 8-10). The
+    // validation salts, key salts and /Perms noise are caller-supplied too, so the
+    // output is fully deterministic given the same material.
     internal static (byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms) DeriveAes256(
-        string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata)
+        string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata,
+        byte[] userValidation, byte[] userKeySalt, byte[] ownerValidation, byte[] ownerKeySalt, byte[] permsNoise)
     {
         var userPw = TruncateUtf8(userPassword);
         var ownerPw = TruncateUtf8(ownerPassword.Length > 0 ? ownerPassword : userPassword);
 
-        var userValidation = RandomNumberGenerator.GetBytes(8);
-        var userKeySalt = RandomNumberGenerator.GetBytes(8);
         var user = Concat(Hash2B(userPw, userValidation, []), userValidation, userKeySalt);
         var userEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(userPw, userKeySalt, []), ZeroIv, fileKey);
 
-        var ownerValidation = RandomNumberGenerator.GetBytes(8);
-        var ownerKeySalt = RandomNumberGenerator.GetBytes(8);
         var owner = Concat(Hash2B(ownerPw, ownerValidation, user), ownerValidation, ownerKeySalt);
         var ownerEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(ownerPw, ownerKeySalt, user), ZeroIv, fileKey);
 
-        return (owner, user, ownerEncrypted, userEncrypted, ComputePerms(permissions, encryptMetadata, fileKey));
+        return (owner, user, ownerEncrypted, userEncrypted, ComputePerms(permissions, encryptMetadata, fileKey, permsNoise));
     }
 
     private static byte[] TruncateUtf8(string password)
@@ -510,7 +508,7 @@ internal sealed class StandardSecurityHandler
 
     // ISO 32000-2 algorithm 10: the /Perms block is a single AES-256 ECB block,
     // which for one 16-byte block equals CBC with a zero IV.
-    private static byte[] ComputePerms(int permissions, bool encryptMetadata, byte[] fileKey)
+    private static byte[] ComputePerms(int permissions, bool encryptMetadata, byte[] fileKey, byte[] noise)
     {
         var perms = new byte[16];
         perms[0] = (byte)permissions;
@@ -525,7 +523,7 @@ internal sealed class StandardSecurityHandler
         perms[9] = (byte)'a';
         perms[10] = (byte)'d';
         perms[11] = (byte)'b';
-        Array.Copy(RandomNumberGenerator.GetBytes(4), 0, perms, 12, 4);
+        Array.Copy(noise, 0, perms, 12, 4);
         return AesCbc.EncryptCbcNoPadding(fileKey, ZeroIv, perms);
     }
 

@@ -69,7 +69,7 @@ public class EncryptMetadataOptionTests
     [InlineData(EncryptionAlgorithm.Aes256)]
     public void EncryptMetadataFalse_WritesFlagFalse(EncryptionAlgorithm algorithm)
     {
-        var pdf = WriteGraph(new EncryptionOptions { Algorithm = algorithm, EncryptMetadata = false });
+        var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm, EncryptMetadata = false });
         var reader = DocumentReader.Parse(pdf, string.Empty);
 
         var encrypt = Encrypt(reader);
@@ -85,6 +85,7 @@ public class EncryptMetadataOptionTests
     {
         var pdf = WriteGraph(new EncryptionOptions
         {
+            Material = new SeededEncryptionMaterial([7]),
             Algorithm = algorithm,
             EncryptMetadata = false,
             UserPassword = "s3cret",
@@ -106,7 +107,7 @@ public class EncryptMetadataOptionTests
     [InlineData(EncryptionAlgorithm.Aes256)]
     public void EncryptMetadataTrue_OmitsFlag(EncryptionAlgorithm algorithm)
     {
-        var pdf = WriteGraph(new EncryptionOptions { Algorithm = algorithm });
+        var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm });
         var reader = DocumentReader.Parse(pdf, string.Empty);
 
         Assert.False(Encrypt(reader).ContainsKey("EncryptMetadata"));

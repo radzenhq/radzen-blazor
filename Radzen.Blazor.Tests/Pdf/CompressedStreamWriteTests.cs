@@ -134,7 +134,7 @@ public class CompressedStreamWriteTests
     [Fact]
     public void Compressed_Encrypted_KeepsEncryptDictionaryTopLevelAndRoundTrips()
     {
-        var pdf = WriteGraph(compressed: true, new EncryptionOptions { Algorithm = EncryptionAlgorithm.Aes128 });
+        var pdf = WriteGraph(compressed: true, new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = EncryptionAlgorithm.Aes128 });
         var text = Latin1(pdf);
 
         var reader = DocumentReader.Parse(pdf, "");
