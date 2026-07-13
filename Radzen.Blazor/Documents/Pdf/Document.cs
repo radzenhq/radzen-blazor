@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Signing;
 namespace Radzen.Documents.Pdf;
 
 
@@ -256,4 +257,18 @@ public sealed class Document
 
         new IncrementalDocumentSaver(this).Save(stream);
     }
+
+    /// <summary>
+    /// Serializes this document and adds an approval signature to it as an
+    /// incremental update, returning the signed bytes. Equivalent to calling
+    /// <see cref="PdfSigner.Sign(byte[], SignatureOptions, ISigner)"/> with
+    /// <see cref="ToArray"/>; exposed here so signing is discoverable from the
+    /// document object. The library performs no cryptography itself - the
+    /// caller-supplied <paramref name="signer"/> produces the detached CMS blob.
+    /// </summary>
+    /// <param name="options">Signature appearance and sizing options.</param>
+    /// <param name="signer">Produces the detached CMS signature. See <see cref="ISigner"/>.</param>
+    /// <returns>The bytes of the signed document.</returns>
+    public byte[] Sign(SignatureOptions options, ISigner signer)
+        => PdfSigner.Sign(ToArray(), options, signer);
 }

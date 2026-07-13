@@ -46,7 +46,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         // containers), so no structure element is passed down.
         tables.EmitBoxContent(
             context,
-            box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,
+            box.Content,
             innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
             bounds, radius, opacity, null,
             left, contentTop, box.Y);
