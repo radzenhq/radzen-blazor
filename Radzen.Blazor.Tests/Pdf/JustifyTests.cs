@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Justify contract: every line except the last stretches so its right edge lands exactly

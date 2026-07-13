@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Hardening for ImageDecoder against hostile PNG/JPEG headers: oversized or

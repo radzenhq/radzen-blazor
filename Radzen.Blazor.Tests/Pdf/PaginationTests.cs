@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Core flow-pagination contract: exact page COUNT and per-line Y offsets for

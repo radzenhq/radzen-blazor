@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf;
 
 

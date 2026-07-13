@@ -2,6 +2,7 @@
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Alignment contract for the L2 line breaker. v1 supports LTR only, so Start resolves

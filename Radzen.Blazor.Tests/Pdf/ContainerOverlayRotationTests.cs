@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Container overlay (z-stack) layout and content rotation.

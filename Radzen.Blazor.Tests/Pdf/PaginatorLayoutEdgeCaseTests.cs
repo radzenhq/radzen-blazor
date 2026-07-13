@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Small layout edge cases: a SpacingBefore taller than the page must not push the first

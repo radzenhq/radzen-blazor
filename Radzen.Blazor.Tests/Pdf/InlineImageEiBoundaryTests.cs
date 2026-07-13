@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // The inline-image skipper must terminate at an EI whose image data runs right up to it

@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Regression tests for two header/footer band defects, asserted on the REAL emitted

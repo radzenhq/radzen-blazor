@@ -3,6 +3,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // The pre-table flush check must account for the whole first body ROW GROUP that

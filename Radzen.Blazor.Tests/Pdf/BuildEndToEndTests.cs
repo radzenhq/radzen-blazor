@@ -5,6 +5,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // L5 test 2 + 5 + 6: Build() drives the layout engine to a real physical Document.

@@ -3,6 +3,7 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // L4b: header rows (Row.IsHeader) repeat at the top of every fragment, and the border resolution

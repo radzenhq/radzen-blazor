@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Regression tests for header/footer band geometry. The header used to render flush

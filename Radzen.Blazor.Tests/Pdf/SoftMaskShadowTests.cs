@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 transparency: a transparency-group form XObject, an /SMask luminosity soft

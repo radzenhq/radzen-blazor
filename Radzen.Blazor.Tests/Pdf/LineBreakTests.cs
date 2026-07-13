@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Contract pinned for the L2 line breaker (INTERNAL, namespace Radzen.Documents.Pdf,

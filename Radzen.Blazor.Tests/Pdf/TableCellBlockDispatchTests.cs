@@ -10,6 +10,7 @@ using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Coverage matrix for block dispatch inside a table cell: every concrete Block

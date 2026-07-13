@@ -3,6 +3,7 @@ using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // A repeated header/footer band appears on EVERY page, in the top/bottom margin, with

@@ -2,6 +2,7 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // L4a column-span / row-span grid-occupancy and geometry contract.

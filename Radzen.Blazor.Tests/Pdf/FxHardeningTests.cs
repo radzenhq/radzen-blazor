@@ -12,6 +12,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Untrusted-parse allocation hardening (fx-hardening lane): every attacker-controlled

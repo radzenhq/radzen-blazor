@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
+using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // The single shared content-stream tokenizer feeds both ContentInterpreter and

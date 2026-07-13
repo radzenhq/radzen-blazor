@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using Radzen.Documents.Pdf.Objects;
 
+using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Signing;
 
 /// <summary>
