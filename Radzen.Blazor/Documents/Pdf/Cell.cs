@@ -29,7 +29,10 @@ public class Cell
         set
         {
             Blocks.Clear();
-            Blocks.AddParagraph().Text = value;
+            if (value != null)
+            {
+                Blocks.AddParagraph().Text = value;
+            }
         }
     }
 

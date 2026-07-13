@@ -56,6 +56,9 @@ public sealed class ReaderLimits
     /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
     public long MaxImagePixels { get; set; } = 64L * 1024 * 1024;
 
+    /// <summary>Maximum size in bytes of a source file buffered while loading. Default 2 GiB.</summary>
+    public long MaxFileBytes { get; set; } = 2L * 1024 * 1024 * 1024;
+
     /// <summary>The default limits used when a caller does not supply their own.</summary>
     public static ReaderLimits Default { get; } = new();
 }

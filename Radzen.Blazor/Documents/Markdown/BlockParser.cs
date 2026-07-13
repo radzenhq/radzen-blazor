@@ -72,7 +72,7 @@ class BlockParser
         var currentLine = CurrentLine;
         char c;
 
-        while (count > 0 && Offset < currentLine.Length != default)
+        while (count > 0 && Offset < currentLine.Length)
         {
             c = currentLine[Offset];
 

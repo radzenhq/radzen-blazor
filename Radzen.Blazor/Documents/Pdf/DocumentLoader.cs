@@ -15,9 +15,7 @@ internal static class DocumentLoader
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(limits);
 
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        var reader = DocumentReader.Parse(buffer.ToArray(), options?.Password, limits);
+        var reader = DocumentReader.Parse(ReadAll(stream, limits), options?.Password, limits);
 
         var document = new Document { source = reader };
         ReadInfo(reader, document.Info);
@@ -51,6 +49,52 @@ internal static class DocumentLoader
         }
 
         return document;
+    }
+
+    // Buffers the source into a single byte[] with the file-size cap enforced while reading, so a
+    // hostile oversized stream throws before exhausting memory rather than after. A seekable stream
+    // is read once into a right-sized array (no second full copy); a non-seekable stream grows a
+    // capped MemoryStream. ISO 32000-1 places no hard file-size limit, so MaxFileBytes is the guard.
+    private static byte[] ReadAll(Stream stream, ReaderLimits limits)
+    {
+        if (stream.CanSeek)
+        {
+            var length = stream.Length - stream.Position;
+            if (length > limits.MaxFileBytes)
+            {
+                throw new DocumentParseException("Maximum file size exceeded.", -1);
+            }
+
+            var buffer = new byte[length];
+            var offset = 0;
+            int read;
+            while (offset < buffer.Length && (read = stream.Read(buffer, offset, buffer.Length - offset)) > 0)
+            {
+                offset += read;
+            }
+
+            if (offset != buffer.Length)
+            {
+                System.Array.Resize(ref buffer, offset);
+            }
+
+            return buffer;
+        }
+
+        using var accumulator = new MemoryStream();
+        var chunk = new byte[81920];
+        int count;
+        while ((count = stream.Read(chunk, 0, chunk.Length)) > 0)
+        {
+            if (accumulator.Length + count > limits.MaxFileBytes)
+            {
+                throw new DocumentParseException("Maximum file size exceeded.", -1);
+            }
+
+            accumulator.Write(chunk, 0, count);
+        }
+
+        return accumulator.ToArray();
     }
 
     // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
