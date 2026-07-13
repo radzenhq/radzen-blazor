@@ -32,6 +32,15 @@ internal sealed class CodeEmitter(FontCollection fonts)
         }
     }
 
+    // Spec-mandated minimum quiet zone (light margin) each side, in modules, so 1D symbols
+    // stay scannable. EAN wants 11x, UPC-A 9x; Code128 and the rest need at least 10x.
+    private static int QuietZoneModules(BarcodeType type) => type switch
+    {
+        BarcodeType.Ean13 or BarcodeType.Ean8 or BarcodeType.Isbn or BarcodeType.Issn => 11,
+        BarcodeType.UpcA => 9,
+        _ => 10,
+    };
+
     // One filled square per dark module, scaled so matrix plus quiet zone fits Size x Size.
     private static void EmitQrCode(PagePlan plan, QrCode qr, double x, double topY)
     {
@@ -65,7 +74,8 @@ internal sealed class CodeEmitter(FontCollection fonts)
     private void EmitBarcode(EmitContext context, Barcode barcode, double x, double topY)
     {
         var plan = context.Plan;
-        var (bars, moduleCount, _) = Radzen.Documents.BarcodeEncoder.EncodeToBars(barcode.Type, barcode.Value, barcode.Height.Point, 0);
+        var quiet = QuietZoneModules(barcode.Type);
+        var (bars, moduleCount, _) = Radzen.Documents.BarcodeEncoder.EncodeToBars(barcode.Type, barcode.Value, barcode.Height.Point, quiet);
         var scaleX = barcode.Width.Point / moduleCount;
 
         foreach (var bar in bars)
