@@ -1,3 +1,4 @@
+using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 
@@ -68,6 +69,12 @@ public abstract class GradientBrush
     /// point (the second entry of the shading <c>/Extend</c> array). Defaults to true.
     /// </summary>
     public bool ExtendEnd { get; set; } = true;
+
+    // The shading /ShadingType of this gradient kind (ISO 32000-1 8.7.4.5): 2 axial, 3 radial.
+    internal abstract int ShadingType { get; }
+
+    // The shading /Coords array in this gradient's own coordinate space (points).
+    internal abstract ArrayObject BuildCoords();
 }
 
 /// <summary>
@@ -94,6 +101,14 @@ public sealed class LinearGradient(double x0, double y0, double x1, double y1, p
 
     /// <summary>Gets the gradient axis end Y, in points.</summary>
     public double Y1 { get; } = y1;
+
+    internal override int ShadingType => 2;
+
+    internal override ArrayObject BuildCoords() =>
+    [
+        new NumberObject(X0), new NumberObject(Y0),
+        new NumberObject(X1), new NumberObject(Y1),
+    ];
 }
 
 /// <summary>
@@ -129,4 +144,12 @@ public sealed class RadialGradient(double x0, double y0, double r0, double x1, d
 
     /// <summary>Gets the end circle radius, in points.</summary>
     public double R1 { get; } = r1;
+
+    internal override int ShadingType => 3;
+
+    internal override ArrayObject BuildCoords() =>
+    [
+        new NumberObject(X0), new NumberObject(Y0), new NumberObject(R0),
+        new NumberObject(X1), new NumberObject(Y1), new NumberObject(R1),
+    ];
 }

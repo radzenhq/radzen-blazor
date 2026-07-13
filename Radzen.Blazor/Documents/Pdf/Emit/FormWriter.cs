@@ -13,8 +13,8 @@ internal sealed class FormWriter(Document document)
     // Field flags (ISO 32000-1 table 226/229): /Ff bit 16 marks a radio group,
     // bit 18 a combo box. Text-field flags: bit 13 multiline, bit 14 password,
     // bit 25 comb.
-    private const int RadioFlag = 1 << 15;
-    private const int ComboFlag = 1 << 17;
+    internal const int RadioFlag = 1 << 15;
+    internal const int ComboFlag = 1 << 17;
     private const int MultilineFlag = 1 << 12;
     private const int PasswordFlag = 1 << 13;
     private const int CombFlag = 1 << 24;
@@ -37,58 +37,11 @@ internal sealed class FormWriter(Document document)
                     $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {document.Pages.Count} pages.");
             }
 
-            DrawDefinition(document.Pages[definition.PageIndex], definition);
+            definition.WriteFlattenedContent(document.Pages[definition.PageIndex]);
         }
 
         document.FormFields.Clear();
         FlattenLoadedForm();
-    }
-
-    private static void DrawDefinition(Page page, FormFieldDefinition definition)
-    {
-        if (definition is TextFieldDefinition text)
-        {
-            if (text.Value.Length == 0)
-            {
-                return;
-            }
-
-            var baseline = FieldAppearances.Baseline(definition.Height.Point, text.Font.Size);
-            page.Content.Add(new TextContent(
-                text.Value,
-                definition.X + Unit.FromPoint(2.0),
-                definition.Y + Unit.FromPoint(baseline))
-            {
-                Font = text.Font,
-            });
-        }
-        else if (definition is CheckBoxFieldDefinition { Checked: true })
-        {
-            page.Content.Add(FieldAppearances.CheckMark(
-                definition.X.Point, definition.Y.Point, definition.Width.Point, definition.Height.Point));
-        }
-        else if (definition is RadioGroupFieldDefinition radio)
-        {
-            var selected = radio.SelectedValue is null
-                ? null
-                : radio.Options.Find(option => string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal));
-            if (selected is not null)
-            {
-                page.Content.Add(FieldAppearances.RadioDot(
-                    selected.X.Point, selected.Y.Point, selected.Width.Point, selected.Height.Point));
-            }
-        }
-        else if (definition is ChoiceFieldDefinition choice && choice.Value.Length > 0)
-        {
-            var baseline = FieldAppearances.Baseline(definition.Height.Point, choice.Font.Size);
-            page.Content.Add(new TextContent(
-                choice.Value,
-                definition.X + Unit.FromPoint(2.0),
-                definition.Y + Unit.FromPoint(baseline))
-            {
-                Font = choice.Font,
-            });
-        }
     }
 
     // Renders every loaded widget's current value into its page content, strips
@@ -414,7 +367,7 @@ internal sealed class FormWriter(Document document)
             var fonts = new DictionaryObject { ["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica") };
             foreach (var definition in document.FormFields)
             {
-                if (TextAppearanceOf(definition) is (_, { } font))
+                if (definition.TextAppearance is (_, { } font))
                 {
                     var baseFont = BaseFontOf(font);
                     if (!fonts.ContainsKey(baseFont))
@@ -429,20 +382,13 @@ internal sealed class FormWriter(Document document)
 
         foreach (var definition in document.FormFields)
         {
-            if (TextAppearanceOf(definition) is ({ } value, _) && !FieldAppearances.CanEncode(value))
+            if (definition.TextAppearance is ({ } value, _) && !FieldAppearances.CanEncode(value))
             {
                 form["NeedAppearances"] = new BooleanObject(true);
                 break;
             }
         }
     }
-
-    private static (string Value, Font Font)? TextAppearanceOf(FormFieldDefinition definition) => definition switch
-    {
-        TextFieldDefinition text => (text.Value, text.Font),
-        ChoiceFieldDefinition choice => (choice.Value, choice.Font),
-        _ => null,
-    };
 
     private static string BaseFontOf(Font font)
         => Fonts.Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
@@ -465,188 +411,13 @@ internal sealed class FormWriter(Document document)
                     $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {pageNodes.Count} pages.");
             }
 
-            if (definition is RadioGroupFieldDefinition radio)
-            {
-                WriteRadioGroup(writer, pageNodes[definition.PageIndex].Reference, radio, fields, created);
-                continue;
-            }
-
-            var x = definition.X.Point;
-            var y = definition.Y.Point;
-            var width = definition.Width.Point;
-            var height = definition.Height.Point;
-            var widget = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Annot"),
-                ["Subtype"] = new NameObject("Widget"),
-                ["T"] = new StringObject(definition.Name),
-                ["Rect"] = new ArrayObject
-                {
-                    new NumberObject(x),
-                    new NumberObject(y),
-                    new NumberObject(x + width),
-                    new NumberObject(y + height),
-                },
-                ["F"] = new NumberObject(4),
-                ["P"] = pageNodes[definition.PageIndex].Reference,
-            };
-
-            if (definition is TextFieldDefinition text)
-            {
-                widget["FT"] = new NameObject("Tx");
-                widget["V"] = new StringObject(text.Value);
-                widget["DA"] = new StringObject(DefaultAppearanceOf(text.Font));
-                var flags = TextFieldFlags(text);
-                if (flags != 0)
-                {
-                    widget["Ff"] = new NumberObject(flags);
-                }
-
-                if (text.MaxLength is { } maxLength)
-                {
-                    widget["MaxLen"] = new NumberObject(maxLength);
-                }
-
-                if (FieldAppearances.CanEncode(text.Value))
-                {
-                    widget["AP"] = new DictionaryObject
-                    {
-                        ["N"] = writer.Add(FieldAppearances.BuildText(text.Value, width, height, text.Font)),
-                    };
-                }
-            }
-            else if (definition is ChoiceFieldDefinition choice)
-            {
-                var options = new ArrayObject();
-                foreach (var option in choice.Options)
-                {
-                    options.Add(new StringObject(option));
-                }
-
-                widget["FT"] = new NameObject("Ch");
-                widget["Opt"] = options;
-                if (choice.ComboBox)
-                {
-                    widget["Ff"] = new NumberObject(ComboFlag);
-                }
-
-                widget["V"] = new StringObject(choice.Value);
-                widget["DA"] = new StringObject(DefaultAppearanceOf(choice.Font));
-                if (FieldAppearances.CanEncode(choice.Value))
-                {
-                    widget["AP"] = new DictionaryObject
-                    {
-                        ["N"] = writer.Add(FieldAppearances.BuildText(choice.Value, width, height, choice.Font)),
-                    };
-                }
-            }
-            else if (definition is CheckBoxFieldDefinition checkBox)
-            {
-                var state = checkBox.Checked ? "Yes" : "Off";
-                widget["FT"] = new NameObject("Btn");
-                widget["V"] = new NameObject(state);
-                widget["AS"] = new NameObject(state);
-                widget["AP"] = new DictionaryObject
-                {
-                    ["N"] = new DictionaryObject
-                    {
-                        ["Yes"] = writer.Add(FieldAppearances.BuildCheck(width, height)),
-                        ["Off"] = writer.Add(FieldAppearances.BuildOff(width, height)),
-                    },
-                };
-            }
-
-            var reference = writer.Add(widget);
-            fields.Add(reference);
-            created.Add((definition.PageIndex, reference));
+            definition.EmitCreatedField(writer, pageNodes[definition.PageIndex].Reference, fields, created);
         }
 
         return created;
     }
 
-    // Emits a radio group as a parent /Btn field (Radio flag, /V and /DV holding
-    // the selected on-state) with one kid widget per option, each carrying its own
-    // /AP /N keyed by the option value plus /Off and an /AS matching the selection.
-    private static void WriteRadioGroup(
-        DocumentWriter writer,
-        ReferenceObject pageReference,
-        RadioGroupFieldDefinition radio,
-        List<DocumentObject> fields,
-        List<(int, ReferenceObject)> created)
-    {
-        if (radio.Options.Count < 2)
-        {
-            throw new InvalidOperationException($"Radio group '{radio.Name}' needs at least two options.");
-        }
-
-        var values = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var option in radio.Options)
-        {
-            if (!values.Add(option.Value))
-            {
-                throw new InvalidOperationException($"Radio group '{radio.Name}' has duplicate option value '{option.Value}'.");
-            }
-        }
-
-        if (radio.SelectedValue is not null && !values.Contains(radio.SelectedValue))
-        {
-            throw new InvalidOperationException($"Radio group '{radio.Name}' selects '{radio.SelectedValue}' which is not among its options.");
-        }
-
-        var state = radio.SelectedValue ?? "Off";
-        var parent = new DictionaryObject
-        {
-            ["FT"] = new NameObject("Btn"),
-            ["T"] = new StringObject(radio.Name),
-            ["Ff"] = new NumberObject(RadioFlag),
-            ["V"] = new NameObject(state),
-            ["DV"] = new NameObject(state),
-        };
-        var parentReference = writer.Add(parent);
-
-        var kids = new ArrayObject();
-        foreach (var option in radio.Options)
-        {
-            var x = option.X.Point;
-            var y = option.Y.Point;
-            var width = option.Width.Point;
-            var height = option.Height.Point;
-            var selected = string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal);
-            var kid = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Annot"),
-                ["Subtype"] = new NameObject("Widget"),
-                ["Rect"] = new ArrayObject
-                {
-                    new NumberObject(x),
-                    new NumberObject(y),
-                    new NumberObject(x + width),
-                    new NumberObject(y + height),
-                },
-                ["F"] = new NumberObject(4),
-                ["P"] = pageReference,
-                ["Parent"] = parentReference,
-                ["AS"] = new NameObject(selected ? option.Value : "Off"),
-                ["AP"] = new DictionaryObject
-                {
-                    ["N"] = new DictionaryObject
-                    {
-                        [option.Value] = writer.Add(FieldAppearances.BuildRadio(width, height, selected: true)),
-                        ["Off"] = writer.Add(FieldAppearances.BuildRadio(width, height, selected: false)),
-                    },
-                },
-            };
-
-            var kidReference = writer.Add(kid);
-            kids.Add(kidReference);
-            created.Add((radio.PageIndex, kidReference));
-        }
-
-        parent["Kids"] = kids;
-        fields.Add(parentReference);
-    }
-
-    private static int TextFieldFlags(TextFieldDefinition text)
+    internal static int TextFieldFlags(TextFieldDefinition text)
     {
         var flags = 0;
         if (text.Multiline)
@@ -667,7 +438,7 @@ internal sealed class FormWriter(Document document)
         return flags;
     }
 
-    private static string DefaultAppearanceOf(Font font)
+    internal static string DefaultAppearanceOf(Font font)
         => "/" + BaseFontOf(font)
             + " " + font.Size.ToString("0.###", CultureInfo.InvariantCulture)
             + " Tf 0 g";

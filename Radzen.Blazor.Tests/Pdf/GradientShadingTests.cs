@@ -136,4 +136,20 @@ public class GradientShadingTests
         var c1 = Array(func["C1"]!);
         Assert.Equal(Num(c0[0]), Num(c1[0]), 3);
     }
+
+    // The shading type and coords are polymorphic on the brush kind, so ShadingBuilder never
+    // type-tests: a base-typed reference reports the right /ShadingType and /Coords arity.
+    [Fact]
+    public void ShadingType_AndCoords_DispatchOnBrushKind()
+    {
+        GradientBrush linear = new LinearGradient(1, 2, 3, 4,
+            new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+        GradientBrush radial = new RadialGradient(5, 6, 7, 8, 9, 10,
+            new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+
+        Assert.Equal(2, linear.ShadingType);
+        Assert.Equal(4, linear.BuildCoords().Count);
+        Assert.Equal(3, radial.ShadingType);
+        Assert.Equal(6, radial.BuildCoords().Count);
+    }
 }
