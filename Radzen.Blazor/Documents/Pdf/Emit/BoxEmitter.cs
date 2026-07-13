@@ -18,8 +18,8 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
             box.Bounds.Width,
             box.Bounds.Height);
 
-        // The container's OWN opacity (times any ancestor product), not recovered
-        // through a child block like the lowered-table path.
+        // The container's OWN opacity (times any ancestor product), read directly
+        // off the container rather than recovered through a child block.
         var opacity = opacities.ContainerOpacity(box.Source);
         var extGState = opacity < 1 || box.Style.HasGraphicsStateOptions
             ? plan.RegisterExtGState(
@@ -43,7 +43,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
         var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
 
         // Container children are untagged (StructureTreeBuilder does not descend into
-        // containers), matching the lowered path where the synthetic cell had no element.
+        // containers), so no structure element is passed down.
         tables.EmitBoxContent(
             context,
             box.Content.Lines, box.Content.Images, box.Content.Codes, box.Content.Tables, box.Content.Boxes,

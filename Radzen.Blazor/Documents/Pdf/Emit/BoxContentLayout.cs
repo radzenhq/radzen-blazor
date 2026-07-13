@@ -151,8 +151,7 @@ internal static class BoxContentLayout
         {
             // A Stack container nests as a first-class box (ExpandBlocks throws for
             // overlay/rotated ones before this point): its content measures at the box's
-            // inner width and the box adds the padding on both axes, exactly like the
-            // synthetic single-cell table it used to lower to.
+            // inner width and the box adds the padding on both axes.
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
             var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage, resolution);
@@ -232,10 +231,9 @@ internal static class BoxContentLayout
             }
             else if (item.Box is { } box && item.BoxContent is { } boxContent)
             {
-                // The box honors its OWN alignment (never the cell's), like the LeftIndent
-                // the lowered single-cell table used to carry; content is positioned
-                // box-local (X/Y from the box's top-left corner) with the lowered cell's
-                // default alignment, and the emitter shifts it by the box position.
+                // The box honors its OWN alignment to place itself within the content box;
+                // its content is positioned box-local (X/Y from the box's top-left corner,
+                // left/top defaults) and the emitter shifts it by the box position.
                 var padding = box.Padding.Point;
                 var indent = Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
                 var innerBox = new Rect(padding, padding, Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
