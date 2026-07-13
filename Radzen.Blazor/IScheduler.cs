@@ -182,6 +182,34 @@ namespace Radzen.Blazor
             return MouseLeaveAppointment(reference, data);
         }
         /// <summary>
+        /// Gets the resources of the scheduler. Views use them when grouping appointments by resource.
+        /// </summary>
+        /// <value>The resources. Empty when the scheduler has no resources.</value>
+        IList<object> Resources => Array.Empty<object>();
+        /// <summary>
+        /// Gets the display text of the specified resource.
+        /// </summary>
+        /// <param name="resource">The resource.</param>
+        /// <returns>The display text.</returns>
+        string ResourceText(object resource)
+        {
+            return resource?.ToString() ?? string.Empty;
+        }
+        /// <summary>
+        /// Gets the template used to render resource headers in views which group appointments by resource.
+        /// </summary>
+        RenderFragment<object>? ResourceHeaderTemplate => null;
+        /// <summary>
+        /// Determines whether the specified appointment belongs to the specified resource.
+        /// </summary>
+        /// <param name="item">The appointment to check.</param>
+        /// <param name="resource">The resource.</param>
+        /// <returns><c>true</c> if the appointment belongs to the resource; otherwise, <c>false</c>.</returns>
+        bool IsAppointmentInResource(AppointmentData item, object? resource)
+        {
+            return false;
+        }
+        /// <summary>
         /// Reloads this instance.
         /// </summary>
         Task Reload();

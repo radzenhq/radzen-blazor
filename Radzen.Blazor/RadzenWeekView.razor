@@ -8,6 +8,17 @@
     {
         var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
 
+        if (HasResourceGroups)
+        {
+            return @<CascadingValue Value=@Scheduler>
+                <ResourceGroups>
+                    <ChildContent Context="resource">
+                        <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResource(appointments, resource) Resource=@resource TimeFormat="@TimeFormat" AppointmentMove=OnAppointmentMove />
+                    </ChildContent>
+                </ResourceGroups>
+            </CascadingValue>;
+        }
+
         return @<CascadingValue Value=@Scheduler>
                 <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments TimeFormat="@TimeFormat" AppointmentMove=OnAppointmentMove />
             </CascadingValue>;
