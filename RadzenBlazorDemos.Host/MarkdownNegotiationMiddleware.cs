@@ -51,6 +51,7 @@ public static class MarkdownNegotiationMiddleware
             response.ContentType = "text/markdown; charset=utf-8";
             response.ContentLength = content.Length;
             AddVaryAccept(response.Headers);
+            response.Headers.CacheControl = "no-cache, no-store";
             response.Headers["X-Robots-Tag"] = "noindex, nofollow";
             response.Headers["x-markdown-tokens"] = EstimateTokens(content.Length).ToString();
 
