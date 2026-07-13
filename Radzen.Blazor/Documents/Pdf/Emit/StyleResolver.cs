@@ -27,14 +27,15 @@ internal sealed class StyleResolution
 // (walking the BaseStyle chain) -> document default (the Normal style, then the Font
 // property defaults).
 //
-// Run/paragraph/barcode fonts, the list-item font map, and cell-paragraph style alignment
-// are written onto the model (and a ConditionalWeakTable) because the layout engine reads
-// them off the model directly - LineBreaker and TableLayout, and TableLayout re-expands
-// list items through Paginator.ExpandItem with no per-save state. Every one of those writes
-// is now deterministic and single-shot: the same value every Save, never a null-then-set
-// window, so concurrent Saves of one shared builder stay byte-identical. Body, band and
-// field paragraphs additionally receive their alignment through the returned per-save
-// StyleResolution so those paths never read the shared model at all.
+// Style-derived alignment is NOT written onto the model: it is returned in the per-save
+// StyleResolution and reaches every layout path (body, band, field, and cell/box through
+// TableLayout + BoxContentLayout) as the `inherited` alignment. Run/paragraph/barcode fonts
+// and the list-item font map are still written onto the model (and a ConditionalWeakTable)
+// because the layout engine reads them off the model directly - LineBreaker and TableLayout,
+// and TableLayout re-expands list items through Paginator.ExpandItem with no per-save state.
+// Every one of those font writes is deterministic and single-shot: the same value every
+// Save, never a null-then-set window, so concurrent Saves of one shared builder stay
+// byte-identical. (Moving the font write-back off the model is the remaining decouple step.)
 internal static class StyleResolver
 {
     // The resolved item-level font of each list item (marker + content default), attached
