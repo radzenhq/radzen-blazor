@@ -36,6 +36,7 @@ internal static class ContentInterpreter
         var operands = new List<Token>();
         var stringBuffer = new List<byte>();
         var arrayNumbers = new List<double>();
+        List<TextAdjustment>? tjSegments = null;
         var clipMode = PathClipMode.None;
         var artifactDepth = 0;
         var markedContent = new Stack<bool>();
@@ -55,15 +56,18 @@ internal static class ContentInterpreter
                 case TokenKind.ArrayStart:
                     stringBuffer.Clear();
                     arrayNumbers.Clear();
+                    tjSegments = [];
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
                     {
                         if (tokens[i].Kind == TokenKind.String)
                         {
                             stringBuffer.AddRange(tokens[i].Bytes!);
+                            tjSegments.Add(new TextAdjustment(tokens[i].Bytes!, 0));
                         }
                         else if (tokens[i].Kind == TokenKind.Number)
                         {
                             arrayNumbers.Add(tokens[i].Number);
+                            tjSegments.Add(new TextAdjustment(null, tokens[i].Number));
                         }
                     }
 
@@ -204,7 +208,7 @@ internal static class ContentInterpreter
 
                 case "Tj":
                 case "TJ":
-                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font);
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font, tjSegments);
                     break;
 
                 // ' and " advance to the next line by the leading before showing.
@@ -212,7 +216,7 @@ internal static class ContentInterpreter
                 case "\"":
                     lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     textMatrix = lineMatrix;
-                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font);
+                    EmitText(target, operands, textMatrix, state, fontName, fontSize, artifactDepth, font, tjSegments);
                     break;
 
                 case "m":
@@ -375,10 +379,11 @@ internal static class ContentInterpreter
             }
 
             operands.Clear();
+            tjSegments = null;
         }
     }
 
-    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth, ReverseFont? font)
+    private static void EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, string? fontName, double fontSize, int artifactDepth, ReverseFont? font, List<TextAdjustment>? tjSegments)
     {
         var bytes = LastString(operands);
         if (bytes is null)
@@ -396,10 +401,31 @@ internal static class ContentInterpreter
             FontResourceName = fontName,
             SourceBytes = bytes,
             SourceText = decoded,
+            // Only carry the TJ array when it holds a numeric adjustment; a plain string
+            // (Tj or a single-element TJ) re-emits through the simpler Tj path unchanged.
+            SourceAdjustments = HasAdjustment(tjSegments) ? tjSegments : null,
             Color = state.Fill,
             Transform = textMatrix * state.Ctm,
             IsArtifact = artifactDepth > 0,
         });
+    }
+
+    private static bool HasAdjustment(List<TextAdjustment>? segments)
+    {
+        if (segments is null)
+        {
+            return false;
+        }
+
+        foreach (var segment in segments)
+        {
+            if (segment.Text is null && segment.Adjustment != 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, bool stroke, bool fill, bool close, bool evenOdd, PathClipMode clip, int artifactDepth)
@@ -631,6 +657,11 @@ internal static class ContentInterpreter
         };
     }
 }
+
+// One element of a TJ show array: a string chunk (Text set) or a numeric position
+// adjustment in thousandths of an em (Text null). Preserved so a re-emitted run keeps
+// its intra-run displacements (kerning, inter-word gaps) instead of collapsing to Tj.
+internal readonly record struct TextAdjustment(byte[]? Text, double Adjustment);
 
 // An operator with no element-model representation, captured verbatim from the decoded
 // token stream and re-emitted unchanged so a full re-encode does not silently drop it.

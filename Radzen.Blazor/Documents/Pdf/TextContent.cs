@@ -35,6 +35,11 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     // SourceBytes no longer describes it and the run is re-encoded through WinAnsi.
     internal string? SourceText { get; set; }
 
+    // The TJ show array a loaded run carried (interleaved string chunks and numeric
+    // displacements). Re-emitted verbatim so kerning/inter-word gaps survive a re-encode;
+    // null for an authored run or an edited one, which re-encode through the Tj path.
+    internal System.Collections.Generic.IReadOnlyList<TextAdjustment>? SourceAdjustments { get; set; }
+
     internal override void EmitBody(ContentWriter writer)
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
@@ -49,8 +54,31 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         writer.WriteRaw(" ");
         writer.WriteNumber(y.Point);
         writer.WriteRaw(" Td\n");
-        writer.WriteString(SourceBytes is not null && Text == SourceText ? SourceBytes : Encode(Text));
-        writer.WriteRaw(" Tj\n");
+
+        if (SourceAdjustments is { } segments && Text == SourceText)
+        {
+            writer.WriteRaw("[");
+            foreach (var segment in segments)
+            {
+                if (segment.Text is not null)
+                {
+                    writer.WriteString(segment.Text);
+                }
+                else
+                {
+                    writer.WriteNumber(segment.Adjustment);
+                    writer.WriteRaw(" ");
+                }
+            }
+
+            writer.WriteRaw("] TJ\n");
+        }
+        else
+        {
+            writer.WriteString(SourceBytes is not null && Text == SourceText ? SourceBytes : Encode(Text));
+            writer.WriteRaw(" Tj\n");
+        }
+
         writer.WriteRaw("ET\n");
     }
 

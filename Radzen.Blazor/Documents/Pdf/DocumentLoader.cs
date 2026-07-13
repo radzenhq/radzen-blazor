@@ -45,6 +45,11 @@ internal static class DocumentLoader
             document.AcroForm = new AcroForm(reader, form);
         }
 
+        if (catalog is not null)
+        {
+            ReadAttachments(reader, catalog, document, limits);
+        }
+
         return document;
     }
 
@@ -225,7 +230,165 @@ internal static class DocumentLoader
         target.Subject = Text(reader, info, "Subject");
         target.Keywords = Text(reader, info, "Keywords");
         target.Creator = Text(reader, info, "Creator");
+        target.Producer = Text(reader, info, "Producer");
+        target.CreationDate = Date(reader, info, "CreationDate");
+        target.ModificationDate = Date(reader, info, "ModDate");
     }
+
+    private static System.DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
+        => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
+            ? ParseDate(DecodeTextString(text.Value))
+            : null;
+
+    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSSOHH'mm'. Every field after the
+    // year is optional; the offset O is +, -, or Z (or absent). A value that does not
+    // parse is dropped rather than throwing so a re-save keeps every other Info entry.
+    private static System.DateTimeOffset? ParseDate(string raw)
+    {
+        var s = raw.StartsWith("D:", StringComparison.Ordinal) ? raw[2..] : raw;
+        if (s.Length < 4 || !int.TryParse(s.AsSpan(0, 4), out var year))
+        {
+            return null;
+        }
+
+        int Part(int start, int length, int fallback)
+            => start + length <= s.Length && int.TryParse(s.AsSpan(start, length), out var v) ? v : fallback;
+
+        var month = Part(4, 2, 1);
+        var day = Part(6, 2, 1);
+        var hour = Part(8, 2, 0);
+        var minute = Part(10, 2, 0);
+        var second = Part(12, 2, 0);
+
+        var offset = System.TimeSpan.Zero;
+        if (s.Length > 14 && s[14] is '+' or '-')
+        {
+            var sign = s[14] == '-' ? -1 : 1;
+            offset = new System.TimeSpan(sign * Part(15, 2, 0), sign * Part(18, 2, 0), 0);
+        }
+
+        try
+        {
+            return new System.DateTimeOffset(year, month, day, hour, minute, second, offset);
+        }
+        catch (System.ArgumentOutOfRangeException)
+        {
+            return null;
+        }
+    }
+
+    // Loads embedded files declared in the catalog /Names EmbeddedFiles name tree and
+    // the /AF associated-files array so they (and /AF) survive a re-save; without this a
+    // loaded Factur-X invoice loses its XML on save. Payloads are re-emitted by the
+    // AttachmentWriter, which runs because these populate document.Attachments.
+    private static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
+    {
+        var seen = new HashSet<DictionaryObject>();
+
+        if (catalog.TryGetValue("Names", out var namesObject)
+            && reader.Resolve(namesObject!) is DictionaryObject names
+            && names.TryGetValue("EmbeddedFiles", out var treeObject)
+            && reader.Resolve(treeObject!) is DictionaryObject tree)
+        {
+            CollectEmbeddedFiles(reader, tree, document, seen, limits, 0);
+        }
+
+        if (catalog.TryGetValue("AF", out var afObject)
+            && reader.Resolve(afObject!) is ArrayObject af)
+        {
+            foreach (var entry in af)
+            {
+                if (reader.Resolve(entry) is DictionaryObject filespec)
+                {
+                    AddAttachment(reader, filespec, document, seen);
+                }
+            }
+        }
+    }
+
+    private static void CollectEmbeddedFiles(DocumentReader reader, DictionaryObject node, Document document, HashSet<DictionaryObject> seen, ReaderLimits limits, int depth)
+    {
+        if (depth > limits.MaxPageTreeDepth)
+        {
+            throw new DocumentParseException("Maximum name tree depth exceeded.", -1);
+        }
+
+        if (node.TryGetValue("Kids", out var kidsObject) && reader.Resolve(kidsObject!) is ArrayObject kids)
+        {
+            foreach (var kid in kids)
+            {
+                if (reader.Resolve(kid) is DictionaryObject child)
+                {
+                    CollectEmbeddedFiles(reader, child, document, seen, limits, depth + 1);
+                }
+            }
+
+            return;
+        }
+
+        if (!node.TryGetValue("Names", out var pairsObject) || reader.Resolve(pairsObject!) is not ArrayObject pairs)
+        {
+            return;
+        }
+
+        for (var i = 1; i < pairs.Count; i += 2)
+        {
+            if (reader.Resolve(pairs[i]) is DictionaryObject filespec)
+            {
+                AddAttachment(reader, filespec, document, seen);
+            }
+        }
+    }
+
+    private static void AddAttachment(DocumentReader reader, DictionaryObject filespec, Document document, HashSet<DictionaryObject> seen)
+    {
+        if (!seen.Add(filespec)
+            || !filespec.TryGetValue("EF", out var efObject)
+            || reader.Resolve(efObject!) is not DictionaryObject ef)
+        {
+            return;
+        }
+
+        var streamObject = ef.TryGetValue("F", out var f) ? reader.Resolve(f!) : null;
+        streamObject ??= ef.TryGetValue("UF", out var uf) ? reader.Resolve(uf!) : null;
+        if (streamObject is not StreamObject stream)
+        {
+            return;
+        }
+
+        var name = FileName(reader, filespec);
+        if (name is null)
+        {
+            return;
+        }
+
+        var mime = stream.Dictionary.TryGetValue("Subtype", out var subtype) && reader.Resolve(subtype!) is NameObject mimeName
+            ? mimeName.Value
+            : "application/octet-stream";
+
+        var attachment = new Attachment(name, reader.DecodeStream(stream), Relationship(reader, filespec), mime)
+        {
+            Description = Text(reader, filespec, "Desc"),
+        };
+
+        if (stream.Dictionary.TryGetValue("Params", out var paramsObject)
+            && reader.Resolve(paramsObject!) is DictionaryObject parameters
+            && Date(reader, parameters, "ModDate") is { } modified)
+        {
+            attachment.ModificationDate = modified;
+        }
+
+        document.Attachments.Add(attachment);
+    }
+
+    private static string? FileName(DocumentReader reader, DictionaryObject filespec)
+        => Text(reader, filespec, "UF") ?? Text(reader, filespec, "F");
+
+    private static AttachmentRelationship Relationship(DocumentReader reader, DictionaryObject filespec)
+        => filespec.TryGetValue("AFRelationship", out var value) && reader.Resolve(value!) is NameObject name
+            && System.Enum.TryParse<AttachmentRelationship>(name.Value, out var relationship)
+            ? relationship
+            : AttachmentRelationship.Unspecified;
 
     private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
         => dictionary.TryGetValue(key, out var value) && reader.Resolve(value!) is StringObject text
