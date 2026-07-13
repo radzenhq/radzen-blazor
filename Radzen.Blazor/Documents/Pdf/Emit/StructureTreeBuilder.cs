@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 // Builds the logical structure tree that mirrors the authoring DOM, assigns each element
 // its DFS pre-order rank, and emits the per-page tagged content (BDC/EMC) in that order.
-internal sealed class StructureTreeBuilder(DocumentBuilder builder)
+internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolution resolution)
 {
     private readonly Dictionary<object, StructureElement> blockElements = [];
     private readonly Dictionary<StructureElement, int> structureOrder = [];
@@ -162,8 +162,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
             var lbody = new StructureElement { Type = "LBody" };
             li.Children.Add(lbl);
             li.Children.Add(lbody);
-            item.LabelElement = lbl;
-            item.BodyElement = lbody;
+            resolution.SetListItemElements(item, lbl, lbody);
             if (item.NestedList is { } nested)
             {
                 MapList(nested, lbody);
@@ -207,8 +206,9 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
 
     public StructureElement? ElementOf(object block)
     {
-        // A synthesized list-item paragraph tags its content into its LBody element.
-        if (block is Paragraph { ListBodyElement: { } body })
+        // A synthesized list-item paragraph tags its content into its LBody element (carried in
+        // the per-save StyleResolution, keyed by that synthesized paragraph).
+        if (block is Paragraph paragraph && resolution.BodyElementOf(paragraph) is { } body)
         {
             return body;
         }
@@ -218,7 +218,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder)
 
     // The Lbl element a list-item paragraph's marker fragment tags into, or null.
     public StructureElement? MarkerElementOf(object block)
-        => block is Paragraph { ListLabelElement: { } label } ? label : null;
+        => block is Paragraph paragraph ? resolution.LabelElementOf(paragraph) : null;
 
     // Emits only the elements that carry content on this page, ordered by their DFS pre-order rank so
     // the byte output matches a full-tree pre-order walk without the per-page O(elements) recursion.

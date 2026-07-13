@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf.Emit;
 // Resolves page-number/count fields at emit time: detects paragraphs that carry fields
 // and re-breaks them with the actual page number/count substituted, so a band laid out
 // once per section renders the right value on every page.
-internal sealed class FieldResolver(FontCollection fonts)
+internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolution)
 {
     public bool HasField(Paragraph paragraph)
     {
@@ -23,10 +23,12 @@ internal sealed class FieldResolver(FontCollection fonts)
         return false;
     }
 
-    private static bool SameStyle(Run a, Run b)
+    private Font ResolvedFont(Run run) => resolution.RunFont(run) ?? run.Font;
+
+    private bool SameStyle(Run a, Run b)
     {
-        var fontA = a.ResolvedFont;
-        var fontB = b.ResolvedFont;
+        var fontA = ResolvedFont(a);
+        var fontB = ResolvedFont(b);
         return a.Link == b.Link
             && fontA.Name == fontB.Name
             && fontA.Size == fontB.Size
@@ -124,8 +126,8 @@ internal sealed class FieldResolver(FontCollection fonts)
             LineSpacing = paragraph.LineSpacing,
             RightTabStop = paragraph.RightTabStop,
             AlignmentValue = paragraph.AlignmentValue,
-            EffectiveFont = paragraph.EffectiveFont,
         };
+        resolved.Font.InheritFrom(resolution.ParagraphFont(paragraph) ?? paragraph.Font);
 
         foreach (var stop in paragraph.TabStops)
         {
@@ -140,14 +142,15 @@ internal sealed class FieldResolver(FontCollection fonts)
                 continue;
             }
 
-            resolved.Inlines.Add(new Run(new string('\t', tabsBefore) + builderText.ToString())
-            {
-                EffectiveFont = run.ResolvedFont,
-                Link = run.Link,
-            });
+            // The synthesized run carries the original run's RESOLVED font as its authored font,
+            // so the line breaker (given this ephemeral paragraph, whose runs are not in the
+            // resolution) reads exactly the font the field text was measured and drawn with.
+            var newRun = new Run(new string('\t', tabsBefore) + builderText.ToString()) { Link = run.Link };
+            newRun.Font.InheritFrom(ResolvedFont(run));
+            resolved.Inlines.Add(newRun);
         }
 
-        var lines = LineBreaker.Break(resolved, width, fonts, inheritedAlignment);
+        var lines = LineBreaker.Break(resolved, width, fonts, inheritedAlignment, resolution);
 
         // The band reserved exactly `reservedLines` for this paragraph (laid out once with the
         // field's single-digit placeholder). A wider resolved number that wraps to more lines

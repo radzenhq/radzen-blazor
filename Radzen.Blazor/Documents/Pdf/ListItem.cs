@@ -1,6 +1,5 @@
 using System.Linq;
 
-using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf;
 
 
@@ -11,13 +10,6 @@ public sealed class ListItem
 {
     /// <summary>Gets the inline content runs.</summary>
     public InlineCollection Inlines { get; } = [];
-
-    // Structure elements for tagged (PDF/UA) output: the item's Lbl (marker) and LBody
-    // (content). Built by StructureTreeBuilder and read when the item is expanded, so the
-    // synthesized marker paragraph can tag its marker and content into the right elements.
-    internal StructureElement? LabelElement { get; set; }
-
-    internal StructureElement? BodyElement { get; set; }
 
     /// <summary>Gets the item font. Item runs inherit any property they leave unset from this font, then the list font.</summary>
     public Font Font { get; } = new();

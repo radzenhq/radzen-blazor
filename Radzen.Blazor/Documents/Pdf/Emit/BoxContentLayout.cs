@@ -62,9 +62,10 @@ internal static class BoxContentLayout
         Func<Image, double, (double Width, double Height)>? measureImage,
         StyleResolution? resolution = null)
     {
-        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, resolution ?? StyleResolution.Empty);
+        var effective = resolution ?? new StyleResolution();
+        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, effective);
         // Lists expand to marker paragraphs exactly as in section content.
-        foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth))
+        foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth, resolution: effective))
         {
             block.Accept(visitor, default);
         }
@@ -100,7 +101,7 @@ internal static class BoxContentLayout
                 Height += spacingBefore;
             }
 
-            foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph) ?? align))
+            foreach (var line in LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph) ?? align, resolution))
             {
                 Items.Add(new CellItem { Line = line, Source = paragraph, Height = line.Height });
                 Height += line.Height;
@@ -132,7 +133,7 @@ internal static class BoxContentLayout
 
         private Nothing VisitCode(Block block)
         {
-            var (codeWidth, codeHeight) = Paginator.MeasureCode(block);
+            var (codeWidth, codeHeight) = Paginator.MeasureCode(block, resolution);
             Items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
             Height += codeHeight;
             return default;

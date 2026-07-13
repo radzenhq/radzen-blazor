@@ -34,9 +34,8 @@ public sealed class Barcode(BarcodeType type, string value, Unit width, Unit hei
     /// <summary>Gets or sets the horizontal alignment within the container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
 
-    // Set by StyleResolver: Font merged with the inherited/document-default cascade.
-    internal Font? EffectiveFont { get; set; }
-
-    // Reserved below the bars for the human-readable line; slightly above typical line height so text never overlaps the next block.
-    internal double TextBandHeight => ShowText ? (EffectiveFont ?? Font).Size * 1.4 : 0;
+    // Reserved below the bars for the human-readable line; slightly above typical line height so
+    // text never overlaps the next block. The resolved font (StyleResolver cascade) is supplied by
+    // the caller since the model holds only the authored Font.
+    internal double TextBandHeight(Font resolvedFont) => ShowText ? resolvedFont.Size * 1.4 : 0;
 }

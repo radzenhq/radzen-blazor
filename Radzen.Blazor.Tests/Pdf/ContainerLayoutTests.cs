@@ -161,9 +161,9 @@ public class ContainerLayoutTests
         var paragraph = container.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add("styled");
 
-        StyleResolver.Resolve(builder);
+        var resolution = StyleResolver.Resolve(builder);
 
-        Assert.NotNull(run.EffectiveFont);
+        Assert.NotNull(resolution.RunFont(run));
     }
 
     [Fact]

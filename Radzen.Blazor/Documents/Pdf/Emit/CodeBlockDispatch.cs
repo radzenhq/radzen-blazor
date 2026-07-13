@@ -7,17 +7,22 @@ internal static class CodeBlockDispatch
     private static readonly SizeVisitor size = new();
     private static readonly AlignmentVisitor alignment = new();
 
-    public static (double Width, double Height) Measure(Block block) => block.Accept(size, default);
+    // The barcode caption band height needs the barcode's resolved font (from the per-save
+    // StyleResolution), passed as the visitor context; the width and QR size are font-independent,
+    // so a null resolution (width-only callers) falls back to the authored font harmlessly.
+    public static (double Width, double Height) Measure(Block block, StyleResolution? resolution = null)
+        => block.Accept(size, resolution);
 
     public static HorizontalAlignment Alignment(Block block) => block.Accept(alignment, default);
 
-    private sealed class SizeVisitor : BlockVisitor<Nothing, (double Width, double Height)>
+    private sealed class SizeVisitor : BlockVisitor<StyleResolution?, (double Width, double Height)>
     {
-        protected override (double Width, double Height) Default(Block block, Nothing context) => (0, 0);
+        protected override (double Width, double Height) Default(Block block, StyleResolution? resolution) => (0, 0);
 
-        public override (double Width, double Height) Visit(QrCode qr, Nothing context) => (qr.Size.Point, qr.Size.Point);
+        public override (double Width, double Height) Visit(QrCode qr, StyleResolution? resolution) => (qr.Size.Point, qr.Size.Point);
 
-        public override (double Width, double Height) Visit(Barcode barcode, Nothing context) => (barcode.Width.Point, barcode.Height.Point + barcode.TextBandHeight);
+        public override (double Width, double Height) Visit(Barcode barcode, StyleResolution? resolution)
+            => (barcode.Width.Point, barcode.Height.Point + barcode.TextBandHeight(resolution?.BarcodeFont(barcode) ?? barcode.Font));
     }
 
     private sealed class AlignmentVisitor : BlockVisitor<Nothing, HorizontalAlignment>

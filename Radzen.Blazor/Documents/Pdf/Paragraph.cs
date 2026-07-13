@@ -57,18 +57,10 @@ public class Paragraph : Block
     internal HorizontalAlignment ResolveAlignment(HorizontalAlignment? inherited)
         => alignment ?? inherited ?? HorizontalAlignment.Left;
 
-    internal Font? EffectiveFont { get; set; }
-
     // A list-item marker drawn on the first line at MarkerIndent, outside the (hanging) LeftIndent.
     internal string? MarkerText { get; set; }
 
     internal Unit MarkerIndent { get; set; }
-
-    // Tagged (PDF/UA) list structure: the LBody element this item's content is tagged into
-    // and the Lbl element its marker is tagged into. Null for a non-list paragraph.
-    internal StructureElement? ListBodyElement { get; set; }
-
-    internal StructureElement? ListLabelElement { get; set; }
 
     /// <summary>Gets or sets the left indent applied to every line of the paragraph.</summary>
     public Unit LeftIndent { get; set; }
