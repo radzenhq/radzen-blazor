@@ -155,6 +155,20 @@ internal static class DocumentLoader
 
         var (width, height) = Dimensions(box);
         var page = new Page(width, height);
+        if (box is not null && box.Count >= 4)
+        {
+            page.SetPreservedMediaBox(ToRect(box));
+        }
+
+        if (cropBox is not null && cropBox.Count >= 4)
+        {
+            page.SetPreservedCropBox(ToRect(cropBox));
+        }
+
+        page.BleedBox = ReadBox(reader, node, "BleedBox");
+        page.TrimBox = ReadBox(reader, node, "TrimBox");
+        page.ArtBox = ReadBox(reader, node, "ArtBox");
+
         var content = ReadContent(reader, node);
         if (content is not null)
         {
@@ -218,6 +232,18 @@ internal static class DocumentLoader
         var ury = Number(box[3]);
         return (Unit.FromPoint(urx - llx), Unit.FromPoint(ury - lly));
     }
+
+    private static Rect ToRect(ArrayObject box)
+    {
+        var x1 = Number(box[0]);
+        var y1 = Number(box[1]);
+        var x2 = Number(box[2]);
+        var y2 = Number(box[3]);
+        return new Rect(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    private static Rect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
+        => reader.GetArray(page, key) is { Count: >= 4 } box ? ToRect(box) : null;
 
     public static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
 

@@ -18,12 +18,17 @@ public sealed class Page
     private int materializedCount;
     private byte[]? snapshot;
     private int rotate;
+    private Unit width;
+    private Unit height;
+    private Rect mediaBox;
+    private Rect? cropBox;
     private IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
 
     internal Page(Unit width, Unit height)
     {
-        Width = width;
-        Height = height;
+        this.width = width;
+        this.height = height;
+        mediaBox = new Rect(0, 0, width.Point, height.Point);
     }
 
     // Pre-generated content and resources produced by DocumentBuilder.Build; when set,
@@ -31,10 +36,71 @@ public sealed class Page
     internal GeneratedPage? Generated { get; set; }
 
     /// <summary>Gets the page width in points.</summary>
-    public Unit Width { get; }
+    public Unit Width => width;
 
     /// <summary>Gets the page height in points.</summary>
-    public Unit Height { get; }
+    public Unit Height => height;
+
+    /// <summary>
+    /// Gets or sets the media box (<c>/MediaBox</c>) in PDF user-space coordinates.
+    /// Changing the box changes the page dimensions but does not scale, translate or
+    /// otherwise modify existing content coordinates.
+    /// </summary>
+    public Rect MediaBox
+    {
+        get => mediaBox;
+        set
+        {
+            ValidateBox(value, nameof(value));
+            SetMediaBox(value, true);
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the crop box (<c>/CropBox</c>) in PDF user-space coordinates.
+    /// Existing content keeps its original coordinates. Set to <see langword="null"/>
+    /// to remove an explicit or preserved crop box.
+    /// </summary>
+    public Rect? CropBox
+    {
+        get => cropBox;
+        set
+        {
+            if (value is { } box)
+            {
+                ValidateBox(box, nameof(value));
+            }
+
+            cropBox = value;
+            CropBoxSet = true;
+        }
+    }
+
+    internal bool MediaBoxSet { get; private set; }
+
+    internal bool CropBoxSet { get; private set; }
+
+    internal void SetPreservedMediaBox(Rect value) => SetMediaBox(value, false);
+
+    internal void SetPreservedCropBox(Rect value) => cropBox = value;
+
+    private void SetMediaBox(Rect value, bool explicitlySet)
+    {
+        mediaBox = value;
+        width = Unit.FromPoint(value.Width);
+        height = Unit.FromPoint(value.Height);
+        MediaBoxSet = explicitlySet;
+    }
+
+    private static void ValidateBox(Rect value, string parameterName)
+    {
+        if (!double.IsFinite(value.X) || !double.IsFinite(value.Y)
+            || !double.IsFinite(value.Width) || !double.IsFinite(value.Height)
+            || value.Width <= 0 || value.Height <= 0)
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Page boxes must have finite coordinates and positive dimensions.");
+        }
+    }
 
     /// <summary>
     /// Gets or sets the bleed box (<c>/BleedBox</c>): the region to which page contents
@@ -148,7 +214,10 @@ public sealed class Page
                 return new ContentEmissionResult(content, ContentResourceManifest.Empty);
             }
 
-            using var appended = new ContentWriter(SafePrefix("SF", reservedNames), SafePrefix("SIm", reservedNames));
+            using var appended = new ContentWriter(
+                SafePrefix("SF", reservedNames),
+                SafePrefix("SIm", reservedNames),
+                SafePrefix("SGS", reservedNames));
             for (var i = materializedCount; i < elements.Count; i++)
             {
                 elements[i].Emit(appended);
@@ -159,7 +228,10 @@ public sealed class Page
 
         // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
         // dodge the loaded page's resource names so MergeResources cannot overwrite them.
-        using var writer = new ContentWriter(SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames));
+        using var writer = new ContentWriter(
+            SafePrefix("F", reservedNames),
+            SafePrefix("Im", reservedNames),
+            SafePrefix("GS", reservedNames));
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -188,7 +260,7 @@ public sealed class Page
             return null;
         }
 
-        using var writer = new ContentWriter("SF", "SIm");
+        using var writer = new ContentWriter("SF", "SIm", "SGS");
         foreach (var element in elements)
         {
             element.Emit(writer);

@@ -51,7 +51,11 @@ internal sealed class DocumentSaver
                 ["MediaBox"] = PageResourceBuilder.MediaBox(doc, page),
             };
 
-            if (loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
+            if (page.CropBoxSet && page.CropBox is { } explicitCropBox)
+            {
+                pageNode["CropBox"] = PageResourceBuilder.NumberBox(explicitCropBox);
+            }
+            else if (!page.CropBoxSet && loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
             {
                 pageNode["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
             }

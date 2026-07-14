@@ -12,6 +12,14 @@ namespace Radzen.Documents.Pdf;
 public sealed class PageCollection : IReadOnlyList<Page>
 {
     private readonly List<Page> pages = [];
+    private readonly Document? owner;
+
+    /// <summary>Initializes an independent page collection.</summary>
+    public PageCollection()
+    {
+    }
+
+    internal PageCollection(Document owner) => this.owner = owner;
 
     /// <summary>Gets the number of pages in the collection.</summary>
     public int Count => pages.Count;
@@ -68,6 +76,82 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// </summary>
     /// <param name="index">The zero-based index of the page to remove.</param>
     public void RemoveAt(int index) => pages.RemoveAt(index);
+
+    /// <summary>Moves a page from one index to another.</summary>
+    /// <param name="from">The zero-based source index.</param>
+    /// <param name="to">The zero-based destination index in the resulting collection.</param>
+    public void Move(int from, int to)
+    {
+        var page = pages[from];
+        pages.RemoveAt(from);
+        try
+        {
+            pages.Insert(to, page);
+        }
+        catch
+        {
+            pages.Insert(from, page);
+            throw;
+        }
+    }
+
+    /// <summary>Removes a contiguous range of pages.</summary>
+    /// <param name="index">The zero-based index of the first page to remove.</param>
+    /// <param name="count">The number of pages to remove.</param>
+    public void RemoveRange(int index, int count) => pages.RemoveRange(index, count);
+
+    /// <summary>Creates a new document containing deep copies of the selected pages.</summary>
+    /// <param name="range">The page range to extract.</param>
+    /// <returns>A new document containing the selected pages.</returns>
+    public Document ExtractPages(Range range)
+    {
+        if (owner is null)
+        {
+            throw new InvalidOperationException("Pages can be extracted only from a collection owned by a Document.");
+        }
+
+        var result = new Document();
+        result.ImportPages(owner, range);
+        return result;
+    }
+
+    /// <summary>
+    /// Splits the document at zero-based page boundaries. Each boundary starts a new
+    /// document; boundaries must be strictly increasing and lie between 1 and Count - 1.
+    /// </summary>
+    /// <param name="boundaries">The page indexes at which new documents start.</param>
+    /// <returns>The documents in original page order.</returns>
+    public IReadOnlyList<Document> Split(params int[] boundaries)
+    {
+        ArgumentNullException.ThrowIfNull(boundaries);
+        if (owner is null)
+        {
+            throw new InvalidOperationException("Pages can be split only from a collection owned by a Document.");
+        }
+
+        var previous = 0;
+        foreach (var boundary in boundaries)
+        {
+            if (boundary <= previous || boundary >= Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(boundaries), boundary, "Split boundaries must be strictly increasing and between 1 and Count - 1.");
+            }
+
+            previous = boundary;
+        }
+
+        var snapshot = PageOperations.Snapshot(owner);
+        var result = new List<Document>(boundaries.Length + 1);
+        previous = 0;
+        foreach (var boundary in boundaries)
+        {
+            result.Add(PageOperations.Extract(snapshot, previous, boundary - previous));
+            previous = boundary;
+        }
+
+        result.Add(PageOperations.Extract(snapshot, previous, Count - previous));
+        return result;
+    }
 
     /// <inheritdoc />
     public IEnumerator<Page> GetEnumerator() => pages.GetEnumerator();
