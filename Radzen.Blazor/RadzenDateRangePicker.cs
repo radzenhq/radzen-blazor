@@ -28,16 +28,6 @@ namespace Radzen.Blazor
     /// </example>
     public class RadzenDateRangePicker : RadzenDatePicker<DateRange>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RadzenDateRangePicker"/> class.
-        /// The date range picker uses <see cref="DatePickerNavigationMode.DrillDown" /> navigation by default -
-        /// set <see cref="RadzenDatePicker{TValue}.NavigationMode" /> to <see cref="DatePickerNavigationMode.DropDown" /> to use previous/next navigation only.
-        /// </summary>
-        public RadzenDateRangePicker()
-        {
-            NavigationMode = DatePickerNavigationMode.DrillDown;
-        }
-
         internal override bool IsRange => true;
 
         internal override string RangeSeparatorText => Separator;

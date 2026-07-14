@@ -105,9 +105,9 @@ namespace Radzen.Blazor
         /// <see cref="DatePickerNavigationMode.DropDown" /> displays month and year drop-downs in the calendar header.
         /// <see cref="DatePickerNavigationMode.DrillDown" /> makes the calendar title a button which drills up to a month grid and a year grid.
         /// </summary>
-        /// <value>The navigation mode. Default is <see cref="DatePickerNavigationMode.DropDown" /> for <see cref="RadzenDatePicker{TValue}" /> and <see cref="DatePickerNavigationMode.DrillDown" /> for <see cref="RadzenDateRangePicker" />.</value>
+        /// <value>The navigation mode. Default is <see cref="DatePickerNavigationMode.DrillDown" />.</value>
         [Parameter]
-        public DatePickerNavigationMode NavigationMode { get; set; } = DatePickerNavigationMode.DropDown;
+        public DatePickerNavigationMode NavigationMode { get; set; } = DatePickerNavigationMode.DrillDown;
 
         internal enum CalendarViewKind
         {
