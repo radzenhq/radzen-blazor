@@ -878,6 +878,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
             {
+                parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DropDown);
                 parameters.Add(p => p.InitialViewDate, new DateTime(2024, 1, 1));
             });
 
@@ -1714,6 +1715,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
             {
+                parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DropDown);
                 parameters.Add(p => p.Value, testDate);
                 parameters.Add(p => p.Culture, thaiCulture);
                 parameters.Add(p => p.Inline, true);
@@ -1738,6 +1740,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>(parameters =>
             {
+                parameters.Add(p => p.NavigationMode, DatePickerNavigationMode.DropDown);
                 parameters.Add(p => p.Value, testDate);
                 parameters.Add(p => p.Culture, thaiCulture);
                 parameters.Add(p => p.Inline, true);
