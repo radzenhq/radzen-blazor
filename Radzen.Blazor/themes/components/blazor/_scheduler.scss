@@ -520,6 +520,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
       flex: none;
     }
 
+    .rz-view > .rz-view-header:first-child {
+      border-block-start: none;
+    }
+
     .rz-view-content {
       height: auto;
     }
@@ -589,6 +593,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   position: static;
 }
 
+.rz-resource-group-children > .rz-resource-group:first-child > .rz-resource-group-header {
+  border-block-start: none;
+}
+
 .rz-resource-group-title {
   position: sticky;
   inset-inline-start: calc(0.5rem + var(--rz-scheduler-resource-group-depth, 0) * 1rem);
@@ -611,40 +619,59 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     scrollbar-width: auto;
   }
 
-  .rz-resource-all-day {
+  .rz-view-header:not(.rz-resource-all-day) .rz-slot-header + .rz-slot-header {
+    border-inline-start: 1px solid var(--rz-scheduler-border-color);
+  }
+
+  .rz-view-header + .rz-view-header {
     border-block-start: none;
+  }
+}
 
-    .rz-slot-header {
-      cursor: pointer;
-      min-height: 1.75rem;
-      padding: 1px;
-      border-inline-start: 1px solid var(--rz-scheduler-border-color);
-      text-transform: none;
-    }
+// All-day row
 
-    .rz-resource-all-day-label {
-      cursor: default;
-      align-self: center;
-      text-align: end;
-      font-size: var(--rz-scheduler-header-font-size);
-      padding: 0 0.25rem;
-      text-transform: var(--rz-scheduler-header-text-transform);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.rz-resource-all-day {
+  border-block-start: none;
 
-    .rz-events {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      min-height: 100%;
-    }
+  .rz-slot-header {
+    cursor: pointer;
+    min-height: 1.75rem;
+    padding: 1px;
+    border-inline-start: 1px solid var(--rz-scheduler-border-color);
+    text-transform: none;
+  }
 
-    .rz-event {
-      position: static;
-      text-align: start;
-    }
+  .rz-slot-hour-header + .rz-slot-header {
+    border-inline-start: none;
+  }
+
+  .rz-resource-all-day-label {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: var(--rz-scheduler-header-font-size);
+    padding: 0 0.25rem;
+    text-transform: var(--rz-scheduler-header-text-transform);
+    border-inline-end: 1px solid var(--rz-scheduler-border-color);
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .rz-events {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-height: 100%;
+  }
+
+  .rz-resource-all-day-event {
+    display: contents;
+  }
+
+  .rz-event {
+    position: static;
+    text-align: start;
   }
 }
 
