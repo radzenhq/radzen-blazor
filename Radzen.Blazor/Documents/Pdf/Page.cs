@@ -13,6 +13,7 @@ namespace Radzen.Documents.Pdf;
 public sealed class Page
 {
     private readonly ContentCollection elements = [];
+    private readonly AnnotationCollection annotations = [];
     private byte[]? content;
     private bool materialized;
     private int materializedCount;
@@ -158,6 +159,9 @@ public sealed class Page
             return elements;
         }
     }
+
+    /// <summary>Gets the ordered collection of interactive annotations on this page.</summary>
+    public AnnotationCollection Annotations => annotations;
 
     /// <summary>
     /// Sets the raw content stream for this page. The bytes are stored verbatim

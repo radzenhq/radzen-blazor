@@ -211,6 +211,8 @@ internal sealed class DocumentSaver
             catalog["AcroForm"] = writer.Add(formWriter.FieldsForm(appendedFields));
         }
 
+        AnnotationEmitter.Write(writer, importer, pageNodes);
+
         foreach (var (pageIndex, reference) in createdWidgets)
         {
             var node = pageNodes[pageIndex].Node;

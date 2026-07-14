@@ -46,6 +46,11 @@ internal static class DocumentLoader
             CollectPages(reader, pagesNode, new InheritedAttributes(), document, state, limits, visited, 0);
         }
 
+        foreach (var page in document.Pages)
+        {
+            AnnotationReader.Read(page, reader, state.SourcePages[page], document.Pages, state.SourcePages);
+        }
+
         if (reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
             state.SourceAcroForm = form;
