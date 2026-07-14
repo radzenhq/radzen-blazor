@@ -42,6 +42,38 @@ public class ContentEditingTests
         return Document.LoadFromStream(input);
     }
 
+    private static Document LoadedSplitShowDocument(string streamData, bool includeSecondFont = false)
+    {
+        var resources = includeSecondFont
+            ? "/Resources << /Font << /F0 5 0 R /F1 6 0 R >> >>"
+            : "/Resources << /Font << /F0 5 0 R >> >>";
+        var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+                + resources + " /Contents 4 0 R >>\nendobj\n")
+            .Object(4, contentObject)
+            .Object(5, "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n");
+        if (includeSecondFont)
+        {
+            pdf.Object(6, "6 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>\nendobj\n");
+        }
+
+        var objectCount = includeSecondFont ? 6 : 5;
+        var xref = pdf.Position;
+        pdf.Append($"xref\n0 {objectCount + 1}\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= objectCount; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append($"trailer\n<< /Size {objectCount + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
+        using var input = new MemoryStream(pdf.ToArray());
+        return Document.LoadFromStream(input);
+    }
+
     [Fact]
     public void RemoveAt_LoadedPath_RemovesOnlyItsPaintOperators()
     {
@@ -103,6 +135,40 @@ public class ContentEditingTests
     }
 
     [Fact]
+    public void ReplaceText_MultipleTjOperators_ReplacesMatchAndPreservesFollowingOrigin()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td (x10) Tj ( July,) Tj ( 2026y) Tj (Z) Tj ET");
+        var beforeRuns = loaded.Pages[0].ExtractPositionedText();
+        var beforeTrailing = beforeRuns.Single(run => run.Text == " 2026y").CharacterQuadrilateral(5).Bounds.Left;
+        var beforeFollowing = beforeRuns.Single(run => run.Text == "Z").Bounds.Left;
+
+        var count = loaded.ReplaceText("10 July, 2026", "10 July, 2027");
+        var saved = loaded.ToArray();
+        var reloaded = InterpreterTestSupport.Load(saved);
+        var afterRuns = reloaded.Pages[0].ExtractPositionedText();
+        var trailingRun = afterRuns.Single(run => run.Text.EndsWith('y'));
+        var afterTrailing = trailingRun.CharacterQuadrilateral(trailingRun.Text.Length - 1).Bounds.Left;
+        var afterFollowing = afterRuns.Single(run => run.Text == "Z").Bounds.Left;
+
+        Assert.Equal(1, count);
+        Assert.Contains("10 July, 2027", reloaded.ExtractText());
+        Assert.DoesNotContain("10 July, 2026", reloaded.ExtractText());
+        Assert.Contains("x10July,2027yZ", reloaded.ExtractText().Replace(" ", string.Empty, StringComparison.Ordinal));
+        Assert.Equal(beforeTrailing, afterTrailing, 6);
+        Assert.Equal(beforeFollowing, afterFollowing, 6);
+    }
+
+    [Fact]
+    public void ReplaceText_MultipleTjOperatorsWithDifferentFonts_FailsLoud()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td (AB) Tj /F1 10 Tf (CD) Tj ET", includeSecondFont: true);
+
+        var exception = Assert.Throws<NotSupportedException>(() => loaded.ReplaceText("ABCD", "EF"));
+
+        Assert.Contains("same font and text state", exception.Message);
+    }
+
+    [Fact]
     public void Insert_ThenReplaceText_PreservesInsertedContent()
     {
         var loaded = LoadedDocumentWithText("original");
@@ -114,6 +180,21 @@ public class ContentEditingTests
         Assert.Equal(1, count);
         Assert.Contains("inserted", reloaded.ExtractText());
         Assert.Contains("changed", reloaded.ExtractText());
+    }
+
+    [Fact]
+    public void Insert_ThenReplaceTextAcrossMultipleTjOperators_PreservesInsertedContent()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td (AB) Tj (CD) Tj ET");
+        loaded.Pages[0].Content.Insert(0, new TextContent("inserted", 72, 720));
+
+        var count = loaded.ReplaceText("ABCD", "EF");
+        var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
+
+        Assert.Equal(1, count);
+        Assert.Contains("inserted", reloaded.ExtractText());
+        Assert.Contains("EF", reloaded.ExtractText());
+        Assert.DoesNotContain("ABCD", reloaded.ExtractText());
     }
 
     [Fact]
@@ -196,6 +277,19 @@ public class ContentEditingTests
         Assert.Equal(1, count);
         Assert.DoesNotContain("SECRET", reloaded.ExtractText());
         Assert.DoesNotContain("SECRET", Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(saved, 0)));
+    }
+
+    [Fact]
+    public void RedactText_MultipleTjOperators_RemovesEveryMatchedGlyph()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td (AB) Tj (CD) Tj (Z) Tj ET");
+
+        var count = loaded.RedactText("ABCD");
+        var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
+
+        Assert.Equal(1, count);
+        Assert.DoesNotContain("ABCD", reloaded.ExtractText());
+        Assert.Contains("Z", reloaded.ExtractText());
     }
 
     [Fact]
