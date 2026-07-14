@@ -593,7 +593,8 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   position: static;
 }
 
-.rz-resource-group-children > .rz-resource-group:first-child > .rz-resource-group-header {
+.rz-resource-group-children > .rz-resource-group:first-child > .rz-resource-group-header,
+.rz-resource-group-children.rz-resource-groups-horizontal > .rz-resource-group > .rz-resource-group-header {
   border-block-start: none;
 }
 
@@ -625,6 +626,10 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
 
   .rz-view-header + .rz-view-header {
     border-block-start: none;
+  }
+
+  > .rz-view-header:first-child {
+    border-block-start: var(--rz-scheduler-header-border) !important;
   }
 }
 
