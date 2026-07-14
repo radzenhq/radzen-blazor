@@ -399,9 +399,12 @@ public sealed class Document
     /// Saves the document as a PDF incremental update (ISO 32000-1 section 7.5.6):
     /// the original file bytes are preserved verbatim as an exact prefix of the
     /// output, and only the objects the caller changed since loading - edited
-    /// metadata, filled form fields, and appended pages - are written afterwards,
-    /// followed by a new cross-reference section chained to the original via
-    /// <c>/Prev</c>. Valid only for a document obtained from
+    /// metadata, filled form fields, annotations, page boxes, and supported page
+    /// insertions, removals or reordering - are written afterwards, followed by a
+    /// new cross-reference section chained to the original via <c>/Prev</c>.
+    /// Content edits, encryption changes, and page-tree structures that cannot be
+    /// updated safely are rejected with a direction to use <see cref="SaveToStream"/>.
+    /// Valid only for a document obtained from
     /// <see cref="LoadFromStream(Stream, LoadOptions)"/>; a freshly built document
     /// has no original revision to increment and must be written with
     /// <see cref="SaveToStream"/>. The output is deterministic: identical edits on

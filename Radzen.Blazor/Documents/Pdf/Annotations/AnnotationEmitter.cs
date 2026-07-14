@@ -8,9 +8,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class AnnotationEmitContext
 {
-    public required DocumentWriter Writer { get; init; }
+    public required IObjectWriter Writer { get; init; }
 
-    public required GraphImporter? Importer { get; init; }
+    public required Func<DocumentObject, DocumentObject> ImportValue { get; init; }
 
     public required IReadOnlyList<(Page Page, DictionaryObject Node, ReferenceObject Reference)> Pages { get; init; }
 
@@ -41,7 +41,9 @@ internal static class AnnotationEmitter
             var context = new AnnotationEmitContext
             {
                 Writer = writer,
-                Importer = importer,
+                ImportValue = importer is null
+                    ? value => throw new InvalidOperationException("A loaded annotation cannot be preserved without its source importer.")
+                    : importer.ImportValue,
                 Pages = pages,
                 PageIndex = pageIndex,
             };
@@ -62,6 +64,43 @@ internal static class AnnotationEmitter
                 node["Annots"] = new NullObject();
             }
         }
+    }
+
+    public static ArrayObject BuildIncremental(
+        IncrementalUpdateWriter writer,
+        AnnotationCollection annotations,
+        IReadOnlyList<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pages,
+        int pageIndex)
+    {
+        var context = new AnnotationEmitContext
+        {
+            Writer = writer,
+            ImportValue = static value => value,
+            Pages = pages,
+            PageIndex = pageIndex,
+        };
+        var result = new ArrayObject();
+        foreach (var entry in annotations.Entries)
+        {
+            if (entry.Annotation is null
+                || (entry.Original is not null && string.Equals(entry.State, entry.Annotation.State(), StringComparison.Ordinal)))
+            {
+                result.Add(Preserve(entry));
+                continue;
+            }
+
+            var dictionary = BuildDictionary(entry.Annotation, entry, context);
+            if (entry.Original is ReferenceObject original)
+            {
+                result.Add(writer.Override(original.ObjectNumber, dictionary));
+            }
+            else
+            {
+                result.Add(writer.Add(dictionary));
+            }
+        }
+
+        return result;
     }
 
     private static ArrayObject Build(AnnotationCollection annotations, AnnotationEmitContext context)
@@ -89,13 +128,16 @@ internal static class AnnotationEmitter
 
     private static DocumentObject Import(AnnotationCollection.Entry entry, AnnotationEmitContext context)
     {
-        if (entry.Original is null || context.Importer is null)
+        if (entry.Original is null)
         {
             throw new InvalidOperationException("A loaded annotation cannot be preserved without its source importer.");
         }
 
-        return context.Importer.ImportValue(entry.Original);
+        return context.ImportValue(entry.Original);
     }
+
+    private static DocumentObject Preserve(AnnotationCollection.Entry entry)
+        => entry.Original ?? throw new InvalidOperationException("A loaded annotation has no original PDF object.");
 
     private static DictionaryObject BuildDictionary(
         Annotation annotation,
@@ -104,13 +146,13 @@ internal static class AnnotationEmitter
     {
         Validate(annotation);
         var dictionary = new DictionaryObject();
-        if (entry.Dictionary is { } original && context.Importer is { } importer)
+        if (entry.Dictionary is { } original)
         {
             foreach (var key in original.Keys)
             {
                 if (!ManagedKeys.Contains(key))
                 {
-                    dictionary[key] = importer.ImportValue(original[key]);
+                    dictionary[key] = context.ImportValue(original[key]);
                 }
             }
         }
@@ -260,7 +302,7 @@ internal static class AnnotationEmitter
         }
     }
 
-    private static StreamObject? BuildAppearance(Annotation annotation, DocumentWriter writer)
+    private static StreamObject? BuildAppearance(Annotation annotation, IObjectWriter writer)
     {
         var elements = AnnotationAppearanceBuilder.Build(annotation);
         if (elements.Count == 0)

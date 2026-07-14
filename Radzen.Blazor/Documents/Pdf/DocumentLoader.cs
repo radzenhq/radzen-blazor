@@ -59,6 +59,7 @@ internal static class DocumentLoader
         }
 
         ReadAttachments(reader, catalog, document, limits);
+        state.LoadedAttachmentSnapshot = AttachmentSnapshot.Capture(document.Attachments);
         ReadOutline(reader, catalog, document, state, limits);
         ReadPageLabels(reader, catalog, document, state, limits);
         ReadXmp(reader, catalog, document);
@@ -192,6 +193,9 @@ internal static class DocumentLoader
 
         document.Pages.Insert(document.Pages.Count, page);
         state.SourcePages[page] = node;
+        state.LoadedPages.Add(page);
+        state.SourceContents[page] = content is null ? null : [.. content];
+        state.LoadedPageSettings[page] = (page.BleedBox, page.TrimBox, page.ArtBox, page.Rotate);
         if (resources is not null)
         {
             state.SourceResources[page] = resources;
