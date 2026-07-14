@@ -13,7 +13,7 @@
             return @<CascadingValue Value=@Scheduler>
                 <ResourceGroups Types=@ResourceTypes Orientation=@GroupOrientation>
                     <ChildContent Context="path">
-                        <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResources(appointments, path) Resources=@path TimeFormat="@TimeFormat" ShowHours=@(GroupOrientation == Orientation.Vertical || IsFirstResourcePath(path)) AppointmentMove=OnAppointmentMove />
+                        <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@AppointmentsForResources(appointments, path) Resources=@path TimeFormat="@TimeFormat" ShowHours=@(GroupOrientation == Orientation.Vertical || IsFirstResourcePath(path)) ShowAllDay=@ShowAllDay AllDayText=@AllDayText AppointmentMove=OnAppointmentMove />
                     </ChildContent>
                 </ResourceGroups>
             </CascadingValue>;

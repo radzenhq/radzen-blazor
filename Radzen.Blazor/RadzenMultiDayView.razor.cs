@@ -59,6 +59,27 @@ namespace Radzen.Blazor
         public int MinutesPerSlot { get; set; } = 30;
 
         /// <summary>
+        /// Gets or sets a value indicating whether a dedicated all-day row is displayed when the view groups appointments by resource.
+        /// All-day appointments are displayed in it instead of the time grid. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if the all-day row is visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowAllDay { get; set; } = true;
+
+        private string? allDayText;
+
+        /// <summary>
+        /// Gets or sets the text displayed in the header of the all-day row when the view groups appointments by resource. Set to <c>All day</c> by default.
+        /// </summary>
+        /// <value>The all-day text.</value>
+        [Parameter]
+        public string AllDayText
+        {
+            get => allDayText ?? Localize(nameof(RadzenStrings.Scheduler_AllDayText));
+            set => allDayText = value;
+        }
+
+        /// <summary>
         /// Gets or sets number of days to view. Set to <c>2</c> by default.
         /// </summary>
         /// <value>The number of days.</value>

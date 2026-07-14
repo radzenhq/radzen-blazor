@@ -24,7 +24,7 @@
     </RadzenStack>
 </RadzenStack>
 
-<RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="RoomBooking" Data=@bookings StartProperty="Start" EndProperty="End" TextProperty="Text"
+<RadzenScheduler @ref=@scheduler style="height: 768px;" TItem="RoomBooking" Data=@bookings StartProperty="Start" EndProperty="End" TextProperty="Text" AllDayProperty="AllDay"
     SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentMove=@OnAppointmentMove>
     <RadzenSchedulerResource Name="Room" Data=@rooms Property="RoomIds" TextProperty="Name" ValueProperty="Id" />
     <RadzenSchedulerResource Name="Employee" Data=@employees Property="StaffId" TextProperty="Name" ValueProperty="Id" />
@@ -65,7 +65,7 @@
         new RoomBooking { RoomIds = new List<int> { 1 }, StaffId = 2, Start = DateTime.Today.AddHours(13), End = DateTime.Today.AddHours(15), Text = "Sprint planning" },
         new RoomBooking { RoomIds = new List<int> { 1, 2 }, StaffId = 3, Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Customer demo" },
         new RoomBooking { RoomIds = new List<int> { 2 }, StaffId = 1, Start = DateTime.Today.AddDays(1).AddHours(11), End = DateTime.Today.AddDays(1).AddHours(12), Text = "Interview" },
-        new RoomBooking { RoomIds = new List<int> { 2 }, StaffId = 2, Start = DateTime.Today, End = DateTime.Today.AddDays(1), Text = "Off-site visit" },
+        new RoomBooking { RoomIds = new List<int> { 2 }, StaffId = 2, Start = DateTime.Today, End = DateTime.Today.AddDays(1), AllDay = true, Text = "Off-site visit" },
     };
 
     async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
@@ -75,7 +75,7 @@
 
         console.Log($"SlotSelect: Start={args.Start} End={args.End} Room={room?.Name ?? "(none)"} Employee={employee?.Name ?? "(none)"}");
 
-        var booking = new RoomBooking { Start = args.Start, End = args.End };
+        var booking = new RoomBooking { Start = args.Start, End = args.End, AllDay = args.Start == args.Start.Date && args.End == args.Start.Date.AddDays(1) };
 
         if (room != null)
         {
@@ -110,6 +110,7 @@
             args.Data.Text = result.Text;
             args.Data.Start = result.Start;
             args.Data.End = result.End;
+            args.Data.AllDay = result.AllDay;
             args.Data.RoomIds = result.RoomIds;
             args.Data.StaffId = result.StaffId;
 

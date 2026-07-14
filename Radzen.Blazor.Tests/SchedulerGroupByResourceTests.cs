@@ -19,6 +19,7 @@ namespace Radzen.Blazor.Tests
             public int EmployeeId { get; set; }
             public DateTime Start { get; set; }
             public DateTime End { get; set; }
+            public bool AllDay { get; set; }
             public string Text { get; set; } = "";
         }
 
@@ -350,6 +351,106 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DayView_Grouped_AllDayProperty_Places_Appointment_In_AllDay_Row()
+        {
+            using var ctx = new TestContext();
+
+            var bookings = new List<Booking>
+            {
+                new() { RoomId = 1, AllDay = true, Start = Today.AddHours(10), End = Today.AddHours(11), Text = "Off-site" }
+            };
+
+            var cut = Render<Booking, RadzenDayView>(ctx, bookings, p => AddRoomResource(p),
+                configureScheduler: p => p.Add(x => x.AllDayProperty, nameof(Booking.AllDay)));
+
+            Assert.Contains("Off-site", cut.FindAll(".rz-resource-all-day .rz-resource-all-day-slot")[0].TextContent);
+            Assert.Empty(cut.FindAll(".rz-resource-view .rz-resource-view-content .rz-slots")[0].QuerySelectorAll(".rz-event"));
+        }
+
+        [Fact]
+        public void DayView_Grouped_Empty_AllDay_Cell_Click_Raises_SlotSelect()
+        {
+            using var ctx = new TestContext();
+
+            SchedulerSlotSelectEventArgs? slotSelectArgs = null;
+
+            var bookings = new List<Booking>
+            {
+                new() { RoomId = 1, AllDay = true, Start = Today, End = Today.AddDays(1), Text = "Off-site" }
+            };
+
+            var cut = Render<Booking, RadzenDayView>(ctx, bookings, p => AddRoomResource(p),
+                configureScheduler: p =>
+                {
+                    p.Add(x => x.AllDayProperty, nameof(Booking.AllDay));
+                    p.Add(x => x.SlotSelect, args => { slotSelectArgs = args; });
+                });
+
+            var cell = cut.FindAll(".rz-resource-all-day .rz-resource-all-day-slot")[0];
+
+            cell.QuerySelector(".rz-events")!.Click();
+
+            Assert.NotNull(slotSelectArgs);
+            Assert.Equal(Today, slotSelectArgs!.Start);
+            Assert.Equal(Today.AddDays(1), slotSelectArgs.End);
+        }
+
+        [Fact]
+        public void WeekView_Grouped_Renders_AllDay_Row_With_Cell_Per_Day()
+        {
+            using var ctx = new TestContext();
+
+            var bookings = new List<Booking>
+            {
+                new() { RoomId = 1, AllDay = true, Start = Today, End = Today.AddDays(1), Text = "Off-site" },
+                new() { RoomId = 1, Start = Today.AddHours(10), End = Today.AddHours(11), Text = "Standup" }
+            };
+
+            var cut = Render<Booking, RadzenWeekView>(ctx, bookings, p => AddRoomResource(p),
+                configureScheduler: p => p.Add(x => x.AllDayProperty, nameof(Booking.AllDay)));
+
+            var groups = cut.FindAll(".rz-resource-groups .rz-resource-group");
+            var allDayCells = groups[0].QuerySelectorAll(".rz-resource-all-day .rz-resource-all-day-slot");
+
+            Assert.Equal(7, allDayCells.Length);
+            Assert.Contains("Off-site", string.Join("", allDayCells.Select(c => c.TextContent)));
+            Assert.DoesNotContain("Off-site", string.Join("", groups[0].QuerySelectorAll(".rz-slots .rz-event").Select(e => e.TextContent)));
+            Assert.Contains("Standup", string.Join("", groups[0].QuerySelectorAll(".rz-slots .rz-event").Select(e => e.TextContent)));
+        }
+
+        [Fact]
+        public void WeekView_Grouped_AllDay_Cell_Click_Selects_Day_With_Resource()
+        {
+            using var ctx = new TestContext();
+
+            SchedulerSlotSelectEventArgs? slotSelectArgs = null;
+
+            var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
+                configureScheduler: p => p.Add(x => x.SlotSelect, args => { slotSelectArgs = args; }));
+
+            var groups = cut.FindAll(".rz-resource-groups .rz-resource-group");
+            var cell = groups[1].QuerySelectorAll(".rz-resource-all-day .rz-resource-all-day-slot")[1];
+
+            cell.Click();
+
+            Assert.NotNull(slotSelectArgs);
+            Assert.Equal(slotSelectArgs!.Start.Date, slotSelectArgs.Start);
+            Assert.Equal(slotSelectArgs.Start.AddDays(1), slotSelectArgs.End);
+            Assert.Equal(2, Assert.IsType<Room>(slotSelectArgs.Resource).Id);
+        }
+
+        [Fact]
+        public void WeekView_Grouped_Hides_AllDay_Row_When_ShowAllDay_Is_False()
+        {
+            using var ctx = new TestContext();
+
+            var cut = Render<Booking, RadzenWeekView>(ctx, new List<Booking>(), p => AddRoomResource(p),
+                configureView: v => v.Add(x => x.ShowAllDay, false));
+
+            Assert.Empty(cut.FindAll(".rz-resource-all-day"));
+        }
+
+        [Fact]
         public void WeekView_Grouped_Horizontal_Renders_Hours_Only_In_First_Group()
         {
             using var ctx = new TestContext();
@@ -507,6 +608,7 @@ namespace Radzen.Blazor.Tests
             var cut = Render<Booking, RadzenWeekView>(ctx, bookings, p => AddRoomResource(p), groupByResource: false);
 
             Assert.Empty(cut.FindAll(".rz-resource-groups"));
+            Assert.Empty(cut.FindAll(".rz-resource-all-day"));
             Assert.Single(cut.FindAll(".rz-week-view"));
             Assert.Single(cut.FindAll(".rz-event"));
         }

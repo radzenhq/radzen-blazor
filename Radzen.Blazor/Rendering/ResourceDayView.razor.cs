@@ -134,7 +134,7 @@ namespace Radzen.Blazor.Rendering
 
         bool IsAllDay(AppointmentData appointment)
         {
-            return appointment.Start <= StartDate && appointment.End >= EndDate;
+            return appointment.AllDay || (appointment.Start <= StartDate && appointment.End >= EndDate);
         }
 
         IList<AppointmentData> AppointmentsForPath(IDictionary<string, object> path)
