@@ -9,10 +9,9 @@ namespace Radzen.Documents.Pdf.Emit;
 // Only the objects the caller mutated since loading are re-emitted, over the
 // original bytes, via the low-level Objects.IncrementalUpdateWriter (the same
 // mechanism PdfSigner/DssBuilder use). Supported edits: document /Info metadata,
-// filled/checked AcroForm fields (tracked by AcroForm.ChangedObjects), and pages
-// appended after load. Anything that would need the full-save Emit pipeline to
-// re-encode (a generated page, authored content elements, brand-new form fields)
-// fails loud rather than silently falling back to a full rewrite.
+// filled/checked AcroForm fields, page and annotation dictionary edits, and a
+// directly rooted page-tree reorder. Anything that would need the full-save Emit
+// pipeline to re-encode fails loud rather than silently falling back to a rewrite.
 internal sealed class IncrementalDocumentSaver
 {
     private static readonly string[] InfoKeys =
@@ -26,6 +25,7 @@ internal sealed class IncrementalDocumentSaver
     {
         var loaded = doc.Loaded!;
         var reader = loaded.Source!;
+        ValidateCapabilities();
         if (doc.FormFields.Count > 0)
         {
             throw new NotSupportedException(
@@ -35,19 +35,93 @@ internal sealed class IncrementalDocumentSaver
 
         var writer = new IncrementalUpdateWriter(loaded.SourceBytes!, reader);
         var index = reader.BuildObjectNumberIndex();
+        var pageReferences = SourcePageReferences(index);
+        var pageNodes = new Dictionary<Page, DictionaryObject>(loaded.SourcePages);
+        var pageOverrides = new SortedDictionary<int, DictionaryObject>();
 
         var changed = WriteFieldEdits(writer, index);
-        changed |= WriteAppendedPages(writer);
+        changed |= WritePageEdits(writer, index, pageReferences, pageNodes, pageOverrides);
+        changed |= WriteAnnotationEdits(writer, pageReferences, pageNodes, pageOverrides);
+        foreach (var pair in pageOverrides)
+        {
+            writer.Override(pair.Key, pair.Value);
+        }
+
         changed |= WriteMetadata(writer, reader);
 
         if (!changed)
         {
             throw new InvalidOperationException(
-                "SaveIncremental found no supported change to write. Edit the metadata, fill a form "
-                + "field, or append a page before saving an incremental update.");
+                "SaveIncremental found no supported change to write. Edit metadata, fill a form field, "
+                + "edit annotations or page boxes, or change the page order before saving an incremental update.");
         }
 
         writer.WriteTo(stream);
+    }
+
+    private void ValidateCapabilities()
+    {
+        if (doc.Encryption is not null)
+        {
+            throw Unsupported("Changing encryption");
+        }
+
+        if (doc.Xmp.IsModified)
+        {
+            throw Unsupported("Editing XMP metadata");
+        }
+
+        if (doc.ViewerPreferences is not null || doc.OutlineChanged || doc.PageLabelsChanged)
+        {
+            throw Unsupported("Editing catalog-level document features");
+        }
+
+        if (doc.Loaded!.LoadedAttachmentSnapshot is not { } attachments
+            || !AttachmentSnapshot.Matches(attachments, doc.Attachments))
+        {
+            throw Unsupported("Editing attachments");
+        }
+
+        foreach (var page in doc.Pages)
+        {
+            if (!doc.Loaded!.SourcePages.ContainsKey(page))
+            {
+                continue;
+            }
+
+            var emission = page.BuildContent();
+            doc.Loaded.SourceContents.TryGetValue(page, out var original);
+            if (emission.IsEmitted || emission.Overlay is not null || !Same(original, emission.Bytes))
+            {
+                throw Unsupported("Editing loaded page content, including redaction and text replacement");
+            }
+
+            var settings = doc.Loaded.LoadedPageSettings[page];
+            if (settings.Bleed != page.BleedBox || settings.Trim != page.TrimBox
+                || settings.Art != page.ArtBox || settings.Rotate != page.Rotate)
+            {
+                throw Unsupported("Editing page rotation, bleed, trim, or art boxes");
+            }
+        }
+    }
+
+    private static NotSupportedException Unsupported(string edit)
+        => new($"{edit} cannot be saved incrementally. Use SaveToStream for a full save.");
+
+    private Dictionary<Page, ReferenceObject> SourcePageReferences(IReadOnlyDictionary<DocumentObject, int> index)
+    {
+        var result = new Dictionary<Page, ReferenceObject>();
+        foreach (var pair in doc.Loaded!.SourcePages)
+        {
+            if (!index.TryGetValue(pair.Value, out var number))
+            {
+                throw Unsupported("A page whose dictionary is not an indirect object");
+            }
+
+            result[pair.Key] = new ReferenceObject(number, 0);
+        }
+
+        return result;
     }
 
     // Re-emits each loaded field/widget/form dictionary a caller mutated through
@@ -86,68 +160,193 @@ internal sealed class IncrementalDocumentSaver
         return overrides.Count > 0;
     }
 
-    // Appends the pages added to the model after load. Each new page becomes an
-    // appended Page object (with its raw content stream, if any) parented to the
-    // existing page-tree root, which is overridden to list the new kids and to
-    // carry the grown /Count.
-    private bool WriteAppendedPages(IncrementalUpdateWriter writer)
+    private bool WritePageEdits(
+        IncrementalUpdateWriter writer,
+        IReadOnlyDictionary<DocumentObject, int> index,
+        Dictionary<Page, ReferenceObject> pageReferences,
+        Dictionary<Page, DictionaryObject> pageNodes,
+        SortedDictionary<int, DictionaryObject> pageOverrides)
     {
         var loaded = doc.Loaded!;
         var reader = loaded.Source!;
-        var newPages = new List<Page>();
-        foreach (var page in doc.Pages)
-        {
-            if (!loaded.SourcePages.ContainsKey(page))
-            {
-                newPages.Add(page);
-            }
-        }
-
-        if (newPages.Count == 0)
-        {
-            return false;
-        }
-
+        ValidateRemovedPages(reader, loaded);
         if (loaded.SourceCatalog is null
             || !loaded.SourceCatalog.TryGetValue("Pages", out var pagesValue)
             || pagesValue is not ReferenceObject pagesRef
             || reader.Resolve(pagesRef) is not DictionaryObject pagesNode)
         {
             throw new NotSupportedException(
-                "Cannot append a page incrementally: the loaded catalog has no indirect /Pages tree.");
+                "Cannot edit pages incrementally: the loaded catalog has no indirect /Pages tree. Use SaveToStream.");
         }
 
-        var newRefs = new List<ReferenceObject>(newPages.Count);
-        foreach (var page in newPages)
+        var changed = false;
+        foreach (var page in doc.Pages)
         {
-            newRefs.Add(AppendPage(writer, page, pagesRef));
-        }
-
-        var updated = Copy(pagesNode);
-        var kids = new ArrayObject();
-        if (reader.GetArray(pagesNode, "Kids") is { } existingKids)
-        {
-            foreach (var kid in existingKids)
+            if (loaded.SourcePages.ContainsKey(page))
             {
-                kids.Add(kid);
+                continue;
+            }
+
+            var appended = AppendPage(writer, page, pagesRef);
+            pageReferences[page] = appended.Reference;
+            pageNodes[page] = appended.Node;
+            changed = true;
+        }
+
+        var appendOnly = doc.Pages.Count >= loaded.LoadedPages.Count;
+        for (var i = 0; appendOnly && i < loaded.LoadedPages.Count; i++)
+        {
+            appendOnly = ReferenceEquals(doc.Pages[i], loaded.LoadedPages[i]);
+        }
+
+        for (var i = loaded.LoadedPages.Count; appendOnly && i < doc.Pages.Count; i++)
+        {
+            appendOnly = !loaded.SourcePages.ContainsKey(doc.Pages[i]);
+        }
+
+        var unchanged = doc.Pages.Count == loaded.LoadedPages.Count;
+        for (var i = 0; unchanged && i < loaded.LoadedPages.Count; i++)
+        {
+            unchanged = ReferenceEquals(doc.Pages[i], loaded.LoadedPages[i]);
+        }
+
+        if (!unchanged)
+        {
+            var updated = Copy(pagesNode);
+            var kids = new ArrayObject();
+            if (appendOnly)
+            {
+                if (reader.GetArray(pagesNode, "Kids") is { } existingKids)
+                {
+                    foreach (var kid in existingKids)
+                    {
+                        kids.Add(kid);
+                    }
+                }
+
+                for (var i = loaded.LoadedPages.Count; i < doc.Pages.Count; i++)
+                {
+                    kids.Add(pageReferences[doc.Pages[i]]);
+                }
+
+                var count = reader.GetInt(pagesNode, "Count") ?? (kids.Count - (doc.Pages.Count - loaded.LoadedPages.Count));
+                updated["Count"] = new NumberObject(count + doc.Pages.Count - loaded.LoadedPages.Count);
+            }
+            else
+            {
+                ValidateFlatPageTree(reader, pagesRef, pagesNode, loaded.LoadedPages, pageReferences);
+                foreach (var page in doc.Pages)
+                {
+                    kids.Add(pageReferences[page]);
+                }
+
+                updated["Count"] = new NumberObject(kids.Count);
+            }
+
+            updated["Kids"] = kids;
+            writer.Override(pagesRef.ObjectNumber, updated);
+            changed = true;
+        }
+
+        foreach (var page in doc.Pages)
+        {
+            if (!loaded.SourcePages.TryGetValue(page, out var sourceNode)
+                || (!page.MediaBoxSet && !page.CropBoxSet))
+            {
+                continue;
+            }
+
+            var number = index[sourceNode];
+            if (page.CropBoxSet && page.CropBox is null && !sourceNode.ContainsKey("CropBox")
+                && loaded.SourceCropBoxes.ContainsKey(page))
+            {
+                throw Unsupported("Removing an inherited crop box");
+            }
+
+            var updated = page.CropBoxSet && page.CropBox is null
+                ? CopyExcept(sourceNode, "CropBox")
+                : Copy(sourceNode);
+            if (page.MediaBoxSet)
+            {
+                updated["MediaBox"] = PageResourceBuilder.NumberBox(page.MediaBox);
+            }
+
+            if (page.CropBoxSet && page.CropBox is { } cropBox)
+            {
+                updated["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
+            }
+
+            pageOverrides[number] = updated;
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private void ValidateRemovedPages(DocumentReader reader, LoadedState loaded)
+    {
+        foreach (var page in loaded.LoadedPages)
+        {
+            var retained = false;
+            foreach (var current in doc.Pages)
+            {
+                retained |= ReferenceEquals(page, current);
+            }
+
+            if (retained || reader.GetArray(loaded.SourcePages[page], "Annots") is not { } annotations)
+            {
+                continue;
+            }
+
+            foreach (var value in annotations)
+            {
+                if (reader.AsDictionary(value) is { } annotation
+                    && reader.GetName(annotation, "Subtype") == "Widget")
+                {
+                    throw Unsupported("Removing a page that owns form widgets");
+                }
+            }
+        }
+    }
+
+    private static void ValidateFlatPageTree(
+        DocumentReader reader,
+        ReferenceObject pagesReference,
+        DictionaryObject pagesNode,
+        IReadOnlyList<Page> loadedPages,
+        IReadOnlyDictionary<Page, ReferenceObject> pageReferences)
+    {
+        if (reader.GetArray(pagesNode, "Kids") is not { } kids || kids.Count != loadedPages.Count)
+        {
+            throw Unsupported("Changing a nested or shared page tree");
+        }
+
+        var seen = new HashSet<int>();
+        foreach (var kid in kids)
+        {
+            if (kid is not ReferenceObject reference || !seen.Add(reference.ObjectNumber)
+                || reader.AsDictionary(kid) is not { } dictionary || reader.GetName(dictionary, "Type") != "Page"
+                || !dictionary.TryGetValue("Parent", out var parent) || parent is not ReferenceObject parentReference
+                || parentReference.ObjectNumber != pagesReference.ObjectNumber)
+            {
+                throw Unsupported("Changing a nested or shared page tree");
             }
         }
 
-        foreach (var reference in newRefs)
+        foreach (var page in loadedPages)
         {
-            kids.Add(reference);
+            var reference = pageReferences[page];
+            if (!seen.Contains(reference.ObjectNumber))
+            {
+                throw Unsupported("Changing a nested or shared page tree");
+            }
         }
-
-        updated["Kids"] = kids;
-
-        var count = reader.GetInt(pagesNode, "Count") ?? (kids.Count - newRefs.Count);
-        updated["Count"] = new NumberObject(count + newRefs.Count);
-
-        writer.Override(pagesRef.ObjectNumber, updated);
-        return true;
     }
 
-    private ReferenceObject AppendPage(IncrementalUpdateWriter writer, Page page, ReferenceObject parent)
+    private (ReferenceObject Reference, DictionaryObject Node) AppendPage(
+        IncrementalUpdateWriter writer,
+        Page page,
+        ReferenceObject parent)
     {
         if (page.Generated is not null)
         {
@@ -167,14 +366,25 @@ internal sealed class IncrementalDocumentSaver
         {
             ["Type"] = new NameObject("Page"),
             ["Parent"] = parent,
-            ["MediaBox"] = new ArrayObject
-            {
-                new NumberObject(0.0),
-                new NumberObject(0.0),
-                new NumberObject(page.Width.Point),
-                new NumberObject(page.Height.Point),
-            },
+            ["MediaBox"] = page.MediaBoxSet
+                ? PageResourceBuilder.NumberBox(page.MediaBox)
+                :
+                [
+                    new NumberObject(0.0),
+                    new NumberObject(0.0),
+                    new NumberObject(page.Width.Point),
+                    new NumberObject(page.Height.Point),
+                ],
         };
+
+        if (page.CropBoxSet && page.CropBox is { } cropBox)
+        {
+            node["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
+        }
+
+        WriteBox(node, "BleedBox", page.BleedBox);
+        WriteBox(node, "TrimBox", page.TrimBox);
+        WriteBox(node, "ArtBox", page.ArtBox);
 
         if (page.Rotate != 0)
         {
@@ -186,7 +396,58 @@ internal sealed class IncrementalDocumentSaver
             node["Contents"] = writer.Add(new StreamObject(emission.Bytes));
         }
 
-        return writer.Add(node);
+        var reference = writer.Add(node);
+        return (reference, node);
+    }
+
+    private static void WriteBox(DictionaryObject node, string key, Rect? box)
+    {
+        if (box is { } value)
+        {
+            node[key] = PageResourceBuilder.NumberBox(value);
+        }
+    }
+
+    private bool WriteAnnotationEdits(
+        IncrementalUpdateWriter writer,
+        IReadOnlyDictionary<Page, ReferenceObject> pageReferences,
+        IReadOnlyDictionary<Page, DictionaryObject> pageNodes,
+        SortedDictionary<int, DictionaryObject> pageOverrides)
+    {
+        var pages = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
+        foreach (var page in doc.Pages)
+        {
+            pages.Add((page, pageNodes[page], pageReferences[page]));
+        }
+
+        var changed = false;
+        for (var i = 0; i < pages.Count; i++)
+        {
+            var (page, source, reference) = pages[i];
+            if (!page.Annotations.HasChanges)
+            {
+                continue;
+            }
+
+            var annotations = AnnotationEmitter.BuildIncremental(writer, page.Annotations, pages, i);
+            if (doc.Loaded!.SourcePages.ContainsKey(page))
+            {
+                var updated = pageOverrides.TryGetValue(reference.ObjectNumber, out var existing)
+                    ? existing
+                    : Copy(source);
+                updated["Annots"] = annotations.Count == 0 ? new NullObject() : annotations;
+                pageOverrides[reference.ObjectNumber] = updated;
+            }
+            else
+            {
+                var node = pages[i].Node;
+                node["Annots"] = annotations.Count == 0 ? new NullObject() : annotations;
+            }
+
+            changed = true;
+        }
+
+        return changed;
     }
 
     // Emits an /Info override (or a new /Info object) only when a modeled metadata
@@ -289,6 +550,30 @@ internal sealed class IncrementalDocumentSaver
         }
 
         return copy;
+    }
+
+    private static DictionaryObject CopyExcept(DictionaryObject source, string omittedKey)
+    {
+        var copy = new DictionaryObject();
+        foreach (var pair in source)
+        {
+            if (!string.Equals(pair.Key, omittedKey, StringComparison.Ordinal))
+            {
+                copy[pair.Key] = pair.Value;
+            }
+        }
+
+        return copy;
+    }
+
+    private static bool Same(byte[]? a, byte[]? b)
+    {
+        if (a is null || b is null)
+        {
+            return a is null && b is null;
+        }
+
+        return a.AsSpan().SequenceEqual(b);
     }
 
     private static bool Same(string?[] a, string?[] b)

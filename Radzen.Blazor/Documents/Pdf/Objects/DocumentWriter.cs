@@ -21,7 +21,7 @@ namespace Radzen.Documents.Pdf.Objects;
 /// Initializes a new instance of the <see cref="DocumentWriter"/> class.
 /// </remarks>
 /// <param name="stream">The destination stream.</param>
-public sealed class DocumentWriter(Stream stream)
+public sealed class DocumentWriter(Stream stream) : IObjectWriter
 {
     private static readonly byte[] HeaderSuffix =
     [

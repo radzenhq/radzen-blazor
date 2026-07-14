@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Signing;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -15,6 +16,11 @@ namespace Radzen.Blazor.Pdf.Tests;
 // resolve from the original revision - plus determinism and the loaded-only guard.
 public class IncrementalSaveTests
 {
+    private sealed class FixedSigner : ISigner
+    {
+        public byte[] Sign(ReadOnlySpan<byte> content) => [0x30, 0x00];
+    }
+
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
     // A minimal one-page loadable document carrying an /Info dictionary.
@@ -28,6 +34,26 @@ public class IncrementalSaveTests
     }
 
     private static byte[] FormFixture() => PdfTestResources.ReadAllBytes(FormTestSupport.Fixture);
+
+    private static byte[] NestedPageTree()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 2 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Pages /Parent 2 0 R /Kids [4 0 R 5 0 R] /Count 2 >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Type /Page /Parent 3 0 R /MediaBox [0 0 612 792] >>\nendobj\n")
+            .Object(5, "5 0 obj\n<< /Type /Page /Parent 3 0 R /MediaBox [0 0 612 792] >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 6\n")
+            .Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= 5; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
+    }
 
     private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
 
@@ -205,6 +231,175 @@ public class IncrementalSaveTests
         page.Content.Add(new TextContent("authored", Unit.FromPoint(72), Unit.FromPoint(720)));
 
         Assert.Throws<NotSupportedException>(() => SaveIncremental(document));
+    }
+
+    [Fact]
+    public void AddedAnnotationIsAppendedAndReParses()
+    {
+        var original = BaseDocument();
+        var document = Load(original);
+        document.Pages[0].Annotations.Add(new HighlightAnnotation(new Rect(10, 20, 100, 20))
+        {
+            Contents = "incremental note",
+        });
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var reloaded = Load(updated);
+        var annotation = Assert.IsType<HighlightAnnotation>(Assert.Single(reloaded.Pages[0].Annotations));
+        Assert.Equal("incremental note", annotation.Contents);
+        var reader = DocumentReader.Parse(updated);
+        var page = DocumentLoadTests.Kid(reader, 0);
+        var dictionary = reader.AsDictionary(Assert.Single(reader.GetArray(page, "Annots")!))!;
+        var appearance = reader.GetDictionary(dictionary, "AP")!;
+        Assert.IsType<StreamObject>(reader.Resolve(appearance["N"]));
+    }
+
+    [Fact]
+    public void CompressOutputDoesNotPreventIncrementalAnnotationSave()
+    {
+        var original = BaseDocument();
+        var document = Load(original);
+        document.CompressOutput = true;
+        document.Pages[0].Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24))
+        {
+            Contents = "incremental note",
+        });
+
+        var updated = SaveIncremental(document);
+
+        AssertVerbatimPrefix(original, updated);
+        var annotation = Assert.IsType<TextAnnotation>(Assert.Single(Load(updated).Pages[0].Annotations));
+        Assert.Equal("incremental note", annotation.Contents);
+    }
+
+    [Fact]
+    public void EditedAndRemovedAnnotationsAreAppendedAndReParse()
+    {
+        var source = new Document();
+        var page = source.Pages.Add();
+        page.Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24)) { Contents = "old" });
+        page.Annotations.Add(new SquareAnnotation(new Rect(40, 20, 24, 24)));
+        var original = source.ToArray();
+        var document = Load(original);
+        Assert.IsType<TextAnnotation>(document.Pages[0].Annotations[0]).Contents = "edited";
+        document.Pages[0].Annotations.RemoveAt(1);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var annotation = Assert.IsType<TextAnnotation>(Assert.Single(Load(updated).Pages[0].Annotations));
+        Assert.Equal("edited", annotation.Contents);
+    }
+
+    [Fact]
+    public void DeletedAndReorderedPagesAreAppendedAndReParse()
+    {
+        var source = new Document();
+        source.Pages.Add().SetContent(Ascii("first"));
+        source.Pages.Add().SetContent(Ascii("remove"));
+        source.Pages.Add().SetContent(Ascii("last"));
+        var original = source.ToArray();
+        var document = Load(original);
+        document.Pages.RemoveAt(1);
+        document.Pages.Move(1, 0);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var reloaded = Load(updated);
+        Assert.Equal(2, reloaded.Pages.Count);
+        Assert.Equal("last", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
+        Assert.Equal("first", Encoding.ASCII.GetString(reloaded.Pages[1].GetContent()!));
+    }
+
+    [Fact]
+    public void InsertedPageIsAppendedAndPlacedInTheUpdatedPageTree()
+    {
+        var source = new Document();
+        source.Pages.Add().SetContent(Ascii("first"));
+        source.Pages.Add().SetContent(Ascii("last"));
+        var original = source.ToArray();
+        var document = Load(original);
+        document.Pages.Add().SetContent(Ascii("inserted"));
+        document.Pages.Move(2, 1);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var reloaded = Load(updated);
+        Assert.Equal(3, reloaded.Pages.Count);
+        Assert.Equal("first", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
+        Assert.Equal("inserted", Encoding.ASCII.GetString(reloaded.Pages[1].GetContent()!));
+        Assert.Equal("last", Encoding.ASCII.GetString(reloaded.Pages[2].GetContent()!));
+    }
+
+    [Fact]
+    public void ReorderingNestedPageTreeThrowsWithFullSaveDirection()
+    {
+        var document = Load(NestedPageTree());
+        document.Pages.Move(1, 0);
+
+        var exception = Assert.Throws<NotSupportedException>(() => SaveIncremental(document));
+
+        Assert.Contains("nested or shared page tree", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SaveToStream", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LoadedPageBoxesAreAppendedAndReParse()
+    {
+        var original = BaseDocument();
+        var document = Load(original);
+        document.Pages[0].MediaBox = new Rect(10, 20, 300, 400);
+        document.Pages[0].CropBox = new Rect(20, 30, 250, 350);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var page = Load(updated).Pages[0];
+        Assert.Equal(new Rect(10, 20, 300, 400), page.MediaBox);
+        Assert.Equal(new Rect(20, 30, 250, 350), page.CropBox);
+    }
+
+    [Fact]
+    public void SignedRevisionRemainsAnExactPrefixAfterAnnotationEdit()
+    {
+        var signed = PdfSigner.Sign(BaseDocument(), new SignatureOptions { SignerName = "Signer" }, new FixedSigner());
+        var document = Load(signed);
+        document.Pages[0].Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24)) { Contents = "after signing" });
+
+        var updated = SaveIncremental(document);
+
+        AssertVerbatimPrefix(signed, updated);
+        var reader = DocumentReader.Parse(updated);
+        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+        var form = reader.GetDictionary(catalog, "AcroForm")!;
+        var fields = reader.GetArray(form, "Fields")!;
+        var signatureField = reader.AsDictionary(Assert.Single(fields))!;
+        var signature = reader.GetDictionary(signatureField, "V")!;
+        var byteRange = reader.GetArray(signature, "ByteRange")!;
+        var signedTail = Assert.IsType<NumberObject>(byteRange[2]).IntValue
+            + Assert.IsType<NumberObject>(byteRange[3]).IntValue;
+        Assert.Equal(signed.Length, signedTail);
+        var page = DocumentLoadTests.Kid(reader, 0);
+        var annotations = reader.GetArray(page, "Annots")!;
+        Assert.Contains(annotations, value => reader.GetName(reader.AsDictionary(value)!, "Subtype") == "Widget");
+        Assert.Contains(annotations, value => reader.GetName(reader.AsDictionary(value)!, "Subtype") == "Text");
+        Assert.Equal("after signing", Assert.IsType<TextAnnotation>(Assert.Single(Load(updated).Pages[0].Annotations)).Contents);
+    }
+
+    [Fact]
+    public void LoadedContentEditThrowsWithFullSaveDirection()
+    {
+        var document = Load(BaseDocument());
+        document.Pages[0].SetContent(Ascii("replacement"));
+
+        var exception = Assert.Throws<NotSupportedException>(() => SaveIncremental(document));
+
+        Assert.Contains("page content", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("SaveToStream", exception.Message, StringComparison.Ordinal);
     }
 
     // --- Determinism ---

@@ -22,7 +22,7 @@ namespace Radzen.Documents.Pdf.Objects;
 /// only required when a number from the free list is reused, which this writer
 /// never does. Output is deterministic: identical inputs produce identical bytes.
 /// </remarks>
-public sealed class IncrementalUpdateWriter
+public sealed class IncrementalUpdateWriter : IObjectWriter
 {
     private readonly byte[] original;
     private readonly DocumentReader reader;

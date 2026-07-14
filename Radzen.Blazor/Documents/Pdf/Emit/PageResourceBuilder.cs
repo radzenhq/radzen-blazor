@@ -234,7 +234,7 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    public static DictionaryObject? BuildResources(DocumentWriter writer, ContentResourceManifest manifest)
+    public static DictionaryObject? BuildResources(IObjectWriter writer, ContentResourceManifest manifest)
     {
         DictionaryObject? fonts = null;
         foreach (var (baseFont, key) in manifest.Fonts)
