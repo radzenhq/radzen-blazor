@@ -74,6 +74,43 @@ public class ContentEditingTests
         return Document.LoadFromStream(input);
     }
 
+    private static Document LoadedSplitSubsetDocument()
+    {
+        const string streamData = "BT /F0 12 Tf 1 0 0 1 72 700 Tm <00010002> Tj "
+            + "1 0 0 1 87 700 Tm <00030004000500060007> Tj "
+            + "1 0 0 1 120 700 Tm <0008000200080009> Tj ET";
+        const string cmap = "/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n"
+            + "1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n"
+            + "10 beginbfchar\n<0001> <0031>\n<0002> <0030>\n<0003> <004A>\n<0004> <0075>\n"
+            + "<0005> <006C>\n<0006> <0079>\n<0007> <002C>\n<0008> <0032>\n<0009> <0036>\n"
+            + "<000A> <0037>\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n";
+        var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
+        var cmapObject = $"6 0 obj\n<< /Length {cmap.Length} >>\nstream\n{cmap}endstream\nendobj\n";
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+                + "/Resources << /Font << /F0 5 0 R >> >> /Contents 4 0 R >>\nendobj\n")
+            .Object(4, contentObject)
+            .Object(5, "5 0 obj\n<< /Type /Font /Subtype /Type0 /BaseFont /SUBSET /Encoding /Identity-H "
+                + "/DescendantFonts [7 0 R] /ToUnicode 6 0 R >>\nendobj\n")
+            .Object(6, cmapObject)
+            .Object(7, "7 0 obj\n<< /Type /Font /Subtype /CIDFontType2 /BaseFont /SUBSET "
+                + "/CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> "
+                + "/DW 500 >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 8\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= 7; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size 8 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+        using var input = new MemoryStream(pdf.ToArray());
+        return Document.LoadFromStream(input);
+    }
+
     [Fact]
     public void RemoveAt_LoadedPath_RemovesOnlyItsPaintOperators()
     {
@@ -156,6 +193,31 @@ public class ContentEditingTests
         Assert.Contains("x10July,2027yZ", reloaded.ExtractText().Replace(" ", string.Empty, StringComparison.Ordinal));
         Assert.Equal(beforeTrailing, afterTrailing, 6);
         Assert.Equal(beforeFollowing, afterFollowing, 6);
+    }
+
+    [Fact]
+    public void ReplaceText_SyntheticPositioningGapsWithoutSpaceGlyph_ReplacesEachOperatorSegment()
+    {
+        var loaded = LoadedSplitSubsetDocument();
+
+        var count = loaded.ReplaceText("10 July, 2026", "10 July, 2027");
+        var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
+        var text = reloaded.ExtractText();
+
+        Assert.Equal(1, count);
+        Assert.Contains("10 July, 2027", text);
+        Assert.DoesNotContain("10 July, 2026", text);
+    }
+
+    [Fact]
+    public void ReplaceText_SyntheticPositioningGapsWithMismatchedReplacementBoundaries_FailsLoud()
+    {
+        var loaded = LoadedSplitSubsetDocument();
+
+        var exception = Assert.Throws<NotSupportedException>(
+            () => loaded.ReplaceText("10 July, 2026", "10July, 2027"));
+
+        Assert.Contains("one whitespace boundary for each synthetic positioning gap", exception.Message);
     }
 
     [Fact]

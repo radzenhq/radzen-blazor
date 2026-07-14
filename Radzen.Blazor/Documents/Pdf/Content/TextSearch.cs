@@ -150,12 +150,14 @@ public sealed class TextSearchOptions
 /// <summary>Represents one positioned text-search match.</summary>
 public sealed class TextHit
 {
-    internal TextHit(string text, int pageIndex, IReadOnlyList<TextQuadrilateral> quadrilaterals, IReadOnlyList<TextSourceReference> sources)
+    internal TextHit(string text, int pageIndex, IReadOnlyList<TextQuadrilateral> quadrilaterals, IReadOnlyList<TextSourceReference> sources,
+        IReadOnlyList<bool> syntheticGapBoundaries)
     {
         Text = text;
         PageIndex = pageIndex;
         Quadrilaterals = quadrilaterals;
         Sources = sources;
+        SyntheticGapBoundaries = syntheticGapBoundaries;
         Bounds = TextSearch.GetBounds(quadrilaterals);
     }
 
@@ -173,6 +175,8 @@ public sealed class TextHit
 
     /// <summary>Gets the source text-show operator references covered by the match.</summary>
     public IReadOnlyList<TextSourceReference> Sources { get; }
+
+    internal IReadOnlyList<bool> SyntheticGapBoundaries { get; }
 }
 
 internal static class TextSearch
@@ -664,11 +668,14 @@ internal static class TextSearch
 
         var quadrilaterals = new List<TextQuadrilateral>();
         var sources = new List<TextSourceReference>();
+        var syntheticGapBoundaries = new List<bool>();
+        var sawSyntheticWhitespace = false;
         for (var i = 0; i < selected.Count;)
         {
             var character = selected[i];
             if (character.RunIndex < 0)
             {
+                sawSyntheticWhitespace |= char.IsWhiteSpace(original.Text[character.OriginalIndex]);
                 i++;
                 continue;
             }
@@ -682,15 +689,21 @@ internal static class TextSearch
             }
 
             var run = runs[character.RunIndex];
+            if (sources.Count > 0)
+            {
+                syntheticGapBoundaries.Add(sawSyntheticWhitespace);
+            }
+
             quadrilaterals.Add(Quad(run.Matrix, character.CharacterIndex, segmentLength, run.AdvanceOffsets, run.FontSize));
             sources.Add(new TextSourceReference(run.OperatorIndex, character.CharacterIndex, segmentLength));
+            sawSyntheticWhitespace = false;
             i += segmentLength;
         }
 
         var firstOriginal = searchable.Characters[index].OriginalIndex;
         var lastOriginal = searchable.Characters[index + length - 1].OriginalIndex;
         var matchedText = original.Text.Substring(firstOriginal, lastOriginal - firstOriginal + 1);
-        return new TextHit(matchedText, pageIndex, quadrilaterals, sources);
+        return new TextHit(matchedText, pageIndex, quadrilaterals, sources, syntheticGapBoundaries);
     }
 
     private static Matrix Components(List<Token> operands)
