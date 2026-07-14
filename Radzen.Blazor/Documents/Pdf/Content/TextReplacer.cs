@@ -171,10 +171,7 @@ internal static class TextReplacer
 
             var first = GetShow(shows, hit.Sources[0]);
             ValidateTj(first);
-            if (!first.Font.TryEncode(replacement, out _))
-            {
-                throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");
-            }
+            var sourceReplacements = GetSourceReplacements(hit, replacement, first.Font);
 
             var oldAdvance = 0.0;
             for (var i = 0; i < hit.Sources.Count; i++)
@@ -201,11 +198,11 @@ internal static class TextReplacer
                     grouped.Add(source.OperatorIndex, replacements);
                 }
 
-                replacements.Add(new SourceReplacement(source, i == 0 ? replacement : string.Empty));
+                replacements.Add(new SourceReplacement(source, sourceReplacements[i]));
             }
 
             if (options.Layout == TextReplacementLayout.FailIfWider
-                && Advance(first.Font, replacement, first) > oldAdvance + 0.000001)
+                && ReplacementAdvance(shows, hit.Sources, sourceReplacements) > oldAdvance + 0.000001)
             {
                 throw new InvalidOperationException("The replacement text is wider than the matched text.");
             }
@@ -230,6 +227,90 @@ internal static class TextReplacer
 
         page.ApplyEditedContent(result);
         return hits.Count;
+    }
+
+    private static IReadOnlyList<string> GetSourceReplacements(TextHit hit, string replacement, ReverseFont font)
+    {
+        if (font.TryEncode(replacement, out _))
+        {
+            var direct = new string[hit.Sources.Count];
+            direct[0] = replacement;
+            Array.Fill(direct, string.Empty, 1, direct.Length - 1);
+            return direct;
+        }
+
+        if (hit.SyntheticGapBoundaries.Count != hit.Sources.Count - 1)
+        {
+            throw new NotSupportedException("The replacement cannot be aligned to the source text-show operators safely.");
+        }
+
+        foreach (var boundary in hit.SyntheticGapBoundaries)
+        {
+            if (!boundary)
+            {
+                throw new NotSupportedException("The replacement cannot be aligned because every source operator boundary is not a synthetic positioning gap.");
+            }
+        }
+
+        var segments = SplitAtWhitespace(replacement);
+        if (segments.Count != hit.Sources.Count)
+        {
+            throw new NotSupportedException("The replacement must contain one whitespace boundary for each synthetic positioning gap in the matched text.");
+        }
+
+        foreach (var segment in segments)
+        {
+            if (segment.Length == 0)
+            {
+                throw new NotSupportedException("The replacement must contain non-whitespace text on both sides of every synthetic positioning gap.");
+            }
+
+            if (!font.TryEncode(segment, out _))
+            {
+                throw new NotSupportedException("The source font does not contain every glyph required by its replacement segment.");
+            }
+        }
+
+        return segments;
+    }
+
+    private static List<string> SplitAtWhitespace(string replacement)
+    {
+        var segments = new List<string>();
+        var start = 0;
+        for (var i = 0; i < replacement.Length;)
+        {
+            if (!char.IsWhiteSpace(replacement[i]))
+            {
+                i++;
+                continue;
+            }
+
+            segments.Add(replacement[start..i]);
+            do
+            {
+                i++;
+            }
+            while (i < replacement.Length && char.IsWhiteSpace(replacement[i]));
+
+            start = i;
+        }
+
+        segments.Add(replacement[start..]);
+        return segments;
+    }
+
+    private static double ReplacementAdvance(IReadOnlyList<Show> shows, IReadOnlyList<TextSourceReference> sources,
+        IReadOnlyList<string> replacements)
+    {
+        var advance = 0.0;
+        for (var i = 0; i < sources.Count; i++)
+        {
+            var show = GetShow(shows, sources[i]);
+            advance += Advance(show.Font, replacements[i], show);
+        }
+
+        return advance;
     }
 
     private static Edit BuildMultipleShowEdit(byte[] content, Show show, string decoded,
