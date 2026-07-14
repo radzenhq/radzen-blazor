@@ -90,6 +90,12 @@ public sealed class ContentWriter : IDisposable
 
     internal byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
 
+    internal void WriteBytes(ReadOnlySpan<byte> bytes)
+    {
+        bytes.CopyTo(Reserve(bytes.Length));
+        length += bytes.Length;
+    }
+
     internal ContentEmissionResult DetachResult() => new(
         ToArray(),
         new ContentResourceManifest([.. keysByBaseFont], [.. images], [.. patterns], [.. extGStates]),

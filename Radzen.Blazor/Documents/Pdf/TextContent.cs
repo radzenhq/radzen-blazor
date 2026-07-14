@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Fonts;
+using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
@@ -35,6 +36,8 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     // The decoded text as materialized. When the caller has edited Text away from this,
     // SourceBytes no longer describes it and the run is re-encoded through WinAnsi.
     internal string? SourceText { get; set; }
+
+    internal ReverseFont? SourceFont { get; set; }
 
     // The TJ show array a loaded run carried (interleaved string chunks and numeric
     // displacements). Re-emitted verbatim so kerning/inter-word gaps survive a re-encode;
@@ -107,11 +110,31 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
         else
         {
-            writer.WriteString(SourceBytes is not null && Text == SourceText ? SourceBytes : Encode(Text));
+            writer.WriteString(EncodeText());
             writer.WriteRaw(" Tj\n");
         }
 
         writer.WriteRaw("ET\n");
+    }
+
+    private byte[] EncodeText()
+    {
+        if (SourceBytes is not null && Text == SourceText)
+        {
+            return SourceBytes;
+        }
+
+        if (SourceFont is not null)
+        {
+            if (SourceFont.TryEncode(Text, out var encoded))
+            {
+                return encoded;
+            }
+
+            throw new NotSupportedException("The source font does not contain every glyph required by the edited text.");
+        }
+
+        return Encode(Text);
     }
 
     private static void WriteDeviceFill(ContentWriter writer, DeviceColor color)

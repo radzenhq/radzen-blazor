@@ -13,11 +13,16 @@ internal sealed class ReverseFont
 {
     private readonly int bytesPerCode;
     private readonly IReadOnlyDictionary<int, string> map;
+    private readonly IReadOnlyDictionary<int, double>? widths;
+    private readonly double? defaultWidth;
 
-    private ReverseFont(int bytesPerCode, IReadOnlyDictionary<int, string> map)
+    private ReverseFont(int bytesPerCode, IReadOnlyDictionary<int, string> map,
+        IReadOnlyDictionary<int, double>? widths = null, double? defaultWidth = null)
     {
         this.bytesPerCode = bytesPerCode;
         this.map = map;
+        this.widths = widths;
+        this.defaultWidth = defaultWidth;
     }
 
     public static ReverseFont WinAnsi { get; } = new(1, BuildWinAnsiMap());
@@ -34,6 +39,9 @@ internal sealed class ReverseFont
 
         return new ReverseFont(2, map);
     }
+
+    public static ReverseFont FromBase14(string name)
+        => new(1, BuildWinAnsiMap(), BuildBase14Widths(name));
 
     public string Decode(byte[] codes)
     {
@@ -73,11 +81,68 @@ internal sealed class ReverseFont
 
             if (map.TryGetValue(code, out var text))
             {
-                decoded.Add(new DecodedCode(text, bytesPerCode == 1 && code == 32));
+                decoded.Add(new DecodedCode(code, text, bytesPerCode == 1 && code == 32));
             }
         }
 
         return decoded;
+    }
+
+    internal bool TryEncode(string text, out byte[] codes)
+    {
+        var reverse = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var entry in map)
+        {
+            reverse.TryAdd(entry.Value, entry.Key);
+        }
+
+        var result = new List<byte>();
+        for (var offset = 0; offset < text.Length;)
+        {
+            var foundCode = -1;
+            var foundLength = 0;
+            foreach (var entry in reverse)
+            {
+                if (entry.Key.Length > foundLength && text.AsSpan(offset).StartsWith(entry.Key, StringComparison.Ordinal))
+                {
+                    foundCode = entry.Value;
+                    foundLength = entry.Key.Length;
+                }
+            }
+
+            if (foundCode < 0)
+            {
+                codes = [];
+                return false;
+            }
+
+            for (var shift = (bytesPerCode - 1) * 8; shift >= 0; shift -= 8)
+            {
+                result.Add((byte)(foundCode >> shift));
+            }
+
+            offset += foundLength;
+        }
+
+        codes = [.. result];
+        return true;
+    }
+
+    internal bool TryGetWidth(int code, out double width)
+    {
+        if (widths is not null && widths.TryGetValue(code, out width) && double.IsFinite(width) && width >= 0)
+        {
+            return true;
+        }
+
+        if (defaultWidth is { } fallback && double.IsFinite(fallback) && fallback >= 0)
+        {
+            width = fallback;
+            return true;
+        }
+
+        width = 0;
+        return false;
     }
 
     public static ReverseFont Build(DocumentReader reader, DictionaryObject fontDict)
@@ -86,7 +151,8 @@ internal sealed class ReverseFont
         if (string.Equals(subtype, "Type0", StringComparison.Ordinal))
         {
             var (unicode, codeBytes) = ToUnicode(reader, fontDict);
-            return new ReverseFont(codeBytes > 0 ? codeBytes : 2, unicode);
+            var (widths, defaultWidth) = CidWidths(reader, fontDict);
+            return new ReverseFont(codeBytes > 0 ? codeBytes : 2, unicode, widths, defaultWidth);
         }
 
         var simple = new Dictionary<int, string>(256);
@@ -106,7 +172,95 @@ internal sealed class ReverseFont
             simple[entry.Key] = entry.Value;
         }
 
-        return new ReverseFont(1, simple);
+        var simpleWidths = SimpleWidths(reader, fontDict);
+        return new ReverseFont(1, simple, simpleWidths);
+    }
+
+    private static IReadOnlyDictionary<int, double>? SimpleWidths(DocumentReader reader, DictionaryObject fontDict)
+    {
+        if (reader.GetArray(fontDict, "Widths") is { } array)
+        {
+            var first = reader.GetInt(fontDict, "FirstChar") ?? 0;
+            var result = new Dictionary<int, double>(array.Count);
+            for (var i = 0; i < array.Count; i++)
+            {
+                if (reader.Resolve(array[i]) is NumberObject number && number.DoubleValue >= 0)
+                {
+                    result[first + i] = number.DoubleValue;
+                }
+            }
+
+            return result;
+        }
+
+        return Name(fontDict, "BaseFont") is { } baseFont ? BuildBase14Widths(baseFont) : null;
+    }
+
+    private static (IReadOnlyDictionary<int, double>? Widths, double? DefaultWidth) CidWidths(DocumentReader reader, DictionaryObject fontDict)
+    {
+        if (reader.GetArray(fontDict, "DescendantFonts") is not { Count: > 0 } descendants
+            || reader.AsDictionary(descendants[0]) is not { } descendant)
+        {
+            return (null, null);
+        }
+
+        var result = new Dictionary<int, double>();
+        if (reader.GetArray(descendant, "W") is { } widths)
+        {
+            for (var i = 0; i < widths.Count;)
+            {
+                if (reader.Resolve(widths[i++]) is not NumberObject startObject)
+                {
+                    throw new FormatException("A CID font /W array has an invalid starting CID.");
+                }
+
+                var start = startObject.IntValue;
+                var next = i < widths.Count ? reader.Resolve(widths[i++]) : null;
+                if (next is ArrayObject run)
+                {
+                    for (var offset = 0; offset < run.Count; offset++)
+                    {
+                        if (reader.Resolve(run[offset]) is not NumberObject width)
+                        {
+                            throw new FormatException("A CID font /W array contains a non-numeric width.");
+                        }
+
+                        result[start + offset] = width.DoubleValue;
+                    }
+                }
+                else if (next is NumberObject endObject && i < widths.Count
+                    && reader.Resolve(widths[i++]) is NumberObject width)
+                {
+                    for (var cid = start; cid <= endObject.IntValue; cid++)
+                    {
+                        result[cid] = width.DoubleValue;
+                    }
+                }
+                else
+                {
+                    throw new FormatException("A CID font /W array is malformed.");
+                }
+            }
+        }
+
+        return (result, reader.GetNumber(descendant, "DW") ?? 1000.0);
+    }
+
+    private static IReadOnlyDictionary<int, double>? BuildBase14Widths(string name)
+    {
+        var metrics = Base14Metrics.Resolve(new Font { Name = name });
+        if (metrics is null)
+        {
+            return null;
+        }
+
+        var result = new Dictionary<int, double>(256);
+        for (var code = 0; code < 256; code++)
+        {
+            result[code] = metrics.GetWidth((byte)code);
+        }
+
+        return result;
     }
 
     private static void ApplyEncoding(DocumentReader reader, DictionaryObject fontDict, Dictionary<int, string> map)
@@ -170,5 +324,5 @@ internal sealed class ReverseFont
     private static string? Name(DictionaryObject dictionary, string key)
         => dictionary.TryGetValue(key, out var value) && value is NameObject name ? name.Value : null;
 
-    internal readonly record struct DecodedCode(string Text, bool IsWordSpace);
+    internal readonly record struct DecodedCode(int Code, string Text, bool IsWordSpace);
 }

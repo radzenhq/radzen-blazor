@@ -25,7 +25,7 @@ internal static class ContentTokenizer
         Operator,
     }
 
-    internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes);
+    internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes, int Start, int End);
 
     public static List<Token> Tokenize(byte[] data)
     {
@@ -53,38 +53,41 @@ internal static class ContentTokenizer
                     continue;
 
                 case (byte)'[':
-                    tokens.Add(new Token(TokenKind.ArrayStart, 0, null, null));
+                    tokens.Add(new Token(TokenKind.ArrayStart, 0, null, null, position, position + 1));
                     position++;
                     continue;
 
                 case (byte)']':
-                    tokens.Add(new Token(TokenKind.ArrayEnd, 0, null, null));
+                    tokens.Add(new Token(TokenKind.ArrayEnd, 0, null, null, position, position + 1));
                     position++;
                     continue;
 
                 case (byte)'(':
-                    tokens.Add(new Token(TokenKind.String, 0, null, ReadLiteralString(data, ref position)));
+                    var literalStart = position;
+                    tokens.Add(new Token(TokenKind.String, 0, null, ReadLiteralString(data, ref position), literalStart, position));
                     continue;
 
                 case (byte)'/':
-                    tokens.Add(new Token(TokenKind.Name, 0, ReadName(data, ref position), null));
+                    var nameStart = position;
+                    tokens.Add(new Token(TokenKind.Name, 0, ReadName(data, ref position), null, nameStart, position));
                     continue;
 
                 case (byte)'<':
                     if (position + 1 < data.Length && data[position + 1] == '<')
                     {
-                        tokens.Add(new Token(TokenKind.DictStart, 0, null, null));
+                        tokens.Add(new Token(TokenKind.DictStart, 0, null, null, position, position + 2));
                         position += 2;
                         continue;
                     }
 
-                    tokens.Add(new Token(TokenKind.String, 0, null, ReadHexString(data, ref position)));
+                    var hexStart = position;
+                    tokens.Add(new Token(TokenKind.String, 0, null, ReadHexString(data, ref position), hexStart, position));
                     continue;
 
                 case (byte)'>':
                     if (position + 1 < data.Length && data[position + 1] == '>')
                     {
-                        tokens.Add(new Token(TokenKind.DictEnd, 0, null, null));
+                        tokens.Add(new Token(TokenKind.DictEnd, 0, null, null, position, position + 2));
                         position += 2;
                         continue;
                     }
@@ -109,7 +112,7 @@ internal static class ContentTokenizer
                 var text = Latin1(data, start, position - start);
                 if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
                 {
-                    tokens.Add(new Token(TokenKind.Number, value, null, null));
+                    tokens.Add(new Token(TokenKind.Number, value, null, null, start, position));
                     continue;
                 }
             }
@@ -133,7 +136,7 @@ internal static class ContentTokenizer
                 continue;
             }
 
-            tokens.Add(new Token(TokenKind.Operator, 0, keyword, null));
+            tokens.Add(new Token(TokenKind.Operator, 0, keyword, null, keywordStart, position));
         }
 
         return tokens;
