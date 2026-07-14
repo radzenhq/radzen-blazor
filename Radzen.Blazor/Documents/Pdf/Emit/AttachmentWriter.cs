@@ -63,10 +63,11 @@ internal sealed class AttachmentWriter(Document document)
             names.Add(reference);
         }
 
-        catalog["Names"] = new DictionaryObject
-        {
-            ["EmbeddedFiles"] = writer.Add(new DictionaryObject { ["Names"] = names }),
-        };
+        var nameTree = catalog.TryGetValue("Names", out var existing) && existing is DictionaryObject dictionary
+            ? dictionary
+            : new DictionaryObject();
+        nameTree["EmbeddedFiles"] = writer.Add(new DictionaryObject { ["Names"] = names });
+        catalog["Names"] = nameTree;
         catalog["AF"] = af;
     }
 

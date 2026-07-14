@@ -73,6 +73,10 @@ public sealed class Attachment
     /// <summary>Gets the MIME type of the attachment, e.g. <c>text/xml</c>.</summary>
     public string MimeType { get; }
 
+    /// <summary>Returns a copy of the embedded file bytes.</summary>
+    /// <returns>The embedded file bytes.</returns>
+    public byte[] GetBytes() => (byte[])Data.Clone();
+
     /// <summary>
     /// Gets or sets the human-readable description written as the /Desc key of the
     /// file specification. Omitted when null or empty.
@@ -99,8 +103,8 @@ public sealed class Attachment
 }
 
 /// <summary>
-/// The files to embed into the produced PDF. Each attachment is written as an
-/// /EmbeddedFiles name-tree entry and an associated-files (/AF) file specification.
+/// The embedded files in a PDF. Each attachment is written as an /EmbeddedFiles
+/// name-tree entry and an associated-files (/AF) file specification.
 /// </summary>
 public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 {
@@ -135,6 +139,24 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
         items.Add(attachment);
         return attachment;
     }
+
+    /// <summary>Removes an attachment.</summary>
+    /// <param name="attachment">The attachment to remove.</param>
+    /// <returns><c>true</c> when the attachment was removed.</returns>
+    public bool Remove(Attachment attachment)
+    {
+        ArgumentNullException.ThrowIfNull(attachment);
+        return items.Remove(attachment);
+    }
+
+    /// <summary>Removes the attachment at the given index.</summary>
+    /// <param name="index">The zero-based index.</param>
+    public void RemoveAt(int index) => items.RemoveAt(index);
+
+    /// <summary>Removes all attachments.</summary>
+    public void Clear() => items.Clear();
+
+    internal void Add(Attachment attachment) => items.Add(attachment);
 
     /// <summary>Returns an enumerator over the attachments in insertion order.</summary>
     /// <returns>The enumerator.</returns>

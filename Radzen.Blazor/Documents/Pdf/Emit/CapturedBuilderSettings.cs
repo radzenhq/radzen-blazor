@@ -64,8 +64,14 @@ internal sealed class CapturedBuilderSettings
             ViewerPreferences = ViewerPreferences,
         };
         Info.CopyTo(document.Info);
-        document.Attachments.AddRange(Attachments);
-        document.Outline.AddRange(Outline);
+        foreach (var attachment in Attachments)
+        {
+            document.Attachments.Add(attachment);
+        }
+        foreach (var item in Outline)
+        {
+            document.Outline.Add(item);
+        }
         foreach (var label in PageLabels)
         {
             document.PageLabels.Add(label);

@@ -51,6 +51,12 @@ internal sealed class LoadedState
     // override only when the caller actually changed a modeled metadata field.
     public string?[]? LoadedInfoSnapshot { get; set; }
 
+    public IReadOnlyList<OutlineSnapshot>? LoadedOutlineSnapshot { get; set; }
+
+    public bool OutlineRequiresRewrite { get; set; }
+
+    public IReadOnlyList<PageLabelSnapshot>? LoadedPageLabelsSnapshot { get; set; }
+
     // Append-only carry state: created lazily when a fresh (or already-loaded)
     // document receives pages appended from a loaded source.
     public LoadedState()
