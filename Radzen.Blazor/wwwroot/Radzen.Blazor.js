@@ -883,7 +883,7 @@ window.Radzen = {
     }
  },
   createSecurityCode: function (id, ref, el, isNumber) {
-      if (!el || !ref) return;
+      if (!el || !ref) return { dispose: function() {} };
 
       var hidden = el.querySelector('input[type="hidden"]');
 
@@ -1993,7 +1993,7 @@ window.Radzen = {
     }
   },
   createDatePicker(el, popupId, instance, callback) {
-      if(!el) return;
+      if(!el) return { dispose: function() {} };
       var handler = function (e, condition) {
           if (condition) {
               Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, instance, callback, true, false);
@@ -5889,10 +5889,10 @@ Radzen.chatScrollAfterRender = function(selector, delay) {
   }, delay || 100);
 };
 Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCallback, closeCallback) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var input = el.querySelector('input.rz-autocomplete-input, textarea.rz-autocomplete-input');
   var list = el.querySelector('.rz-autocomplete-list');
-  if (!input) return null;
+  if (!input) return { dispose: function() {} };
   function open() {
     var popup = document.getElementById(popupId);
     var wasOpen = popup && popup.style.display == 'block';
@@ -5916,7 +5916,7 @@ Radzen.createAutoComplete = function(el, popupId, openOnFocus, instance, openCal
   }};
 };
 Radzen.createDataGrid = function(el) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   function onClick(e) {
     var label = e.target.closest('.rz-cell-filter-label');
     if (label) { e.preventDefault(); }
@@ -5937,7 +5937,7 @@ Radzen.createDataGrid = function(el) {
   }};
 };
 Radzen.createDropDown = function(el) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   function onMousedown() { Radzen.activeElement = null; }
   function onFilterClick(e) {
     var input = e.target.closest('.rz-multiselect-filter-container input');
@@ -5951,7 +5951,7 @@ Radzen.createDropDown = function(el) {
   }};
 };
 Radzen.createFileInput = function(el) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var choose = el.querySelector('.rz-fileupload-choose');
   var fileInput = el.querySelector('input[type=file]');
   function onKeydown(e) {
@@ -5977,15 +5977,15 @@ Radzen.createFileInput = function(el) {
   }};
 };
 Radzen.createMask = function(el, id, mask, pattern, charPattern) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   function onInput() { Radzen.mask(id, mask, pattern, charPattern); }
   el.addEventListener('input', onInput);
   return { dispose: function() { el.removeEventListener('input', onInput); }};
 };
 Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var input = el.querySelector('.rz-numeric-input');
-  if (!input) return null;
+  if (!input) return { dispose: function() {} };
   function onKeypress(e) { Radzen.numericKeyPress(e, isInteger, separator); }
   function onBlur(e) { Radzen.numericOnInput(e, min, max, isNullable); }
   function onPaste(e) { Radzen.numericOnPaste(e, min, max); }
@@ -6001,23 +6001,23 @@ Radzen.createNumeric = function(el, isInteger, separator, min, max, isNullable) 
   }};
 };
 Radzen.createProfileMenu = function(el) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var toggle = el.querySelector('.rz-navigation-item-wrapper');
-  if (!toggle) return null;
+  if (!toggle) return { dispose: function() {} };
   function onClick() { Radzen.toggleMenuItem(toggle); }
   toggle.addEventListener('click', onClick);
   return { dispose: function() { toggle.removeEventListener('click', onClick); }};
 };
 Radzen.createSplitButton = function(el, popupId) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var btn = el.querySelector('.rz-splitbutton-menubutton');
-  if (!btn) return null;
+  if (!btn) return { dispose: function() {} };
   function onClick() { if (popupId) Radzen.togglePopup(btn.parentNode, popupId); }
   btn.addEventListener('click', onClick);
   return { dispose: function() { btn.removeEventListener('click', onClick); }};
 };
 Radzen.createMenu = function(el, clickToOpen) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   function onClick(e) {
     var item = e.target.closest('.rz-navigation-item-wrapper');
     if (!item || !el.contains(item)) return;
@@ -6051,7 +6051,7 @@ Radzen.createMenu = function(el, clickToOpen) {
   }};
 };
 Radzen.createUpload = function(el, url, auto, multiple, parameterName, method, stream) {
-  if (!el) return null;
+  if (!el) return { dispose: function() {} };
   var choose = el.querySelector('.rz-fileupload-choose');
   var fileInput = el.querySelector('input[type=file]');
   function onKeydown(e) {
@@ -6700,7 +6700,7 @@ Radzen.scrollElementTo = (scrollable, left, top) => {
   scrollable.scrollTo({ top: top, left: Radzen.isRTL(scrollable) ? -left : left });
 };
 Radzen.createFormField = function(el) {
-  if (!el || typeof el.addEventListener !== 'function') return null;
+  if (!el || typeof el.addEventListener !== 'function') return { dispose: function() {} };
   function onFocusIn() { el.classList.add('rz-state-focused'); }
   function onFocusOut() { el.classList.remove('rz-state-focused'); }
   el.addEventListener('focusin', onFocusIn);
@@ -6711,10 +6711,11 @@ Radzen.createFormField = function(el) {
   }};
 };
 Radzen.createSignaturePad = function(element, ref, strokeColor, strokeWidth, disabled, initialValue) {
-  if (!element) return null;
+  var noop = { update: function() {}, clear: function() {}, dispose: function() {} };
+  if (!element) return noop;
 
   var canvas = element.querySelector('canvas');
-  if (!canvas) return null;
+  if (!canvas) return noop;
 
   var ctx = canvas.getContext('2d');
   var drawing = false;
