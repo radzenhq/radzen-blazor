@@ -32,9 +32,11 @@ public sealed class ReplaceTextOptions
 
 internal static class TextReplacer
 {
-    private sealed record Show(int Index, string Operator, Token Text, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
+    private sealed record Show(int Index, string Operator, Token Text, string? FontName, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
 
     private readonly record struct Edit(int Start, int End, byte[] Bytes);
+
+    private readonly record struct SourceReplacement(TextSourceReference Source, string Replacement);
 
     public static int Replace(Page page, string search, string replacement, ReplaceTextOptions? options)
     {
@@ -49,6 +51,17 @@ internal static class TextReplacer
         }
 
         var content = page.RawContent ?? throw new NotSupportedException("Text replacement requires an existing serialized content stream.");
+        var hasMultipleShowMatch = false;
+        foreach (var hit in hits)
+        {
+            hasMultipleShowMatch |= hit.Sources.Count > 1;
+        }
+
+        if (hasMultipleShowMatch)
+        {
+            return ReplaceMultipleShows(page, hits, replacement, options, content);
+        }
+
         var shows = ParseShows(content, page.TextFonts);
         var grouped = new Dictionary<int, List<TextSourceReference>>();
         foreach (var hit in hits)
@@ -145,10 +158,202 @@ internal static class TextReplacer
         return hits.Count;
     }
 
-    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts)
+    private static int ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content)
+    {
+        var shows = ParseShows(content, page.TextFonts, includeEveryShow: true);
+        var grouped = new Dictionary<int, List<SourceReplacement>>();
+        foreach (var hit in hits)
+        {
+            if (hit.Sources.Count == 0)
+            {
+                throw new NotSupportedException("A text match without source glyphs cannot be replaced safely.");
+            }
+
+            var first = GetShow(shows, hit.Sources[0]);
+            ValidateTj(first);
+            if (!first.Font.TryEncode(replacement, out _))
+            {
+                throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");
+            }
+
+            var oldAdvance = 0.0;
+            for (var i = 0; i < hit.Sources.Count; i++)
+            {
+                var source = hit.Sources[i];
+                var show = GetShow(shows, source);
+                ValidateTj(show);
+                if (i > 0 && source.OperatorIndex != hit.Sources[i - 1].OperatorIndex + 1)
+                {
+                    throw new NotSupportedException("A text match must span contiguous text-show operators to be replaced safely.");
+                }
+
+                if (!SameTextState(first, show))
+                {
+                    throw new NotSupportedException("A text match spanning multiple show operators must use the same font and text state.");
+                }
+
+                var decoded = show.Font.Decode(show.Text.Bytes!);
+                ValidateRange(source, decoded);
+                oldAdvance += Advance(show.Font, decoded.Substring(source.CharacterOffset, source.CharacterLength), show);
+                if (!grouped.TryGetValue(source.OperatorIndex, out var replacements))
+                {
+                    replacements = [];
+                    grouped.Add(source.OperatorIndex, replacements);
+                }
+
+                replacements.Add(new SourceReplacement(source, i == 0 ? replacement : string.Empty));
+            }
+
+            if (options.Layout == TextReplacementLayout.FailIfWider
+                && Advance(first.Font, replacement, first) > oldAdvance + 0.000001)
+            {
+                throw new InvalidOperationException("The replacement text is wider than the matched text.");
+            }
+        }
+
+        var edits = new List<Edit>(grouped.Count);
+        foreach (var group in grouped)
+        {
+            var show = shows[group.Key];
+            var decoded = show.Font.Decode(show.Text.Bytes!);
+            group.Value.Sort(static (left, right) => left.Source.CharacterOffset.CompareTo(right.Source.CharacterOffset));
+            ValidateNonOverlapping(group.Value, decoded);
+            edits.Add(BuildMultipleShowEdit(content, show, decoded, group.Value, options.Layout));
+        }
+
+        edits.Sort(static (a, b) => b.Start.CompareTo(a.Start));
+        var result = content;
+        foreach (var edit in edits)
+        {
+            result = Splice(result, edit);
+        }
+
+        page.ApplyEditedContent(result);
+        return hits.Count;
+    }
+
+    private static Edit BuildMultipleShowEdit(byte[] content, Show show, string decoded,
+        IReadOnlyList<SourceReplacement> replacements, TextReplacementLayout layout)
+    {
+        using var writer = new ContentWriter();
+        if (layout != TextReplacementLayout.PreserveAdvance)
+        {
+            var changed = decoded;
+            for (var i = replacements.Count - 1; i >= 0; i--)
+            {
+                var item = replacements[i];
+                changed = changed.Remove(item.Source.CharacterOffset, item.Source.CharacterLength)
+                    .Insert(item.Source.CharacterOffset, item.Replacement);
+            }
+
+            if (!show.Font.TryEncode(changed, out var encoded))
+            {
+                throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");
+            }
+
+            writer.WriteString(encoded);
+            return new Edit(show.Text.Start, show.Text.End, writer.ToArray());
+        }
+
+        var denominator = show.FontSize * show.Scale;
+        if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
+        {
+            throw new NotSupportedException("Replacing text with a zero or non-finite font scale cannot preserve positioning safely.");
+        }
+
+        writer.WriteRaw("[");
+        var offset = 0;
+        foreach (var item in replacements)
+        {
+            var prefix = decoded[offset..item.Source.CharacterOffset] + item.Replacement;
+            if (!show.Font.TryEncode(prefix, out var encoded))
+            {
+                throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");
+            }
+
+            writer.WriteString(encoded);
+            var oldText = decoded.Substring(item.Source.CharacterOffset, item.Source.CharacterLength);
+            var adjustment = (Advance(show.Font, item.Replacement, show) - Advance(show.Font, oldText, show)) / denominator * 1000.0;
+            if (Math.Abs(adjustment) > 0.000001)
+            {
+                writer.WriteRaw(" ");
+                writer.WriteNumber(adjustment);
+                writer.WriteRaw(" ");
+            }
+
+            offset = item.Source.CharacterOffset + item.Source.CharacterLength;
+        }
+
+        if (!show.Font.TryEncode(decoded[offset..], out var trailing))
+        {
+            throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");
+        }
+
+        writer.WriteString(trailing);
+        writer.WriteRaw("] TJ");
+        return new Edit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray());
+    }
+
+    private static Show GetShow(IReadOnlyList<Show> shows, TextSourceReference source)
+    {
+        if (source.OperatorIndex < 0 || source.OperatorIndex >= shows.Count)
+        {
+            throw new InvalidOperationException("The text match source operator is unavailable.");
+        }
+
+        return shows[source.OperatorIndex];
+    }
+
+    private static void ValidateTj(Show show)
+    {
+        if (show.Operator != "Tj")
+        {
+            throw new NotSupportedException($"Replacing text in the '{show.Operator}' show operator is not supported safely.");
+        }
+
+        if (show.Text.Bytes is null)
+        {
+            throw new FormatException("The source text-show operator has no valid string operand.");
+        }
+    }
+
+    private static bool SameTextState(Show first, Show current)
+        => string.Equals(first.FontName, current.FontName, StringComparison.Ordinal)
+        && ReferenceEquals(first.Font, current.Font)
+        && first.FontSize == current.FontSize
+        && first.Scale == current.Scale
+        && first.CharSpacing == current.CharSpacing
+        && first.WordSpacing == current.WordSpacing;
+
+    private static void ValidateRange(TextSourceReference source, string decoded)
+    {
+        if (source.CharacterOffset < 0 || source.CharacterLength < 0
+            || source.CharacterOffset > decoded.Length - source.CharacterLength)
+        {
+            throw new InvalidOperationException("The text match source range is unavailable.");
+        }
+    }
+
+    private static void ValidateNonOverlapping(IReadOnlyList<SourceReplacement> replacements, string decoded)
+    {
+        var nextOffset = 0;
+        foreach (var item in replacements)
+        {
+            ValidateRange(item.Source, decoded);
+            if (item.Source.CharacterOffset < nextOffset)
+            {
+                throw new InvalidOperationException("Overlapping text matches cannot be replaced safely.");
+            }
+
+            nextOffset = item.Source.CharacterOffset + item.Source.CharacterLength;
+        }
+    }
+
+    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, bool includeEveryShow = false)
     {
         var result = new List<Show>();
         var operands = new List<Token>();
+        string? fontName = null;
         var font = ReverseFont.WinAnsi;
         var fontSize = 0.0;
         var scale = 1.0;
@@ -171,6 +376,7 @@ internal static class TextReplacer
             {
                 case "Tf":
                     var name = LastName(operands);
+                    fontName = name;
                     font = name is not null && fonts is not null && fonts.TryGetValue(name, out var resolved) ? resolved : ReverseFont.WinAnsi;
                     fontSize = LastNumber(operands);
                     break;
@@ -183,9 +389,16 @@ internal static class TextReplacer
                     var text = LastString(operands);
                     if (text is not null)
                     {
-                        result.Add(new Show(result.Count, token.Text, text.Value, font, fontSize, scale, charSpacing, wordSpacing));
+                        result.Add(new Show(result.Count, token.Text, text.Value, fontName, font, fontSize, scale, charSpacing, wordSpacing));
+                    }
+                    else if (includeEveryShow)
+                    {
+                        result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, scale, charSpacing, wordSpacing));
                     }
 
+                    break;
+                case "TJ" when includeEveryShow:
+                    result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, scale, charSpacing, wordSpacing));
                     break;
             }
 

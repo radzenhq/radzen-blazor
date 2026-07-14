@@ -216,6 +216,7 @@ public sealed class Page
         => TextSearch.Find(content, textFonts, text, options, -1);
 
     /// <summary>Replaces every matching text occurrence using the source font encoding.</summary>
+    /// <remarks>Matches may span contiguous <c>Tj</c> operators with the same font and text state. Unsupported show operators or incompatible text states cause an exception.</remarks>
     /// <param name="search">The non-empty text to find.</param>
     /// <param name="replacement">The replacement text.</param>
     /// <param name="options">The matching and layout options, or <c>null</c> for defaults.</param>
