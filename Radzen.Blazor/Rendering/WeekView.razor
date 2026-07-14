@@ -19,6 +19,30 @@
         </div>
     }
     </div>
+    @if (ShowAllDay)
+    {
+        <div class="rz-view-header rz-resource-all-day">
+            @if (ShowHours)
+            {
+                <div class="rz-slot-hour-header rz-resource-all-day-label">@AllDayText</div>
+            }
+            @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
+            {
+                var loopDay = day;
+                <div class="rz-slot-header rz-resource-all-day-slot"
+                     @onclick=@(args => OnAllDaySlotClick(loopDay)) @ondragover:preventDefault @ondrop=@(args => OnDrop(loopDay, Resources)) dropzone="move">
+                    <div class="rz-events">
+                        @foreach (var appointment in AllDayAppointments(loopDay))
+                        {
+                            <div class="rz-resource-all-day-event" @onclick:stopPropagation>
+                                <Appointment Data=@appointment Click=@OnAppointmentSelect DragStart=@OnAppointmentDragStart />
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
     <div class="rz-view-content">
         @if (ShowHours)
         {
@@ -30,8 +54,9 @@
         {
             var start = day.Add(StartTime);
             var end = day.Add(EndTime);
+            var loopDay = day;
             <div class="rz-slots @(day == CurrentDate ? " rz-state-focused" : "")">
-                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment"AppointmentDragStart=@OnAppointmentDragStart/>
+                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@GridAppointments(loopDay) CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart/>
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
@@ -83,8 +108,60 @@
     [Parameter]
     public bool ShowHours { get; set; } = true;
 
+    [Parameter]
+    public bool ShowAllDay { get; set; }
+
+    [Parameter]
+    public string? AllDayText { get; set; }
+
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
+
+    bool IsAllDay(AppointmentData appointment, DateTime day)
+    {
+        return appointment.AllDay || (appointment.Start <= day.Add(StartTime) && appointment.End >= day.Add(EndTime));
+    }
+
+    AppointmentData[] AllDayAppointments(DateTime day)
+    {
+        if (Appointments == null || Scheduler == null)
+        {
+            return Array.Empty<AppointmentData>();
+        }
+
+        return Appointments.Where(item => IsAllDay(item, day) && Scheduler.IsAppointmentInRange(item, day, day.AddDays(1))).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+    }
+
+    IList<AppointmentData> GridAppointments(DateTime day)
+    {
+        if (Appointments == null)
+        {
+            return Array.Empty<AppointmentData>();
+        }
+
+        if (!ShowAllDay)
+        {
+            return Appointments;
+        }
+
+        return Appointments.Where(item => !IsAllDay(item, day)).ToList();
+    }
+
+    async Task OnAllDaySlotClick(DateTime day)
+    {
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectSlot(day, day.AddDays(1), AllDayAppointments(day), Resources);
+        }
+    }
+
+    async Task OnAppointmentSelect(AppointmentData data)
+    {
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectAppointment(data);
+        }
+    }
 
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
     {

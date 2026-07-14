@@ -169,6 +169,15 @@ namespace Radzen.Blazor
         [Parameter]
         public string? TextProperty { get; set; }
 
+        /// <summary>
+        /// Specifies the property of <typeparamref name="TItem" /> which will set <see cref="AppointmentData.AllDay" />.
+        /// Views with an all-day row display such appointments in it instead of the time grid. When not set an appointment is
+        /// considered all-day when it spans the entire visible day.
+        /// </summary>
+        /// <value>The name of the property. Must be a <c>bool</c> property.</value>
+        [Parameter]
+        public string? AllDayProperty { get; set; }
+
 
         /// <summary>
         /// Specifies whether to Show or Hide the Scheduler Header. Defaults to true />.
@@ -633,6 +642,7 @@ namespace Radzen.Blazor
         Func<TItem, DateTime>? startGetter;
         Func<TItem, DateTime>? endGetter;
         Func<TItem, string>? textGetter;
+        Func<TItem, bool>? allDayGetter;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -669,6 +679,12 @@ namespace Radzen.Blazor
             if (parameters.DidParameterChange(nameof(TextProperty), TextProperty))
             {
                 textGetter = PropertyAccess.Getter<TItem, string>(parameters.GetValueOrDefault<string>(nameof(TextProperty))!);
+            }
+
+            if (parameters.DidParameterChange(nameof(AllDayProperty), AllDayProperty))
+            {
+                var allDayProperty = parameters.GetValueOrDefault<string>(nameof(AllDayProperty));
+                allDayGetter = string.IsNullOrEmpty(allDayProperty) ? null : PropertyAccess.Getter<TItem, bool>(allDayProperty);
             }
 
             await base.SetParametersAsync(parameters);
@@ -722,7 +738,7 @@ namespace Radzen.Blazor
                                     new FilterDescriptor { Property = StartProperty, FilterValue = end, FilterOperator = FilterOperator.LessThanOrEquals }
                                 ], LogicalFilterOperator.And, FilterCaseSensitivity.Default)
                                .ToList()
-                               .Select(item => new AppointmentData { Start = startGetter!(item), End = endGetter!(item), Text = textGetter!(item), Data = item });
+                               .Select(item => new AppointmentData { Start = startGetter!(item), End = endGetter!(item), Text = textGetter!(item), AllDay = allDayGetter?.Invoke(item) ?? false, Data = item });
 
             return appointments;
         }
