@@ -294,6 +294,37 @@ public sealed class PathContent : ContentElement
         _ => "n",
     };
 
+    internal TextBounds? GetBounds()
+    {
+        var hasPoint = false;
+        var left = 0.0;
+        var right = 0.0;
+        var bottom = 0.0;
+        var top = 0.0;
+        foreach (var segment in segments)
+        {
+            for (var i = 0; i + 1 < segment.Operands.Length; i += 2)
+            {
+                var point = Transform.Transform(segment.Operands[i], segment.Operands[i + 1]);
+                if (!hasPoint)
+                {
+                    left = right = point.X;
+                    bottom = top = point.Y;
+                    hasPoint = true;
+                }
+                else
+                {
+                    left = Math.Min(left, point.X);
+                    right = Math.Max(right, point.X);
+                    bottom = Math.Min(bottom, point.Y);
+                    top = Math.Max(top, point.Y);
+                }
+            }
+        }
+
+        return hasPoint ? new TextBounds(left, bottom, right, top) : null;
+    }
+
     private static void EmitDeviceColor(ContentWriter writer, DeviceColor color, bool stroke)
     {
         if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)

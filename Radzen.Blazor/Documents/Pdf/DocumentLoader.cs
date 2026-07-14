@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Emit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -184,6 +185,11 @@ internal static class DocumentLoader
         }
 
         page.SetTextFonts(BuildTextFonts(reader, resources));
+        if (resources is not null)
+        {
+            page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(reader, resources));
+        }
+
         document.Pages.Insert(document.Pages.Count, page);
         state.SourcePages[page] = node;
         if (resources is not null)

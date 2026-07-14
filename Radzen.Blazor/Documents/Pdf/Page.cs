@@ -24,6 +24,9 @@ public sealed class Page
     private Rect mediaBox;
     private Rect? cropBox;
     private IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
+    private IReadOnlyList<ContentEditor.SourceElement>? sourceElements;
+    private ContentResourceManifest editedResources = ContentResourceManifest.Empty;
+    private IReadOnlyCollection<string>? reservedResourceNames;
 
     internal Page(Unit width, Unit height)
     {
@@ -212,6 +215,28 @@ public sealed class Page
     public IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options = null)
         => TextSearch.Find(content, textFonts, text, options, -1);
 
+    /// <summary>Replaces every matching text occurrence using the source font encoding.</summary>
+    /// <param name="search">The non-empty text to find.</param>
+    /// <param name="replacement">The replacement text.</param>
+    /// <param name="options">The matching and layout options, or <c>null</c> for defaults.</param>
+    /// <returns>The number of replacements.</returns>
+    public int ReplaceText(string search, string replacement, ReplaceTextOptions? options = null)
+        => TextReplacer.Replace(this, search, replacement, options);
+
+    /// <summary>Irreversibly removes page content intersecting the specified regions.</summary>
+    /// <param name="areas">The redaction regions in PDF user-space coordinates.</param>
+    /// <param name="options">The redaction appearance options, or <c>null</c> for no fill.</param>
+    public void Redact(IEnumerable<Rect> areas, RedactionOptions? options = null)
+        => Redactor.Redact(this, areas, options);
+
+    /// <summary>Finds text and irreversibly redacts the bounds of every match.</summary>
+    /// <param name="text">The non-empty text to redact.</param>
+    /// <param name="searchOptions">The text matching options, or <c>null</c> for defaults.</param>
+    /// <param name="redactionOptions">The redaction appearance options, or <c>null</c> for no fill.</param>
+    /// <returns>The number of redacted matches.</returns>
+    public int RedactText(string text, TextSearchOptions? searchOptions = null, RedactionOptions? redactionOptions = null)
+        => Redactor.RedactText(this, text, searchOptions, redactionOptions);
+
     internal IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options, int pageIndex)
         => TextSearch.Find(content, textFonts, text, options, pageIndex);
 
@@ -224,6 +249,55 @@ public sealed class Page
     // can carry them onto a copied page (a Type0/Identity-H stream is not reversible without them).
     internal IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
 
+    internal byte[]? RawContent => content;
+
+    internal void SetReservedResourceNames(IReadOnlyCollection<string> names) => reservedResourceNames = names;
+
+    internal void ApplyPendingContentEdits()
+    {
+        if (!materialized)
+        {
+            return;
+        }
+
+        if (content is null || sourceElements is null)
+        {
+            throw new NotSupportedException("Content collection edits cannot be composed with raw content editing because the page has no safely mapped serialized content stream.");
+        }
+
+        var reserved = new HashSet<string>(reservedResourceNames ?? []);
+        AddResourceNames(reserved, editedResources);
+        var emission = ContentEditor.Reemit(content, elements, sourceElements,
+            SafePrefix("F", reserved), SafePrefix("Im", reserved), SafePrefix("GS", reserved));
+        if (emission.Resources.Patterns.Count > 0)
+        {
+            throw new NotSupportedException("Inserted gradient content cannot be composed with raw content editing because pattern resource names cannot be allocated safely.");
+        }
+
+        editedResources = ContentResourceManifest.Combine(editedResources, emission.Resources);
+        if (emission.Resources.Fonts.Count > 0)
+        {
+            var fonts = textFonts is null
+                ? new Dictionary<string, Fonts.ReverseFont>(StringComparer.Ordinal)
+                : new Dictionary<string, Fonts.ReverseFont>(textFonts, StringComparer.Ordinal);
+            foreach (var font in emission.Resources.Fonts)
+            {
+                fonts[font.Value] = Fonts.ReverseFont.FromBase14(font.Key);
+            }
+
+            textFonts = fonts;
+        }
+
+        content = emission.Bytes ?? throw new InvalidOperationException("Content re-emission did not produce a serialized stream.");
+        ResetMaterialization();
+    }
+
+    internal void ApplyEditedContent(byte[] value)
+    {
+        content = value;
+        ResetMaterialization();
+    }
+
     // Resolves the content-stream bytes to write. An untouched loaded page reuses its
     // retained raw bytes. A loaded page whose original elements are intact but that
     // gained new elements keeps its raw bytes untouched and returns the additions as a
@@ -231,9 +305,16 @@ public sealed class Page
     // re-encodes from elements; the emitters carry the resources each stream needs.
     internal ContentEmissionResult BuildContent(IReadOnlyCollection<string>? reservedNames = null)
     {
+        if (!editedResources.IsEmpty)
+        {
+            var combinedNames = new HashSet<string>(reservedNames ?? []);
+            AddResourceNames(combinedNames, editedResources);
+            reservedNames = combinedNames;
+        }
+
         if (elements.Count == 0)
         {
-            return new ContentEmissionResult(content, ContentResourceManifest.Empty);
+            return new ContentEmissionResult(content, editedResources);
         }
 
         if (content is not null && snapshot is not null && elements.Count >= materializedCount
@@ -241,7 +322,7 @@ public sealed class Page
         {
             if (elements.Count == materializedCount)
             {
-                return new ContentEmissionResult(content, ContentResourceManifest.Empty);
+                return new ContentEmissionResult(content, editedResources);
             }
 
             using var appended = new ContentWriter(
@@ -253,7 +334,18 @@ public sealed class Page
                 elements[i].Emit(appended);
             }
 
-            return new ContentEmissionResult(content, ContentResourceManifest.Empty, appended.DetachResult());
+            var overlay = appended.DetachResult();
+            return new ContentEmissionResult(content,
+                ContentResourceManifest.Combine(editedResources, overlay.Resources),
+                new ContentEmissionResult(overlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
+        }
+
+        if (content is not null && sourceElements is not null)
+        {
+            var emission = ContentEditor.Reemit(content, elements, sourceElements,
+                SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames), SafePrefix("GS", reservedNames));
+            return new ContentEmissionResult(emission.Bytes,
+                ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
 
         // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
@@ -267,7 +359,9 @@ public sealed class Page
             element.Emit(writer);
         }
 
-        return writer.DetachResult();
+        var authored = writer.DetachResult();
+        return new ContentEmissionResult(authored.Bytes,
+            ContentResourceManifest.Combine(editedResources, authored.Resources), isEmitted: true);
     }
 
     private bool OriginalElementsIntact()
@@ -314,6 +408,7 @@ public sealed class Page
 
         ContentInterpreter.Materialize(content, elements, textFonts);
         materializedCount = elements.Count;
+        sourceElements = ContentEditor.Map(content, elements);
 
         using var writer = new ContentWriter();
         foreach (var element in elements)
@@ -322,6 +417,15 @@ public sealed class Page
         }
 
         snapshot = writer.ToArray();
+    }
+
+    private void ResetMaterialization()
+    {
+        elements.Clear();
+        materialized = false;
+        materializedCount = 0;
+        snapshot = null;
+        sourceElements = null;
     }
 
     // Emitter keys are prefix+index; a prefix that no reserved name begins with can never
@@ -353,6 +457,29 @@ public sealed class Page
         }
 
         return false;
+    }
+
+    private static void AddResourceNames(HashSet<string> names, ContentResourceManifest resources)
+    {
+        foreach (var item in resources.Fonts)
+        {
+            names.Add(item.Value);
+        }
+
+        foreach (var item in resources.Images)
+        {
+            names.Add(item.Key);
+        }
+
+        foreach (var item in resources.ExtGStates)
+        {
+            names.Add(item.Key);
+        }
+
+        foreach (var item in resources.Patterns)
+        {
+            names.Add(item.Key);
+        }
     }
 
     private static bool Same(byte[] a, byte[] b)

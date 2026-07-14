@@ -21,6 +21,15 @@ internal sealed class ContentResourceManifest(
     public IReadOnlyList<KeyValuePair<string, double>> ExtGStates { get; } = extGStates;
 
     public bool IsEmpty => Fonts.Count == 0 && Images.Count == 0 && Patterns.Count == 0 && ExtGStates.Count == 0;
+
+    public static ContentResourceManifest Combine(ContentResourceManifest first, ContentResourceManifest second)
+        => first.IsEmpty ? second
+            : second.IsEmpty ? first
+            : new ContentResourceManifest(
+                [.. first.Fonts, .. second.Fonts],
+                [.. first.Images, .. second.Images],
+                [.. first.Patterns, .. second.Patterns],
+                [.. first.ExtGStates, .. second.ExtGStates]);
 }
 
 internal sealed class ContentEmissionResult(

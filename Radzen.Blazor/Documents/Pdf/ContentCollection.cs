@@ -35,8 +35,36 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
         return element;
     }
 
+    /// <summary>Inserts an element at the specified paint-order index.</summary>
+    /// <typeparam name="T">The concrete element type.</typeparam>
+    /// <param name="index">The zero-based insertion index.</param>
+    /// <param name="element">The element to insert.</param>
+    /// <returns>The same <paramref name="element"/> instance.</returns>
+    public T Insert<T>(int index, T element)
+        where T : ContentElement
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        items.Insert(index, element);
+        return element;
+    }
+
+    /// <summary>Removes the first occurrence of an element.</summary>
+    /// <param name="element">The element to remove.</param>
+    /// <returns><see langword="true"/> when the element was removed.</returns>
+    public bool Remove(ContentElement element)
+    {
+        ArgumentNullException.ThrowIfNull(element);
+        return items.Remove(element);
+    }
+
+    /// <summary>Removes the element at the specified paint-order index.</summary>
+    /// <param name="index">The zero-based element index.</param>
+    public void RemoveAt(int index) => items.RemoveAt(index);
+
     /// <inheritdoc />
     public IEnumerator<ContentElement> GetEnumerator() => items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    internal void Clear() => items.Clear();
 }

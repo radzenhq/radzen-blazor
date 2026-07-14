@@ -88,13 +88,18 @@ public readonly struct TextSourceReference(int operatorIndex, int characterOffse
 /// <summary>Represents decoded text and geometry from one text-show operator.</summary>
 public sealed class PositionedTextRun
 {
-    internal PositionedTextRun(string text, int operatorIndex, TextQuadrilateral quadrilateral, double[] advanceOffsets, double fontSize, Matrix matrix)
+    internal PositionedTextRun(string text, int operatorIndex, TextQuadrilateral quadrilateral, double[] advanceOffsets,
+        ReverseFont font, double fontSize, double scale, double charSpacing, double wordSpacing, Matrix matrix)
     {
         Text = text;
         OperatorIndex = operatorIndex;
         Quadrilateral = quadrilateral;
         AdvanceOffsets = advanceOffsets;
+        Font = font;
         FontSize = fontSize;
+        Scale = scale;
+        CharSpacing = charSpacing;
+        WordSpacing = wordSpacing;
         Matrix = matrix;
     }
 
@@ -114,9 +119,19 @@ public sealed class PositionedTextRun
 
     internal double[] AdvanceOffsets { get; }
 
+    internal ReverseFont Font { get; }
+
     internal double FontSize { get; }
 
+    internal double Scale { get; }
+
+    internal double CharSpacing { get; }
+
+    internal double WordSpacing { get; }
+
     internal Matrix Matrix { get; }
+
+    internal TextQuadrilateral CharacterQuadrilateral(int index) => TextSearch.Quad(Matrix, index, 1, AdvanceOffsets, FontSize);
 }
 
 /// <summary>Specifies text-search matching behavior.</summary>
@@ -412,10 +427,11 @@ internal static class TextSearch
             return Matrix.Identity;
         }
 
+        var reverse = font ?? ReverseFont.WinAnsi;
         var builder = new StringBuilder();
         var advanceOffsets = new List<double> { 0.0 };
-        AppendText(builder, advanceOffsets, font ?? ReverseFont.WinAnsi, bytes, fontSize, scale, charSpacing, wordSpacing);
-        AddRun(runs, builder.ToString(), textMatrix, ctm, fontSize, rise, advanceOffsets, operatorIndex);
+        AppendText(builder, advanceOffsets, reverse, bytes, fontSize, scale, charSpacing, wordSpacing);
+        AddRun(runs, builder.ToString(), textMatrix, ctm, reverse, fontSize, scale, charSpacing, wordSpacing, rise, advanceOffsets, operatorIndex);
         return Matrix.Translate(advanceOffsets[^1], 0);
     }
 
@@ -445,7 +461,7 @@ internal static class TextSearch
             }
         }
 
-        AddRun(runs, builder.ToString(), textMatrix, ctm, fontSize, rise, advanceOffsets, operatorIndex);
+        AddRun(runs, builder.ToString(), textMatrix, ctm, reverse, fontSize, scale, charSpacing, wordSpacing, rise, advanceOffsets, operatorIndex);
         return Matrix.Translate(advanceOffsets[^1], 0);
     }
 
@@ -454,10 +470,14 @@ internal static class TextSearch
         var advance = advanceOffsets[^1];
         foreach (var code in font.DecodeCodes(bytes))
         {
+            var glyphAdvance = (font.TryGetWidth(code.Code, out var width) ? width / 1000.0 : AverageGlyphEm) * fontSize + charSpacing;
             for (var i = 0; i < code.Text.Length; i++)
             {
                 builder.Append(code.Text[i]);
-                advance += (AverageGlyphEm * fontSize + charSpacing) * scale;
+                if (i == code.Text.Length - 1)
+                {
+                    advance += glyphAdvance * scale;
+                }
                 if (code.IsWordSpace && i == code.Text.Length - 1)
                 {
                     advance += wordSpacing * scale;
@@ -468,7 +488,8 @@ internal static class TextSearch
         }
     }
 
-    private static void AddRun(List<PositionedTextRun> runs, string text, Matrix textMatrix, Matrix ctm, double fontSize, double rise, List<double> advanceOffsets, int operatorIndex)
+    private static void AddRun(List<PositionedTextRun> runs, string text, Matrix textMatrix, Matrix ctm, ReverseFont font,
+        double fontSize, double scale, double charSpacing, double wordSpacing, double rise, List<double> advanceOffsets, int operatorIndex)
     {
         if (text.Length == 0)
         {
@@ -482,10 +503,11 @@ internal static class TextSearch
 
         var offsets = advanceOffsets.ToArray();
         var matrix = Matrix.Translate(0, rise) * textMatrix * ctm;
-        runs.Add(new PositionedTextRun(text, operatorIndex, Quad(matrix, 0, text.Length, offsets, fontSize), offsets, fontSize, matrix));
+        runs.Add(new PositionedTextRun(text, operatorIndex, Quad(matrix, 0, text.Length, offsets, fontSize), offsets,
+            font, fontSize, scale, charSpacing, wordSpacing, matrix));
     }
 
-    private static TextQuadrilateral Quad(Matrix matrix, int offset, int length, IReadOnlyList<double> advanceOffsets, double fontSize)
+    internal static TextQuadrilateral Quad(Matrix matrix, int offset, int length, IReadOnlyList<double> advanceOffsets, double fontSize)
     {
         var start = advanceOffsets[offset];
         var end = advanceOffsets[offset + length];

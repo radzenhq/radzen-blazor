@@ -46,7 +46,7 @@ internal static class ContentInterpreter
                         }
                     }
 
-                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer]));
+                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], token.Start, tokens[i].End));
                     continue;
                 case TokenKind.DictStart:
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.DictEnd; i++)
@@ -499,6 +499,7 @@ internal static class ContentInterpreter
             FontResourceName = text.FontName,
             SourceBytes = bytes,
             SourceText = decoded,
+            SourceFont = text.Font,
             // Only carry the TJ array when it holds a numeric adjustment; a plain string
             // (Tj or a single-element TJ) re-emits through the simpler Tj path unchanged.
             SourceAdjustments = HasAdjustment(tjSegments) ? tjSegments : null,

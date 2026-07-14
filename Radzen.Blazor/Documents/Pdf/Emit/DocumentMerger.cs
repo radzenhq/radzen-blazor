@@ -58,6 +58,7 @@ internal static class DocumentMerger
         {
             target.EnsureLoaded().RecordAppendedResources(page, reader, loadedResources);
             page.SetTextFonts(DocumentLoader.BuildTextFonts(reader, loadedResources));
+            page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(reader, loadedResources));
         }
 
         // Carry each appended page's source node (for its /Annots and any widget

@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Radzen.Documents.Pdf.Emit;
@@ -224,6 +225,55 @@ public sealed class Document
         }
 
         return hits;
+    }
+
+    /// <summary>Replaces matching text on every page using each source font encoding.</summary>
+    /// <param name="search">The non-empty text to find.</param>
+    /// <param name="replacement">The replacement text.</param>
+    /// <param name="options">The matching and layout options, or <c>null</c> for defaults.</param>
+    /// <returns>The total number of replacements.</returns>
+    public int ReplaceText(string search, string replacement, ReplaceTextOptions? options = null)
+    {
+        var count = 0;
+        foreach (var page in Pages)
+        {
+            count += page.ReplaceText(search, replacement, options);
+        }
+
+        return count;
+    }
+
+    /// <summary>Irreversibly removes content intersecting page-specific redaction regions.</summary>
+    /// <param name="areas">The redaction regions with their zero-based page indexes.</param>
+    /// <param name="options">The redaction appearance options, or <c>null</c> for no fill.</param>
+    public void Redact(IEnumerable<PageRedaction> areas, RedactionOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(areas);
+        foreach (var group in areas.GroupBy(static area => area.PageIndex))
+        {
+            if (group.Key < 0 || group.Key >= Pages.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(areas), group.Key, "A redaction page index is outside the document.");
+            }
+
+            Pages[group.Key].Redact(group.Select(static area => area.Area), options);
+        }
+    }
+
+    /// <summary>Finds text throughout the document and irreversibly redacts every match.</summary>
+    /// <param name="text">The non-empty text to redact.</param>
+    /// <param name="searchOptions">The text matching options, or <c>null</c> for defaults.</param>
+    /// <param name="redactionOptions">The redaction appearance options, or <c>null</c> for no fill.</param>
+    /// <returns>The number of redacted matches.</returns>
+    public int RedactText(string text, TextSearchOptions? searchOptions = null, RedactionOptions? redactionOptions = null)
+    {
+        var count = 0;
+        foreach (var page in Pages)
+        {
+            count += page.RedactText(text, searchOptions, redactionOptions);
+        }
+
+        return count;
     }
 
     /// <summary>
