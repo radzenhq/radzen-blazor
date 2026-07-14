@@ -18,6 +18,7 @@ public sealed class ContentWriter : IDisposable
 {
     private readonly string fontKeyPrefix;
     private readonly string imageKeyPrefix;
+    private readonly string extGStateKeyPrefix;
     private byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
     private int length;
     private bool returned;
@@ -25,12 +26,14 @@ public sealed class ContentWriter : IDisposable
     private readonly List<KeyValuePair<string, ImageXObject>> images = [];
     private readonly List<KeyValuePair<string, DictionaryObject>> patterns = [];
     private readonly List<GradientBrush> patternBrushes = [];
+    private readonly List<KeyValuePair<string, double>> extGStates = [];
 
     // The key prefixes keep overlay streams from colliding with generated resources.
-    internal ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im")
+    internal ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
     {
         this.fontKeyPrefix = fontKeyPrefix;
         this.imageKeyPrefix = imageKeyPrefix;
+        this.extGStateKeyPrefix = extGStateKeyPrefix;
     }
 
     internal IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
@@ -38,6 +41,29 @@ public sealed class ContentWriter : IDisposable
     internal IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
 
     internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
+
+    internal string RegisterOpacity(double opacity)
+    {
+        var value = Math.Clamp(opacity, 0, 1);
+        foreach (var state in extGStates)
+        {
+            if (state.Value == value)
+            {
+                return state.Key;
+            }
+        }
+
+        var key = extGStateKeyPrefix + extGStates.Count.ToString(CultureInfo.InvariantCulture);
+        extGStates.Add(new KeyValuePair<string, double>(key, value));
+        return key;
+    }
+
+    internal string RegisterImage(ImageXObject image)
+    {
+        var key = imageKeyPrefix + images.Count.ToString(CultureInfo.InvariantCulture);
+        images.Add(new KeyValuePair<string, ImageXObject>(key, image));
+        return key;
+    }
 
     /// <summary>
     /// Registers a shading pattern for <paramref name="gradient"/> and returns its <c>/Pattern</c>
@@ -66,7 +92,7 @@ public sealed class ContentWriter : IDisposable
 
     internal ContentEmissionResult DetachResult() => new(
         ToArray(),
-        new ContentResourceManifest([.. keysByBaseFont], [.. images], [.. patterns]),
+        new ContentResourceManifest([.. keysByBaseFont], [.. images], [.. patterns], [.. extGStates]),
         isEmitted: true);
 
     /// <summary>
@@ -77,10 +103,7 @@ public sealed class ContentWriter : IDisposable
     /// <returns>The resource name the image is painted by.</returns>
     public string RegisterImage(byte[] encodedImage)
     {
-        var decoded = ImageDecoder.Decode(encodedImage);
-        var key = imageKeyPrefix + images.Count.ToString(CultureInfo.InvariantCulture);
-        images.Add(new KeyValuePair<string, ImageXObject>(key, decoded));
-        return key;
+        return RegisterImage(ImageDecoder.Decode(encodedImage));
     }
 
     /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>

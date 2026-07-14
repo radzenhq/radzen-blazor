@@ -262,7 +262,14 @@ internal static class PageResourceBuilder
             patterns[key] = writer.Add(pattern);
         }
 
-        if (fonts is null && xobjects is null && patterns is null)
+        DictionaryObject? extGStates = null;
+        foreach (var (key, opacity) in manifest.ExtGStates)
+        {
+            extGStates ??= new DictionaryObject();
+            extGStates[key] = ExtGStateDictionary(opacity, opacity);
+        }
+
+        if (fonts is null && xobjects is null && patterns is null && extGStates is null)
         {
             return null;
         }
@@ -281,6 +288,11 @@ internal static class PageResourceBuilder
         if (patterns is not null)
         {
             resources["Pattern"] = patterns;
+        }
+
+        if (extGStates is not null)
+        {
+            resources["ExtGState"] = extGStates;
         }
 
         return resources;
@@ -342,6 +354,7 @@ internal static class PageResourceBuilder
         var names = new HashSet<string>(StringComparer.Ordinal);
         CollectResourceKeys(reader, resources, "Font", names);
         CollectResourceKeys(reader, resources, "XObject", names);
+        CollectResourceKeys(reader, resources, "ExtGState", names);
         return names;
     }
 
@@ -358,6 +371,11 @@ internal static class PageResourceBuilder
 
     public static ArrayObject MediaBox(Document document, Page page)
     {
+        if (page.MediaBoxSet)
+        {
+            return NumberBox(page.MediaBox);
+        }
+
         // Re-emit a loaded page's original box so a non-zero origin round-trips;
         // content coordinates are preserved verbatim and would otherwise shift.
         if (document.Loaded is { } loaded && loaded.SourceBoxes.TryGetValue(page, out var box))
@@ -380,5 +398,13 @@ internal static class PageResourceBuilder
         new NumberObject(DocumentLoader.Number(box[1])),
         new NumberObject(DocumentLoader.Number(box[2])),
         new NumberObject(DocumentLoader.Number(box[3])),
+    ];
+
+    public static ArrayObject NumberBox(Rect box) =>
+    [
+        new NumberObject(box.X),
+        new NumberObject(box.Y),
+        new NumberObject(box.X + box.Width),
+        new NumberObject(box.Y + box.Height),
     ];
 }

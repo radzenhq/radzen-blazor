@@ -15,6 +15,12 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
+    /// <summary>Initializes an empty PDF document.</summary>
+    public Document()
+    {
+        Pages = new PageCollection(this);
+    }
+
     // The document's load/merge/incremental state, encapsulated in one owned object.
     // Null for a freshly built document that carries no loaded or appended source
     // pages; set by DocumentLoader (fully loaded) or lazily by Append (carry only).
@@ -45,7 +51,7 @@ public sealed class Document
     public DocumentInfo Info { get; } = new();
 
     /// <summary>Gets the ordered collection of pages.</summary>
-    public PageCollection Pages { get; } = [];
+    public PageCollection Pages { get; }
 
     /// <summary>
     /// Gets the interactive form of a loaded document, or <c>null</c> when the
@@ -194,6 +200,74 @@ public sealed class Document
         ArgumentNullException.ThrowIfNull(other);
 
         DocumentMerger.Append(this, other);
+    }
+
+    /// <summary>Imports a deep copy of one page from another document.</summary>
+    /// <param name="source">The source document.</param>
+    /// <param name="pageIndex">The zero-based source page index.</param>
+    /// <returns>The imported page.</returns>
+    public Page ImportPage(Document source, int pageIndex)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var imported = ImportPages(source, new Range(pageIndex, pageIndex + 1));
+        return imported[0];
+    }
+
+    /// <summary>Imports deep copies of a selected range of pages from another document.</summary>
+    /// <param name="source">The source document.</param>
+    /// <param name="range">The source page range.</param>
+    /// <returns>The imported pages in source order.</returns>
+    public IReadOnlyList<Page> ImportPages(Document source, Range range)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        var snapshot = PageOperations.Snapshot(source);
+        var (offset, length) = range.GetOffsetAndLength(snapshot.Pages.Count);
+        return PageOperations.Import(this, snapshot, offset, length);
+    }
+
+    /// <summary>Creates a new document containing deep copies of all pages from the supplied documents.</summary>
+    /// <param name="documents">The documents to merge in order.</param>
+    /// <returns>A new merged document.</returns>
+    public static Document Merge(params Document[] documents)
+    {
+        ArgumentNullException.ThrowIfNull(documents);
+        var result = new Document();
+        foreach (var document in documents)
+        {
+            ArgumentNullException.ThrowIfNull(document);
+            result.ImportPages(document, ..);
+        }
+
+        return result;
+    }
+
+    /// <summary>Adds a centered watermark overlay to every current page.</summary>
+    /// <param name="watermark">The watermark options.</param>
+    public void AddWatermark(Watermark watermark)
+    {
+        ArgumentNullException.ThrowIfNull(watermark);
+        if (!double.IsFinite(watermark.Opacity) || watermark.Opacity < 0 || watermark.Opacity > 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(watermark), watermark.Opacity, "Watermark opacity must be between 0 and 1.");
+        }
+
+        if (!double.IsFinite(watermark.Rotation))
+        {
+            throw new ArgumentOutOfRangeException(nameof(watermark), watermark.Rotation, "Watermark rotation must be finite.");
+        }
+
+        foreach (var page in Pages)
+        {
+            page.Content.Add(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox));
+        }
+    }
+
+    /// <summary>Adds centered watermark text to every current page.</summary>
+    /// <param name="text">The watermark text.</param>
+    public void AddWatermark(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        AddWatermark(new Watermark { Text = text });
     }
 
     /// <summary>

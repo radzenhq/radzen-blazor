@@ -7,9 +7,10 @@ namespace Radzen.Documents.Pdf.Content;
 internal sealed class ContentResourceManifest(
     IReadOnlyList<KeyValuePair<string, string>> fonts,
     IReadOnlyList<KeyValuePair<string, ImageXObject>> images,
-    IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns)
+    IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns,
+    IReadOnlyList<KeyValuePair<string, double>> extGStates)
 {
-    public static ContentResourceManifest Empty { get; } = new([], [], []);
+    public static ContentResourceManifest Empty { get; } = new([], [], [], []);
 
     public IReadOnlyList<KeyValuePair<string, string>> Fonts { get; } = fonts;
 
@@ -17,7 +18,9 @@ internal sealed class ContentResourceManifest(
 
     public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns { get; } = patterns;
 
-    public bool IsEmpty => Fonts.Count == 0 && Images.Count == 0 && Patterns.Count == 0;
+    public IReadOnlyList<KeyValuePair<string, double>> ExtGStates { get; } = extGStates;
+
+    public bool IsEmpty => Fonts.Count == 0 && Images.Count == 0 && Patterns.Count == 0 && ExtGStates.Count == 0;
 }
 
 internal sealed class ContentEmissionResult(
