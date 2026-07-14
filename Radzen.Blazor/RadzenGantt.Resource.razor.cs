@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -608,6 +609,7 @@ namespace Radzen.Blazor
 
         private Type? resourceElementType;
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
         private Type GetResourceElementType()
         {
             if (resourceElementType != null)
@@ -631,6 +633,8 @@ namespace Radzen.Blazor
             return resourceElementType;
         }
 
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2060, Justification = TrimMessages.DataTypePreserved)]
+        [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2075, Justification = TrimMessages.DataTypePreserved)]
         internal async Task OnResourceGridLoadData(LoadDataArgs args)
         {
             InitResourceGetters();
