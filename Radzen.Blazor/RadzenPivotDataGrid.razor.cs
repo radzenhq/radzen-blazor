@@ -734,6 +734,7 @@ namespace Radzen.Blazor
         /// Keeps the most significant groups when their number exceeds the configured limit and collects the items of the remaining groups.
         /// Groups are ranked by the sorted aggregate or the first aggregate; the kept groups preserve their current order.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
         private List<GroupResult> ApplyMaxGroups(IEnumerable<GroupResult> groups, int? maxGroups, out List<TItem>? othersItems)
         {
             othersItems = null;

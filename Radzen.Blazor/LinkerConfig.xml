@@ -45,6 +45,7 @@
     <type fullname="Radzen.Blazor.RadzenHtmlEditorLink/LinkAttributes" preserve="all" />
     <!-- Preserve all types with [JSInvokable] methods (called from JS, invisible to trimmer) -->
     <type fullname="Radzen.DialogService" preserve="methods" />
+    <type fullname="Radzen.Blazor.RadzenAutoComplete" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenCarousel" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenChart" preserve="methods" />
     <type fullname="Radzen.Blazor.RadzenChartTooltip" preserve="methods" />
