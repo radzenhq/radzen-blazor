@@ -185,6 +185,32 @@ public sealed class Page
     /// <returns>The page text, or an empty string when the page has no text.</returns>
     public string ExtractText() => TextExtractor.Extract(content, textFonts);
 
+    /// <summary>
+    /// Extracts decoded text-show runs in reading order with transformed em-box
+    /// geometry and source operator ordinals.
+    /// </summary>
+    /// <remarks>
+    /// Geometry is an estimated em box because PDF content streams do not always
+    /// expose glyph outlines or shaping clusters. Form XObject text is not included.
+    /// </remarks>
+    /// <returns>The positioned text-show runs, or an empty list when the page has no text.</returns>
+    public IReadOnlyList<PositionedTextRun> ExtractPositionedText() => TextSearch.Extract(content, textFonts);
+
+    /// <summary>Finds text in this page across adjacent text-show operators.</summary>
+    /// <remarks>
+    /// Hits use a page index of -1 when this method is called directly. Use
+    /// <see cref="Document.FindText(string, TextSearchOptions?)"/> to obtain document page indexes.
+    /// Form XObject text and complex shaping or ligature cluster mapping are not included.
+    /// </remarks>
+    /// <param name="text">The non-empty text to find.</param>
+    /// <param name="options">The matching options, or <c>null</c> for defaults.</param>
+    /// <returns>The matches in reading order.</returns>
+    public IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options = null)
+        => TextSearch.Find(content, textFonts, text, options, -1);
+
+    internal IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options, int pageIndex)
+        => TextSearch.Find(content, textFonts, text, options, pageIndex);
+
     internal void SetTextFonts(IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
     {
         textFonts = fonts;

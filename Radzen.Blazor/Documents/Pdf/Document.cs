@@ -189,6 +189,31 @@ public sealed class Document
         return builder.ToString();
     }
 
+    /// <summary>Finds text across all pages and reports each match's page index.</summary>
+    /// <remarks>
+    /// Matches may span adjacent text-show operators within one page but never span
+    /// pages. Form XObject text and complex shaping or ligature cluster mapping are not included.
+    /// </remarks>
+    /// <param name="text">The non-empty text to find.</param>
+    /// <param name="options">The matching options, or <c>null</c> for defaults.</param>
+    /// <returns>The matches in page and reading order.</returns>
+    public IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        if (text.Length == 0)
+        {
+            throw new ArgumentException("Search text cannot be empty.", nameof(text));
+        }
+
+        var hits = new List<TextHit>();
+        for (var pageIndex = 0; pageIndex < Pages.Count; pageIndex++)
+        {
+            hits.AddRange(Pages[pageIndex].FindText(text, options, pageIndex));
+        }
+
+        return hits;
+    }
+
     /// <summary>
     /// Appends a deep copy of every page in <paramref name="other"/> to this
     /// document. Each appended page keeps its own content stream (no resource

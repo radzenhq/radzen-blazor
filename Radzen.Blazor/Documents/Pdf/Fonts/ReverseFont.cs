@@ -55,6 +55,31 @@ internal sealed class ReverseFont
         return builder.ToString();
     }
 
+    internal IReadOnlyList<DecodedCode> DecodeCodes(byte[] codes)
+    {
+        if (codes.Length % bytesPerCode != 0)
+        {
+            throw new FormatException("The text string ends with an incomplete character code.");
+        }
+
+        var decoded = new List<DecodedCode>(codes.Length / bytesPerCode);
+        for (var i = 0; i < codes.Length; i += bytesPerCode)
+        {
+            var code = 0;
+            for (var j = 0; j < bytesPerCode; j++)
+            {
+                code = (code << 8) | codes[i + j];
+            }
+
+            if (map.TryGetValue(code, out var text))
+            {
+                decoded.Add(new DecodedCode(text, bytesPerCode == 1 && code == 32));
+            }
+        }
+
+        return decoded;
+    }
+
     public static ReverseFont Build(DocumentReader reader, DictionaryObject fontDict)
     {
         var subtype = Name(fontDict, "Subtype");
@@ -144,4 +169,6 @@ internal sealed class ReverseFont
 
     private static string? Name(DictionaryObject dictionary, string key)
         => dictionary.TryGetValue(key, out var value) && value is NameObject name ? name.Value : null;
+
+    internal readonly record struct DecodedCode(string Text, bool IsWordSpace);
 }
