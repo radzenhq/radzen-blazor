@@ -105,6 +105,18 @@ public sealed class Document
     /// </summary>
     public IList<PageLabel> PageLabels { get; } = [];
 
+    /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
+    public IList<OutlineItem> Outline { get; } = [];
+
+    /// <summary>Gets the files embedded in the document.</summary>
+    public AttachmentCollection Attachments { get; } = [];
+
+    /// <summary>
+    /// Gets the document XMP metadata. Caller-set XMP takes precedence over automatic
+    /// non-conformance metadata. Editing XMP on PDF/A or PDF/UA output is rejected.
+    /// </summary>
+    public DocumentXmpMetadata Xmp { get; } = new();
+
     // Logical structure tree of a generated document (Tagged PDF). Set by the
     // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
@@ -129,16 +141,16 @@ public sealed class Document
     // content, so the conformance writer fails loud rather than claim conformance.
     internal bool HasUntaggedListContent { get; set; }
 
-    // Files embedded on save (EmbeddedFiles name tree + /AF associated files).
-    internal List<Attachment> Attachments { get; } = [];
-
-    // Outline (bookmark) tree copied from DocumentBuilder.Outline; emitted on
-    // save as the catalog /Outlines tree.
-    internal List<OutlineItem> Outline { get; } = [];
-
     // Named destinations recorded at emit time (Run.Anchor); emitted on save as
     // the catalog /Names /Dests name tree.
     internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
+
+    internal bool OutlineChanged => Loaded?.OutlineRequiresRewrite == true
+        || Loaded?.LoadedOutlineSnapshot is not { } snapshot
+        || !OutlineSnapshot.Matches(snapshot, Outline);
+
+    internal bool PageLabelsChanged => Loaded?.LoadedPageLabelsSnapshot is not { } snapshot
+        || !PageLabelSnapshot.Matches(snapshot, PageLabels);
 
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and

@@ -20,6 +20,12 @@ internal sealed class DocumentSaver
 
     internal void Save(Stream stream)
     {
+        if (doc.Xmp.IsModified && (doc.Conformance != PdfAConformance.None || doc.PdfUA))
+        {
+            throw new InvalidOperationException(
+                "Caller-edited XMP cannot be combined with PDF/A or PDF/UA output because conformance metadata has mandatory values. Clear the XMP edits or disable conformance.");
+        }
+
         if (doc.Conformance != PdfAConformance.None || doc.PdfUA)
         {
             new ConformanceWriter(doc).ValidateConformance();
@@ -228,7 +234,7 @@ internal sealed class DocumentSaver
             new NavigationWriter(doc).WriteDestinations(writer, catalog, pageNodes);
         }
 
-        if (doc.Outline.Count > 0)
+        if (doc.OutlineChanged && doc.Outline.Count > 0)
         {
             catalog["Outlines"] = new NavigationWriter(doc).WriteOutline(writer, pageNodes);
         }
@@ -238,7 +244,7 @@ internal sealed class DocumentSaver
             WriteViewerPreferences(catalog, preferences);
         }
 
-        if (doc.PageLabels.Count > 0)
+        if (doc.PageLabelsChanged && doc.PageLabels.Count > 0)
         {
             catalog["PageLabels"] = PageLabelsWriter.Build([.. doc.PageLabels]);
         }
@@ -246,6 +252,13 @@ internal sealed class DocumentSaver
         if (doc.Conformance != PdfAConformance.None || doc.PdfUA)
         {
             new ConformanceWriter(doc).WriteConformance(writer, catalog);
+        }
+        else if (doc.Xmp.IsModified)
+        {
+            if (doc.Xmp.HasPacket)
+            {
+                catalog["Metadata"] = writer.Add(XmpMetadata.WrapPacket(doc.Xmp.Packet));
+            }
         }
         else if (doc.Info.Producer is not null || doc.Info.CreationDate is not null || doc.Info.ModificationDate is not null)
         {

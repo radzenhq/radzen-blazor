@@ -52,7 +52,7 @@ internal sealed class NavigationWriter(Document document)
     // descendants (they add nothing to ancestors) and is written with a negative /Count.
     private int WriteOutlineLevel(
         DocumentWriter writer,
-        IReadOnlyList<OutlineItem> items,
+        IList<OutlineItem> items,
         DictionaryObject parent,
         ReferenceObject parentRef,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
@@ -64,8 +64,11 @@ internal sealed class NavigationWriter(Document document)
             {
                 ["Title"] = new StringObject(item.Title),
                 ["Parent"] = parentRef,
-                ["Dest"] = OutlineDestination(item.Target, pageNodes),
             };
+            if (item.Target is { } target)
+            {
+                node["Dest"] = OutlineDestination(target, pageNodes);
+            }
 
             if (item.Color is { } color)
             {

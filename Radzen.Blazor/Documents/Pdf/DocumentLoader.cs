@@ -53,6 +53,9 @@ internal static class DocumentLoader
         }
 
         ReadAttachments(reader, catalog, document, limits);
+        ReadOutline(reader, catalog, document, state, limits);
+        ReadPageLabels(reader, catalog, document, state, limits);
+        ReadXmp(reader, catalog, document);
 
         return document;
     }
@@ -485,5 +488,322 @@ internal static class DocumentLoader
         }
 
         return Encoding.BigEndianUnicode.GetString(bytes);
+    }
+
+    private static void ReadOutline(DocumentReader reader, DictionaryObject catalog, Document document, LoadedState state, ReaderLimits limits)
+    {
+        if (reader.GetDictionary(catalog, "Outlines") is { } root
+            && root.TryGetValue("First", out var first))
+        {
+            var pageIndexes = new Dictionary<DictionaryObject, int>();
+            for (var i = 0; i < document.Pages.Count; i++)
+            {
+                pageIndexes[state.SourcePages[document.Pages[i]]] = i;
+            }
+
+            var destinations = ReadNamedDestinations(reader, catalog, limits);
+            var requiresRewrite = false;
+            ReadOutlineLevel(reader, first!, document.Outline, pageIndexes, destinations, [], limits, 0, ref requiresRewrite);
+            state.OutlineRequiresRewrite = requiresRewrite;
+        }
+
+        state.LoadedOutlineSnapshot = OutlineSnapshot.Capture(document.Outline);
+    }
+
+    private static void ReadOutlineLevel(
+        DocumentReader reader,
+        DocumentObject first,
+        IList<OutlineItem> target,
+        Dictionary<DictionaryObject, int> pageIndexes,
+        Dictionary<string, DocumentObject> destinations,
+        HashSet<DictionaryObject> visited,
+        ReaderLimits limits,
+        int depth,
+        ref bool requiresRewrite)
+    {
+        if (depth > limits.MaxPageTreeDepth)
+        {
+            throw new DocumentParseException("Maximum outline depth exceeded.", -1);
+        }
+
+        DocumentObject? current = first;
+        while (current is not null)
+        {
+            if (reader.Resolve(current) is not DictionaryObject node)
+            {
+                throw new DocumentParseException("An outline item is not a dictionary.", -1);
+            }
+
+            if (!visited.Add(node))
+            {
+                throw new DocumentParseException("Cyclic outline item reference.", -1);
+            }
+
+            var title = Text(reader, node, "Title")
+                ?? throw new DocumentParseException("An outline item is missing its /Title string.", -1);
+            var item = new OutlineItem(title, ReadOutlineTarget(reader, node, pageIndexes, destinations, out var namedDestination));
+            requiresRewrite |= namedDestination;
+            if (reader.GetArray(node, "C") is { Count: >= 3 } color)
+            {
+                item.Color = Color.FromRgb(ColorChannel(reader, color[0]), ColorChannel(reader, color[1]), ColorChannel(reader, color[2]));
+            }
+
+            var flags = reader.GetInt(node, "F") ?? 0;
+            item.Italic = (flags & 1) != 0;
+            item.Bold = (flags & 2) != 0;
+            item.Collapsed = (reader.GetInt(node, "Count") ?? 0) < 0;
+            if (node.TryGetValue("First", out var child))
+            {
+                ReadOutlineLevel(reader, child!, item.Children, pageIndexes, destinations, visited, limits, depth + 1, ref requiresRewrite);
+            }
+
+            target.Add(item);
+            current = node.TryGetValue("Next", out var next) ? next : null;
+        }
+    }
+
+    private static byte ColorChannel(DocumentReader reader, DocumentObject value)
+    {
+        var number = reader.AsNumber(value)
+            ?? throw new DocumentParseException("An outline /C entry contains a non-number.", -1);
+        if (number < 0 || number > 1)
+        {
+            throw new DocumentParseException("An outline /C component is outside the 0 to 1 range.", -1);
+        }
+
+        return (byte)Math.Round(number * 255, MidpointRounding.AwayFromZero);
+    }
+
+    private static OutlineTarget? ReadOutlineTarget(
+        DocumentReader reader,
+        DictionaryObject node,
+        Dictionary<DictionaryObject, int> pageIndexes,
+        Dictionary<string, DocumentObject> destinations,
+        out bool namedDestination)
+    {
+        namedDestination = false;
+        DocumentObject destination;
+        if (node.TryGetValue("Dest", out var direct))
+        {
+            destination = direct!;
+        }
+        else if (reader.GetDictionary(node, "A") is { } action
+            && reader.GetName(action, "S") == "GoTo"
+            && action.TryGetValue("D", out var actionDestination))
+        {
+            destination = actionDestination!;
+        }
+        else
+        {
+            return null;
+        }
+
+        var resolved = reader.Resolve(destination);
+        if (resolved is StringObject text)
+        {
+            var target = ResolveNamedOutlineTarget(reader, text.Value, destinations, pageIndexes);
+            namedDestination = target is not null;
+            return target;
+        }
+
+        if (resolved is NameObject name)
+        {
+            var target = ResolveNamedOutlineTarget(reader, name.Value, destinations, pageIndexes);
+            namedDestination = target is not null;
+            return target;
+        }
+
+        return ExplicitOutlineTarget(reader, resolved, pageIndexes);
+    }
+
+    private static OutlineTarget? ResolveNamedOutlineTarget(
+        DocumentReader reader,
+        string name,
+        Dictionary<string, DocumentObject> destinations,
+        Dictionary<DictionaryObject, int> pageIndexes)
+    {
+        if (!destinations.TryGetValue(name, out var destination))
+        {
+            return null;
+        }
+
+        var resolved = reader.Resolve(destination);
+        if (resolved is DictionaryObject dictionary && dictionary.TryGetValue("D", out var nested))
+        {
+            resolved = reader.Resolve(nested!);
+        }
+
+        return ExplicitOutlineTarget(reader, resolved, pageIndexes);
+    }
+
+    private static OutlineTarget? ExplicitOutlineTarget(
+        DocumentReader reader,
+        DocumentObject destination,
+        Dictionary<DictionaryObject, int> pageIndexes)
+    {
+        if (destination is not ArrayObject array || array.Count < 2
+            || reader.Resolve(array[0]) is not DictionaryObject page
+            || !pageIndexes.TryGetValue(page, out var pageIndex)
+            || reader.AsName(array[1]) is not { } fit)
+        {
+            return null;
+        }
+
+        // A null or absent coordinate is legal and common (e.g. /XYZ null null 0 means
+        // "retain the current value"); treat it as 0 rather than failing the whole load.
+        double Argument(int index)
+            => index < array.Count && reader.AsNumber(array[index]) is { } number ? number : 0;
+
+        return fit switch
+        {
+            "Fit" => OutlineTarget.ToPageFit(pageIndex),
+            "FitH" => OutlineTarget.ToPageFitHorizontal(pageIndex, Argument(2)),
+            "FitR" => OutlineTarget.ToPageRectangle(pageIndex, Argument(2), Argument(3), Argument(4), Argument(5)),
+            "XYZ" => OutlineTarget.ToPageXYZ(pageIndex, Argument(2), Argument(3), Argument(4)),
+            _ => null,
+        };
+    }
+
+    private static Dictionary<string, DocumentObject> ReadNamedDestinations(DocumentReader reader, DictionaryObject catalog, ReaderLimits limits)
+    {
+        var result = new Dictionary<string, DocumentObject>(StringComparer.Ordinal);
+        if (reader.GetDictionary(catalog, "Dests") is { } legacy)
+        {
+            foreach (var key in legacy.Keys)
+            {
+                result[key] = legacy[key];
+            }
+        }
+
+        if (reader.GetDictionary(catalog, "Names") is { } names
+            && reader.GetDictionary(names, "Dests") is { } tree)
+        {
+            ReadNameTree(reader, tree, result, [], limits, 0);
+        }
+
+        return result;
+    }
+
+    private static void ReadNameTree(
+        DocumentReader reader,
+        DictionaryObject node,
+        Dictionary<string, DocumentObject> target,
+        HashSet<DictionaryObject> visited,
+        ReaderLimits limits,
+        int depth)
+    {
+        if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
+        {
+            throw new DocumentParseException("Cyclic or excessively deep destination name tree.", -1);
+        }
+
+        if (reader.GetArray(node, "Kids") is { } kids)
+        {
+            foreach (var kid in kids)
+            {
+                if (reader.AsDictionary(kid) is not { } child)
+                {
+                    throw new DocumentParseException("A destination name-tree child is not a dictionary.", -1);
+                }
+
+                ReadNameTree(reader, child, target, visited, limits, depth + 1);
+            }
+        }
+
+        if (reader.GetArray(node, "Names") is { } pairs)
+        {
+            if (pairs.Count % 2 != 0)
+            {
+                throw new DocumentParseException("A destination name tree has an odd /Names array.", -1);
+            }
+
+            for (var i = 0; i < pairs.Count; i += 2)
+            {
+                var key = reader.AsString(pairs[i])
+                    ?? throw new DocumentParseException("A destination name-tree key is not a string.", -1);
+                target[key] = pairs[i + 1];
+            }
+        }
+    }
+
+    private static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, Document document, LoadedState state, ReaderLimits limits)
+    {
+        if (reader.GetDictionary(catalog, "PageLabels") is { } tree)
+        {
+            ReadPageLabelTree(reader, tree, document.PageLabels, [], limits, 0);
+        }
+
+        state.LoadedPageLabelsSnapshot = PageLabelSnapshot.Capture(document.PageLabels);
+    }
+
+    private static void ReadPageLabelTree(
+        DocumentReader reader,
+        DictionaryObject node,
+        IList<PageLabel> target,
+        HashSet<DictionaryObject> visited,
+        ReaderLimits limits,
+        int depth)
+    {
+        if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
+        {
+            throw new DocumentParseException("Cyclic or excessively deep page-label number tree.", -1);
+        }
+
+        if (reader.GetArray(node, "Kids") is { } kids)
+        {
+            foreach (var kid in kids)
+            {
+                if (reader.AsDictionary(kid) is not { } child)
+                {
+                    throw new DocumentParseException("A page-label number-tree child is not a dictionary.", -1);
+                }
+
+                ReadPageLabelTree(reader, child, target, visited, limits, depth + 1);
+            }
+        }
+
+        if (reader.GetArray(node, "Nums") is not { } pairs)
+        {
+            return;
+        }
+
+        if (pairs.Count % 2 != 0)
+        {
+            throw new DocumentParseException("A page-label number tree has an odd /Nums array.", -1);
+        }
+
+        for (var i = 0; i < pairs.Count; i += 2)
+        {
+            var startPage = reader.AsInt(pairs[i])
+                ?? throw new DocumentParseException("A page-label range key is not an integer.", -1);
+            var dictionary = reader.AsDictionary(pairs[i + 1])
+                ?? throw new DocumentParseException("A page-label range value is not a dictionary.", -1);
+            var label = new PageLabel(startPage)
+            {
+                Style = ReadPageLabelStyle(reader.GetName(dictionary, "S")),
+                Prefix = Text(reader, dictionary, "P"),
+                Start = reader.GetInt(dictionary, "St") ?? 1,
+            };
+            target.Add(label);
+        }
+    }
+
+    private static PageLabelStyle? ReadPageLabelStyle(string? style) => style switch
+    {
+        null => null,
+        "D" => PageLabelStyle.Decimal,
+        "R" => PageLabelStyle.UppercaseRoman,
+        "r" => PageLabelStyle.LowercaseRoman,
+        "A" => PageLabelStyle.UppercaseLetters,
+        "a" => PageLabelStyle.LowercaseLetters,
+        _ => throw new DocumentParseException($"Page-label style /{style} is not supported.", -1),
+    };
+
+    private static void ReadXmp(DocumentReader reader, DictionaryObject catalog, Document document)
+    {
+        if (reader.GetStream(catalog, "Metadata") is { } metadata)
+        {
+            document.Xmp.LoadPacket(reader.DecodeStream(metadata));
+        }
     }
 }

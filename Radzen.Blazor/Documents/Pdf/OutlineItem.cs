@@ -6,17 +6,18 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// An entry in the document outline (bookmark) tree shown in the viewer's
-/// navigation panel. Add root entries to <see cref="DocumentBuilder.Outline"/>.
+/// navigation panel. Add or edit root entries through <see cref="Document.Outline"/>
+/// or <see cref="DocumentBuilder.Outline"/>.
 /// </summary>
 /// <param name="title">The title shown in the bookmark panel.</param>
-/// <param name="target">The location the entry navigates to.</param>
-public sealed class OutlineItem(string title, OutlineTarget target)
+/// <param name="target">The location the entry navigates to, or <c>null</c> for a non-navigating entry.</param>
+public sealed class OutlineItem(string title, OutlineTarget? target)
 {
     /// <summary>Gets or sets the title shown in the bookmark panel.</summary>
     public string Title { get; set; } = title;
 
-    /// <summary>Gets or sets the location the entry navigates to.</summary>
-    public OutlineTarget Target { get; set; } = target;
+    /// <summary>Gets or sets the location the entry navigates to, or <c>null</c> when unavailable.</summary>
+    public OutlineTarget? Target { get; set; } = target;
 
     /// <summary>Gets the child entries nested under this one.</summary>
     public IList<OutlineItem> Children { get; } = [];
