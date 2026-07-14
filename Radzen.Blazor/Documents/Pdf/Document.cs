@@ -308,13 +308,20 @@ public sealed class Document
     }
 
     /// <summary>
-    /// Flattens the interactive form into static page content: each field's
-    /// current value renders onto its page, and the fields, their widget
-    /// annotations and the catalog <c>/AcroForm</c> are removed. Applies both
-    /// to a loaded form (<see cref="AcroForm"/>) and to pending
-    /// <see cref="FormFields"/> definitions.
+    /// Flattens interactive forms and modeled annotations into static page
+    /// content. Field widgets, modeled annotations and the catalog
+    /// <c>/AcroForm</c> are removed; unsupported loaded annotations are retained.
     /// </summary>
-    public void Flatten() => new FormWriter(this).Flatten();
+    public void Flatten()
+    {
+        new FormWriter(this).Flatten();
+        foreach (var page in Pages)
+        {
+            page.Annotations.RemoveLoadedSubtype("Widget");
+        }
+
+        AnnotationFlattener.Flatten(this);
+    }
 
     /// <summary>
     /// Serializes the document to a byte array.

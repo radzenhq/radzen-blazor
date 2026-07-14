@@ -1,0 +1,253 @@
+using Radzen.Documents.Pdf.Objects;
+using System;
+using System.Collections.Generic;
+
+namespace Radzen.Documents.Pdf;
+
+internal static class AnnotationReader
+{
+    public static void Read(
+        Page page,
+        DocumentReader reader,
+        DictionaryObject pageDictionary,
+        IReadOnlyList<Page> pages,
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+    {
+        if (reader.GetArray(pageDictionary, "Annots") is not { } annotations)
+        {
+            return;
+        }
+
+        foreach (var original in annotations)
+        {
+            if (reader.AsDictionary(original) is not { } dictionary)
+            {
+                page.Annotations.Load(null, reader, original, null);
+                continue;
+            }
+
+            page.Annotations.Load(Create(reader, dictionary, pages, pageDictionaries), reader, original, dictionary);
+        }
+    }
+
+    private static Annotation? Create(
+        DocumentReader reader,
+        DictionaryObject dictionary,
+        IReadOnlyList<Page> pages,
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+    {
+        var subtype = reader.GetName(dictionary, "Subtype");
+        if (subtype is not ("Text" or "Highlight" or "Underline" or "StrikeOut" or "Squiggly"
+            or "Link" or "Stamp" or "Ink" or "FreeText" or "Square" or "Circle"))
+        {
+            return null;
+        }
+
+        var bounds = Bounds(reader, reader.GetArray(dictionary, "Rect"));
+        Annotation? annotation = subtype switch
+        {
+            "Text" => new TextAnnotation(bounds)
+            {
+                Open = reader.GetBool(dictionary, "Open") ?? false,
+                Icon = reader.GetName(dictionary, "Name") ?? "Note",
+            },
+            "Highlight" => Markup(new HighlightAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
+            "Underline" => Markup(new UnderlineAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
+            "StrikeOut" => Markup(new StrikeOutAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
+            "Squiggly" => Markup(new SquigglyAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
+            "Link" => ReadLink(new LinkAnnotation(bounds), reader, dictionary, pages, pageDictionaries),
+            "Stamp" => new StampAnnotation(bounds) { Name = reader.GetName(dictionary, "Name") ?? "Draft" },
+            "Ink" => ReadInk(new InkAnnotation(bounds), reader, dictionary),
+            "FreeText" => new FreeTextAnnotation(bounds),
+            "Square" => ReadShape(new SquareAnnotation(bounds), reader, dictionary),
+            "Circle" => ReadShape(new CircleAnnotation(bounds), reader, dictionary),
+            _ => null,
+        };
+
+        if (annotation is not null)
+        {
+            annotation.Color = ReadColor(reader, reader.GetArray(dictionary, "C")) ?? annotation.Color;
+            annotation.Opacity = reader.GetNumber(dictionary, "CA") ?? 1;
+            annotation.Flags = (AnnotationFlags)(reader.GetInt(dictionary, "F") ?? 0);
+            annotation.Contents = Text(reader.GetString(dictionary, "Contents"));
+            annotation.Title = Text(reader.GetString(dictionary, "T"));
+        }
+
+        return annotation;
+    }
+
+    private static T Markup<T>(T annotation, DocumentReader reader, ArrayObject? quadPoints) where T : MarkupAnnotation
+    {
+        if (quadPoints is null || quadPoints.Count == 0)
+        {
+            return annotation;
+        }
+
+        if (quadPoints.Count % 8 != 0)
+        {
+            throw new DocumentParseException("An annotation /QuadPoints array must contain groups of eight numbers.", -1);
+        }
+
+        annotation.Areas.Clear();
+        for (var i = 0; i < quadPoints.Count; i += 8)
+        {
+            var minX = double.PositiveInfinity;
+            var minY = double.PositiveInfinity;
+            var maxX = double.NegativeInfinity;
+            var maxY = double.NegativeInfinity;
+            for (var point = 0; point < 8; point += 2)
+            {
+                var x = Number(reader, quadPoints[i + point]);
+                var y = Number(reader, quadPoints[i + point + 1]);
+                minX = Math.Min(minX, x);
+                minY = Math.Min(minY, y);
+                maxX = Math.Max(maxX, x);
+                maxY = Math.Max(maxY, y);
+            }
+
+            annotation.Areas.Add(new Rect(minX, minY, maxX - minX, maxY - minY));
+        }
+
+        return annotation;
+    }
+
+    private static LinkAnnotation ReadLink(
+        LinkAnnotation annotation,
+        DocumentReader reader,
+        DictionaryObject dictionary,
+        IReadOnlyList<Page> pages,
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+    {
+        if (reader.GetDictionary(dictionary, "A") is { } action)
+        {
+            var kind = reader.GetName(action, "S");
+            if (kind == "URI" && reader.GetString(action, "URI") is { } uri)
+            {
+                annotation.Uri = new Uri(uri, UriKind.RelativeOrAbsolute);
+            }
+            else if (kind == "GoTo" && action.TryGetValue("D", out var destination))
+            {
+                ReadDestination(annotation, reader, destination!, pages, pageDictionaries);
+            }
+        }
+        else if (dictionary.TryGetValue("Dest", out var destination))
+        {
+            ReadDestination(annotation, reader, destination!, pages, pageDictionaries);
+        }
+
+        return annotation;
+    }
+
+    private static void ReadDestination(
+        LinkAnnotation annotation,
+        DocumentReader reader,
+        DocumentObject destination,
+        IReadOnlyList<Page> pages,
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+    {
+        var resolved = reader.Resolve(destination);
+        if (resolved is StringObject text)
+        {
+            annotation.Destination = Text(text.Value);
+            return;
+        }
+
+        if (resolved is NameObject name)
+        {
+            annotation.Destination = name.Value;
+            annotation.DestinationIsName = true;
+            return;
+        }
+
+        if (resolved is not ArrayObject { Count: > 0 } array || reader.AsDictionary(array[0]) is not { } target)
+        {
+            throw new DocumentParseException("A link annotation has an unsupported destination.", -1);
+        }
+
+        for (var i = 0; i < pages.Count; i++)
+        {
+            if (ReferenceEquals(pageDictionaries[pages[i]], target))
+            {
+                annotation.TargetPageIndex = i;
+                return;
+            }
+        }
+
+        throw new DocumentParseException("A link annotation targets a page outside the document.", -1);
+    }
+
+    private static InkAnnotation ReadInk(InkAnnotation annotation, DocumentReader reader, DictionaryObject dictionary)
+    {
+        if (reader.GetArray(dictionary, "InkList") is not { } strokes)
+        {
+            return annotation;
+        }
+
+        foreach (var value in strokes)
+        {
+            if (reader.AsArray(value) is not { } points || points.Count % 2 != 0)
+            {
+                throw new DocumentParseException("An annotation /InkList stroke must contain coordinate pairs.", -1);
+            }
+
+            var stroke = new InkStroke();
+            for (var i = 0; i < points.Count; i += 2)
+            {
+                stroke.Add(new AnnotationPoint(Number(reader, points[i]), Number(reader, points[i + 1])));
+            }
+
+            annotation.Strokes.Add(stroke);
+        }
+
+        return annotation;
+    }
+
+    private static T ReadShape<T>(T annotation, DocumentReader reader, DictionaryObject dictionary) where T : ShapeAnnotation
+    {
+        annotation.InteriorColor = ReadColor(reader, reader.GetArray(dictionary, "IC"));
+        if (reader.GetDictionary(dictionary, "BS") is { } border)
+        {
+            annotation.BorderWidth = reader.GetNumber(border, "W") ?? 1;
+        }
+
+        return annotation;
+    }
+
+    private static Rect Bounds(DocumentReader reader, ArrayObject? value)
+    {
+        if (value is null || value.Count != 4)
+        {
+            throw new DocumentParseException("A modeled annotation requires a four-number /Rect array.", -1);
+        }
+
+        var x0 = Number(reader, value[0]);
+        var y0 = Number(reader, value[1]);
+        var x1 = Number(reader, value[2]);
+        var y1 = Number(reader, value[3]);
+        return new Rect(Math.Min(x0, x1), Math.Min(y0, y1), Math.Abs(x1 - x0), Math.Abs(y1 - y0));
+    }
+
+    private static Color? ReadColor(DocumentReader reader, ArrayObject? value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        if (value.Count != 3)
+        {
+            throw new DocumentParseException("Only RGB annotation colors are supported.", -1);
+        }
+
+        return Color.FromRgb(Channel(Number(reader, value[0])), Channel(Number(reader, value[1])), Channel(Number(reader, value[2])));
+    }
+
+    private static byte Channel(double value) => (byte)Math.Clamp((int)Math.Round(value * 255), 0, 255);
+
+    private static double Number(DocumentReader reader, DocumentObject value)
+        => reader.Resolve(value) is NumberObject number
+            ? number.DoubleValue
+            : throw new DocumentParseException("An annotation coordinate is not numeric.", -1);
+
+    private static string? Text(string? value) => value is null ? null : FormField.DecodeTextString(value);
+}
