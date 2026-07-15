@@ -31,7 +31,7 @@
     {
         <Appointment Data=@(appointment.Appointment) Top=@appointment.Top Left=@appointment.Left Width=@appointment.Width Height=@appointment.Height Click=@OnAppointmentSelect
                 CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments?.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment.Appointment) ? " rz-state-focused" : "" )"
-                DragStart=@OnAppointmentDragStart />
+                DragStart=@OnAppointmentDragStart MinutesPerSlot=@MinutesPerSlot CanResizeStart=@(appointment.Appointment.Start >= StartDate) CanResizeEnd=@(appointment.Appointment.End <= EndDate) />
     }
 }
 </div>

@@ -21,7 +21,7 @@
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
 TextProperty="Text" SelectedIndex="2"
 SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
-AppointmentMove=@OnAppointmentMove >
+AppointmentMove=@OnAppointmentMove AppointmentResize=@OnAppointmentResize >
     <RadzenDayView />
     <RadzenWeekView />
     <RadzenMultiDayView NumberOfDays="@sliderNumberOfDays" AdvanceDays="@sliderAdvanceDays" />
@@ -130,6 +130,21 @@ AppointmentMove=@OnAppointmentMove >
             draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
 
             draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
+
+            await scheduler.Reload();
+        }
+    }
+
+    async Task OnAppointmentResize(SchedulerAppointmentResizeEventArgs args)
+    {
+        var resizedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (resizedAppointment != null)
+        {
+            resizedAppointment.Start = args.Start;
+            resizedAppointment.End = args.End;
+
+            console.Log($"AppointmentResize: Appointment={resizedAppointment.Text} Start={args.Start} End={args.End}");
 
             await scheduler.Reload();
         }
