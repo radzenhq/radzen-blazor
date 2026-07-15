@@ -5135,6 +5135,7 @@ window.Radzen = {
     if (!ref) {
         return { left: 0, top: 0, width: 0, height: 0 };
     }
+    Radzen.endDrag(ref);
     ref.mouseMoveHandler = function (e) {
       try { suppressDisposed(instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY })); } catch { }
     };
@@ -5146,10 +5147,15 @@ window.Radzen = {
     ref.mouseUpHandler = function (e) {
       Radzen.endDrag(ref);
     };
+    ref.dragStartHandler = function (e) {
+      e.preventDefault();
+    };
     document.addEventListener('mousemove', ref.mouseMoveHandler);
     document.addEventListener('mouseup', ref.mouseUpHandler);
     document.addEventListener('touchmove', ref.touchMoveHandler, { passive: true, capture: true })
     document.addEventListener('touchend', ref.mouseUpHandler, { passive: true });
+    document.addEventListener('dragstart', ref.dragStartHandler);
+    document.addEventListener('dragend', ref.mouseUpHandler);
     return Radzen.clientRect(ref);
   },
   submit: function (form) {
@@ -5173,6 +5179,8 @@ window.Radzen = {
     document.removeEventListener('mouseup', ref.mouseUpHandler);
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
+    document.removeEventListener('dragstart', ref.dragStartHandler);
+    document.removeEventListener('dragend', ref.mouseUpHandler);
   },
   capturePointer: function (el, pointerId) {
     try {
