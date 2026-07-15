@@ -25,9 +25,12 @@
                             @Scheduler.RenderAppointment(appointment)
                         }
                     </div>
-                    <div class="rz-event-agenda-time">
-                        @GetTimeDisplay(appointment)
-                    </div>
+                        @if (ShowTimeDisplay)
+                        {
+                            <div class="rz-event-agenda-time">
+                                @GetTimeDisplay(appointment)
+                            </div>
+                        }
                 </Appointment>
             </div>
         }
@@ -46,6 +49,9 @@
 
     [Parameter]
     public string MultiDayText { get; set; } = "Multi-day";
+
+    [Parameter]
+    public bool ShowTimeDisplay { get; set; } = true;
 
     [Parameter]
     public EventCallback<AppointmentData> AppointmentDragStart { get; set; }

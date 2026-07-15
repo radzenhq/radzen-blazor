@@ -39,6 +39,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string MultiDayText { get => multiDayText ?? Localize(nameof(RadzenStrings.AgendaView_MultiDayText)); set => multiDayText = value; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the time display for appointments.
+        /// </summary>
+        /// <value><c>true</c> if the time display should be shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowTimeDisplay { get; set; } = true;
+
         /// <inheritdoc />
         public override string Title
         {
