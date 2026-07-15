@@ -402,6 +402,32 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when the start or end edge of an appointment is dragged to a different time slot in a day, week or multi-day view.
+        /// Commonly used to change the appointment duration. The new boundaries snap to the current <c>MinutesPerSlot</c> of the view.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentResize=@OnAppointmentResize&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   async Task OnAppointmentResize(SchedulerAppointmentResizeEventArgs resized)
+        ///   {
+        ///     var appointment = appointments.SingleOrDefault(x => x == (Appointment)resized.Appointment.Data);
+        ///     if (appointment != null)
+        ///     {
+        ///         appointment.Start = resized.Start;
+        ///         appointment.End = resized.End;
+        ///         await scheduler.Reload();
+        ///     }
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        /// <value></value>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentResizeEventArgs> AppointmentResize { get; set; }
+
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
         /// <summary>
@@ -843,6 +869,11 @@ namespace Radzen.Blazor
         bool IScheduler.HasAppointmentMoveDelegate()
         {
             return AppointmentMove.HasDelegate;
+        }
+
+        bool IScheduler.HasAppointmentResizeDelegate()
+        {
+            return AppointmentResize.HasDelegate;
         }
 
         IList<RadzenSchedulerResource> resources = new List<RadzenSchedulerResource>();

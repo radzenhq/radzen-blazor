@@ -6119,6 +6119,104 @@ window.Radzen = {
           element.removeEventListener('dragstart', handleDragStart);
         }
       };
+    },
+    createSchedulerResizable: function (element, ref, onResize, minutesPerSlot) {
+      var drag = null;
+      var justResized = false;
+
+      function applyPreview(slots) {
+        if (drag.mode === 'start') {
+          element.style.insetBlockStart = (drag.top + slots * drag.pxPerSlot) + 'px';
+          element.style.height = (drag.height - slots * drag.pxPerSlot) + 'px';
+        } else {
+          element.style.height = (drag.height + slots * drag.pxPerSlot) + 'px';
+        }
+      }
+
+      function onMouseDown(e) {
+        var handle = e.target.closest('.rz-event-resize');
+        if (!handle || e.button !== 0) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        var fontSize = parseFloat(getComputedStyle(element).fontSize) || 16;
+        var pxPerSlot = 1.5 * fontSize;
+        var slotsElement = element.closest('.rz-slots');
+
+        drag = {
+          mode: handle.classList.contains('rz-event-resize-start') ? 'start' : 'end',
+          startClientY: e.clientY,
+          top: element.offsetTop,
+          height: element.offsetHeight,
+          maxHeight: slotsElement ? slotsElement.getBoundingClientRect().height : Infinity,
+          pxPerSlot: pxPerSlot,
+          slots: 0,
+          wasDraggable: element.draggable
+        };
+
+        element.draggable = false;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      }
+
+      function onMouseMove(e) {
+        if (!drag) return;
+
+        var slots = Math.round((e.clientY - drag.startClientY) / drag.pxPerSlot);
+        var heightSlots = Math.round(drag.height / drag.pxPerSlot);
+
+        if (drag.mode === 'start') {
+          slots = Math.min(slots, heightSlots - 1);
+          slots = Math.max(slots, Math.round(-drag.top / drag.pxPerSlot));
+        } else {
+          slots = Math.max(slots, 1 - heightSlots);
+          slots = Math.min(slots, Math.floor((drag.maxHeight - drag.top - drag.height) / drag.pxPerSlot));
+        }
+
+        drag.slots = slots;
+        applyPreview(slots);
+        document.body.style.cursor = 'ns-resize';
+      }
+
+      function onMouseUp() {
+        if (!drag) return;
+
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        element.draggable = drag.wasDraggable;
+        justResized = true;
+        setTimeout(function () { justResized = false; }, 0);
+
+        if (drag.slots !== 0) {
+          var minutes = drag.slots * minutesPerSlot;
+          try { suppressDisposed(ref.invokeMethodAsync(onResize, drag.mode === 'start' ? minutes : 0, drag.mode === 'end' ? minutes : 0)); } catch { }
+        }
+
+        drag = null;
+      }
+
+      function onClickCapture(e) {
+        if (justResized) {
+          e.stopPropagation();
+          e.preventDefault();
+          justResized = false;
+        }
+      }
+
+      element.addEventListener('mousedown', onMouseDown);
+      element.addEventListener('click', onClickCapture, true);
+
+      return {
+        dispose() {
+          element.removeEventListener('mousedown', onMouseDown);
+          element.removeEventListener('click', onClickCapture, true);
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          document.body.style.cursor = '';
+        }
+      };
     }
 };
 
