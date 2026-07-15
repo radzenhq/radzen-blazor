@@ -19,6 +19,14 @@
                 @Scheduler.RenderAppointment(Data)
             }
         </div>
+        @if (Resizable && CanResizeStart)
+        {
+            <div class="rz-event-resize rz-event-resize-start"></div>
+        }
+        @if (Resizable && CanResizeEnd)
+        {
+            <div class="rz-event-resize rz-event-resize-end"></div>
+        }
     </div>
 @code {
     private ElementReference element;
@@ -48,6 +56,17 @@
 
     [Parameter]
     public EventCallback<AppointmentData> DragStart { get; set; }
+
+    [Parameter]
+    public int MinutesPerSlot { get; set; }
+
+    [Parameter]
+    public bool CanResizeStart { get; set; } = true;
+
+    [Parameter]
+    public bool CanResizeEnd { get; set; } = true;
+
+    bool Resizable => MinutesPerSlot > 0 && Data != null && Scheduler?.HasAppointmentResizeDelegate() == true;
 
     IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
@@ -144,16 +163,47 @@
         await DragStart.InvokeAsync(Data);
     }
 
+    [JSInvokable]
+    public async Task OnResizeAsync(double startOffsetMinutes, double endOffsetMinutes)
+    {
+        if (Scheduler != null && Data != null && (startOffsetMinutes != 0 || endOffsetMinutes != 0))
+        {
+            var start = Data.Start.AddMinutes(startOffsetMinutes);
+            var end = Data.End.AddMinutes(endOffsetMinutes);
+
+            if (end > start)
+            {
+                await Scheduler.AppointmentResize.InvokeAsync(new SchedulerAppointmentResizeEventArgs { Appointment = Data, Start = start, End = end });
+            }
+        }
+    }
+
     private DotNetObjectReference<Appointment>? dotnetRef;
 
     private IJSObjectReference? jsRef;
 
+    private IJSObjectReference? jsResizeRef;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && Scheduler?.HasAppointmentMoveDelegate() == true)
+        if (firstRender)
         {
-            dotnetRef = DotNetObjectReference.Create(this);
-            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDraggable", element, dotnetRef, nameof(OnDragStartAsync));
+            var draggable = Scheduler?.HasAppointmentMoveDelegate() == true;
+
+            if (draggable || Resizable)
+            {
+                dotnetRef = DotNetObjectReference.Create(this);
+            }
+
+            if (draggable)
+            {
+                jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createDraggable", element, dotnetRef, nameof(OnDragStartAsync));
+            }
+
+            if (Resizable)
+            {
+                jsResizeRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSchedulerResizable", element, dotnetRef, nameof(OnResizeAsync), MinutesPerSlot);
+            }
         }
     }
 
@@ -166,6 +216,12 @@
             {
                 await jsRef.InvokeVoidAsync("dispose");
                 await jsRef.DisposeAsync();
+            }
+
+            if (jsResizeRef != null)
+            {
+                await jsResizeRef.InvokeVoidAsync("dispose");
+                await jsResizeRef.DisposeAsync();
             }
         }
         catch (JSDisconnectedException)
