@@ -45,14 +45,11 @@ namespace Radzen.Blazor
             get
             {
                 var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
-                if (StartDate == EndDate.AddDays(-1))
-                {
-                    return $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
-                }
-                else
-                {
-                    return $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {EndDate.AddDays(-1).ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
-                }
+                var end = EndDate.AddDays(-1);
+                var title = StartDate == end
+                    ? $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)}"
+                    : $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {end.ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
+                return FormatTitle(StartDate, end, title);
             }
         }
 

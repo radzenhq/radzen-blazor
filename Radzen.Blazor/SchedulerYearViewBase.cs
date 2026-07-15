@@ -18,6 +18,26 @@ namespace Radzen.Blazor
         /// <value>The start month.</value>
         public abstract Month StartMonth { get; set; }
 
+        /// <inheritdoc />
+        public override string Title
+        {
+            get
+            {
+                if (Scheduler == null)
+                {
+                    return "";
+                }
+
+                var culture = Scheduler.Culture ?? CultureInfo.CurrentCulture;
+                var yearStart = GetYearRange().yearStart;
+                var title = StartMonth == Month.January
+                    ? Scheduler.CurrentDate.ToString("yyyy", culture)
+                    : (Scheduler.CurrentDate.Month < (int)StartMonth + 1) ? $"{Scheduler.CurrentDate.AddYears(-1).ToString("yyyy", culture)}-{Scheduler.CurrentDate.ToString("yyyy", culture)}" : $"{Scheduler.CurrentDate.ToString("yyyy", culture)}-{Scheduler.CurrentDate.AddYears(+1).ToString("yyyy", culture)}";
+
+                return FormatTitle(yearStart, yearStart.AddYears(1).AddDays(-1), title);
+            }
+        }
+
         /// <summary>
         /// Returns the logical year start (first day of <see cref="StartMonth"/>) and the computed view start/end range.
         /// </summary>

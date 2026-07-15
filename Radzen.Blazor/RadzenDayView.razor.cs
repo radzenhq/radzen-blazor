@@ -58,7 +58,8 @@ namespace Radzen.Blazor
             get
             {
                 var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
-                return Scheduler?.CurrentDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern ?? "d", culture) ?? "";
+                var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
+                return FormatTitle(date, date, Scheduler?.CurrentDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern ?? "d", culture) ?? "");
             }
         }
 

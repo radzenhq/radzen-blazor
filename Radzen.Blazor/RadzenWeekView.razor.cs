@@ -82,7 +82,8 @@ namespace Radzen.Blazor
             get
             {
                 var culture = Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
-                return $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {StartDate.EndOfWeek(culture).ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
+                var end = StartDate.EndOfWeek(culture);
+                return FormatTitle(StartDate, end, $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {end.ToString(culture.DateTimeFormat.ShortDatePattern, culture)}");
             }
         }
 

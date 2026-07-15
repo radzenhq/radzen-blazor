@@ -22,28 +22,6 @@ namespace Radzen.Blazor
         public override string Icon => "view_list";
 
         /// <inheritdoc />
-        public override string Title
-        {
-            get
-            {
-                if (Scheduler == null)
-                {
-                    return "";
-                }
-
-                var culture = Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
-                if (StartMonth == Month.January)
-                {
-                    return Scheduler.CurrentDate.ToString("yyyy", culture);
-                }
-                else
-                {
-                    return (Scheduler.CurrentDate.Month < (int)StartMonth + 1) ? $"{Scheduler.CurrentDate.AddYears(-1).ToString("yyyy", culture)}-{Scheduler.CurrentDate.ToString("yyyy", culture)}" : $"{Scheduler.CurrentDate.ToString("yyyy", culture)}-{Scheduler.CurrentDate.AddYears(+1).ToString("yyyy", culture)}";
-                }
-            }
-        }
-
-        /// <inheritdoc />
         [Parameter]
         public override string Text { get; set; } = "Planner";
 

@@ -22,7 +22,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override string Title
         {
-            get => Scheduler?.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture) ?? "";
+            get
+            {
+                var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
+                return FormatTitle(date.StartOfMonth(), date.EndOfMonth(), Scheduler?.CurrentDate.ToString("MMMM yyyy", Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture) ?? "");
+            }
         }
 
         /// <inheritdoc />
