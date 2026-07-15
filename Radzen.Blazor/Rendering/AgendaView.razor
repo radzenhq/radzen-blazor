@@ -28,7 +28,7 @@
                 </div>
                 <div class="rz-slot-agenda">
                     <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(slotDate)></div>
-                    <AgendaSlotEvents Appointments=@appointments MultiDayText=@MultiDayText CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart />
+                    <AgendaSlotEvents Appointments=@appointments MultiDayText=@MultiDayText CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment" AppointmentDragStart=@OnAppointmentDragStart ShowTimeDisplay=@ShowTimeDisplay />
                 </div>
             </RadzenStack>
         }
@@ -57,6 +57,9 @@
 
     [Parameter]
     public string MultiDayText { get; set; } = "Multi-day";
+
+    [Parameter]
+    public bool ShowTimeDisplay { get; set; } = true;
 
     [Parameter]
     public IList<AppointmentData>? Appointments { get; set; }
