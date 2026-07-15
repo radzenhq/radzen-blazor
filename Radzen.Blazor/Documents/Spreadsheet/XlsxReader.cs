@@ -324,17 +324,18 @@ static class XlsxReader
 
     private static Worksheet LoadSheet(ZipArchive archive, WorksheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
     {
-        var sheet = new Worksheet(100, 100);
-
         var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
         if (sheetEntry is null)
         {
-            return sheet;
+            return new Worksheet(100, 100) { Name = sheetInfo.Name };
         }
 
         using var sheetStream = sheetEntry.Open();
         var sheetDoc = XDocument.Load(sheetStream);
         var sNs = sheetDoc.Root!.Name.Namespace;
+
+        var (rows, columns) = ComputeSheetSize(sheetDoc, sNs);
+        var sheet = new Worksheet(rows, columns);
 
         var defaultRowHeight = ParseDefaultRowHeight(sheetDoc, sNs);
 
@@ -361,6 +362,48 @@ static class XlsxReader
 
         sheet.Name = sheetInfo.Name;
         return sheet;
+    }
+
+    // The sheet must be large enough to hold its used range; a fixed grid dropped any content
+    // beyond it. 100x100 is kept as a floor so nearly-empty files still render a full default grid.
+    private static (int Rows, int Columns) ComputeSheetSize(XDocument sheetDoc, XNamespace sNs)
+    {
+        var maxRow = 100;
+        var maxColumn = 100;
+
+        var dimensionRef = sheetDoc.Descendants(sNs + "dimension").FirstOrDefault()?.Attribute("ref")?.Value;
+        if (!string.IsNullOrEmpty(dimensionRef))
+        {
+            var range = RangeRef.Parse(dimensionRef);
+            if (!range.Equals(RangeRef.Invalid))
+            {
+                maxRow = Math.Max(maxRow, range.End.Row + 1);
+                maxColumn = Math.Max(maxColumn, range.End.Column + 1);
+            }
+        }
+
+        // The dimension element is optional and sometimes understated, so cross-check against the
+        // actual row and cell references.
+        foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
+        {
+            if (int.TryParse(rowElem.Attribute("r")?.Value, out var r))
+            {
+                maxRow = Math.Max(maxRow, r);
+            }
+
+            foreach (var cellElem in rowElem.Elements(sNs + "c"))
+            {
+                var cellRef = cellElem.Attribute("r")?.Value;
+                if (!string.IsNullOrEmpty(cellRef))
+                {
+                    var address = CellRef.Parse(cellRef);
+                    maxRow = Math.Max(maxRow, address.Row + 1);
+                    maxColumn = Math.Max(maxColumn, address.Column + 1);
+                }
+            }
+        }
+
+        return (maxRow, maxColumn);
     }
 
     private static double ParseDefaultRowHeight(XDocument sheetDoc, XNamespace sNs)
