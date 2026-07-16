@@ -42,15 +42,16 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
+    [CascadingTypeParameter(nameof(TValue))]
+    public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>, IRadzenCheckBoxList
     {
-        string ItemClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
+        string ItemClass(IRadzenCheckBoxListItem item) => ClassList.Create("rz-chkbox-box")
                                                                           .Add("rz-state-active", IsSelected(item))
                                                                           .Add("rz-state-focused", IsFocused(item) && focused)
                                                                           .AddDisabled(Disabled || item.Disabled)
                                                                           .ToString();
 
-        string IconClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
+        string IconClass(IRadzenCheckBoxListItem item) => ClassList.Create("rz-chkbox-icon")
                                                                           .Add("notranslate rzi rzi-check", IsSelected(item))
                                                                           .ToString();
 
@@ -128,7 +129,7 @@ namespace Radzen.Blazor
                     item.SetReadOnly(readOnlyResult);
                 }
 
-                return item;
+                return (IRadzenCheckBoxListItem)item;
             })).ToList();
         }
 
@@ -140,7 +141,7 @@ namespace Radzen.Blazor
             UpdateAllItems();
         }
 
-        List<RadzenCheckBoxListItem<TValue>> allItems = new();
+        List<IRadzenCheckBoxListItem> allItems = new();
         /// <summary>
         /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
         /// </summary>
@@ -164,7 +165,7 @@ namespace Radzen.Blazor
 
             if (value == true)
             {
-                Value = allItems.Where(i => !i.Disabled).Select(i => i.Value)!;
+                Value = allItems.Where(i => !i.Disabled).Select(i => i.Value is TValue typedValue ? typedValue : default!).ToList();
             }
             else if (value == false)
             {
@@ -180,7 +181,7 @@ namespace Radzen.Blazor
 
         bool? IsAllSelected()
         {
-            Func<RadzenCheckBoxListItem<TValue>, bool> predicate = i => Value != null && Value.Contains(i.Value);
+            Func<IRadzenCheckBoxListItem, bool> predicate = IsSelected;
             var all = allItems.All(predicate);
             var any = allItems.Any(predicate);
 
@@ -256,13 +257,22 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment? Items { get; set; }
 
-        List<RadzenCheckBoxListItem<TValue>> items = new List<RadzenCheckBoxListItem<TValue>>();
+        List<IRadzenCheckBoxListItem> items = new List<IRadzenCheckBoxListItem>();
 
         /// <summary>
         /// Adds the item.
         /// </summary>
         /// <param name="item">The item.</param>
         public void AddItem(RadzenCheckBoxListItem<TValue> item)
+        {
+            AddItem((IRadzenCheckBoxListItem)item);
+        }
+
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void AddItem(IRadzenCheckBoxListItem item)
         {
             if (items.IndexOf(item) == -1)
             {
@@ -277,6 +287,15 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenCheckBoxListItem<TValue> item)
+        {
+            RemoveItem((IRadzenCheckBoxListItem)item);
+        }
+
+        /// <summary>
+        /// Removes the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void RemoveItem(IRadzenCheckBoxListItem item)
         {
             if (items.Remove(item))
             {
@@ -293,17 +312,17 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
-        protected bool IsSelected(RadzenCheckBoxListItem<TValue> item)
+        protected bool IsSelected(IRadzenCheckBoxListItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            return Value != null && Value.Contains(item.Value);
+            return Value != null && Value.Cast<object?>().Contains(item.Value);
         }
 
         /// <summary>
         /// Selects the item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected async System.Threading.Tasks.Task SelectItem(RadzenCheckBoxListItem<TValue> item)
+        protected async System.Threading.Tasks.Task SelectItem(IRadzenCheckBoxListItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
@@ -315,15 +334,11 @@ namespace Radzen.Blazor
 
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
 
-            if (item.Value != null && !selectedValues.Contains(item.Value))
+            if (item.Value is TValue typedValue)
             {
-                selectedValues.Add(item.Value);
-            }
-            else
-            {
-                if (item.Value != null)
+                if (!selectedValues.Remove(typedValue))
                 {
-                    selectedValues.Remove(item.Value);
+                    selectedValues.Add(typedValue);
                 }
             }
 
@@ -336,7 +351,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        async Task OnItemKeyDown(KeyboardEventArgs args, RadzenCheckBoxListItem<TValue> item)
+        async Task OnItemKeyDown(KeyboardEventArgs args, IRadzenCheckBoxListItem item)
         {
             var key = args.Code != null ? args.Code : args.Key;
             if (key == "Enter" || key == "Space")
@@ -406,12 +421,12 @@ namespace Radzen.Blazor
             }
         }
 
-        bool HasInvisibleBefore(RadzenCheckBoxListItem<TValue> item)
+        bool HasInvisibleBefore(IRadzenCheckBoxListItem item)
         {
             return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
         }
 
-        bool IsFocused(RadzenCheckBoxListItem<TValue> item)
+        bool IsFocused(IRadzenCheckBoxListItem item)
         {
             return allItems.IndexOf(item) == focusedIndex;
         }

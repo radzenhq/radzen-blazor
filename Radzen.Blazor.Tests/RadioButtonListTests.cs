@@ -342,6 +342,54 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("margin:1rem", component.Markup);
         }
+
+        private static void AddNullableMismatchItems(ComponentParameterCollectionBuilder<RadzenRadioButtonList<bool?>> parameters)
+        {
+            parameters.Add(p => p.Items, builder =>
+            {
+                builder.OpenComponent<RadzenRadioButtonListItem<bool>>(0);
+                builder.AddAttribute(1, "Text", "Yes");
+                builder.AddAttribute(2, "Value", true);
+                builder.CloseComponent();
+
+                builder.OpenComponent<RadzenRadioButtonListItem<bool>>(3);
+                builder.AddAttribute(4, "Text", "No");
+                builder.AddAttribute(5, "Value", false);
+                builder.CloseComponent();
+            });
+        }
+
+        [Fact]
+        public void RadioButtonList_NullableValue_RendersItemsDeclaredWithNonNullableValueType()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<bool?>>(AddNullableMismatchItems);
+
+            Assert.Equal(2, component.FindAll("[role=radio]").Count);
+        }
+
+        [Fact]
+        public void RadioButtonList_NullableValue_SelectsItemDeclaredWithNonNullableValueType()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            bool? value = null;
+
+            var component = ctx.RenderComponent<RadzenRadioButtonList<bool?>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, (bool? v) => value = v);
+                AddNullableMismatchItems(parameters);
+            });
+
+            component.FindAll("[role=radio]")[0].Click();
+
+            Assert.True(value);
+            Assert.Equal("true", component.FindAll("[role=radio]")[0].GetAttribute("aria-checked"));
+        }
     }
 }
 

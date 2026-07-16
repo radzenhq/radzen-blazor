@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 
 namespace Radzen.Blazor
@@ -7,7 +7,7 @@ namespace Radzen.Blazor
     /// RadzenCheckBoxListItem component.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public partial class RadzenCheckBoxListItem<TValue> : RadzenComponent
+    public partial class RadzenCheckBoxListItem<TValue> : RadzenComponent, IRadzenCheckBoxListItem
     {
         /// <summary>
         /// Gets or sets the text.
@@ -44,14 +44,14 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ReadOnly { get; set; }
 
-        RadzenCheckBoxList<TValue>? checkBoxList;
+        IRadzenCheckBoxList? checkBoxList;
 
         /// <summary>
         /// Gets or sets the CheckBox list.
         /// </summary>
         /// <value>The CheckBox list.</value>
         [CascadingParameter]
-        public RadzenCheckBoxList<TValue>? CheckBoxList
+        public IRadzenCheckBoxList? CheckBoxList
         {
             get
             {
@@ -66,6 +66,20 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        object? IRadzenCheckBoxListItem.Value => Value;
+
+        RenderFragment? IRadzenCheckBoxListItem.Template => Template?.Invoke(this);
+
+        ElementReference IRadzenCheckBoxListItem.Element
+        {
+            get => Element;
+            set => Element = value;
+        }
+
+        string? IRadzenCheckBoxListItem.GetItemId() => GetItemId();
+
+        string IRadzenCheckBoxListItem.GetItemCssClass() => GetItemCssClass();
 
         /// <summary>
         /// Disposes this instance.

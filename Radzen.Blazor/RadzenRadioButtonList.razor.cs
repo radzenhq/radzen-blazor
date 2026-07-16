@@ -37,19 +37,20 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     [UnconditionalSuppressMessage(TrimMessages.Trimming, TrimMessages.IL2026, Justification = TrimMessages.DataTypePreserved)]
-    public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
+    [CascadingTypeParameter(nameof(TValue))]
+    public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>, IRadzenRadioButtonList
     {
-        string ItemClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
+        string ItemClass(IRadzenRadioButtonListItem item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .Add("rz-state-focused", IsFocused(item) && focused)
                                                                             .AddDisabled(Disabled || item.Disabled)
                                                                             .ToString();
 
-        string IconClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
+        string IconClass(IRadzenRadioButtonListItem item) => ClassList.Create("rz-radiobutton-icon")
                                                                              .Add("notranslate rzi rzi-circle-on", IsSelected(item))
                                                                              .ToString();
 
-        string LabelClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-label")
+        string LabelClass(IRadzenRadioButtonListItem item) => ClassList.Create("rz-radiobutton-label")
                                                                              .AddDisabled(Disabled || item.Disabled)
                                                                              .ToString();
 
@@ -109,7 +110,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string? VisibleProperty { get; set; }
 
-        List<RadzenRadioButtonListItem<TValue>> allItems = new();
+        List<IRadzenRadioButtonListItem> allItems = new();
 
         void UpdateAllItems()
         {
@@ -129,7 +130,7 @@ namespace Radzen.Blazor
                     item.SetVisible(visibleResult);
                 }
 
-                return item;
+                return (IRadzenRadioButtonListItem)item;
             })).ToList();
         }
 
@@ -187,13 +188,22 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment? Items { get; set; }
 
-        List<RadzenRadioButtonListItem<TValue>> items = new List<RadzenRadioButtonListItem<TValue>>();
+        List<IRadzenRadioButtonListItem> items = new List<IRadzenRadioButtonListItem>();
 
         /// <summary>
         /// Adds the item.
         /// </summary>
         /// <param name="item">The item.</param>
         public void AddItem(RadzenRadioButtonListItem<TValue> item)
+        {
+            AddItem((IRadzenRadioButtonListItem)item);
+        }
+
+        /// <summary>
+        /// Adds the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void AddItem(IRadzenRadioButtonListItem item)
         {
             if (items.IndexOf(item) == -1)
             {
@@ -209,6 +219,15 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenRadioButtonListItem<TValue> item)
         {
+            RemoveItem((IRadzenRadioButtonListItem)item);
+        }
+
+        /// <summary>
+        /// Removes the item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void RemoveItem(IRadzenRadioButtonListItem item)
+        {
             if (items.Remove(item))
             {
                 UpdateAllItems();
@@ -223,7 +242,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
-        protected bool IsSelected(RadzenRadioButtonListItem<TValue> item)
+        protected bool IsSelected(IRadzenRadioButtonListItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
 
@@ -234,7 +253,7 @@ namespace Radzen.Blazor
         /// Selects the item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected async System.Threading.Tasks.Task SelectItem(RadzenRadioButtonListItem<TValue> item)
+        protected async System.Threading.Tasks.Task SelectItem(IRadzenRadioButtonListItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
@@ -244,7 +263,7 @@ namespace Radzen.Blazor
 
             focusedIndex = allItems.IndexOf(item);
 
-            Value = item.Value!;
+            Value = item.Value is TValue typedValue ? typedValue : default!;
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null)
@@ -254,7 +273,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        async Task OnItemKeyDown(KeyboardEventArgs args, RadzenRadioButtonListItem<TValue> item)
+        async Task OnItemKeyDown(KeyboardEventArgs args, IRadzenRadioButtonListItem item)
         {
             var key = args.Code != null ? args.Code : args.Key;
             if (key == "Enter" || key == "Space")
@@ -376,7 +395,7 @@ namespace Radzen.Blazor
             ? null
             : Name;
 
-        bool IsFocused(RadzenRadioButtonListItem<TValue> item)
+        bool IsFocused(IRadzenRadioButtonListItem item)
         {
             return allItems.IndexOf(item) == focusedIndex;
         }

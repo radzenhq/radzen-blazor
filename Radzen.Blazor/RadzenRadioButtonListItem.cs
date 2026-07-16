@@ -9,7 +9,7 @@ namespace Radzen.Blazor
     /// RadzenRadioButtonListItem component.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public class RadzenRadioButtonListItem<TValue> : RadzenComponent
+    public class RadzenRadioButtonListItem<TValue> : RadzenComponent, IRadzenRadioButtonListItem
     {
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
@@ -66,14 +66,14 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
-        private RadzenRadioButtonList<TValue>? list;
+        private IRadzenRadioButtonList? list;
 
         /// <summary>
         /// Gets or sets the list.
         /// </summary>
         /// <value>The list.</value>
         [CascadingParameter]
-        public RadzenRadioButtonList<TValue>? List
+        public IRadzenRadioButtonList? List
         {
             get
             {
@@ -88,6 +88,20 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        object? IRadzenRadioButtonListItem.Value => Value;
+
+        RenderFragment? IRadzenRadioButtonListItem.Template => Template?.Invoke(this);
+
+        ElementReference IRadzenRadioButtonListItem.Element
+        {
+            get => Element;
+            set => Element = value;
+        }
+
+        string? IRadzenRadioButtonListItem.GetItemId() => GetItemId();
+
+        string IRadzenRadioButtonListItem.GetItemCssClass() => GetItemCssClass();
 
         /// <summary>
         /// Disposes this instance.

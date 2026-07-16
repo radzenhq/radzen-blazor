@@ -279,6 +279,40 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(secondId, component.Find("div.rz-checkbox-list").GetAttribute("aria-activedescendant"));
         }
+
+        [Fact]
+        public void CheckBoxList_NullableValue_RendersAndSelectsItemsDeclaredWithNonNullableValueType()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int?> value = null;
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<int?>>(parameters =>
+            {
+                parameters.Add(p => p.ValueChanged, (IEnumerable<int?> v) => value = v);
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenCheckBoxListItem<int>>(0);
+                    builder.AddAttribute(1, "Text", "Orders");
+                    builder.AddAttribute(2, "Value", 1);
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenCheckBoxListItem<int>>(3);
+                    builder.AddAttribute(4, "Text", "Employees");
+                    builder.AddAttribute(5, "Value", 2);
+                    builder.CloseComponent();
+                });
+            });
+
+            var checkboxes = component.FindAll("[role=checkbox]");
+            Assert.Equal(2, checkboxes.Count);
+
+            checkboxes[0].Click();
+
+            Assert.Contains((int?)1, value);
+            Assert.Equal("true", component.FindAll("[role=checkbox]")[0].GetAttribute("aria-checked"));
+        }
     }
 }
 
