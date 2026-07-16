@@ -6,6 +6,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class FormFlattener(Document document)
 {
+    // Button /Ff bit 17 (ISO 32000-1 table 226).
+    private const int PushButtonFlag = 1 << 16;
+
     private LoadedState? Loaded => document.Loaded;
 
     private DocumentReader? Source => document.Loaded?.Source;
@@ -152,6 +155,19 @@ internal sealed class FormFlattener(Document document)
         var (x, y, width, height) = WidgetRect(widget);
         if (string.Equals(type.Value, "Btn", StringComparison.Ordinal))
         {
+            // A pushbutton has no /AS or /V state to redraw from, so its caption and border
+            // live only in its /AP; refuse rather than delete the widget and paint nothing.
+            if (Inherited(widget, "Ff") is NumberObject pushFf
+                && (pushFf.IntValue & PushButtonFlag) != 0)
+            {
+                if (HasVisibleAppearance(widget))
+                {
+                    throw new NotSupportedException("Cannot flatten a pushbutton field with a visible appearance.");
+                }
+
+                return;
+            }
+
             var state = source!.GetName(widget, "AS") ?? (Inherited(widget, "V") as NameObject)?.Value;
             if (state is not null && !string.Equals(state, "Off", StringComparison.Ordinal))
             {

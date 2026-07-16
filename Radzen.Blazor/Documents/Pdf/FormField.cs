@@ -50,7 +50,7 @@ public sealed class FormField
     {
         get
         {
-            var value = InheritedValue();
+            var value = InheritedEntry("V");
             if (value is null)
             {
                 return null;
@@ -66,14 +66,15 @@ public sealed class FormField
         }
     }
 
-    // Walks the /Parent chain for the nearest /V, since a choice or text value can be
-    // set on a non-terminal parent and inherited by its widget kids (ISO 32000 12.7.3.1).
-    private DocumentObject? InheritedValue()
+    // Walks the /Parent chain for the nearest inheritable attribute (ISO 32000 12.7.3.1):
+    // /V and /FT can both be set on a non-terminal parent and inherited by its kids. The
+    // walk is bounded against a cyclic /Parent chain.
+    private DocumentObject? InheritedEntry(string key)
     {
         var current = Dictionary;
         for (var depth = 0; current is not null && depth < 32; depth++)
         {
-            if (current.TryGetValue("V", out var value))
+            if (current.TryGetValue(key, out var value))
             {
                 return value;
             }
@@ -117,10 +118,13 @@ public sealed class FormField
         return Encoding.BigEndianUnicode.GetString(bytes);
     }
 
-    /// <summary>Gets the field type from its <c>/FT</c> entry.</summary>
+    /// <summary>
+    /// Gets the field type from its <c>/FT</c> entry. A field with no own <c>/FT</c>
+    /// inherits it from an ancestor field.
+    /// </summary>
     public FormFieldType Type
-        => reader.GetName(Dictionary, "FT") is { } name
-            ? name switch
+        => InheritedEntry("FT") is { } entry && reader.Resolve(entry) is NameObject name
+            ? name.Value switch
             {
                 "Btn" => FormFieldType.Button,
                 "Ch" => FormFieldType.Choice,

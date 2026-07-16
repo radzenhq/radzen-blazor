@@ -67,7 +67,9 @@ public sealed class AcroForm
     /// </summary>
     public IReadOnlyList<string> FieldNames => fieldNames;
 
-    private readonly record struct Terminal(DictionaryObject Field, DictionaryObject Widget);
+    // A terminal and every annotation that renders it: one field can be shown by several
+    // widget kids (the same field repeated on each page), all of which an edit must refresh.
+    private readonly record struct Terminal(DictionaryObject Field, IReadOnlyList<DictionaryObject> Widgets);
 
     // Walks the field tree, recording each terminal under its qualified name. A node
     // whose /Kids are field dictionaries (they carry /T) is non-terminal; a node with
@@ -116,7 +118,7 @@ public sealed class AcroForm
                 key = qualified + "_" + index;
             }
 
-            terminals[key] = new Terminal(dict, WidgetOf(dict));
+            terminals[key] = new Terminal(dict, WidgetsOf(dict));
             fieldNames.Add(key);
             fields.Add(new FormField(reader, dict, key));
         }
@@ -129,19 +131,25 @@ public sealed class AcroForm
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
         => reader.GetArray(dict, "Kids") is { } kids ? kids : [];
 
-    // The annotation that renders a terminal: its first widget-only kid (a separate
-    // widget carries no field /T), or the field dict itself when field and widget merge.
-    private DictionaryObject WidgetOf(DictionaryObject dict)
+    // The annotations that render a terminal: its widget-only kids (a separate widget
+    // carries no field /T), or the field dict itself when field and widget merge.
+    private List<DictionaryObject> WidgetsOf(DictionaryObject dict)
     {
+        var widgets = new List<DictionaryObject>();
         foreach (var kid in Kids(dict))
         {
             if (reader.AsDictionary(kid) is { } kidDict && !kidDict.ContainsKey("T"))
             {
-                return kidDict;
+                widgets.Add(kidDict);
             }
         }
 
-        return dict;
+        if (widgets.Count == 0)
+        {
+            widgets.Add(dict);
+        }
+
+        return widgets;
     }
 
     private string PartialName(DictionaryObject dict)
@@ -217,9 +225,8 @@ public sealed class AcroForm
 
         var terminal = Find(name);
         RequireFieldType(name, terminal.Field, "Btn", allowUntyped: false);
-        var widgets = RadioWidgets(terminal);
         var matched = false;
-        foreach (var widget in widgets)
+        foreach (var widget in terminal.Widgets)
         {
             if (HasAppearanceState(widget, value))
             {
@@ -235,7 +242,7 @@ public sealed class AcroForm
 
         terminal.Field["V"] = new NameObject(value);
         ChangedObjects.Add(terminal.Field);
-        foreach (var widget in widgets)
+        foreach (var widget in terminal.Widgets)
         {
             widget["AS"] = new NameObject(HasAppearanceState(widget, value) ? value : "Off");
             ChangedObjects.Add(widget);
@@ -246,10 +253,14 @@ public sealed class AcroForm
     {
         if (FieldAppearances.CanEncode(value) && CanBakeAppearance(terminal.Field))
         {
-            // Write the appearance onto the widget so a separate-widget kid's stale /AP
-            // does not override the new value in a viewer; when merged this is the field.
-            terminal.Widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal, value) };
-            ChangedObjects.Add(terminal.Widget);
+            // Write the appearance onto every widget so a kid's stale /AP does not override
+            // the new value in a viewer; when field and widget merge this is the field. Each
+            // widget bakes its own /Rect, since they need not share a size.
+            foreach (var widget in terminal.Widgets)
+            {
+                widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal, widget, value) };
+                ChangedObjects.Add(widget);
+            }
         }
         else
         {
@@ -259,10 +270,13 @@ public sealed class AcroForm
             // viewer via /NeedAppearances rather than emit a wrong or password-leaking stream.
             Dictionary["NeedAppearances"] = new BooleanObject(true);
             ChangedObjects.Add(Dictionary);
-            if (terminal.Widget.ContainsKey("AP"))
+            foreach (var widget in terminal.Widgets)
             {
-                terminal.Widget["AP"] = new NullObject();
-                ChangedObjects.Add(terminal.Widget);
+                if (widget.ContainsKey("AP"))
+                {
+                    widget["AP"] = new NullObject();
+                    ChangedObjects.Add(widget);
+                }
             }
         }
     }
@@ -342,31 +356,13 @@ public sealed class AcroForm
         return values;
     }
 
-    // The kid widgets of a radio group; when field and its single widget are merged
-    // (no /Kids) the group is just that one widget.
-    private List<DictionaryObject> RadioWidgets(Terminal terminal)
-    {
-        var widgets = new List<DictionaryObject>();
-        foreach (var kid in Kids(terminal.Field))
-        {
-            if (reader.AsDictionary(kid) is { } widget && !widget.ContainsKey("T"))
-            {
-                widgets.Add(widget);
-            }
-        }
-
-        if (widgets.Count == 0)
-        {
-            widgets.Add(terminal.Widget);
-        }
-
-        return widgets;
-    }
-
     private bool HasAppearanceState(DictionaryObject widget, string state)
-        => reader.GetDictionary(widget, "AP") is { } ap
-            && reader.GetDictionary(ap, "N") is { } states
-            && states.ContainsKey(state);
+        => AppearanceStates(widget) is { } states && states.ContainsKey(state);
+
+    private bool HasAppearanceStates(DictionaryObject widget) => AppearanceStates(widget) is not null;
+
+    private DictionaryObject? AppearanceStates(DictionaryObject widget)
+        => reader.GetDictionary(widget, "AP") is { } ap ? reader.GetDictionary(ap, "N") : null;
 
     /// <summary>
     /// Turns a button (check box) field on: its value and appearance state
@@ -377,18 +373,23 @@ public sealed class AcroForm
     {
         var terminal = Find(name);
         RequireFieldType(name, terminal.Field, "Btn", allowUntyped: false);
-        var on = OnStateName(terminal.Widget);
+        var on = OnStateName(terminal.Widgets[0]);
         terminal.Field["V"] = new NameObject(on);
-        terminal.Widget["AS"] = new NameObject(on);
         ChangedObjects.Add(terminal.Field);
-        ChangedObjects.Add(terminal.Widget);
+        foreach (var widget in terminal.Widgets)
+        {
+            // A widget whose own /AP states do not include the value stays Off: naming a
+            // state it has no stream for would render nothing at all.
+            widget["AS"] = new NameObject(HasAppearanceStates(widget) && !HasAppearanceState(widget, on) ? "Off" : on);
+            ChangedObjects.Add(widget);
+        }
     }
 
     // The on-state is the first non-/Off appearance in the widget's /AP /N; only when
     // the widget has no /AP states do we fall back to the conventional "Yes".
     private string OnStateName(DictionaryObject widget)
     {
-        if (reader.GetDictionary(widget, "AP") is { } ap && reader.GetDictionary(ap, "N") is { } states)
+        if (AppearanceStates(widget) is { } states)
         {
             foreach (var key in states.Keys)
             {
@@ -407,10 +408,10 @@ public sealed class AcroForm
             ? terminal
             : throw new ArgumentException($"Field '{name}' not found.", nameof(name));
 
-    private StreamObject BuildTextAppearance(Terminal terminal, string value)
+    private StreamObject BuildTextAppearance(Terminal terminal, DictionaryObject widget, string value)
     {
-        var (width, height) = RectSize(terminal.Widget);
-        var (daFont, daSize) = DefaultAppearance(terminal);
+        var (width, height) = RectSize(widget);
+        var (daFont, daSize) = DefaultAppearance(terminal, widget);
         var fontSize = daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize;
         return FieldAppearances.BuildText(value, width, height, FieldAppearances.AppearanceFont(daFont, fontSize));
     }
@@ -433,9 +434,9 @@ public sealed class AcroForm
 
     // Resolves the /DA to draw the value with: the field's own /DA wins, else the widget's,
     // else the form default /DA. A /DA size of 0 (auto) is reported as 0 for the caller to map.
-    private (string? Font, double Size) DefaultAppearance(Terminal terminal)
+    private (string? Font, double Size) DefaultAppearance(Terminal terminal, DictionaryObject widget)
         => FieldAppearances.ParseDefaultAppearance(
-            DaString(terminal.Field) ?? DaString(terminal.Widget) ?? DaString(Dictionary));
+            DaString(terminal.Field) ?? DaString(widget) ?? DaString(Dictionary));
 
     private string? DaString(DictionaryObject dict)
         => reader.GetString(dict, "DA");
