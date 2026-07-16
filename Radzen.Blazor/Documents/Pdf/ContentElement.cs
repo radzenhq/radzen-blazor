@@ -21,7 +21,12 @@ public abstract class ContentElement
     /// </summary>
     public bool IsArtifact { get; set; }
 
-    internal void Emit(ContentWriter writer)
+    internal void Emit(ContentWriter writer) => Emit(writer, Transform);
+
+    // A re-emitted element is spliced back where the source graphics state is still in
+    // effect, so the caller passes the transform to emit relative to that ambient state
+    // instead of this element's absolute one.
+    internal void Emit(ContentWriter writer, Matrix transform)
     {
         if (IsArtifact)
         {
@@ -29,21 +34,21 @@ public abstract class ContentElement
             writer.WriteRaw(" BDC\n");
         }
 
-        var transformed = Transform != Matrix.Identity;
+        var transformed = transform != Matrix.Identity;
         if (transformed)
         {
             writer.WriteRaw("q\n");
-            writer.WriteNumber(Transform.A);
+            writer.WriteNumber(transform.A);
             writer.WriteRaw(" ");
-            writer.WriteNumber(Transform.B);
+            writer.WriteNumber(transform.B);
             writer.WriteRaw(" ");
-            writer.WriteNumber(Transform.C);
+            writer.WriteNumber(transform.C);
             writer.WriteRaw(" ");
-            writer.WriteNumber(Transform.D);
+            writer.WriteNumber(transform.D);
             writer.WriteRaw(" ");
-            writer.WriteNumber(Transform.E);
+            writer.WriteNumber(transform.E);
             writer.WriteRaw(" ");
-            writer.WriteNumber(Transform.F);
+            writer.WriteNumber(transform.F);
             writer.WriteRaw(" cm\n");
         }
 

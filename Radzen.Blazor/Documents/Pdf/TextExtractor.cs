@@ -93,6 +93,7 @@ internal static class TextExtractor
                     continue;
 
                 case TokenKind.DictEnd:
+                case TokenKind.InlineImage:
                     continue;
 
                 case TokenKind.Operator:

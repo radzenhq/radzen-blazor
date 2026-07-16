@@ -50,6 +50,25 @@ public readonly struct Matrix : IEquatable<Matrix>
     internal static Matrix FromComponents(double a, double b, double c, double d, double e, double f)
         => new(a, b, c, d, e, f);
 
+    internal bool TryInvert(out Matrix result)
+    {
+        var determinant = A * D - B * C;
+        if (determinant == 0 || double.IsNaN(determinant) || double.IsInfinity(determinant))
+        {
+            result = Identity;
+            return false;
+        }
+
+        result = new(
+            D / determinant,
+            -B / determinant,
+            -C / determinant,
+            A / determinant,
+            (C * F - D * E) / determinant,
+            (B * E - A * F) / determinant);
+        return true;
+    }
+
     /// <summary>
     /// Creates a scaling matrix.
     /// </summary>

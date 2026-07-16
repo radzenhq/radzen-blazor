@@ -3,11 +3,12 @@
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Inline images (BI ... ID <binary> EI) must be skipped as a unit by both the
+// Inline images (BI ... ID <binary> EI) must be consumed as a unit by both the
 // interpreter and the extractor. The binary payload can contain bytes that look like
 // operators (even an unbounded "EI"), so it must not be lexed as content operators.
 public class InlineImageTests
@@ -38,12 +39,13 @@ public class InlineImageTests
     }
 
     [Fact]
-    public void Interpreter_SkipsPayloadAndMaterializesTrailingText()
+    public void Interpreter_MaterializesPayloadAsOneElementAndTrailingText()
     {
         var content = Load(StreamWithInlineImage()).Pages[0].Content;
 
-        var text = Assert.IsType<TextContent>(content[0]);
-        Assert.Equal("After", text.Text);
+        Assert.IsType<InlineImageContent>(content[0]);
+        Assert.Equal("After", Assert.IsType<TextContent>(content[1]).Text);
+        Assert.Equal(2, content.Count);
     }
 
     [Fact]

@@ -282,6 +282,12 @@ internal static class ContentEmitter
             writer.WriteRaw(" ");
         }
 
+        if (color.PatternName is { } pattern)
+        {
+            writer.WriteName(pattern);
+            writer.WriteRaw(" ");
+        }
+
         writer.WriteRaw(color.Kind switch
         {
             DeviceColorKind.Named => "scn",

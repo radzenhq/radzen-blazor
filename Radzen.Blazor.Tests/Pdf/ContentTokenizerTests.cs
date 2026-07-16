@@ -98,7 +98,7 @@ public class ContentTokenizerTests
     }
 
     [Fact]
-    public void Interpreter_MaterializesPathAndTextAndSkipsInlineImage()
+    public void Interpreter_MaterializesPathAndTextAndInlineImage()
     {
         var content = Load(StreamWithEverything()).Pages[0].Content;
 
@@ -106,7 +106,8 @@ public class ContentTokenizerTests
         Assert.Equal("Hello", Assert.IsType<TextContent>(content[1]).Text);
         Assert.Equal("World", Assert.IsType<TextContent>(content[2]).Text);
         Assert.Equal("Hi", Assert.IsType<TextContent>(content[3]).Text);
-        Assert.Equal(4, content.Count);
+        Assert.IsType<InlineImageContent>(content[4]);
+        Assert.Equal(5, content.Count);
     }
 
     [Fact]

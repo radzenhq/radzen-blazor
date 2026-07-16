@@ -92,6 +92,14 @@ internal static class Redactor
                     break;
                 case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
                     throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
+                case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
+                    content.RemoveAt(i);
+                    break;
+                // An operator with no modeled shape paints somewhere inside the clip in
+                // effect, and nowhere else; an unclipped one can paint anywhere at all.
+                case RawContent unmodeled when MayPaint(unmodeled.Operator)
+                    && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
+                    throw new NotSupportedException($"A redaction region intersects content painted by the '{unmodeled.Operator}' operator. Its extent cannot be determined safely from the content stream.");
                 case RawContent:
                     break;
             }
@@ -227,6 +235,12 @@ internal static class Redactor
             writer.WriteRaw(" ");
         }
     }
+
+    // Every unmodeled operator is assumed to put marks on the page unless it is one of the
+    // few known to only mutate graphics state or annotate the stream. Guessing the other
+    // way round would let an unrecognised painting operator survive a redaction silently.
+    private static bool MayPaint(string op) => op is not ("gs" or "ri" or "i" or "j" or "J" or "M"
+        or "BX" or "EX" or "MP" or "DP" or "d0" or "d1");
 
     private static TextBounds Bounds(Rect rect)
         => new(Math.Min(rect.Left, rect.Right), Math.Min(rect.Top, rect.Bottom), Math.Max(rect.Left, rect.Right), Math.Max(rect.Top, rect.Bottom));
