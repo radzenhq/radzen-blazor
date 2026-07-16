@@ -45,7 +45,7 @@ internal sealed class WatermarkContent(Watermark watermark, Rect box) : ContentE
             return;
         }
 
-        var decoded = ImageDecoder.ApplyOptions(ImageDecoder.Decode(image.Data), image);
+        var decoded = watermark.DecodeImage(image);
         var (width, height) = ImageDecoder.Measure(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
         writer.WriteRaw("q\n");
