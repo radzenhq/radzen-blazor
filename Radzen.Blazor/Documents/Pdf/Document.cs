@@ -357,7 +357,7 @@ public sealed class Document
 
         foreach (var page in Pages)
         {
-            page.Content.Add(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox));
+            page.AppendContent(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox));
         }
     }
 

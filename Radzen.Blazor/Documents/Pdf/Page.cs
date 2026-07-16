@@ -13,6 +13,7 @@ namespace Radzen.Documents.Pdf;
 public sealed class Page
 {
     private readonly ContentCollection elements = [];
+    private readonly List<ContentElement> pendingAppends = [];
     private readonly AnnotationCollection annotations = [];
     private byte[]? content;
     private bool materialized;
@@ -257,10 +258,30 @@ public sealed class Page
 
     internal byte[]? RawContent => content;
 
+    // Stamping a constant-size overlay onto a loaded page must not pay to parse and re-emit
+    // the whole content stream. Queuing the element leaves the raw bytes untouched, so
+    // BuildContent emits exactly the overlay the intact-append path would have produced;
+    // materializing later folds the queue in where Content.Add would have placed it.
+    internal void AppendContent(ContentElement element)
+    {
+        if (materialized || content is null || Generated is not null)
+        {
+            Content.Add(element);
+            return;
+        }
+
+        pendingAppends.Add(element);
+    }
+
     internal void SetReservedResourceNames(IReadOnlyCollection<string> names) => reservedResourceNames = names;
 
     internal void ApplyPendingContentEdits()
     {
+        if (pendingAppends.Count > 0)
+        {
+            EnsureMaterialized();
+        }
+
         if (!materialized)
         {
             return;
@@ -316,6 +337,25 @@ public sealed class Page
             var combinedNames = new HashSet<string>(reservedNames ?? []);
             AddResourceNames(combinedNames, editedResources);
             reservedNames = combinedNames;
+        }
+
+        // Queued appends imply a loaded page that was never materialized, so its raw bytes
+        // are still intact and only the additions need emitting.
+        if (pendingAppends.Count > 0)
+        {
+            using var pending = new ContentWriter(
+                SafePrefix("SF", reservedNames),
+                SafePrefix("SIm", reservedNames),
+                SafePrefix("SGS", reservedNames));
+            foreach (var element in pendingAppends)
+            {
+                element.Emit(pending);
+            }
+
+            var pendingOverlay = pending.DetachResult();
+            return new ContentEmissionResult(content,
+                ContentResourceManifest.Combine(editedResources, pendingOverlay.Resources),
+                new ContentEmissionResult(pendingOverlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
         }
 
         // An empty collection means "reuse the raw bytes" only when nothing was ever
@@ -412,6 +452,7 @@ public sealed class Page
         materialized = true;
         if (content is null || Generated is not null)
         {
+            FlushPendingAppends();
             return;
         }
 
@@ -426,6 +467,19 @@ public sealed class Page
         }
 
         snapshot = writer.ToArray();
+        FlushPendingAppends();
+    }
+
+    // Queued appends join the elements only after materializedCount and the snapshot are
+    // fixed, so they count as additions rather than as original content.
+    private void FlushPendingAppends()
+    {
+        foreach (var element in pendingAppends)
+        {
+            elements.Add(element);
+        }
+
+        pendingAppends.Clear();
     }
 
     private void ResetMaterialization()
