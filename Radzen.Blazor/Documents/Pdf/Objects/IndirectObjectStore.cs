@@ -44,6 +44,11 @@ internal sealed class IndirectObjectStore(
 
     internal bool IsEncrypted => security is not null;
 
+    // Type-2 entries carry an index into an object stream in Field3, not a generation;
+    // members of an object stream are always generation 0 (ISO 32000-1 7.5.7).
+    internal int GenerationOf(int number)
+        => entries.TryGetValue(number, out var entry) && entry.Type == 1 ? (int)entry.Field3 : 0;
+
     public DocumentObject GetObject(int number)
     {
         if (cache.TryGetValue(number, out var cached))

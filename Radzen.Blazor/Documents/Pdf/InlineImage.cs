@@ -13,18 +13,13 @@ public sealed class InlineImage : Run
 {
     private Unit? width;
     private Unit? height;
-    private (double Width, double Height)? natural;
+    private (double Width, double Height)? pixels;
 
     internal InlineImage(byte[] data)
         : base(string.Empty)
         => Data = data;
 
-    internal static InlineImage FromStream(Stream stream)
-    {
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return new InlineImage(buffer.ToArray());
-    }
+    internal static InlineImage FromStream(Stream stream) => new(ImageDecoder.ReadFully(stream));
 
     /// <summary>The buffered image bytes.</summary>
     internal byte[] Data { get; }
@@ -45,30 +40,7 @@ public sealed class InlineImage : Run
 
     internal (double Width, double Height) EffectiveSize()
     {
-        var (naturalWidth, naturalHeight) = natural ??= NaturalSize();
-        if (width is { } w && height is { } h)
-        {
-            return (w.Point, h.Point);
-        }
-
-        if (width is { } wo)
-        {
-            return (wo.Point, naturalHeight * wo.Point / naturalWidth);
-        }
-
-        if (height is { } ho)
-        {
-            return (naturalWidth * ho.Point / naturalHeight, ho.Point);
-        }
-
-        return (naturalWidth, naturalHeight);
-    }
-
-    private (double Width, double Height) NaturalSize()
-    {
-        var dict = ImageDecoder.Decode(Data).Image.Dictionary;
-        var pixelWidth = ((Objects.NumberObject)dict["Width"]).DoubleValue;
-        var pixelHeight = ((Objects.NumberObject)dict["Height"]).DoubleValue;
-        return (pixelWidth * 72.0 / 96.0, pixelHeight * 72.0 / 96.0);
+        var (pixelWidth, pixelHeight) = pixels ??= ImageDecoder.PixelSize(ImageDecoder.Decode(Data));
+        return ImageDecoder.DeriveSize(width, height, pixelWidth, pixelHeight);
     }
 }

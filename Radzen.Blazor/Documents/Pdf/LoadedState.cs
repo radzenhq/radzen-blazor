@@ -58,6 +58,10 @@ internal sealed class LoadedState
     // override only when the caller actually changed a modeled metadata field.
     public string?[]? LoadedInfoSnapshot { get; set; }
 
+    // The source /Info dictionary, so a full save can carry through the entries
+    // DocumentInfo does not model (/Trapped and any custom key).
+    public DictionaryObject? SourceInfo { get; set; }
+
     public IReadOnlyList<OutlineSnapshot>? LoadedOutlineSnapshot { get; set; }
 
     public bool OutlineRequiresRewrite { get; set; }

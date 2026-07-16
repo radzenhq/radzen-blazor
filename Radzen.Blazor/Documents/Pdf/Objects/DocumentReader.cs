@@ -69,6 +69,8 @@ public sealed class DocumentReader
     /// </summary>
     public bool IsEncrypted => store.IsEncrypted;
 
+    internal int GenerationOf(int number) => store.GenerationOf(number);
+
     /// <summary>
     /// Parses a PDF document from a byte array.
     /// </summary>

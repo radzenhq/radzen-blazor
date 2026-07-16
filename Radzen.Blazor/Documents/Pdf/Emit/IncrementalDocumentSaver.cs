@@ -14,8 +14,7 @@ namespace Radzen.Documents.Pdf.Emit;
 // pipeline to re-encode fails loud rather than silently falling back to a rewrite.
 internal sealed class IncrementalDocumentSaver
 {
-    private static readonly string[] InfoKeys =
-        ["Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate", "ModDate"];
+    private static readonly string[] InfoKeys = DocumentSaver.InfoKeys;
 
     private readonly Document doc;
 

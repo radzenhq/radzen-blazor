@@ -14,6 +14,10 @@ namespace Radzen.Documents.Pdf.Emit;
 // stays byte-identical with the previous inline implementation.
 internal sealed class DocumentSaver
 {
+    // The /Info keys DocumentInfo models, in the order both savers emit them.
+    internal static readonly string[] InfoKeys =
+        ["Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate", "ModDate"];
+
     private readonly Document doc;
 
     internal DocumentSaver(Document document) => doc = document;
@@ -304,9 +308,24 @@ internal sealed class DocumentSaver
         writer.Close();
     }
 
+    // The modeled keys are rebuilt from DocumentInfo, so a field cleared to null is
+    // omitted. Entries DocumentInfo does not model (/Trapped, custom keys) are not the
+    // saver's to drop and carry through from the source dictionary.
     private DictionaryObject? BuildInfo()
     {
         DictionaryObject? info = null;
+
+        if (doc.Loaded?.SourceInfo is { } source)
+        {
+            foreach (var pair in source)
+            {
+                if (Array.IndexOf(InfoKeys, pair.Key) < 0)
+                {
+                    info ??= new DictionaryObject();
+                    info[pair.Key] = pair.Value;
+                }
+            }
+        }
 
         void Set(string key, string? value)
         {

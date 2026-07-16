@@ -165,6 +165,23 @@ public sealed class PathContent : ContentElement
     /// <summary>Closes the current subpath.</summary>
     public void Close() => segments.Add(new Segment("h", []));
 
+    // The alpha actually painted. A gradient or device paint replaces the RGB Color, so only
+    // the channels that reach rg/RG contribute. One ExtGState carries one /ca and one /CA, and
+    // a fill+stroke path paints both in a single operator, so differing alphas cannot be
+    // expressed: fail loud rather than silently dropping one of them.
+    private double ColorAlpha()
+    {
+        var fill = Fill && FillGradient is null && FillPaint is null ? FillColor.A / 255.0 : 1;
+        var stroke = Stroke && StrokePaint is null ? StrokeColor.A / 255.0 : 1;
+        if (fill < 1 && stroke < 1 && fill != stroke)
+        {
+            throw new NotSupportedException(
+                "A path cannot fill and stroke with different color alphas; give FillColor and StrokeColor the same alpha, or split the fill and the stroke into two paths.");
+        }
+
+        return Math.Min(fill, stroke);
+    }
+
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
@@ -176,10 +193,20 @@ public sealed class PathContent : ContentElement
         // so a path that sets any of it is scoped too, keeping later paths at the viewer defaults.
         var leaksStrokeState = Cap is not null || Join is not null || MiterLimit is not null
             || Intent is not null || DashArray is not null;
-        var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState;
+
+        // A translucent colour paints through a constant-alpha /ExtGState, and gs persists in
+        // the graphics state just like the above, so it is scoped by the same q..Q.
+        var alpha = ColorAlpha();
+        var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState || alpha < 1;
         if (scoped)
         {
             writer.WriteRaw("q\n");
+        }
+
+        if (alpha < 1)
+        {
+            writer.WriteName(writer.RegisterOpacity(alpha));
+            writer.WriteRaw(" gs\n");
         }
 
         if (Stroke)

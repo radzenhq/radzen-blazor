@@ -60,6 +60,37 @@ public class IncrementalUpdateWriterTests
         return buffer.ToArray();
     }
 
+    // Object 3 lives at generation 1 (a number reclaimed from the free list by a prior
+    // full save, as Acrobat produces) and is referenced as "3 1 R" by the page.
+    private static byte[] BuildGenerationOneDocument()
+    {
+        var bodies = new (int Number, int Generation, string Body)[]
+        {
+            (1, 0, "<< /Type /Catalog /Pages 2 0 R >>"),
+            (2, 0, "<< /Type /Pages /Count 1 /Kids [4 0 R] >>"),
+            (3, 1, "<< /Marker (original generation one) >>"),
+            (4, 0, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Extra 3 1 R >>"),
+        };
+
+        var text = new StringBuilder("%PDF-1.7\n");
+        var offsets = new int[bodies.Length + 1];
+        foreach (var (number, generation, body) in bodies)
+        {
+            offsets[number] = text.Length;
+            text.Append($"{number} {generation} obj\n{body}\nendobj\n");
+        }
+
+        var xref = text.Length;
+        text.Append("xref\n0 5\n0000000000 65535 f \n");
+        foreach (var (number, generation, _) in bodies)
+        {
+            text.Append($"{offsets[number]:D10} {generation:D5} n \n");
+        }
+
+        text.Append($"trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
+        return Encoding.ASCII.GetBytes(text.ToString());
+    }
+
     private static long FindStartXref(byte[] data)
     {
         var text = Encoding.Latin1.GetString(data);
@@ -168,6 +199,33 @@ public class IncrementalUpdateWriterTests
 
         Assert.Equal(((NumberObject)originalReader.Trailer["Size"]).IntValue,
             ((NumberObject)reader.Trailer["Size"]).IntValue);
+    }
+
+    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation, so an
+    // override of an object living at generation 1 must keep that generation. Emitting
+    // gen 0 leaves the in-document "3 1 R" references resolving to null in strict readers.
+    [Fact]
+    public void Override_PreservesNonZeroGenerationOfTheOverriddenObject()
+    {
+        var original = BuildGenerationOneDocument();
+
+        var writer = new IncrementalUpdateWriter(original);
+        var reference = writer.Override(3, new DictionaryObject { ["Marker"] = new StringObject("patched") });
+        var updated = writer.ToArray();
+
+        AssertPrefix(original, updated);
+        Assert.Equal(1, reference.Generation);
+
+        var appended = Encoding.Latin1.GetString(updated, original.Length, updated.Length - original.Length);
+        Assert.Contains("3 1 obj", appended, StringComparison.Ordinal);
+        Assert.Contains(" 00001 n \n", appended, StringComparison.Ordinal);
+
+        var reader = DocumentReader.Parse(updated);
+        var page = (DictionaryObject)reader.Resolve(
+            ((ArrayObject)reader.Resolve(((DictionaryObject)reader.Resolve(
+                Catalog(reader)["Pages"]))["Kids"]))[0]);
+        var extra = Assert.IsType<DictionaryObject>(reader.Resolve(page["Extra"]));
+        Assert.Equal("patched", ((StringObject)extra["Marker"]).Value);
     }
 
     [Fact]

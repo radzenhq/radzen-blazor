@@ -1,8 +1,12 @@
 #nullable enable
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -53,4 +57,56 @@ public class ImageDecoderRegistryTests
     [Fact]
     public void Decode_UnrecognizedFormat_Throws()
         => Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode([0x00, 0x01, 0x02, 0x03]));
+
+    // Register is a public plugin seam over process-wide static state, and its read-copy-swap
+    // must be atomic: concurrent registrations that each copy the same snapshot lose all but the
+    // last, and the loss only surfaces later as an "unrecognized format" for a decoder the caller
+    // did register. Every decoder registered here sniffs a magic no other test uses.
+    [Fact]
+    public void ConcurrentRegistrationsAreAllRetained()
+    {
+        const int Threads = 8;
+        using var start = new Barrier(Threads);
+        var magics = new byte[Threads][];
+
+        var tasks = new Task[Threads];
+        for (var i = 0; i < Threads; i++)
+        {
+            var magic = new byte[] { 0x5A, 0x5A, (byte)i };
+            magics[i] = magic;
+            tasks[i] = Task.Run(() =>
+            {
+                start.SignalAndWait();
+                ImageDecoder.Register(new StubDecoder(magic));
+            });
+        }
+
+        Task.WaitAll(tasks);
+
+        foreach (var magic in magics)
+        {
+            // Throws NotSupportedException if this registration was lost.
+            Assert.NotNull(ImageDecoder.Decode(magic));
+        }
+    }
+
+    // Claims exactly one magic prefix and yields on everything else, so registering it
+    // cannot shadow a built-in format for any other test in the process.
+    private sealed class StubDecoder(byte[] magic) : IImageDecoder
+    {
+        public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        {
+            if (!data.AsSpan().StartsWith(magic))
+            {
+                xobject = null;
+                return false;
+            }
+
+            var stream = new StreamObject([]);
+            stream.Dictionary["Width"] = new NumberObject(1);
+            stream.Dictionary["Height"] = new NumberObject(1);
+            xobject = new ImageXObject(stream, null);
+            return true;
+        }
+    }
 }

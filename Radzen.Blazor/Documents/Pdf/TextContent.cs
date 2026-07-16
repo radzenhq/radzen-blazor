@@ -60,6 +60,17 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
 
+        // A translucent colour paints through a constant-alpha /ExtGState; gs persists in the
+        // graphics state, so it is scoped by q..Q to keep the alpha off later elements. A
+        // device fill paint replaces Color, and carries no alpha of its own.
+        var alpha = FillPaint is null ? Color.A / 255.0 : 1;
+        if (alpha < 1)
+        {
+            writer.WriteRaw("q\n");
+            writer.WriteName(writer.RegisterOpacity(alpha));
+            writer.WriteRaw(" gs\n");
+        }
+
         writer.WriteRaw("BT\n");
         if (FillPaint is { } fillPaint)
         {
@@ -115,6 +126,10 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
 
         writer.WriteRaw("ET\n");
+        if (alpha < 1)
+        {
+            writer.WriteRaw("Q\n");
+        }
     }
 
     private byte[] EncodeText()
