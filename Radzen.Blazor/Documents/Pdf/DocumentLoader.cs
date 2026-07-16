@@ -3,6 +3,7 @@ using Radzen.Documents.Pdf.Emit;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Radzen.Documents.Pdf;
@@ -163,21 +164,29 @@ internal static class DocumentLoader
             return;
         }
 
-        var (width, height) = Dimensions(box);
+        var mediaCorners = ResolveCorners(reader, box);
+        var cropCorners = ResolveCorners(reader, cropBox);
+        var mediaBox = ToRect(mediaCorners);
+        var cropRect = ToRect(cropCorners);
+        var (width, height) = Dimensions(mediaBox);
         var page = new Page(width, height);
-        if (box is not null && box.Count >= 4)
+        if (mediaBox is { } preservedMediaBox)
         {
-            page.SetPreservedMediaBox(ToRect(box));
+            page.SetPreservedMediaBox(preservedMediaBox);
         }
 
-        if (cropBox is not null && cropBox.Count >= 4)
+        if (cropRect is { } preservedCropBox)
         {
-            page.SetPreservedCropBox(ToRect(cropBox));
+            page.SetPreservedCropBox(preservedCropBox);
         }
 
         page.BleedBox = ReadBox(reader, node, "BleedBox");
         page.TrimBox = ReadBox(reader, node, "TrimBox");
         page.ArtBox = ReadBox(reader, node, "ArtBox");
+        if (rotate is { } loadedRotation)
+        {
+            page.SetLoadedRotate(loadedRotation);
+        }
 
         var content = ReadContent(reader, node);
         if (content is not null)
@@ -201,22 +210,31 @@ internal static class DocumentLoader
             state.SourceResources[page] = resources;
         }
 
-        if (box is not null && box.Count >= 4)
+        // The resolved boxes rather than the source arrays: an element held as an indirect
+        // reference re-emits as 0 unless it is resolved here.
+        if (mediaCorners is not null)
         {
-            state.SourceBoxes[page] = box;
+            state.SourceBoxes[page] = BoxArray(mediaCorners);
         }
 
-        if (cropBox is not null && cropBox.Count >= 4)
+        if (cropCorners is not null)
         {
-            state.SourceCropBoxes[page] = cropBox;
+            state.SourceCropBoxes[page] = BoxArray(cropCorners);
         }
 
-        // Only a rotation the viewer would actually apply is worth re-emitting.
-        if (rotate is { } degrees && degrees % 360 != 0)
+        // Carries the rotation onto a page appended from this document, which copies the
+        // page rather than sharing it. Only a rotation the viewer would apply is worth it.
+        if (page.Rotate != 0)
         {
-            state.SourceRotations[page] = degrees;
+            state.SourceRotations[page] = page.Rotate;
         }
     }
+
+    // Building a ReverseFont decodes and parses the font's whole /ToUnicode CMap, and the
+    // same font dictionary is typically shared by every page (commonly through /Resources
+    // inherited from the /Pages node), so each one is reversed once per reader. ReverseFont
+    // is immutable, and the cache dies with the reader it is keyed by.
+    private static readonly ConditionalWeakTable<DocumentReader, Dictionary<DictionaryObject, Fonts.ReverseFont>> ReverseFonts = [];
 
     public static Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
     {
@@ -226,42 +244,75 @@ internal static class DocumentLoader
             return fonts;
         }
 
+        var cache = ReverseFonts.GetOrCreateValue(reader);
         foreach (var key in fontDictionary.Keys)
         {
-            if (reader.AsDictionary(fontDictionary[key]) is { } font)
+            if (reader.AsDictionary(fontDictionary[key]) is not { } font)
             {
-                fonts[key] = Fonts.ReverseFont.Build(reader, font);
+                continue;
+            }
+
+            lock (cache)
+            {
+                if (!cache.TryGetValue(font, out var reversed))
+                {
+                    reversed = Fonts.ReverseFont.Build(reader, font);
+                    cache[font] = reversed;
+                }
+
+                fonts[key] = reversed;
             }
         }
 
         return fonts;
     }
 
-    private static (Unit Width, Unit Height) Dimensions(ArrayObject? box)
+    private static (Unit Width, Unit Height) Dimensions(Rect? box)
+        => box is { } rect
+            ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
+            : (PageSizes.A4.Width, PageSizes.A4.Height);
+
+    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10), so each
+    // element is resolved; a box with a coordinate that is not a number at all is unusable
+    // and reads as absent rather than collapsing the page to a degenerate size.
+    private static double[]? ResolveCorners(DocumentReader reader, ArrayObject? box)
     {
         if (box is null || box.Count < 4)
         {
-            return (PageSizes.A4.Width, PageSizes.A4.Height);
+            return null;
         }
 
-        var llx = Number(box[0]);
-        var lly = Number(box[1]);
-        var urx = Number(box[2]);
-        var ury = Number(box[3]);
-        return (Unit.FromPoint(urx - llx), Unit.FromPoint(ury - lly));
+        var corners = new double[4];
+        for (var i = 0; i < corners.Length; i++)
+        {
+            if (reader.AsNumber(box[i]) is not { } corner)
+            {
+                return null;
+            }
+
+            corners[i] = corner;
+        }
+
+        return corners;
     }
 
-    private static Rect ToRect(ArrayObject box)
-    {
-        var x1 = Number(box[0]);
-        var y1 = Number(box[1]);
-        var x2 = Number(box[2]);
-        var y2 = Number(box[3]);
-        return new Rect(x1, y1, x2 - x1, y2 - y1);
-    }
+    private static Rect? ToRect(double[]? corners)
+        => corners is not null
+            ? new Rect(corners[0], corners[1], corners[2] - corners[0], corners[3] - corners[1])
+            : null;
+
+    // The re-emitted box keeps the source coordinates rather than the corners a Rect
+    // recomputes, so a fractional origin cannot shift the far edge by a rounding step.
+    private static ArrayObject BoxArray(double[] corners) =>
+    [
+        new NumberObject(corners[0]),
+        new NumberObject(corners[1]),
+        new NumberObject(corners[2]),
+        new NumberObject(corners[3]),
+    ];
 
     private static Rect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
-        => reader.GetArray(page, key) is { Count: >= 4 } box ? ToRect(box) : null;
+        => ToRect(ResolveCorners(reader, reader.GetArray(page, key)));
 
     public static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
 

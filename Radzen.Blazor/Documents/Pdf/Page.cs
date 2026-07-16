@@ -140,6 +140,8 @@ public sealed class Page
     /// <summary>
     /// Gets or sets the clockwise viewing rotation of the page in degrees.
     /// Must be 0, 90, 180 or 270; the default 0 emits no <c>/Rotate</c> key.
+    /// A page loaded from a source reports that page's rotation, and setting 0
+    /// removes it.
     /// </summary>
     public int Rotate
     {
@@ -152,8 +154,18 @@ public sealed class Page
             }
 
             rotate = value;
+
+            // An explicit rotation supersedes the source page's, which the saver would
+            // otherwise re-emit whenever this value is 0.
+            Owner?.Loaded?.SourceRotations.Remove(this);
         }
     }
+
+    // A source /Rotate is any multiple of 90 (including negative and over-360 values) and
+    // is normalized to the 0-359 range the public setter accepts; a non-conforming value
+    // is kept verbatim so it still round-trips.
+    internal void SetLoadedRotate(int degrees)
+        => rotate = degrees % 90 == 0 ? ((degrees % 360) + 360) % 360 : degrees;
 
     /// <summary>
     /// Gets the ordered collection of content elements. For a loaded page the raw

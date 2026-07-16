@@ -59,6 +59,44 @@ public class MediaBoxOriginTests
         Assert.Equal(812, N(box, 3), 0.01);
     }
 
+    // A /MediaBox element may legally be an indirect reference; unresolved it reads as 0
+    // and collapses the page to nothing.
+    [Fact]
+    public void IndirectCoordinates_AreResolved()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 5 0 R 6 0 R] /Contents 4 0 R >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Length 12 >>\nstream\n0 0 10 10 re\nendstream\nendobj\n")
+            .Object(5, "5 0 obj\n612\nendobj\n")
+            .Object(6, "6 0 obj\n792\nendobj\n");
+        var loaded = Load(Wrap(pdf, 7));
+
+        Assert.Equal(612, loaded.Pages[0].Width.Point, 0.01);
+        Assert.Equal(792, loaded.Pages[0].Height.Point, 0.01);
+
+        var reader = DocumentReader.Parse(loaded.ToArray());
+        var box = Assert.IsType<ArrayObject>(reader.Resolve(DocumentLoadTests.Kid(reader, 0)["MediaBox"]));
+
+        Assert.Equal(0, N(box, 0), 0.01);
+        Assert.Equal(0, N(box, 1), 0.01);
+        Assert.Equal(612, N(box, 2), 0.01);
+        Assert.Equal(792, N(box, 3), 0.01);
+    }
+
+    // A coordinate that is not a number at all leaves the box unusable, so the page falls
+    // back to the default size rather than to a degenerate 0 x 0.
+    [Fact]
+    public void NonNumericCoordinate_FallsBackToDefaultSize()
+    {
+        var loaded = Load(OnePageWithBox("[0 0 /Bogus 812]"));
+
+        Assert.Equal(PageSizes.A4.Width.Point, loaded.Pages[0].Width.Point, 0.01);
+        Assert.Equal(PageSizes.A4.Height.Point, loaded.Pages[0].Height.Point, 0.01);
+    }
+
     [Fact]
     public void ZeroOrigin_RoundTrips()
     {
