@@ -161,12 +161,12 @@ public class AttachmentSpecConformanceTests
         var xml = EmbeddedStream(reader, files["factur-x.xml"]);
         var xmlParams = Assert.IsType<DictionaryObject>(reader.Resolve(xml.Dictionary["Params"]));
         Assert.Equal(InvoiceXml.Length, BuildTestSupport.Int(xmlParams, "Size"));
-        Assert.Equal("D:20260315083045Z00'00'", ParamsModDate(reader, xml));
+        Assert.Equal("D:20260315083045+00'00'", ParamsModDate(reader, xml));
 
         var binary = EmbeddedStream(reader, files["scan.bin"]);
         var binaryParams = Assert.IsType<DictionaryObject>(reader.Resolve(binary.Dictionary["Params"]));
         Assert.Equal(BinaryPayload.Length, BuildTestSupport.Int(binaryParams, "Size"));
-        Assert.Equal("D:20000101000000Z00'00'", ParamsModDate(reader, binary));
+        Assert.Equal("D:20000101000000+00'00'", ParamsModDate(reader, binary));
     }
 
     [Fact]

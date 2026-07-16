@@ -267,16 +267,6 @@ internal static class Paginator
 
     internal static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 
-    // Pre-breaks each paragraph into its lines at the content width; a non-paragraph block
-    // has no lines to break (Default returns null).
-    private sealed class LineBreakVisitor(double contentWidth, FontCollection fonts, StyleResolution resolution)
-        : BlockVisitor<Nothing, IReadOnlyList<LineBox>?>
-    {
-        protected override IReadOnlyList<LineBox>? Default(Block block, Nothing context) => null;
-
-        public override IReadOnlyList<LineBox>? Visit(Paragraph paragraph, Nothing context)
-            => LineBreaker.Break(paragraph, contentWidth, fonts, resolution.Alignment(paragraph), resolution);
-    }
     // Forwards to BlockExpander so external callers (BoxContentLayout) keep using
     // Paginator.ExpandBlocks; the expansion itself lives in BlockExpander.
     internal static IReadOnlyList<Block> ExpandBlocks(

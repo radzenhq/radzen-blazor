@@ -242,8 +242,8 @@ internal sealed class ConformanceWriter(Document document)
 
             if (part == 4)
             {
-                // ISO 19005-4 documents are PDF 2.0; the header stays 1.7, so
-                // declare the version through the catalog.
+                // ISO 19005-4 documents are PDF 2.0: DocumentSaver emits the 2.0 header
+                // (ISO 19005-4 6.1.2) and the catalog restates it (ISO 32000-2 7.5.2).
                 catalog["Version"] = new NameObject("2.0");
             }
         }

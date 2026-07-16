@@ -2,7 +2,6 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -33,7 +32,7 @@ internal sealed class AttachmentWriter(Document document)
             file.Dictionary["Params"] = new DictionaryObject
             {
                 ["Size"] = new NumberObject(attachment.Data.Length),
-                ["ModDate"] = new StringObject(FormatDate(attachment.ModificationDate)),
+                ["ModDate"] = new StringObject(DocumentSaver.PdfDate(attachment.ModificationDate.ToUniversalTime())),
             };
 
             var fileReference = writer.Add(file);
@@ -70,7 +69,4 @@ internal sealed class AttachmentWriter(Document document)
         catalog["Names"] = nameTree;
         catalog["AF"] = af;
     }
-
-    internal static string FormatDate(DateTimeOffset date)
-        => "D:" + date.UtcDateTime.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + "Z00'00'";
 }
