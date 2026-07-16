@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Encryption;
-using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -206,66 +205,26 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
     private void WriteXrefStream(CountingBufferedStream buffer, int xrefNumber, long xrefOffset, long[] offsets, int[] packedIndex, int objStmNumber, long objStmOffset)
     {
         var size = xrefNumber + 1;
-        var types = new byte[size];
-        var field2 = new long[size];
-        var field3 = new long[size];
+        var rows = new XrefRow[size];
 
-        field3[0] = 65535;
+        // The head of the free list: object 0, generation 65535.
+        rows[0] = new XrefRow(0, 0, 65535);
         for (var i = 0; i < offsets.Length; i++)
         {
             var number = i + 1;
-            if (packedIndex[i] >= 0)
-            {
-                types[number] = 2;
-                field2[number] = objStmNumber;
-                field3[number] = packedIndex[i];
-            }
-            else
-            {
-                types[number] = 1;
-                field2[number] = offsets[i];
-            }
+            rows[number] = packedIndex[i] >= 0
+                ? new XrefRow(2, objStmNumber, packedIndex[i])
+                : new XrefRow(1, offsets[i], 0);
         }
 
         if (objStmNumber > 0)
         {
-            types[objStmNumber] = 1;
-            field2[objStmNumber] = objStmOffset;
+            rows[objStmNumber] = new XrefRow(1, objStmOffset, 0);
         }
 
-        types[xrefNumber] = 1;
-        field2[xrefNumber] = xrefOffset;
+        rows[xrefNumber] = new XrefRow(1, xrefOffset, 0);
 
-        var w1 = 1;
-        var w2 = 1;
-        for (var i = 0; i < size; i++)
-        {
-            w1 = Math.Max(w1, PdfBytes.FieldWidth(field2[i]));
-            w2 = Math.Max(w2, PdfBytes.FieldWidth(field3[i]));
-        }
-
-        var data = new byte[size * (1 + w1 + w2)];
-        var pos = 0;
-        for (var i = 0; i < size; i++)
-        {
-            data[pos++] = types[i];
-            PdfBytes.WriteBigEndian(data, ref pos, field2[i], w1);
-            PdfBytes.WriteBigEndian(data, ref pos, field3[i], w2);
-        }
-
-        var xref = new StreamObject(FlateFilter.Encode(data));
-        xref.Dictionary["Type"] = new NameObject("XRef");
-        xref.Dictionary["Size"] = new NumberObject(size);
-        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
-        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
-
-        foreach (var key in Trailer.Keys)
-        {
-            if (!xref.Dictionary.ContainsKey(key))
-            {
-                xref.Dictionary[key] = Trailer[key];
-            }
-        }
+        var xref = XrefStreamPacker.Pack(rows, "Size", new NumberObject(size), Trailer);
 
         // Cross-reference streams are never encrypted (ISO 32000-1 7.5.8.2).
         WriteIndirectObject(buffer, xrefNumber, xref, null, -1);

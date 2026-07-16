@@ -5,6 +5,28 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
 
+// Accumulates a /Resources dictionary. Categories and their entries appear in the
+// order the caller adds them: DictionaryObject serializes by insertion order, so
+// each build path's Add sequence is what pins its emitted bytes.
+internal sealed class ResourceDictionaryBuilder
+{
+    private DictionaryObject? resources;
+
+    public void Add(string category, string key, DocumentObject value)
+    {
+        resources ??= new DictionaryObject();
+        if (!resources.TryGetValue(category, out var existing) || existing is not DictionaryObject entries)
+        {
+            entries = new DictionaryObject();
+            resources[category] = entries;
+        }
+
+        entries[key] = value;
+    }
+
+    public DictionaryObject? Build() => resources;
+}
+
 // Builds each page's /Resources and /MediaBox on save: registers generated fonts
 // and image XObjects, materializes base-14 font dictionaries, and merges freshly
 // emitted resources into the entries a loaded page already carried.
@@ -16,24 +38,20 @@ internal static class PageResourceBuilder
         Dictionary<GeneratedFont, DocumentObject> fontRefs,
         Dictionary<GeneratedImage, ReferenceObject> imageRefs)
     {
-        DictionaryObject? fonts = null;
+        var resources = new ResourceDictionaryBuilder();
+
         foreach (var font in page.Fonts)
         {
-            fonts ??= new DictionaryObject();
-            fonts[font.Key] = ResolveFont(writer, font, fontRefs);
+            resources.Add("Font", font.Key, ResolveFont(writer, font, fontRefs));
         }
 
-        DictionaryObject? xobjects = null;
         foreach (var image in page.Images)
         {
-            xobjects ??= new DictionaryObject();
-            xobjects[image.Key] = ResolveImage(writer, image, imageRefs);
+            resources.Add("XObject", image.Key, ResolveImage(writer, image, imageRefs));
         }
 
-        DictionaryObject? extGStates = null;
         foreach (var state in page.ExtGStates)
         {
-            extGStates ??= new DictionaryObject();
             DocumentObject? softMask = null;
             if (state.SoftMask is { } mask)
             {
@@ -44,7 +62,7 @@ internal static class PageResourceBuilder
                 softMask = new NameObject("None");
             }
 
-            extGStates[state.Key] = ExtGStateDictionary(
+            resources.Add("ExtGState", state.Key, ExtGStateDictionary(
                 state.FillAlpha,
                 state.StrokeAlpha,
                 state.Blend,
@@ -52,43 +70,15 @@ internal static class PageResourceBuilder
                 state.OverprintFill,
                 state.OverprintMode,
                 state.Intent,
-                softMask);
+                softMask));
         }
 
-        DictionaryObject? patterns = null;
         foreach (var pattern in page.Patterns)
         {
-            patterns ??= new DictionaryObject();
-            patterns[pattern.Key] = writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient));
+            resources.Add("Pattern", pattern.Key, writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient)));
         }
 
-        if (fonts is null && xobjects is null && extGStates is null && patterns is null)
-        {
-            return null;
-        }
-
-        var resources = new DictionaryObject();
-        if (fonts is not null)
-        {
-            resources["Font"] = fonts;
-        }
-
-        if (xobjects is not null)
-        {
-            resources["XObject"] = xobjects;
-        }
-
-        if (extGStates is not null)
-        {
-            resources["ExtGState"] = extGStates;
-        }
-
-        if (patterns is not null)
-        {
-            resources["Pattern"] = patterns;
-        }
-
-        return resources;
+        return resources.Build();
     }
 
     // Builds an /ExtGState parameter dictionary. Alpha (/ca, /CA) is always present;
@@ -241,61 +231,29 @@ internal static class PageResourceBuilder
         ContentResourceManifest manifest,
         Dictionary<ImageXObject, ReferenceObject>? sharedImages = null)
     {
-        DictionaryObject? fonts = null;
+        var resources = new ResourceDictionaryBuilder();
+
         foreach (var (baseFont, key) in manifest.Fonts)
         {
-            fonts ??= new DictionaryObject();
-            fonts[key] = Base14FontDictionary(baseFont);
+            resources.Add("Font", key, Base14FontDictionary(baseFont));
         }
 
-        DictionaryObject? xobjects = null;
         foreach (var (key, image) in manifest.Images)
         {
-            xobjects ??= new DictionaryObject();
-            xobjects[key] = ResolveManifestImage(writer, image, sharedImages);
+            resources.Add("XObject", key, ResolveManifestImage(writer, image, sharedImages));
         }
 
-        DictionaryObject? patterns = null;
         foreach (var (key, pattern) in manifest.Patterns)
         {
-            patterns ??= new DictionaryObject();
-            patterns[key] = writer.Add(pattern);
+            resources.Add("Pattern", key, writer.Add(pattern));
         }
 
-        DictionaryObject? extGStates = null;
         foreach (var (key, opacity) in manifest.ExtGStates)
         {
-            extGStates ??= new DictionaryObject();
-            extGStates[key] = ExtGStateDictionary(opacity, opacity);
+            resources.Add("ExtGState", key, ExtGStateDictionary(opacity, opacity));
         }
 
-        if (fonts is null && xobjects is null && patterns is null && extGStates is null)
-        {
-            return null;
-        }
-
-        var resources = new DictionaryObject();
-        if (fonts is not null)
-        {
-            resources["Font"] = fonts;
-        }
-
-        if (xobjects is not null)
-        {
-            resources["XObject"] = xobjects;
-        }
-
-        if (patterns is not null)
-        {
-            resources["Pattern"] = patterns;
-        }
-
-        if (extGStates is not null)
-        {
-            resources["ExtGState"] = extGStates;
-        }
-
-        return resources;
+        return resources.Build();
     }
 
     private static ReferenceObject ResolveManifestImage(

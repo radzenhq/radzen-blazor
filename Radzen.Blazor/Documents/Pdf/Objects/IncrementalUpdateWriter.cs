@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -264,44 +263,19 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         var xrefOffset = buffer.Position;
         offsets[xrefNumber] = xrefOffset;
 
-        var w1 = 1;
-        foreach (var offset in offsets.Values)
-        {
-            w1 = Math.Max(w1, PdfBytes.FieldWidth(offset));
-        }
-
-        var w2 = 1;
-        foreach (var generation in generations.Values)
-        {
-            w2 = Math.Max(w2, PdfBytes.FieldWidth(generation));
-        }
-
         var index = new ArrayObject();
-        using var data = new MemoryStream();
+        var rows = new List<XrefRow>();
         foreach (var (start, count) in Subsections(offsets))
         {
             index.Add(new NumberObject(start));
             index.Add(new NumberObject(count));
             for (var number = start; number < start + count; number++)
             {
-                data.WriteByte(1);
-                PdfBytes.WriteBigEndian(data, offsets[number], w1);
-                PdfBytes.WriteBigEndian(data, GenerationOf(number), w2);
+                rows.Add(new XrefRow(1, offsets[number], GenerationOf(number)));
             }
         }
 
-        var xref = new StreamObject(FlateFilter.Encode(data.ToArray()));
-        xref.Dictionary["Type"] = new NameObject("XRef");
-        xref.Dictionary["Index"] = index;
-        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
-        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
-        foreach (var pair in BuildTrailer(xrefNumber + 1))
-        {
-            if (!xref.Dictionary.ContainsKey(pair.Key))
-            {
-                xref.Dictionary[pair.Key] = pair.Value;
-            }
-        }
+        var xref = XrefStreamPacker.Pack(rows, "Index", index, BuildTrailer(xrefNumber + 1));
 
         PdfBytes.WriteInteger(buffer, xrefNumber);
         PdfBytes.WriteAscii(buffer, " 0 obj\n");

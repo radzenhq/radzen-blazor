@@ -135,6 +135,70 @@ public class SimpleShaperTests
         }
     }
 
+    private static readonly string[] WidthCorpus =
+    [
+        "", "A", "AV", "AVATAR", "Wave To Vary", "Measurement, 1234.56 EUR",
+        "Liberation Sans - the quick brown fox jumps over the lazy dog",
+        "ÄÖÜ Привет", "tab\tseparated", "😀 emoji", "VA.VA.VA", "To,Yo.We",
+    ];
+
+    // Raw bit patterns of the widths the two hand-copied loops produced before they were merged
+    // into ShapeCore, captured per corpus entry. Pinned as bits, not with a tolerance: a
+    // reordered sum or a changed kern guard shifts the last mantissa bits and slides drawn text
+    // against its measured line, which a tolerance would wave through.
+    public static TheoryData<bool, double, long[]> PinnedWidths => new()
+    {
+        { false, 7, [0, 4616942783519784960, 4621446383147155456, 4628576441175375872, 4631437782747709440, 4635943066002259968, 4640925898080518144, 4630934137702711296, 4631686959570354176, 4627426764329582592, 4629673204024082432, 4629452889381666816] },
+        { false, 12, [0, 4620695416705384448, 4625199016332754944, 4631953866017996800, 4635049815883907072, 4639554858620289024, 4644469228919848960, 4634618120131051520, 4635263396017602560, 4630968428721602560, 4632893948459745280, 4632705107337674752] },
+        { false, 13.5, [0, 4621258641536712704, 4625762241164083200, 4632798497106558976, 4635718490752286720, 4640223713877295104, 4645189430510878720, 4635232833030324224, 4635958768402694144, 4631689880148115456, 4633856089853526016, 4633643643591196672] },
+        { true, 7, [0, 4616942783519784960, 4621153913054167040, 4627991500989399040, 4631201112869830656, 4635943066002259968, 4640925898080518144, 4630890363396030464, 4631686959570354176, 4627426764329582592, 4629234498884599808, 4629018032532881408] },
+        { true, 12, [0, 4620695416705384448, 4624699838053744640, 4631452488715730944, 4634846955988582400, 4639554858620289024, 4644469228919848960, 4634580599296753664, 4635263396017602560, 4630968428721602560, 4632517915483045888, 4632332372895858688] },
+        { true, 13.5, [0, 4621258641536712704, 4625480216431558656, 4632234447641509888, 4635490273370046464, 4640223713877295104, 4645189430510878720, 4635190622091739136, 4635958768402694144, 4631689880148115456, 4633433052754739200, 4633224317344153600] },
+    };
+
+    [Theory]
+    [MemberData(nameof(PinnedWidths))]
+    public void MeasureAdvance_AndShape_MatchPreMergeWidths_BitForBit(bool kerning, double size, long[] expected)
+    {
+        var fonts = LiberationSans();
+        fonts.EnableKerning = kerning;
+        var font = new Font { Name = "Liberation Sans", Size = size };
+
+        for (var i = 0; i < WidthCorpus.Length; i++)
+        {
+            var measured = fonts.Shaper().MeasureAdvance(WidthCorpus[i], font);
+            fonts.Shaper().Shape(WidthCorpus[i], font, out var shaped);
+
+            Assert.Equal(expected[i], BitConverter.DoubleToInt64Bits(measured));
+            Assert.Equal(expected[i], BitConverter.DoubleToInt64Bits(shaped));
+        }
+    }
+
+    [Fact]
+    public void MeasureAdvance_DoesNotAllocate()
+    {
+        var fonts = LiberationSans();
+        fonts.EnableKerning = true;
+        var shaper = fonts.Shaper();
+        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        const string Word = "Measurement";
+
+        shaper.MeasureAdvance(Word, font);
+
+        var bytes = Measure(() =>
+        {
+            for (var i = 0; i < 1000; i++)
+            {
+                shaper.MeasureAdvance(Word, font);
+            }
+        });
+
+        // MeasureSink is a struct reached through a struct generic constraint, so the shared
+        // ShapeCore builds no glyph list on the measure path. Zero allocation is the reason the
+        // two loops were allowed to be merged; if this regresses, the merge cost a real win.
+        Assert.True(bytes < 4096, $"1000 MeasureAdvance calls allocated {bytes} bytes.");
+    }
+
     [Fact]
     public void Shape_UnknownFamily_ThrowsWithNameInMessage()
     {
