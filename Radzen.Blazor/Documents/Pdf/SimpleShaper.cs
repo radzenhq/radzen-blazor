@@ -12,57 +12,49 @@ namespace Radzen.Documents.Pdf;
 // the glyph/cluster sequence they draw is the one measurement summed.
 internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = false)
 {
-    // Returns the shaped glyphs in visual order; advance is their total width in points. Since
-    // any kern is folded into both a glyph's advance and the running total, advance always
-    // equals the sum of the returned glyph advances.
-    public List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
+    // Receives the shaped run. Implemented by structs and consumed through a struct generic
+    // constraint so the JIT devirtualizes every call: measuring costs no allocation because the
+    // sink that discards glyphs has nowhere to put them, not because a second loop omits them.
+    private interface IGlyphSink
     {
-        ArgumentNullException.ThrowIfNull(font);
+        void Add(ushort glyph, double advance, int cluster, SfntFont face);
 
-        EnsureNoComplexScript(text);
-
-        var primary = fonts.ResolvePrimarySfnt(font);
-
-        var glyphs = new List<PositionedGlyph>(text.Length);
-        double total = 0;
-        SfntFont? previousFace = null;
-        ushort previousGlyph = 0;
-        var i = 0;
-        while (i < text.Length)
-        {
-            var codepoint = FontCollection.CodePointAt(text, i);
-            var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
-            var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
-
-            // Kerning adjusts the space between the previous glyph and this one, so it is
-            // folded into the previous glyph's advance. It applies only within a single face.
-            if (enableKerning && ReferenceEquals(previousFace, face) && glyphs.Count > 0)
-            {
-                var kern = previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
-                if (kern != 0)
-                {
-                    var last = glyphs.Count - 1;
-                    var previous = glyphs[last];
-                    glyphs[last] = new PositionedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster, previous.Face);
-                    total += kern;
-                }
-            }
-
-            glyphs.Add(new PositionedGlyph(glyph, advance, i, face));
-            total += advance;
-            previousFace = face;
-            previousGlyph = glyph;
-            i += codepoint > 0xFFFF ? 2 : 1;
-        }
-
-        totalAdvance = total;
-        return glyphs;
+        void Kern(double kern);
     }
 
-    // The width Shape would report, without materializing the glyph list measurement discards.
-    // Kept structurally identical to Shape's loop (same resolve, same kern folding, same
-    // accumulation order) so a measured width is bit-for-bit the advance that gets drawn.
-    public double MeasureAdvance(ReadOnlySpan<char> text, Font font)
+    private struct MeasureSink : IGlyphSink
+    {
+        public double Total;
+
+        public void Add(ushort glyph, double advance, int cluster, SfntFont face) => Total += advance;
+
+        public void Kern(double kern) => Total += kern;
+    }
+
+    private struct CollectSink : IGlyphSink
+    {
+        public List<PositionedGlyph> Glyphs;
+        public double Total;
+
+        public void Add(ushort glyph, double advance, int cluster, SfntFont face)
+        {
+            Glyphs.Add(new PositionedGlyph(glyph, advance, cluster, face));
+            Total += advance;
+        }
+
+        public void Kern(double kern)
+        {
+            var last = Glyphs.Count - 1;
+            var previous = Glyphs[last];
+            Glyphs[last] = new PositionedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster, previous.Face);
+            Total += kern;
+        }
+    }
+
+    // The one shaping loop. Measure and emit differ only in the sink, so a kern or fallback
+    // change cannot shift a measured line relative to its drawn glyphs.
+    private void ShapeCore<TSink>(ReadOnlySpan<char> text, Font font, ref TSink sink)
+        where TSink : struct, IGlyphSink
     {
         ArgumentNullException.ThrowIfNull(font);
 
@@ -70,7 +62,6 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
 
         var primary = fonts.ResolvePrimarySfnt(font);
 
-        double total = 0;
         SfntFont? previousFace = null;
         ushort previousGlyph = 0;
         var count = 0;
@@ -81,19 +72,42 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
             var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
 
+            // Kerning adjusts the space between the previous glyph and this one, so it is
+            // folded into the previous glyph's advance. It applies only within a single face.
             if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
             {
-                total += previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
+                var kern = previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
+                if (kern != 0)
+                {
+                    sink.Kern(kern);
+                }
             }
 
-            total += advance;
+            sink.Add(glyph, advance, i, face);
             count++;
             previousFace = face;
             previousGlyph = glyph;
             i += codepoint > 0xFFFF ? 2 : 1;
         }
+    }
 
-        return total;
+    // Returns the shaped glyphs in visual order; advance is their total width in points. Since
+    // any kern is folded into both a glyph's advance and the running total, advance always
+    // equals the sum of the returned glyph advances.
+    public List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
+    {
+        var sink = new CollectSink { Glyphs = new List<PositionedGlyph>(text.Length) };
+        ShapeCore(text, font, ref sink);
+        totalAdvance = sink.Total;
+        return sink.Glyphs;
+    }
+
+    // The width Shape would report, without materializing the glyph list measurement discards.
+    public double MeasureAdvance(ReadOnlySpan<char> text, Font font)
+    {
+        var sink = new MeasureSink();
+        ShapeCore(text, font, ref sink);
+        return sink.Total;
     }
 
     // Fails loud when text needs OpenType shaping or bidirectional reordering the identity

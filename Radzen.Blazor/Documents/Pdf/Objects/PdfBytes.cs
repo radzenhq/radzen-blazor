@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -129,5 +131,51 @@ internal static class PdfBytes
         Span<char> digits = stackalloc char[20];
         value.TryFormat(digits, out var written, provider: CultureInfo.InvariantCulture);
         WriteAscii(stream, digits[..written]);
+    }
+}
+
+// One cross-reference stream row: the type byte plus its two /W-sized fields.
+internal readonly record struct XrefRow(byte Type, long Field2, long Field3);
+
+internal static class XrefStreamPacker
+{
+    // Packs rows into a Flate-encoded /Type /XRef stream with /W widths derived from the
+    // rows themselves. The caller supplies the one key that distinguishes the two shapes:
+    // /Size for a contiguous full-save table, /Index for incremental subsections. It is
+    // stamped after /Type so the emitted key order matches each caller's original.
+    internal static StreamObject Pack(IReadOnlyList<XrefRow> rows, string key, DocumentObject value, DictionaryObject trailer)
+    {
+        var w1 = 1;
+        var w2 = 1;
+        foreach (var row in rows)
+        {
+            w1 = Math.Max(w1, PdfBytes.FieldWidth(row.Field2));
+            w2 = Math.Max(w2, PdfBytes.FieldWidth(row.Field3));
+        }
+
+        var data = new byte[rows.Count * (1 + w1 + w2)];
+        var pos = 0;
+        foreach (var row in rows)
+        {
+            data[pos++] = row.Type;
+            PdfBytes.WriteBigEndian(data, ref pos, row.Field2, w1);
+            PdfBytes.WriteBigEndian(data, ref pos, row.Field3, w2);
+        }
+
+        var xref = new StreamObject(FlateFilter.Encode(data));
+        xref.Dictionary["Type"] = new NameObject("XRef");
+        xref.Dictionary[key] = value;
+        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
+        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
+
+        foreach (var pair in trailer)
+        {
+            if (!xref.Dictionary.ContainsKey(pair.Key))
+            {
+                xref.Dictionary[pair.Key] = pair.Value;
+            }
+        }
+
+        return xref;
     }
 }

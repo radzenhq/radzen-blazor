@@ -400,19 +400,85 @@ internal sealed class CffFont
         public double[]? FontMatrix => fontMatrix;
     }
 
+    // Type 2 charstring operand decoding and subr dispatch, shared by the partial
+    // interpreters below. Each derives its own Run: they walk the same bytes for
+    // different answers, so the dispatch loops are deliberately not shared.
+    private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
+    {
+        protected readonly List<double> stack = [];
+        protected bool done;
+
+        protected FdInfo Fd => fd;
+
+        protected CffIndex GlobalSubrs => globalSubrs;
+
+        protected int GlobalBias => globalBias;
+
+        public abstract void Run(byte[] cs, int depth);
+
+        // Returns true once the walk is finished, so callers that must stop at the first
+        // answer can return immediately rather than resuming their dispatch loop.
+        protected bool RunSubr(CffIndex? subrs, int bias, int depth)
+        {
+            if (subrs is null || stack.Count == 0)
+            {
+                stack.Clear();
+                return false;
+            }
+
+            var index = (int)stack[^1] + bias;
+            stack.RemoveAt(stack.Count - 1);
+            if (index < 0 || index >= subrs.Count)
+            {
+                done = true;
+                return true;
+            }
+
+            Run(subrs.GetBytes(index), depth + 1);
+            return done;
+        }
+
+        protected int ReadOperand(byte[] cs, int i, int b)
+        {
+            if (b == 28)
+            {
+                stack.Add((short)((cs[i + 1] << 8) | cs[i + 2]));
+                return i + 3;
+            }
+
+            if (b < 247)
+            {
+                stack.Add(b - 139);
+                return i + 1;
+            }
+
+            if (b < 251)
+            {
+                stack.Add(((b - 247) * 256) + cs[i + 1] + 108);
+                return i + 2;
+            }
+
+            if (b < 255)
+            {
+                stack.Add((-(b - 251) * 256) - cs[i + 1] - 108);
+                return i + 2;
+            }
+
+            stack.Add(((cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4]) / 65536.0);
+            return i + 5;
+        }
+    }
+
     // Executes a Type 2 charstring only far enough to recover the optional leading width
     // operand. The width sits before the first stem/moveto/endchar operator when the
     // operand count exceeds what that operator consumes. Subr calls are executed because
     // real charstrings can dispatch into a subr before emitting the first such operator.
     private sealed class WidthContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
+        : CharstringContext(fd, globalSubrs, globalBias)
     {
-        private readonly List<double> stack = [];
-
         public double? Width { get; private set; }
 
-        private bool done;
-
-        public void Run(byte[] cs, int depth)
+        public override void Run(byte[] cs, int depth)
         {
             if (depth > 10)
             {
@@ -452,7 +518,7 @@ internal sealed class CffFont
                         ResolveWidth(stack.Count % 2 == 1);
                         return;
                     case 10:
-                        if (RunSubr(fd.LocalSubrs, fd.LocalBias, depth))
+                        if (RunSubr(Fd.LocalSubrs, Fd.LocalBias, depth))
                         {
                             return;
                         }
@@ -461,7 +527,7 @@ internal sealed class CffFont
                     case 11:
                         return;
                     case 29:
-                        if (RunSubr(globalSubrs, globalBias, depth))
+                        if (RunSubr(GlobalSubrs, GlobalBias, depth))
                         {
                             return;
                         }
@@ -478,61 +544,10 @@ internal sealed class CffFont
             }
         }
 
-        private bool RunSubr(CffIndex? subrs, int bias, int depth)
-        {
-            if (subrs is null || stack.Count == 0)
-            {
-                stack.Clear();
-                return false;
-            }
-
-            var index = (int)stack[^1] + bias;
-            stack.RemoveAt(stack.Count - 1);
-            if (index < 0 || index >= subrs.Count)
-            {
-                done = true;
-                return true;
-            }
-
-            Run(subrs.GetBytes(index), depth + 1);
-            return done;
-        }
-
         private void ResolveWidth(bool hasWidth)
         {
-            Width = hasWidth ? fd.NominalWidthX + stack[0] : fd.DefaultWidthX;
+            Width = hasWidth ? Fd.NominalWidthX + stack[0] : Fd.DefaultWidthX;
             done = true;
-        }
-
-        private int ReadOperand(byte[] cs, int i, int b)
-        {
-            if (b == 28)
-            {
-                stack.Add((short)((cs[i + 1] << 8) | cs[i + 2]));
-                return i + 3;
-            }
-
-            if (b < 247)
-            {
-                stack.Add(b - 139);
-                return i + 1;
-            }
-
-            if (b < 251)
-            {
-                stack.Add(((b - 247) * 256) + cs[i + 1] + 108);
-                return i + 2;
-            }
-
-            if (b < 255)
-            {
-                stack.Add((-(b - 251) * 256) - cs[i + 1] - 108);
-                return i + 2;
-            }
-
-            var value = (cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4];
-            stack.Add(value / 65536.0);
-            return i + 5;
         }
     }
 
@@ -541,14 +556,13 @@ internal sealed class CffFont
     // bytes are skipped correctly, and follows local/global subrs, so a residual operand
     // count at endchar is not mistaken for a seac.
     private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
+        : CharstringContext(fd, globalSubrs, globalBias)
     {
-        private readonly List<double> stack = [];
         private int hintCount;
-        private bool done;
 
         public bool Seac { get; private set; }
 
-        public void Run(byte[] cs, int depth)
+        public override void Run(byte[] cs, int depth)
         {
             if (depth > 10)
             {
@@ -587,10 +601,10 @@ internal sealed class CffFont
                         done = true;
                         return;
                     case 10:
-                        RunSubr(fd.LocalSubrs, fd.LocalBias, depth);
+                        RunSubr(Fd.LocalSubrs, Fd.LocalBias, depth);
                         break;
                     case 29:
-                        RunSubr(globalSubrs, globalBias, depth);
+                        RunSubr(GlobalSubrs, GlobalBias, depth);
                         break;
                     case 11:
                         return;
@@ -605,53 +619,5 @@ internal sealed class CffFont
             }
         }
 
-        private void RunSubr(CffIndex? subrs, int bias, int depth)
-        {
-            if (subrs is null || stack.Count == 0)
-            {
-                stack.Clear();
-                return;
-            }
-
-            var index = (int)stack[^1] + bias;
-            stack.RemoveAt(stack.Count - 1);
-            if (index < 0 || index >= subrs.Count)
-            {
-                done = true;
-                return;
-            }
-
-            Run(subrs.GetBytes(index), depth + 1);
-        }
-
-        private int ReadOperand(byte[] cs, int i, int b)
-        {
-            if (b == 28)
-            {
-                stack.Add((short)((cs[i + 1] << 8) | cs[i + 2]));
-                return i + 3;
-            }
-
-            if (b < 247)
-            {
-                stack.Add(b - 139);
-                return i + 1;
-            }
-
-            if (b < 251)
-            {
-                stack.Add(((b - 247) * 256) + cs[i + 1] + 108);
-                return i + 2;
-            }
-
-            if (b < 255)
-            {
-                stack.Add((-(b - 251) * 256) - cs[i + 1] - 108);
-                return i + 2;
-            }
-
-            stack.Add(((cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4]) / 65536.0);
-            return i + 5;
-        }
     }
 }

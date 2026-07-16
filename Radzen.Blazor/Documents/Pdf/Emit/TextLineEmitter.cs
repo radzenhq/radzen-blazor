@@ -129,44 +129,79 @@ internal sealed class TextLineEmitter(
         EmitLinks(plan, line, originX, y);
     }
 
-    // One /Link rect per maximal group of consecutive fragments of the same linked
-    // run on this line; a run wrapped over several lines gets one rect per line.
-    private static void EmitLinks(PagePlan plan, LineBox line, double originX, double y)
+    // Maximal groups of consecutive eligible fragments, each group extended while
+    // sameGroup holds against the group's first fragment.
+    private static IEnumerable<(int First, double Start, double End)> Spans(
+        IReadOnlyList<LineFragment> fragments,
+        Func<LineFragment, bool> eligible,
+        Func<LineFragment, LineFragment, bool> sameGroup)
     {
-        var fragments = line.Fragments;
         var i = 0;
         while (i < fragments.Count)
         {
-            var run = fragments[i].Run;
-            var uri = run.Link is { Length: > 0 } link ? link : null;
-            var destination = uri is null && run.LinkToAnchor is { Length: > 0 } anchor ? anchor : null;
-            if ((uri is null && destination is null) || fragments[i].Text.Length == 0)
+            var first = fragments[i];
+            if (!eligible(first))
             {
                 i++;
                 continue;
             }
 
-            var start = fragments[i].XOffset;
-            var end = start + fragments[i].Advance;
+            var start = first.XOffset;
+            var end = start + first.Advance;
             var j = i + 1;
-            while (j < fragments.Count && fragments[j].Run == run)
+            while (j < fragments.Count && sameGroup(first, fragments[j]))
             {
                 end = fragments[j].XOffset + fragments[j].Advance;
                 j++;
             }
 
-            var size = fragments[i].Font.Size;
+            yield return (i, start, end);
+            i = j;
+        }
+    }
+
+    private static double DecorationThickness(double size) => Math.Max(size * 0.06, 0.5);
+
+    private static void AddDecorationEdge(PagePlan plan, double x1, double x2, double edgeY, Font font, double alpha)
+    {
+        plan.Edges.Add(new EdgeDraw
+        {
+            X1 = x1,
+            Y1 = edgeY,
+            X2 = x2,
+            Y2 = edgeY,
+            LineWidth = DecorationThickness(font.Size),
+            Color = font.Color,
+            Style = BorderStyle.Solid,
+            ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
+        });
+    }
+
+    private static string? LinkUri(Run run) => run.Link is { Length: > 0 } link ? link : null;
+
+    private static string? LinkDestination(Run run) =>
+        LinkUri(run) is null && run.LinkToAnchor is { Length: > 0 } anchor ? anchor : null;
+
+    // One /Link rect per maximal group of consecutive fragments of the same linked
+    // run on this line; a run wrapped over several lines gets one rect per line.
+    private static void EmitLinks(PagePlan plan, LineBox line, double originX, double y)
+    {
+        foreach (var (first, start, end) in Spans(
+            line.Fragments,
+            f => (LinkUri(f.Run) is not null || LinkDestination(f.Run) is not null) && f.Text.Length > 0,
+            (f, next) => next.Run == f.Run))
+        {
+            var fragment = line.Fragments[first];
+            var size = fragment.Font.Size;
             plan.Links.Add(new GeneratedLink
             {
                 X1 = originX + start,
                 Y1 = y - (size * 0.3),
                 X2 = originX + end,
                 Y2 = y + (size * 0.9),
-                Uri = uri,
-                Destination = destination,
+                Uri = LinkUri(fragment.Run),
+                Destination = LinkDestination(fragment.Run),
             });
-
-            i = j;
         }
     }
 
@@ -175,42 +210,20 @@ internal sealed class TextLineEmitter(
     // inter-word gaps inside the run stay underlined.
     private static void EmitUnderlines(PagePlan plan, LineBox line, double originX, double y, double opacity)
     {
-        var fragments = line.Fragments;
-        var i = 0;
-        while (i < fragments.Count)
+        foreach (var (first, start, end) in Spans(
+            line.Fragments,
+            f => f.Font.Underline && f.Text.Length > 0,
+            (f, next) => next.Run == f.Run))
         {
-            var run = fragments[i].Run;
-            var font = fragments[i].Font;
-            if (!font.Underline || fragments[i].Text.Length == 0)
-            {
-                i++;
-                continue;
-            }
-
-            var start = fragments[i].XOffset;
-            var end = fragments[i].XOffset + fragments[i].Advance;
-            var j = i + 1;
-            while (j < fragments.Count && fragments[j].Run == run)
-            {
-                end = fragments[j].XOffset + fragments[j].Advance;
-                j++;
-            }
-
-            var underlineY = y - (font.Size * 0.12);
-            var alpha = opacity * run.Opacity;
-            plan.Edges.Add(new EdgeDraw
-            {
-                X1 = originX + start,
-                Y1 = underlineY,
-                X2 = originX + end,
-                Y2 = underlineY,
-                LineWidth = Math.Max(font.Size * 0.06, 0.5),
-                Color = font.Color,
-                Style = BorderStyle.Solid,
-                ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
-            });
-
-            i = j;
+            var fragment = line.Fragments[first];
+            var font = fragment.Font;
+            AddDecorationEdge(
+                plan,
+                originX + start,
+                originX + end,
+                y - (font.Size * 0.12),
+                font,
+                opacity * fragment.Run.Opacity);
         }
     }
 
@@ -219,45 +232,23 @@ internal sealed class TextLineEmitter(
     // above the baseline; a style change starts a new correctly-styled line.
     private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y, double opacity)
     {
-        var fragments = line.Fragments;
-        var i = 0;
-        while (i < fragments.Count)
+        foreach (var (first, start, end) in Spans(
+            line.Fragments,
+            f => f.Font.Strikethrough && f.Text.Length > 0,
+            (f, next) => next.Font.Strikethrough
+                && next.Font.Size == f.Font.Size
+                && next.Font.Color.Equals(f.Font.Color)
+                && next.Run.Opacity == f.Run.Opacity))
         {
-            var font = fragments[i].Font;
-            if (!font.Strikethrough || fragments[i].Text.Length == 0)
-            {
-                i++;
-                continue;
-            }
-
-            var start = fragments[i].XOffset;
-            var end = fragments[i].XOffset + fragments[i].Advance;
-            var j = i + 1;
-            while (j < fragments.Count
-                && fragments[j].Font.Strikethrough
-                && fragments[j].Font.Size == font.Size
-                && fragments[j].Font.Color.Equals(font.Color)
-                && fragments[j].Run.Opacity == fragments[i].Run.Opacity)
-            {
-                end = fragments[j].XOffset + fragments[j].Advance;
-                j++;
-            }
-
-            var strikeY = y + (font.Size * 0.3);
-            var alpha = opacity * fragments[i].Run.Opacity;
-            plan.Edges.Add(new EdgeDraw
-            {
-                X1 = originX + start,
-                Y1 = strikeY,
-                X2 = originX + end,
-                Y2 = strikeY,
-                LineWidth = Math.Max(font.Size * 0.06, 0.5),
-                Color = font.Color,
-                Style = BorderStyle.Solid,
-                ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
-            });
-
-            i = j;
+            var fragment = line.Fragments[first];
+            var font = fragment.Font;
+            AddDecorationEdge(
+                plan,
+                originX + start,
+                originX + end,
+                y + (font.Size * 0.3),
+                font,
+                opacity * fragment.Run.Opacity);
         }
     }
 
