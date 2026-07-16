@@ -231,7 +231,7 @@ internal sealed class PaginationContext
 
     public void PlaceCode(Block block)
     {
-        var (codeWidth, codeHeight) = Paginator.MeasureCode(block, resolution);
+        var (codeWidth, codeHeight) = Paginator.MeasureCode(block, fonts, resolution);
         if (Cursor + codeHeight > contentHeight + Eps && HasPageContent)
         {
             Flush();

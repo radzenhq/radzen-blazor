@@ -170,6 +170,42 @@ public class CodeElementTests
         Assert.True(baseline < barsBottom, $"text baseline {baseline} is not below the bars bottom {barsBottom}");
     }
 
+    private static List<(string Text, double Y)> ShownText(byte[] content)
+    {
+        var ops = ContentStreamTokenizer.Parse(content);
+        var shown = new List<(string, double)>();
+        var y = 0.0;
+        foreach (var op in ops)
+        {
+            if (op.Operator == "Td")
+            {
+                y = op.Num(1);
+            }
+            else if (op.Operator == "Tj")
+            {
+                shown.Add((Encoding.ASCII.GetString(op.Operands[0].Bytes), y));
+            }
+        }
+
+        return shown;
+    }
+
+    [Fact]
+    public void Barcode_ShowText_WrappedCaption_DoesNotOverlapNextBlock()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN CODE ONE TWO", Unit.FromPoint(50), Unit.FromPoint(40), showText: true);
+        section.Blocks.AddParagraph("after");
+
+        var shown = ShownText(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+        var after = shown.Single(s => s.Text == "after").Y;
+        var caption = shown.Where(s => s.Text != "after").ToList();
+
+        Assert.True(caption.Count > 1, "the caption did not wrap");
+        Assert.All(caption, line => Assert.True(line.Y > after, $"caption line '{line.Text}' at {line.Y} overlaps the next block at {after}"));
+    }
+
     [Fact]
     public void Barcode_ShowText_WithoutExplicitFont_UsesDocumentDefaultFont_InPdfA()
     {
