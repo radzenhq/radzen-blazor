@@ -270,6 +270,11 @@ public sealed class Page
 
     internal byte[]? RawContent => content;
 
+    // Whether the retained bytes are still the whole story: no elements were materialized
+    // (and so none can have been edited) and no overlay is queued. Read by PageOperations to
+    // decide whether a copy can take the bytes verbatim.
+    internal bool ContentIsIntact => !materialized && pendingAppends.Count == 0;
+
     // Stamping a constant-size overlay onto a loaded page must not pay to parse and re-emit
     // the whole content stream. Queuing the element leaves the raw bytes untouched, so
     // BuildContent emits exactly the overlay the intact-append path would have produced;
