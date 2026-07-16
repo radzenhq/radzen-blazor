@@ -95,11 +95,13 @@ internal sealed class StandardSecurityHandler
         => Decrypt(streamCipher, data, objectNumber, generation);
 
     // A /Metadata stream stays plaintext when /EncryptMetadata is false (ISO 32000-1
-    // 7.6.3.2); running it through the cipher would return corrupted XMP.
+    // 7.6.3.2); running it through the cipher would return corrupted XMP. A stream whose
+    // chain starts with /Crypt is decrypted by that filter instead of /StmF (7.4.10), so
+    // it is left alone here; CryptStreamFilter rejects any non-Identity crypt filter.
     public byte[] DecryptStream(byte[] data, int objectNumber, int generation, DictionaryObject dictionary)
     {
         ArgumentNullException.ThrowIfNull(dictionary);
-        return !encryptMetadata && IsMetadataStream(dictionary)
+        return (!encryptMetadata && IsMetadataStream(dictionary)) || HasCryptFilter(dictionary)
             ? data
             : DecryptStream(data, objectNumber, generation);
     }
@@ -107,6 +109,19 @@ internal sealed class StandardSecurityHandler
     private static bool IsMetadataStream(DictionaryObject dictionary)
         => dictionary.TryGetValue("Type", out var type) && type is NameObject name
             && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
+
+    // /Crypt shall be the first filter in the chain, so only that position is honoured;
+    // a /Crypt found later is left to the normal /StmF path.
+    private static bool HasCryptFilter(DictionaryObject dictionary)
+    {
+        if (!dictionary.TryGetValue("Filter", out var filter))
+        {
+            return false;
+        }
+
+        var first = filter is ArrayObject array ? (array.Count > 0 ? array[0] : null) : filter;
+        return first is NameObject name && string.Equals(name.Value, "Crypt", StringComparison.Ordinal);
+    }
 
     public byte[] DecryptString(byte[] data, int objectNumber, int generation)
         => Decrypt(stringCipher, data, objectNumber, generation);
