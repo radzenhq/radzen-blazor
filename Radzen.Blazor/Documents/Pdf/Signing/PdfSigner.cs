@@ -415,12 +415,15 @@ public static class PdfSigner
         }
     }
 
-    // Patches /ByteRange in place (length-preserving), collects the two byte
-    // ranges, obtains the detached blob from <paramref name="produceBlob"/> and
-    // hex-encodes it into the /Contents gap. Shared by ordinary signing (the blob
-    // is a CMS SignedData) and document time-stamping (an RFC 3161 token).
+    internal delegate byte[] BlobProducer(SignedContent content);
+
+    // Patches /ByteRange in place (length-preserving), hands the two covered
+    // ranges to <paramref name="produceBlob"/> as views into the document itself,
+    // and hex-encodes the returned blob into the /Contents gap. Shared by ordinary
+    // signing (the blob is a CMS SignedData) and document time-stamping (an RFC
+    // 3161 token).
     internal static byte[] Embed(byte[] bytes, int sigStart, int sigEnd, int reservedBytes,
-        Func<byte[], byte[]> produceBlob, string reservedHint)
+        BlobProducer produceBlob, string reservedHint)
     {
         var hexDigits = reservedBytes * 2;
         var (gapStart, gapEnd) = FindContentsGap(bytes, sigStart, sigEnd, hexDigits);
@@ -431,9 +434,7 @@ public static class PdfSigner
             throw new InvalidOperationException("The /Contents placeholder moved while patching /ByteRange.");
         }
 
-        var content = new byte[gapStart + bytes.Length - gapEnd];
-        Array.Copy(bytes, 0, content, 0, gapStart);
-        Array.Copy(bytes, gapEnd, content, gapStart, bytes.Length - gapEnd);
+        var content = new SignedContent(bytes.AsSpan(0, gapStart), bytes.AsSpan(gapEnd));
 
         var blob = produceBlob(content);
         if (blob.Length > reservedBytes)

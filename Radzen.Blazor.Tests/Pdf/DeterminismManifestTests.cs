@@ -40,7 +40,7 @@ public class DeterminismManifestTests
             }
         }
 
-        public byte[] Sign(ReadOnlySpan<byte> content) => (byte[])signature.Clone();
+        public byte[] Sign(SignedContent content) => (byte[])signature.Clone();
     }
 
     // Fixed, deterministic stand-in for an RFC 3161 token from a TSA.

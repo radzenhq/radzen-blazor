@@ -57,7 +57,7 @@ public class PdfSignerTests
 
         public byte[]? LastSignature { get; private set; }
 
-        public byte[] Sign(ReadOnlySpan<byte> content)
+        public byte[] Sign(SignedContent content)
         {
             LastContent = content.ToArray();
             LastSignature = sign(LastContent);

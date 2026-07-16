@@ -1,5 +1,3 @@
-using System;
-
 namespace Radzen.Documents.Pdf.Signing;
 
 /// <summary>
@@ -25,7 +23,11 @@ public interface ISigner
     /// the whole file except the <c>/Contents</c> hex string (including its
     /// angle brackets).
     /// </summary>
-    /// <param name="content">The bytes to sign.</param>
+    /// <param name="content">The bytes to sign, as the two segments the
+    /// <c>/ByteRange</c> names. Call <see cref="SignedContent.ToArray"/> for
+    /// them contiguously, or hash <see cref="SignedContent.First"/> then
+    /// <see cref="SignedContent.Second"/> to sign a large document without
+    /// copying it.</param>
     /// <returns>A DER-encoded detached PKCS#7/CMS <c>SignedData</c>.</returns>
-    byte[] Sign(ReadOnlySpan<byte> content);
+    byte[] Sign(SignedContent content);
 }

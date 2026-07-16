@@ -58,7 +58,7 @@ public class VisibleSignatureTests
 
     private sealed class CmsSigner2(X509Certificate2 certificate) : ISigner
     {
-        public byte[] Sign(ReadOnlySpan<byte> content)
+        public byte[] Sign(SignedContent content)
         {
             var cms = new SignedCms(new ContentInfo(content.ToArray()), detached: true);
             cms.ComputeSignature(new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, certificate));
@@ -68,7 +68,7 @@ public class VisibleSignatureTests
 
     private sealed class FixedSigner(byte[] blob) : ISigner
     {
-        public byte[] Sign(ReadOnlySpan<byte> content) => blob;
+        public byte[] Sign(SignedContent content) => blob;
     }
 
     private static DictionaryObject Catalog(DocumentReader reader)
