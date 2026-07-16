@@ -22,6 +22,7 @@ internal sealed class StyleResolution
     private readonly Dictionary<Paragraph, Font> paragraphFonts = [];
     private readonly Dictionary<Barcode, Font> barcodeFonts = [];
     private readonly Dictionary<ListItem, Font> itemFonts = [];
+    private readonly Dictionary<TableOfContents, Font> tocFonts = [];
     private readonly Dictionary<ListItem, (StructureElement Label, StructureElement Body)> listItemElements = [];
     private readonly Dictionary<Paragraph, (StructureElement Label, StructureElement Body)> listParagraphElements = [];
 
@@ -54,6 +55,12 @@ internal sealed class StyleResolution
 
     internal void SetItemFont(ListItem item, Font font)
         => itemFonts[item] = font;
+
+    public Font? TocFont(TableOfContents toc)
+        => tocFonts.TryGetValue(toc, out var font) ? font : null;
+
+    internal void SetTocFont(TableOfContents toc, Font font)
+        => tocFonts[toc] = font;
 
     internal void SetListItemElements(ListItem item, StructureElement label, StructureElement body)
         => listItemElements[item] = (label, body);
@@ -142,6 +149,12 @@ internal static class StyleResolver
             ResolveBlocks(container.Blocks, inherited, this);
             return default;
         }
+
+        public override Nothing Visit(TableOfContents toc, List<Font> inherited)
+        {
+            ResolveTableOfContents(toc, styles, inherited, resolution);
+            return default;
+        }
     }
 
     // List items cascade exactly like paragraph runs: item run -> item.Font -> list.Font ->
@@ -213,6 +226,22 @@ internal static class StyleResolver
 
         effective.InheritFrom(styles.Normal.Font);
         resolution.SetBarcodeFont(barcode, effective);
+    }
+
+    // Entry lines inherit like a barcode's text line: the block font, the ambient context, then
+    // Normal. BlockExpander lowers every run of every entry from this one resolved font, so the
+    // leader/page-number measuring and the emitted runs share it.
+    private static void ResolveTableOfContents(TableOfContents toc, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
+    {
+        var effective = new Font();
+        effective.InheritFrom(toc.Font);
+        foreach (var font in inherited)
+        {
+            effective.InheritFrom(font);
+        }
+
+        effective.InheritFrom(styles.Normal.Font);
+        resolution.SetTocFont(toc, effective);
     }
 
     private static void ResolveParagraph(Paragraph paragraph, StyleCollection styles, List<Font> inherited, StyleResolution resolution)

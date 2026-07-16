@@ -36,9 +36,9 @@ internal sealed class ContentTextWalker
 
     public double Rise { get; private set; }
 
-    public static void Walk(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ShowHandler show)
+    public static void Walk(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ShowHandler show, ContentTokenizer.Cache? cache = null)
     {
-        var tokens = ContentTokenizer.Tokenize(content);
+        var tokens = ContentTokenizer.Tokenize(content, cache);
         var walker = new ContentTextWalker();
         var ctmStack = new Stack<Matrix>();
         var lineMatrix = Matrix.Identity;

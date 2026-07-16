@@ -43,7 +43,8 @@ internal static class TextReplacer
         ArgumentNullException.ThrowIfNull(replacement);
         options ??= new ReplaceTextOptions();
         page.ApplyPendingContentEdits();
-        var hits = page.FindText(search, options.Search);
+        var cache = new ContentTokenizer.Cache();
+        var hits = page.FindText(search, options.Search, -1, cache);
         if (hits.Count == 0)
         {
             return 0;
@@ -58,10 +59,10 @@ internal static class TextReplacer
 
         if (hasMultipleShowMatch)
         {
-            return ReplaceMultipleShows(page, hits, replacement, options, content);
+            return ReplaceMultipleShows(page, hits, replacement, options, content, cache);
         }
 
-        var shows = ParseShows(content, page.TextFonts, includeEveryShow: true);
+        var shows = ParseShows(content, page.TextFonts, cache, includeEveryShow: true);
         var grouped = new Dictionary<int, List<TextSourceReference>>();
         foreach (var hit in hits)
         {
@@ -141,9 +142,9 @@ internal static class TextReplacer
         return hits.Count;
     }
 
-    private static int ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content)
+    private static int ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content, ContentTokenizer.Cache? cache)
     {
-        var shows = ParseShows(content, page.TextFonts, includeEveryShow: true);
+        var shows = ParseShows(content, page.TextFonts, cache, includeEveryShow: true);
         var grouped = new Dictionary<int, List<SourceReplacement>>();
         foreach (var hit in hits)
         {
@@ -406,7 +407,7 @@ internal static class TextReplacer
         }
     }
 
-    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, bool includeEveryShow = false)
+    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache, bool includeEveryShow = false)
     {
         var result = new List<Show>();
         var operands = new List<Token>();
@@ -416,7 +417,7 @@ internal static class TextReplacer
         var scale = 1.0;
         var charSpacing = 0.0;
         var wordSpacing = 0.0;
-        foreach (var token in ContentTokenizer.Tokenize(content))
+        foreach (var token in ContentTokenizer.Tokenize(content, cache))
         {
             if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
             {

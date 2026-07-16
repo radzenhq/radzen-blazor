@@ -21,9 +21,9 @@ internal static class ContentEditor
         Raw,
     }
 
-    public static IReadOnlyList<SourceElement> Map(byte[] content, ContentCollection elements)
+    public static IReadOnlyList<SourceElement> Map(byte[] content, ContentCollection elements, ContentTokenizer.Cache? cache = null)
     {
-        var candidates = Candidates(content);
+        var candidates = Candidates(content, cache);
         var result = new List<SourceElement>(elements.Count);
         var candidateIndex = 0;
         foreach (var element in elements)
@@ -148,9 +148,9 @@ internal static class ContentEditor
         return writer.DetachResult();
     }
 
-    private static List<Candidate> Candidates(byte[] content)
+    private static List<Candidate> Candidates(byte[] content, ContentTokenizer.Cache? cache)
     {
-        var tokens = ContentTokenizer.Tokenize(content);
+        var tokens = ContentTokenizer.Tokenize(content, cache);
         var result = new List<Candidate>();
         var operands = new List<Token>();
         var array = new List<Token>();

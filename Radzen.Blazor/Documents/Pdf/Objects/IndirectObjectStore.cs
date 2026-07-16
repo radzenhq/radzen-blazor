@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -29,6 +30,8 @@ internal sealed class IndirectObjectStore(
     private readonly ConcurrentDictionary<int, DocumentObject> cache = [];
     private readonly ConcurrentDictionary<int, ObjectStream> objectStreams = [];
     private readonly NullObject nullObject = new();
+    private readonly Lock memberCountsLock = new();
+    private Dictionary<int, int>? memberCounts;
 
     // Being mid-parse is a property of one resolution stack, not of the store: two
     // threads resolving the same object are not a cycle, but a store-wide marker
@@ -97,7 +100,61 @@ internal sealed class IndirectObjectStore(
         // Two threads may parse the same object at once. Publishing with GetOrAdd lets
         // one instance win for everyone, so the reference identity that write-back and
         // BuildObjectNumberIndex rely on stays single-valued per object number.
-        return cache.GetOrAdd(number, value);
+        var published = cache.GetOrAdd(number, value);
+        if (entry.Type == 2 && ReferenceEquals(published, value))
+        {
+            ReleaseDrainedObjectStream((int)entry.Field2);
+        }
+
+        return published;
+    }
+
+    // A decoded ObjStm payload is dead weight once every xref entry pointing into it has
+    // published its member: those numbers then answer from cache and no path can ask for
+    // the container again, so dropping it can never cost a re-decode. Counting from the
+    // xref rather than the ObjStm header is what makes that hold under a crafted file -
+    // an entry naming an out-of-range index reaches GetObjectStream but never publishes,
+    // so it keeps the count above zero instead of being evicted out from under itself.
+    private void ReleaseDrainedObjectStream(int streamNumber)
+    {
+        if (objectStreams.TryGetValue(streamNumber, out var container) && container.MemberResolved())
+        {
+            // Safe against a concurrent reader: it holds its own container reference and
+            // reads it happily, and only a future lookup misses.
+            objectStreams.TryRemove(streamNumber, out _);
+        }
+    }
+
+    private int MemberCountOf(int streamNumber)
+    {
+        var counts = memberCounts;
+        if (counts is null)
+        {
+            lock (memberCountsLock)
+            {
+                counts = memberCounts ??= CountMembersPerStream();
+            }
+        }
+
+        return counts.TryGetValue(streamNumber, out var count) ? count : 0;
+    }
+
+    private Dictionary<int, int> CountMembersPerStream()
+    {
+        var counts = new Dictionary<int, int>();
+        foreach (var pair in entries)
+        {
+            if (pair.Value.Type != 2)
+            {
+                continue;
+            }
+
+            var stream = (int)pair.Value.Field2;
+            counts.TryGetValue(stream, out var count);
+            counts[stream] = count + 1;
+        }
+
+        return counts;
     }
 
     public DocumentObject Resolve(DocumentObject value)
@@ -131,6 +188,7 @@ internal sealed class IndirectObjectStore(
         // loading, before the document is shared.
         cache.Clear();
         objectStreams.Clear();
+        memberCounts = null;
     }
 
     private DocumentObject DecryptObject(DocumentObject value, int number, int generation)
@@ -284,7 +342,7 @@ internal sealed class IndirectObjectStore(
             members.Add(new ObjectStreamMember((int)numberToken.IntValue, (int)offsetToken.IntValue));
         }
 
-        var container = new ObjectStream(decoded, first, members);
+        var container = new ObjectStream(decoded, first, members, MemberCountOf(streamNumber));
         return objectStreams.GetOrAdd(streamNumber, container);
     }
 
@@ -411,11 +469,14 @@ internal sealed class IndirectObjectStore(
         throw new DocumentParseException("Invalid stream length.", -1);
     }
 
+    // Repair registers type-2 entries only after it has decoded each container, so the
+    // count built during a repair is zero and eviction stays off for a repaired document.
     public void ResetForRepair()
     {
         entries.Clear();
         cache.Clear();
         objectStreams.Clear();
+        memberCounts = null;
     }
 
     public List<int> GetEntryNumbers() => [.. entries.Keys];
@@ -427,13 +488,19 @@ internal sealed class IndirectObjectStore(
     public void SetEntry(int number, XrefEntry entry) => entries[number] = entry;
 }
 
-internal sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMember> members)
+internal sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMember> members, int unresolved)
 {
+    private int unresolved = unresolved;
+
     public byte[] Data { get; } = data;
 
     public int First { get; } = first;
 
     public List<ObjectStreamMember> Members { get; } = members;
+
+    // Distinct member numbers publish at most once each, so this reaches zero exactly
+    // once; a container built with no counted members drops below zero and never does.
+    internal bool MemberResolved() => Interlocked.Decrement(ref unresolved) == 0;
 }
 
 internal readonly struct ObjectStreamMember(int number, int offset)

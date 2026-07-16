@@ -17,19 +17,21 @@ internal static class Redactor
 {
     public static int RedactText(Page page, string text, TextSearchOptions? searchOptions, RedactionOptions? redactionOptions)
     {
-        var hits = page.FindText(text, searchOptions);
+        var cache = new ContentTokenizer.Cache();
+        var hits = page.FindText(text, searchOptions, -1, cache);
         if (hits.Count == 0)
         {
             return 0;
         }
 
-        Redact(page, hits.Select(static hit => new Rect(hit.Bounds.Left, hit.Bounds.Bottom, hit.Bounds.Width, hit.Bounds.Height)), redactionOptions);
+        Redact(page, hits.Select(static hit => new Rect(hit.Bounds.Left, hit.Bounds.Bottom, hit.Bounds.Width, hit.Bounds.Height)), redactionOptions, cache);
         return hits.Count;
     }
 
-    public static void Redact(Page page, IEnumerable<Rect> areas, RedactionOptions? options)
+    public static void Redact(Page page, IEnumerable<Rect> areas, RedactionOptions? options, ContentTokenizer.Cache? cache = null)
     {
         ArgumentNullException.ThrowIfNull(areas);
+        cache ??= new ContentTokenizer.Cache();
         var regions = areas.ToArray();
         foreach (var area in regions)
         {
@@ -50,7 +52,7 @@ internal static class Redactor
         if (page.RawContent is { Length: > 0 } raw)
         {
             var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
-            foreach (var run in page.ExtractPositionedText())
+            foreach (var run in page.ExtractPositionedText(cache))
             {
                 var removed = new bool[run.Text.Length];
                 var any = false;
@@ -68,7 +70,7 @@ internal static class Redactor
 
             if (selected.Count > 0)
             {
-                page.ApplyEditedContent(RemoveTextGlyphs(raw, selected));
+                page.ApplyEditedContent(RemoveTextGlyphs(raw, selected, cache));
             }
         }
 
@@ -118,13 +120,13 @@ internal static class Redactor
         }
     }
 
-    private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected)
+    private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected, ContentTokenizer.Cache? cache)
     {
         var edits = new List<ContentEdit>();
         var operandsStart = -1;
         var arrayStart = -1;
         var showIndex = 0;
-        foreach (var token in ContentTokenizer.Tokenize(source))
+        foreach (var token in ContentTokenizer.Tokenize(source, cache))
         {
             if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
             {

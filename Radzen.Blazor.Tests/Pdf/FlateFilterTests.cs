@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 
@@ -68,5 +69,30 @@ public class FlateFilterTests
     public void Decode_Empty_Throws()
     {
         Assert.Throws<InvalidDataException>(() => FlateFilter.Decode(Array.Empty<byte>()));
+    }
+
+    [Fact]
+    public void Decode_MemorySlice_InflatesOnlyThatWindow()
+    {
+        var data = Encoding.UTF8.GetBytes("sliced payload");
+        var encoded = FlateFilter.Encode(data);
+        var framed = new byte[encoded.Length + 6];
+        encoded.CopyTo(framed, 3);
+
+        Assert.Equal(data, FlateFilter.Decode(framed.AsMemory(3, encoded.Length)));
+    }
+
+    [Fact]
+    public void Decode_EmptyMemory_Throws()
+    {
+        Assert.Throws<InvalidDataException>(() => FlateFilter.Decode(ReadOnlyMemory<byte>.Empty));
+    }
+
+    [Fact]
+    public void Decode_MemoryExceedingMaxOutput_Throws()
+    {
+        var encoded = FlateFilter.Encode(new byte[128 * 1024]);
+
+        Assert.Throws<DocumentParseException>(() => FlateFilter.Decode(encoded.AsMemory(), 1024));
     }
 }

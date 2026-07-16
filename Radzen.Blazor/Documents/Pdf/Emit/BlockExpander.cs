@@ -93,7 +93,7 @@ internal static class BlockExpander
                     "A table of contents is only supported as direct section content.");
             }
 
-            ExpandTableOfContents(toc, expanded, availableWidth, tocPages, fonts);
+            ExpandTableOfContents(toc, expanded, availableWidth, tocPages, fonts, resolution);
             return default;
         }
     }
@@ -103,76 +103,68 @@ internal static class BlockExpander
     // line is identical in both layout passes regardless of the resolved digits.
     private const string TocPagePlaceholder = "0000";
 
-    private const double TocLeaderGap = 2.0;
-
     // A stop far beyond any line keeps a tab off the default 36pt grid when the entry text
     // reaches past the page-number stop: the number word then wraps in both passes alike
     // instead of depending on its (pass-varying) width against the grid.
     private const double TocSentinelStop = 100000;
 
-    // Lowers a TableOfContents to one Paragraph per entry: linked text, a measured run of
-    // leader characters and the page number right-aligned at a tab stop. See the remarks on
-    // TableOfContents for why entries lower to paragraphs rather than a table.
+    // Lowers a TableOfContents to one Paragraph per entry: linked text and the page number
+    // right-aligned at a leader-filled tab stop. See the remarks on TableOfContents for why
+    // entries lower to paragraphs rather than a table.
     private static void ExpandTableOfContents(
         TableOfContents toc,
         List<Block> expanded,
         double availableWidth,
         IReadOnlyDictionary<string, int>? tocPages,
-        FontCollection? fonts)
+        FontCollection? fonts,
+        StyleResolution resolution)
     {
         if (fonts is null)
         {
             throw new InvalidOperationException("A table of contents requires font metrics to lower.");
         }
 
+        // Falls back to the authored font only when the resolver has not run over this block
+        // (paginator-internal expansions of a tree the generator did not resolve).
+        var font = resolution.TocFont(toc) ?? toc.Font;
         foreach (var entry in toc.Entries)
         {
-            expanded.Add(LowerTocEntry(toc, entry, availableWidth, tocPages, fonts));
+            expanded.Add(LowerTocEntry(toc, entry, font, availableWidth, tocPages, fonts, resolution));
         }
     }
 
     private static Paragraph LowerTocEntry(
         TableOfContents toc,
         TocEntry entry,
+        Font font,
         double availableWidth,
         IReadOnlyDictionary<string, int>? tocPages,
-        FontCollection fonts)
+        FontCollection fonts,
+        StyleResolution resolution)
     {
         var indent = toc.LevelIndent.Point * entry.Level;
         var max = availableWidth - indent;
-        var reserve = fonts.MeasureText(TocPagePlaceholder, toc.Font) + 2;
+        var reserve = fonts.MeasureText(TocPagePlaceholder, font) + 2;
         var stop = Math.Max(0, max - reserve);
 
         var paragraph = new Paragraph { LeftIndent = Unit.FromPoint(indent) };
-        paragraph.Font.InheritFrom(toc.Font);
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(stop), TabAlignment.Right);
+        paragraph.TabStops.AddTabStop(Unit.FromPoint(stop), TabAlignment.Right, toc.Leader);
         paragraph.TabStops.AddTabStop(Unit.FromPoint(TocSentinelStop));
+        resolution.SetParagraphFont(paragraph, font);
 
         var text = SanitizeTocText(entry.Text);
         var textRun = paragraph.Inlines.Add(text);
         textRun.LinkToAnchor = entry.Anchor;
-        textRun.Font.InheritFrom(toc.Font);
+        resolution.SetRunFont(textRun, font);
 
-        var leaderWidth = fonts.MeasureText(toc.Leader.ToString(), toc.Font);
-        if (leaderWidth > 0)
-        {
-            var textWidth = fonts.MeasureText(text, toc.Font);
-            var spaceWidth = fonts.MeasureText(" ", toc.Font);
-            var count = (int)Math.Floor((stop - TocLeaderGap - textWidth - spaceWidth) / leaderWidth);
-            if (count >= 1)
-            {
-                paragraph.Inlines.Add(" " + new string(toc.Leader, count)).Font.InheritFrom(toc.Font);
-            }
-        }
-
-        paragraph.Inlines.Add("\t").Font.InheritFrom(toc.Font);
+        resolution.SetRunFont(paragraph.Inlines.Add("\t"), font);
 
         var number = tocPages is not null && tocPages.TryGetValue(entry.Anchor, out var page)
             ? page.ToString(CultureInfo.InvariantCulture)
             : TocPagePlaceholder;
         var numberRun = paragraph.Inlines.Add(number);
         numberRun.LinkToAnchor = entry.Anchor;
-        numberRun.Font.InheritFrom(toc.Font);
+        resolution.SetRunFont(numberRun, font);
 
         return paragraph;
     }

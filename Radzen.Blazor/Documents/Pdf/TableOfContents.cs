@@ -51,8 +51,8 @@ public sealed class TocEntry
 /// link annotations are only emitted for body paragraph lines: text inside table cells is
 /// drawn by the table emitter, which produces no link annotations, so a two-column table
 /// lowering would lose the required clickable links. Each paragraph carries a right-aligned
-/// tab stop for the page number and a measured run of leader characters between the text and
-/// the number. A table of contents is only supported as direct section content.
+/// tab stop for the page number, and the leader fills that tab's gap. A table of contents is
+/// only supported as direct section content.
 /// </remarks>
 public sealed class TableOfContents : Block
 {

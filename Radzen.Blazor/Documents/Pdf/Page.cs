@@ -236,6 +236,9 @@ public sealed class Page
     /// <returns>The positioned text-show runs, or an empty list when the page has no text.</returns>
     public IReadOnlyList<PositionedTextRun> ExtractPositionedText() => TextSearch.Extract(content, textFonts);
 
+    internal IReadOnlyList<PositionedTextRun> ExtractPositionedText(ContentTokenizer.Cache? cache)
+        => TextSearch.Extract(content, textFonts, cache);
+
     /// <summary>Finds text in this page across adjacent text-show operators.</summary>
     /// <remarks>
     /// Hits use a page index of -1 when this method is called directly. Use
@@ -271,8 +274,8 @@ public sealed class Page
     public int RedactText(string text, TextSearchOptions? searchOptions = null, RedactionOptions? redactionOptions = null)
         => Redactor.RedactText(this, text, searchOptions, redactionOptions);
 
-    internal IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options, int pageIndex)
-        => TextSearch.Find(content, textFonts, text, options, pageIndex);
+    internal IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options, int pageIndex, ContentTokenizer.Cache? cache = null)
+        => TextSearch.Find(content, textFonts, text, options, pageIndex, cache);
 
     internal void SetTextFonts(IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
     {
@@ -513,9 +516,10 @@ public sealed class Page
             return;
         }
 
-        ContentInterpreter.Materialize(content, elements, textFonts);
+        var cache = new ContentTokenizer.Cache();
+        ContentInterpreter.Materialize(content, elements, textFonts, cache);
         materializedCount = elements.Count;
-        sourceElements = ContentEditor.Map(content, elements);
+        sourceElements = ContentEditor.Map(content, elements, cache);
 
         // The interpreter builds these elements through the same tracked setters a caller
         // would use, so without this every loaded page would be born modified and re-encode.

@@ -30,6 +30,17 @@ public class FormFieldTextDecodeTests
         return builder.Append('>').ToString();
     }
 
+    private static string Utf8Hex(string text)
+    {
+        var builder = new StringBuilder("<EFBBBF");
+        foreach (var b in Encoding.UTF8.GetBytes(text))
+        {
+            builder.Append(b.ToString("X2"));
+        }
+
+        return builder.Append('>').ToString();
+    }
+
     private static byte[] Wrap(FixturePdf pdf, int count)
     {
         var xref = pdf.Position;
@@ -51,14 +62,16 @@ public class FormFieldTextDecodeTests
             .Append("%PDF-1.7\n")
             .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R /AcroForm 4 0 R >>\nendobj\n")
             .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
-            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R 6 0 R 8 0 R 9 0 R] >>\nendobj\n")
-            .Object(4, "4 0 obj\n<< /Fields [5 0 R 6 0 R 7 0 R 9 0 R] >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R 6 0 R 8 0 R 9 0 R 10 0 R 11 0 R] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Fields [5 0 R 6 0 R 7 0 R 9 0 R 10 0 R 11 0 R] >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (utf) /V " + Utf16BeHex(Faktura) + " /P 3 0 R /Rect [100 700 350 720] >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (ascii) /V (Hello) /P 3 0 R /Rect [100 660 350 680] >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /T (grp) /FT /Tx /V " + Utf16BeHex(Sofia) + " /Kids [8 0 R] >>\nendobj\n")
             .Object(8, "8 0 obj\n<< /Type /Annot /Subtype /Widget /T (leaf) /Parent 7 0 R /P 3 0 R /Rect [100 620 350 640] >>\nendobj\n")
-            .Object(9, "9 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Ch /T (multi) /V [" + Utf16BeHex(A) + " " + Utf16BeHex(Be) + "] /P 3 0 R /Rect [100 580 350 600] >>\nendobj\n");
-        return Wrap(pdf, 10);
+            .Object(9, "9 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Ch /T (multi) /V [" + Utf16BeHex(A) + " " + Utf16BeHex(Be) + "] /P 3 0 R /Rect [100 580 350 600] >>\nendobj\n")
+            .Object(10, "10 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (utf8) /V " + Utf8Hex(Faktura) + " /P 3 0 R /Rect [100 540 350 560] >>\nendobj\n")
+            .Object(11, "11 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T " + Utf8Hex(Imya) + " /V (x) /P 3 0 R /Rect [100 500 350 520] >>\nendobj\n");
+        return Wrap(pdf, 12);
     }
 
     private static Document Load()
@@ -104,6 +117,65 @@ public class FormFieldTextDecodeTests
         var document = Document.LoadFromStream(new MemoryStream(Wrap(pdf, 6)));
 
         Assert.Equal(Imya, document.AcroForm!.Fields.Single().Name);
+    }
+
+    // ISO 32000-2 7.9.2.2 additionally allows a text string to be UTF-8 prefixed EF BB BF.
+    [Fact]
+    public void Utf8ValueDecodes()
+    {
+        Assert.Equal(Faktura, ValueOf(Load(), "utf8"));
+    }
+
+    [Fact]
+    public void Utf8NameDecodes()
+    {
+        Assert.Contains(Imya, Load().AcroForm!.Fields.Select(f => f.Name));
+    }
+
+    [Fact]
+    public void Utf8InfoTitleDecodes()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-2.0\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Title " + Utf8Hex(Sofia) + " >>\nendobj\n");
+
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 5\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number < 5; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size 5 /Root 1 0 R /Info 4 0 R >>\n");
+        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
+
+        var document = Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
+
+        Assert.Equal(Sofia, document.Info.Title);
+    }
+
+    // EF BB BF is itself PDFDocEncodable ("ï»¿"). The spec makes the prefix win, but a
+    // remainder that is not valid UTF-8 is far likelier to be Latin1 than a broken
+    // producer, so it must survive verbatim rather than be replacement-charactered.
+    [Fact]
+    public void Utf8PrefixWithInvalidRemainderStaysVerbatim()
+    {
+        Assert.Equal("ï»¿ÿþ", FormField.DecodeTextString("ï»¿ÿþ"));
+    }
+
+    [Fact]
+    public void Utf8PrefixAloneDecodesToEmpty()
+    {
+        Assert.Equal("", FormField.DecodeTextString("ï»¿"));
+    }
+
+    [Fact]
+    public void ShortStringWithoutBomIsUnchanged()
+    {
+        Assert.Equal("ï»", FormField.DecodeTextString("ï»"));
     }
 
     [Fact]
