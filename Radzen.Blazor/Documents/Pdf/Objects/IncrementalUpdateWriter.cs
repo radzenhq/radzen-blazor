@@ -130,7 +130,9 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
     /// <returns>The bytes of the updated document.</returns>
     public byte[] ToArray()
     {
-        using var buffer = new MemoryStream();
+        // Sized for the original plus the appended section so growth never re-copies the
+        // whole document, which for a large original is several LOH allocations of it.
+        using var buffer = new PooledBufferStream(original.Length + (64 * 1024));
         WriteTo(buffer);
         return buffer.ToArray();
     }

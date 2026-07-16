@@ -6,6 +6,41 @@ namespace Radzen.Documents.Pdf.Objects;
 
 internal sealed class Lexer(byte[] data, int position)
 {
+    private const int MaxInternedLength = 16;
+
+    private static readonly string[] InternedTokens =
+    [
+        // Keywords.
+        "obj", "endobj", "stream", "endstream", "R", "true", "false", "null",
+        "xref", "trailer", "startxref",
+
+        // Structure.
+        "Type", "Subtype", "Length", "Length1", "Filter", "DecodeParms", "Root", "Info",
+        "Size", "Prev", "First", "Extends", "N", "W", "Index", "ID", "Encrypt",
+        "Catalog", "Pages", "Page", "Kids", "Count", "Parent", "ObjStm", "XRef",
+
+        // Page and resources.
+        "MediaBox", "CropBox", "Resources", "Contents", "Rotate", "Annots", "Group",
+        "Font", "XObject", "ExtGState", "ColorSpace", "Pattern", "Shading", "Properties",
+        "ProcSet", "Image", "Form", "Width", "Height",
+
+        // Fonts.
+        "BaseFont", "Encoding", "FirstChar", "LastChar", "Widths", "FontDescriptor",
+        "ToUnicode", "DescendantFonts", "CIDToGIDMap", "TrueType", "Type0", "Type1",
+        "Type1C", "FontFile", "FontFile2", "FontFile3", "Differences",
+
+        // Filters.
+        "FlateDecode", "LZWDecode", "ASCII85Decode", "ASCIIHexDecode", "RunLengthDecode",
+        "DCTDecode", "JPXDecode", "CCITTFaxDecode", "Crypt",
+
+        // Common values.
+        "DeviceRGB", "DeviceGray", "DeviceCMYK", "Indexed", "ICCBased", "Separation",
+        "Predictor", "Columns", "Colors", "BitsPerComponent", "BitsPerCoordinate",
+    ];
+
+    // Bucketed by length and first byte so a lookup compares against one or two candidates.
+    private static readonly Dictionary<int, string[]> Interned = BuildInterned();
+
     private readonly byte[] data = data;
     private int position = position;
 
@@ -97,19 +132,19 @@ internal sealed class Lexer(byte[] data, int position)
             position++;
         }
 
-        var raw = Encoding.Latin1.GetString(data, start, position - start);
+        var length = position - start;
         var hasDot = false;
-        for (var i = 0; i < raw.Length; i++)
+        for (var i = 0; i < length; i++)
         {
-            var c = raw[i];
-            if (c == '+' || c == '-')
+            var c = data[start + i];
+            if (c == (byte)'+' || c == (byte)'-')
             {
                 if (i != 0)
                 {
                     throw new DocumentParseException("Malformed number.", start);
                 }
             }
-            else if (c == '.')
+            else if (c == (byte)'.')
             {
                 if (hasDot)
                 {
@@ -118,16 +153,29 @@ internal sealed class Lexer(byte[] data, int position)
 
                 hasDot = true;
             }
-            else if (c < '0' || c > '9')
+            else if (c < (byte)'0' || c > (byte)'9')
             {
                 throw new DocumentParseException("Malformed number.", start);
             }
         }
 
+        // A trailing '.' is legal in PDF but not to TryParse, so leave room to append '0'.
+        var chars = length < 128 ? stackalloc char[length + 1] : new char[length + 1];
+        for (var i = 0; i < length; i++)
+        {
+            chars[i] = (char)data[start + i];
+        }
+
         if (hasDot)
         {
-            var normalized = raw.EndsWith('.') ? raw + "0" : raw;
-            if (!double.TryParse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture, out var real))
+            var text = chars[..length];
+            if (data[position - 1] == (byte)'.')
+            {
+                chars[length] = '0';
+                text = chars;
+            }
+
+            if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var real))
             {
                 throw new DocumentParseException("Malformed number.", start);
             }
@@ -135,7 +183,7 @@ internal sealed class Lexer(byte[] data, int position)
             return Token.Real(real);
         }
 
-        if (!long.TryParse(raw, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var integer))
+        if (!long.TryParse(chars[..length], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var integer))
         {
             throw new DocumentParseException("Malformed number.", start);
         }
@@ -146,24 +194,46 @@ internal sealed class Lexer(byte[] data, int position)
     private Token ReadName()
     {
         position++;
-        var bytes = new List<byte>();
+        var start = position;
+        var escaped = false;
         while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
         {
-            var b = data[position];
-            if (b == (byte)'#' && position + 2 < data.Length
-                && TryHex(data[position + 1], out var hi) && TryHex(data[position + 2], out var lo))
+            if (data[position] == (byte)'#' && position + 2 < data.Length
+                && TryHex(data[position + 1], out _) && TryHex(data[position + 2], out _))
             {
-                bytes.Add((byte)((hi << 4) | lo));
+                escaped = true;
                 position += 3;
             }
             else
             {
-                bytes.Add(b);
                 position++;
             }
         }
 
-        return Token.Name(Encoding.Latin1.GetString([.. bytes]));
+        return Token.Name(escaped ? DecodeEscapedName(start) : Decode(start, position - start));
+    }
+
+    private string DecodeEscapedName(int start)
+    {
+        var bytes = new List<byte>(position - start);
+        var at = start;
+        while (at < position)
+        {
+            var b = data[at];
+            if (b == (byte)'#' && at + 2 < data.Length
+                && TryHex(data[at + 1], out var hi) && TryHex(data[at + 2], out var lo))
+            {
+                bytes.Add((byte)((hi << 4) | lo));
+                at += 3;
+            }
+            else
+            {
+                bytes.Add(b);
+                at++;
+            }
+        }
+
+        return Encoding.Latin1.GetString([.. bytes]);
     }
 
     private Token ReadLiteralString()
@@ -337,7 +407,61 @@ internal sealed class Lexer(byte[] data, int position)
             throw new DocumentParseException("Unexpected character.", start);
         }
 
-        return Token.Keyword(Encoding.Latin1.GetString(data, start, position - start));
+        return Token.Keyword(Decode(start, position - start));
+    }
+
+    private static Dictionary<int, string[]> BuildInterned()
+    {
+        var buckets = new Dictionary<int, List<string>>();
+        foreach (var token in InternedTokens)
+        {
+            var key = BucketKey(token.Length, (byte)token[0]);
+            if (!buckets.TryGetValue(key, out var bucket))
+            {
+                buckets[key] = bucket = [];
+            }
+
+            bucket.Add(token);
+        }
+
+        var result = new Dictionary<int, string[]>(buckets.Count);
+        foreach (var pair in buckets)
+        {
+            result[pair.Key] = [.. pair.Value];
+        }
+
+        return result;
+    }
+
+    private static int BucketKey(int length, byte first) => (length << 8) | first;
+
+    // The same handful of names and keywords repeat once per object across the whole file,
+    // so hand back the canonical instance instead of a fresh string for each occurrence.
+    private string Decode(int start, int length)
+    {
+        if (length is > 0 and <= MaxInternedLength
+            && Interned.TryGetValue(BucketKey(length, data[start]), out var candidates))
+        {
+            foreach (var candidate in candidates)
+            {
+                var match = true;
+                for (var i = 1; i < length; i++)
+                {
+                    if (candidate[i] != (char)data[start + i])
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return Encoding.Latin1.GetString(data, start, length);
     }
 
     private static bool TryHex(byte b, out int value)
