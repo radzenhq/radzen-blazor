@@ -59,6 +59,43 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         return glyphs;
     }
 
+    // The width Shape would report, without materializing the glyph list measurement discards.
+    // Kept structurally identical to Shape's loop (same resolve, same kern folding, same
+    // accumulation order) so a measured width is bit-for-bit the advance that gets drawn.
+    public double MeasureAdvance(ReadOnlySpan<char> text, Font font)
+    {
+        ArgumentNullException.ThrowIfNull(font);
+
+        EnsureNoComplexScript(text);
+
+        var primary = fonts.ResolvePrimarySfnt(font);
+
+        double total = 0;
+        SfntFont? previousFace = null;
+        ushort previousGlyph = 0;
+        var count = 0;
+        var i = 0;
+        while (i < text.Length)
+        {
+            var codepoint = FontCollection.CodePointAt(text, i);
+            var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
+            var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+
+            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
+            {
+                total += previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
+            }
+
+            total += advance;
+            count++;
+            previousFace = face;
+            previousGlyph = glyph;
+            i += codepoint > 0xFFFF ? 2 : 1;
+        }
+
+        return total;
+    }
+
     // Fails loud when text needs OpenType shaping or bidirectional reordering the identity
     // mapper cannot do, rather than emitting unshaped/unjoined/reversed glyphs. Shared by the
     // shaper and by text measuring.
