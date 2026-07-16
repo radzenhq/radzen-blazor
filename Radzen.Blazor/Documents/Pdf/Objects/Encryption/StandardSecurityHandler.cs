@@ -215,61 +215,13 @@ internal sealed class StandardSecurityHandler
         FileKey = userKey;
     }
 
-    // ISO 32000-1 algorithm 2.
     private byte[] ComputeFileKey(byte[] password)
-    {
-        var padded = Pad(password);
-        var extra = revision >= 4 && !encryptMetadata ? 4 : 0;
-        var buffer = new byte[padded.Length + 32 + 4 + documentId.Length + extra];
-        var pos = 0;
-        Array.Copy(padded, 0, buffer, pos, padded.Length);
-        pos += padded.Length;
-        var oBytes = ownerEntry.Length >= 32 ? ownerEntry[..32] : ownerEntry;
-        Array.Copy(oBytes, 0, buffer, pos, oBytes.Length);
-        pos += 32;
-        buffer[pos++] = (byte)permissions;
-        buffer[pos++] = (byte)(permissions >> 8);
-        buffer[pos++] = (byte)(permissions >> 16);
-        buffer[pos++] = (byte)(permissions >> 24);
-        Array.Copy(documentId, 0, buffer, pos, documentId.Length);
-        pos += documentId.Length;
-        for (var i = 0; i < extra; i++)
-        {
-            buffer[pos + i] = 0xFF;
-        }
+        => ComputeFileKey(password, ownerEntry, permissions, documentId, revision, keyLength, encryptMetadata);
 
-        var hash = Md5.ComputeHash(buffer);
-        if (revision >= 3)
-        {
-            for (var i = 0; i < 50; i++)
-            {
-                hash = Md5.ComputeHash(hash[..keyLength]);
-            }
-        }
-
-        return hash[..keyLength];
-    }
-
-    // ISO 32000-1 algorithm 6.
+    // ISO 32000-1 algorithm 6. The R2 /U is the full 32-byte RC4 block; for R >= 3 only
+    // the leading 16 bytes are defined, the rest being arbitrary producer padding.
     private bool UserPasswordMatches(byte[] fileKey)
-    {
-        if (revision == 2)
-        {
-            var test = Rc4.Transform(fileKey, Padding);
-            return Equal(test, userEntry, 32);
-        }
-
-        var seed = new byte[Padding.Length + documentId.Length];
-        Array.Copy(Padding, seed, Padding.Length);
-        Array.Copy(documentId, 0, seed, Padding.Length, documentId.Length);
-        var value = Rc4.Transform(fileKey, Md5.ComputeHash(seed));
-        for (var i = 1; i <= 19; i++)
-        {
-            value = Rc4.Transform(Xor(fileKey, i), value);
-        }
-
-        return Equal(value, userEntry, 16);
-    }
+        => Equal(ComputeUserEntry(fileKey, documentId, revision), userEntry, revision == 2 ? 32 : 16);
 
     // ISO 32000-1 algorithm 7: recover the (padded) user password from /O.
     private byte[] RecoverUserPassword(byte[] password)
@@ -467,7 +419,7 @@ internal sealed class StandardSecurityHandler
         var userBytes = Encoding.Latin1.GetBytes(userPassword);
         var ownerBytes = Encoding.Latin1.GetBytes(ownerPassword.Length > 0 ? ownerPassword : userPassword);
         var owner = ComputeOwnerEntry(ownerBytes, userBytes, revision, keyLength);
-        var fileKey = ComputeWriteFileKey(userBytes, owner, permissions, documentId, revision, keyLength, encryptMetadata);
+        var fileKey = ComputeFileKey(userBytes, owner, permissions, documentId, revision, keyLength, encryptMetadata);
         var user = ComputeUserEntry(fileKey, documentId, revision);
         return (owner, user, fileKey);
     }
@@ -523,8 +475,9 @@ internal sealed class StandardSecurityHandler
         return value;
     }
 
-    // ISO 32000-1 algorithm 2.
-    private static byte[] ComputeWriteFileKey(
+    // ISO 32000-1 algorithm 2. A short /O (only reachable from a malformed dictionary on
+    // the read side) is zero-filled to the 32 bytes the layout reserves for it.
+    private static byte[] ComputeFileKey(
         byte[] userPassword, byte[] owner, int permissions, byte[] documentId,
         int revision, int keyLength, bool encryptMetadata)
     {
@@ -534,7 +487,8 @@ internal sealed class StandardSecurityHandler
         var pos = 0;
         Array.Copy(padded, 0, buffer, pos, padded.Length);
         pos += padded.Length;
-        Array.Copy(owner, 0, buffer, pos, 32);
+        var oBytes = owner.Length >= 32 ? owner[..32] : owner;
+        Array.Copy(oBytes, 0, buffer, pos, oBytes.Length);
         pos += 32;
         buffer[pos++] = (byte)permissions;
         buffer[pos++] = (byte)(permissions >> 8);
