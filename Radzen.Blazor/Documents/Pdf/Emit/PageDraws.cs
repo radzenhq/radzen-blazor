@@ -346,6 +346,14 @@ internal sealed class PagePlan
                 throw new NotSupportedException(
                     "A rotated box cannot preserve rounded corners or a rounded clip; remove the corner radius or the rotation.");
             }
+
+            // A centerline stroke carries a single colour, so the shading pattern would
+            // degrade to the solid fill colour (black when only the gradient was set).
+            if (fill.Gradient is not null)
+            {
+                throw new NotSupportedException(
+                    "A rotated box cannot preserve a gradient background; remove the gradient or the rotation.");
+            }
         }
 
         for (var i = mark.Rounded; i < RoundedStrokes.Count; i++)

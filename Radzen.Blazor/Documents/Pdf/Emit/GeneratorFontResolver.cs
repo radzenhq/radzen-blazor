@@ -72,12 +72,15 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
     // their glyph-id codes through the accumulated gid-to-Unicode table, mirroring
     // the /ToUnicode CMap the embedder writes on save.
+    // The maps are derived from document-global state frozen before the page loop, so each
+    // font's ReverseFont is built once and shared by every page that references it.
     public static Dictionary<string, ReverseFont> BuildExtractionFonts(GeneratedPage generated)
     {
         var map = new Dictionary<string, ReverseFont>(StringComparer.Ordinal);
         foreach (var font in generated.Fonts)
         {
-            map[font.Key] = font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
+            map[font.Key] = font.Extraction ??=
+                font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
         }
 
         return map;

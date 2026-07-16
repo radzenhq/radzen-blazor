@@ -1,0 +1,124 @@
+#nullable enable
+using System;
+using System.IO;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// Unmappable input in the emit layer fails loud rather than painting something that
+// silently disagrees with what was asked for: a gradient fill cannot survive the
+// fill-to-stroke conversion a rotation forces, and PDF/A cannot pair DeviceCMYK image
+// data with the sRGB output intent it emits.
+public class EmitFailLoudTests
+{
+    [Fact]
+    public void RotatedGradientBackground_Throws()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Rotation = 15,
+            Padding = Unit.FromPoint(10),
+            BackgroundGradient = new LinearGradient(
+                0, 0, 100, 0,
+                new GradientStop(0, Color.FromRgb(255, 0, 0)),
+                new GradientStop(1, Color.FromRgb(0, 0, 255))),
+        });
+        container.Blocks.Add(FeatureEmissionTestHelpers.Text("Rotated"));
+
+        var error = Assert.Throws<NotSupportedException>(() =>
+        {
+            using var stream = new MemoryStream();
+            builder.SaveToStream(stream);
+        });
+        Assert.Contains("gradient", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void UnrotatedGradientBackground_StillEmitsThePattern()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(10),
+            BackgroundGradient = new LinearGradient(
+                0, 0, 100, 0,
+                new GradientStop(0, Color.FromRgb(255, 0, 0)),
+                new GradientStop(1, Color.FromRgb(0, 0, 255))),
+        });
+        container.Blocks.Add(FeatureEmissionTestHelpers.Text("Upright"));
+
+        Assert.Contains("/Pattern cs", FeatureEmissionTestHelpers.Content(builder), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RotatedSolidBackground_StillSaves()
+    {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Rotation = 15,
+            Padding = Unit.FromPoint(10),
+            Background = Color.FromRgb(200, 200, 200),
+        });
+        container.Blocks.Add(FeatureEmissionTestHelpers.Text("Rotated"));
+
+        using var stream = new MemoryStream();
+        builder.SaveToStream(stream);
+        Assert.True(stream.Length > 0);
+    }
+
+    [Fact]
+    public void PdfA_WithCmykImage_Throws()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, "Hello conformance", BuildTestSupport.Latin);
+        section.Blocks.AddImage(PdfTestResources.Open("Images/cmyk.jpg"));
+        builder.Conformance = PdfAConformance.PdfA2B;
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+        {
+            using var stream = new MemoryStream();
+            builder.SaveToStream(stream);
+        });
+        Assert.Contains("DeviceCMYK", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PdfA_WithRgbImage_Saves()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, "Hello conformance", BuildTestSupport.Latin);
+        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        builder.Conformance = PdfAConformance.PdfA2B;
+
+        using var stream = new MemoryStream();
+        builder.SaveToStream(stream);
+        Assert.True(stream.Length > 0);
+    }
+
+    [Fact]
+    public void CmykImage_WithoutConformance_Saves()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+
+        var section = builder.Sections.Add();
+        section.Blocks.AddImage(PdfTestResources.Open("Images/cmyk.jpg"));
+
+        using var stream = new MemoryStream();
+        builder.SaveToStream(stream);
+        Assert.True(stream.Length > 0);
+    }
+}
