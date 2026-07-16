@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 // integer and as an indirect reference, and both LF and CRLF after "stream".
 public class StreamParsingTests
 {
-    private static string Data(StreamObject stream) => Encoding.Latin1.GetString(stream.Data);
+    private static string Data(StreamObject stream) => Encoding.Latin1.GetString(stream.Data.ToArray());
 
     // Wraps a single stream object (number 1) plus optional extra objects into a
     // complete classic file with an xref covering objects 0..count-1.

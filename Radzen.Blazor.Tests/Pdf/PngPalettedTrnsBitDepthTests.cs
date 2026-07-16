@@ -25,7 +25,7 @@ public class PngPalettedTrnsBitDepthTests
 
         var xobj = ImageDecoder.Decode(png);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF, 0xFF, 0xFF, 0x00, 0xFF }, alpha);
     }
 
@@ -40,7 +40,7 @@ public class PngPalettedTrnsBitDepthTests
 
         var xobj = ImageDecoder.Decode(png);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x00 }, alpha);
     }
 
@@ -55,7 +55,7 @@ public class PngPalettedTrnsBitDepthTests
 
         var xobj = ImageDecoder.Decode(png);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF }, alpha);
     }
 

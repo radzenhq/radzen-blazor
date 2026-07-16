@@ -104,7 +104,7 @@ internal static class FormTestSupport
 
     public static string Decode(StreamObject stream)
     {
-        var data = stream.Data;
+        var data = stream.Data.ToArray();
         if (stream.Dictionary.TryGetValue("Filter", out var filter)
             && filter is NameObject name && name.Value is "FlateDecode" or "Fl")
         {

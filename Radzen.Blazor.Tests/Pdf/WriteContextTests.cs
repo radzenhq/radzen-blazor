@@ -100,7 +100,7 @@ public class WriteContextTests
         var page = Assert.IsType<DictionaryObject>(reader.Resolve(kids[0]));
 
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-        Assert.Equal(StreamMarker, Encoding.Latin1.GetString(content.Data));
+        Assert.Equal(StreamMarker, Encoding.Latin1.GetString(content.Data.ToArray()));
 
         var marker = Assert.IsType<StringObject>(reader.Resolve(page["Marker"]));
         Assert.Equal(StringMarker, marker.Value);

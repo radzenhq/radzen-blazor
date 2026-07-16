@@ -100,12 +100,12 @@ internal static class Type0EmbedSupport
     {
         if (!stream.Dictionary.TryGetValue("Filter", out var filter) || filter is null)
         {
-            return stream.Data;
+            return stream.Data.ToArray();
         }
 
         var name = ((NameObject)filter).Value;
         Assert.Equal("FlateDecode", name);
-        return FlateFilter.Decode(stream.Data);
+        return FlateFilter.Decode(stream.Data.ToArray());
     }
 
     // Parse a PDF /W array into CID -> width. Handles both the "c [w ...]" list form

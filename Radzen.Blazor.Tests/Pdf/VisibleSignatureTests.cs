@@ -91,7 +91,7 @@ public class VisibleSignatureTests
     {
         var ap = (DictionaryObject)reader.Resolve(field["AP"]);
         var stream = (StreamObject)reader.Resolve(ap["N"]);
-        var data = stream.Data;
+        var data = stream.Data.ToArray();
         if (stream.Dictionary.TryGetValue("Filter", out var filter)
             && filter is NameObject name && name.Value is "FlateDecode" or "Fl")
         {

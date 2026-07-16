@@ -275,7 +275,7 @@ internal sealed class DocumentGenerator
             {
                 Generated = generated,
             };
-            page.SetContent(generated.Content);
+            page.SetLoadedContent(generated.Content);
             page.SetTextFonts(BuildExtractionFonts(generated));
             document.Pages.Insert(document.Pages.Count, page);
         }

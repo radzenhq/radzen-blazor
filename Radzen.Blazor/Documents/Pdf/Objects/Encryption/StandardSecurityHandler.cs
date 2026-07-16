@@ -91,14 +91,15 @@ internal sealed class StandardSecurityHandler
 
     public bool IsOwnerPassword { get; private set; }
 
-    public byte[] DecryptStream(byte[] data, int objectNumber, int generation)
+    public ReadOnlyMemory<byte> DecryptStream(ReadOnlyMemory<byte> data, int objectNumber, int generation)
         => Decrypt(streamCipher, data, objectNumber, generation);
 
     // A /Metadata stream stays plaintext when /EncryptMetadata is false (ISO 32000-1
     // 7.6.3.2); running it through the cipher would return corrupted XMP. A stream whose
     // chain starts with /Crypt is decrypted by that filter instead of /StmF (7.4.10), so
     // it is left alone here; CryptStreamFilter rejects any non-Identity crypt filter.
-    public byte[] DecryptStream(byte[] data, int objectNumber, int generation, DictionaryObject dictionary)
+    public ReadOnlyMemory<byte> DecryptStream(
+        ReadOnlyMemory<byte> data, int objectNumber, int generation, DictionaryObject dictionary)
     {
         ArgumentNullException.ThrowIfNull(dictionary);
         return (!encryptMetadata && IsMetadataStream(dictionary)) || HasCryptFilter(dictionary)
@@ -123,23 +124,28 @@ internal sealed class StandardSecurityHandler
         return first is NameObject name && string.Equals(name.Value, "Crypt", StringComparison.Ordinal);
     }
 
-    public byte[] DecryptString(byte[] data, int objectNumber, int generation)
-        => Decrypt(stringCipher, data, objectNumber, generation);
-
-    private byte[] Decrypt(CryptMethod cipher, byte[] data, int objectNumber, int generation)
+    public ReadOnlyMemory<byte> DecryptString(byte[] data, int objectNumber, int generation)
     {
         ArgumentNullException.ThrowIfNull(data);
-        if (data.Length == 0)
+        return Decrypt(stringCipher, data, objectNumber, generation);
+    }
+
+    private ReadOnlyMemory<byte> Decrypt(
+        CryptMethod cipher, ReadOnlyMemory<byte> data, int objectNumber, int generation)
+    {
+        if (data.Length == 0 || cipher == CryptMethod.Identity)
         {
             return data;
         }
 
+        // The ciphers take arrays and allocate their own output, so the input is
+        // materialized only once an actual cipher runs.
+        var bytes = data.ToArray();
         return cipher switch
         {
-            CryptMethod.Identity => data,
-            CryptMethod.AesV3 => AesCbc.Decrypt(FileKey, data),
-            CryptMethod.AesV2 => AesCbc.Decrypt(ObjectKey(objectNumber, generation, aes: true), data),
-            _ => Rc4.Transform(ObjectKey(objectNumber, generation, aes: false), data),
+            CryptMethod.AesV3 => AesCbc.Decrypt(FileKey, bytes),
+            CryptMethod.AesV2 => AesCbc.Decrypt(ObjectKey(objectNumber, generation, aes: true), bytes),
+            _ => Rc4.Transform(ObjectKey(objectNumber, generation, aes: false), bytes),
         };
     }
 

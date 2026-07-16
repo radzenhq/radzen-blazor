@@ -71,18 +71,22 @@ internal sealed class EncryptionWriter(
     }
 
     public byte[] EncryptString(byte[] data, int objectNumber, int generation)
-        => Apply(data, objectNumber, generation);
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        return Apply(data, objectNumber, generation);
+    }
 
-    public byte[] EncryptStream(byte[] data, int objectNumber, int generation)
+    public byte[] EncryptStream(ReadOnlyMemory<byte> data, int objectNumber, int generation)
         => Apply(data, objectNumber, generation);
 
     // A /Type /Metadata stream is left plaintext when the writer's /EncryptMetadata flag
     // is false (ISO 32000-1 7.6.3.2), mirroring the reader's DecryptStream dictionary path.
-    public byte[] EncryptStream(byte[] data, int objectNumber, int generation, DictionaryObject dictionary)
+    public byte[] EncryptStream(
+        ReadOnlyMemory<byte> data, int objectNumber, int generation, DictionaryObject dictionary)
     {
         ArgumentNullException.ThrowIfNull(dictionary);
         return !encryptMetadata && IsMetadataStream(dictionary)
-            ? data
+            ? data.ToArray()
             : Apply(data, objectNumber, generation);
     }
 
@@ -162,21 +166,23 @@ internal sealed class EncryptionWriter(
 
     private static StringObject FromBytes(byte[] bytes) => new(Encoding.Latin1.GetString(bytes));
 
-    private byte[] Apply(byte[] data, int objectNumber, int generation)
+    private byte[] Apply(ReadOnlyMemory<byte> data, int objectNumber, int generation)
     {
-        ArgumentNullException.ThrowIfNull(data);
-        if (data.Length == 0)
+        // The ciphers take arrays and allocate their own output, so the input is
+        // materialized only once an actual cipher runs.
+        var bytes = data.ToArray();
+        if (bytes.Length == 0)
         {
-            return data;
+            return bytes;
         }
 
         return cipher switch
         {
             Method.Rc4 => Rc4.Transform(
-                StandardSecurityHandler.ComputeObjectKey(fileKey, objectNumber, generation, aes: false), data),
+                StandardSecurityHandler.ComputeObjectKey(fileKey, objectNumber, generation, aes: false), bytes),
             Method.AesV2 => AesEncrypt(
-                StandardSecurityHandler.ComputeObjectKey(fileKey, objectNumber, generation, aes: true), data),
-            _ => AesEncrypt(fileKey, data),
+                StandardSecurityHandler.ComputeObjectKey(fileKey, objectNumber, generation, aes: true), bytes),
+            _ => AesEncrypt(fileKey, bytes),
         };
     }
 

@@ -102,7 +102,7 @@ public class ImageDecoderRegistryTests
                 return false;
             }
 
-            var stream = new StreamObject([]);
+            var stream = new StreamObject(Array.Empty<byte>());
             stream.Dictionary["Width"] = new NumberObject(1);
             stream.Dictionary["Height"] = new NumberObject(1);
             xobject = new ImageXObject(stream, null);

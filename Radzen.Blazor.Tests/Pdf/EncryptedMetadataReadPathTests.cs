@@ -130,7 +130,7 @@ public class EncryptedMetadataReadPathTests
         var reader = DocumentReader.Parse(BuildDocument(encryptMetadata: false), "");
 
         Assert.True(reader.IsEncrypted);
-        Assert.Equal(Xmp, Encoding.ASCII.GetString(Metadata(reader).Data));
+        Assert.Equal(Xmp, Encoding.ASCII.GetString(Metadata(reader).Data.ToArray()));
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class EncryptedMetadataReadPathTests
     {
         var reader = DocumentReader.Parse(BuildDocument(encryptMetadata: true), "");
 
-        Assert.Equal(Xmp, Encoding.ASCII.GetString(Metadata(reader).Data));
+        Assert.Equal(Xmp, Encoding.ASCII.GetString(Metadata(reader).Data.ToArray()));
         Assert.Contains("(metadata-read-marker) Tj", Content(reader));
     }
 }

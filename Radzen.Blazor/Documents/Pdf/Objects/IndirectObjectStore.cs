@@ -139,7 +139,7 @@ internal sealed class IndirectObjectStore(
         {
             case StringObject text:
                 var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
-                return new StringObject(Encoding.Latin1.GetString(plain));
+                return new StringObject(Encoding.Latin1.GetString(plain.Span));
             case StreamObject stream:
                 var decrypted = security!.DecryptStream(stream.Data, number, generation, stream.Dictionary);
                 var result = new StreamObject(decrypted);
@@ -369,9 +369,7 @@ internal sealed class IndirectObjectStore(
             length = repairer.RecoverStreamLength(dataStart);
         }
 
-        var payload = new byte[length];
-        Array.Copy(data, dataStart, payload, 0, length);
-        var stream = new StreamObject(payload);
+        var stream = new StreamObject(data.AsMemory(dataStart, length));
         foreach (var key in dictionary.Keys)
         {
             stream.Dictionary[key] = dictionary[key];

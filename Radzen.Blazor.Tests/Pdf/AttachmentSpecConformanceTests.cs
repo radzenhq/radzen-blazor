@@ -94,11 +94,11 @@ public class AttachmentSpecConformanceTests
     {
         if (!stream.Dictionary.TryGetValue("Filter", out var filter) || filter is null)
         {
-            return stream.Data;
+            return stream.Data.ToArray();
         }
 
         Assert.Equal("FlateDecode", Assert.IsType<NameObject>(reader.Resolve(filter)).Value);
-        return FlateFilter.Decode(stream.Data);
+        return FlateFilter.Decode(stream.Data.ToArray());
     }
 
     private static string ParamsModDate(DocumentReader reader, StreamObject stream)

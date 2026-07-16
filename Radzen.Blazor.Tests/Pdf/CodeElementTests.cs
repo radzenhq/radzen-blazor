@@ -325,7 +325,7 @@ public class CodeElementTests
 
         var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
         var metadata = Assert.IsType<StreamObject>(reader.Resolve(root["Metadata"]));
-        var packet = Encoding.UTF8.GetString(metadata.Data);
+        var packet = Encoding.UTF8.GetString(metadata.Data.ToArray());
         Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:conformance>B</pdfaid:conformance>", packet, StringComparison.Ordinal);
 

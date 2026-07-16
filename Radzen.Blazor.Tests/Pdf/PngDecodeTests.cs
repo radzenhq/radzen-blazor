@@ -28,7 +28,7 @@ public class PngDecodeTests
         Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
         Assert.Equal("FlateDecode", ImageTestHelpers.Name(dict, "Filter"));
 
-        var samples = FlateFilter.Decode(xobj.Image.Data);
+        var samples = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(64 * 64 * 3, samples.Length);
 
         Assert.Null(xobj.SoftMask);
@@ -47,7 +47,7 @@ public class PngDecodeTests
         Assert.Equal(64, ImageTestHelpers.Int(dict, "Width"));
         Assert.Equal(64, ImageTestHelpers.Int(dict, "Height"));
 
-        var samples = FlateFilter.Decode(xobj.Image.Data);
+        var samples = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(64 * 64, samples.Length);
 
         Assert.Null(xobj.SoftMask);
@@ -71,7 +71,7 @@ public class PngDecodeTests
         var palette = Assert.IsType<StringObject>(cs[3]);
         Assert.Equal(256 * 3, palette.Value.Length);
 
-        var indices = FlateFilter.Decode(xobj.Image.Data);
+        var indices = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(64 * 64, indices.Length);
 
         Assert.Null(xobj.SoftMask);
@@ -85,7 +85,7 @@ public class PngDecodeTests
 
         Assert.Equal("DeviceRGB", ImageTestHelpers.Name(dict, "ColorSpace"));
         Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
-        var colour = FlateFilter.Decode(xobj.Image.Data);
+        var colour = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(64 * 64 * 3, colour.Length);
 
         var mask = xobj.SoftMask;
@@ -99,7 +99,7 @@ public class PngDecodeTests
         Assert.Equal(8, ImageTestHelpers.Int(maskDict, "BitsPerComponent"));
         Assert.Equal("FlateDecode", ImageTestHelpers.Name(maskDict, "Filter"));
 
-        var alpha = FlateFilter.Decode(mask.Data);
+        var alpha = FlateFilter.Decode(mask.Data.ToArray());
         Assert.Equal(64 * 64, alpha.Length);
     }
 
@@ -117,7 +117,7 @@ public class PngDecodeTests
         Assert.Equal(8, ImageTestHelpers.Int(mask.Dictionary, "BitsPerComponent"));
         Assert.Equal(64, ImageTestHelpers.Int(mask.Dictionary, "Width"));
 
-        var alpha = FlateFilter.Decode(mask.Data);
+        var alpha = FlateFilter.Decode(mask.Data.ToArray());
         Assert.Equal(64 * 64, alpha.Length);
     }
 

@@ -143,12 +143,12 @@ public class EmbeddedFileAttachmentTests
     {
         if (!stream.Dictionary.TryGetValue("Filter", out var filter) || filter is null)
         {
-            return stream.Data;
+            return stream.Data.ToArray();
         }
 
         var name = Assert.IsType<NameObject>(reader.Resolve(filter));
         Assert.Equal("FlateDecode", name.Value);
-        return FlateFilter.Decode(stream.Data);
+        return FlateFilter.Decode(stream.Data.ToArray());
     }
 
     private static string MetadataPacket(DocumentReader reader)
@@ -156,7 +156,7 @@ public class EmbeddedFileAttachmentTests
         var catalog = Catalog(reader);
         Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
         var metadata = Assert.IsType<StreamObject>(reader.Resolve(metadataObject!));
-        return Encoding.UTF8.GetString(metadata.Data);
+        return Encoding.UTF8.GetString(metadata.Data.ToArray());
     }
 
     [Fact]

@@ -193,6 +193,19 @@ public sealed class Page
     public void SetContent(byte[] value)
     {
         ArgumentNullException.ThrowIfNull(value);
+        SetContentCore(value);
+
+        // ResetMaterialization makes the page look freshly loaded again, so without this bit
+        // nothing would report the replacement and a save would keep the pre-SetContent bytes.
+        ContentReplaced = true;
+    }
+
+    // Installs the bytes a page starts life with (parsed source, generator output, a merge
+    // copy). Unlike SetContent this is the page's baseline, not an edit to it.
+    internal void SetLoadedContent(byte[] value) => SetContentCore(value);
+
+    private void SetContentCore(byte[] value)
+    {
         content = value;
         ResetMaterialization();
     }
@@ -272,10 +285,16 @@ public sealed class Page
 
     internal byte[]? RawContent => content;
 
-    // Whether the retained bytes are still the whole story: no elements were materialized
-    // (and so none can have been edited) and no overlay is queued. Read by PageOperations to
-    // decide whether a copy can take the bytes verbatim.
-    internal bool ContentIsIntact => !materialized && pendingAppends.Count == 0;
+    // Whether the retained bytes are still the ones this page was loaded with: they were never
+    // replaced wholesale, no elements were materialized (and so none can have been edited) and
+    // no overlay is queued. Read by PageOperations to decide whether a copy can take the bytes
+    // verbatim.
+    internal bool ContentIsIntact => !ContentReplaced && !materialized && pendingAppends.Count == 0;
+
+    // Whether the raw bytes were swapped out from under the element graph, by SetContent or by
+    // a redaction/replacement rewrite. Element flags cannot see this: the replacement resets
+    // materialization, so every element-level signal reads as untouched afterwards.
+    internal bool ContentReplaced { get; private set; }
 
     // Stamping a constant-size overlay onto a loaded page must not pay to parse and re-emit
     // the whole content stream. Queuing the element leaves the raw bytes untouched, so
@@ -303,6 +322,14 @@ public sealed class Page
 
         if (!materialized)
         {
+            return;
+        }
+
+        // Materializing is not editing: with the original prefix intact and nothing appended the
+        // re-emit would reproduce the bytes already held, so skip it rather than claim a replace.
+        if (OriginalElementsIntact() && elements.Count == materializedCount)
+        {
+            ResetMaterialization();
             return;
         }
 
@@ -336,12 +363,13 @@ public sealed class Page
 
         content = emission.Bytes ?? throw new InvalidOperationException("Content re-emission did not produce a serialized stream.");
         ResetMaterialization();
+        ContentReplaced = true;
     }
 
     internal void ApplyEditedContent(byte[] value)
     {
-        content = value;
-        ResetMaterialization();
+        SetContentCore(value);
+        ContentReplaced = true;
     }
 
     // Resolves the content-stream bytes to write. A loaded page that was never materialized

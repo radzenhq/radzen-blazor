@@ -95,7 +95,7 @@ public class EncryptMetadataOptionTests
 
         var page = FirstPage(reader);
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-        Assert.Equal(StreamMarker, Encoding.Latin1.GetString(content.Data));
+        Assert.Equal(StreamMarker, Encoding.Latin1.GetString(content.Data.ToArray()));
 
         var marker = Assert.IsType<StringObject>(reader.Resolve(page["Marker"]));
         Assert.Equal(StringMarker, marker.Value);

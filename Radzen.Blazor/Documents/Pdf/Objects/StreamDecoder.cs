@@ -14,7 +14,9 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
     private readonly ReaderLimits limits = limits;
     private readonly Func<DocumentObject, DocumentObject> resolve = resolve;
 
-    public byte[] Decode(DictionaryObject dictionary, byte[] data)
+    // The decoded payload is always a buffer of its own: callers hand it to the lexer and
+    // to public byte[] APIs, and the raw input may be a window onto the shared file buffer.
+    public byte[] Decode(DictionaryObject dictionary, ReadOnlyMemory<byte> data)
     {
         var hasFilter = dictionary.TryGetValue("Filter", out var filterObject);
         var filter = hasFilter && filterObject is not null ? resolve(filterObject) : null;
@@ -26,7 +28,7 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         var names = FilterNames(filter);
         if (names.Count == 0)
         {
-            return data;
+            return data.ToArray();
         }
 
         if (names.Count > limits.MaxFilterChainLength)
@@ -35,7 +37,7 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         }
 
         var parms = FilterParms(dictionary, names.Count);
-        var result = data;
+        var result = data.ToArray();
         var inputLength = data.Length;
         for (var i = 0; i < names.Count; i++)
         {

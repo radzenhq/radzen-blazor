@@ -167,5 +167,5 @@ public class DocumentLoadTests
         => Assert.IsType<DictionaryObject>(reader.Resolve(Kids(reader)[index]));
 
     internal static byte[] KidContent(DocumentReader reader, int index)
-        => Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, index)["Contents"])).Data;
+        => Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, index)["Contents"])).Data.ToArray();
 }
