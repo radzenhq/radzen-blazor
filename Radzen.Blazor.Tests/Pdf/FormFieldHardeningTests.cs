@@ -213,10 +213,12 @@ public class FormFieldHardeningTests
 
         Assert.Equal(2, form.Fields.Count);
         Assert.Equal(["dup", "dup_2"], form.FieldNames);
+        Assert.Equal(["dup", "dup_2"], form.Fields.Select(f => f.Name));
+        Assert.Equal(["dup", "dup"], form.Fields.Select(f => f.PartialName));
         Assert.NotSame(form.Fields[0].Dictionary, form.Fields[1].Dictionary);
 
-        form.FillField("dup", "AAA");
-        form.FillField("dup_2", "BBB");
+        form.FillField(form.Fields[0].Name, "AAA");
+        form.FillField(form.Fields[1].Name, "BBB");
 
         Assert.Equal("AAA", form.Fields[0].Value);
         Assert.Equal("BBB", form.Fields[1].Value);

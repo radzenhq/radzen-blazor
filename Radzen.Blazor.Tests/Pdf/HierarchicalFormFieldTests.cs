@@ -95,6 +95,31 @@ public class HierarchicalFormFieldTests
         Assert.DoesNotContain("address", document.AcroForm.FieldNames);
         Assert.Equal(3, document.AcroForm.FieldNames.Count);
         Assert.Equal(3, names.Length);
+        Assert.Equal(document.AcroForm.FieldNames, names);
+    }
+
+    [Fact]
+    public void FieldNameRoundTripsThroughFillField()
+    {
+        var document = Load();
+        var form = document.AcroForm!;
+
+        foreach (var field in form.Fields)
+        {
+            form.FillField(field.Name, "filled " + field.Name);
+        }
+
+        Assert.Equal(["filled address.city", "filled address.zip", "filled Name"], form.Fields.Select(f => f.Value));
+    }
+
+    [Fact]
+    public void PartialNameExposesTheOwnTitleOfANestedField()
+    {
+        var document = Load();
+        var fields = document.AcroForm!.Fields;
+
+        Assert.Equal(["city", "zip", "Name"], fields.Select(f => f.PartialName));
+        Assert.Equal(["address.city", "address.zip", "Name"], fields.Select(f => f.Name));
     }
 
     [Fact]
