@@ -24,6 +24,10 @@ internal static class StreamFilterRegistry
         Register(map, new RunLengthStreamFilter(), "RL");
         Register(map, new AsciiHexStreamFilter(), "AHx");
         Register(map, new Ascii85StreamFilter(), "A85");
+
+        // /Crypt has no inline-image abbreviation (ISO 32000-1 Table 6).
+        var crypt = new CryptStreamFilter();
+        map[crypt.Name] = crypt;
         return map;
     }
 
