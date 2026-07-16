@@ -473,8 +473,7 @@ internal sealed class IncrementalDocumentSaver
             original = reader.AsDictionary(infoValue);
         }
 
-        var info = original is null ? new DictionaryObject() : Copy(original);
-        ApplyInfo(info);
+        var info = BuildInfo(original);
 
         if (number is int existing)
         {
@@ -488,7 +487,10 @@ internal sealed class IncrementalDocumentSaver
         return true;
     }
 
-    private void ApplyInfo(DictionaryObject info)
+    // The emitted modeled keys are exactly the non-null modeled values, matching what a
+    // full save writes (DocumentSaver.BuildInfo): a field cleared to null is omitted from
+    // the override, which removes it. Unmodeled keys carry over from the original.
+    private DictionaryObject BuildInfo(DictionaryObject? original)
     {
         var meta = doc.Info;
         var values = new string?[]
@@ -498,8 +500,18 @@ internal sealed class IncrementalDocumentSaver
             meta.ModificationDate is { } modified ? DocumentSaver.PdfDate(modified) : null,
         };
 
-        // A null modeled field is left as the original carried it: DictionaryObject
-        // has no key removal, and clearing metadata is out of the incremental MVP.
+        var info = new DictionaryObject();
+        if (original is not null)
+        {
+            foreach (var pair in original)
+            {
+                if (Array.IndexOf(InfoKeys, pair.Key) < 0)
+                {
+                    info[pair.Key] = pair.Value;
+                }
+            }
+        }
+
         for (var i = 0; i < InfoKeys.Length; i++)
         {
             if (values[i] is { } value)
@@ -507,6 +519,8 @@ internal sealed class IncrementalDocumentSaver
                 info[InfoKeys[i]] = new StringObject(value);
             }
         }
+
+        return info;
     }
 
     // Deep-copies a dictionary, replacing any inline stream (an appearance stream a

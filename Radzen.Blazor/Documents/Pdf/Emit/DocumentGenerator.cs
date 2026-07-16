@@ -23,6 +23,10 @@ internal sealed class GeneratedFont
     // planned; content streams emit the NEW gid so CID == gid stays true for the
     // compact embedded subset (glyf and CFF alike). Null for base-14 faces.
     public Dictionary<ushort, ushort>? CompactGidMap { get; set; }
+
+    // The shared reverse map for text extraction, built on first use once CompactGidMap
+    // is final so all pages of the document reference one instance per font.
+    public Fonts.ReverseFont? Extraction { get; set; }
 }
 
 internal sealed class GeneratedImage

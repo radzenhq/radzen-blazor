@@ -135,6 +135,31 @@ internal sealed class ConformanceWriter(Document document)
                 throw new InvalidOperationException(
                     "PDF/A-4F requires at least one embedded file; add one with DocumentBuilder.Attachments or use PdfA4.");
         }
+
+        ValidateImageColorSpaces();
+    }
+
+    // ISO 19005-2 6.2.4.3: DeviceCMYK is only permitted when the output intent is a CMYK
+    // profile, and WriteConformance always emits the sRGB one.
+    private void ValidateImageColorSpaces()
+    {
+        foreach (var page in document.Pages)
+        {
+            if (page.Generated is not { } generated)
+            {
+                continue;
+            }
+
+            foreach (var image in generated.Images)
+            {
+                if (image.Image.Image.Dictionary.TryGetValue("ColorSpace", out var space)
+                    && space is NameObject { Value: "DeviceCMYK" })
+                {
+                    throw new InvalidOperationException(
+                        "PDF/A pairs a DeviceCMYK image with an sRGB output intent, which ISO 19005 forbids; convert the image to RGB or grayscale, or use PdfAConformance.None.");
+                }
+            }
+        }
     }
 
     private void ValidateFonts()
