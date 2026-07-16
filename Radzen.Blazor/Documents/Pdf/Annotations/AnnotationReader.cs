@@ -234,12 +234,25 @@ internal static class AnnotationReader
             return null;
         }
 
-        if (value.Count != 3)
+        // ISO 32000-1 Table 164: 0 numbers means no colour, 1 grayscale, 3 RGB, 4 CMYK.
+        switch (value.Count)
         {
-            throw new DocumentParseException("Only RGB annotation colors are supported.", -1);
+            case 0:
+                return null;
+            case 1:
+                var gray = Channel(Number(reader, value[0]));
+                return Color.FromRgb(gray, gray, gray);
+            case 3:
+                return Color.FromRgb(Channel(Number(reader, value[0])), Channel(Number(reader, value[1])), Channel(Number(reader, value[2])));
+            case 4:
+                var black = Number(reader, value[3]);
+                return Color.FromRgb(
+                    Channel((1 - Number(reader, value[0])) * (1 - black)),
+                    Channel((1 - Number(reader, value[1])) * (1 - black)),
+                    Channel((1 - Number(reader, value[2])) * (1 - black)));
+            default:
+                throw new DocumentParseException("An annotation colour array must contain zero, one, three or four numbers.", -1);
         }
-
-        return Color.FromRgb(Channel(Number(reader, value[0])), Channel(Number(reader, value[1])), Channel(Number(reader, value[2])));
     }
 
     private static byte Channel(double value) => (byte)Math.Clamp((int)Math.Round(value * 255), 0, 255);
