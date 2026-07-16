@@ -16,54 +16,39 @@ namespace Radzen.Documents.Pdf.Content;
 /// </summary>
 public sealed class ContentWriter : IDisposable
 {
-    private readonly string fontKeyPrefix;
-    private readonly string imageKeyPrefix;
-    private readonly string extGStateKeyPrefix;
     private byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
     private int length;
     private bool returned;
-    private readonly Dictionary<string, string> keysByBaseFont = new(StringComparer.Ordinal);
-    private readonly List<KeyValuePair<string, ImageXObject>> images = [];
-    private readonly List<KeyValuePair<string, DictionaryObject>> patterns = [];
-    private readonly List<GradientBrush> patternBrushes = [];
-    private readonly List<KeyValuePair<string, double>> extGStates = [];
+    private readonly ResourceKeyRegistry<string, KeyValuePair<string, string>> fonts;
+    private readonly ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>> images;
+    private readonly ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns =
+        new("P", ReferenceKeyComparer<GradientBrush>.Instance);
+
+    private readonly ResourceKeyRegistry<double, KeyValuePair<string, double>> extGStates;
 
     // The key prefixes keep overlay streams from colliding with generated resources.
     internal ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
     {
-        this.fontKeyPrefix = fontKeyPrefix;
-        this.imageKeyPrefix = imageKeyPrefix;
-        this.extGStateKeyPrefix = extGStateKeyPrefix;
+        fonts = new ResourceKeyRegistry<string, KeyValuePair<string, string>>(fontKeyPrefix, StringComparer.Ordinal);
+        images = new ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>>(imageKeyPrefix);
+        extGStates = new ResourceKeyRegistry<double, KeyValuePair<string, double>>(extGStateKeyPrefix, AlphaComparer.Instance);
     }
 
-    internal IEnumerable<KeyValuePair<string, string>> Fonts => keysByBaseFont;
+    internal IEnumerable<KeyValuePair<string, string>> Fonts => fonts.Values;
 
-    internal IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images;
+    internal IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images.Values;
 
-    internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns;
+    internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns.Values;
 
     internal string RegisterOpacity(double opacity)
     {
         var value = Math.Clamp(opacity, 0, 1);
-        foreach (var state in extGStates)
-        {
-            if (state.Value == value)
-            {
-                return state.Key;
-            }
-        }
-
-        var key = extGStateKeyPrefix + extGStates.Count.ToString(CultureInfo.InvariantCulture);
-        extGStates.Add(new KeyValuePair<string, double>(key, value));
-        return key;
+        return extGStates.GetOrAdd(value, key => new KeyValuePair<string, double>(key, value));
     }
 
+    // Images opt out of reuse: the same XObject registered twice gets two keys, as it always has.
     internal string RegisterImage(ImageXObject image)
-    {
-        var key = imageKeyPrefix + images.Count.ToString(CultureInfo.InvariantCulture);
-        images.Add(new KeyValuePair<string, ImageXObject>(key, image));
-        return key;
-    }
+        => images.Add(key => new KeyValuePair<string, ImageXObject>(key, image));
 
     /// <summary>
     /// Registers a shading pattern for <paramref name="gradient"/> and returns its <c>/Pattern</c>
@@ -74,18 +59,9 @@ public sealed class ContentWriter : IDisposable
     public string RegisterPattern(GradientBrush gradient)
     {
         ArgumentNullException.ThrowIfNull(gradient);
-        for (var i = 0; i < patternBrushes.Count; i++)
-        {
-            if (ReferenceEquals(patternBrushes[i], gradient))
-            {
-                return patterns[i].Key;
-            }
-        }
-
-        var key = "P" + patterns.Count.ToString(CultureInfo.InvariantCulture);
-        patterns.Add(new KeyValuePair<string, DictionaryObject>(key, ShadingBuilder.BuildPattern(gradient)));
-        patternBrushes.Add(gradient);
-        return key;
+        return patterns.GetOrAdd(
+            gradient,
+            key => new KeyValuePair<string, DictionaryObject>(key, ShadingBuilder.BuildPattern(gradient)));
     }
 
     internal byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
@@ -98,7 +74,7 @@ public sealed class ContentWriter : IDisposable
 
     internal ContentEmissionResult DetachResult() => new(
         ToArray(),
-        new ContentResourceManifest([.. keysByBaseFont], [.. images], [.. patterns], [.. extGStates]),
+        new ContentResourceManifest([.. fonts.Values], [.. images.Values], [.. patterns.Values], [.. extGStates.Values]),
         isEmitted: true);
 
     /// <summary>
@@ -118,13 +94,7 @@ public sealed class ContentWriter : IDisposable
     public string RegisterFont(Font font)
     {
         var baseFont = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
-        if (!keysByBaseFont.TryGetValue(baseFont, out var key))
-        {
-            key = fontKeyPrefix + keysByBaseFont.Count.ToString(CultureInfo.InvariantCulture);
-            keysByBaseFont[baseFont] = key;
-        }
-
-        return key;
+        return fonts.GetOrAdd(baseFont, key => new KeyValuePair<string, string>(baseFont, key));
     }
 
     /// <summary>Appends <paramref name="text"/> to the content stream verbatim, one byte per character.</summary>

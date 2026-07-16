@@ -139,61 +139,21 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
             writer.WriteRaw(" gs\n");
         }
 
-        writer.WriteRaw("BT\n");
-        if (FillPaint is { } fillPaint)
+        var adjustments = SourceAdjustments is { } segments && Text == SourceText ? segments : (ImmutableArray<TextAdjustment>?)null;
+        ContentEmitter.WriteTextShow(writer, new TextShowOp
         {
-            ContentEmitter.WriteDeviceColor(writer, fillPaint, stroke: false);
-        }
-        else
-        {
-            writer.WriteColor(Color, "rg");
-        }
+            FontKey = key,
+            Size = Font.Size,
+            X = x.Point,
+            Baseline = y.Point,
+            Color = Color,
+            FillPaint = FillPaint,
+            CharSpacing = CharSpacing,
+            WordSpacing = WordSpacing,
+            Bytes = adjustments is null ? EncodeText() : default,
+            Adjustments = adjustments,
+        });
 
-        writer.WriteName(key);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(Font.Size);
-        writer.WriteRaw(" Tf\n");
-        if (CharSpacing != 0)
-        {
-            writer.WriteNumber(CharSpacing);
-            writer.WriteRaw(" Tc\n");
-        }
-
-        if (WordSpacing != 0)
-        {
-            writer.WriteNumber(WordSpacing);
-            writer.WriteRaw(" Tw\n");
-        }
-        writer.WriteNumber(x.Point);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(y.Point);
-        writer.WriteRaw(" Td\n");
-
-        if (SourceAdjustments is { } segments && Text == SourceText)
-        {
-            writer.WriteRaw("[");
-            foreach (var segment in segments)
-            {
-                if (segment.Text is not null)
-                {
-                    writer.WriteString(segment.Text);
-                }
-                else
-                {
-                    writer.WriteNumber(segment.Adjustment);
-                    writer.WriteRaw(" ");
-                }
-            }
-
-            writer.WriteRaw("] TJ\n");
-        }
-        else
-        {
-            writer.WriteString(EncodeText().Span);
-            writer.WriteRaw(" Tj\n");
-        }
-
-        writer.WriteRaw("ET\n");
         if (alpha < 1)
         {
             writer.WriteRaw("Q\n");

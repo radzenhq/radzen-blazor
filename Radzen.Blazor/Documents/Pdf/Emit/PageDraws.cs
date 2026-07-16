@@ -158,15 +158,21 @@ internal sealed class PagePlan
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
-    public List<GeneratedExtGState> ExtGStates { get; } = [];
-    public List<GeneratedPattern> Patterns { get; } = [];
+    // One registry per resource kind: it owns the entries, the dedup index and the single GS/P
+    // ordinal counter. Plain (alpha/blend/overprint/intent) states dedup by their composite
+    // tuple and soft-mask states by their content key, in one registry so both draw from the
+    // same counter; the identity prefix keeps the two domains from colliding.
+    private readonly ResourceKeyRegistry<string, GeneratedExtGState> extGStates =
+        new("GS", StringComparer.Ordinal);
 
-    // Dedup indexes over ExtGStates: plain (alpha/blend/overprint/intent) states by their
-    // composite tuple, soft-mask states by their content key. Both back the linear scans that
-    // otherwise made registration O(n^2) on pages with many distinct states or shadows.
-    private readonly Dictionary<string, string> extGStateKeys = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, string> softMaskKeys = new(StringComparer.Ordinal);
+    private readonly ResourceKeyRegistry<GradientBrush, GeneratedPattern> patterns =
+        new("P", ReferenceKeyComparer<GradientBrush>.Instance);
+
     private readonly Dictionary<string, GeneratedExtGState> extGStatesByKey = new(StringComparer.Ordinal);
+
+    public IReadOnlyList<GeneratedExtGState> ExtGStates => extGStates.Values;
+
+    public IReadOnlyList<GeneratedPattern> Patterns => patterns.Values;
 
     // Caches the blurred coverage raster by geometry so a grid of identically shaped shadows
     // (differing only in position) runs the Coverage+Blur passes once instead of per placement.
@@ -209,14 +215,8 @@ internal sealed class PagePlan
         strokeAlpha = Math.Clamp(strokeAlpha, 0, 1);
         var dedupKey = string.Create(
             CultureInfo.InvariantCulture,
-            $"{fillAlpha}|{strokeAlpha}|{blend}|{overprintStroke}|{overprintFill}|{overprintMode}|{intent}");
-        if (extGStateKeys.TryGetValue(dedupKey, out var existing))
-        {
-            return existing;
-        }
-
-        var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
-        var state = new GeneratedExtGState
+            $"a|{fillAlpha}|{strokeAlpha}|{blend}|{overprintStroke}|{overprintFill}|{overprintMode}|{intent}");
+        return extGStates.GetOrAdd(dedupKey, key => Track(new GeneratedExtGState
         {
             Key = key,
             FillAlpha = fillAlpha,
@@ -226,11 +226,13 @@ internal sealed class PagePlan
             OverprintFill = overprintFill,
             OverprintMode = overprintMode,
             Intent = intent,
-        };
-        ExtGStates.Add(state);
-        extGStateKeys[dedupKey] = key;
-        extGStatesByKey[key] = state;
-        return key;
+        }));
+    }
+
+    private GeneratedExtGState Track(GeneratedExtGState state)
+    {
+        extGStatesByKey[state.Key] = state;
+        return state;
     }
 
     public GeneratedExtGState? FindExtGState(string key)
@@ -272,44 +274,22 @@ internal sealed class PagePlan
     // content key opts out and always appends a fresh entry.
     public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
     {
-        if (softMask.ContentKey is { } contentKey && softMaskKeys.TryGetValue(contentKey, out var existing))
-        {
-            return existing;
-        }
-
-        var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
-        var state = new GeneratedExtGState
+        GeneratedExtGState Create(string key) => Track(new GeneratedExtGState
         {
             Key = key,
             FillAlpha = Math.Clamp(fillAlpha, 0, 1),
             StrokeAlpha = Math.Clamp(strokeAlpha, 0, 1),
             SoftMask = softMask,
-        };
-        ExtGStates.Add(state);
-        extGStatesByKey[key] = state;
-        if (softMask.ContentKey is { } key2)
-        {
-            softMaskKeys[key2] = key;
-        }
+        });
 
-        return key;
+        return softMask.ContentKey is { } contentKey
+            ? extGStates.GetOrAdd("m|" + contentKey, Create)
+            : extGStates.Add(Create);
     }
 
     // One shading pattern per gradient brush instance, keyed P0, P1, ...
     public string RegisterPattern(GradientBrush gradient)
-    {
-        foreach (var pattern in Patterns)
-        {
-            if (ReferenceEquals(pattern.Gradient, gradient))
-            {
-                return pattern.Key;
-            }
-        }
-
-        var key = "P" + Patterns.Count.ToString(CultureInfo.InvariantCulture);
-        Patterns.Add(new GeneratedPattern { Key = key, Gradient = gradient });
-        return key;
-    }
+        => patterns.GetOrAdd(gradient, key => new GeneratedPattern { Key = key, Gradient = gradient });
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 
