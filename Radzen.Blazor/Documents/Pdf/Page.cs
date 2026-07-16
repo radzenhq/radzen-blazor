@@ -39,6 +39,11 @@ public sealed class Page
     // the document writer emits these bytes and resources directly (see Document.SaveToStream).
     internal GeneratedPage? Generated { get; set; }
 
+    // The document this page was first added to, and whose LoadedState therefore holds the
+    // page's source-derived entries. Set once by PageCollection and never reassigned, so a
+    // page inserted into further documents still carries from the document that owns its state.
+    internal Document? Owner { get; set; }
+
     /// <summary>Gets the page width in points.</summary>
     public Unit Width => width;
 

@@ -39,6 +39,17 @@ public sealed class Document
     // loaded pages on a document that was not itself loaded.
     internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
+    // Adopts a page inserted straight from another document, keyed by the same Page
+    // instance rather than by a copy as Append does. A built page carries its closure on
+    // the page itself, so only a donor with loaded state has anything to carry.
+    internal void CarryForeignPage(Page page, Document donor)
+    {
+        if (donor.Loaded is { } origin)
+        {
+            EnsureLoaded().CarryForeign(page, origin);
+        }
+    }
+
     // The eight modeled /Info fields captured as strings, for a cheap value comparison
     // between the load-time metadata and the current metadata on the incremental path.
     internal static string?[] InfoSnapshot(DocumentInfo info) =>

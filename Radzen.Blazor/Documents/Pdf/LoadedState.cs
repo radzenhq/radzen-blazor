@@ -116,6 +116,33 @@ internal sealed class LoadedState
         }
     }
 
+    // Carries a page inserted into this document directly from another one. The page
+    // instance is shared with the donor rather than copied, so every entry is keyed by the
+    // page itself: its effective /Resources plus everything CarryAppended carries, and the
+    // donor's own appended handles when the page had in turn been merged into the donor.
+    public void CarryForeign(Page page, LoadedState origin)
+    {
+        if (origin.Source is { } reader && origin.SourceResources.TryGetValue(page, out var resources))
+        {
+            RecordAppendedResources(page, reader, resources);
+        }
+        else if (origin.AppendedResources.TryGetValue(page, out var appendedResources))
+        {
+            RecordAppendedResources(page, appendedResources.Reader, appendedResources.Resources);
+        }
+
+        CarryAppended(page, page, origin);
+
+        if (origin.AppendedPages.TryGetValue(page, out var appendedNode))
+        {
+            AppendedPages[page] = appendedNode;
+            if (origin.AppendedAcroForms.TryGetValue(appendedNode.Reader, out var appendedForm))
+            {
+                AppendedAcroForms[appendedNode.Reader] = appendedForm;
+            }
+        }
+    }
+
     // Drops the loaded AcroForm handle after FormWriter flattens it, so the next
     // save emits no /AcroForm.
     public void ClearAcroForm() => SourceAcroForm = null;

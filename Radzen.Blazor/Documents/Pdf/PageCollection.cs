@@ -56,12 +56,14 @@ public sealed class PageCollection : IReadOnlyList<Page>
             : (size.Width, size.Height);
 
         var page = new Page(width, height);
-        pages.Add(page);
+        Insert(pages.Count, page);
         return page;
     }
 
     /// <summary>
-    /// Inserts an existing page at the specified index.
+    /// Inserts an existing page at the specified index. A page taken from another
+    /// document keeps its source content and resources; the other document is left
+    /// unchanged and keeps the page too.
     /// </summary>
     /// <param name="index">The zero-based index at which to insert.</param>
     /// <param name="page">The page to insert.</param>
@@ -69,6 +71,27 @@ public sealed class PageCollection : IReadOnlyList<Page>
     {
         ArgumentNullException.ThrowIfNull(page);
         pages.Insert(index, page);
+        Adopt(page);
+    }
+
+    // A page from another document keeps its source node, contents and resources in the
+    // donor's LoadedState, which this document's save path cannot see; carry those entries
+    // over, or the page emits no /Resources for a content stream that still names them.
+    private void Adopt(Page page)
+    {
+        if (owner is null || ReferenceEquals(page.Owner, owner))
+        {
+            return;
+        }
+
+        if (page.Owner is { } donor)
+        {
+            owner.CarryForeignPage(page, donor);
+        }
+        else
+        {
+            page.Owner = owner;
+        }
     }
 
     /// <summary>
