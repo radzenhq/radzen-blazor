@@ -110,6 +110,77 @@ public class AnnotationTests
     }
 
     [Fact]
+    public void Flatten_PagesInheritingOneResources_DoNotShareEachOthersAppearances()
+    {
+        var loaded = Load(SharedResourcesWithAppearances());
+
+        loaded.Flatten();
+        var reader = DocumentReader.Parse(loaded.ToArray());
+
+        Assert.Equal(new[] { "AFlatten" }, XObjectNames(reader, 0));
+        Assert.Equal(new[] { "AFlatten" }, XObjectNames(reader, 1));
+    }
+
+    [Fact]
+    public void Flatten_DoesNotChangeWhatAnotherDocumentHoldingTheSamePagesSaves()
+    {
+        var first = Load(SharedResourcesWithAppearances());
+        var second = new Document();
+        second.Append(first);
+        var expected = second.ToArray();
+
+        first.Flatten();
+
+        Assert.Equal(expected, second.ToArray());
+    }
+
+    private static string[] XObjectNames(DocumentReader reader, int index)
+    {
+        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(DocumentLoadTests.Kid(reader, index)["Resources"]));
+        var xobjects = reader.GetDictionary(resources, "XObject");
+        return xobjects is null ? [] : [.. xobjects.Keys];
+    }
+
+    // Two pages that inherit one /Resources from their /Pages node, each carrying a
+    // Square annotation whose /AP /N is its own form XObject.
+    private static byte[] SharedResourcesWithAppearances()
+    {
+        var content = Encoding.ASCII.GetBytes("q Q");
+        var appearance = Encoding.ASCII.GetBytes("1 0 0 RG 0 0 20 20 re S");
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 2 /Kids [3 0 R 4 0 R] /MediaBox [0 0 612 792] "
+            + "/Resources 5 0 R >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 8 0 R /Annots [6 0 R] >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 9 0 R /Annots [7 0 R] >>\nendobj\n");
+        pdf.Object(5, "5 0 obj\n<< >>\nendobj\n");
+        pdf.Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Square /Rect [10 10 30 30] /AP << /N 10 0 R >> >>\nendobj\n");
+        pdf.Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Square /Rect [40 40 60 60] /AP << /N 11 0 R >> >>\nendobj\n");
+        for (var i = 8; i <= 9; i++)
+        {
+            pdf.Mark(i);
+            pdf.Append(i + " 0 obj\n<< /Length " + content.Length + " >>\nstream\n").Append(content).Append("\nendstream\nendobj\n");
+        }
+
+        for (var i = 10; i <= 11; i++)
+        {
+            pdf.Mark(i);
+            pdf.Append(i + " 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 20 20] /Length "
+                + appearance.Length + " >>\nstream\n").Append(appearance).Append("\nendstream\nendobj\n");
+        }
+
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 12\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var i = 1; i < 12; i++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(i)));
+        }
+
+        pdf.Append("trailer\n<< /Size 12 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
     public void EmptyAnnotationCollection_DoesNotChangeOutput()
     {
         var first = new Document();

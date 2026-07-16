@@ -9,6 +9,7 @@ internal static class AnnotationFlattener
 {
     public static void Flatten(Document document)
     {
+        var owned = new HashSet<Page>();
         foreach (var page in document.Pages)
         {
             foreach (var entry in page.Annotations.Entries)
@@ -18,7 +19,7 @@ internal static class AnnotationFlattener
                     continue;
                 }
 
-                if (TryFlattenLoadedAppearance(document, page, entry, annotation))
+                if (TryFlattenLoadedAppearance(document, page, entry, annotation, owned))
                 {
                     continue;
                 }
@@ -41,7 +42,8 @@ internal static class AnnotationFlattener
         Document document,
         Page page,
         AnnotationCollection.Entry entry,
-        Annotation annotation)
+        Annotation annotation,
+        HashSet<Page> owned)
     {
         if (entry.Reader is not { } reader || entry.Dictionary is not { } dictionary
             || reader.GetDictionary(dictionary, "AP") is not { } appearances)
@@ -84,18 +86,7 @@ internal static class AnnotationFlattener
             throw new InvalidOperationException("A loaded annotation appearance has no loaded document state.");
         }
 
-        if (!loaded.SourceResources.TryGetValue(page, out var resources))
-        {
-            resources = new DictionaryObject();
-            loaded.SourceResources[page] = resources;
-        }
-
-        var xobjects = reader.GetDictionary(resources, "XObject");
-        if (xobjects is null)
-        {
-            xobjects = new DictionaryObject();
-            resources["XObject"] = xobjects;
-        }
+        var xobjects = PrivateXObjects(reader, loaded, page, owned);
 
         var name = "AFlatten";
         while (xobjects.ContainsKey(name))
@@ -117,6 +108,41 @@ internal static class AnnotationFlattener
                 annotation.Bounds.Y - y0 * scaleY),
         });
         return true;
+    }
+
+    // Sibling pages under a /Pages node that declares /Resources all record the same
+    // parsed dictionary instance, and an appended page shares it with its donor, so
+    // the appearance XObject is registered into a private copy taken on first use:
+    // mutating in place would leak this page's appearance into every sharer.
+    private static DictionaryObject PrivateXObjects(DocumentReader reader, LoadedState loaded, Page page, HashSet<Page> owned)
+    {
+        loaded.SourceResources.TryGetValue(page, out var resources);
+        if (!owned.Add(page))
+        {
+            return (DictionaryObject)resources!["XObject"]!;
+        }
+
+        var copy = new DictionaryObject();
+        var xobjects = new DictionaryObject();
+        if (resources is not null)
+        {
+            foreach (var key in resources.Keys)
+            {
+                copy[key] = resources[key];
+            }
+
+            if (reader.GetDictionary(resources, "XObject") is { } shared)
+            {
+                foreach (var key in shared.Keys)
+                {
+                    xobjects[key] = shared[key];
+                }
+            }
+        }
+
+        copy["XObject"] = xobjects;
+        loaded.SourceResources[page] = copy;
+        return xobjects;
     }
 
     private static bool Identity(DocumentReader reader, ArrayObject matrix)
