@@ -172,14 +172,7 @@ internal sealed class ReverseFont
             return new ReverseFont(codeBytes > 0 ? codeBytes : 2, unicode, widths, defaultWidth);
         }
 
-        var simple = new Dictionary<int, string>(256);
-        for (var code = 0; code < 256; code++)
-        {
-            if (WinAnsiEncoding.TryGetChar((byte)code, out var c))
-            {
-                simple[code] = c.ToString();
-            }
-        }
+        var simple = BuildBaseMap(BaseEncodingName(reader, fontDict));
 
         ApplyEncoding(reader, fontDict, simple);
 
@@ -322,12 +315,39 @@ internal sealed class ReverseFont
         return ToUnicodeCMap.Parse(reader.DecodeStream(stream), reader.Limits);
     }
 
-    private static Dictionary<int, string> BuildWinAnsiMap()
+    private static Dictionary<int, string> BuildWinAnsiMap() => BuildBaseMap(null);
+
+    // A simple font's base encoding: /Encoding may be the name itself, or a dictionary whose
+    // /BaseEncoding names it. Anything else (absent, or a base this table does not model such
+    // as MacExpertEncoding) keeps the WinAnsi default the emitter writes.
+    private static string? BaseEncodingName(DocumentReader reader, DictionaryObject fontDict)
     {
+        if (fontDict.TryGetValue("Encoding", out var value) && value is { } encodingValue
+            && reader.Resolve(encodingValue) is NameObject name)
+        {
+            return name.Value;
+        }
+
+        if (reader.GetDictionary(fontDict, "Encoding") is { } encoding
+            && encoding.TryGetValue("BaseEncoding", out var baseValue) && baseValue is { } resolvable
+            && reader.Resolve(resolvable) is NameObject baseName)
+        {
+            return baseName.Value;
+        }
+
+        return null;
+    }
+
+    private static Dictionary<int, string> BuildBaseMap(string? encodingName)
+    {
+        var macRoman = string.Equals(encodingName, "MacRomanEncoding", StringComparison.Ordinal);
         var map = new Dictionary<int, string>(256);
         for (var code = 0; code < 256; code++)
         {
-            if (WinAnsiEncoding.TryGetChar((byte)code, out var c))
+            var mapped = macRoman
+                ? MacRomanEncoding.TryGetChar((byte)code, out var c)
+                : WinAnsiEncoding.TryGetChar((byte)code, out c);
+            if (mapped)
             {
                 map[code] = c.ToString();
             }

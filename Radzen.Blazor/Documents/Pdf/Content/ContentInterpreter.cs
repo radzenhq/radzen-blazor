@@ -66,7 +66,7 @@ internal static class ContentInterpreter
                         Transform = interpreter.Graphics.Ctm,
                         IsArtifact = interpreter.ArtifactDepth > 0,
                     });
-                    interpreter.PendingMerge = null;
+                    FinalizeMerge(interpreter);
                     interpreter.ResetOperandFrame();
                     continue;
             }
@@ -82,11 +82,32 @@ internal static class ContentInterpreter
 
             if (op is not ("Tj" or "TJ" or "'" or "\""))
             {
-                interpreter.PendingMerge = null;
+                FinalizeMerge(interpreter);
             }
 
             interpreter.ResetOperandFrame();
         }
+
+        FinalizeMerge(interpreter);
+    }
+
+    // Writes a fold chain's accumulated bytes/text onto the run once, when the chain ends.
+    // Folding leaves the run's SourceBytes/SourceText at their pre-fold values, so every
+    // path that abandons PendingMerge must come through here.
+    private static void FinalizeMerge(InterpreterState interpreter)
+    {
+        if (interpreter.PendingMerge is { } run && interpreter.MergeBytes.Count > 0)
+        {
+            var text = interpreter.MergeText.ToString();
+            run.SourceBytes = [.. interpreter.MergeBytes];
+            run.Text = text;
+            run.SourceText = text;
+        }
+
+        interpreter.PendingMerge = null;
+        interpreter.MergeBytes.Clear();
+        interpreter.MergeText.Clear();
+        interpreter.MergeAdjustments = null;
     }
 
     private static bool HandleGraphicsOperators(string? op, InterpreterState interpreter, ContentCollection target)
@@ -232,14 +253,14 @@ internal static class ContentInterpreter
 
             case "Tj":
             case "TJ":
-                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0));
                 break;
 
             // ' advances to the next line by the interpreter.Leading before showing.
             case "'":
                 interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
                 interpreter.TextMatrix = interpreter.LineMatrix;
-                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0));
                 break;
 
             // " advances the line then shows, and additionally sets word spacing (aw)
@@ -247,7 +268,7 @@ internal static class ContentInterpreter
             case "\"":
                 interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
                 interpreter.TextMatrix = interpreter.LineMatrix;
-                interpreter.PendingMerge = EmitText(target, operands, interpreter.TextMatrix, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, Number(operands, 0), Number(operands, 1)), interpreter.ArtifactDepth, interpreter.TjSegments, interpreter.PendingMerge);
+                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, Number(operands, 0), Number(operands, 1)));
                 break;
 
             default:
@@ -460,6 +481,13 @@ internal static class ContentInterpreter
         public Stack<bool> MarkedContent { get; } = new();
         public TextContent? PendingMerge { get; set; }
 
+        // Growable accumulators for the run PendingMerge points at; empty until a fold happens.
+        public List<byte> MergeBytes { get; } = [];
+
+        public StringBuilder MergeText { get; } = new();
+
+        public List<TextAdjustment>? MergeAdjustments { get; set; }
+
         public void ResetOperandFrame()
         {
             Operands.Clear();
@@ -469,12 +497,18 @@ internal static class ContentInterpreter
     }
 
 
-    private static TextContent? EmitText(ContentCollection target, List<Token> operands, Matrix textMatrix, GraphicsState state, TextState text, int artifactDepth, List<TextAdjustment>? tjSegments, TextContent? pendingMerge)
+    private static void EmitText(ContentCollection target, InterpreterState interpreter, GraphicsState state, TextState text)
     {
-        var bytes = LastString(operands);
+        var textMatrix = interpreter.TextMatrix;
+        var artifactDepth = interpreter.ArtifactDepth;
+        var tjSegments = interpreter.TjSegments;
+        var pendingMerge = interpreter.PendingMerge;
+
+        var bytes = LastString(interpreter.Operands);
         if (bytes is null)
         {
-            return null;
+            FinalizeMerge(interpreter);
+            return;
         }
 
         // A loaded run in an embedded/Type0 font carries multi-byte codes; decode Text via
@@ -498,16 +532,26 @@ internal static class ContentInterpreter
             && pendingMerge.CharSpacing == text.CharSpacing
             && pendingMerge.IsArtifact == (artifactDepth > 0))
         {
-            var segments = new List<TextAdjustment>(
-                pendingMerge.SourceAdjustments ?? [new TextAdjustment(pendingMerge.SourceBytes, 0)]);
-            segments.AddRange(tjSegments ?? [new TextAdjustment(bytes, 0)]);
-            var combinedText = pendingMerge.SourceText + decoded;
-            pendingMerge.SourceAdjustments = segments;
-            pendingMerge.SourceBytes = Concat(pendingMerge.SourceBytes, bytes);
-            pendingMerge.Text = combinedText;
-            pendingMerge.SourceText = combinedText;
-            return pendingMerge;
+            // The first fold seeds the growable buffers from the run as authored; later folds
+            // append, so a k-show chain copies each chunk once instead of re-copying the whole
+            // run per show. FinalizeMerge writes the result back when the chain ends.
+            if (interpreter.MergeBytes.Count == 0)
+            {
+                interpreter.MergeBytes.AddRange(pendingMerge.SourceBytes);
+                interpreter.MergeText.Append(pendingMerge.SourceText);
+                interpreter.MergeAdjustments = pendingMerge.SourceAdjustments is { } existing
+                    ? [.. existing]
+                    : [new TextAdjustment(pendingMerge.SourceBytes, 0)];
+                pendingMerge.SourceAdjustments = interpreter.MergeAdjustments;
+            }
+
+            interpreter.MergeAdjustments!.AddRange(tjSegments ?? [new TextAdjustment(bytes, 0)]);
+            interpreter.MergeBytes.AddRange(bytes);
+            interpreter.MergeText.Append(decoded);
+            return;
         }
+
+        FinalizeMerge(interpreter);
 
         var run = new TextContent(decoded, 0, 0)
         {
@@ -527,15 +571,7 @@ internal static class ContentInterpreter
             IsArtifact = artifactDepth > 0,
         };
         target.Add(run);
-        return run;
-    }
-
-    private static byte[] Concat(byte[] a, byte[] b)
-    {
-        var result = new byte[a.Length + b.Length];
-        Array.Copy(a, 0, result, 0, a.Length);
-        Array.Copy(b, 0, result, a.Length, b.Length);
-        return result;
+        interpreter.PendingMerge = run;
     }
 
     private static bool HasAdjustment(List<TextAdjustment>? segments)

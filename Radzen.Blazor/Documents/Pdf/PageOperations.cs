@@ -6,10 +6,14 @@ namespace Radzen.Documents.Pdf;
 
 internal static class PageOperations
 {
+    // The re-parse runs under the limits the source itself was loaded with, so a host that
+    // tightened them against hostile input keeps that budget for imported content instead of
+    // silently falling back to the defaults.
     internal static Document Snapshot(Document source)
     {
         var bytes = source.ToArray();
-        return Document.LoadFromStream(new MemoryStream(bytes, writable: false));
+        var limits = source.Loaded?.Source?.Limits ?? ReaderLimits.Default;
+        return Document.LoadFromStream(new MemoryStream(bytes, writable: false), limits);
     }
 
     internal static Document Extract(Document snapshot, int offset, int length)
