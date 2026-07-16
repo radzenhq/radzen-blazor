@@ -16,10 +16,13 @@ internal static class AnnotationAppearanceBuilder
         var height = annotation.Bounds.Height;
         return annotation switch
         {
-            HighlightAnnotation => [Rectangle(width, height, annotation.Color, fill: true, stroke: false, 0)],
-            UnderlineAnnotation => [Line(0, 1, width, 1, annotation.Color, 1)],
-            StrikeOutAnnotation => [Line(0, height / 2, width, height / 2, annotation.Color, 1)],
-            SquigglyAnnotation => [Squiggle(width, annotation.Color)],
+            HighlightAnnotation highlight => Markup(highlight, static (area, color) =>
+                Rectangle(area.X, area.Y, area.Width, area.Height, color, fill: true, stroke: false, 0)),
+            UnderlineAnnotation underline => Markup(underline, static (area, color) =>
+                Line(area.X, area.Y + 1, area.X + area.Width, area.Y + 1, color, 1)),
+            StrikeOutAnnotation strikeOut => Markup(strikeOut, static (area, color) =>
+                Line(area.X, area.Y + area.Height / 2, area.X + area.Width, area.Y + area.Height / 2, color, 1)),
+            SquigglyAnnotation squiggly => Markup(squiggly, static (area, color) => Squiggle(area, color)),
             TextAnnotation => [Note(width, height, annotation.Color)],
             StampAnnotation stamp => Stamp(width, height, annotation.Color, stamp.Name),
             InkAnnotation ink => Ink(ink),
@@ -28,6 +31,21 @@ internal static class AnnotationAppearanceBuilder
             CircleAnnotation circle => Shape(width, height, circle, circle: true),
             _ => [],
         };
+    }
+
+    // One primitive per markup area so the appearance agrees with the /QuadPoints the
+    // emitter writes: a markup spanning wrapped lines must not paint the gaps between them.
+    private static IReadOnlyList<ContentElement> Markup(MarkupAnnotation annotation, Func<Rect, Color, ContentElement> build)
+    {
+        var result = new List<ContentElement>(annotation.Areas.Count);
+        foreach (var area in annotation.Areas)
+        {
+            result.Add(build(
+                new Rect(area.X - annotation.Bounds.X, area.Y - annotation.Bounds.Y, area.Width, area.Height),
+                annotation.Color));
+        }
+
+        return result;
     }
 
     private static IReadOnlyList<ContentElement> Stamp(double width, double height, Color color, string name)
@@ -102,15 +120,15 @@ internal static class AnnotationAppearanceBuilder
         return path;
     }
 
-    private static PathContent Squiggle(double width, Color color)
+    private static PathContent Squiggle(Rect area, Color color)
     {
         var path = new PathContent { Stroke = true, StrokeColor = color, Thickness = 1 };
-        path.MoveTo(0, 1);
+        path.MoveTo(area.X, area.Y + 1);
         var x = 0.0;
-        while (x < width)
+        while (x < area.Width)
         {
-            path.LineTo(Math.Min(width, x + 2), 3);
-            path.LineTo(Math.Min(width, x + 4), 1);
+            path.LineTo(area.X + Math.Min(area.Width, x + 2), area.Y + 3);
+            path.LineTo(area.X + Math.Min(area.Width, x + 4), area.Y + 1);
             x += 4;
         }
 
@@ -126,8 +144,11 @@ internal static class AnnotationAppearanceBuilder
     }
 
     private static PathContent Rectangle(double width, double height, Color color, bool fill, bool stroke, double thickness)
+        => Rectangle(0, 0, width, height, color, fill, stroke, thickness);
+
+    private static PathContent Rectangle(double x, double y, double width, double height, Color color, bool fill, bool stroke, double thickness)
     {
-        var path = RectanglePath(width, height);
+        var path = RectanglePath(x, y, width, height);
         path.Fill = fill;
         path.Stroke = stroke;
         path.FillColor = color;
@@ -136,13 +157,15 @@ internal static class AnnotationAppearanceBuilder
         return path;
     }
 
-    private static PathContent RectanglePath(double width, double height)
+    private static PathContent RectanglePath(double width, double height) => RectanglePath(0, 0, width, height);
+
+    private static PathContent RectanglePath(double x, double y, double width, double height)
     {
         var path = new PathContent();
-        path.MoveTo(0, 0);
-        path.LineTo(width, 0);
-        path.LineTo(width, height);
-        path.LineTo(0, height);
+        path.MoveTo(x, y);
+        path.LineTo(x + width, y);
+        path.LineTo(x + width, y + height);
+        path.LineTo(x, y + height);
         path.Close();
         return path;
     }

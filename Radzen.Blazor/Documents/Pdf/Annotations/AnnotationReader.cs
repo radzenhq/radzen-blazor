@@ -1,6 +1,8 @@
+using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
@@ -58,7 +60,7 @@ internal static class AnnotationReader
             "Link" => ReadLink(new LinkAnnotation(bounds), reader, dictionary, pages, pageDictionaries),
             "Stamp" => new StampAnnotation(bounds) { Name = reader.GetName(dictionary, "Name") ?? "Draft" },
             "Ink" => ReadInk(new InkAnnotation(bounds), reader, dictionary),
-            "FreeText" => new FreeTextAnnotation(bounds),
+            "FreeText" => ReadFreeText(new FreeTextAnnotation(bounds), reader, dictionary),
             "Square" => ReadShape(new SquareAnnotation(bounds), reader, dictionary),
             "Circle" => ReadShape(new CircleAnnotation(bounds), reader, dictionary),
             _ => null,
@@ -199,7 +201,79 @@ internal static class AnnotationReader
             annotation.Strokes.Add(stroke);
         }
 
+        if (reader.GetDictionary(dictionary, "BS") is { } border)
+        {
+            annotation.StrokeWidth = reader.GetNumber(border, "W") ?? annotation.StrokeWidth;
+        }
+
         return annotation;
+    }
+
+    // /BS and /DA are rebuilt from the model whenever an annotation is re-emitted, so what
+    // the source stated has to land on the model or the edit silently reverts it.
+    private static FreeTextAnnotation ReadFreeText(FreeTextAnnotation annotation, DocumentReader reader, DictionaryObject dictionary)
+    {
+        if (reader.GetString(dictionary, "DA") is not { } da)
+        {
+            return annotation;
+        }
+
+        var (font, size) = FieldAppearances.ParseDefaultAppearance(da);
+        if (font is not null && size > 0)
+        {
+            annotation.Font = FieldAppearances.AppearanceFont(font, size);
+        }
+
+        annotation.TextColor = DefaultAppearanceColor(da) ?? annotation.TextColor;
+        return annotation;
+    }
+
+    // The colour of a /DA: the operand of its last non-stroking colour operator (ISO 32000-1
+    // 12.7.3.3). A /Pattern or /CS-based colour has no direct model equivalent and is ignored.
+    private static Color? DefaultAppearanceColor(string da)
+    {
+        var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        Color? color = null;
+        for (var i = 0; i < tokens.Length; i++)
+        {
+            var operands = tokens[i] switch
+            {
+                "g" => 1,
+                "rg" => 3,
+                "k" => 4,
+                _ => 0,
+            };
+
+            if (operands == 0 || i < operands)
+            {
+                continue;
+            }
+
+            var values = new double[operands];
+            var parsed = true;
+            for (var operand = 0; operand < operands; operand++)
+            {
+                parsed &= double.TryParse(
+                    tokens[i - operands + operand], NumberStyles.Float, CultureInfo.InvariantCulture, out values[operand]);
+            }
+
+            if (!parsed)
+            {
+                continue;
+            }
+
+            color = operands switch
+            {
+                1 => Color.FromRgb(Channel(values[0]), Channel(values[0]), Channel(values[0])),
+                3 => Color.FromRgb(Channel(values[0]), Channel(values[1]), Channel(values[2])),
+                _ => Color.FromRgb(
+                    Channel((1 - values[0]) * (1 - values[3])),
+                    Channel((1 - values[1]) * (1 - values[3])),
+                    Channel((1 - values[2]) * (1 - values[3]))),
+            };
+        }
+
+        return color;
     }
 
     private static T ReadShape<T>(T annotation, DocumentReader reader, DictionaryObject dictionary) where T : ShapeAnnotation
