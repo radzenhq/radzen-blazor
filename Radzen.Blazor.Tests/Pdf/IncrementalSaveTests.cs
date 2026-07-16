@@ -18,7 +18,7 @@ public class IncrementalSaveTests
 {
     private sealed class FixedSigner : ISigner
     {
-        public byte[] Sign(ReadOnlySpan<byte> content) => [0x30, 0x00];
+        public byte[] Sign(SignedContent content) => [0x30, 0x00];
     }
 
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);

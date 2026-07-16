@@ -28,7 +28,7 @@ public class PdfLtvTests
 
     private sealed class FixedSigner(byte[] blob) : ISigner
     {
-        public byte[] Sign(ReadOnlySpan<byte> content) => blob;
+        public byte[] Sign(SignedContent content) => blob;
     }
 
     private sealed class RecordingTimestampProvider(byte[] token) : ITimestampProvider

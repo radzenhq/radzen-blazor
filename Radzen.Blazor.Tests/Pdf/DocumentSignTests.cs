@@ -15,7 +15,7 @@ public class DocumentSignTests
 
     private sealed class ConstantSigner(byte[] blob) : ISigner
     {
-        public byte[] Sign(ReadOnlySpan<byte> content) => blob;
+        public byte[] Sign(SignedContent content) => blob;
     }
 
     private static Document BuildDocument()
