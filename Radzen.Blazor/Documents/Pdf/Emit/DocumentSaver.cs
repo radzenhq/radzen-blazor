@@ -46,6 +46,7 @@ internal sealed class DocumentSaver
 
         var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
         var imageRefs = new Dictionary<GeneratedImage, ReferenceObject>();
+        var sharedImages = new Dictionary<ImageXObject, ReferenceObject>(ReferenceEqualityComparer.Instance);
 
         var kids = new ArrayObject();
         foreach (var page in doc.Pages)
@@ -145,7 +146,7 @@ internal sealed class DocumentSaver
             var activeResources = emission.Resources.IsEmpty && emission.Overlay is not null
                 ? emission.Overlay.Resources
                 : emission.Resources;
-            var emitted = activeResources.IsEmpty ? null : PageResourceBuilder.BuildResources(writer, activeResources);
+            var emitted = activeResources.IsEmpty ? null : PageResourceBuilder.BuildResources(writer, activeResources, sharedImages);
             DictionaryObject? merged;
             if (importer is not null && loaded?.Source is { } mergeSource
                 && loaded.SourceResources.TryGetValue(page, out var loadedResources))

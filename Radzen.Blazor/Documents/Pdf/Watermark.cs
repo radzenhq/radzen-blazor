@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using Radzen.Documents.Pdf.Emit;
 
 namespace Radzen.Documents.Pdf;
 
@@ -29,6 +31,30 @@ public sealed class Watermark
     public double Rotation { get; set; } = 45;
 
     internal Image? Image { get; private set; }
+
+    private ImageXObject? decoded;
+    private (bool Interpolate, bool Stencil, int[]? ColorKeyMask) decodedOptions;
+
+    // One Watermark is stamped onto every page, so its image decodes once and every page
+    // shares the XObject; decoding per page would inflate the payload once per page and
+    // emit a duplicate image stream for each. Keyed on the options ApplyOptions reads so a
+    // caller that flips one between saves is not served a stale XObject.
+    internal ImageXObject DecodeImage(Image image)
+    {
+        var options = (image.Interpolate, image.Stencil, image.ColorKeyMask);
+        if (decoded is null || decodedOptions.Interpolate != options.Interpolate
+            || decodedOptions.Stencil != options.Stencil
+            || !ColorKeyMaskEqual(decodedOptions.ColorKeyMask, options.ColorKeyMask))
+        {
+            decoded = ImageDecoder.ApplyOptions(ImageDecoder.Decode(image.Data), image);
+            decodedOptions = (options.Interpolate, options.Stencil, options.ColorKeyMask?.ToArray());
+        }
+
+        return decoded;
+    }
+
+    private static bool ColorKeyMaskEqual(int[]? first, int[]? second)
+        => first is null ? second is null : second is not null && first.AsSpan().SequenceEqual(second);
 
     /// <summary>
     /// Sets the watermark image, drawn centered on the page under any <see cref="Text"/>.

@@ -234,7 +234,12 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    public static DictionaryObject? BuildResources(IObjectWriter writer, ContentResourceManifest manifest)
+    // sharedImages, when supplied, spans a whole save: an XObject instance registered by
+    // several pages (a watermark image) is then written once and the pages reference it.
+    public static DictionaryObject? BuildResources(
+        IObjectWriter writer,
+        ContentResourceManifest manifest,
+        Dictionary<ImageXObject, ReferenceObject>? sharedImages = null)
     {
         DictionaryObject? fonts = null;
         foreach (var (baseFont, key) in manifest.Fonts)
@@ -247,12 +252,7 @@ internal static class PageResourceBuilder
         foreach (var (key, image) in manifest.Images)
         {
             xobjects ??= new DictionaryObject();
-            if (image.SoftMask is { } mask)
-            {
-                image.Image.Dictionary["SMask"] = writer.Add(mask);
-            }
-
-            xobjects[key] = writer.Add(image.Image);
+            xobjects[key] = ResolveManifestImage(writer, image, sharedImages);
         }
 
         DictionaryObject? patterns = null;
@@ -296,6 +296,27 @@ internal static class PageResourceBuilder
         }
 
         return resources;
+    }
+
+    private static ReferenceObject ResolveManifestImage(
+        IObjectWriter writer,
+        ImageXObject image,
+        Dictionary<ImageXObject, ReferenceObject>? sharedImages)
+    {
+        if (sharedImages is not null && sharedImages.TryGetValue(image, out var existing))
+        {
+            return existing;
+        }
+
+        // Restamped per save: the mask reference is only valid against this save's writer.
+        if (image.SoftMask is { } mask)
+        {
+            image.Image.Dictionary["SMask"] = writer.Add(mask);
+        }
+
+        var reference = writer.Add(image.Image);
+        sharedImages?.TryAdd(image, reference);
+        return reference;
     }
 
     // Imports the loaded page's effective /Resources into the writer and overlays
