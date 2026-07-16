@@ -47,36 +47,27 @@ public sealed class FormField
     /// field. A field with no own <c>/V</c> inherits it from an ancestor field.
     /// </summary>
     public string? Value
-    {
-        get
+        => InheritedEntry("V") switch
         {
-            var value = InheritedEntry("V");
-            if (value is null)
-            {
-                return null;
-            }
+            StringObject text => DecodeTextString(text.Value),
+            NameObject name => name.Value,
+            ArrayObject items => JoinValues(items),
+            _ => null,
+        };
 
-            return reader.Resolve(value) switch
-            {
-                StringObject text => DecodeTextString(text.Value),
-                NameObject name => name.Value,
-                ArrayObject items => JoinValues(items),
-                _ => null,
-            };
-        }
-    }
+    private DocumentObject? InheritedEntry(string key) => InheritedAttribute(reader, Dictionary, key);
 
-    // Walks the /Parent chain for the nearest inheritable attribute (ISO 32000 12.7.3.1):
-    // /V and /FT can both be set on a non-terminal parent and inherited by its kids. The
-    // walk is bounded against a cyclic /Parent chain.
-    private DocumentObject? InheritedEntry(string key)
+    // Walks a field/widget's /Parent chain for the nearest inheritable attribute (ISO 32000
+    // 12.7.3.1) and returns it resolved: /V, /FT, /Ff and /Q can all be set on a non-terminal
+    // parent and inherited by its kids. The walk is bounded against a cyclic /Parent chain.
+    internal static DocumentObject? InheritedAttribute(DocumentReader reader, DictionaryObject dictionary, string key)
     {
-        var current = Dictionary;
+        var current = dictionary;
         for (var depth = 0; current is not null && depth < 32; depth++)
         {
             if (current.TryGetValue(key, out var value))
             {
-                return value;
+                return reader.Resolve(value!);
             }
 
             current = reader.GetDictionary(current, "Parent");
@@ -123,7 +114,7 @@ public sealed class FormField
     /// inherits it from an ancestor field.
     /// </summary>
     public FormFieldType Type
-        => InheritedEntry("FT") is { } entry && reader.Resolve(entry) is NameObject name
+        => InheritedEntry("FT") is NameObject name
             ? name.Value switch
             {
                 "Btn" => FormFieldType.Button,

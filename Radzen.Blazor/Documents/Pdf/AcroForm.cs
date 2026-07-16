@@ -294,23 +294,8 @@ public sealed class AcroForm
         return Inherited(field, "Q") is not NumberObject quad || quad.IntValue == 0;
     }
 
-    // Walks a field/widget's /Parent chain for an inheritable attribute (ISO 32000-1
-    // 12.7.3.1) and returns it resolved, bounding the walk against a cyclic chain.
     private DocumentObject? Inherited(DictionaryObject dict, string key)
-    {
-        var current = dict;
-        for (var depth = 0; current is not null && depth < 32; depth++)
-        {
-            if (current.TryGetValue(key, out var value))
-            {
-                return reader.Resolve(value!);
-            }
-
-            current = reader.GetDictionary(current, "Parent");
-        }
-
-        return null;
-    }
+        => FormField.InheritedAttribute(reader, dict, key);
 
     // Throws when a mutator is applied to the wrong /FT: writing a text /V onto a button,
     // a name /V onto a text field, etc., would emit a spec-invalid field viewers mishandle.

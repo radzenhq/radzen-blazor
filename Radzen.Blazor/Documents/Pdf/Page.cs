@@ -438,7 +438,7 @@ public sealed class Page
             elements[i].Emit(writer);
         }
 
-        return snapshot is not null && Same(writer.ToArray(), snapshot);
+        return snapshot is not null && writer.ToArray().AsSpan().SequenceEqual(snapshot);
     }
 
     // A built page keeps the generator's bytes as its base; Content holds only the
@@ -560,23 +560,5 @@ public sealed class Page
         {
             names.Add(item.Key);
         }
-    }
-
-    private static bool Same(byte[] a, byte[] b)
-    {
-        if (a.Length != b.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < a.Length; i++)
-        {
-            if (a[i] != b[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

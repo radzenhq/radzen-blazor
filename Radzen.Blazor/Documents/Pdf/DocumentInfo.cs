@@ -47,17 +47,12 @@ public class DocumentInfo
     /// </summary>
     public DateTimeOffset? ModificationDate { get; set; }
 
-    internal DocumentInfo Clone() => new()
+    internal DocumentInfo Clone()
     {
-        Title = Title,
-        Author = Author,
-        Subject = Subject,
-        Keywords = Keywords,
-        Creator = Creator,
-        Producer = Producer,
-        CreationDate = CreationDate,
-        ModificationDate = ModificationDate,
-    };
+        var copy = new DocumentInfo();
+        CopyTo(copy);
+        return copy;
+    }
 
     internal void CopyTo(DocumentInfo target)
     {
