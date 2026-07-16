@@ -299,9 +299,9 @@ public sealed class Page
         ResetMaterialization();
     }
 
-    // Resolves the content-stream bytes to write. An untouched loaded page reuses its
-    // retained raw bytes. A loaded page whose original elements are intact but that
-    // gained new elements keeps its raw bytes untouched and returns the additions as a
+    // Resolves the content-stream bytes to write. A loaded page that was never materialized
+    // reuses its retained raw bytes. A loaded page whose original elements are intact but
+    // that gained new elements keeps its raw bytes untouched and returns the additions as a
     // separate overlay stream. Any other modification (or a freshly authored page)
     // re-encodes from elements; the emitters carry the resources each stream needs.
     internal ContentEmissionResult BuildContent(IReadOnlyCollection<string>? reservedNames = null)
@@ -313,7 +313,10 @@ public sealed class Page
             reservedNames = combinedNames;
         }
 
-        if (elements.Count == 0)
+        // An empty collection means "reuse the raw bytes" only when nothing was ever
+        // materialized from them; once it was, empty means the caller removed everything
+        // and reusing the raw bytes would restore the removed content.
+        if (elements.Count == 0 && materializedCount == 0)
         {
             return new ContentEmissionResult(content, editedResources);
         }
