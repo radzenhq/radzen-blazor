@@ -62,7 +62,7 @@ internal static class TextReplacer
             return ReplaceMultipleShows(page, hits, replacement, options, content);
         }
 
-        var shows = ParseShows(content, page.TextFonts);
+        var shows = ParseShows(content, page.TextFonts, includeEveryShow: true);
         var grouped = new Dictionary<int, List<TextSourceReference>>();
         foreach (var hit in hits)
         {
@@ -85,17 +85,8 @@ internal static class TextReplacer
         foreach (var group in grouped)
         {
             var source = group.Value[0];
-            if (source.OperatorIndex < 0 || source.OperatorIndex >= shows.Count)
-            {
-                throw new InvalidOperationException("The text match source operator is unavailable.");
-            }
-
-            var show = shows[source.OperatorIndex];
-            if (show.Operator != "Tj")
-            {
-                throw new NotSupportedException($"Replacing text in the '{show.Operator}' show operator is not supported safely.");
-            }
-
+            var show = GetShow(shows, source);
+            ValidateTj(show);
             if (!show.Font.TryEncode(replacement, out _))
             {
                 throw new NotSupportedException("The source font does not contain every glyph required by the replacement text.");

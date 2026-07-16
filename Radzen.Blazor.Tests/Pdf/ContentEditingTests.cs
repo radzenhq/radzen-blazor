@@ -282,6 +282,32 @@ public class ContentEditingTests
     }
 
     [Fact]
+    public void ReplaceText_PrecedingArrayShow_ReplacesTheMatchedOperator()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td [(Hello)] TJ 0 -20 Td (Date) Tj 0 -20 Td (Name) Tj ET");
+
+        var count = loaded.ReplaceText("Date", "Time");
+        var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
+        var text = reloaded.ExtractText();
+
+        Assert.Equal(1, count);
+        Assert.Contains("Time", text);
+        Assert.DoesNotContain("Date", text);
+        Assert.Contains("Hello", text);
+        Assert.Contains("Name", text);
+    }
+
+    [Fact]
+    public void ReplaceText_MatchInsideArrayShow_FailsLoud()
+    {
+        var loaded = LoadedSplitShowDocument("BT /F0 10 Tf 72 700 Td [(Date)] TJ 0 -20 Td (Name) Tj ET");
+
+        var exception = Assert.Throws<NotSupportedException>(() => loaded.ReplaceText("Date", "Time"));
+
+        Assert.Contains("'TJ' show operator", exception.Message);
+    }
+
+    [Fact]
     public void ReplaceText_MissingWinAnsiGlyph_FailsLoud()
     {
         var loaded = LoadedDocumentWithText("Invoice 1001");
