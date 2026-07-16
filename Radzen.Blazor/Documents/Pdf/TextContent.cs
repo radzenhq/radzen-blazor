@@ -63,7 +63,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         writer.WriteRaw("BT\n");
         if (FillPaint is { } fillPaint)
         {
-            WriteDeviceFill(writer, fillPaint);
+            ContentEmitter.WriteDeviceColor(writer, fillPaint, stroke: false);
         }
         else
         {
@@ -135,35 +135,6 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
 
         return Encode(Text);
-    }
-
-    private static void WriteDeviceFill(ContentWriter writer, DeviceColor color)
-    {
-        if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
-        {
-            writer.WriteName(name);
-            writer.WriteRaw(" cs\n");
-        }
-
-        foreach (var operand in color.Operands)
-        {
-            writer.WriteNumber(operand);
-            writer.WriteRaw(" ");
-        }
-
-        if (color.PatternName is { } pattern)
-        {
-            writer.WriteName(pattern);
-            writer.WriteRaw(" ");
-        }
-
-        writer.WriteRaw(color.Kind switch
-        {
-            DeviceColorKind.Named => "scn",
-            DeviceColorKind.Gray => "g",
-            _ => "k",
-        });
-        writer.WriteRaw("\n");
     }
 
     // A character outside WinAnsi is drawn as a visible '?' rather than dropped, matching the

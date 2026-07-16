@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
+using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -665,12 +666,6 @@ internal static class ContentInterpreter
             Math.Min(existing.Top, bounds.Top));
     }
 
-    private static Matrix Components(List<Token> operands)
-    {
-        var n = Numbers(operands, 6);
-        return Matrix.FromComponents(n[0], n[1], n[2], n[3], n[4], n[5]);
-    }
-
     private static Color Rgb(List<Token> operands)
     {
         var n = Numbers(operands, 3);
@@ -685,114 +680,10 @@ internal static class ContentInterpreter
 
     private static byte Channel(double value) => (byte)Math.Round(Math.Clamp(value, 0, 1) * 255.0);
 
-    private static double[] Numbers(List<Token> operands, int count)
-    {
-        var result = new double[count];
-        var numbers = new List<double>(count);
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Number)
-            {
-                numbers.Add(token.Number);
-            }
-        }
-
-        var offset = numbers.Count - count;
-        for (var i = 0; i < count; i++)
-        {
-            var index = offset + i;
-            result[i] = index >= 0 && index < numbers.Count ? numbers[index] : 0.0;
-        }
-
-        return result;
-    }
-
-    private static double[] AllNumbers(List<Token> operands)
-    {
-        var numbers = new List<double>();
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Number)
-            {
-                numbers.Add(token.Number);
-            }
-        }
-
-        return [.. numbers];
-    }
-
-    private static double Number(List<Token> operands, int index)
-    {
-        var numbers = new List<double>();
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Number)
-            {
-                numbers.Add(token.Number);
-            }
-        }
-
-        return index < numbers.Count ? numbers[index] : 0.0;
-    }
-
-    private static double LastNumber(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Number)
-            {
-                return operands[i].Number;
-            }
-        }
-
-        return 0.0;
-    }
-
-    private static string? LastName(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Name)
-            {
-                return operands[i].Text;
-            }
-        }
-
-        return null;
-    }
-
-    // The BDC/BMC tag is the first name operand; the optional property list may itself
-    // be a name, so LastName would misread it.
-    private static string? FirstName(List<Token> operands)
-    {
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Name)
-            {
-                return token.Text;
-            }
-        }
-
-        return null;
-    }
-
     // Text-state operators (char/word spacing, horizontal scale, leading, rise, render
     // mode) set state that persists across BT/ET. The model re-emits each run in its own
     // isolated BT/ET, so passing these through as standalone elements would misapply them.
     private static bool IsTextState(string op) => op is "Tc" or "Tw" or "Tz" or "TL" or "Ts" or "Tr";
-
-    private static byte[]? LastString(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.String)
-            {
-                return operands[i].Bytes;
-            }
-        }
-
-        return null;
-    }
 
     private static string Decode(byte[] bytes)
     {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
+using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -38,134 +39,15 @@ internal static class TextExtractor
         }
 
         var fragments = new List<Fragment>();
-        var tokens = ContentTokenizer.Tokenize(content);
-
-        var ctm = Matrix.Identity;
-        var ctmStack = new Stack<Matrix>();
-        var textMatrix = Matrix.Identity;
-        var lineMatrix = Matrix.Identity;
-        var leading = 0.0;
-        var fontSize = 0.0;
-        ReverseFont? font = null;
-
-        var operands = new List<Token>();
-        var array = new List<Token>();
-
-        for (var i = 0; i < tokens.Count; i++)
-        {
-            var token = tokens[i];
-            switch (token.Kind)
-            {
-                case TokenKind.Number:
-                case TokenKind.Name:
-                case TokenKind.String:
-                    operands.Add(token);
-                    continue;
-
-                case TokenKind.ArrayStart:
-                    array.Clear();
-                    for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
-                    {
-                        if (tokens[i].Kind is TokenKind.String or TokenKind.Number)
-                        {
-                            array.Add(tokens[i]);
-                        }
-                    }
-
-                    continue;
-
-                case TokenKind.ArrayEnd:
-                    continue;
-
-                case TokenKind.DictStart:
-                    for (var depth = 1; depth > 0 && ++i < tokens.Count;)
-                    {
-                        if (tokens[i].Kind == TokenKind.DictStart)
-                        {
-                            depth++;
-                        }
-                        else if (tokens[i].Kind == TokenKind.DictEnd)
-                        {
-                            depth--;
-                        }
-                    }
-
-                    continue;
-
-                case TokenKind.DictEnd:
-                case TokenKind.InlineImage:
-                    continue;
-
-                case TokenKind.Operator:
-                    break;
-            }
-
-            switch (token.Text)
-            {
-                case "q":
-                    ctmStack.Push(ctm);
-                    break;
-                case "Q":
-                    if (ctmStack.Count > 0)
-                    {
-                        ctm = ctmStack.Pop();
-                    }
-
-                    break;
-                case "cm":
-                    ctm = Components(operands) * ctm;
-                    break;
-                case "BT":
-                    textMatrix = Matrix.Identity;
-                    lineMatrix = Matrix.Identity;
-                    break;
-                case "Tf":
-                    font = LastName(operands) is { } key && fonts is not null && fonts.TryGetValue(key, out var f)
-                        ? f
-                        : ReverseFont.WinAnsi;
-                    fontSize = LastNumber(operands);
-                    break;
-                case "TD":
-                    leading = -Number(operands, 1);
-                    goto case "Td";
-                case "Td":
-                    lineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    break;
-                case "TL":
-                    leading = Number(operands, 0);
-                    break;
-                case "Tm":
-                    lineMatrix = Components(operands);
-                    textMatrix = lineMatrix;
-                    break;
-                case "T*":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    break;
-                case "Tj":
-                    textMatrix = Matrix.Translate(Show(fragments, operands, textMatrix * ctm, font, fontSize), 0) * textMatrix;
-                    break;
-                case "TJ":
-                    textMatrix = Matrix.Translate(ShowArray(fragments, array, textMatrix * ctm, font, fontSize), 0) * textMatrix;
-                    break;
-                case "'":
-                case "\"":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    textMatrix = lineMatrix;
-                    textMatrix = Matrix.Translate(Show(fragments, operands, textMatrix * ctm, font, fontSize), 0) * textMatrix;
-                    break;
-            }
-
-            operands.Clear();
-        }
-
+        ContentTextWalker.Walk(content, fonts, (walker, op, operands, array, _) => op == "TJ"
+            ? ShowArray(fragments, array, walker)
+            : Show(fragments, operands, walker));
         return Compose(fragments);
     }
 
     // Emits one fragment and returns the text-space horizontal advance the pen moved,
     // so the caller can step the text matrix and same-line fragments abut correctly.
-    private static double Show(List<Fragment> fragments, List<Token> operands, Matrix matrix, ReverseFont? font, double fontSize)
+    private static double Show(List<Fragment> fragments, List<Token> operands, ContentTextWalker walker)
     {
         var bytes = LastString(operands);
         if (bytes is null || bytes.Length == 0)
@@ -173,20 +55,22 @@ internal static class TextExtractor
             return 0.0;
         }
 
-        var text = (font ?? ReverseFont.WinAnsi).Decode(bytes);
+        var text = (walker.Font ?? ReverseFont.WinAnsi).Decode(bytes);
         if (text.Length == 0)
         {
             return 0.0;
         }
 
+        var fontSize = walker.FontSize;
         var advance = text.Length * AverageGlyphEm * fontSize;
-        AddFragment(fragments, matrix, text, advance, fontSize);
+        AddFragment(fragments, walker.TextMatrix * walker.Ctm, text, advance, fontSize);
         return advance;
     }
 
-    private static double ShowArray(List<Fragment> fragments, List<Token> array, Matrix matrix, ReverseFont? font, double fontSize)
+    private static double ShowArray(List<Fragment> fragments, List<Token> array, ContentTextWalker walker)
     {
-        var reverse = font ?? ReverseFont.WinAnsi;
+        var fontSize = walker.FontSize;
+        var reverse = walker.Font ?? ReverseFont.WinAnsi;
         var builder = new StringBuilder();
         var glyphEms = 0.0;
         var adjustEms = 0.0;
@@ -217,7 +101,7 @@ internal static class TextExtractor
         }
 
         var advance = (glyphEms - adjustEms) * fontSize;
-        AddFragment(fragments, matrix, builder.ToString(), advance, fontSize);
+        AddFragment(fragments, walker.TextMatrix * walker.Ctm, builder.ToString(), advance, fontSize);
         return advance;
     }
 
@@ -280,92 +164,6 @@ internal static class TextExtractor
         var gap = current.X - (previous.X + previous.Advance);
         var em = Math.Abs(current.Em != 0 ? current.Em : previous.Em);
         return gap > SpaceGapEm * em;
-    }
-
-    private static Matrix Components(List<Token> operands)
-    {
-        var n = Numbers(operands, 6);
-        return Matrix.FromComponents(n[0], n[1], n[2], n[3], n[4], n[5]);
-    }
-
-    private static double[] Numbers(List<Token> operands, int count)
-    {
-        var numbers = new List<double>(count);
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Number)
-            {
-                numbers.Add(token.Number);
-            }
-        }
-
-        var result = new double[count];
-        var offset = numbers.Count - count;
-        for (var i = 0; i < count; i++)
-        {
-            var index = offset + i;
-            result[i] = index >= 0 && index < numbers.Count ? numbers[index] : 0.0;
-        }
-
-        return result;
-    }
-
-    private static double Number(List<Token> operands, int index)
-    {
-        var count = 0;
-        foreach (var token in operands)
-        {
-            if (token.Kind == TokenKind.Number)
-            {
-                if (count == index)
-                {
-                    return token.Number;
-                }
-
-                count++;
-            }
-        }
-
-        return 0.0;
-    }
-
-    private static string? LastName(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Name)
-            {
-                return operands[i].Text;
-            }
-        }
-
-        return null;
-    }
-
-    private static double LastNumber(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Number)
-            {
-                return operands[i].Number;
-            }
-        }
-
-        return 0.0;
-    }
-
-    private static byte[]? LastString(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.String)
-            {
-                return operands[i].Bytes;
-            }
-        }
-
-        return null;
     }
 
     private readonly record struct Fragment(double Y, double X, double Advance, double Em, string Text);
