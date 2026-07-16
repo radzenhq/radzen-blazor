@@ -204,9 +204,8 @@ public sealed class ContentWriter : IDisposable
 
     /// <summary>Writes <paramref name="bytes"/> as a parenthesised PDF literal string, escaping as required.</summary>
     /// <param name="bytes">The raw string bytes to write.</param>
-    public void WriteString(byte[] bytes)
+    public void WriteString(ReadOnlySpan<byte> bytes)
     {
-        ArgumentNullException.ThrowIfNull(bytes);
         Append((byte)'(');
         foreach (var b in bytes)
         {

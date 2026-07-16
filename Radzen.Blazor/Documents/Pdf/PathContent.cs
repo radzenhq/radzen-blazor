@@ -12,59 +12,130 @@ namespace Radzen.Documents.Pdf;
 public sealed class PathContent : ContentElement
 {
     private readonly List<Segment> segments = [];
+    private bool stroke;
+    private bool fill;
+    private double thickness = 1;
+    private Color strokeColor = Color.Black;
+    private Color fillColor = Color.Black;
+    private GradientBrush? fillGradient;
+    private LineCap? cap;
+    private LineJoin? join;
+    private double? miterLimit;
+    private RenderingIntent? intent;
+    private bool evenOdd;
+    private PathClipMode clip;
+    private ReadOnlyMemory<double>? dashArray;
+    private double dashPhase;
+    private DeviceColor? fillPaint;
+    private DeviceColor? strokePaint;
 
     /// <summary>Gets or sets a value indicating whether the path is stroked.</summary>
-    public bool Stroke { get; set; }
+    public bool Stroke
+    {
+        get => stroke;
+        set => Set(ref stroke, value);
+    }
 
     /// <summary>Gets or sets a value indicating whether the path is filled.</summary>
-    public bool Fill { get; set; }
+    public bool Fill
+    {
+        get => fill;
+        set => Set(ref fill, value);
+    }
 
     /// <summary>Gets or sets the stroke line width in points. Defaults to 1.</summary>
-    public double Thickness { get; set; } = 1;
+    public double Thickness
+    {
+        get => thickness;
+        set => Set(ref thickness, value);
+    }
 
     /// <summary>Gets or sets the stroke color. Defaults to black.</summary>
-    public Color StrokeColor { get; set; } = Color.Black;
+    public Color StrokeColor
+    {
+        get => strokeColor;
+        set => Set(ref strokeColor, value);
+    }
 
     /// <summary>Gets or sets the fill color. Defaults to black.</summary>
-    public Color FillColor { get; set; } = Color.Black;
+    public Color FillColor
+    {
+        get => fillColor;
+        set => Set(ref fillColor, value);
+    }
 
     /// <summary>
     /// Gets or sets a gradient the path is filled with, realized as a PDF shading pattern
     /// (<c>/Pattern cs</c> + <c>scn</c>). When set it overrides <see cref="FillColor"/> and
     /// <see cref="FillPaint"/> for the fill. Defaults to <see langword="null"/> (solid fill).
     /// </summary>
-    public GradientBrush? FillGradient { get; set; }
+    public GradientBrush? FillGradient
+    {
+        get => fillGradient;
+        set => Set(ref fillGradient, value);
+    }
+
+    // A path owns its gradient, but FillGradient is settable, so one instance can be shared by
+    // two paths; asking the brush rather than having it push back keeps that from misfiring.
+    /// <inheritdoc/>
+    public override bool IsModified => base.IsModified || FillGradient?.IsModified == true;
+
+    internal override void AcceptChanges()
+    {
+        base.AcceptChanges();
+        FillGradient?.AcceptChanges();
+    }
 
     /// <summary>
     /// Gets or sets the line cap style (the <c>J</c> operator). When null (the
     /// default), no cap operator is emitted and the viewer default (butt) applies.
     /// </summary>
-    public LineCap? Cap { get; set; }
+    public LineCap? Cap
+    {
+        get => cap;
+        set => Set(ref cap, value);
+    }
 
     /// <summary>
     /// Gets or sets the line join style (the <c>j</c> operator). When null (the
     /// default), no join operator is emitted and the viewer default (miter) applies.
     /// </summary>
-    public LineJoin? Join { get; set; }
+    public LineJoin? Join
+    {
+        get => join;
+        set => Set(ref join, value);
+    }
 
     /// <summary>
     /// Gets or sets the miter limit (the <c>M</c> operator). When null (the default),
     /// no miter-limit operator is emitted.
     /// </summary>
-    public double? MiterLimit { get; set; }
+    public double? MiterLimit
+    {
+        get => miterLimit;
+        set => Set(ref miterLimit, value);
+    }
 
     /// <summary>
     /// Gets or sets the colour rendering intent (the <c>ri</c> operator). When null
     /// (the default), no rendering-intent operator is emitted.
     /// </summary>
-    public RenderingIntent? Intent { get; set; }
+    public RenderingIntent? Intent
+    {
+        get => intent;
+        set => Set(ref intent, value);
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the path is filled with the even-odd
     /// rule (the <c>f*</c>/<c>B*</c> operators) instead of the default nonzero winding
     /// rule (<c>f</c>/<c>B</c>).
     /// </summary>
-    public bool EvenOdd { get; set; }
+    public bool EvenOdd
+    {
+        get => evenOdd;
+        set => Set(ref evenOdd, value);
+    }
 
     /// <summary>
     /// Gets or sets the clipping applied by this path. When not
@@ -72,18 +143,38 @@ public sealed class PathContent : ContentElement
     /// operator is emitted before the paint operator, intersecting the current clip
     /// region with this path.
     /// </summary>
-    public PathClipMode Clip { get; set; }
+    public PathClipMode Clip
+    {
+        get => clip;
+        set => Set(ref clip, value);
+    }
 
     // Round-trip state carried from a decoded content stream so a re-encode preserves
     // the source operators. The dash array/phase emit a d operator; Fill/StrokePaint
     // carry a non-RGB device color (CMYK k/K, Gray g/G or a named colorspace cs+scn).
-    internal double[]? DashArray { get; set; }
+    internal ReadOnlyMemory<double>? DashArray
+    {
+        get => dashArray;
+        set => Set(ref dashArray, value);
+    }
 
-    internal double DashPhase { get; set; }
+    internal double DashPhase
+    {
+        get => dashPhase;
+        set => Set(ref dashPhase, value);
+    }
 
-    internal DeviceColor? FillPaint { get; set; }
+    internal DeviceColor? FillPaint
+    {
+        get => fillPaint;
+        set => Set(ref fillPaint, value);
+    }
 
-    internal DeviceColor? StrokePaint { get; set; }
+    internal DeviceColor? StrokePaint
+    {
+        get => strokePaint;
+        set => Set(ref strokePaint, value);
+    }
 
     /// <summary>
     /// Sets the fill color to a DeviceCMYK color (the <c>k</c> operator). Each
@@ -142,15 +233,17 @@ public sealed class PathContent : ContentElement
         DashPhase = phase;
     }
 
+    // The segment list is not reached through a tracked property, so each of these opens the
+    // door explicitly.
     /// <summary>Begins a new subpath at the given point.</summary>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
-    public void MoveTo(Unit x, Unit y) => segments.Add(new Segment("m", [x.Point, y.Point]));
+    public void MoveTo(Unit x, Unit y) => AddSegment(new Segment("m", [x.Point, y.Point]));
 
     /// <summary>Appends a straight line to the given point.</summary>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
-    public void LineTo(Unit x, Unit y) => segments.Add(new Segment("l", [x.Point, y.Point]));
+    public void LineTo(Unit x, Unit y) => AddSegment(new Segment("l", [x.Point, y.Point]));
 
     /// <summary>Appends a cubic Bezier curve.</summary>
     /// <param name="x1">The first control point X.</param>
@@ -160,10 +253,16 @@ public sealed class PathContent : ContentElement
     /// <param name="x3">The end point X.</param>
     /// <param name="y3">The end point Y.</param>
     public void CurveTo(Unit x1, Unit y1, Unit x2, Unit y2, Unit x3, Unit y3)
-        => segments.Add(new Segment("c", [x1.Point, y1.Point, x2.Point, y2.Point, x3.Point, y3.Point]));
+        => AddSegment(new Segment("c", [x1.Point, y1.Point, x2.Point, y2.Point, x3.Point, y3.Point]));
 
     /// <summary>Closes the current subpath.</summary>
-    public void Close() => segments.Add(new Segment("h", []));
+    public void Close() => AddSegment(new Segment("h", []));
+
+    private void AddSegment(Segment segment)
+    {
+        segments.Add(segment);
+        Touch();
+    }
 
     // The alpha actually painted. A gradient or device paint replaces the RGB Color, so only
     // the channels that reach rg/RG contribute. One ExtGState carries one /ca and one /CA, and
@@ -251,14 +350,15 @@ public sealed class PathContent : ContentElement
         if (DashArray is { } dash)
         {
             writer.WriteRaw("[");
-            for (var i = 0; i < dash.Length; i++)
+            var pattern = dash.Span;
+            for (var i = 0; i < pattern.Length; i++)
             {
                 if (i > 0)
                 {
                     writer.WriteRaw(" ");
                 }
 
-                writer.WriteNumber(dash[i]);
+                writer.WriteNumber(pattern[i]);
             }
 
             writer.WriteRaw("] ");

@@ -118,6 +118,6 @@ public class ContentInterpreterMergeTests
 
         var path = Assert.IsType<PathContent>(content.Last());
         Assert.NotNull(path.DashArray);
-        Assert.Empty(path.DashArray!);
+        Assert.True(path.DashArray!.Value.IsEmpty);
     }
 }
