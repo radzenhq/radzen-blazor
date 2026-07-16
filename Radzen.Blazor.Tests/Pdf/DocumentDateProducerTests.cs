@@ -44,7 +44,7 @@ public class DocumentDateProducerTests
         var catalog = ContentTestHelpers.Catalog(reader);
         Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
         var stream = Assert.IsType<StreamObject>(reader.Resolve(metadataObject!));
-        return Encoding.UTF8.GetString(stream.Data);
+        return Encoding.UTF8.GetString(stream.Data.ToArray());
     }
 
     [Fact]

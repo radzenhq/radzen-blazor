@@ -31,7 +31,7 @@ public class FlateWritePathTests
             "stream must declare /Filter /FlateDecode");
         var name = Assert.IsType<NameObject>(reader.Resolve(filter!));
         Assert.Equal("FlateDecode", name.Value);
-        return FlateFilter.Decode(stream.Data);
+        return FlateFilter.Decode(stream.Data.ToArray());
     }
 
     private static StreamObject FirstPageContents(DocumentReader reader)
@@ -166,7 +166,7 @@ public class FlateWritePathTests
 
         var width = BuildTestSupport.Int(image.Dictionary, "Width");
         var height = BuildTestSupport.Int(image.Dictionary, "Height");
-        var samples = FlateFilter.Decode(image.Data);
+        var samples = FlateFilter.Decode(image.Data.ToArray());
         Assert.Equal(width * height * 3, samples.Length);
     }
 }

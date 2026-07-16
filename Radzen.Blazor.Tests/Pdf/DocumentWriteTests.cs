@@ -31,7 +31,7 @@ public class DocumentWriteTests
         => Assert.IsType<DictionaryObject>(reader.Resolve(Kids(reader)[index]));
 
     private static byte[] KidContent(DocumentReader reader, int index)
-        => Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, index)["Contents"])).Data;
+        => Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, index)["Contents"])).Data.ToArray();
 
     private static void AssertMediaBox(DocumentReader reader, DictionaryObject page, double width, double height)
     {

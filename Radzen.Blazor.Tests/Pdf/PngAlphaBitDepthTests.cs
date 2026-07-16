@@ -25,10 +25,10 @@ public class PngAlphaBitDepthTests
         Assert.Equal("DeviceGray", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
 
-        var color = FlateFilter.Decode(xobj.Image.Data);
+        var color = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(new byte[] { 0xAA, 0x11 }, color);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0xCC, 0x33 }, alpha);
     }
 
@@ -49,10 +49,10 @@ public class PngAlphaBitDepthTests
         Assert.Equal("DeviceRGB", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
 
-        var color = FlateFilter.Decode(xobj.Image.Data);
+        var color = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(new byte[] { 0x10, 0x20, 0x30, 0x50, 0x60, 0x70 }, color);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x40, 0x80 }, alpha);
     }
 
@@ -67,10 +67,10 @@ public class PngAlphaBitDepthTests
 
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
 
-        var color = FlateFilter.Decode(xobj.Image.Data);
+        var color = FlateFilter.Decode(xobj.Image.Data.ToArray());
         Assert.Equal(new byte[] { 0x10, 0x20, 0x30, 0x50, 0x60, 0x70 }, color);
 
-        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data);
+        var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x40, 0x80 }, alpha);
     }
 

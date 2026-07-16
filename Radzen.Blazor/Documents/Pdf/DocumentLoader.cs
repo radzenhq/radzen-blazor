@@ -217,7 +217,7 @@ internal static class DocumentLoader
         var content = ReadContent(reader, node);
         if (content is not null)
         {
-            page.SetContent(content);
+            page.SetLoadedContent(content);
         }
 
         page.SetTextFonts(BuildTextFonts(reader, resources));
@@ -229,7 +229,6 @@ internal static class DocumentLoader
         document.Pages.Insert(document.Pages.Count, page);
         state.SourcePages[page] = node;
         state.LoadedPages.Add(page);
-        state.SourceContents[page] = content is null ? null : [.. content];
         state.LoadedPageSettings[page] = (page.BleedBox, page.TrimBox, page.ArtBox, page.Rotate);
         if (resources is not null)
         {

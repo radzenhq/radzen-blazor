@@ -58,7 +58,7 @@ public class XrefStreamTests
         var page = Assert.IsType<DictionaryObject>(reader.Resolve(kids[0]));
 
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-        var text = Encoding.Latin1.GetString(FlateFilter.Decode(content.Data));
+        var text = Encoding.Latin1.GetString(FlateFilter.Decode(content.Data.ToArray()));
         Assert.Contains("Hello encrypted world", text);
     }
 

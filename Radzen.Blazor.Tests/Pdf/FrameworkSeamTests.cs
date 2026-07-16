@@ -133,7 +133,7 @@ public class FrameworkSeamTests
                 return false;
             }
 
-            var stream = new StreamObject([0xFF]);
+            var stream = new StreamObject(new byte[] { 0xFF });
             stream.Dictionary["Type"] = new NameObject("XObject");
             stream.Dictionary["Subtype"] = new NameObject("Image");
             stream.Dictionary["Width"] = new NumberObject(1);

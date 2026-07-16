@@ -50,7 +50,7 @@ public class ConformanceProfilesTests
         Assert.Equal("Metadata", BuildTestSupport.Name(reader, metadata.Dictionary, "Type"));
         Assert.Equal("XML", BuildTestSupport.Name(reader, metadata.Dictionary, "Subtype"));
         Assert.False(metadata.Dictionary.ContainsKey("Filter"), "/Metadata must be unfiltered");
-        return Encoding.UTF8.GetString(metadata.Data);
+        return Encoding.UTF8.GetString(metadata.Data.ToArray());
     }
 
     private static void AssertSrgbOutputIntent(DocumentReader reader)

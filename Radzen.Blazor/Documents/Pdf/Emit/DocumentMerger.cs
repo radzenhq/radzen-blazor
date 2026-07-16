@@ -40,7 +40,7 @@ internal static class DocumentMerger
         var content = source.GetContent();
         if (content is not null)
         {
-            page.SetContent([.. content]);
+            page.SetLoadedContent([.. content]);
         }
 
         // Carry the source page's resource closure so appended fonts/images still

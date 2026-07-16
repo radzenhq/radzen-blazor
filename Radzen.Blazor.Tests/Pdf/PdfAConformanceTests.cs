@@ -69,7 +69,7 @@ public class PdfAConformanceTests
     {
         var metadata = MetadataStream(reader);
         Assert.False(metadata.Dictionary.ContainsKey("Filter"), "/Metadata must be unfiltered");
-        return Encoding.UTF8.GetString(metadata.Data);
+        return Encoding.UTF8.GetString(metadata.Data.ToArray());
     }
 
     [Fact]

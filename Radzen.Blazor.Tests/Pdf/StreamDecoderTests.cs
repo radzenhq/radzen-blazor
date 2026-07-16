@@ -27,13 +27,16 @@ public class StreamDecoderTests
         return output.ToArray();
     }
 
+    // The raw input may be a window onto the shared file buffer, so an unfiltered
+    // decode must copy rather than hand the caller a view of it.
     [Fact]
-    public void NoFilter_ReturnsInputUnchanged()
+    public void NoFilter_ReturnsInputContentInAnOwnedBuffer()
     {
         var payload = Encoding.ASCII.GetBytes("no filter here");
         var result = NewDecoder().Decode(new DictionaryObject(), payload);
 
-        Assert.Same(payload, result);
+        Assert.Equal(payload, result);
+        Assert.NotSame(payload, result);
     }
 
     [Fact]
@@ -41,7 +44,7 @@ public class StreamDecoderTests
     {
         var dictionary = new DictionaryObject { ["Filter"] = new NumberObject(7) };
 
-        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [1, 2, 3]));
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, new byte[] { 1, 2, 3 }));
     }
 
     [Fact]
@@ -52,7 +55,7 @@ public class StreamDecoderTests
             ["Filter"] = new ArrayObject { new NameObject("FlateDecode"), new NumberObject(7) },
         };
 
-        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [1, 2, 3]));
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, new byte[] { 1, 2, 3 }));
     }
 
     [Fact]
@@ -71,7 +74,7 @@ public class StreamDecoderTests
     {
         var dictionary = new DictionaryObject { ["Filter"] = new NameObject("Bogus") };
 
-        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [1, 2, 3]));
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, new byte[] { 1, 2, 3 }));
     }
 
     [Fact]
@@ -85,6 +88,6 @@ public class StreamDecoderTests
 
         var dictionary = new DictionaryObject { ["Filter"] = chain };
 
-        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, [0]));
+        Assert.Throws<DocumentParseException>(() => NewDecoder().Decode(dictionary, new byte[] { 0 }));
     }
 }

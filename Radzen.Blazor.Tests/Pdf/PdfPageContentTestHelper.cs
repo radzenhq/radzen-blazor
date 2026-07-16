@@ -127,9 +127,9 @@ internal static class PdfPageContentTestHelper
             && filter is NameObject name
             && name.Value == "FlateDecode")
         {
-            return FlateFilter.Decode(stream.Data);
+            return FlateFilter.Decode(stream.Data.ToArray());
         }
 
-        return stream.Data;
+        return stream.Data.ToArray();
     }
 }

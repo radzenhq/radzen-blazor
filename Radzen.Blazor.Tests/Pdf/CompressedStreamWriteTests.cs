@@ -127,7 +127,7 @@ public class CompressedStreamWriteTests
             Assert.Equal(StringMarker, Assert.IsType<StringObject>(page["Marker"]).Value);
 
             var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-            Assert.Equal(StreamMarker, Latin1(content.Data));
+            Assert.Equal(StreamMarker, Latin1(content.Data.ToArray()));
         }
     }
 
@@ -150,6 +150,6 @@ public class CompressedStreamWriteTests
 
         Assert.Equal(StringMarker, Assert.IsType<StringObject>(page["Marker"]).Value);
         var content = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-        Assert.Equal(StreamMarker, Latin1(content.Data));
+        Assert.Equal(StreamMarker, Latin1(content.Data.ToArray()));
     }
 }

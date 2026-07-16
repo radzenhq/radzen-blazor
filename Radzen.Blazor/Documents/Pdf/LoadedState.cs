@@ -21,8 +21,6 @@ internal sealed class LoadedState
 
     public List<Page> LoadedPages { get; } = [];
 
-    public Dictionary<Page, byte[]?> SourceContents { get; } = [];
-
     public Dictionary<Page, DictionaryObject> SourceResources { get; } = [];
 
     public Dictionary<Page, ArrayObject> SourceBoxes { get; } = [];

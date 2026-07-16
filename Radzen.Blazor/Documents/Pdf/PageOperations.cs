@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf.Emit;
@@ -35,8 +34,6 @@ internal static class PageOperations
             var page = source.Pages[index];
             if (!page.ContentIsIntact || page.Annotations.Count > 0
                 || !state.SourceResources.ContainsKey(page)
-                || !state.SourceContents.TryGetValue(page, out var loaded)
-                || !ContentMatches(page.RawContent, loaded)
                 || page.Rotate != (state.SourceRotations.TryGetValue(page, out var rotation) ? rotation : 0))
             {
                 return false;
@@ -45,9 +42,6 @@ internal static class PageOperations
 
         return true;
     }
-
-    private static bool ContentMatches(byte[]? current, byte[]? loaded)
-        => current is null ? loaded is null : loaded is not null && current.AsSpan().SequenceEqual(loaded);
 
     internal static Document Extract(Document snapshot, int offset, int length)
     {

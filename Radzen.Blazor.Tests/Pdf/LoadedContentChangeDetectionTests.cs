@@ -145,6 +145,7 @@ public class LoadedContentChangeDetectionTests
         "ContentAdd",
         "ContentRemove",
         "NestedFontSize",
+        "QueuedAppend",
     };
 
     private static void Apply(Document document, string edit)
@@ -169,6 +170,11 @@ public class LoadedContentChangeDetectionTests
                 break;
             case "NestedFontSize":
                 ((TextContent)page.Content[0]).Font.Size = 22;
+                break;
+            // Queues an overlay without materializing, so the raw bytes stay intact and only
+            // pendingAppends carries the edit.
+            case "QueuedAppend":
+                document.AddWatermark("Draft");
                 break;
             default:
                 throw new InvalidOperationException($"Unknown edit path '{edit}'.");
@@ -204,6 +210,38 @@ public class LoadedContentChangeDetectionTests
 
         Assert.True(fullSaverSeesEdit, $"{edit}: the full saver did not see the edit");
         Assert.Equal(fullSaverSeesEdit, incrementalSaverSeesEdit);
+    }
+
+    // SetContent replaces the bytes and resets materialization, so every element-level signal
+    // reads as untouched afterwards. Nothing but the page's own replaced bit can report it.
+    [Fact]
+    public void SetContentOnALoadedPage_WritesTheReplacementBytes()
+    {
+        var document = Loaded();
+        document.Pages[0].SetContent(InterpreterTestSupport.Ascii("BT /F0 12 Tf 72 700 Td (Delta) Tj ET\n"));
+
+        var content = SavedContent(document);
+
+        Assert.True(Contains(content, "(Delta)"));
+        Assert.False(Contains(content, "(Alpha)"), "the replaced bytes must not survive as the saved content");
+        Assert.False(Contains(content, "(Beta)"));
+    }
+
+    // Reading Content materializes but edits nothing, so a replacement pass that finds no match
+    // must leave the page reported as unedited rather than as wholesale replaced.
+    [Fact]
+    public void MaterializingThenReplacingNothing_LeavesThePageUnedited()
+    {
+        var unedited = SavedContent(Loaded());
+
+        var document = Loaded();
+        Assert.Equal(2, document.Pages[0].Content.Count);
+        Assert.Equal(0, document.Pages[0].ReplaceText("Nowhere", "Somewhere"));
+
+        Assert.Equal(unedited, SavedContent(document));
+
+        using var stream = new MemoryStream();
+        Assert.Throws<InvalidOperationException>(() => document.SaveIncremental(stream));
     }
 
     [Fact]

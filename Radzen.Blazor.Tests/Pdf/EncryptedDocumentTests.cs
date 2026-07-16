@@ -39,7 +39,7 @@ public class EncryptedDocumentTests
     private static string ContentText(DocumentReader reader, DictionaryObject page)
     {
         var contents = Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
-        var data = contents.Data;
+        var data = contents.Data.ToArray();
         if (contents.Dictionary.TryGetValue("Filter", out var filter)
             && filter is NameObject name && name.Value == "FlateDecode")
         {

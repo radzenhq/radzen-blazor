@@ -8,22 +8,17 @@ namespace Radzen.Documents.Pdf.Objects;
 /// raw byte data between the <c>stream</c> and <c>endstream</c> keywords. The
 /// <c>/Length</c> entry is emitted automatically from the data byte count.
 /// </summary>
-public sealed class StreamObject : DocumentObject
+/// <remarks>
+/// Initializes a new instance of the <see cref="StreamObject"/> class with the
+/// given raw stream data.
+/// </remarks>
+public sealed class StreamObject(ReadOnlyMemory<byte> data) : DocumentObject
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="StreamObject"/> class.
+    /// Gets the raw stream data. A parsed stream windows the file buffer rather than
+    /// owning a copy, so the payload must never be written through.
     /// </summary>
-    /// <param name="data">The raw stream data.</param>
-    public StreamObject(byte[] data)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-        Data = data;
-    }
-
-    /// <summary>
-    /// Gets the raw stream data.
-    /// </summary>
-    public byte[] Data { get; }
+    public ReadOnlyMemory<byte> Data { get; } = data;
 
     /// <summary>
     /// Gets the stream dictionary. The <c>/Length</c> entry is added
@@ -33,17 +28,17 @@ public sealed class StreamObject : DocumentObject
 
     internal override void Write(Stream stream, WriteContext context)
     {
-        var data = Data;
+        var payload = Data;
         var encryptor = context.Encryptor;
         if (encryptor is not null)
         {
             // Pass the dictionary so a /Type /Metadata stream is left plaintext when the
             // writer's /EncryptMetadata flag is false.
-            data = encryptor.EncryptStream(Data, context.ObjectNumber, context.Generation, Dictionary);
+            payload = encryptor.EncryptStream(Data, context.ObjectNumber, context.Generation, Dictionary);
         }
 
         PdfBytes.WriteAscii(stream, "<< /Length ");
-        PdfBytes.WriteInteger(stream, data.Length);
+        PdfBytes.WriteInteger(stream, payload.Length);
 
         foreach (var key in Dictionary.Keys)
         {
@@ -59,7 +54,7 @@ public sealed class StreamObject : DocumentObject
         }
 
         PdfBytes.WriteAscii(stream, " >>\nstream\n");
-        stream.Write(data, 0, data.Length);
+        stream.Write(payload.Span);
         PdfBytes.WriteAscii(stream, "\nendstream");
     }
 }

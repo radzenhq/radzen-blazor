@@ -89,8 +89,7 @@ internal sealed class IncrementalDocumentSaver
             }
 
             var emission = page.BuildContent();
-            doc.Loaded.SourceContents.TryGetValue(page, out var original);
-            if (emission.IsEmitted || emission.Overlay is not null || !Same(original, emission.Bytes))
+            if (emission.IsEmitted || emission.Overlay is not null || page.ContentReplaced)
             {
                 throw Unsupported("Editing loaded page content, including redaction and text replacement");
             }
@@ -284,15 +283,10 @@ internal sealed class IncrementalDocumentSaver
 
     private void ValidateRemovedPages(DocumentReader reader, LoadedState loaded)
     {
+        var kept = new HashSet<Page>(doc.Pages);
         foreach (var page in loaded.LoadedPages)
         {
-            var retained = false;
-            foreach (var current in doc.Pages)
-            {
-                retained |= ReferenceEquals(page, current);
-            }
-
-            if (retained || reader.GetArray(loaded.SourcePages[page], "Annots") is not { } annotations)
+            if (kept.Contains(page) || reader.GetArray(loaded.SourcePages[page], "Annots") is not { } annotations)
             {
                 continue;
             }
