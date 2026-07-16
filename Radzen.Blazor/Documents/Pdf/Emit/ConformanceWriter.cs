@@ -109,6 +109,12 @@ internal sealed class ConformanceWriter(Document document)
             throw new InvalidOperationException("PDF/A forbids encryption; the source document is encrypted.");
         }
 
+        if (document.Encryption is not null)
+        {
+            throw new InvalidOperationException(
+                "PDF/A forbids encryption; clear DocumentBuilder.Encryption or use PdfAConformance.None.");
+        }
+
         if (IsLevelA(document.Conformance) && document.Structure is null)
         {
             throw new InvalidOperationException(
