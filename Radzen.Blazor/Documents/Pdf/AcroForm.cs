@@ -118,7 +118,7 @@ public sealed class AcroForm
 
             terminals[key] = new Terminal(dict, WidgetOf(dict));
             fieldNames.Add(key);
-            fields.Add(new FormField(reader, dict));
+            fields.Add(new FormField(reader, dict, key));
         }
         finally
         {

@@ -14,16 +14,29 @@ public sealed class FormField
 {
     private readonly DocumentReader reader;
 
-    internal FormField(DocumentReader reader, DictionaryObject dictionary)
+    internal FormField(DocumentReader reader, DictionaryObject dictionary, string name)
     {
         this.reader = reader;
         Dictionary = dictionary;
+        Name = name;
     }
 
     internal DictionaryObject Dictionary { get; }
 
-    /// <summary>Gets the fully qualified field name from its <c>/T</c> entry.</summary>
-    public string Name
+    /// <summary>
+    /// Gets the fully qualified field name (ancestor <c>/T</c> entries joined with
+    /// <c>.</c>). This is the name <see cref="AcroForm.FillField"/> and the other
+    /// <see cref="AcroForm"/> lookups accept, and it appears in
+    /// <see cref="AcroForm.FieldNames"/>.
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Gets the field's own partial name: its <c>/T</c> entry alone, without any
+    /// ancestor qualification. Not unique across a hierarchical form; use
+    /// <see cref="Name"/> to address the field.
+    /// </summary>
+    public string PartialName
         => reader.GetString(Dictionary, "T") is { } text
             ? DecodeTextString(text)
             : string.Empty;

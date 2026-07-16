@@ -82,7 +82,7 @@ public class FormFieldTextDecodeTests
     [Fact]
     public void InheritedValueResolvesFromParent()
     {
-        Assert.Equal(Sofia, ValueOf(Load(), "leaf"));
+        Assert.Equal(Sofia, ValueOf(Load(), "grp.leaf"));
     }
 
     [Fact]
