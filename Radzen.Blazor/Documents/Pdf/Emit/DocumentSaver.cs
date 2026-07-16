@@ -416,17 +416,16 @@ internal sealed class DocumentSaver
     // identical. Both halves are equal at creation time (ISO 32000-1 14.4).
     private ArrayObject BuildDocumentId()
     {
-        using var seed = new MemoryStream();
+        var seed = new Radzen.Documents.Crypto.Sha256Hasher();
 
         void Text(string? value)
         {
             if (value is { Length: > 0 })
             {
-                var bytes = Encoding.UTF8.GetBytes(value);
-                seed.Write(bytes, 0, bytes.Length);
+                seed.Append(Encoding.UTF8.GetBytes(value));
             }
 
-            seed.WriteByte(0);
+            seed.Append((byte)0);
         }
 
         var meta = doc.Info;
@@ -446,13 +445,13 @@ internal sealed class DocumentSaver
             Text(page.Height.Point.ToString("R", CultureInfo.InvariantCulture));
             if (page.GetContent() is { } content)
             {
-                seed.Write(content, 0, content.Length);
+                seed.Append(content);
             }
 
-            seed.WriteByte(0);
+            seed.Append((byte)0);
         }
 
-        var hash = Radzen.Documents.Crypto.Sha2.ComputeHash256(seed.ToArray());
+        var hash = seed.Finish();
         var id = Convert.ToHexString(hash, 0, 16);
         return [new StringObject(id), new StringObject(id)];
     }

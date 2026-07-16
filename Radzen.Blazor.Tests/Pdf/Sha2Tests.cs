@@ -56,6 +56,83 @@ public class Sha2Tests
         Assert.Equal("cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", Hex(Sha2.ComputeHash256(input)));
     }
 
+    // The incremental hasher must agree with the one-shot API for any chunking, including
+    // chunks that straddle, exactly fill and overshoot the 64-byte compression block.
+    [Theory]
+    [InlineData(1)]
+    [InlineData(7)]
+    [InlineData(63)]
+    [InlineData(64)]
+    [InlineData(65)]
+    [InlineData(128)]
+    [InlineData(1000)]
+    public void Sha256Hasher_ChunkedAppend_MatchesOneShot(int chunk)
+    {
+        var input = new byte[5000];
+        for (var i = 0; i < input.Length; i++)
+        {
+            input[i] = (byte)(i * 31 % 251);
+        }
+
+        var hasher = new Sha256Hasher();
+        for (var offset = 0; offset < input.Length; offset += chunk)
+        {
+            hasher.Append(input.AsSpan(offset, Math.Min(chunk, input.Length - offset)));
+        }
+
+        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(hasher.Finish()));
+    }
+
+    [Fact]
+    public void Sha256Hasher_WithNoInput_MatchesEmptyDigest()
+    {
+        Assert.Equal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", Hex(new Sha256Hasher().Finish()));
+    }
+
+    [Fact]
+    public void Sha256Hasher_SingleByteAppend_MatchesSpanAppend()
+    {
+        var hasher = new Sha256Hasher();
+        for (var i = 0; i < 200; i++)
+        {
+            hasher.Append((byte)i);
+        }
+
+        var input = new byte[200];
+        for (var i = 0; i < input.Length; i++)
+        {
+            input[i] = (byte)i;
+        }
+
+        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(hasher.Finish()));
+    }
+
+    // Mixed span/byte appends around block boundaries are how BuildDocumentId feeds the
+    // seed: null-terminated text interleaved with page content.
+    [Fact]
+    public void Sha256Hasher_MixedAppends_MatchOneShot()
+    {
+        var hasher = new Sha256Hasher();
+        var expected = new System.IO.MemoryStream();
+        for (var i = 0; i < 40; i++)
+        {
+            var part = Ascii(new string((char)('a' + i % 26), i));
+            hasher.Append(part);
+            expected.Write(part, 0, part.Length);
+            hasher.Append((byte)0);
+            expected.WriteByte(0);
+        }
+
+        Assert.Equal(Hex(Sha2.ComputeHash256(expected.ToArray())), Hex(hasher.Finish()));
+    }
+
+    [Fact]
+    public void ComputeHash256_SpanOverload_MatchesArrayOverload()
+    {
+        var input = Ascii("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
+        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(Sha2.ComputeHash256(input.AsSpan())));
+    }
+
     [Theory]
     [InlineData(
         "",

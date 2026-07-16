@@ -9,7 +9,7 @@ namespace Radzen.Documents.Crypto;
 /// </summary>
 public static class Sha2
 {
-    private static readonly uint[] K256 =
+    internal static readonly uint[] K256 =
     [
         0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -53,63 +53,19 @@ public static class Sha2
     public static byte[] ComputeHash256(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
-        Span<uint> h =
-        [
-            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
-        ];
+        return ComputeHash256((ReadOnlySpan<byte>)data);
+    }
 
-        var padded = Pad64(data);
-        Span<uint> w = stackalloc uint[64];
-        for (var offset = 0; offset < padded.Length; offset += 64)
-        {
-            for (var i = 0; i < 16; i++)
-            {
-                w[i] = ReadUInt32(padded, offset + (i * 4));
-            }
-
-            for (var i = 16; i < 64; i++)
-            {
-                var s0 = RotR32(w[i - 15], 7) ^ RotR32(w[i - 15], 18) ^ (w[i - 15] >> 3);
-                var s1 = RotR32(w[i - 2], 17) ^ RotR32(w[i - 2], 19) ^ (w[i - 2] >> 10);
-                w[i] = w[i - 16] + s0 + w[i - 7] + s1;
-            }
-
-            uint a = h[0], b = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], hh = h[7];
-            for (var i = 0; i < 64; i++)
-            {
-                var s1 = RotR32(e, 6) ^ RotR32(e, 11) ^ RotR32(e, 25);
-                var ch = (e & f) ^ (~e & g);
-                var t1 = hh + s1 + ch + K256[i] + w[i];
-                var s0 = RotR32(a, 2) ^ RotR32(a, 13) ^ RotR32(a, 22);
-                var maj = (a & b) ^ (a & c) ^ (b & c);
-                var t2 = s0 + maj;
-                hh = g;
-                g = f;
-                f = e;
-                e = d + t1;
-                d = c;
-                c = b;
-                b = a;
-                a = t1 + t2;
-            }
-
-            h[0] += a;
-            h[1] += b;
-            h[2] += c;
-            h[3] += d;
-            h[4] += e;
-            h[5] += f;
-            h[6] += g;
-            h[7] += hh;
-        }
-
-        var result = new byte[32];
-        for (var i = 0; i < 8; i++)
-        {
-            WriteUInt32(result, i * 4, h[i]);
-        }
-
-        return result;
+    /// <summary>
+    /// Computes the 32-byte SHA-256 digest of <paramref name="data"/>.
+    /// </summary>
+    /// <param name="data">The bytes to hash.</param>
+    /// <returns>The 32-byte digest.</returns>
+    public static byte[] ComputeHash256(ReadOnlySpan<byte> data)
+    {
+        var hasher = new Sha256Hasher();
+        hasher.Append(data);
+        return hasher.Finish();
     }
 
     /// <summary>
@@ -214,22 +170,6 @@ public static class Sha2
         return result;
     }
 
-    private static byte[] Pad64(byte[] data)
-    {
-        var bitLength = (ulong)data.Length * 8;
-        var total = data.Length + 1;
-        var padZeros = (56 - (total % 64) + 64) % 64;
-        var padded = new byte[total + padZeros + 8];
-        Array.Copy(data, padded, data.Length);
-        padded[data.Length] = 0x80;
-        for (var i = 0; i < 8; i++)
-        {
-            padded[padded.Length - 1 - i] = (byte)(bitLength >> (8 * i));
-        }
-
-        return padded;
-    }
-
     private static byte[] Pad128(byte[] data)
     {
         var bitLength = (ulong)data.Length * 8;
@@ -246,7 +186,7 @@ public static class Sha2
         return padded;
     }
 
-    private static uint RotR32(uint value, int bits) => (value >> bits) | (value << (32 - bits));
+    internal static uint RotR32(uint value, int bits) => (value >> bits) | (value << (32 - bits));
 
     private static ulong RotR64(ulong value, int bits) => (value >> bits) | (value << (64 - bits));
 
@@ -256,7 +196,7 @@ public static class Sha2
     private static ulong ReadUInt64(byte[] data, int offset)
         => ((ulong)ReadUInt32(data, offset) << 32) | ReadUInt32(data, offset + 4);
 
-    private static void WriteUInt32(byte[] data, int offset, uint value)
+    internal static void WriteUInt32(byte[] data, int offset, uint value)
     {
         data[offset] = (byte)(value >> 24);
         data[offset + 1] = (byte)(value >> 16);
@@ -281,5 +221,152 @@ public static class Sha2
         }
 
         return new string(chars);
+    }
+}
+
+/// <summary>
+/// Incremental SHA-256 (FIPS 180-4): hashes data supplied in arbitrary chunks without
+/// concatenating it first. Produces the same digest as <see cref="Sha2.ComputeHash256(byte[])"/>
+/// for the same overall byte sequence. Not thread safe; single use - the instance is
+/// finalized by <see cref="Finish"/>.
+/// </summary>
+public sealed class Sha256Hasher
+{
+    private readonly uint[] state =
+    [
+        0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+    ];
+
+    private readonly byte[] block = new byte[64];
+    private int blockLength;
+    private ulong length;
+
+    /// <summary>
+    /// Appends <paramref name="data"/> to the running digest.
+    /// </summary>
+    /// <param name="data">The bytes to append.</param>
+    public void Append(ReadOnlySpan<byte> data)
+    {
+        length += (ulong)data.Length;
+        AppendCore(data);
+    }
+
+    /// <summary>
+    /// Appends a single byte to the running digest.
+    /// </summary>
+    /// <param name="value">The byte to append.</param>
+    public void Append(byte value)
+    {
+        length++;
+        block[blockLength++] = value;
+        if (blockLength == 64)
+        {
+            Transform(block);
+            blockLength = 0;
+        }
+    }
+
+    /// <summary>
+    /// Applies the FIPS 180-4 padding and returns the 32-byte digest.
+    /// </summary>
+    /// <returns>The 32-byte digest.</returns>
+    public byte[] Finish()
+    {
+        var bitLength = length * 8;
+        Span<byte> tail = stackalloc byte[72];
+        tail.Clear();
+        tail[0] = 0x80;
+        var padZeros = (56 - ((blockLength + 1) % 64) + 64) % 64;
+        var tailLength = 1 + padZeros + 8;
+        for (var i = 0; i < 8; i++)
+        {
+            tail[tailLength - 1 - i] = (byte)(bitLength >> (8 * i));
+        }
+
+        AppendCore(tail[..tailLength]);
+
+        var result = new byte[32];
+        for (var i = 0; i < 8; i++)
+        {
+            Sha2.WriteUInt32(result, i * 4, state[i]);
+        }
+
+        return result;
+    }
+
+    // Feeds bytes through the compression function without counting them, so Finish can
+    // append its own padding after the message length has been fixed.
+    private void AppendCore(ReadOnlySpan<byte> data)
+    {
+        if (blockLength > 0)
+        {
+            var take = Math.Min(64 - blockLength, data.Length);
+            data[..take].CopyTo(block.AsSpan(blockLength));
+            blockLength += take;
+            data = data[take..];
+            if (blockLength < 64)
+            {
+                return;
+            }
+
+            Transform(block);
+            blockLength = 0;
+        }
+
+        while (data.Length >= 64)
+        {
+            Transform(data[..64]);
+            data = data[64..];
+        }
+
+        data.CopyTo(block);
+        blockLength = data.Length;
+    }
+
+    private void Transform(ReadOnlySpan<byte> chunk)
+    {
+        Span<uint> w = stackalloc uint[64];
+        for (var i = 0; i < 16; i++)
+        {
+            var offset = i * 4;
+            w[i] = ((uint)chunk[offset] << 24) | ((uint)chunk[offset + 1] << 16)
+                | ((uint)chunk[offset + 2] << 8) | chunk[offset + 3];
+        }
+
+        for (var i = 16; i < 64; i++)
+        {
+            var s0 = Sha2.RotR32(w[i - 15], 7) ^ Sha2.RotR32(w[i - 15], 18) ^ (w[i - 15] >> 3);
+            var s1 = Sha2.RotR32(w[i - 2], 17) ^ Sha2.RotR32(w[i - 2], 19) ^ (w[i - 2] >> 10);
+            w[i] = w[i - 16] + s0 + w[i - 7] + s1;
+        }
+
+        uint a = state[0], b = state[1], c = state[2], d = state[3];
+        uint e = state[4], f = state[5], g = state[6], hh = state[7];
+        for (var i = 0; i < 64; i++)
+        {
+            var s1 = Sha2.RotR32(e, 6) ^ Sha2.RotR32(e, 11) ^ Sha2.RotR32(e, 25);
+            var ch = (e & f) ^ (~e & g);
+            var t1 = hh + s1 + ch + Sha2.K256[i] + w[i];
+            var s0 = Sha2.RotR32(a, 2) ^ Sha2.RotR32(a, 13) ^ Sha2.RotR32(a, 22);
+            var maj = (a & b) ^ (a & c) ^ (b & c);
+            var t2 = s0 + maj;
+            hh = g;
+            g = f;
+            f = e;
+            e = d + t1;
+            d = c;
+            c = b;
+            b = a;
+            a = t1 + t2;
+        }
+
+        state[0] += a;
+        state[1] += b;
+        state[2] += c;
+        state[3] += d;
+        state[4] += e;
+        state[5] += f;
+        state[6] += g;
+        state[7] += hh;
     }
 }

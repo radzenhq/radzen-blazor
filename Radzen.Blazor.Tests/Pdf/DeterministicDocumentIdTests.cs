@@ -72,4 +72,47 @@ public class DeterministicDocumentIdTests
     {
         Assert.Equal(PlainDocument().ToArray(), PlainDocument().ToArray());
     }
+
+    // Pins the exact /ID bytes: the seed layout and the hash feeding it are part of the
+    // deterministic-output contract, so any reimplementation must reproduce this value.
+    [Fact]
+    public void DocumentId_HasAPinnedValue_ForAKnownDocument()
+    {
+        Assert.Equal(
+            "FB42652C3E52C1AECAC2A39EFA11EC9D",
+            Assert.IsType<StringObject>(Id(PlainDocument().ToArray())[0]).Value);
+    }
+
+    private static long SaveAllocations(bool includeId, byte[] content)
+    {
+        var document = new Document { IncludeDocumentId = includeId };
+        document.Info.Title = "Deterministic";
+        document.Pages.Add(PageSizes.A4).SetContent(content);
+        using var stream = new MemoryStream();
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        document.SaveToStream(stream);
+        return GC.GetAllocatedBytesForCurrentThread() - before;
+    }
+
+    // The /ID seed must stream into the hash, not be concatenated into a buffer and copied
+    // again to hash it: turning /ID on may not cost a multiple of the content size.
+    [Fact]
+    public void DocumentId_DoesNotBufferOrCopyPageContent()
+    {
+        const int size = 4 * 1024 * 1024;
+        var content = new byte[size];
+        for (var i = 0; i < content.Length; i++)
+        {
+            content[i] = (byte)(' ' + (i % 64));
+        }
+
+        SaveAllocations(true, content);
+        SaveAllocations(false, content);
+
+        var withId = SaveAllocations(true, content);
+        var withoutId = SaveAllocations(false, content);
+        var cost = withId - withoutId;
+
+        Assert.True(cost < size / 4, $"/ID cost {cost} bytes for {size} bytes of content");
+    }
 }
