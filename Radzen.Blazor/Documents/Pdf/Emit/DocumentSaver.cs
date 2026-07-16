@@ -339,13 +339,7 @@ internal sealed class DocumentSaver
     {
         if (value is { } rect)
         {
-            pageNode[key] = new ArrayObject
-            {
-                new NumberObject(rect.X),
-                new NumberObject(rect.Y),
-                new NumberObject(rect.X + rect.Width),
-                new NumberObject(rect.Y + rect.Height),
-            };
+            pageNode[key] = PageResourceBuilder.NumberBox(rect);
             return;
         }
 

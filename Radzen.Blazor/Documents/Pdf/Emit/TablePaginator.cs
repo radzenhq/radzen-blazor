@@ -36,25 +36,7 @@ internal static class TablePaginator
     public static IReadOnlyList<TableFragment> Paginate(
         LaidOutTable layout, Table source, double firstAvailable, double subsequentAvailable)
     {
-        List<int> headers = [];
-        List<int> bodies = [];
-        for (var i = 0; i < source.Rows.Count; i++)
-        {
-            if (source.Rows[i].IsHeader)
-            {
-                headers.Add(i);
-            }
-            else
-            {
-                bodies.Add(i);
-            }
-        }
-
-        double headerHeight = 0;
-        foreach (var h in headers)
-        {
-            headerHeight += layout.RowHeights[h];
-        }
+        var (headers, bodies, headerHeight) = SplitRows(layout, source);
 
         // Rows covered by a RowSpan > 1 cell move between fragments as one group.
         var reach = BuildReach(layout, source.Rows.Count);
@@ -73,15 +55,7 @@ internal static class TablePaginator
             var deferred = false;
             while (body < bodies.Count)
             {
-                var last = body;
-                var groupEnd = reach[bodies[body]];
-                double groupHeight = layout.RowHeights[bodies[body]];
-                while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
-                {
-                    last++;
-                    groupEnd = Math.Max(groupEnd, reach[bodies[last]]);
-                    groupHeight += layout.RowHeights[bodies[last]];
-                }
+                var (last, groupHeight) = NextGroup(layout, bodies, reach, body);
 
                 var fits = running + groupHeight <= available + 1e-6;
 
@@ -167,34 +141,34 @@ internal static class TablePaginator
         return reach;
     }
 
-    // Height of the header rows plus the first body row group - the rowspan closure Paginate
-    // force-places as one unit. Paginator's page-flush check needs the identical measurement,
-    // so both consume this one helper instead of duplicating the reach/group computation.
-    internal static double FirstBodyGroupHeight(LaidOutTable layout, Table source)
+    private static (List<int> Headers, List<int> Bodies, double HeaderHeight) SplitRows(LaidOutTable layout, Table source)
     {
-        double headerHeight = 0;
+        List<int> headers = [];
         List<int> bodies = [];
-        for (var r = 0; r < source.Rows.Count; r++)
+        double headerHeight = 0;
+        for (var i = 0; i < source.Rows.Count; i++)
         {
-            if (source.Rows[r].IsHeader)
+            if (source.Rows[i].IsHeader)
             {
-                headerHeight += layout.RowHeights[r];
+                headers.Add(i);
+                headerHeight += layout.RowHeights[i];
             }
             else
             {
-                bodies.Add(r);
+                bodies.Add(i);
             }
         }
 
-        if (bodies.Count == 0)
-        {
-            return headerHeight;
-        }
+        return (headers, bodies, headerHeight);
+    }
 
-        var reach = BuildReach(layout, source.Rows.Count);
-        var last = 0;
-        var groupEnd = reach[bodies[0]];
-        var groupHeight = layout.RowHeights[bodies[0]];
+    // The rowspan closure starting at bodies[start]: the rows Paginate places as one unit.
+    private static (int Last, double GroupHeight) NextGroup(
+        LaidOutTable layout, List<int> bodies, int[] reach, int start)
+    {
+        var last = start;
+        var groupEnd = reach[bodies[start]];
+        var groupHeight = layout.RowHeights[bodies[start]];
         while (last + 1 < bodies.Count && bodies[last + 1] <= groupEnd)
         {
             last++;
@@ -202,6 +176,21 @@ internal static class TablePaginator
             groupHeight += layout.RowHeights[bodies[last]];
         }
 
+        return (last, groupHeight);
+    }
+
+    // Height of the header rows plus the first body row group - the rowspan closure Paginate
+    // force-places as one unit. Paginator's page-flush check needs the identical measurement,
+    // so both consume the same SplitRows/NextGroup helpers.
+    internal static double FirstBodyGroupHeight(LaidOutTable layout, Table source)
+    {
+        var (_, bodies, headerHeight) = SplitRows(layout, source);
+        if (bodies.Count == 0)
+        {
+            return headerHeight;
+        }
+
+        var (_, groupHeight) = NextGroup(layout, bodies, BuildReach(layout, source.Rows.Count), 0);
         return headerHeight + groupHeight;
     }
 
