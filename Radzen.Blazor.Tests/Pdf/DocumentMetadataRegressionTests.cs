@@ -54,17 +54,30 @@ public class DocumentMetadataRegressionTests
     }
 
     [Fact]
-    public void NonAttachmentNames_DoNotChangeLoadedSaveOutput()
+    public void NonAttachmentNames_SurviveLoadedSave()
     {
         const string names = "/Names << /JavaScript << /Names [(startup) 8 0 R] >> "
             + "/Dests << /Names [(chapter) [3 0 R /Fit]] >> >>";
-        var withNames = Load(BuildPdf(names, null)).ToArray();
-        var withoutNames = Load(BuildPdf("", null)).ToArray();
 
-        Assert.Equal(withoutNames, withNames);
-        var reader = DocumentReader.Parse(withNames);
+        var saved = Load(BuildPdf(names, null)).ToArray();
+
+        var reader = DocumentReader.Parse(saved);
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
-        Assert.False(catalog.ContainsKey("Names"));
+        var tree = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Names"]));
+
+        var dests = Assert.IsType<ArrayObject>(
+            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(tree["Dests"]))["Names"]));
+        Assert.Equal("chapter", Assert.IsType<StringObject>(reader.Resolve(dests[0])).Value);
+        var destination = Assert.IsType<ArrayObject>(reader.Resolve(dests[1]));
+        var pages = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Pages"]));
+        var kids = Assert.IsType<ArrayObject>(reader.Resolve(pages["Kids"]));
+        Assert.Equal(
+            Assert.IsType<ReferenceObject>(kids[0]).ObjectNumber,
+            Assert.IsType<ReferenceObject>(destination[0]).ObjectNumber);
+
+        var javaScript = Assert.IsType<ArrayObject>(
+            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(tree["JavaScript"]))["Names"]));
+        Assert.Equal("startup", Assert.IsType<StringObject>(reader.Resolve(javaScript[0])).Value);
     }
 
     [Fact]

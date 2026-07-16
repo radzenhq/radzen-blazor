@@ -13,7 +13,15 @@ internal sealed class CatalogPreserver(Document document)
     // overwrite them (or drag in a duplicate sub-graph for them).
     private static readonly HashSet<string> ManagedCatalogKeys = new(StringComparer.Ordinal)
     {
-        "Type", "Pages", "AcroForm", "Names", "AF", "OutputIntents", "MarkInfo", "StructTreeRoot",
+        "Type", "Pages", "AcroForm", "AF", "OutputIntents", "MarkInfo", "StructTreeRoot",
+    };
+
+    // /Names is a container of independent branches rather than a single managed entry.
+    // Only /EmbeddedFiles is this writer's: the loader turns it into document.Attachments
+    // and the AttachmentWriter re-emits it, so importing it too would orphan a duplicate.
+    private static readonly HashSet<string> ManagedNameTreeBranches = new(StringComparer.Ordinal)
+    {
+        "EmbeddedFiles",
     };
 
     // Marks every source page node that was loaded but removed from Pages before
@@ -81,8 +89,42 @@ internal sealed class CatalogPreserver(Document document)
                 continue;
             }
 
+            if (string.Equals(key, "Names", StringComparison.Ordinal))
+            {
+                PreserveNames(importer, source, catalog, sourceCatalog);
+                continue;
+            }
+
             catalog[key] = importer.ImportValue(sourceCatalog[key]);
         }
 
+    }
+
+    // Carries the source /Names branches this writer does not build itself - /Dests
+    // above all, without which every re-emitted link annotation keeps a /D (name) that
+    // resolves to nothing. Page references inside an imported branch repoint onto the
+    // new page tree (kept pages are seeded, removed ones pruned to null), so a
+    // preserved destination still lands on its own page after renumbering. The tree is
+    // left inline so the attachment and navigation writers can still merge into it.
+    private static void PreserveNames(GraphImporter importer, DocumentReader source, DictionaryObject catalog, DictionaryObject sourceCatalog)
+    {
+        if (source.GetDictionary(sourceCatalog, "Names") is not { } names)
+        {
+            return;
+        }
+
+        var tree = new DictionaryObject();
+        foreach (var branch in names.Keys)
+        {
+            if (!ManagedNameTreeBranches.Contains(branch))
+            {
+                tree[branch] = importer.ImportValue(names[branch]);
+            }
+        }
+
+        if (tree.Keys.Count > 0)
+        {
+            catalog["Names"] = tree;
+        }
     }
 }
