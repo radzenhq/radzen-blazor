@@ -15,6 +15,7 @@ internal sealed class ReverseFont
     private readonly IReadOnlyDictionary<int, string> map;
     private readonly IReadOnlyDictionary<int, double>? widths;
     private readonly double? defaultWidth;
+    private ReverseMap? reverse;
 
     private ReverseFont(int bytesPerCode, IReadOnlyDictionary<int, string> map,
         IReadOnlyDictionary<int, double>? widths = null, double? defaultWidth = null)
@@ -90,23 +91,21 @@ internal sealed class ReverseFont
 
     internal bool TryEncode(string text, out byte[] codes)
     {
-        var reverse = new Dictionary<string, int>(StringComparer.Ordinal);
-        foreach (var entry in map)
-        {
-            reverse.TryAdd(entry.Value, entry.Key);
-        }
+        var lookup = reverse ??= BuildReverseMap();
 
         var result = new List<byte>();
         for (var offset = 0; offset < text.Length;)
         {
             var foundCode = -1;
             var foundLength = 0;
-            foreach (var entry in reverse)
+            var longest = Math.Min(lookup.MaxLength, text.Length - offset);
+            for (var length = longest; length >= 1; length--)
             {
-                if (entry.Key.Length > foundLength && text.AsSpan(offset).StartsWith(entry.Key, StringComparison.Ordinal))
+                if (lookup.Codes.TryGetValue(text.Substring(offset, length), out var code))
                 {
-                    foundCode = entry.Value;
-                    foundLength = entry.Key.Length;
+                    foundCode = code;
+                    foundLength = length;
+                    break;
                 }
             }
 
@@ -127,6 +126,24 @@ internal sealed class ReverseFont
         codes = [.. result];
         return true;
     }
+
+    // The forward map never changes after construction, so the reverse lookup is built once.
+    private ReverseMap BuildReverseMap()
+    {
+        var codes = new Dictionary<string, int>(map.Count, StringComparer.Ordinal);
+        var maxLength = 0;
+        foreach (var entry in map)
+        {
+            if (codes.TryAdd(entry.Value, entry.Key) && entry.Value.Length > maxLength)
+            {
+                maxLength = entry.Value.Length;
+            }
+        }
+
+        return new ReverseMap(codes, maxLength);
+    }
+
+    private sealed record ReverseMap(Dictionary<string, int> Codes, int MaxLength);
 
     internal bool TryGetWidth(int code, out double width)
     {
