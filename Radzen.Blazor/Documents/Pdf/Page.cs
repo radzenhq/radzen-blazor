@@ -18,7 +18,6 @@ public sealed class Page
     private byte[]? content;
     private bool materialized;
     private int materializedCount;
-    private byte[]? snapshot;
     private int rotate;
     private Unit width;
     private Unit height;
@@ -386,8 +385,7 @@ public sealed class Page
             return new ContentEmissionResult(content, editedResources);
         }
 
-        if (content is not null && snapshot is not null && elements.Count >= materializedCount
-            && OriginalElementsIntact())
+        if (content is not null && OriginalElementsIntact())
         {
             if (elements.Count == materializedCount)
             {
@@ -433,15 +431,26 @@ public sealed class Page
             ContentResourceManifest.Combine(editedResources, authored.Resources), isEmitted: true);
     }
 
+    // Prefix identity, not just a count: removing one original and appending one new element
+    // leaves the count unchanged, so a count test alone would pass it as intact and the
+    // removed content would come back from the raw bytes.
     private bool OriginalElementsIntact()
     {
-        using var writer = new ContentWriter();
-        for (var i = 0; i < materializedCount; i++)
+        // The count guard also keeps the prefix walk in range once elements were removed.
+        if (sourceElements is null || elements.Count < materializedCount)
         {
-            elements[i].Emit(writer);
+            return false;
         }
 
-        return snapshot is not null && writer.ToArray().AsSpan().SequenceEqual(snapshot);
+        for (var i = 0; i < materializedCount; i++)
+        {
+            if (elements[i].IsModified || !ReferenceEquals(elements[i], sourceElements[i].Element))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // A built page keeps the generator's bytes as its base; Content holds only the
@@ -480,18 +489,18 @@ public sealed class Page
         materializedCount = elements.Count;
         sourceElements = ContentEditor.Map(content, elements);
 
-        using var writer = new ContentWriter();
+        // The interpreter builds these elements through the same tracked setters a caller
+        // would use, so without this every loaded page would be born modified and re-encode.
         foreach (var element in elements)
         {
-            element.Emit(writer);
+            element.AcceptChanges();
         }
 
-        snapshot = writer.ToArray();
         FlushPendingAppends();
     }
 
-    // Queued appends join the elements only after materializedCount and the snapshot are
-    // fixed, so they count as additions rather than as original content.
+    // Queued appends join the elements only after materializedCount is fixed and the original
+    // prefix is frozen, so they count as additions rather than as original content.
     private void FlushPendingAppends()
     {
         foreach (var element in pendingAppends)
@@ -507,7 +516,6 @@ public sealed class Page
         elements.Clear();
         materialized = false;
         materializedCount = 0;
-        snapshot = null;
         sourceElements = null;
     }
 

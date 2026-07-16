@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -7,7 +8,7 @@ namespace Radzen.Documents.Pdf.Content;
 
 internal static class ContentEditor
 {
-    internal sealed record SourceElement(ContentElement Element, int Start, int End, byte[] Snapshot, Matrix Ambient);
+    internal sealed record SourceElement(ContentElement Element, int Start, int End, Matrix Ambient);
 
     private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes, Matrix Ambient);
 
@@ -49,13 +50,13 @@ internal static class ContentEditor
                     var part = candidates[candidateIndex++];
                     combined.AddRange(part.TextBytes);
                     end = part.End;
-                    if (Same(combined, sourceBytes))
+                    if (Same(combined, sourceBytes.Span))
                     {
                         break;
                     }
                 }
 
-                if (!Same(combined, sourceBytes))
+                if (!Same(combined, sourceBytes.Span))
                 {
                     throw new NotSupportedException("The text-show operators cannot be mapped safely to the materialized text run.");
                 }
@@ -65,7 +66,7 @@ internal static class ContentEditor
                 candidateIndex++;
             }
 
-            result.Add(new SourceElement(element, start, end, Emit(element), candidate.Ambient));
+            result.Add(new SourceElement(element, start, end, candidate.Ambient));
         }
 
         if (candidateIndex != candidates.Count)
@@ -127,8 +128,7 @@ internal static class ContentEditor
                 inserted.Emit(writer);
             }
 
-            var emitted = Emit(item.Element);
-            if (Same(emitted, item.Snapshot))
+            if (!item.Element.IsModified)
             {
                 writer.WriteBytes(source.AsSpan(item.Start, item.End - item.Start));
             }
@@ -325,6 +325,8 @@ internal static class ContentEditor
         }
     }
 
+    // Reachable for every element type: these three declare no tracked member of their own but
+    // still inherit the Transform and IsArtifact doors from ContentElement.
     private static void ValidateModification(ContentElement element)
     {
         if (element is RawContent or XObjectContent or InlineImageContent)
@@ -333,28 +335,6 @@ internal static class ContentEditor
         }
     }
 
-    private static byte[] Emit(ContentElement element)
-    {
-        using var writer = new ContentWriter();
-        element.Emit(writer);
-        return writer.ToArray();
-    }
-
-    private static bool Same(IReadOnlyList<byte> left, IReadOnlyList<byte> right)
-    {
-        if (left.Count != right.Count)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < left.Count; i++)
-        {
-            if (left[i] != right[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private static bool Same(List<byte> left, ReadOnlySpan<byte> right)
+        => CollectionsMarshal.AsSpan(left).SequenceEqual(right);
 }

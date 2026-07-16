@@ -1,6 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Radzen.Documents.Pdf;
 
@@ -27,6 +27,10 @@ public sealed class GradientStop(double offset, Color color)
 /// </summary>
 public abstract class GradientBrush
 {
+    private bool extendStart = true;
+    private bool extendEnd = true;
+    private bool touched;
+
     /// <summary>Initializes the shared gradient state from <paramref name="stops"/>.</summary>
     /// <param name="stops">The colour stops, in non-decreasing offset order within [0, 1].</param>
     protected GradientBrush(GradientStop[] stops)
@@ -54,23 +58,48 @@ public abstract class GradientBrush
             }
         }
 
-        Stops = (GradientStop[])stops.Clone();
+        // Wrapped, not just cloned: an array handed out as IReadOnlyList can be cast back and
+        // written through, which no change-detection door would ever see.
+        Stops = new ReadOnlyCollection<GradientStop>((GradientStop[])stops.Clone());
     }
 
     /// <summary>Gets the ordered colour stops of this gradient.</summary>
-    public IReadOnlyList<GradientStop> Stops { get; }
+    public ReadOnlyCollection<GradientStop> Stops { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the gradient extends beyond its start
     /// point (the first entry of the shading <c>/Extend</c> array). Defaults to true.
     /// </summary>
-    public bool ExtendStart { get; set; } = true;
+    public bool ExtendStart
+    {
+        get => extendStart;
+        set => Set(ref extendStart, value);
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the gradient extends beyond its end
     /// point (the second entry of the shading <c>/Extend</c> array). Defaults to true.
     /// </summary>
-    public bool ExtendEnd { get; set; } = true;
+    public bool ExtendEnd
+    {
+        get => extendEnd;
+        set => Set(ref extendEnd, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this gradient has been assigned to since it was
+    /// materialized. A <see cref="PathContent"/> folds its own gradient's state into
+    /// <see cref="ContentElement.IsModified"/>.
+    /// </summary>
+    public bool IsModified => touched;
+
+    private void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    internal void AcceptChanges() => touched = false;
 
     /// <summary>
     /// Gets the shading <c>/ShadingType</c> of this gradient kind (ISO 32000-1 8.7.4.5):

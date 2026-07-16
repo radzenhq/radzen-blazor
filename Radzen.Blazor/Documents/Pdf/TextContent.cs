@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Fonts;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf;
@@ -15,45 +16,112 @@ namespace Radzen.Documents.Pdf;
 /// <param name="y">The baseline Y position.</param>
 public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
 {
+    private string textValue = text;
+    private Font font = new();
+    private Color color = Color.Black;
+    private string? fontResourceName;
+    private ReadOnlyMemory<byte>? sourceBytes;
+    private string? sourceText;
+    private ReverseFont? sourceFont;
+    private ImmutableArray<TextAdjustment>? sourceAdjustments;
+    private DeviceColor? fillPaint;
+    private double wordSpacing;
+    private double charSpacing;
+
     /// <summary>Gets or sets the text to draw.</summary>
-    public string Text { get; set; } = text;
+    public string Text
+    {
+        get => textValue;
+        set => Set(ref textValue, value);
+    }
 
     /// <summary>Gets or sets the font.</summary>
-    public Font Font { get; set; } = new();
+    public Font Font
+    {
+        get => font;
+        set => Set(ref font, value);
+    }
 
     /// <summary>Gets or sets the fill color of the text. Defaults to black.</summary>
-    public Color Color { get; set; } = Color.Black;
+    public Color Color
+    {
+        get => color;
+        set => Set(ref color, value);
+    }
+
+    // A run owns its font, but Font is settable, so one instance can be shared by two runs;
+    // asking the font rather than having it push back keeps that from misfiring.
+    /// <inheritdoc/>
+    public override bool IsModified => base.IsModified || Font.IsModified;
+
+    internal override void AcceptChanges()
+    {
+        base.AcceptChanges();
+        Font.AcceptChanges();
+    }
 
     // Resource name captured when materializing a loaded page; when set, re-emission
     // keeps the original /Font reference instead of registering a base-14 face.
-    internal string? FontResourceName { get; set; }
+    internal string? FontResourceName
+    {
+        get => fontResourceName;
+        set => Set(ref fontResourceName, value);
+    }
 
     // Original show-string bytes captured when materializing a loaded page. A Type0/CID
     // run carries 2-byte codes that a WinAnsi re-encode would corrupt, so it is re-emitted
     // verbatim. The plain generate path leaves this null and encodes via WinAnsi.
-    internal byte[]? SourceBytes { get; set; }
+    internal ReadOnlyMemory<byte>? SourceBytes
+    {
+        get => sourceBytes;
+        set => Set(ref sourceBytes, value);
+    }
 
     // The decoded text as materialized. When the caller has edited Text away from this,
     // SourceBytes no longer describes it and the run is re-encoded through WinAnsi.
-    internal string? SourceText { get; set; }
+    internal string? SourceText
+    {
+        get => sourceText;
+        set => Set(ref sourceText, value);
+    }
 
-    internal ReverseFont? SourceFont { get; set; }
+    internal ReverseFont? SourceFont
+    {
+        get => sourceFont;
+        set => Set(ref sourceFont, value);
+    }
 
     // The TJ show array a loaded run carried (interleaved string chunks and numeric
     // displacements). Re-emitted verbatim so kerning/inter-word gaps survive a re-encode;
     // null for an authored run or an edited one, which re-encode through the Tj path.
-    internal IReadOnlyList<TextAdjustment>? SourceAdjustments { get; set; }
+    internal ImmutableArray<TextAdjustment>? SourceAdjustments
+    {
+        get => sourceAdjustments;
+        set => Set(ref sourceAdjustments, value);
+    }
 
     // Non-RGB fill (CMYK/gray/named color space) captured when materializing a loaded run.
     // When set it overrides Color so a re-encode preserves the original color space instead
     // of collapsing to the last rg color or black. Null for authored runs (which use Color).
-    internal DeviceColor? FillPaint { get; set; }
+    internal DeviceColor? FillPaint
+    {
+        get => fillPaint;
+        set => Set(ref fillPaint, value);
+    }
 
     // Word spacing (Tw) and character spacing (Tc) captured from a loaded run (the "
     // operator or a preceding Tc/Tw). Zero for authored runs, which keep the defaults.
-    internal double WordSpacing { get; set; }
+    internal double WordSpacing
+    {
+        get => wordSpacing;
+        set => Set(ref wordSpacing, value);
+    }
 
-    internal double CharSpacing { get; set; }
+    internal double CharSpacing
+    {
+        get => charSpacing;
+        set => Set(ref charSpacing, value);
+    }
 
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
@@ -121,7 +189,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
         else
         {
-            writer.WriteString(EncodeText());
+            writer.WriteString(EncodeText().Span);
             writer.WriteRaw(" Tj\n");
         }
 
@@ -132,11 +200,11 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         }
     }
 
-    private byte[] EncodeText()
+    private ReadOnlyMemory<byte> EncodeText()
     {
-        if (SourceBytes is not null && Text == SourceText)
+        if (SourceBytes is { } source && Text == SourceText)
         {
-            return SourceBytes;
+            return source;
         }
 
         if (SourceFont is not null)

@@ -8,18 +8,56 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class ContentElement
 {
+    private bool touched;
+    private Matrix transform = Matrix.Identity;
+    private bool isArtifact;
+
     /// <summary>
     /// Gets or sets the transform applied to this element. Defaults to
     /// <see cref="Matrix.Identity"/>, in which case no transform is emitted.
     /// </summary>
-    public Matrix Transform { get; set; } = Matrix.Identity;
+    public Matrix Transform
+    {
+        get => transform;
+        set => Set(ref transform, value);
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether this element is an artifact
     /// (decorative, non-content). Artifacts are wrapped in an
     /// <c>/Artifact BDC ... EMC</c> marked-content sequence.
     /// </summary>
-    public bool IsArtifact { get; set; }
+    public bool IsArtifact
+    {
+        get => isArtifact;
+        set => Set(ref isArtifact, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this element has been modified since it was
+    /// materialized from a loaded content stream. A loaded page re-emits only the
+    /// elements that report true, so an untouched one keeps its original bytes.
+    /// </summary>
+    public virtual bool IsModified => touched;
+
+    /// <summary>Assigns a tracked backing field and marks this element modified.</summary>
+    /// <typeparam name="T">The field type.</typeparam>
+    /// <param name="field">The backing field to assign.</param>
+    /// <param name="value">The value to assign.</param>
+    // Unconditional: whether the new value is "equal" to the old is not the same question as
+    // whether it emits the same bytes, and for a mutable Font or a float it is not even stable.
+    protected void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    /// <summary>Marks this element modified without assigning a tracked field.</summary>
+    protected void Touch() => touched = true;
+
+    // Called once over a loaded page's original elements after materialization, which builds
+    // them through these same setters and would otherwise leave every page born dirty.
+    internal virtual void AcceptChanges() => touched = false;
 
     internal void Emit(ContentWriter writer) => Emit(writer, Transform);
 

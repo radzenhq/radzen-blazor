@@ -1,0 +1,348 @@
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Fonts;
+using Xunit;
+using Xunit.Sdk;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// Byte fidelity for a loaded page rests on every mutable member of a materialized element
+// opening a change-detection door. That used to be enforced at run time by re-serializing
+// each element and comparing; this test is what replaces it. It walks the closed set by
+// reflection and fails the build if a member can move the emitted bytes with the flag clean.
+public class ContentElementChangeTrackingMatrixTests
+{
+    // The element kinds ContentInterpreter can produce, and so the only ones that can occupy
+    // the original prefix of a loaded page. Anything else can only be appended.
+    private static readonly Type[] Tracked =
+    [
+        typeof(TextContent),
+        typeof(PathContent),
+        typeof(XObjectContent),
+        typeof(RawContent),
+        typeof(InlineImageContent),
+    ];
+
+    private static readonly byte[] InlineImagePayload = [0x00, 0x01, 0xFF, 0x0A];
+
+    private static byte[] Source()
+    {
+        var bytes = new List<byte>();
+        bytes.AddRange(Encoding.ASCII.GetBytes("BI /W 2 /H 1 /CS /RGB /BPC 8 ID "));
+        bytes.AddRange(InlineImagePayload);
+        bytes.AddRange(Encoding.ASCII.GetBytes(
+            " EI\n" +
+            "BT /F0 12 Tf 10 700 Td (Hi) Tj ET\n" +
+            "[3 2] 0 d\n" +
+            "0 0 m 10 10 l S\n" +
+            "/Im0 Do\n" +
+            "/Sh0 sh\n"));
+        return [.. bytes];
+    }
+
+    private static ContentCollection Materialized()
+    {
+        var document = new Document();
+        document.Pages.Add().SetContent(Source());
+        return InterpreterTestSupport.Load(document.ToArray()).Pages[0].Content;
+    }
+
+    // A fresh materialized element per member, so each starts from the frozen state.
+    private static ContentElement Element(Type type)
+    {
+        foreach (var element in Materialized())
+        {
+            if (element.GetType() == type)
+            {
+                return element;
+            }
+        }
+
+        throw new XunitException($"The fixture content stream did not materialize a {type.Name}.");
+    }
+
+    private static byte[] EmitBytes(ContentElement element)
+    {
+        using var writer = new ContentWriter();
+        element.Emit(writer);
+        return writer.ToArray();
+    }
+
+    [Fact]
+    public void EveryContentElementSubclassIsEitherTrackedOrAppendOnly()
+    {
+        var discovered = typeof(ContentElement).Assembly.GetTypes()
+            .Where(type => typeof(ContentElement).IsAssignableFrom(type) && !type.IsAbstract)
+            .ToList();
+
+        Assert.NotEmpty(discovered);
+        foreach (var type in Tracked)
+        {
+            Assert.Contains(type, discovered);
+        }
+    }
+
+    [Fact]
+    public void EveryMutableMemberOfALoadedElementOpensAChangeDetectionDoor()
+    {
+        var checkedMembers = 0;
+        foreach (var type in Tracked)
+        {
+            foreach (var property in SettableProperties(type, typeof(ContentElement)))
+            {
+                AssertDoor(type, property.Name, () => Element(type), (element, _) => Mutate(property, element));
+                checkedMembers++;
+            }
+
+            foreach (var method in PublicVoidMutators(type, typeof(ContentElement)))
+            {
+                AssertDoor(type, method.Name + "()", () => Element(type), (element, _) => Invoke(method, element));
+                checkedMembers++;
+            }
+        }
+
+        // The nested owned objects. A run's Font and a path's gradient reach the emitted bytes
+        // through their owner, so the owner's flag is what must move.
+        foreach (var property in SettableProperties(typeof(Font), typeof(object)))
+        {
+            AssertDoor(typeof(Font), property.Name, TextFixture, (_, nested) => Mutate(property, nested!));
+            checkedMembers++;
+        }
+
+        foreach (var property in SettableProperties(typeof(GradientBrush), typeof(object)))
+        {
+            AssertDoor(typeof(GradientBrush), property.Name, GradientFixture, (_, nested) => Mutate(property, nested!));
+            checkedMembers++;
+        }
+
+        // Guards the walk itself: a filter that silently matched nothing would report green.
+        Assert.InRange(checkedMembers, 40, 100);
+    }
+
+    private static ContentElement TextFixture() => Element(typeof(TextContent));
+
+    // A loaded path carries no gradient, so one is attached and the element re-frozen: the
+    // matrix still starts from a clean, materialized element.
+    private static ContentElement GradientFixture()
+    {
+        var path = (PathContent)Element(typeof(PathContent));
+        path.FillGradient = new LinearGradient(0, 0, 10, 10,
+            new GradientStop(0, Color.Red),
+            new GradientStop(1, Color.Blue));
+        path.AcceptChanges();
+        return path;
+    }
+
+    private static object? Nested(Type owner, ContentElement element) => owner == typeof(Font)
+        ? ((TextContent)element).Font
+        : owner == typeof(GradientBrush) ? ((PathContent)element).FillGradient : element;
+
+    private static void AssertDoor(Type owner, string member, Func<ContentElement> fixture, Action<ContentElement, object?> mutate)
+    {
+        var element = fixture();
+        Assert.False(element.IsModified, $"{owner.Name}.{member}: the materialized fixture was already modified before the mutation.");
+
+        var baseline = EmitBytes(element);
+        mutate(element, Nested(owner, element));
+
+        if (element.IsModified)
+        {
+            return;
+        }
+
+        // The disjunction, short-circuited: a member the emitter genuinely ignores may leave the
+        // flag clean, but one that moved the bytes without opening a door is the bug.
+        Assert.True(EmitBytes(element).SequenceEqual(baseline),
+            $"{owner.Name}.{member}: mutation changed emitted bytes but the flag stayed clean");
+    }
+
+    private static void Mutate(PropertyInfo property, object target)
+        => property.SetValue(target, DistinctValue(property.PropertyType, property.GetValue(target), $"{property.DeclaringType?.Name}.{property.Name}"));
+
+    private static void Invoke(MethodInfo method, object target)
+        => method.Invoke(target, [.. method.GetParameters().Select(p => MethodArgument(p.ParameterType, $"{method.Name}({p.Name})"))]);
+
+    private static IEnumerable<PropertyInfo> SettableProperties(Type type, Type stopAfter)
+    {
+        foreach (var declaring in Hierarchy(type, stopAfter))
+        {
+            foreach (var property in declaring.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+            {
+                // Assembly-visible setters only: a private one cannot be reached from outside.
+                // Init-only members are excluded as a category, not skipped for convenience:
+                // they cannot be assigned after construction, so they have nothing to track.
+                if (property.SetMethod is { } setter && (setter.IsPublic || setter.IsAssembly || setter.IsFamilyOrAssembly)
+                    && !IsInitOnly(setter) && property.GetIndexParameters().Length == 0)
+                {
+                    yield return property;
+                }
+            }
+        }
+    }
+
+    private static bool IsInitOnly(MethodInfo setter)
+        => setter.ReturnParameter.GetRequiredCustomModifiers()
+            .Any(modifier => modifier.FullName == "System.Runtime.CompilerServices.IsExternalInit");
+
+    private static IEnumerable<MethodInfo> PublicVoidMutators(Type type, Type stopAfter)
+    {
+        foreach (var declaring in Hierarchy(type, stopAfter))
+        {
+            foreach (var method in declaring.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
+            {
+                if (method.ReturnType == typeof(void) && !method.IsSpecialName)
+                {
+                    yield return method;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<Type> Hierarchy(Type type, Type stopAfter)
+    {
+        for (var current = type; current is not null && current != typeof(object); current = current.BaseType)
+        {
+            yield return current;
+            if (current == stopAfter)
+            {
+                yield break;
+            }
+        }
+    }
+
+    // Throws rather than skips on an unregistered type: a new member of a type this does not
+    // know must break the build, not quietly drop out of the matrix.
+    private static object? DistinctValue(Type type, object? current, string member)
+    {
+        if (Nullable.GetUnderlyingType(type) is { } underlying)
+        {
+            return current is null ? SomeValue(underlying, member) : null;
+        }
+
+        if (type == typeof(bool))
+        {
+            return !(bool)current!;
+        }
+
+        if (type == typeof(double))
+        {
+            return (double)current! + 17.25;
+        }
+
+        if (type == typeof(string))
+        {
+            return (string?)current == "probe" ? "other" : "probe";
+        }
+
+        if (type == typeof(Matrix))
+        {
+            return (Matrix)current! == Matrix.Identity ? Matrix.Translate(3, 4) : Matrix.Identity;
+        }
+
+        if (type == typeof(Color))
+        {
+            return (Color)current! == Color.Red ? Color.Blue : Color.Red;
+        }
+
+        if (type.IsEnum)
+        {
+            foreach (var value in Enum.GetValues(type))
+            {
+                if (!value.Equals(current))
+                {
+                    return value;
+                }
+            }
+
+            throw new XunitException($"{member}: enum {type.Name} has no second value to distinguish with.");
+        }
+
+        if (type == typeof(Font))
+        {
+            return new Font { Size = ((Font?)current)?.Size + 13 ?? 13 };
+        }
+
+        if (type == typeof(ReverseFont))
+        {
+            return current is null ? ReverseFont.FromBase14("Helvetica") : null;
+        }
+
+        if (type == typeof(GradientBrush))
+        {
+            return current is null ? SomeValue(typeof(GradientBrush), member) : null;
+        }
+
+        throw new XunitException(
+            $"{member}: no distinct-value rule for type {type}. Add one - a member left uncovered is exactly what this matrix exists to catch.");
+    }
+
+    private static object SomeValue(Type type, string member)
+    {
+        if (type == typeof(double))
+        {
+            return 19.5;
+        }
+
+        if (type == typeof(ReadOnlyMemory<byte>))
+        {
+            return new ReadOnlyMemory<byte>([0x5A, 0x5B]);
+        }
+
+        if (type == typeof(ReadOnlyMemory<double>))
+        {
+            return new ReadOnlyMemory<double>([9.5, 8.5]);
+        }
+
+        if (type == typeof(ImmutableArray<TextAdjustment>))
+        {
+            return ImmutableArray.Create(new TextAdjustment([0x5A], -33));
+        }
+
+        if (type == typeof(DeviceColor))
+        {
+            return new DeviceColor(DeviceColorKind.Gray, null, [0.25]);
+        }
+
+        if (type == typeof(GradientBrush))
+        {
+            return new LinearGradient(0, 0, 5, 5, new GradientStop(0, Color.Green), new GradientStop(1, Color.Yellow));
+        }
+
+        if (type.IsEnum)
+        {
+            return Enum.GetValues(type).GetValue(0)!;
+        }
+
+        throw new XunitException(
+            $"{member}: no sample-value rule for type {type}. Add one - a member left uncovered is exactly what this matrix exists to catch.");
+    }
+
+    private static object MethodArgument(Type type, string member)
+    {
+        if (type == typeof(Unit))
+        {
+            return Unit.FromPoint(7);
+        }
+
+        if (type == typeof(double))
+        {
+            return 0.25;
+        }
+
+        if (type == typeof(double[]))
+        {
+            return new double[] { 4, 5 };
+        }
+
+        throw new XunitException(
+            $"{member}: no argument rule for parameter type {type}. Add one - a mutator left uncovered is exactly what this matrix exists to catch.");
+    }
+}

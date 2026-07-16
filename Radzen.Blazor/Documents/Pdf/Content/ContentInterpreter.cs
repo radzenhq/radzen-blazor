@@ -94,15 +94,18 @@ internal static class ContentInterpreter
 
     // Writes a fold chain's accumulated bytes/text onto the run once, when the chain ends.
     // Folding leaves the run's SourceBytes/SourceText at their pre-fold values, so every
-    // path that abandons PendingMerge must come through here.
+    // path that abandons PendingMerge must come through here. The accumulators stay inside
+    // the interpreter and are frozen onto the run here: assigning a still-growing list would
+    // leave the run aliasing a buffer that keeps changing behind its change-detection door.
     private static void FinalizeMerge(InterpreterState interpreter)
     {
         if (interpreter.PendingMerge is { } run && interpreter.MergeBytes.Count > 0)
         {
             var text = interpreter.MergeText.ToString();
-            run.SourceBytes = [.. interpreter.MergeBytes];
+            run.SourceBytes = interpreter.MergeBytes.ToArray();
             run.Text = text;
             run.SourceText = text;
+            run.SourceAdjustments = [.. interpreter.MergeAdjustments!];
         }
 
         interpreter.PendingMerge = null;
@@ -184,7 +187,7 @@ internal static class ContentInterpreter
                 break;
 
             case "d":
-                state.DashArray = [.. interpreter.ArrayNumbers];
+                state.DashArray = interpreter.ArrayNumbers.ToArray();
                 state.DashPhase = LastNumber(operands);
                 break;
 
@@ -523,7 +526,7 @@ internal static class ContentInterpreter
         // same origin, fold consecutive shows that share the text matrix and text state
         // into one run: a single combined show operator lets the renderer advance between
         // the chunks using the font's own widths.
-        if (pendingMerge is { SourceBytes: not null, SourceText: not null }
+        if (pendingMerge is { SourceBytes: { } pendingBytes, SourceText: not null }
             && pendingMerge.Transform == transform
             && pendingMerge.FontResourceName == text.FontName
             && pendingMerge.Font.Size == text.FontSize
@@ -538,12 +541,11 @@ internal static class ContentInterpreter
             // run per show. FinalizeMerge writes the result back when the chain ends.
             if (interpreter.MergeBytes.Count == 0)
             {
-                interpreter.MergeBytes.AddRange(pendingMerge.SourceBytes);
+                interpreter.MergeBytes.AddRange(pendingBytes.ToArray());
                 interpreter.MergeText.Append(pendingMerge.SourceText);
                 interpreter.MergeAdjustments = pendingMerge.SourceAdjustments is { } existing
                     ? [.. existing]
-                    : [new TextAdjustment(pendingMerge.SourceBytes, 0)];
-                pendingMerge.SourceAdjustments = interpreter.MergeAdjustments;
+                    : [new TextAdjustment(pendingBytes.ToArray(), 0)];
             }
 
             interpreter.MergeAdjustments!.AddRange(tjSegments ?? [new TextAdjustment(bytes, 0)]);
@@ -563,7 +565,7 @@ internal static class ContentInterpreter
             SourceFont = text.Font,
             // Only carry the TJ array when it holds a numeric adjustment; a plain string
             // (Tj or a single-element TJ) re-emits through the simpler Tj path unchanged.
-            SourceAdjustments = HasAdjustment(tjSegments) ? tjSegments : null,
+            SourceAdjustments = HasAdjustment(tjSegments) ? [.. tjSegments!] : null,
             Color = state.Fill,
             FillPaint = state.FillPaint,
             WordSpacing = text.WordSpacing,
@@ -727,7 +729,7 @@ internal static class ContentInterpreter
 
         public string? StrokeColorSpace { get; set; }
 
-        public double[]? DashArray { get; set; }
+        public ReadOnlyMemory<double>? DashArray { get; set; }
 
         public double DashPhase { get; set; }
 

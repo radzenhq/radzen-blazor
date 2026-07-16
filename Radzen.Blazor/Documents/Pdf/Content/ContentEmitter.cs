@@ -1,3 +1,4 @@
+using System;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
 
@@ -313,7 +314,7 @@ internal static class ContentEmitter
                 writer.WriteRaw(" ");
             }
 
-            writer.WriteString(bytes[(g * glyphWidth)..((g + 1) * glyphWidth)]);
+            writer.WriteString(bytes.AsSpan(g * glyphWidth, glyphWidth));
         }
 
         writer.WriteRaw("] TJ\n");
