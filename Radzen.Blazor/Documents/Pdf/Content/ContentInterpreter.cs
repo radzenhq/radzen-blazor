@@ -14,9 +14,9 @@ namespace Radzen.Documents.Pdf.Content;
 // painted element. The inverse of the C3 emitter.
 internal static class ContentInterpreter
 {
-    public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null)
+    public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null, ContentTokenizer.Cache? cache = null)
     {
-        var tokens = ContentTokenizer.Tokenize(content);
+        var tokens = ContentTokenizer.Tokenize(content, cache);
         var interpreter = new InterpreterState();
 
         for (var i = 0; i < tokens.Count; i++)

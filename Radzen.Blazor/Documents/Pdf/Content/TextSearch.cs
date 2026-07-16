@@ -187,14 +187,14 @@ internal static class TextSearch
     private const double SpaceGapEm = 0.2;
     private const double TjSpaceThreshold = 200.0;
 
-    public static IReadOnlyList<PositionedTextRun> Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts)
+    public static IReadOnlyList<PositionedTextRun> Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache = null)
     {
-        var runs = Parse(content, fonts);
+        var runs = Parse(content, fonts, cache);
         Sort(runs);
         return runs;
     }
 
-    public static IReadOnlyList<TextHit> Find(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, string text, TextSearchOptions? options, int pageIndex)
+    public static IReadOnlyList<TextHit> Find(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, string text, TextSearchOptions? options, int pageIndex, ContentTokenizer.Cache? cache = null)
     {
         ArgumentNullException.ThrowIfNull(text);
         if (text.Length == 0)
@@ -203,7 +203,7 @@ internal static class TextSearch
         }
 
         options ??= new TextSearchOptions();
-        var runs = Parse(content, fonts);
+        var runs = Parse(content, fonts, cache);
         Sort(runs);
         var composed = Compose(runs);
         var needle = options.NormalizeWhitespace ? Normalize(text).Text : text;
@@ -276,7 +276,7 @@ internal static class TextSearch
         return new TextBounds(left, bottom, right, top);
     }
 
-    private static List<PositionedTextRun> Parse(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts)
+    private static List<PositionedTextRun> Parse(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)
     {
         if (content is null || content.Length == 0)
         {
@@ -286,7 +286,7 @@ internal static class TextSearch
         var runs = new List<PositionedTextRun>();
         ContentTextWalker.Walk(content, fonts, (walker, op, operands, array, operatorIndex) => op == "TJ"
             ? ShowArray(runs, array, walker, operatorIndex)
-            : Show(runs, operands, walker, operatorIndex));
+            : Show(runs, operands, walker, operatorIndex), cache);
         return runs;
     }
 

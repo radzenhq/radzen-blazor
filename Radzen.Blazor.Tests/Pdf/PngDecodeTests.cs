@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -126,6 +127,72 @@ public class PngDecodeTests
     {
         var png = BuildInterlacedPngHeader();
         Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(png));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(17)]
+    public void SplitIdat_DecodesSameSamplesAsSingleChunk(int chunkSize)
+    {
+        var idat = RgbIdat();
+        var expected = ImageDecoder.Decode(BuildRgbPng([idat]));
+        var actual = ImageDecoder.Decode(BuildRgbPng(SplitIntoChunks(idat, chunkSize)));
+
+        Assert.Equal(
+            FlateFilter.Decode(expected.Image.Data.ToArray()),
+            FlateFilter.Decode(actual.Image.Data.ToArray()));
+    }
+
+    [Fact]
+    public void NoIdat_Throws()
+    {
+        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(BuildRgbPng([])));
+    }
+
+    private static byte[] RgbIdat()
+    {
+        // 4x4 truecolor: each scanline is a zero filter byte plus 4 RGB pixels.
+        var raw = new byte[4 * (1 + (4 * 3))];
+        for (int i = 0; i < raw.Length; i++)
+        {
+            raw[i] = (byte)(i * 7);
+        }
+
+        for (int y = 0; y < 4; y++)
+        {
+            raw[y * 13] = 0;
+        }
+
+        return Deflate(raw);
+    }
+
+    private static byte[][] SplitIntoChunks(byte[] data, int chunkSize)
+    {
+        var chunks = new List<byte[]>();
+        for (int offset = 0; offset < data.Length; offset += chunkSize)
+        {
+            chunks.Add(data[offset..Math.Min(offset + chunkSize, data.Length)]);
+        }
+
+        return [.. chunks];
+    }
+
+    private static byte[] BuildRgbPng(byte[][] idatChunks)
+    {
+        using var ms = new MemoryStream();
+        ms.Write([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
+
+        byte[] ihdr = [0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x04, 0x08, 0x02, 0x00, 0x00, 0x00];
+        WriteChunk(ms, "IHDR", ihdr);
+
+        foreach (var chunk in idatChunks)
+        {
+            WriteChunk(ms, "IDAT", chunk);
+        }
+
+        WriteChunk(ms, "IEND", []);
+        return ms.ToArray();
     }
 
     private static byte[] BuildInterlacedPngHeader()

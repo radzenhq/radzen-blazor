@@ -90,23 +90,45 @@ public sealed class FormField
         return string.Join("\n", parts);
     }
 
-    // A PDF text string (ISO 32000 7.9.2.2) whose raw bytes start with the FE FF byte
-    // order mark is UTF-16BE; otherwise the bytes are PDFDocEncoding/Latin1, which
-    // StringObject.Value already exposes verbatim as chars 0-255.
+    private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, throwOnInvalidBytes: true);
+
+    // A PDF text string (ISO 32000 7.9.2.2) is UTF-16BE when prefixed FE FF, or UTF-8
+    // when prefixed EF BB BF (ISO 32000-2); otherwise it is PDFDocEncoding/Latin1, which
+    // StringObject.Value already exposes verbatim as chars 0-255. Both prefixes are
+    // themselves PDFDocEncodable ("þÿ", "ï»¿") and the spec resolves that by fiat: the
+    // prefix wins. The strict-UTF8 fallback only covers the residual case where the
+    // prefix is real Latin1 text, which a malformed UTF-8 remainder reveals.
     internal static string DecodeTextString(string raw)
     {
-        if (raw.Length < 2 || raw[0] != 0xFE || raw[1] != 0xFF)
+        if (raw.Length >= 2 && raw[0] == 0xFE && raw[1] == 0xFF)
         {
-            return raw;
+            return Encoding.BigEndianUnicode.GetString(ToBytes(raw, 2));
         }
 
-        var bytes = new byte[raw.Length - 2];
+        if (raw.Length >= 3 && raw[0] == 0xEF && raw[1] == 0xBB && raw[2] == 0xBF)
+        {
+            try
+            {
+                return StrictUtf8.GetString(ToBytes(raw, 3));
+            }
+            catch (DecoderFallbackException)
+            {
+                return raw;
+            }
+        }
+
+        return raw;
+    }
+
+    private static byte[] ToBytes(string raw, int start)
+    {
+        var bytes = new byte[raw.Length - start];
         for (var i = 0; i < bytes.Length; i++)
         {
-            bytes[i] = (byte)raw[i + 2];
+            bytes[i] = (byte)raw[i + start];
         }
 
-        return Encoding.BigEndianUnicode.GetString(bytes);
+        return bytes;
     }
 
     /// <summary>

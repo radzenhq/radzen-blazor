@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -177,6 +178,67 @@ public class TableOfContentsTests
         {
             Assert.Matches(new Regex($@"Chapter {i}\s*\.{{3,}}\s*{tocPageCount + 1 + i}\b"), text);
         }
+    }
+
+    // The page numbers form a real column: every entry's number starts at the same x
+    // regardless of how far its leader run reaches.
+    [Fact]
+    public void Toc_PageNumbers_ShareOneRightAlignedColumn()
+    {
+        var builder = new DocumentBuilder();
+        var front = builder.Sections.Add();
+        front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
+        front.Margin = Unit.FromPoint(40);
+        var toc = front.Blocks.AddTableOfContents();
+        foreach (var (text, anchor) in new[]
+        {
+            ("Chapter One", "ch1"),
+            ("A Considerably Longer Chapter Title Here", "ch2"),
+            ("Mid", "ch3"),
+        })
+        {
+            toc.AddEntry(text, anchor);
+            var section = builder.Sections.Add();
+            section.PageSize = front.PageSize;
+            section.Margin = Unit.FromPoint(40);
+            var paragraph = new Paragraph();
+            paragraph.Inlines.Add("Body " + anchor).Anchor = anchor;
+            section.Blocks.Add(paragraph);
+        }
+
+        var content = CascadeTestSupport.FirstPageContent(builder);
+
+        var numberX = Regex.Matches(content, @"(-?[\d.]+) (?:-?[\d.]+) Td\s*\((\d+)\) Tj")
+            .Select(m => double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture))
+            .ToList();
+
+        Assert.Equal(3, numberX.Count);
+        Assert.All(numberX, x => Assert.Equal(numberX[0], x, 3));
+    }
+
+    [Fact]
+    public void Toc_WithoutExplicitFont_InheritsNormalStyleFont()
+    {
+        var builder = ChapterDocument();
+        builder.Styles.Normal.Font.Size = 14;
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(14.0, sizes);
+        Assert.DoesNotContain(10.0, sizes);
+    }
+
+    [Fact]
+    public void Toc_ExplicitFont_WinsOverNormalStyleFont()
+    {
+        var builder = ChapterDocument();
+        builder.Styles.Normal.Font.Size = 14;
+        ((TableOfContents)builder.Sections[0].Blocks[0]).Font.Size = 8;
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+
+        Assert.Contains(8.0, sizes);
+        Assert.DoesNotContain(14.0, sizes);
     }
 
     [Fact]

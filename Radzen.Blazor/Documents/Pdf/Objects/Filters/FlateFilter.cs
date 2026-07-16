@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
@@ -8,19 +9,26 @@ internal static class FlateFilter
 {
     public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decompressed size so a compression bomb aborts with a
-    // recoverable DocumentParseException instead of exhausting memory. A fixed-size
-    // read loop is used rather than CopyTo so the cap is checked before each grow.
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
 
+        return Decode(data.AsMemory(), maxOutput);
+    }
+
+    public static byte[] Decode(ReadOnlyMemory<byte> data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
+
+    // maxOutput bounds the decompressed size so a compression bomb aborts with a
+    // recoverable DocumentParseException instead of exhausting memory. A fixed-size
+    // read loop is used rather than CopyTo so the cap is checked before each grow.
+    public static byte[] Decode(ReadOnlyMemory<byte> data, long maxOutput)
+    {
         if (data.Length == 0)
         {
             throw new InvalidDataException("Empty stream is not a valid zlib stream.");
         }
 
-        using var input = new MemoryStream(data);
+        using var input = AsStream(data);
         using var zlib = new ZLibStream(input, CompressionMode.Decompress);
         using var output = new PooledBufferStream((int)Math.Min((long)data.Length * 4, 1 << 20));
         var buffer = new byte[64 * 1024];
@@ -37,6 +45,13 @@ internal static class FlateFilter
 
         return output.ToArray();
     }
+
+    // Array-backed memory - every caller in practice - is inflated in place; only an
+    // exotic MemoryManager-backed segment pays for a copy.
+    private static MemoryStream AsStream(ReadOnlyMemory<byte> data)
+        => MemoryMarshal.TryGetArray(data, out var segment)
+            ? new MemoryStream(segment.Array!, segment.Offset, segment.Count, writable: false)
+            : new MemoryStream(data.ToArray(), writable: false);
 
     public static byte[] Encode(byte[] data)
     {

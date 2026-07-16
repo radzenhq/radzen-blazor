@@ -29,6 +29,30 @@ internal static class ContentTokenizer
 
     internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes, int Start, int End);
 
+    // One tokenization shared by the consumers of a single Find/Replace/Redact/materialize
+    // operation, which otherwise re-tokenize identical bytes up to three times. Scoped to the
+    // call that creates it: a longer-lived cache would trade transient churn for retention.
+    // Reference identity is the key, so an edit that swaps the byte[] cannot hit a stale entry;
+    // one slot is enough because an operation only ever moves forward onto its edited bytes.
+    internal sealed class Cache
+    {
+        private byte[]? source;
+        private List<Token>? tokens;
+
+        public List<Token> Get(byte[] data)
+        {
+            if (!ReferenceEquals(source, data))
+            {
+                source = data;
+                tokens = Tokenize(data);
+            }
+
+            return tokens!;
+        }
+    }
+
+    public static List<Token> Tokenize(byte[] data, Cache? cache) => cache is null ? Tokenize(data) : cache.Get(data);
+
     public static List<Token> Tokenize(byte[] data)
     {
         var tokens = new List<Token>();

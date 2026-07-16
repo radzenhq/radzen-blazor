@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -42,6 +43,38 @@ internal sealed class PngImageDecoder : IImageDecoder
         return true;
     }
 
+    // A lone IDAT chunk - the overwhelmingly common case - is inflated straight out of the
+    // source buffer; only a split payload has to be joined, and then at its exact size.
+    private static ReadOnlyMemory<byte> JoinIdat(byte[] data, List<Range>? chunks)
+    {
+        if (chunks is null)
+        {
+            return ReadOnlyMemory<byte>.Empty;
+        }
+
+        if (chunks.Count == 1)
+        {
+            return data.AsMemory(chunks[0]);
+        }
+
+        var total = 0;
+        foreach (var chunk in chunks)
+        {
+            total += chunk.End.Value - chunk.Start.Value;
+        }
+
+        var joined = new byte[total];
+        var offset = 0;
+        foreach (var chunk in chunks)
+        {
+            var span = data.AsSpan(chunk);
+            span.CopyTo(joined.AsSpan(offset));
+            offset += span.Length;
+        }
+
+        return joined;
+    }
+
     private static ImageXObject DecodePng(byte[] data, ReaderLimits limits)
     {
         var width = 0;
@@ -50,7 +83,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         var colorType = 0;
         byte[]? palette = null;
         byte[]? transparency = null;
-        using var idat = new MemoryStream();
+        List<Range>? idat = null;
 
         long pos = PngSignature.Length;
         while (pos + 8 <= data.Length)
@@ -93,7 +126,7 @@ internal sealed class PngImageDecoder : IImageDecoder
                     transparency = data[start..(start + count)];
                     break;
                 case "IDAT":
-                    idat.Write(data, start, count);
+                    (idat ??= []).Add(new Range(start, start + count));
                     break;
                 case "IEND":
                     pos = data.Length;
@@ -117,7 +150,7 @@ internal sealed class PngImageDecoder : IImageDecoder
 
         ValidatePngBitDepth(colorType, bitDepth);
 
-        var compressed = idat.ToArray();
+        var compressed = JoinIdat(data, idat);
         var raw = FlateFilter.Decode(compressed, limits.MaxDecodedStreamBytes);
 
         // Secondary compression-bomb guard mirroring DocumentReader: a tiny IDAT that inflates
