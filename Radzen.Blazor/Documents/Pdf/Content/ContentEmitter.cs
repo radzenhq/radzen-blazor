@@ -1,6 +1,37 @@
 using System;
+using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
+
+// The operands of one BT..ET text show. Capability differences between callers are values
+// here (an unset one emits nothing), not separate emit paths.
+internal readonly struct TextShowOp
+{
+    public required string FontKey { get; init; }
+    public required double Size { get; init; }
+    public required double X { get; init; }
+    public required double Baseline { get; init; }
+    public Color Color { get; init; }
+    public DeviceColor? FillPaint { get; init; }
+    public double CharSpacing { get; init; }
+    public double WordSpacing { get; init; }
+    public double HorizontalScale { get; init; }
+    public double Rise { get; init; }
+    public int RenderMode { get; init; }
+    public double StrokeWidth { get; init; }
+    public double Shear { get; init; }
+
+    // The show payload, already prepared by the caller: Adjustments wins (verbatim TJ array),
+    // else Kerns (per-pair kerned TJ over Bytes), else a plain Tj of Bytes.
+    public ReadOnlyMemory<byte> Bytes { get; init; }
+    public double[]? Kerns { get; init; }
+    public int GlyphWidth { get; init; }
+    public ImmutableArray<TextAdjustment>? Adjustments { get; init; }
+
+    // Emits the trailing 0 Tr / 0 Tc / 0 Tw / 100 Tz / 0 Ts resets. The loaded-content path
+    // leaves the state set, so re-emitted bytes match what was read.
+    public bool ResetTextState { get; init; }
+}
 
 // Pure byte-writing helpers: given a ContentWriter and a draw command, they emit the
 // operators for that command. No state, so they stay static and shared across pages.
@@ -149,55 +180,86 @@ internal static class ContentEmitter
             WriteClip(writer, clip, text.ClipRadius);
         }
 
+        WriteTextShow(writer, new TextShowOp
+        {
+            FontKey = text.Font.Key,
+            Size = text.Size,
+            X = text.X,
+            Baseline = text.Baseline,
+            Color = text.Color,
+            FillPaint = text.FillPaint,
+            CharSpacing = text.CharSpacing,
+            WordSpacing = text.WordSpacing,
+            HorizontalScale = text.HorizontalScale,
+            Rise = text.Rise,
+            RenderMode = text.RenderMode,
+            StrokeWidth = text.StrokeWidth,
+            Shear = text.Shear,
+            Bytes = RemapBytes(text),
+            Kerns = text.Kerns,
+            GlyphWidth = text.Font.Base14 is not null ? 1 : 2,
+            ResetTextState = true,
+        });
+
+        if (wrapped)
+        {
+            writer.WriteRaw("Q\n");
+        }
+    }
+
+    // The single BT..ET text-show skeleton. Callers own their own wrapper (q/gs/cm/clip) and
+    // their own payload preparation; everything between BT and ET is emitted here so the
+    // operator order and the state-reset discipline exist once.
+    public static void WriteTextShow(ContentWriter writer, in TextShowOp op)
+    {
         writer.WriteRaw("BT\n");
-        if (text.FillPaint is { } fillPaint)
+        if (op.FillPaint is { } fillPaint)
         {
             WriteDeviceColor(writer, fillPaint, stroke: false);
         }
         else
         {
-            writer.WriteColor(text.Color, "rg");
+            writer.WriteColor(op.Color, "rg");
         }
 
-        writer.WriteName(text.Font.Key);
+        writer.WriteName(op.FontKey);
         writer.WriteRaw(" ");
-        writer.WriteNumber(text.Size);
+        writer.WriteNumber(op.Size);
         writer.WriteRaw(" Tf\n");
-        if (text.CharSpacing != 0)
+        if (op.CharSpacing != 0)
         {
-            writer.WriteNumber(text.CharSpacing);
+            writer.WriteNumber(op.CharSpacing);
             writer.WriteRaw(" Tc\n");
         }
 
-        var wordSpacing = text.WordSpacing != 0;
-        if (wordSpacing)
+        if (op.WordSpacing != 0)
         {
-            writer.WriteNumber(text.WordSpacing);
+            writer.WriteNumber(op.WordSpacing);
             writer.WriteRaw(" Tw\n");
         }
 
-        // 0 (the struct default for draws that never set it) means "unchanged"; only a
-        // genuinely non-100 scale emits Tz, so default text stays byte identical.
-        var horizontalScale = text.HorizontalScale != 0 && text.HorizontalScale != 100;
+        // 0 (the default for draws that never set it) means "unchanged"; only a genuinely
+        // non-100 scale emits Tz, so default text stays byte identical.
+        var horizontalScale = op.HorizontalScale != 0 && op.HorizontalScale != 100;
         if (horizontalScale)
         {
-            writer.WriteNumber(text.HorizontalScale);
+            writer.WriteNumber(op.HorizontalScale);
             writer.WriteRaw(" Tz\n");
         }
 
-        if (text.Rise != 0)
+        if (op.Rise != 0)
         {
-            writer.WriteNumber(text.Rise);
+            writer.WriteNumber(op.Rise);
             writer.WriteRaw(" Ts\n");
         }
 
         // Synthetic bold draws in fill+stroke (mode 2); an explicit invisible/other mode
         // wins. Both reset to 0 Tr after the show since Tr persists across BT/ET.
-        var renderMode = text.RenderMode != 0 ? text.RenderMode : text.StrokeWidth > 0 ? 2 : 0;
-        if (text.StrokeWidth > 0 && renderMode == 2)
+        var renderMode = op.RenderMode != 0 ? op.RenderMode : op.StrokeWidth > 0 ? 2 : 0;
+        if (op.StrokeWidth > 0 && renderMode == 2)
         {
-            writer.WriteColor(text.Color, "RG");
-            writer.WriteNumber(text.StrokeWidth);
+            writer.WriteColor(op.Color, "RG");
+            writer.WriteNumber(op.StrokeWidth);
             writer.WriteRaw(" w\n");
         }
 
@@ -207,64 +269,85 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tr\n");
         }
 
-        if (text.Shear != 0)
+        if (op.Shear != 0)
         {
             writer.WriteRaw("1 0 ");
-            writer.WriteNumber(text.Shear);
+            writer.WriteNumber(op.Shear);
             writer.WriteRaw(" 1 ");
-            writer.WriteNumber(text.X);
+            writer.WriteNumber(op.X);
             writer.WriteRaw(" ");
-            writer.WriteNumber(text.Baseline);
+            writer.WriteNumber(op.Baseline);
             writer.WriteRaw(" Tm\n");
         }
         else
         {
-            writer.WriteNumber(text.X);
+            writer.WriteNumber(op.X);
             writer.WriteRaw(" ");
-            writer.WriteNumber(text.Baseline);
+            writer.WriteNumber(op.Baseline);
             writer.WriteRaw(" Td\n");
         }
 
-        if (text.Kerns is { } kerns)
+        WriteShow(writer, op);
+        if (op.ResetTextState)
         {
-            WriteKernedShow(writer, RemapBytes(text), kerns, text.Font.Base14 is not null ? 1 : 2);
-        }
-        else
-        {
-            writer.WriteString(RemapBytes(text));
-            writer.WriteRaw(" Tj\n");
-        }
+            if (renderMode != 0)
+            {
+                writer.WriteRaw("0 Tr\n");
+            }
 
-        if (renderMode != 0)
-        {
-            writer.WriteRaw("0 Tr\n");
-        }
+            // Tc/Ts/Tw/Tz persist across BT/ET, so non-default values are reset after the show.
+            if (op.CharSpacing != 0)
+            {
+                writer.WriteRaw("0 Tc\n");
+            }
 
-        // Tc/Ts/Tw/Tz persist across BT/ET, so non-default values are reset after the show.
-        if (text.CharSpacing != 0)
-        {
-            writer.WriteRaw("0 Tc\n");
-        }
+            if (op.WordSpacing != 0)
+            {
+                writer.WriteRaw("0 Tw\n");
+            }
 
-        if (wordSpacing)
-        {
-            writer.WriteRaw("0 Tw\n");
-        }
+            if (horizontalScale)
+            {
+                writer.WriteRaw("100 Tz\n");
+            }
 
-        if (horizontalScale)
-        {
-            writer.WriteRaw("100 Tz\n");
-        }
-
-        if (text.Rise != 0)
-        {
-            writer.WriteRaw("0 Ts\n");
+            if (op.Rise != 0)
+            {
+                writer.WriteRaw("0 Ts\n");
+            }
         }
 
         writer.WriteRaw("ET\n");
-        if (wrapped)
+    }
+
+    private static void WriteShow(ContentWriter writer, in TextShowOp op)
+    {
+        if (op.Adjustments is { } segments)
         {
-            writer.WriteRaw("Q\n");
+            writer.WriteRaw("[");
+            foreach (var segment in segments)
+            {
+                if (segment.Text is not null)
+                {
+                    writer.WriteString(segment.Text);
+                }
+                else
+                {
+                    writer.WriteNumber(segment.Adjustment);
+                    writer.WriteRaw(" ");
+                }
+            }
+
+            writer.WriteRaw("] TJ\n");
+        }
+        else if (op.Kerns is { } kerns)
+        {
+            WriteKernedShow(writer, op.Bytes.Span, kerns, op.GlyphWidth);
+        }
+        else
+        {
+            writer.WriteString(op.Bytes.Span);
+            writer.WriteRaw(" Tj\n");
         }
     }
 
@@ -302,7 +385,7 @@ internal static class ContentEmitter
     // Shows a glyph string as a TJ array with per-pair kern adjustments interleaved: each
     // kern is a TJ number (positive tightens) placed between adjacent glyph codes. Glyph
     // codes are 2 bytes for embedded Type0 subsets and 1 byte for WinAnsi base-14 faces.
-    private static void WriteKernedShow(ContentWriter writer, byte[] bytes, double[] kerns, int glyphWidth)
+    private static void WriteKernedShow(ContentWriter writer, ReadOnlySpan<byte> bytes, double[] kerns, int glyphWidth)
     {
         writer.WriteRaw("[");
         var glyphs = bytes.Length / glyphWidth;
@@ -314,7 +397,7 @@ internal static class ContentEmitter
                 writer.WriteRaw(" ");
             }
 
-            writer.WriteString(bytes.AsSpan(g * glyphWidth, glyphWidth));
+            writer.WriteString(bytes.Slice(g * glyphWidth, glyphWidth));
         }
 
         writer.WriteRaw("] TJ\n");

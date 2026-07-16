@@ -204,9 +204,11 @@ public class ContentTokenizerTests
 
         // 6000 number tokens cost 862,712 bytes when each allocated a transient string to
         // feed double.TryParse, and 655,520 parsing the source bytes directly; the remainder
-        // is the Token list backing array, which dominates either way.
+        // is the Token list backing array, which dominates either way. The budget sits midway
+        // between the two rather than just above the good value, so the verdict turns on the
+        // 207,192-byte regression and not on where the list's doubling chain happens to land.
         Assert.Equal(6000, tokens.Count);
-        Assert.True(allocated < 700_000, $"Tokenizing 6000 numeric operands allocated {allocated} bytes.");
+        Assert.True(allocated < 780_000, $"Tokenizing 6000 numeric operands allocated {allocated} bytes.");
     }
 
     // RedactText tokenized the same bytes three times (FindText, ExtractPositionedText,

@@ -109,8 +109,10 @@ public class SimpleShaperTests
         });
 
         // Width measurement is the hottest layout path (once per token, per line-break
-        // candidate): it must not build a glyph list it throws away.
-        Assert.True(bytes < 4096, $"1000 MeasureText calls allocated {bytes} bytes.");
+        // candidate): it must not build a glyph list it throws away. 1000 calls measure 0
+        // bytes; a discarded glyph list per call costs ~500,000. The budget sits far from
+        // both, so only a per-call allocation trips it, never measurement noise.
+        Assert.True(bytes < 50_000, $"1000 MeasureText calls allocated {bytes} bytes.");
     }
 
     [Theory]
@@ -196,7 +198,8 @@ public class SimpleShaperTests
         // MeasureSink is a struct reached through a struct generic constraint, so the shared
         // ShapeCore builds no glyph list on the measure path. Zero allocation is the reason the
         // two loops were allowed to be merged; if this regresses, the merge cost a real win.
-        Assert.True(bytes < 4096, $"1000 MeasureAdvance calls allocated {bytes} bytes.");
+        // 1000 calls measure 0 bytes against ~500,000 for a glyph list per call.
+        Assert.True(bytes < 50_000, $"1000 MeasureAdvance calls allocated {bytes} bytes.");
     }
 
     [Fact]

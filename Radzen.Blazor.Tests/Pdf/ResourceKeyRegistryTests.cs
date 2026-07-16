@@ -1,0 +1,89 @@
+#nullable enable
+
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Emit;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// The registry mints the prefix+ordinal resource keys that land in emitted bytes, so the
+// numbering it produces is a byte-fidelity contract, not an implementation detail.
+public class ResourceKeyRegistryTests
+{
+    private static PagePlan Plan() => new() { Size = PageSizes.A4 };
+
+    private static GeneratedSoftMask Mask(string? contentKey) => new()
+    {
+        Type = SoftMaskType.Luminosity,
+        Group = new GeneratedTransparencyGroup { Content = [], BBox = [0, 0, 1, 1] },
+        ContentKey = contentKey,
+    };
+
+    [Fact]
+    public void PlainAndSoftMaskStates_ShareOneGsCounter()
+    {
+        var plan = Plan();
+
+        Assert.Equal("GS0", plan.RegisterExtGState(0.5, 0.5));
+        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask("a")));
+        Assert.Equal("GS2", plan.RegisterExtGState(0.25, 0.25));
+
+        // Both domains dedup against their own identity without consuming an ordinal.
+        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask("a")));
+        Assert.Equal("GS0", plan.RegisterExtGState(0.5, 0.5));
+
+        Assert.Equal("GS3", plan.RegisterSoftMaskExtGState(1, 1, Mask("b")));
+        Assert.Equal(4, plan.ExtGStates.Count);
+    }
+
+    [Fact]
+    public void SoftMaskWithoutContentKey_AppendsAFreshStatePerCall()
+    {
+        var plan = Plan();
+
+        Assert.Equal("GS0", plan.RegisterSoftMaskExtGState(1, 1, Mask(null)));
+        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask(null)));
+        Assert.Equal(2, plan.ExtGStates.Count);
+    }
+
+    // A soft-mask state must never be handed back to a plain registration: it carries an /SMask
+    // the caller did not ask for.
+    [Fact]
+    public void PlainState_NeverReusesASoftMaskStateWithEqualAlpha()
+    {
+        var plan = Plan();
+        var mask = plan.RegisterSoftMaskExtGState(0.5, 0.5, Mask("a"));
+
+        Assert.NotEqual(mask, plan.RegisterExtGState(0.5, 0.5));
+    }
+
+    [Fact]
+    public void EqualGradientInstances_StayDistinctPatterns()
+    {
+        var plan = Plan();
+        var first = new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+        var second = new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+
+        Assert.Equal("P0", plan.RegisterPattern(first));
+        Assert.Equal("P0", plan.RegisterPattern(first));
+        Assert.Equal("P1", plan.RegisterPattern(second));
+    }
+
+    // Reproduces the IEEE `==` dedup the opacity linear scan had: -0 and 0 are one entry.
+    [Fact]
+    public void NegativeZeroOpacity_SharesTheZeroEntry()
+    {
+        using var writer = new ContentWriter();
+
+        Assert.Equal(writer.RegisterOpacity(0.0), writer.RegisterOpacity(-0.0));
+    }
+
+    [Fact]
+    public void NanOpacity_NeverDedupsAgainstItself()
+    {
+        using var writer = new ContentWriter();
+
+        Assert.NotEqual(writer.RegisterOpacity(double.NaN), writer.RegisterOpacity(double.NaN));
+    }
+}
