@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
+using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -33,8 +34,6 @@ public sealed class ReplaceTextOptions
 internal static class TextReplacer
 {
     private sealed record Show(int Index, string Operator, Token Text, string? FontName, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
-
-    private readonly record struct Edit(int Start, int End, byte[] Bytes);
 
     private readonly record struct SourceReplacement(TextSourceReference Source, string Replacement);
 
@@ -81,7 +80,7 @@ internal static class TextReplacer
             references.Add(source);
         }
 
-        var edits = new List<Edit>(grouped.Count);
+        var edits = new List<ContentEdit>(grouped.Count);
         foreach (var group in grouped)
         {
             var source = group.Value[0];
@@ -129,23 +128,16 @@ internal static class TextReplacer
                 writer.WriteRaw(" ");
                 writer.WriteNumber((newAdvance - oldAdvance) / (show.FontSize * show.Scale) * 1000.0);
                 writer.WriteRaw("] TJ");
-                edits.Add(new Edit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray()));
+                edits.Add(new ContentEdit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray()));
             }
             else
             {
                 writer.WriteString(encoded);
-                edits.Add(new Edit(show.Text.Start, show.Text.End, writer.ToArray()));
+                edits.Add(new ContentEdit(show.Text.Start, show.Text.End, writer.ToArray()));
             }
         }
 
-        edits.Sort(static (a, b) => b.Start.CompareTo(a.Start));
-        var result = content;
-        foreach (var edit in edits)
-        {
-            result = Splice(result, edit);
-        }
-
-        page.ApplyEditedContent(result);
+        page.ApplyEditedContent(ContentEdits.Apply(content, edits));
         return hits.Count;
     }
 
@@ -199,7 +191,7 @@ internal static class TextReplacer
             }
         }
 
-        var edits = new List<Edit>(grouped.Count);
+        var edits = new List<ContentEdit>(grouped.Count);
         foreach (var group in grouped)
         {
             var show = shows[group.Key];
@@ -209,14 +201,7 @@ internal static class TextReplacer
             edits.Add(BuildMultipleShowEdit(content, show, decoded, group.Value, options.Layout));
         }
 
-        edits.Sort(static (a, b) => b.Start.CompareTo(a.Start));
-        var result = content;
-        foreach (var edit in edits)
-        {
-            result = Splice(result, edit);
-        }
-
-        page.ApplyEditedContent(result);
+        page.ApplyEditedContent(ContentEdits.Apply(content, edits));
         return hits.Count;
     }
 
@@ -304,7 +289,7 @@ internal static class TextReplacer
         return advance;
     }
 
-    private static Edit BuildMultipleShowEdit(byte[] content, Show show, string decoded,
+    private static ContentEdit BuildMultipleShowEdit(byte[] content, Show show, string decoded,
         IReadOnlyList<SourceReplacement> replacements, TextReplacementLayout layout)
     {
         using var writer = new ContentWriter();
@@ -324,7 +309,7 @@ internal static class TextReplacer
             }
 
             writer.WriteString(encoded);
-            return new Edit(show.Text.Start, show.Text.End, writer.ToArray());
+            return new ContentEdit(show.Text.Start, show.Text.End, writer.ToArray());
         }
 
         var denominator = show.FontSize * show.Scale;
@@ -363,7 +348,7 @@ internal static class TextReplacer
 
         writer.WriteString(trailing);
         writer.WriteRaw("] TJ");
-        return new Edit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray());
+        return new ContentEdit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray());
     }
 
     private static Show GetShow(IReadOnlyList<Show> shows, TextSourceReference source)
@@ -458,7 +443,7 @@ internal static class TextReplacer
                 case "Tj":
                 case "'":
                 case "\"":
-                    var text = LastString(operands);
+                    var text = LastStringToken(operands);
                     if (text is not null)
                     {
                         result.Add(new Show(result.Count, token.Text, text.Value, fontName, font, fontSize, scale, charSpacing, wordSpacing));
@@ -495,11 +480,7 @@ internal static class TextReplacer
                 throw new NotSupportedException($"The source font does not provide a usable width for character code {code.Code}.");
             }
 
-            value += width / 1000.0 * show.FontSize + show.CharSpacing;
-            if (code.IsWordSpace)
-            {
-                value += show.WordSpacing;
-            }
+            value += GlyphMetrics.Advance(width / 1000.0, show.FontSize, show.CharSpacing, show.WordSpacing, code.IsWordSpace);
         }
 
         return value * show.Scale;
@@ -521,51 +502,4 @@ internal static class TextReplacer
         return position + 2;
     }
 
-    private static byte[] Splice(byte[] source, Edit edit)
-    {
-        var result = new byte[source.Length - (edit.End - edit.Start) + edit.Bytes.Length];
-        source.AsSpan(0, edit.Start).CopyTo(result);
-        edit.Bytes.CopyTo(result, edit.Start);
-        source.AsSpan(edit.End).CopyTo(result.AsSpan(edit.Start + edit.Bytes.Length));
-        return result;
-    }
-
-    private static Token? LastString(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.String)
-            {
-                return operands[i];
-            }
-        }
-
-        return null;
-    }
-
-    private static string? LastName(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Name)
-            {
-                return operands[i].Text;
-            }
-        }
-
-        return null;
-    }
-
-    private static double LastNumber(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Number)
-            {
-                return operands[i].Number;
-            }
-        }
-
-        return 0;
-    }
 }

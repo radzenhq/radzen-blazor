@@ -151,7 +151,7 @@ internal static class ContentEmitter
         writer.WriteRaw("BT\n");
         if (text.FillPaint is { } fillPaint)
         {
-            WriteDeviceFill(writer, fillPaint);
+            WriteDeviceColor(writer, fillPaint, stroke: false);
         }
         else
         {
@@ -267,13 +267,14 @@ internal static class ContentEmitter
         }
     }
 
-    // Emits a device fill colour (Gray g, CMYK k or a named colorspace cs+scn) in place of rg.
-    private static void WriteDeviceFill(ContentWriter writer, DeviceColor color)
+    // Emits a device colour (Gray g/G, CMYK k/K or a named colorspace cs+scn / CS+SCN) in
+    // place of rg/RG.
+    public static void WriteDeviceColor(ContentWriter writer, DeviceColor color, bool stroke)
     {
         if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
         {
             writer.WriteName(name);
-            writer.WriteRaw(" cs\n");
+            writer.WriteRaw(stroke ? " CS\n" : " cs\n");
         }
 
         foreach (var operand in color.Operands)
@@ -290,9 +291,9 @@ internal static class ContentEmitter
 
         writer.WriteRaw(color.Kind switch
         {
-            DeviceColorKind.Named => "scn",
-            DeviceColorKind.Gray => "g",
-            _ => "k",
+            DeviceColorKind.Named => stroke ? "SCN" : "scn",
+            DeviceColorKind.Gray => stroke ? "G" : "g",
+            _ => stroke ? "K" : "k",
         });
         writer.WriteRaw("\n");
     }

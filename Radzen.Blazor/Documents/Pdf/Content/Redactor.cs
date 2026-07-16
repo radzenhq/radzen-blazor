@@ -15,8 +15,6 @@ public sealed class RedactionOptions
 
 internal static class Redactor
 {
-    private readonly record struct Edit(int Start, int End, byte[] Bytes);
-
     public static int RedactText(Page page, string text, TextSearchOptions? searchOptions, RedactionOptions? redactionOptions)
     {
         var hits = page.FindText(text, searchOptions);
@@ -122,7 +120,7 @@ internal static class Redactor
 
     private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected)
     {
-        var edits = new List<Edit>();
+        var edits = new List<ContentEdit>();
         var operandsStart = -1;
         var arrayStart = -1;
         var showIndex = 0;
@@ -160,7 +158,7 @@ internal static class Redactor
                         throw new FormatException("The text-show operator has no valid operand.");
                     }
 
-                    edits.Add(new Edit(start, token.End, BuildRedactedShow(selection.Run, selection.Removed)));
+                    edits.Add(new ContentEdit(start, token.End, BuildRedactedShow(selection.Run, selection.Removed)));
                 }
 
                 showIndex++;
@@ -170,18 +168,7 @@ internal static class Redactor
             arrayStart = -1;
         }
 
-        edits.Sort(static (a, b) => b.Start.CompareTo(a.Start));
-        var result = source;
-        foreach (var edit in edits)
-        {
-            var next = new byte[result.Length - (edit.End - edit.Start) + edit.Bytes.Length];
-            result.AsSpan(0, edit.Start).CopyTo(next);
-            edit.Bytes.CopyTo(next, edit.Start);
-            result.AsSpan(edit.End).CopyTo(next.AsSpan(edit.Start + edit.Bytes.Length));
-            result = next;
-        }
-
-        return result;
+        return ContentEdits.Apply(source, edits);
     }
 
     private static byte[] BuildRedactedShow(PositionedTextRun run, IReadOnlyList<bool> removed)
@@ -217,8 +204,7 @@ internal static class Redactor
             }
 
             writer.WriteString(bytes);
-            var nominalAdvance = (width / 1000.0 * run.FontSize + run.CharSpacing
-                + (code.IsWordSpace ? run.WordSpacing : 0.0)) * run.Scale;
+            var nominalAdvance = GlyphMetrics.Advance(width / 1000.0, run.FontSize, run.CharSpacing, run.WordSpacing, code.IsWordSpace) * run.Scale;
             WriteAdvance(writer, desiredAdvance - nominalAdvance, denominator);
         }
 
