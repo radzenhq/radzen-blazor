@@ -186,13 +186,16 @@ public sealed class Page
 
     /// <summary>
     /// Sets the raw content stream for this page. The bytes are stored verbatim
-    /// and written without a compression filter.
+    /// and written without a compression filter. They replace the page's content
+    /// entirely, so <see cref="Content"/> discards any elements parsed from the
+    /// previous bytes and re-parses these on next access.
     /// </summary>
     /// <param name="value">The raw content stream bytes.</param>
     public void SetContent(byte[] value)
     {
         ArgumentNullException.ThrowIfNull(value);
         content = value;
+        ResetMaterialization();
     }
 
     /// <summary>

@@ -14,12 +14,7 @@ public sealed class Image : Block
 
     internal Image(byte[] data) => Data = data;
 
-    internal static Image FromStream(Stream stream)
-    {
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return new Image(buffer.ToArray());
-    }
+    internal static Image FromStream(Stream stream) => new(ImageDecoder.ReadFully(stream));
 
     /// <summary>The buffered image bytes.</summary>
     internal byte[] Data { get; }

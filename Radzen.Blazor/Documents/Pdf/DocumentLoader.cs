@@ -23,7 +23,7 @@ internal static class DocumentLoader
 
         var state = new LoadedState(reader, bytes);
         var document = Document.CreateLoaded(state);
-        ReadInfo(reader, document.Info);
+        state.SourceInfo = ReadInfo(reader, document.Info);
         state.LoadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
@@ -97,20 +97,47 @@ internal static class DocumentLoader
             return buffer;
         }
 
-        using var accumulator = new MemoryStream();
-        var chunk = new byte[81920];
+        // A MemoryStream grows by doubling, so the old and new buffers are both live across
+        // each grow and ToArray() adds a third full-size copy - roughly 3x the file, all on
+        // the LOH for a large one. Chunks stay just under the 85 KB LOH threshold and are
+        // copied out once into an exactly-sized array.
+        const int ChunkSize = 81920;
+        var chunks = new List<(byte[] Buffer, int Length)>();
+        var chunk = new byte[ChunkSize];
+        var filled = 0;
+        var total = 0L;
         int count;
-        while ((count = stream.Read(chunk, 0, chunk.Length)) > 0)
+        while ((count = stream.Read(chunk, filled, chunk.Length - filled)) > 0)
         {
-            if (accumulator.Length + count > limits.MaxFileBytes)
+            filled += count;
+            total += count;
+            if (total > limits.MaxFileBytes || total > int.MaxValue)
             {
                 throw new DocumentParseException("Maximum file size exceeded.", -1);
             }
 
-            accumulator.Write(chunk, 0, count);
+            if (filled == chunk.Length)
+            {
+                chunks.Add((chunk, filled));
+                chunk = new byte[ChunkSize];
+                filled = 0;
+            }
         }
 
-        return accumulator.ToArray();
+        if (filled > 0)
+        {
+            chunks.Add((chunk, filled));
+        }
+
+        var result = new byte[total];
+        var written = 0;
+        foreach (var (buffer, length) in chunks)
+        {
+            Array.Copy(buffer, 0, result, written, length);
+            written += length;
+        }
+
+        return result;
     }
 
     // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
@@ -367,11 +394,11 @@ internal static class DocumentLoader
         return null;
     }
 
-    private static void ReadInfo(DocumentReader reader, DocumentInfo target)
+    private static DictionaryObject? ReadInfo(DocumentReader reader, DocumentInfo target)
     {
         if (reader.GetDictionary(reader.Trailer, "Info") is not { } info)
         {
-            return;
+            return null;
         }
 
         target.Title = Text(reader, info, "Title");
@@ -382,6 +409,7 @@ internal static class DocumentLoader
         target.Producer = Text(reader, info, "Producer");
         target.CreationDate = Date(reader, info, "CreationDate");
         target.ModificationDate = Date(reader, info, "ModDate");
+        return info;
     }
 
     private static DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)

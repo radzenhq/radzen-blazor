@@ -39,6 +39,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         taggedImages.Clear();
         taggedTexts.Clear();
         generatedPage = null;
+        ApplyColorAlpha();
 
         foreach (var phase in OrderedPhases)
         {
@@ -46,6 +47,84 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         }
 
         return generatedPage!;
+    }
+
+    // Color carries an alpha channel but rg/RG are RGB-only, so a translucent colour reaches
+    // the page as a constant-alpha /ExtGState, exactly like Run/Container opacity does (and
+    // multiplying with it). Folded in here, before any phase emits, so every draw type is
+    // covered once - EmitText/EmitImages hand structs to the structure tree, so the draws must
+    // already carry their final state by then.
+    private void ApplyColorAlpha()
+    {
+        for (var i = 0; i < plan.Fills.Count; i++)
+        {
+            var fill = plan.Fills[i];
+
+            // A gradient paints through a pattern, leaving the solid Color (and its alpha)
+            // unused; per-stop alpha would need a luminosity soft mask instead.
+            if (fill.Gradient is null && Translucent(fill.Color, out var alpha))
+            {
+                plan.Fills[i] = fill with { ExtGState = plan.ApplyAlpha(fill.ExtGState, alpha) };
+            }
+        }
+
+        for (var i = 0; i < plan.Edges.Count; i++)
+        {
+            var edge = plan.Edges[i];
+            if (Translucent(edge.Color, out var alpha))
+            {
+                plan.Edges[i] = edge with { ExtGState = plan.ApplyAlpha(edge.ExtGState, alpha) };
+            }
+        }
+
+        for (var i = 0; i < plan.RoundedStrokes.Count; i++)
+        {
+            var rounded = plan.RoundedStrokes[i];
+            if (Translucent(rounded.Color, out var alpha))
+            {
+                plan.RoundedStrokes[i] = rounded with { ExtGState = plan.ApplyAlpha(rounded.ExtGState, alpha) };
+            }
+        }
+
+        for (var i = 0; i < plan.Images.Count; i++)
+        {
+            var image = plan.Images[i];
+            if (image.StencilColor is { } stencil && Translucent(stencil, out var alpha))
+            {
+                plan.Images[i] = image with { ExtGState = plan.ApplyAlpha(image.ExtGState, alpha) };
+            }
+        }
+
+        for (var i = 0; i < plan.Texts.Count; i++)
+        {
+            plan.Texts[i] = WithColorAlpha(plan.Texts[i], 1);
+        }
+
+        if (plan.Watermark is { } watermark)
+        {
+            // The watermark's own gs wraps its texts, and a nested gs replaces /ca rather than
+            // compounding it, so the watermark opacity is multiplied into the text's own state.
+            var outer = watermark.ExtGState is { } key && plan.FindExtGState(key) is { } state
+                ? state.FillAlpha
+                : 1;
+            for (var i = 0; i < watermark.Texts.Count; i++)
+            {
+                watermark.Texts[i] = WithColorAlpha(watermark.Texts[i], outer);
+            }
+        }
+    }
+
+    // A device fill paint overrides Color for the fill operator, so its alpha no longer
+    // describes what is painted (a DeviceColor carries no alpha channel of its own).
+    private TextDraw WithColorAlpha(TextDraw text, double scale)
+        => text.FillPaint is null && Translucent(text.Color, out var alpha)
+            ? text with { ExtGState = plan.ApplyAlpha(text.ExtGState, alpha * scale) }
+            : text;
+
+    private static bool Translucent(Color color, out double alpha)
+    {
+        alpha = color.A / 255.0;
+        return color.A != 255;
     }
 
     private void Emit(ContentPhase phase)

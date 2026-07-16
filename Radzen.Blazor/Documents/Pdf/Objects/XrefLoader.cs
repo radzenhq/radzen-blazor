@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -92,7 +90,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 }
 
                 var entryOffset = ReadLong(ref index);
-                ReadLong(ref index);
+                var entryGeneration = ReadLong(ref index);
                 SkipWhitespace(ref index);
                 var type = data[index];
                 index++;
@@ -100,7 +98,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 if (!entries.ContainsKey(number) && !section.ContainsKey(number))
                 {
                     section[number] = type == (byte)'n'
-                        ? new XrefEntry(1, entryOffset, 0)
+                        ? new XrefEntry(1, entryOffset, entryGeneration)
                         : new XrefEntry(0, 0, 0);
                 }
             }
@@ -233,22 +231,35 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
     {
         SkipWhitespace(ref index);
         var start = index;
+        var negative = false;
         if (index < data.Length && (data[index] == (byte)'+' || data[index] == (byte)'-'))
         {
+            negative = data[index] == (byte)'-';
             index++;
         }
 
+        var digits = index;
+        long value = 0;
         while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
         {
+            // Classic-xref fields are fixed at 10 and 5 digits, but a corrupt file can carry
+            // an arbitrarily long run; long.Parse threw on overflow, so keep failing loudly
+            // rather than silently wrapping into a bogus offset.
+            if (value > (long.MaxValue - (data[index] - '0')) / 10)
+            {
+                throw new DocumentParseException("Integer is out of range.", start);
+            }
+
+            value = (value * 10) + (data[index] - '0');
             index++;
         }
 
-        if (index == start)
+        if (index == digits)
         {
             throw new DocumentParseException("Expected integer.", start);
         }
 
-        return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
+        return negative ? -value : value;
     }
 }
 

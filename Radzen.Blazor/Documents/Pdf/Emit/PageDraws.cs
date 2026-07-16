@@ -166,6 +166,7 @@ internal sealed class PagePlan
     // otherwise made registration O(n^2) on pages with many distinct states or shadows.
     private readonly Dictionary<string, string> extGStateKeys = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> softMaskKeys = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, GeneratedExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
     // Caches the blurred coverage raster by geometry so a grid of identically shaped shadows
     // (differing only in position) runs the Coverage+Blur passes once instead of per placement.
@@ -215,7 +216,7 @@ internal sealed class PagePlan
         }
 
         var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
-        ExtGStates.Add(new GeneratedExtGState
+        var state = new GeneratedExtGState
         {
             Key = key,
             FillAlpha = fillAlpha,
@@ -225,9 +226,45 @@ internal sealed class PagePlan
             OverprintFill = overprintFill,
             OverprintMode = overprintMode,
             Intent = intent,
-        });
+        };
+        ExtGStates.Add(state);
         extGStateKeys[dedupKey] = key;
+        extGStatesByKey[key] = state;
         return key;
+    }
+
+    public GeneratedExtGState? FindExtGState(string key)
+        => extGStatesByKey.TryGetValue(key, out var state) ? state : null;
+
+    // Folds a constant alpha into a draw's graphics state: multiplies into an existing state
+    // (keeping its blend/overprint/intent options) or registers an alpha-only one. A soft-mask
+    // state is returned untouched: SoftMask.EmitBoxShadow already folds its colour alpha in,
+    // and RegisterExtGState cannot carry the /SMask forward.
+    public string? ApplyAlpha(string? extGState, double alpha)
+    {
+        if (alpha >= 1)
+        {
+            return extGState;
+        }
+
+        if (extGState is null)
+        {
+            return RegisterExtGState(alpha, alpha);
+        }
+
+        if (FindExtGState(extGState) is not { SoftMask: null, ClearSoftMask: false } state)
+        {
+            return extGState;
+        }
+
+        return RegisterExtGState(
+            state.FillAlpha * alpha,
+            state.StrokeAlpha * alpha,
+            state.Blend,
+            state.OverprintStroke,
+            state.OverprintFill,
+            state.OverprintMode,
+            state.Intent);
     }
 
     // A soft-mask graphics state carries its own transparency group. States with an equal,
@@ -241,13 +278,15 @@ internal sealed class PagePlan
         }
 
         var key = "GS" + ExtGStates.Count.ToString(CultureInfo.InvariantCulture);
-        ExtGStates.Add(new GeneratedExtGState
+        var state = new GeneratedExtGState
         {
             Key = key,
             FillAlpha = Math.Clamp(fillAlpha, 0, 1),
             StrokeAlpha = Math.Clamp(strokeAlpha, 0, 1),
             SoftMask = softMask,
-        });
+        };
+        ExtGStates.Add(state);
+        extGStatesByKey[key] = state;
         if (softMask.ContentKey is { } key2)
         {
             softMaskKeys[key2] = key;

@@ -156,6 +156,30 @@ public class ImageDecoderValidationTests
         Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(jpeg));
     }
 
+    // JPEG sample precision is not PDF /BitsPerComponent: ISO 32000-1 8.9.5.1 allows only
+    // 1/2/4/8/16, while extended-sequential (SOF1) and progressive (SOF2) JPEG legally carry
+    // 12. The library embeds the JPEG bytes verbatim under /DCTDecode and has no entropy
+    // decoder to requantize with, so 12-bit must fail loud rather than emit /BitsPerComponent 12.
+    [Theory]
+    [InlineData(0xC1)] // extended sequential
+    [InlineData(0xC2)] // progressive
+    public void TwelveBitJpeg_Throws(int marker)
+    {
+        var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false, precision: 12);
+        Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(jpeg));
+    }
+
+    [Theory]
+    [InlineData(0xC0)]
+    [InlineData(0xC1)]
+    [InlineData(0xC2)]
+    public void EightBitJpeg_EmitsLegalBitsPerComponent(int marker)
+    {
+        var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false);
+        var dict = ImageDecoder.Decode(jpeg).Image.Dictionary;
+        Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
+    }
+
     private static byte[] FullPng(int width, int height, int bitDepth, int colorType, byte[]? palette, byte[]? trns, byte[] rawScanlines)
     {
         using var ms = new MemoryStream();
@@ -207,7 +231,7 @@ public class ImageDecoderValidationTests
         return output.ToArray();
     }
 
-    private static byte[] Jpeg(byte sofMarker, int width, int height, int components, bool adobe)
+    private static byte[] Jpeg(byte sofMarker, int width, int height, int components, bool adobe, byte precision = 8)
     {
         using var ms = new MemoryStream();
         ms.WriteByte(0xFF);
@@ -219,7 +243,7 @@ public class ImageDecoderValidationTests
         }
 
         var sof = new byte[6 + (3 * components)];
-        sof[0] = 8;
+        sof[0] = precision;
         sof[1] = (byte)(height >> 8);
         sof[2] = (byte)height;
         sof[3] = (byte)(width >> 8);

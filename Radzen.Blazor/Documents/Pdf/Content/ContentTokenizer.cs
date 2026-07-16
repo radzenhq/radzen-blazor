@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -110,8 +111,9 @@ internal static class ContentTokenizer
                     position++;
                 }
 
-                var text = Latin1(data, start, position - start);
-                if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+                // Numbers are ASCII, so the UTF-8 overload is the same parser over the raw
+                // bytes and saves a transient string per numeric operand.
+                if (double.TryParse(data.AsSpan(start, position - start), NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
                 {
                     tokens.Add(new Token(TokenKind.Number, value, null, null, start, position));
                     continue;
@@ -496,6 +498,19 @@ internal static class ContentTokenizer
 
                 depth--;
                 bytes.Add(b);
+                continue;
+            }
+
+            // ISO 32000-1 7.3.4.2: an unescaped CR, LF or CRLF is an end-of-line marker and
+            // decodes to a single LF, matching Objects/Lexer.ReadLiteralString.
+            if (b == 13)
+            {
+                bytes.Add(10);
+                if (position < data.Length && data[position] == 10)
+                {
+                    position++;
+                }
+
                 continue;
             }
 

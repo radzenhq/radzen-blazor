@@ -26,6 +26,16 @@ internal sealed class JpegImageDecoder : IImageDecoder
 
         ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG");
 
+        // SOF1/SOF2 legally carry 12-bit samples, but /BitsPerComponent admits only 1/2/4/8/16
+        // (ISO 32000-1 8.9.5.1). The JPEG is embedded verbatim under /DCTDecode, so there is no
+        // entropy decoder here to requantize down to 8; emitting 12 would be a spec-invalid file
+        // the library called a success. Fail loud, like the undecodable-SOF guard.
+        if (precision != 8)
+        {
+            throw new NotSupportedException(
+                $"JPEG sample precision {precision} is not supported; PDF images require 8-bit DCTDecode samples.");
+        }
+
         var colorSpace = components switch
         {
             1 => "DeviceGray",

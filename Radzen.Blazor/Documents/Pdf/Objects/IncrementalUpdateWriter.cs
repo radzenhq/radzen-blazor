@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Radzen.Documents.Pdf.Objects.Filters;
 
@@ -17,16 +18,18 @@ namespace Radzen.Documents.Pdf.Objects;
 /// The style of the appended cross-reference section matches the original
 /// file: a classic <c>xref</c> table and trailer when the original ends with
 /// one, or a <c>/Type /XRef</c> cross-reference stream when the original uses
-/// one. Overridden objects keep their object number with generation 0 - per
-/// section 7.5.6 an updated object reuses its number, and a generation bump is
-/// only required when a number from the free list is reused, which this writer
-/// never does. Output is deterministic: identical inputs produce identical bytes.
+/// one. Overridden objects keep both their object number and their current
+/// generation - per section 7.5.6 an updated object reuses its number, and a
+/// generation bump is only required when a number from the free list is reused,
+/// which this writer never does; new objects are written at generation 0.
+/// Output is deterministic: identical inputs produce identical bytes.
 /// </remarks>
 public sealed class IncrementalUpdateWriter : IObjectWriter
 {
     private readonly byte[] original;
     private readonly DocumentReader reader;
     private readonly SortedDictionary<int, DocumentObject> objects = [];
+    private readonly Dictionary<int, int> generations = [];
     private readonly long previousStartXref;
     private readonly bool classicXref;
     private readonly int originalMaxNumber;
@@ -104,8 +107,9 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
 
     /// <summary>
     /// Registers a replacement for an existing indirect object. The replacement
-    /// keeps the object number with generation 0; readers resolve it instead of
-    /// the original because the appended cross-reference section is newer.
+    /// keeps both the object number and the object's current generation; readers
+    /// resolve it instead of the original because the appended cross-reference
+    /// section is newer.
     /// </summary>
     /// <param name="objectNumber">The number of the object to override.</param>
     /// <param name="value">The replacement object.</param>
@@ -119,9 +123,17 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
                 $"Object number must be between 1 and {originalMaxNumber} to override an existing object.");
         }
 
+        // A reference matches on number AND generation (ISO 32000-1 7.3.10), so an object
+        // whose number was reclaimed from the free list lives at a non-zero generation and
+        // the existing "N G R" references only resolve if the override keeps G.
+        var generation = reader.GenerationOf(objectNumber);
         objects[objectNumber] = value;
-        return new ReferenceObject(objectNumber, 0);
+        generations[objectNumber] = generation;
+        return new ReferenceObject(objectNumber, generation);
     }
+
+    private int GenerationOf(int objectNumber)
+        => generations.TryGetValue(objectNumber, out var generation) ? generation : 0;
 
     /// <summary>
     /// Writes the original bytes followed by the incremental update section and
@@ -187,7 +199,9 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         {
             offsets[pair.Key] = buffer.Position;
             PdfBytes.WriteInteger(buffer, pair.Key);
-            PdfBytes.WriteAscii(buffer, " 0 obj\n");
+            PdfBytes.WriteAscii(buffer, " ");
+            PdfBytes.WriteInteger(buffer, GenerationOf(pair.Key));
+            PdfBytes.WriteAscii(buffer, " obj\n");
             pair.Value.Write(buffer);
             PdfBytes.WriteAscii(buffer, "\nendobj\n");
         }
@@ -222,13 +236,26 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
             PdfBytes.WriteAscii(buffer, "\n");
             for (var number = start; number < start + count; number++)
             {
-                PdfBytes.WriteXrefEntry(buffer, offsets[number]);
+                WriteXrefEntry(buffer, offsets[number], GenerationOf(number));
             }
         }
 
         PdfBytes.WriteAscii(buffer, "trailer\n");
         BuildTrailer(nextNumber).Write(buffer);
         PdfBytes.WriteAscii(buffer, "\n");
+    }
+
+    // PdfBytes.WriteXrefEntry hardcodes generation 0, which a full save can assume but an
+    // incremental update cannot: an overridden object keeps its own generation.
+    private static void WriteXrefEntry(Stream stream, long offset, int generation)
+    {
+        Span<char> field = stackalloc char[20];
+        offset.TryFormat(field, out var written, "D10", CultureInfo.InvariantCulture);
+        PdfBytes.WriteAscii(stream, field[..written]);
+        PdfBytes.WriteAscii(stream, " ");
+        generation.TryFormat(field, out written, "D5", CultureInfo.InvariantCulture);
+        PdfBytes.WriteAscii(stream, field[..written]);
+        PdfBytes.WriteAscii(stream, " n \n");
     }
 
     private long WriteXrefStream(CountingBufferedStream buffer, SortedDictionary<int, long> offsets)
@@ -243,6 +270,12 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
             w1 = Math.Max(w1, PdfBytes.FieldWidth(offset));
         }
 
+        var w2 = 1;
+        foreach (var generation in generations.Values)
+        {
+            w2 = Math.Max(w2, PdfBytes.FieldWidth(generation));
+        }
+
         var index = new ArrayObject();
         using var data = new MemoryStream();
         foreach (var (start, count) in Subsections(offsets))
@@ -253,14 +286,14 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
             {
                 data.WriteByte(1);
                 PdfBytes.WriteBigEndian(data, offsets[number], w1);
-                data.WriteByte(0);
+                PdfBytes.WriteBigEndian(data, GenerationOf(number), w2);
             }
         }
 
         var xref = new StreamObject(FlateFilter.Encode(data.ToArray()));
         xref.Dictionary["Type"] = new NameObject("XRef");
         xref.Dictionary["Index"] = index;
-        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(1) };
+        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
         xref.Dictionary["Filter"] = new NameObject("FlateDecode");
         foreach (var pair in BuildTrailer(xrefNumber + 1))
         {

@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -95,6 +96,92 @@ public class ContentTokenizerTests
 
         Assert.Equal(ContentTokenizer.TokenKind.String, tokens[0].Kind);
         Assert.Equal("Hi", Encoding.ASCII.GetString(tokens[0].Bytes!));
+    }
+
+    // ISO 32000-1 7.3.4.2: an end-of-line marker inside a literal string - CR, LF or CRLF -
+    // is treated as a single LF. The object lexer already does this, so a string operand read
+    // from a content stream must decode to the same bytes as the same literal read as an object.
+    [Theory]
+    [InlineData("(a\rb)", "a\nb")]
+    [InlineData("(a\r\nb)", "a\nb")]
+    [InlineData("(a\nb)", "a\nb")]
+    [InlineData("(a\r\r\nb)", "a\n\nb")]
+    public void Tokenize_LiteralStringEndOfLine_NormalizesToLineFeed(string literal, string expected)
+    {
+        var tokens = ContentTokenizer.Tokenize(Encoding.Latin1.GetBytes(literal));
+
+        Assert.Equal(expected, Encoding.Latin1.GetString(tokens[0].Bytes!));
+    }
+
+    [Theory]
+    [InlineData("(a\rb)")]
+    [InlineData("(a\r\nb)")]
+    [InlineData("(a\r\r\nb)")]
+    [InlineData("(a\\rb)")]
+    [InlineData("(a\\\r\nb)")]
+    public void Tokenize_LiteralString_DecodesLikeTheObjectLexer(string literal)
+    {
+        var data = Encoding.Latin1.GetBytes(literal);
+
+        var content = ContentTokenizer.Tokenize(data)[0].Bytes!;
+        var lexed = new Radzen.Documents.Pdf.Objects.Lexer(data, 0).Next().Bytes!;
+
+        Assert.Equal(lexed, content);
+    }
+
+    // Numeric operands are parsed straight from the source bytes. These pin the accepted
+    // grammar, including the forms PDF permits that a hand-rolled span parser gets wrong:
+    // a trailing decimal point, a leading sign and a leading decimal point.
+    [Theory]
+    [InlineData("4.", 4.0)]
+    [InlineData("3. Tj", 3.0)]
+    [InlineData("-.002", -0.002)]
+    [InlineData("+7", 7.0)]
+    [InlineData(".5", 0.5)]
+    [InlineData("-5", -5.0)]
+    [InlineData("007", 7.0)]
+    [InlineData("6.02E23", 6.02E23)]
+    [InlineData("1e-5", 1e-5)]
+    public void Tokenize_NumericOperand_AcceptsEveryPermittedForm(string source, double expected)
+    {
+        var tokens = ContentTokenizer.Tokenize(Ascii(source));
+
+        Assert.Equal(ContentTokenizer.TokenKind.Number, tokens[0].Kind);
+        Assert.Equal(expected, tokens[0].Number);
+    }
+
+    [Theory]
+    [InlineData("--5")]
+    [InlineData("1.2.3")]
+    [InlineData("4.-5")]
+    public void Tokenize_MalformedNumber_EmitsNoNumberToken(string source)
+    {
+        var tokens = ContentTokenizer.Tokenize(Ascii(source));
+
+        Assert.DoesNotContain(tokens, t => t.Kind == ContentTokenizer.TokenKind.Number);
+    }
+
+    [Fact]
+    public void Tokenize_NumericOperands_DoNotAllocateAStringPerNumber()
+    {
+        var builder = new StringBuilder();
+        for (var i = 0; i < 2000; i++)
+        {
+            builder.Append(i).Append(".25 ").Append(-i).Append(" 0.5 ");
+        }
+
+        var data = Ascii(builder.ToString());
+        ContentTokenizer.Tokenize(data);
+
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        var tokens = ContentTokenizer.Tokenize(data);
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        // 6000 number tokens cost 862,712 bytes when each allocated a transient string to
+        // feed double.TryParse, and 655,520 parsing the source bytes directly; the remainder
+        // is the Token list backing array, which dominates either way.
+        Assert.Equal(6000, tokens.Count);
+        Assert.True(allocated < 700_000, $"Tokenizing 6000 numeric operands allocated {allocated} bytes.");
     }
 
     [Fact]
