@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Objects.Encryption;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,13 @@ namespace Radzen.Documents.Pdf.Objects;
 /// <summary>
 /// Retrieves and caches indirect objects, including object-stream members.
 /// </summary>
+/// <remarks>
+/// Objects resolve lazily, so reads of a loaded document mutate this store and are
+/// expected to run concurrently (one document served from several request threads).
+/// Reads are safe; mutation of a loaded document from several threads is not.
+/// <see cref="entries"/>, <see cref="security"/> and <see cref="encryptObjectNumber"/>
+/// are written only while loading, before the document is handed to any reader.
+/// </remarks>
 internal sealed class IndirectObjectStore(
     byte[] data,
     ReaderLimits limits,
@@ -18,10 +26,17 @@ internal sealed class IndirectObjectStore(
     private readonly byte[] data = data;
     private readonly ReaderLimits limits = limits;
     private readonly Dictionary<int, XrefEntry> entries = entries;
-    private readonly Dictionary<int, DocumentObject> cache = [];
-    private readonly Dictionary<int, ObjectStream> objectStreams = [];
+    private readonly ConcurrentDictionary<int, DocumentObject> cache = [];
+    private readonly ConcurrentDictionary<int, ObjectStream> objectStreams = [];
     private readonly NullObject nullObject = new();
-    private readonly HashSet<int> parsing = [];
+
+    // Being mid-parse is a property of one resolution stack, not of the store: two
+    // threads resolving the same object are not a cycle, but a store-wide marker
+    // reported one and aborted a legitimate read. Resolution recurses synchronously,
+    // so the current thread's set is exactly that stack. The store is part of the key
+    // because one thread may resolve through two documents at once (merge/import).
+    [ThreadStatic]
+    private static HashSet<(IndirectObjectStore Store, int Number)>? parsing;
     private readonly StreamDecoder decoder = decoder;
     private readonly DocumentRepairer repairer = repairer;
     private StandardSecurityHandler? security;
@@ -46,7 +61,9 @@ internal sealed class IndirectObjectStore(
 
         // Guards cyclic references (e.g. a stream /Length pointing back at its own
         // object) that would otherwise recurse without bound.
-        if (!parsing.Add(number))
+        var inProgress = parsing ??= [];
+        var marker = (this, number);
+        if (!inProgress.Add(marker))
         {
             throw new DocumentParseException("Cyclic object reference.", -1);
         }
@@ -69,11 +86,13 @@ internal sealed class IndirectObjectStore(
         }
         finally
         {
-            parsing.Remove(number);
+            inProgress.Remove(marker);
         }
 
-        cache[number] = value;
-        return value;
+        // Two threads may parse the same object at once. Publishing with GetOrAdd lets
+        // one instance win for everyone, so the reference identity that write-back and
+        // BuildObjectNumberIndex rely on stays single-valued per object number.
+        return cache.GetOrAdd(number, value);
     }
 
     public DocumentObject Resolve(DocumentObject value)
@@ -102,7 +121,9 @@ internal sealed class IndirectObjectStore(
         security = handler;
         encryptObjectNumber = objectNumber;
 
-        // Objects cached before the handler existed were not decrypted.
+        // Objects cached before the handler existed were not decrypted. Clearing is
+        // unsynchronized against readers, which is safe only because this runs while
+        // loading, before the document is shared.
         cache.Clear();
         objectStreams.Clear();
     }
@@ -259,8 +280,7 @@ internal sealed class IndirectObjectStore(
         }
 
         var container = new ObjectStream(decoded, first, members);
-        objectStreams[streamNumber] = container;
-        return container;
+        return objectStreams.GetOrAdd(streamNumber, container);
     }
 
     internal bool TryParseObjectAt(long offset, int? expected, out DocumentObject? value, out int generation)
