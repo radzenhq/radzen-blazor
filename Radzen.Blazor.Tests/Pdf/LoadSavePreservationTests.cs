@@ -72,6 +72,47 @@ public class LoadSavePreservationTests
     }
 
     [Fact]
+    public void Rotate90_IsReportedByThePage()
+    {
+        Assert.Equal(90, LoadSaveReload(Build("/Rotate 90", "", "", 5)).Pages[0].Rotate);
+    }
+
+    [Fact]
+    public void InheritedRotate_IsReportedByThePage()
+    {
+        Assert.Equal(270, LoadSaveReload(InheritedRotate270()).Pages[0].Rotate);
+    }
+
+    [Fact]
+    public void NegativeRotate_IsNormalizedToItsPositiveEquivalent()
+    {
+        var document = LoadSaveReload(Build("/Rotate -90", "", "", 5));
+
+        Assert.Equal(270, document.Pages[0].Rotate);
+
+        var reader = SaveAndParse(document);
+        Assert.Equal(270, Assert.IsType<NumberObject>(reader.Resolve(FirstPage(reader)["Rotate"])).IntValue);
+    }
+
+    [Fact]
+    public void RotateSetToZero_RemovesTheLoadedRotation()
+    {
+        var document = LoadSaveReload(Build("/Rotate 90", "", "", 5));
+        document.Pages[0].Rotate = 0;
+
+        Assert.False(FirstPage(SaveAndParse(document)).ContainsKey("Rotate"));
+    }
+
+    [Fact]
+    public void InheritedRotateSetToZero_RemovesTheLoadedRotation()
+    {
+        var document = LoadSaveReload(InheritedRotate270());
+        document.Pages[0].Rotate = 0;
+
+        Assert.False(FirstPage(SaveAndParse(document)).ContainsKey("Rotate"));
+    }
+
+    [Fact]
     public void CropBox_SurvivesLoadSave()
     {
         var reader = SaveAndParse(LoadSaveReload(Build("/CropBox [10 20 200 400]", "", "", 5)));
@@ -85,10 +126,9 @@ public class LoadSavePreservationTests
         Assert.Equal(400.0, Assert.IsType<NumberObject>(crop[3]).DoubleValue);
     }
 
-    [Fact]
-    public void InheritedRotate_FromPageTree_SurvivesLoadSave()
+    // /Rotate declared on the /Pages node, not the leaf: an inheritable attribute.
+    private static byte[] InheritedRotate270()
     {
-        // /Rotate declared on the /Pages node, not the leaf: an inheritable attribute.
         var content = Encoding.ASCII.GetBytes("(x) Tj");
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
@@ -104,8 +144,13 @@ public class LoadSavePreservationTests
         }
 
         pdf.Append("trailer\n<< /Size 5 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
 
-        var reader = SaveAndParse(LoadSaveReload(pdf.ToArray()));
+    [Fact]
+    public void InheritedRotate_FromPageTree_SurvivesLoadSave()
+    {
+        var reader = SaveAndParse(LoadSaveReload(InheritedRotate270()));
         Assert.Equal(270, Assert.IsType<NumberObject>(reader.Resolve(FirstPage(reader)["Rotate"])).IntValue);
     }
 
