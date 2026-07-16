@@ -263,7 +263,7 @@ internal static class Paginator
     internal static (double Width, double Height) MeasureImage(Image image, double availableWidth)
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
 
-    internal static (double Width, double Height) MeasureCode(Block block, StyleResolution resolution) => CodeBlockDispatch.Measure(block, resolution);
+    internal static (double Width, double Height) MeasureCode(Block block, FontCollection fonts, StyleResolution resolution) => CodeBlockDispatch.Measure(block, fonts, resolution);
 
     internal static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 

@@ -104,7 +104,7 @@ internal static class NextBlockHeightResolver
 
         public override NextBlockHeight Visit(Barcode block, int next) => VisitCode(block);
 
-        private NextBlockHeight VisitCode(Block block) => new() { Found = true, Height = Paginator.MeasureCode(block, resolution).Height };
+        private NextBlockHeight VisitCode(Block block) => new() { Found = true, Height = Paginator.MeasureCode(block, fonts, resolution).Height };
     }
 
     internal static double SumHeights(IReadOnlyList<LineBox> lines, int start, int count)

@@ -105,7 +105,7 @@ internal static class BandLayouter
 
         private Nothing VisitCode(Block block)
         {
-            var (codeWidth, codeHeight) = Paginator.MeasureCode(block, resolution);
+            var (codeWidth, codeHeight) = Paginator.MeasureCode(block, fonts, resolution);
             result.Content.Codes.Add(new PositionedCode
             {
                 Source = block,

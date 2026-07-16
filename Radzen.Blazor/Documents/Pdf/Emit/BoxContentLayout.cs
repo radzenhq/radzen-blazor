@@ -133,7 +133,7 @@ internal static class BoxContentLayout
 
         private Nothing VisitCode(Block block)
         {
-            var (codeWidth, codeHeight) = Paginator.MeasureCode(block, resolution);
+            var (codeWidth, codeHeight) = Paginator.MeasureCode(block, fonts, resolution);
             Items.Add(new CellItem { Code = block, Width = codeWidth, Height = codeHeight });
             Height += codeHeight;
             return default;
