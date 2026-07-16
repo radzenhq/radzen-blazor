@@ -336,8 +336,7 @@ public sealed class FontCollection
 
         if (TryResolvePrimary(font, out _))
         {
-            Shaper().Shape(text, font, out var advance);
-            return advance;
+            return Shaper().MeasureAdvance(text, font);
         }
 
         var base14 = Base14Metrics.Resolve(font)

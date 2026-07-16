@@ -1,6 +1,8 @@
 #nullable enable
 using System;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -79,6 +81,58 @@ public class SimpleShaperTests
 
         // Legacy 'kern' is not applied by default: total == sum, not sum - 152 units.
         Assert.Equal(glyphs[0].Advance + glyphs[1].Advance, advance, 10);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static long Measure(Action action)
+    {
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        action();
+        return GC.GetAllocatedBytesForCurrentThread() - before;
+    }
+
+    [Fact]
+    public void MeasureText_DoesNotAllocatePerCall()
+    {
+        var fonts = LiberationSans();
+        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        const string Word = "Measurement";
+
+        fonts.MeasureText(Word, font);
+
+        var bytes = Measure(() =>
+        {
+            for (var i = 0; i < 1000; i++)
+            {
+                fonts.MeasureText(Word, font);
+            }
+        });
+
+        // Width measurement is the hottest layout path (once per token, per line-break
+        // candidate): it must not build a glyph list it throws away.
+        Assert.True(bytes < 4096, $"1000 MeasureText calls allocated {bytes} bytes.");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void MeasureText_EqualsShapedAdvance_Exactly(bool kerning)
+    {
+        var fonts = LiberationSans();
+        fonts.EnableKerning = kerning;
+        var font = new Font { Name = "Liberation Sans", Size = 12 };
+
+        foreach (var text in new[]
+        {
+            "", "A", "AV", "AVATAR", "Wave To Vary", "Measurement, 1234.56 EUR",
+            "Liberation Sans - the quick brown fox jumps over the lazy dog",
+            "ÄÖÜ Привет", "tab\tseparated", "😀 emoji",
+        })
+        {
+            var shaped = fonts.Shaper().Shape(text, font, out var advance);
+            Assert.Equal(advance, fonts.MeasureText(text, font));
+            Assert.Equal(shaped.Sum(g => g.Advance), fonts.MeasureText(text, font), 10);
+        }
     }
 
     [Fact]
