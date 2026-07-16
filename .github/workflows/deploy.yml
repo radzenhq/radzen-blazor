@@ -37,6 +37,22 @@ jobs:
             RadzenBlazorDemos/Pages \
             RadzenBlazorDemos/Services/ExampleService.cs
 
+      # Kept out of the sources so forks, clones and local runs of the demos never report to
+      # our analytics - only the image this workflow builds carries the snippet.
+      - name: Inject analytics script
+        run: |
+          FILE=RadzenBlazorDemos.Host/App.razor
+          ANCHOR='<script src="js/demos.js"></script>'
+          SNIPPET='    <script defer data-domain="blazor.radzen.com" src="https://analytics.radzen.com/js/plausible.js"></script>'
+          # Fail loudly: if App.razor is refactored, we want a red build, not a silent
+          # deploy with analytics missing.
+          grep -qF "$ANCHOR" "$FILE" || { echo "::error::anchor '$ANCHOR' not found in $FILE"; exit 1; }
+          awk -v snip="$SNIPPET" -v anchor="$ANCHOR" \
+            'index($0, anchor) && !done { print snip; done = 1 } { print }' "$FILE" > "$FILE.tmp"
+          mv "$FILE.tmp" "$FILE"
+          grep -qF 'analytics.radzen.com' "$FILE" || { echo "::error::injection produced no snippet"; exit 1; }
+          echo "Injected analytics snippet into $FILE"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
