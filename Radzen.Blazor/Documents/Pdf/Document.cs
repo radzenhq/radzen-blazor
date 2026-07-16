@@ -319,9 +319,13 @@ public sealed class Document
     public IReadOnlyList<Page> ImportPages(Document source, Range range)
     {
         ArgumentNullException.ThrowIfNull(source);
-        var snapshot = PageOperations.Snapshot(source);
-        var (offset, length) = range.GetOffsetAndLength(snapshot.Pages.Count);
-        return PageOperations.Import(this, snapshot, offset, length);
+        var (offset, length) = range.GetOffsetAndLength(source.Pages.Count);
+        if (PageOperations.CanImportDirectly(this, source, offset, length))
+        {
+            return PageOperations.Import(this, source, offset, length);
+        }
+
+        return PageOperations.Import(this, PageOperations.Snapshot(source), offset, length);
     }
 
     /// <summary>Creates a new document containing deep copies of all pages from the supplied documents.</summary>

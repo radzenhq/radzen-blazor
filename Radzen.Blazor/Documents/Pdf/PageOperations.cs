@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf.Emit;
@@ -15,6 +16,38 @@ internal static class PageOperations
         var limits = source.Loaded?.Source?.Limits ?? ReaderLimits.Default;
         return Document.LoadFromStream(new MemoryStream(bytes, writable: false), limits);
     }
+
+    // A page still holding exactly the bytes, resources and rotation it was loaded with
+    // re-serializes from those alone, so DocumentMerger can copy it straight off the live
+    // source and the snapshot round trip is pure waste. Everything else (authored or edited
+    // content, a queued overlay, modeled annotations, document-level form fields) only turns
+    // into bytes when the source is saved, so it still needs the snapshot.
+    internal static bool CanImportDirectly(Document target, Document source, int offset, int length)
+    {
+        if (ReferenceEquals(target, source) || source.FormFields.Count > 0
+            || source.Loaded is not { Source: not null } state)
+        {
+            return false;
+        }
+
+        for (var index = offset; index < offset + length; index++)
+        {
+            var page = source.Pages[index];
+            if (!page.ContentIsIntact || page.Annotations.Count > 0
+                || !state.SourceResources.ContainsKey(page)
+                || !state.SourceContents.TryGetValue(page, out var loaded)
+                || !ContentMatches(page.RawContent, loaded)
+                || page.Rotate != (state.SourceRotations.TryGetValue(page, out var rotation) ? rotation : 0))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool ContentMatches(byte[]? current, byte[]? loaded)
+        => current is null ? loaded is null : loaded is not null && current.AsSpan().SequenceEqual(loaded);
 
     internal static Document Extract(Document snapshot, int offset, int length)
     {
