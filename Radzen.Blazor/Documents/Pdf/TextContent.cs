@@ -151,6 +151,12 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
             writer.WriteRaw(" ");
         }
 
+        if (color.PatternName is { } pattern)
+        {
+            writer.WriteName(pattern);
+            writer.WriteRaw(" ");
+        }
+
         writer.WriteRaw(color.Kind switch
         {
             DeviceColorKind.Named => "scn",

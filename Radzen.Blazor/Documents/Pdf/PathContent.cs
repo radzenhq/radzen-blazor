@@ -339,6 +339,12 @@ public sealed class PathContent : ContentElement
             writer.WriteRaw(" ");
         }
 
+        if (color.PatternName is { } pattern)
+        {
+            writer.WriteName(pattern);
+            writer.WriteRaw(" ");
+        }
+
         var op = color.Kind switch
         {
             DeviceColorKind.Named => stroke ? "SCN" : "scn",
@@ -377,4 +383,5 @@ internal enum DeviceColorKind
 
 // A path color set by an operator other than rg/RG: CMYK (k/K) or a color in a named
 // colorspace (cs/scn). Operands are preserved verbatim so the path re-emits equivalently.
-internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands);
+// PatternName is the trailing name operand of scn/SCN in a Pattern colorspace (/P0 scn).
+internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands, string? PatternName = null);

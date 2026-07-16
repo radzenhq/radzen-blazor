@@ -7,15 +7,16 @@ namespace Radzen.Documents.Pdf.Content;
 
 internal static class ContentEditor
 {
-    internal sealed record SourceElement(ContentElement Element, int Start, int End, byte[] Snapshot);
+    internal sealed record SourceElement(ContentElement Element, int Start, int End, byte[] Snapshot, Matrix Ambient);
 
-    private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes);
+    private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes, Matrix Ambient);
 
     private enum CandidateKind
     {
         Text,
         Path,
         XObject,
+        InlineImage,
         Raw,
     }
 
@@ -64,7 +65,7 @@ internal static class ContentEditor
                 candidateIndex++;
             }
 
-            result.Add(new SourceElement(element, start, end, Emit(element)));
+            result.Add(new SourceElement(element, start, end, Emit(element), candidate.Ambient));
         }
 
         if (candidateIndex != candidates.Count)
@@ -134,7 +135,7 @@ internal static class ContentEditor
             else
             {
                 ValidateModification(item.Element);
-                item.Element.Emit(writer);
+                item.Element.Emit(writer, Relative(item.Element.Transform, item.Ambient));
             }
         }
 
@@ -155,6 +156,9 @@ internal static class ContentEditor
         var array = new List<Token>();
         var frameStart = -1;
         var pathStart = -1;
+        var ctm = Matrix.Identity;
+        var ctmStack = new Stack<Matrix>();
+        var pathCtm = Matrix.Identity;
         foreach (var token in tokens)
         {
             if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
@@ -178,6 +182,15 @@ internal static class ContentEditor
                 continue;
             }
 
+            if (token.Kind == TokenKind.InlineImage)
+            {
+                result.Add(new Candidate(CandidateKind.InlineImage, token.Start, token.End, [], ctm));
+                operands.Clear();
+                array.Clear();
+                frameStart = -1;
+                continue;
+            }
+
             if (token.Kind != TokenKind.Operator)
             {
                 continue;
@@ -185,22 +198,39 @@ internal static class ContentEditor
 
             var start = frameStart < 0 ? token.Start : frameStart;
             var op = token.Text!;
+            if (op == "q")
+            {
+                ctmStack.Push(ctm);
+            }
+            else if (op == "Q")
+            {
+                ctm = ctmStack.Count > 0 ? ctmStack.Pop() : Matrix.Identity;
+            }
+            else if (op == "cm")
+            {
+                ctm = Components(operands) * ctm;
+            }
+
             if (op is "m" or "l" or "c" or "v" or "y" or "re" or "h" or "W" or "W*")
             {
-                pathStart = pathStart < 0 ? start : pathStart;
+                if (pathStart < 0)
+                {
+                    pathStart = start;
+                    pathCtm = ctm;
+                }
             }
             else if (op is "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n")
             {
                 if (pathStart >= 0)
                 {
-                    result.Add(new Candidate(CandidateKind.Path, pathStart, token.End, []));
+                    result.Add(new Candidate(CandidateKind.Path, pathStart, token.End, [], pathCtm));
                 }
 
                 pathStart = -1;
             }
             else if (op == "Do")
             {
-                result.Add(new Candidate(CandidateKind.XObject, start, token.End, []));
+                result.Add(new Candidate(CandidateKind.XObject, start, token.End, [], ctm));
             }
             else if (op is "Tj" or "TJ" or "'" or "\"")
             {
@@ -213,11 +243,11 @@ internal static class ContentEditor
                     }
                 }
 
-                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes]));
+                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ctm));
             }
             else if (!KnownNonElement(op))
             {
-                result.Add(new Candidate(CandidateKind.Raw, start, token.End, []));
+                result.Add(new Candidate(CandidateKind.Raw, start, token.End, [], ctm));
             }
 
             operands.Clear();
@@ -228,11 +258,50 @@ internal static class ContentEditor
         return result;
     }
 
+    private static Matrix Components(List<Token> operands)
+    {
+        var numbers = new List<double>(6);
+        foreach (var operand in operands)
+        {
+            if (operand.Kind == TokenKind.Number)
+            {
+                numbers.Add(operand.Number);
+            }
+        }
+
+        if (numbers.Count < 6)
+        {
+            return Matrix.Identity;
+        }
+
+        var first = numbers.Count - 6;
+        return Matrix.FromComponents(numbers[first], numbers[first + 1], numbers[first + 2],
+            numbers[first + 3], numbers[first + 4], numbers[first + 5]);
+    }
+
+    // The interpreter bakes the absolute CTM into every element, but a re-emitted element is
+    // spliced back where the source cm scope is still active, so its own cm has to undo it.
+    private static Matrix Relative(Matrix transform, Matrix ambient)
+    {
+        if (ambient == Matrix.Identity)
+        {
+            return transform;
+        }
+
+        if (!ambient.TryInvert(out var inverse))
+        {
+            throw new NotSupportedException("Modifying content under a degenerate transformation matrix is not supported.");
+        }
+
+        return transform * inverse;
+    }
+
     private static CandidateKind Kind(ContentElement element) => element switch
     {
         TextContent => CandidateKind.Text,
         PathContent => CandidateKind.Path,
         XObjectContent => CandidateKind.XObject,
+        InlineImageContent => CandidateKind.InlineImage,
         RawContent => CandidateKind.Raw,
         _ => throw new NotSupportedException($"Loaded content element '{element.GetType().Name}' cannot be mapped safely."),
     };
@@ -258,7 +327,7 @@ internal static class ContentEditor
 
     private static void ValidateModification(ContentElement element)
     {
-        if (element is RawContent or XObjectContent)
+        if (element is RawContent or XObjectContent or InlineImageContent)
         {
             throw new NotSupportedException($"Modifying loaded {element.GetType().Name} is not supported.");
         }

@@ -46,7 +46,10 @@ internal static class ContentInterpreter
                         }
                     }
 
-                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], token.Start, tokens[i].End));
+                    // An array left unterminated by a truncated stream consumes every remaining
+                    // token, so the span ends at the last one rather than at the missing ']'.
+                    var end = i < tokens.Count ? tokens[i].End : tokens[^1].End;
+                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], token.Start, end));
                     continue;
                 case TokenKind.DictStart:
                     for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.DictEnd; i++)
@@ -56,6 +59,15 @@ internal static class ContentInterpreter
                     continue;
                 case TokenKind.ArrayEnd:
                 case TokenKind.DictEnd:
+                    continue;
+                case TokenKind.InlineImage:
+                    target.Add(new InlineImageContent(token.Bytes!)
+                    {
+                        Transform = interpreter.Graphics.Ctm,
+                        IsArtifact = interpreter.ArtifactDepth > 0,
+                    });
+                    interpreter.PendingMerge = null;
+                    interpreter.ResetOperandFrame();
                     continue;
             }
 
@@ -141,12 +153,12 @@ internal static class ContentInterpreter
 
             case "scn":
             case "sc":
-                state.FillPaint = new DeviceColor(DeviceColorKind.Named, state.FillColorSpace, AllNumbers(operands));
+                state.FillPaint = new DeviceColor(DeviceColorKind.Named, state.FillColorSpace, AllNumbers(operands), LastName(operands));
                 break;
 
             case "SCN":
             case "SC":
-                state.StrokePaint = new DeviceColor(DeviceColorKind.Named, state.StrokeColorSpace, AllNumbers(operands));
+                state.StrokePaint = new DeviceColor(DeviceColorKind.Named, state.StrokeColorSpace, AllNumbers(operands), LastName(operands));
                 break;
 
             case "d":
@@ -416,7 +428,11 @@ internal static class ContentInterpreter
     {
         if (op is not null && !IsTextState(op))
         {
-            target.Add(new RawContent(op, [.. interpreter.Operands]) { IsArtifact = interpreter.ArtifactDepth > 0 });
+            target.Add(new RawContent(op, [.. interpreter.Operands])
+            {
+                IsArtifact = interpreter.ArtifactDepth > 0,
+                ClipBounds = interpreter.Graphics.Clip,
+            });
         }
     }
 
@@ -583,8 +599,34 @@ internal static class ContentInterpreter
             path.Close();
         }
 
+        if (clip != PathClipMode.None)
+        {
+            state.Clip = Intersect(state.Clip, path.GetBounds());
+        }
+
         target.Add(path);
         pathOps.Clear();
+    }
+
+    // An empty clipping path bounds nothing, so it keeps whatever the enclosing clip was
+    // rather than widening it back to unbounded.
+    private static TextBounds? Intersect(TextBounds? current, TextBounds? added)
+    {
+        if (added is not { } bounds)
+        {
+            return current;
+        }
+
+        if (current is not { } existing)
+        {
+            return bounds;
+        }
+
+        return new TextBounds(
+            Math.Max(existing.Left, bounds.Left),
+            Math.Max(existing.Bottom, bounds.Bottom),
+            Math.Min(existing.Right, bounds.Right),
+            Math.Min(existing.Top, bounds.Top));
     }
 
     private static Matrix Components(List<Token> operands)
@@ -762,6 +804,11 @@ internal static class ContentInterpreter
 
         public double DashPhase { get; set; }
 
+        // A bounding box the current clipping path is known to fit inside, or null while no
+        // clip is active. Only ever a superset of the real region, so it can bound an
+        // operator that paints the whole clip (sh) without under-reporting its extent.
+        public TextBounds? Clip { get; set; }
+
         public GraphicsState Clone() => new()
         {
             Ctm = Ctm,
@@ -774,6 +821,7 @@ internal static class ContentInterpreter
             StrokeColorSpace = StrokeColorSpace,
             DashArray = DashArray,
             DashPhase = DashPhase,
+            Clip = Clip,
         };
     }
 }
@@ -787,6 +835,12 @@ internal readonly record struct TextAdjustment(byte[]? Text, double Adjustment);
 // token stream and re-emitted unchanged so a full re-encode does not silently drop it.
 internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : ContentElement
 {
+    public string Operator => op;
+
+    // The clip in effect where the operator appeared, or null if unclipped. An operator
+    // that paints without a shape of its own (sh) can only be bounded by this.
+    public TextBounds? ClipBounds { get; init; }
+
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
@@ -810,6 +864,22 @@ internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : Con
         }
 
         writer.WriteRaw(op);
+        writer.WriteRaw("\n");
+    }
+}
+
+// A BI/ID/EI inline image, captured verbatim from the source bytes. Its payload is opaque
+// binary that the content grammar cannot rewrite, so it is only ever re-emitted unchanged
+// or dropped whole; Transform carries the CTM that maps its unit square onto the page,
+// which is what makes it bounds-testable like any other painted element.
+internal sealed class InlineImageContent(byte[] source) : ContentElement
+{
+    public byte[] Source => source;
+
+    /// <inheritdoc/>
+    protected override void EmitBody(ContentWriter writer)
+    {
+        writer.WriteBytes(source);
         writer.WriteRaw("\n");
     }
 }

@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Content;
 
 
 // Shared content-stream tokenizer for the page-content grammar (operators, operands,
-// arrays/dicts and whitespace-bounded BI/ID/EI inline-image skipping). Both
+// arrays/dicts and BI/ID/EI inline images captured whole as a single token). Both
 // ContentInterpreter and TextExtractor consume this stream; each consumer filters the
 // tokens it cares about. This is the content-stream grammar, distinct from the PDF
 // object/file grammar in Objects/Lexer.cs.
@@ -23,6 +23,7 @@ internal static class ContentTokenizer
         DictStart,
         DictEnd,
         Operator,
+        InlineImage,
     }
 
     internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes, int Start, int End);
@@ -133,6 +134,7 @@ internal static class ContentTokenizer
             if (keyword == "BI")
             {
                 SkipInlineImage(data, ref position);
+                tokens.Add(new Token(TokenKind.InlineImage, 0, null, data[keywordStart..position], keywordStart, position));
                 continue;
             }
 
