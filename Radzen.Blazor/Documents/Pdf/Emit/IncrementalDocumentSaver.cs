@@ -8,6 +8,7 @@ namespace Radzen.Documents.Pdf.Emit;
 internal sealed class IncrementalDocumentSaver
 {
     private readonly Document doc;
+    private readonly Dictionary<DocumentReader, GraphImporter> appendImporters = [];
 
     internal IncrementalDocumentSaver(Document document) => doc = document;
 
@@ -374,6 +375,17 @@ internal sealed class IncrementalDocumentSaver
         if (emission.Bytes is not null)
         {
             node["Contents"] = writer.Add(new StreamObject(emission.Bytes));
+        }
+
+        if (doc.Loaded!.AppendedResources.TryGetValue(page, out var appended))
+        {
+            if (!appendImporters.TryGetValue(appended.Reader, out var importer))
+            {
+                importer = new GraphImporter(appended.Reader, writer);
+                appendImporters[appended.Reader] = importer;
+            }
+
+            node["Resources"] = PageResourceBuilder.MergeResources(importer, appended.Reader, appended.Resources, null);
         }
 
         var reference = writer.Add(node);

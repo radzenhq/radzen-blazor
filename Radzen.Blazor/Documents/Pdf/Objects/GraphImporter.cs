@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer)
+internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
 {
     private readonly Dictionary<DocumentObject, ReferenceObject> map = [];
     private readonly Dictionary<DocumentObject, DocumentObject> instances = [];
