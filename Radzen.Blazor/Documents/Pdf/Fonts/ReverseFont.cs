@@ -183,8 +183,16 @@ internal sealed class ReverseFont
         }
 
         var simpleWidths = SimpleWidths(reader, fontDict);
-        return new ReverseFont(1, simple, simpleWidths);
+        return new ReverseFont(1, simple, simpleWidths, MissingWidth(reader, fontDict));
     }
+
+    // ISO 32000-1 9.6.2.1 Table 122: the width for a code whose width /Widths does not specify,
+    // defaulting to 0. It is /DW's analogue for a simple font. No descriptor means no entry to
+    // default, so those fonts keep reporting no width rather than inventing a zero advance.
+    private static double? MissingWidth(DocumentReader reader, DictionaryObject fontDict)
+        => reader.GetDictionary(fontDict, "FontDescriptor") is { } descriptor
+            ? reader.GetNumber(descriptor, "MissingWidth") ?? 0
+            : null;
 
     private static IReadOnlyDictionary<int, double>? SimpleWidths(DocumentReader reader, DictionaryObject fontDict)
     {
