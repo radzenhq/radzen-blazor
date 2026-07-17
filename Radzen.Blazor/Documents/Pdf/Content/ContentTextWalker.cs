@@ -1,50 +1,44 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts;
-using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// Walks a content stream's token grammar tracking the graphics CTM stack and the text
-// state (matrices, font, leading, spacing, scale, rise), and hands each text-show
-// operator to a consumer. The consumer decodes the shown string however it needs and
-// returns the horizontal text-space advance the pen moved, which steps the text matrix.
+// Walks a content stream's token grammar over the shared ContentStateMachine and hands each
+// text-show operator to a consumer. The consumer decodes the shown string however it needs
+// and returns the horizontal text-space advance the pen moved, which steps the text matrix.
 internal sealed class ContentTextWalker
 {
+    private readonly ContentStateMachine machine;
+
+    private ContentTextWalker(ContentStateMachine machine) => this.machine = machine;
+
     // op is the show operator ("Tj", "TJ", "'" or "\""); array holds the flattened
     // string/number elements of the last TJ array and is only meaningful when op is "TJ".
     public delegate double ShowHandler(ContentTextWalker walker, string op, List<Token> operands, List<Token> array, int operatorIndex);
 
-    private ContentTextWalker()
-    {
-    }
+    public Matrix Ctm => machine.Ctm;
 
-    public Matrix Ctm { get; private set; } = Matrix.Identity;
+    public Matrix TextMatrix => machine.TextMatrix;
 
-    public Matrix TextMatrix { get; private set; } = Matrix.Identity;
+    public ReverseFont? Font => machine.Text.Font;
 
-    public ReverseFont? Font { get; private set; }
+    public double FontSize => machine.Text.FontSize;
 
-    public double FontSize { get; private set; }
+    public double HorizontalScale => machine.Text.Spacing.HorizontalScale;
 
-    private TextSpacing spacing = new();
+    public double CharSpacing => machine.Text.Spacing.CharSpacing;
 
-    public double HorizontalScale => spacing.HorizontalScale;
+    public double WordSpacing => machine.Text.Spacing.WordSpacing;
 
-    public double CharSpacing => spacing.CharSpacing;
-
-    public double WordSpacing => spacing.WordSpacing;
-
-    public double Rise { get; private set; }
+    public double Rise => machine.Text.Rise;
 
     public static void Walk(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ShowHandler show, ContentTokenizer.Cache? cache = null)
     {
         var tokens = ContentTokenizer.Tokenize(content, cache);
-        var walker = new ContentTextWalker();
-        var ctmStack = new Stack<Matrix>();
-        var lineMatrix = Matrix.Identity;
-        var leading = 0.0;
+        var machine = new ContentStateMachine(fonts, ReverseFont.WinAnsi);
+        var walker = new ContentTextWalker(machine);
         var operatorIndex = 0;
         var operands = new List<Token>();
         var array = new List<Token>();
@@ -92,75 +86,12 @@ internal sealed class ContentTextWalker
                     break;
             }
 
-            // Tc/Tw/Tz have no other effect and fall through the switch; " also shows.
-            walker.spacing.Apply(token.Text, operands);
-
-            switch (token.Text)
+            if (!machine.Apply(token.Text, operands) && ContentShows.IsShow(token.Text))
             {
-                case "q":
-                    ctmStack.Push(walker.Ctm);
-                    break;
-                case "Q":
-                    if (ctmStack.Count > 0)
-                    {
-                        walker.Ctm = ctmStack.Pop();
-                    }
-
-                    break;
-                case "cm":
-                    walker.Ctm = Components(operands) * walker.Ctm;
-                    break;
-                case "BT":
-                    walker.TextMatrix = Matrix.Identity;
-                    lineMatrix = Matrix.Identity;
-                    break;
-                case "Tf":
-                    walker.Font = LastName(operands) is { } key && fonts is not null && fonts.TryGetValue(key, out var resolved)
-                        ? resolved
-                        : ReverseFont.WinAnsi;
-                    walker.FontSize = LastNumber(operands);
-                    break;
-                case "Ts":
-                    walker.Rise = LastNumber(operands);
-                    break;
-                case "TD":
-                    leading = -Number(operands, 1);
-                    goto case "Td";
-                case "Td":
-                    lineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * lineMatrix;
-                    walker.TextMatrix = lineMatrix;
-                    break;
-                case "TL":
-                    leading = Number(operands, 0);
-                    break;
-                case "Tm":
-                    lineMatrix = Components(operands);
-                    walker.TextMatrix = lineMatrix;
-                    break;
-                case "T*":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    walker.TextMatrix = lineMatrix;
-                    break;
-                case "Tj":
-                case "TJ":
-                    walker.Show(show, token.Text, operands, array, operatorIndex++);
-                    break;
-                case "'":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    walker.TextMatrix = lineMatrix;
-                    walker.Show(show, token.Text, operands, array, operatorIndex++);
-                    break;
-                case "\"":
-                    lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
-                    walker.TextMatrix = lineMatrix;
-                    walker.Show(show, token.Text, operands, array, operatorIndex++);
-                    break;
+                machine.Advance(show(walker, token.Text!, operands, array, operatorIndex++));
             }
 
             operands.Clear();
         }
     }
-
-    private void Show(ShowHandler show, string op, List<Token> operands, List<Token> array, int operatorIndex)
-        => TextMatrix = Matrix.Translate(show(this, op, operands, array, operatorIndex), 0) * TextMatrix;
 }

@@ -17,7 +17,7 @@ internal static class ContentInterpreter
     public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null, ContentTokenizer.Cache? cache = null)
     {
         var tokens = ContentTokenizer.Tokenize(content, cache);
-        var interpreter = new InterpreterState();
+        var interpreter = new InterpreterState(fonts);
 
         for (var i = 0; i < tokens.Count; i++)
         {
@@ -73,15 +73,20 @@ internal static class ContentInterpreter
             }
 
             var op = token.Text;
-            if (!HandleGraphicsOperators(op, interpreter, target)
-                && !HandleTextOperators(op, interpreter, target, fonts)
+
+            // The shared machine owns q/Q, cm, the text matrices and the text state. What it
+            // consumes has no element of its own, which is also why those operators need no
+            // passthrough: the source bytes carrying them are copied verbatim by the editor.
+            if (!interpreter.Machine.Apply(op, interpreter.Operands)
+                && !HandleGraphicsOperators(op, interpreter, target)
+                && !HandleTextOperators(op, interpreter, target)
                 && !HandlePathOperators(op, interpreter, target)
                 && !HandleMarkedContentOperators(op, interpreter))
             {
                 HandlePassthroughOperator(op, interpreter, target);
             }
 
-            if (op is not ("Tj" or "TJ" or "'" or "\""))
+            if (!ContentShows.IsShow(op))
             {
                 FinalizeMerge(interpreter);
             }
@@ -117,25 +122,9 @@ internal static class ContentInterpreter
     private static bool HandleGraphicsOperators(string? op, InterpreterState interpreter, ContentCollection target)
     {
         var operands = interpreter.Operands;
-        ref var state = ref interpreter.Graphics;
+        var state = interpreter.Graphics;
         switch (op)
         {
-            case "q":
-                interpreter.Stack.Push(state.Clone());
-                break;
-
-            case "Q":
-                if (interpreter.Stack.Count > 0)
-                {
-                    state = interpreter.Stack.Pop();
-                }
-
-                break;
-
-            case "cm":
-                state.Ctm = Components(operands) * state.Ctm;
-                break;
-
             case "w":
                 state.LineWidth = LastNumber(operands);
                 break;
@@ -210,82 +199,23 @@ internal static class ContentInterpreter
         return true;
     }
 
-    private static bool HandleTextOperators(string? op, InterpreterState interpreter, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? reverseFonts)
+    // The machine has already advanced the line and applied a " operator's own aw/ac, so
+    // every show reads the same text state a viewer would have in effect here.
+    private static bool HandleTextOperators(string? op, InterpreterState interpreter, ContentCollection target)
     {
-        var operands = interpreter.Operands;
-        ref var state = ref interpreter.Graphics;
-        switch (op)
+        if (!ContentShows.IsShow(op))
         {
-            case "BT":
-                interpreter.TextMatrix = Matrix.Identity;
-                interpreter.LineMatrix = Matrix.Identity;
-                break;
-
-            case "ET":
-                break;
-
-            case "Tf":
-                interpreter.FontName = LastName(operands);
-                interpreter.FontSize = LastNumber(operands);
-                interpreter.Font = interpreter.FontName is not null && reverseFonts is not null && reverseFonts.TryGetValue(interpreter.FontName, out var resolved)
-                    ? resolved
-                    : null;
-                break;
-
-            case "TL":
-                interpreter.Leading = LastNumber(operands);
-                break;
-
-            case "TD":
-                interpreter.Leading = -Number(operands, 1);
-                goto case "Td";
-
-            case "Td":
-                interpreter.LineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * interpreter.LineMatrix;
-                interpreter.TextMatrix = interpreter.LineMatrix;
-                break;
-
-            case "Tm":
-                interpreter.LineMatrix = Components(operands);
-                interpreter.TextMatrix = interpreter.LineMatrix;
-                break;
-
-            case "T*":
-                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
-                interpreter.TextMatrix = interpreter.LineMatrix;
-                break;
-
-            case "Tj":
-            case "TJ":
-                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0));
-                break;
-
-            // ' advances to the next line by the interpreter.Leading before showing.
-            case "'":
-                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
-                interpreter.TextMatrix = interpreter.LineMatrix;
-                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, 0, 0));
-                break;
-
-            // " advances the line then shows, and additionally sets word spacing (aw)
-            // and character spacing (ac) from its first two operands.
-            case "\"":
-                interpreter.LineMatrix = Matrix.Translate(0, -interpreter.Leading) * interpreter.LineMatrix;
-                interpreter.TextMatrix = interpreter.LineMatrix;
-                EmitText(target, interpreter, state, new TextState(interpreter.FontName, interpreter.FontSize, interpreter.Font, Number(operands, 0), Number(operands, 1)));
-                break;
-
-            default:
-                return false;
+            return false;
         }
 
+        EmitText(target, interpreter, interpreter.Graphics);
         return true;
     }
 
     private static bool HandlePathOperators(string? op, InterpreterState interpreter, ContentCollection target)
     {
         var operands = interpreter.Operands;
-        ref var state = ref interpreter.Graphics;
+        var state = interpreter.Graphics;
         switch (op)
         {
             case "W":
@@ -451,7 +381,7 @@ internal static class ContentInterpreter
 
     private static void HandlePassthroughOperator(string? op, InterpreterState interpreter, ContentCollection target)
     {
-        if (op is not null && !IsTextState(op))
+        if (op is not null)
         {
             target.Add(new RawContent(op, [.. interpreter.Operands])
             {
@@ -461,16 +391,14 @@ internal static class ContentInterpreter
         }
     }
 
-    private sealed class InterpreterState
+    private sealed class InterpreterState(IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
-        public GraphicsState Graphics = new();
-        public Stack<GraphicsState> Stack { get; } = new();
-        public Matrix TextMatrix { get; set; } = Matrix.Identity;
-        public Matrix LineMatrix { get; set; } = Matrix.Identity;
-        public double FontSize { get; set; }
-        public double Leading { get; set; }
-        public string? FontName { get; set; }
-        public ReverseFont? Font { get; set; }
+        // An unresolvable Tf leaves the font null so an edited run re-encodes through
+        // WinAnsi substitution rather than failing on a font that was never really there.
+        public ContentStateMachine Machine { get; } = new(fonts, fallbackFont: null, new GraphicsState());
+
+        public GraphicsState Graphics => (GraphicsState)Machine.State;
+
         public double CurrentX { get; set; }
         public double CurrentY { get; set; }
         public double StartX { get; set; }
@@ -501,9 +429,10 @@ internal static class ContentInterpreter
     }
 
 
-    private static void EmitText(ContentCollection target, InterpreterState interpreter, GraphicsState state, TextState text)
+    private static void EmitText(ContentCollection target, InterpreterState interpreter, GraphicsState state)
     {
-        var textMatrix = interpreter.TextMatrix;
+        ref var text = ref interpreter.Machine.Text;
+        var textMatrix = interpreter.Machine.TextMatrix;
         var artifactDepth = interpreter.ArtifactDepth;
         var tjSegments = interpreter.TjSegments;
         var pendingMerge = interpreter.PendingMerge;
@@ -532,8 +461,8 @@ internal static class ContentInterpreter
             && pendingMerge.Font.Size == text.FontSize
             && pendingMerge.Color == state.Fill
             && pendingMerge.FillPaint == state.FillPaint
-            && pendingMerge.WordSpacing == text.WordSpacing
-            && pendingMerge.CharSpacing == text.CharSpacing
+            && pendingMerge.WordSpacing == text.Spacing.WordSpacing
+            && pendingMerge.CharSpacing == text.Spacing.CharSpacing
             && pendingMerge.IsArtifact == (artifactDepth > 0))
         {
             // The first fold seeds the growable buffers from the run as authored; later folds
@@ -568,8 +497,8 @@ internal static class ContentInterpreter
             SourceAdjustments = HasAdjustment(tjSegments) ? [.. tjSegments!] : null,
             Color = state.Fill,
             FillPaint = state.FillPaint,
-            WordSpacing = text.WordSpacing,
-            CharSpacing = text.CharSpacing,
+            WordSpacing = text.Spacing.WordSpacing,
+            CharSpacing = text.Spacing.CharSpacing,
             Transform = transform,
             IsArtifact = artifactDepth > 0,
         };
@@ -682,11 +611,6 @@ internal static class ContentInterpreter
 
     private static byte Channel(double value) => (byte)Math.Round(Math.Clamp(value, 0, 1) * 255.0);
 
-    // Text-state operators (char/word spacing, horizontal scale, leading, rise, render
-    // mode) set state that persists across BT/ET. The model re-emits each run in its own
-    // isolated BT/ET, so passing these through as standalone elements would misapply them.
-    private static bool IsTextState(string op) => op is "Tc" or "Tw" or "Tz" or "TL" or "Ts" or "Tr";
-
     private static string Decode(byte[] bytes)
     {
         var builder = new StringBuilder(bytes.Length);
@@ -703,18 +627,14 @@ internal static class ContentInterpreter
 
     private readonly record struct PathOp(string Operator, double[] Operands);
 
-    // The text-show state a show operator carries: the selected font resource and size,
-    // its resolved reverse map, and the word/character spacing an inline " sets.
-    private readonly record struct TextState(string? FontName, double FontSize, ReverseFont? Font, double WordSpacing, double CharSpacing);
-
     // The paint disposition of a path operator: stroke/fill, whether it closes the last
     // subpath, and even-odd vs nonzero fill.
     private readonly record struct PathPaint(bool Stroke, bool Fill, bool Close, bool EvenOdd);
 
-    private sealed class GraphicsState
+    // The CTM and text state live in the shared base, which is also what q/Q saves; these
+    // are the extra members only materialization needs.
+    private sealed class GraphicsState : ContentGraphicsState
     {
-        public Matrix Ctm { get; set; } = Matrix.Identity;
-
         public Color Fill { get; set; } = Color.Black;
 
         public Color Stroke { get; set; } = Color.Black;
@@ -737,21 +657,6 @@ internal static class ContentInterpreter
         // clip is active. Only ever a superset of the real region, so it can bound an
         // operator that paints the whole clip (sh) without under-reporting its extent.
         public PdfRect? Clip { get; set; }
-
-        public GraphicsState Clone() => new()
-        {
-            Ctm = Ctm,
-            Fill = Fill,
-            Stroke = Stroke,
-            LineWidth = LineWidth,
-            FillPaint = FillPaint,
-            StrokePaint = StrokePaint,
-            FillColorSpace = FillColorSpace,
-            StrokeColorSpace = StrokeColorSpace,
-            DashArray = DashArray,
-            DashPhase = DashPhase,
-            Clip = Clip,
-        };
     }
 }
 

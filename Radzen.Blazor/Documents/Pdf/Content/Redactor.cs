@@ -145,7 +145,7 @@ internal static class Redactor
                 continue;
             }
 
-            if (token.Text is "Tj" or "TJ" or "'" or "\"")
+            if (ContentShows.IsShow(token.Text))
             {
                 if (selected.TryGetValue(showIndex, out var selection))
                 {

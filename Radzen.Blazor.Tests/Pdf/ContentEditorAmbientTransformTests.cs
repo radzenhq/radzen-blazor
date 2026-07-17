@@ -100,5 +100,24 @@ public class ContentEditorAmbientTransformTests
         InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
     }
 
+    // A Q with nothing on the stack has no state to restore, so the CTM in effect is
+    // unchanged and the editor's ambient must agree with the interpreter's transform.
+    [Fact]
+    public void ModifiedTextAfterUnbalancedQ_KeepsItsTransform()
+    {
+        var document = new Document();
+        document.Pages.Add().SetContent(Content("2 0 0 2 0 0 cm Q BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
+
+        var loaded = InterpreterTestSupport.SaveAndLoad(document);
+        var run = loaded.Pages[0].Content.OfType<TextContent>().Single();
+        var expected = run.Transform;
+        run.Color = Color.Red;
+
+        var reloaded = InterpreterTestSupport.SaveAndLoad(loaded);
+        var actual = reloaded.Pages[0].Content.OfType<TextContent>().Single();
+
+        InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
+    }
+
     private static byte[] Content(string value) => Encoding.ASCII.GetBytes(value);
 }
