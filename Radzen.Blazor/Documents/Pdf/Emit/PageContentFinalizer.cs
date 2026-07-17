@@ -157,7 +157,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         if (wrapArtifacts)
         {
             writer.WriteName("Artifact");
-            writer.WriteRaw(" BDC\n");
+            writer.WriteRaw(" BMC\n");
         }
     }
 
@@ -310,7 +310,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         if (markArtifacts)
         {
             writer.WriteName("Artifact");
-            writer.WriteRaw(" BDC\n");
+            writer.WriteRaw(" BMC\n");
         }
 
         WriteWatermark(writer, watermark);
