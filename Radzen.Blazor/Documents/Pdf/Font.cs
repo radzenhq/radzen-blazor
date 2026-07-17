@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// A text font: family name, size in points and style attributes.
 /// </summary>
-public class Font
+public class Font : ITracksChanges
 {
     private string? name;
     private double? size;
@@ -13,55 +13,55 @@ public class Font
     private bool? underline;
     private bool? strikethrough;
     private Color? color;
-    private bool touched;
+    private ChangeTracker tracker;
 
     /// <summary>Gets or sets the font family name.</summary>
     public string Name
     {
         get => name ?? "Helvetica";
-        set => Set(ref name, value);
+        set => tracker.Set(ref name, value);
     }
 
     /// <summary>Gets or sets the font size in points. Defaults to 10.</summary>
     public double Size
     {
         get => size ?? 10;
-        set => Set(ref size, value);
+        set => tracker.Set(ref size, value);
     }
 
     /// <summary>Gets or sets a value indicating whether the font is bold.</summary>
     public bool Bold
     {
         get => bold ?? false;
-        set => Set(ref bold, value);
+        set => tracker.Set(ref bold, value);
     }
 
     /// <summary>Gets or sets a value indicating whether the font is italic.</summary>
     public bool Italic
     {
         get => italic ?? false;
-        set => Set(ref italic, value);
+        set => tracker.Set(ref italic, value);
     }
 
     /// <summary>Gets or sets a value indicating whether the text is underlined.</summary>
     public bool Underline
     {
         get => underline ?? false;
-        set => Set(ref underline, value);
+        set => tracker.Set(ref underline, value);
     }
 
     /// <summary>Gets or sets a value indicating whether the text is struck through.</summary>
     public bool Strikethrough
     {
         get => strikethrough ?? false;
-        set => Set(ref strikethrough, value);
+        set => tracker.Set(ref strikethrough, value);
     }
 
     /// <summary>Gets or sets the text color. Defaults to black.</summary>
     public Color Color
     {
         get => color ?? Color.Black;
-        set => Set(ref color, value);
+        set => tracker.Set(ref color, value);
     }
 
     /// <summary>
@@ -69,15 +69,11 @@ public class Font
     /// materialized. A <see cref="TextContent"/> folds its own font's state into
     /// <see cref="ContentElement.IsModified"/>.
     /// </summary>
-    public bool IsModified => touched;
+    public bool IsModified => tracker.IsModified;
 
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    internal void AcceptChanges() => tracker.AcceptChanges();
 
-    internal void AcceptChanges() => touched = false;
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     internal string? NameValue => name;
 

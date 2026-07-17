@@ -2,9 +2,9 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>Describes an interactive annotation placed on a PDF page.</summary>
 /// <param name="bounds">The annotation bounds in PDF page coordinates.</param>
-public abstract class Annotation(PdfRect bounds)
+public abstract class Annotation(PdfRect bounds) : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private PdfRect bounds = bounds;
     private Color color = Color.Yellow;
     private double opacity = 1;
@@ -67,7 +67,7 @@ public abstract class Annotation(PdfRect bounds)
     /// A loaded page re-emits only the annotations that report true, so an untouched one keeps
     /// its original dictionary.
     /// </summary>
-    public virtual bool IsModified => touched || Appearance?.IsModified == true;
+    public virtual bool IsModified => tracker.IsModified || Appearance?.IsModified == true;
 
     internal abstract string Subtype { get; }
 
@@ -75,22 +75,22 @@ public abstract class Annotation(PdfRect bounds)
     /// <typeparam name="T">The field type.</typeparam>
     /// <param name="field">The backing field to assign.</param>
     /// <param name="value">The value to assign.</param>
-    // Unconditional, as on ContentElement: whether the new value is "equal" to the old is not
-    // the same question as whether it emits the same bytes.
-    protected void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
 
     /// <summary>Marks this annotation modified without assigning a tracked field.</summary>
-    protected void Touch() => touched = true;
+    protected void Touch() => tracker.Touch();
 
     // Called once over a loaded page's annotations after reading, which builds them through
     // these same setters and would otherwise leave every loaded annotation born dirty.
     internal virtual void AcceptChanges()
     {
-        touched = false;
+        tracker.AcceptChanges();
         Appearance?.AcceptChanges();
     }
+
+    // Explicit so the overridable public IsModified/AcceptChanges do not themselves implement an
+    // internal interface member (CA2119); subclass overrides are still reached through them.
+    bool ITracksChanges.IsModified => IsModified;
+
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 }

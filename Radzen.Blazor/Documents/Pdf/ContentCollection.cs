@@ -11,8 +11,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class ContentCollection : IReadOnlyList<ContentElement>
 {
-    private readonly List<ContentElement> items = [];
-    private bool structureChanged;
+    private readonly TrackedList<ContentElement> items = [];
 
     /// <summary>Gets the number of elements in the collection.</summary>
     public int Count => items.Count;
@@ -33,7 +32,6 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     {
         ArgumentNullException.ThrowIfNull(element);
         items.Add(element);
-        structureChanged = true;
         return element;
     }
 
@@ -47,7 +45,6 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     {
         ArgumentNullException.ThrowIfNull(element);
         items.Insert(index, element);
-        structureChanged = true;
         return element;
     }
 
@@ -57,37 +54,27 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     public bool Remove(ContentElement element)
     {
         ArgumentNullException.ThrowIfNull(element);
-        var removed = items.Remove(element);
-        structureChanged |= removed;
-        return removed;
+        return items.Remove(element);
     }
 
     /// <summary>Removes the element at the specified paint-order index.</summary>
     /// <param name="index">The zero-based element index.</param>
-    public void RemoveAt(int index)
-    {
-        items.RemoveAt(index);
-        structureChanged = true;
-    }
+    public void RemoveAt(int index) => items.RemoveAt(index);
 
     /// <inheritdoc />
     public IEnumerator<ContentElement> GetEnumerator() => items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    internal void Clear()
-    {
-        structureChanged |= items.Count > 0;
-        items.Clear();
-    }
+    internal void Clear() => items.Clear();
 
     // Element flags answer "did an element change", not "did the collection change": a removed
-    // element leaves every survivor clean.
+    // element leaves every survivor clean. The composed list carries the structural truth.
     internal bool IsModified
     {
         get
         {
-            if (structureChanged)
+            if (items.StructureChanged)
             {
                 return true;
             }
@@ -106,7 +93,7 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
 
     internal void AcceptChanges()
     {
-        structureChanged = false;
+        items.AcceptStructure();
         foreach (var item in items)
         {
             item.AcceptChanges();

@@ -8,8 +8,7 @@ namespace Radzen.Documents.Pdf;
 /// <summary>Stores the modeled annotations of a page in paint order.</summary>
 public sealed class AnnotationCollection : IReadOnlyList<Annotation>
 {
-    private readonly List<Entry> entries = [];
-    private bool structureChanged;
+    private readonly TrackedList<Entry> entries = [];
     private bool loaded;
 
     /// <summary>Gets the number of modeled annotations.</summary>
@@ -43,7 +42,6 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     {
         ArgumentNullException.ThrowIfNull(annotation);
         entries.Add(new Entry(annotation, null, null, null));
-        structureChanged = true;
         return annotation;
     }
 
@@ -61,8 +59,6 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
         {
             entries.Insert(EntryIndex(index), new Entry(annotation, null, null, null));
         }
-
-        structureChanged = true;
     }
 
     /// <summary>Removes the specified annotation.</summary>
@@ -76,7 +72,6 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
             if (ReferenceEquals(entries[i].Annotation, annotation))
             {
                 entries.RemoveAt(i);
-                structureChanged = true;
                 return true;
             }
         }
@@ -86,18 +81,10 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
 
     /// <summary>Removes the annotation at a modeled annotation index.</summary>
     /// <param name="index">The zero-based modeled annotation index.</param>
-    public void RemoveAt(int index)
-    {
-        entries.RemoveAt(EntryIndex(index));
-        structureChanged = true;
-    }
+    public void RemoveAt(int index) => entries.RemoveAt(EntryIndex(index));
 
     /// <summary>Removes all modeled annotations while retaining unsupported loaded annotations.</summary>
-    public void Clear()
-    {
-        var removed = entries.RemoveAll(entry => entry.Annotation is not null);
-        structureChanged |= removed > 0;
-    }
+    public void Clear() => entries.RemoveAll(entry => entry.Annotation is not null);
 
     /// <inheritdoc />
     public IEnumerator<Annotation> GetEnumerator()
@@ -121,7 +108,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     {
         get
         {
-            if (structureChanged)
+            if (entries.StructureChanged)
             {
                 return true;
             }
@@ -145,14 +132,14 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
         // leave every loaded annotation born dirty.
         annotation?.AcceptChanges();
         entries.Add(new Entry(annotation, reader, original, dictionary));
+        // The loaded entry is the clean baseline: adding it must not read as a structural edit,
+        // or an unmodified loaded page would re-emit its /Annots array.
+        entries.AcceptStructure();
     }
 
     internal void RemoveLoadedSubtype(string subtype)
-    {
-        var removed = entries.RemoveAll(entry => entry.Dictionary is { } dictionary
+        => entries.RemoveAll(entry => entry.Dictionary is { } dictionary
             && string.Equals(entry.Reader!.GetName(dictionary, "Subtype"), subtype, StringComparison.Ordinal));
-        structureChanged |= removed > 0;
-    }
 
     private int EntryIndex(int modeledIndex)
     {

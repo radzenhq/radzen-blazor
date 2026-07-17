@@ -176,20 +176,7 @@ public sealed class Document
         || pageLabels.StructureChanged
         || AnyModified(pageLabels);
 
-    private static bool AnyModified(TrackedList<OutlineItem> items)
-    {
-        foreach (var item in items)
-        {
-            if (item.IsModified)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static bool AnyModified(TrackedList<PageLabel> items)
+    private static bool AnyModified<T>(TrackedList<T> items) where T : ITracksChanges
     {
         foreach (var item in items)
         {

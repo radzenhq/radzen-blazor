@@ -30,9 +30,9 @@ public enum PageLabelStyle
 /// <see cref="Document.PageLabels"/> to control the page numbers a viewer shows.
 /// </summary>
 /// <param name="startPage">The zero-based index of the first page in the range.</param>
-public sealed class PageLabel(int startPage)
+public sealed class PageLabel(int startPage) : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private PageLabelStyle? style;
     private string? prefix;
     private int start = 1;
@@ -47,33 +47,29 @@ public sealed class PageLabel(int startPage)
     public PageLabelStyle? Style
     {
         get => style;
-        set => Set(ref style, value);
+        set => tracker.Set(ref style, value);
     }
 
     /// <summary>Gets or sets the label prefix (the <c>/P</c> entry). When <see langword="null"/> no prefix is written.</summary>
     public string? Prefix
     {
         get => prefix;
-        set => Set(ref prefix, value);
+        set => tracker.Set(ref prefix, value);
     }
 
     /// <summary>Gets or sets the ordinal of the first page in the range (the <c>/St</c> entry). Defaults to 1.</summary>
     public int Start
     {
         get => start;
-        set => Set(ref start, value);
+        set => tracker.Set(ref start, value);
     }
 
     /// <summary>Gets a value indicating whether this range has been modified since the document was loaded.</summary>
-    public bool IsModified => touched;
+    public bool IsModified => tracker.IsModified;
 
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    internal void AcceptChanges() => tracker.AcceptChanges();
 
-    internal void AcceptChanges() => touched = false;
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
 // Serializes Document.PageLabels as the catalog /PageLabels number tree (ISO 32000-1
