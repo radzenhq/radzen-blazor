@@ -4,8 +4,6 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class PngPredictor
 {
-    private const int MaxColors = 32;
-
     public static byte[] Decode(byte[] data, int colors, int bitsPerComponent, int columns)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -122,10 +120,7 @@ internal static class PngPredictor
 
     static void ValidateParameters(int colors, int bitsPerComponent, int columns)
     {
-        if (columns <= 0 || colors <= 0 || colors > MaxColors)
-        {
-            throw new DocumentParseException("PNG predictor colors/columns are out of range.");
-        }
+        PredictorParameters.ValidateColorsAndColumns(colors, columns, "PNG");
 
         if (bitsPerComponent is not (1 or 2 or 4 or 8 or 16))
         {

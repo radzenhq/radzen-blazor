@@ -150,21 +150,10 @@ public sealed class ContentWriter : IDisposable
     public void WriteName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
-        foreach (var ch in name)
+        if (NameObject.NeedsEscaping(name))
         {
-            // Names are byte sequences; a code point above Latin-1 cannot be represented
-            // without silently aliasing to a different resource (e.g. U+0141 -> 'A').
-            if (ch > 0xFF)
-            {
-                throw new NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
-            }
-
-            var code = ch & 0xFF;
-            if (code <= 0x20 || code >= 0x7F || code == '#' || IsDelimiter(code))
-            {
-                WriteRaw(NameObject.Escape(name));
-                return;
-            }
+            WriteRaw(NameObject.Escape(name));
+            return;
         }
 
         Append((byte)'/');
@@ -244,12 +233,6 @@ public sealed class ContentWriter : IDisposable
 
         Append((byte)')');
     }
-
-    private static bool IsDelimiter(int code) => code switch
-    {
-        '(' or ')' or '<' or '>' or '[' or ']' or '{' or '}' or '/' or '%' => true,
-        _ => false,
-    };
 
     private void Append(byte value)
     {

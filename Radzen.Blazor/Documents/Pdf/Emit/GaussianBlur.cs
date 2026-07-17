@@ -65,7 +65,7 @@ internal static class GaussianBlur
         var pixels = new byte[width * height];
         for (var i = 0; i < pixels.Length; i++)
         {
-            pixels[i] = (byte)Math.Clamp((int)Math.Round(coverage[i] * 255.0), 0, 255);
+            pixels[i] = ColorComponent.ToChannel(coverage[i]);
         }
 
         return new ShadowMask
