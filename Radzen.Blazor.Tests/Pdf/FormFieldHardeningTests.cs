@@ -224,7 +224,9 @@ public class FormFieldHardeningTests
         Assert.Equal("BBB", form.Fields[1].Value);
     }
 
-    // #55 - a multi-select list box (/V array) is flattened by joining its selections.
+    // #55 - a multi-select list box (/V array) renders as stacked highlighted /Opt entries
+    // (ISO 32000-1 12.7.4.4). Joining its selections into one line invented a string the field
+    // never shows and dropped the unselected options, so flatten refuses it instead.
 
     private static byte[] MultiSelectListForm()
     {
@@ -239,16 +241,12 @@ public class FormFieldHardeningTests
     }
 
     [Fact]
-    public void FlattenJoinsMultiSelectListBoxSelections()
+    public void FlattenRefusesMultiSelectListBoxSelections()
     {
         var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm()));
         document.AcroForm!.Fields.Single();
-        document.Flatten();
 
-        var reader = FormTestSupport.Reload(document);
-        var content = FormTestSupport.PageContentText(reader);
-
-        Assert.Contains("Red, Blue", content);
+        Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
     // #13 - a visible signature appearance the redraw heuristic cannot reproduce fails loud.

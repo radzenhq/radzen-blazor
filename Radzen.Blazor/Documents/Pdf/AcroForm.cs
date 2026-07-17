@@ -247,7 +247,7 @@ public sealed class AcroForm
 
     private void WriteTextAppearance(Terminal terminal, string value)
     {
-        if (FieldAppearances.CanEncode(value) && CanBakeAppearance(terminal.Field))
+        if (FieldBakePolicy.CanBakeSingleLine(reader, terminal.Field, value))
         {
             // Write the appearance onto every widget so a kid's stale /AP does not override
             // the new value in a viewer; when field and widget merge this is the field. Each
@@ -275,19 +275,6 @@ public sealed class AcroForm
                 }
             }
         }
-    }
-
-    // The baked single left-aligned line is faithful only for a plain text field: not for a
-    // multiline, comb or password field, nor a centered/right /Q. Those defer to the viewer.
-    private bool CanBakeAppearance(DictionaryObject field)
-    {
-        var flags = Inherited(field, "Ff") is NumberObject ff ? ff.IntValue : 0;
-        if ((flags & (FieldFlags.Multiline | FieldFlags.Password | FieldFlags.Comb)) != 0)
-        {
-            return false;
-        }
-
-        return Inherited(field, "Q") is not NumberObject quad || quad.IntValue == 0;
     }
 
     private DocumentObject? Inherited(DictionaryObject dict, string key)
