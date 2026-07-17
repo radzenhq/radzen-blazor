@@ -30,8 +30,10 @@ dotnet_diagnostic.IDE0005.severity = warning
 # Null propagation (?.)
 dotnet_diagnostic.IDE0031.severity = warning
 
-# Simplify member access
-dotnet_diagnostic.IDE0002.severity = warning
+# Simplify member access. IDE-only: EnforceCodeStyleInBuild never reports IDE0002, so setting it
+# to warning enforces nothing and only nags. Markdown/ qualifies Radzen.Documents.Markdown types in
+# full on purpose - Paragraph, Image and Table collide with Radzen.Documents.Pdf.
+dotnet_diagnostic.IDE0002.severity = none
 
 # Redundant #nullable directive (project already enables nullable)
 dotnet_diagnostic.IDE0240.severity = warning
