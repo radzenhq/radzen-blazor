@@ -119,10 +119,19 @@ internal static class ContentEmitter
         writer.WriteRaw(" cm\n");
     }
 
-    public static void WriteImageDraw(ContentWriter writer, in ImageDraw image)
+    public static void WriteImageDraw(ContentWriter writer, in ImageDraw image) =>
+        WriteImagePlacement(writer, image.Image.Key, image.X, image.Y, image.Width, image.Height,
+            image.ExtGState, image.Transform, image.Clip, image.ClipRadius, image.StencilColor);
+
+    // Emits q [gs] [transform cm] [clip] [rg] <w 0 0 h x y cm> /key Do Q. Every optional argument
+    // emits nothing when unset, so a bare key+geometry call produces the plain placement.
+    public static void WriteImagePlacement(
+        ContentWriter writer, string key, double x, double y, double width, double height,
+        string? extGState = null, Matrix? transform = null, PdfRect? clip = null,
+        double clipRadius = 0, Color? stencilColor = null)
     {
         writer.WriteRaw("q\n");
-        if (image.ExtGState is { } state)
+        if (extGState is { } state)
         {
             writer.WriteName(state);
             writer.WriteRaw(" gs\n");
@@ -130,30 +139,30 @@ internal static class ContentEmitter
 
         // The transform precedes the clip so the clip rectangle (given in the same
         // pre-transform coordinates as the image box) rotates with the image.
-        if (image.Transform is { } transform)
+        if (transform is { } t)
         {
-            WriteTransform(writer, transform);
+            WriteTransform(writer, t);
         }
 
-        if (image.Clip is { } clip)
+        if (clip is { } c)
         {
-            WriteClip(writer, clip, image.ClipRadius);
+            WriteClip(writer, c, clipRadius);
         }
 
-        if (image.StencilColor is { } stencilColor)
+        if (stencilColor is { } color)
         {
-            writer.WriteColor(stencilColor, "rg");
+            writer.WriteColor(color, "rg");
         }
 
-        writer.WriteNumber(image.Width);
+        writer.WriteNumber(width);
         writer.WriteRaw(" 0 0 ");
-        writer.WriteNumber(image.Height);
+        writer.WriteNumber(height);
         writer.WriteRaw(" ");
-        writer.WriteNumber(image.X);
+        writer.WriteNumber(x);
         writer.WriteRaw(" ");
-        writer.WriteNumber(image.Y);
+        writer.WriteNumber(y);
         writer.WriteRaw(" cm\n");
-        writer.WriteName(image.Image.Key);
+        writer.WriteName(key);
         writer.WriteRaw(" Do\nQ\n");
     }
 

@@ -34,17 +34,7 @@ public sealed class ImageContent : ContentElement
     protected override void EmitBody(ContentWriter writer)
     {
         var key = writer.RegisterImage(EncodedXObject);
-
-        writer.WriteRaw("q\n");
-        writer.WriteNumber(Bounds.Width);
-        writer.WriteRaw(" 0 0 ");
-        writer.WriteNumber(Bounds.Height);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(Bounds.Left);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(Bounds.Bottom);
-        writer.WriteRaw(" cm\n");
-        writer.WriteName(key);
-        writer.WriteRaw(" Do\nQ\n");
+        ContentEmitter.WriteImagePlacement(
+            writer, key, Bounds.Left, Bounds.Bottom, Bounds.Width, Bounds.Height);
     }
 }
