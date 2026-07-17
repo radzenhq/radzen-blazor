@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
-using static Radzen.Documents.Pdf.Emit.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -10,6 +8,8 @@ namespace Radzen.Documents.Pdf.Emit;
 // image, and records a WatermarkDraw the generator serializes after all content.
 internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolver fontResolver, ImageStore imageStore)
 {
+    private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
+
     public void Plan(PagePlan plan, Watermark watermark)
     {
         var draw = new WatermarkDraw
@@ -52,43 +52,25 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
     {
         var size = font.Size;
         var baseline = WatermarkGeometry.Baseline(size);
-        if (fonts.TryResolvePrimary(font, out var primary))
+        if (fonts.TryResolvePrimary(font, out _))
         {
+            // The whole text is measured as one run, so its space-straddling pairs are kerned
+            // in the width the mark is centred from and must be kerned in the drawn run too.
             var x = WatermarkGeometry.Centered(fonts.MeasureText(text, font));
-            var i = 0;
-            while (i < text.Length)
+            foreach (var glyphRun in runBuilder.Build(text, font, size, kernAcrossSpaces: true))
             {
-                var (face, _) = fonts.ResolveGlyph(primary, CodePointAt(text, i));
-                var generated = fontResolver.ResolveSfnt(face);
-                var bytes = new List<byte>();
-                var advance = 0.0;
-                while (i < text.Length)
-                {
-                    var codepoint = CodePointAt(text, i);
-                    var (candidate, gid) = fonts.ResolveGlyph(primary, codepoint);
-                    if (candidate != face)
-                    {
-                        break;
-                    }
-
-                    generated.GidToUnicode.TryAdd(gid, codepoint);
-                    bytes.Add((byte)(gid >> 8));
-                    bytes.Add((byte)(gid & 0xFF));
-                    advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
-                    i += codepoint > 0xFFFF ? 2 : 1;
-                }
-
-                plan.UsedFonts.Add(generated);
+                plan.UsedFonts.Add(glyphRun.Font);
                 draw.Texts.Add(new TextDraw
                 {
                     X = x,
                     Baseline = baseline,
                     Size = size,
                     Color = font.Color,
-                    Font = generated,
-                    Bytes = [.. bytes],
+                    Font = glyphRun.Font,
+                    Bytes = glyphRun.Bytes,
+                    Kerns = glyphRun.Kerns,
                 });
-                x += advance;
+                x += glyphRun.Advance;
             }
         }
         else

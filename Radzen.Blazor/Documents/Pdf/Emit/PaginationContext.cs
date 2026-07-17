@@ -147,6 +147,22 @@ internal sealed class PaginationContext
         }
     }
 
+    // A rotated container turns about its own centre in page space: shift that centre to the
+    // origin, rotate, shift back.
+    private Matrix? RotationAboutCenter(Container container, double indent, double boxWidth, double boxHeight)
+    {
+        if (container.Rotation == 0)
+        {
+            return null;
+        }
+
+        var centerX = left + indent + boxWidth / 2;
+        var centerY = pageHeight - contentTop - Cursor - boxHeight / 2;
+        return Matrix.Translate(-centerX, -centerY)
+            * Matrix.Rotate(container.Rotation)
+            * Matrix.Translate(centerX, centerY);
+    }
+
     public void PlaceBox(int index, Container container)
     {
         var padding = container.Padding.Point;
@@ -161,15 +177,7 @@ internal sealed class PaginationContext
             Cursor = 0;
         }
 
-        Matrix? transform = null;
-        if (container.Rotation != 0)
-        {
-            var centerX = left + indent + boxWidth / 2;
-            var centerY = pageHeight - contentTop - Cursor - boxHeight / 2;
-            transform = Matrix.Translate(-centerX, -centerY)
-                * Matrix.Rotate(container.Rotation)
-                * Matrix.Translate(centerX, centerY);
-        }
+        var transform = RotationAboutCenter(container, indent, boxWidth, boxHeight);
 
         current.Boxes.Add(OverlayBoxPlacer.BuildBox(container, measured, contentWidth, Cursor, order++, transform));
         Cursor += boxHeight;
@@ -185,15 +193,7 @@ internal sealed class PaginationContext
             Cursor = 0;
         }
 
-        Matrix? transform = null;
-        if (container.Rotation != 0)
-        {
-            var centerX = left + indent + boxWidth / 2;
-            var centerY = pageHeight - ContentBox.Y - Cursor - boxHeight / 2;
-            transform = Matrix.Translate(-centerX, -centerY)
-                * Matrix.Rotate(container.Rotation)
-                * Matrix.Translate(centerX, centerY);
-        }
+        var transform = RotationAboutCenter(container, indent, boxWidth, boxHeight);
 
         current.Boxes.Add(new PositionedBox
         {

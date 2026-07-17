@@ -16,6 +16,7 @@ internal sealed class TextLineEmitter(
     StyleResolution resolution)
 {
     private readonly List<byte> scratchBytes = [];
+    private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
 
     private static bool HasNonZero(List<double>? values)
     {
@@ -477,67 +478,22 @@ internal sealed class TextLineEmitter(
         var size = font.Size * run.ScriptScale;
         var spacing = run.LetterSpacing.Point;
         var rise = run.ScriptRise(font.Size);
-        var text = fragment.Text;
         var runX = startX;
 
-        var kerning = fonts.EnableKerning;
-        // The shaper produces the same per-codepoint (face, glyph, cluster) mapping the line
-        // was measured through, so the drawn glyphs are the measured glyphs by construction.
-        // Advances and kern are recomputed here at the script-scaled size (and with the
-        // space-straddle guard) that measurement does not model, so the bytes are unchanged.
-        var glyphs = fonts.Shaper().Shape(text, font, out _);
-        var g = 0;
-        while (g < glyphs.Count)
+        // A line coalesces separately measured words across their spaces, so layout never saw a
+        // space-straddling pair: kerning one here would drift the line off its measured width.
+        foreach (var glyphRun in runBuilder.Build(fragment.Text, font, size, kernAcrossSpaces: false))
         {
-            var face = glyphs[g].Face;
-            var generated = fontResolver.ResolveSfnt(face);
-            var bytes = scratchBytes;
-            bytes.Clear();
-            var advance = 0.0;
-            List<double>? kernList = null;
-            ushort prevGid = 0;
-            var prevCodepoint = 0;
-            var glyphCount = 0;
-            while (g < glyphs.Count && ReferenceEquals(glyphs[g].Face, face))
-            {
-                var gid = glyphs[g].GlyphId;
-                var codepoint = CodePointAt(text, glyphs[g].Cluster);
-
-                if (kerning && glyphCount > 0)
-                {
-                    // One entry per glyph gap (0 when the pair is not kerned) so the TJ
-                    // adjustments stay aligned with the glyph codes. Measurement adds
-                    // kern*size/upem; the TJ number (-kern*1000/upem, positive tightens)
-                    // reproduces the same displacement when drawn. A pair straddling a space
-                    // is never kerned: coalescing joined separately-measured words across the
-                    // space, so layout never saw this pair and kerning it here would drift.
-                    var kern = codepoint == ' ' || prevCodepoint == ' ' ? 0 : face.GetKerning(prevGid, gid);
-                    advance += kern * size / face.UnitsPerEm;
-                    (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
-                }
-
-                // First-seen codepoint wins so glyphs shared by several codepoints
-                // (e.g. hyphen/soft-hyphen) map deterministically, not by draw order.
-                generated.GidToUnicode.TryAdd(gid, codepoint);
-                bytes.Add((byte)(gid >> 8));
-                bytes.Add((byte)(gid & 0xFF));
-                advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
-                prevGid = gid;
-                prevCodepoint = codepoint;
-                glyphCount++;
-                g++;
-            }
-
-            double[]? kerns = HasNonZero(kernList) ? [.. kernList!] : null;
-            plan.UsedFonts.Add(generated);
+            var face = glyphRun.Face;
+            plan.UsedFonts.Add(glyphRun.Font);
             plan.Texts.Add(new TextDraw
             {
                 X = runX,
                 Baseline = y,
                 Size = size,
                 Color = font.Color,
-                Font = generated,
-                Bytes = [.. bytes],
+                Font = glyphRun.Font,
+                Bytes = glyphRun.Bytes,
                 Element = element,
                 // Synthetic bold: no real bold face is available, so the glyphs are
                 // thickened by fill+stroke with a small stroke width at emission.
@@ -552,12 +508,12 @@ internal sealed class TextLineEmitter(
                 RenderMode = run.Invisible ? 3 : 0,
                 FillPaint = run.FillPaint,
                 ExtGState = extGState,
-                Kerns = kerns,
+                Kerns = glyphRun.Kerns,
             });
 
             // Tc advances after every shown glyph, so a face switch inside the
             // fragment continues one spacing gap past the sub-run's glyph advances.
-            runX += spacing == 0 ? advance : advance + (spacing * (bytes.Count / 2));
+            runX += spacing == 0 ? glyphRun.Advance : glyphRun.Advance + (spacing * glyphRun.GlyphCount);
         }
     }
 
