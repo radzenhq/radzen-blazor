@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -235,26 +234,13 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
             PdfBytes.WriteAscii(buffer, "\n");
             for (var number = start; number < start + count; number++)
             {
-                WriteXrefEntry(buffer, offsets[number], GenerationOf(number));
+                PdfBytes.WriteXrefEntry(buffer, offsets[number], GenerationOf(number));
             }
         }
 
         PdfBytes.WriteAscii(buffer, "trailer\n");
         BuildTrailer(nextNumber).Write(buffer);
         PdfBytes.WriteAscii(buffer, "\n");
-    }
-
-    // PdfBytes.WriteXrefEntry hardcodes generation 0, which a full save can assume but an
-    // incremental update cannot: an overridden object keeps its own generation.
-    private static void WriteXrefEntry(Stream stream, long offset, int generation)
-    {
-        Span<char> field = stackalloc char[20];
-        offset.TryFormat(field, out var written, "D10", CultureInfo.InvariantCulture);
-        PdfBytes.WriteAscii(stream, field[..written]);
-        PdfBytes.WriteAscii(stream, " ");
-        generation.TryFormat(field, out written, "D5", CultureInfo.InvariantCulture);
-        PdfBytes.WriteAscii(stream, field[..written]);
-        PdfBytes.WriteAscii(stream, " n \n");
     }
 
     private long WriteXrefStream(CountingBufferedStream buffer, SortedDictionary<int, long> offsets)

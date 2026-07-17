@@ -98,14 +98,15 @@ internal static class PdfBytes
         pos += width;
     }
 
-    // Writes one in-use classic cross-reference entry: a 10-digit offset, generation 0,
-    // and the "n" flag with the mandatory trailing space and newline.
-    internal static void WriteXrefEntry(Stream stream, long offset)
+    internal static void WriteXrefEntry(Stream stream, long offset, int generation = 0)
     {
-        Span<char> padded = stackalloc char[20];
-        offset.TryFormat(padded, out var written, "D10", CultureInfo.InvariantCulture);
-        WriteAscii(stream, padded[..written]);
-        WriteAscii(stream, " 00000 n \n");
+        Span<char> field = stackalloc char[20];
+        offset.TryFormat(field, out var written, "D10", CultureInfo.InvariantCulture);
+        WriteAscii(stream, field[..written]);
+        WriteAscii(stream, " ");
+        generation.TryFormat(field, out written, "D5", CultureInfo.InvariantCulture);
+        WriteAscii(stream, field[..written]);
+        WriteAscii(stream, " n \n");
     }
 
     internal static void WriteAscii(Stream stream, string text) => WriteAscii(stream, text.AsSpan());

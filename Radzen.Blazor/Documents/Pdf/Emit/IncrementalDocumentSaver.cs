@@ -513,16 +513,4 @@ internal sealed class IncrementalDocumentSaver
                 return value;
         }
     }
-
-
-    private static bool Same(byte[]? a, byte[]? b)
-    {
-        if (a is null || b is null)
-        {
-            return a is null && b is null;
-        }
-
-        return a.AsSpan().SequenceEqual(b);
-    }
-
 }
