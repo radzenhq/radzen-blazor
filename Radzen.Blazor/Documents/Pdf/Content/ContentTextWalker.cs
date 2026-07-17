@@ -28,11 +28,13 @@ internal sealed class ContentTextWalker
 
     public double FontSize { get; private set; }
 
-    public double HorizontalScale { get; private set; } = 1.0;
+    private TextSpacing spacing = new();
 
-    public double CharSpacing { get; private set; }
+    public double HorizontalScale => spacing.HorizontalScale;
 
-    public double WordSpacing { get; private set; }
+    public double CharSpacing => spacing.CharSpacing;
+
+    public double WordSpacing => spacing.WordSpacing;
 
     public double Rise { get; private set; }
 
@@ -90,6 +92,9 @@ internal sealed class ContentTextWalker
                     break;
             }
 
+            // Tc/Tw/Tz have no other effect and fall through the switch; " also shows.
+            walker.spacing.Apply(token.Text, operands);
+
             switch (token.Text)
             {
                 case "q":
@@ -114,15 +119,6 @@ internal sealed class ContentTextWalker
                         ? resolved
                         : ReverseFont.WinAnsi;
                     walker.FontSize = LastNumber(operands);
-                    break;
-                case "Tc":
-                    walker.CharSpacing = LastNumber(operands);
-                    break;
-                case "Tw":
-                    walker.WordSpacing = LastNumber(operands);
-                    break;
-                case "Tz":
-                    walker.HorizontalScale = LastNumber(operands) / 100.0;
                     break;
                 case "Ts":
                     walker.Rise = LastNumber(operands);
@@ -154,11 +150,7 @@ internal sealed class ContentTextWalker
                     walker.TextMatrix = lineMatrix;
                     walker.Show(show, token.Text, operands, array, operatorIndex++);
                     break;
-                // " sets word spacing (aw) and character spacing (ac) from its first two
-                // operands, then advances the line and shows.
                 case "\"":
-                    walker.WordSpacing = Number(operands, 0);
-                    walker.CharSpacing = Number(operands, 1);
                     lineMatrix = Matrix.Translate(0, -leading) * lineMatrix;
                     walker.TextMatrix = lineMatrix;
                     walker.Show(show, token.Text, operands, array, operatorIndex++);

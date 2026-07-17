@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
@@ -15,22 +14,6 @@ namespace Radzen.Documents.Pdf;
 // emitted in reading order (descending Y, then ascending X).
 internal static class TextExtractor
 {
-    private const double LineTolerance = 0.5;
-
-    // TJ adjustments are in thousandths of an em; a leftward move (negative) beyond
-    // ~0.2 em is an inter-word gap, smaller values are kerning. Third-party streams
-    // rely on this for word breaks; the authoring path never emits TJ arrays.
-    private const double TjSpaceThreshold = 200.0;
-
-    // No per-glyph widths are available to extraction, so the pen advance is estimated
-    // at half an em per code; this only feeds the same-line gap test, never the text.
-    private const double AverageGlyphEm = 0.5;
-
-    // Two same-line fragments read as separate words only when the X gap between the
-    // pen left by one and the origin of the next exceeds this fraction of an em, which
-    // sits below a space (~0.25 em) yet clears kerning and abutting fragments.
-    private const double SpaceGapEm = 0.2;
-
     public static string Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
         if (content is null || content.Length == 0)
@@ -62,7 +45,7 @@ internal static class TextExtractor
         }
 
         var fontSize = walker.FontSize;
-        var advance = text.Length * AverageGlyphEm * fontSize;
+        var advance = text.Length * TextComposition.AverageGlyphEm * fontSize;
         AddFragment(fragments, walker.TextMatrix * walker.Ctm, text, advance, fontSize);
         return advance;
     }
@@ -82,13 +65,13 @@ internal static class TextExtractor
                 {
                     var decoded = reverse.Decode(bytes);
                     builder.Append(decoded);
-                    glyphEms += decoded.Length * AverageGlyphEm;
+                    glyphEms += decoded.Length * TextComposition.AverageGlyphEm;
                 }
             }
             else
             {
                 adjustEms += element.Number / 1000.0;
-                if (element.Number <= -TjSpaceThreshold)
+                if (element.Number <= -TextComposition.TjSpaceThreshold)
                 {
                     builder.Append(' ');
                 }
@@ -106,12 +89,7 @@ internal static class TextExtractor
     }
 
     private static void AddFragment(List<Fragment> fragments, Matrix matrix, string text, double textAdvance, double fontSize)
-    {
-        var origin = matrix.Transform(0, 0);
-        var pen = matrix.Transform(textAdvance, 0);
-        var emPoint = matrix.Transform(fontSize, 0);
-        fragments.Add(new Fragment(origin.Y, origin.X, pen.X - origin.X, emPoint.X - origin.X, text));
-    }
+        => fragments.Add(new Fragment(TextComposition.Place(matrix, textAdvance, fontSize), text));
 
     private static string Compose(List<Fragment> fragments)
     {
@@ -120,30 +98,16 @@ internal static class TextExtractor
             return string.Empty;
         }
 
-        fragments.Sort(static (a, b) =>
-        {
-            if (Math.Abs(a.Y - b.Y) > LineTolerance)
-            {
-                return b.Y.CompareTo(a.Y);
-            }
-
-            return a.X.CompareTo(b.X);
-        });
+        fragments.Sort(static (a, b) => TextComposition.Compare(a.Placement, b.Placement));
 
         var builder = new StringBuilder();
         Fragment? previous = null;
         foreach (var fragment in fragments)
         {
-            if (previous is { } prev)
+            if (previous is { } prev
+                && TextComposition.Separator(prev.Placement, prev.Text, fragment.Placement, fragment.Text) is { } separator)
             {
-                if (Math.Abs(fragment.Y - prev.Y) > LineTolerance)
-                {
-                    builder.Append('\n');
-                }
-                else if (NeedsSpace(prev, fragment))
-                {
-                    builder.Append(' ');
-                }
+                builder.Append(separator);
             }
 
             builder.Append(fragment.Text);
@@ -153,18 +117,5 @@ internal static class TextExtractor
         return builder.ToString();
     }
 
-    private static bool NeedsSpace(Fragment previous, Fragment current)
-    {
-        if (previous.Text.Length == 0 || current.Text.Length == 0
-            || char.IsWhiteSpace(previous.Text[^1]) || char.IsWhiteSpace(current.Text[0]))
-        {
-            return false;
-        }
-
-        var gap = current.X - (previous.X + previous.Advance);
-        var em = Math.Abs(current.Em != 0 ? current.Em : previous.Em);
-        return gap > SpaceGapEm * em;
-    }
-
-    private readonly record struct Fragment(double Y, double X, double Advance, double Em, string Text);
+    private readonly record struct Fragment(TextComposition.Placement Placement, string Text);
 }
