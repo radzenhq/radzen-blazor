@@ -221,13 +221,7 @@ internal static class FieldAppearances
         foreach (var (baseFont, key) in writer.Fonts)
         {
             fonts ??= new DictionaryObject();
-            fonts[key] = new DictionaryObject
-            {
-                ["Type"] = new NameObject("Font"),
-                ["Subtype"] = new NameObject("Type1"),
-                ["BaseFont"] = new NameObject(baseFont),
-                ["Encoding"] = new NameObject("WinAnsiEncoding"),
-            };
+            fonts[key] = PageResourceBuilder.Base14FontDictionary(baseFont);
         }
 
         return fonts is null ? null : new DictionaryObject { ["Font"] = fonts };

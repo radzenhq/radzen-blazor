@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -11,43 +10,24 @@ namespace Radzen.Documents.Pdf.Emit;
 // WinAnsi/codepoint helpers the emitters share.
 internal sealed class GeneratorFontResolver(PdfAConformance conformance)
 {
-    private readonly List<GeneratedFont> allFonts = [];
-    private readonly Dictionary<string, GeneratedFont> base14Fonts = new(StringComparer.Ordinal);
-    private readonly Dictionary<SfntFont, GeneratedFont> sfntFonts = [];
+    // One registry over both identity domains: a base-14 face is identified by its
+    // PostScript name and an embedded face by instance, but they share one key sequence.
+    private readonly ResourceKeyRegistry<object, GeneratedFont> fonts = new("F");
 
-    public IReadOnlyList<GeneratedFont> AllFonts => allFonts;
+    public IReadOnlyList<GeneratedFont> AllFonts => fonts.Values;
 
     public GeneratedFont ResolveSfnt(SfntFont sfnt)
-    {
-        if (sfntFonts.TryGetValue(sfnt, out var existing))
-        {
-            return existing;
-        }
-
-        var generated = new GeneratedFont { Key = "F" + allFonts.Count.ToString(CultureInfo.InvariantCulture), Sfnt = sfnt };
-        sfntFonts[sfnt] = generated;
-        allFonts.Add(generated);
-        return generated;
-    }
+        => fonts.GetOrAddValue(sfnt, key => new GeneratedFont { Key = key, Sfnt = sfnt });
 
     public GeneratedFont ResolveBase14(Font font)
     {
-        var name = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
+        var name = FontResolution.ResolveBase14Name(font);
         if (conformance != PdfAConformance.None)
         {
-            throw new InvalidOperationException(
-                $"PDF/A forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{font.Name}' with DocumentBuilder.Fonts instead.");
+            throw FontResolution.Base14Forbidden("PDF/A", name, font.Name);
         }
 
-        if (base14Fonts.TryGetValue(name, out var existing))
-        {
-            return existing;
-        }
-
-        var generated = new GeneratedFont { Key = "F" + allFonts.Count.ToString(CultureInfo.InvariantCulture), Base14 = name };
-        base14Fonts[name] = generated;
-        allFonts.Add(generated);
-        return generated;
+        return fonts.GetOrAddValue(name, key => new GeneratedFont { Key = key, Base14 = name });
     }
 
     public static int CodePointAt(string text, int index) => FontCollection.CodePointAt(text, index);

@@ -93,7 +93,7 @@ public sealed class ContentWriter : IDisposable
     /// <returns>The resource name the font is selected by.</returns>
     public string RegisterFont(Font font)
     {
-        var baseFont = Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
+        var baseFont = FontResolution.ResolveBase14Name(font);
         return fonts.GetOrAdd(baseFont, key => new KeyValuePair<string, string>(baseFont, key));
     }
 
