@@ -7,9 +7,6 @@ using System.Runtime.CompilerServices;
 
 namespace Radzen.Documents.Pdf;
 
-// Parses a PDF file into the Document model: reads the info dictionary, walks the
-// page tree collecting each leaf page's inherited attributes and raw content, and
-// captures the source catalog and AcroForm for a faithful round-trip on save.
 internal static class DocumentLoader
 {
     public static Document Load(Stream stream, ReaderLimits limits, LoadOptions? options)
@@ -62,15 +59,15 @@ internal static class DocumentLoader
         ReadPageLabels(reader, catalog, document, state, limits);
         ReadXmp(reader, catalog, document);
 
-        // Reading built the metadata model through its tracked setters; freeze it so only the
-        // caller's later edits read as changes.
+        // Reading went through the tracked setters, so without this freeze every loaded
+        // document would report itself as modified.
         document.AcceptMetadataChanges();
 
         return document;
     }
 
-    // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
-    // page tree so a leaf without its own entry re-saves the ancestor's value.
+    // The inheritable page attributes (ISO 32000-1 Table 30): a leaf without its own entry
+    // must re-save the ancestor's value.
     private readonly struct InheritedAttributes
     {
         public ArrayObject? Box { get; init; }
@@ -164,8 +161,8 @@ internal static class DocumentLoader
             state.SourceResources[page] = resources;
         }
 
-        // The resolved boxes rather than the source arrays: an element held as an indirect
-        // reference re-emits as 0 unless it is resolved here.
+        // Resolved, not the source arrays: an element held as an indirect reference re-emits
+        // as 0 otherwise.
         if (mediaCorners is not null)
         {
             state.SourceBoxes[page] = BoxArray(mediaCorners);
@@ -176,18 +173,16 @@ internal static class DocumentLoader
             state.SourceCropBoxes[page] = BoxArray(cropCorners);
         }
 
-        // Carries the rotation onto a page appended from this document, which copies the
-        // page rather than sharing it. Only a rotation the viewer would apply is worth it.
+        // Append copies the page rather than sharing it, so the rotation must be carried.
         if (page.Rotate != 0)
         {
             state.SourceRotations[page] = page.Rotate;
         }
     }
 
-    // Building a ReverseFont decodes and parses the font's whole /ToUnicode CMap, and the
-    // same font dictionary is typically shared by every page (commonly through /Resources
-    // inherited from the /Pages node), so each one is reversed once per reader. ReverseFont
-    // is immutable, and the cache dies with the reader it is keyed by.
+    // One /Pages-inherited /Resources is typically shared by every page, so without this cache
+    // each page re-decodes the same /ToUnicode CMaps. ReverseFont is immutable and the cache
+    // dies with the reader it is keyed by, so sharing entries is safe.
     private static readonly ConditionalWeakTable<DocumentReader, Dictionary<DictionaryObject, Fonts.ReverseFont>> ReverseFonts = [];
 
     public static Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
@@ -226,9 +221,8 @@ internal static class DocumentLoader
             ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
             : (PageSizes.A4.Width, PageSizes.A4.Height);
 
-    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10), so each
-    // element is resolved; a box with a coordinate that is not a number at all is unusable
-    // and reads as absent rather than collapsing the page to a degenerate size.
+    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10). A
+    // non-numeric coordinate reads as absent rather than collapsing the page to zero size.
     private static double[]? ResolveCorners(DocumentReader reader, ArrayObject? box)
     {
         if (box is null || box.Count < 4)
@@ -253,8 +247,8 @@ internal static class DocumentLoader
     private static PdfRect? ToRect(double[]? corners)
         => corners is not null ? new PdfRect(corners[0], corners[1], corners[2], corners[3]) : null;
 
-    // The re-emitted box keeps the source coordinates rather than the corners a PdfRect
-    // recomputes, so a fractional origin cannot shift the far edge by a rounding step.
+    // Keeps the source coordinates rather than the corners PdfRect recomputes, so a
+    // fractional origin cannot shift the far edge by a rounding step.
     private static ArrayObject BoxArray(double[] corners) =>
     [
         new NumberObject(corners[0]),
@@ -380,10 +374,8 @@ internal static class DocumentLoader
         }
     }
 
-    // Loads embedded files declared in the catalog /Names EmbeddedFiles name tree and
-    // the /AF associated-files array so they (and /AF) survive a re-save; without this a
-    // loaded Factur-X invoice loses its XML on save. Payloads are re-emitted by the
-    // AttachmentWriter, which runs because these populate document.Attachments.
+    // Both the /Names EmbeddedFiles tree and the /AF array must be read, or a loaded
+    // Factur-X invoice loses its XML on save. AttachmentWriter re-emits what this populates.
     private static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
     {
         var seen = new HashSet<DictionaryObject>();
@@ -646,8 +638,8 @@ internal static class DocumentLoader
             return null;
         }
 
-        // A null or absent coordinate is legal and common (e.g. /XYZ null null 0 means
-        // "retain the current value"); treat it as 0 rather than failing the whole load.
+        // /XYZ null null 0 ("retain the current value") is legal and common, so a null
+        // coordinate must not fail the load.
         double Argument(int index)
             => index < array.Count && reader.AsNumber(array[index]) is { } number ? number : 0;
 

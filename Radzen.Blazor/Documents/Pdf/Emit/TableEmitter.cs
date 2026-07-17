@@ -4,9 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Emits a positioned table fragment: row backgrounds, then each cell's background,
-// borders, text lines (with per-page field resolution), images, codes and nested
-// tables - clipping content that overflows the cell box.
+// Emits a positioned table fragment, clipping content that overflows the cell box.
 internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, StyleResolution resolution, OpacityResolver opacities)
 {
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
@@ -168,10 +166,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             left, contentTop, delta);
     }
 
-    // Emits a box's laid-out content (lines with per-page field resolution, images, codes,
-    // nested tables) with overflow clipping to the box and, for rounded boxes, a rounded
-    // clip over the content. Shared by table cells and (later) containers, so it takes the
-    // already-resolved pieces instead of a Cell/Table.
+    // Shared by table cells and containers, so it takes already-resolved pieces rather than
+    // a Cell/Table.
     internal void EmitBoxContent(
         EmitContext context,
         in LaidOutBoxContent content,
@@ -346,9 +342,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    // A first-class nested box paints decoration first (opacity registered per page here,
-    // like BoxEmitter), then the child content recursing through EmitBoxContent with the
-    // box's clamped radius so rounded boxes clip their content.
     private void EmitNestedBox(EmitContext context, in LaidOutNestedBox box, StructureElement? element, double left, double contentTop, double delta)
     {
         var plan = context.Plan;

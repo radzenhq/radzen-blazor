@@ -14,9 +14,9 @@ internal static class GlyphMetrics
         => widthEm * fontSize + charSpacing + (isWordSpace ? wordSpacing : 0.0);
 }
 
-// The spacing operands feeding GlyphMetrics.Advance. Standalone Tc/Tw/Tz are not the only
-// source: the " show operator carries its own aw/ac, so a walk that reads only Tc/Tw drifts
-// out of step with one that does not, and their advances then disagree.
+// Standalone Tc/Tw/Tz are not the only source: the " show operator carries its own aw/ac,
+// so a walk that reads only Tc/Tw drifts out of step with one that does not, and their
+// advances then disagree.
 internal struct TextSpacing()
 {
     public double CharSpacing { get; private set; }
@@ -25,8 +25,7 @@ internal struct TextSpacing()
 
     public double HorizontalScale { get; private set; } = 1.0;
 
-    // Applies op's spacing effect, if it has one. Call before showing " so its aw/ac reach
-    // the string it shows.
+    // Call before showing " so its aw/ac reach the string it shows.
     public bool Apply(string? op, List<Token> operands)
     {
         switch (op)

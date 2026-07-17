@@ -28,13 +28,9 @@ internal readonly struct PositionedTableFragment
     public int Order { get; init; }
 }
 
-// A container placed as a first-class box (section body or header/footer band): the
-// decoration paints through BoxRenderer and the laid-out content through
-// TableEmitter.EmitBoxContent. Bounds is in content space (X from the content-box left,
-// Y from the content-box top, Y == Bounds.Top). Style carries no ExtGState - the box's
-// own opacity is registered per page by the emitter. A Stack container stacks its content
-// vertically; an overlay container overlays its children at the box top-left (both routed
-// here via PlaceBox and PlaceSpecialContainer respectively).
+// Bounds is in content space (X from the content-box left, Y from the content-box top,
+// Y == Bounds.Top). Style carries no ExtGState - the box's own opacity is registered per
+// page by the emitter.
 internal readonly struct PositionedBox
 {
     public required Container Source { get; init; }
@@ -200,9 +196,8 @@ internal static class Paginator
         context.Finish();
     }
 
-    // Routes each section-body block to its placement function. A block kind not valid as
-    // direct section content (e.g. a List that escaped expansion) fails loud through Default,
-    // exactly as the former is-not-Paragraph throw did.
+    // Default fails loud: a block kind reaching here is not valid as direct section content
+    // (e.g. a List that escaped expansion).
     private sealed class SectionPlacer(PaginationContext context)
         : BlockVisitor<int, Nothing>
     {
@@ -267,8 +262,6 @@ internal static class Paginator
 
     internal static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 
-    // Forwards to BlockExpander so external callers (BoxContentLayout) keep using
-    // Paginator.ExpandBlocks; the expansion itself lives in BlockExpander.
     internal static IReadOnlyList<Block> ExpandBlocks(
         BlockCollection blocks,
         double availableWidth,

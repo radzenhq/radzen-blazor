@@ -50,10 +50,8 @@ public class Paragraph : Block
         set => alignment = value;
     }
 
-    // Resolves the paragraph's horizontal alignment: an explicit Alignment on the paragraph,
-    // then the style-derived alignment carried by the per-save StyleResolution (passed in as
-    // `inherited` by every layout path - body, band, field, and cell), then the default Left.
-    // No style-resolution scratch is kept on the model, so generation never mutates it.
+    // `inherited` is the per-save StyleResolution's alignment, passed in rather than stored:
+    // keeping no style scratch on the model is what lets generation run without mutating it.
     internal HorizontalAlignment ResolveAlignment(HorizontalAlignment? inherited)
         => alignment ?? inherited ?? HorizontalAlignment.Left;
 

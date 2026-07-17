@@ -2,24 +2,21 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Shared polymorphic queries over the code block kinds (QrCode/Barcode). A non-code block
-// answers the identity (zero size, left alignment) exactly as the replaced switches did.
+// Shared polymorphic queries over the code block kinds (QrCode/Barcode); a non-code block
+// answers the identity (zero size, left alignment).
 internal static class CodeBlockDispatch
 {
     private static readonly SizeVisitor size = new();
     private static readonly AlignmentVisitor alignment = new();
 
-    // The barcode caption band is measured by breaking the caption exactly as CodeEmitter paints it,
-    // so a value that wraps reserves every line it draws. That needs the font collection plus the
-    // barcode's resolved font (from the per-save StyleResolution); the bar width and QR size depend
-    // on neither, so width-only callers may omit them.
+    // The caption band must be measured by breaking the caption exactly as CodeEmitter paints
+    // it, so a wrapping value reserves every line it draws; that needs fonts + resolution. Bar
+    // width and QR size depend on neither, so width-only callers may omit them.
     public static (double Width, double Height) Measure(Block block, FontCollection? fonts = null, StyleResolution? resolution = null)
         => block.Accept(size, (fonts, resolution));
 
     public static HorizontalAlignment Alignment(Block block) => block.Accept(alignment, default);
 
-    // The caption paragraph drawn below the bars: one centered run carrying the resolved font as its
-    // authored font, broken at the bar width.
     public static IReadOnlyList<LineBox> CaptionLines(Barcode barcode, Font font, FontCollection fonts)
     {
         var run = new Run(barcode.Value);

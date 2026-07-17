@@ -3,18 +3,9 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// The generator-owned side state of one Save: everything style resolution and pagination
-// derive from the shared authoring model but must NOT write back onto it. A DocumentGenerator
-// owns one of these for the duration of a single Save (exactly like it owns its GeneratedFont
-// set), so nothing here is ever written onto the shared model where a concurrent Save could
-// read a half-updated value. It carries, keyed by the model (or the paginator-synthesized
-// paragraph) node:
-//   - the style-derived alignment of every paragraph (the one non-idempotent piece);
-//   - the resolved font of every run, paragraph, barcode and list item (the run -> paragraph
-//     -> cell/row/table -> named-style -> Normal cascade), so the layout engine reads the
-//     resolved font from here instead of off the model;
-//   - the PDF/UA list structure elements (Lbl/LBody) of every list item and of the
-//     paginator-synthesized marker paragraph that renders it.
+// Per-Save side state, keyed by model (or synthesized paragraph) node. Resolved values live
+// here and never on the shared authoring model, where a concurrent Save could read a
+// half-updated value.
 internal sealed class StyleResolution
 {
     private readonly Dictionary<Paragraph, HorizontalAlignment?> alignments = [];
@@ -80,16 +71,9 @@ internal sealed class StyleResolution
         => listParagraphElements.TryGetValue(paragraph, out var elements) ? elements.Label : null;
 }
 
-// Resolves the effective font of every run/paragraph/barcode/list item and the style-derived
-// alignment of every paragraph before layout, cascading run -> paragraph -> cell -> row ->
-// named Style (walking the BaseStyle chain) -> document default (the Normal style, then the
-// Font property defaults).
-//
-// Nothing is written onto the model: every resolved value is stored in the per-save
-// StyleResolution and reaches every layout path (body, band, field, and cell/box through
-// TableLayout + BoxContentLayout) from there. Nested-list items (which this pass does not
-// walk) are resolved on the fly by Paginator.ExpandItem and stored into the same
-// StyleResolution, so the layout engine never reads a resolved font off the shared model.
+// Nested-list items are NOT walked here; BlockExpander.ExpandItem resolves them on the fly
+// into the same StyleResolution, so the layout engine never reads a resolved font off the
+// shared model.
 internal static class StyleResolver
 {
     public static StyleResolution Resolve(DocumentBuilder builder)
@@ -114,8 +98,6 @@ internal static class StyleResolver
         }
     }
 
-    // Only paragraphs, tables, barcodes, lists and (recursively) containers carry font
-    // context to resolve; images, page breaks and code blocks inherit nothing (Default).
     private sealed class StyleVisitor(StyleCollection styles, StyleResolution resolution) : BlockVisitor<List<Font>, Nothing>
     {
         protected override Nothing Default(Block block, List<Font> inherited) => default;
@@ -157,9 +139,8 @@ internal static class StyleResolver
         }
     }
 
-    // List items cascade exactly like paragraph runs: item run -> item.Font -> list.Font ->
-    // inherited cell/row/table context -> Normal. The item-level font (marker glyph and the
-    // default for runs) omits the run override; both are stored for Paginator.ExpandItem.
+    // The item-level font (marker glyph, and the default for runs) omits the run override;
+    // both it and the run fonts are stored for BlockExpander.ExpandItem.
     private static void ResolveList(List list, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
         foreach (var item in list.Items)
@@ -214,7 +195,6 @@ internal static class StyleResolver
         }
     }
 
-    // The human-readable line of a barcode inherits like a paragraph without a named style.
     private static void ResolveBarcode(Barcode barcode, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
         var effective = new Font();
@@ -228,8 +208,7 @@ internal static class StyleResolver
         resolution.SetBarcodeFont(barcode, effective);
     }
 
-    // Entry lines inherit like a barcode's text line: the block font, the ambient context, then
-    // Normal. BlockExpander lowers every run of every entry from this one resolved font, so the
+    // BlockExpander lowers every run of every entry from this one resolved font, so the
     // leader/page-number measuring and the emitted runs share it.
     private static void ResolveTableOfContents(TableOfContents toc, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
@@ -259,10 +238,9 @@ internal static class StyleResolver
 
         resolution.SetAlignment(paragraph, styleAlignment);
 
-        // An explicit paragraph style outranks the ambient cell/row/table context: the
-        // named-style chain (Normal excluded) is applied before the inherited fonts, so a
-        // requested style wins over table defaults just as it does outside a table. Normal
-        // stays the final document-default fallback. Matches word-processing semantics.
+        // Normal is excluded so an explicit paragraph style outranks the ambient
+        // cell/row/table context while Normal stays the last document-default fallback,
+        // matching word-processing semantics.
         var namedChain = StyleChain(paragraph.StyleName, styles, includeNormal: false);
 
         var paragraphFont = new Font();

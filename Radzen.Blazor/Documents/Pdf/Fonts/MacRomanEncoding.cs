@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// MacRomanEncoding per ISO 32000-1 Annex D.2: a simple font's single-byte code to Unicode.
-// Codes 0-31 and 127 are undefined (.notdef), as in WinAnsiEncoding. Generated from the Mac
-// OS Roman mapping with two Annex D deviations: 0xDB is /currency rather than the Euro later
-// Mac OS versions put there, and 0xF0 (the Apple logo) is undefined rather than a private-use
+// MacRomanEncoding per ISO 32000-1 Annex D.2, not the later Mac OS Roman: 0xDB is /currency,
+// not the Euro, and 0xF0 (the Apple logo) is left undefined rather than mapped to a private-use
 // code point, so it never reaches extracted text.
 internal static class MacRomanEncoding
 {

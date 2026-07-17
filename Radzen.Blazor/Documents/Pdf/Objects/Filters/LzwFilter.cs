@@ -11,13 +11,8 @@ internal static class LzwFilter
     public static byte[] Decode(byte[] data, int early)
         => Decode(data, early, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decoded size against an LZW bomb; codes are bounds-checked
-    // against the table so a code past the current dictionary raises a recoverable
-    // DocumentParseException instead of an IndexOutOfRangeException.
-    //
-    // The dictionary stores each entry as (prefix code, appended byte, first byte, length)
-    // rather than a full byte[] so growing the table never copies whole sequences; an entry
-    // is materialized only when it is emitted, by walking its prefix chain.
+    // maxOutput bounds the decoded size against an LZW bomb: a small input can expand
+    // without bound, so output.Length is re-checked every code rather than at the end.
     public static byte[] Decode(byte[] data, int early, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -150,7 +145,6 @@ internal static class LzwFilter
                 }
                 else
                 {
-                    // A code beyond the next slot cannot be reconstructed; reject it.
                     throw new DocumentParseException("Invalid LZW code.", -1);
                 }
 

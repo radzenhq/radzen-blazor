@@ -5,10 +5,8 @@ using static Radzen.Documents.Pdf.Emit.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// A font referenced by generated content: either a base-14 Type1 face (by PostScript
-// name, WinAnsi encoded) or a registered sfnt face embedded as Type0/CID (Identity-H,
-// 2-byte glyph-id codes). GidToUnicode is accumulated across the whole document so the
-// shared embedded subset covers every glyph any page shows.
+// GidToUnicode is accumulated across the whole document so the shared embedded subset
+// covers every glyph any page shows.
 internal sealed class GeneratedFont
 {
     public required string Key { get; init; }
@@ -115,11 +113,8 @@ internal sealed class GeneratedPage
     public IReadOnlyList<GeneratedPattern> Patterns { get; init; } = [];
 }
 
-// Orchestrates PDF generation: runs the merged layout engine (Paginator for paragraph
-// flow, TableLayout + TablePaginator for tables) over a DocumentBuilder, plans each page
-// through the element emitters, then serializes each PagePlan to a content stream. The
-// per-element drawing is delegated to the emitters; this class only wires them and
-// dispatches per page.
+// Orchestrates PDF generation: runs the layout engine over a DocumentBuilder, plans each page
+// through the element emitters, then serializes each PagePlan to a content stream.
 internal sealed class DocumentGenerator
 {
     private readonly DocumentBuilder builder;

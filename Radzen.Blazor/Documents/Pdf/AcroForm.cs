@@ -22,18 +22,14 @@ public sealed class AcroForm
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
 
-    // The field/widget/form dictionaries a caller has mutated through this form,
-    // recorded for the incremental save path (Document.SaveIncremental) so it can
-    // re-emit only the objects that actually changed. Inert on the full-save path,
+    // Drives SaveIncremental, which re-emits only these. Inert on the full-save path,
     // which re-imports the whole form graph regardless.
     internal HashSet<DocumentObject> ChangedObjects { get; } = new(ReferenceEqualityComparer.Instance);
 
-    // Terminal fields keyed by their fully qualified dotted name, each paired with
-    // the widget annotation that renders it (the field dict itself when merged).
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
 
-    // Field dictionaries on the current root-to-node path, to fail loud on a
-    // self-referencing /Kids tree instead of recursing into a StackOverflow.
+    // The current root-to-node path (removed on exit), so it rejects a /Kids cycle only.
+    // It bounds neither recursion depth nor node count - see Collect.
     private readonly HashSet<DictionaryObject> visiting = [];
 
     internal AcroForm(DocumentReader reader, DictionaryObject dictionary, Document owner)
@@ -63,13 +59,12 @@ public sealed class AcroForm
     /// </summary>
     public IReadOnlyList<string> FieldNames => fieldNames;
 
-    // A terminal and every annotation that renders it: one field can be shown by several
-    // widget kids (the same field repeated on each page), all of which an edit must refresh.
+    // Several widgets per field is normal (the same field repeated on each page); an edit
+    // must refresh every one of them.
     private readonly record struct Terminal(DictionaryObject Field, IReadOnlyList<DictionaryObject> Widgets);
 
-    // Walks the field tree, recording each terminal under its qualified name. A node
-    // whose /Kids are field dictionaries (they carry /T) is non-terminal; a node with
-    // no /Kids, or whose /Kids are only widget annotations, is itself the terminal.
+    // A /T on a kid is what distinguishes a non-terminal node from a terminal whose kids are
+    // merely its widget annotations (ISO 32000-1 12.7.3.1).
     private void Collect(DocumentObject entry, string prefix)
     {
         if (reader.AsDictionary(entry) is not { } dict)
@@ -127,8 +122,8 @@ public sealed class AcroForm
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
         => reader.GetArray(dict, "Kids") is { } kids ? kids : [];
 
-    // The annotations that render a terminal: its widget-only kids (a separate widget
-    // carries no field /T), or the field dict itself when field and widget merge.
+    // A separate widget carries no field /T; when field and widget merge the field dict is
+    // itself the widget.
     private List<DictionaryObject> WidgetsOf(DictionaryObject dict)
     {
         var widgets = new List<DictionaryObject>();
@@ -249,9 +244,8 @@ public sealed class AcroForm
     {
         if (FieldBakePolicy.CanBakeSingleLine(reader, terminal.Field, value))
         {
-            // Write the appearance onto every widget so a kid's stale /AP does not override
-            // the new value in a viewer; when field and widget merge this is the field. Each
-            // widget bakes its own /Rect, since they need not share a size.
+            // Every widget, or a kid's stale /AP overrides the new value in a viewer. Each
+            // bakes its own /Rect, since widgets of one field need not share a size.
             foreach (var widget in terminal.Widgets)
             {
                 widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal, widget, value) };
@@ -260,10 +254,8 @@ public sealed class AcroForm
         }
         else
         {
-            // The baked appearance is a single left-aligned WinAnsi line. When that would be
-            // wrong - a non-WinAnsi glyph, a multiline/comb layout, a centered/right /Q, or a
-            // password whose value must render masked, not in cleartext - leave /AP to the
-            // viewer via /NeedAppearances rather than emit a wrong or password-leaking stream.
+            // Defer to the viewer rather than bake a wrong line - or, for a password field,
+            // one that would leak the value in cleartext. See FieldBakePolicy for the rules.
             Dictionary["NeedAppearances"] = new BooleanObject(true);
             ChangedObjects.Add(Dictionary);
             foreach (var widget in terminal.Widgets)
@@ -346,15 +338,14 @@ public sealed class AcroForm
         ChangedObjects.Add(terminal.Field);
         foreach (var widget in terminal.Widgets)
         {
-            // A widget whose own /AP states do not include the value stays Off: naming a
-            // state it has no stream for would render nothing at all.
+            // Naming a state the widget has no /AP stream for would render nothing at all.
             widget["AS"] = new NameObject(HasAppearanceStates(widget) && !HasAppearanceState(widget, on) ? "Off" : on);
             ChangedObjects.Add(widget);
         }
     }
 
-    // The on-state is the first non-/Off appearance in the widget's /AP /N; only when
-    // the widget has no /AP states do we fall back to the conventional "Yes".
+    // "Yes" is only a convention, so it is a last resort: the widget's own /AP /N states
+    // are authoritative when it has any.
     private string OnStateName(DictionaryObject widget)
     {
         if (AppearanceStates(widget) is { } states)
@@ -391,8 +382,8 @@ public sealed class AcroForm
         return (rect.Width, rect.Height);
     }
 
-    // Resolves the /DA to draw the value with: the field's own /DA wins, else the widget's,
-    // else the form default /DA. A /DA size of 0 (auto) is reported as 0 for the caller to map.
+    // A /DA size of 0 means auto-size (ISO 32000-1 12.7.3.3); it is reported as 0 rather
+    // than resolved here, for the caller to map.
     private (string? Font, double Size) DefaultAppearance(Terminal terminal, DictionaryObject widget)
         => FieldAppearances.ParseDefaultAppearance(
             DaString(terminal.Field) ?? DaString(widget) ?? DaString(Dictionary));

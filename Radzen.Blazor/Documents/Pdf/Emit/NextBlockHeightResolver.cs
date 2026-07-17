@@ -3,11 +3,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// The keep-with-next look-ahead: resolves the leading height the NEXT block needs at the top
-// of a page so a KeepWithNext paragraph can decide whether it and its successor fit together.
-// It shares the per-section layout caches (broken lines, table layouts, box measures) with the
-// main placement loop and warms them as a side effect, so a later placement of the same block
-// reuses the measurement instead of recomputing it.
+// The keep-with-next look-ahead. Shares the per-section layout caches with the main placement
+// loop and warms them as a side effect, so a later placement reuses the measurement.
 internal static class NextBlockHeightResolver
 {
     // The required height of the header rows plus the first body ROW GROUP: the minimum a
@@ -26,8 +23,6 @@ internal static class NextBlockHeightResolver
         public double Height { get; init; }
     }
 
-    // The height the NEXT block needs at the top of a page: the first line of a
-    // paragraph, the header rows plus first body row of a table, or a whole image.
     internal static bool NextBlockFirstHeight(
         IReadOnlyList<Block> blocks,
         IReadOnlyList<LineBox>?[] broken,
@@ -56,9 +51,8 @@ internal static class NextBlockHeightResolver
         return result.Found;
     }
 
-    // Resolves the leading height of the block at the given index, keyed off the same
-    // per-section layout caches the main loop shares. A block kind that a page can start
-    // mid-way (or that never breaks meaningfully here) reports no minimum (Default).
+    // Default reports no minimum: a block kind a page can start mid-way, or that never
+    // breaks meaningfully here.
     private sealed class NextHeightVisitor(
         IReadOnlyList<LineBox>?[] broken,
         LaidOutTable?[] tableLayouts,

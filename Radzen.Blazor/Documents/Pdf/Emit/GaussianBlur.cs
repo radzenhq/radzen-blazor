@@ -12,22 +12,19 @@ internal readonly struct ShadowMask
     public required double MarginPoints { get; init; }
 }
 
-// Pure managed rounded-rectangle coverage rasterization plus a separable Gaussian blur.
-// Array math only so it runs unchanged under WASM. Deterministic for identical inputs.
+// Array math only, so it runs unchanged under WASM and is deterministic for identical inputs.
 internal static class GaussianBlur
 {
     private const double MaxShapePixels = 512;
     private const double BaseScale = 2.0;
 
-    // Caps direct-convolution cost: kernelRadius = ceil(3*sigma) and sigma = blurPt*scale/2,
-    // so an uncapped blur is O((shape+2r)^2 * (2r+1)) and can pin a WASM thread for seconds.
-    // When a blur would exceed this radius the raster scale is reduced so work stays bounded;
-    // small blurs are unaffected and their output is byte-identical.
+    // Direct convolution is O((shape+2r)^2 * (2r+1)); uncapped it can pin a WASM thread for
+    // seconds. Reducing scale (never raising it) bounds r here and shape via MaxShapePixels,
+    // so both factors stay bounded. Blurs under the cap keep their scale and are byte-identical.
     private const int MaxKernelRadius = 64;
 
-    // Rasterizes a rounded rectangle of the given point size (analytic 1px anti-aliasing via
-    // signed distance) then blurs it. The buffer is padded by the blur's kernel radius on every
-    // side so the softened edge fully fades inside it; that padding is returned as MarginPoints.
+    // The buffer is padded by the kernel radius on every side so the softened edge fully fades
+    // inside it; that padding is returned as MarginPoints.
     public static ShadowMask Render(double shapeWidthPt, double shapeHeightPt, double radiusPt, double blurPt)
     {
         var maxShape = Math.Max(shapeWidthPt, shapeHeightPt);

@@ -2,12 +2,8 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Paints a box's background fill and borders into a page plan - the single code path
-// shared by table cells and (later) containers. A rounded background fills a genuine
-// rounded-rectangle path; a rounded box with a UNIFORM border strokes one
-// rounded-rectangle path; everything else draws four square edges. Content emission
-// and content clipping stay with the caller. `bounds` is in page space: Y is the
-// bottom edge, like FillDraw.
+// Content emission and content clipping stay with the caller. `bounds` is in page space:
+// Y is the bottom edge, like FillDraw.
 internal static class BoxRenderer
 {
     public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style)

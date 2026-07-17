@@ -8,10 +8,7 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Serializes a Document to a stream. Extracted from Document to keep the page/metadata
-// model separate from the save orchestration; the logic delegates to the feature writers
-// (ConformanceWriter/StructureWriter/FormWriter/AttachmentWriter/NavigationWriter/Xmp) and
-// stays byte-identical with the previous inline implementation.
+// Serializes a Document to a stream.
 internal sealed class DocumentSaver
 {
     // The /Info keys DocumentInfo models, in the order both savers emit them.

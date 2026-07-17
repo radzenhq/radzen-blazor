@@ -4,10 +4,7 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Turns authoring blocks into the flat placeable-block sequence the paginator lays out:
-// lists lower to hanging-indented marker paragraphs, a table of contents to entry
-// paragraphs, and containers pass through as first-class boxes. A block sequence with no
-// list/container/TOC is returned unchanged.
+// Turns authoring blocks into the flat placeable-block sequence the paginator lays out.
 internal static class BlockExpander
 {
     internal static IReadOnlyList<Block> ExpandBlocks(
@@ -43,9 +40,6 @@ internal static class BlockExpander
         return expanded;
     }
 
-    // Lowers lists to marker paragraphs and a table of contents to entry paragraphs, keeps
-    // containers first-class (rejecting overlay/rotated ones outside direct section content),
-    // and passes every other block through unchanged (Default).
     private sealed class ExpandVisitor(
         List<Block> expanded,
         double availableWidth,
@@ -69,12 +63,8 @@ internal static class BlockExpander
 
         public override Nothing Visit(Container container, Nothing context)
         {
-            // A Stack container is a first-class box: the section body and the
-            // header/footer bands place it as a first-class box and cell/box content
-            // nests it as a first-class nested box (BoxContentLayout). Overlay and
-            // rotated containers are only allowed as direct section content
-            // (keepSpecialContainers: true), where PlaceSpecialContainer/PlaceBox
-            // handle them - nested content cannot host a page-space transform.
+            // Overlay and rotated containers are only allowed as direct section content:
+            // nested content cannot host a page-space transform.
             if (!keepSpecialContainers && (OverlayBoxPlacer.IsSpecial(container) || container.Rotation != 0))
             {
                 throw new NotSupportedException(
@@ -108,9 +98,7 @@ internal static class BlockExpander
     // instead of depending on its (pass-varying) width against the grid.
     private const double TocSentinelStop = 100000;
 
-    // Lowers a TableOfContents to one Paragraph per entry: linked text and the page number
-    // right-aligned at a leader-filled tab stop. See the remarks on TableOfContents for why
-    // entries lower to paragraphs rather than a table.
+    // See the remarks on TableOfContents for why entries lower to paragraphs, not a table.
     private static void ExpandTableOfContents(
         TableOfContents toc,
         List<Block> expanded,
@@ -190,8 +178,6 @@ internal static class BlockExpander
         return new string(chars);
     }
 
-    // Each nesting level shifts the marker column by the parent's LeftIndent + HangingIndent and
-    // inherits the parent item's resolved font, so nested runs cascade item -> list -> parent item.
     private static void ExpandList(List list, List<Block> expanded, double indent, Font? inherited, StyleResolution resolution)
     {
         for (var i = 0; i < list.Items.Count; i++)
@@ -209,11 +195,8 @@ internal static class BlockExpander
     {
         var item = list.Items[index];
 
-        // StyleResolver resolves the marker and run fonts through the full cascade (including the
-        // surrounding cell/row/table context and the Normal default) and stores them in the
-        // per-save StyleResolution; fall back to the item/list cascade only when the resolver has
-        // not run (nested items always take this path). The resolved fonts live in the resolution
-        // (keyed by the shared run and by this synthesized paragraph), never on the model.
+        // The item/list cascade is a fallback for when StyleResolver has not run over this item;
+        // nested items always take that path (StyleResolver does not walk them).
         var itemFont = resolution.ItemFont(item) ?? ItemFont(item, list, inherited);
         var paragraph = new Paragraph
         {
@@ -223,8 +206,7 @@ internal static class BlockExpander
         };
         resolution.SetParagraphFont(paragraph, itemFont);
 
-        // Null unless the tree was built for tagged output; carries the item's Lbl/LBody so the
-        // synthesized paragraph tags its marker and content into the right structure elements.
+        // Null unless the tree was built for tagged output.
         if (resolution.ListItemElements(item) is { } elements)
         {
             resolution.SetListParagraphElements(paragraph, elements.Label, elements.Body);

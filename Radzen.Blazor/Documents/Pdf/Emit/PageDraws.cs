@@ -136,9 +136,7 @@ internal struct EdgeDraw
     public string? ExtGState { get; init; }
 }
 
-// A watermark overlay serialized after all page content: text segments and/or an
-// image drawn in a coordinate system rotated around the page center, made
-// semi-transparent through the page's ExtGState resource.
+// Serialized after all page content, in a coordinate system rotated around the page center.
 internal sealed class WatermarkDraw
 {
     public required double CenterX { get; init; }
@@ -158,10 +156,9 @@ internal sealed class PagePlan
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
-    // One registry per resource kind: it owns the entries, the dedup index and the single GS/P
-    // ordinal counter. Plain (alpha/blend/overprint/intent) states dedup by their composite
-    // tuple and soft-mask states by their content key, in one registry so both draw from the
-    // same counter; the identity prefix keeps the two domains from colliding.
+    // Plain states (keyed by their composite tuple) and soft-mask states (keyed by content key)
+    // share one registry so both draw from the same GS counter; the "a|"/"m|" key prefix keeps
+    // the two domains from colliding.
     private readonly ResourceKeyRegistry<string, GeneratedExtGState> extGStates =
         new("GS", StringComparer.Ordinal);
 
@@ -174,12 +171,10 @@ internal sealed class PagePlan
 
     public IReadOnlyList<GeneratedPattern> Patterns => patterns.Values;
 
-    // Caches the blurred coverage raster by geometry so a grid of identically shaped shadows
-    // (differing only in position) runs the Coverage+Blur passes once instead of per placement.
     private readonly Dictionary<(double Width, double Height, double Radius, double Blur), ShadowMask> shadowMasks = [];
 
-    // Renders (or returns the cached) blurred shadow coverage for the given geometry. Placement
-    // is intentionally not part of the key: identical shapes share one raster.
+    // Placement is intentionally not part of the key: identically shaped shadows share one
+    // raster, so a grid of them runs the Coverage+Blur passes once rather than per placement.
     public ShadowMask RenderShadowMask(double shapeWidthPt, double shapeHeightPt, double radiusPt, double blurPt)
     {
         var key = (shapeWidthPt, shapeHeightPt, radiusPt, blurPt);
@@ -195,13 +190,11 @@ internal sealed class PagePlan
     public OrderedSet<GeneratedFont> UsedFonts { get; } = [];
     public OrderedSet<GeneratedImage> UsedImages { get; } = [];
 
-    // One ExtGState per distinct (fill, stroke) alpha pair, keyed GS0, GS1, ...
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
         => RegisterExtGState(fillAlpha, strokeAlpha, null, null, null, null, null);
 
-    // One ExtGState per distinct full (alpha + blend + overprint + intent) tuple. An
-    // alpha-only call reuses (and produces) exactly the same entries as before, so a
-    // document that sets none of the extra fields stays byte identical.
+    // An alpha-only call must dedup to exactly the entries it produced before the
+    // blend/overprint/intent fields existed, so such a document stays byte identical.
     public string RegisterExtGState(
         double fillAlpha,
         double strokeAlpha,
@@ -238,10 +231,8 @@ internal sealed class PagePlan
     public GeneratedExtGState? FindExtGState(string key)
         => extGStatesByKey.TryGetValue(key, out var state) ? state : null;
 
-    // Folds a constant alpha into a draw's graphics state: multiplies into an existing state
-    // (keeping its blend/overprint/intent options) or registers an alpha-only one. A soft-mask
-    // state is returned untouched: SoftMask.EmitBoxShadow already folds its colour alpha in,
-    // and RegisterExtGState cannot carry the /SMask forward.
+    // A soft-mask state is returned untouched: SoftMask.EmitBoxShadow already folds its colour
+    // alpha in, and RegisterExtGState cannot carry the /SMask forward.
     public string? ApplyAlpha(string? extGState, double alpha)
     {
         if (alpha >= 1)
@@ -269,9 +260,7 @@ internal sealed class PagePlan
             state.Intent);
     }
 
-    // A soft-mask graphics state carries its own transparency group. States with an equal,
-    // non-null soft-mask content key share one GS entry (keyed by that content key); a null
-    // content key opts out and always appends a fresh entry.
+    // A null soft-mask content key opts out of dedup and always appends a fresh entry.
     public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
     {
         GeneratedExtGState Create(string key) => Track(new GeneratedExtGState
@@ -293,9 +282,7 @@ internal sealed class PagePlan
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 
-    // Clips every fill, edge, image and text added after the mark to a rounded rectangle,
-    // so a rounded container/cell/table confines its children to the rounded shape. Draws
-    // that already carry a clip keep it - an inner rounded box wins over an outer one.
+    // Draws that already carry a clip keep it - an inner rounded box wins over an outer one.
     public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
     {
         for (var i = mark.Fills; i < Fills.Count; i++)
@@ -343,20 +330,15 @@ internal sealed class PagePlan
         }
     }
 
-    // Applies an affine transform to every draw added after the mark. Texts and images
-    // carry the matrix into ContentEmitter, which wraps them in q cm .. Q. Edges bake the
-    // transform into their endpoints (line width is rotation-invariant). Fills cannot stay
-    // axis-aligned rectangles, so each becomes an equivalent solid stroke along the rect
-    // centerline with line width = rect height (exact under butt caps); the converted
-    // strokes are inserted BEFORE the marked edges so backgrounds stay under borders.
-    // Fill clips are dropped in the process - rotated overflow clipping is not supported.
-    // Rounded corners are also dropped under rotation: a rounded fill converts to the same
-    // plain centerline stroke, and a rounded uniform border falls back to four square edges.
+    // Applies an affine transform to every draw added after the mark. A fill cannot stay an
+    // axis-aligned rectangle, so it becomes a solid stroke along the rect centerline with line
+    // width = rect height (exact only under butt caps); those converted strokes are inserted
+    // BEFORE the marked edges so backgrounds stay under borders. Fills and edges lose any clip
+    // in the process - rotated overflow clipping is not supported.
     public void ApplyTransform(Matrix transform, PlanMarks mark)
     {
-        // Fills degrade to centerline strokes and rounded strokes to square edges under rotation
-        // (see remarks). Rounded geometry cannot survive that conversion, so fail loud rather
-        // than silently emitting square corners or dropping a rounded clip.
+        // Rounded geometry cannot survive the conversion to centerline strokes, so fail loud
+        // rather than silently emitting square corners or dropping a rounded clip.
         for (var i = mark.Fills; i < Fills.Count; i++)
         {
             var fill = Fills[i];

@@ -2,10 +2,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-// Copies a sub-graph from a loaded DocumentReader into a DocumentWriter, turning
-// each indirect object into a freshly numbered writer object while preserving
-// inline structure and sharing. Cyclic references are handled by registering an
-// object's new reference before its contents are populated.
+// A cycle in the source graph terminates only because ImportInstance registers an
+// object's new reference before Populate walks its contents.
 internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer)
 {
     private readonly Dictionary<DocumentObject, ReferenceObject> map = [];
@@ -59,9 +57,8 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
             return existing;
         }
 
-        // A resolved scalar (Number/String/Name/Boolean/...) has no sub-graph to
-        // populate; register it directly so its value survives instead of becoming
-        // an empty dictionary shell.
+        // A scalar has no sub-graph, so the shell/Populate path below would emit an
+        // empty dictionary in place of its value.
         if (target is not StreamObject and not ArrayObject and not DictionaryObject)
         {
             var scalar = writer.Add(target);
@@ -84,15 +81,9 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         return reference;
     }
 
-    // Imports the AcroForm field tree a widget annotation belongs to and returns
-    // the tree root - the object to list in the catalog /AcroForm /Fields. A
-    // merged field/widget (no /Parent) is its own root; a kid widget contributes
-    // its top-most /Parent, so a nested tree keeps its /Parent<->/Kids structure
-    // and the partial /T names still combine into fully qualified names. Each
-    // root is returned once per importer so /Fields never lists it twice.
-    // `field` is the imported (destination-space, still mutable) root dictionary
-    // and `name` its partial /T, for collision handling by the caller. Returns
-    // false for non-field annotations and for roots already returned.
+    // Importing the top-most /Parent rather than the widget keeps a nested tree's
+    // /Parent<->/Kids structure, so partial /T names still combine into fully
+    // qualified names. Roots are returned once each: /Fields must not list one twice.
     public bool TryImportFieldRoot(DictionaryObject annotation, out ReferenceObject reference, out DictionaryObject? field, out string? name)
     {
         reference = null!;
@@ -121,12 +112,8 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         return true;
     }
 
-    // Folds a source /AcroForm's form-wide defaults into an assembled destination
-    // form dictionary: /DR resource categories are unioned entry-by-entry with
-    // destination entries winning, /DA is adopted only when the destination has
-    // none, and /NeedAppearances becomes true when either side requires it.
-    // /Fields is never touched. The destination /DR must be an inline dictionary
-    // (as this method itself creates) for later sources to union into it.
+    // The destination /DR must be an inline dictionary (as ImportValue leaves it here)
+    // for later sources to union into it; a /DR that arrives as a reference is skipped.
     public void MergeFormDefaults(DictionaryObject form, DictionaryObject sourceForm)
     {
         if (!form.ContainsKey("DA") && sourceForm.TryGetValue("DA", out var da))
@@ -177,10 +164,8 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         }
     }
 
-    // Registers a root field's top-level name and renames the imported field when
-    // the name is already taken: the first collision becomes "name_2", then
-    // "name_3", and so on - the smallest unused suffix, so a given import order
-    // always yields the same names and no colliding field is ever dropped.
+    // Renaming rather than dropping a colliding field, by smallest unused suffix, is
+    // what makes a given import order reproduce identical names.
     public static void DisambiguateFieldName(DictionaryObject field, string? name, HashSet<string> usedNames)
     {
         if (name is null || usedNames.Add(name))

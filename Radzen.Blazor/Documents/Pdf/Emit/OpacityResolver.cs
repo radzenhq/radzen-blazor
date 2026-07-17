@@ -3,10 +3,7 @@ using System.Collections.Generic;
 namespace Radzen.Documents.Pdf.Emit;
 
 // Maps every block below a semi-transparent container to the product of its ancestor
-// container opacities. First-class container boxes (section-level, band-level and
-// nested) resolve their decoration opacity through ContainerOpacity; CellOpacity
-// recovers the value through a cell's child blocks for real table cells under
-// translucent containers.
+// container opacities.
 internal sealed class OpacityResolver
 {
     private readonly Dictionary<Block, double> byBlock = [];
@@ -23,8 +20,7 @@ internal sealed class OpacityResolver
         }
     }
 
-    // The decoration opacity of a FIRST-CLASS container box (section-level or nested):
-    // the container's own opacity times the product of its ancestor container opacities.
+    // byBlock holds only ANCESTOR opacity, so the container's own must be multiplied in here.
     public double ContainerOpacity(Container container)
         => (byBlock.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
 
@@ -41,8 +37,6 @@ internal sealed class OpacityResolver
         return 1;
     }
 
-    // Every block below a semi-transparent container maps to the product of its
-    // ancestor container opacities, so nested containers and tables inherit it.
     private void Walk(BlockCollection blocks, double opacity)
     {
         foreach (var block in blocks)
@@ -56,8 +50,6 @@ internal sealed class OpacityResolver
         }
     }
 
-    // Only containers and tables carry descendants that inherit the ambient opacity; every
-    // other block kind has none to recurse into (the identity Default).
     private sealed class Walker(OpacityResolver owner) : BlockVisitor<double, Nothing>
     {
         protected override Nothing Default(Block block, double opacity) => default;

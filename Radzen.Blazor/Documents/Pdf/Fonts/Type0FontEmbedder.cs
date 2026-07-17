@@ -10,22 +10,16 @@ using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// Builds the Type0/CID font object graph (ISO 32000-1 9.7) for a used-glyph subset:
-// a composite Type0 dictionary, a descendant CIDFontType2 (glyf) or CIDFontType0 (CFF),
-// a FontDescriptor with an embedded FontFile2/FontFile3 subset, /W widths, a /CIDSet
-// bitmap and a /ToUnicode CMap. Both paths renumber glyphs into a compact 0..N-1
-// space (GlyfSubsetter/CffSubsetter.BuildCompactGidMap); under Identity-H the
-// content code equals the NEW compact gid, so CID == gid and W/CIDSet/ToUnicode
-// are keyed by the compact gid. The CFF subset carries an identity charset.
+// Builds the Type0/CID font object graph (ISO 32000-1 9.7) for a used-glyph subset.
+// Both paths renumber glyphs into a compact 0..N-1 space; under Identity-H the content
+// code is the compact gid, so CID == gid and W/CIDSet/ToUnicode are keyed by it.
 internal static class Type0FontEmbedder
 {
     private const int StemV = 80;
     private const int DefaultWidth = 1000;
 
-    // compactGidMap is the original-to-compact renumbering the generator already computed
-    // and used to remap the content-stream codes; passing it in keeps a single source of
-    // truth so W/CIDSet/ToUnicode cannot silently disagree with the drawn glyph codes.
-    // When null (direct callers) the map is derived here as before.
+    // compactGidMap is the renumbering the generator already applied to the content-stream
+    // codes; reusing it keeps W/CIDSet/ToUnicode from disagreeing with the drawn codes.
     public static ReferenceObject Embed(DocumentWriter writer, SfntFont font, IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort>? compactGidMap = null)
     {
         ArgumentNullException.ThrowIfNull(writer);
@@ -147,12 +141,8 @@ internal static class Type0FontEmbedder
         descriptor["FontFile3"] = writer.Add(stream);
     }
 
-    // gidMap (compact renumbering, monotonic in the original gid) keys W by the new gid.
-    // usedGids is sorted, so the compact CIDs it produces are ascending; consecutive
-    // CIDs collapse into a single "startCid [w0 w1 ...]" run instead of one c [w] pair
-    // per glyph, which is much smaller when the used glyphs fill a contiguous CID block.
-    // The single gid->Unicode remap shared by the embedder and the generator's fresh-text
-    // extraction fonts: each drawn glyph's Unicode is re-keyed by its compact gid.
+    // Public because the generator's fresh-text extraction fonts must re-key by the same map
+    // the /ToUnicode CMap is built from.
     public static Dictionary<ushort, int> RemapToCompactGids(IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort> gidMap)
     {
         var remapped = new Dictionary<ushort, int>(gidToUnicode.Count);
