@@ -189,6 +189,17 @@ internal sealed class FormFlattener(Document document)
             return;
         }
 
+        // The value renders in a viewer, so dropping the widget would lose it: refuse unless
+        // the single left-aligned line this paints is what the field actually shows. Baking a
+        // password's /V here would turn it into cleartext page content.
+        if (!FieldBakePolicy.CanBakeSingleLine(source!, widget, value)
+            || (type.Value is "Ch" && !FieldBakePolicy.HasSingleSelection(source!, widget)))
+        {
+            throw new NotSupportedException(
+                $"Cannot flatten the /{type.Value} field '{FieldName(widget)}': its value does not render as a "
+                + "single left-aligned line, so flattening it would paint the wrong content.");
+        }
+
         var da = (Inherited(widget, "DA") as StringObject)?.Value ?? formDa;
         var (daFont, daSize) = FieldAppearances.ParseDefaultAppearance(da);
         var font = FieldAppearances.AppearanceFont(daFont, daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize);
@@ -200,6 +211,9 @@ internal sealed class FormFlattener(Document document)
             Font = font,
         });
     }
+
+    private string FieldName(DictionaryObject widget)
+        => Inherited(widget, "T") is StringObject name ? FormField.DecodeTextString(name.Value) : "?";
 
     private bool HasVisibleAppearance(DictionaryObject widget)
     {

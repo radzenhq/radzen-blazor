@@ -1,12 +1,16 @@
 using Radzen.Documents.Pdf;
+using System;
 using System.IO;
 using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// FormField.Value reports a multi-select choice field's /V and FormFlattener paints it.
-// They render the same array through one primitive, so they cannot disagree.
+// FormField.Value reports a multi-select choice field's /V as a display string. That is a
+// data API and "Red, Blue" is a fine answer for it. The flattener paints *page content*, and
+// a list box does not render as that string: ISO 32000-1 12.7.4.4 stacks every /Opt entry
+// with the selected ones highlighted. The two paths agreeing never made the painting right,
+// so Value is pinned here and the rendering is pinned in FlattenBakeFidelityTests.
 public class ChoiceValueAgreementTests
 {
     private static byte[] MultiSelectListForm(string values)
@@ -41,28 +45,36 @@ public class ChoiceValueAgreementTests
     [InlineData("[(Red) (Blue)]", "Red, Blue")]
     [InlineData("[(Red)]", "Red")]
     [InlineData("(Red)", "Red")]
-    public void ValueReportsWhatFlattenPaints(string stored, string expected)
+    public void ValueReportsTheSelectionAsADisplayString(string stored, string expected)
     {
         var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
+
         Assert.Equal(expected, document.AcroForm!.Fields.Single().Value);
-
-        document.Flatten();
-        var content = FormTestSupport.PageContentText(FormTestSupport.Reload(document));
-
-        Assert.Contains("(" + expected + ") Tj", content);
     }
 
-    // A newline separator would reach the painter as a raw byte inside a single Tj literal,
-    // where PDF does not treat it as a line break: the join must stay renderable on one line.
-    [Fact]
-    public void PaintedSelectionsCarryNoRawNewline()
+    // What Value reports is not what the page must show. An array /V is a multi-selection: it
+    // renders as stacked highlighted /Opt entries, so "Red, Blue" is a string the field never
+    // shows and Green is dropped. The rendering lives in the /AP the flattener would discard,
+    // so it refuses rather than paint that string.
+    [Theory]
+    [InlineData("[(Red) (Blue)]")]
+    [InlineData("[(Red)]")]
+    public void FlattenRefusesToPaintAMultiSelectionAsThatString(string stored)
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm("[(Red) (Blue)]")));
+        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
+
+        Assert.Throws<NotSupportedException>(document.Flatten);
+    }
+
+    // A scalar /V is a single selection, which is the one line the flattener paints.
+    [Fact]
+    public void FlattenPaintsASingleSelection()
+    {
+        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm("(Red)")));
         document.Flatten();
 
         var content = FormTestSupport.PageContentText(FormTestSupport.Reload(document));
-        var tj = content[content.IndexOf("(Red")..content.IndexOf(") Tj")];
 
-        Assert.DoesNotContain('\n', tj);
+        Assert.Contains("(Red) Tj", content);
     }
 }
