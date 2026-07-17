@@ -18,24 +18,6 @@ internal sealed class TextLineEmitter(
     private readonly List<byte> scratchBytes = [];
     private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
 
-    private static bool HasNonZero(List<double>? values)
-    {
-        if (values is null)
-        {
-            return false;
-        }
-
-        foreach (var value in values)
-        {
-            if (value != 0)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     // Named destinations recorded at emit time: anchor name -> (page, line top).
     // First occurrence wins so a run split across pages anchors where it starts.
     public Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
@@ -441,7 +423,7 @@ internal sealed class TextLineEmitter(
                         list.Add(-kern);
                     }
 
-                    kerns = HasNonZero(list) ? [.. list] : null;
+                    kerns = SfntRunBuilder.HasNonZero(list) ? [.. list] : null;
                 }
 
                 plan.Texts.Add(new TextDraw

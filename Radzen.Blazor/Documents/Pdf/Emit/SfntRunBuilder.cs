@@ -91,7 +91,9 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
         return runs;
     }
 
-    private static bool HasNonZero(List<double>? values)
+    // Kern lists that are entirely zero carry no displacement, so they are dropped rather
+    // than emitted as a TJ array of 0s. Shared with the base-14 draw site.
+    internal static bool HasNonZero(List<double>? values)
     {
         if (values is null)
         {
