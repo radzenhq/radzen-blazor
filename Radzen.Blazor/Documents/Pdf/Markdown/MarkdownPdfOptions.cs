@@ -20,7 +20,29 @@ public sealed class MarkdownPdfOptions
     /// Gets or sets the font sizes for heading levels 1 through 6, indexed 0-based (index 0 is level 1).
     /// Must contain exactly 6 entries. Defaults to a decreasing scale from 24pt down to 11pt.
     /// </summary>
-    public double[] HeadingFontSizes { get; set; } = [24, 20, 16, 14, 12, 11];
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="value"/> does not contain exactly 6 entries.</exception>
+    public double[] HeadingFontSizes
+    {
+        get => headingFontSizes;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            if (value.Length != HeadingLevels)
+            {
+                throw new ArgumentException(
+                    $"{nameof(HeadingFontSizes)} must contain exactly {HeadingLevels} entries, but had {value.Length}.",
+                    nameof(value));
+            }
+
+            headingFontSizes = value;
+        }
+    }
+
+    private const int HeadingLevels = 6;
+
+    private double[] headingFontSizes = [24, 20, 16, 14, 12, 11];
 
     /// <summary>Gets or sets the indent applied per block quote nesting level, in points. Defaults to 24pt.</summary>
     public double BlockQuoteIndent { get; set; } = 24;

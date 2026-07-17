@@ -155,10 +155,17 @@ public sealed class ContentWriter : IDisposable
 
     /// <summary>Writes <paramref name="value"/> as a content-stream number at 1/1000-unit precision.</summary>
     /// <param name="value">The number to write.</param>
+    /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
+    /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
     // Sub-0.001pt coordinate rounding is invisible, and 3-decimal color/matrix values quantize
     // to the same 8-bit channels and glyph positions while shrinking the stream.
     public void WriteNumber(double value)
     {
+        if (!double.IsFinite(value))
+        {
+            throw new InvalidOperationException("A PDF number cannot be NaN or infinite.");
+        }
+
         Span<char> chars = stackalloc char[32];
         if (value.TryFormat(chars, out var written, "0.###", CultureInfo.InvariantCulture))
         {
