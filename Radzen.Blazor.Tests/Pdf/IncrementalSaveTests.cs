@@ -232,6 +232,34 @@ public class IncrementalSaveTests
     }
 
     [Fact]
+    public void AppendedLoadedPageCarriesResourcesIncrementally()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, "Fonted append", BuildTestSupport.Latin);
+        var other = Load(builder.ToArray());
+
+        var original = BaseDocument();
+        var document = Load(original);
+        document.Append(other);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var reader = DocumentReader.Parse(updated);
+        var pages = (DictionaryObject)reader.Resolve(FormTestSupport.Catalog(reader)["Pages"]);
+        var kids = (ArrayObject)reader.Resolve(pages["Kids"]);
+        var appended = (DictionaryObject)reader.Resolve(kids[^1]);
+
+        var resources = reader.GetDictionary(appended, "Resources");
+        Assert.NotNull(resources);
+        var fonts = reader.GetDictionary(resources!, "Font");
+        Assert.NotNull(fonts);
+        Assert.NotEmpty(fonts!.Keys);
+    }
+
+    [Fact]
     public void AppendedPageWithAuthoredElementsThrows()
     {
         var document = Load(BaseDocument());
