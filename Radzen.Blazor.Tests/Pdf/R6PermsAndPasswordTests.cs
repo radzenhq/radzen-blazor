@@ -93,6 +93,77 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
+    // SASLprep B.1 deletes U+00AD (SOFT HYPHEN); NFKC keeps it. A file keyed on the clean
+    // password must open with the soft-hyphen form and vice versa. Fails on the NFKC-only
+    // base (the two forms derive different keys).
+    [Fact]
+    public void SoftHyphenPassword_AuthenticatesAsIfRemoved()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions);
+
+        var handler = new StandardSecurityHandler(encrypt, DocumentId, "sec\u00adret");
+        Assert.True(handler.IsUserPassword);
+        Assert.Equal(FileKey, handler.FileKey);
+    }
+
+    // SASLprep B.1 deletes U+200B (ZERO WIDTH SPACE); NFKC keeps it.
+    [Fact]
+    public void ZeroWidthSpacePassword_AuthenticatesAsIfRemoved()
+    {
+        var encrypt = BuildEncrypt("secret", "owner", Permissions);
+
+        Assert.True(new StandardSecurityHandler(encrypt, DocumentId, "sec\u200bret").IsUserPassword);
+    }
+
+    // SASLprep C.1.2 maps U+1680 (OGHAM SPACE MARK) to U+0020; NFKC leaves it unchanged.
+    [Fact]
+    public void OghamSpacePassword_AuthenticatesAsRegularSpace()
+    {
+        var encrypt = BuildEncrypt("open sesame", "owner", Permissions);
+
+        var handler = new StandardSecurityHandler(encrypt, DocumentId, "open\u1680sesame");
+        Assert.True(handler.IsUserPassword);
+        Assert.Equal(FileKey, handler.FileKey);
+    }
+
+    // Printable ASCII is outside every SASLprep table, so the derived key is unchanged.
+    [Fact]
+    public void PrintableAsciiPassword_Authenticates()
+    {
+        var encrypt = BuildEncrypt("P@ssw0rd!~ ", "owner", Permissions);
+
+        var handler = new StandardSecurityHandler(encrypt, DocumentId, "P@ssw0rd!~ ");
+        Assert.True(handler.IsUserPassword);
+        Assert.Equal(FileKey, handler.FileKey);
+    }
+
+    // A prohibited code point (U+202E RIGHT-TO-LEFT OVERRIDE, RFC 3454 C.8) is rejected
+    // loudly instead of being passed through NFKC-mangled.
+    [Fact]
+    public void ProhibitedCodePointPassword_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => BuildEncrypt("bad\u202epassword", "owner", Permissions));
+    }
+
+    // A RandALCat character (Hebrew Alef) whose string does not begin and end with a
+    // RandALCat violates the bidi rule (RFC 3454 6) and is rejected.
+    [Fact]
+    public void BidiFirstLastViolationPassword_Throws()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => BuildEncrypt("abc\u05d0", "owner", Permissions));
+    }
+
+    // A well-formed right-to-left password (first and last RandALCat) is accepted.
+    [Fact]
+    public void RightToLeftPassword_Authenticates()
+    {
+        var encrypt = BuildEncrypt("\u05d0\u05d1\u05d2", "owner", Permissions);
+
+        Assert.True(new StandardSecurityHandler(encrypt, DocumentId, "\u05d0\u05d1\u05d2").IsUserPassword);
+    }
+
     private static DictionaryObject BuildEncrypt(string userPassword, string ownerPassword, int permissions, bool includePerms = true)
     {
         var (owner, user, ownerEncrypted, userEncrypted, perms) = StandardSecurityHandler.DeriveAes256(

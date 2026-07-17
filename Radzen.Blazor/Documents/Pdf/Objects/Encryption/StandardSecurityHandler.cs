@@ -107,7 +107,10 @@ internal sealed class StandardSecurityHandler
             : DecryptStream(data, objectNumber, generation);
     }
 
-    private static bool IsMetadataStream(DictionaryObject dictionary)
+    // The /EncryptMetadata rule is one rule with a read side and a write side; both must
+    // classify a /Metadata stream identically or the writer leaves plaintext the reader
+    // re-decrypts (or vice versa), so the predicate lives here and EncryptionWriter calls it.
+    internal static bool IsMetadataStream(DictionaryObject dictionary)
         => dictionary.TryGetValue("Type", out var type) && type is NameObject name
             && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
 
@@ -330,11 +333,126 @@ internal sealed class StandardSecurityHandler
         }
     }
 
-    // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-processed before UTF-8
-    // encoding. NFKC covers the normalization SASLprep mandates; ASCII passwords are
-    // unaffected, so this only changes behavior for composed/decomposed Unicode input.
+    // ISO 32000-2 7.6.4.3.3: SASLprep (RFC 4013) before UTF-8. A bounded subset: NFKC alone
+    // does not map RFC 3454 C.1.2 spaces or delete B.1 code points, so those are handled here,
+    // and prohibited/bidi-violating input is rejected rather than silently re-keyed. The
+    // no-LCat-mixing rule (needs table D.2) is accepted, not enforced.
     private static byte[] EncodeR6Password(string password)
-        => Encoding.UTF8.GetBytes(password.Normalize(NormalizationForm.FormKC));
+    {
+        var mapped = MapForSaslprep(password);
+        var normalized = mapped.Normalize(NormalizationForm.FormKC);
+        RejectProhibited(normalized);
+        RejectBidiViolation(normalized);
+        return Encoding.UTF8.GetBytes(normalized);
+    }
+
+    private static string MapForSaslprep(string password)
+    {
+        var builder = new StringBuilder(password.Length);
+        foreach (var rune in password.EnumerateRunes())
+        {
+            if (InAnyRange(rune.Value, SaslprepMappedToNothing))
+            {
+                continue;
+            }
+
+            builder.Append(InAnyRange(rune.Value, SaslprepNonAsciiSpace) ? " " : rune.ToString());
+        }
+
+        return builder.ToString();
+    }
+
+    private static void RejectProhibited(string value)
+    {
+        foreach (var rune in value.EnumerateRunes())
+        {
+            if (InAnyRange(rune.Value, SaslprepProhibited))
+            {
+                throw new DocumentParseException(
+                    "Revision 6 password contains a code point prohibited by the SASLprep profile.");
+            }
+        }
+    }
+
+    // RFC 3454 6: a string containing a RandALCat character must begin and end with one.
+    private static void RejectBidiViolation(string value)
+    {
+        Rune? first = null;
+        var last = default(Rune);
+        var hasRandAl = false;
+        foreach (var rune in value.EnumerateRunes())
+        {
+            first ??= rune;
+            last = rune;
+            hasRandAl |= InAnyRange(rune.Value, SaslprepRandAlCat);
+        }
+
+        if (hasRandAl && first is { } start
+            && !(InAnyRange(start.Value, SaslprepRandAlCat) && InAnyRange(last.Value, SaslprepRandAlCat)))
+        {
+            throw new DocumentParseException(
+                "Revision 6 password violates the SASLprep bidirectional first/last rule.");
+        }
+    }
+
+    // Flattened inclusive [lo, hi] code-point pairs; passwords are <= 127 bytes so a linear
+    // scan is cheaper than the machinery of a sorted lookup.
+    private static bool InAnyRange(int codePoint, int[] ranges)
+    {
+        for (var i = 0; i < ranges.Length; i += 2)
+        {
+            if (codePoint >= ranges[i] && codePoint <= ranges[i + 1])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // RFC 3454 table B.1 (commonly mapped to nothing).
+    private static readonly int[] SaslprepMappedToNothing =
+    [
+        0x00AD, 0x00AD, 0x034F, 0x034F, 0x1806, 0x1806, 0x180B, 0x180D,
+        0x200B, 0x200D, 0x2060, 0x2060, 0xFE00, 0xFE0F, 0xFEFF, 0xFEFF,
+    ];
+
+    // RFC 3454 table C.1.2 (non-ASCII space characters).
+    private static readonly int[] SaslprepNonAsciiSpace =
+    [
+        0x00A0, 0x00A0, 0x1680, 0x1680, 0x2000, 0x200A,
+        0x202F, 0x202F, 0x205F, 0x205F, 0x3000, 0x3000,
+    ];
+
+    // RFC 3454 tables C.2.1, C.2.2, C.3, C.4, C.5, C.6, C.7, C.8, C.9 (prohibited output).
+    private static readonly int[] SaslprepProhibited =
+    [
+        0x0000, 0x001F, 0x007F, 0x009F,
+        0x0340, 0x0341, 0x06DD, 0x06DD, 0x070F, 0x070F, 0x180E, 0x180E,
+        0x200C, 0x200F, 0x2028, 0x2029, 0x202A, 0x202E, 0x2060, 0x2063, 0x206A, 0x206F,
+        0x2FF0, 0x2FFB, 0xD800, 0xDFFF, 0xE000, 0xF8FF,
+        0xFDD0, 0xFDEF, 0xFEFF, 0xFEFF, 0xFFF9, 0xFFFF,
+        0x1D173, 0x1D17A,
+        0x1FFFE, 0x1FFFF, 0x2FFFE, 0x2FFFF, 0x3FFFE, 0x3FFFF, 0x4FFFE, 0x4FFFF,
+        0x5FFFE, 0x5FFFF, 0x6FFFE, 0x6FFFF, 0x7FFFE, 0x7FFFF, 0x8FFFE, 0x8FFFF,
+        0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF, 0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF,
+        0xDFFFE, 0xDFFFF, 0xEFFFE, 0xEFFFF, 0xE0001, 0xE0001, 0xE0020, 0xE007F,
+        0xF0000, 0xFFFFD, 0xFFFFE, 0xFFFFF, 0x100000, 0x10FFFD, 0x10FFFE, 0x10FFFF,
+    ];
+
+    // RFC 3454 table D.1 (bidirectional property R or AL).
+    private static readonly int[] SaslprepRandAlCat =
+    [
+        0x05BE, 0x05BE, 0x05C0, 0x05C0, 0x05C3, 0x05C3, 0x05D0, 0x05EA,
+        0x05F0, 0x05F4, 0x061B, 0x061B, 0x061F, 0x061F, 0x0621, 0x063A,
+        0x0640, 0x064A, 0x066D, 0x066F, 0x0671, 0x06D5, 0x06DD, 0x06DD,
+        0x06E5, 0x06E6, 0x06FA, 0x06FE, 0x0700, 0x070D, 0x0710, 0x0710,
+        0x0712, 0x072C, 0x0780, 0x07A5, 0x07B1, 0x07B1, 0x200F, 0x200F,
+        0xFB1D, 0xFB1D, 0xFB1F, 0xFB28, 0xFB2A, 0xFB36, 0xFB38, 0xFB3C,
+        0xFB3E, 0xFB3E, 0xFB40, 0xFB41, 0xFB43, 0xFB44, 0xFB46, 0xFBB1,
+        0xFBD3, 0xFD3D, 0xFD50, 0xFD8F, 0xFD92, 0xFDC7, 0xFDF0, 0xFDFC,
+        0xFE70, 0xFE74, 0xFE76, 0xFEFC,
+    ];
 
     // The AESV3 file key comes straight from decrypting the attacker-supplied /UE or /OE.
     // Anything but 32 bytes (an empty /UE gives a zero-length key that divides-by-zero in

@@ -85,14 +85,10 @@ internal sealed class EncryptionWriter(
         ReadOnlyMemory<byte> data, int objectNumber, int generation, DictionaryObject dictionary)
     {
         ArgumentNullException.ThrowIfNull(dictionary);
-        return !encryptMetadata && IsMetadataStream(dictionary)
+        return !encryptMetadata && StandardSecurityHandler.IsMetadataStream(dictionary)
             ? data.ToArray()
             : Apply(data, objectNumber, generation);
     }
-
-    private static bool IsMetadataStream(DictionaryObject dictionary)
-        => dictionary.TryGetValue("Type", out var type) && type is NameObject name
-            && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
 
     private static DictionaryObject BuildLegacyDictionary(
         (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool aes, bool encryptMetadata)
