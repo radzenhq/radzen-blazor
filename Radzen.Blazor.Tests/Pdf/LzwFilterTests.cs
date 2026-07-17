@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 
@@ -130,5 +131,17 @@ public class LzwFilterTests
             outBytes.Add((byte)((bitBuf << (8 - bitCnt)) & 0xFF));
         }
         return outBytes.ToArray();
+    }
+
+    // 2^28 bytes is the smallest input whose bit count overflows a 32-bit total, so the
+    // input size is the thing under test and cannot be scaled down. The array is zero
+    // pages the decoder never reads past ~1 KB of, and maxOutput stops it after ~1024
+    // codes, so this costs virtual address space rather than resident memory or time.
+    [Fact]
+    public void Decode_InputAtBitCountOverflowBoundary_StillDecodes()
+    {
+        var data = new byte[1 << 28];
+
+        Assert.Throws<DocumentParseException>(() => LzwFilter.Decode(data, early: 1, maxOutput: 1024));
     }
 }
