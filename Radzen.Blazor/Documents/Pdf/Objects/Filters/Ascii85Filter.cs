@@ -24,7 +24,7 @@ internal static class Ascii85Filter
                 break;
             }
 
-            if (IsWhitespace(b))
+            if (Lexer.IsWhitespace(b))
             {
                 continue;
             }
@@ -138,9 +138,6 @@ internal static class Ascii85Filter
         output.Add((byte)'>');
         return [.. output];
     }
-
-    static bool IsWhitespace(byte b) =>
-        b is 0 or 9 or 10 or 12 or 13 or 32;
 }
 
 internal sealed class Ascii85StreamFilter : IStreamFilter

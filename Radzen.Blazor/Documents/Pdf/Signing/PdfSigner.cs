@@ -448,12 +448,7 @@ public static class PdfSigner
                 $"The signature is {blob.Length} bytes but only {reservedBytes} bytes are reserved. " + reservedHint);
         }
 
-        const string hex = "0123456789abcdef";
-        for (var i = 0; i < blob.Length; i++)
-        {
-            bytes[gapStart + 1 + 2 * i] = (byte)hex[blob[i] >> 4];
-            bytes[gapStart + 2 + 2 * i] = (byte)hex[blob[i] & 0xF];
-        }
+        HexCodec.Encode(blob, bytes.AsSpan(gapStart + 1, blob.Length * 2), HexCase.Lower);
 
         return bytes;
     }
