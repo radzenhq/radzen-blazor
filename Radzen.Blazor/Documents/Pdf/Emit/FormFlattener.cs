@@ -241,21 +241,7 @@ internal sealed class FormFlattener(Document document)
     }
 
     private DocumentObject? Inherited(DictionaryObject widget, string key)
-    {
-        var source = Source;
-        var current = widget;
-        for (var depth = 0; current is not null && depth < 32; depth++)
-        {
-            if (current.TryGetValue(key, out var value))
-            {
-                return source!.Resolve(value!);
-            }
-
-            current = source!.GetDictionary(current, "Parent");
-        }
-
-        return null;
-    }
+        => FormField.InheritedAttribute(Source!, widget, key);
 
     private (double X, double Y, double Width, double Height) WidgetRect(DictionaryObject widget)
     {

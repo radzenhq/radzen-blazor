@@ -57,20 +57,34 @@ public sealed class FormField
 
     private DocumentObject? InheritedEntry(string key) => InheritedAttribute(reader, Dictionary, key);
 
-    // Walks a field/widget's /Parent chain for the nearest inheritable attribute (ISO 32000
-    // 12.7.3.1) and returns it resolved: /V, /FT, /Ff and /Q can all be set on a non-terminal
-    // parent and inherited by its kids. The walk is bounded against a cyclic /Parent chain.
+    // Walks a field/widget's /Parent chain from `dictionary` up to its root field, yielding
+    // each ancestor. The chain is a finite object graph, so revisiting a node is the only way
+    // the walk fails to terminate: track them and fail loud, matching AcroForm's /Kids descent
+    // over this same tree rather than truncating a deep-but-valid hierarchy at a fixed depth.
+    internal static IEnumerable<DictionaryObject> ParentChain(DocumentReader reader, DictionaryObject dictionary)
+    {
+        var seen = new HashSet<DictionaryObject>(ReferenceEqualityComparer.Instance);
+        for (var current = dictionary; current is not null; current = reader.GetDictionary(current, "Parent"))
+        {
+            if (!seen.Add(current))
+            {
+                throw new DocumentParseException("Cyclic /Parent reference in the field tree.");
+            }
+
+            yield return current;
+        }
+    }
+
+    // The nearest inheritable attribute on a field/widget's /Parent chain (ISO 32000 12.7.3.1),
+    // resolved: /V, /FT, /Ff and /Q can all be set on a non-terminal parent and inherited.
     internal static DocumentObject? InheritedAttribute(DocumentReader reader, DictionaryObject dictionary, string key)
     {
-        var current = dictionary;
-        for (var depth = 0; current is not null && depth < 32; depth++)
+        foreach (var current in ParentChain(reader, dictionary))
         {
             if (current.TryGetValue(key, out var value))
             {
                 return reader.Resolve(value!);
             }
-
-            current = reader.GetDictionary(current, "Parent");
         }
 
         return null;

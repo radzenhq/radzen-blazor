@@ -106,9 +106,9 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         }
 
         var root = annotation;
-        for (var depth = 0; depth < 32 && reader.GetDictionary(root, "Parent") is { } next; depth++)
+        foreach (var ancestor in FormField.ParentChain(reader, annotation))
         {
-            root = next;
+            root = ancestor;
         }
 
         if (!fieldRoots.Add(root))
