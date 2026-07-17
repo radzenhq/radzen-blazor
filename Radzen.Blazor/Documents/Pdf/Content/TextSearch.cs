@@ -64,12 +64,13 @@ public readonly struct TextSourceReference(int operatorIndex, int characterOffse
 public sealed class PositionedTextRun
 {
     internal PositionedTextRun(string text, int operatorIndex, TextQuadrilateral quadrilateral, double[] advanceOffsets,
-        ReverseFont font, double fontSize, double scale, double charSpacing, double wordSpacing, Matrix matrix)
+        bool geometryEstimated, ReverseFont font, double fontSize, double scale, double charSpacing, double wordSpacing, Matrix matrix)
     {
         Text = text;
         OperatorIndex = operatorIndex;
         Quadrilateral = quadrilateral;
         AdvanceOffsets = advanceOffsets;
+        GeometryEstimated = geometryEstimated;
         Font = font;
         FontSize = fontSize;
         Scale = scale;
@@ -89,6 +90,12 @@ public sealed class PositionedTextRun
 
     /// <summary>Gets the axis-aligned bounds enclosing the quadrilateral.</summary>
     public PdfRect Bounds => Quadrilateral.Bounds;
+
+    /// <summary>
+    /// Gets whether the run's font left at least one shown glyph without a usable width, so
+    /// every advance from that glyph onwards, and the geometry derived from it, is estimated.
+    /// </summary>
+    public bool GeometryEstimated { get; }
 
     internal double Advance => AdvanceOffsets[^1];
 
@@ -126,13 +133,14 @@ public sealed class TextSearchOptions
 public sealed class TextHit
 {
     internal TextHit(string text, int pageIndex, IReadOnlyList<TextQuadrilateral> quadrilaterals, IReadOnlyList<TextSourceReference> sources,
-        IReadOnlyList<bool> syntheticGapBoundaries)
+        IReadOnlyList<bool> syntheticGapBoundaries, bool geometryEstimated)
     {
         Text = text;
         PageIndex = pageIndex;
         Quadrilaterals = quadrilaterals;
         Sources = sources;
         SyntheticGapBoundaries = syntheticGapBoundaries;
+        GeometryEstimated = geometryEstimated;
         Bounds = TextSearch.GetBounds(quadrilaterals);
     }
 
@@ -150,6 +158,12 @@ public sealed class TextHit
 
     /// <summary>Gets the source text-show operator references covered by the match.</summary>
     public IReadOnlyList<TextSourceReference> Sources { get; }
+
+    /// <summary>
+    /// Gets whether <see cref="Quadrilaterals"/> and <see cref="Bounds"/> rest on an estimated
+    /// glyph width because the source font does not provide one for every glyph shown.
+    /// </summary>
+    public bool GeometryEstimated { get; }
 
     internal IReadOnlyList<bool> SyntheticGapBoundaries { get; }
 }
@@ -277,8 +291,8 @@ internal static class TextSearch
         var reverse = walker.Font ?? ReverseFont.WinAnsi;
         var builder = new StringBuilder();
         var advanceOffsets = new List<double> { 0.0 };
-        AppendText(builder, advanceOffsets, reverse, bytes, walker.FontSize, walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing);
-        AddRun(runs, builder.ToString(), walker, reverse, advanceOffsets, operatorIndex);
+        var estimated = AppendText(builder, advanceOffsets, reverse, bytes, walker.FontSize, walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing);
+        AddRun(runs, builder.ToString(), walker, reverse, advanceOffsets, estimated, operatorIndex);
         return advanceOffsets[^1];
     }
 
@@ -289,11 +303,12 @@ internal static class TextSearch
         var scale = walker.HorizontalScale;
         var builder = new StringBuilder();
         var advanceOffsets = new List<double> { 0.0 };
+        var estimated = false;
         foreach (var element in array)
         {
             if (element.Kind == TokenKind.String && element.Bytes is { Length: > 0 } bytes)
             {
-                AppendText(builder, advanceOffsets, reverse, bytes, fontSize, scale, walker.CharSpacing, walker.WordSpacing);
+                estimated |= AppendText(builder, advanceOffsets, reverse, bytes, fontSize, scale, walker.CharSpacing, walker.WordSpacing);
             }
             else if (element.Kind == TokenKind.Number)
             {
@@ -310,16 +325,19 @@ internal static class TextSearch
             }
         }
 
-        AddRun(runs, builder.ToString(), walker, reverse, advanceOffsets, operatorIndex);
+        AddRun(runs, builder.ToString(), walker, reverse, advanceOffsets, estimated, operatorIndex);
         return advanceOffsets[^1];
     }
 
-    private static void AppendText(StringBuilder builder, List<double> advanceOffsets, ReverseFont font, byte[] bytes, double fontSize, double scale, double charSpacing, double wordSpacing)
+    private static bool AppendText(StringBuilder builder, List<double> advanceOffsets, ReverseFont font, byte[] bytes, double fontSize, double scale, double charSpacing, double wordSpacing)
     {
         var advance = advanceOffsets[^1];
+        var estimated = false;
         foreach (var code in font.DecodeCodes(bytes))
         {
-            var widthEm = font.TryGetWidth(code.Code, out var width) ? width / 1000.0 : TextComposition.AverageGlyphEm;
+            var known = font.TryGetWidth(code.Code, out var width);
+            estimated |= !known;
+            var widthEm = known ? width / 1000.0 : TextComposition.AverageGlyphEm;
             var glyphAdvance = GlyphMetrics.Advance(widthEm, fontSize, charSpacing, wordSpacing, code.IsWordSpace);
             for (var i = 0; i < code.Text.Length; i++)
             {
@@ -332,10 +350,12 @@ internal static class TextSearch
                 advanceOffsets.Add(advance);
             }
         }
+
+        return estimated;
     }
 
     private static void AddRun(List<PositionedTextRun> runs, string text, ContentTextWalker walker, ReverseFont font,
-        List<double> advanceOffsets, int operatorIndex)
+        List<double> advanceOffsets, bool geometryEstimated, int operatorIndex)
     {
         if (text.Length == 0)
         {
@@ -350,7 +370,7 @@ internal static class TextSearch
         var offsets = advanceOffsets.ToArray();
         var matrix = Matrix.Translate(0, walker.Rise) * walker.TextMatrix * walker.Ctm;
         runs.Add(new PositionedTextRun(text, operatorIndex, Quad(matrix, 0, text.Length, offsets, walker.FontSize), offsets,
-            font, walker.FontSize, walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing, matrix));
+            geometryEstimated, font, walker.FontSize, walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing, matrix));
     }
 
     internal static TextQuadrilateral Quad(Matrix matrix, int offset, int length, IReadOnlyList<double> advanceOffsets, double fontSize)
@@ -478,6 +498,7 @@ internal static class TextSearch
         var sources = new List<TextSourceReference>();
         var syntheticGapBoundaries = new List<bool>();
         var sawSyntheticWhitespace = false;
+        var geometryEstimated = false;
         for (var i = 0; i < selected.Count;)
         {
             var character = selected[i];
@@ -497,6 +518,7 @@ internal static class TextSearch
             }
 
             var run = runs[character.RunIndex];
+            geometryEstimated |= run.GeometryEstimated;
             if (sources.Count > 0)
             {
                 syntheticGapBoundaries.Add(sawSyntheticWhitespace);
@@ -511,7 +533,7 @@ internal static class TextSearch
         var firstOriginal = searchable.Characters[index].OriginalIndex;
         var lastOriginal = searchable.Characters[index + length - 1].OriginalIndex;
         var matchedText = original.Text.Substring(firstOriginal, lastOriginal - firstOriginal + 1);
-        return new TextHit(matchedText, pageIndex, quadrilaterals, sources, syntheticGapBoundaries);
+        return new TextHit(matchedText, pageIndex, quadrilaterals, sources, syntheticGapBoundaries, geometryEstimated);
     }
 
     private readonly record struct CharacterSource(int OriginalIndex, int RunIndex, int CharacterIndex);

@@ -13,9 +13,9 @@ internal static class TextComposition
     // ~0.2 em is an inter-word gap, smaller values are kerning.
     public const double TjSpaceThreshold = 200.0;
 
-    // Stands in for a width the font does not provide. It never affects the decoded text,
-    // but it does feed the advances behind TextHit quads, so a hit in a widthless font is
-    // positioned on an estimate.
+    // Stands in for a width the font does not provide, keeping a partial-width font searchable.
+    // Reading may estimate and says so via GeometryEstimated; editing (TextReplacer, Redactor)
+    // must refuse an estimate rather than consume one.
     public const double AverageGlyphEm = 0.5;
 
     // Sits below a space (~0.25 em) yet clears kerning and abutting fragments.
