@@ -86,19 +86,7 @@ public static class PdfSigner
     internal static (byte[] Bytes, int SigStart, int SigEnd) AppendSignatureField(
         byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
     {
-        var reader = DocumentReader.Parse(pdf);
-        if (reader.IsEncrypted)
-        {
-            throw new NotSupportedException("Signing encrypted documents is not supported.");
-        }
-
-        if (!(reader.Trailer.TryGetValue("Root", out var root) && root is ReferenceObject rootRef
-            && reader.Resolve(rootRef) is DictionaryObject catalog))
-        {
-            throw new DocumentParseException("The trailer /Root must reference the document catalog.", -1);
-        }
-
-        var writer = new IncrementalUpdateWriter(pdf, reader);
+        var (reader, rootRef, catalog, writer) = IncrementalEditSession.Begin(pdf, "Signing");
         var (pageRef, page) = FindPage(reader, catalog, pageIndex);
 
         var signatureRef = writer.Add(signature);
@@ -505,12 +493,9 @@ public static class PdfSigner
     private static bool IsByteRangePlaceholder(byte[] bytes, int start)
     {
         const string prefix = "0 0 0 0";
-        for (var i = 0; i < prefix.Length; i++)
+        if (!PdfBytes.Matches(bytes, start, prefix))
         {
-            if (bytes[start + i] != (byte)prefix[i])
-            {
-                return false;
-            }
+            return false;
         }
 
         for (var i = prefix.Length; i < ByteRangeInteriorWidth; i++)
@@ -542,17 +527,7 @@ public static class PdfSigner
         var last = Math.Min(end, bytes.Length) - pattern.Length;
         for (var i = Math.Max(from, 0); i <= last; i++)
         {
-            var match = true;
-            for (var j = 0; j < pattern.Length; j++)
-            {
-                if (bytes[i + j] != (byte)pattern[j])
-                {
-                    match = false;
-                    break;
-                }
-            }
-
-            if (match)
+            if (PdfBytes.Matches(bytes, i, pattern))
             {
                 return i;
             }

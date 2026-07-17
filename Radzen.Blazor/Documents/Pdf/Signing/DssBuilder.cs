@@ -73,19 +73,7 @@ public static class DssBuilder
             throw new ArgumentException("At least one of certs, ocsps or crls must be non-empty.", nameof(certs));
         }
 
-        var reader = DocumentReader.Parse(pdf);
-        if (reader.IsEncrypted)
-        {
-            throw new NotSupportedException("Augmenting encrypted documents is not supported.");
-        }
-
-        if (!(reader.Trailer.TryGetValue("Root", out var root) && root is ReferenceObject rootRef
-            && reader.Resolve(rootRef) is DictionaryObject catalog))
-        {
-            throw new DocumentParseException("The trailer /Root must reference the document catalog.", -1);
-        }
-
-        var writer = new IncrementalUpdateWriter(pdf, reader);
+        var (reader, rootRef, catalog, writer) = IncrementalEditSession.Begin(pdf, "Augmenting");
 
         // Merge with any existing /DSS so a multi-signature document (or a later
         // re-augmentation) keeps the earlier validation material instead of dropping it.
