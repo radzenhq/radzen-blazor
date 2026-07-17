@@ -31,6 +31,13 @@ internal readonly struct TextShowOp
     // Emits the trailing 0 Tr / 0 Tc / 0 Tw / 100 Tz / 0 Ts resets. The loaded-content path
     // leaves the state set, so re-emitted bytes match what was read.
     public bool ResetTextState { get; init; }
+
+    // Set when this show splices into a text object the caller has already opened. ISO
+    // 32000-1 9.4.1 forbids nesting one, and a nested BT would reset the text and line
+    // matrices the enclosing object's later operators still position against. The live text
+    // matrix already sits at the run's origin, so no BT/ET and no Td are emitted; X and
+    // Baseline must be zero because the caller carries the origin in the ambient instead.
+    public bool InsideTextObject { get; init; }
 }
 
 // Pure byte-writing helpers: given a ContentWriter and a draw command, they emit the
@@ -209,7 +216,16 @@ internal static class ContentEmitter
     // operator order and the state-reset discipline exist once.
     public static void WriteTextShow(ContentWriter writer, in TextShowOp op)
     {
-        writer.WriteRaw("BT\n");
+        if (op.InsideTextObject && (op.X != 0 || op.Baseline != 0 || op.Shear != 0))
+        {
+            throw new NotSupportedException("A text show spliced into an open text object must carry its origin in the ambient transform.");
+        }
+
+        if (!op.InsideTextObject)
+        {
+            writer.WriteRaw("BT\n");
+        }
+
         if (op.FillPaint is { } fillPaint)
         {
             WriteDeviceColor(writer, fillPaint, stroke: false);
@@ -266,22 +282,11 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tr\n");
         }
 
-        if (op.Shear != 0)
+        // Positioning inside an open text object would discard where that object left the
+        // text and line matrices; the ambient transform carries the origin instead.
+        if (!op.InsideTextObject)
         {
-            writer.WriteRaw("1 0 ");
-            writer.WriteNumber(op.Shear);
-            writer.WriteRaw(" 1 ");
-            writer.WriteNumber(op.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(op.Baseline);
-            writer.WriteRaw(" Tm\n");
-        }
-        else
-        {
-            writer.WriteNumber(op.X);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(op.Baseline);
-            writer.WriteRaw(" Td\n");
+            WritePosition(writer, op);
         }
 
         WriteShow(writer, op);
@@ -314,7 +319,32 @@ internal static class ContentEmitter
             }
         }
 
-        writer.WriteRaw("ET\n");
+        if (!op.InsideTextObject)
+        {
+            writer.WriteRaw("ET\n");
+        }
+    }
+
+    // Shear needs the full Tm form; a plain origin rides the shorter Td.
+    private static void WritePosition(ContentWriter writer, in TextShowOp op)
+    {
+        if (op.Shear != 0)
+        {
+            writer.WriteRaw("1 0 ");
+            writer.WriteNumber(op.Shear);
+            writer.WriteRaw(" 1 ");
+            writer.WriteNumber(op.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(op.Baseline);
+            writer.WriteRaw(" Tm\n");
+        }
+        else
+        {
+            writer.WriteNumber(op.X);
+            writer.WriteRaw(" ");
+            writer.WriteNumber(op.Baseline);
+            writer.WriteRaw(" Td\n");
+        }
     }
 
     private static void WriteShow(ContentWriter writer, in TextShowOp op)

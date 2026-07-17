@@ -67,6 +67,11 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
 
     public Matrix LineMatrix { get; private set; } = Matrix.Identity;
 
+    // ISO 32000-1 9.4.1 forbids nesting text objects, so this is 0 or 1 for a conformant
+    // stream. It is a count rather than a flag because a malformed stream can nest anyway,
+    // and an inner ET must then not be read as leaving the outer text object.
+    public int TextObjectDepth { get; private set; }
+
     // Applies op's effect on the shared state and reports whether that is all op means.
     // False leaves op to the caller: a show operator (already advanced to its line and
     // carrying its own spacing), or an operator this machine does not model at all.
@@ -112,10 +117,16 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
 
             // BT/ET only scope the text matrices; ET leaves no state behind.
             case "BT":
+                TextObjectDepth++;
                 TextMatrix = LineMatrix = Matrix.Identity;
                 return true;
 
             case "ET":
+                if (TextObjectDepth > 0)
+                {
+                    TextObjectDepth--;
+                }
+
                 return true;
 
             case "Tf":
