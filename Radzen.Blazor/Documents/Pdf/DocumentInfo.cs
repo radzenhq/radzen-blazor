@@ -6,9 +6,9 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// Document metadata such as title, author and keywords.
 /// </summary>
-public class DocumentInfo
+public class DocumentInfo : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private string? title;
     private string? author;
     private string? subject;
@@ -22,35 +22,35 @@ public class DocumentInfo
     public string? Title
     {
         get => title;
-        set => Set(ref title, value);
+        set => tracker.Set(ref title, value);
     }
 
     /// <summary>Gets or sets the document author.</summary>
     public string? Author
     {
         get => author;
-        set => Set(ref author, value);
+        set => tracker.Set(ref author, value);
     }
 
     /// <summary>Gets or sets the document subject.</summary>
     public string? Subject
     {
         get => subject;
-        set => Set(ref subject, value);
+        set => tracker.Set(ref subject, value);
     }
 
     /// <summary>Gets or sets the document keywords.</summary>
     public string? Keywords
     {
         get => keywords;
-        set => Set(ref keywords, value);
+        set => tracker.Set(ref keywords, value);
     }
 
     /// <summary>Gets or sets the name of the application that created the document.</summary>
     public string? Creator
     {
         get => creator;
-        set => Set(ref creator, value);
+        set => tracker.Set(ref creator, value);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public class DocumentInfo
     public string? Producer
     {
         get => producer;
-        set => Set(ref producer, value);
+        set => tracker.Set(ref producer, value);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class DocumentInfo
     public DateTimeOffset? CreationDate
     {
         get => creationDate;
-        set => Set(ref creationDate, value);
+        set => tracker.Set(ref creationDate, value);
     }
 
     /// <summary>
@@ -86,26 +86,20 @@ public class DocumentInfo
     public DateTimeOffset? ModificationDate
     {
         get => modificationDate;
-        set => Set(ref modificationDate, value);
+        set => tracker.Set(ref modificationDate, value);
     }
 
     /// <summary>
     /// Gets a value indicating whether a modeled metadata field has been assigned since the
     /// document was loaded. A loaded document emits an /Info override only when this is true.
     /// </summary>
-    public bool IsModified => touched;
-
-    // Unconditional, as on ContentElement: whether the new value is "equal" to the old is not
-    // the same question as whether it emits the same bytes.
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    public bool IsModified => tracker.IsModified;
 
     // Called once after load, which fills these same setters and would otherwise leave every
     // loaded document born dirty.
-    internal void AcceptChanges() => touched = false;
+    internal void AcceptChanges() => tracker.AcceptChanges();
+
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     internal DocumentInfo Clone()
     {

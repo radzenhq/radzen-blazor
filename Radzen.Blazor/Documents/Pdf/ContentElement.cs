@@ -6,9 +6,9 @@ namespace Radzen.Documents.Pdf;
 /// The base class for a single drawable element in a page content stream.
 /// Elements are painted in the order they are added to <see cref="Page.Content"/>.
 /// </summary>
-public abstract class ContentElement
+public abstract class ContentElement : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private Matrix transform = Matrix.Identity;
     private bool isArtifact;
 
@@ -38,26 +38,26 @@ public abstract class ContentElement
     /// materialized from a loaded content stream. A loaded page re-emits only the
     /// elements that report true, so an untouched one keeps its original bytes.
     /// </summary>
-    public virtual bool IsModified => touched;
+    public virtual bool IsModified => tracker.IsModified;
 
     /// <summary>Assigns a tracked backing field and marks this element modified.</summary>
     /// <typeparam name="T">The field type.</typeparam>
     /// <param name="field">The backing field to assign.</param>
     /// <param name="value">The value to assign.</param>
-    // Unconditional: whether the new value is "equal" to the old is not the same question as
-    // whether it emits the same bytes, and for a mutable Font or a float it is not even stable.
-    protected void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
 
     /// <summary>Marks this element modified without assigning a tracked field.</summary>
-    protected void Touch() => touched = true;
+    protected void Touch() => tracker.Touch();
 
     // Called once over a loaded page's original elements after materialization, which builds
     // them through these same setters and would otherwise leave every page born dirty.
-    internal virtual void AcceptChanges() => touched = false;
+    internal virtual void AcceptChanges() => tracker.AcceptChanges();
+
+    // Explicit so the overridable public IsModified/AcceptChanges do not themselves implement an
+    // internal interface member (CA2119); subclass overrides are still reached through them.
+    bool ITracksChanges.IsModified => IsModified;
+
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     internal void Emit(ContentWriter writer) => Emit(writer, Transform);
 

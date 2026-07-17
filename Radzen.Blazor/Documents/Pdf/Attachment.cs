@@ -33,9 +33,9 @@ public enum AttachmentRelationship
 /// <c>fx:Version</c>, <c>fx:ConformanceLevel</c>). Set it on the attachment so the
 /// XMP declares the invoice's real profile instead of the BASIC 1.0 defaults.
 /// </summary>
-public sealed class FacturXProfile
+public sealed class FacturXProfile : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private string documentType = "INVOICE";
     private string version = "1.0";
     private string conformanceLevel = "BASIC";
@@ -44,41 +44,37 @@ public sealed class FacturXProfile
     public string DocumentType
     {
         get => documentType;
-        set => Set(ref documentType, value);
+        set => tracker.Set(ref documentType, value);
     }
 
     /// <summary>Gets or sets the standard version (<c>fx:Version</c>), e.g. <c>1.0</c>.</summary>
     public string Version
     {
         get => version;
-        set => Set(ref version, value);
+        set => tracker.Set(ref version, value);
     }
 
     /// <summary>Gets or sets the conformance level (<c>fx:ConformanceLevel</c>), e.g. <c>BASIC</c>, <c>EN 16931</c> or <c>EXTENDED</c>.</summary>
     public string ConformanceLevel
     {
         get => conformanceLevel;
-        set => Set(ref conformanceLevel, value);
+        set => tracker.Set(ref conformanceLevel, value);
     }
 
     /// <summary>Gets a value indicating whether this profile has been modified since the document was loaded.</summary>
-    public bool IsModified => touched;
+    public bool IsModified => tracker.IsModified;
 
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    internal void AcceptChanges() => tracker.AcceptChanges();
 
-    internal void AcceptChanges() => touched = false;
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
 /// <summary>
 /// A file embedded into the produced PDF: name, payload, relationship and MIME type.
 /// </summary>
-public sealed class Attachment
+public sealed class Attachment : ITracksChanges
 {
-    private bool touched;
+    private ChangeTracker tracker;
     private string? description;
     private DateTimeOffset modificationDate = DefaultModificationDate;
     private FacturXProfile? facturX;
@@ -117,7 +113,7 @@ public sealed class Attachment
     public string? Description
     {
         get => description;
-        set => Set(ref description, value);
+        set => tracker.Set(ref description, value);
     }
 
     /// <summary>
@@ -129,7 +125,7 @@ public sealed class Attachment
     public DateTimeOffset ModificationDate
     {
         get => modificationDate;
-        set => Set(ref modificationDate, value);
+        set => tracker.Set(ref modificationDate, value);
     }
 
     /// <summary>
@@ -141,7 +137,7 @@ public sealed class Attachment
     public FacturXProfile? FacturX
     {
         get => facturX;
-        set => Set(ref facturX, value);
+        set => tracker.Set(ref facturX, value);
     }
 
     /// <summary>
@@ -149,19 +145,15 @@ public sealed class Attachment
     /// loaded. Name, payload, relationship and MIME type are immutable, so only the settable
     /// fields and the owned FacturX profile can move it.
     /// </summary>
-    public bool IsModified => touched || FacturX?.IsModified == true;
-
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    public bool IsModified => tracker.IsModified || FacturX?.IsModified == true;
 
     internal void AcceptChanges()
     {
-        touched = false;
+        tracker.AcceptChanges();
         FacturX?.AcceptChanges();
     }
+
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     internal byte[] Data { get; }
 }
@@ -172,8 +164,7 @@ public sealed class Attachment
 /// </summary>
 public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 {
-    private readonly List<Attachment> items = [];
-    private bool structureChanged;
+    private readonly TrackedList<Attachment> items = [];
 
     /// <summary>Gets the number of attachments.</summary>
     public int Count => items.Count;
@@ -202,7 +193,6 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 
         var attachment = new Attachment(name, data, relationship, mimeType);
         items.Add(attachment);
-        structureChanged = true;
         return attachment;
     }
 
@@ -212,39 +202,26 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
     public bool Remove(Attachment attachment)
     {
         ArgumentNullException.ThrowIfNull(attachment);
-        var removed = items.Remove(attachment);
-        structureChanged |= removed;
-        return removed;
+        return items.Remove(attachment);
     }
 
     /// <summary>Removes the attachment at the given index.</summary>
     /// <param name="index">The zero-based index.</param>
-    public void RemoveAt(int index)
-    {
-        items.RemoveAt(index);
-        structureChanged = true;
-    }
+    public void RemoveAt(int index) => items.RemoveAt(index);
 
     /// <summary>Removes all attachments.</summary>
-    public void Clear()
-    {
-        structureChanged |= items.Count > 0;
-        items.Clear();
-    }
+    public void Clear() => items.Clear();
 
-    internal void Add(Attachment attachment)
-    {
-        items.Add(attachment);
-        structureChanged = true;
-    }
+    internal void Add(Attachment attachment) => items.Add(attachment);
 
     // Item flags answer "did an attachment change", not "did the collection change": a removed
-    // or reordered attachment leaves every survivor clean.
+    // or reordered attachment leaves every survivor clean. The composed list carries the
+    // structural truth.
     internal bool IsModified
     {
         get
         {
-            if (structureChanged)
+            if (items.StructureChanged)
             {
                 return true;
             }
@@ -263,7 +240,7 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 
     internal void AcceptChanges()
     {
-        structureChanged = false;
+        items.AcceptStructure();
         foreach (var item in items)
         {
             item.AcceptChanges();

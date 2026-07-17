@@ -25,11 +25,11 @@ public sealed class GradientStop(double offset, Color color)
 /// (ISO 32000-1 8.7.4.5) used through a shading pattern. Coordinates are given in the
 /// coordinate space in which the brush is painted (points).
 /// </summary>
-public abstract class GradientBrush
+public abstract class GradientBrush : ITracksChanges
 {
     private bool extendStart = true;
     private bool extendEnd = true;
-    private bool touched;
+    private ChangeTracker tracker;
 
     /// <summary>Initializes the shared gradient state from <paramref name="stops"/>.</summary>
     /// <param name="stops">The colour stops, in non-decreasing offset order within [0, 1].</param>
@@ -73,7 +73,7 @@ public abstract class GradientBrush
     public bool ExtendStart
     {
         get => extendStart;
-        set => Set(ref extendStart, value);
+        set => tracker.Set(ref extendStart, value);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public abstract class GradientBrush
     public bool ExtendEnd
     {
         get => extendEnd;
-        set => Set(ref extendEnd, value);
+        set => tracker.Set(ref extendEnd, value);
     }
 
     /// <summary>
@@ -91,15 +91,11 @@ public abstract class GradientBrush
     /// materialized. A <see cref="PathContent"/> folds its own gradient's state into
     /// <see cref="ContentElement.IsModified"/>.
     /// </summary>
-    public bool IsModified => touched;
+    public bool IsModified => tracker.IsModified;
 
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
+    internal void AcceptChanges() => tracker.AcceptChanges();
 
-    internal void AcceptChanges() => touched = false;
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     /// <summary>
     /// Gets the shading <c>/ShadingType</c> of this gradient kind (ISO 32000-1 8.7.4.5):

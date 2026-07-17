@@ -11,10 +11,10 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 /// <param name="title">The title shown in the bookmark panel.</param>
 /// <param name="target">The location the entry navigates to, or <c>null</c> for a non-navigating entry.</param>
-public sealed class OutlineItem(string title, OutlineTarget? target)
+public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksChanges
 {
     private readonly TrackedList<OutlineItem> children = [];
-    private bool touched;
+    private ChangeTracker tracker;
     private string title = title;
     private OutlineTarget? target = target;
     private Color? color;
@@ -26,7 +26,7 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
     public string Title
     {
         get => title;
-        set => Set(ref title, value);
+        set => tracker.Set(ref title, value);
     }
 
     /// <summary>Gets or sets the location the entry navigates to, or <c>null</c> when unavailable.</summary>
@@ -34,7 +34,7 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
     public OutlineTarget? Target
     {
         get => target;
-        set => Set(ref target, value);
+        set => tracker.Set(ref target, value);
     }
 
     /// <summary>Gets the child entries nested under this one.</summary>
@@ -47,21 +47,21 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
     public Color? Color
     {
         get => color;
-        set => Set(ref color, value);
+        set => tracker.Set(ref color, value);
     }
 
     /// <summary>Gets or sets whether the entry's title is bold (the <c>/F</c> bit 2). Defaults to <see langword="false"/>.</summary>
     public bool Bold
     {
         get => bold;
-        set => Set(ref bold, value);
+        set => tracker.Set(ref bold, value);
     }
 
     /// <summary>Gets or sets whether the entry's title is italic (the <c>/F</c> bit 1). Defaults to <see langword="false"/>.</summary>
     public bool Italic
     {
         get => italic;
-        set => Set(ref italic, value);
+        set => tracker.Set(ref italic, value);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
     public bool Collapsed
     {
         get => collapsed;
-        set => Set(ref collapsed, value);
+        set => tracker.Set(ref collapsed, value);
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
     {
         get
         {
-            if (touched || children.StructureChanged)
+            if (tracker.IsModified || children.StructureChanged)
             {
                 return true;
             }
@@ -99,21 +99,17 @@ public sealed class OutlineItem(string title, OutlineTarget? target)
         }
     }
 
-    private void Set<T>(ref T field, T value)
-    {
-        field = value;
-        touched = true;
-    }
-
     internal void AcceptChanges()
     {
-        touched = false;
+        tracker.AcceptChanges();
         children.AcceptStructure();
         foreach (var child in children)
         {
             child.AcceptChanges();
         }
     }
+
+    void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
 // The page-destination fit the viewer applies when navigating to a page target.
