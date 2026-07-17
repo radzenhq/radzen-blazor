@@ -82,25 +82,36 @@ internal static class ShadingBuilder
             ["FunctionType"] = new NumberObject(3),
             ["Domain"] = Domain(),
             ["Functions"] = functions,
-            ["Bounds"] = StrictlyIncreasing(bounds),
+            ["Bounds"] = BoundsWithinDomain(bounds),
             ["Encode"] = encode,
         };
     }
 
-    // Type 3 /Bounds must be strictly increasing (ISO 32000-1 7.10.4). CSS hard stops produce
-    // equal adjacent offsets; nudge each colliding bound just past its predecessor so Acrobat
-    // accepts the function instead of rendering the fill blank. The epsilon is below content
-    // stream (0.001) precision, so a valid strictly-increasing gradient is unaffected.
-    private static ArrayObject StrictlyIncreasing(List<double> bounds)
+    // ISO 32000-1 7.10.4: Type 3 /Bounds must lie strictly inside the domain. A CSS hard stop
+    // lands a bound on or past the boundary, so nudge those by an epsilon below emitted (0.001)
+    // precision, leaving valid interior gradients unaffected.
+    private static ArrayObject BoundsWithinDomain(List<double> bounds)
     {
         const double epsilon = 1e-6;
-        ArrayObject result = [];
-        var previous = double.NegativeInfinity;
-        foreach (var value in bounds)
+        var values = new double[bounds.Count];
+        var lower = 0.0;
+        for (var i = 0; i < bounds.Count; i++)
         {
-            var bound = value <= previous ? previous + epsilon : value;
-            result.Add(new NumberObject(bound));
-            previous = bound;
+            lower = bounds[i] <= lower ? lower + epsilon : bounds[i];
+            values[i] = lower;
+        }
+
+        var upper = 1.0;
+        for (var i = values.Length - 1; i >= 0; i--)
+        {
+            upper = values[i] >= upper ? upper - epsilon : values[i];
+            values[i] = upper;
+        }
+
+        ArrayObject result = [];
+        foreach (var value in values)
+        {
+            result.Add(new NumberObject(value));
         }
 
         return result;
@@ -116,13 +127,10 @@ internal static class ShadingBuilder
     {
         ["FunctionType"] = new NumberObject(2),
         ["Domain"] = Domain(),
-        ["C0"] = Rgb(from),
-        ["C1"] = Rgb(to),
+        ["C0"] = PdfColorArray.Rgb(from),
+        ["C1"] = PdfColorArray.Rgb(to),
         ["N"] = new NumberObject(1),
     };
-
-    private static ArrayObject Rgb(Color color) =>
-        [new NumberObject(color.R / 255.0), new NumberObject(color.G / 255.0), new NumberObject(color.B / 255.0)];
 
     private static ArrayObject Domain() => [new NumberObject(0), new NumberObject(1)];
 }
