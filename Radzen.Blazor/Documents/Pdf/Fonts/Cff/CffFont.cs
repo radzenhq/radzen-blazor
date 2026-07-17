@@ -405,6 +405,11 @@ internal sealed class CffFont
     // subr dispatch. Subclasses supply only the answer they are after, via Visit.
     private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
     {
+        // Type 2 charstring spec section 3.1: the argument stack holds at most 48 entries.
+        // Subr nesting fans out, so pushes grow as (calls per subr)^(nesting depth) and the
+        // depth-10 limit alone leaves a few dozen font bytes able to demand billions of them.
+        private const int MaxStackEntries = 48;
+
         protected readonly List<double> stack = [];
         private int hintCount;
         private bool done;
@@ -487,6 +492,19 @@ internal sealed class CffFont
 
         protected void Stop() => done = true;
 
+        // Overflow ends the walk rather than throwing: the charstring is malformed, and every
+        // other malformed case here degrades to the default width instead of failing a render.
+        private void Push(double value)
+        {
+            if (stack.Count >= MaxStackEntries)
+            {
+                done = true;
+                return;
+            }
+
+            stack.Add(value);
+        }
+
         // Type 2 arithmetic escapes leave a result on the stack, so a width operand sitting
         // under one survives to the moveto/endchar that resolves it. Returning false means
         // "not applied" and the caller clears, which is correct for the drawing escapes
@@ -540,7 +558,7 @@ internal sealed class CffFont
                         return false;
                     }
 
-                    stack.Add(stack[^1]);
+                    Push(stack[^1]);
                     return true;
                 case 28: // exch
                     if (stack.Count < 2)
@@ -578,29 +596,29 @@ internal sealed class CffFont
         {
             if (b == 28)
             {
-                stack.Add((short)((ReadByteAt(cs, i + 1) << 8) | ReadByteAt(cs, i + 2)));
+                Push((short)((ReadByteAt(cs, i + 1) << 8) | ReadByteAt(cs, i + 2)));
                 return i + 3;
             }
 
             if (b < 247)
             {
-                stack.Add(b - 139);
+                Push(b - 139);
                 return i + 1;
             }
 
             if (b < 251)
             {
-                stack.Add(((b - 247) * 256) + ReadByteAt(cs, i + 1) + 108);
+                Push(((b - 247) * 256) + ReadByteAt(cs, i + 1) + 108);
                 return i + 2;
             }
 
             if (b < 255)
             {
-                stack.Add((-(b - 251) * 256) - ReadByteAt(cs, i + 1) - 108);
+                Push((-(b - 251) * 256) - ReadByteAt(cs, i + 1) - 108);
                 return i + 2;
             }
 
-            stack.Add((
+            Push((
                 (ReadByteAt(cs, i + 1) << 24) | (ReadByteAt(cs, i + 2) << 16) |
                 (ReadByteAt(cs, i + 3) << 8) | ReadByteAt(cs, i + 4)) / 65536.0);
             return i + 5;

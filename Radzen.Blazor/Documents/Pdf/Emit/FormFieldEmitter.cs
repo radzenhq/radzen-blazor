@@ -6,12 +6,6 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal static class FormFieldEmitter
 {
-    internal const int RadioFlag = 1 << 15;
-    internal const int ComboFlag = 1 << 17;
-    private const int MultilineFlag = 1 << 12;
-    private const int PasswordFlag = 1 << 13;
-    private const int CombFlag = 1 << 24;
-
     public static void Emit(FormFieldDefinition definition, FormEmitContext context)
     {
         if (definition is RadioGroupFieldDefinition radio)
@@ -110,7 +104,7 @@ internal static class FormFieldEmitter
                 widget["Opt"] = options;
                 if (choice.ComboBox)
                 {
-                    widget["Ff"] = new NumberObject(ComboFlag);
+                    widget["Ff"] = new NumberObject(FieldFlags.Combo);
                 }
 
                 widget["V"] = new StringObject(choice.Value);
@@ -155,7 +149,7 @@ internal static class FormFieldEmitter
         {
             ["FT"] = new NameObject("Btn"),
             ["T"] = new StringObject(radio.Name),
-            ["Ff"] = new NumberObject(RadioFlag),
+            ["Ff"] = new NumberObject(FieldFlags.Radio),
             ["V"] = new NameObject(state),
             ["DV"] = new NameObject(state),
         };
@@ -208,17 +202,17 @@ internal static class FormFieldEmitter
         var flags = 0;
         if (text.Multiline)
         {
-            flags |= MultilineFlag;
+            flags |= FieldFlags.Multiline;
         }
 
         if (text.Password)
         {
-            flags |= PasswordFlag;
+            flags |= FieldFlags.Password;
         }
 
         if (text.Comb)
         {
-            flags |= CombFlag;
+            flags |= FieldFlags.Comb;
         }
 
         return flags;
