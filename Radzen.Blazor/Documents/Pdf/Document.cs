@@ -355,6 +355,17 @@ public sealed class Document
     {
         ArgumentNullException.ThrowIfNull(other);
 
+        // The merger carries content as raw bytes only; a page holding a queued overlay or
+        // element edits keeps them outside those bytes, so it has to be serialized first.
+        foreach (var page in other.Pages)
+        {
+            if (!page.ContentIsIntact)
+            {
+                ImportPages(other, ..);
+                return;
+            }
+        }
+
         DocumentMerger.Append(this, other);
     }
 
