@@ -35,14 +35,42 @@ public enum AttachmentRelationship
 /// </summary>
 public sealed class FacturXProfile
 {
+    private bool touched;
+    private string documentType = "INVOICE";
+    private string version = "1.0";
+    private string conformanceLevel = "BASIC";
+
     /// <summary>Gets or sets the document type (<c>fx:DocumentType</c>), e.g. <c>INVOICE</c> or <c>ORDER</c>.</summary>
-    public string DocumentType { get; set; } = "INVOICE";
+    public string DocumentType
+    {
+        get => documentType;
+        set => Set(ref documentType, value);
+    }
 
     /// <summary>Gets or sets the standard version (<c>fx:Version</c>), e.g. <c>1.0</c>.</summary>
-    public string Version { get; set; } = "1.0";
+    public string Version
+    {
+        get => version;
+        set => Set(ref version, value);
+    }
 
     /// <summary>Gets or sets the conformance level (<c>fx:ConformanceLevel</c>), e.g. <c>BASIC</c>, <c>EN 16931</c> or <c>EXTENDED</c>.</summary>
-    public string ConformanceLevel { get; set; } = "BASIC";
+    public string ConformanceLevel
+    {
+        get => conformanceLevel;
+        set => Set(ref conformanceLevel, value);
+    }
+
+    /// <summary>Gets a value indicating whether this profile has been modified since the document was loaded.</summary>
+    public bool IsModified => touched;
+
+    private void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    internal void AcceptChanges() => touched = false;
 }
 
 /// <summary>
@@ -50,6 +78,11 @@ public sealed class FacturXProfile
 /// </summary>
 public sealed class Attachment
 {
+    private bool touched;
+    private string? description;
+    private DateTimeOffset modificationDate = DefaultModificationDate;
+    private FacturXProfile? facturX;
+
     /// <summary>
     /// The modification date written when <see cref="ModificationDate"/> is not set.
     /// A fixed sentinel keeps the produced bytes reproducible.
@@ -81,7 +114,11 @@ public sealed class Attachment
     /// Gets or sets the human-readable description written as the /Desc key of the
     /// file specification. Omitted when null or empty.
     /// </summary>
-    public string? Description { get; set; }
+    public string? Description
+    {
+        get => description;
+        set => Set(ref description, value);
+    }
 
     /// <summary>
     /// Gets or sets the modification date of the embedded file, written as the
@@ -89,7 +126,11 @@ public sealed class Attachment
     /// <see cref="DefaultModificationDate"/> so output stays deterministic; set it
     /// explicitly to record the real file timestamp.
     /// </summary>
-    public DateTimeOffset ModificationDate { get; set; } = DefaultModificationDate;
+    public DateTimeOffset ModificationDate
+    {
+        get => modificationDate;
+        set => Set(ref modificationDate, value);
+    }
 
     /// <summary>
     /// Gets or sets the Factur-X / ZUGFeRD profile declared in the document XMP for a
@@ -97,7 +138,30 @@ public sealed class Attachment
     /// the BASIC 1.0 INVOICE defaults; set it to embed an EN 16931 or EXTENDED invoice.
     /// Ignored for attachments not named <c>factur-x.xml</c>.
     /// </summary>
-    public FacturXProfile? FacturX { get; set; }
+    public FacturXProfile? FacturX
+    {
+        get => facturX;
+        set => Set(ref facturX, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this attachment has been modified since the document was
+    /// loaded. Name, payload, relationship and MIME type are immutable, so only the settable
+    /// fields and the owned FacturX profile can move it.
+    /// </summary>
+    public bool IsModified => touched || FacturX?.IsModified == true;
+
+    private void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    internal void AcceptChanges()
+    {
+        touched = false;
+        FacturX?.AcceptChanges();
+    }
 
     internal byte[] Data { get; }
 }
@@ -109,6 +173,7 @@ public sealed class Attachment
 public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 {
     private readonly List<Attachment> items = [];
+    private bool structureChanged;
 
     /// <summary>Gets the number of attachments.</summary>
     public int Count => items.Count;
@@ -137,6 +202,7 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 
         var attachment = new Attachment(name, data, relationship, mimeType);
         items.Add(attachment);
+        structureChanged = true;
         return attachment;
     }
 
@@ -146,17 +212,63 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
     public bool Remove(Attachment attachment)
     {
         ArgumentNullException.ThrowIfNull(attachment);
-        return items.Remove(attachment);
+        var removed = items.Remove(attachment);
+        structureChanged |= removed;
+        return removed;
     }
 
     /// <summary>Removes the attachment at the given index.</summary>
     /// <param name="index">The zero-based index.</param>
-    public void RemoveAt(int index) => items.RemoveAt(index);
+    public void RemoveAt(int index)
+    {
+        items.RemoveAt(index);
+        structureChanged = true;
+    }
 
     /// <summary>Removes all attachments.</summary>
-    public void Clear() => items.Clear();
+    public void Clear()
+    {
+        structureChanged |= items.Count > 0;
+        items.Clear();
+    }
 
-    internal void Add(Attachment attachment) => items.Add(attachment);
+    internal void Add(Attachment attachment)
+    {
+        items.Add(attachment);
+        structureChanged = true;
+    }
+
+    // Item flags answer "did an attachment change", not "did the collection change": a removed
+    // or reordered attachment leaves every survivor clean.
+    internal bool IsModified
+    {
+        get
+        {
+            if (structureChanged)
+            {
+                return true;
+            }
+
+            foreach (var item in items)
+            {
+                if (item.IsModified)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal void AcceptChanges()
+    {
+        structureChanged = false;
+        foreach (var item in items)
+        {
+            item.AcceptChanges();
+        }
+    }
 
     /// <summary>Returns an enumerator over the attachments in insertion order.</summary>
     /// <returns>The enumerator.</returns>

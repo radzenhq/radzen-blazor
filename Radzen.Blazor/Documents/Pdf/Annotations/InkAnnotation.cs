@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -8,9 +7,18 @@ namespace Radzen.Documents.Pdf;
 public sealed class InkStroke : IList<AnnotationPoint>
 {
     private readonly List<AnnotationPoint> points = [];
+    private bool touched;
 
     /// <inheritdoc />
-    public AnnotationPoint this[int index] { get => points[index]; set => points[index] = value; }
+    public AnnotationPoint this[int index]
+    {
+        get => points[index];
+        set
+        {
+            points[index] = value;
+            touched = true;
+        }
+    }
 
     /// <inheritdoc />
     public int Count => points.Count;
@@ -19,10 +27,18 @@ public sealed class InkStroke : IList<AnnotationPoint>
     public bool IsReadOnly => false;
 
     /// <inheritdoc />
-    public void Add(AnnotationPoint item) => points.Add(item);
+    public void Add(AnnotationPoint item)
+    {
+        points.Add(item);
+        touched = true;
+    }
 
     /// <inheritdoc />
-    public void Clear() => points.Clear();
+    public void Clear()
+    {
+        touched |= points.Count > 0;
+        points.Clear();
+    }
 
     /// <inheritdoc />
     public bool Contains(AnnotationPoint item) => points.Contains(item);
@@ -37,40 +53,85 @@ public sealed class InkStroke : IList<AnnotationPoint>
     public int IndexOf(AnnotationPoint item) => points.IndexOf(item);
 
     /// <inheritdoc />
-    public void Insert(int index, AnnotationPoint item) => points.Insert(index, item);
+    public void Insert(int index, AnnotationPoint item)
+    {
+        points.Insert(index, item);
+        touched = true;
+    }
 
     /// <inheritdoc />
-    public bool Remove(AnnotationPoint item) => points.Remove(item);
+    public bool Remove(AnnotationPoint item)
+    {
+        var removed = points.Remove(item);
+        touched |= removed;
+        return removed;
+    }
 
     /// <inheritdoc />
-    public void RemoveAt(int index) => points.RemoveAt(index);
+    public void RemoveAt(int index)
+    {
+        points.RemoveAt(index);
+        touched = true;
+    }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    internal bool IsModified => touched;
+
+    internal void AcceptChanges() => touched = false;
 }
 
 /// <summary>Represents one or more freehand ink strokes.</summary>
-/// <param name="bounds">The annotation bounds.</param>
-public sealed class InkAnnotation(PdfRect bounds) : Annotation(bounds)
+public sealed class InkAnnotation : Annotation
 {
+    private double strokeWidth = 1;
+
+    /// <summary>Initializes a new instance of the <see cref="InkAnnotation"/> class.</summary>
+    /// <param name="bounds">The annotation bounds.</param>
+    public InkAnnotation(PdfRect bounds) : base(bounds) => Strokes = new TrackedList<InkStroke>(Touch);
+
     /// <summary>Gets the freehand strokes.</summary>
-    public IList<InkStroke> Strokes { get; } = [];
+    public IList<InkStroke> Strokes { get; }
 
     /// <summary>Gets or sets the stroke width in points.</summary>
-    public double StrokeWidth { get; set; } = 1;
+    public double StrokeWidth
+    {
+        get => strokeWidth;
+        set => Set(ref strokeWidth, value);
+    }
+
+    /// <inheritdoc />
+    // Each stroke carries its own flag; the list itself reports add/remove/reorder, which no
+    // surviving stroke would show.
+    public override bool IsModified
+    {
+        get
+        {
+            if (base.IsModified)
+            {
+                return true;
+            }
+
+            foreach (var stroke in Strokes)
+            {
+                if (stroke.IsModified)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 
     internal override string Subtype => "Ink";
 
-    internal override void AppendState(StringBuilder value)
+    internal override void AcceptChanges()
     {
-        Append(value, StrokeWidth);
+        base.AcceptChanges();
         foreach (var stroke in Strokes)
         {
-            value.Append('|').Append(stroke.Count);
-            foreach (var point in stroke)
-            {
-                Append(value, point.X);
-                Append(value, point.Y);
-            }
+            stroke.AcceptChanges();
         }
     }
 }

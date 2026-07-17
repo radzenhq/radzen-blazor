@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -7,19 +6,37 @@ namespace Radzen.Documents.Pdf;
 /// <param name="bounds">The clickable bounds.</param>
 public sealed class LinkAnnotation(PdfRect bounds) : Annotation(bounds)
 {
+    private Uri? uri;
+    private string? destination;
+    private int? targetPageIndex;
+    private bool destinationIsName;
+
     /// <summary>Gets or sets the target URI.</summary>
-    public Uri? Uri { get; set; }
+    public Uri? Uri
+    {
+        get => uri;
+        set => Set(ref uri, value);
+    }
 
     /// <summary>Gets or sets the target named destination.</summary>
-    public string? Destination { get; set; }
+    public string? Destination
+    {
+        get => destination;
+        set => Set(ref destination, value);
+    }
 
     /// <summary>Gets or sets the zero-based target page index.</summary>
-    public int? TargetPageIndex { get; set; }
+    public int? TargetPageIndex
+    {
+        get => targetPageIndex;
+        set => Set(ref targetPageIndex, value);
+    }
 
-    internal bool DestinationIsName { get; set; }
+    internal bool DestinationIsName
+    {
+        get => destinationIsName;
+        set => Set(ref destinationIsName, value);
+    }
 
     internal override string Subtype => "Link";
-
-    internal override void AppendState(StringBuilder value)
-        => value.Append('|').Append(Uri?.OriginalString).Append('|').Append(Destination).Append('|').Append(TargetPageIndex);
 }

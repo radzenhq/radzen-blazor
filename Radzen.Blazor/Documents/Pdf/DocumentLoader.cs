@@ -24,7 +24,6 @@ internal static class DocumentLoader
         var state = new LoadedState(reader, bytes);
         var document = Document.CreateLoaded(state);
         state.SourceInfo = ReadInfo(reader, document.Info);
-        state.LoadedInfoSnapshot = Document.InfoSnapshot(document.Info);
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
         if (catalog is null || !catalog.TryGetValue("Pages", out var candidatePages)
@@ -59,10 +58,13 @@ internal static class DocumentLoader
         }
 
         ReadAttachments(reader, catalog, document, limits);
-        state.LoadedAttachmentSnapshot = AttachmentSnapshot.Capture(document.Attachments);
         ReadOutline(reader, catalog, document, state, limits);
         ReadPageLabels(reader, catalog, document, state, limits);
         ReadXmp(reader, catalog, document);
+
+        // Reading built the metadata model through its tracked setters; freeze it so only the
+        // caller's later edits read as changes.
+        document.AcceptMetadataChanges();
 
         return document;
     }
@@ -577,8 +579,6 @@ internal static class DocumentLoader
             ReadOutlineLevel(reader, first!, document.Outline, pageIndexes, destinations, [], limits, 0, ref requiresRewrite);
             state.OutlineRequiresRewrite = requiresRewrite;
         }
-
-        state.LoadedOutlineSnapshot = OutlineSnapshot.Capture(document.Outline);
     }
 
     private static void ReadOutlineLevel(
@@ -803,8 +803,6 @@ internal static class DocumentLoader
         {
             ReadPageLabelTree(reader, tree, document.PageLabels, [], limits, 0);
         }
-
-        state.LoadedPageLabelsSnapshot = PageLabelSnapshot.Capture(document.PageLabels);
     }
 
     private static void ReadPageLabelTree(

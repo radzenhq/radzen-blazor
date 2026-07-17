@@ -1,54 +1,96 @@
-using System.Globalization;
-using System.Text;
-
 namespace Radzen.Documents.Pdf;
 
 /// <summary>Describes an interactive annotation placed on a PDF page.</summary>
 /// <param name="bounds">The annotation bounds in PDF page coordinates.</param>
 public abstract class Annotation(PdfRect bounds)
 {
+    private bool touched;
+    private PdfRect bounds = bounds;
+    private Color color = Color.Yellow;
+    private double opacity = 1;
+    private AnnotationFlags flags = AnnotationFlags.Print;
+    private string? contents;
+    private string? title;
+    private AnnotationAppearance? appearance;
+
     /// <summary>Gets or sets the annotation bounds in PDF page coordinates.</summary>
-    public PdfRect Bounds { get; set; } = bounds;
+    public PdfRect Bounds
+    {
+        get => bounds;
+        set => Set(ref bounds, value);
+    }
 
     /// <summary>Gets or sets the annotation color.</summary>
-    public Color Color { get; set; } = Color.Yellow;
+    public Color Color
+    {
+        get => color;
+        set => Set(ref color, value);
+    }
 
     /// <summary>Gets or sets the annotation opacity from 0 to 1.</summary>
-    public double Opacity { get; set; } = 1;
+    public double Opacity
+    {
+        get => opacity;
+        set => Set(ref opacity, value);
+    }
 
     /// <summary>Gets or sets the annotation flags.</summary>
-    public AnnotationFlags Flags { get; set; } = AnnotationFlags.Print;
+    public AnnotationFlags Flags
+    {
+        get => flags;
+        set => Set(ref flags, value);
+    }
 
     /// <summary>Gets or sets the annotation text.</summary>
-    public string? Contents { get; set; }
+    public string? Contents
+    {
+        get => contents;
+        set => Set(ref contents, value);
+    }
 
     /// <summary>Gets or sets the annotation title or author.</summary>
-    public string? Title { get; set; }
+    public string? Title
+    {
+        get => title;
+        set => Set(ref title, value);
+    }
 
     /// <summary>Gets or sets a custom appearance.</summary>
-    public AnnotationAppearance? Appearance { get; set; }
+    public AnnotationAppearance? Appearance
+    {
+        get => appearance;
+        set => Set(ref appearance, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this annotation has been modified since it was loaded.
+    /// A loaded page re-emits only the annotations that report true, so an untouched one keeps
+    /// its original dictionary.
+    /// </summary>
+    public virtual bool IsModified => touched || Appearance?.IsModified == true;
 
     internal abstract string Subtype { get; }
 
-    internal string State()
+    /// <summary>Assigns a tracked backing field and marks this annotation modified.</summary>
+    /// <typeparam name="T">The field type.</typeparam>
+    /// <param name="field">The backing field to assign.</param>
+    /// <param name="value">The value to assign.</param>
+    // Unconditional, as on ContentElement: whether the new value is "equal" to the old is not
+    // the same question as whether it emits the same bytes.
+    protected void Set<T>(ref T field, T value)
     {
-        var value = new StringBuilder();
-        Append(value, Bounds.Left);
-        Append(value, Bounds.Bottom);
-        Append(value, Bounds.Width);
-        Append(value, Bounds.Height);
-        value.Append('|').Append(Color.A).Append(',').Append(Color.R).Append(',').Append(Color.G).Append(',').Append(Color.B);
-        Append(value, Opacity);
-        value.Append('|').Append((int)Flags).Append('|').Append(Contents).Append('|').Append(Title);
-        value.Append('|').Append(Appearance is null ? -1 : Appearance.Content.Count);
-        AppendState(value);
-        return value.ToString();
+        field = value;
+        touched = true;
     }
 
-    internal virtual void AppendState(StringBuilder value)
-    {
-    }
+    /// <summary>Marks this annotation modified without assigning a tracked field.</summary>
+    protected void Touch() => touched = true;
 
-    internal static void Append(StringBuilder value, double number)
-        => value.Append('|').Append(number.ToString("R", CultureInfo.InvariantCulture));
+    // Called once over a loaded page's annotations after reading, which builds them through
+    // these same setters and would otherwise leave every loaded annotation born dirty.
+    internal virtual void AcceptChanges()
+    {
+        touched = false;
+        Appearance?.AcceptChanges();
+    }
 }

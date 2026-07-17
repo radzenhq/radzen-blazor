@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
@@ -7,34 +6,36 @@ namespace Radzen.Documents.Pdf;
 /// <param name="bounds">The annotation bounds.</param>
 public sealed class TextAnnotation(PdfRect bounds) : Annotation(bounds)
 {
+    private bool open;
+    private string icon = "Note";
+
     /// <summary>Gets or sets whether the note is initially open.</summary>
-    public bool Open { get; set; }
+    public bool Open
+    {
+        get => open;
+        set => Set(ref open, value);
+    }
 
     /// <summary>Gets or sets the standard note icon name.</summary>
-    public string Icon { get; set; } = "Note";
+    public string Icon
+    {
+        get => icon;
+        set => Set(ref icon, value);
+    }
 
     internal override string Subtype => "Text";
-
-    internal override void AppendState(StringBuilder value) => value.Append('|').Append(Open).Append('|').Append(Icon);
 }
 
 /// <summary>Base class for text markup annotations.</summary>
-/// <param name="bounds">The annotation bounds.</param>
-public abstract class MarkupAnnotation(PdfRect bounds) : Annotation(bounds)
+public abstract class MarkupAnnotation : Annotation
 {
-    /// <summary>Gets the rectangular text areas covered by the markup.</summary>
-    public IList<PdfRect> Areas { get; } = [bounds];
+    /// <summary>Initializes a new instance of the <see cref="MarkupAnnotation"/> class.</summary>
+    /// <param name="bounds">The annotation bounds.</param>
+    protected MarkupAnnotation(PdfRect bounds) : base(bounds)
+        => Areas = new TrackedList<PdfRect>(Touch) { bounds };
 
-    internal override void AppendState(StringBuilder value)
-    {
-        foreach (var area in Areas)
-        {
-            Append(value, area.Left);
-            Append(value, area.Bottom);
-            Append(value, area.Width);
-            Append(value, area.Height);
-        }
-    }
+    /// <summary>Gets the rectangular text areas covered by the markup.</summary>
+    public IList<PdfRect> Areas { get; }
 }
 
 /// <summary>Represents highlighted text.</summary>
