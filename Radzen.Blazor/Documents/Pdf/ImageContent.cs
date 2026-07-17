@@ -9,6 +9,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class ImageContent : ContentElement
 {
+    private PdfRect bounds;
+
     /// <summary>
     /// Initializes a new <see cref="ImageContent"/>.
     /// </summary>
@@ -20,7 +22,11 @@ public sealed class ImageContent : ContentElement
     }
 
     /// <summary>Gets or sets the placement rectangle in PDF user space.</summary>
-    public PdfRect Bounds { get; set; }
+    public PdfRect Bounds
+    {
+        get => bounds;
+        set => Set(ref bounds, value);
+    }
 
     internal byte[] EncodedXObject { get; }
 

@@ -609,7 +609,7 @@ internal static class ContentInterpreter
         return Color.FromRgb(v, v, v);
     }
 
-    private static byte Channel(double value) => (byte)Math.Round(Math.Clamp(value, 0, 1) * 255.0);
+    private static byte Channel(double value) => ColorComponent.ToChannel(value);
 
     private static string Decode(byte[] bytes)
     {

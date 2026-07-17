@@ -564,12 +564,8 @@ internal static class DocumentLoader
     {
         var number = reader.AsNumber(value)
             ?? throw new DocumentParseException("An outline /C entry contains a non-number.", -1);
-        if (number < 0 || number > 1)
-        {
-            throw new DocumentParseException("An outline /C component is outside the 0 to 1 range.", -1);
-        }
 
-        return (byte)Math.Round(number * 255, MidpointRounding.AwayFromZero);
+        return ColorComponent.ToChannel(number);
     }
 
     private static OutlineTarget? ReadOutlineTarget(
