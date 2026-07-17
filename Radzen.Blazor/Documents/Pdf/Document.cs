@@ -141,6 +141,18 @@ public sealed class Document
     // the sRGB output intent, the trailer /ID and full-embedding enforcement.
     internal PdfAConformance Conformance { get; set; }
 
+    // The faces registered at build time; null for loaded or hand-assembled documents.
+    // Kept so text added after Build() can tell an embeddable family from an unknown one.
+    internal FontCollection? Fonts { get; set; }
+
+    // The policy for every stream emitted on top of this document's pages: appearance streams,
+    // overlays and annotations, none of which can embed a font file. Mirrors ConformanceWriter's
+    // label so the seam and its validate-before-write backstop reject with one message.
+    internal Fonts.FontScope FontScope => new(
+        Fonts,
+        Conformance != PdfAConformance.None ? "PDF/A" : PdfUA ? "PDF/UA" : null,
+        CanEmbed: false);
+
     // PDF/UA-1 identification requested at build time; drives the pdfuaid XMP
     // entry, the DisplayDocTitle viewer preference and tagging enforcement.
     internal bool PdfUA { get; set; }

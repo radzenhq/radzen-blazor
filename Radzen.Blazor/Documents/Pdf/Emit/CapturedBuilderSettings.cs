@@ -11,6 +11,7 @@ internal sealed class CapturedBuilderSettings
         Attachments = [.. builder.Attachments];
         Outline = [.. builder.Outline];
         Conformance = builder.Conformance;
+        Fonts = builder.Fonts;
         PdfUA = builder.PdfUA;
         Language = builder.Language;
         RoleMap = builder.RoleMap;
@@ -29,6 +30,8 @@ internal sealed class CapturedBuilderSettings
     public IReadOnlyList<OutlineItem> Outline { get; }
 
     public PdfAConformance Conformance { get; }
+
+    public FontCollection Fonts { get; }
 
     public bool PdfUA { get; }
 
@@ -55,6 +58,7 @@ internal sealed class CapturedBuilderSettings
         var document = new Document
         {
             Conformance = Conformance,
+            Fonts = Fonts,
             PdfUA = PdfUA,
             Language = Language,
             RoleMap = RoleMap,

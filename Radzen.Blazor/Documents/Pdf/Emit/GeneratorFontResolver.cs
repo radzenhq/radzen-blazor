@@ -19,14 +19,13 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     public GeneratedFont ResolveSfnt(SfntFont sfnt)
         => fonts.GetOrAddValue(sfnt, key => new GeneratedFont { Key = key, Sfnt = sfnt });
 
+    // PdfUA is deliberately absent from the label: a PDF/UA-only document rejects its base-14
+    // faces at save through ConformanceWriter, and gating here would move that throw to Build().
+    private FontScope Scope => new(Fonts: null, conformance != PdfAConformance.None ? "PDF/A" : null, CanEmbed: true);
+
     public GeneratedFont ResolveBase14(Font font)
     {
-        var name = FontResolution.ResolveBase14Name(font);
-        if (conformance != PdfAConformance.None)
-        {
-            throw FontResolution.Base14Forbidden("PDF/A", name, font.Name);
-        }
-
+        var name = FontResolution.ResolveBase14Name(font, Scope);
         return fonts.GetOrAddValue(name, key => new GeneratedFont { Key = key, Base14 = name });
     }
 

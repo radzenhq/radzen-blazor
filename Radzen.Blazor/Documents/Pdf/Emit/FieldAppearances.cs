@@ -18,9 +18,9 @@ internal static class FieldAppearances
     public static double Baseline(double height, double fontSize)
         => height > fontSize ? (height - fontSize) / 2.0 : 2.0;
 
-    public static StreamObject BuildText(string value, double width, double height, Font font)
+    public static StreamObject BuildText(string value, double width, double height, Font font, FontScope scope)
     {
-        using var writer = new ContentWriter();
+        using var writer = new ContentWriter(scope);
         writer.WriteRaw("/Tx BMC\nq\n");
         new TextContent(value, Unit.FromPoint(2.0), Unit.FromPoint(Baseline(height, font.Size)))
         {
@@ -35,9 +35,9 @@ internal static class FieldAppearances
     // top of the box down, each in the supplied base-14 font. Non-encodable glyphs
     // are dropped by the WinAnsi text encoder rather than failing the whole stream.
     public static StreamObject BuildSignatureAppearance(
-        IReadOnlyList<string> lines, double width, double height, Font font)
+        IReadOnlyList<string> lines, double width, double height, Font font, FontScope scope)
     {
-        using var writer = new ContentWriter();
+        using var writer = new ContentWriter(scope);
         writer.WriteRaw("q\n");
         var lineHeight = font.Size * 1.2;
         var y = height - font.Size - 2.0;

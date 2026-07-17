@@ -26,9 +26,14 @@ public sealed class ContentWriter : IDisposable
 
     private readonly ResourceKeyRegistry<double, KeyValuePair<string, double>> extGStates;
 
+    private readonly FontScope scope;
+
     // The key prefixes keep overlay streams from colliding with generated resources.
-    internal ContentWriter(string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
+    // The scope carries the emitting document's font policy: a stream built with the default
+    // scope can only reach base-14 faces, and no conformance level forbids them.
+    internal ContentWriter(FontScope scope = default, string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
     {
+        this.scope = scope;
         fonts = new ResourceKeyRegistry<string, KeyValuePair<string, string>>(fontKeyPrefix, StringComparer.Ordinal);
         images = new ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>>(imageKeyPrefix);
         extGStates = new ResourceKeyRegistry<double, KeyValuePair<string, double>>(extGStateKeyPrefix, AlphaComparer.Instance);
@@ -91,9 +96,17 @@ public sealed class ContentWriter : IDisposable
     /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>
     /// <param name="font">The font whose base-14 face to register.</param>
     /// <returns>The resource name the font is selected by.</returns>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="font"/> names a family this stream cannot reach: one with no base-14 face,
+    /// or one registered as an embeddable font file, which this stream cannot embed.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// The document's conformance level forbids referencing a base-14 face by name.
+    /// </exception>
     public string RegisterFont(Font font)
     {
-        var baseFont = FontResolution.ResolveBase14Name(font);
+        ArgumentNullException.ThrowIfNull(font);
+        var baseFont = FontResolution.ResolveBase14Name(font, scope);
         return fonts.GetOrAdd(baseFont, key => new KeyValuePair<string, string>(baseFont, key));
     }
 
