@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
@@ -203,6 +204,78 @@ public class CffCharstringWalkTests
         Assert.True(font.UsesSeacEndchar(0));
     }
 
-    // Captured from the pre-merge implementation (two independent dispatch loops).
-    private const string PinnedManifestHash = "C9DD3F21FBDF8B90539C65863BE6839E853919678CF8FD5082FCD23B0CDF7726";
+    // Charstrings come from untrusted embedded fonts. A truncated operand at the end of one
+    // must surface as a parse error, matching the convention ReadByteAt/ReadCard16 and
+    // CffRealOperandTests already hold the DICT path to - never IndexOutOfRangeException.
+    [Theory]
+    [InlineData(new byte[] { 255 })] // 16.16 fixed, wants 4 more bytes
+    [InlineData(new byte[] { 255, 1, 2, 3 })]
+    [InlineData(new byte[] { 28 })] // short int, wants 2 more bytes
+    [InlineData(new byte[] { 28, 1 })]
+    [InlineData(new byte[] { 247 })] // two-byte positive, wants 1 more byte
+    [InlineData(new byte[] { 251 })] // two-byte negative, wants 1 more byte
+    [InlineData(new byte[] { 12 })] // escape with no sub-operator byte
+    public void TruncatedOperandSurfacesAsParseError(byte[] charString)
+    {
+        var font = Font(charString);
+
+        Assert.Throws<InvalidDataException>(() => font.GetAdvanceWidth(0));
+        Assert.Throws<InvalidDataException>(() => font.UsesSeacEndchar(0));
+    }
+
+    [Fact]
+    public void TruncatedOperandInsideASubrSurfacesAsParseError()
+    {
+        var font = Font([Subr0, 10], [[255, 1]]);
+
+        Assert.Throws<InvalidDataException>(() => font.GetAdvanceWidth(0));
+    }
+
+    // Type 2 arithmetic escapes leave their result on the stack; only the drawing escapes
+    // (flex and friends) consume their operands. Clearing the stack for "div" would drop
+    // the leading width operand before hmoveto could resolve it.
+    [Fact]
+    public void DivLeavesItsResultOnTheStackSoTheWidthStillResolves()
+    {
+        // width(1) 4 2 div hmoveto -> stack [1, 2] at hmoveto, so the width operand is present.
+        var font = Font([One, 0x8F, 0x8D, 12, 12, 22]);
+
+        Assert.Equal(201, font.GetAdvanceWidth(0));
+    }
+
+    [Theory]
+    [InlineData(10, 3)] // add: 1 2 add -> 3
+    [InlineData(11, -1)] // sub: 1 2 sub -> -1
+    [InlineData(24, 2)] // mul: 1 2 mul -> 2
+    public void ArithmeticEscapesLeaveOneResultOnTheStack(byte escape, int expected)
+    {
+        // 1 2 <escape> endchar: the result is the only operand, so it reads as the width.
+        var font = Font([One, 0x8D, 12, escape, 14]);
+
+        Assert.Equal(200 + expected, font.GetAdvanceWidth(0));
+    }
+
+    [Fact]
+    public void DrawingEscapesStillConsumeTheirOperands()
+    {
+        // width(1) then a 13-operand flex (12 35), then endchar with an empty stack.
+        var cs = new List<byte> { One };
+        for (var i = 0; i < 13; i++)
+        {
+            cs.Add(Zero);
+        }
+
+        cs.AddRange([12, 35, 14]);
+
+        // flex clears, so endchar sees no leading width operand: defaultWidthX applies.
+        Assert.Equal(100, Font([.. cs]).GetAdvanceWidth(0));
+    }
+
+    // Re-pinned when the arithmetic escapes stopped discarding their result. Exactly 2 of the
+    // 785 answers moved, both widths the old walk had lost to an unconditional stack clear:
+    // 9:2 100 -> 628 (abs, 12 9, before hstem: 3 operands left, so the leading width counts)
+    // 279:0 100 -> -25821 (add, 12 10, before rmoveto). Both verified against an independent
+    // decode of those charstrings. No answer moved to an exception: the corpus never
+    // truncates an operand, so the bounds guard is not what re-pinned this.
+    private const string PinnedManifestHash = "1E262A6DB348AB5736217E20572BE45F41D15EFD656639B9AED28FDF361CD554";
 }

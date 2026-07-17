@@ -362,14 +362,15 @@ internal sealed class CffFont
 
     private static string Ascii(byte[] bytes) => Encoding.ASCII.GetString(bytes);
 
-    // Attacker-controlled offsets from the Top DICT reach these raw readers; surface a
-    // diagnosable InvalidDataException (as the rest of the parser does) instead of a bare
-    // IndexOutOfRangeException from deep inside charset/FDSelect parsing.
+    // Attacker-controlled offsets from the Top DICT, and attacker-controlled charstring
+    // bytes, reach these raw readers; surface a diagnosable InvalidDataException (as the
+    // rest of the parser does) instead of a bare IndexOutOfRangeException from deep inside
+    // charset/FDSelect parsing or the charstring walk.
     private static byte ReadByteAt(byte[] data, int offset)
     {
         if (offset < 0 || offset >= data.Length)
         {
-            throw new InvalidDataException("CFF table read past the end of the font.");
+            throw new InvalidDataException("CFF read past the end of the font.");
         }
 
         return data[offset];
@@ -379,7 +380,7 @@ internal sealed class CffFont
     {
         if (offset < 0 || offset + 2 > data.Length)
         {
-            throw new InvalidDataException("CFF table read past the end of the font.");
+            throw new InvalidDataException("CFF read past the end of the font.");
         }
 
         return BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(offset));
@@ -464,8 +465,13 @@ internal sealed class CffFont
                         RunSubr(globalSubrs, globalBias, depth);
                         break;
                     case 12:
+                        var escape = ReadByteAt(cs, i);
                         i++;
-                        stack.Clear();
+                        if (!ApplyEscape(escape))
+                        {
+                            stack.Clear();
+                        }
+
                         break;
                     default:
                         if (Visit(b))
@@ -480,6 +486,74 @@ internal sealed class CffFont
         }
 
         protected void Stop() => done = true;
+
+        // Type 2 arithmetic escapes leave a result on the stack, so a width operand sitting
+        // under one survives to the moveto/endchar that resolves it. Returning false means
+        // "not applied" and the caller clears, which is correct for the drawing escapes
+        // (12 34 hflex, 12 35 flex, 12 36 hflex1, 12 37 flex1 - they consume their operands)
+        // and a conservative fallback elsewhere: an unhandled escape loses the width to
+        // defaultWidthX, which is what this walk did for every escape before.
+        // Not implemented, as none appears in the width arithmetic this walk exists to read:
+        // put(20) get(21) need transient-array state, random(23) has no deterministic answer,
+        // and index(29) roll(30) and(3) or(4) not(5) eq(15) ifelse(22) are pure stack but
+        // would be untested guesswork here. Add one only with a charstring that needs it.
+        private bool ApplyEscape(int escape)
+        {
+            switch (escape)
+            {
+                case 9: // abs
+                case 14: // neg
+                case 26: // sqrt
+                    if (stack.Count < 1 || (escape == 26 && stack[^1] < 0))
+                    {
+                        return false;
+                    }
+
+                    var v = stack[^1];
+                    stack[^1] = escape switch { 9 => Math.Abs(v), 14 => -v, _ => Math.Sqrt(v) };
+                    return true;
+                case 10: // add
+                case 11: // sub
+                case 12: // div
+                case 24: // mul
+                    if (stack.Count < 2 || (escape == 12 && stack[^1] == 0))
+                    {
+                        return false;
+                    }
+
+                    var y = stack[^1];
+                    var x = stack[^2];
+                    stack.RemoveAt(stack.Count - 1);
+                    stack[^1] = escape switch { 10 => x + y, 11 => x - y, 24 => x * y, _ => x / y };
+                    return true;
+                case 18: // drop
+                    if (stack.Count < 1)
+                    {
+                        return false;
+                    }
+
+                    stack.RemoveAt(stack.Count - 1);
+                    return true;
+                case 27: // dup
+                    if (stack.Count < 1)
+                    {
+                        return false;
+                    }
+
+                    stack.Add(stack[^1]);
+                    return true;
+                case 28: // exch
+                    if (stack.Count < 2)
+                    {
+                        return false;
+                    }
+
+                    (stack[^1], stack[^2]) = (stack[^2], stack[^1]);
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         private void RunSubr(CffIndex? subrs, int bias, int depth)
         {
@@ -504,7 +578,7 @@ internal sealed class CffFont
         {
             if (b == 28)
             {
-                stack.Add((short)((cs[i + 1] << 8) | cs[i + 2]));
+                stack.Add((short)((ReadByteAt(cs, i + 1) << 8) | ReadByteAt(cs, i + 2)));
                 return i + 3;
             }
 
@@ -516,17 +590,19 @@ internal sealed class CffFont
 
             if (b < 251)
             {
-                stack.Add(((b - 247) * 256) + cs[i + 1] + 108);
+                stack.Add(((b - 247) * 256) + ReadByteAt(cs, i + 1) + 108);
                 return i + 2;
             }
 
             if (b < 255)
             {
-                stack.Add((-(b - 251) * 256) - cs[i + 1] - 108);
+                stack.Add((-(b - 251) * 256) - ReadByteAt(cs, i + 1) - 108);
                 return i + 2;
             }
 
-            stack.Add(((cs[i + 1] << 24) | (cs[i + 2] << 16) | (cs[i + 3] << 8) | cs[i + 4]) / 65536.0);
+            stack.Add((
+                (ReadByteAt(cs, i + 1) << 24) | (ReadByteAt(cs, i + 2) << 16) |
+                (ReadByteAt(cs, i + 3) << 8) | ReadByteAt(cs, i + 4)) / 65536.0);
             return i + 5;
         }
     }
