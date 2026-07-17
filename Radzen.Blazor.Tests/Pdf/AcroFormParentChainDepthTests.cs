@@ -1,0 +1,110 @@
+#nullable enable
+using System.IO;
+using System.Linq;
+using System.Text;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+// A field hierarchy deeper than the /Parent walk's bound must still inherit /V, /FT and
+// /Ff from the root that sets them, and a /Parent chain that loops must be diagnosed
+// rather than silently truncated.
+public class AcroFormParentChainDepthTests
+{
+    private static byte[] Wrap(FixturePdf pdf, int count)
+    {
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 " + count + "\n");
+        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number < count; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
+        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    // A /Parent<->/Kids spine `levels` deep. Object 5 is the root field carrying /FT and
+    // /V; each following object is a non-terminal kid; the last is the terminal widget.
+    private static byte[] DeepChainSource(int levels)
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R /AcroForm 4 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots ["
+                + (4 + levels) + " 0 R] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n");
+
+        for (var level = 0; level < levels; level++)
+        {
+            var number = 5 + level;
+            var body = new StringBuilder();
+            body.Append(number).Append(" 0 obj\n<< /T (f").Append(level).Append(')');
+
+            if (level == 0)
+            {
+                body.Append(" /FT /Tx /V (deep)");
+            }
+            else
+            {
+                body.Append(" /Parent ").Append(number - 1).Append(" 0 R");
+            }
+
+            if (level == levels - 1)
+            {
+                body.Append(" /Type /Annot /Subtype /Widget /Rect [100 700 350 720]");
+            }
+            else
+            {
+                body.Append(" /Kids [").Append(number + 1).Append(" 0 R]");
+            }
+
+            body.Append(" >>\nendobj\n");
+            pdf.Object(number, body.ToString());
+        }
+
+        return Wrap(pdf, 5 + levels);
+    }
+
+    // obj5 is the root field; obj6's /Parent points back at obj7 and obj7's at obj6, so
+    // walking up from the terminal never reaches a root.
+    private static byte[] CyclicParentSource()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R /AcroForm 4 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [7 0 R] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
+            .Object(5, "5 0 obj\n<< /T (root) /FT /Tx /V (v) /Kids [7 0 R] >>\nendobj\n")
+            .Object(6, "6 0 obj\n<< /T (a) /Parent 7 0 R >>\nendobj\n")
+            .Object(7, "7 0 obj\n<< /T (b) /Parent 6 0 R /Type /Annot /Subtype /Widget /Rect [100 700 350 720] >>\nendobj\n");
+        return Wrap(pdf, 8);
+    }
+
+    [Theory]
+    [InlineData(8)]
+    [InlineData(40)]
+    public void DeepParentChain_InheritsValueFromRoot(int levels)
+    {
+        var document = Document.LoadFromStream(new MemoryStream(DeepChainSource(levels)));
+        var field = document.AcroForm!.Fields.Single();
+
+        Assert.Equal("deep", field.Value);
+    }
+
+    [Fact]
+    public void CyclicParentChain_ThrowsInsteadOfTruncatingSilently()
+    {
+        var document = Document.LoadFromStream(new MemoryStream(CyclicParentSource()));
+        var field = document.AcroForm!.Fields.Single();
+
+        var exception = Assert.Throws<DocumentParseException>(() => field.Value);
+        Assert.Contains("Cyclic", exception.Message);
+    }
+}
