@@ -49,26 +49,10 @@ public static class ImageDecoder
         }
     }
 
-    // Buffers a source stream for Image/InlineImage. A seekable stream is read straight into an
-    // exact-size buffer (one copy) rather than growing a MemoryStream and copying it out again,
-    // which for a large photo is the difference between ~1x and ~3x the payload in LOH transients.
-    internal static byte[] ReadFully(Stream stream)
-    {
-        if (stream.CanSeek)
-        {
-            var remaining = stream.Length - stream.Position;
-            if (remaining is >= 0 and <= int.MaxValue)
-            {
-                var bytes = new byte[remaining];
-                stream.ReadExactly(bytes);
-                return bytes;
-            }
-        }
-
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return buffer.ToArray();
-    }
+    // Buffers a source stream for Image/InlineImage. An image payload has no file-size cap of
+    // its own, so the shared buffering runs uncapped and only the int.MaxValue array ceiling
+    // applies.
+    internal static byte[] ReadFully(Stream stream) => DocumentReader.ReadFully(stream, long.MaxValue);
 
     internal static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
 

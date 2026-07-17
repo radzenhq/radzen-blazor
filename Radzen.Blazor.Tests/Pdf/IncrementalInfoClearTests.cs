@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -88,6 +89,45 @@ public class IncrementalInfoClearTests
 
         Assert.False(Info(SaveIncremental(incremental)).ContainsKey("Title"));
         Assert.False(Info(stream.ToArray()).ContainsKey("Title"));
+    }
+
+    // Both savers build /Info from one mapping, so every modeled field - and the unmodeled
+    // keys carried alongside them - must come out identical whichever save path ran. The
+    // shipped bug this pins was a full save dropping a key the incremental save preserved.
+    [Fact]
+    public void IncrementalAndFullSaveAgreeOnEveryModeledField()
+    {
+        static void Edit(Document document)
+        {
+            document.Info.Title = "T";
+            document.Info.Author = "A";
+            document.Info.Subject = "S";
+            document.Info.Keywords = "K";
+            document.Info.Creator = "C";
+            document.Info.Producer = "P";
+            document.Info.CreationDate = new DateTimeOffset(2020, 1, 2, 3, 4, 5, TimeSpan.FromHours(2));
+            document.Info.ModificationDate = new DateTimeOffset(2021, 6, 7, 8, 9, 10, TimeSpan.Zero);
+        }
+
+        var incremental = Load(UnmodeledInfoFixture());
+        Edit(incremental);
+
+        var full = Load(UnmodeledInfoFixture());
+        Edit(full);
+        using var stream = new MemoryStream();
+        full.SaveToStream(stream);
+
+        var incrementalInfo = Info(SaveIncremental(incremental));
+        var fullInfo = Info(stream.ToArray());
+
+        Assert.Equal(fullInfo.Keys, incrementalInfo.Keys);
+        foreach (var key in fullInfo.Keys)
+        {
+            Assert.Equal(((StringObject)fullInfo[key]).Value, ((StringObject)incrementalInfo[key]).Value);
+        }
+
+        Assert.Equal("kept", ((StringObject)fullInfo["Custom"]).Value);
+        Assert.Equal("D:20200102030405+02'00'", ((StringObject)fullInfo["CreationDate"]).Value);
     }
 
     // An unmodeled key the library does not model is still carried over untouched.

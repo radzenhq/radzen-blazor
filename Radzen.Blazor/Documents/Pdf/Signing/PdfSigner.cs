@@ -139,7 +139,7 @@ public static class PdfSigner
         }
         else
         {
-            var newCatalog = Copy(catalog);
+            var newCatalog = catalog.Copy();
             newCatalog["AcroForm"] = writer.Add(acroForm);
             writer.Override(rootRef.ObjectNumber, newCatalog);
         }
@@ -202,7 +202,7 @@ public static class PdfSigner
     // new field appended and /SigFlags carrying SignaturesExist | AppendOnly.
     private static DictionaryObject BuildAcroForm(DocumentReader reader, DictionaryObject? existing, ReferenceObject fieldRef)
     {
-        var acroForm = existing is null ? new DictionaryObject() : Copy(existing);
+        var acroForm = existing is null ? new DictionaryObject() : existing.Copy();
 
         var fields = new ArrayObject();
         if (existing is not null && reader.GetArray(existing, "Fields") is { } existingFields)
@@ -248,7 +248,7 @@ public static class PdfSigner
         }
         else
         {
-            var newPage = Copy(page);
+            var newPage = page.Copy();
             newPage["Annots"] = annots;
             writer.Override(pageRef.ObjectNumber, newPage);
         }
@@ -578,19 +578,6 @@ public static class PdfSigner
         }
 
         return -1;
-    }
-
-    // Shallow copy preserving key order. Shared with DssBuilder so a merged
-    // dictionary can be rebuilt without mutating the object read from the input.
-    internal static DictionaryObject Copy(DictionaryObject source)
-    {
-        var copy = new DictionaryObject();
-        foreach (var pair in source)
-        {
-            copy[pair.Key] = pair.Value;
-        }
-
-        return copy;
     }
 
     // Emits a pre-formatted token verbatim; used for the fixed-width

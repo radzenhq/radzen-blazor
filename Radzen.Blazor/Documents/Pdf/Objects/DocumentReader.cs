@@ -148,8 +148,10 @@ public sealed class DocumentReader
     // A seekable stream is read straight into an exact-size buffer (one copy); a
     // non-seekable stream grows a pooled buffer and is copied out once. Either way the
     // document is never held in two full-size buffers at the same time, which matters
-    // for large files under a constrained (WASM) heap.
-    private static byte[] ReadFully(Stream stream, long maxFileBytes)
+    // for large files under a constrained (WASM) heap. A stream that delivers fewer bytes
+    // than its Length promised throws rather than parsing a truncated prefix, which a
+    // repair pass would happily turn into a different document.
+    internal static byte[] ReadFully(Stream stream, long maxFileBytes)
     {
         if (stream.CanSeek)
         {

@@ -18,7 +18,7 @@ internal static class DocumentLoader
         ArgumentNullException.ThrowIfNull(limits);
         limits = limits.Snapshot();
 
-        var bytes = ReadAll(stream, limits);
+        var bytes = DocumentReader.ReadFully(stream, limits.MaxFileBytes);
         var reader = DocumentReader.Parse(bytes, options?.Password, limits);
 
         var state = new LoadedState(reader, bytes);
@@ -67,79 +67,6 @@ internal static class DocumentLoader
         document.AcceptMetadataChanges();
 
         return document;
-    }
-
-    // Buffers the source into a single byte[] with the file-size cap enforced while reading, so a
-    // hostile oversized stream throws before exhausting memory rather than after. A seekable stream
-    // is read once into a right-sized array (no second full copy); a non-seekable stream grows a
-    // capped MemoryStream. ISO 32000-1 places no hard file-size limit, so MaxFileBytes is the guard.
-    private static byte[] ReadAll(Stream stream, ReaderLimits limits)
-    {
-        if (stream.CanSeek)
-        {
-            var length = stream.Length - stream.Position;
-            if (length > limits.MaxFileBytes || length > int.MaxValue)
-            {
-                throw new DocumentParseException("Maximum file size exceeded.", -1);
-            }
-
-            var buffer = new byte[length];
-            var offset = 0;
-            int read;
-            while (offset < buffer.Length && (read = stream.Read(buffer, offset, buffer.Length - offset)) > 0)
-            {
-                offset += read;
-            }
-
-            if (offset != buffer.Length)
-            {
-                Array.Resize(ref buffer, offset);
-            }
-
-            return buffer;
-        }
-
-        // A MemoryStream grows by doubling, so the old and new buffers are both live across
-        // each grow and ToArray() adds a third full-size copy - roughly 3x the file, all on
-        // the LOH for a large one. Chunks stay just under the 85 KB LOH threshold and are
-        // copied out once into an exactly-sized array.
-        const int ChunkSize = 81920;
-        var chunks = new List<(byte[] Buffer, int Length)>();
-        var chunk = new byte[ChunkSize];
-        var filled = 0;
-        var total = 0L;
-        int count;
-        while ((count = stream.Read(chunk, filled, chunk.Length - filled)) > 0)
-        {
-            filled += count;
-            total += count;
-            if (total > limits.MaxFileBytes || total > int.MaxValue)
-            {
-                throw new DocumentParseException("Maximum file size exceeded.", -1);
-            }
-
-            if (filled == chunk.Length)
-            {
-                chunks.Add((chunk, filled));
-                chunk = new byte[ChunkSize];
-                filled = 0;
-            }
-        }
-
-        if (filled > 0)
-        {
-            chunks.Add((chunk, filled));
-        }
-
-        var result = new byte[total];
-        var written = 0;
-        foreach (var (buffer, length) in chunks)
-        {
-            Array.Copy(buffer, 0, result, written, length);
-            written += length;
-        }
-
-        return result;
     }
 
     // The inheritable page attributes (ISO 32000-1 Table 30) threaded down the
