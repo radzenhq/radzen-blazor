@@ -366,6 +366,18 @@ internal sealed class PagePlan
             }
         }
 
+        // An edge bakes the transform into its endpoints, but EdgeDraw.Clip is an
+        // axis-aligned PdfRect the stroke emitter writes without a cm wrap, so a rotated
+        // rounded clip has nowhere to go.
+        for (var i = mark.Edges; i < Edges.Count; i++)
+        {
+            if (Edges[i].Clip is not null && Edges[i].ClipRadius > 0)
+            {
+                throw new NotSupportedException(
+                    "A rotated box cannot preserve a rounded clip on a border edge; remove the corner radius or the rotation.");
+            }
+        }
+
         for (var i = mark.Edges; i < Edges.Count; i++)
         {
             var edge = Edges[i];
