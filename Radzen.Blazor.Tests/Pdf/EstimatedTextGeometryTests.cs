@@ -8,22 +8,24 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A simple font's /Widths need only cover FirstChar..LastChar; every other code takes the
-// descriptor's /MissingWidth (ISO 32000-1 9.6.2.1), which the reader does not read, so those
-// codes reach TextSearch with no usable width and are measured at the average-glyph estimate.
+// ISO 32000-1 Table 111 (/Widths): "For character codes outside the range FirstChar to LastChar,
+// the value of MissingWidth from the FontDescriptor entry for this font shall be used", and Table
+// 122 defaults MissingWidth to 0. So a font with a descriptor always has a width, and the estimate
+// is reached only with no width source at all - here, a font omitting /FontDescriptor.
 //
-// The fixture pins the divergence that estimate creates. Its font gives a width for X only,
-// and /MissingWidth 1000 makes each W advance a full em: at size 10 from x=10 the four Ws
-// really end at x=50 and the X really occupies 50..56.67, while the 0.5em estimate puts the
-// whole run inside 10..36.67 - short of, and disjoint from, where the X really is.
+// The fixture pins the divergence the estimate creates. Its font gives a width for X only, and
+// the widthForW control spells out the 1000 that W really advances: at size 10 from x=10 the
+// four Ws end at x=50 and the X occupies 50..56.67, while the 0.5em estimate puts the whole run
+// inside 10..36.67 - short of, and disjoint from, where the X really is.
 public class EstimatedTextGeometryTests
 {
     private static readonly PdfRect TrueXBounds = new(50, 700, 56.67, 710);
 
-    private static Document LoadedDocument(bool widthForW)
+    private static Document LoadedDocument(bool widthForW, bool descriptor = false, int? missingWidth = null)
     {
         const string stream = "BT /F1 10 Tf 10 700 Td (WWWWX) Tj ET";
         var widths = widthForW ? "/FirstChar 87 /LastChar 88 /Widths [1000 667]" : "/FirstChar 88 /LastChar 88 /Widths [667]";
+        var last = descriptor ? 6 : 5;
         var pdf = new FixturePdf()
             .Append("%PDF-1.7\n")
             .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
@@ -32,17 +34,23 @@ public class EstimatedTextGeometryTests
                 + "/Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>\nendobj\n")
             .Object(4, $"4 0 obj\n<< /Length {stream.Length} >>\nstream\n{stream}\nendstream\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Font /Subtype /TrueType /BaseFont /Widthless /Encoding /WinAnsiEncoding "
-                + widths + " /FontDescriptor 6 0 R >>\nendobj\n")
-            .Object(6, "6 0 obj\n<< /Type /FontDescriptor /FontName /Widthless /Flags 32 /ItalicAngle 0 "
-                + "/Ascent 700 /Descent -200 /CapHeight 700 /StemV 80 /FontBBox [0 -200 1000 900] /MissingWidth 1000 >>\nendobj\n");
+                + widths + (descriptor ? " /FontDescriptor 6 0 R" : string.Empty) + " >>\nendobj\n");
+
+        if (descriptor)
+        {
+            pdf.Object(6, "6 0 obj\n<< /Type /FontDescriptor /FontName /Widthless /Flags 32 /ItalicAngle 0 "
+                + "/Ascent 700 /Descent -200 /CapHeight 700 /StemV 80 /FontBBox [0 -200 1000 900]"
+                + (missingWidth is { } value ? $" /MissingWidth {value}" : string.Empty) + " >>\nendobj\n");
+        }
+
         var xref = pdf.Position;
-        pdf.Append("xref\n0 7\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number <= 6; number++)
+        pdf.Append($"xref\n0 {last + 1}\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= last; number++)
         {
             pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
         }
 
-        pdf.Append("trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+        pdf.Append($"trailer\n<< /Size {last + 1} /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
         return Document.LoadFromStream(input);
     }
@@ -133,5 +141,30 @@ public class EstimatedTextGeometryTests
         document.Pages[0].Redact([new PdfRect(0, 700, 9, 710)]);
 
         Assert.Contains("(WWWWX)", SavedContent(document), StringComparison.Ordinal);
+    }
+
+    // ISO 32000-1 Table 111, /Widths: "For character codes outside the range FirstChar to
+    // LastChar, the value of MissingWidth from the FontDescriptor entry for this font shall be
+    // used." Reading it is what stops W being estimated, so this fails if the reader ignores it.
+    [Fact]
+    public void FindText_WithMissingWidth_UsesItRatherThanEstimating()
+    {
+        var hit = Assert.Single(LoadedDocument(widthForW: false, descriptor: true, missingWidth: 1000).Pages[0].FindText("X"));
+
+        Assert.False(hit.GeometryEstimated);
+        Assert.Equal(TrueXBounds.Left, hit.Bounds.Left, 2);
+        Assert.Equal(TrueXBounds.Right, hit.Bounds.Right, 2);
+    }
+
+    // Table 122: MissingWidth is Optional, "Default value: 0". A descriptor that omits it still
+    // states a width - zero - for W, rather than leaving one unknown, so nothing is estimated and
+    // the four zero-width Ws leave X at the run's own origin.
+    [Fact]
+    public void FindText_WithDescriptorButNoMissingWidth_DefaultsToZeroRatherThanEstimating()
+    {
+        var hit = Assert.Single(LoadedDocument(widthForW: false, descriptor: true).Pages[0].FindText("X"));
+
+        Assert.False(hit.GeometryEstimated);
+        Assert.Equal(10.0, hit.Bounds.Left, 2);
     }
 }
