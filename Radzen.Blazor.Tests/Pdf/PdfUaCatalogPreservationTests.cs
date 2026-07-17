@@ -46,14 +46,32 @@ public class PdfUaCatalogPreservationTests
         return pdf.ToArray();
     }
 
+    // The source page itself is untagged, uninspectable content that PDF/UA cannot be claimed
+    // over (ConformanceWriter refuses it), so it is replaced by a built page. The load-time
+    // catalog - and with it the indirect /ViewerPreferences and orphan /Metadata this fixture
+    // exists to exercise - is preserved from the source regardless of where the pages came from.
     private static Document LoadAsPdfUa()
     {
         var document = Document.LoadFromStream(new MemoryStream(SourceWithIndirectPrefsAndMetadata()));
+        document.Pages.RemoveAt(0);
+        document.Append(TaggedPage());
+
         document.Structure = new StructureElement { Type = "Document" };
         document.Language = "en-US";
         document.Info.Title = "Accessible Title";
         document.PdfUA = true;
         return document;
+    }
+
+    private static Document TaggedPage()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        builder.Info.Title = "Accessible Title";
+        builder.Language = "en-US";
+        builder.PdfUA = true;
+        BuildTestSupport.AddText(builder.Sections.Add(), "Accessible content", BuildTestSupport.Latin);
+        return builder.Build();
     }
 
     [Fact]

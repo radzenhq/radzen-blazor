@@ -55,6 +55,28 @@ internal sealed class ConformanceWriter(Document document)
         }
 
         ValidateTagging();
+        ValidateInspectable();
+    }
+
+    // Every resource check above reads GeneratedPage, so a page without one (loaded, or
+    // carrying caller-supplied raw content) is scanned by nothing: font embedding
+    // (ISO 19005-2 6.2.11.4.1) and DeviceCMYK against the sRGB intent WriteConformance
+    // always emits (6.2.4.3) go unverified. Inspecting it properly means resolving
+    // arbitrarily nested resources (form XObjects, patterns, shadings, Type3 procedures),
+    // which this library cannot do, so refuse the claim rather than stamp it unverified.
+    private void ValidateInspectable()
+    {
+        foreach (var page in document.Pages)
+        {
+            if (page.Generated is null)
+            {
+                throw new InvalidOperationException(
+                    $"{Label} cannot be claimed for a page that did not come from DocumentBuilder: its fonts, images and "
+                    + "colour spaces cannot be inspected, and this library will not identify a document as conformant on "
+                    + "content it has not verified. Rebuild the page with DocumentBuilder, or save without conformance "
+                    + "(PdfAConformance.None and PdfUA false).");
+            }
+        }
     }
 
     // Fully tagged conformance (PDF/UA, PDF/A Level-A) forbids untagged real content and
