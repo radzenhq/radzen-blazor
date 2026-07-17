@@ -4,8 +4,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Big-endian primitive reader over a byte[] with a movable cursor. A struct so
-// hot paths (cmap lookup, table parsing) can read without heap allocation.
 internal struct SfntReader(byte[] data, int position = 0)
 {
     private readonly byte[] data = data ?? throw new ArgumentNullException(nameof(data));

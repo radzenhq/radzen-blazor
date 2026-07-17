@@ -5,15 +5,10 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// KeepTogether: a paragraph that does not fit whole in the remaining space moves as a
-// unit to the next page instead of splitting. KeepWithNext: a heading is pulled to the
-// next page when its following block's first line would not fit beneath it.
 public class KeepTogetherTests
 {
     private const double Tol = 1e-6;
 
-    // Page fits exactly 5 lines; two single-line fillers then a 4-line paragraph, so the
-    // paragraph meets a page boundary with only 3 of its 4 lines fitting.
     private static (Section Section, Paragraph Para) BuildBoundary(FontCollection fonts, bool keepTogether)
     {
         var lineH = PaginationSupport.LineHeight(fonts);
@@ -85,8 +80,6 @@ public class KeepTogetherTests
         Assert.Equal(5, pages[0].Lines.Count);
     }
 
-    // Heading lands as the last fitting line at the bottom; KeepWithNext must pull it
-    // down so it shares a page with the first line of the body that follows.
     [Fact]
     public void KeepWithNext_PullsAHeadingToTheNextPage()
     {

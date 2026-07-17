@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded catalog's /Names branches survive a full save: the /Dests name tree keeps
-// resolving after pages are renumbered, so the link annotations re-emitted with a
-// /D (name) still reach their page, and branches this writer does not build itself
-// (e.g. /JavaScript) carry over too.
 public class NamedDestinationPreservationTests
 {
     private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
@@ -28,7 +24,6 @@ public class NamedDestinationPreservationTests
     private static int Number(DocumentObject reference)
         => Assert.IsType<ReferenceObject>(reference).ObjectNumber;
 
-    // Flattens the saved /Names /Dests tree to name -> destination array.
     private static ArrayObject? Destination(DocumentReader reader, string name)
     {
         var names = Assert.IsType<DictionaryObject>(reader.Resolve(Catalog(reader)["Names"]));
@@ -66,9 +61,6 @@ public class NamedDestinationPreservationTests
         return null;
     }
 
-    // Two pages, a /Names tree whose /Dests branch is split across /Kids (so the save
-    // must walk an intermediate node), a /JavaScript branch, and a page-one link
-    // annotation whose GoTo action targets the named destination on page two.
     private static byte[] Source()
     {
         var one = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-one-body) Tj ET");

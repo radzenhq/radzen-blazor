@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Signing appends a few KB to a document that may be tens of MB. The signed bytes are the
-// two /ByteRange segments of the document already in hand, so handing them to an ISigner
-// must not materialize a second copy of the whole file: for a large scanned PDF that copy
-// alone is an LOH allocation the size of the document.
 public class PdfSignerAllocationTests
 {
     private sealed class FixedSigner : ISigner
@@ -30,7 +26,6 @@ public class PdfSignerAllocationTests
         var document = new Document();
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (page zero) Tj ET"));
 
-        // Incompressible bytes give the original a predictable size.
         var payload = new byte[padding];
         new Random(7).NextBytes(payload);
         document.Pages.Add(PageSizes.A4).SetContent(payload);
@@ -59,7 +54,6 @@ public class PdfSignerAllocationTests
 
         var bytes = Measure(() => Sign(original));
 
-        // The returned signed document is unavoidable; a second full-size array is not.
         var budget = original.Length * 2L;
         Assert.True(
             bytes < budget,
@@ -92,7 +86,6 @@ public class PdfSignerAllocationTests
 
         var signed = PdfSigner.Sign(original, options, signer);
 
-        // Everything except the <...> /Contents token, angle brackets included.
         var contents = (options.SignatureMaxSizeBytes * 2) + 2;
         Assert.Equal(signed.Length - contents, signer.ContentLength);
     }

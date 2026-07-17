@@ -10,7 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// QR and barcode block elements rendered as vector rectangle fills in the page content.
 public class CodeElementTests
 {
     private static List<(double X, double Y, double W, double H)> FilledRects(byte[] content)
@@ -116,7 +115,6 @@ public class CodeElementTests
         Assert.Equal(expectedBars, rects.Count);
         Assert.All(rects, r => Assert.Equal(40.0, r.H, 3));
 
-        // The symbol plus its quiet zones spans exactly the declared width; the bars alone fit inside.
         var span = rects.Max(r => r.X + r.W) - rects.Min(r => r.X);
         Assert.True(span < 200.0, $"bars span {span} should be narrower than the declared width once quiet zones are added");
     }
@@ -126,12 +124,11 @@ public class CodeElementTests
     {
         const string value = "RADZEN";
         const double width = 200.0;
-        const int quiet = 10; // Code128 minimum quiet zone in modules
+        const int quiet = 10;
         var builder = new DocumentBuilder();
         var section = builder.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(width), Unit.FromPoint(40));
 
-        // Symbol width in modules (no quiet zone), and the total the emitter scales into `width`.
         var (_, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Code128, value, 40, 0);
         var total = symbolModules + 2 * quiet;
         var scaleX = width / total;
@@ -139,8 +136,6 @@ public class CodeElementTests
         var reader = BuildTestSupport.Read(builder);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
-        // Bars occupy only the symbol modules; the remaining declared width is the quiet zone,
-        // split evenly on both sides. These are independent of the block's page position.
         var barsSpan = rects.Max(r => r.X + r.W) - rects.Min(r => r.X);
         var totalQuiet = width - barsSpan;
 

@@ -78,8 +78,6 @@ public class Run(string text)
     /// </summary>
     public bool Invisible { get; set; }
 
-    // A non-RGB device fill colour set through the SetFill* helpers; overrides the font
-    // colour's rg emission with g/k/scn. Null (default) keeps the rg path byte-identical.
     internal DeviceColor? FillPaint { get; private set; }
 
     /// <summary>
@@ -108,7 +106,6 @@ public class Run(string text)
 
     internal double ScriptScale => VerticalAlign == RunVerticalAlign.None ? 1.0 : VerticalAlignScale;
 
-    // Rise fractions of the ORIGINAL font size, matching common typesetting defaults.
     internal double ScriptRise(double size) => VerticalAlign switch
     {
         RunVerticalAlign.Superscript => size * 0.33,

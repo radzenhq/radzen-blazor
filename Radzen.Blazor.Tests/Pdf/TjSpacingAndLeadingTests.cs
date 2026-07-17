@@ -5,8 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Extraction of third-party content-stream idioms the authoring path never emits:
-// TJ numeric adjustments (inter-word gaps and kerning) and TL/T* line advances.
 public class TjSpacingAndLeadingTests
 {
     private static DictionaryObject Helvetica() => new()

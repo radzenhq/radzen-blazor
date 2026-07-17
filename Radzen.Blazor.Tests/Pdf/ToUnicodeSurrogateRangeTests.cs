@@ -7,11 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A Type0 /ToUnicode may map supra-BMP scalars the standard Adobe way: a UTF-16BE
-// surrogate pair as the incremental bfrange base (<D835DC00> = U+1D400). Parsing
-// must decode the destination as UTF-16BE (2 bytes = a code unit, 4 = a surrogate
-// pair) and advance the LAST code unit per entry, and must never throw on an
-// invalid or lone-surrogate destination.
 public class ToUnicodeSurrogateRangeTests
 {
     [Fact]

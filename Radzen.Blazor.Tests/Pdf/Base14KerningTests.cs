@@ -9,14 +9,10 @@ using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Standard-14 AFM pair kerning. Expected values are read straight from the raw AFM
-// fixtures (KPX <nameA> <nameB> <value>), never from the generated Base14KernData, so a
-// data-generation bug cannot self-confirm. Values are in 1/1000 em (AFM units).
 public class Base14KerningTests
 {
     private static Font MakeFont(string name) => new() { Name = name };
 
-    // Reads the KPX value for a glyph-name pair from the raw AFM fixture; 0 when absent.
     private static int AfmKern(string afmFile, string leftGlyph, string rightGlyph)
     {
         using var stream = PdfTestResources.Open($"Afm/{afmFile}.afm");
@@ -70,7 +66,6 @@ public class Base14KerningTests
     public void GetKerning_UnkernedPairIsZero()
     {
         var helvetica = Base14Metrics.Resolve(MakeFont("Helvetica"))!;
-        // 'H' 'H' is not a kern pair in the Helvetica AFM.
         Assert.Equal(0, AfmKern("Helvetica", "H", "H"));
         Assert.Equal(0.0, helvetica.GetKerning('H', 'H'));
     }

@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Covers three document-model cleanups: Cell.Text = null must not leave a phantom empty
-// paragraph, InlineCollection.Add(Run) must null-check like every sibling Add, and the
-// loader must enforce ReaderLimits.MaxFileBytes while buffering (seekable and not).
 public class DocModelHardeningTests
 {
     private static Cell NewCell()
@@ -50,8 +47,6 @@ public class DocModelHardeningTests
     {
         var bytes = ValidPdfBytes();
 
-        // Control: the same bytes load cleanly under the default cap, so a throw under a
-        // low cap can only be the file-size guard, not a parse failure on invalid input.
         using (var ok = new MemoryStream(bytes))
         {
             Assert.Single(Document.LoadFromStream(ok).Pages);
@@ -73,9 +68,6 @@ public class DocModelHardeningTests
         Assert.Contains("file size", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // A seekable stream whose Length over-reports (a growing file, a wrapper over a partial
-    // download) must fail the same way through both entry points rather than one of them
-    // parsing whatever bytes did arrive.
     [Fact]
     public void Load_SeekableStreamShorterThanLength_ThrowsLikeReader()
     {

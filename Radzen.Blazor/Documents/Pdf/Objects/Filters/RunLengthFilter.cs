@@ -9,8 +9,6 @@ internal static class RunLengthFilter
 
     public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decoded size; run-length can expand up to 64x, so a small
-    // hostile stream aborts with a recoverable DocumentParseException.
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);

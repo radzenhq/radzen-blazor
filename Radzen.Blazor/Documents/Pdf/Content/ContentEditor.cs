@@ -134,8 +134,6 @@ internal static class ContentEditor
 
             if (!item.Element.IsModified)
             {
-                // Only after a splice: two raw spans are adjacent in the source and already
-                // lex apart, so padding them would move bytes that were never edited.
                 if (spliced)
                 {
                     writer.EnsureSeparated();
@@ -224,8 +222,6 @@ internal static class ContentEditor
             var start = frameStart < 0 ? token.Start : frameStart;
             var op = token.Text!;
 
-            // Only the CTM matters here, but reading it through the shared machine is what
-            // keeps the ambient spliced against identical to the one baked into the element.
             machine.Apply(op, operands);
 
             if (op is "m" or "l" or "c" or "v" or "y" or "re" or "h" or "W" or "W*")
@@ -240,9 +236,6 @@ internal static class ContentEditor
             }
             else if (op is "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n")
             {
-                // n discards the path without painting, so it only produces an element when a
-                // clip is pending - exactly the interpreter's rule. Otherwise the construction
-                // bytes stay in the inter-element gap and re-emit verbatim.
                 if (pathStart >= 0 && (op != "n" || clipPending))
                 {
                     result.Add(new Candidate(CandidateKind.Path, pathStart, token.End, [], pathCtm));
@@ -257,8 +250,6 @@ internal static class ContentEditor
             }
             else if (ContentShows.IsShow(op))
             {
-                // A Tj/'/" with no string operand shows nothing, so the interpreter emits no
-                // element; only TJ always materializes (its empty array still builds a run).
                 if (op == "TJ" || LastStringToken(operands) is not null)
                 {
                     var bytes = new List<byte>();
@@ -270,10 +261,6 @@ internal static class ContentEditor
                         }
                     }
 
-                    // A show splices back where the source text object is still open, so its
-                    // ambient is the full text rendering space: the live text matrix as well as
-                    // the CTM. Both are what the interpreter baked into the element's transform,
-                    // so an unmoved run comes back out relative to identity.
                     var insideText = machine.TextObjectDepth > 0;
                     var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
                     result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
@@ -292,8 +279,6 @@ internal static class ContentEditor
         return result;
     }
 
-    // The interpreter bakes the absolute CTM into every element, but a re-emitted element is
-    // spliced back where the source cm scope is still active, so its own cm has to undo it.
     private static Matrix Relative(Matrix transform, Matrix ambient)
     {
         if (ambient == Matrix.Identity)
@@ -338,8 +323,6 @@ internal static class ContentEditor
         }
     }
 
-    // Reachable for every element type: these three declare no tracked member of their own but
-    // still inherit the Transform and IsArtifact doors from ContentElement.
     private static void ValidateModification(ContentElement element)
     {
         if (element is RawContent or XObjectContent or InlineImageContent)

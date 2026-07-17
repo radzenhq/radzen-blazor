@@ -1,8 +1,6 @@
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// hmtx: advance widths keyed by glyph id, with last-advance reuse for
-// glyphs beyond numberOfHMetrics (monospaced tail of the table).
 internal sealed class HorizontalMetrics
 {
     private readonly ushort[] advanceWidths;
@@ -16,7 +14,7 @@ internal sealed class HorizontalMetrics
         for (var i = 0; i < numberOfHMetrics; i++)
         {
             widths[i] = reader.ReadUInt16();
-            reader.ReadInt16(); // leftSideBearing
+            reader.ReadInt16();
         }
 
         return new HorizontalMetrics(widths);

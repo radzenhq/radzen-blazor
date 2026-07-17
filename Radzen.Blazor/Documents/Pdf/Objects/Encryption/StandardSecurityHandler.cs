@@ -4,12 +4,6 @@ using Radzen.Documents.Crypto;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
 
-/// <summary>
-/// Implements the ISO 32000-1 standard security handler (revisions 2-4) and the
-/// ISO 32000-2 revision 6 (AESV3) key derivation and password authentication.
-/// Given the /Encrypt dictionary, the document /ID and a candidate password it
-/// derives the file encryption key and decrypts strings and streams.
-/// </summary>
 internal sealed class StandardSecurityHandler
 {
     private static readonly byte[] Padding =
@@ -72,8 +66,7 @@ internal sealed class StandardSecurityHandler
         stringCipher = ResolveCipher(encrypt, "StrF");
         FileKey = [];
 
-        // Revision 6 passwords are SASLprep-normalized UTF-8 (ISO 32000-2 7.6.4.3.3);
-        // earlier revisions use the PDFDocEncoding/Latin-1 byte interpretation.
+        // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-normalized UTF-8.
         Authenticate(revision >= 5 ? EncodeR6Password(password) : Encoding.Latin1.GetBytes(password));
     }
 
@@ -94,10 +87,8 @@ internal sealed class StandardSecurityHandler
     public ReadOnlyMemory<byte> DecryptStream(ReadOnlyMemory<byte> data, int objectNumber, int generation)
         => Decrypt(streamCipher, data, objectNumber, generation);
 
-    // A /Metadata stream stays plaintext when /EncryptMetadata is false (ISO 32000-1
-    // 7.6.3.2); running it through the cipher would return corrupted XMP. A stream whose
-    // chain starts with /Crypt is decrypted by that filter instead of /StmF (7.4.10), so
-    // it is left alone here; CryptStreamFilter rejects any non-Identity crypt filter.
+    // ISO 32000-1 7.6.3.2: a /Metadata stream stays plaintext when /EncryptMetadata is false.
+    // ISO 32000-1 7.4.10: a /Crypt-first chain is decrypted by that filter, not /StmF.
     public ReadOnlyMemory<byte> DecryptStream(
         ReadOnlyMemory<byte> data, int objectNumber, int generation, DictionaryObject dictionary)
     {
@@ -107,15 +98,11 @@ internal sealed class StandardSecurityHandler
             : DecryptStream(data, objectNumber, generation);
     }
 
-    // The /EncryptMetadata rule is one rule with a read side and a write side; both must
-    // classify a /Metadata stream identically or the writer leaves plaintext the reader
-    // re-decrypts (or vice versa), so the predicate lives here and EncryptionWriter calls it.
     internal static bool IsMetadataStream(DictionaryObject dictionary)
         => dictionary.TryGetValue("Type", out var type) && type is NameObject name
             && string.Equals(name.Value, "Metadata", StringComparison.Ordinal);
 
-    // /Crypt shall be the first filter in the chain, so only that position is honoured;
-    // a /Crypt found later is left to the normal /StmF path.
+    // ISO 32000-1 7.4.10: /Crypt shall be the first filter in the chain.
     private static bool HasCryptFilter(DictionaryObject dictionary)
     {
         if (!dictionary.TryGetValue("Filter", out var filter))
@@ -141,8 +128,6 @@ internal sealed class StandardSecurityHandler
             return data;
         }
 
-        // The ciphers take arrays and allocate their own output, so the input is
-        // materialized only once an actual cipher runs.
         var bytes = data.ToArray();
         return cipher switch
         {
@@ -152,8 +137,7 @@ internal sealed class StandardSecurityHandler
         };
     }
 
-    // /StmF and /StrF name the crypt filter in /CF; /Identity means no
-    // encryption for that class of data (ISO 32000-1 7.6.5).
+    // ISO 32000-1 7.6.5: /StmF and /StrF name the crypt filter in /CF; /Identity means no encryption.
     private CryptMethod ResolveCipher(DictionaryObject encrypt, string selector)
     {
         if (version < 4)
@@ -180,19 +164,14 @@ internal sealed class StandardSecurityHandler
                     "AESV2" => CryptMethod.AesV2,
                     "V2" => CryptMethod.Rc4,
                     "Identity" => CryptMethod.Identity,
-                    // An unrecognized /CFM would otherwise decrypt to garbage under a
-                    // guessed RC4 key; fail loud instead of silently emitting wrong bytes.
                     _ => throw new DocumentParseException(
                         $"Unsupported crypt filter method /CFM /{method.Value}."),
                 };
             }
 
-            // The named (non-Identity) crypt filter has no matching /CF entry or no /CFM.
-            // Falling back to RC4 here would silently decrypt to garbage.
             throw new DocumentParseException($"Crypt filter '{filterName}' is not defined in /CF.");
         }
 
-        // No /CF dictionary at all: the standard-handler default (RC4 for V4, AESV3 for V5).
         return version == 5 ? CryptMethod.AesV3 : CryptMethod.Rc4;
     }
 
@@ -227,8 +206,7 @@ internal sealed class StandardSecurityHandler
     private byte[] ComputeFileKey(byte[] password)
         => ComputeFileKey(password, ownerEntry, permissions, documentId, revision, keyLength, encryptMetadata);
 
-    // ISO 32000-1 algorithm 6. The R2 /U is the full 32-byte RC4 block; for R >= 3 only
-    // the leading 16 bytes are defined, the rest being arbitrary producer padding.
+    // ISO 32000-1 algorithm 6. R2 /U is the full 32-byte RC4 block; for R >= 3 only the leading 16 bytes are defined.
     private bool UserPasswordMatches(byte[] fileKey)
         => Equal(ComputeUserEntry(fileKey, documentId, revision), userEntry, revision == 2 ? 32 : 16);
 
@@ -295,8 +273,7 @@ internal sealed class StandardSecurityHandler
         }
     }
 
-    // ISO 32000-2 algorithm 13: decrypt /Perms with the file key (a single AES-256 ECB
-    // block, i.e. CBC with a zero IV) and validate its fixed permission binding.
+    // ISO 32000-2 algorithm 13: decrypt /Perms with the file key and validate its permission binding.
     private void VerifyPerms()
     {
         if (!hasPermsEntry)
@@ -333,10 +310,7 @@ internal sealed class StandardSecurityHandler
         }
     }
 
-    // ISO 32000-2 7.6.4.3.3: SASLprep (RFC 4013) before UTF-8. A bounded subset: NFKC alone
-    // does not map RFC 3454 C.1.2 spaces or delete B.1 code points, so those are handled here,
-    // and prohibited/bidi-violating input is rejected rather than silently re-keyed. The
-    // no-LCat-mixing rule (needs table D.2) is accepted, not enforced.
+    // ISO 32000-2 7.6.4.3.3: R6 passwords are SASLprep-prepared (RFC 4013) before UTF-8.
     private static byte[] EncodeR6Password(string password)
     {
         var mapped = MapForSaslprep(password);
@@ -395,8 +369,6 @@ internal sealed class StandardSecurityHandler
         }
     }
 
-    // Flattened inclusive [lo, hi] code-point pairs; passwords are <= 127 bytes so a linear
-    // scan is cheaper than the machinery of a sorted lookup.
     private static bool InAnyRange(int codePoint, int[] ranges)
     {
         for (var i = 0; i < ranges.Length; i += 2)
@@ -454,16 +426,12 @@ internal sealed class StandardSecurityHandler
         0xFE70, 0xFE74, 0xFE76, 0xFEFC,
     ];
 
-    // The AESV3 file key comes straight from decrypting the attacker-supplied /UE or /OE.
-    // Anything but 32 bytes (an empty /UE gives a zero-length key that divides-by-zero in
-    // AES key expansion; an oversized /UE gives a huge key) is a forged dictionary.
     private static byte[] RequireAes256Key(byte[] fileKey)
         => fileKey.Length == 32
             ? fileKey
             : throw new DocumentParseException("Revision 6 file key must be exactly 32 bytes.");
 
-    // Revision 5 (Acrobat 9 ExtensionLevel 3) hashes with a single SHA-256 pass;
-    // the iterated algorithm 2.B loop applies to revision 6 only.
+    // ISO 32000-2 algorithm 2.B: iterated for revision 6; revision 5 uses a single SHA-256 pass.
     private byte[] HashPassword(byte[] password, byte[] salt, byte[] userData)
         => revision == 5
             ? Sha2.ComputeHash256(Concat(password, salt, userData))
@@ -511,8 +479,7 @@ internal sealed class StandardSecurityHandler
     private byte[] ObjectKey(int objectNumber, int generation, bool aes)
         => ComputeObjectKey(FileKey, objectNumber, generation, aes);
 
-    // ISO 32000-1 algorithm 1: the per-object key derived from the file key,
-    // the object number and generation (plus the "sAlT" bytes for AESV2).
+    // ISO 32000-1 algorithm 1: per-object key from the file key, object number and generation (plus "sAlT" for AESV2).
     internal static byte[] ComputeObjectKey(byte[] fileKey, int objectNumber, int generation, bool aes)
     {
         var extra = aes ? AesSalt.Length : 0;
@@ -534,8 +501,6 @@ internal sealed class StandardSecurityHandler
         return hash[..length];
     }
 
-    // Write side: derive /O, /U and the file key for the RC4 (R3) and AESV2 (R4)
-    // handlers from the passwords, permissions and document /ID.
     internal static (byte[] Owner, byte[] User, byte[] FileKey) DeriveLegacy(
         string userPassword, string ownerPassword, int revision, int keyLength,
         int permissions, byte[] documentId, bool encryptMetadata)
@@ -548,10 +513,7 @@ internal sealed class StandardSecurityHandler
         return (owner, user, fileKey);
     }
 
-    // Write side: derive /O, /U, /OE, /UE and /Perms for the AESV3 (R6) handler
-    // from a caller-supplied 32-byte file key (ISO 32000-2 algorithms 8-10). The
-    // validation salts, key salts and /Perms noise are caller-supplied too, so the
-    // output is fully deterministic given the same material.
+    // ISO 32000-2 algorithms 8-10: derive /O, /U, /OE, /UE and /Perms for the AESV3 (R6) handler.
     internal static (byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms) DeriveAes256(
         string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata,
         byte[] userValidation, byte[] userKeySalt, byte[] ownerValidation, byte[] ownerKeySalt, byte[] permsNoise)
@@ -599,8 +561,7 @@ internal sealed class StandardSecurityHandler
         return value;
     }
 
-    // ISO 32000-1 algorithm 2. A short /O (only reachable from a malformed dictionary on
-    // the read side) is zero-filled to the 32 bytes the layout reserves for it.
+    // ISO 32000-1 algorithm 2. A short /O is zero-filled to the 32 bytes the layout reserves for it.
     private static byte[] ComputeFileKey(
         byte[] userPassword, byte[] owner, int permissions, byte[] documentId,
         int revision, int keyLength, bool encryptMetadata)
@@ -659,8 +620,7 @@ internal sealed class StandardSecurityHandler
         return result;
     }
 
-    // ISO 32000-2 algorithm 10: the /Perms block is a single AES-256 ECB block,
-    // which for one 16-byte block equals CBC with a zero IV.
+    // ISO 32000-2 algorithm 10: the /Perms block is a single AES-256 ECB block (CBC with a zero IV).
     private static byte[] ComputePerms(int permissions, bool encryptMetadata, byte[] fileKey, byte[] noise)
     {
         var perms = new byte[16];
@@ -680,9 +640,7 @@ internal sealed class StandardSecurityHandler
         return AesCbc.EncryptCbcNoPadding(fileKey, ZeroIv, perms);
     }
 
-    // For V>=4 the file-key length comes from the resolved crypt-filter dictionary,
-    // not the top-level /Length (ISO 32000-1 7.6.5). AESV2/AESV3 fix the size at
-    // 16/32 bytes regardless of a wrong or absent /Length.
+    // ISO 32000-1 7.6.5: for V>=4 the file-key length comes from the crypt-filter dictionary. AESV2/AESV3 fix it at 16/32 bytes.
     private int DeriveCryptFilterKeyLength(DictionaryObject encrypt)
     {
         var filter = ResolveCryptFilterDictionary(encrypt);
@@ -699,8 +657,7 @@ internal sealed class StandardSecurityHandler
 
         if (filter is not null && filter.TryGetValue("Length", out var length) && length is NumberObject number)
         {
-            // The crypt-filter /Length is bytes (ISO 32000-1 Table 25); some producers
-            // still write bits, so treat anything above 16 as a bit count.
+            // ISO 32000-1 Table 25: the crypt-filter /Length is in bytes; treat anything above 16 as a bit count.
             var value = number.IntValue;
             return DeriveMd5KeyLength(value > 16 ? value : value * 8);
         }
@@ -724,9 +681,7 @@ internal sealed class StandardSecurityHandler
             : null;
     }
 
-    // The MD5-derived V1/V2/V4 file key is sliced out of a 16-byte hash; a hostile
-    // /Length (e.g. 1000000000) would otherwise slice past the hash. RC4/AES key sizes
-    // are 5..16 bytes (ISO 32000-1 7.6.3.3), so anything else is a malformed dictionary.
+    // ISO 32000-1 7.6.3.3: RC4/AES key sizes are 5..16 bytes; anything else is a malformed dictionary.
     private static int DeriveMd5KeyLength(int lengthBits)
     {
         var bytes = lengthBits / 8;

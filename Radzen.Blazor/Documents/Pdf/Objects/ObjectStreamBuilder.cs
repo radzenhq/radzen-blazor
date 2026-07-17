@@ -4,17 +4,13 @@ using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-// Packs non-stream indirect objects into a /Type /ObjStm stream
-// (ISO 32000-1 section 7.5.7): a header of "number offset" integer pairs
-// followed by the concatenated object bodies, Flate-compressed.
+// ISO 32000-1 7.5.7: /Type /ObjStm - a header of "number offset" pairs followed by concatenated bodies, Flate-compressed.
 internal sealed class ObjectStreamBuilder
 {
     private readonly List<(int Number, byte[] Body)> members = [];
 
     public int Count => members.Count;
 
-    // Serializes the object body immediately and returns the member index
-    // used by the type-2 cross-reference entry.
     public int Add(int number, DocumentObject value)
     {
         using var body = new MemoryStream();

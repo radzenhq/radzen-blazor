@@ -7,9 +7,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// When a family is registered with only a styled face (e.g. bold), regular-weight text
-// in that family must resolve to the available face instead of throwing. An exact-style
-// face, when present, still wins.
 public class FontStyledFallbackResolutionTests
 {
     private static double SfntWidth(byte[] bytes, string text, double size)

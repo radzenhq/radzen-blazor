@@ -13,11 +13,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Coverage matrix for block dispatch inside a table cell: every concrete Block
-// subclass must either render in a cell or be an explicit, documented no-op
-// (PageBreak). Anything else must throw instead of silently vanishing. The
-// reflection test at the bottom trips when a new Block subclass is added
-// without wiring TableLayout.LayoutContent.
 public class TableCellBlockDispatchTests
 {
     private static (Table Table, Cell Cell) CellTable()
@@ -132,7 +127,6 @@ public class TableCellBlockDispatchTests
     [Fact]
     public void ListInCell_EmitsMarkersAndItemTextWithHangingIndent()
     {
-        // Default base-14 font so text is emitted as literal (text) Tj strings.
         var builder = new DocumentBuilder();
         var section = builder.Sections.Add();
         var table = section.Blocks.AddTable();
@@ -194,9 +188,6 @@ public class TableCellBlockDispatchTests
         Assert.Contains("UnknownBlock", exception.Message);
     }
 
-    // Systemic guard: every concrete Block subclass in the library must lay out
-    // inside a table cell without throwing (or be PageBreak, an explicit no-op).
-    // Adding a new Block subclass without wiring the cell path fails here.
     [Fact]
     public void EveryBlockSubclass_IsHandledInsideATableCell()
     {
@@ -210,7 +201,6 @@ public class TableCellBlockDispatchTests
         {
             if (type == typeof(TableOfContents))
             {
-                // Only supported as direct section content; the cell path rejects it explicitly.
                 continue;
             }
 

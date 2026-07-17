@@ -5,9 +5,6 @@ using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared fixture for the L2 line-breaking / layout contract tests. All expected
-// widths are derived from the already-merged FontCollection.MeasureText using the
-// deterministic Liberation Sans metrics (unitsPerEm 2048), never hardcoded.
 internal static class LineLayoutSupport
 {
     public const string Family = "Liberation Sans";
@@ -41,8 +38,6 @@ internal static class LineLayoutSupport
     public static double SpaceWidth(FontCollection fonts, double size)
         => fonts.MeasureText(" ", FontAt(size));
 
-    // Greedy word-wrap at single spaces: this IS the pinned break spec. Returns the
-    // inclusive [first,last] word-index range of each line.
     public static List<(int First, int Last)> Wrap(double[] widths, double space, double max)
     {
         var lines = new List<(int, int)>();
@@ -64,7 +59,6 @@ internal static class LineLayoutSupport
         return lines;
     }
 
-    // Char offset of word k in "w0 w1 w2 ..." (single-space joined).
     public static int WordStart(string[] words, int k)
     {
         var start = 0;

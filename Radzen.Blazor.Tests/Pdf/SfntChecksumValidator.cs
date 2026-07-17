@@ -5,9 +5,6 @@ using System.Text;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Test-side raw sfnt inspector. Re-derives table-directory checksums and the
-// whole-font checkSumAdjustment straight from the output bytes so the tests
-// pin the on-disk invariants independently of the parser.
 internal static class SfntChecksumValidator
 {
     internal readonly record struct Entry(uint Checksum, uint Offset, uint Length);
@@ -26,7 +23,6 @@ internal static class SfntChecksumValidator
         return tables;
     }
 
-    // loca offsets, length numGlyphs+1. Reads head.indexToLocFormat and maxp.numGlyphs.
     public static uint[] ReadLocaOffsets(byte[] data)
     {
         var dir = ReadDirectory(data);
@@ -51,8 +47,6 @@ internal static class SfntChecksumValidator
     public static short IndexToLocFormat(byte[] data)
         => ReadInt16(data, (int)ReadDirectory(data)["head"].Offset + 50);
 
-    // Every directory entry's stored checksum must equal a fresh sum of its
-    // (zero-padded) table data; head is summed with checkSumAdjustment zeroed.
     public static void AssertTableChecksums(byte[] data)
     {
         var dir = ReadDirectory(data);
@@ -73,7 +67,6 @@ internal static class SfntChecksumValidator
         }
     }
 
-    // head.checkSumAdjustment == 0xB1B0AFBA - checksum(whole font, adjustment zeroed).
     public static void AssertHeadAdjustment(byte[] data)
     {
         var dir = ReadDirectory(data);

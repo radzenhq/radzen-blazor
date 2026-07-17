@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Applying edits one at a time reallocates and recopies the whole content stream per edit,
-// which is quadratic in the hit count on a large stream. These pin the single-pass cost
-// model: allocation must track the output size, not hits x streamSize.
 public class ContentEditsScalingTests
 {
     private static long Apply(int streamSize, int hits)
@@ -36,8 +33,6 @@ public class ContentEditsScalingTests
         var ten = Apply(size, 10);
         var twoHundred = Apply(size, 200);
 
-        // Splicing one edit at a time cost ~456KB per additional hit (10 hits -> 54MB,
-        // 200 -> 141MB). One forward pass allocates the single output buffer regardless.
         Assert.True(twoHundred < ten * 2,
             $"Applying 200 edits allocated {twoHundred} bytes against {ten} for 10: allocation scales with hit count.");
         Assert.True(twoHundred < size * 3,

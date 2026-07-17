@@ -7,11 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// EncryptionOptions.EncryptMetadata threads through EncryptionWriter: when false
-// the crypt-filter handlers (V >= 4) write /EncryptMetadata false into /Encrypt and
-// fold the flag into the key derivation so the file still opens, matching the reader
-// that already honors it. The default (true) omits the entry, leaving the historic
-// /Encrypt shape untouched.
 public class EncryptMetadataOptionTests
 {
     private const string StreamMarker = "BT /F1 12 Tf 72 720 Td (metadata flag test) Tj ET";

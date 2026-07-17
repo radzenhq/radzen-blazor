@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Emits embedded files on save: one compressed EmbeddedFile stream and /Filespec
-// per attachment, wired into the catalog /Names /EmbeddedFiles name tree and the
-// /AF associated-files array.
 internal sealed class AttachmentWriter(Document document)
 {
     public void WriteAttachments(DocumentWriter writer, DictionaryObject catalog)
@@ -17,9 +14,6 @@ internal sealed class AttachmentWriter(Document document)
 
         foreach (var attachment in document.Attachments)
         {
-            // The /EmbeddedFiles name tree keys by name and would keep only the last of a
-            // duplicate, while /AF lists both filespecs - fail loud rather than emit a file
-            // unreachable from the attachments panel whose winner depends on insertion order.
             if (filespecs.ContainsKey(attachment.Name))
             {
                 throw new InvalidOperationException(

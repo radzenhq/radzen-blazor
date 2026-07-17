@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Emits a positioned table fragment, clipping content that overflows the cell box.
 internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, StyleResolution resolution, OpacityResolver opacities)
 {
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
@@ -51,8 +50,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    // The page-space box of one on-page table fragment. A table that splits across pages
-    // rounds each fragment to its own box, so every fragment gets four rounded corners.
     private static PdfRect FragmentBounds(in PositionedTableFragment positioned, double x, double contentTop)
     {
         var top = double.MaxValue;
@@ -71,10 +68,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         return PdfRect.FromSize(x, contentTop - positioned.Y - bottom, positioned.Layout.Width, bottom - top);
     }
 
-    // Draws the rounded frame of a whole table: clips everything the table emitted (corner
-    // cell backgrounds and outer border edges included; interior grid lines are only touched
-    // where they meet the rounded corners) and, when the table-level borders resolve to one
-    // uniform edge, strokes a single rounded-rectangle border around the perimeter.
     private static void EmitTableFrame(PagePlan plan, Table source, in PdfRect bounds, double radius, PlanMarks mark)
     {
         plan.ApplyRoundedClip(bounds, radius, mark);
@@ -118,8 +111,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    // Groups a table's flat cell list by source row once (cached per layout) so a
-    // multi-fragment table no longer rescans every cell for each row it emits.
     private List<LaidOutCell>[] RowIndex(LaidOutTable layout)
     {
         if (tableRows.TryGetValue(layout, out var cached))
@@ -155,9 +146,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             cell.Bounds.Height);
         BoxRenderer.Paint(plan, bounds, ResolveStyle(layout, cell, extGState));
 
-        // A grid cell never rounds its own corners against its neighbours, so its content is
-        // never rounded-clipped (radius 0); only whole tables and containers round.
-        // Height is unused by the emit path; the cell stores no content height to carry.
         EmitBoxContent(
             context,
             new LaidOutBoxContent
@@ -174,8 +162,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             left, contentTop, delta);
     }
 
-    // Shared by table cells and containers, so it takes already-resolved pieces rather than
-    // a Cell/Table.
     internal void EmitBoxContent(
         EmitContext context,
         in LaidOutBoxContent content,
@@ -199,8 +185,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var pageNumber = context.PageNumber;
         var pageCount = context.PageCount;
 
-        // The mark sits after the cell's own rounded background and border so only CHILD
-        // content gets clipped to the rounded box - the border stroke stays unclipped.
         var contentMark = radius > 0 ? plan.Mark() : default;
 
         var firstText = plan.Texts.Count;
@@ -210,10 +194,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         while (li < cellLines.Count)
         {
             var line = cellLines[li];
-            // Fields (page number/count) in a band-table cell resolve per page here,
-            // re-broken to the cell's content width, replacing the placeholder layout.
-            // A container tags each child block into its own structure element; a table cell
-            // leaves its blocks unmapped and inherits the cell's element (the passed element).
             var lineElement = structureTree.ElementOf(line.Source) ?? element;
             if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
@@ -241,8 +221,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        // An unbreakable token or oversized image/code wider than the cell is clipped to the
-        // cell box so it never overpaints the neighboring cell.
         var cellClip = clip;
         if (overflows)
         {
@@ -303,8 +281,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        // Nested tables and nested boxes interleave in document order (the shared Order
-        // sequence assigned by BoxContentLayout.Position).
         var cursor = OrderedMerge.ByOrder(tables, static t => t.Order, boxes, static b => b.Order);
         while (cursor.MoveNext())
         {
@@ -386,8 +362,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
     }
 
-    // Resolves the cell/row/table border cascade (an edge falls back cell -> row -> table)
-    // into the box decoration BoxRenderer paints.
     private static BoxStyle ResolveStyle(LaidOutTable layout, LaidOutCell cell, string? extGState)
     {
         var cellBorders = cell.Cell.Borders;

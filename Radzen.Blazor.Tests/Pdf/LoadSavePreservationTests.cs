@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Load-save preservation of page-level inheritable attributes (/Rotate, /CropBox)
-// and catalog-level features (/Outlines, /PageLabels, /OpenAction) that the writer
-// does not build itself. A hand-built source is loaded through Document and saved,
-// then the re-serialized bytes are re-parsed and inspected.
 public class LoadSavePreservationTests
 {
     private static Document LoadSaveReload(byte[] source)
@@ -23,8 +19,6 @@ public class LoadSavePreservationTests
     private static DocumentReader SaveAndParse(Document document)
         => DocumentReader.Parse(document.ToArray());
 
-    // A single-page document with the given extra entries spliced into the page
-    // dictionary and the catalog, plus any extra indirect objects appended.
     private static byte[] Build(string pageExtra, string catalogExtra, string extraObjects, int objectCount)
     {
         var content = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-body) Tj ET");
@@ -126,7 +120,6 @@ public class LoadSavePreservationTests
         Assert.Equal(400.0, Assert.IsType<NumberObject>(crop[3]).DoubleValue);
     }
 
-    // /Rotate declared on the /Pages node, not the leaf: an inheritable attribute.
     private static byte[] InheritedRotate270()
     {
         var content = Encoding.ASCII.GetBytes("(x) Tj");
@@ -199,7 +192,6 @@ public class LoadSavePreservationTests
         Assert.True(catalog.ContainsKey("PageLabels"));
         Assert.Equal("en-US", Assert.IsType<StringObject>(reader.Resolve(catalog["Lang"])).Value);
 
-        // /OpenAction still targets a real page in the re-saved tree.
         var openAction = Assert.IsType<ArrayObject>(reader.Resolve(catalog["OpenAction"]));
         var target = Assert.IsType<DictionaryObject>(reader.Resolve(openAction[0]));
         Assert.Equal("Page", Assert.IsType<NameObject>(target["Type"]).Value);

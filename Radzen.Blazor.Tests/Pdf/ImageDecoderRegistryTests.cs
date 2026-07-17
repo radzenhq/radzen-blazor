@@ -11,9 +11,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The image decoders are a registry of magic-byte-sniffing IImageDecoder implementations
-// rather than a central if-chain: each sniffs only its own signature (returning false and
-// yielding to the next for foreign bytes), and only decodes when its magic matches.
 public class ImageDecoderRegistryTests
 {
     private static readonly byte[] PngMagic = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
@@ -42,8 +39,6 @@ public class ImageDecoderRegistryTests
         Assert.Null(jp2);
     }
 
-    // A matching signature routes into the format's own decode: a malformed body of the right
-    // magic reaches that decoder's validation (rather than silently yielding to another arm).
     [Fact]
     public void PngDecoder_ClaimsThenDecodesOwnMagic()
         => Assert.Throws<InvalidDataException>(
@@ -58,10 +53,6 @@ public class ImageDecoderRegistryTests
     public void Decode_UnrecognizedFormat_Throws()
         => Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode([0x00, 0x01, 0x02, 0x03]));
 
-    // Register is a public plugin seam over process-wide static state, and its read-copy-swap
-    // must be atomic: concurrent registrations that each copy the same snapshot lose all but the
-    // last, and the loss only surfaces later as an "unrecognized format" for a decoder the caller
-    // did register. Every decoder registered here sniffs a magic no other test uses.
     [Fact]
     public void ConcurrentRegistrationsAreAllRetained()
     {
@@ -85,13 +76,10 @@ public class ImageDecoderRegistryTests
 
         foreach (var magic in magics)
         {
-            // Throws NotSupportedException if this registration was lost.
             Assert.NotNull(ImageDecoder.Decode(magic));
         }
     }
 
-    // Claims exactly one magic prefix and yields on everything else, so registering it
-    // cannot shadow a built-in format for any other test in the process.
     private sealed class StubDecoder(byte[] magic) : IImageDecoder
     {
         public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)

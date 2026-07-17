@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L5 test 4: a Table block flows through Build() into real page content. A small table
-// round trips header and body text in reading order; a table taller than one page
-// paginates and repeats its header row at the top of every page.
 public class BuildTableTests
 {
     private static int Index(string text, string needle)
@@ -93,7 +90,6 @@ public class BuildTableTests
             Assert.Contains("H0", page.ExtractText(), StringComparison.Ordinal);
         }
 
-        // The header text appears at least once per page (repeated across fragments).
         var occurrences = BuildTestSupport.CountOccurrences(reloaded.ExtractText(), "H0");
         Assert.True(occurrences >= reloaded.Pages.Count, "header repeats on each page");
     }

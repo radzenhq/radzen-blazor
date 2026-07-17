@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A PathContent that does not opt into any of the new graphics features (device
-// colours, caps/joins/miter/dash, clipping, even-odd, rendering intent) must emit
-// exactly the solid-RGB, nonzero-fill stream it always did.
 public class PathGraphicsByteSafetyTests
 {
     private static Document BuildDocument()

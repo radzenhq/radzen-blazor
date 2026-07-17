@@ -5,8 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Pins the /ToUnicode tokenizer's break set: the PDF whitespace bytes (shared with
-// Lexer.IsWhitespace) plus only the delimiters Tokenize itself dispatches on.
 public class ToUnicodeBreakSetTests
 {
     private static byte[] Bytes(string text) => Encoding.ASCII.GetBytes(text);
@@ -27,9 +25,6 @@ public class ToUnicodeBreakSetTests
         Assert.Equal("B", map[0x41]);
     }
 
-    // The break set stops short of Lexer.IsDelimiter on purpose. Were '(' and ')' breaks,
-    // Tokenize would drop them (an undispatched break emits no token) and leave a bare
-    // beginbfchar keyword that starts a real section over the codes that follow.
     [Fact]
     public void KeywordInsideAParentheticalRun_DoesNotStartASection()
     {

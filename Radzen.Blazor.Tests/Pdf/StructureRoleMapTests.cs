@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A declared RoleMap lets a paragraph carry a non-standard structure role that maps to a
-// standard ISO 32000-1 type, so tagged output (PDF/UA, PDF/A Level A) stays conformant.
-// With no declared roles the /StructTreeRoot carries no /RoleMap and output is unchanged.
 public class StructureRoleMapTests
 {
     private static DocumentBuilder AuthorTagged(bool declareRole)

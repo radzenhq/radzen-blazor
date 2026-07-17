@@ -5,9 +5,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// A set that preserves first-insertion order on enumeration. Used where the collected
-// members reach the serialized page /Resources: HashSet enumeration order is not
-// contractual across runtimes, and byte-identical output requires a stable order.
 internal sealed class OrderedSet<T> : IEnumerable<T>
     where T : notnull
 {
@@ -42,32 +39,21 @@ internal struct TextDraw
     public double CharSpacing { get; init; }
     public double Rise { get; init; }
 
-    // Word spacing (Tw). Default 0 emits nothing, preserving byte-identity.
     public double WordSpacing { get; init; }
 
-    // Horizontal scaling percent (Tz). 0 (unset) and 100 both emit nothing; only a
-    // genuinely non-100 scale emits a Tz operator.
     public double HorizontalScale { get; init; }
 
-    // Text rendering mode (Tr). 0 (fill) emits nothing beyond the synthetic-bold path.
     public int RenderMode { get; init; }
 
-    // A non-RGB device fill colour (Gray g, CMYK k or a named colorspace cs+scn) used
-    // instead of rg when set.
     public DeviceColor? FillPaint { get; init; }
 
-    // Per-pair kern adjustments (TJ number convention, thousandths of text space:
-    // positive tightens) inserted between glyphs when kerning is enabled; null = plain Tj.
     public double[]? Kerns { get; init; }
     public StructureElement? Element { get; init; }
     public PdfRect? Clip { get; set; }
 
-    // Corner radius of the clip path; 0 clips to the plain `re` rectangle.
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 
-    // Applied as a q .. cm wrap around the whole draw (clip included), so the clip
-    // rectangle rotates with the content it clips.
     public Matrix? Transform { get; set; }
 }
 
@@ -84,8 +70,6 @@ internal struct ImageDraw
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; set; }
 
-    // Set for an /ImageMask stencil so its fill colour is emitted inside the image's own
-    // q..Q, making the painted colour deterministic instead of the ambient fill colour.
     public Color? StencilColor { get; init; }
 }
 
@@ -97,18 +81,14 @@ internal struct FillDraw
     public required double Height { get; init; }
     public required Color Color { get; init; }
 
-    // Corner radius of the filled rounded rectangle; 0 fills a plain `re` rectangle.
     public double Radius { get; init; }
     public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 
-    // When set, the rectangle is painted with a shading pattern (/Pattern cs + scn)
-    // instead of the solid Color; opt-in, default null keeps the solid-fill path.
     public GradientBrush? Gradient { get; init; }
 }
 
-// A uniform border stroked as a single rounded-rectangle path (one S, not four edges).
 internal readonly struct RoundedStrokeDraw
 {
     public required double X { get; init; }
@@ -136,7 +116,6 @@ internal struct EdgeDraw
     public string? ExtGState { get; init; }
 }
 
-// Serialized after all page content, in a coordinate system rotated around the page center.
 internal sealed class WatermarkDraw
 {
     public required double CenterX { get; init; }
@@ -156,9 +135,6 @@ internal sealed class PagePlan
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
-    // Plain states (keyed by their composite tuple) and soft-mask states (keyed by content key)
-    // share one registry so both draw from the same GS counter; the "a|"/"m|" key prefix keeps
-    // the two domains from colliding.
     private readonly ResourceKeyRegistry<string, GeneratedExtGState> extGStates =
         new("GS", StringComparer.Ordinal);
 
@@ -173,8 +149,6 @@ internal sealed class PagePlan
 
     private readonly Dictionary<(double Width, double Height, double Radius, double Blur), ShadowMask> shadowMasks = [];
 
-    // Placement is intentionally not part of the key: identically shaped shadows share one
-    // raster, so a grid of them runs the Coverage+Blur passes once rather than per placement.
     public ShadowMask RenderShadowMask(double shapeWidthPt, double shapeHeightPt, double radiusPt, double blurPt)
     {
         var key = (shapeWidthPt, shapeHeightPt, radiusPt, blurPt);
@@ -193,8 +167,6 @@ internal sealed class PagePlan
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
         => RegisterExtGState(fillAlpha, strokeAlpha, null, null, null, null, null);
 
-    // An alpha-only call must dedup to exactly the entries it produced before the
-    // blend/overprint/intent fields existed, so such a document stays byte identical.
     public string RegisterExtGState(
         double fillAlpha,
         double strokeAlpha,
@@ -231,8 +203,6 @@ internal sealed class PagePlan
     public GeneratedExtGState? FindExtGState(string key)
         => extGStatesByKey.TryGetValue(key, out var state) ? state : null;
 
-    // A soft-mask state is returned untouched: SoftMask.EmitBoxShadow already folds its colour
-    // alpha in, and RegisterExtGState cannot carry the /SMask forward.
     public string? ApplyAlpha(string? extGState, double alpha)
     {
         if (alpha >= 1)
@@ -260,7 +230,6 @@ internal sealed class PagePlan
             state.Intent);
     }
 
-    // A null soft-mask content key opts out of dedup and always appends a fresh entry.
     public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
     {
         GeneratedExtGState Create(string key) => Track(new GeneratedExtGState
@@ -276,13 +245,11 @@ internal sealed class PagePlan
             : extGStates.Add(Create);
     }
 
-    // One shading pattern per gradient brush instance, keyed P0, P1, ...
     public string RegisterPattern(GradientBrush gradient)
         => patterns.GetOrAdd(gradient, key => new GeneratedPattern { Key = key, Gradient = gradient });
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 
-    // Draws that already carry a clip keep it - an inner rounded box wins over an outer one.
     public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
     {
         for (var i = mark.Fills; i < Fills.Count; i++)
@@ -330,15 +297,8 @@ internal sealed class PagePlan
         }
     }
 
-    // Applies an affine transform to every draw added after the mark. A fill cannot stay an
-    // axis-aligned rectangle, so it becomes a solid stroke along the rect centerline with line
-    // width = rect height (exact only under butt caps); those converted strokes are inserted
-    // BEFORE the marked edges so backgrounds stay under borders. Fills and edges lose any clip
-    // in the process - rotated overflow clipping is not supported.
     public void ApplyTransform(Matrix transform, PlanMarks mark)
     {
-        // Rounded geometry cannot survive the conversion to centerline strokes, so fail loud
-        // rather than silently emitting square corners or dropping a rounded clip.
         for (var i = mark.Fills; i < Fills.Count; i++)
         {
             var fill = Fills[i];
@@ -348,8 +308,6 @@ internal sealed class PagePlan
                     "A rotated box cannot preserve rounded corners or a rounded clip; remove the corner radius or the rotation.");
             }
 
-            // A centerline stroke carries a single colour, so the shading pattern would
-            // degrade to the solid fill colour (black when only the gradient was set).
             if (fill.Gradient is not null)
             {
                 throw new NotSupportedException(
@@ -366,9 +324,6 @@ internal sealed class PagePlan
             }
         }
 
-        // An edge bakes the transform into its endpoints, but EdgeDraw.Clip is an
-        // axis-aligned PdfRect the stroke emitter writes without a cm wrap, so a rotated
-        // rounded clip has nowhere to go.
         for (var i = mark.Edges; i < Edges.Count; i++)
         {
             if (Edges[i].Clip is not null && Edges[i].ClipRadius > 0)

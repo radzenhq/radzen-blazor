@@ -10,11 +10,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Micro-typography contract: Run.LetterSpacing renders via the Tc operator (reset
-// after the show) and widens measurement by spacing * (glyphs - 1); Run.VerticalAlign
-// renders super/subscript at a reduced Tf size with a Ts text rise (reset after the
-// show). Default runs (LetterSpacing 0, VerticalAlign None) emit exactly as before,
-// with no Tc/Ts operators in the content stream.
 public class MicroTypographyTests
 {
     private const string Family = "Liberation Sans";

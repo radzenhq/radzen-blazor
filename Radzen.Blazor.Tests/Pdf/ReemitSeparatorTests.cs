@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// An overlay is spliced in at the previous element's End, which is the byte immediately after
-// its operator. Without a separator the two fuse into one unreadable token ("Tj" + "q" = "Tjq"),
-// destroying both the original operator and the overlay's.
 public class ReemitSeparatorTests
 {
     private static byte[] Source()

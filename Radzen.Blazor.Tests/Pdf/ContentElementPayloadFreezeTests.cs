@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Change detection tracks assignment through a property. A payload handed out as a mutable
-// array or list can be written through behind the door, so every array-typed payload is
-// frozen at the boundary. The payloads are boxed to object here so each assertion compiles
-// against both the array-typed member and its frozen replacement.
 public class ContentElementPayloadFreezeTests
 {
     private const string TextSource =
@@ -25,8 +21,6 @@ public class ContentElementPayloadFreezeTests
         return InterpreterTestSupport.Load(document.ToArray()).Pages[0];
     }
 
-    // P1: replacing the raw stream must discard elements parsed from the previous bytes,
-    // otherwise the stale elements re-emit and the new content is silently dropped.
     [Fact]
     public void SetContent_DiscardsElementsMaterializedFromThePreviousBytes()
     {
@@ -45,8 +39,6 @@ public class ContentElementPayloadFreezeTests
         Assert.Equal(2, reloaded.Content.Count);
     }
 
-    // P3: the one hole reflection can never see. A caller can cast the IReadOnlyList back to
-    // the GradientStop[] the constructor cloned into and write straight through it.
     [Fact]
     public void GradientStops_AreNotWritableThroughTheReturnedReference()
     {
@@ -54,7 +46,6 @@ public class ContentElementPayloadFreezeTests
             new GradientStop(0, Color.Red),
             new GradientStop(1, Color.Blue));
 
-        // Boxed so the cast stays expressible once Stops is no longer an array-typed reference.
         object stops = brush.Stops;
         if (stops is GradientStop[] array)
         {
@@ -64,8 +55,6 @@ public class ContentElementPayloadFreezeTests
         Assert.Equal(Color.Red, brush.Stops[0].Color);
     }
 
-    // P2: the interpreter assigned its growable merge list onto the run and then kept
-    // AddRange-ing into it, so the run's payload stayed an alias the caller can grow.
     [Fact]
     public void SourceAdjustments_AreNotAnAliasedGrowableList()
     {

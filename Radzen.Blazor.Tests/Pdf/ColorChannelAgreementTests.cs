@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One 0..1 colour component must quantize to one byte no matter which reader sees it.
-// The outline loader, the annotation reader and the content interpreter each read the
-// same /C or rg operand, so a document that states 0.3 three times must report one value.
 public class ColorChannelAgreementTests
 {
     private static byte[] FileWithSameColorEverywhere(string component)

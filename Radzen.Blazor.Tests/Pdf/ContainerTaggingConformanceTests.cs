@@ -5,10 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Real content inside a Container must not be hidden from assistive technology as an
-// /Artifact when the document is stamped PDF/UA or PDF/A Level-A: a Container's children
-// are descended into and tagged into the logical structure tree, exactly like top-level
-// section blocks.
 public class ContainerTaggingConformanceTests
 {
     private static DocumentBuilder Author(bool ua, PdfAConformance conformance)
@@ -32,8 +28,6 @@ public class ContainerTaggingConformanceTests
     private static List<ContentOperation> Ops(DocumentBuilder builder)
         => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
 
-    // Returns the set of marked-content tag names that directly enclose a text-showing
-    // operator anywhere on the page.
     private static HashSet<string> TagsWrappingText(List<ContentOperation> ops)
     {
         var stack = new List<string>();
@@ -81,8 +75,6 @@ public class ContainerTaggingConformanceTests
         Assert.Contains("P", tags);
     }
 
-    // A plain (untagged) document is unaffected: the container paragraph stays exactly as
-    // before, so container output is byte-identical across builds.
     [Fact]
     public void PlainDocument_ContainerOutputIsByteStable()
     {

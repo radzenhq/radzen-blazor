@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Creating AcroForm fields on a generated document: Document.FormFields definitions
-// save as widget annotations with a catalog /AcroForm (/Fields, /DR, /DA and a
-// generated /AP appearance per field), and Document.Flatten renders each field's
-// value into the page content and drops the interactive form.
 public class FormFieldCreationTests
 {
     private static Document BuildDocument()
@@ -55,7 +51,6 @@ public class FormFieldCreationTests
         return [.. rect.Select(entry => ((NumberObject)reader.Resolve(entry)).DoubleValue)];
     }
 
-    // Concatenates every content stream of the first page (base plus overlays).
     private static string AllPageContent(DocumentReader reader)
     {
         var page = FormTestSupport.FirstPage(reader);

@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// AcroForm.Collect walks the field tree DOWN through /Kids at load. Like every other loaded
-// tree walk it must be bounded by both a global visited set (DAG/cycle) and a configured depth
-// (deep acyclic tree), or a hostile field tree overflows the stack or fans out exponentially.
 public class AcroFormFieldTreeBoundsTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -27,8 +24,6 @@ public class AcroFormFieldTreeBoundsTests
         return pdf.ToArray();
     }
 
-    // A field spine `levels` deep: obj5 is the root field, each following object is its /Kids
-    // child carrying its own /T (so it is a field node, not a widget), the last is a terminal.
     private static byte[] DeepKidsSource(int levels)
     {
         var pdf = new FixturePdf()
@@ -60,8 +55,6 @@ public class AcroFormFieldTreeBoundsTests
         return Wrap(pdf, 5 + levels);
     }
 
-    // Two root fields whose /Kids both reference the same field node: without a global visited
-    // set the shared subtree is walked once per incoming path.
     private static byte[] SharedNodeSource()
     {
         var pdf = new FixturePdf()
@@ -76,7 +69,6 @@ public class AcroFormFieldTreeBoundsTests
         return Wrap(pdf, 8);
     }
 
-    // Deeper than the configured depth: rejected rather than recursing arbitrarily deep.
     [Fact]
     public void DeepFieldTree_BeyondConfiguredDepth_Throws()
     {
@@ -87,7 +79,6 @@ public class AcroFormFieldTreeBoundsTests
         Assert.Contains("deep", exception.Message);
     }
 
-    // Within the configured depth it loads and the terminal is reached normally.
     [Fact]
     public void DeepFieldTree_WithinConfiguredDepth_Loads()
     {

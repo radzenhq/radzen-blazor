@@ -7,17 +7,11 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// #33: with kerning enabled, a coalesced text run must NOT kern the pairs that straddle a
-// space. Coalescing joins words the layout measured separately (each without any space), so
-// applying the AFM space-pair kern at draw time would drift the glyphs away from the measured
-// XOffsets that underlines/links are built from.
 public class KerningSpaceBoundaryTests
 {
     private static string Content(DocumentBuilder builder)
         => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
 
-    // Ordered tokens of the single "[ ... ] TJ" show array: ("g", <char>) per glyph, ("n", null)
-    // per numeric kern.
     private static List<(string Kind, char Glyph)> ShowTokens(string content)
     {
         var array = Regex.Match(content, @"\[(.*?)\]\s*TJ", RegexOptions.Singleline);
@@ -42,8 +36,6 @@ public class KerningSpaceBoundaryTests
     [Fact]
     public void CoalescedRun_DoesNotKernAcrossSpace()
     {
-        // Helvetica AFM kerns "space W" (-40) and within-word "To"/"Wa"; only the within-word
-        // pairs may survive.
         var builder = new DocumentBuilder { Fonts = { EnableKerning = true } };
         var section = builder.Sections.Add();
         var paragraph = new Paragraph();
@@ -52,7 +44,7 @@ public class KerningSpaceBoundaryTests
 
         var tokens = ShowTokens(Content(builder));
 
-        Assert.Contains(tokens, t => t.Kind == "n");   // kerning is active on this run
+        Assert.Contains(tokens, t => t.Kind == "n");
 
         for (var i = 0; i < tokens.Count; i++)
         {

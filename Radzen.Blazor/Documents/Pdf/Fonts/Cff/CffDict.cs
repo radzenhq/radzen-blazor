@@ -6,9 +6,7 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
-// CFF DICT (spec section 4): operands precede an operator. Two-byte operators use the
-// 12 escape and are keyed here as 1200 + b1. Real operands (b0 == 30) are decoded from
-// packed BCD nibbles.
+// CFF DICT operand/operator encoding: spec section 4.
 internal static class CffDict
 {
     private const int TwoByteOperator = 12;
@@ -78,8 +76,6 @@ internal static class CffDict
         return result;
     }
 
-    // A truncated DICT (e.g. a bare operand prefix at the end of the buffer) must fail
-    // with the parser's diagnosable exception, not a bare IndexOutOfRangeException.
     private static void Require(byte[] data, int index)
     {
         if (index >= data.Length)
@@ -118,8 +114,6 @@ internal static class CffDict
         }
     }
 
-    // Forces the 5-byte 32-bit integer form so an operand's encoded width is stable
-    // regardless of the value; used for placeholder offsets resolved in a later pass.
     public static void WriteOffset(List<byte> dst, int value) => WriteInteger32(dst, value);
 
     public static void WriteNumber(List<byte> dst, double value)

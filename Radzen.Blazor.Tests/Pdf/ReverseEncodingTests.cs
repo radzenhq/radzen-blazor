@@ -7,17 +7,11 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Reverse char-code -> Unicode mapping through the three sources ExtractText must
-// honour: a simple font's /Differences array, a simple font's base WinAnsi encoding,
-// and a Type0/Identity-H font's emitted /ToUnicode CMap (glyf and CFF descendants).
 public class ReverseEncodingTests
 {
     [Fact]
     public void Differences_ReversesRemappedCodes()
     {
-        // /Encoding remaps codes 1,2,3 to named glyphs; codes 0x48/0x69 fall through
-        // to the base WinAnsi encoding, and 0x80 is Euro under WinAnsi.
-        //   1 -> eacute (U+00E9), 2 -> Adieresis (U+00C4), 3 -> bullet (U+2022)
         var codes = new byte[] { 0x48, 0x69, 0x01, 0x02, 0x03, 0x80 };
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
 
@@ -29,7 +23,7 @@ public class ReverseEncodingTests
     [Fact]
     public void Differences_WithoutBaseEncoding_UnlistedCodesUseStandardEncoding()
     {
-        var codes = new byte[] { 0x41, 0x01, 0x7A }; // 'A', remapped, 'z'
+        var codes = new byte[] { 0x41, 0x01, 0x7A };
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
 
         var font = new DictionaryObject
@@ -70,7 +64,6 @@ public class ReverseEncodingTests
         var map = Type0EmbedSupport.BuildMap(font, top + bottom);
 
         var content = new List<byte>();
-        // bottom run authored first, at a lower baseline; extraction must reorder.
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 600, Type0EmbedSupport.CompactCodes(font, map, bottom)));
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 700, Type0EmbedSupport.CompactCodes(font, map, top)));
         var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), [.. content]);

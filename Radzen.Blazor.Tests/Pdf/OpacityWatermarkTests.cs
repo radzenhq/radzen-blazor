@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Container.Opacity and Image.Opacity paint their draws through a page /ExtGState
-// (/ca fill, /CA stroke) selected with the gs operator; Section.Watermark stamps a
-// rotated, semi-transparent overlay centered on every page of the section. All of it
-// is additive: default opacity and no watermark emit no ExtGState and no gs.
 public class OpacityWatermarkTests
 {
     private static Paragraph Text(string text)
@@ -75,7 +71,6 @@ public class OpacityWatermarkTests
         container.Borders.Width = 2;
         container.Blocks.Add(Text("Bordered"));
 
-        // Four border edges plus the child text draw share the container's opacity.
         var text = PageText(builder);
         Assert.Equal(5, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
     }
@@ -116,7 +111,6 @@ public class OpacityWatermarkTests
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
         Assert.Equal(0.3, Alpha(states!, "GS1", "ca"), 6);
 
-        // Each container wraps its background fill and its child text draw.
         var text = PageText(builder);
         Assert.Equal(4, BuildTestSupport.CountOccurrences(text, "/GS0 gs"));
         Assert.Equal(2, BuildTestSupport.CountOccurrences(text, "/GS1 gs"));

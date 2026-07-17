@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Inserting a page that belongs to another Document carries that page's loaded
-// source state onto the receiving document, so the emitted page keeps the
-// /Resources its retained content stream refers to. Text extraction cannot see a
-// regression here: it reads content operators and never resolves the font, so
-// these tests assert on the emitted page dictionary.
 public class ForeignPageInsertTests
 {
     private static Document LoadedWithText(string text)

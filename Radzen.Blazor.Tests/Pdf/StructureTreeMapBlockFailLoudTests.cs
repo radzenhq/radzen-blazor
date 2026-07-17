@@ -6,8 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// StructureTreeBuilder.MapBlock must fail loud on a block type it does not map
-// rather than silently dropping it from the tagged / PDF-UA structure tree.
 public class StructureTreeMapBlockFailLoudTests
 {
     private sealed class UnmappedBlock : Block;

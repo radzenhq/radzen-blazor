@@ -10,10 +10,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Write->reload tests for the physical Document/Page skeleton. Documents are
-// produced by Document.Save/ToArray and read back through the Objects-layer
-// DocumentReader, which is the oracle for the resulting object graph. Loading
-// into a Document is out of scope for C1.
 public class DocumentWriteTests
 {
     private static DocumentReader Reload(Document document) => DocumentReader.Parse(document.ToArray());
@@ -101,7 +97,6 @@ public class DocumentWriteTests
 
         AssertMediaBox(reader, Kid(reader, 0), PageSizes.A4.Width.Point, PageSizes.A4.Height.Point);
         AssertMediaBox(reader, Kid(reader, 1), PageSizes.Letter.Width.Point, PageSizes.Letter.Height.Point);
-        // A4 landscape swaps width/height: [0 0 841.88 595.27].
         AssertMediaBox(reader, Kid(reader, 2), PageSizes.A4.Height.Point, PageSizes.A4.Width.Point);
         AssertMediaBox(reader, Kid(reader, 2), 841.88, 595.27);
     }
@@ -181,7 +176,6 @@ public class DocumentWriteTests
         var reader = Reload(document);
         var stream = Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, 0)["Contents"]));
         Assert.Equal(content, stream.Data);
-        // Skeleton stores content verbatim - no compression filter.
         Assert.False(stream.Dictionary.ContainsKey("Filter"));
     }
 
@@ -204,7 +198,6 @@ public class DocumentWriteTests
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("b"));
 
         var reader = Reload(document);
-        // catalog + pages + 2 page + 2 content + info == 7
         Assert.Equal(7, reader.ObjectCount);
     }
 

@@ -5,10 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The compact gid renumbering must be computed once in the generator and reused by the
-// Type0 embedder. A representative document that embeds both a TrueType (glyf) and a
-// CFF Type0 subset must serialize deterministically and identically build-to-build so a
-// shared map cannot silently diverge from the content-stream codes.
 public class Type0GidMapReuseTests
 {
     private static byte[] BuildMixedSubsetDocument()

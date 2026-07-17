@@ -7,10 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Colour-stop offsets must be honoured: a gradient whose stops do not span the full [0 1]
-// parametric domain holds the endpoint colour constant before the first and after the last
-// stop, and interpolates each adjacent pair over its own offset sub-range (ISO 32000-1
-// 7.10.3 stitching functions).
+// ISO 32000-1 7.10.3 (stitching functions): each adjacent stop pair interpolates over its own offset sub-range; endpoints stay constant outside [first, last].
 public class GradientStopOffsetTests
 {
     private static DictionaryObject Dict(DocumentObject o) => Assert.IsType<DictionaryObject>(o);
@@ -40,16 +37,14 @@ public class GradientStopOffsetTests
 
         Assert.Equal(6, Array(func["Encode"]!).Count);
 
-        // Leading segment is constant red (C0 == C1), trailing is constant blue.
         var lead = Dict(functions[0]);
         Assert.Equal(Num(Array(lead["C0"]!)[0]), Num(Array(lead["C1"]!)[0]), 3);
-        Assert.Equal(1, Num(Array(lead["C0"]!)[0]), 3); // red channel
+        Assert.Equal(1, Num(Array(lead["C0"]!)[0]), 3);
 
         var tail = Dict(functions[2]);
         Assert.Equal(Num(Array(tail["C0"]!)[2]), Num(Array(tail["C1"]!)[2]), 3);
-        Assert.Equal(1, Num(Array(tail["C0"]!)[2]), 3); // blue channel
+        Assert.Equal(1, Num(Array(tail["C0"]!)[2]), 3);
 
-        // Middle segment interpolates red -> blue.
         var mid = Dict(functions[1]);
         Assert.Equal(1, Num(Array(mid["C0"]!)[0]), 3);
         Assert.Equal(1, Num(Array(mid["C1"]!)[2]), 3);

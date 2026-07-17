@@ -14,8 +14,6 @@ internal static class ImageTestHelpers
 
     public static int Int(DictionaryObject dict, string key) => ((NumberObject)dict[key]).IntValue;
 
-    // Minimal 1-bit greyscale PNG (colour type 0, bit depth 1): one filter byte plus
-    // ceil(width/8) packed sample bytes per row, zlib-deflated into a single IDAT.
     public static byte[] OneBitGrayPng(int width, int height)
     {
         var rowBytes = ((width * 1) + 7) / 8;

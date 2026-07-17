@@ -13,12 +13,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// End-to-end contract of PdfSigner: the original file stays a byte-for-byte
-// prefix, /ByteRange covers everything except the <...> /Contents token
-// (angle brackets included), and the embedded detached CMS verifies against
-// the covered bytes. The real-CMS tests drive Microsoft's SignedCms directly
-// (the test host is a desktop runtime; only the library itself must stay
-// WASM-safe, hence the ISigner delegation boundary).
 public class PdfSignerTests
 {
     private static readonly DateTimeOffset FixedTime = new(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);
@@ -68,8 +62,6 @@ public class PdfSignerTests
     private static DelegateSigner CmsSigner(X509Certificate2 certificate)
         => new(content => Pkcs.SignDetached(certificate, content));
 
-    // Microsoft's SignedCms runs on the desktop test host; only the library
-    // itself must stay WASM-safe, which is what the ISigner boundary enforces.
     private static class Pkcs
     {
         public static byte[] SignDetached(X509Certificate2 certificate, byte[] content)
@@ -79,7 +71,6 @@ public class PdfSignerTests
             return cms.Encode();
         }
 
-        // Throws CryptographicException when the signature does not verify.
         public static void CheckSignature(byte[] content, byte[] der)
         {
             var cms = new SignedCms(new ContentInfo(content), detached: true);
@@ -134,8 +125,6 @@ public class PdfSignerTests
         return raw;
     }
 
-    // The DER blob's own header determines where the CMS ends and the zero
-    // padding of the reserved /Contents area begins.
     private static int DerTotalLength(byte[] der)
     {
         Assert.Equal(0x30, der[0]);
@@ -165,11 +154,6 @@ public class PdfSignerTests
         Pkcs.CheckSignature(content, der);
     }
 
-    // A one-page PDF whose page dictionary carries a string value that embeds a
-    // decoy "/Contents <0...0>" and "/ByteRange [0 0 0 0 ...]" matching the exact
-    // placeholder shapes the signer scans for. The page is copied verbatim into
-    // the incremental update, so a naive whole-appended-region scan would lock
-    // onto these decoys instead of the real signature dictionary.
     private static byte[] HostilePdf()
     {
         var zeros = new string('0', 16384 * 2);
@@ -194,8 +178,6 @@ public class PdfSignerTests
         return pdf.ToArray();
     }
 
-    // A single page reached through `depth` chained /Pages nodes. Deep but acyclic and
-    // well within ReaderLimits.MaxPageTreeDepth, so the loader accepts it.
     private static byte[] DeepPageTree(int depth)
     {
         var pdf = new FixturePdf()
@@ -224,8 +206,6 @@ public class PdfSignerTests
         return pdf.ToArray();
     }
 
-    // One policy, one limit: a page tree the loader accepts must not be rejected by the
-    // signer walking that same tree against a private constant.
     [Fact]
     public void Sign_PageTreeDeeperThanSixtyFive_MatchesTheLoaderPolicy()
     {
@@ -240,8 +220,6 @@ public class PdfSignerTests
         Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
     }
 
-    // Joining the reader's policy must not remove the backstop: past the limit the walk
-    // still fails loud rather than recursing to a stack overflow.
     [Fact]
     public void Sign_PageTreeDeeperThanTheReaderLimit_Throws()
     {
@@ -263,13 +241,9 @@ public class PdfSignerTests
 
         Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
 
-        // The signature must be scoped to the REAL /Contents in the sig dict, so
-        // the CMS verifies over the declared /ByteRange. Under the pre-fix scan
-        // this would lock onto the decoy string and fail here.
         var reader = DocumentReader.Parse(signed);
         VerifySignature(signed, reader, 0);
 
-        // The decoy string in the copied page must remain untouched (all zeros).
         var decoyStart = IndexOfAscii(signed, "/Decoy (/Contents <");
         Assert.True(decoyStart >= 0);
         var hexStart = decoyStart + "/Decoy (/Contents <".Length;
@@ -372,7 +346,6 @@ public class PdfSignerTests
         var signed = PdfSigner.Sign(original, Options(), CmsSigner(certificate));
         var reader = DocumentReader.Parse(signed);
 
-        // Throws CryptographicException unless SignedCms.CheckSignature(true) succeeds.
         VerifySignature(signed, reader, 0);
     }
 
@@ -423,9 +396,6 @@ public class PdfSignerTests
         Assert.True(first.SequenceEqual(second));
     }
 
-    // The reservation bound is shared by PdfSigner and PdfTimestamper because both size the
-    // same /Contents placeholder. These pin the accepted range and the message on both sides
-    // so the shared constant cannot drift unnoticed.
     private sealed class UnusedSigner : ISigner
     {
         public byte[] Sign(SignedContent content) => throw new InvalidOperationException("must not be called");

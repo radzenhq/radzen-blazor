@@ -11,10 +11,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The single shared content-stream tokenizer feeds both ContentInterpreter and
-// TextSearch. These assert its token stream directly and that both consumers
-// produce consistent output for a stream exercising text, TJ arrays, hex strings,
-// paths, marked-content dictionaries and inline images.
 public class ContentTokenizerTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -75,7 +71,6 @@ public class ContentTokenizerTests
             .Select(t => t.Text)
             .ToArray();
 
-        // No /W, /H, ID or EI leak out of the inline image as operators.
         Assert.Equal(
             new[]
             {
@@ -121,9 +116,7 @@ public class ContentTokenizerTests
         Assert.Equal("Hi", Encoding.ASCII.GetString(tokens[0].Bytes!));
     }
 
-    // ISO 32000-1 7.3.4.2: an end-of-line marker inside a literal string - CR, LF or CRLF -
-    // is treated as a single LF. The object lexer already does this, so a string operand read
-    // from a content stream must decode to the same bytes as the same literal read as an object.
+    // ISO 32000-1 7.3.4.2: CR, LF or CRLF inside a literal string decodes to a single LF
     [Theory]
     [InlineData("(a\rb)", "a\nb")]
     [InlineData("(a\r\nb)", "a\nb")]
@@ -152,10 +145,6 @@ public class ContentTokenizerTests
         Assert.Equal(lexed, content);
     }
 
-    // Numeric operands are parsed straight from the source bytes. These pin the accepted
-    // grammar, including the forms PDF permits that a hand-rolled span parser gets wrong:
-    // a trailing decimal point, a leading sign and a leading decimal point. The grammar
-    // itself is shared with the file-object lexer and pinned in PdfGrammarTests.
     [Theory]
     [InlineData("4.", 4.0)]
     [InlineData("3. Tj", 3.0)]
@@ -178,9 +167,7 @@ public class ContentTokenizerTests
     [InlineData("4.-5")]
     [InlineData("-.")]
     [InlineData(".")]
-    // ISO 32000-1 7.3.3 has no exponent notation, so these are malformed operands rather
-    // than large numbers; they used to parse as 1e-5 and 6.02E23 here while the file-object
-    // lexer rejected them.
+    // ISO 32000-1 7.3.3 has no exponent notation
     [InlineData("1e-5")]
     [InlineData("6.02E23")]
     public void Tokenize_MalformedNumber_EmitsNoNumberToken(string source)
@@ -206,18 +193,10 @@ public class ContentTokenizerTests
         var tokens = ContentTokenizer.Tokenize(data);
         var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
 
-        // 6000 number tokens cost 862,712 bytes when each allocated a transient string to
-        // feed double.TryParse, and 655,520 parsing the source bytes directly; the remainder
-        // is the Token list backing array, which dominates either way. The budget sits midway
-        // between the two rather than just above the good value, so the verdict turns on the
-        // 207,192-byte regression and not on where the list's doubling chain happens to land.
         Assert.Equal(6000, tokens.Count);
         Assert.True(allocated < 780_000, $"Tokenizing 6000 numeric operands allocated {allocated} bytes.");
     }
 
-    // RedactText tokenized the same bytes three times (FindText, ExtractPositionedText,
-    // RemoveTextGlyphs) before its operation-scoped cache; on this 136KB stream that cost
-    // 29.0MB against 17.2MB sharing one tokenization per distinct content array.
     [Fact]
     public void RedactText_SharesOneTokenizationPerContentArray()
     {
@@ -253,8 +232,6 @@ public class ContentTokenizerTests
         Assert.Same(ContentTokenizer.Tokenize(data, cache), ContentTokenizer.Tokenize(data, cache));
     }
 
-    // Reference identity, not content, is the key: an edit hands over a new array, and that
-    // must re-tokenize rather than serve the pre-edit tokens.
     [Fact]
     public void Cache_EqualButDistinctArray_Retokenizes()
     {
@@ -308,7 +285,6 @@ public class ContentTokenizerTests
         Assert.Equal("Hello\nWorld\nHi", extracted);
     }
 
-    // An inline image with no /L, wrapped in q/Q. The payload is spliced in verbatim.
     private static byte[] InlineImageStream(string dictionary, IEnumerable<byte> payload, string trailer = "\nEI\nQ\n")
     {
         var stream = new List<byte>();
@@ -324,9 +300,6 @@ public class ContentTokenizerTests
         .Select(t => t.Text!)
         .ToArray();
 
-    // A binary-compressed payload's encoded length is unknowable without decoding, so the
-    // tokenizer scans for EI. Compressed bytes can spell a whitespace-bounded EI of their
-    // own; the bytes that follow such a false EI are the image tail, not operators.
     [Fact]
     public void Tokenize_FilteredInlineImageWithoutLength_DoesNotTerminateOnPayloadBytesSpellingEI()
     {
@@ -337,8 +310,6 @@ public class ContentTokenizerTests
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl", payload)));
     }
 
-    // ASCII85 marks its own end with "~>", which the alphabet ('!'..'u', plus z and y) cannot
-    // contain, so the payload end is exact and an embedded EI is never even a candidate.
     [Fact]
     public void Tokenize_Ascii85InlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
@@ -347,15 +318,12 @@ public class ContentTokenizerTests
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /A85", payload)));
     }
 
-    // ASCIIHex ends at '>'.
     [Fact]
     public void Tokenize_AsciiHexInlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /AHx", Ascii("48656C6C6F>"))));
     }
 
-    // Run-length data is length-prefixed runs closed by a 128 byte, so its end is exact even
-    // though a literal run here carries the bytes " EI ".
     [Fact]
     public void Tokenize_RunLengthInlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
@@ -366,8 +334,6 @@ public class ContentTokenizerTests
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /RL", payload)));
     }
 
-    // /Filter lists filters in the order a reader applies them to decode, so the bytes on the
-    // page are in the format of the first - here ASCII85, whose end-of-data marker bounds them.
     [Fact]
     public void Tokenize_InlineImageFilterArray_MeasuresPayloadWithFirstFilter()
     {
@@ -376,13 +342,6 @@ public class ContentTokenizerTests
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F [/A85 /Fl]", payload)));
     }
 
-    // The residual, pinned rather than blessed: when the image is truncated and no candidate
-    // EI validates, the scan has nothing better to go on and takes the first candidate, so the
-    // payload tail after it still leaks out as junk operators. This is the pre-existing
-    // behavior, kept deliberately because the alternative - swallowing every remaining byte of
-    // a stream whose image happens to be malformed - loses real content. Only the /L, geometry
-    // and self-terminating-filter paths above are exact; a binary-compressed payload with no
-    // /L cannot be measured at the tokenizer layer without decoding it.
     [Fact]
     public void Tokenize_FilteredInlineImageWithNoPlausibleTerminator_TakesFirstCandidate()
     {
@@ -396,7 +355,6 @@ public class ContentTokenizerTests
         Assert.Single(tokens, t => t.Kind == ContentTokenizer.TokenKind.InlineImage);
     }
 
-    // An explicit /L still wins over every scan, including when the payload spells EI.
     [Fact]
     public void Tokenize_FilteredInlineImageWithLength_UsesDeclaredLength()
     {

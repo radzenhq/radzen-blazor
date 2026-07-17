@@ -4,12 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Layer 2a guard: extracting the cell content measure/position primitive into
-// BoxContentLayout must be byte-neutral. This document leans on every path the
-// primitive owns: line breaking with cell/column/row alignment fallbacks,
-// spacing gaps, vertical alignment offsets, row/column spans, list expansion,
-// a nested table and a container. The generator emits no /ID or dates, so two
-// independent builds must produce identical bytes.
 public class BoxContentLayoutByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)

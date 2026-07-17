@@ -9,8 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The stream-decode pipeline (extracted into StreamDecoder) exercised in isolation:
-// filter selection, chain-length limit, and the FlateDecode round trip.
 public class StreamDecoderTests
 {
     private static StreamDecoder NewDecoder()
@@ -27,8 +25,6 @@ public class StreamDecoderTests
         return output.ToArray();
     }
 
-    // The raw input may be a window onto the shared file buffer, so an unfiltered
-    // decode must copy rather than hand the caller a view of it.
     [Fact]
     public void NoFilter_ReturnsInputContentInAnOwnedBuffer()
     {

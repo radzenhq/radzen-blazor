@@ -5,9 +5,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Serializes the changes made to a loaded Document as a PDF incremental update. Anything
-// that would need the full-save Emit pipeline to re-encode fails loud rather than silently
-// falling back to a rewrite.
 internal sealed class IncrementalDocumentSaver
 {
     private readonly Document doc;
@@ -110,17 +107,13 @@ internal sealed class IncrementalDocumentSaver
                 throw Unsupported("A page whose dictionary is not an indirect object");
             }
 
-            // A reference matches on number AND generation (ISO 32000-1 7.3.10): a page whose
-            // number was reclaimed from the free list lives at a non-zero generation, and
-            // naming it "N 0 R" in a rewritten /Kids resolves to nothing.
+            // ISO 32000-1 7.3.10: a reference matches on number AND generation.
             result[pair.Key] = new ReferenceObject(number, reader.GenerationOf(number));
         }
 
         return result;
     }
 
-    // Overrides are applied in object-number order so the update is deterministic
-    // regardless of the tracking set's iteration order.
     private bool WriteFieldEdits(IncrementalUpdateWriter writer, IReadOnlyDictionary<DocumentObject, int> index)
     {
         if (doc.AcroForm is not { } form || form.ChangedObjects.Count == 0)
@@ -437,8 +430,6 @@ internal sealed class IncrementalDocumentSaver
         return changed;
     }
 
-    // Unmodeled /Info keys and the values of untouched modeled keys are preserved from
-    // the original dictionary.
     private bool WriteMetadata(IncrementalUpdateWriter writer, DocumentReader reader)
     {
         if (!doc.Info.IsModified)
@@ -458,8 +449,6 @@ internal sealed class IncrementalDocumentSaver
             original = reader.AsDictionary(infoValue);
         }
 
-        // An /Info whose every modeled field is null and that carried no unmodeled key emits as
-        // an empty override, which is what removes the entries.
         var info = DocumentSaver.BuildInfo(doc.Info, original) ?? new DictionaryObject();
 
         if (number is int existing)
@@ -474,11 +463,6 @@ internal sealed class IncrementalDocumentSaver
         return true;
     }
 
-    // Deep-copies a dictionary, replacing any inline stream (an appearance stream a
-    // form mutator built and hung directly under the field) with a freshly appended
-    // indirect object, since a PDF stream is only legal as an indirect object.
-    // References and scalars pass through unchanged - a loaded dictionary's own
-    // sub-objects stay referenced in the preserved original revision.
     private static DocumentObject HoistStreams(DocumentObject value, IncrementalUpdateWriter writer)
     {
         switch (value)

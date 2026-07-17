@@ -73,8 +73,6 @@ public static class AesCbc
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(iv);
         ArgumentNullException.ThrowIfNull(cipher);
-        // A trailing partial block cannot be decrypted; silently dropping it (whole = n/16*16)
-        // would return truncated plaintext, so reject a non-block-aligned ciphertext instead.
         if (cipher.Length % 16 != 0)
         {
             throw new DocumentParseException("AES ciphertext length must be a whole number of 16-byte blocks.");
@@ -131,9 +129,6 @@ public static class AesCbc
         return result;
     }
 
-    // PKCS#7: the final byte is the pad length (1..16) and every padding byte must equal it.
-    // Returning the padding as plaintext on a bad key/corrupt stream hides the failure, so
-    // fail loud instead of emitting padding-polluted content.
     private static byte[] StripPadding(byte[] plain)
     {
         if (plain.Length == 0)
@@ -219,7 +214,6 @@ public static class AesCbc
         }
     }
 
-    // State is column-major: byte index = row + 4*column.
     private static void ShiftRows(byte[] s)
     {
         Rotate(s, 1, left: true);
@@ -308,8 +302,7 @@ public static class AesCbc
 
     private static byte[] ExpandKey(byte[] key, out int rounds)
     {
-        // AES is defined only for 128/192/256-bit keys; reject anything else so a forged
-        // key length cannot divide-by-zero here or blow up the key schedule (FIPS-197 5.2).
+        // FIPS-197 5.2: AES keys are 128/192/256-bit.
         if (key.Length is not (16 or 24 or 32))
         {
             throw new DocumentParseException("AES key length must be 16, 24, or 32 bytes.");

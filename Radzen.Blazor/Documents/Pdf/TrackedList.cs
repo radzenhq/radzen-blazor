@@ -4,9 +4,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-// Item flags answer "did an item change", not "did the list change". A removed or reordered
-// item moves the bytes without touching any surviving item, so the list carries the structural
-// truth itself and optionally reports it to an owner.
 internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOnlyList<T>
 {
     private readonly List<T> items = [];
@@ -70,8 +67,6 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
         return removed;
     }
 
-    // Structural, like Remove: reports the removal count and flags the list once when any item
-    // left, so a no-op predicate leaves a loaded list clean.
     public int RemoveAll(Predicate<T> match)
     {
         var removed = items.RemoveAll(match);

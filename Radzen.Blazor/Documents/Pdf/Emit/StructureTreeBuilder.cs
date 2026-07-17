@@ -6,8 +6,6 @@ using static Radzen.Documents.Pdf.Content.ContentEmitter;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
 
-// Builds the logical structure tree that mirrors the authoring DOM, assigns each element
-// its DFS pre-order rank, and emits the per-page tagged content (BDC/EMC) in that order.
 internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolution resolution)
 {
     private readonly Dictionary<object, StructureElement> blockElements = [];
@@ -17,9 +15,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
     public StructureElement DocumentElement => documentElement;
 
-    // True when the authoring DOM has a List the tree left untagged (lists are only mapped
-    // for PDF/UA). PDF/A Level-A rejects such untagged content, so the conformance writer
-    // fails loud instead of advertising a conformance it does not meet.
     public bool HasUntaggedList => hasUntaggedList;
 
     public void Build()
@@ -28,9 +23,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         IndexStructure();
     }
 
-    // The logical structure tree mirrors the authoring DOM in authoring order:
-    // Document -> Sect per Section -> P (or H1..H6 by StyleName), Table -> TR ->
-    // TH/TD, Figure per image. Header and footer content stays unmapped (untagged).
     private void BuildStructureTree()
     {
         documentElement = new StructureElement { Type = "Document" };
@@ -45,8 +37,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         }
     }
 
-    // Assign each structure element its DFS pre-order rank once so per-page tagged emission can
-    // order that page's content-bearing elements without re-walking the whole tree per page.
     private void IndexStructure()
     {
         var index = 0;
@@ -69,17 +59,10 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
     private Mapper mapper => cachedMapper ??= new Mapper(this, builder);
 
-    // True when the output is fully tagged (PDF/UA or PDF/A Level-A). Real content that
-    // would otherwise be emitted as /Artifact (a Container's children) must be tagged then,
-    // so it is not hidden from assistive technology while the file claims conformance.
     private bool TaggingActive
         => builder.PdfUA
             || builder.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
 
-    // Maps each block into the tagged structure tree. The types that carry no logical
-    // Blocks with no structure of their own are mapped explicitly (not by Default) so an
-    // unmapped block type fails loud rather than vanishing from accessible output. A Stack
-    // Container has no element itself but its children are descended into and mapped in place.
     private sealed class Mapper(StructureTreeBuilder tree, DocumentBuilder builder) : BlockVisitor<StructureElement, Nothing>
     {
         protected override Nothing Default(Block block, StructureElement parent)
@@ -145,9 +128,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
         public override Nothing Visit(Container block, StructureElement parent)
         {
-            // Overlay (and rotated) containers are lowered onto a different emit path that
-            // does not resolve per-child structure elements, so only Stack containers - whose
-            // children flow through the tagged box-content path - are descended into here.
             if (tree.TaggingActive && block.Layout == ContainerLayout.Stack)
             {
                 foreach (var child in block.Blocks)
@@ -166,10 +146,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         public override Nothing Visit(TableOfContents block, StructureElement parent) => default;
     }
 
-    // PDF/UA list structure (ISO 32000-1 14.8.4.3.3): L -> LI -> {Lbl, LBody}. Each item's
-    // Lbl and LBody are stashed on the ListItem so the paginator's synthesized marker
-    // paragraph can tag its marker into Lbl and its content into LBody. A nested list is
-    // built inside its parent item's LBody. Only built for tagged (PDF/UA) output.
+    // ISO 32000-1 14.8.4.3.3: list structure L -> LI -> {Lbl, LBody}.
     private void MapList(List list, StructureElement parent)
     {
         var l = new StructureElement { Type = "L" };
@@ -190,10 +167,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         }
     }
 
-    // A recognized heading style keeps its H1..H6 mapping. Otherwise a style name declared
-    // as a custom role becomes that role verbatim (emitted with a /RoleMap to its standard
-    // type); everything else stays P. With no declared roles this is exactly HeadingType, so
-    // default output is unchanged.
     private string StructureTypeFor(string? styleName)
     {
         var type = HeadingType(styleName);
@@ -241,8 +214,6 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
     public StructureElement? ElementOf(object block)
     {
-        // A synthesized list-item paragraph tags its content into its LBody element (carried in
-        // the per-save StyleResolution, keyed by that synthesized paragraph).
         if (block is Paragraph paragraph && resolution.BodyElementOf(paragraph) is { } body)
         {
             return body;
@@ -251,12 +222,9 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
         return blockElements.TryGetValue(block, out var element) ? element : null;
     }
 
-    // The Lbl element a list-item paragraph's marker fragment tags into, or null.
     public StructureElement? MarkerElementOf(object block)
         => block is Paragraph paragraph ? resolution.LabelElementOf(paragraph) : null;
 
-    // Emits only the elements that carry content on this page, ordered by their DFS pre-order rank so
-    // the byte output matches a full-tree pre-order walk without the per-page O(elements) recursion.
     public void WriteTaggedContent(
         ContentWriter writer,
         int pageIndex,

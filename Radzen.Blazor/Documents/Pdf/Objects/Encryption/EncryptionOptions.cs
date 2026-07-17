@@ -83,8 +83,7 @@ public sealed class EncryptionOptions
     /// <summary>Gets or sets a value indicating whether assembling the document is permitted (/P bit 11).</summary>
     public bool AllowAssembly { get; set; } = true;
 
-    // Bits 1-2 are 0, bits 7-8 and 13-32 are 1 (ISO 32000-1 Table 22). Bit 10
-    // (accessibility) is deprecated in PDF 2.0 and always set.
+    // ISO 32000-1 Table 22: bits 1-2 are 0, bits 7-8 and 13-32 are 1, bit 10 always set.
     private const int ReservedPermissions = unchecked((int)0xFFFFF0C0) | 0x200;
 
     // ISO 32000-1 Table 22: maps the permission flags onto the /P integer.

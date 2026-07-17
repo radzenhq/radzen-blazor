@@ -405,8 +405,6 @@ internal static class TextReplacer
         }
     }
 
-    // Every show operator becomes a Show, in the order and numbering ContentTextWalker defines,
-    // so an index the search (which walks the same seam) produced selects the same operator here.
     private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)
     {
         var result = new List<Show>();

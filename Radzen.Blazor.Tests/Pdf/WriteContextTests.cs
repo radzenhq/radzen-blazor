@@ -10,11 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Roadmap #11: the write-side encryption ambient (EncryptionWriter.Current /
-// CurrentObjectNumber / BeginObject) is replaced by an explicit WriteContext
-// threaded through DocumentObject.Write. These tests pin that the ambient is
-// gone and that encrypted serialization carries no shared mutable state, so
-// documents written concurrently do not interfere.
 public class WriteContextTests
 {
     private const string StreamMarker = "BT /F1 12 Tf 72 720 Td (Context threaded!) Tj ET";

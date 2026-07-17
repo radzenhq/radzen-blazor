@@ -8,33 +8,10 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract for CffSubsetter.Subset(CffFont, IReadOnlyCollection<int> glyphIds).
-// COMPACT CID model (PDF CIDFontType0 with content codes == compact ids): the
-// subsetter rebuilds a CID-keyed CFF holding exactly the closure of the requested
-// glyphs (requested original gids plus glyph 0) RENUMBERED into a contiguous
-// space 0..N-1 with an IDENTITY charset (CID == new gid). Glyph 0 stays .notdef.
-// Charstrings are copied verbatim, so a kept glyph is located in the output by
-// matching its original charstring bytes; its advance width must survive.
-//
-// The oracle is CffFont.Parse: the subset bytes are re-parsed and every
-// expectation is checked on the parsed result.
-//
-// Values derived from the exact fixture NotoSansSC-Subset.otf via fontTools 4.60.2
-// (font["CFF "].cff, getGlyphOrder, cidNNNNN name -> CID, Type 2 charstring .width):
-//   gid 0   -> CID 0     width 1000
-//   gid 1   -> CID 1     width 224
-//   gid 34  -> CID 34    width 608
-//   gid 66  -> CID 66    width 563
-//   gid 190 -> CID 307   width 608
-//   gid 300 -> CID 2341  width 1000
-//   gid 657 -> CID 65456 width 1000
-// Not-requested probes: gid 223 and gid 418. The original charset is NOT identity
-// above gid ~190, so identity-charset assertions genuinely pin the renumbering.
-// This is a CID-keyed CFF (ROS Adobe Identity 0), 658 glyphs, CFF table 59984 bytes.
 public class CffSubsetterTests
 {
     private static readonly int[] Requested = [1, 34, 66, 190, 300, 657];
-    private const int ClosureCount = 7; // Requested (6 distinct) + glyph 0.
+    private const int ClosureCount = 7;
 
     private static byte[] OriginalCffBytes()
     {
@@ -48,9 +25,6 @@ public class CffSubsetterTests
     private static CffFont SubsetAndReparse(params int[] glyphIds)
         => CffFont.Parse(CffSubsetter.Subset(OriginalFont(), glyphIds));
 
-    // Charstrings are copied verbatim: the output gids carrying the original
-    // glyph's charstring bytes. Duplicates are possible (Latin 'A' gid 34 and
-    // Cyrillic А gid 190 share identical charstrings in the fixture).
     private static List<int> OutGidsForOriginal(CffFont subset, CffFont original, int originalGid)
     {
         var expected = original.GetCharStringBytes(originalGid);
@@ -105,15 +79,12 @@ public class CffSubsetterTests
     {
         var subset = SubsetAndReparse(Requested);
 
-        // Original CIDs (307, 2341, 65456, ...) are renumbered away: CID == new gid.
         AssertIdentityCharset(subset);
     }
 
     [Fact]
     public void Subset_NotdefStaysAtGid0()
     {
-        // Glyph 0 is not in the requested set but must be pulled into the closure
-        // and keep its position: compact gid 0 carries the original .notdef.
         Assert.DoesNotContain(0, Requested);
 
         var original = OriginalFont();
@@ -209,7 +180,7 @@ public class CffSubsetterTests
 
         Assert.NotNull(bytes);
         Assert.True(bytes.Length > 4);
-        Assert.Equal(1, bytes[0]); // CFF major version.
+        Assert.Equal(1, bytes[0]);
 
         var reparsed = CffFont.Parse(bytes);
         Assert.Equal(ClosureCount, reparsed.GlyphCount);
@@ -221,7 +192,6 @@ public class CffSubsetterTests
         var original = OriginalCffBytes();
         var subset = CffSubsetter.Subset(CffFont.Parse(original), Requested);
 
-        // Dropping 651 of 658 charstrings must shrink the blob.
         Assert.True(subset.Length < original.Length,
             $"subset {subset.Length} bytes should be smaller than original {original.Length}");
     }
@@ -229,10 +199,9 @@ public class CffSubsetterTests
     [Fact]
     public void Subset_RepeatedGlyphIds_CollapseToClosure()
     {
-        // Duplicates in the request must not create duplicate output glyphs.
         var subset = CffFont.Parse(CffSubsetter.Subset(OriginalFont(), [34, 34, 66, 66, 66]));
 
-        Assert.Equal(3, subset.GlyphCount); // {0, 34, 66}
+        Assert.Equal(3, subset.GlyphCount);
         AssertIdentityCharset(subset);
     }
 }

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Maps a PDF filter name (full name or its inline-image abbreviation) to the
-/// <see cref="IStreamFilter"/> that decodes it. An unknown name is fail-loud.
-/// </summary>
 internal static class StreamFilterRegistry
 {
     private static readonly Dictionary<string, IStreamFilter> Filters = Build();

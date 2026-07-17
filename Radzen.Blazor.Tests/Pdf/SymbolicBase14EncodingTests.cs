@@ -7,9 +7,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 9.6.6.4: the symbolic base-14 fonts Symbol and ZapfDingbats have a
-// built-in encoding and must NOT declare /Encoding /WinAnsiEncoding, which would
-// remap their glyph codes. Non-symbolic base-14 fonts keep WinAnsiEncoding.
+// ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats have a built-in encoding, no /Encoding /WinAnsiEncoding.
 public class SymbolicBase14EncodingTests
 {
     private static DictionaryObject FontWithBaseFont(Document document, string baseFont)

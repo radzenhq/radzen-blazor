@@ -8,8 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 5: Document.PageLabels emits the catalog /PageLabels number tree, one label
-// dictionary per range: /S style (D/R/r/A/a), optional /P prefix and /St start number.
 public class PageLabelsTests
 {
     private static Document Document(int pages)

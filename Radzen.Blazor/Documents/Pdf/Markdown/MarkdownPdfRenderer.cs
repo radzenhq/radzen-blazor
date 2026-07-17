@@ -4,11 +4,6 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Markdown;
 
-/// <summary>
-/// Walks a parsed Markdown document and appends the equivalent PDF blocks to a target
-/// <see cref="BlockCollection"/>. Raw HTML nodes are skipped (the base visitor no-ops on them),
-/// which is out of scope for this renderer.
-/// </summary>
 internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOptions options) : Radzen.Documents.Markdown.NodeVisitorBase
 {
     private InlineCollection? currentInlines;
@@ -17,7 +12,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
     private int italicDepth;
     private double quoteIndent;
 
-    /// <inheritdoc />
     public override void VisitHeading(Radzen.Documents.Markdown.Heading heading)
     {
         var paragraph = target.AddParagraph();
@@ -28,11 +22,8 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         RenderInlines(heading.Children, paragraph.Inlines);
     }
 
-    /// <inheritdoc />
     public override void VisitParagraph(Radzen.Documents.Markdown.Paragraph paragraph)
     {
-        // A paragraph whose only content is an image (an image on its own line) becomes an
-        // Image block; images mixed with text become inline images via VisitImage instead.
         if (paragraph.Children.Count == 1 && paragraph.Children[0] is Radzen.Documents.Markdown.Image image)
         {
             AddImageBlock(image);
@@ -45,7 +36,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         RenderInlines(paragraph.Children, pdfParagraph.Inlines);
     }
 
-    /// <inheritdoc />
     public override void VisitBlockQuote(Radzen.Documents.Markdown.BlockQuote blockQuote)
     {
         quoteIndent += options.BlockQuoteIndent;
@@ -53,11 +43,8 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         quoteIndent -= options.BlockQuoteIndent;
     }
 
-    /// <inheritdoc />
     public override void VisitThematicBreak(Radzen.Documents.Markdown.ThematicBreak thematicBreak)
     {
-        // Paragraph has no border/background API, so the rule is drawn as a 1x1 table
-        // with a top border rather than a bordered paragraph.
         var table = target.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
@@ -66,13 +53,11 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         row.Cells[0].Text = string.Empty;
     }
 
-    /// <inheritdoc />
     public override void VisitFencedCodeBlock(Radzen.Documents.Markdown.FencedCodeBlock fencedCodeBlock)
     {
         AddCodeParagraph(fencedCodeBlock.Value);
     }
 
-    /// <inheritdoc />
     public override void VisitIndentedCodeBlock(Radzen.Documents.Markdown.IndentedCodeBlock codeBlock)
     {
         AddCodeParagraph(codeBlock.Value);
@@ -80,15 +65,12 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
 
     private void AddCodeParagraph(string text)
     {
-        // No paragraph background/border is applied here (see VisitThematicBreak); a code
-        // block renders as a plain monospace paragraph instead of a shaded box.
         var paragraph = target.AddParagraph();
         paragraph.Font.Name = options.ResolvedMonospaceFontName;
         paragraph.LeftIndent = Unit.FromPoint(quoteIndent);
         paragraph.Text = text.TrimEnd('\n');
     }
 
-    /// <inheritdoc />
     public override void VisitUnorderedList(Radzen.Documents.Markdown.UnorderedList unorderedList)
     {
         var list = target.AddList(ListStyle.Bullet);
@@ -96,7 +78,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         AddListItems(list, unorderedList, string.Empty);
     }
 
-    /// <inheritdoc />
     public override void VisitOrderedList(Radzen.Documents.Markdown.OrderedList orderedList)
     {
         var list = target.AddList(ListStyle.Number);
@@ -104,9 +85,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         AddListItems(list, orderedList, string.Empty);
     }
 
-    // The PDF List type is single-level, so a nested list is flattened into the parent
-    // list: its items become additional items of the same list, indented one extra level
-    // per nesting depth instead of being dropped.
     private void AddListItems(List list, Radzen.Documents.Markdown.List source, string indent)
     {
         foreach (var child in source.Children)
@@ -177,7 +155,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         }
     }
 
-    /// <inheritdoc />
     public override void VisitTable(Radzen.Documents.Markdown.Table table)
     {
         if (table.Rows.Count == 0)
@@ -227,13 +204,11 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         currentInlines = previous;
     }
 
-    /// <inheritdoc />
     public override void VisitText(Radzen.Documents.Markdown.Text text)
     {
         AddRun(text.Value);
     }
 
-    /// <inheritdoc />
     public override void VisitCode(Radzen.Documents.Markdown.Code code)
     {
         var run = AddRun(code.Value);
@@ -245,19 +220,16 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         run.Font.Name = options.ResolvedMonospaceFontName;
     }
 
-    /// <inheritdoc />
     public override void VisitSoftLineBreak(Radzen.Documents.Markdown.SoftLineBreak softLineBreak)
     {
         AddRun(" ");
     }
 
-    /// <inheritdoc />
     public override void VisitLineBreak(Radzen.Documents.Markdown.LineBreak lineBreak)
     {
         AddRun("\n");
     }
 
-    /// <inheritdoc />
     public override void VisitStrong(Radzen.Documents.Markdown.Strong strong)
     {
         boldDepth++;
@@ -265,7 +237,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         boldDepth--;
     }
 
-    /// <inheritdoc />
     public override void VisitEmphasis(Radzen.Documents.Markdown.Emphasis emphasis)
     {
         italicDepth++;
@@ -273,7 +244,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         italicDepth--;
     }
 
-    /// <inheritdoc />
     public override void VisitLink(Radzen.Documents.Markdown.Link link)
     {
         var previous = currentLink;
@@ -282,7 +252,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         currentLink = previous;
     }
 
-    /// <inheritdoc />
     public override void VisitImage(Radzen.Documents.Markdown.Image image)
     {
         if (currentInlines is null || string.IsNullOrEmpty(image.Destination))
@@ -293,7 +262,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         var data = options.ImageResolver?.Invoke(image.Destination);
         if (data is null)
         {
-            // Render the alt text so an unresolved image does not vanish without a trace.
             VisitChildren(image.Children);
             return;
         }
@@ -311,7 +279,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         var data = options.ImageResolver?.Invoke(image.Destination);
         if (data is null)
         {
-            // Fall back to the alt text as a paragraph rather than dropping the block silently.
             if (AltText(image).Length > 0)
             {
                 var paragraph = target.AddParagraph();
@@ -331,7 +298,6 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
         }
     }
 
-    // Flattens an image's inline alt-text children to plain text for the Figure's alternate description.
     private static string AltText(Radzen.Documents.Markdown.Image image)
     {
         var builder = new StringBuilder();

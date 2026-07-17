@@ -6,9 +6,7 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
-// CFF font parser (Adobe Technical Note 5176). Supports name-keyed and CID-keyed
-// (ROS) fonts: charset, per-FD Private DICTs, FDArray/FDSelect, and enough Type 2
-// charstring interpretation to recover the advance width operand and detect seac.
+// CFF font parser: Adobe Technical Note 5176.
 internal sealed class CffFont
 {
     private readonly int[] charset;
@@ -57,7 +55,6 @@ internal sealed class CffFont
 
     public int Supplement { get; }
 
-    // Top DICT FontMatrix (12 7), or null when the font uses the default 0.001 matrix.
     public double[]? FontMatrix { get; }
 
     public bool IsCidKeyed => isCidKeyed;
@@ -92,10 +89,6 @@ internal sealed class CffFont
 
     internal byte[] GetCharStringBytes(int glyphIndex) => charStrings.GetBytes(glyphIndex);
 
-    // True when the glyph is composed with an endchar seac (4 or 5 operands): its base and
-    // accent are addressed through the source charset/Standard Encoding. A compact subset
-    // renumbers glyphs and rewrites the charset to identity, which silently breaks that
-    // reference, so the subsetter rejects such glyphs rather than emit a wrong composition.
     internal bool UsesSeacEndchar(int glyphIndex)
     {
         var fd = fdArray[GetFd(glyphIndex)];
@@ -129,8 +122,6 @@ internal sealed class CffFont
         return result;
     }
 
-    // limits bounds the charstring walk. The font bytes reach here from the public
-    // FontCollection.Register(string, Stream), so they are attacker-controlled.
     public static CffFont Parse(byte[] cffData, ReaderLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(cffData);
@@ -184,9 +175,6 @@ internal sealed class CffFont
         }
         else
         {
-            // A name-keyed font carries its FontMatrix only in the Top DICT. Do not also
-            // surface it as the FD's matrix: the subsetter writes both, and a viewer that
-            // concatenates Top-DICT and FD-DICT matrices would then scale glyphs twice.
             fdArray = [ReadPrivate(cffData, topDict, includeFontMatrix: false)];
             fdSelect = [];
         }
@@ -199,7 +187,6 @@ internal sealed class CffFont
         var charset = new int[glyphCount];
         var offset = topDict.TryGetValue(15, out var op) && op.Length > 0 ? (int)op[0] : 0;
 
-        // 0/1/2 are predefined charsets; the CID fonts we target always carry a real offset.
         if (offset <= 2)
         {
             for (var gid = 0; gid < glyphCount; gid++)
@@ -332,8 +319,6 @@ internal sealed class CffFont
         var size = (int)op[0];
         var offset = (int)op[1];
 
-        // size/offset come straight from the Top DICT; a hostile size would allocate an
-        // arbitrary buffer and the copy would read past the font. Validate against the data.
         if (size < 0 || offset < 0 || (long)offset + size > data.Length)
         {
             throw new InvalidDataException("CFF Private DICT extends past the end of the font.");
@@ -369,10 +354,6 @@ internal sealed class CffFont
 
     private static string Ascii(byte[] bytes) => Encoding.ASCII.GetString(bytes);
 
-    // Attacker-controlled offsets from the Top DICT, and attacker-controlled charstring
-    // bytes, reach these raw readers; surface a diagnosable InvalidDataException (as the
-    // rest of the parser does) instead of a bare IndexOutOfRangeException from deep inside
-    // charset/FDSelect parsing or the charstring walk.
     private static byte ReadByteAt(byte[] data, int offset)
     {
         if (offset < 0 || offset >= data.Length)
@@ -408,28 +389,19 @@ internal sealed class CffFont
         public double[]? FontMatrix => fontMatrix;
     }
 
-    // Walks a Type 2 charstring: operand decoding, stem counting, hintmask skipping and
-    // subr dispatch. Subclasses supply only the answer they are after, via Visit.
     private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
     {
         // Type 2 charstring spec section 3.1: the argument stack holds at most 48 entries.
-        // This bounds stack depth only. It does not bound the walk: a subr that pops what it
-        // pushes leaves the stack at 0 or 1 forever, so a font built from callsubr alone never
-        // reaches 48 no matter how many operations it demands. MaxCharstringOperations bounds
-        // that count; the two caps guard different quantities and neither implies the other.
         private const int MaxStackEntries = 48;
 
         protected readonly List<double> stack = [];
         private int hintCount;
         private bool done;
 
-        // Walk-wide, deliberately not reset per Run: the whole point is to bound the product of
-        // the nested calls, which a per-invocation counter would never see.
         private int operations;
 
         protected FdInfo Fd => fd;
 
-        // Called with the operator's operands still on the stack. Returning true ends the walk.
         protected abstract bool Visit(int op);
 
         public void Run(byte[] cs) => Run(cs, 0);
@@ -511,8 +483,6 @@ internal sealed class CffFont
 
         protected void Stop() => done = true;
 
-        // Overflow ends the walk rather than throwing: the charstring is malformed, and every
-        // other malformed case here degrades to the default width instead of failing a render.
         private void Push(double value)
         {
             if (stack.Count >= MaxStackEntries)
@@ -524,23 +494,13 @@ internal sealed class CffFont
             stack.Add(value);
         }
 
-        // Type 2 arithmetic escapes leave a result on the stack, so a width operand sitting
-        // under one survives to the moveto/endchar that resolves it. Returning false means
-        // "not applied" and the caller clears, which is correct for the drawing escapes
-        // (12 34 hflex, 12 35 flex, 12 36 hflex1, 12 37 flex1 - they consume their operands)
-        // and a conservative fallback elsewhere: an unhandled escape loses the width to
-        // defaultWidthX, which is what this walk did for every escape before.
-        // Not implemented, as none appears in the width arithmetic this walk exists to read:
-        // put(20) get(21) need transient-array state, random(23) has no deterministic answer,
-        // and index(29) roll(30) and(3) or(4) not(5) eq(15) ifelse(22) are pure stack but
-        // would be untested guesswork here. Add one only with a charstring that needs it.
         private bool ApplyEscape(int escape)
         {
             switch (escape)
             {
-                case 9: // abs
-                case 14: // neg
-                case 26: // sqrt
+                case 9:
+                case 14:
+                case 26:
                     if (stack.Count < 1 || (escape == 26 && stack[^1] < 0))
                     {
                         return false;
@@ -549,10 +509,10 @@ internal sealed class CffFont
                     var v = stack[^1];
                     stack[^1] = escape switch { 9 => Math.Abs(v), 14 => -v, _ => Math.Sqrt(v) };
                     return true;
-                case 10: // add
-                case 11: // sub
-                case 12: // div
-                case 24: // mul
+                case 10:
+                case 11:
+                case 12:
+                case 24:
                     if (stack.Count < 2 || (escape == 12 && stack[^1] == 0))
                     {
                         return false;
@@ -563,7 +523,7 @@ internal sealed class CffFont
                     stack.RemoveAt(stack.Count - 1);
                     stack[^1] = escape switch { 10 => x + y, 11 => x - y, 24 => x * y, _ => x / y };
                     return true;
-                case 18: // drop
+                case 18:
                     if (stack.Count < 1)
                     {
                         return false;
@@ -571,7 +531,7 @@ internal sealed class CffFont
 
                     stack.RemoveAt(stack.Count - 1);
                     return true;
-                case 27: // dup
+                case 27:
                     if (stack.Count < 1)
                     {
                         return false;
@@ -579,7 +539,7 @@ internal sealed class CffFont
 
                     Push(stack[^1]);
                     return true;
-                case 28: // exch
+                case 28:
                     if (stack.Count < 2)
                     {
                         return false;
@@ -644,9 +604,6 @@ internal sealed class CffFont
         }
     }
 
-    // Recovers the optional leading width operand: it sits before the first
-    // stem/moveto/endchar operator when the operand count exceeds what that operator
-    // consumes, so the first such operator settles the question either way.
     private sealed class WidthContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
         : CharstringContext(fd, globalSubrs, globalBias, maxOperations)
     {
@@ -668,8 +625,6 @@ internal sealed class CffFont
         }
     }
 
-    // Decides whether the charstring terminates in an endchar seac (an endchar with 4 or 5
-    // operands, the 5th form carrying a leading width).
     private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
         : CharstringContext(fd, globalSubrs, globalBias, maxOperations)
     {

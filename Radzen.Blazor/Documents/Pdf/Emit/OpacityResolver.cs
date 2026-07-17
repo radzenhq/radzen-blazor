@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Maps every block below a semi-transparent container to the product of its ancestor
-// container opacities.
 internal sealed class OpacityResolver
 {
     private readonly Dictionary<Block, double> byBlock = [];
@@ -20,7 +18,6 @@ internal sealed class OpacityResolver
         }
     }
 
-    // byBlock holds only ANCESTOR opacity, so the container's own must be multiplied in here.
     public double ContainerOpacity(Container container)
         => (byBlock.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
 

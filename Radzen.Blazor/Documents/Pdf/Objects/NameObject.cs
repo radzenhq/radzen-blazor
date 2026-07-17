@@ -27,8 +27,6 @@ public sealed class NameObject(string value) : DocumentObject
         WriteEscaped(stream, Value);
     }
 
-    // Streams the escaped form without allocating when no byte needs escaping,
-    // which is the case for almost every name written by the generator.
     internal static void WriteEscaped(Stream stream, string name)
     {
         if (NeedsEscaping(name))
@@ -41,8 +39,6 @@ public sealed class NameObject(string value) : DocumentObject
         PdfBytes.WriteAscii(stream, name);
     }
 
-    // Whether any character forces the #xx-escaped form. Returning early on the first such
-    // character is safe because Escape re-scans and re-applies ThrowIfUnencodable to the rest.
     internal static bool NeedsEscaping(string name)
     {
         foreach (var ch in name)
@@ -82,8 +78,6 @@ public sealed class NameObject(string value) : DocumentObject
         return builder.ToString();
     }
 
-    // Names are byte sequences; a code point above Latin-1 cannot be represented without
-    // silently aliasing to a different name (e.g. U+0141 -> 'A'), so fail loud instead.
     private static void ThrowIfUnencodable(char ch, string name)
     {
         if (ch > 0xFF)

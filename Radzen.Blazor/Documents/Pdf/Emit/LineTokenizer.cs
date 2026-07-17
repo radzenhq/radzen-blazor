@@ -12,7 +12,6 @@ internal readonly struct LinePiece
     public required double Advance { get; init; }
 }
 
-// Pieces of a word are contiguous in the shared piece list: [PieceStart, PieceStart + PieceCount).
 internal struct LineWord
 {
     public int PieceStart { get; init; }
@@ -21,23 +20,12 @@ internal struct LineWord
     public double GapAfter { get; set; }
     public int TabsAfter { get; set; }
 
-    // A zero-width break opportunity follows this word (soft hyphen U+00AD or ZWSP
-    // U+200B). Such a boundary carries no inter-word gap and is excluded from
-    // justification, so an unbroken word is placed exactly as if it were never split.
     public bool OptionalBreakAfter { get; set; }
 
-    // The optional break after this word is a soft hyphen: a hyphen is rendered when
-    // the line breaks there, and nothing otherwise.
     public bool SoftHyphenAfter { get; set; }
 
-    // The advance of the '-' rendered when a soft-hyphen break is taken after this word,
-    // measured in the preceding text's font. Reserved by the wrap fit and by alignment
-    // so the hyphen never spills past the measure.
     public double HyphenWidth { get; set; }
 
-    // The boundary after this word carries no inter-word whitespace and is not a word
-    // space (an inline-image edge: text[img] or [img]text with no space). Excluded from
-    // justification like an optional break so no stretch gap is inserted there.
     public bool NoGapBoundary { get; set; }
 }
 
@@ -49,8 +37,6 @@ internal static class LineTokenizer
     private static Font ResolvedFont(StyleResolution? resolution, Run run)
         => resolution?.RunFont(run) ?? run.Font;
 
-    // Spaces carry no kerning, so a run of them measures as count * one space width; cache the
-    // per-font single-space advance to avoid allocating and measuring a fresh space string per gap.
     private static double SpaceWidth(FontCollection fonts, Font font, Dictionary<Font, double> cache)
     {
         if (!cache.TryGetValue(font, out var width))
@@ -69,12 +55,8 @@ internal static class LineTokenizer
 
     private static bool IsLineBreak(char c) => c is '\n' or '\r';
 
-    // Zero-width conditional break characters removed from the rendered text.
     private static bool IsConditionalBreak(char c) => c == SoftHyphen || c == ZeroWidthSpace;
 
-    // Splits the paragraph into forced-break segments ('\n', '\r' and "\r\n"), each a
-    // list of words separated by breakable whitespace (' ' and '\t'). NBSP is a word
-    // character; control characters never enter fragment text.
     public static LineTokenization Tokenize(Paragraph paragraph, FontCollection fonts, StyleResolution? resolution)
     {
         var segments = new List<List<LineWord>>();
@@ -92,8 +74,6 @@ internal static class LineTokenizer
             {
                 if (hasCurrent)
                 {
-                    // A word butting directly against the image (no space, no tab) forms a
-                    // no-gap boundary; a spaced boundary keeps its real gap.
                     if (current.GapAfter == 0 && current.TabsAfter == 0)
                     {
                         current.NoGapBoundary = true;
@@ -104,8 +84,6 @@ internal static class LineTokenizer
                 }
 
                 var advance = inlineImage.EffectiveSize().Width;
-                // Any whitespace after the image is held by a separate empty word, so the
-                // boundary immediately after an image never carries a word space.
                 words.Add(new LineWord
                 {
                     PieceStart = pieces.Count,
@@ -162,9 +140,6 @@ internal static class LineTokenizer
                         }
                         else
                         {
-                            // A leading space (paragraph start / after '\n'), a space after an inline
-                            // image, or a space after a tab has no word to attach to (or would attach
-                            // ahead of the tab); start an empty word so the gap is honored in order.
                             if (!hasCurrent || current.TabsAfter > 0)
                             {
                                 if (hasCurrent)
@@ -190,13 +165,6 @@ internal static class LineTokenizer
                         i++;
                     }
 
-                    // A non-whitespace run is split at zero-width conditional breaks: soft
-                    // hyphen (U+00AD) and ZWSP (U+200B). Each split finalizes the current
-                    // word with an optional-break boundary; the special char is dropped from
-                    // the rendered text. A conditional char with no left context in the word
-                    // (q == sub) is not a valid hyphenation point and stays a literal char.
-                    // A run with no interior conditional char produces a single word,
-                    // byte-identical to the pre-split tokenizer.
                     var sub = start;
                     while (sub <= i)
                     {
@@ -239,7 +207,6 @@ internal static class LineTokenizer
                             break;
                         }
 
-                        // The break attaches to the word just built from [sub, q).
                         current.OptionalBreakAfter = true;
                         current.SoftHyphenAfter = text[q] == SoftHyphen;
                         if (current.SoftHyphenAfter)
@@ -264,10 +231,7 @@ internal static class LineTokenizer
         return new LineTokenization(segments, pieces);
     }
 
-    // A run's measured advance: the plain measurement scaled to the script size, plus
-    // Measurement must match what the emitter draws: scale by /HorizontalScale (Tz, ISO
-    // 32000-1 9.4.4) or lines lay out at a width the glyphs never occupy. Tw is excluded - it
-    // only advances code 32, and word pieces never contain a space.
+    // Scale by /HorizontalScale (Tz, ISO 32000-1 9.4.4) to match what the emitter draws.
     private static double MeasureRun(FontCollection fonts, Run run, Font font, string text)
     {
         var advance = fonts.MeasureText(text, font) * run.ScriptScale;

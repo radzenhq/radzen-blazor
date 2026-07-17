@@ -11,20 +11,15 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Fail-loud hardening for the (colour type, bit depth) table, PLTE/tRNS well-formedness,
-// the IDAT decompression cap, and JPEG frame validity. Positive cases confirm tRNS on
-// grayscale/truecolor becomes a /Mask colour key and that only Adobe CMYK is inverted.
 public class ImageDecoderValidationTests
 {
     private static readonly byte[] Signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
-    // Each pair is a valid depth for the predictor but illegal for the colour type, so
-    // without the guard the decoder emits silent garbage instead of throwing.
     [Theory]
-    [InlineData(6, 4)]  // RGBA must be 8 or 16
-    [InlineData(4, 1)]  // gray+alpha must be 8 or 16
-    [InlineData(2, 4)]  // truecolor must be 8 or 16
-    [InlineData(3, 16)] // indexed must be 1/2/4/8
+    [InlineData(6, 4)]
+    [InlineData(4, 1)]
+    [InlineData(2, 4)]
+    [InlineData(3, 16)]
     public void IllegalBitDepthForColorType_Throws(int colorType, int bitDepth)
     {
         var channels = colorType switch { 0 => 1, 2 => 3, 3 => 1, 4 => 2, _ => 4 };
@@ -60,7 +55,6 @@ public class ImageDecoderValidationTests
     [Fact]
     public void TruecolorTrns_BecomesColorKeyMask()
     {
-        // 1x1 RGB, filter byte + R,G,B.
         byte[] scanline = [0x00, 0x11, 0x22, 0x33];
         byte[] trns = [0x00, 0x10, 0x00, 0x20, 0x00, 0x30];
         var png = FullPng(1, 1, 8, colorType: 2, palette: null, trns, scanline);
@@ -96,7 +90,7 @@ public class ImageDecoderValidationTests
     public void TruncatedTrns_Throws()
     {
         byte[] scanline = [0x00, 0x11, 0x22, 0x33];
-        byte[] trns = [0x00, 0x10, 0x00]; // 3 bytes; truecolor needs 6
+        byte[] trns = [0x00, 0x10, 0x00];
         var png = FullPng(1, 1, 8, colorType: 2, palette: null, trns, scanline);
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
     }
@@ -113,8 +107,8 @@ public class ImageDecoderValidationTests
     }
 
     [Theory]
-    [InlineData(0, 8)]   // zero height
-    [InlineData(8, 0)]   // zero width
+    [InlineData(0, 8)]
+    [InlineData(8, 0)]
     public void JpegZeroDimension_Throws(int width, int height)
     {
         var jpeg = Jpeg(0xC0, width, height, components: 1, adobe: false);
@@ -147,22 +141,19 @@ public class ImageDecoderValidationTests
     }
 
     [Theory]
-    [InlineData(0xC3)] // lossless
-    [InlineData(0xC9)] // arithmetic extended sequential
-    [InlineData(0xCB)] // arithmetic lossless
+    [InlineData(0xC3)]
+    [InlineData(0xC9)]
+    [InlineData(0xCB)]
     public void UndecodableSofMarker_Throws(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false);
         Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(jpeg));
     }
 
-    // JPEG sample precision is not PDF /BitsPerComponent: ISO 32000-1 8.9.5.1 allows only
-    // 1/2/4/8/16, while extended-sequential (SOF1) and progressive (SOF2) JPEG legally carry
-    // 12. The library embeds the JPEG bytes verbatim under /DCTDecode and has no entropy
-    // decoder to requantize with, so 12-bit must fail loud rather than emit /BitsPerComponent 12.
+    // ISO 32000-1 8.9.5.1: /BitsPerComponent allows only 1/2/4/8/16, so 12-bit JPEG (SOF1/SOF2) must fail loud.
     [Theory]
-    [InlineData(0xC1)] // extended sequential
-    [InlineData(0xC2)] // progressive
+    [InlineData(0xC1)]
+    [InlineData(0xC2)]
     public void TwelveBitJpeg_Throws(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false, precision: 12);
@@ -217,7 +208,7 @@ public class ImageDecoderValidationTests
         stream.Write(length);
         stream.Write(Encoding.ASCII.GetBytes(type));
         stream.Write(body);
-        stream.Write(stackalloc byte[4]); // CRC placeholder; the decoder does not verify it.
+        stream.Write(stackalloc byte[4]);
     }
 
     private static byte[] Deflate(byte[] data)

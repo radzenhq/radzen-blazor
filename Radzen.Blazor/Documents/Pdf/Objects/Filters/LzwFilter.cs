@@ -11,8 +11,6 @@ internal static class LzwFilter
     public static byte[] Decode(byte[] data, int early)
         => Decode(data, early, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decoded size against an LZW bomb: a small input can expand
-    // without bound, so output.Length is re-checked every code rather than at the end.
     public static byte[] Decode(byte[] data, int early, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -42,7 +40,6 @@ internal static class LzwFilter
                 length.Add(1);
             }
 
-            // Clear (256) and Eod (257) placeholders; never emitted as sequences.
             for (int i = 0; i < 2; i++)
             {
                 prefix.Add(-1);
@@ -85,8 +82,6 @@ internal static class LzwFilter
         int previous = -1;
         long bitPos = 0;
 
-        // 8 * int.MaxValue does not fit an int: a >= 256 MB stage output overflowed to a
-        // negative total, skipped the loop and returned an empty stream with no error.
         long totalBits = (long)data.Length * 8;
 
         while (bitPos + width <= totalBits)
@@ -140,7 +135,6 @@ internal static class LzwFilter
                 }
                 else if (code == nextCode)
                 {
-                    // KwKwK: the only code the decoder is allowed to see before adding it.
                     AddEntry(previous, first[previous]);
                 }
                 else

@@ -4,8 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Fail-loud policy: unsupported font/script features throw rather than silently
-// emitting broken output. Scripts that need no shaping stay unaffected.
 public class FailLoudFontGuardTests
 {
     private static DocumentBuilder WithText(string text)
@@ -18,19 +16,19 @@ public class FailLoudFontGuardTests
     }
 
     [Theory]
-    [InlineData("مرحبا")] // Arabic "marhaba"
-    [InlineData("नमस्ते")] // Devanagari "namaste"
-    [InlineData("สวัสดี")] // Thai "sawasdee"
-    [InlineData("שלום")] // Hebrew "shalom" - RTL, was silently reversed before the guard
-    [InlineData("מזלטוב")] // Hebrew "mazel tov"
-    [InlineData("שׁוּוֹ")] // Hebrew presentation forms
-    [InlineData("ᠠᠷᠠ")] // Mongolian
-    [InlineData("ߊߕߜ")] // N'Ko
-    [InlineData("ࠀࠁ")] // Samaritan (RTL) - was outside the old BMP range list
-    [InlineData("ࡰࡱ")] // Arabic Extended-B - was in the gap between the old ranges
-    [InlineData("A‏B")] // RIGHT-TO-LEFT MARK bidi control
-    [InlineData("A⁦B")] // LEFT-TO-RIGHT ISOLATE bidi control
-    [InlineData("\U0001E900\U0001E921")] // Adlam (RTL) supplementary plane - surrogate pair
+    [InlineData("مرحبا")]
+    [InlineData("नमस्ते")]
+    [InlineData("สวัสดี")]
+    [InlineData("שלום")]
+    [InlineData("מזלטוב")]
+    [InlineData("שׁוּוֹ")]
+    [InlineData("ᠠᠷᠠ")]
+    [InlineData("ߊߕߜ")]
+    [InlineData("ࠀࠁ")]
+    [InlineData("ࡰࡱ")]
+    [InlineData("A‏B")]
+    [InlineData("A⁦B")]
+    [InlineData("\U0001E900\U0001E921")]
     public void ComplexOrRtlScript_ThrowsInsteadOfRenderingBroken(string text)
     {
         var builder = WithText(text);
@@ -39,9 +37,9 @@ public class FailLoudFontGuardTests
     }
 
     [Theory]
-    [InlineData("Hello world")]      // Latin
-    [InlineData("Привет")] // Cyrillic "Privet"
-    [InlineData("Γειά")]  // Greek
+    [InlineData("Hello world")]
+    [InlineData("Привет")]
+    [InlineData("Γειά")]
     public void NonShapingScript_RendersWithoutThrowing(string text)
     {
         var bytes = WithText(text).ToArray();
@@ -49,8 +47,8 @@ public class FailLoudFontGuardTests
     }
 
     [Theory]
-    [InlineData("中文")]  // CJK Han
-    [InlineData("가나")] // Hangul
+    [InlineData("中文")]
+    [InlineData("가나")]
     public void CjkAndHangul_RenderWithoutThrowing(string text)
     {
         var builder = new DocumentBuilder();

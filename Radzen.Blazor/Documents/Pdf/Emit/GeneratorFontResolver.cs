@@ -5,13 +5,8 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Owns the per-document font caches: a stable GeneratedFont per base-14 face and per
-// embedded sfnt face, keyed so a face registered once is emitted once. Also carries the
-// WinAnsi/codepoint helpers the emitters share.
 internal sealed class GeneratorFontResolver(PdfAConformance conformance)
 {
-    // One registry over both identity domains: a base-14 face is identified by its
-    // PostScript name and an embedded face by instance, but they share one key sequence.
     private readonly ResourceKeyRegistry<object, GeneratedFont> fonts = new("F");
 
     public IReadOnlyList<GeneratedFont> AllFonts => fonts.Values;
@@ -19,8 +14,6 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     public GeneratedFont ResolveSfnt(SfntFont sfnt)
         => fonts.GetOrAddValue(sfnt, key => new GeneratedFont { Key = key, Sfnt = sfnt });
 
-    // PdfUA is deliberately absent from the label: a PDF/UA-only document rejects its base-14
-    // faces at save through ConformanceWriter, and gating here would move that throw to Build().
     private FontScope Scope => new(Fonts: null, conformance != PdfAConformance.None ? "PDF/A" : null, CanEmbed: true);
 
     public GeneratedFont ResolveBase14(Font font)
@@ -34,11 +27,6 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     public static bool IsWinAnsi(int codepoint)
         => codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out _);
 
-    // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
-    // their glyph-id codes through the accumulated gid-to-Unicode table, mirroring
-    // the /ToUnicode CMap the embedder writes on save.
-    // The maps are derived from document-global state frozen before the page loop, so each
-    // font's ReverseFont is built once and shared by every page that references it.
     public static Dictionary<string, ReverseFont> BuildExtractionFonts(GeneratedPage generated)
     {
         var map = new Dictionary<string, ReverseFont>(StringComparer.Ordinal);

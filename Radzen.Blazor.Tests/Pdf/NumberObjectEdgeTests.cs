@@ -8,10 +8,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// NumberObject edge cases: integers wider than 32 bits (offsets in files larger
-// than 2 GiB, /Prev values, IDs) must survive parse and re-serialization without
-// truncation, and NaN/Infinity must never leak into the output as an invalid
-// token (ISO 32000-1 7.3.3 defines only signed decimal numbers).
+// ISO 32000-1 7.3.3 defines only signed decimal numbers.
 public class NumberObjectEdgeTests
 {
     private static string Written(NumberObject number)
@@ -25,8 +22,8 @@ public class NumberObjectEdgeTests
         => Assert.IsType<NumberObject>(ObjectParser.Parse(Encoding.Latin1.GetBytes(text), 0));
 
     [Theory]
-    [InlineData("8589934592")]      // 2^33
-    [InlineData("2147483648")]      // 2^31, one past int.MaxValue
+    [InlineData("8589934592")]
+    [InlineData("2147483648")]
     [InlineData("-8589934592")]
     public void ParsedInteger_WiderThan32Bits_IsNotTruncated(string text)
     {
@@ -47,8 +44,6 @@ public class NumberObjectEdgeTests
         Assert.Equal("10000000000", Written(prev));
     }
 
-    // A PDF numeric token is [+-]?digits[.digits]. NaN/Infinity have no valid
-    // representation; writing them must either throw or emit a valid number.
     [Theory]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
@@ -59,7 +54,7 @@ public class NumberObjectEdgeTests
         var exception = Record.Exception(() => written = Written(new NumberObject(value)));
         if (exception is not null)
         {
-            return; // throwing is an accepted guard
+            return;
         }
 
         Assert.NotNull(written);

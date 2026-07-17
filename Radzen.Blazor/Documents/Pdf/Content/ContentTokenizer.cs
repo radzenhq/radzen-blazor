@@ -6,10 +6,6 @@ using Radzen.Documents.Pdf.Objects;
 namespace Radzen.Documents.Pdf.Content;
 
 
-// Only the operator layer lives here. What the operands themselves are - numbers, strings,
-// hex strings, names - is the one PDF object syntax, so it is read through Objects/Lexer
-// (lenient recovery, so a corrupt stream still renders) rather than re-implemented here: a
-// second operand grammar would drift from the one the object parser enforces.
 internal static class ContentTokenizer
 {
     internal enum TokenKind
@@ -27,10 +23,6 @@ internal static class ContentTokenizer
 
     internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes, int Start, int End);
 
-    // Scoped to the single operation that creates it: a longer-lived cache would trade
-    // transient churn for retention. Reference identity is the key, so an edit that swaps the
-    // byte[] cannot hit a stale entry; one slot is enough because an operation only ever moves
-    // forward onto its edited bytes.
     internal sealed class Cache
     {
         private byte[]? source;
@@ -133,7 +125,6 @@ internal static class ContentTokenizer
                     tokens.Add(new Token(TokenKind.Number, value.RealValue, null, null, start, position));
                 }
 
-                // A malformed numeric run is dropped rather than executed as an operand.
                 continue;
             }
 
@@ -163,14 +154,6 @@ internal static class ContentTokenizer
         return tokens;
     }
 
-    // After a BI operator, skip the inline-image dict and its binary payload, resuming
-    // past the EI that ends the image. The end of the payload is computed exactly whenever
-    // the dictionary allows it - an explicit /L, or /W /H /BPC and the color-space component
-    // count for an unfiltered image, or the encoding's own end-of-data marker when the first
-    // filter is self-terminating - so a payload that happens to contain the bytes "EI" is not
-    // mistaken for the terminator. Only an image whose first filter is a binary compressor
-    // with no /L - whose encoded length the tokenizer cannot know without decoding - falls
-    // back to the EI scan, which is why that scan validates its candidates.
     private static void SkipInlineImage(byte[] data, ref int position)
     {
         var image = ParseInlineImageDictionary(data, ref position);
@@ -179,15 +162,11 @@ internal static class ContentTokenizer
             return;
         }
 
-        // Exactly one whitespace byte separates ID from the binary payload.
         if (IsWhitespace(data[position]))
         {
             position++;
         }
 
-        // When the payload end is known, jump straight to it - but only commit if an EI
-        // actually follows. A declared geometry that disagrees with the real payload (a
-        // malformed image) falls through to the EI scan instead.
         var end = InlineImagePayloadEnd(data, position, image);
         if (end >= 0)
         {
@@ -207,15 +186,6 @@ internal static class ContentTokenizer
         ScanForInlineImageTerminator(data, ref position);
     }
 
-    // Last resort for a payload of unknowable length. EI ends the payload when bounded by
-    // whitespace/delimiter/EOF on the trailing side. A preceding whitespace is the common
-    // case but not required: streams that pack the image data flush against EI ("dataEI")
-    // must still terminate here rather than swallowing the remainder of the content stream.
-    // Compressed payload bytes can spell a whitespace-bounded EI of their own, so a candidate
-    // is only taken when what follows it reads as a plausible operator stream; the bytes
-    // after a false EI are the tail of the image and essentially never do. Candidates inside
-    // the payload always precede the real one, so taking the first that validates can only
-    // improve on taking the first outright, which is what happens if none validates.
     private static void ScanForInlineImageTerminator(byte[] data, ref int position)
     {
         var first = -1;
@@ -246,9 +216,6 @@ internal static class ContentTokenizer
         => position + 1 < data.Length && data[position] == (byte)'E' && data[position + 1] == (byte)'I'
             && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2]));
 
-    // How many tokens past a candidate EI must read as content before it is believed. Enough
-    // to get past the operands of the first operator or two; the check is only ever separating
-    // real operators from compressed-image tails, which diverge almost immediately.
     private const int InlineImageValidationBudget = 8;
 
     private static bool LooksLikeOperatorStream(byte[] data, int position)
@@ -353,8 +320,6 @@ internal static class ContentTokenizer
 
     private static bool IsContentOperator(string keyword) => ContentOperators.Contains(keyword);
 
-    // Reads the key/value pairs between BI and ID into the fields needed to size the
-    // payload; leaves position just past the ID keyword.
     private static InlineImage ParseInlineImageDictionary(byte[] data, ref int position)
     {
         var image = new InlineImage();
@@ -407,10 +372,6 @@ internal static class ContentTokenizer
         }
     }
 
-    // Reads a single dictionary value: a name (returned with a leading '/'), an
-    // array/dictionary (skipped and returned as null), or a bare token (number, boolean
-    // or keyword). Only the shapes the payload-length computation needs are distinguished.
-    // raw carries the value's source text, which a composite needs to name its first filter.
     private static string? ReadInlineToken(byte[] data, ref int position, out string? raw)
     {
         raw = null;
@@ -444,8 +405,6 @@ internal static class ContentTokenizer
             return raw = Latin1(data, start, position - start);
         }
 
-        // A stray delimiter that is not a name/array/dict start: consume one byte so the
-        // dictionary scan always makes progress and never spins to EOF.
         position++;
         return null;
     }
@@ -477,8 +436,6 @@ internal static class ContentTokenizer
         }
     }
 
-    // The absolute index one past the end of the payload starting at start, or -1 when it
-    // cannot be established without decoding.
     private static int InlineImagePayloadEnd(byte[] data, int start, InlineImage image)
     {
         var length = InlineImagePayloadLength(image);
@@ -487,9 +444,6 @@ internal static class ContentTokenizer
             return start + length <= data.Length ? start + (int)length : -1;
         }
 
-        // The bytes on the page are in the format of the FIRST filter in the chain (the
-        // /Filter array lists filters in the order a reader applies them to decode). Those
-        // encodings that mark their own end can be measured exactly without decoding.
         return image.FirstFilter switch
         {
             "/AHx" or "/ASCIIHexDecode" => IndexAfter(data, start, (byte)'>'),
@@ -505,7 +459,6 @@ internal static class ContentTokenizer
         return index < 0 ? -1 : index + 1;
     }
 
-    // '~' is outside the ASCII85 alphabet, so "~>" occurs only as the end-of-data marker.
     private static int IndexAfterAscii85(byte[] data, int start)
     {
         for (var index = start; index + 1 < data.Length; index++)
@@ -519,7 +472,6 @@ internal static class ContentTokenizer
         return -1;
     }
 
-    // Run-length data is a chain of length-prefixed runs closed by a 128 byte.
     private static int IndexAfterRunLength(byte[] data, int start)
     {
         var index = start;
@@ -544,8 +496,6 @@ internal static class ContentTokenizer
             return image.Length;
         }
 
-        // A filtered image's on-disk length is its encoded size, which cannot be derived
-        // from the geometry.
         if (image.Filtered)
         {
             return -1;
@@ -591,8 +541,6 @@ internal static class ContentTokenizer
 
         private string? colorSpace;
 
-        // The first name in a raw "[/Fl /AHx]" style filter list, or null when the list is
-        // a decode-parms dictionary or has no leading name.
         private static string? FirstNameIn(string? raw)
         {
             var slash = raw is null || !raw.StartsWith('[') ? -1 : raw.IndexOf('/', System.StringComparison.Ordinal);
@@ -637,8 +585,6 @@ internal static class ContentTokenizer
                     colorSpace = value;
                     break;
                 case "F" or "Filter":
-                    // A null value means an array/dict filter list; a slash name is a
-                    // single filter. Either way the payload is encoded.
                     Filtered = value is null || value.StartsWith('/');
                     FirstFilter = value is not null && value.StartsWith('/') ? value : FirstNameIn(raw);
                     break;

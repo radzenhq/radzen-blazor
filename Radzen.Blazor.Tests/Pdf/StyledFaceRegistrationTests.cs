@@ -8,12 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3(b): FontCollection keys registered faces by (family, bold, italic) so
-// Font.Bold/Italic select the matching registered face, with a regular fallback
-// when no styled face exists. Pinned API: a Register overload
-// Register(string family, Stream font, bool bold, bool italic); when that
-// overload is absent these tests fall back to plain Register (which today
-// overwrites the family and loses the style distinction).
 public class StyledFaceRegistrationTests
 {
     private const string Family = "Liberation Sans";

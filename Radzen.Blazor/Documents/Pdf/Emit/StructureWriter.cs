@@ -3,15 +3,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Serializes the logical structure tree (Tagged PDF) into the catalog: one
-// indirect StructElem per element and the per-page ParentTree that maps marked
-// content back to its element.
 internal static class StructureWriter
 {
-    // Serializes the logical structure tree: one indirect StructElem per element
-    // (marked-content kids before child elements), /Pg on elements with marks, a
-    // /StructParents key per marked page and a flat Nums ParentTree whose per-page
-    // arrays are indexed by MCID.
     public static ReferenceObject WriteStructureTree(
         DocumentWriter writer,
         StructureElement structure,
@@ -81,8 +74,7 @@ internal static class StructureWriter
             dictionary["ActualText"] = new StringObject(actualText);
         }
 
-        // Header cells come from header rows, so their scope is the column
-        // below them; PDF/UA (ISO 14289-1, 7.5) requires TH to carry a Scope.
+        // ISO 14289-1 7.5: TH must carry a Scope.
         if (element.Type == "TH")
         {
             dictionary["A"] = new DictionaryObject

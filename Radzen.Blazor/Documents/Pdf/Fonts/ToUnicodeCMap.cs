@@ -3,9 +3,7 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// Parses a /ToUnicode CMap stream (ISO 32000-1 9.10.3): the bfchar and bfrange
-// sections that map source char codes to UTF-16BE Unicode sequences. Returns the
-// code -> string map plus the source code byte width taken from the code space range.
+// /ToUnicode CMap stream per ISO 32000-1 9.10.3: bfchar and bfrange sections.
 internal static class ToUnicodeCMap
 {
     public static (IReadOnlyDictionary<int, string> Map, int CodeBytes) Parse(byte[] data)
@@ -26,10 +24,6 @@ internal static class ToUnicodeCMap
                     {
                         if (tokens[i].Hex is { } low)
                         {
-                            // ReverseFont decodes every code at one fixed width. A CMap that
-                            // mixes widths (e.g. a 1-byte and a 2-byte range, common in CJK)
-                            // cannot be decoded correctly at a single width, so fail loud
-                            // rather than pairwise-merge or split codes into garbage text.
                             if (codeBytes != 0 && codeBytes != low.Length)
                             {
                                 throw new DocumentParseException(
@@ -97,9 +91,6 @@ internal static class ToUnicodeCMap
             }
             else if (index < tokens.Count && tokens[index].Hex is { } dst)
             {
-                // The source-codespace bound is width-specific (an incremental bfrange must walk
-                // one contiguous run inside the codespace); the total-entries cap and the
-                // endpoint (wrap) check are shared with the CID /W range form.
                 if (high >= low && (long)high - low + 1 > MaxCodespaceSpan(lowBytes.Length))
                 {
                     throw new DocumentParseException("ToUnicode bfrange exceeds the permitted CMap size.");
@@ -116,10 +107,6 @@ internal static class ToUnicodeCMap
         return index;
     }
 
-    // Every materialized entry passes through here so MaxCMapEntries bounds the whole map
-    // rather than a single section: bfchar and array-form bfrange each cost only a few input
-    // bytes per entry, so a large stream still reaches millions of entries without a cap.
-    // Overwriting an existing code is always allowed - it materializes nothing new.
     private static void Add(Dictionary<int, string> map, int code, string text, ReaderLimits limits)
     {
         if (map.Count >= limits.MaxCMapEntries && !map.ContainsKey(code))
@@ -130,9 +117,6 @@ internal static class ToUnicodeCMap
         map[code] = text;
     }
 
-    // Number of code points addressable by a source code of the given byte width;
-    // a 2-byte code covers at most 0x10000 entries. Codes wider than 4 bytes are
-    // clamped to the incremental cap below, which rejects the span outright.
     private static long MaxCodespaceSpan(int codeByteLength)
         => codeByteLength >= 4 ? 0x1_0000_0000L : 1L << (8 * (codeByteLength < 1 ? 1 : codeByteLength));
 
@@ -158,10 +142,6 @@ internal static class ToUnicodeCMap
         return new string(chars);
     }
 
-    // Incremental bfrange destination: decode as UTF-16BE (the bfchar form) and
-    // advance the LAST code unit by offset, so a surrogate-pair base like <D835DC00>
-    // walks the low surrogate and stays a valid supra-BMP scalar. A malformed or
-    // lone-surrogate result falls back to U+FFFD rather than throwing.
     private static string Incremental(byte[] bytes, int offset)
     {
         var chars = Utf16(bytes).ToCharArray();
@@ -258,9 +238,6 @@ internal static class ToUnicodeCMap
         return tokens;
     }
 
-    // Not Lexer.IsDelimiter: that also breaks on '(' ')' '>' '/' '{' '}', which would lift a
-    // keyword out of a bracketed run, so a name like /CMapName (beginbfchar) would start a
-    // bfchar section. Only the delimiters Tokenize itself dispatches on end a keyword here.
     private static bool IsBreak(byte b)
         => Lexer.IsWhitespace(b) || b is (byte)'<' or (byte)'[' or (byte)']' or (byte)'%';
 

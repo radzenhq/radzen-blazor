@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The reverse gid-to-Unicode map a generated page carries for text extraction is derived
-// from document-global state (GidToUnicode, CompactGidMap), so every page of a build must
-// share one instance per font rather than retaining a byte-identical copy per page.
 public class ExtractionFontSharingTests
 {
     private static Document Build(int paragraphs)

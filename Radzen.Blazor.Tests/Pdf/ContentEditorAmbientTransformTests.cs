@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded element carries the absolute transform baked in by the interpreter, but a
-// modified element is spliced back where the source cm scope is still active. The
-// re-emitted transform must therefore be relative to the ambient CTM at the splice point.
 public class ContentEditorAmbientTransformTests
 {
     [Fact]
@@ -81,8 +78,6 @@ public class ContentEditorAmbientTransformTests
         InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
     }
 
-    // A cm short of six operands is read by zero-filling the missing leading operand, so the
-    // ambient the editor splices against has to be read the same way the interpreter read it.
     [Fact]
     public void ModifiedTextUnderMalformedCm_KeepsItsTransform()
     {
@@ -100,8 +95,6 @@ public class ContentEditorAmbientTransformTests
         InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
     }
 
-    // A Q with nothing on the stack has no state to restore, so the CTM in effect is
-    // unchanged and the editor's ambient must agree with the interpreter's transform.
     [Fact]
     public void ModifiedTextAfterUnbalancedQ_KeepsItsTransform()
     {

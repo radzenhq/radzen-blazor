@@ -6,8 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Widow control must hold at EVERY page break of a paragraph, not only the first. A
-// paragraph spanning 3+ pages must never strand fewer than Widows lines on its final page.
 public class ContinuationWidowTests
 {
     private static double Width(FontCollection fonts)
@@ -19,8 +17,6 @@ public class ContinuationWidowTests
         var fonts = PaginationSupport.Fonts();
         var lh = PaginationSupport.LineHeight(fonts);
 
-        // 11 single lines on a 5-line page: page 1 takes 5, and the continuation break must
-        // leave >= Widows lines for the last page instead of a lone widow.
         var section = PaginationSupport.Section(Width(fonts), PaginationSupport.HeightForLines(lh, 5));
         var para = PaginationSupport.Repeated("Ha", 22);
         section.Blocks.Add(para);

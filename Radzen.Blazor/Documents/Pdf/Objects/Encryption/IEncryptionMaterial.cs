@@ -88,9 +88,6 @@ public sealed class SeededEncryptionMaterial : IEncryptionMaterial
     }
 }
 
-// Threads a caller's IEncryptionMaterial through one write, handing out the fixed
-// order of byte requests the standard security handler makes. Created fresh per
-// write so the request index always restarts at zero and output stays reproducible.
 internal sealed class MaterialSequence(IEncryptionMaterial material)
 {
     private int index;

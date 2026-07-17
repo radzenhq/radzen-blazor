@@ -4,10 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Roadmap #13: the output-configuration surface (ViewerPreferences, PageLabels,
-// Conformance, FormFields) is now expressible up front on DocumentBuilder and must
-// be a faithful facade: configuring it through the builder produces byte-for-byte
-// the same file as building first and then mutating the Document the old way.
 public class DocumentBuilderOutputConfigTests
 {
     private static DocumentBuilder Authored()

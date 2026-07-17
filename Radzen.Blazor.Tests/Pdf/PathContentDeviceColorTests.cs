@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// CMYK (k/K) and Gray (g/G) device colors on a public PathContent, per ISO 32000-1 8.6.4.
+// ISO 32000-1 8.6.4 device colour spaces.
 public class PathContentDeviceColorTests
 {
     private static ContentOperation Find(byte[] content, string op)

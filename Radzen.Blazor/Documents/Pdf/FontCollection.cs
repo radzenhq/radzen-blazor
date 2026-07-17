@@ -14,18 +14,15 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class FontCollection
 {
-    private const uint TtcTag = 0x74746366; // 'ttcf'
+    private const uint TtcTag = 0x74746366;
     private const int SignatureWindow = 64 * 1024;
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
 
-    // Dictionary enumeration order is not contractual, and the style fallback picks the first
-    // matching face, so the chosen face - and the bytes it embeds - must not ride on it.
     private readonly List<(string Family, bool Bold, bool Italic)> registrationOrder = [];
 
     private readonly List<string> fallback = [];
 
-    // Recreated when EnableKerning toggles, because SimpleShaper captures the flag.
     private SimpleShaper? shaper;
     private bool shaperKerning;
 
@@ -53,9 +50,6 @@ public sealed class FontCollection
     /// </summary>
     public bool AllowDegradedFonts { get; set; }
 
-    // Values are weak and pruned on access so nothing is rooted for the life of the process;
-    // the faceRetention ephemerons keep an entry alive exactly while any of its faces is
-    // still referenced, which is what stops a live face from being re-parsed.
     private static readonly Dictionary<(ulong Hash, int Length), WeakReference<ParsedSource>> parseCache = [];
     private static readonly ConditionalWeakTable<SfntFont, ParsedSource> faceRetention = [];
 
@@ -97,8 +91,7 @@ public sealed class FontCollection
             ? SelectCollectionFace(parsed.Faces, family, bold, italic)
             : parsed.Faces[0];
 
-        // ISO 32000-1 9.9 / OS/2 fsType: a Restricted License Embedding font must not be
-        // embedded unless the caller holds a license and explicitly opts in.
+        // ISO 32000-1 9.9 / OS/2 fsType: a Restricted License Embedding font must not be embedded without a license.
         face.EnsureEmbeddable(AllowRestrictedEmbedding);
         face.EnsureRenderable(AllowDegradedFonts);
         var key = (family, bold, italic);
@@ -110,9 +103,6 @@ public sealed class FontCollection
         registered[key] = face;
     }
 
-    // Faces are always parsed from a private copy and a hit is verified byte-for-byte, so a
-    // hash collision or in-place mutation of the caller's bytes can never serve a stale face.
-    // The stream's position is restored, since callers may reuse it.
     private static ParsedSource ParseSource(Stream font)
     {
         if (font is MemoryStream ms)
@@ -134,8 +124,6 @@ public sealed class FontCollection
             }
         }
 
-        // Deliberately uncapped: a font's size is the caller's choice, not untrusted input
-        // bounded by a document limit.
         return FromBytes(DocumentReader.ReadFully(font, long.MaxValue), sharedWithCaller: false);
     }
 
@@ -183,9 +171,6 @@ public sealed class FontCollection
         return ParseAndStore(signature, bytes);
     }
 
-    // Parses outside the lock so concurrent Register() calls do not serialize behind each
-    // other's multi-megabyte parse; hence the re-check, which adopts an equal entry another
-    // thread published while we parsed rather than storing a duplicate.
     private static ParsedSource ParseAndStore((ulong, int) signature, byte[] ownedBytes)
     {
         var parsed = ParseCopy(ownedBytes);
@@ -258,8 +243,6 @@ public sealed class FontCollection
         }
     }
 
-    // Head/tail windows keep hashing O(1) for multi-megabyte fonts. A hit is verified
-    // byte-for-byte anyway, so hash quality only affects the collision (re-parse) rate.
     private static ulong Signature(ReadOnlySpan<byte> head, ReadOnlySpan<byte> tail, ulong hash = 14695981039346656037)
     {
         hash = Fold(head, hash);
@@ -348,8 +331,6 @@ public sealed class FontCollection
         return MeasureBase14(text, font, base14);
     }
 
-    // Emission maps its runs through this same instance, so measure and emit agree by
-    // construction rather than by two implementations being kept in sync.
     internal SimpleShaper Shaper()
     {
         if (shaper is null || shaperKerning != EnableKerning)
@@ -361,8 +342,6 @@ public sealed class FontCollection
         return shaper;
     }
 
-    // Kerning goes through Base14Metrics.GetRunKerning, the same seam TextLineEmitter emits
-    // from, so this width is the width actually drawn.
     private double MeasureBase14(string text, Font font, Base14Metrics metrics)
     {
         WinAnsiEncoding.TryGetCode('?', out var question);
@@ -399,7 +378,6 @@ public sealed class FontCollection
         return sum;
     }
 
-    // A lone surrogate yields its own code unit rather than throwing.
     internal static int CodePointAt(ReadOnlySpan<char> text, int index)
         => char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1])
             ? char.ConvertToUtf32(text[index], text[index + 1])

@@ -5,13 +5,6 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Recovers a document whose cross-reference machinery is unusable: it scans the raw
-/// bytes for <c>N G obj</c> headers to rebuild the xref, recovers streams whose
-/// <c>/Length</c> is wrong or truncated, and reconstructs a trailer. The scan and
-/// endstream caches are also consulted by the reader's normal object-retrieval path
-/// (a single object recorded at the wrong offset, a stream with a bogus length).
-/// </summary>
 internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
 {
     private readonly byte[] data = data;
@@ -39,8 +32,6 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
             }
         }
 
-        // The header scan only sees each ObjStm container's "N G obj"; register
-        // type-2 entries for its members so compressed objects and /Root resolve.
         foreach (var number in store.GetEntryNumbers())
         {
             if (!store.IsObjectStream(number))
@@ -79,8 +70,6 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
 
         var trailer = new DictionaryObject();
 
-        // Newest catalog wins: scan object numbers in descending order so a stale
-        // catalog left behind by an incremental update never shadows the current one.
         var numbers = store.GetEntryNumbers();
         numbers.Sort();
         numbers.Reverse();
@@ -130,8 +119,6 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
         return trailer;
     }
 
-    // Locates the last parseable trailer dictionary in the raw bytes so a
-    // repaired document keeps /Encrypt, /ID and /Info.
     private DictionaryObject? FindRawTrailer()
     {
         const string pattern = "trailer";
@@ -233,10 +220,6 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
         return map;
     }
 
-    // A wrong /Length (negative or past the end of the file) falls back to the nearest
-    // "endstream" keyword at or after the payload start. The keyword positions are
-    // precomputed in a single pass and binary-searched, so a hostile file full of streams
-    // with bogus lengths cannot force a quadratic per-stream scan to end-of-file.
     public int RecoverStreamLength(int dataStart)
     {
         var offsets = EndstreamOffsets();
@@ -311,9 +294,6 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
     private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
 }
 
-/// <summary>
-/// Exposes only the object-store operations needed while repairing a document.
-/// </summary>
 internal interface IDocumentRepairStore
 {
     void ResetForRepair();

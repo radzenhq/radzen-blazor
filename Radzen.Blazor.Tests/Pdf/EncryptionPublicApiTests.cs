@@ -8,8 +8,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// End-to-end coverage of the public encrypt-on-write entry point wired through
-// DocumentBuilder.Encryption / Document.Encryption into the writer.
 public class EncryptionPublicApiTests
 {
     private static byte[] BuildEncrypted(EncryptionOptions options)
@@ -57,7 +55,6 @@ public class EncryptionPublicApiTests
         var withNull = new DocumentBuilder { Encryption = null };
         withNull.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
 
-        // Trailer /ID is nondeterministic; compare everything up to the trailer.
         var a = plain.ToArray();
         var b = withNull.ToArray();
         Assert.Equal(a.Length, b.Length);

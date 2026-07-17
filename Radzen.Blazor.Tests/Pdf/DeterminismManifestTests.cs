@@ -10,23 +10,10 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Broad determinism manifest. A representative corpus exercises distinct emit
-// paths - plain text, tables, an embedded TrueType subset, an image, gradients,
-// a seeded-encrypted document, and a seeded-signed/timestamped document. Each is
-// generated TWICE in-process and asserted byte-identical (catching HashSet-order
-// and other emit-path nondeterminism that per-feature ByteIdentical tests miss),
-// and each one's SHA-256 is pinned to a checked-in expected value so the test
-// also catches cross-change drift in real output. Test-only: no library or byte
-// change to real output. Deterministic seams are used for the crypto paths
-// (SeededEncryptionMaterial, a fixed ISigner/ITimestampProvider, caller-supplied
-// dates) so those documents are reproducible without any RNG.
 public class DeterminismManifestTests
 {
     private static readonly DateTimeOffset FixedTime = new(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);
 
-    // Fixed, deterministic stand-in for a real detached CMS blob. The library
-    // treats the ISigner output as opaque bytes, so a fixed payload is enough to
-    // drive the full signing emit path reproducibly.
     private sealed class FixedSigner : ISigner
     {
         private readonly byte[] signature;
@@ -43,7 +30,6 @@ public class DeterminismManifestTests
         public byte[] Sign(SignedContent content) => (byte[])signature.Clone();
     }
 
-    // Fixed, deterministic stand-in for an RFC 3161 token from a TSA.
     private sealed class FixedTimestampProvider : ITimestampProvider
     {
         private readonly byte[] token;
@@ -73,7 +59,6 @@ public class DeterminismManifestTests
         return paragraph;
     }
 
-    // --- Corpus builders. Each returns the bytes of one document. ---
 
     private static byte[] PlainText()
     {
@@ -214,9 +199,6 @@ public class DeterminismManifestTests
         yield return new object[] { "timestamped", (Func<byte[]>)Timestamped };
     }
 
-    // SHA-256 of each document's bytes, pinned so a change to any emit path that
-    // alters real output surfaces here as a drift failure. Regenerate only when a
-    // byte change is intended and understood.
     private static readonly Dictionary<string, string> ExpectedSha256 = new()
     {
         ["plain-text"] = "17509576c3839f8833478414a2d21189753951372311492c094100caf2010b34",

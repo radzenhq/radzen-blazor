@@ -7,22 +7,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract for GlyfSubsetter.Subset(SfntFont, IReadOnlyCollection<ushort>).
-// COMPACT glyph-ID model (PDF CIDFontType2 with content codes == new gids):
-// the subset renumbers glyphs into a contiguous space 0..N-1 holding exactly the
-// closure of the requested set (requested + recursive composite components +
-// glyph 0), with compact loca/glyf/hmtx sized for N glyphs. Composite glyphs have
-// their component ids rewritten into the compact space; simple-glyph outlines
-// survive with their contours/points intact but with instruction bytecode STRIPPED
-// (the subset drops the cvt/fpgm/prep hinting tables to stay compact). The compact
-// gid assignment is recovered structurally (outline bytes, advance multisets)
-// rather than pinned to an order.
-//
-// Glyph IDs and advances derived from LiberationSans-Regular.ttf via fontTools 4.60.2:
-//   'H'=43 'e'=72 'l'=79 'o'=82 'W'=58 'r'=85 'd'=71 space=3
-//   advances: notdef=1229 H=1479 e=1139 l=455 o=1139 W=1933 r=682 d=1139 space=569
-//   eacute U+00E9 = gid 171, composite referencing e(72) and acute(118), acute adv=682
-//   original numGlyphs=2620, glyph 0 = .notdef
 public class GlyfSubsetterTests
 {
     private const ushort GidNotdef = 0;
@@ -67,9 +51,6 @@ public class GlyfSubsetterTests
         return outlines;
     }
 
-    // The subset strips instruction bytecode from every glyph, so a source outline
-    // survives with its contours/points intact but zero instructions. Normalize the
-    // expected simple-glyph bytes the same way the subsetter does before matching.
     private static int FindOutline(byte[][] outlines, byte[] expected)
     {
         var target = StripSimpleInstructions(expected);
@@ -84,13 +65,11 @@ public class GlyfSubsetterTests
         return -1;
     }
 
-    // Mirrors GlyfSubsetter: set instructionLength to 0, drop the instructions[]
-    // block, keep flags/coordinates, and pad an odd result to a 2-byte boundary.
     private static byte[] StripSimpleInstructions(byte[] g)
     {
         if (g.Length < 10 || (short)((g[0] << 8) | g[1]) < 0)
         {
-            return g; // empty or composite outline
+            return g;
         }
 
         var contours = (short)((g[0] << 8) | g[1]);
@@ -109,7 +88,6 @@ public class GlyfSubsetterTests
         return result;
     }
 
-    // 1. Basic subset round-trips through the parser with a COMPACT glyph count.
     [Fact]
     public void Subset_Hello_ReparsesWithCompactGlyphCount()
     {
@@ -119,7 +97,6 @@ public class GlyfSubsetterTests
         var subset = GlyfSubsetter.Subset(font, ids);
         var reparsed = SfntFont.Parse(subset);
 
-        // closure("Hello") = {notdef, H, e, l, o}
         Assert.Equal(5, (int)reparsed.GlyphCount);
         Assert.Equal(ClosureCount(font, ids), (int)reparsed.GlyphCount);
     }
@@ -172,7 +149,6 @@ public class GlyfSubsetterTests
         }
     }
 
-    // 2. Composite closure: subset ONLY eacute; components come along, renumbered.
     [Fact]
     public void Subset_Eacute_PullsComponentsIntoCompactSpace()
     {
@@ -182,10 +158,8 @@ public class GlyfSubsetterTests
         var subset = GlyfSubsetter.Subset(font, new ushort[] { GidEacute });
         var outlines = SubsetOutlines(subset);
 
-        // closure(eacute) = {notdef, eacute, e, acute}
         Assert.Equal(4, outlines.Length);
 
-        // The simple components keep their outline bytes at some compact gid.
         var eGid = FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, GidE));
         var acuteGid = FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, GidAcute));
         Assert.True(eGid >= 0, "component 'e' outline missing");
@@ -203,8 +177,6 @@ public class GlyfSubsetterTests
         var eGid = FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, GidE));
         var acuteGid = FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, GidAcute));
 
-        // Exactly one composite glyph; its component ids point at the compact
-        // gids carrying the e/acute outlines.
         var composites = new List<int>();
         for (var gid = 0; gid < outlines.Length; gid++)
         {
@@ -236,7 +208,6 @@ public class GlyfSubsetterTests
         Assert.Equal(682, (int)reparsed.GetAdvanceWidth((ushort)acuteGid));
     }
 
-    // 3. Glyphs outside the closure are dropped entirely, not blanked.
     [Fact]
     public void Subset_Hello_GlyphOutsideClosureIsNotEmbedded()
     {
@@ -244,11 +215,9 @@ public class GlyfSubsetterTests
         var subset = GlyfSubsetter.Subset(font, GlyphIds(font, "Hello"));
         var outlines = SubsetOutlines(subset);
 
-        // 'W' has an outline in the original but is not in the "Hello" closure.
         Assert.Equal(-1, FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, 58)));
     }
 
-    // 4. Empty-outline glyphs in the request (space) still get a compact gid.
     [Fact]
     public void Subset_HelloWorldWithSpace_KeepsEmptyOutlineGlyph()
     {
@@ -258,13 +227,11 @@ public class GlyfSubsetterTests
         var subset = GlyfSubsetter.Subset(font, ids);
         var reparsed = SfntFont.Parse(subset);
 
-        // distinct {H,e,l,o,space,W,r,d} + notdef = 9, space with an empty outline
         Assert.Equal(9, (int)reparsed.GlyphCount);
         var outlines = SubsetOutlines(subset);
         Assert.Contains(outlines, outline => outline.Length == 0);
     }
 
-    // 5. .notdef always retained even when not requested.
     [Fact]
     public void Subset_WithoutNotdef_StillKeepsNotdefOutline()
     {
@@ -278,8 +245,6 @@ public class GlyfSubsetterTests
         Assert.True(FindOutline(outlines, Type0EmbedSupport.OutlineBytes(font, GidO)) >= 0);
     }
 
-    // 6. Size: a compact subset dwarfs both the original and the per-document
-    // fixed cost of full-length loca/hmtx.
     [Fact]
     public void Subset_HelloWorld_IsMuchSmallerThanOriginal()
     {
@@ -291,7 +256,6 @@ public class GlyfSubsetterTests
             $"compact subset is {subset.Length} bytes; full-length loca/hmtx must not pass through (original {original.Length})");
     }
 
-    // 7. Checksums: every directory entry and head.checkSumAdjustment are valid.
     [Fact]
     public void Subset_TableChecksumsAreCorrect()
     {
@@ -310,7 +274,6 @@ public class GlyfSubsetterTests
         SfntChecksumValidator.AssertHeadAdjustment(subset);
     }
 
-    // 8. loca is compact (N + 1 entries), monotonic, and ends at glyf length.
     [Fact]
     public void Subset_LocaIsCompactMonotonicAndMatchesGlyfLength()
     {
@@ -332,8 +295,6 @@ public class GlyfSubsetterTests
     [Fact]
     public void Subset_HeadIndexToLocFormatMatchesLocaEncoding()
     {
-        // The subsetter chooses loca format via head.indexToLocFormat; whatever it
-        // picks (0=short, 1=long) the head field must agree so re-parse succeeds.
         var font = LiberationSansRegular();
         var subset = GlyfSubsetter.Subset(font, GlyphIds(font, "Hello"));
 
@@ -345,9 +306,6 @@ public class GlyfSubsetterTests
         Assert.Equal((uint)glyf.Length, loca[^1]);
     }
 
-    // 9. Layout tables stripped; core outline/metric tables retained. cmap and
-    // name are NOT pinned: a CIDFontType2 subset needs neither and may drop or
-    // minimize them.
     [Fact]
     public void Subset_StripsLayoutTables()
     {
@@ -378,11 +336,9 @@ public class GlyfSubsetterTests
         Assert.True(data.Length > 0);
     }
 
-    // 10. Error cases.
     [Fact]
     public void Subset_CffFont_Throws()
     {
-        // NotoSansSC-Subset.otf is CFF-flavoured; glyf subsetting is TrueType-only.
         var font = SfntFont.Parse(PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf"));
 
         Assert.ThrowsAny<Exception>(() => GlyfSubsetter.Subset(font, new ushort[] { 34 }));
@@ -403,7 +359,6 @@ public class GlyfSubsetterTests
         SfntChecksumValidator.AssertHeadAdjustment(subset);
     }
 
-    // 11. Determinism.
     [Fact]
     public void Subset_IsDeterministic()
     {

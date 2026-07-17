@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Color carries an alpha channel, so a translucent fill/stroke/text colour paints through a
-// page /ExtGState (/ca fill, /CA stroke) exactly like Run.Opacity does, and the two multiply.
-// Opaque colours (A = 255) register nothing and stay byte-identical.
 public class ColorAlphaTests
 {
     private static Paragraph Text(string text)
@@ -134,8 +131,6 @@ public class ColorAlphaTests
         Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "CA") - (64 / 255.0)) < 1e-6);
     }
 
-    // The box-shadow path folds shadow.Color.A into its own soft-mask ExtGState, so the
-    // central alpha pass must leave soft-mask states alone rather than applying it twice.
     [Fact]
     public void ShadowColorAlpha_IsNotAppliedTwice()
     {
@@ -187,7 +182,6 @@ public class ColorAlphaTests
         Assert.DoesNotContain(" gs\n", Encoding.ASCII.GetString(Content(explicitAlpha: true)), StringComparison.Ordinal);
     }
 
-    // ---- The direct Page.Content API (a separate pipeline the page planner never sees) ----
 
     private static string DirectContent(ContentElement element)
     {
@@ -239,8 +233,6 @@ public class ColorAlphaTests
         Assert.True(content.IndexOf("Q\n", gs, StringComparison.Ordinal) > gs);
     }
 
-    // One ExtGState carries one /ca and one /CA, and a fill+stroke path paints both in a
-    // single operator, so differing alphas fail loud instead of silently dropping one.
     [Fact]
     public void PathContentDifferingFillAndStrokeAlpha_Throws()
     {

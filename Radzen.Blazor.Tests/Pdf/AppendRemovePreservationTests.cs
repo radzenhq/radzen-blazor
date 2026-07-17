@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Append carries an appended page's /Annots (e.g. a /URI link); RemoveAt of a
-// loaded page must redact the page (its content and its form field), not leave
-// them referenced by a resurrected page dict.
 public class AppendRemovePreservationTests
 {
     private static Document Load(byte[] bytes)

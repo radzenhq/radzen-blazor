@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Document.Append must carry an appended loaded page's /Rotate and /CropBox, which
-// serialization reads from sourceRotations/sourceCropBoxes. Without the copy a merged
-// scanned/rotated page renders sideways and uncropped.
 public class AppendRotateCropTests
 {
     private static byte[] Build(string pageExtra)
@@ -64,8 +61,6 @@ public class AppendRotateCropTests
         Assert.Equal(400.0, Assert.IsType<NumberObject>(crop[3]).DoubleValue);
     }
 
-    // Chained append: a page rotated/cropped in doc B, appended into C, then C appended
-    // into A must still carry /Rotate and /CropBox to the final document.
     [Fact]
     public void ChainedAppend_KeepsRotateAndCropBox()
     {

@@ -4,10 +4,7 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Turns a public GradientBrush into the PDF dictionaries a shading fill needs: the
-// axial/radial /Shading dict (ISO 32000-1 8.7.4.5.2/8.7.4.5.3), its colour /Function
-// (type 2 exponential for two stops, type 3 stitching for more) and the shading
-// /Pattern (PatternType 2) that a content stream selects with /Pattern cs + scn.
+// ISO 32000-1 8.7.4.5.2/8.7.4.5.3: axial/radial /Shading dictionaries.
 internal static class ShadingBuilder
 {
     public static DictionaryObject BuildShading(GradientBrush brush)
@@ -31,10 +28,6 @@ internal static class ShadingBuilder
         ["Shading"] = BuildShading(brush),
     };
 
-    // A single stop is a constant colour. Stops that span the full [0 1] domain interpolate
-    // directly (two stops) or stitch one exponential per adjacent pair; stops that start after
-    // 0 or end before 1 hold the endpoint colour constant over the leading/trailing sub-range,
-    // so the stop offsets are honoured instead of being stretched across the whole axis.
     public static DictionaryObject BuildFunction(IReadOnlyList<GradientStop> stops)
     {
         if (stops.Count == 1)
@@ -87,9 +80,7 @@ internal static class ShadingBuilder
         };
     }
 
-    // ISO 32000-1 7.10.4: Type 3 /Bounds must lie strictly inside the domain. A CSS hard stop
-    // lands a bound on or past the boundary, so nudge those by an epsilon below emitted (0.001)
-    // precision, leaving valid interior gradients unaffected.
+    // ISO 32000-1 7.10.4: Type 3 /Bounds must lie strictly inside the domain.
     private static ArrayObject BoundsWithinDomain(List<double> bounds)
     {
         const double epsilon = 1e-6;

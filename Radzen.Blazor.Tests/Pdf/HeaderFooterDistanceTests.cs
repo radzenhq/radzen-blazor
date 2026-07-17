@@ -11,13 +11,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Regression tests for header/footer band geometry. The header used to render flush
-// to the physical page top (its ascender in the unprintable zone) and the footer hung
-// from the body bottom instead of sitting on the page bottom. Section must expose
-// HeaderDistance/FooterDistance (Unit, default ~1.25cm) so the header band STARTS
-// HeaderDistance below the page top and the footer band ENDS FooterDistance above the
-// page bottom, shrinking the body when a band plus its distance exceeds the margin.
-// Asserted on the real emitted PDF (Build -> bytes -> content-stream Td baselines).
 public class HeaderFooterDistanceTests
 {
     private const double Tol = 0.5;
@@ -51,8 +44,6 @@ public class HeaderFooterDistanceTests
         return (builder, section);
     }
 
-    // (shown text, baseline Y in PDF space, origin at page BOTTOM) pairs from the
-    // base-14 literal-string "x y Td (text) Tj" pattern.
     private static List<(string Text, double Y)> TextRuns(string content)
     {
         var runs = new List<(string, double)>();
@@ -107,9 +98,6 @@ public class HeaderFooterDistanceTests
         var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
         var (lineHeight, baseline) = LineMetrics(FontSize);
 
-        // Currently the band hangs from the body bottom: its bottom edge lands at
-        // margin - lineHeight (about 6pt). Anchored FooterDistance above the page
-        // bottom it must end at least ~15pt up (the default distance is ~1.25cm).
         var footerBottomEdge = footerY - (lineHeight - baseline);
         Assert.True(
             footerBottomEdge >= 15,
@@ -201,7 +189,6 @@ public class HeaderFooterDistanceTests
             Math.Abs(footerY - (footerDistance + lineHeight - baseline)) <= Tol,
             $"footer baseline {footerY:F2} must reflect FooterDistance {footerDistance}");
 
-        // Bands plus distances fit inside the 60pt margins, so the body keeps them.
         Assert.True(
             Math.Abs(bodyY - (PageHeight - margin - baseline)) <= Tol,
             $"body baseline {bodyY:F2} must stay at the margin when the bands fit inside it");

@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
 
-// Accumulates a /Resources dictionary. Categories and their entries appear in the
-// order the caller adds them: DictionaryObject serializes by insertion order, so
-// each build path's Add sequence is what pins its emitted bytes.
 internal sealed class ResourceDictionaryBuilder
 {
     private DictionaryObject? resources;
@@ -27,9 +24,6 @@ internal sealed class ResourceDictionaryBuilder
     public DictionaryObject? Build() => resources;
 }
 
-// Builds each page's /Resources and /MediaBox on save: registers generated fonts
-// and image XObjects, materializes base-14 font dictionaries, and merges freshly
-// emitted resources into the entries a loaded page already carried.
 internal static class PageResourceBuilder
 {
     public static DictionaryObject? BuildGeneratedResources(
@@ -81,9 +75,6 @@ internal static class PageResourceBuilder
         return resources.Build();
     }
 
-    // Builds an /ExtGState parameter dictionary. Alpha (/ca, /CA) is always present;
-    // /BM (blend mode), /OP + /op + /OPM (overprint) and /RI (rendering intent) are
-    // appended only when requested, so an alpha-only state stays Type/ca/CA verbatim.
     public static DictionaryObject ExtGStateDictionary(
         double fillAlpha,
         double strokeAlpha,
@@ -167,7 +158,6 @@ internal static class PageResourceBuilder
         return reference;
     }
 
-    // Restamped per save: the mask reference is only valid against this save's writer.
     private static ReferenceObject WriteImage(IObjectWriter writer, ImageXObject image)
     {
         if (image.SoftMask is { } mask)
@@ -178,9 +168,6 @@ internal static class PageResourceBuilder
         return writer.Add(image.Image);
     }
 
-    // Adds the fonts and image XObjects referenced by an overlay stream to a built
-    // page's resources. Overlay keys use a distinct prefix so generated entries are
-    // never clobbered.
     public static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentResourceManifest manifest)
     {
         var emitted = BuildResources(writer, manifest);
@@ -209,9 +196,7 @@ internal static class PageResourceBuilder
         return resources;
     }
 
-    // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats are symbolic and carry a built-in
-    // encoding; declaring /Encoding /WinAnsiEncoding would remap their glyphs, so it is
-    // omitted for them and kept for the non-symbolic base-14 faces.
+    // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats are symbolic with a built-in encoding; /WinAnsiEncoding would remap their glyphs.
     public static DictionaryObject Base14FontDictionary(string baseFont)
     {
         var dictionary = new DictionaryObject
@@ -229,8 +214,6 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    // sharedImages, when supplied, spans a whole save: an XObject instance registered by
-    // several pages (a watermark image) is then written once and the pages reference it.
     public static DictionaryObject? BuildResources(
         IObjectWriter writer,
         ContentResourceManifest manifest,
@@ -276,9 +259,6 @@ internal static class PageResourceBuilder
         return reference;
     }
 
-    // Imports the loaded page's effective /Resources into the writer and overlays
-    // any newly emitted entries (emitter keys win on collision) so a re-save keeps
-    // the source fonts, XObjects and graphics states.
     public static DictionaryObject MergeResources(
         GraphImporter importer,
         DocumentReader reader,
@@ -325,8 +305,6 @@ internal static class PageResourceBuilder
         return result;
     }
 
-    // The /Font and /XObject names a loaded page already binds; a full re-emit must not
-    // reuse any of them for a freshly registered base-14 face or image XObject.
     public static HashSet<string> ResourceNames(DocumentReader reader, DictionaryObject resources)
     {
         var names = new HashSet<string>(StringComparer.Ordinal);
@@ -354,8 +332,6 @@ internal static class PageResourceBuilder
             return NumberBox(page.MediaBox);
         }
 
-        // Re-emit a loaded page's original box so a non-zero origin round-trips;
-        // content coordinates are preserved verbatim and would otherwise shift.
         if (document.Loaded is { } loaded && loaded.SourceBoxes.TryGetValue(page, out var box))
         {
             return NumberBox(box);

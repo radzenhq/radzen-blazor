@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// CornerRadius on Container/Cell rounds the box: the background fills a genuine
-// rounded-rectangle path (four cubic Beziers), and a uniform border strokes the same
-// path with a single S. Non-uniform borders keep the square four-edge rendering.
-// CornerRadius == 0 must be byte-identical to a document that never set it.
 public class RoundedCornersTests
 {
     private static DocumentBuilder Builder(Action<Container>? configure = null)
@@ -62,7 +58,6 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        // Fill path + border path + the rounded clip around the child paragraph text.
         Assert.Equal(12, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(1, Count(content, "h\nS\n"));
@@ -93,7 +88,6 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        // Fill path + the rounded clip around the child paragraph text.
         Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(0, Count(content, "h\nS\n"));
@@ -111,7 +105,6 @@ public class RoundedCornersTests
 
         var content = FirstPageContent(builder);
 
-        // Fill path + the rounded clip around the child paragraph text.
         Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
         Assert.Equal(0, Count(content, "h\nS\n"));
@@ -147,9 +140,6 @@ public class RoundedCornersTests
         Assert.Equal(untouched, zeroed);
     }
 
-    // Reconstructs (radius, width, height) from the emitted rounded fill path, whose
-    // first segment is: (x+r) y m, (x+w-r) y l, ... c ending at (x+w) (y+r), then
-    // l to (x+w) (y+h-r), c ..., l to (x+r) (y+h).
     private static (double Radius, double Width, double Height) ParseRoundedFill(string content)
     {
         var closeFill = content.IndexOf("h\nf\n", StringComparison.Ordinal);

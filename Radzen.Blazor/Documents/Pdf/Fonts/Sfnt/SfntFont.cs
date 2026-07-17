@@ -4,16 +4,10 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// A single parsed sfnt (TrueType/OpenType) font face. Retains the whole source
-// buffer so any table can be served raw via TryGetTable (GSUB/GPOS shaper seam).
 internal sealed class SfntFont
 {
-    private const uint TtcTag = 0x74746366; // 'ttcf'
+    private const uint TtcTag = 0x74746366;
 
-    // Faces in one ttcf collection. A spec constant rather than a ReaderLimits knob:
-    // ReaderLimits governs reading a PDF and is not threaded into font parsing, and
-    // this bounds a font-format structure whose real-world size (the largest shipping
-    // collections carry a few dozen faces) is a property of the format, not of a document.
     internal const int MaxCollectionFaces = 256;
 
     private readonly byte[] data;
@@ -35,8 +29,6 @@ internal sealed class SfntFont
             ? NameTable.Parse(data, (int)name.Offset)
             : new NameTable();
 
-        // hmtx is required whenever hhea is present (and hhea is required above); without it
-        // every glyph would silently measure zero-width. Fail loud like head/maxp/hhea.
         metrics = directory.TryGet("hmtx", out var hmtx)
             ? HorizontalMetrics.Parse(data, (int)hmtx.Offset, numberOfHMetrics)
             : throw new InvalidDataException("Required 'hmtx' table is missing.");
@@ -77,15 +69,10 @@ internal sealed class SfntFont
 
     public bool Italic { get; private set; }
 
-    // OS/2 fsType embedding-permission flags (OpenType OS/2). 0 when the font has no
-    // OS/2 table, which the spec treats as installable (no embedding restriction).
     public ushort FsType { get; private set; }
 
-    // Bit 1 (0x0002, RESTRICTED_LICENSE_EMBEDDING) forbids embedding the font. It is
-    // mutually exclusive with the Preview/Print (0x0004) and Editable (0x0008) bits.
     public bool EmbeddingRestricted => (FsType & 0x0002) != 0;
 
-    // Throws unless the font may be embedded, or the caller opts past the restriction.
     public void EnsureEmbeddable(bool allowRestricted)
     {
         if (EmbeddingRestricted && !allowRestricted)
@@ -96,16 +83,10 @@ internal sealed class SfntFont
         }
     }
 
-    // A variable font (has an 'fvar' axis table): only the default instance would be
-    // embedded, so a requested weight/width axis is silently ignored.
     public bool IsVariable => directory.Contains("fvar");
 
-    // A color font (COLR/CPAL layered, sbix bitmap, or SVG-in-OpenType): color glyphs
-    // are not translated to PDF, so they degrade to monochrome outlines or .notdef.
     public bool IsColorFont => directory.Contains("COLR") || directory.Contains("sbix") || directory.Contains("SVG ");
 
-    // Fails loud (rather than degrading silently) when the font uses features this
-    // library cannot honor, unless the caller opts to embed it degraded anyway.
     public void EnsureRenderable(bool allowDegraded)
     {
         if (allowDegraded)
@@ -132,12 +113,8 @@ internal sealed class SfntFont
 
     public ushort GetAdvanceWidth(ushort glyphId) => metrics.GetAdvanceWidth(glyphId);
 
-    // Legacy 'kern' pair adjustments, parsed and cached on first use so a face that is
-    // never kerned pays nothing. Empty when there is no 'kern' table.
     private Dictionary<int, int>? kerning;
 
-    // Pair-kerning adjustment (font design units, negative tightening) for the ordered
-    // glyph pair from the legacy 'kern' table; 0 when the pair is not kerned.
     public int GetKerning(ushort left, ushort right)
     {
         kerning ??= directory.Contains("kern") && TryGetTable("kern", out var table)
@@ -162,8 +139,6 @@ internal sealed class SfntFont
         return false;
     }
 
-    // Zero-copy variant for read-only consumers (e.g. subsetting a multi-MB glyf
-    // table); the memory aliases the font's source buffer and must not be mutated.
     public bool TryGetTableMemory(string tag, out ReadOnlyMemory<byte> table)
     {
         ArgumentNullException.ThrowIfNull(tag);
@@ -178,9 +153,6 @@ internal sealed class SfntFont
         return false;
     }
 
-    // Offset/Length come from the table directory; a hostile record would address a buffer
-    // past the font (or, via an int overflow in AsMemory, throw an opaque exception). Both
-    // table accessors validate here so they share one diagnosable contract.
     private void ValidateTableExtent(uint offset, uint length, string tag)
     {
         if ((long)offset + length > data.Length)
@@ -224,24 +196,16 @@ internal sealed class SfntFont
         if (ReadTagValue(data) == TtcTag)
         {
             var reader = new SfntReader(data, 4);
-            reader.ReadUInt16(); // majorVersion
-            reader.ReadUInt16(); // minorVersion
+            reader.ReadUInt16();
+            reader.ReadUInt16();
             var numFonts = reader.ReadUInt32();
 
-            // What grows here is the number of FACE PARSES: each offset costs a whole font
-            // (head/maxp/hhea/name/hmtx and the entire cmap), and nothing requires the
-            // offsets to differ. Requiring only that the 4-byte-per-face offset table fit
-            // the buffer bounds the table, not the work, and still permits data.Length/4
-            // parses of one face - measured at 102,000 faces and 11.6 s from an 818 KB
-            // collection, growing quadratically with size. Cap the face count itself.
             if (numFonts > MaxCollectionFaces)
             {
                 throw new InvalidDataException(
                     $"TrueType collection face count {numFonts} exceeds the supported maximum of {MaxCollectionFaces}.");
             }
 
-            // Independently, the offset table must actually be present: a header may claim
-            // a legal face count the buffer cannot supply.
             if (12 + ((long)numFonts * 4) > data.Length)
             {
                 throw new InvalidDataException("TrueType collection font count exceeds the header bounds.");

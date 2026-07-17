@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ImageContent.Bounds reaches the emitted cm operands, so it must open a change-detection
-// door like every other mutable member. ContentElementChangeTrackingMatrixTests cannot
-// cover it: the matrix only walks kinds the interpreter can materialize.
 public class ImageContentChangeTrackingTests
 {
     [Fact]
@@ -21,9 +18,6 @@ public class ImageContentChangeTrackingTests
         Assert.True(image.IsModified);
     }
 
-    // Pins why the above is a convention fix rather than a live bug: IsModified is only
-    // consulted over a loaded page's materialized prefix, and an image XObject comes back
-    // as XObjectContent, so an ImageContent can never occupy that prefix.
     [Fact]
     public void ImageContent_IsNeverMaterializedFromALoadedPage()
     {

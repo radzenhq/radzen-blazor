@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The encryption seam must be fully deterministic: the same options and the same
-// caller-supplied material must yield byte-identical encrypted output, and the
-// library must generate no randomness of its own (no System.Security.Cryptography).
 public class EncryptionDeterminismTests
 {
     private const string StreamMarker = "BT /F1 12 Tf 72 720 Td (Deterministic!) Tj ET";
@@ -104,11 +101,6 @@ public class EncryptionDeterminismTests
     [Fact]
     public void PerStreamIvs_AreUnique()
     {
-        // Two AESV3 streams under one file key must get distinct IVs: identical
-        // plaintext encrypted with a reused IV yields identical ciphertext and
-        // leaks. Drive the real writer path and compare the two encrypted blobs
-        // (AESV3 layout is IV(16) || ciphertext) rather than round-tripping,
-        // because the reader strips the IV on decrypt.
         var sequence = new MaterialSequence(new SeededEncryptionMaterial([42]));
         var options = new EncryptionOptions
         {
@@ -117,16 +109,10 @@ public class EncryptionDeterminismTests
         };
         var writer = EncryptionWriter.Build(options, new byte[16], sequence, out _);
 
-        // AESV3 encrypts every object under the file key directly, so the object
-        // number does not vary the IV - the uniqueness comes solely from the
-        // material sequence advancing one fresh IV per stream. Use one object
-        // number so the sequence advance is unmistakably the only difference.
         var plaintext = Encoding.Latin1.GetBytes(new string('A', 64));
         var first = writer.EncryptStream(plaintext, objectNumber: 3, generation: 0);
         var second = writer.EncryptStream(plaintext, objectNumber: 3, generation: 0);
 
-        // Identical plaintext must not produce identical output, and the 16-byte
-        // IV prefixes must differ.
         Assert.False(first.AsSpan().SequenceEqual(second));
         Assert.False(first.AsSpan(0, 16).SequenceEqual(second.AsSpan(0, 16)));
     }

@@ -7,8 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 7: Page.BleedBox/TrimBox/ArtBox are written to the page node as PDF boxes
-// [llx lly urx ury] and preserved across a load -> save round trip (previously dropped).
 public class PageBoxTests
 {
     private static Document WithBoxes()

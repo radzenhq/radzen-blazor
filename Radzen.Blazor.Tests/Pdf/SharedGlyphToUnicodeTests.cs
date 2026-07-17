@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// When several codepoints share one glyph (in NotoSansSC-Subset U+002D hyphen-minus and
-// U+00AD soft-hyphen both map to gid 14), the accumulated gid->Unicode table must keep
-// the FIRST codepoint drawn for that glyph rather than letting the last-drawn one
-// overwrite it, so /ToUnicode is deterministic and independent of paint order.
 public class SharedGlyphToUnicodeTests
 {
     private const char SoftHyphen = '\u00AD';

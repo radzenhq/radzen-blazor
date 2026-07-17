@@ -6,31 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract pinned for the L2 line breaker (INTERNAL, namespace Radzen.Documents.Pdf,
-// reachable via InternalsVisibleTo). No PDF bytes are produced; assertions are purely
-// numeric on the laid-out model using deterministic Liberation Sans metrics.
-//
-// Pinned shapes:
-//  - static IReadOnlyList<LineBox> LineBreaker.Break(Paragraph paragraph,
-//        double maxWidthPoints, FontCollection fonts)
-//  - LineBox { IReadOnlyList<LineFragment> Fragments; double Width; double Height;
-//        double Baseline; }
-//  - LineFragment { Run Run; string Text; int Start; int Length;
-//        double XOffset; double Advance; }
-//
-// Pinned semantics:
-//  - Greedy word wrap at single ASCII spaces. A word joins the current line iff
-//    currentWidth + spaceWidth + wordWidth <= maxWidth (no leading space for the first
-//    word). The space that triggers a break is consumed (not a fragment, not counted
-//    in the line width).
-//  - One LineFragment per maximal non-space run of chars within a single Run. Text is
-//    the word with NO surrounding spaces; Start/Length index into that Run's Text.
-//    Fragment.Advance == FontCollection.MeasureText(Text, run.Font).
-//  - Words that fit are never split mid-word (no hyphenation). A single token wider
-//    than maxWidth is broken at code-point granularity so no line exceeds the measure;
-//    a lone glyph wider than maxWidth occupies its own line as a last resort.
-//  - LineBox.Width is the natural visible width of the line (sum of fragment advances
-//    plus interior single-space gaps); trailing spaces are excluded.
 public class LineBreakTests
 {
     private const string Sentence =
@@ -59,7 +34,6 @@ public class LineBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var widest = Words.Max(w => LineLayoutSupport.WordWidth(fonts, w, 12));
 
-        // Wide enough for any single word, too narrow for the narrowest word pair: word-level wrap only.
         var lines = LineBreaker.Break(paragraph, widest + 1.0, fonts);
 
         Assert.Equal(Words.Length, lines.Count);
@@ -111,7 +85,6 @@ public class LineBreakTests
         Assert.Equal("quick", lines[0].Fragments[1].Text);
         Assert.Equal(twoWords, lines[0].Width, 6);
 
-        // The third word starts the second line.
         Assert.Equal("brown", lines[1].Fragments[0].Text);
     }
 

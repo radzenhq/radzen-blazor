@@ -7,16 +7,11 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// OS/2 fsType embedding-permission check (ISO 32000-1 9.9 / OpenType OS/2 fsType).
-// Bit 1 (0x0002) is RESTRICTED_LICENSE_EMBEDDING: the font must not be embedded. The
-// check throws by default and is bypassable with an explicit opt-in override. Liberation
-// Sans ships fsType 0 (installable); the restricted case is produced by patching the
-// OS/2 fsType field of the real font so the test exercises the exact byte layout.
+// ISO 32000-1 9.9 / OpenType OS/2 fsType: bit 1 (0x0002) RESTRICTED_LICENSE_EMBEDDING forbids embedding.
 public class FontEmbedPermissionTests
 {
     private static byte[] Liberation() => PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
 
-    // Locates a top-level sfnt table by tag and returns its offset, or -1.
     private static int TableOffset(byte[] data, string tag)
     {
         var numTables = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(4));
@@ -48,7 +43,7 @@ public class FontEmbedPermissionTests
         var face = SfntFont.Parse(Liberation());
         Assert.Equal(0, face.FsType);
         Assert.False(face.EmbeddingRestricted);
-        face.EnsureEmbeddable(allowRestricted: false); // must not throw
+        face.EnsureEmbeddable(allowRestricted: false);
     }
 
     [Fact]
@@ -70,13 +65,12 @@ public class FontEmbedPermissionTests
     public void EnsureEmbeddable_OptInOverrideAllowsRestrictedFont()
     {
         var face = SfntFont.Parse(WithFsType(Liberation(), 0x0002));
-        face.EnsureEmbeddable(allowRestricted: true); // must not throw
+        face.EnsureEmbeddable(allowRestricted: true);
     }
 
     [Fact]
     public void PreviewPrintAndEditableBits_AreNotRestricted()
     {
-        // Preview/Print (0x0004) and Editable (0x0008) permit embedding.
         Assert.False(SfntFont.Parse(WithFsType(Liberation(), 0x0004)).EmbeddingRestricted);
         Assert.False(SfntFont.Parse(WithFsType(Liberation(), 0x0008)).EmbeddingRestricted);
     }

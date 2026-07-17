@@ -9,10 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Lane cq-reader, finding #107: this writer has no encryption scope, so an incremental
-// update over an encrypted original would silently corrupt the document (the appended
-// objects are plaintext while the readers still treat the originals as encrypted). The
-// constructor must refuse an encrypted original, matching PdfSigner/DssBuilder.
 public class IncrementalUpdateEncryptedGuardTests
 {
     private static byte[] WriteGraph(EncryptionOptions? options)

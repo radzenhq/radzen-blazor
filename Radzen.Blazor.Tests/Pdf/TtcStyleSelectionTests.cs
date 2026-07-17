@@ -8,15 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// G1(b): registering from a .ttc must select the face whose parsed Bold/Italic
-// flags (OS/2 fsSelection / head macStyle) match the requested style, not merely
-// the first face matching the family name.
-//
-// Fixture LiberationSans-RegBold.ttc (built with fontTools 4.60.2 TTCollection)
-// holds two faces both named "Liberation Sans": index 0 regular (fsSelection
-// 0x40, macStyle 0), index 1 bold (fsSelection 0x20, macStyle 1). Both are
-// 2048 upem; 'A' advance is 1366 in the regular face and 1479 in the bold face
-// (scaled /W widths 667 vs 722).
 public class TtcStyleSelectionTests
 {
     private const string Family = "Liberation Sans";
@@ -83,11 +74,9 @@ public class TtcStyleSelectionTests
         var descendant = (DictionaryObject)reader.Resolve(descendants[0]);
         var widths = Type0EmbedSupport.ParseWidths(reader, (ArrayObject)reader.Resolve(descendant["W"]));
 
-        // Bold-face 'A'/'B' scale to 722; regular-face would be 667.
         Assert.Contains(722, widths.Values);
         Assert.DoesNotContain(667, widths.Values);
 
-        // A real bold face is in use, so no synthetic stroke is applied.
         var content = CascadeTestSupport.FirstPageContent(builder);
         Assert.DoesNotContain("2 Tr", content, StringComparison.Ordinal);
 

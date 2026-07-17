@@ -6,8 +6,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Expectations for Liberation-Subset.ttc derived via fonttools TTCollection:
-// 2 faces, family names "Liberation Sans" (index 0) then "Liberation Serif" (index 1).
 public class TtcTests
 {
     private static byte[] Ttc() => PdfTestResources.ReadAllBytes("Fonts/Liberation-Subset.ttc");
@@ -50,14 +48,12 @@ public class TtcTests
     [Fact]
     public void ParseCollection_HostileNumFonts_ThrowsBeforeAllocating()
     {
-        // 16-byte 'ttcf' blob claiming int.MaxValue faces: the offset table cannot fit,
-        // so parsing must reject it rather than size a multi-GB face list (OutOfMemory).
         byte[] header =
         [
-            0x74, 0x74, 0x63, 0x66, // 'ttcf'
-            0x00, 0x01, 0x00, 0x00, // version 1.0
-            0x7F, 0xFF, 0xFF, 0xFF, // numFonts = int.MaxValue
-            0x00, 0x00, 0x00, 0x00, // one (bogus) face offset
+            0x74, 0x74, 0x63, 0x66,
+            0x00, 0x01, 0x00, 0x00,
+            0x7F, 0xFF, 0xFF, 0xFF,
+            0x00, 0x00, 0x00, 0x00,
         ];
 
         Assert.Throws<InvalidDataException>(() => SfntFont.ParseCollection(header));

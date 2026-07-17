@@ -8,8 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Clearing a modeled /Info field and saving incrementally removes the key, matching what
-// a full SaveToStream of the same edit emits: the two save paths must not disagree.
 public class IncrementalInfoClearTests
 {
     private static byte[] BaseDocument()
@@ -21,7 +19,6 @@ public class IncrementalInfoClearTests
         return document.ToArray();
     }
 
-    // An /Info carrying a key the library does not model alongside a modeled one.
     private static byte[] UnmodeledInfoFixture()
     {
         var pdf = new FixturePdf()
@@ -91,9 +88,6 @@ public class IncrementalInfoClearTests
         Assert.False(Info(stream.ToArray()).ContainsKey("Title"));
     }
 
-    // Both savers build /Info from one mapping, so every modeled field - and the unmodeled
-    // keys carried alongside them - must come out identical whichever save path ran. The
-    // shipped bug this pins was a full save dropping a key the incremental save preserved.
     [Fact]
     public void IncrementalAndFullSaveAgreeOnEveryModeledField()
     {
@@ -130,7 +124,6 @@ public class IncrementalInfoClearTests
         Assert.Equal("D:20200102030405+02'00'", ((StringObject)fullInfo["CreationDate"]).Value);
     }
 
-    // An unmodeled key the library does not model is still carried over untouched.
     [Fact]
     public void ClearingAModeledFieldPreservesUnmodeledKeys()
     {

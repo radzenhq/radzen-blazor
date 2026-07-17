@@ -25,19 +25,14 @@ internal sealed class LoadedState
 
     public Dictionary<DocumentReader, DictionaryObject> AppendedAcroForms { get; } = [];
 
-    // Null for an append-only carry state: the document was not itself loaded.
     public DocumentReader? Source { get; }
 
     public DictionaryObject? SourceCatalog { get; set; }
 
     public DictionaryObject? SourceAcroForm { get; set; }
 
-    // Retained verbatim because SaveIncremental emits them as the literal prefix of its
-    // output; any normalization here would break the byte offsets the source xref records.
     public byte[]? SourceBytes { get; }
 
-    // Retained so a full save carries through the /Info entries DocumentInfo does not
-    // model (/Trapped and any custom key), which would otherwise be dropped.
     public DictionaryObject? SourceInfo { get; set; }
 
     public bool OutlineRequiresRewrite { get; set; }
@@ -82,8 +77,6 @@ internal sealed class LoadedState
         }
     }
 
-    // The page instance is shared with the donor rather than copied, so every entry is
-    // keyed by the page itself (hence CarryAppended(page, page, origin)).
     public void CarryForeign(Page page, LoadedState origin)
     {
         if (origin.Source is { } reader && origin.SourceResources.TryGetValue(page, out var resources))
@@ -107,6 +100,5 @@ internal sealed class LoadedState
         }
     }
 
-    // Dropping the handle is what makes the next save emit no /AcroForm, after flattening.
     public void ClearAcroForm() => SourceAcroForm = null;
 }

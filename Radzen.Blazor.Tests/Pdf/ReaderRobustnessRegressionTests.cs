@@ -5,19 +5,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R4(b) reader robustness:
-// - Hybrid-reference files (ISO 32000-1 7.5.8.4): the /XRefStm cross-reference
-//   stream must be consulted BEFORE the classic table's entries, because Acrobat
-//   lists the compressed objects as free in the classic section for the benefit
-//   of pre-1.5 readers. A classic free entry must not mask the stream's type-2 entry.
-// - A wrong (negative or oversized) /Length must not escape as an uncaught
-//   OverflowException/ArgumentException; it falls through to the repair/scan path.
-// - Load()'s repair fallback must trigger for the exception types malformed xref
-//   streams actually throw (missing /W etc.), not only DocumentParseException.
+// Hybrid-reference files (ISO 32000-1 7.5.8.4): /XRefStm is consulted before the classic table.
 public class ReaderRobustnessRegressionTests
 {
-    // Objects 1-3 classic; object 4 (the page font) lives in ObjStm 5 and is
-    // listed as FREE in the classic table but as type-2 in the /XRefStm stream.
     private static byte[] HybridFileWithFreeMask()
     {
         var pdf = new FixturePdf().Append("%PDF-1.6\n");
@@ -48,7 +38,7 @@ public class ReaderRobustnessRegressionTests
             .Append(FixturePdf.Entry20(pdf.OffsetOf(1)))
             .Append(FixturePdf.Entry20(pdf.OffsetOf(2)))
             .Append(FixturePdf.Entry20(pdf.OffsetOf(3)))
-            .Append(FixturePdf.Entry20(0, 65535, 'f')) // object 4: free here, compressed in the XRefStm
+            .Append(FixturePdf.Entry20(0, 65535, 'f'))
             .Append("trailer\n<< /Size 7 /Root 1 0 R /XRefStm " + offset6 + " >>\n")
             .Append("startxref\n" + xrefOffset + "\n%%EOF\n");
         return pdf.ToArray();
@@ -81,7 +71,6 @@ public class ReaderRobustnessRegressionTests
         Assert.Equal("Helvetica", Assert.IsType<NameObject>(font["BaseFont"]).Value);
     }
 
-    // Classic single-page file whose content stream declares the given /Length.
     private static byte[] FileWithStreamLength(string length)
     {
         const string content = "BT /F1 12 Tf 72 720 Td (hello) Tj ET";
@@ -116,10 +105,6 @@ public class ReaderRobustnessRegressionTests
             $"expected recovery or DocumentParseException, got {exception?.GetType().Name}: {exception?.Message}");
     }
 
-    // Body objects are intact but the startxref target is a /Type /XRef stream
-    // whose dictionary is missing /W - dereferencing it throws a plain BCL
-    // exception (not DocumentParseException). Load() must still fall back to the
-    // repair scan instead of letting that exception escape Parse().
     private static byte[] FileWithBrokenXrefStream()
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");

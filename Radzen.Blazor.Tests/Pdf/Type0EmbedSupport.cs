@@ -14,12 +14,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared plumbing for the Type0/CID embedding tests. The PINNED internal API is
-// Radzen.Documents.Pdf.Fonts.Type0FontEmbedder.Embed(DocumentWriter, SfntFont,
-// IReadOnlyDictionary<ushort,int> gidToUnicode) -> ReferenceObject (the indirect
-// top-level Type0 font dictionary). Every numeric expectation is derived from the
-// exact fixture via SfntFont/CffFont (already-merged, independently tested) and
-// cross-checked against fontTools 4.60.2 in the test comments.
 internal static class Type0EmbedSupport
 {
     public static SfntFont LoadLiberation()
@@ -28,8 +22,6 @@ internal static class Type0EmbedSupport
     public static SfntFont LoadNoto()
         => SfntFont.Parse(PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf"));
 
-    // Distinct code point -> glyph id map for a sample string, dropping uncovered
-    // code points. Fixtures used here are entirely BMP so char iteration is safe.
     public static Dictionary<ushort, int> BuildMap(SfntFont font, string text)
     {
         var map = new Dictionary<ushort, int>();
@@ -108,8 +100,7 @@ internal static class Type0EmbedSupport
         return FlateFilter.Decode(stream.Data.ToArray());
     }
 
-    // Parse a PDF /W array into CID -> width. Handles both the "c [w ...]" list form
-    // and the "cFirst cLast w" range form (ISO 32000-1 9.7.4.3).
+    // /W array forms per ISO 32000-1 9.7.4.3
     public static Dictionary<int, int> ParseWidths(DocumentReader reader, ArrayObject w)
     {
         var result = new Dictionary<int, int>();
@@ -172,8 +163,6 @@ internal static class Type0EmbedSupport
         return set;
     }
 
-    // Parse a ToUnicode CMap: CID (2-byte source) -> destination string. Supports
-    // the beginbfchar and (triple form) beginbfrange sections.
     public static Dictionary<int, string> ParseToUnicode(byte[] cmap)
     {
         var text = Encoding.Latin1.GetString(cmap);
@@ -216,9 +205,6 @@ internal static class Type0EmbedSupport
         return Encoding.BigEndianUnicode.GetString(bytes);
     }
 
-    // Content-stream bytes for a sample under the COMPACT scheme: embed once,
-    // invert the emitted ToUnicode, and encode each char as its compact 2-byte
-    // code. Mapping-agnostic - only assumes ToUnicode keys ARE the content codes.
     public static byte[] CompactCodes(SfntFont font, IReadOnlyDictionary<ushort, int> map, string text)
     {
         var e = Embed(font, map);
@@ -236,7 +222,6 @@ internal static class Type0EmbedSupport
         return bytes;
     }
 
-    // Reverse ToUnicode lookup: the unique compact code mapping to ch.
     public static int NewGid(Dictionary<int, string> toUnicode, char ch)
     {
         var expected = ch.ToString();
@@ -252,10 +237,6 @@ internal static class Type0EmbedSupport
         return Assert.Single(matches);
     }
 
-    // Independent composite-closure walker over the ORIGINAL font: requested gids
-    // plus recursively referenced glyf component gids plus .notdef. Includes glyphs
-    // with empty outlines (e.g. space) - the compact subset must assign them a gid
-    // so the content stream can reference them.
     public static HashSet<int> GlyfClosure(SfntFont font, IEnumerable<int> gids)
     {
         Assert.True(font.TryGetTable("glyf", out var glyf), "font has glyf");
@@ -301,21 +282,21 @@ internal static class Type0EmbedSupport
                 }
 
                 pos += 4;
-                pos += (flags & 0x0001) != 0 ? 4 : 2; // ARG_1_AND_2_ARE_WORDS
+                pos += (flags & 0x0001) != 0 ? 4 : 2;
                 if ((flags & 0x0008) != 0)
                 {
-                    pos += 2; // WE_HAVE_A_SCALE
+                    pos += 2;
                 }
                 else if ((flags & 0x0040) != 0)
                 {
-                    pos += 4; // X_AND_Y_SCALE
+                    pos += 4;
                 }
                 else if ((flags & 0x0080) != 0)
                 {
-                    pos += 8; // 2x2
+                    pos += 8;
                 }
 
-                if ((flags & 0x0020) == 0) // MORE_COMPONENTS
+                if ((flags & 0x0020) == 0)
                 {
                     break;
                 }
@@ -325,7 +306,6 @@ internal static class Type0EmbedSupport
         return closure;
     }
 
-    // Raw glyf outline bytes of a glyph in an sfnt font (empty array for empty outlines).
     public static byte[] OutlineBytes(SfntFont font, int gid)
     {
         Assert.True(font.TryGetTable("glyf", out var glyf));

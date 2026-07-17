@@ -8,8 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A full save rebuilds /Info from the modeled fields, so entries it does not model
-// (/Trapped and any custom key) must still be carried through from the source.
 public class InfoUnmodeledEntryTests
 {
     private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));

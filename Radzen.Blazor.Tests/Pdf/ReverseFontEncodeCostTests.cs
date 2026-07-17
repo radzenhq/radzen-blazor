@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// TryEncode is called once per character by redaction and per segment by replacement, so its
-// cost must not scale with the size of the font's code -> Unicode map (a CJK /ToUnicode CMap
-// holds tens of thousands of entries). The reverse map is derived from an immutable field and
-// must be built once, not per call, and lookups must not scan every entry.
 public class ReverseFontEncodeCostTests
 {
     private static ReverseFont LargeFont(int entries)
@@ -48,7 +44,6 @@ public class ReverseFontEncodeCostTests
             }
         });
 
-        // 960 bytes measured, against ~6,000,000 if each call rebuilt the 20000-entry map.
         Assert.True(bytes < 40_960, $"TryEncode allocated {bytes} bytes for 10 single-character calls.");
     }
 
@@ -65,10 +60,6 @@ public class ReverseFontEncodeCostTests
         var smallBytes = Measure(() => small.TryEncode(text, out _));
         var largeBytes = Measure(() => large.TryEncode(text, out _));
 
-        // Both measure 96 bytes (the closure), independent of the map. Rebuilding the reverse
-        // map per call would cost the 20000-entry font ~600,000 bytes against the 200-entry
-        // font's ~6,000, so a band that only an algorithmic regression can breach - an exact
-        // equality here would instead turn on whether a JIT promotion landed in the window.
         Assert.True(largeBytes < smallBytes + 50_000,
             $"TryEncode allocated {largeBytes} bytes against {smallBytes} for a map 100x smaller: cost scales with map size.");
     }

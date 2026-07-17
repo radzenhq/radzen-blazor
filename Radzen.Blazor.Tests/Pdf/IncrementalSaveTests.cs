@@ -9,11 +9,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Model-level incremental save (ISO 32000-1 7.5.6): a loaded, edited document is
-// re-saved by appending only the changed objects over the verbatim original bytes.
-// Each test asserts the incremental contract - the original is an exact prefix, the
-// appended xref chains via /Prev, the edit re-parses, untouched objects still
-// resolve from the original revision - plus determinism and the loaded-only guard.
+// ISO 32000-1 7.5.6: incremental save appends only the changed objects over the verbatim original bytes.
 public class IncrementalSaveTests
 {
     private sealed class FixedSigner : ISigner
@@ -23,7 +19,6 @@ public class IncrementalSaveTests
 
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    // A minimal one-page loadable document carrying an /Info dictionary.
     private static byte[] BaseDocument()
     {
         var document = new Document();
@@ -55,8 +50,6 @@ public class IncrementalSaveTests
         return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
     }
 
-    // A flat two-page tree whose second page lives at generation 2, as a file whose
-    // object 5 was freed and reused by an earlier incremental update would.
     private static byte[] GenerationTwoPageTree()
     {
         var pdf = new FixturePdf()
@@ -109,7 +102,6 @@ public class IncrementalSaveTests
         return long.Parse(rest[..end]);
     }
 
-    // --- Guards ---
 
     [Fact]
     public void FreshlyBuiltDocumentThrows()
@@ -128,7 +120,6 @@ public class IncrementalSaveTests
         Assert.Throws<InvalidOperationException>(() => SaveIncremental(document));
     }
 
-    // --- Metadata edit ---
 
     [Fact]
     public void MetadataEditIsAppendedAndReParses()
@@ -143,7 +134,6 @@ public class IncrementalSaveTests
         var reader = DocumentReader.Parse(updated);
         var info = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Info"]));
         Assert.Equal("Updated title", ((StringObject)reader.Resolve(info["Title"])).Value);
-        // An untouched modeled field is preserved from the original /Info.
         Assert.Equal("Original author", ((StringObject)reader.Resolve(info["Author"])).Value);
         Assert.Equal(OriginalStartXref(original), ((NumberObject)reader.Trailer["Prev"]).IntValue);
     }
@@ -165,7 +155,6 @@ public class IncrementalSaveTests
             ((DictionaryObject)reader.Resolve(reader.Trailer["Info"]))["Title"])).Value);
     }
 
-    // --- Form fill ---
 
     [Fact]
     public void FilledFieldIsAppendedAndReParses()
@@ -192,8 +181,6 @@ public class IncrementalSaveTests
 
         var reader = DocumentReader.Parse(SaveIncremental(document));
 
-        // The untouched checkbox field was never re-emitted; it must still resolve
-        // (from the original revision) with its original /Off value and its /Rect.
         var agree = FormTestSupport.Field(reader, "Agree");
         Assert.Equal("Off", ((NameObject)reader.Resolve(agree["V"])).Value);
         Assert.IsType<ArrayObject>(reader.Resolve(agree["Rect"]));
@@ -216,7 +203,6 @@ public class IncrementalSaveTests
         Assert.Equal("Yes", ((NameObject)reader.Resolve(agree["AS"])).Value);
     }
 
-    // --- Append page ---
 
     [Fact]
     public void AppendedPageIsAppendedAndReParses()
@@ -241,7 +227,6 @@ public class IncrementalSaveTests
         var content = (StreamObject)reader.Resolve(appended["Contents"]);
         Assert.Contains("appended page", Encoding.Latin1.GetString(reader.DecodeStream(content)));
 
-        // The original first page still resolves and keeps its content.
         var firstContent = (StreamObject)reader.Resolve(((DictionaryObject)reader.Resolve(kids[0]))["Contents"]);
         Assert.Contains("page zero", Encoding.Latin1.GetString(reader.DecodeStream(firstContent)));
     }
@@ -337,9 +322,7 @@ public class IncrementalSaveTests
         Assert.Equal("first", Encoding.ASCII.GetString(reloaded.Pages[1].GetContent()!));
     }
 
-    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation. A page
-    // whose number was reclaimed from the free list lives at a non-zero generation, so a
-    // rewritten /Kids entry that drops the generation names a different (free) object.
+    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation.
     [Fact]
     public void ReorderedPageTreeKeepsTheNonZeroGenerationOfAReusedPageNumber()
     {
@@ -449,7 +432,6 @@ public class IncrementalSaveTests
         Assert.Contains("SaveToStream", exception.Message, StringComparison.Ordinal);
     }
 
-    // --- Determinism ---
 
     [Fact]
     public void SameEditsProduceIdenticalBytes()
@@ -469,7 +451,6 @@ public class IncrementalSaveTests
         Assert.Equal(Build(), Build());
     }
 
-    // --- Combined edit re-parses as a whole ---
 
     [Fact]
     public void CombinedEditsAllReParse()

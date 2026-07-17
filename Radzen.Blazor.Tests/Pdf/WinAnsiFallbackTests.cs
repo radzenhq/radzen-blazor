@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3(e): the base-14 WinAnsi path never silently deletes characters outside cp1252.
-// With a registered fallback the character renders through the fallback face; with
-// no fallback a visible placeholder is substituted instead of dropping the glyph.
 public class WinAnsiFallbackTests
 {
     [Fact]

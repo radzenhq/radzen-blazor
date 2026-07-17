@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Pins that Register() no longer serializes concurrent parses of different font
-// content behind a single process-wide lock: both registrations below must complete
-// and resolve to their own, correctly distinct, faces.
 public class ConcurrentFontRegistrationTests
 {
     private static byte[] SansBytes() => PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");

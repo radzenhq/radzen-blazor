@@ -37,8 +37,6 @@ public class MatrixNonFiniteTests
     }
 
     // ISO 32000-1 7.3.3 reals carry no exponent, so the lexer drops "1.0e400" as malformed.
-    // A plain digit run is lexically valid though, and double.TryParse IEEE-parses an
-    // overflowing one to infinity - a loaded cm operand reaching Matrix as non-finite.
     private static string Huge => new string('9', 400) + ".0";
 
     [Fact]
@@ -51,8 +49,6 @@ public class MatrixNonFiniteTests
         Assert.True(double.IsInfinity(path.Transform.A), $"Transform.A was {path.Transform.A:R}");
     }
 
-    // The differentiator: an untouched loaded page must keep its original bytes, which
-    // means a non-finite operand must survive a load+save without reaching the writer.
     [Fact]
     public void LoadSave_UntouchedNonFiniteCm_RoundTripsUnchanged()
     {
@@ -64,8 +60,6 @@ public class MatrixNonFiniteTests
         Assert.Contains(Huge, Encoding.Latin1.GetString(saved));
     }
 
-    // The other half of the boundary: a non-finite value is only invalid at the moment it
-    // must become PDF syntax, and that is where it is rejected.
     [Fact]
     public void Author_NonFiniteTransform_ThrowsWhenWritten()
     {

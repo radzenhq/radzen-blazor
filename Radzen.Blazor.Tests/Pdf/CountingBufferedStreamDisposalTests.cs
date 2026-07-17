@@ -9,7 +9,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class CountingBufferedStreamDisposalTests
 {
-    // Never actually written to; Write always throws before touching it.
     private sealed class ThrowsOnWriteStream : Stream
     {
         public override bool CanRead => false;
@@ -46,8 +45,6 @@ public class CountingBufferedStreamDisposalTests
 
         Assert.Throws<IOException>(() => stream.Dispose());
 
-        // The rented buffer was returned to the pool by the throwing Dispose above, so
-        // renting again should be able to reuse it rather than growing the pool further.
         var reclaimed = ArrayPool<byte>.Shared.Rent(64 * 1024);
         try
         {
@@ -68,7 +65,6 @@ public class CountingBufferedStreamDisposalTests
 
         Assert.Throws<IOException>(() => stream.Dispose());
 
-        // Second Dispose sees a null buffer and must be a no-op, not rethrow or double-return.
         var exception = Record.Exception(() => stream.Dispose());
         Assert.Null(exception);
     }

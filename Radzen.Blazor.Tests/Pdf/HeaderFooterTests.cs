@@ -6,8 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A repeated header/footer band appears on EVERY page, in the top/bottom margin, with
-// its Source paragraph reused across pages. Body content stays inside the content box.
 public class HeaderFooterTests
 {
     private const double Tol = 1e-6;

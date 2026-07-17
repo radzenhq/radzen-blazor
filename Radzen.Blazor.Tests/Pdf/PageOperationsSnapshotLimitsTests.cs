@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ImportPage/ImportPages/Merge/Split re-parse a serialized snapshot of the source. That
-// re-parse must run under the limits the caller loaded the source with, or a host that
-// configured tight limits against hostile input has them silently replaced by the
-// defaults for every imported page (finding #160).
 public class PageOperationsSnapshotLimitsTests
 {
     private static byte[] OnePageFile()

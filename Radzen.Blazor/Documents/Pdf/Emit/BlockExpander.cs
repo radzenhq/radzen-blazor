@@ -4,7 +4,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Turns authoring blocks into the flat placeable-block sequence the paginator lays out.
 internal static class BlockExpander
 {
     internal static IReadOnlyList<Block> ExpandBlocks(
@@ -63,8 +62,6 @@ internal static class BlockExpander
 
         public override Nothing Visit(Container container, Nothing context)
         {
-            // Overlay and rotated containers are only allowed as direct section content:
-            // nested content cannot host a page-space transform.
             if (!keepSpecialContainers && (OverlayBoxPlacer.IsSpecial(container) || container.Rotation != 0))
             {
                 throw new NotSupportedException(
@@ -88,17 +85,10 @@ internal static class BlockExpander
         }
     }
 
-    // The page-number column is sized for this placeholder (plus a small safety margin) and
-    // pass 1 renders it in place of the not-yet-known number, so the wrap fit of every entry
-    // line is identical in both layout passes regardless of the resolved digits.
     private const string TocPagePlaceholder = "0000";
 
-    // A stop far beyond any line keeps a tab off the default 36pt grid when the entry text
-    // reaches past the page-number stop: the number word then wraps in both passes alike
-    // instead of depending on its (pass-varying) width against the grid.
     private const double TocSentinelStop = 100000;
 
-    // See the remarks on TableOfContents for why entries lower to paragraphs, not a table.
     private static void ExpandTableOfContents(
         TableOfContents toc,
         List<Block> expanded,
@@ -112,8 +102,6 @@ internal static class BlockExpander
             throw new InvalidOperationException("A table of contents requires font metrics to lower.");
         }
 
-        // Falls back to the authored font only when the resolver has not run over this block
-        // (paginator-internal expansions of a tree the generator did not resolve).
         var font = resolution.TocFont(toc) ?? toc.Font;
         foreach (var entry in toc.Entries)
         {
@@ -157,8 +145,6 @@ internal static class BlockExpander
         return paragraph;
     }
 
-    // Tabs and line breaks in entry text would defeat the single-line tab layout; they flatten
-    // to spaces.
     private static string SanitizeTocText(string text)
     {
         if (text.IndexOfAny(['\t', '\r', '\n']) < 0)
@@ -195,8 +181,6 @@ internal static class BlockExpander
     {
         var item = list.Items[index];
 
-        // The item/list cascade is a fallback for when StyleResolver has not run over this item;
-        // nested items always take that path (StyleResolver does not walk them).
         var itemFont = resolution.ItemFont(item) ?? ItemFont(item, list, inherited);
         var paragraph = new Paragraph
         {
@@ -206,7 +190,6 @@ internal static class BlockExpander
         };
         resolution.SetParagraphFont(paragraph, itemFont);
 
-        // Null unless the tree was built for tagged output.
         if (resolution.ListItemElements(item) is { } elements)
         {
             resolution.SetListParagraphElements(paragraph, elements.Label, elements.Body);

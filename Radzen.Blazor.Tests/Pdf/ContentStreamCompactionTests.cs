@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Compact content-stream emission: generated operands are written at 1/1000-unit
-// precision (at most 3 fractional digits) so coordinate, color and matrix strings
-// stay short. Fidelity is the invariant - the extractable text of a compacted
-// document is exactly what it was, and every text object keeps its single-Td form.
 public class ContentStreamCompactionTests
 {
     private static DocumentBuilder AuthorInvoice()
@@ -82,8 +78,6 @@ public class ContentStreamCompactionTests
         Assert.True(offenders.Count == 0, "operands over 3 decimals: " + string.Join(", ", offenders));
     }
 
-    // A fractional right-aligned position is still emitted (proving the doc is not
-    // trivially all-integer coordinates) but never with a long fractional tail.
     [Fact]
     public void FractionalPosition_IsRoundedNotIntegerized()
     {
@@ -100,9 +94,6 @@ public class ContentStreamCompactionTests
         Assert.True(sawFraction, "expected at least one fractional operand from right-aligned layout");
     }
 
-    // One text object per drawn run: a single BT...ET enclosing exactly one Td and
-    // one Tj. This pins the current text-object shape so a later BT/ET batching
-    // change is a deliberate, reviewed edit rather than an accident.
     [Fact]
     public void EveryTextObject_HasSingleTdAndTj()
     {

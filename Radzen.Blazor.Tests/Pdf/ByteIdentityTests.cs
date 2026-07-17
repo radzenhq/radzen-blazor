@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C2 scoped byte-identity contract. LoadFromStream retains raw content-stream
-// bytes and preserves object identity such that an UNTOUCHED page's content
-// stream and page dictionary serialize byte-for-byte identically on re-save.
-// Whole-file identity is NOT asserted: xref offsets move as objects are added.
 public class ByteIdentityTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -92,7 +88,6 @@ public class ByteIdentityTests
     private static int KidNumber(DocumentReader reader, int index)
         => Assert.IsType<ReferenceObject>(DocumentLoadTests.Kids(reader)[index]).ObjectNumber;
 
-    // Raw "N 0 obj ... endobj" slice of the file, including the object header.
     private static byte[] ObjectBytes(byte[] file, int number)
     {
         var header = Encoding.ASCII.GetBytes($"{number} 0 obj");

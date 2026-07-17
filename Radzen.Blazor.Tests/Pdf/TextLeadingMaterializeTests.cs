@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// TL sets the text leading; T* and the ' operator advance to the next line by that
-// leading. Without honoring them the interpreter folds every run onto the first
-// baseline, collapsing a multi-line block into one overlapping line on re-encode.
 public class TextLeadingMaterializeTests
 {
     private static ContentCollection Materialize(string rawStream)

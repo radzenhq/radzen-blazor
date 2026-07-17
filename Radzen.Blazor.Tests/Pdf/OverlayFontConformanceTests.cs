@@ -5,11 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A user can stamp overlay content onto a built page via Page.Content. Overlay
-// TextContent always emits a non-embedded base-14 Type1 font, which PDF/A forbids.
-// SaveToStream must reject such an overlay on a conforming document with the same
-// embeddable-font error the generator raises, while leaving image-only overlays and
-// non-conforming documents untouched.
 public class OverlayFontConformanceTests
 {
     private static byte[] Png() => PdfTestResources.ReadAllBytes("Images/rgb.png");

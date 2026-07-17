@@ -7,11 +7,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One classic in-use cross-reference entry (ISO 32000-1 7.5.4) is exactly 20 bytes:
-// a 10-digit offset, a space, a 5-digit generation, and " n \n". Generation is a
-// parameter of the entry, not a property of the save mode: a full save passes 0
-// because DocumentWriter assigns every object a fresh number at generation 0, while
-// an incremental update passes the overridden object's own generation.
+// In-use cross-reference entry per ISO 32000-1 7.5.4
 public class XrefEntryWriterTests
 {
     private static string Write(long offset, int? generation = null)

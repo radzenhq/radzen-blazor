@@ -12,7 +12,6 @@ public class HexCodecTests
 {
     static byte[] AllBytes() => Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
-    // The pre-extraction bodies, verbatim, as the oracle for byte-neutrality.
     static string LegacyUpperString(byte[] digest)
     {
         const string hex = "0123456789ABCDEF";
@@ -58,7 +57,6 @@ public class HexCodecTests
     {
         var blob = AllBytes();
 
-        // PdfSigner's retired loop, writing at an offset inside a larger buffer.
         var expected = new byte[blob.Length * 2];
         const string hex = "0123456789abcdef";
         for (var i = 0; i < blob.Length; i++)
@@ -82,7 +80,6 @@ public class HexCodecTests
         Assert.Equal(string.Empty, HexCodec.EncodeToString([], HexCase.Upper));
     }
 
-    // Each caller's case is byte-visible in the file it writes; pin it at the caller.
 
     [Fact]
     public void AsciiHexFilterEncode_StaysUppercaseAndKeepsEod()
@@ -109,7 +106,6 @@ public class HexCodecTests
     [Fact]
     public void Sha1ComputeHashHex_StaysUppercase()
     {
-        // The /VRI key is matched literally by readers, so the case is semantic here.
         var hex = Sha1.ComputeHashHex(Encoding.ASCII.GetBytes("abc"));
 
         Assert.Equal("A9993E364706816ABA3E25717850C26C9CD0D89D", hex);
@@ -123,9 +119,6 @@ public class HexCodecTests
         Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", hex);
     }
 
-    // The input size is the thing under test and cannot be scaled down. The array is zero pages
-    // that nothing reads and the length check rejects before encoding, so this costs virtual
-    // address space rather than resident memory or time.
     [Fact]
     public void EncodeToString_InputTooLargeToEncode_ThrowsDiagnosable()
     {

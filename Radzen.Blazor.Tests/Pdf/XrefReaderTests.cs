@@ -8,10 +8,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Classic cross-reference table + trailer contract (ISO 32000-1 section 7.5),
-// driven entirely by hand-built FixturePdf files so the byte offsets are visible.
-// Pins DocumentReader.Parse(byte[])/Parse(Stream), Trailer, ObjectCount,
-// GetObject(int), Resolve(DocumentObject).
+// Cross-reference table + trailer per ISO 32000-1 section 7.5
 public class XrefReaderTests
 {
     private static string Entry19(long offset)

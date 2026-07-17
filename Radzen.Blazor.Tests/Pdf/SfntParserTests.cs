@@ -5,10 +5,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// All hardcoded expectations derived from the exact fixture files via
-// `python3 - <<EOF` scripts using fontTools.ttLib.TTFont / SFNTReader (fontTools 4.60.2).
-// Actual numeric properties are cast to int/double at the assert site so the tests do
-// not depend on the exact integer width the implementer picks (ushort vs short vs int).
 public class SfntParserTests
 {
     private static SfntFont LiberationSansRegular()
@@ -89,8 +85,8 @@ public class SfntParserTests
     [InlineData('0', 19)]
     [InlineData(' ', 3)]
     [InlineData('W', 58)]
-    [InlineData(0x0411, 962)]  // Cyrillic capital Be
-    [InlineData(0x044F, 1024)] // Cyrillic small ya
+    [InlineData(0x0411, 962)]
+    [InlineData(0x044F, 1024)]
     public void LiberationSansRegular_CmapFormat4_GlyphIds(int codepoint, int expectedGid)
     {
         Assert.Equal(expectedGid, (int)LiberationSansRegular().GetGlyphId(codepoint));
@@ -99,14 +95,13 @@ public class SfntParserTests
     [Fact]
     public void LiberationSansRegular_UnmappedCodepointReturnsNotdef()
     {
-        // U+2603 SNOWMAN is not in Liberation Sans (verified via fonttools getBestCmap).
         Assert.Equal(0, (int)LiberationSansRegular().GetGlyphId(0x2603));
     }
 
     [Theory]
-    [InlineData(36, 1366)]  // 'A'
-    [InlineData(3, 569)]    // space
-    [InlineData(58, 1933)]  // 'W'
+    [InlineData(36, 1366)]
+    [InlineData(3, 569)]
+    [InlineData(58, 1933)]
     public void LiberationSansRegular_AdvanceWidths(int gid, int expected)
     {
         Assert.Equal(expected, (int)LiberationSansRegular().GetAdvanceWidth((ushort)gid));
@@ -127,10 +122,10 @@ public class SfntParserTests
     }
 
     [Theory]
-    [InlineData(0x53D1, 401)] // 发
-    [InlineData(0x7968, 418)] // 票
+    [InlineData(0x53D1, 401)]
+    [InlineData(0x7968, 418)]
     [InlineData('A', 34)]
-    [InlineData(0x0431, 223)] // Cyrillic small be
+    [InlineData(0x0431, 223)]
     [InlineData(' ', 1)]
     public void NotoSubset_GlyphIds(int codepoint, int expectedGid)
     {
@@ -138,11 +133,11 @@ public class SfntParserTests
     }
 
     [Theory]
-    [InlineData(401, 1000)] // 发
-    [InlineData(418, 1000)] // 票
-    [InlineData(34, 608)]   // 'A'
-    [InlineData(223, 608)]  // Cyrillic be
-    [InlineData(1, 224)]    // space
+    [InlineData(401, 1000)]
+    [InlineData(418, 1000)]
+    [InlineData(34, 608)]
+    [InlineData(223, 608)]
+    [InlineData(1, 224)]
     public void NotoSubset_AdvanceWidths(int gid, int expected)
     {
         Assert.Equal(expected, (int)NotoSubset().GetAdvanceWidth((ushort)gid));
@@ -151,8 +146,6 @@ public class SfntParserTests
     [Fact]
     public void NotoSubset_GlyphBeyondNumberOfHMetricsReusesLastAdvance()
     {
-        // numberOfHMetrics=655, numGlyphs=658; glyph 657 has no explicit metric
-        // and must reuse the last hmtx advance (1000) per the OpenType spec.
         Assert.Equal(1000, (int)NotoSubset().GetAdvanceWidth(657));
     }
 
@@ -169,7 +162,6 @@ public class SfntParserTests
     [Fact]
     public void NotoSubset_TryGetTable_MissingTableReturnsFalse()
     {
-        // GDEF is not present in the subset (verified via fonttools SFNTReader).
         Assert.False(NotoSubset().TryGetTable("GDEF", out var data));
         Assert.Null(data);
     }

@@ -6,9 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Core flow-pagination contract: exact page COUNT and per-line Y offsets for
-// known-height paragraphs across a fixed page height, plus explicit PageBreak and
-// SpacingBefore/After. See PaginationSupport for the pinned model + semantics.
 public class PaginationTests
 {
     private const double Tol = 1e-6;

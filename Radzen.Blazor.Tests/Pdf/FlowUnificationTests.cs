@@ -5,15 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P1 regression tests: sections mixing paragraphs and tables must run through ONE
-// unified flow. Pinned behavior:
-//   * a Table starts at the current cursor (no forced page break before it); its first
-//     fragment gets the REMAINING page height and breaks early only when the header +
-//     first body row cannot fit,
-//   * section Header/Footer bands render on EVERY page of EVERY section, including
-//     table-bearing ones,
-//   * KeepTogether / widow / orphan rules apply across the unified flow.
-// All asserts reload the produced bytes and inspect extracted per-page text.
 public class FlowUnificationTests
 {
     private static Table SmallTable(Section section, string text)
@@ -151,8 +142,6 @@ public class FlowUnificationTests
     [Fact]
     public void OrphanControl_AppliesInTableBearingSection()
     {
-        // 4 filler lines leave room for only 1 line of the 3-line paragraph; the
-        // default Orphans = 2 must push the whole paragraph to the next page.
         var (builder, _) = AuthorSplitSection(fillerLines: 4);
 
         var reloaded = BuildTestSupport.Reload(builder);

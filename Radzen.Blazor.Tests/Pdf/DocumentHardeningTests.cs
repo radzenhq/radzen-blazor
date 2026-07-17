@@ -11,13 +11,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Document-level defensive-hardening contract: cyclic/over-deep page trees, an
-// unbounded xref stream, an over-declared object stream, and stream-filter bombs
-// must all be handled quickly and safely instead of overflowing the stack,
-// hanging, or exhausting memory. Each guard is paired with a positive control.
 public class DocumentHardeningTests
 {
-    // --- Item 2: page-tree cycle and depth ----------------------------------
 
     [Fact]
     public void CyclicPageTree_Throws()
@@ -56,12 +51,7 @@ public class DocumentHardeningTests
         Assert.Equal(2, document.Pages.Count);
     }
 
-    // --- Item 3: unbounded xref stream --------------------------------------
 
-    // /W [0 0 0] makes each entry zero-length so a huge /Size never advances the
-    // read cursor. The guard rejects the widths; the existing repair fallback then
-    // rebuilds from the object scan, so the reader recovers quickly instead of
-    // exhausting memory building a hundred-million-entry table.
     [Fact]
     public void XrefStreamZeroWidthHugeSize_RecoversWithoutOom()
     {
@@ -78,11 +68,7 @@ public class DocumentHardeningTests
         Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
     }
 
-    // --- Item 4: over-declared object stream --------------------------------
 
-    // /N 2000000000 would size the member list (and the fill loop) from attacker
-    // input. The clamp caps it to what the payload can hold, so resolving the one
-    // real member succeeds quickly instead of trying to allocate ~16 GB.
     [Fact]
     public void ObjectStreamHugeCount_ResolvesWithoutOom()
     {
@@ -101,13 +87,10 @@ public class DocumentHardeningTests
         Assert.Equal("Pages", Assert.IsType<NameObject>(pages["Type"]).Value);
     }
 
-    // --- Item 5: stream-filter bombs and chain length -----------------------
 
     [Fact]
     public void FilterChainBomb_ExceedsCap_Throws()
     {
-        // Filter chain [/ASCII85Decode /FlateDecode]: the inner Flate expands 1 MB
-        // of zeros far past the tiny per-stream cap.
         var inner = FlateFilter.Encode(new byte[1024 * 1024]);
         var payload = Ascii85Filter.Encode(inner);
         var bytes = StreamObjectFile("<< /Length LEN /Filter [/ASCII85Decode /FlateDecode] >>", payload);
@@ -146,9 +129,7 @@ public class DocumentHardeningTests
         Assert.Throws<DocumentParseException>(() => reader.DecodeStream(stream));
     }
 
-    // --- fixtures -----------------------------------------------------------
 
-    // Assembles a classic cross-reference file from contiguous objects 1..k.
     private static byte[] ClassicXref(params (int Number, string Body)[] objects)
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
@@ -185,8 +166,6 @@ public class DocumentHardeningTests
         return pdf.ToArray();
     }
 
-    // Newest section is a /Type /XRef stream with /W [0 0 0] and a huge /Size, plus
-    // a valid catalog/pages/page reachable by the repair scan.
     private static byte[] ZeroWidthXrefStreamFile()
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
@@ -201,7 +180,6 @@ public class DocumentHardeningTests
         return pdf.ToArray();
     }
 
-    // Hand-built minimal xref stream (/W [1 2 1], no filter/predictor).
     private static byte[] RawXrefStreamFile()
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
@@ -225,8 +203,6 @@ public class DocumentHardeningTests
 
     private static byte[] ValidObjStmFile() => ObjStmFile(declaredCount: 2);
 
-    // ObjStm holding objects 1 (Catalog) and 2 (Pages), referenced by an xref
-    // stream; /N is set to declaredCount so a hostile value can be exercised.
     private static byte[] ObjStmFile(long declaredCount)
     {
         var b1 = "<< /Type /Catalog /Pages 2 0 R >>";

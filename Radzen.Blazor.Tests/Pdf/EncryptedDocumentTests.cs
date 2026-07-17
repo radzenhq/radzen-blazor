@@ -8,13 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// End-to-end decryption contract. Pins the public surface:
-//   static DocumentReader DocumentReader.Parse(byte[] data, string? password)
-//   static DocumentReader DocumentReader.Parse(Stream stream, string? password)
-//   bool DocumentReader.IsEncrypted { get; }
-//   public InvalidPasswordException (namespace Radzen.Documents.Pdf.Objects)
-// Behaviour: with the correct/empty password every string and stream arrives
-// decrypted and the object graph resolves transparently; a wrong password throws.
 public class EncryptedDocumentTests
 {
     private static byte[] Bytes(string file) => PdfTestResources.ReadAllBytes("Documents/" + file);
@@ -54,10 +47,8 @@ public class EncryptedDocumentTests
         Assert.True(reader.IsEncrypted);
         var page = Page(reader);
 
-        // Decrypted (and Flate-decoded) content stream carries the fixture marker.
         Assert.Contains("Hello encrypted world!", ContentText(reader, page));
 
-        // Font resource resolves to the Helvetica base font.
         var resources = Dict(reader, page["Resources"]);
         var fonts = Dict(reader, resources["Font"]);
         var font = Dict(reader, fonts["F1"]);
@@ -74,14 +65,12 @@ public class EncryptedDocumentTests
         AssertFixtureOpens(DocumentReader.Parse(Bytes(file), ""));
     }
 
-    // The passwordless overload behaves like an empty password: opens empty-user files.
     [Fact]
     public void PasswordlessOverload_OpensEmptyUserFile()
     {
         AssertFixtureOpens(DocumentReader.Parse(Bytes("encrypted-rc4-40.pdf")));
     }
 
-    // Stream overload with a password argument.
     [Fact]
     public void StreamOverload_WithPassword_Decrypts()
     {
@@ -116,8 +105,6 @@ public class EncryptedDocumentTests
             () => DocumentReader.Parse(Bytes("encrypted-rc4-40.pdf"), "definitely-wrong"));
     }
 
-    // R6 owner-password fixture: both the user and the owner password open the file,
-    // exercising the algorithm 2.A user and owner paths.
     [Fact]
     public void Aes256UserFixture_UserPassword_Opens()
     {
@@ -130,7 +117,6 @@ public class EncryptedDocumentTests
         AssertFixtureOpens(DocumentReader.Parse(Bytes("encrypted-aes-256-user.pdf"), "owner"));
     }
 
-    // An unencrypted document accepts a password argument and reports IsEncrypted false.
     [Fact]
     public void UnencryptedFile_WithPassword_ParsesAndIsNotEncrypted()
     {

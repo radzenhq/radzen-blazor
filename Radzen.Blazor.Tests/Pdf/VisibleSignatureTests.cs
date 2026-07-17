@@ -13,11 +13,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A signature can be made visible: a non-zero /Rect on a chosen page plus a
-// generated /AP /N appearance stream showing the signer name, reason and date.
-// Omitting SignatureOptions.Appearance keeps the historic invisible [0 0 0 0]
-// widget with no appearance so unchanged callers stay byte-stable, and either
-// way the embedded detached CMS still verifies over the declared /ByteRange.
 public class VisibleSignatureTests
 {
     private static readonly DateTimeOffset FixedTime = new(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);

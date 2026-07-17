@@ -6,11 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ReaderLimits.MaxXrefEntries must bound the table the loader actually builds - the
-// document-wide entry dictionary accumulated across every section of the /Prev chain -
-// not the entry count of any single section. An xref stream declares its subsection
-// sizes in a DECOMPRESSED payload, so a few KB of input per section yields millions of
-// entries, and a /Prev chain of such sections multiplies that without limit.
 public class XrefChainEntryBudgetTests
 {
     private const int FillerObjectBase = 100;
@@ -21,8 +16,6 @@ public class XrefChainEntryBudgetTests
         var data = ChainedXrefStreamFile(fillerSections: 5, perSection: 4);
         var limits = new ReaderLimits { MaxXrefEntries = 10 };
 
-        // Every section on its own (4 entries, and 3 in the oldest) is under the cap;
-        // only the accumulated total (23) exceeds it.
         var exception = Assert.Throws<DocumentParseException>(() => Load(data, limits));
         Assert.Contains("maximum number of entries", exception.Message);
     }
@@ -40,9 +33,6 @@ public class XrefChainEntryBudgetTests
         Assert.True(loader.Entries.ContainsKey(FillerObjectBase + 403));
     }
 
-    // The cap must hold at whatever value it is configured to: growing the chain past a
-    // fixed cap must not grow the table. This is the bounded stand-in for the OOM - the
-    // hostile file scales the same way, with ~8M entries per section instead of 4.
     [Theory]
     [InlineData(4)]
     [InlineData(12)]
@@ -61,15 +51,12 @@ public class XrefChainEntryBudgetTests
         {
         }
 
-        // Total across the chain is 83, so every cap here must be enforced by refusal.
         Assert.Null(loader);
     }
 
     [Fact]
     public void ChainedXrefStreams_OverCap_LoadFromStreamThrows()
     {
-        // The cap is below the file's physical object count too, so the repair scan
-        // (which already bounds the accumulated table) cannot mask the loader's refusal.
         var data = ChainedXrefStreamFile(fillerSections: 5, perSection: 4);
 
         Assert.Throws<DocumentParseException>(
@@ -89,8 +76,6 @@ public class XrefChainEntryBudgetTests
             Assert.IsType<DictionaryObject>(reader.GetObject(3))["Type"]).Value);
     }
 
-    // Drives XrefLoader the way DocumentReader wires it, but without the repair fallback,
-    // so the loader's own budget decision is what the test observes.
     private static XrefLoader Load(byte[] data, ReaderLimits limits)
     {
         var decoder = new StreamDecoder(limits, o => o);
@@ -101,9 +86,6 @@ public class XrefChainEntryBudgetTests
         return loader;
     }
 
-    // A /Prev chain of cross-reference streams. The oldest section lists the three real
-    // objects; each newer section lists `perSection` free entries in an object-number
-    // range of its own, so no key ever collides and every entry is a new dictionary slot.
     private static byte[] ChainedXrefStreamFile(int fillerSections, int perSection)
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");

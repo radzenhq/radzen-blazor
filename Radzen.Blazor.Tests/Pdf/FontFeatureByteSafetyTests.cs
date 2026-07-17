@@ -5,10 +5,6 @@ using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Byte-safety guard for the font/line-breaking feature work (pair kerning, dot leaders,
-// conditional breaks). A document that does NOT opt into any new feature - it merely
-// contains plain hyphens, tabs without leaders, and justified text that all flow through
-// the modified LineBreaker - must serialize byte-for-byte identically across builds.
 public class FontFeatureByteSafetyTests
 {
     private static DocumentBuilder BuildDocument()

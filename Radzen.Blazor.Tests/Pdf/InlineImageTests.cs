@@ -8,13 +8,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Inline images (BI ... ID <binary> EI) must be consumed as a unit by both the
-// interpreter and the extractor. The binary payload can contain bytes that look like
-// operators (even an unbounded "EI"), so it must not be lexed as content operators.
 public class InlineImageTests
 {
-    // Binary payload containing an unbounded "EI" (0x45 0x49) plus operator-looking
-    // bytes; only the whitespace-delimited trailing EI terminates the image.
     private static readonly byte[] Payload = [0x00, 0x01, 0x45, 0x49, 0xFF, 0x0A, 0xDE, 0xAD, 0x28, 0x42];
 
     private static byte[] StreamWithInlineImage()

@@ -8,10 +8,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L5 test 2 + 5 + 6: Build() drives the layout engine to a real physical Document.
-// The page count matches the Paginator over the same builder; an Image block decodes
-// to an XObject scaled to its box; and a base-14 paragraph round trips with no
-// registered fonts (zero configuration).
 public class BuildEndToEndTests
 {
     [Fact]
@@ -36,7 +32,6 @@ public class BuildEndToEndTests
         var built = builder.Build();
         Assert.Equal(expected, built.Pages.Count);
 
-        // 13 single lines, 5 per page -> 3 pages, and each page carries its own dimensions.
         Assert.Equal(3, built.Pages.Count);
         Assert.Equal(200, built.Pages[0].Width.Point, 3);
     }
@@ -87,7 +82,6 @@ public class BuildEndToEndTests
         Assert.Equal(8, BuildTestSupport.Int(dict, "BitsPerComponent"));
         Assert.Equal("DCTDecode", BuildTestSupport.Name(reader, dict, "Filter"));
 
-        // JPEG passthrough: the stored bytes are the untouched DCT data.
         Assert.Equal(original, images[0].Data);
     }
 
@@ -106,8 +100,6 @@ public class BuildEndToEndTests
 
         var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
 
-        // Conventional image placement: `w 0 0 h x y cm ... Do`, the CTM scaling the
-        // unit image square to the requested 200x100 point box.
         Assert.Matches(
             @"200(?:\.0+)?\s+0(?:\.0+)?\s+0(?:\.0+)?\s+100(?:\.0+)?\s+[-\d.]+\s+[-\d.]+\s+cm",
             content);

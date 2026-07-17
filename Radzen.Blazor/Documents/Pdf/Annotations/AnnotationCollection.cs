@@ -128,12 +128,8 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     internal void Load(Annotation? annotation, DocumentReader reader, DocumentObject original, DictionaryObject? dictionary)
     {
         loaded = true;
-        // Reading builds the annotation through its tracked setters, which would otherwise
-        // leave every loaded annotation born dirty.
         annotation?.AcceptChanges();
         entries.Add(new Entry(annotation, reader, original, dictionary));
-        // The loaded entry is the clean baseline: adding it must not read as a structural edit,
-        // or an unmodified loaded page would re-emit its /Annots array.
         entries.AcceptStructure();
     }
 

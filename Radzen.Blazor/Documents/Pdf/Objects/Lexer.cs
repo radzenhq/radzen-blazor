@@ -11,35 +11,28 @@ internal sealed class Lexer(byte[] data, int position)
 
     private static readonly string[] InternedTokens =
     [
-        // Keywords.
         "obj", "endobj", "stream", "endstream", "R", "true", "false", "null",
         "xref", "trailer", "startxref",
 
-        // Structure.
         "Type", "Subtype", "Length", "Length1", "Filter", "DecodeParms", "Root", "Info",
         "Size", "Prev", "First", "Extends", "N", "W", "Index", "ID", "Encrypt",
         "Catalog", "Pages", "Page", "Kids", "Count", "Parent", "ObjStm", "XRef",
 
-        // Page and resources.
         "MediaBox", "CropBox", "Resources", "Contents", "Rotate", "Annots", "Group",
         "Font", "XObject", "ExtGState", "ColorSpace", "Pattern", "Shading", "Properties",
         "ProcSet", "Image", "Form", "Width", "Height",
 
-        // Fonts.
         "BaseFont", "Encoding", "FirstChar", "LastChar", "Widths", "FontDescriptor",
         "ToUnicode", "DescendantFonts", "CIDToGIDMap", "TrueType", "Type0", "Type1",
         "Type1C", "FontFile", "FontFile2", "FontFile3", "Differences",
 
-        // Filters.
         "FlateDecode", "LZWDecode", "ASCII85Decode", "ASCIIHexDecode", "RunLengthDecode",
         "DCTDecode", "JPXDecode", "CCITTFaxDecode", "Crypt",
 
-        // Common values.
         "DeviceRGB", "DeviceGray", "DeviceCMYK", "Indexed", "ICCBased", "Separation",
         "Predictor", "Columns", "Colors", "BitsPerComponent", "BitsPerCoordinate",
     ];
 
-    // Bucketed by length and first byte so a lookup compares against one or two candidates.
     private static readonly Dictionary<int, string[]> Interned = BuildInterned();
 
     private readonly byte[] data = data;
@@ -55,21 +48,14 @@ internal sealed class Lexer(byte[] data, int position)
             or (byte)'[' or (byte)']' or (byte)'{' or (byte)'}'
             or (byte)'/' or (byte)'%';
 
-    // What counts as a number, a string or a hex string is one grammar (ISO 32000-1 7.3);
-    // only what to do with malformed input differs. A file object must be rejected so a
-    // corrupt document cannot be silently misread, while a content stream must recover and
-    // keep rendering, so recovery is a parameter of the shared readers below - never a
-    // second grammar.
+    // ISO 32000-1 7.3: numbers, strings and hex strings share one grammar; recovery only changes handling of malformed input.
     public enum Recovery
     {
         Strict,
         Lenient,
     }
 
-    // Whether a hex string's closing '>' is required is a separate axis from Recovery: the
-    // 7.3.4.3 string object needs it as a delimiter, while for the 7.4.2 ASCIIHexDecode
-    // filter the stream /Length already bounds the data, so running out is legal there even
-    // though a bad digit is still fatal.
+    // ISO 32000-1 7.3.4.3 requires the closing '>'; for the 7.4.2 ASCIIHexDecode filter running out is legal.
     public enum HexEnd
     {
         Required,
@@ -151,11 +137,7 @@ internal sealed class Lexer(byte[] data, int position)
 
     private Token ReadNumber() => ReadNumber(data, ref position, Recovery.Strict)!.Value;
 
-    // ISO 32000-1 7.3.3: a number is an optional sign, digits and at most one decimal point.
-    // There is no exponent notation in PDF, so "1e3" is malformed input in every context and
-    // must never parse as 1000. A numeric object runs to the next whitespace or delimiter, so
-    // the whole run is validated rather than stopping at the first byte that does not fit.
-    // Lenient callers get null for a malformed run and skip it; strict callers get an exception.
+    // ISO 32000-1 7.3.3: a number is an optional sign, digits and at most one decimal point, with no exponent notation.
     public static Token? ReadNumber(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
@@ -214,8 +196,7 @@ internal sealed class Lexer(byte[] data, int position)
             return Token.Integer(integer);
         }
 
-        // An integer too large for long is out of range per ISO 32000-1 Annex C rather than
-        // ungrammatical, so a lenient reader keeps the approximate magnitude.
+        // ISO 32000-1 Annex C: an integer too large for long is out of range, not ungrammatical.
         return recovery == Recovery.Lenient
             && double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var approximate)
             ? Token.Real(approximate)
@@ -227,10 +208,7 @@ internal sealed class Lexer(byte[] data, int position)
 
     private Token ReadName() => Token.Name(ReadName(data, ref position));
 
-    // ISO 32000-1 7.3.5: a name runs to the next whitespace or delimiter, with #XX decoding
-    // to one byte. Names are the same in both grammars and cannot be malformed - a '#' that
-    // is not followed by two hex digits is simply a literal '#' - so there is no recovery
-    // parameter here.
+    // ISO 32000-1 7.3.5: a name runs to the next whitespace or delimiter, with #XX decoding to one byte.
     public static string ReadName(byte[] data, ref int position)
     {
         position++;
@@ -279,9 +257,7 @@ internal sealed class Lexer(byte[] data, int position)
     private Token ReadLiteralString()
         => Token.String(TokenKind.StringLiteral, ReadLiteralString(data, ref position, Recovery.Strict));
 
-    // ISO 32000-1 7.3.4.2: balanced parentheses, backslash escapes, octal escapes, and an
-    // unescaped CR/LF/CRLF decoding to a single LF. Position enters on '(' and leaves past
-    // the matching ')'; a lenient reader returns what it decoded when the string never closes.
+    // ISO 32000-1 7.3.4.2: balanced parentheses, backslash escapes, octal escapes, and an unescaped CR/LF/CRLF decoding to a single LF.
     public static byte[] ReadLiteralString(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
@@ -399,8 +375,7 @@ internal sealed class Lexer(byte[] data, int position)
     private Token ReadHexString()
         => Token.String(TokenKind.HexString, ReadHexString(data, ref position, Recovery.Strict));
 
-    // ISO 32000-1 7.3.4.3: position enters on '<' and leaves past the '>', which this grammar
-    // requires. The digits themselves are read by ReadHexDigits.
+    // ISO 32000-1 7.3.4.3: a hex string enters on '<' and requires the closing '>'.
     public static byte[] ReadHexString(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
@@ -408,8 +383,7 @@ internal sealed class Lexer(byte[] data, int position)
         return ReadHexDigits(data, ref position, recovery, recovery == Recovery.Lenient ? HexEnd.Optional : HexEnd.Required, start);
     }
 
-    // ISO 32000-1 7.3.4.3 / 7.4.2: hex digit pairs, whitespace ignored, an odd trailing digit
-    // padded with a zero, '>' ends. Position enters on the first digit and leaves past the '>'.
+    // ISO 32000-1 7.3.4.3 / 7.4.2: hex digit pairs, whitespace ignored, an odd trailing digit padded with a zero, '>' ends.
     public static byte[] ReadHexDigits(byte[] data, ref int position, Recovery recovery, HexEnd end, int start = -1)
     {
         if (start < 0)
@@ -512,8 +486,6 @@ internal sealed class Lexer(byte[] data, int position)
 
     private static int BucketKey(int length, byte first) => (length << 8) | first;
 
-    // The same handful of names and keywords repeat once per object across the whole file,
-    // so hand back the canonical instance instead of a fresh string for each occurrence.
     private static string Decode(byte[] data, int start, int length)
     {
         if (length is > 0 and <= MaxInternedLength

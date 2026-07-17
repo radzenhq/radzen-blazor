@@ -6,11 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// FormField.Value reports a multi-select choice field's /V as a display string. That is a
-// data API and "Red, Blue" is a fine answer for it. The flattener paints *page content*, and
-// a list box does not render as that string: ISO 32000-1 12.7.4.4 stacks every /Opt entry
-// with the selected ones highlighted. The two paths agreeing never made the painting right,
-// so Value is pinned here and the rendering is pinned in FlattenBakeFidelityTests.
+// ISO 32000-1 12.7.4.4: a list box renders every /Opt entry stacked with the selected ones highlighted.
 public class ChoiceValueAgreementTests
 {
     private static byte[] MultiSelectListForm(string values)
@@ -52,10 +48,6 @@ public class ChoiceValueAgreementTests
         Assert.Equal(expected, document.AcroForm!.Fields.Single().Value);
     }
 
-    // What Value reports is not what the page must show. An array /V is a multi-selection: it
-    // renders as stacked highlighted /Opt entries, so "Red, Blue" is a string the field never
-    // shows and Green is dropped. The rendering lives in the /AP the flattener would discard,
-    // so it refuses rather than paint that string.
     [Theory]
     [InlineData("[(Red) (Blue)]")]
     [InlineData("[(Red)]")]
@@ -66,7 +58,6 @@ public class ChoiceValueAgreementTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // A scalar /V is a single selection, which is the one line the flattener paints.
     [Fact]
     public void FlattenPaintsASingleSelection()
     {

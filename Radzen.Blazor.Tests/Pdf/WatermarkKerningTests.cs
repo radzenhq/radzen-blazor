@@ -8,9 +8,6 @@ using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A watermark in a registered (embedded) font is centred from the kerned MeasureText width,
-// so the drawn run must carry the same kerning: without the TJ adjustments the mark is
-// painted at its unkerned width while positioned for its kerned one, and sits off-centre.
 public class WatermarkKerningTests
 {
     private const string Text = "AVATAR";
@@ -43,8 +40,6 @@ public class WatermarkKerningTests
         return fonts;
     }
 
-    // AVATAR has kerned pairs in Liberation Sans, so the two widths must differ - otherwise
-    // the drift this test guards could not be observed at all.
     [Fact]
     public void KernedAndUnkernedWidthsDiffer()
     {
@@ -53,8 +48,6 @@ public class WatermarkKerningTests
         Assert.True(Fonts(kerning: true).MeasureText(Text, font) < Fonts(kerning: false).MeasureText(Text, font));
     }
 
-    // Sums the numeric adjustments of the page's single TJ array, in 1/1000 em. Glyph codes sit
-    // in (...) literal strings whose octal escapes are digits too, so those are skipped wholesale.
     private static double TjAdjustments(string content)
     {
         var open = content.IndexOf('[');
@@ -106,9 +99,6 @@ public class WatermarkKerningTests
         return total;
     }
 
-    // The invariant the bug broke: the width the run is drawn at must equal the width it was
-    // centred from. Drawn width is the unkerned advance sum plus the TJ displacement
-    // (-adjustment * size / 1000 per entry), and that must land on the kerned MeasureText width.
     [Fact]
     public void Kerned_DrawnWidthEqualsTheMeasuredWidthTheMarkIsCentredFrom()
     {
@@ -118,11 +108,9 @@ public class WatermarkKerningTests
 
         var displacement = -TjAdjustments(PageText(Builder(kerning: true))) * font.Size / 1000.0;
 
-        // 2 dp: the TJ numbers are written to 3 decimals, far below the ~8.9 pt drift of the bug.
         Assert.Equal(measured, unkerned + displacement, 2);
     }
 
-    // The default (unkerned) watermark emits a plain Tj show, unchanged.
     [Fact]
     public void Unkerned_WatermarkShowsWithoutTj()
     {

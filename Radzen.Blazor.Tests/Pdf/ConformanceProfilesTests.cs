@@ -7,12 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// PDF/A-2, PDF/A-4 and PDF/UA conformance profiles. Pins the extended
-// PdfAConformance enum (PdfA2B/PdfA2A/PdfA4/PdfA4E/PdfA4F), the pdfaid
-// part/conformance/rev XMP identification each level emits, the per-level
-// attachment rules, and the PDF/UA-1 identification (pdfuaid:part 1,
-// /MarkInfo /Marked true, /StructTreeRoot, DisplayDocTitle) requested through
-// DocumentBuilder.PdfUA, composable with any PDF/A level.
 public class ConformanceProfilesTests
 {
     private static DocumentBuilder Author(PdfAConformance conformance = PdfAConformance.None, bool ua = false)

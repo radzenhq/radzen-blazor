@@ -4,18 +4,11 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Applies a stream's <c>/Filter</c> chain (with <c>/DecodeParms</c> predictors) in
-/// order and enforces the decoded-length and expansion-ratio limits. References inside
-/// the filter/parameters dictionaries are resolved through the supplied resolver.
-/// </summary>
 internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, DocumentObject> resolve)
 {
     private readonly ReaderLimits limits = limits;
     private readonly Func<DocumentObject, DocumentObject> resolve = resolve;
 
-    // The decoded payload is always a buffer of its own: callers hand it to the lexer and
-    // to public byte[] APIs, and the raw input may be a window onto the shared file buffer.
     public byte[] Decode(DictionaryObject dictionary, ReadOnlyMemory<byte> data)
     {
         var hasFilter = dictionary.TryGetValue("Filter", out var filterObject);
@@ -43,9 +36,6 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         {
             result = ApplyFilter(names[i], result, parms[i], limits.MaxDecodedStreamBytes);
 
-            // Cumulative per-stream cap plus a secondary expansion-ratio check that
-            // only engages once output clears the floor, so small streams are never
-            // rejected for a high ratio on tiny input.
             if (result.LongLength > limits.MaxDecodedStreamBytes)
             {
                 throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);

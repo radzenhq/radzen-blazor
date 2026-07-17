@@ -11,14 +11,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// TableOfContents block: two-pass page-number resolution, dot leaders, GoTo link
-// annotations on the TOC page, single-pass byte identity for documents without a TOC
-// and the missing-anchor failure. All assertions run against real DocumentBuilder.Build()
-// bytes reloaded through DocumentReader / Document.LoadFromStream.
 public class TableOfContentsTests
 {
-    // Page 1: the TOC. Page 2: "Chapter One" (anchor ch1). Pages 3-4: filler, then a
-    // page break puts "Chapter Two" (anchor ch2) on page 4.
     private static DocumentBuilder ChapterDocument()
     {
         var builder = new DocumentBuilder();
@@ -126,7 +120,6 @@ public class TableOfContentsTests
         var content = Encoding.Latin1.GetString(
             ContentTestHelpers.PageContent(BuildTestSupport.Read(ChapterDocument()), 0));
 
-        // Both entry lines start at the left content edge (x = 40) plus the level indent (12pt).
         Assert.Contains("40 ", content, StringComparison.Ordinal);
         Assert.Contains("52 ", content, StringComparison.Ordinal);
     }
@@ -138,9 +131,6 @@ public class TableOfContentsTests
         Assert.Equal(bytes, PlainNavigationDocument().ToArray());
     }
 
-    // Exercises the two-pass pagination identity where it is least trivial: many entries
-    // spilling the TOC itself across pages, and an entry whose text reaches into the
-    // page-number column. Wrong numbers here would mean the passes broke lines differently.
     [Fact]
     public void Toc_ManyAndOverlongEntries_ResolveCorrectPageNumbers()
     {
@@ -180,8 +170,6 @@ public class TableOfContentsTests
         }
     }
 
-    // The page numbers form a real column: every entry's number starts at the same x
-    // regardless of how far its leader run reaches.
     [Fact]
     public void Toc_PageNumbers_ShareOneRightAlignedColumn()
     {

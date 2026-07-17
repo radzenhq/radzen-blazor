@@ -8,22 +8,13 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Crypto robustness contract:
-// - AesCbc must reject ciphertext that is not a whole number of blocks (fail loud
-//   rather than silently dropping the trailing partial block).
-// - Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3), not Latin-1.
-// - /StmF and /StrF select the crypt filter by name from /CF; /Identity means
-//   the data is not encrypted at all (ISO 32000-1 7.6.5).
-// - The repair path (broken startxref) must keep the real trailer's /Encrypt,
-//   /ID and /Info instead of synthesizing a bare Root/Size trailer.
+// Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3).
+// /Identity crypt filter means the data is not encrypted (ISO 32000-1 7.6.5).
 public class ReaderCryptoRobustnessTests
 {
     private static readonly byte[] DocumentId = CryptoFixtureSupport.FixedBytes(16, 5);
 
-    // ---- AesCbc odd-length ciphertext ----
 
-    // IV(16) + a ciphertext whose length is not a multiple of 16: the trailing partial
-    // block cannot be decrypted, so fail loud instead of silently truncating.
     [Theory]
     [InlineData(17)]
     [InlineData(20)]
@@ -36,7 +27,6 @@ public class ReaderCryptoRobustnessTests
         Assert.Throws<DocumentParseException>(() => AesCbc.Decrypt(key, data));
     }
 
-    // ---- crafted encrypted single-page files ----
 
     private static byte[] EncryptedFile(string encryptDict, byte[] content, string? infoBody)
     {
@@ -82,7 +72,6 @@ public class ReaderCryptoRobustnessTests
         return Encoding.Latin1.GetString(reader.DecodeStream(stream));
     }
 
-    // ---- /StmF /Identity /StrF /Identity: data is stored unencrypted ----
 
     [Fact]
     public void IdentityStmFAndStrF_LeaveDataUntouched()
@@ -99,8 +88,6 @@ public class ReaderCryptoRobustnessTests
             + " /U " + CryptoFixtureSupport.Hex(user)
             + " /P " + permissions + " >>";
 
-        // Plaintext content, padded to a multiple of 16 so a wrong AES pass
-        // garbles rather than crashes.
         var text = "BT /F1 12 Tf 72 720 Td (identity-marker) Tj ET";
         var content = Encoding.Latin1.GetBytes(text.PadRight((text.Length + 15) / 16 * 16));
 
@@ -114,7 +101,6 @@ public class ReaderCryptoRobustnessTests
         Assert.Equal("Identity plain title", Assert.IsType<StringObject>(info["Title"]).Value);
     }
 
-    // ---- named crypt filter (not /StdCF) selected via /StmF and /StrF ----
 
     [Fact]
     public void NamedCryptFilter_AesV2StreamsDecrypt()
@@ -141,12 +127,11 @@ public class ReaderCryptoRobustnessTests
         Assert.Contains("(named-cf-marker) Tj", ContentText(reader));
     }
 
-    // ---- revision 6 password is UTF-8 ----
 
     [Fact]
     public void Revision6_NonAsciiPassword_IsUtf8()
     {
-        const string password = "m\u00FCnchen"; // u-umlaut: Latin-1 and UTF-8 bytes differ
+        const string password = "m\u00FCnchen";
         var passwordBytes = Encoding.UTF8.GetBytes(password);
 
         var validationSalt = CryptoFixtureSupport.FixedBytes(8, 11);
@@ -180,7 +165,6 @@ public class ReaderCryptoRobustnessTests
         Assert.Contains("(utf8-password-marker) Tj", ContentText(reader));
     }
 
-    // ---- repair keeps /Info, /Encrypt and /ID from the real trailer ----
 
     private static byte[] BreakStartxref(byte[] bytes)
     {
@@ -210,11 +194,9 @@ public class ReaderCryptoRobustnessTests
 
         var reader = DocumentReader.Parse(BreakStartxref(pdf.ToArray()));
 
-        // Repair recovered the catalog...
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
         Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
 
-        // ...and must also keep the surviving trailer's /Info.
         Assert.True(reader.Trailer.TryGetValue("Info", out var infoObject) && infoObject is not null,
             "Repaired trailer lost /Info.");
         var info = Assert.IsType<DictionaryObject>(reader.Resolve(infoObject!));

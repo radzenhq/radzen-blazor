@@ -7,19 +7,12 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A PDF arriving from a network stream, an ASP.NET request body or a Blazor
-// BrowserFileStream is not seekable, so its length is unknown up front and the loader must
-// accumulate it. Accumulating through a MemoryStream costs roughly 3x the file: the buffer
-// doubles (old and new both live across each grow) and ToArray() copies the whole thing
-// again, all on the LOH for a large document. The non-seekable path must not cost
-// materially more than the seekable one, which allocates the file exactly once.
 public class DocumentLoaderAllocationTests
 {
     private static byte[] BuildLargeDocument(int padding)
     {
         var document = new Document();
 
-        // Incompressible bytes keep the document's size predictable.
         var payload = new byte[padding];
         new Random(11).NextBytes(payload);
         document.Pages.Add(PageSizes.A4).SetContent(payload);
@@ -47,9 +40,6 @@ public class DocumentLoaderAllocationTests
         var seekable = Measure(() => new MemoryStream(bytes));
         var nonSeekable = Measure(() => new NonSeekableStream(bytes));
 
-        // Everything past ReadAll is identical between the two, so the difference is exactly
-        // what accumulating an unknown-length stream costs. One extra copy of the file is
-        // inherent (chunks, then the exactly-sized array); the doubling chain is not.
         var overhead = nonSeekable - seekable;
         var budget = bytes.Length * 3L / 2L;
         Assert.True(
@@ -61,8 +51,6 @@ public class DocumentLoaderAllocationTests
     [Fact]
     public void Load_NonSeekableStreamReadsTheSameBytesAsSeekable()
     {
-        // Chunked accumulation must reassemble a document that spans many chunks, including a
-        // partially filled last one, and short reads that do not fill a chunk in one call.
         var bytes = BuildLargeDocument((256 * 1024) + 517);
 
         using var stream = new NonSeekableStream(bytes, 7000);

@@ -23,15 +23,11 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         return true;
     }
 
-    // A JP2 file opens with the signature box; a bare codestream opens with SOC+SIZ.
     private static bool IsJpeg2000(byte[] data)
         => StartsWith(data, Jp2Signature)
             || (data.Length >= 4 && data[0] == 0xFF && data[1] == 0x4F && data[2] == 0xFF && data[3] == 0x51);
 
-    // JPEG2000 embeds verbatim through the /JPXDecode filter, exactly like the /DCTDecode
-    // JPEG path: only the header is parsed for geometry and no /ColorSpace is written, so
-    // the JPX stream's own colour space applies (PDF 32000-1 7.4.9). BitsPerComponent is
-    // informational for JPXDecode; a conforming producer writes 8.
+    // JPXDecode embeds verbatim with no /ColorSpace, so the JPX stream's own colour space applies (ISO 32000-1 7.4.9).
     private static ImageXObject DecodeJpeg2000(byte[] data, ReaderLimits limits)
     {
         var (width, height, components) = StartsWith(data, Jp2Signature)
@@ -51,8 +47,6 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         return new ImageXObject(stream, null);
     }
 
-    // Walk the top-level boxes: an ihdr (inside the jp2h superbox) gives dimensions
-    // directly; otherwise fall back to the SIZ marker inside the jp2c codestream.
     private static (int Width, int Height, int Components) ReadJp2Header(byte[] data)
     {
         long codestream = -1;
@@ -125,8 +119,6 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         return null;
     }
 
-    // sizPos points just past the SOC marker; the SIZ marker segment carries Xsiz/Ysiz,
-    // the image origin XOsiz/YOsiz, and the component count Csiz.
     private static (int Width, int Height, int Components) ReadCodestreamSiz(byte[] data, long sizPos)
     {
         if (sizPos + 40 > data.Length || data[sizPos] != 0xFF || data[sizPos + 1] != 0x51)

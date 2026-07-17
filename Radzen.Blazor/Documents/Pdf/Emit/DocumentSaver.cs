@@ -8,10 +8,8 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Serializes a Document to a stream.
 internal sealed class DocumentSaver
 {
-    // The /Info keys DocumentInfo models, in the order both savers emit them.
     internal static readonly string[] InfoKeys =
         ["Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate", "ModDate"];
 
@@ -266,9 +264,6 @@ internal sealed class DocumentSaver
         }
         else if (doc.Info.Producer is not null || doc.Info.CreationDate is not null || doc.Info.ModificationDate is not null)
         {
-            // Producer and the creation/modification dates are mirrored into an XMP
-            // packet alongside the /Info dictionary. Absent all three, no metadata
-            // stream is written and the output stays byte identical.
             var xmp = new XmpMetadata
             {
                 Info = doc.Info,
@@ -281,17 +276,13 @@ internal sealed class DocumentSaver
 
         writer.Trailer["Root"] = catalogRef;
 
-        // A deterministic trailer /ID (ISO 32000-1 7.5.5). Opt-in for plain output so
-        // an untouched document stays byte identical; PDF/A and PDF/UA require a file
-        // identifier so they always carry one. The encrypted path derives its own /ID
-        // from the encryption seed inside DocumentWriter, so it is excluded here.
+        // ISO 32000-1 7.5.5: trailer /ID.
         if (doc.Encryption is null && (doc.IncludeDocumentId || doc.Conformance != PdfAConformance.None || doc.PdfUA))
         {
             writer.Trailer["ID"] = BuildDocumentId();
         }
 
-        // PDF/A-4 (ISO 19005-4, 6.1.3) forbids the trailer /Info key; the
-        // document metadata lives in the XMP stream instead.
+        // ISO 19005-4 6.1.3: PDF/A-4 forbids the trailer /Info key.
         var isPart4 = doc.Conformance is PdfAConformance.PdfA4 or PdfAConformance.PdfA4E or PdfAConformance.PdfA4F;
         var info = isPart4 ? null : BuildInfo(doc.Info, doc.Loaded?.SourceInfo);
         if (info is not null)
@@ -305,8 +296,6 @@ internal sealed class DocumentSaver
         writer.Close();
     }
 
-    // The one mapping from DocumentInfo to the modeled /Info values, in InfoKeys order, so a
-    // full save and an incremental save cannot disagree about what a modeled field is worth.
     private static string?[] InfoValues(DocumentInfo meta) =>
     [
         meta.Title,
@@ -319,10 +308,6 @@ internal sealed class DocumentSaver
         meta.ModificationDate is { } modified ? PdfDate(modified) : null,
     ];
 
-    // The modeled keys are rebuilt from DocumentInfo, so a field cleared to null is
-    // omitted. Entries DocumentInfo does not model (/Trapped, custom keys) are not the
-    // saver's to drop and carry through from the source dictionary. Null when the result
-    // would carry no entry at all.
     internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source)
     {
         DictionaryObject? info = null;
@@ -352,9 +337,6 @@ internal sealed class DocumentSaver
         return info;
     }
 
-    // Writes /BleedBox, /TrimBox or /ArtBox to a page node. An explicit value on the Page
-    // wins; otherwise a loaded page re-emits the box its source node carried (previously
-    // dropped). A page with neither adds nothing, so untouched output stays byte identical.
     private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, PdfRect? value)
     {
         if (value is { } rect)
@@ -370,10 +352,7 @@ internal sealed class DocumentSaver
         }
     }
 
-    // PageLayout and PageMode are catalog entries (ISO 32000-1 Table 28); the rest are
-    // grouped in the /ViewerPreferences dictionary (Table 150). Only set options are
-    // written, and a dictionary is only added when at least one of its flags is present,
-    // so an all-default ViewerPreferences leaves the catalog untouched.
+    // ISO 32000-1 Table 28: PageLayout/PageMode catalog entries. Table 150: /ViewerPreferences.
     private static void WriteViewerPreferences(DictionaryObject catalog, ViewerPreferences preferences)
     {
         if (preferences.PageLayout is { } layout)
@@ -415,8 +394,7 @@ internal sealed class DocumentSaver
         }
     }
 
-    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSS followed by the UTC offset as
-    // O HH ' mm ' (O is + or -). Caller-supplied offset only; no clock is read.
+    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSS then UTC offset O HH ' mm '.
     internal static string PdfDate(DateTimeOffset value)
     {
         var offset = value.Offset;
@@ -425,9 +403,7 @@ internal sealed class DocumentSaver
             $"D:{value:yyyyMMddHHmmss}{sign}{Math.Abs(offset.Hours):D2}'{Math.Abs(offset.Minutes):D2}'");
     }
 
-    // A stable /ID derived only from the document metadata and page content, never from
-    // the clock or a random source, so repeated saves of the same document are byte
-    // identical. Both halves are equal at creation time (ISO 32000-1 14.4).
+    // ISO 32000-1 14.4: both /ID halves equal at creation time.
     private ArrayObject BuildDocumentId()
     {
         var seed = new Radzen.Documents.Crypto.Sha256Hasher();

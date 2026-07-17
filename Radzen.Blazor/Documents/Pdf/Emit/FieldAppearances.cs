@@ -8,11 +8,8 @@ using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
 
 
-// Builds AcroForm widget appearance streams (/AP /N) and the geometry shared with
-// form flattening, so a filled, created and flattened field all render identically.
 internal static class FieldAppearances
 {
-    // Fallback appearance size when the /DA carries none (a /DA size of 0 means auto).
     public const double DefaultFontSize = 12.0;
 
     public static double Baseline(double height, double fontSize)
@@ -31,9 +28,6 @@ internal static class FieldAppearances
         return Wrap(writer, width, height);
     }
 
-    // A visible signature widget appearance: the given text lines stacked from the
-    // top of the box down, each in the supplied base-14 font. Non-encodable glyphs are
-    // substituted with '?' by TextContent's encoder rather than failing the whole stream.
     public static StreamObject BuildSignatureAppearance(
         IReadOnlyList<string> lines, double width, double height, Font font, FontScope scope)
     {
@@ -80,8 +74,6 @@ internal static class FieldAppearances
         return Wrap(writer, width, height);
     }
 
-    // The circular outline every radio widget state draws, positioned inside the
-    // given rectangle in the target coordinate space (appearance bbox or page).
     public static PathContent RadioBorder(double x, double y, double width, double height)
     {
         var extent = Math.Min(width, height);
@@ -94,8 +86,6 @@ internal static class FieldAppearances
         return path;
     }
 
-    // The filled dot drawn for the selected radio option; shared with form
-    // flattening so a flattened selection matches the widget appearance.
     public static PathContent RadioDot(double x, double y, double width, double height)
     {
         var path = new PathContent { Fill = true };
@@ -103,8 +93,6 @@ internal static class FieldAppearances
         return path;
     }
 
-    // The check-mark glyph drawn for a checked box, positioned inside the given
-    // rectangle in the target coordinate space (appearance bbox or page).
     public static PathContent CheckMark(double x, double y, double width, double height)
     {
         var path = new PathContent
@@ -120,7 +108,6 @@ internal static class FieldAppearances
 
     public static bool CanEncode(string value) => WinAnsiText.CanEncode(value);
 
-    // Reads the font resource name and size from a "/Font size Tf" default-appearance string.
     public static (string? Font, double Size) ParseDefaultAppearance(string? da)
     {
         if (da is null)
@@ -143,7 +130,6 @@ internal static class FieldAppearances
         return (null, 0.0);
     }
 
-    // Maps a standard AcroForm /DA font resource name to a base-14 family for the appearance.
     public static Font AppearanceFont(string? daFont, double size) => new()
     {
         Name = daFont switch

@@ -7,20 +7,9 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract pinned for FontCollection.SetFallback(params string[] families) (F5).
-//
-// Pinned semantics: SetFallback declares an ordered fallback chain among REGISTERED
-// families. When the primary font (Font.Name) lacks a glyph for a codepoint (cmap gid 0),
-// the collection walks the fallback chain and uses the first registered family that maps
-// the codepoint to a non-notdef glyph. Both MeasureText and SimpleShaper honor it.
-//
-// Fixtures: Liberation Sans has Latin/Cyrillic but NO CJK; NotoSansSC-Subset has CJK
-// (plus Latin/Cyrillic). Verified via fonttools: U+4E2D is absent from Liberation Sans
-// and present in Noto (gid 395, advance 1000, unitsPerEm 1000); Liberation 'A' gid 36
-// differs from Noto 'A' gid 34, so a glyph id uniquely identifies its source face.
 public class FallbackTests
 {
-    private const char Cjk = '中'; // CJK ideograph absent from Liberation Sans
+    private const char Cjk = '中';
 
     private static SfntFont Sans()
         => SfntFont.Parse(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"));
@@ -50,10 +39,8 @@ public class FallbackTests
 
         Assert.Equal(2, glyphs.Count);
 
-        // 'A' resolved by the primary (Liberation gid 36, not Noto's 34).
         Assert.Equal(Sans().GetGlyphId('A'), glyphs[0].GlyphId);
 
-        // CJK resolved via the fallback: non-notdef and equal to Noto's glyph id.
         var notoGid = Noto().GetGlyphId(Cjk);
         Assert.NotEqual(0, notoGid);
         Assert.Equal(notoGid, glyphs[1].GlyphId);
@@ -107,13 +94,13 @@ public class FallbackTests
     [Fact]
     public void Shape_WithoutFallback_MissingGlyphIsNotdef()
     {
-        var fonts = Registered(); // no SetFallback
+        var fonts = Registered();
         var shaper = new SimpleShaper(fonts);
         var font = new Font { Name = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
         Assert.Equal(Sans().GetGlyphId('A'), glyphs[0].GlyphId);
-        Assert.Equal(0, glyphs[1].GlyphId); // notdef: no fallback configured
+        Assert.Equal(0, glyphs[1].GlyphId);
     }
 }

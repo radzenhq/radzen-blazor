@@ -27,7 +27,6 @@ internal static class PdfBytes
         return true;
     }
 
-    // Finds the last startxref keyword and returns the cross-reference offset it points at.
     internal static long FindStartXref(byte[] data)
     {
         const string pattern = "startxref";
@@ -66,7 +65,6 @@ internal static class PdfBytes
         throw new DocumentParseException("Missing startxref.", -1);
     }
 
-    // Minimum number of bytes needed to hold value in a cross-reference stream field.
     internal static int FieldWidth(long value)
     {
         var width = 1;
@@ -135,15 +133,10 @@ internal static class PdfBytes
     }
 }
 
-// One cross-reference stream row: the type byte plus its two /W-sized fields.
 internal readonly record struct XrefRow(byte Type, long Field2, long Field3);
 
 internal static class XrefStreamPacker
 {
-    // Packs rows into a Flate-encoded /Type /XRef stream with /W widths derived from the
-    // rows themselves. The caller supplies the one key that distinguishes the two shapes:
-    // /Size for a contiguous full-save table, /Index for incremental subsections. It is
-    // stamped after /Type so the emitted key order matches each caller's original.
     internal static StreamObject Pack(IReadOnlyList<XrefRow> rows, string key, DocumentObject value, DictionaryObject trailer)
     {
         var w1 = 1;

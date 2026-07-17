@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 4: Document.ViewerPreferences maps to catalog /PageLayout, /PageMode and a
-// /ViewerPreferences dictionary (HideToolbar/HideMenubar/FitWindow/CenterWindow/
-// DisplayDocTitle/Direction). Absent it, none of those keys appear and output is stable.
 public class ViewerPreferencesTests
 {
     private static Document Document()

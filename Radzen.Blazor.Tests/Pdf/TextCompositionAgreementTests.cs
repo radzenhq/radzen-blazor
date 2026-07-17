@@ -33,9 +33,6 @@ public class TextCompositionAgreementTests
         return Document.LoadFromStream(input);
     }
 
-    // Helvetica "i" is 222/1000 em, so four of them at size 10 advance 8.88 points, not the
-    // 20 an average-glyph estimate predicts. The next run's origin sits 15 points along: a
-    // real word break by measurement, an overlap by estimate.
     private const string NarrowGlyphRun = "BT /F0 10 Tf 1 0 0 1 72 700 Tm (iiii) Tj 1 0 0 1 87 700 Tm (B) Tj ET";
 
     [Fact]
@@ -100,8 +97,6 @@ public class TextCompositionAgreementTests
         Assert.Contains("ADDED", loaded.Pages[0].ExtractPositionedText().Select(run => run.Text));
     }
 
-    // Reading must not dirty a page: extraction flushes pending edits, and the flush has to
-    // stay a no-op when there is nothing edited, or every read would force a re-encode.
     [Fact]
     public void ExtractText_OnUneditedLoadedPage_DoesNotForceReencode()
     {

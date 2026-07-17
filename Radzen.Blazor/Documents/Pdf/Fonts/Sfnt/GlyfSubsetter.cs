@@ -6,13 +6,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Rebuilds a TrueType font as a COMPACT subset: glyphs are renumbered into a
-// contiguous 0..N-1 space holding exactly the closure of the requested set
-// (requested + recursive composite components + .notdef), with compact
-// loca/glyf/hmtx sized for N glyphs. New gids are assigned in ascending original
-// gid order, so the mapping is deterministic and monotonic. Composite component
-// ids are rewritten into the compact space. cmap/name and layout tables are
-// dropped (a Type0/CIDFontType2 embedded subset needs neither).
 internal static class GlyfSubsetter
 {
     private const ushort MoreComponents = 0x0020;
@@ -36,9 +29,6 @@ internal static class GlyfSubsetter
         }
     }
 
-    // The compact renumbering for a request: original gid -> new gid, covering the
-    // full glyf closure plus .notdef, assigned in ascending original-gid order.
-    // Deterministic, so content generation and embedding agree on the codes.
     public static Dictionary<ushort, ushort> BuildCompactGidMap(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
         ArgumentNullException.ThrowIfNull(font);
@@ -49,9 +39,6 @@ internal static class GlyfSubsetter
         return BuildMap(OrderedClosure(glyfMemory.Span, loca, font.GlyphCount, glyphIds));
     }
 
-    // Returns a pooled array holding the subset in its first length bytes; the
-    // caller must return it to ArrayPool<byte>.Shared. gidMap receives the
-    // original-to-compact renumbering (same as BuildCompactGidMap).
     public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length, out Dictionary<ushort, ushort> gidMap)
     {
         ArgumentNullException.ThrowIfNull(font);
@@ -67,8 +54,6 @@ internal static class GlyfSubsetter
         gidMap = BuildMap(ordered);
         var count = ordered.Count;
 
-        // Upper bound: stripping instructions only shrinks glyphs, and per-glyph
-        // 2-byte padding adds at most one byte per glyph (offset by removed bytes).
         var glyfUpperBound = 0;
         foreach (var gid in ordered)
         {
@@ -119,8 +104,6 @@ internal static class GlyfSubsetter
         return map;
     }
 
-    // Reads glyph offsets straight from the raw loca table instead of
-    // materializing a (numGlyphs + 1) uint array per subset.
     private readonly ref struct LocaTable(ReadOnlySpan<byte> raw, bool longFormat)
     {
         private readonly ReadOnlySpan<byte> raw = raw;
@@ -147,9 +130,6 @@ internal static class GlyfSubsetter
         Enqueue(0);
         foreach (var gid in requested)
         {
-            // A corrupt font (e.g. a cmap returning a gid past the glyph count) must
-            // fail loudly here rather than silently drop the glyph and later throw an
-            // opaque KeyNotFoundException while remapping.
             if (gid >= numGlyphs)
             {
                 throw new ArgumentOutOfRangeException(nameof(requested), gid,
@@ -171,7 +151,7 @@ internal static class GlyfSubsetter
 
             if (ReadInt16(glyf, (int)start) >= 0)
             {
-                continue; // simple glyph
+                continue;
             }
 
             var pos = (int)start + 10;
@@ -180,9 +160,6 @@ internal static class GlyfSubsetter
                 var flags = ReadUInt16(glyf, pos);
                 var component = ReadUInt16(glyf, pos + 2);
 
-                // A component past the glyph count cannot be renumbered; fail loud here (as
-                // the requested-gid guard does) rather than skip it and later throw an opaque
-                // KeyNotFoundException from the gidMap lookup while copying the composite.
                 if (component >= numGlyphs)
                 {
                     throw new InvalidDataException(
@@ -223,10 +200,6 @@ internal static class GlyfSubsetter
         return tail;
     }
 
-    // Copies each glyph outline (renumbering composite components) while STRIPPING
-    // instruction bytecode, since the subset drops the cvt/fpgm/prep tables that
-    // bytecode depends on. Hinting is irrelevant at document render sizes and the
-    // outline (contours/points) is untouched. Returns the total glyf byte length.
     private static int FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
     {
         var offset = 0;
@@ -252,7 +225,6 @@ internal static class GlyfSubsetter
                 written = CopySimpleStripped(glyf, start, length, newGlyf, offset);
             }
 
-            // loca offsets stay 2-byte aligned; pad an odd stripped length by one.
             if ((written & 1) != 0)
             {
                 newGlyf[offset + written] = 0;
@@ -266,8 +238,6 @@ internal static class GlyfSubsetter
         return offset;
     }
 
-    // Simple glyph: after endPtsOfContours[numberOfContours] set instructionLength
-    // to 0 and drop the instructions[] block, keeping flags/coordinates that follow.
     private static int CopySimpleStripped(ReadOnlySpan<byte> glyf, int start, int length, byte[] newGlyf, int offset)
     {
         var numberOfContours = ReadInt16(glyf, start);
@@ -285,8 +255,6 @@ internal static class GlyfSubsetter
         return headLen + tailLen;
     }
 
-    // Composite glyph: renumber components, then if the last component's flags carry
-    // WE_HAVE_INSTRUCTIONS clear that bit and drop the trailing instruction block.
     private static int CopyCompositeStripped(ReadOnlySpan<byte> glyf, int start, int length, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, int offset)
     {
         glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
@@ -310,19 +278,17 @@ internal static class GlyfSubsetter
             WriteUInt16(newGlyf, lastFlagsPos, (ushort)(lastFlags & ~WeHaveInstructions));
         }
 
-        return pos - offset; // end of components; trailing instructions dropped
+        return pos - offset;
     }
 
     private static byte[] BuildHead(ReadOnlySpan<byte> head)
     {
         var result = head.ToArray();
-        WriteUInt32(result, 8, 0); // checkSumAdjustment, finalized after assembly
-        WriteInt16(result, 50, 1); // indexToLocFormat = long
+        WriteUInt32(result, 8, 0);
+        WriteInt16(result, 50, 1);
         return result;
     }
 
-    // Full 4-byte (advance, lsb) entries for all N glyphs; hhea.numberOfHMetrics
-    // is patched to N to match.
     private static byte[] BuildHmtx(SfntFont font, List<ushort> ordered)
     {
         var hasHmtx = font.TryGetTableMemory("hmtx", out var hmtxMemory);
@@ -375,14 +341,12 @@ internal static class GlyfSubsetter
         WriteUInt16(result, 4, (ushort)glyphCount);
         if (result.Length >= 26)
         {
-            WriteUInt16(result, 24, 0); // maxSizeOfInstructions: no glyph keeps instructions
+            WriteUInt16(result, 24, 0);
         }
 
         return result;
     }
 
-    // Downgrade post to format 3.0: drop the per-glyph name array (tens of KB) but
-    // keep the 32-byte header (italicAngle, underline metrics) intact.
     private static byte[] BuildPost(ReadOnlySpan<byte> post)
     {
         var result = new byte[32];
@@ -448,7 +412,6 @@ internal static class GlyfSubsetter
         var pool = ArrayPool<byte>.Shared;
         var file = pool.Rent(cursor);
 
-        // The caller owns the buffer on success; a throw before that must return it.
         try
         {
             WriteUInt32(file, 0, 0x00010000);

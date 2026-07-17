@@ -105,7 +105,6 @@ public class FormFillTests
         var reader = FormTestSupport.Reload(document);
         var name = FormTestSupport.Field(reader, "Name");
 
-        // The text field keeps its empty value; only the checkbox was mutated.
         Assert.False(name.TryGetValue("V", out var value) && reader.Resolve(value!) is StringObject text && text.Value.Length > 0);
     }
 }

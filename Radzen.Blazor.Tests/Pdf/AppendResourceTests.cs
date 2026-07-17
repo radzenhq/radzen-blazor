@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Append must carry each source page's resource closure. A merged page whose content
-// references /F0 and /Im0 needs a /Resources dict with those fonts and images, or the
-// appended text/images do not render and text extraction is wrong.
 public class AppendResourceTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -101,7 +98,6 @@ public class AppendResourceTests
         target.Append(loaded);
         target.ToArray();
 
-        // The source document must still round-trip its own resources afterwards.
         var reader = DocumentReader.Parse(loaded.ToArray());
         var (hasFont, hasXObject) = ResourceKinds(reader, 0);
         Assert.True(hasFont && hasXObject, "source document still carries its resources");

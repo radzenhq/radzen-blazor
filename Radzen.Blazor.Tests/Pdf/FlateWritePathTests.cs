@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P5: the write path must Flate-compress generated content streams, embedded font
-// subsets (FontFile2/FontFile3), the ToUnicode CMap and the CIDSet bitmap, declaring
-// /Filter /FlateDecode so any reader (including ours) decodes them. Already-DCTDecode
-// JPEG image streams must NOT be double-compressed, and PNG-derived image XObjects
-// must keep a single FlateDecode filter.
 public class FlateWritePathTests
 {
     private static DocumentBuilder LatinBuilder(string text)
@@ -70,7 +65,6 @@ public class FlateWritePathTests
         var fontFile = (StreamObject)reader.Resolve(descriptor["FontFile2"]);
         var decoded = RequireFlate(reader, fontFile);
 
-        // TrueType sfnt version 1.0.
         Assert.True(decoded.Length > 12, "subset has sfnt header");
         Assert.Equal(new byte[] { 0x00, 0x01, 0x00, 0x00 }, decoded[..4]);
 
@@ -91,7 +85,6 @@ public class FlateWritePathTests
         var fontFile = (StreamObject)reader.Resolve(descriptor["FontFile3"]);
         var decoded = RequireFlate(reader, fontFile);
 
-        // Bare CFF starts with major version 1, minor 0.
         Assert.True(decoded.Length > 4, "subset has CFF header");
         Assert.Equal(1, decoded[0]);
         Assert.Equal(0, decoded[1]);

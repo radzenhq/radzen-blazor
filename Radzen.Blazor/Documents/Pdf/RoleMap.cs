@@ -47,6 +47,5 @@ public sealed class RoleMap
     /// <returns><see langword="true"/> when the role is declared.</returns>
     public bool Contains(string role) => map.ContainsKey(role);
 
-    // Declared mappings in a deterministic (ordinal by role) order for /RoleMap emission.
     internal IEnumerable<KeyValuePair<string, string>> Entries => map;
 }

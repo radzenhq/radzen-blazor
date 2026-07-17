@@ -11,11 +11,8 @@ using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Boundary contracts for authoring entry points that previously deferred their failure
-// past the point where a bad value had already reached output.
 public class PdfBoundaryValidationTests
 {
-    // A seekable stream whose Length promises more than Read will deliver.
     private sealed class LyingLengthStream : Stream
     {
         private readonly byte[] data;
@@ -53,8 +50,7 @@ public class PdfBoundaryValidationTests
         public override void Flush() { }
     }
 
-    // ISO 32000-1 7.3.3 has no token for a non-finite number. The object path
-    // (NumberObject.Write) already rejects these; page content must agree.
+    // ISO 32000-1 7.3.3 has no token for a non-finite number.
     [Theory]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
@@ -119,9 +115,6 @@ public class PdfBoundaryValidationTests
         Assert.Equal(30, options.HeadingFontSizes[0]);
     }
 
-    // FontCollection buffered with CopyTo, which silently accepted a stream that
-    // delivered fewer bytes than Length promised. DocumentReader.ReadFully is the single
-    // implementation and rejects that rather than parsing a truncated prefix.
     [Fact]
     public void Register_StreamShorterThanItsLength_Throws()
     {
@@ -143,10 +136,8 @@ public class PdfBoundaryValidationTests
         Assert.True(fonts.MeasureText("Hi", new Font { Name = "Honest", Size = 12 }) > 0);
     }
 
-    // ISO 32000-1 7.4.2: '>' is the ASCIIHexDecode EOD marker, but stream /Length already
-    // bounds the data, so running out is not an error. This is the contract that separates
-    // the filter from the hex-string OBJECT reader (Lexer.ReadHexString, 7.3.4.3), whose
-    // '>' is a required delimiter and whose absence is "Unterminated".
+    // ISO 32000-1 7.4.2: ASCIIHexDecode '>' EOD, but stream /Length bounds the data;
+    // contrast the hex-string object reader 7.3.4.3 whose '>' is a required delimiter.
     [Fact]
     public void AsciiHex_MissingEod_IsNotAnError()
         => Assert.Equal("He", Encoding.ASCII.GetString(AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("4865"))));

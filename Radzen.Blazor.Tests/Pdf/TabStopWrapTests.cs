@@ -6,10 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A tabbed line whose post-tab segment is placed at an explicit tab stop must be measured
-// against that stop (not the 36pt default grid) when deciding where to wrap, so no line
-// runs past the content measure. A paragraph with NO explicit tab stops must wrap exactly
-// as the default grid does (positive control).
 public class TabStopWrapTests
 {
     private const double Tol = 0.5;

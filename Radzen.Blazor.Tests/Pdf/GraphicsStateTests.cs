@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C4a: graphics-state folding. A foreign content stream using q/Q save-restore,
-// nested cm concatenation and Td/Tm text positioning materializes into elements
-// whose Transform is the ABSOLUTE composed matrix at the point they are painted.
 public class GraphicsStateTests
 {
     private static ContentCollection Materialize(string rawStream)
@@ -54,7 +51,6 @@ public class GraphicsStateTests
         var text = Assert.IsType<TextContent>(content[0]);
         Assert.Equal("A", text.Text);
 
-        // Td(3,4) then inner cm(1,0,0,1,5,5) then outer cm(2,0,0,2,10,20).
         InterpreterTestSupport.AssertMatrix(2, 0, 0, 2, 26, 38, text.Transform);
     }
 
@@ -66,7 +62,6 @@ public class GraphicsStateTests
         var path = Assert.IsType<PathContent>(content[1]);
         Assert.True(path.Stroke);
 
-        // Inner q..Q is restored, so the path sees only the outer cm(2,0,0,2,10,20).
         InterpreterTestSupport.AssertMatrix(2, 0, 0, 2, 10, 20, path.Transform);
     }
 
@@ -99,7 +94,6 @@ public class GraphicsStateTests
         var text = Assert.IsType<TextContent>(content[0]);
         Assert.Equal("B", text.Text);
 
-        // Tm(2,0,0,2,5,7) then cm Translate(100,100) => (2,0,0,2,105,107).
         InterpreterTestSupport.AssertMatrix(2, 0, 0, 2, 105, 107, text.Transform);
     }
 

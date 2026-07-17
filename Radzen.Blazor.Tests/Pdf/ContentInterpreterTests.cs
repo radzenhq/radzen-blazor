@@ -5,10 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C4a: the read side of the retained content model. After a save + load, a page's
-// content stream is parsed lazily into ContentElement objects on first access to
-// Page.Content, inverse of the C3 emitter. This asserts round-trip equivalence of
-// element kinds, text, colors and absolute (folded) transforms.
 public class ContentInterpreterTests
 {
     private static Document BuildAndReload()
@@ -96,8 +92,6 @@ public class ContentInterpreterTests
 
         var text = Assert.IsType<TextContent>(content[0]);
 
-        // Td (72,700) applied in text space, then the element CTM Scale(2,2):
-        // render matrix = Translate(72,700) * Scale(2,2) = (2,0,0,2,144,1400).
         var expected = Matrix.Translate(72, 700) * Matrix.Scale(2, 2);
         InterpreterTestSupport.AssertMatrix(expected, text.Transform);
     }

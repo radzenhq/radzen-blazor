@@ -3,9 +3,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Decodes each distinct image payload once and hands back a stable GeneratedImage,
-// keyed by the source object (or the raw byte[] for inline images) so a picture reused
-// across pages shares one XObject.
 internal sealed class ImageStore
 {
     private readonly Dictionary<object, GeneratedImage> images = [];

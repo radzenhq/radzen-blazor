@@ -8,7 +8,6 @@ internal static class Ascii85Filter
 {
     public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decoded size for parity with the other filters in a chain.
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -53,8 +52,6 @@ internal static class Ascii85Filter
 
             if (count == 5)
             {
-                // A 5-tuple encodes a 32-bit value; a group like "s8W-#" exceeds 0xFFFFFFFF.
-                // Fail loud rather than silently truncating to the low 32 bits.
                 if (tuple > uint.MaxValue)
                 {
                     throw new InvalidDataException("ASCII85 5-tuple exceeds the 32-bit maximum.");
@@ -71,8 +68,6 @@ internal static class Ascii85Filter
 
         if (count > 0)
         {
-            // A final group of a single character cannot encode any bytes (it would emit
-            // count-1 == 0 bytes); a truncated stream ending in one stray char is corrupt.
             if (count == 1)
             {
                 throw new InvalidDataException("ASCII85 stream ends with a dangling single character.");

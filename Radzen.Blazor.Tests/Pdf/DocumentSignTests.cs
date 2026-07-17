@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Document.Sign is a discoverability wrapper: it must produce the exact bytes of
-// PdfSigner.Sign over the document's own serialized output for the same options
-// and signer.
 public class DocumentSignTests
 {
     private static readonly DateTimeOffset FixedTime = new(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);

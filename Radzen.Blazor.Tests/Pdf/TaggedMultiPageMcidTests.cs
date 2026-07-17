@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Item 2: per-page tagged emission orders each page's content-bearing elements by their
-// document DFS rank instead of re-walking the whole structure tree per page. Each page's
-// marked content must carry a dense MCID sequence starting at 0, and every authored
-// paragraph must be marked exactly once across all pages.
 public class TaggedMultiPageMcidTests
 {
     private static DocumentBuilder AuthorManyParagraphs(int count)

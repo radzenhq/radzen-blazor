@@ -4,12 +4,8 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Enforces and emits PDF/A and PDF/UA conformance on save: validates the document
-// against the requested level, then writes the XMP metadata, sRGB output intent and
-// trailer /ID the conformance level requires.
 internal sealed class ConformanceWriter(Document document)
 {
-    // (pdfaid:part, pdfaid:conformance). PDF/A-4 carries no conformance letter.
     private static (int Part, string Conformance) Identification(PdfAConformance level) => level switch
     {
         PdfAConformance.PdfA2B => (2, "B"),
@@ -58,12 +54,7 @@ internal sealed class ConformanceWriter(Document document)
         ValidateInspectable();
     }
 
-    // Every resource check above reads GeneratedPage, so a page without one (loaded, or
-    // carrying caller-supplied raw content) is scanned by nothing: font embedding
-    // (ISO 19005-2 6.2.11.4.1) and DeviceCMYK against the sRGB intent WriteConformance
-    // always emits (6.2.4.3) go unverified. Inspecting it properly means resolving
-    // arbitrarily nested resources (form XObjects, patterns, shadings, Type3 procedures),
-    // which this library cannot do, so refuse the claim rather than stamp it unverified.
+    // Font embedding: ISO 19005-2 6.2.11.4.1. DeviceCMYK against sRGB intent: 6.2.4.3.
     private void ValidateInspectable()
     {
         foreach (var page in document.Pages)
@@ -79,9 +70,6 @@ internal sealed class ConformanceWriter(Document document)
         }
     }
 
-    // Fully tagged conformance (PDF/UA, PDF/A Level-A) forbids untagged real content and
-    // requires alternate descriptions and structure-linked annotations. These are checked
-    // here so the writer fails loud instead of advertising a conformance it does not meet.
     private void ValidateTagging()
     {
         if (!document.PdfUA && !IsLevelA(document.Conformance))
@@ -143,10 +131,6 @@ internal sealed class ConformanceWriter(Document document)
                 $"{document.Conformance} requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder or use a Level B conformance.");
         }
 
-        // PDF/A-2 and base PDF/A-4 only permit embedded files that are themselves
-        // PDF/A conformant, which this library cannot verify; PDF/A-4E is treated
-        // the same conservatively. PDF/A-3 and PDF/A-4F allow arbitrary files, and
-        // PDF/A-4F additionally requires at least one.
         switch (document.Conformance)
         {
             case PdfAConformance.PdfA2B or PdfAConformance.PdfA2A
@@ -161,8 +145,7 @@ internal sealed class ConformanceWriter(Document document)
         ValidateImageColorSpaces();
     }
 
-    // ISO 19005-2 6.2.4.3: DeviceCMYK is only permitted when the output intent is a CMYK
-    // profile, and WriteConformance always emits the sRGB one.
+    // ISO 19005-2 6.2.4.3: DeviceCMYK requires a CMYK output intent.
     private void ValidateImageColorSpaces()
     {
         foreach (var page in document.Pages)
@@ -202,10 +185,6 @@ internal sealed class ConformanceWriter(Document document)
             }
         }
 
-        // Kept as a backstop only for its timing: Page.BuildContent's resolve seam rejects this
-        // same overlay text with this same error, but not until the content stream is being
-        // written, which would leave partial bytes in the caller's stream. Loaded original text
-        // keeps its own font reference (FontResourceName) and is not re-emitted as a base-14 face.
         foreach (var page in document.Pages)
         {
             foreach (var element in page.Content)
@@ -262,8 +241,7 @@ internal sealed class ConformanceWriter(Document document)
 
             if (part == 4)
             {
-                // ISO 19005-4 documents are PDF 2.0: DocumentSaver emits the 2.0 header
-                // (ISO 19005-4 6.1.2) and the catalog restates it (ISO 32000-2 7.5.2).
+                // ISO 19005-4 6.1.2: PDF 2.0 header. Catalog restates the version (ISO 32000-2 7.5.2).
                 catalog["Version"] = new NameObject("2.0");
             }
         }
@@ -279,8 +257,6 @@ internal sealed class ConformanceWriter(Document document)
         }
     }
 
-    // Amends the packet XmpMetadata builds with the identification entries it does
-    // not model: pdfaid:rev (required by PDF/A-4) and the pdfuaid schema.
     private StreamObject BuildMetadataStream(XmpMetadata xmp, int part)
     {
         var packet = Encoding.UTF8.GetString(xmp.BuildPacket());
@@ -298,9 +274,7 @@ internal sealed class ConformanceWriter(Document document)
                 "   xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"\n");
             packet = InsertBefore(packet, "  </rdf:Description>", "   <pdfuaid:part>1</pdfuaid:part>\n");
 
-            // PDF/A 6.6.2.3.1: pdfuaid is not among the PDF/A predefined XMP
-            // schemas, so combining with any PDF/A level needs an extension
-            // schema declaring it.
+            // PDF/A 6.6.2.3.1: pdfuaid needs an extension schema when combined with PDF/A.
             if (document.Conformance != PdfAConformance.None)
             {
                 packet = InsertBefore(packet, " </rdf:RDF>", PdfUaExtensionSchema);
@@ -310,9 +284,6 @@ internal sealed class ConformanceWriter(Document document)
         return XmpMetadata.WrapPacket(Encoding.UTF8.GetBytes(packet));
     }
 
-    // factur-x.xml with no declared profile keeps the historic BASIC 1.0 INVOICE
-    // defaults; a caller that sets a profile must fill every field so the XMP never
-    // declares a blank fx:ConformanceLevel.
     private static FacturXMetadata BuildFacturX(FacturXProfile? profile)
     {
         if (profile is null)
@@ -336,9 +307,6 @@ internal sealed class ConformanceWriter(Document document)
         };
     }
 
-    // PreserveCatalog imports an indirect source /ViewerPreferences as a reference
-    // into the writer; resolve it so preserved entries (Direction, HideToolbar, ...)
-    // survive alongside the DisplayDocTitle PDF/UA requires instead of being replaced.
     private static DictionaryObject ResolveViewerPreferences(DocumentWriter writer, DictionaryObject catalog)
     {
         if (catalog.TryGetValue("ViewerPreferences", out var existing))
@@ -391,10 +359,6 @@ internal sealed class ConformanceWriter(Document document)
     private static string InsertBefore(string packet, string anchor, string insertion)
         => packet.Insert(RequireAnchor(packet, anchor), insertion);
 
-    // The identification entries PDF/A-4 and PDF/UA require are spliced into the raw
-    // XMP packet by anchor. A missing anchor means XmpMetadata's format drifted and
-    // the amendment would silently drop; fail loud rather than emit a non-conforming
-    // packet that still reports success.
     private static int RequireAnchor(string packet, string anchor)
     {
         var index = packet.IndexOf(anchor, StringComparison.Ordinal);

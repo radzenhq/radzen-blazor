@@ -2,9 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// Native AFM code -> glyph name for the FontSpecific fonts Symbol and ZapfDingbats,
-// derived from the Adobe Core-14 AFM C-to-N declarations. Base14Data preserves widths by
-// glyph name only, so these tables recover the native (non-WinAnsi) code order.
 internal static class SymbolEncodingData
 {
     internal static readonly IReadOnlyDictionary<byte, string> Symbol = new Dictionary<byte, string>

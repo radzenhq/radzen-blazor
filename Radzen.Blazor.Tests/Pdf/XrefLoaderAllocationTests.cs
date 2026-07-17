@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Every classic-xref open parses two fixed-format decimal fields per entry before a single
-// object is read. Those fields must be accumulated digit by digit out of the raw bytes:
-// materializing a string per field puts two short-lived allocations on every entry of the
-// table, which for a large document is millions of allocations of pure GC churn.
 public class XrefLoaderAllocationTests
 {
     private static byte[] BuildClassicXrefDocument(int count)
@@ -61,10 +57,6 @@ public class XrefLoaderAllocationTests
 
         var bytes = LoadXref(data, Count);
 
-        // The two entry dictionaries (the per-section table plus the merged one, each grown by
-        // doubling) dominate at ~308 bytes per entry and are not what this pins. A string per
-        // decimal field adds a measured 80 bytes per entry on top of that, taking the total to
-        // ~388; the budget sits between the two so only the per-field allocation trips it.
         var budget = Count * 350L;
         Assert.True(bytes < budget, $"XrefLoader.Load allocated {bytes} bytes for {Count} entries, budget {budget}.");
     }

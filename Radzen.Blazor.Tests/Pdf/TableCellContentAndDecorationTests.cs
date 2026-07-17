@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P2 regression tests: cell content beyond paragraphs (images, nested tables,
-// band images), per-edge border emission, and cell/row background fills. All
-// assertions run against the real PDF bytes produced by Build() - reparsed via
-// DocumentReader / Document.LoadFromStream and the content-stream tokenizer.
 public class TableCellContentAndDecorationTests
 {
     private static readonly string[] PaintingOperators =
@@ -67,8 +63,6 @@ public class TableCellContentAndDecorationTests
         return -1;
     }
 
-    // (b) A bottom-only rule must be a single horizontal line segment, not a
-    // stroked rectangle around the whole cell.
     [Fact]
     public void BottomOnlyBorder_EmitsSingleBottomLine_NotBox()
     {
@@ -115,7 +109,6 @@ public class TableCellContentAndDecorationTests
         }
     }
 
-    // (b) Each visible edge carries its own width and color.
     [Fact]
     public void PerEdgeBorders_EmitOwnWidthAndColor()
     {
@@ -147,7 +140,6 @@ public class TableCellContentAndDecorationTests
         Assert.Contains(2, widths);
     }
 
-    // (b) A cell whose own edges are unset inherits the table-level borders.
     [Fact]
     public void TableBorders_ApplyToCellsWithUnsetEdges()
     {
@@ -171,7 +163,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(stroked, "table-level borders stroke the cell edges");
     }
 
-    // (b) Dashed/dotted border styles set a dash pattern via the 'd' operator.
     [Fact]
     public void DashedBorder_EmitsDashPattern()
     {
@@ -197,7 +188,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(dashed, "dashed border sets a non-empty dash array via 'd'");
     }
 
-    // (c) Cell.Background paints a filled rectangle behind the content.
     [Fact]
     public void CellBackground_EmitsFilledRectangleBeforeText()
     {
@@ -214,7 +204,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(fill < text, "background is painted before (behind) the text");
     }
 
-    // (c) Row.Background paints behind every cell of the row.
     [Fact]
     public void RowBackground_EmitsFilledRectangle()
     {
@@ -237,7 +226,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(HasColorOperation(ops, "rg", 0, 0, 1), "fill uses the row background color");
     }
 
-    // (a) An Image block inside a cell is decoded and drawn, not dropped.
     [Fact]
     public void ImageInCell_EmitsImageXObjectAndDoOperator()
     {
@@ -264,7 +252,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(FirstIndex(ops, "Do") >= 0, "cell image is drawn via Do");
     }
 
-    // (a) A nested Table block inside a cell is laid out recursively.
     [Fact]
     public void NestedTableInCell_ContentSurvivesRoundTrip()
     {
@@ -305,7 +292,6 @@ public class TableCellContentAndDecorationTests
         return builder;
     }
 
-    // (a) Image blocks in the header band are laid out and drawn.
     [Fact]
     public void HeaderImage_EmitsImageXObjectAndDoOperator()
     {
@@ -317,7 +303,6 @@ public class TableCellContentAndDecorationTests
         Assert.True(FirstIndex(ops, "Do") >= 0, "header image is drawn via Do");
     }
 
-    // (a) Image blocks in the footer band are laid out and drawn.
     [Fact]
     public void FooterImage_EmitsImageXObjectAndDoOperator()
     {

@@ -5,8 +5,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Public even-odd fill (f*/B*) and arbitrary-path clipping (W/W*) on PathContent,
-// per ISO 32000-1 8.5.3.1 and 8.5.4.
+// ISO 32000-1 8.5.3.1 and 8.5.4 even-odd fill and path clipping.
 public class PathContentClipTests
 {
     private static byte[] Render(PathContent path)

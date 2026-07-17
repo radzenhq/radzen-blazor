@@ -9,21 +9,10 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R5: round-trip fidelity of generated pages.
-// (a) ContentInterpreter must materialize 're' rectangles, 'Do' image XObjects and
-//     'v'/'y' curves, and 'Tf' must retain the font resource reference, so a built
-//     page survives materialize -> edit -> re-save without dropping fills/images or
-//     collapsing text to Helvetica.
-// (b) Document.SaveToStream must honor Page.Content edits on a Build() output
-//     instead of always writing the generator's original bytes.
-// (c) ExtractText on a freshly built document with embedded Type0 fonts must route
-//     through the emitted ToUnicode mapping instead of decoding glyph ids as WinAnsi.
 public class RoundTripFidelityRegressionTests
 {
     private static readonly string[] FillPaints = ["f", "F", "f*", "B", "B*", "b", "b*"];
 
-    // (a) A raw 're ... f' rectangle materializes into a path with geometry that
-    // survives a dirty re-save instead of degenerating into an empty fill.
     [Fact]
     public void MaterializedRectangleFill_SurvivesResave()
     {
@@ -33,7 +22,7 @@ public class RoundTripFidelityRegressionTests
 
         var path = Assert.IsType<PathContent>(Assert.Single(page.Content));
         Assert.True(path.Fill, "materialized rectangle is a fill");
-        path.FillColor = Color.FromRgb(0, 255, 0); // dirty the page so it re-encodes from elements
+        path.FillColor = Color.FromRgb(0, 255, 0);
 
         var reader = ContentTestHelpers.Reload(document);
         var operations = ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(reader, 0));
@@ -42,7 +31,6 @@ public class RoundTripFidelityRegressionTests
             "re-saved page keeps the recolored fill with rectangle geometry");
     }
 
-    // (a) 'v' and 'y' curve segments materialize and survive a dirty re-save.
     [Fact]
     public void MaterializedCurves_V_And_Y_SurviveResave()
     {
@@ -51,7 +39,7 @@ public class RoundTripFidelityRegressionTests
         page.SetContent(Encoding.ASCII.GetBytes("0 0 1 RG 1 w\n10 10 m\n20 20 30 30 v\n40 40 50 50 y\nS\n"));
 
         var path = Assert.IsType<PathContent>(Assert.Single(page.Content));
-        path.Thickness = 3; // dirty
+        path.Thickness = 3;
 
         var reader = ContentTestHelpers.Reload(document);
         var operations = ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(reader, 0));
@@ -75,8 +63,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Contains(coordinates, value => Math.Abs(value - 50) < 0.01);
     }
 
-    // (a) A built cell background ('re f' from the generator) survives
-    // load -> materialize -> edit -> re-save.
     [Fact]
     public void BuiltCellBackground_SurvivesMaterializeAndResave()
     {
@@ -102,9 +88,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Contains("Total", Load(bytes).ExtractText(), StringComparison.Ordinal);
     }
 
-    // (a) A built image ('Do' from the generator) survives
-    // load -> materialize -> edit -> re-save, and the re-saved page still
-    // carries the image XObject the operator references.
     [Fact]
     public void BuiltImage_SurvivesMaterializeAndResave()
     {
@@ -130,8 +113,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Equal("Image", ((NameObject)reader.Resolve(stream.Dictionary["Subtype"])).Value);
     }
 
-    // (a) Tf keeps the font resource reference: text set in Times must not collapse
-    // to Helvetica when the page is materialized, edited and re-saved.
     [Fact]
     public void MaterializedText_KeepsFontResource()
     {
@@ -155,8 +136,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Contains("Serif body", Load(bytes).ExtractText(), StringComparison.Ordinal);
     }
 
-    // (b) Edits to Page.Content on a Build() output are honored on save instead of
-    // being silently replaced by the generator's original content.
     [Fact]
     public void BuiltPage_ContentEdit_IsHonoredOnSave()
     {
@@ -175,8 +154,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Contains("Original body", text, StringComparison.Ordinal);
     }
 
-    // (a)+(b) Stamping a built invoice page must not cost it its backgrounds or
-    // images: the edit is saved and the materialized fills/images survive.
     [Fact]
     public void BuiltPage_Stamp_KeepsBackgroundsAndImages()
     {
@@ -211,8 +188,6 @@ public class RoundTripFidelityRegressionTests
             "stamped built page keeps its image Do operator");
     }
 
-    // (c) ExtractText on a freshly built document with embedded Type0 fonts decodes
-    // through the emitted ToUnicode mapping, matching what a reload extracts.
     [Fact]
     public void BuiltType0_FreshExtractText_ReturnsRealText()
     {
@@ -238,7 +213,6 @@ public class RoundTripFidelityRegressionTests
         return Document.LoadFromStream(stream);
     }
 
-    // Forces the page dirty so BuildContent re-encodes from materialized elements.
     private static void DirtyFirstText(Page page)
     {
         foreach (var element in page.Content)
@@ -253,7 +227,6 @@ public class RoundTripFidelityRegressionTests
         Assert.Fail("page has no materialized text element to dirty");
     }
 
-    // True when some fill paint has path geometry and the given rg fill color.
     private static bool HasFillWithGeometry(List<ContentOperation> operations, double r, double g, double b)
     {
         var geometry = 0;

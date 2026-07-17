@@ -4,10 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3(a): the effective font and alignment of a run are resolved at layout time by
-// cascading run -> paragraph -> cell -> row -> named Style (BaseStyle chain) ->
-// document default. Assertions read the real emitted content stream (Tf sizes,
-// Td positions) and the embedded font set.
 public class StyleCascadeTests
 {
     private static DocumentBuilder Builder(out Section section)
@@ -222,8 +218,6 @@ public class StyleCascadeTests
     [Fact]
     public void ParagraphStyleName_WinsOverAmbientTableFont()
     {
-        // An explicit paragraph style must outrank the ambient table font, exactly as it does
-        // outside a table: the 20pt style wins over the 8pt table default.
         var builder = Builder(out var section);
         var style = builder.Styles.Add("Title");
         style.Font.Size = 20;

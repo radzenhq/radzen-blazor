@@ -214,9 +214,6 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 
     internal void Add(Attachment attachment) => items.Add(attachment);
 
-    // Item flags answer "did an attachment change", not "did the collection change": a removed
-    // or reordered attachment leaves every survivor clean. The composed list carries the
-    // structural truth.
     internal bool IsModified
     {
         get

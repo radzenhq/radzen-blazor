@@ -8,12 +8,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Revision 6 (AESV3) read-path integrity and password handling:
-//   #73 /Perms is decrypted and checked against /P (ISO 32000-2 algorithm 13).
-//   #72 R6 passwords are SASLprep/NFKC-normalized, so composed and decomposed
-//        Unicode forms of the same password authenticate identically.
-// Built through the library's own DeriveAes256 write side so the fixture is
-// self-consistent (no external PDF required).
+// ISO 32000-2 algorithm 13: /Perms is decrypted and checked against /P.
 public class R6PermsAndPasswordTests
 {
     private static readonly byte[] FileKey = Fixed(32, 7);
@@ -29,12 +24,11 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
-    // A /P edited to grant extra permissions no longer matches the encrypted /Perms.
     [Fact]
     public void TamperedPermissions_Throws()
     {
         var encrypt = BuildEncrypt("secret", "owner", Permissions);
-        encrypt["P"] = new NumberObject(-4); // claim more permissions than /Perms encodes
+        encrypt["P"] = new NumberObject(-4);
 
         Assert.Throws<DocumentParseException>(
             () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
@@ -78,14 +72,11 @@ public class R6PermsAndPasswordTests
             () => new StandardSecurityHandler(encrypt, DocumentId, "secret"));
     }
 
-    // #72: "cafe"+acute as a single composed codepoint (U+00E9) and as "e" + combining
-    // acute (U+0301) are the same password after NFKC; either form must open a file
-    // whose key was derived from the other.
     [Fact]
     public void ComposedAndDecomposedPassword_AuthenticateEquivalently()
     {
-        var composed = "caf\u00e9";   // U+00E9 e-with-acute, composed
-        var decomposed = "cafe\u0301"; // e + U+0301 combining acute, decomposed
+        var composed = "caf\u00e9";
+        var decomposed = "cafe\u0301";
         var encrypt = BuildEncrypt(composed, "owner", Permissions);
 
         var handler = new StandardSecurityHandler(encrypt, DocumentId, decomposed);
@@ -93,9 +84,7 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
-    // SASLprep B.1 deletes U+00AD (SOFT HYPHEN); NFKC keeps it. A file keyed on the clean
-    // password must open with the soft-hyphen form and vice versa. Fails on the NFKC-only
-    // base (the two forms derive different keys).
+    // SASLprep B.1 deletes U+00AD (SOFT HYPHEN); NFKC keeps it.
     [Fact]
     public void SoftHyphenPassword_AuthenticatesAsIfRemoved()
     {
@@ -126,7 +115,6 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
-    // Printable ASCII is outside every SASLprep table, so the derived key is unchanged.
     [Fact]
     public void PrintableAsciiPassword_Authenticates()
     {
@@ -137,8 +125,7 @@ public class R6PermsAndPasswordTests
         Assert.Equal(FileKey, handler.FileKey);
     }
 
-    // A prohibited code point (U+202E RIGHT-TO-LEFT OVERRIDE, RFC 3454 C.8) is rejected
-    // loudly instead of being passed through NFKC-mangled.
+    // RFC 3454 C.8: U+202E RIGHT-TO-LEFT OVERRIDE is a prohibited code point.
     [Fact]
     public void ProhibitedCodePointPassword_Throws()
     {
@@ -146,8 +133,7 @@ public class R6PermsAndPasswordTests
             () => BuildEncrypt("bad\u202epassword", "owner", Permissions));
     }
 
-    // A RandALCat character (Hebrew Alef) whose string does not begin and end with a
-    // RandALCat violates the bidi rule (RFC 3454 6) and is rejected.
+    // RFC 3454 6 bidi rule: a RandALCat string must begin and end with a RandALCat.
     [Fact]
     public void BidiFirstLastViolationPassword_Throws()
     {
@@ -155,7 +141,6 @@ public class R6PermsAndPasswordTests
             () => BuildEncrypt("abc\u05d0", "owner", Permissions));
     }
 
-    // A well-formed right-to-left password (first and last RandALCat) is accepted.
     [Fact]
     public void RightToLeftPassword_Authenticates()
     {

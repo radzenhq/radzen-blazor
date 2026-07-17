@@ -6,8 +6,6 @@ using System.Reflection;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Loads font fixtures embedded via <EmbeddedResource Include="Pdf\Resources\**" />.
-// Resource names are "<default namespace>.Pdf.Resources." + path-with-separators-as-dots.
 internal static class PdfTestResources
 {
     private const string ResourceRoot = "Radzen.Blazor.Tests.Pdf.Resources.";

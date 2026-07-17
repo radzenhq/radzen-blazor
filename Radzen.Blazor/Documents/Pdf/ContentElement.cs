@@ -49,21 +49,14 @@ public abstract class ContentElement : ITracksChanges
     /// <summary>Marks this element modified without assigning a tracked field.</summary>
     protected void Touch() => tracker.Touch();
 
-    // Called once over a loaded page's original elements after materialization, which builds
-    // them through these same setters and would otherwise leave every page born dirty.
     internal virtual void AcceptChanges() => tracker.AcceptChanges();
 
-    // Explicit so the overridable public IsModified/AcceptChanges do not themselves implement an
-    // internal interface member (CA2119); subclass overrides are still reached through them.
     bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
     internal void Emit(ContentWriter writer) => Emit(writer, Transform);
 
-    // A re-emitted element is spliced back where the source graphics state is still in
-    // effect, so the caller passes the transform to emit relative to that ambient state
-    // instead of this element's absolute one.
     internal void Emit(ContentWriter writer, Matrix transform)
     {
         if (IsArtifact)

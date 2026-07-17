@@ -34,8 +34,6 @@ internal static class AnnotationAppearanceBuilder
         };
     }
 
-    // One primitive per markup area so the appearance agrees with the /QuadPoints the
-    // emitter writes: a markup spanning wrapped lines must not paint the gaps between them.
     private static IReadOnlyList<ContentElement> Markup(MarkupAnnotation annotation, Func<PdfRect, Color, ContentElement> build)
     {
         var result = new List<ContentElement>(annotation.Areas.Count);

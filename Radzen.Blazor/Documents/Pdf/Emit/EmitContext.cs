@@ -1,8 +1,5 @@
 namespace Radzen.Documents.Pdf.Emit;
 
-// Per-page emission context: the PagePlan being filled, this page's number/count, and
-// the shared element emitters so any emitter can dispatch to a sibling (a table cell
-// emits lines, a barcode emits its caption, the body emits fields).
 internal sealed class EmitContext
 {
     public required PagePlan Plan { get; init; }

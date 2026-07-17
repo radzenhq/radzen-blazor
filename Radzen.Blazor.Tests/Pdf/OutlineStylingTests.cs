@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 6: outline items carry /C colour, /F style flags and a negative /Count when
-// collapsed; page destinations support the /Fit, /FitH, /FitR and /XYZ fit modes rather
-// than only the hardcoded /XYZ 0 top 0.
 public class OutlineStylingTests
 {
     private static DocumentBuilder ThreePages()
@@ -50,7 +47,6 @@ public class OutlineStylingTests
         Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(color[1])).DoubleValue, 5);
         Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(color[2])).DoubleValue, 5);
 
-        // /F bit 1 = italic, bit 2 = bold.
         Assert.Equal(3, Assert.IsType<NumberObject>(reader.Resolve(item["F"])).IntValue);
     }
 
@@ -66,7 +62,6 @@ public class OutlineStylingTests
         var reader = BuildTestSupport.Read(builder);
         var outlines = Outlines(reader);
 
-        // The parent is closed: its two children are invisible, so the root sees one item.
         Assert.Equal(1, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
 
         var parentNode = Resolve(reader, outlines["First"]);

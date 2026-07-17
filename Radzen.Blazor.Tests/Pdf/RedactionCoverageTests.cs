@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Redaction is documented as irreversibly removing intersecting content, so every painting
-// operator has to be accounted for: an inline image or a shading that intersects a region
-// must not survive, and one that does not intersect must not be disturbed.
 public class RedactionCoverageTests
 {
     private const string InlineImage = "BI /W 1 /H 1 /BPC 8 /CS /G ID * EI";
@@ -42,14 +39,9 @@ public class RedactionCoverageTests
     private static string SavedContent(Document document)
         => Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 
-    // The image maps the unit square through "100 0 0 100 10 10 cm", so it covers
-    // (10,10)-(110,110). The trailing rectangle is a second element well away from it, so
-    // removing either one still leaves the page re-emitting through ContentEditor.
     private static Document LoadedInlineImageDocument()
         => LoadedDocument($"q 100 0 0 100 10 10 cm {InlineImage} Q 450 450 10 10 re f");
 
-    // A redaction region is PDF user space, not top-left: on a 792pt page it must remove the
-    // rectangle sharing its coordinates and leave the one mirrored across the centre line.
     [Fact]
     public void Redact_RegionIsMeasuredInPdfUserSpace()
     {

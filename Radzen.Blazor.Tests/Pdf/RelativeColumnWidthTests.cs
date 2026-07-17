@@ -6,9 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Star (relative) column widths: columns without a fixed Width share the remaining
-// content width proportionally to Column.RelativeWidth; an unset weight counts as 1,
-// and a fixed Width always wins over a weight.
 public class RelativeColumnWidthTests
 {
     [Fact]

@@ -10,11 +10,6 @@ using TokenKind = Radzen.Documents.Pdf.Objects.TokenKind;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Lexing dominates document open: a large PDF yields tens of millions of tokens, so the
-// per-token cost must not be a heap allocation. These pin the cost model, not the grammar
-// (see LexerTests). Token_IsAValueType pins the load-bearing invariant structurally; the
-// measured budgets below are deliberately orders of magnitude away from both the real cost
-// and the regression they catch, so no verdict here turns on JIT or GC timing.
 public class LexerAllocationTests
 {
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -70,9 +65,6 @@ public class LexerAllocationTests
 
         var bytes = LexAllBytes(builder.ToString(), 20);
 
-        // 10,000 real tokens: 640 bytes measured (the loop's closure, once), against ~400,000
-        // when each real built a transient string to feed double.TryParse. The budget sits far
-        // from both so only a per-token allocation trips it, never measurement noise.
         Assert.True(bytes < 50_000, $"Lexing 500 real tokens 20 times allocated {bytes} bytes.");
     }
 
@@ -87,8 +79,6 @@ public class LexerAllocationTests
 
         var bytes = LexAllBytes(builder.ToString(), 20);
 
-        // 50,000 name tokens, all of them standard: under a byte each, against ~200 when
-        // every name built a List, a copied array and a fresh string.
         Assert.True(bytes < 50_000, $"Lexing 2500 standard name tokens 20 times allocated {bytes} bytes.");
     }
 

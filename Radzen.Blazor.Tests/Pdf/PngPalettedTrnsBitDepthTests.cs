@@ -16,8 +16,6 @@ public class PngPalettedTrnsBitDepthTests
     [Fact]
     public void FourBitIndexedWithTrns_YieldsPerPixelAlpha()
     {
-        // 3x2, 4bpp. Rows are byte padded: 3 pixels -> 2 bytes each.
-        // Row 0 indices 0,1,2 -> 0x01 0x20; row 1 indices 3,0,1 -> 0x30 0x10.
         byte[] scanlines = [0x00, 0x01, 0x20, 0x00, 0x30, 0x10];
         byte[] palette = [10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40];
         byte[] trns = [0x00, 0xFF];
@@ -32,7 +30,6 @@ public class PngPalettedTrnsBitDepthTests
     [Fact]
     public void OneBitIndexedWithTrns_YieldsPerPixelAlpha()
     {
-        // 4x2, 1bpp. Row 0 indices 0,1,0,1 -> 0x50; row 1 indices 1,1,0,0 -> 0xC0.
         byte[] scanlines = [0x00, 0x50, 0x00, 0xC0];
         byte[] palette = [0, 0, 0, 255, 255, 255];
         byte[] trns = [0x00];
@@ -47,7 +44,6 @@ public class PngPalettedTrnsBitDepthTests
     [Fact]
     public void EightBitIndexedWithTrns_DecodesUnchanged()
     {
-        // 2x1, 8bpp. Indices 0,1.
         byte[] scanlines = [0x00, 0x00, 0x01];
         byte[] palette = [10, 10, 10, 20, 20, 20];
         byte[] trns = [0x00, 0xFF];

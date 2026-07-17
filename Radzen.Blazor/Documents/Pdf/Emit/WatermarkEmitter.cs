@@ -2,9 +2,6 @@ using Radzen.Documents.Pdf.Content;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Plans a section watermark onto a page: shapes the text during page planning (so
-// glyph usage lands in the document-wide subsets before compaction), decodes the
-// image, and records a WatermarkDraw the generator serializes after all content.
 internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolver fontResolver, ImageStore imageStore)
 {
     private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
@@ -44,17 +41,12 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         plan.Watermark = draw;
     }
 
-    // Segments are laid out in the rotated coordinate system, centered on its origin:
-    // the run starts at -width/2 with the baseline dropped so the glyph body straddles
-    // the page center.
     private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Font font)
     {
         var size = font.Size;
         var baseline = WatermarkGeometry.Baseline(size);
         if (fonts.TryResolvePrimary(font, out _))
         {
-            // The whole text is measured as one run, so its space-straddling pairs are kerned
-            // in the width the mark is centred from and must be kerned in the drawn run too.
             var x = WatermarkGeometry.Centered(fonts.MeasureText(text, font));
             foreach (var glyphRun in runBuilder.Build(text, font, size, kernAcrossSpaces: true))
             {

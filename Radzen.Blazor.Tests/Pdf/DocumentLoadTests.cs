@@ -9,11 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C2 physical LOAD contract. Pins:
-//   static Document Document.LoadFromStream(Stream stream, LoadOptions? options = null)
-//   sealed class LoadOptions { string? Password { get; set; } }
-// LoadFromStream parses via the internal DocumentReader into Document.Pages,
-// retaining each page's raw content-stream bytes verbatim (not re-encoded).
 public class DocumentLoadTests
 {
     private static Document Load(byte[] bytes, LoadOptions? options = null)
@@ -49,7 +44,6 @@ public class DocumentLoadTests
         Assert.Equal(PageSizes.A4.Height.Point, loaded.Pages[0].Height.Point, 0.01);
         Assert.Equal(PageSizes.Letter.Width.Point, loaded.Pages[1].Width.Point, 0.01);
         Assert.Equal(PageSizes.Letter.Height.Point, loaded.Pages[1].Height.Point, 0.01);
-        // Landscape swapped the A4 dimensions.
         Assert.Equal(PageSizes.A4.Height.Point, loaded.Pages[2].Width.Point, 0.01);
         Assert.Equal(PageSizes.A4.Width.Point, loaded.Pages[2].Height.Point, 0.01);
 

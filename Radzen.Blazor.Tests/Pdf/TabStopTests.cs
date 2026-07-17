@@ -7,11 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract for explicit, variable-position tab stops on a paragraph. Tab stops are
-// added through paragraph.TabStops.AddTabStop(position, alignment) (MigraDoc parity,
-// mapped onto this library's format-on-paragraph model). Assertions are numeric on the
-// laid-out fragment XOffsets produced by the internal LineBreaker, using deterministic
-// Liberation Sans metrics. A paragraph with NO tab stops must keep the 36pt default grid.
 public class TabStopTests
 {
     private const double Tol = 0.5;

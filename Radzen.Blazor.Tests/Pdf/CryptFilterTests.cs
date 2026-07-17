@@ -9,10 +9,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 7.4.10: a /Crypt filter names a crypt filter from /CF that decrypts the
-// stream in place of /StmF; /Identity (the default) means the stream is not encrypted.
-// Acrobat emits /Filter [/Crypt] with /Name /Identity on the plaintext /Metadata stream
-// of a document written with /EncryptMetadata false.
+// ISO 32000-1 7.4.10: a /Crypt filter names a crypt filter from /CF; /Identity means not encrypted
 public class CryptFilterTests
 {
     private static readonly byte[] DocumentId = CryptoFixtureSupport.FixedBytes(16, 5);
@@ -22,8 +19,7 @@ public class CryptFilterTests
 
     private const string Marker = "BT /F1 12 Tf 72 720 Td (crypt-filter-marker) Tj ET";
 
-    // Algorithm 2 with the /EncryptMetadata false extension: 0xFFFFFFFF is appended
-    // before the 50-round MD5 spin (ISO 32000-1 7.6.3.3 step (f)).
+    // ISO 32000-1 7.6.3.3 step (f): 0xFFFFFFFF appended before the 50-round MD5 spin
     private static byte[] FileKeyNoMetadata(byte[] owner, int permissions, byte[] documentId)
     {
         var p = new[]
@@ -58,8 +54,6 @@ public class CryptFilterTests
         return hash[..16];
     }
 
-    // An encrypted (V4/AESV2) document whose /Metadata carries the plaintext-XMP
-    // /Crypt idiom, and whose page content opts out of /StmF the same way.
     private static byte[] BuildDocument(string metadataCryptName, string contentCryptName)
     {
         const int permissions = -3904;
@@ -146,7 +140,7 @@ public class CryptFilterTests
         Assert.Equal("payload", Encoding.ASCII.GetString(Decode("Crypt", Parms("Identity"))));
     }
 
-    // /Name defaults to /Identity when absent (ISO 32000-1 Table 14).
+    // ISO 32000-1 Table 14: /Name defaults to /Identity when absent
     [Fact]
     public void CryptFilter_WithoutParms_PassesDataThrough()
     {

@@ -7,11 +7,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Write-side compressed cross-reference contract (ISO 32000-1 7.5.7 and 7.5.8).
-// With DocumentWriter.UseCompressedStreams on, eligible non-stream objects are
-// packed into a Flate-compressed /Type /ObjStm and the file ends with a
-// /Type /XRef cross-reference stream instead of the classic table + trailer.
-// The mode is opt-in: the default output stays the classic byte layout.
+// ISO 32000-1 7.5.7 and 7.5.8: object streams and cross-reference streams
 public class CompressedStreamWriteTests
 {
     private const string StreamMarker = "BT /F1 12 Tf (compressed marker) Tj ET";
@@ -89,8 +85,6 @@ public class CompressedStreamWriteTests
     {
         var text = Latin1(WriteGraph(compressed: true));
 
-        // Object 1 (catalog) and 2 (pages) are packed, so they have no
-        // top-level body; object 3 (the content stream) must stay top-level.
         Assert.DoesNotContain("\n1 0 obj\n", text);
         Assert.DoesNotContain("\n2 0 obj\n", text);
         Assert.Contains("\n3 0 obj\n", text);

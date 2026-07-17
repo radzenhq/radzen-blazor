@@ -26,10 +26,7 @@ internal sealed class JpegImageDecoder : IImageDecoder
 
         ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG");
 
-        // SOF1/SOF2 legally carry 12-bit samples, but /BitsPerComponent admits only 1/2/4/8/16
-        // (ISO 32000-1 8.9.5.1). The JPEG is embedded verbatim under /DCTDecode, so there is no
-        // entropy decoder here to requantize down to 8; emitting 12 would be a spec-invalid file
-        // the library called a success. Fail loud, like the undecodable-SOF guard.
+        // ISO 32000-1 8.9.5.1: /BitsPerComponent admits only 1/2/4/8/16.
         if (precision != 8)
         {
             throw new NotSupportedException(
@@ -54,9 +51,6 @@ internal sealed class JpegImageDecoder : IImageDecoder
         dict["BitsPerComponent"] = new NumberObject(precision);
         dict["Filter"] = new NameObject("DCTDecode");
 
-        // The inverted /Decode is correct only for Adobe CMYK JPEGs, which store inverted
-        // samples and are flagged by an APP14 'Adobe' marker; a non-Adobe CMYK JPEG holds
-        // normal samples and would render inverted if we forced the same array.
         if (components == 4 && adobe)
         {
             dict["Decode"] = new ArrayObject
@@ -109,9 +103,6 @@ internal sealed class JpegImageDecoder : IImageDecoder
 
             if (IsStartOfFrame(marker))
             {
-                // SOF3 (lossless), SOF5-7 (differential) and SOF9-15 (arithmetic-coded) cannot be
-                // shown by a /DCTDecode viewer, which supports only baseline/extended-sequential/
-                // progressive Huffman; embedding them verbatim would render blank. Fail loud.
                 if (marker is not (0xC0 or 0xC1 or 0xC2))
                 {
                     throw new NotSupportedException(

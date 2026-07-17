@@ -7,8 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The registry mints the prefix+ordinal resource keys that land in emitted bytes, so the
-// numbering it produces is a byte-fidelity contract, not an implementation detail.
 public class ResourceKeyRegistryTests
 {
     private static PagePlan Plan() => new() { Size = PageSizes.A4 };
@@ -29,7 +27,6 @@ public class ResourceKeyRegistryTests
         Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask("a")));
         Assert.Equal("GS2", plan.RegisterExtGState(0.25, 0.25));
 
-        // Both domains dedup against their own identity without consuming an ordinal.
         Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask("a")));
         Assert.Equal("GS0", plan.RegisterExtGState(0.5, 0.5));
 
@@ -47,8 +44,6 @@ public class ResourceKeyRegistryTests
         Assert.Equal(2, plan.ExtGStates.Count);
     }
 
-    // A soft-mask state must never be handed back to a plain registration: it carries an /SMask
-    // the caller did not ask for.
     [Fact]
     public void PlainState_NeverReusesASoftMaskStateWithEqualAlpha()
     {
@@ -70,7 +65,6 @@ public class ResourceKeyRegistryTests
         Assert.Equal("P1", plan.RegisterPattern(second));
     }
 
-    // Reproduces the IEEE `==` dedup the opacity linear scan had: -0 and 0 are one entry.
     [Fact]
     public void NegativeZeroOpacity_SharesTheZeroEntry()
     {

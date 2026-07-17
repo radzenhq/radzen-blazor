@@ -5,15 +5,10 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One /Rect reader, three malformed-input policies. The policies differ on purpose - each
-// call site keeps the one it had when they were three separate readers - so they are pinned
-// here rather than left to whichever file the reader happened to live in.
 public class PdfRectPolicyTests
 {
     private static readonly RectPolicy Strict = RectPolicy.Strict("missing", "non-numeric");
 
-    // The reader only has to resolve loose objects here, so the fixture is a minimal
-    // one-page file plus whatever extra objects a test wants to reference.
     private static DocumentReader Reader(params string[] extra)
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
@@ -113,8 +108,6 @@ public class PdfRectPolicyTests
         }
     }
 
-    // A short array falls back wholesale, but a four-element array with one unusable
-    // coordinate keeps the three that did resolve and reads the odd one out as zero.
     [Fact]
     public void FallbackPoliciesReadANonNumericCoordinateAsZero()
     {
@@ -126,8 +119,6 @@ public class PdfRectPolicyTests
         Assert.Equal(70, bounds.Top);
     }
 
-    // A /Rect may legally state coordinates as indirect references; unresolved they read as
-    // zero and collapse the rectangle, so resolution is part of the shared reader's contract.
     [Fact]
     public void ResolvesIndirectCoordinates()
     {

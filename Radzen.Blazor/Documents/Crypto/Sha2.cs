@@ -283,8 +283,6 @@ public sealed class Sha256Hasher
         return result;
     }
 
-    // Feeds bytes through the compression function without counting them, so Finish can
-    // append its own padding after the message length has been fixed.
     private void AppendCore(ReadOnlySpan<byte> data)
     {
         if (blockLength > 0)

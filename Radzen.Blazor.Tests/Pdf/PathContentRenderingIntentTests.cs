@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Rendering intent (the ri operator) on a public PathContent, per ISO 32000-1 8.6.5.8.
+// ISO 32000-1 8.6.5.8 rendering intent.
 public class PathContentRenderingIntentTests
 {
     private static ContentOperation Find(byte[] content, string op)

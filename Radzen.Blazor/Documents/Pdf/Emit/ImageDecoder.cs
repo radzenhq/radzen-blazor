@@ -11,8 +11,6 @@ namespace Radzen.Documents.Pdf.Emit;
 /// </summary>
 public static class ImageDecoder
 {
-    // The built-in format decoders, tried in order; a new format is a new IImageDecoder
-    // registered here rather than an added arm in a central magic-byte switch.
     private static readonly IImageDecoder[] Decoders =
     [
         new PngImageDecoder(),
@@ -20,14 +18,8 @@ public static class ImageDecoder
         new Jpeg2000ImageDecoder(),
     ];
 
-    // Registered custom decoders, tried after the built-ins so a third party cannot shadow a
-    // built-in format. Held as an immutable snapshot swapped on register, so a concurrent Decode
-    // enumerates a stable array rather than a list being mutated under it.
     private static volatile IImageDecoder[] registered = [];
 
-    // Serializes the read-copy-swap in Register: without it two concurrent registrations
-    // both copy the same snapshot and the second swap drops the first decoder silently.
-    // Decode stays lock-free, enumerating whichever snapshot it read.
     private static readonly object RegisterGate = new();
 
     /// <summary>
@@ -49,9 +41,6 @@ public static class ImageDecoder
         }
     }
 
-    // Buffers a source stream for Image/InlineImage. An image payload has no file-size cap of
-    // its own, so the shared buffering runs uncapped and only the int.MaxValue array ceiling
-    // applies.
     internal static byte[] ReadFully(Stream stream) => DocumentReader.ReadFully(stream, long.MaxValue);
 
     internal static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
@@ -80,16 +69,12 @@ public static class ImageDecoder
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
     }
 
-    // Reads a decoded image's pixel dimensions off its XObject dictionary.
     internal static (double Width, double Height) PixelSize(ImageXObject xobject)
     {
         var dict = xobject.Image.Dictionary;
         return (((NumberObject)dict["Width"]).DoubleValue, ((NumberObject)dict["Height"]).DoubleValue);
     }
 
-    // The width/height derivation shared by block Image and InlineImage: an explicit pair wins,
-    // a single explicit dimension keeps the pixel aspect, and a fully unsized image falls back
-    // to its natural size at an assumed 96dpi source.
     internal static (double Width, double Height) DeriveSize(Unit? width, Unit? height, double pixelWidth, double pixelHeight)
     {
         if (width is { } w && height is { } h)
@@ -110,8 +95,6 @@ public static class ImageDecoder
         return (pixelWidth * 72.0 / 96.0, pixelHeight * 72.0 / 96.0);
     }
 
-    // Rendered size honoring explicit Width/Height, keeping aspect when one is omitted.
-    // A fully unsized image renders at 96dpi and is clamped to the available width.
     internal static (double Width, double Height) Measure(Image image, ImageXObject xobject, double availableWidth)
     {
         var (pixelWidth, pixelHeight) = PixelSize(xobject);
@@ -123,7 +106,6 @@ public static class ImageDecoder
             return (baseWidth * scale, baseHeight * scale);
         }
 
-        // Only a fully unsized image is clamped to the available width; an explicit dimension wins.
         if (image.Width is null && image.Height is null
             && availableWidth > 0 && !double.IsInfinity(availableWidth) && baseWidth > availableWidth)
         {
@@ -134,10 +116,6 @@ public static class ImageDecoder
         return (baseWidth, baseHeight);
     }
 
-    // Stamps the opt-in options a block Image carries onto its decoded XObject. A stencil
-    // mask needs a dictionary without /ColorSpace, so it yields a fresh image-mask XObject;
-    // the remaining flags are additive. An image that opts into nothing is returned untouched,
-    // keeping the default output byte-identical.
     internal static ImageXObject ApplyOptions(ImageXObject xobject, Image image)
     {
         if (image.Stencil && image.ColorKeyMask is not null)
@@ -147,14 +125,10 @@ public static class ImageDecoder
 
         if (image.Stencil)
         {
-            // Yields a brand-new image-mask XObject; nothing of the shared decode is touched.
             xobject = BuildStencilMask(xobject);
         }
         else if (image.ColorKeyMask is not null || image.Interpolate)
         {
-            // Copy the shared decode before stamping additive dictionary options so the
-            // cached plain XObject is never mutated in place (distinct-option uses of the
-            // same bytes must not leak /Mask or /Interpolate onto each other).
             xobject = Copy(xobject);
         }
 
@@ -171,8 +145,6 @@ public static class ImageDecoder
         return xobject;
     }
 
-    // Shallow copy of an image XObject: a fresh stream over the same sample bytes carrying
-    // a fresh dictionary with the same entries, so additive options mutate the copy alone.
     private static ImageXObject Copy(ImageXObject xobject)
     {
         var stream = new StreamObject(xobject.Image.Data);
@@ -184,8 +156,7 @@ public static class ImageDecoder
         return new ImageXObject(stream, xobject.SoftMask);
     }
 
-    // Colour-key masking (ISO 32000-1 8.9.6.4): /Mask holds one inclusive [min max] pair per
-    // colour component; a pixel whose components all fall within their ranges is not painted.
+    // Colour-key masking (ISO 32000-1 8.9.6.4): /Mask holds one [min max] pair per colour component.
     private static void ApplyColorKeyMask(ImageXObject xobject, int[] ranges)
     {
         if (ranges.Length == 0 || (ranges.Length % 2) != 0)
@@ -214,8 +185,6 @@ public static class ImageDecoder
         dict["Mask"] = array;
     }
 
-    // Colour-component count of the image's colour space, or null when it cannot be told from
-    // the dictionary (a JPXDecode image carries its own colour space and has no /ColorSpace).
     private static int? ColorComponents(DictionaryObject dict)
     {
         if (!dict.TryGetValue("ColorSpace", out var colorSpace) || colorSpace is null)
@@ -233,9 +202,7 @@ public static class ImageDecoder
         };
     }
 
-    // Re-expresses a 1-bit grayscale image as a stencil mask (ISO 32000-1 8.9.6.2): the same
-    // packed 1-bit sample stream, but with /ImageMask true and no /ColorSpace so its samples
-    // gate painting in the current fill colour (sample 0 paints, per the default /Decode [0 1]).
+    // Stencil mask (ISO 32000-1 8.9.6.2): /ImageMask true, no /ColorSpace; sample 0 paints (default /Decode [0 1]).
     private static ImageXObject BuildStencilMask(ImageXObject xobject)
     {
         var source = xobject.Image.Dictionary;
@@ -259,9 +226,6 @@ public static class ImageDecoder
         return new ImageXObject(stream, null);
     }
 
-    // Header dimensions drive every downstream pixel buffer; reject non-positive or
-    // oversized geometry before allocating so a tiny header cannot request gigabytes
-    // or wrap width*height negative.
     internal static void ValidateImageDimensions(long width, long height, ReaderLimits limits, string format)
     {
         if (width <= 0 || height <= 0)

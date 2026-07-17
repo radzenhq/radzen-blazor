@@ -59,7 +59,6 @@ public readonly struct Rect(double x, double y, double width, double height) : I
     public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
 }
 
-/// <summary>How <see cref="PdfRect.Read"/> answers a missing, short or non-numeric /Rect array.</summary>
 internal readonly struct RectPolicy
 {
     private RectPolicy(string? missingMessage, string? nonNumericMessage, double fallbackWidth, double fallbackHeight)
@@ -80,14 +79,11 @@ internal readonly struct RectPolicy
 
     public bool Throws => MissingMessage is not null;
 
-    /// <summary>Requires exactly four resolvable numbers, throwing <see cref="DocumentParseException"/> otherwise.</summary>
     public static RectPolicy Strict(string missingMessage, string nonNumericMessage)
         => new(missingMessage, nonNumericMessage, 0, 0);
 
-    /// <summary>Reads a missing or short array as an empty rectangle, and any non-numeric coordinate as zero.</summary>
     public static RectPolicy ZeroFallback { get; } = new(null, null, 0, 0);
 
-    /// <summary>Reads a missing or short array as the given size at the origin, and any non-numeric coordinate as zero.</summary>
     public static RectPolicy DefaultSize(double width, double height) => new(null, null, width, height);
 }
 
@@ -147,8 +143,7 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Left, Bottom, Right, Top);
 
-    // A legal /Rect may state its corners in either order and may hold indirect references
-    // (ISO 32000-1 7.9.5), so each coordinate is resolved and the result normalised.
+    // /Rect corners may be in either order and may be indirect references (ISO 32000-1 7.9.5).
     internal static PdfRect Read(DocumentReader reader, ArrayObject? value, RectPolicy policy)
     {
         if (value is null || value.Count < 4 || (policy.Throws && value.Count != 4))

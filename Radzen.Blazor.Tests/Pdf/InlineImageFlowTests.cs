@@ -58,7 +58,6 @@ public class InlineImageFlowTests
         var placements = ImagePlacements(builder);
         Assert.Equal(2, placements.Count);
 
-        // Same baseline (shared line), second advanced by the first image's 40pt width.
         Assert.Equal(placements[0].Y, placements[1].Y, 3);
         Assert.Equal(placements[0].X + 40, placements[1].X, 3);
     }
@@ -68,7 +67,6 @@ public class InlineImageFlowTests
     {
         var builder = new DocumentBuilder();
         var section = builder.Sections.Add();
-        // Content width 60pt fits one 40pt image per line, forcing the second to wrap.
         section.PageSize = new PageSize(Unit.FromPoint(60), Unit.FromPoint(500));
         section.Margin = Unit.FromPoint(0);
 
@@ -79,7 +77,6 @@ public class InlineImageFlowTests
         var placements = ImagePlacements(builder);
         Assert.Equal(2, placements.Count);
 
-        // Both flush left, second on a lower line.
         Assert.Equal(0, placements[0].X, 3);
         Assert.Equal(0, placements[1].X, 3);
         Assert.True(placements[1].Y < placements[0].Y - 1, "second image wrapped to a lower line");

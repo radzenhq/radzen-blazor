@@ -6,7 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L4a cell geometry, padding, row-height, content layout and alignment contract.
 public class TableLayoutTests
 {
     [Fact]
@@ -243,7 +242,6 @@ public class TableLayoutTests
         var laid = TableLayout.Layout(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
-        // Left is explicit (20); right/top/bottom fall back to the uniform 5.
         Assert.Equal(new Rect(20, 5, 175, lh), c.ContentBox);
         Assert.Equal(new Rect(0, 0, 200, lh + 10), c.Bounds);
     }
@@ -274,7 +272,6 @@ public class TableLayoutTests
             return TableLayoutSupport.CellAt(TableLayout.Layout(table, 200, f), 0, 0);
         }
 
-        // Old way (uniform Padding, per-edge all unset) == setting all four edges equally.
         var legacy = Build(fonts, perEdge: false);
         var perEdge = Build(fonts, perEdge: true);
 

@@ -6,8 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3(d): Font.Underline draws a horizontal line under the run - below the baseline,
-// above baseline minus the font size, spanning roughly the run's advance width.
 public class UnderlineRenderTests
 {
     private const string Text = "Underlined words";

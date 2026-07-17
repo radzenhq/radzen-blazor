@@ -10,17 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Package C2: compact CID-keyed CFF subsetting through the full Build() pipeline.
-// The embedded CIDFontType0 subset renumbers glyphs into a contiguous 0..N-1 space
-// (used glyphs + .notdef), the content stream emits the NEW compact id as the
-// 2-byte Identity-H code (CID == new gid), the subset charset is the identity map
-// over the compact space, and W / CIDSet / ToUnicode are keyed by the compact id.
-// The CIDSet must mark exactly 0..N-1 per veraPDF 6.2.11.4.2.
-//
-// Fixture: NotoSansSC-Subset.otf (CFF, CID-keyed ROS Adobe-Identity-0, 658 glyphs).
-// Sample gids (fontTools 4.60.2): space=1 A=34 b=67 М=202 и=230 р=238 中=395 产=396,
-// so N = 8 used + notdef = 9. Original charset is NOT identity above gid ~190
-// (中 gid 395 -> CID 9544), so identity-charset assertions genuinely pin renumbering.
 public class CompactCffSubsetTests
 {
     private const string Sample = "Ab Мир 中产";
@@ -51,8 +40,6 @@ public class CompactCffSubsetTests
         return CffFont.Parse(reader.DecodeStream(stream));
     }
 
-    // Distinct original gids used by the sample; all covered and non-zero, and
-    // none of them is .notdef, so the compact space is exactly used + notdef.
     private static HashSet<int> UsedOriginalGids()
     {
         var original = Type0EmbedSupport.LoadNoto();
@@ -114,7 +101,6 @@ public class CompactCffSubsetTests
         Assert.True(cff.IsCidKeyed);
         Assert.Equal(UsedOriginalGids().Count + 1, cff.GlyphCount);
 
-        // CID == compact gid: the subset charset is the identity over 0..N-1.
         for (var gid = 0; gid < cff.GlyphCount; gid++)
         {
             Assert.Equal(gid, cff.Charset[gid]);
@@ -132,8 +118,6 @@ public class CompactCffSubsetTests
         var stream = Assert.IsType<StreamObject>(reader.Resolve(descriptor["CIDSet"]));
         var bits = Type0EmbedSupport.SetBits(reader.DecodeStream(stream));
 
-        // Every CFF charstring is present in the font program, so the CIDSet marks
-        // exactly the compact space with no gaps and no original-gid stragglers.
         Assert.Equal(Enumerable.Range(0, n).ToHashSet(), bits);
     }
 

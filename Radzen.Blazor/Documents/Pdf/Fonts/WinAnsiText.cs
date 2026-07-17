@@ -3,24 +3,15 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-/// <summary>
-/// What <see cref="WinAnsiText.Encode"/> does with a character the WinAnsi encoding
-/// cannot represent.
-/// </summary>
 internal enum OnUnencodable
 {
-    /// <summary>Emit the '?' glyph in its place.</summary>
     Substitute,
 
-    /// <summary>Throw a <see cref="NotSupportedException"/> naming the character.</summary>
     Throw,
 
-    /// <summary>Emit nothing for it. Only safe when the caller has already pre-filtered.</summary>
     Drop,
 }
 
-// The one WinAnsi encoder. The policy for an unencodable character is a parameter, so a
-// caller must name the one it wants rather than reach for a helper that silently drops.
 internal static class WinAnsiText
 {
     public static bool CanEncode(string text)
@@ -36,7 +27,6 @@ internal static class WinAnsiText
         return true;
     }
 
-    // context names the feature in the OnUnencodable.Throw message.
     public static byte[] Encode(string text, OnUnencodable onUnencodable, string context = "Text")
     {
         var bytes = new List<byte>(text.Length);

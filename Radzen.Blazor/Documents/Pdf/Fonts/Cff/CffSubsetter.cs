@@ -4,15 +4,8 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
-// Rebuilds a compact CID-keyed CFF holding only the closure of the requested glyphs
-// (requested original gids plus glyph 0), renumbered into a contiguous 0..N-1 space with
-// an identity charset (CID == new gid). Charstrings are copied verbatim and the whole
-// FDArray, its Private DICTs, local subrs and the global subrs are preserved, so a re-parse
-// recovers identical advance widths. Offsets use the forced 5-byte integer form so every
-// DICT has a layout-independent size and positions resolve in a single pass.
 internal static class CffSubsetter
 {
-    // Registry/Ordering are appended as custom strings; standard strings occupy SIDs 0..N-1.
     private static int FirstCustomSid => CffStandardStrings.Strings.Length;
 
     public static byte[] Subset(CffFont font, IReadOnlyCollection<int> glyphIds)
@@ -29,8 +22,6 @@ internal static class CffSubsetter
         {
             var gid = closure[i];
 
-            // seac composes a glyph from base+accent addressed through the source charset;
-            // the compact identity-charset rewrite would silently break that reference.
             if (font.UsesSeacEndchar(gid))
             {
                 throw new NotSupportedException(
@@ -128,9 +119,6 @@ internal static class CffSubsetter
         return result;
     }
 
-    // The compact renumbering for a request: original gid -> new gid, covering the
-    // requested glyphs plus .notdef, assigned in ascending original-gid order.
-    // Deterministic, so content generation and embedding agree on the codes.
     public static Dictionary<ushort, ushort> BuildCompactGidMap(IReadOnlyCollection<ushort> glyphIds)
     {
         ArgumentNullException.ThrowIfNull(glyphIds);
@@ -156,8 +144,6 @@ internal static class CffSubsetter
         var set = new SortedSet<int> { 0 };
         foreach (var gid in glyphIds)
         {
-            // A corrupt font (e.g. a cmap returning a gid past the charstring count)
-            // must fail loudly here rather than silently emit a wrong glyph.
             if (gid < 0 || gid >= font.GlyphCount)
             {
                 throw new ArgumentOutOfRangeException(nameof(glyphIds), gid,
@@ -172,7 +158,6 @@ internal static class CffSubsetter
 
     private static byte[] BuildIdentityCharset(int glyphCount)
     {
-        // Format 0: leading byte then a Card16 CID per glyph 1..n-1 (glyph 0 is implicit CID 0).
         var bytes = new byte[1 + ((glyphCount - 1) * 2)];
         bytes[0] = 0;
         var p = 1;
@@ -207,8 +192,6 @@ internal static class CffSubsetter
 
         if (hasLocalSubrs)
         {
-            // Subrs offset is relative to the Private DICT start; local subrs follow it directly,
-            // so the offset equals the (forced-5-byte, hence stable) Private DICT length.
             var withoutSubrs = dict.Count;
             var subrsOffset = withoutSubrs + 6;
             CffDict.WriteOffset(dict, subrsOffset);

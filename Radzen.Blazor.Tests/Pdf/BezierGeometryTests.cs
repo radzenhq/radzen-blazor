@@ -20,8 +20,6 @@ public class BezierGeometryTests
             ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));
     }
 
-    // Guards the drift that had the annotation builder carrying a 12-digit truncation
-    // (0.552284749831) of this constant, which is 6.4e-13 off and would fail this bound.
     [Fact]
     public void Kappa_IsTheQuarterArcConstantToFullDoublePrecision()
     {
@@ -36,9 +34,6 @@ public class BezierGeometryTests
         Assert.Equal(ellipse, circle);
     }
 
-    // Each quarter arc's Bezier midpoint must sit on the ellipse to within the approximation's
-    // known error (~0.027%); the truncated constant that used to live in the annotation builder
-    // is a strictly worse approximation of the same curve.
     [Theory]
     [InlineData(50.0, 50.0)]
     [InlineData(80.0, 20.0)]
@@ -46,7 +41,6 @@ public class BezierGeometryTests
     {
         var k = BezierGeometry.Kappa;
 
-        // Bezier midpoint (t=0.5) of the first quarter: (rx,0) -> (rx,ry*k) -> (rx*k,ry) -> (0,ry).
         var x = (rx + 3 * rx + 3 * rx * k + 0) / 8.0;
         var y = (0 + 3 * ry * k + 3 * ry + ry) / 8.0;
 

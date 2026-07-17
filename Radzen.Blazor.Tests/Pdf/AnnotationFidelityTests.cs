@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The generated /AP of a markup annotation must agree with the /QuadPoints it emits
-// (one primitive per area, not one over the whole bounds), and editing a loaded ink
-// or free-text annotation must not silently drop the /BS width or /DA the source
-// carried, since the emitter rebuilds both keys from the model.
 public class AnnotationFidelityTests
 {
     private static Document Load(byte[] bytes)
@@ -28,7 +24,6 @@ public class AnnotationFidelityTests
         return FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(appearance["N"])));
     }
 
-    // #70 - two wrapped lines of markup inside one bounding rect.
     private static T TwoLines<T>(T annotation) where T : MarkupAnnotation
     {
         annotation.Areas.Clear();
@@ -48,7 +43,6 @@ public class AnnotationFidelityTests
     [Fact]
     public void HighlightAppearancePaintsOneRectanglePerArea()
     {
-        // Bounds 40 100 -> 140 142; areas are at y 30..42 and y 0..12 within it.
         var content = MarkupAppearance(TwoLines(new HighlightAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
         Assert.Equal(2, Occurrences(content, "\nf\n"));
@@ -88,8 +82,6 @@ public class AnnotationFidelityTests
         Assert.Contains("0 1 m", content);
     }
 
-    // A single-area markup is the overwhelmingly common case and its appearance must
-    // stay exactly what it was: one primitive spanning the bounds.
     [Fact]
     public void SingleAreaMarkupAppearanceIsUnchanged()
     {
@@ -111,7 +103,6 @@ public class AnnotationFidelityTests
         return count;
     }
 
-    // #71 - /BS /W and /DA of a loaded annotation survive an edit of that annotation.
 
     [Fact]
     public void EditedInkKeepsTheLoadedStrokeWidth()
@@ -158,8 +149,6 @@ public class AnnotationFidelityTests
         Assert.Equal("/Courier 18 Tf 1 0 0 rg", reader.GetString(dictionary, "DA"));
     }
 
-    // A /DA carrying only a colour operator leaves the font unstated, so the model
-    // default must stand rather than collapse to size 0.
     [Fact]
     public void LoadedFreeTextWithoutFontInDefaultAppearanceKeepsTheDefaultFont()
     {
@@ -170,7 +159,6 @@ public class AnnotationFidelityTests
         Assert.Equal(Color.FromRgb(128, 128, 128), loaded.TextColor);
     }
 
-    // Rewrites the /DA of the sole loaded annotation, to model another producer's.
     private static byte[] WithDefaultAppearance(string da)
     {
         var source = new Document();

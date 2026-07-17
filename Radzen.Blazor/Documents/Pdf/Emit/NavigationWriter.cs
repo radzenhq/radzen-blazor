@@ -4,13 +4,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Emits the document's navigation structures on save: the /Names /Dests named
-// destination tree, the /Outlines bookmark tree, and the per-page link
-// annotations for generated content.
 internal sealed class NavigationWriter(Document document)
 {
-    // Emits the /Names /Dests name tree mapping each anchor to [pageRef /XYZ 0 top 0],
-    // merging into a /Names dictionary the attachments block may already have set.
     public void WriteDestinations(
         DocumentWriter writer,
         DictionaryObject catalog,
@@ -41,15 +36,10 @@ internal sealed class NavigationWriter(Document document)
     {
         var root = new DictionaryObject { ["Type"] = new NameObject("Outlines") };
         var rootRef = writer.Add(root);
-        // The root is always open, so its /Count is the total number of visible items.
         root["Count"] = new NumberObject(WriteOutlineLevel(writer, document.Outline, root, rootRef, pageNodes));
         return rootRef;
     }
 
-    // Writes one sibling level and recurses into children. Returns the number of items
-    // this level contributes to its parent's visible count: each item counts once, plus
-    // its own visible descendants when the item is open. A collapsed item hides its
-    // descendants (they add nothing to ancestors) and is written with a negative /Count.
     private int WriteOutlineLevel(
         DocumentWriter writer,
         IList<OutlineItem> items,
@@ -112,8 +102,6 @@ internal sealed class NavigationWriter(Document document)
         return levelVisible;
     }
 
-    // An anchor target navigates through the named-destination tree; a page target gets
-    // an explicit destination whose fit mode is chosen by the target.
     private DocumentObject OutlineDestination(
         OutlineTarget target,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
@@ -191,8 +179,7 @@ internal sealed class NavigationWriter(Document document)
                 ["Subtype"] = new NameObject("Link"),
                 ["Rect"] = rect,
                 ["Border"] = border,
-                // PDF/A (ISO 19005-3 6.3.2) requires the Print flag (bit 3 = 4) set
-                // and Hidden/NoView clear on every annotation.
+                // ISO 19005-3 6.3.2: Print flag (bit 3 = 4) set, Hidden/NoView clear.
                 ["F"] = new NumberObject(4),
                 ["A"] = link.Destination is { } destination
                     ? new DictionaryObject

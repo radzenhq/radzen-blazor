@@ -6,8 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 9.6.6.4: a widget appearance must reach its base-14 face through the same
-// dictionary builder the page resources use, or the symbolic faces get their glyphs remapped.
+// ISO 32000-1 9.6.6.4: a widget appearance must reach its base-14 face through the page-resource dictionary builder or symbolic glyphs get remapped.
 public class FieldAppearanceFontResourceTests
 {
     [Fact]

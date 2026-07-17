@@ -9,13 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Importing a source PDF with a hierarchical AcroForm into a generated document
-// must carry each field TREE over, not just merged widget/fields: a kid widget
-// contributes its top-most /Parent to the destination /AcroForm /Fields exactly
-// once, the /Parent<->/Kids links survive so partial /T names still combine into
-// fully qualified dotted names, form-wide defaults merge (/DR unions, the
-// destination /DA wins, /NeedAppearances ORs), and a colliding top-level name is
-// suffixed deterministically instead of dropped.
 public class AcroFormFieldTreeImportTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -33,9 +26,6 @@ public class AcroFormFieldTreeImportTests
         return pdf.ToArray();
     }
 
-    // obj5 = non-terminal parent "address" with two terminal kid widgets, "city"
-    // (obj6) and "zip" (obj7). obj9 = standalone merged field/widget "Name". The
-    // form carries /DA, /NeedAppearances and a /DR /Font entry to merge.
     private static byte[] NestedFormSource()
     {
         var pdf = new FixturePdf()
@@ -52,9 +42,6 @@ public class AcroFormFieldTreeImportTests
         return Wrap(pdf, 10);
     }
 
-    // Runs the merge choreography over a fresh destination document: imports the
-    // source page /Annots, lists each field root once via TryImportFieldRoot with
-    // DisambiguateFieldName, and folds the form defaults with MergeFormDefaults.
     private static byte[] Merge(bool destinationHasNameField, bool destinationHasDa)
     {
         var reader = DocumentReader.Parse(NestedFormSource());

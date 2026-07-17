@@ -13,9 +13,6 @@ internal static class TiffPredictor
             throw new NotSupportedException("Only 8 bits per component is supported.");
         }
 
-        // colors/columns come straight from an attacker-controlled /DecodeParms, so validate
-        // them and compute the row length as a long: colors*columns overflows int32 for a
-        // hostile /Columns and would otherwise wrap to zero (whole stream dropped) or negative.
         PredictorParameters.ValidateColorsAndColumns(colors, columns, "TIFF");
 
         if (data.Length == 0)

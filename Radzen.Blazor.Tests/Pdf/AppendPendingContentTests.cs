@@ -7,8 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Append copied a loaded page's raw bytes and neither of the two queues that supersede them:
-// a watermark queued by AddWatermark, or edits held in a materialized Content collection.
 public class AppendPendingContentTests
 {
     private static Document Loaded(int pages)

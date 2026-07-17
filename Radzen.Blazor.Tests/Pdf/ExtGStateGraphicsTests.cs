@@ -7,9 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Blend mode (/BM), overprint (/OP /op /OPM) and rendering intent (/RI) entries added
-// to a graphics-state parameter dictionary by PageResourceBuilder, per ISO 32000-1
-// 8.4.5 and 11.3.7. The alpha-only dictionary must stay Type/ca/CA, in that order.
+// ISO 32000-1 8.4.5, 11.3.7: /BM, /OP /op /OPM and /RI entries in an ExtGState parameter dictionary.
 public class ExtGStateGraphicsTests
 {
     private static string Name(DocumentObject o) => Assert.IsType<NameObject>(o).Value;

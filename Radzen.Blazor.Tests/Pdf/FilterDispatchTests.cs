@@ -7,15 +7,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Filter dispatch on loaded streams (ISO 32000-1 7.4): /Filter and /DecodeParms
-// values are ordinary objects and may be indirect references, both at the top
-// level and inside a filter array. The reader must resolve them before applying
-// the chain - for page content streams and for object streams alike.
+// ISO 32000-1 7.4: /Filter and /DecodeParms may be indirect references (top level and inside a filter array) and must be resolved before applying the chain.
 public class FilterDispatchTests
 {
-    // Builds a classic single-page file. Object 4 is the /Contents stream; any
-    // objects passed in `extra` are appended after it. Numbers absent from the
-    // offset map are written as free xref entries.
     private static byte[] SinglePageFile(Action<FixturePdf> content, (int Number, string Body)[] extra, int size)
     {
         var pdf = new FixturePdf().Append("%PDF-1.6\n");
@@ -57,7 +51,6 @@ public class FilterDispatchTests
         return Assert.IsType<StreamObject>(reader.Resolve(page["Contents"]));
     }
 
-    // /Filter [7 0 R] - the filter name inside the array is an indirect reference.
     [Fact]
     public void FilterArrayWithIndirectName_IsResolvedAndApplied()
     {
@@ -74,7 +67,6 @@ public class FilterDispatchTests
         Assert.Contains("(filter-array-ref) Tj", decoded);
     }
 
-    // /DecodeParms 8 0 R - the predictor parameters are an indirect reference.
     [Fact]
     public void IndirectDecodeParms_PredictorIsApplied()
     {
@@ -95,8 +87,6 @@ public class FilterDispatchTests
         Assert.Contains("(png-predictor-marker) Tj", decoded);
     }
 
-    // Object stream whose /Filter is an indirect reference: the compressed
-    // members are unreachable unless the reader resolves the filter first.
     [Fact]
     public void ObjectStreamWithIndirectFilter_MembersResolve()
     {

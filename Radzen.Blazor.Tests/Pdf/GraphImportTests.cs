@@ -5,10 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// GraphImporter copies a loaded sub-graph into a DocumentWriter. Indirect scalar
-// objects (Number/String/Name/Boolean) must round-trip as their scalar value, not
-// collapse into an empty dictionary - AcroForms reference /V, /MaxLen and /DA as
-// indirect scalars.
 public class GraphImportTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)

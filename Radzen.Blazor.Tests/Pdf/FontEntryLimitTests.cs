@@ -8,12 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ReaderLimits caps on font tables materialized from untrusted input. MaxCMapEntries is
-// documented to bound a /ToUnicode CMap, but only the scalar bfrange form ever checked it:
-// beginbfchar and the array form of bfrange filled the map unbounded. The CID font /W array
-// had no ReaderLimits check at all, and its "c_first c_last w" range form is the worst case -
-// ~15 input bytes buy an arbitrary span, so <0 2147483647 500> materializes billions of
-// width entries. Each cap is paired with a positive control proving valid fonts still map.
 public class FontEntryLimitTests
 {
     [Fact]
@@ -42,8 +36,6 @@ public class FontEntryLimitTests
         Assert.Equal("b", map[0x0009]);
     }
 
-    // Redefining a code materializes no new entry, so a CMap sitting exactly at the cap
-    // must not be rejected for overwriting codes it already holds.
     [Fact]
     public void Bfchar_RedefiningCodeAtCap_DoesNotThrow()
     {
@@ -82,9 +74,6 @@ public class FontEntryLimitTests
         Assert.Equal("C", map[0x0005]);
     }
 
-    // The bomb: a 24-byte /W range asks for 2.1 billion width entries (~168 GB at the
-    // ~88 bytes/entry this dictionary costs). It must be refused from the default limits,
-    // before the expansion loop runs.
     [Fact]
     public void CidWidthRange_FullIntSpan_ThrowsFastUnderDefaultLimits()
     {
@@ -98,9 +87,6 @@ public class FontEntryLimitTests
         Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
     }
 
-    // A singleton range ending at int.MaxValue declares span 1 and slips past the size cap,
-    // then an int counter wraps to int.MinValue and the loop never ends. The endpoint itself
-    // must be rejected.
     [Fact]
     public void CidWidthRange_SingletonAtIntMaxValue_ThrowsFast()
     {
@@ -114,8 +100,6 @@ public class FontEntryLimitTests
         Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
     }
 
-    // A high but non-wrapping singleton CID still materializes: the wrap guard rejects only
-    // int.MaxValue, not any large code.
     [Fact]
     public void CidWidthRange_HighSingleton_StillResolvesWidth()
     {
@@ -157,7 +141,6 @@ public class FontEntryLimitTests
         Assert.True(font.TryGetWidth(9, out var listed));
         Assert.Equal(900, listed);
 
-        // /DW 1 for any CID the table does not cover.
         Assert.True(font.TryGetWidth(4000, out var fallback));
         Assert.Equal(1, fallback);
     }
@@ -171,8 +154,6 @@ public class FontEntryLimitTests
         return reader.GetDictionary(reader.GetDictionary(resources, "Font")!, "F0")!;
     }
 
-    // A Type0/Identity-H font whose descendant carries the /W array verbatim, so a hostile
-    // span can be injected while the file itself stays a few hundred bytes.
     private static byte[] WidthPdf(string w)
     {
         var pdf = new FixturePdf()

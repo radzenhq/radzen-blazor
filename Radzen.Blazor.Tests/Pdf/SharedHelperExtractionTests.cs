@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Pins the behaviour the duplicate-helper merges had to preserve exactly. Each test states the
-// property the two former copies agreed on, so a future divergence fails here rather than in a
-// byte-fidelity test whose message would not name the cause.
 public class SharedHelperExtractionTests
 {
     [Theory]
@@ -27,9 +24,6 @@ public class SharedHelperExtractionTests
         Assert.Equal(expected, UnitInterval.Clamp(value));
     }
 
-    // The former PathContent.Clamp/Run.ClampUnit used comparisons, not Math.Clamp, so NaN fell
-    // through both tests and propagated. Math.Clamp(NaN, 0, 1) also yields NaN, but the two are
-    // not interchangeable in general and this pins the contract the callers were written against.
     [Fact]
     public void UnitIntervalClampPropagatesNaN()
     {
@@ -56,8 +50,7 @@ public class SharedHelperExtractionTests
         Assert.Equal(1.0, runPaint.Operands[2]);
     }
 
-    // Every ISO 32000-1 7.2.2 delimiter, plus '#' and the whitespace/range bounds, must still
-    // force the escaped form now that all three copies of the set resolve to Lexer.IsDelimiter.
+    // Every ISO 32000-1 7.2.2 delimiter (plus '#') forces the escaped form.
     [Theory]
     [InlineData("(")]
     [InlineData(")")]
@@ -106,8 +99,6 @@ public class SharedHelperExtractionTests
         Assert.Contains("U+0141", fromWriter.Message);
     }
 
-    // An unencodable code point AFTER a character that already forces escaping must still throw:
-    // NeedsEscaping returns early there, so the guard has to survive inside Escape's own re-scan.
     [Fact]
     public void UnencodableCodePointAfterAnEscapeTriggerStillThrows()
     {
@@ -142,7 +133,6 @@ public class SharedHelperExtractionTests
         Assert.Throws<DocumentParseException>(() => Decode(predictor, new byte[8], colors, columns));
     }
 
-    // MaxColors itself is the boundary both predictors share: 32 is accepted, 33 is not.
     [Theory]
     [InlineData("PNG")]
     [InlineData("TIFF")]

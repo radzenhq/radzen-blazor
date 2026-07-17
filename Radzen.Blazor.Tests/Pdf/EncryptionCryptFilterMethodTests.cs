@@ -6,9 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 7.6.5: /StmF and /StrF name a crypt filter in /CF whose /CFM selects
-// the cipher. An unrecognized /CFM, or a named non-Identity filter missing from /CF,
-// must fail loud - falling back to RC4 would "decrypt" to silent garbage.
+// ISO 32000-1 7.6.5: /StmF and /StrF name a crypt filter in /CF whose /CFM selects the cipher; an unknown /CFM or missing named filter must fail loud.
 public class EncryptionCryptFilterMethodTests
 {
     private static readonly byte[] DocumentId = Encoding.Latin1.GetBytes("0123456789ABCDEF");
@@ -56,7 +54,6 @@ public class EncryptionCryptFilterMethodTests
         {
             ["StdCF"] = new DictionaryObject { ["CFM"] = new NameObject("AESV2") },
         };
-        // /StmF names a filter that /CF does not define.
         var encrypt = BaseEncrypt(cf, "MissingCF");
         Assert.Throws<DocumentParseException>(() => new StandardSecurityHandler(encrypt, DocumentId, string.Empty));
     }
@@ -68,7 +65,6 @@ public class EncryptionCryptFilterMethodTests
         {
             ["StdCF"] = new DictionaryObject { ["CFM"] = new NameObject("AESV2") },
         };
-        // /StmF /Identity means no encryption for streams and must not throw.
         var encrypt = BaseEncrypt(cf, "Identity");
         var handler = new StandardSecurityHandler(encrypt, DocumentId, string.Empty);
         Assert.NotNull(handler);

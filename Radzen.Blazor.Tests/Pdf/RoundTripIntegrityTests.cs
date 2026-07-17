@@ -9,16 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P4 load-modify-save round-trip integrity. Pins:
-// (a) re-saving a loaded document preserves the source page /Resources
-//     (fonts, image XObjects), merged with any newly emitted entries;
-// (b) loaded content streams are filter-decoded, so text extraction works on
-//     compressed input and a re-save emits a readable (or correctly filtered)
-//     content stream instead of raw Flate bytes with the /Filter dropped;
-// (c) pages produced by DocumentBuilder.Build() expose their generated content
-//     through GetContent/ExtractText/Append like loaded pages do;
-// (d) Type0 embedding survives text containing surrogate pairs and lone
-//     surrogates instead of crashing in char.ConvertFromUtf32.
 public class RoundTripIntegrityTests
 {
     private static Document Load(byte[] bytes)
@@ -27,7 +17,6 @@ public class RoundTripIntegrityTests
         return Document.LoadFromStream(stream);
     }
 
-    // ----- (a) source page resources survive a re-save -----
 
     [Fact]
     public void Resave_LoadedBase14Page_KeepsFontResourcesAndText()
@@ -79,7 +68,6 @@ public class RoundTripIntegrityTests
         Assert.Equal(original, images[0].Data);
     }
 
-    // ----- (b) filter-decoded content streams -----
 
     private static byte[] FlateFixture(string text)
     {
@@ -139,8 +127,6 @@ public class RoundTripIntegrityTests
         var leaves = BuildTestSupport.PageLeaves(reader);
         Assert.Single(leaves);
 
-        // Content() honors a /Filter entry, so this passes whether the fix keeps
-        // decoded bytes or re-emits compressed bytes with the filter declared.
         var operators = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
         Assert.Contains("BT", operators, StringComparison.Ordinal);
         Assert.Contains("(Hello Flate) Tj", operators, StringComparison.Ordinal);
@@ -154,7 +140,6 @@ public class RoundTripIntegrityTests
         Assert.Contains("Hello Flate", Load(resaved).ExtractText(), StringComparison.Ordinal);
     }
 
-    // ----- (c) generated pages expose their content -----
 
     private static Document BuildBase14(string text)
     {
@@ -199,7 +184,6 @@ public class RoundTripIntegrityTests
         Assert.Contains("Tj", operators, StringComparison.Ordinal);
     }
 
-    // ----- (d) surrogate handling in Type0 embedding -----
 
     private static DocumentBuilder BuilderWithLatinText(string text)
     {
@@ -213,8 +197,6 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Build_TextWithSurrogatePair_DoesNotThrow()
     {
-        // U+1F600 (emoji) has no glyph in Liberation Sans; both surrogate halves
-        // flow through the gid-to-unicode map that ToUnicode is built from.
         var builder = BuilderWithLatinText("A😀B");
 
         var bytes = builder.ToArray();

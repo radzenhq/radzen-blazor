@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Write-side standard security handler. Uses the existing DocumentReader as an
-// oracle: a small graph is written with EncryptionOptions, parsed back with the
-// password, and the decrypted string and stream must equal the originals. The
-// wrong password must be rejected, and a writer with no options must still
-// produce byte-identical output.
 public class EncryptWriteTests
 {
     private const string StreamMarker = "BT /F1 12 Tf 72 720 Td (Hello encrypted world!) Tj ET";

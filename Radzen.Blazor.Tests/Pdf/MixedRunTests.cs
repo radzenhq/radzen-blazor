@@ -5,11 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Mixed-run layout + line-height contract. A paragraph whose Inlines carry different
-// fonts/sizes lays out with per-run advances and a fragment boundary at each run break.
-// The space separating two words belongs to the Run that owns it (so its width uses that
-// run's font). Line height is driven by the tallest run on the line and scales with
-// Paragraph.LineSpacing.
 public class MixedRunTests
 {
     private static Paragraph MixedParagraph(out Run first, out Run second)

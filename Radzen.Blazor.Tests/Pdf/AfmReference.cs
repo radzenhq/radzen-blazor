@@ -6,9 +6,6 @@ using System.IO;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Independent parser for the raw Adobe Core-14 AFM fixtures. Expected values in the
-// metrics/encoding tests are derived from here, never from Base14Data, so a data
-// generation bug cannot self-confirm.
 internal sealed class AfmReference
 {
     public string FontName = "";
@@ -25,11 +22,8 @@ internal sealed class AfmReference
     public double BBoxRight;
     public double BBoxTop;
 
-    // glyph name -> advance width (WX) in 1/1000 units.
     public readonly Dictionary<string, int> WidthByName = new();
-    // native AFM code -> advance width (used for the FontSpecific fonts Symbol/ZapfDingbats).
     public readonly Dictionary<int, int> WidthByCode = new();
-    // native AFM code -> glyph name.
     public readonly Dictionary<int, string> NameByCode = new();
 
     public static AfmReference Load(string fontFileBaseName)
@@ -74,7 +68,6 @@ internal sealed class AfmReference
         }
     }
 
-    // "C 32 ; WX 278 ; N space ; B 0 0 0 0 ;"
     private void ParseCharMetric(string line)
     {
         int code = -1;

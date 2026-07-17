@@ -48,19 +48,12 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         return generatedPage!;
     }
 
-    // Color carries an alpha channel but rg/RG are RGB-only, so a translucent colour reaches
-    // the page as a constant-alpha /ExtGState, exactly like Run/Container opacity does (and
-    // multiplying with it). Folded in here, before any phase emits, so every draw type is
-    // covered once - EmitText/EmitImages hand structs to the structure tree, so the draws must
-    // already carry their final state by then.
     private void ApplyColorAlpha()
     {
         for (var i = 0; i < plan.Fills.Count; i++)
         {
             var fill = plan.Fills[i];
 
-            // A gradient paints through a pattern, leaving the solid Color (and its alpha)
-            // unused; per-stop alpha would need a luminosity soft mask instead.
             if (fill.Gradient is null && Translucent(fill.Color, out var alpha))
             {
                 plan.Fills[i] = fill with { ExtGState = plan.ApplyAlpha(fill.ExtGState, alpha) };
@@ -101,8 +94,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
         if (plan.Watermark is { } watermark)
         {
-            // The watermark's own gs wraps its texts, and a nested gs replaces /ca rather than
-            // compounding it, so the watermark opacity is multiplied into the text's own state.
             var outer = watermark.ExtGState is { } key && plan.FindExtGState(key) is { } state
                 ? state.FillAlpha
                 : 1;
@@ -113,8 +104,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         }
     }
 
-    // A device fill paint overrides Color for the fill operator, so its alpha no longer
-    // describes what is painted (a DeviceColor carries no alpha channel of its own).
     private TextDraw WithColorAlpha(TextDraw text, double scale)
         => text.FillPaint is null && Translucent(text.Color, out var alpha)
             ? text with { ExtGState = plan.ApplyAlpha(text.ExtGState, alpha * scale) }
@@ -176,8 +165,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var fill in plan.Fills)
         {
-            // A pattern colour space persists in the graphics state, so a gradient fill is
-            // always scoped by q..Q to keep it from leaking onto the fills that follow.
             var grouped = fill.Clip is not null || fill.ExtGState is not null || fill.Gradient is not null;
             if (grouped)
             {
@@ -349,8 +336,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         };
     }
 
-    // Stroke colour + line width, then any dash pattern. Edges and rounded strokes must
-    // emit this byte-for-byte identically, so both go through here.
     private static void WriteStrokeState(ContentWriter writer, Color color, double lineWidth, BorderStyle style)
     {
         writer.WriteColor(color, "RG");
@@ -397,9 +382,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         writer.WriteRaw("Q\n");
     }
 
-    // Whether the page carries any non-structure (pagination/decorative) content that a
-    // fully tagged document must wrap in /Artifact: backgrounds, borders, or header/footer
-    // images and texts (the draws left untagged because they have no structure element).
     private static bool HasArtifactContent(PagePlan plan)
     {
         if (plan.Fills.Count > 0 || plan.Edges.Count > 0 || plan.RoundedStrokes.Count > 0)

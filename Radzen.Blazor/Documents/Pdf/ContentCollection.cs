@@ -68,8 +68,6 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
 
     internal void Clear() => items.Clear();
 
-    // Element flags answer "did an element change", not "did the collection change": a removed
-    // element leaves every survivor clean. The composed list carries the structural truth.
     internal bool IsModified
     {
         get

@@ -8,15 +8,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 Table 111 (/Widths): "For character codes outside the range FirstChar to LastChar,
-// the value of MissingWidth from the FontDescriptor entry for this font shall be used", and Table
-// 122 defaults MissingWidth to 0. So a font with a descriptor always has a width, and the estimate
-// is reached only with no width source at all - here, a font omitting /FontDescriptor.
-//
-// The fixture pins the divergence the estimate creates. Its font gives a width for X only, and
-// the widthForW control spells out the 1000 that W really advances: at size 10 from x=10 the
-// four Ws end at x=50 and the X occupies 50..56.67, while the 0.5em estimate puts the whole run
-// inside 10..36.67 - short of, and disjoint from, where the X really is.
+// ISO 32000-1 Table 111 (/Widths): MissingWidth is used for codes outside FirstChar..LastChar; Table 122 defaults MissingWidth to 0.
 public class EstimatedTextGeometryTests
 {
     private static readonly PdfRect TrueXBounds = new(50, 700, 56.67, 710);
@@ -58,8 +50,6 @@ public class EstimatedTextGeometryTests
     private static string SavedContent(Document document)
         => Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 
-    // The control: spelling out the same width the descriptor implies leaves nothing estimated,
-    // and the search then agrees with where the glyph really is.
     [Fact]
     public void FindText_WithEveryWidth_IsExactAndNotEstimated()
     {
@@ -70,8 +60,6 @@ public class EstimatedTextGeometryTests
         Assert.Equal(TrueXBounds.Right, hit.Bounds.Right, 2);
     }
 
-    // Search still answers on a partial-width font, but says its geometry is an estimate - and
-    // the estimate here is not merely imprecise, it does not overlap the glyph at all.
     [Fact]
     public void FindText_WithMissingWidth_AnswersButReportsEstimatedGeometry()
     {
@@ -92,9 +80,6 @@ public class EstimatedTextGeometryTests
     public void ReplaceText_WithMissingWidth_Throws()
         => Assert.Throws<NotSupportedException>(() => LoadedDocument(widthForW: false).Pages[0].ReplaceText("W", "X"));
 
-    // The failure this pins: the caller names the area the X really occupies, the estimate puts
-    // every glyph short of it, so nothing is selected for removal and the fill is painted over
-    // text that is still there. Redaction must refuse rather than report a cover it did not make.
     [Fact]
     public void Redact_AreaOverAnEstimatedRun_Throws()
     {
@@ -119,8 +104,6 @@ public class EstimatedTextGeometryTests
     public void RedactText_MatchingAnEstimatedRun_Throws()
         => Assert.Throws<NotSupportedException>(() => LoadedDocument(widthForW: false).Pages[0].RedactText("X"));
 
-    // No width makes a run paint off its own baseline, so an estimate must not veto a redaction
-    // it provably cannot reach.
     [Fact]
     public void Redact_AreaOffTheEstimatedRunsBaseline_Succeeds()
     {
@@ -131,8 +114,6 @@ public class EstimatedTextGeometryTests
         Assert.Contains("(WWWWX)", SavedContent(document), StringComparison.Ordinal);
     }
 
-    // Uncertainty runs forward along the baseline only: the origin is exact, so an area behind
-    // the run's start is out of its reach however wide the real glyphs turn out to be.
     [Fact]
     public void Redact_AreaBehindTheEstimatedRunsOrigin_Succeeds()
     {
@@ -143,10 +124,8 @@ public class EstimatedTextGeometryTests
         Assert.Contains("(WWWWX)", SavedContent(document), StringComparison.Ordinal);
     }
 
-    // ISO 32000-1 Table 111, /Widths: "For character codes outside the range FirstChar to
-    // LastChar, the value of MissingWidth from the FontDescriptor entry for this font shall be
-    // used." Reading it is what stops W being estimated, so this fails if the reader ignores it.
     [Fact]
+    // ISO 32000-1 Table 111 (/Widths): MissingWidth is used for codes outside FirstChar..LastChar.
     public void FindText_WithMissingWidth_UsesItRatherThanEstimating()
     {
         var hit = Assert.Single(LoadedDocument(widthForW: false, descriptor: true, missingWidth: 1000).Pages[0].FindText("X"));
@@ -156,10 +135,8 @@ public class EstimatedTextGeometryTests
         Assert.Equal(TrueXBounds.Right, hit.Bounds.Right, 2);
     }
 
-    // Table 122: MissingWidth is Optional, "Default value: 0". A descriptor that omits it still
-    // states a width - zero - for W, rather than leaving one unknown, so nothing is estimated and
-    // the four zero-width Ws leave X at the run's own origin.
     [Fact]
+    // ISO 32000-1 Table 122: MissingWidth is Optional, default value 0.
     public void FindText_WithDescriptorButNoMissingWidth_DefaultsToZeroRatherThanEstimating()
     {
         var hit = Assert.Single(LoadedDocument(widthForW: false, descriptor: true).Pages[0].FindText("X"));

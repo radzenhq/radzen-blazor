@@ -10,10 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Opt-in keys stamped on the image XObject dictionary: /Interpolate, the /ImageMask
-// stencil transform, and /Mask colour-key masking. Each test builds a document through
-// the public DocumentBuilder API, round-trips the bytes through DocumentReader and asserts
-// the exact ISO 32000-1 construct on the reloaded XObject.
 public class ImageXObjectOptionTests
 {
     private static Image AddImage(DocumentBuilder builder, string resource)
@@ -42,7 +38,6 @@ public class ImageXObjectOptionTests
 
         Assert.True(dict.ContainsKey("Interpolate"), "image XObject is missing /Interpolate");
         Assert.True(Assert.IsType<BooleanObject>(dict["Interpolate"]).Value);
-        // The colour image keeps its colour space; the flag is purely additive.
         Assert.Equal("DeviceGray", ((NameObject)dict["ColorSpace"]).Value);
     }
 
@@ -67,8 +62,6 @@ public class ImageXObjectOptionTests
             return builder.ToArray();
         }
 
-        // An image that opts into none of the new XObject keys must take the unchanged
-        // emission path, so two identical documents produce byte-for-byte identical output.
         Assert.Equal(Build(), Build());
     }
 
@@ -177,8 +170,6 @@ public class ImageXObjectOptionTests
         Assert.Throws<InvalidOperationException>(() => builder.ToArray());
     }
 
-    // Minimal 1-bit greyscale PNG (colour type 0, bit depth 1): one filter byte plus
-    // ceil(width/8) packed sample bytes per row, zlib-deflated into a single IDAT.
     private static byte[] OneBitGrayPng(int width, int height)
     {
         var rowBytes = ((width * 1) + 7) / 8;
@@ -186,7 +177,7 @@ public class ImageXObjectOptionTests
         for (var y = 0; y < height; y++)
         {
             var rowStart = y * (rowBytes + 1);
-            raw[rowStart] = 0; // filter: none
+            raw[rowStart] = 0;
             for (var b = 0; b < rowBytes; b++)
             {
                 raw[rowStart + 1 + b] = (byte)((y % 2 == 0) ? 0xAA : 0x55);
@@ -200,11 +191,11 @@ public class ImageXObjectOptionTests
         [
             (byte)(width >> 24), (byte)(width >> 16), (byte)(width >> 8), (byte)width,
             (byte)(height >> 24), (byte)(height >> 16), (byte)(height >> 8), (byte)height,
-            0x01, // bit depth
-            0x00, // colour type 0 (greyscale)
-            0x00, // compression
-            0x00, // filter
-            0x00, // interlace
+            0x01,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
         ];
         WriteChunk(ms, "IHDR", ihdr);
         WriteChunk(ms, "IDAT", Deflate(raw));

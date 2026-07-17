@@ -6,9 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 Table 164: annotation /C and /IC hold 0, 1, 3 or 4 numbers - no colour,
-// grayscale, RGB or CMYK. Every legal count must load; only RGB used to be accepted,
-// which aborted the whole document.
+// ISO 32000-1 Table 164: annotation /C and /IC hold 0, 1, 3 or 4 numbers (no colour, grayscale, RGB, CMYK).
 public class AnnotationColorSpaceTests
 {
     private static byte[] FileWithAnnotationColors()

@@ -4,8 +4,7 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
-// CFF INDEX (spec section 5): Card16 count, Card8 offSize, (count+1) 1-based offsets,
-// then packed object data. An empty INDEX is just a Card16 count of 0.
+// CFF INDEX: spec section 5.
 internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
 {
     public int Count => offsets.Length - 1;
@@ -89,21 +88,14 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
 
         var offsetArrayStart = offset + 3;
 
-        // Offsets are 1-based relative to the byte before the object data block.
         var dataBase = offsetArrayStart + ((count + 1) * offSize) - 1;
         var offsets = new int[count + 1];
 
-        // GetBytes sizes an allocation from the gap between adjacent offsets, so every offset
-        // is checked here rather than there: each is attacker-chosen and independent, and
-        // validating only offsets[count] leaves the other count of them free to name any
-        // address. Checking once at Read keeps GetBytes (per glyph, per subr call) branch-free.
         var previous = (long)dataBase;
         for (var i = 0; i <= count; i++)
         {
             var raw = ReadOffset(data, offsetArrayStart + (i * offSize), offSize);
 
-            // 1-based, so raw 0 would address the byte before the data block. Widened to long
-            // because a 4-byte offset spans the full uint range and would otherwise wrap.
             if (raw < 1)
             {
                 throw new InvalidDataException("CFF INDEX offset is out of range.");

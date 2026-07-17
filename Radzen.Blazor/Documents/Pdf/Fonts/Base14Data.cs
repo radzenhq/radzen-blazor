@@ -1,5 +1,3 @@
-// Generated from the Adobe Core 14 AFM files (Core14_AFMs.tar, Adobe Systems).
-// Regenerate with the orchestrator AFM script; do not edit by hand.
 namespace Radzen.Documents.Pdf.Fonts;
 
 internal static class Base14Data

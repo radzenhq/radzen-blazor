@@ -86,8 +86,6 @@ public class FontParseCacheTests
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference RegisterAndDrop()
     {
-        // Unique content (sfnt ignores trailing bytes) so no other concurrently
-        // running test shares - and thus roots - this parsed face during the GC loop.
         var bytes = FontBytes();
         var unique = new byte[bytes.Length + 24];
         Array.Copy(bytes, unique, bytes.Length);

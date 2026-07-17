@@ -6,8 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Line cap (J), line join (j), miter limit (M) and dash pattern (d) on a public
-// PathContent, per ISO 32000-1 8.4.3.
+// ISO 32000-1 8.4.3 line cap, join, miter limit and dash pattern.
 public class PathContentStrokeStyleTests
 {
     private static ContentOperation Find(byte[] content, string op)

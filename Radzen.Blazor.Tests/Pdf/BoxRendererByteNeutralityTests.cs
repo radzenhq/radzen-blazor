@@ -4,12 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Layer 1 guard: BoxRenderer.Paint must be a byte-neutral extraction of the cell
-// background + border painting. This decoration-heavy document exercises every box
-// path: per-cell backgrounds, uniform and non-uniform borders, the cell/row/table
-// cascade, a whole-table rounded frame, a rounded translucent container (uniform
-// rounded stroke + ExtGState) and a nested rounded table. The generator emits no /ID
-// or dates, so two independent builds must produce identical bytes.
 public class BoxRendererByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)

@@ -7,10 +7,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Two-clients-one-API test: a document is written by DocumentWriter (B1) and
-// read back by DocumentReader (B2). Every registered object is walked against
-// the reconstructed graph for structural equality. This is the ONLY test group
-// permitted to use DocumentWriter as input (all others use hand-built fixtures).
 public class RoundTripTests
 {
     private static (byte[] Bytes, Dictionary<int, DocumentObject> Originals) WriteEveryType()
@@ -61,8 +57,6 @@ public class RoundTripTests
         return (ms.ToArray(), originals);
     }
 
-    // References are compared by identity (number/generation), not followed, so
-    // each indirect object is validated exactly once.
     private static void AssertEqual(DocumentObject expected, DocumentObject actual)
     {
         switch (expected)

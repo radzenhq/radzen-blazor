@@ -11,7 +11,6 @@ public class LzwFilterTests
 {
     // ISO 32000-1 worked example: the encoded stream 80 0B 60 50 22 0C 0C 85 01
     // decodes to the byte sequence 45 45 45 45 45 65 45 45 45 66 (decimal).
-    // Verified by hand-simulating the LZW state machine and with a python3 reference.
     [Fact]
     public void Decode_Iso32000_WorkedExample()
     {
@@ -26,9 +25,6 @@ public class LzwFilterTests
         Assert.Empty(LzwFilter.Decode(Array.Empty<byte>(), early: 1));
     }
 
-    // Round-trip with the default early-change (1). The encoder helper below is part of
-    // the test contract; it mirrors the decoder's early-change rule so streams it produces
-    // must decode back to the original.
     [Fact]
     public void Decode_RoundTrip_EarlyChange1()
     {
@@ -37,7 +33,6 @@ public class LzwFilterTests
         Assert.Equal(data, LzwFilter.Decode(encoded, early: 1));
     }
 
-    // Round-trip with early-change disabled (0). The bit layout differs from early=1.
     [Fact]
     public void Decode_RoundTrip_EarlyChange0()
     {
@@ -46,8 +41,6 @@ public class LzwFilterTests
         Assert.Equal(data, LzwFilter.Decode(encoded, early: 0));
     }
 
-    // early=1 and early=0 pick different code-width boundaries, so the encoded streams
-    // for the same input differ once the table grows past the first boundary.
     [Fact]
     public void EarlyChange_ChangesEncoding()
     {
@@ -57,8 +50,6 @@ public class LzwFilterTests
         Assert.NotEqual(e1, e0);
     }
 
-    // Code-width growth: a 2000-byte input pushes the table past 511 and 1023 entries,
-    // exercising 10- and 11-bit codes. The stream is produced by the inline encoder.
     [Fact]
     public void Decode_CodeWidthGrowth_Past11Bits()
     {
@@ -77,9 +68,6 @@ public class LzwFilterTests
         return data;
     }
 
-    // Reference LZW encoder (MSB-first bit packing, 9..12 bit codes, clear=256, eod=257).
-    // Width increases when nextCode + early - 1 == 2^width, the mirror of the decoder rule
-    // (decoder increases when nextCode + early == 2^width, one entry behind the encoder).
     static byte[] LzwEncode(byte[] data, int early)
     {
         const int Clear = 256, Eod = 257;
@@ -133,10 +121,6 @@ public class LzwFilterTests
         return outBytes.ToArray();
     }
 
-    // 2^28 bytes is the smallest input whose bit count overflows a 32-bit total, so the
-    // input size is the thing under test and cannot be scaled down. The array is zero
-    // pages the decoder never reads past ~1 KB of, and maxOutput stops it after ~1024
-    // codes, so this costs virtual address space rather than resident memory or time.
     [Fact]
     public void Decode_InputAtBitCountOverflowBoundary_StillDecodes()
     {

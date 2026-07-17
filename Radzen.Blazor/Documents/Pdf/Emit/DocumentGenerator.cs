@@ -5,29 +5,20 @@ using static Radzen.Documents.Pdf.Emit.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// GidToUnicode is accumulated across the whole document so the shared embedded subset
-// covers every glyph any page shows.
 internal sealed class GeneratedFont
 {
     public required string Key { get; init; }
 
     public string? Base14 { get; init; }
 
-    // The face a non-sfnt font is emitted as; the resolver always sets Base14, so the
-    // fallback only guards a GeneratedFont built with neither face.
     public string Base14Name => Base14 ?? "Helvetica";
 
     public SfntFont? Sfnt { get; init; }
 
     public Dictionary<ushort, int> GidToUnicode { get; } = [];
 
-    // Compact renumbering (original gid -> new gid) computed once all pages are
-    // planned; content streams emit the NEW gid so CID == gid stays true for the
-    // compact embedded subset (glyf and CFF alike). Null for base-14 faces.
     public Dictionary<ushort, ushort>? CompactGidMap { get; set; }
 
-    // The shared reverse map for text extraction, built on first use once CompactGidMap
-    // is final so all pages of the document reference one instance per font.
     public Fonts.ReverseFont? Extraction { get; set; }
 }
 
@@ -38,8 +29,6 @@ internal sealed class GeneratedImage
     public required ImageXObject Image { get; init; }
 }
 
-// Exactly one of Uri (external /URI action) and Destination (named destination
-// resolved through the /Names /Dests tree by a /GoTo action) is set.
 internal sealed class GeneratedLink
 {
     public required double X1 { get; init; }
@@ -55,14 +44,8 @@ internal sealed class GeneratedLink
     public string? Destination { get; init; }
 }
 
-// Where a named anchor landed at emit time: the zero-based page and the top of
-// its line in PDF user space, emitted as an /XYZ named destination on save.
 internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
 
-// A page /ExtGState resource entry: constant fill (/ca) and stroke (/CA) alpha
-// selected in the content stream with the gs operator. The optional blend mode,
-// overprint and rendering-intent fields default to null and, when unset, emit
-// exactly the alpha-only dictionary they always did.
 internal sealed class GeneratedExtGState
 {
     public required string Key { get; init; }
@@ -81,16 +64,11 @@ internal sealed class GeneratedExtGState
 
     public RenderingIntent? Intent { get; init; }
 
-    // A luminosity/alpha soft mask (/SMask << ... >>) built from a transparency group; null
-    // (the default) writes no /SMask so an alpha-only state stays byte-identical.
     public GeneratedSoftMask? SoftMask { get; init; }
 
-    // When true and SoftMask is null, writes /SMask /None to clear an inherited soft mask.
     public bool ClearSoftMask { get; init; }
 }
 
-// A page /Pattern resource entry: a shading pattern (PatternType 2) built from a
-// public GradientBrush, selected in the content stream with /Pattern cs + scn.
 internal sealed class GeneratedPattern
 {
     public required string Key { get; init; }
@@ -113,8 +91,6 @@ internal sealed class GeneratedPage
     public IReadOnlyList<GeneratedPattern> Patterns { get; init; } = [];
 }
 
-// Orchestrates PDF generation: runs the layout engine over a DocumentBuilder, plans each page
-// through the element emitters, then serializes each PagePlan to a content stream.
 internal sealed class DocumentGenerator
 {
     private readonly DocumentBuilder builder;
@@ -132,9 +108,6 @@ internal sealed class DocumentGenerator
     private readonly FieldResolver fieldResolver;
     private readonly WatermarkEmitter watermarkEmitter;
 
-    // Fully tagged conformance (PDF/UA or PDF/A Level-A) forbids untagged real content, so
-    // pagination and decorative draws are wrapped in /Artifact marked content. Off for plain
-    // and Level-B output, which stays byte-identical.
     private readonly bool markArtifacts;
 
     private DocumentGenerator(DocumentBuilder builder, CapturedBuilderSettings settings)
@@ -158,10 +131,6 @@ internal sealed class DocumentGenerator
         watermarkEmitter = new(fonts, fontResolver, imageStore);
     }
 
-    // A document without a table of contents generates in the single pass it always had. With
-    // one, the first pass resolves every anchor's page and a second pass (on a fresh generator;
-    // the emitters are stateful) lays out again with the numbers substituted. The TOC line
-    // footprint is independent of the digits, so both passes paginate identically.
     public static Document Generate(DocumentBuilder builder, CapturedBuilderSettings settings)
     {
         var generator = new DocumentGenerator(builder, settings);
@@ -182,8 +151,6 @@ internal sealed class DocumentGenerator
         return new DocumentGenerator(builder, settings).Run(tocPages);
     }
 
-    // A TableOfContents is only supported as direct section content, so a shallow scan decides
-    // whether the two-pass path runs at all.
     private static bool HasTableOfContents(DocumentBuilder builder)
     {
         foreach (var section in builder.Sections)
@@ -233,7 +200,6 @@ internal sealed class DocumentGenerator
         var watermarks = new List<Watermark?>();
         foreach (var section in builder.Sections)
         {
-            // RTL / vertical shaping is not implemented; fail loudly rather than silently laying out LTR.
             if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
             {
                 throw new NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
@@ -348,8 +314,6 @@ internal sealed class DocumentGenerator
         while (b < bodyLines.Count)
         {
             var line = bodyLines[b];
-            // A body paragraph carrying page-number/count fields resolves per page here,
-            // the same substitution the header/footer band and band-table cell paths run.
             if (line.Source is Paragraph paragraph && fieldResolver.HasField(paragraph))
             {
                 var element = structureTree.ElementOf(paragraph);
@@ -391,9 +355,6 @@ internal sealed class DocumentGenerator
         }
     }
 
-    // Table fragments and boxes interleave by their shared placement Order (document
-    // order), so a body or band mixing containers and tables paints in document order.
-    // A rotated box bakes its own page-space transform inside BoxEmitter.
     private void EmitTablesAndBoxes(
         EmitContext context,
         IReadOnlyList<PositionedTableFragment> tables,

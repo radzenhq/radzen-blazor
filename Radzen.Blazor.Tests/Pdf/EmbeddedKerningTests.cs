@@ -6,11 +6,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Embedded-font pair kerning parsed from the legacy 'kern' table (format 0). Liberation
-// Sans ships an OpenType version-0 'kern' with 908 horizontal format-0 pairs
-// (unitsPerEm 2048): A/V = -152, T/o = -227, W/a = -76 design units. The opt-in
-// SimpleShaper applies those adjustments to glyph advances when opted in; the default does
-// not, so byte output of the existing pipeline is unchanged.
 public class EmbeddedKerningTests
 {
     private static SfntFont SansFace()
@@ -69,9 +64,7 @@ public class EmbeddedKerningTests
         var plain = new SimpleShaper(Fonts()).Shape("AV", font, out var plainAdvance);
         var kerned = new SimpleShaper(Fonts(), enableKerning: true).Shape("AV", font, out var kernedAdvance);
 
-        // Total advance is tightened by exactly the kern amount.
         Assert.Equal(plainAdvance + expectedKern, kernedAdvance, 9);
-        // The adjustment lands on the left glyph's advance; the right glyph is unchanged.
         Assert.Equal(plain[0].Advance + expectedKern, kerned[0].Advance, 9);
         Assert.Equal(plain[1].Advance, kerned[1].Advance, 9);
     }

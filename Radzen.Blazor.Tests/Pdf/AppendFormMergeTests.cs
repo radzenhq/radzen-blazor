@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// End-to-end coverage of Document.Append with a source carrying a hierarchical
-// AcroForm: the nested field tree must survive into the merged /AcroForm /Fields
-// (roots listed once, /Kids intact), source /DR fonts must union, and a top-level
-// name colliding with a created field must be disambiguated - not dropped.
 public class AppendFormMergeTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -29,8 +25,6 @@ public class AppendFormMergeTests
         return pdf.ToArray();
     }
 
-    // One page, an AcroForm with a nested "address" field (kids "city" and "zip",
-    // "zip" itself carrying a widget kid) plus a standalone terminal "Name".
     private static byte[] NestedForm()
     {
         const string ap = "/Tx BMC q (x) Tj Q EMC";
@@ -98,7 +92,6 @@ public class AppendFormMergeTests
         var kids = (ArrayObject)reader.Resolve(address["Kids"]!)!;
         Assert.Equal(2, kids.Count);
 
-        // The "zip" child keeps its own widget kid (deep tree preserved).
         var zip = kids
             .Select(k => (DictionaryObject)reader.Resolve(k)!)
             .Single(d => ((StringObject)reader.Resolve(d["T"]!)!).Value == "zip");

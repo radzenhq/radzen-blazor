@@ -6,17 +6,11 @@ using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// All expected metrics are derived from the raw AFM fixtures via AfmReference, never
-// from Base14Data. fontSize 1000 makes points equal AFM 1/1000 units, so MeasureString
-// sums can be compared exactly against the fixture widths.
 public class Base14MetricsTests
 {
     private static Font MakeFont(string name, bool bold = false, bool italic = false)
         => new() { Name = name, Bold = bold, Italic = italic };
 
-    // Minimal, explicit char -> Adobe glyph name map for the exact test strings. Kept
-    // independent of WinAnsiEncoding so the expected width sums do not depend on the code
-    // under test.
     private static string GlyphNameFor(char c) => c switch
     {
         ' ' => "space",
@@ -85,7 +79,6 @@ public class Base14MetricsTests
         var afm = AfmReference.Load("Helvetica");
         var metrics = Base14Metrics.Resolve(MakeFont("Helvetica"))!;
 
-        // Cyrillic Be (U+0411) is not WinAnsi-encodable and must contribute 0.
         var expected = afm.WidthByName["A"] + afm.WidthByName["B"];
         Assert.Equal(expected, metrics.MeasureString("AБB", 1000));
     }
@@ -177,7 +170,7 @@ public class Base14MetricsTests
     }
 
     [Theory]
-    [InlineData("Symbol", 0x61)]     // alpha
+    [InlineData("Symbol", 0x61)]
     [InlineData("ZapfDingbats", 0x61)]
     public void GetWidth_SymbolicFontsUseNativeEncoding(string family, int code)
     {

@@ -50,12 +50,9 @@ public class Paragraph : Block
         set => alignment = value;
     }
 
-    // `inherited` is the per-save StyleResolution's alignment, passed in rather than stored:
-    // keeping no style scratch on the model is what lets generation run without mutating it.
     internal HorizontalAlignment ResolveAlignment(HorizontalAlignment? inherited)
         => alignment ?? inherited ?? HorizontalAlignment.Left;
 
-    // A list-item marker drawn on the first line at MarkerIndent, outside the (hanging) LeftIndent.
     internal string? MarkerText { get; set; }
 
     internal Unit MarkerIndent { get; set; }

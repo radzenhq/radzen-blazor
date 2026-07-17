@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A page whose elements were all removed must emit empty content. An empty element
-// collection alone cannot mean "reuse the raw bytes": it also describes a page that
-// was materialized and then fully emptied, where reusing the raw bytes restores the
-// removed content.
 public class EmptiedPageContentTests
 {
     private static Document LoadedSinglePathDocument()

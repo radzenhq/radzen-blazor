@@ -45,17 +45,9 @@ internal readonly struct LaidOutNestedTable
 
     public required double Y { get; init; }
 
-    /// <summary>
-    /// Placement sequence within the parent box content, shared with
-    /// <see cref="LaidOutNestedBox.Order"/> so emission interleaves nested tables and
-    /// nested boxes in document order.
-    /// </summary>
     public int Order { get; init; }
 }
 
-// Bounds is in the parent's content space (same space as LaidOutNestedTable.X/Y), Radius is
-// already clamped to the box, and Style carries no ExtGState - opacity resolves per page at
-// emit time.
 internal readonly struct LaidOutNestedBox
 {
     public required Container Source { get; init; }
@@ -212,8 +204,6 @@ internal static class TableLayout
             }
         }
 
-        // Rows covered by a spanning cell grow (last row absorbs the deficit) so the
-        // spanned content always fits within the combined row heights.
         foreach (var p in placed)
         {
             if (p.RowSpan <= 1)
@@ -315,8 +305,6 @@ internal static class TableLayout
         var count = table.Columns.Count;
         if (count == 0)
         {
-            // No declared columns: derive them from the widest row so content is not
-            // silently dropped.
             foreach (var row in table.Rows)
             {
                 var cells = 0;

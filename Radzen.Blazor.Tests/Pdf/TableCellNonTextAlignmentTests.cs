@@ -9,9 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Non-text cell content (image, QR, barcode) must honor its OWN Alignment and, when the
-// block leaves it at the default Left, the cell/column alignment - resolving End the same
-// way text does (flush right) rather than folding it to left.
 public class TableCellNonTextAlignmentTests
 {
     private static List<(double X, double Y, double W, double H)> FilledRects(byte[] content)
@@ -101,8 +98,6 @@ public class TableCellNonTextAlignmentTests
         var qrRight = FilledRects(content).Max(r => r.X + r.W);
         var textX = CascadeTestSupport.TdPositions(Encoding.Latin1.GetString(content)).Max(p => p.X);
 
-        // Both the QR and the text must flush right (past the page midpoint at x=200),
-        // where previously the QR folded left while text went right.
         Assert.True(qrRight > 200, $"End-aligned QR right edge {qrRight} should be flush right");
         Assert.True(textX > 200, $"End-aligned text x {textX} should be flush right");
     }

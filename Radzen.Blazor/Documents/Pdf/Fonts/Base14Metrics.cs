@@ -5,7 +5,6 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// Metrics for the Adobe Core-14 (base-14) fonts, resolved from Base14Data.
 internal sealed class Base14Metrics
 {
     private static readonly Dictionary<string, Base14Data.Entry> EntryByName = BuildEntryIndex();
@@ -60,20 +59,9 @@ internal sealed class Base14Metrics
 
     public double GetWidth(byte code) => widthByCode[code];
 
-    /// <summary>
-    /// Returns the AFM pair-kerning adjustment for the ordered glyph pair (in 1/1000 em,
-    /// negative tightening the pair), or 0 when the font defines no kern for the pair.
-    /// Fixed-pitch faces (Courier) and the symbol fonts define no pairs.
-    /// </summary>
     public double GetKerning(char left, char right)
         => kernByPair.TryGetValue((left << 16) | right, out var value) ? value : 0.0;
 
-    /// <summary>
-    /// Returns the kerning actually applied to an ordered pair within a drawn run: as
-    /// <see cref="GetKerning"/>, except that a pair straddling a space is never kerned.
-    /// Layout measures word by word, so no drawn run ever saw the space pair; measurement and
-    /// emission both go through here so the width measured is the width drawn.
-    /// </summary>
     public double GetRunKerning(char left, char right)
         => left == ' ' || right == ' ' ? 0.0 : GetKerning(left, right);
 
@@ -182,8 +170,6 @@ internal sealed class Base14Metrics
         return map;
     }
 
-    // Kern pairs are "left right value" triples of WinAnsi code points, '|'-separated;
-    // keyed by (left << 16) | right to match GetKerning's char-pair lookup.
     private static Dictionary<int, int> ParseKerning(string fontName)
     {
         var map = new Dictionary<int, int>();

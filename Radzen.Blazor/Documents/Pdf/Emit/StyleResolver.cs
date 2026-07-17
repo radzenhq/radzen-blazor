@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Per-Save side state, keyed by model (or synthesized paragraph) node. Resolved values live
-// here and never on the shared authoring model, where a concurrent Save could read a
-// half-updated value.
 internal sealed class StyleResolution
 {
     private readonly Dictionary<Paragraph, HorizontalAlignment?> alignments = [];
@@ -59,8 +56,6 @@ internal sealed class StyleResolution
     internal (StructureElement Label, StructureElement Body)? ListItemElements(ListItem item)
         => listItemElements.TryGetValue(item, out var elements) ? elements : null;
 
-    // Records the Lbl/LBody a paginator-synthesized list-item paragraph tags into, keyed by
-    // that synthesized paragraph so StructureTreeBuilder can resolve it back at emit time.
     internal void SetListParagraphElements(Paragraph paragraph, StructureElement label, StructureElement body)
         => listParagraphElements[paragraph] = (label, body);
 
@@ -71,9 +66,6 @@ internal sealed class StyleResolution
         => listParagraphElements.TryGetValue(paragraph, out var elements) ? elements.Label : null;
 }
 
-// Nested-list items are NOT walked here; BlockExpander.ExpandItem resolves them on the fly
-// into the same StyleResolution, so the layout engine never reads a resolved font off the
-// shared model.
 internal static class StyleResolver
 {
     public static StyleResolution Resolve(DocumentBuilder builder)
@@ -139,8 +131,6 @@ internal static class StyleResolver
         }
     }
 
-    // The item-level font (marker glyph, and the default for runs) omits the run override;
-    // both it and the run fonts are stored for BlockExpander.ExpandItem.
     private static void ResolveList(List list, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
         foreach (var item in list.Items)
@@ -180,8 +170,6 @@ internal static class StyleResolver
             foreach (var cell in row.Cells)
             {
                 var context = new List<Font> { cell.Font };
-                // Cell named style sits below the explicit cell font, above row/table defaults;
-                // Normal is excluded here so it stays the last (document-default) fallback.
                 foreach (var style in StyleChain(cell.StyleName, styles, includeNormal: false))
                 {
                     context.Add(style.Font);
@@ -208,8 +196,6 @@ internal static class StyleResolver
         resolution.SetBarcodeFont(barcode, effective);
     }
 
-    // BlockExpander lowers every run of every entry from this one resolved font, so the
-    // leader/page-number measuring and the emitted runs share it.
     private static void ResolveTableOfContents(TableOfContents toc, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
         var effective = new Font();
@@ -238,9 +224,6 @@ internal static class StyleResolver
 
         resolution.SetAlignment(paragraph, styleAlignment);
 
-        // Normal is excluded so an explicit paragraph style outranks the ambient
-        // cell/row/table context while Normal stays the last document-default fallback,
-        // matching word-processing semantics.
         var namedChain = StyleChain(paragraph.StyleName, styles, includeNormal: false);
 
         var paragraphFont = new Font();

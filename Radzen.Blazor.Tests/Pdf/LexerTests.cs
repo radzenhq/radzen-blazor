@@ -3,7 +3,6 @@ using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
-// Disambiguate from the pre-existing Radzen.Blazor.Token that is in scope here.
 using Token = Radzen.Documents.Pdf.Objects.Token;
 using TokenKind = Radzen.Documents.Pdf.Objects.TokenKind;
 
@@ -11,10 +10,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Token-grammar contract for the internal Lexer (ISO 32000-1 section 7.2).
-// Pins: Lexer(byte[] data, int position); Token Next(); TokenKind enum;
-// Token accessors Kind, IntValue (Integer), RealValue (Real), Text (Name/Keyword),
-// Bytes (StringLiteral/HexString, decoded content bytes).
+// ISO 32000-1 section 7.2: token grammar for the Lexer.
 public class LexerTests
 {
     private static List<Token> LexAll(string text)
@@ -179,7 +175,6 @@ public class LexerTests
     [Fact]
     public void StringLiteral_LineContinuation()
     {
-        // Backslash immediately before an end-of-line marker removes both.
         Assert.Equal("foobar", StringValue(First("(foo\\\nbar)")));
     }
 
@@ -300,9 +295,6 @@ public class LexerTests
         return Lexer.ReadHexDigits(Encoding.Latin1.GetBytes(text), ref position, recovery, end);
     }
 
-    // The two axes are independent: what a bad digit costs, and what a missing '>' costs.
-    // (Strict, Optional) is the ASCIIHexDecode filter's combination and the reason the axes
-    // cannot share one flag.
     [Fact]
     public void HexDigits_StrictDigit_OptionalEnd_RejectsBadDigitButAcceptsMissingEod()
     {

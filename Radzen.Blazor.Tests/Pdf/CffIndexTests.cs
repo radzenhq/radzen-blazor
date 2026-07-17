@@ -4,16 +4,9 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Unit tests for the low-level CFF INDEX reader on hand-built bytes. This isolates
-// the trickiest CFF primitive (Card16 count, offSize, (count+1) 1-based offsets, then
-// packed object data) independently of any real font. Layout per CFF spec section 5.
+// CFF spec section 5.
 public class CffIndexTests
 {
-    // INDEX of {"AB","C",""}, offSize 1:
-    //   count  = 00 03
-    //   offSize= 01
-    //   offsets= 01 03 04 04   (1-based, relative to the byte before the data block)
-    //   data   = 41 42 43      ("ABC")
     private static readonly byte[] ThreeEntryIndex =
     {
         0x00, 0x03,
@@ -66,7 +59,6 @@ public class CffIndexTests
     [Fact]
     public void Read_EmptyIndex()
     {
-        // count = 0; an empty INDEX is just a Card16 count of 0 with no offSize/offsets/data.
         var empty = new byte[] { 0x00, 0x00 };
 
         var index = CffIndex.Read(empty, 0);

@@ -2,9 +2,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// MacRomanEncoding per ISO 32000-1 Annex D.2, not the later Mac OS Roman: 0xDB is /currency,
-// not the Euro, and 0xF0 (the Apple logo) is left undefined rather than mapped to a private-use
-// code point, so it never reaches extracted text.
+// MacRomanEncoding per ISO 32000-1 Annex D.2 (not the later Mac OS Roman).
 internal static class MacRomanEncoding
 {
     public static bool TryGetChar(byte code, out char c) => CodeToChar.TryGetValue(code, out c);

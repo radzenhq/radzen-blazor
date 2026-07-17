@@ -2,16 +2,10 @@ using System;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// CanEmbed is a parameter so the embedding (GeneratorFontResolver) and non-embedding
-// (Document.FontScope) sites reach ResolveBase14Name through one decision point.
 internal readonly record struct FontScope(FontCollection? Fonts, string? Base14ForbiddenBy, bool CanEmbed);
 
 internal static class FontResolution
 {
-    // Only the standard-14 set is guaranteed present in a viewer without an embedded file, so a
-    // family with neither base-14 metrics nor a registered file has no honest rendering, and
-    // substituting Helvetica ships the wrong glyphs and metrics under the caller's own name. An
-    // empty Font.Name is not a family: it is the documented default-font path and stays Helvetica.
     public static string ResolveBase14Name(Font font, FontScope scope)
     {
         var metrics = Base14Metrics.Resolve(font);
@@ -44,7 +38,6 @@ internal static class FontResolution
         return psName;
     }
 
-    // family is null or empty where the caller only knows the resolved face, not the requested family.
     public static InvalidOperationException Base14Forbidden(string label, string psName, string? family)
         => new($"{label} forbids the standard-14 font '{psName}' referenced by name; register an embeddable font file{(string.IsNullOrEmpty(family) ? "" : $" for '{family}'")} with DocumentBuilder.Fonts instead.");
 }

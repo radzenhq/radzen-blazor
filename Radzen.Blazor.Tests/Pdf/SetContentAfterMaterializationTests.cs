@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// SetContent replaces the page's bytes wholesale, so everything derived from the previous
-// bytes (the parsed elements, their recorded source spans and the intact-content snapshot)
-// describes a stream that no longer exists.
 public class SetContentAfterMaterializationTests
 {
     private const string Original = "10 10 100 100 re f\n";

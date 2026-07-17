@@ -5,15 +5,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Hybrid-reference file contract (ISO 32000-1 7.5.8.4): a classic xref table
-// whose trailer carries /XRefStm pointing at a cross-reference stream. Acrobat
-// writes such files by default; the compressed objects are listed only in the
-// cross-reference stream, so a reader that ignores /XRefStm cannot find them.
+// ISO 32000-1 7.5.8.4: hybrid-reference file - a classic xref table whose trailer /XRefStm points at a cross-reference stream.
 public class HybridXrefTests
 {
-    // Objects 1-3 (catalog/pages/page) live in the classic table. Object 4 (the
-    // page's font) is compressed in ObjStm 5; objects 4-6 are listed only by the
-    // /Type /XRef stream (object 6) referenced from the classic trailer /XRefStm.
     private static byte[] HybridFile()
     {
         var pdf = new FixturePdf().Append("%PDF-1.6\n");
@@ -22,7 +16,6 @@ public class HybridXrefTests
         pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
             + "/Resources << /Font << /F1 4 0 R >> >> >>\nendobj\n");
 
-        // ObjStm holding object 4. "4 0 " pairs occupy the first 4 bytes.
         var member = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
         var objStmData = "4 0 " + member;
         pdf.Mark(5);
@@ -77,7 +70,6 @@ public class HybridXrefTests
         Assert.Equal("Helvetica", Assert.IsType<NameObject>(font["BaseFont"]).Value);
     }
 
-    // The classic table stays authoritative for the objects it lists.
     [Fact]
     public void XRefStm_ClassicEntriesStillResolve()
     {

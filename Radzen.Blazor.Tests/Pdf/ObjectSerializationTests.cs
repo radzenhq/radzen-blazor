@@ -7,7 +7,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Byte-grammar contract for the COS object model (ISO 32000-1 section 7.3).
+// ISO 32000-1 7.3 COS object serialization.
 public class ObjectSerializationTests
 {
     private static string Serialize(DocumentObject obj)

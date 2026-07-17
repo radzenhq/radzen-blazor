@@ -75,8 +75,6 @@ public sealed class PathContent : ContentElement
         set => Set(ref fillGradient, value);
     }
 
-    // FillGradient is settable, so one brush instance can be shared by two paths; asking the
-    // brush rather than having it push back keeps that from misfiring.
     /// <inheritdoc/>
     public override bool IsModified => base.IsModified || FillGradient?.IsModified == true;
 
@@ -149,8 +147,6 @@ public sealed class PathContent : ContentElement
         set => Set(ref clip, value);
     }
 
-    // Round-trip state carried from a decoded content stream so a re-encode preserves the
-    // source operators rather than normalizing them to rg/RG.
     internal ReadOnlyMemory<double>? DashArray
     {
         get => dashArray;
@@ -231,8 +227,6 @@ public sealed class PathContent : ContentElement
         DashPhase = phase;
     }
 
-    // The segment list is not reached through a tracked property, so each mutator must Touch()
-    // explicitly or the edit goes unreported.
     /// <summary>Begins a new subpath at the given point.</summary>
     /// <param name="x">The X coordinate.</param>
     /// <param name="y">The Y coordinate.</param>
@@ -262,10 +256,6 @@ public sealed class PathContent : ContentElement
         Touch();
     }
 
-    // One ExtGState carries one /ca and one /CA, and a fill+stroke path paints both in a
-    // single operator, so differing alphas cannot be expressed: fail loud rather than
-    // silently dropping one. A gradient or device paint replaces the RGB Color, so only the
-    // channels that reach rg/RG contribute.
     private double ColorAlpha()
     {
         var fill = Fill && FillGradient is null && FillPaint is null ? FillColor.A / 255.0 : 1;
@@ -282,13 +272,9 @@ public sealed class PathContent : ContentElement
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
-        // Clip (W/W*), a pattern colour space, and stroke state (J/j/M/ri/d) all persist in
-        // the graphics state, so each must be confined by a q..Q or it leaks onto every
-        // element that follows on the page.
         var leaksStrokeState = Cap is not null || Join is not null || MiterLimit is not null
             || Intent is not null || DashArray is not null;
 
-        // gs persists just like the above, so it is scoped by the same q..Q.
         var alpha = ColorAlpha();
         var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState || alpha < 1;
         if (scoped)
@@ -472,7 +458,4 @@ internal enum DeviceColorKind
     Gray,
 }
 
-// A path color set by an operator other than rg/RG: CMYK (k/K) or a named colorspace
-// (cs/scn). Operands are preserved verbatim so the path re-emits equivalently.
-// PatternName is the trailing name operand of scn/SCN in a Pattern colorspace (/P0 scn).
 internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands, string? PatternName = null);

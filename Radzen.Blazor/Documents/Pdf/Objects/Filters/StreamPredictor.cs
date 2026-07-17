@@ -1,10 +1,5 @@
 namespace Radzen.Documents.Pdf.Objects.Filters;
 
-/// <summary>
-/// Applies the optional <c>/DecodeParms</c> predictor (PNG or TIFF) that may follow a
-/// FlateDecode or LZWDecode link. A predictor of 1 (or an absent parameters dictionary)
-/// is a no-op.
-/// </summary>
 internal static class StreamPredictor
 {
     public static byte[] Apply(byte[] data, DictionaryObject? parms)

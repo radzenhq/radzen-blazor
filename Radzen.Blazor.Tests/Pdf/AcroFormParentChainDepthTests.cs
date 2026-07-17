@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A field hierarchy deeper than the /Parent walk's bound must still inherit /V, /FT and
-// /Ff from the root that sets them, and a /Parent chain that loops must be diagnosed
-// rather than silently truncated.
 public class AcroFormParentChainDepthTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -28,8 +25,6 @@ public class AcroFormParentChainDepthTests
         return pdf.ToArray();
     }
 
-    // A /Parent<->/Kids spine `levels` deep. Object 5 is the root field carrying /FT and
-    // /V; each following object is a non-terminal kid; the last is the terminal widget.
     private static byte[] DeepChainSource(int levels)
     {
         var pdf = new FixturePdf()
@@ -71,8 +66,6 @@ public class AcroFormParentChainDepthTests
         return Wrap(pdf, 5 + levels);
     }
 
-    // obj5 is the root field; obj6's /Parent points back at obj7 and obj7's at obj6, so
-    // walking up from the terminal never reaches a root.
     private static byte[] CyclicParentSource()
     {
         var pdf = new FixturePdf()

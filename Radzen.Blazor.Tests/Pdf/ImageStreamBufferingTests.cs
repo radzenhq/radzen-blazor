@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Buffering a source stream must cost one copy of the payload, not three. Growing a
-// MemoryStream doubles its way to ~2x and ToArray adds a third exact-size buffer, all
-// LOH-sized for a photo; a seekable stream's Length sizes the final array up front.
 public class ImageStreamBufferingTests
 {
     private const int PayloadBytes = 4 * 1024 * 1024;
@@ -35,13 +32,10 @@ public class ImageStreamBufferingTests
         Assert.True(allocated < PayloadBytes * 1.5, $"allocated {allocated} bytes for a {PayloadBytes} byte payload");
     }
 
-    // A non-seekable stream cannot be pre-sized, so it keeps the grow-and-copy path.
     [Fact]
     public void UnseekableStream_StillBuffersFully()
         => Assert.Equal(PayloadBytes, Image.FromStream(new UnseekableStream(new byte[PayloadBytes])).Data.Length);
 
-    // Buffering starts at the stream's current position, so a caller handing over a stream
-    // seeked past a container header gets the payload it pointed at, not the whole stream.
     [Fact]
     public void SeekableStream_BuffersFromCurrentPosition()
     {

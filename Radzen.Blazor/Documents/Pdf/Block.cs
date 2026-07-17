@@ -14,7 +14,6 @@ public abstract class Block
     {
     }
 
-    // External subclasses inherit the catch-all because BlockVisitor remains internal.
     internal virtual TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context)
         => visitor.Visit(this, context);
 }

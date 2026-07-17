@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Q1(b): public Font.Strikethrough draws a horizontal line through the run at
-// roughly the x-height midline (~0.3 * fontSize above the baseline), one line per
-// maximal run of consecutive strikethrough fragments. Set via reflection so the
-// suite compiles before the property exists and fails pointing at the gap.
 public class StrikethroughRenderTests
 {
     private const string Text = "Struck words";

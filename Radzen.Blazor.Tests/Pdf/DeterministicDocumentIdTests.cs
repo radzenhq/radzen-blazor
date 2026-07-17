@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 2: every saved document carries a trailer /ID. The value is deterministic -
-// derived from the document content and info, never from the clock or a random source -
-// so two independent saves of the same document produce byte-identical /ID halves.
 public class DeterministicDocumentIdTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -73,8 +70,6 @@ public class DeterministicDocumentIdTests
         Assert.Equal(PlainDocument().ToArray(), PlainDocument().ToArray());
     }
 
-    // Pins the exact /ID bytes: the seed layout and the hash feeding it are part of the
-    // deterministic-output contract, so any reimplementation must reproduce this value.
     [Fact]
     public void DocumentId_HasAPinnedValue_ForAKnownDocument()
     {
@@ -94,8 +89,6 @@ public class DeterministicDocumentIdTests
         return GC.GetAllocatedBytesForCurrentThread() - before;
     }
 
-    // The /ID seed must stream into the hash, not be concatenated into a buffer and copied
-    // again to hash it: turning /ID on may not cost a multiple of the content size.
     [Fact]
     public void DocumentId_DoesNotBufferOrCopyPageContent()
     {

@@ -23,7 +23,6 @@ public class AsciiHexFilterTests
         Assert.Equal(new byte[] { 0x48, 0x65, 0x6C }, result);
     }
 
-    // Odd final digit is padded with a trailing 0 per the AHx spec: "7>" -> 0x70.
     [Fact]
     public void Decode_OddFinalDigit_PadsZero()
     {
@@ -69,7 +68,6 @@ public class AsciiHexFilterTests
 
 public class Ascii85FilterTests
 {
-    // Verified: python3 base64.a85encode(b'Man ') -> "9jqo^".
     [Fact]
     public void Decode_KnownVector_WithEod()
     {
@@ -81,12 +79,10 @@ public class Ascii85FilterTests
     public void Encode_KnownVector()
     {
         var result = Encoding.ASCII.GetString(Ascii85Filter.Encode(Encoding.ASCII.GetBytes("Man ")));
-        // Encoder emits the group followed by the ~> terminator.
         Assert.StartsWith("9jqo^", result);
         Assert.EndsWith("~>", result);
     }
 
-    // "z" shortcut expands to four zero bytes.
     [Fact]
     public void Decode_ZShortcut_FourZeroBytes()
     {
@@ -94,7 +90,6 @@ public class Ascii85FilterTests
         Assert.Equal(new byte[] { 0, 0, 0, 0 }, result);
     }
 
-    // Partial final groups. python3 base64.a85encode: M->"9`", Ma->"9jn", Man->"9jqo".
     [Fact]
     public void Decode_PartialGroup_OneByte()
     {
@@ -133,12 +128,9 @@ public class Ascii85FilterTests
     [Fact]
     public void Decode_CharOutOfRange_Throws()
     {
-        // 'v' (0x76) is above the valid '!'..'u' range.
         Assert.ThrowsAny<Exception>(() => Ascii85Filter.Decode(Encoding.ASCII.GetBytes("9jqv^~>")));
     }
 
-    // A final group of exactly one character cannot encode any bytes; a truncated stream
-    // ending in one stray char is corrupt and must fail loud, not silently drop it.
     [Fact]
     public void Decode_DanglingSingleChar_Throws()
     {
@@ -161,7 +153,6 @@ public class Ascii85FilterTests
         Assert.Equal(data, decoded);
     }
 
-    // The shared reader reports the offset; the filter's message must still name the byte.
     [Fact]
     public void AsciiHex_BadDigit_MessageNamesTheOffendingByte()
     {
@@ -170,10 +161,6 @@ public class Ascii85FilterTests
         Assert.Contains("0x5A", e.Message);
     }
 
-    // 2^30 is the smallest input whose encoded length exceeds the maximum byte[], so the
-    // input size is the thing under test and cannot be scaled down. The array is zero pages
-    // that nothing reads and the length check rejects before encoding, so this costs virtual
-    // address space rather than resident memory or time.
     [Fact]
     public void Encode_InputTooLargeToEncode_ThrowsDiagnosable()
     {

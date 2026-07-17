@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// PDF/UA and PDF/A Level-A artifact wiring and fail-loud conformance. Tagged output must
-// carry ZERO untagged real content: pagination (header/footer) and decorative
-// (background/border/watermark) content is wrapped in /Artifact BDC..EMC, while a plain
-// untagged document is left byte-identical (no /Artifact markers). ConformanceWriter must
-// throw rather than silently advertise a conformance it cannot meet.
 public class PdfUaArtifactTests
 {
     private static DocumentBuilder AuthorBanded(bool ua, PdfAConformance conformance = PdfAConformance.None)
@@ -65,8 +60,6 @@ public class PdfUaArtifactTests
         "Tj", "TJ", "'", "\"", "Do", "f", "F", "f*", "S", "s", "B", "B*", "b", "b*", "sh",
     };
 
-    // Walks the content stream tracking marked-content nesting; returns the painting
-    // operators that appear at marked-content depth 0 (neither tagged nor artifact).
     private static List<string> PaintingOpsOutsideMarkedContent(DocumentReader reader, DictionaryObject page)
     {
         var offenders = new List<string>();

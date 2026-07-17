@@ -7,8 +7,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// In-memory tests for the authoring-side PageCollection/Page API surface. These
-// assert on the object model directly without going through Save/reload.
 public class PageCollectionTests
 {
     [Fact]
