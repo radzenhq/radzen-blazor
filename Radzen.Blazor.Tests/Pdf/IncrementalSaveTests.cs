@@ -55,6 +55,29 @@ public class IncrementalSaveTests
         return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
     }
 
+    // A flat two-page tree whose second page lives at generation 2, as a file whose
+    // object 5 was freed and reused by an earlier incremental update would.
+    private static byte[] GenerationTwoPageTree()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [4 0 R 5 2 R] /Count 2 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Length 5 >>\nstream\nfirst\nendstream\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 3 0 R >>\nendobj\n")
+            .Object(5, "5 2 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 6\n")
+            .Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= 4; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(5), 2));
+        return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
+    }
+
     private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
 
     private static byte[] SaveIncremental(Document document)
@@ -312,6 +335,30 @@ public class IncrementalSaveTests
         Assert.Equal(2, reloaded.Pages.Count);
         Assert.Equal("last", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
         Assert.Equal("first", Encoding.ASCII.GetString(reloaded.Pages[1].GetContent()!));
+    }
+
+    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation. A page
+    // whose number was reclaimed from the free list lives at a non-zero generation, so a
+    // rewritten /Kids entry that drops the generation names a different (free) object.
+    [Fact]
+    public void ReorderedPageTreeKeepsTheNonZeroGenerationOfAReusedPageNumber()
+    {
+        var original = GenerationTwoPageTree();
+        var document = Load(original);
+        Assert.Equal(2, document.Pages.Count);
+        document.Pages.Move(1, 0);
+
+        var updated = SaveIncremental(document);
+        AssertVerbatimPrefix(original, updated);
+
+        var appended = Encoding.Latin1.GetString(updated, original.Length, updated.Length - original.Length);
+        Assert.Contains("5 2 R", appended, StringComparison.Ordinal);
+        Assert.DoesNotContain("5 0 R", appended, StringComparison.Ordinal);
+
+        var reader = DocumentReader.Parse(updated);
+        var pages = (DictionaryObject)reader.Resolve(FormTestSupport.Catalog(reader)["Pages"]);
+        var kids = (ArrayObject)reader.Resolve(pages["Kids"]);
+        Assert.Equal(2, ((ReferenceObject)kids[0]).Generation);
     }
 
     [Fact]

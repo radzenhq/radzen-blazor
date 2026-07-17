@@ -194,6 +194,65 @@ public class PdfSignerTests
         return pdf.ToArray();
     }
 
+    // A single page reached through `depth` chained /Pages nodes. Deep but acyclic and
+    // well within ReaderLimits.MaxPageTreeDepth, so the loader accepts it.
+    private static byte[] DeepPageTree(int depth)
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        var leaf = depth + 2;
+        for (var number = 2; number < leaf; number++)
+        {
+            var parent = number == 2 ? "" : " /Parent " + (number - 1) + " 0 R";
+            pdf.Object(number,
+                number + " 0 obj\n<< /Type /Pages" + parent + " /Kids [" + (number + 1) + " 0 R] /Count 1 >>\nendobj\n");
+        }
+
+        pdf.Object(leaf,
+            leaf + " 0 obj\n<< /Type /Page /Parent " + (leaf - 1) + " 0 R /MediaBox [0 0 612 792] >>\nendobj\n");
+
+        var count = leaf + 1;
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 " + count + "\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number < count; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    // One policy, one limit: a page tree the loader accepts must not be rejected by the
+    // signer walking that same tree against a private constant.
+    [Fact]
+    public void Sign_PageTreeDeeperThanSixtyFive_MatchesTheLoaderPolicy()
+    {
+        var original = DeepPageTree(70);
+        using var certificate = CreateCertificate();
+
+        var loaded = Document.LoadFromStream(new MemoryStream(original));
+        Assert.Single(loaded.Pages);
+
+        var signed = PdfSigner.Sign(original, Options(), CmsSigner(certificate));
+
+        Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
+    }
+
+    // Joining the reader's policy must not remove the backstop: past the limit the walk
+    // still fails loud rather than recursing to a stack overflow.
+    [Fact]
+    public void Sign_PageTreeDeeperThanTheReaderLimit_Throws()
+    {
+        var original = DeepPageTree(ReaderLimits.Default.MaxPageTreeDepth + 50);
+        using var certificate = CreateCertificate();
+
+        var error = Assert.Throws<DocumentParseException>(
+            () => PdfSigner.Sign(original, Options(), CmsSigner(certificate)));
+        Assert.Contains("page tree depth", error.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void Sign_HostileContentsDecoyInInput_DoesNotMisscopeSignature()
     {
