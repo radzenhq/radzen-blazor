@@ -320,7 +320,7 @@ internal static class AnnotationReader
         }
     }
 
-    private static byte Channel(double value) => (byte)Math.Clamp((int)Math.Round(value * 255), 0, 255);
+    private static byte Channel(double value) => ColorComponent.ToChannel(value);
 
     private static double Number(DocumentReader reader, DocumentObject value)
         => reader.Resolve(value) is NumberObject number

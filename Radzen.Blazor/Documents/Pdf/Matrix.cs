@@ -47,6 +47,10 @@ public readonly struct Matrix : IEquatable<Matrix>
     /// </summary>
     public static Matrix Translate(double tx, double ty) => new(1, 0, 0, 1, tx, ty);
 
+    // Non-finite components are deliberately constructible: a lexically valid real can
+    // overflow to infinity, and such a page must still load and re-emit its original
+    // bytes. A non-finite value is only invalid once it must become PDF syntax, so the
+    // writer rejects it there. See MatrixNonFiniteTests.
     internal static Matrix FromComponents(double a, double b, double c, double d, double e, double f)
         => new(a, b, c, d, e, f);
 
