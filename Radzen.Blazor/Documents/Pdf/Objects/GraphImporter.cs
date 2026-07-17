@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -200,8 +199,7 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         field["T"] = new StringObject(candidate);
     }
 
-    private bool IsWidget(DictionaryObject annotation)
-        => string.Equals(reader.GetName(annotation, "Subtype"), "Widget", StringComparison.Ordinal);
+    private bool IsWidget(DictionaryObject annotation) => FormField.IsWidget(reader, annotation);
 
     private void Populate(DocumentObject shell, DocumentObject target)
     {

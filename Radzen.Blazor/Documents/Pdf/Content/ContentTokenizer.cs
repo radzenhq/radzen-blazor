@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf.Content;
 
 // Shared content-stream tokenizer for the page-content grammar (operators, operands,
 // arrays/dicts and BI/ID/EI inline images captured whole as a single token). Both
-// ContentInterpreter and TextExtractor consume this stream; each consumer filters the
+// ContentInterpreter and TextSearch consume this stream; each consumer filters the
 // tokens it cares about. What the operands themselves are - numbers, strings, hex strings,
 // names - is the one PDF object syntax, read here through Objects/Lexer with lenient
 // recovery so a corrupt stream still renders. Only the operator layer lives here.

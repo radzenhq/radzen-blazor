@@ -101,7 +101,7 @@ public class FormFieldTextDecodeTests
     [Fact]
     public void MultiSelectArrayValueDecodes()
     {
-        Assert.Equal(A + "\n" + Be, ValueOf(Load(), "multi"));
+        Assert.Equal(A + ", " + Be, ValueOf(Load(), "multi"));
     }
 
     [Fact]
