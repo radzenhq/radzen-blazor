@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
-using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf;
 
@@ -33,7 +32,7 @@ public sealed class ReplaceTextOptions
 
 internal static class TextReplacer
 {
-    private sealed record Show(int Index, string Operator, Token Text, string? FontName, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
+    private sealed record Show(int Index, string Operator, Token Text, int OperatorEnd, string? FontName, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
 
     private readonly record struct SourceReplacement(TextSourceReference Source, string Replacement);
 
@@ -128,7 +127,7 @@ internal static class TextReplacer
                 writer.WriteRaw(" ");
                 writer.WriteNumber((newAdvance - oldAdvance) / (show.FontSize * show.Scale) * 1000.0);
                 writer.WriteRaw("] TJ");
-                edits.Add(new ContentEdit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray()));
+                edits.Add(new ContentEdit(show.Text.Start, show.OperatorEnd, writer.ToArray()));
             }
             else
             {
@@ -198,7 +197,7 @@ internal static class TextReplacer
             var decoded = show.Font.Decode(show.Text.Bytes!);
             group.Value.Sort(static (left, right) => left.Source.CharacterOffset.CompareTo(right.Source.CharacterOffset));
             ValidateNonOverlapping(group.Value, decoded);
-            edits.Add(BuildMultipleShowEdit(content, show, decoded, group.Value, options.Layout));
+            edits.Add(BuildMultipleShowEdit(show, decoded, group.Value, options.Layout));
         }
 
         page.ApplyEditedContent(ContentEdits.Apply(content, edits));
@@ -289,7 +288,7 @@ internal static class TextReplacer
         return advance;
     }
 
-    private static ContentEdit BuildMultipleShowEdit(byte[] content, Show show, string decoded,
+    private static ContentEdit BuildMultipleShowEdit(Show show, string decoded,
         IReadOnlyList<SourceReplacement> replacements, TextReplacementLayout layout)
     {
         using var writer = new ContentWriter();
@@ -348,7 +347,7 @@ internal static class TextReplacer
 
         writer.WriteString(trailing);
         writer.WriteRaw("] TJ");
-        return new ContentEdit(show.Text.Start, FindOperatorEnd(content, show.Text.End), writer.ToArray());
+        return new ContentEdit(show.Text.Start, show.OperatorEnd, writer.ToArray());
     }
 
     private static Show GetShow(IReadOnlyList<Show> shows, TextSourceReference source)
@@ -406,36 +405,18 @@ internal static class TextReplacer
         }
     }
 
-    // Every show operator becomes a Show, in the order and numbering ContentShows defines,
-    // so an index a search produced selects the same operator here.
+    // Every show operator becomes a Show, in the order and numbering ContentTextWalker defines,
+    // so an index the search (which walks the same seam) produced selects the same operator here.
     private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)
     {
         var result = new List<Show>();
-        var operands = new List<Token>();
-        var machine = new ContentStateMachine(fonts, ReverseFont.WinAnsi);
-        foreach (var token in ContentTokenizer.Tokenize(content, cache))
+        ContentTextWalker.Walk(content, fonts, (walker, op, operands, array, operatorIndex) =>
         {
-            if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
-            {
-                operands.Add(token);
-                continue;
-            }
-
-            if (token.Kind != TokenKind.Operator)
-            {
-                continue;
-            }
-
-            if (!machine.Apply(token.Text, operands) && ContentShows.IsShow(token.Text))
-            {
-                ref var text = ref machine.Text;
-                result.Add(new Show(result.Count, token.Text!, token.Text == "TJ" ? default : LastStringToken(operands) ?? default,
-                    text.FontName, text.Font ?? ReverseFont.WinAnsi, text.FontSize,
-                    text.Spacing.HorizontalScale, text.Spacing.CharSpacing, text.Spacing.WordSpacing));
-            }
-
-            operands.Clear();
-        }
+            result.Add(new Show(operatorIndex, op, op == "TJ" ? default : LastStringToken(operands) ?? default,
+                walker.Operator.End, walker.FontName, walker.Font ?? ReverseFont.WinAnsi, walker.FontSize,
+                walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing));
+            return 0.0;
+        }, cache);
 
         return result;
     }
@@ -459,22 +440,6 @@ internal static class TextReplacer
         }
 
         return value * show.Scale;
-    }
-
-    private static int FindOperatorEnd(byte[] content, int afterString)
-    {
-        var position = afterString;
-        while (position < content.Length && content[position] is 0 or 9 or 10 or 12 or 13 or 32)
-        {
-            position++;
-        }
-
-        if (position + 2 > content.Length || content[position] != (byte)'T' || content[position + 1] != (byte)'j')
-        {
-            throw new FormatException("The source text-show operator is malformed.");
-        }
-
-        return position + 2;
     }
 
 }

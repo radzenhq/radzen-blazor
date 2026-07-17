@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -180,6 +181,7 @@ internal static class ContentEditor
         var array = new List<Token>();
         var frameStart = -1;
         var pathStart = -1;
+        var clipPending = false;
         var machine = new ContentStateMachine();
         var pathCtm = Matrix.Identity;
         foreach (var token in tokens)
@@ -233,15 +235,21 @@ internal static class ContentEditor
                     pathStart = start;
                     pathCtm = machine.Ctm;
                 }
+
+                clipPending |= op is "W" or "W*";
             }
             else if (op is "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n")
             {
-                if (pathStart >= 0)
+                // n discards the path without painting, so it only produces an element when a
+                // clip is pending - exactly the interpreter's rule. Otherwise the construction
+                // bytes stay in the inter-element gap and re-emit verbatim.
+                if (pathStart >= 0 && (op != "n" || clipPending))
                 {
                     result.Add(new Candidate(CandidateKind.Path, pathStart, token.End, [], pathCtm));
                 }
 
                 pathStart = -1;
+                clipPending = false;
             }
             else if (op == "Do")
             {
@@ -249,22 +257,27 @@ internal static class ContentEditor
             }
             else if (ContentShows.IsShow(op))
             {
-                var bytes = new List<byte>();
-                foreach (var operand in op == "TJ" ? array : operands)
+                // A Tj/'/" with no string operand shows nothing, so the interpreter emits no
+                // element; only TJ always materializes (its empty array still builds a run).
+                if (op == "TJ" || LastStringToken(operands) is not null)
                 {
-                    if (operand.Kind == TokenKind.String && operand.Bytes is not null)
+                    var bytes = new List<byte>();
+                    foreach (var operand in op == "TJ" ? array : operands)
                     {
-                        bytes.AddRange(operand.Bytes);
+                        if (operand.Kind == TokenKind.String && operand.Bytes is not null)
+                        {
+                            bytes.AddRange(operand.Bytes);
+                        }
                     }
-                }
 
-                // A show splices back where the source text object is still open, so its
-                // ambient is the full text rendering space: the live text matrix as well as
-                // the CTM. Both are what the interpreter baked into the element's transform,
-                // so an unmoved run comes back out relative to identity.
-                var insideText = machine.TextObjectDepth > 0;
-                var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
-                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
+                    // A show splices back where the source text object is still open, so its
+                    // ambient is the full text rendering space: the live text matrix as well as
+                    // the CTM. Both are what the interpreter baked into the element's transform,
+                    // so an unmoved run comes back out relative to identity.
+                    var insideText = machine.TextObjectDepth > 0;
+                    var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
+                    result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
+                }
             }
             else if (!KnownNonElement(op))
             {
