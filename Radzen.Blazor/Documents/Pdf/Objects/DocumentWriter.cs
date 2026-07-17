@@ -142,18 +142,11 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
 
     private static long WriteIndirectObject(CountingBufferedStream buffer, int number, DocumentObject value, EncryptionWriter? encryption, int encryptNumber)
     {
-        var offset = buffer.Position;
-        PdfBytes.WriteInteger(buffer, number);
-        PdfBytes.WriteAscii(buffer, " 0 obj\n");
-
         // The /Encrypt dictionary and the document /ID are never themselves encrypted.
         var context = encryption is not null && number != encryptNumber
             ? new WriteContext(encryption, number, 0)
             : WriteContext.None;
-        value.Write(buffer, context);
-
-        PdfBytes.WriteAscii(buffer, "\nendobj\n");
-        return offset;
+        return IndirectObjectFramer.Write(buffer, number, 0, value, context);
     }
 
     // Packs eligible objects into an object stream, writes the remaining objects

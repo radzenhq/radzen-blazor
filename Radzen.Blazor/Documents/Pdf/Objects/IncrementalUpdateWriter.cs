@@ -195,13 +195,7 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         var offsets = new SortedDictionary<int, long>();
         foreach (var pair in objects)
         {
-            offsets[pair.Key] = buffer.Position;
-            PdfBytes.WriteInteger(buffer, pair.Key);
-            PdfBytes.WriteAscii(buffer, " ");
-            PdfBytes.WriteInteger(buffer, GenerationOf(pair.Key));
-            PdfBytes.WriteAscii(buffer, " obj\n");
-            pair.Value.Write(buffer);
-            PdfBytes.WriteAscii(buffer, "\nendobj\n");
+            offsets[pair.Key] = IndirectObjectFramer.Write(buffer, pair.Key, GenerationOf(pair.Key), pair.Value, WriteContext.None);
         }
 
         writtenOffsets = offsets;
@@ -263,10 +257,7 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
 
         var xref = XrefStreamPacker.Pack(rows, "Index", index, BuildTrailer(xrefNumber + 1));
 
-        PdfBytes.WriteInteger(buffer, xrefNumber);
-        PdfBytes.WriteAscii(buffer, " 0 obj\n");
-        xref.Write(buffer);
-        PdfBytes.WriteAscii(buffer, "\nendobj\n");
+        IndirectObjectFramer.Write(buffer, xrefNumber, 0, xref, WriteContext.None);
         return xrefOffset;
     }
 
