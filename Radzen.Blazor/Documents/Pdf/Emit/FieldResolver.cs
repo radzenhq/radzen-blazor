@@ -50,8 +50,8 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
         double width,
         int pageNumber,
         int pageCount,
-        HorizontalAlignment? inheritedAlignment = null,
-        int reservedLines = int.MaxValue)
+        HorizontalAlignment? inheritedAlignment,
+        int reservedLines)
     {
         // Text == null marks a passthrough piece: a non-text run (e.g. InlineImage) re-emitted
         // as its ORIGINAL instance so the line breaker lays it out instead of coercing it to
@@ -152,14 +152,15 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
 
         var lines = LineBreaker.Break(resolved, width, fonts, inheritedAlignment, resolution);
 
-        // The band reserved exactly `reservedLines` for this paragraph (laid out once with the
-        // field's single-digit placeholder). A wider resolved number that wraps to more lines
-        // would overprint the content below it, so fail loud instead of drawing over it.
+        // Every call site (band, body, table cell) laid this paragraph out ONCE with the field's
+        // single-digit placeholder and reserved exactly those lines; the content below sits at a
+        // position derived from that count. A wider resolved number that wraps to more lines would
+        // overprint it, so fail loud instead of drawing over it.
         if (lines.Count > reservedLines)
         {
             throw new InvalidOperationException(
-                $"A header/footer field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
-                $"but only {reservedLines} were reserved; widen the band or shorten the text.");
+                $"A field paragraph wrapped to {lines.Count} lines on page {pageNumber} " +
+                $"but only {reservedLines} were reserved; widen the available width or shorten the text.");
         }
 
         return lines;

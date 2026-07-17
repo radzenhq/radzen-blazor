@@ -210,18 +210,21 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             // re-broken to the cell's content width, replacing the placeholder layout.
             if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
+                var reserved = 0;
+                while (li + reserved < cellLines.Count && cellLines[li + reserved].Source == paragraph)
+                {
+                    reserved++;
+                }
+
                 var y = line.Y;
-                foreach (var box in context.Fields.ResolveFields(paragraph, contentWidth, pageNumber, pageCount, resolution.Alignment(paragraph)))
+                foreach (var box in context.Fields.ResolveFields(paragraph, contentWidth, pageNumber, pageCount, resolution.Alignment(paragraph), reserved))
                 {
                     context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), element, opacity);
                     overflows |= box.Width > contentWidth + 0.01;
                     y += box.Height;
                 }
 
-                while (li < cellLines.Count && cellLines[li].Source == paragraph)
-                {
-                    li++;
-                }
+                li += reserved;
             }
             else
             {

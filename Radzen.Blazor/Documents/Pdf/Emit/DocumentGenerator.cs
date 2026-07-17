@@ -358,17 +358,20 @@ internal sealed class DocumentGenerator
             if (line.Source is Paragraph paragraph && fieldResolver.HasField(paragraph))
             {
                 var element = structureTree.ElementOf(paragraph);
+                var reserved = 0;
+                while (b + reserved < bodyLines.Count && bodyLines[b + reserved].Source == paragraph)
+                {
+                    reserved++;
+                }
+
                 var y = line.Y;
-                foreach (var box in fieldResolver.ResolveFields(paragraph, width, context.PageNumber, context.PageCount, resolution.Alignment(paragraph)))
+                foreach (var box in fieldResolver.ResolveFields(paragraph, width, context.PageNumber, context.PageCount, resolution.Alignment(paragraph), reserved))
                 {
                     textEmitter.EmitLine(context, box, left, top - y, element);
                     y += box.Height;
                 }
 
-                while (b < bodyLines.Count && bodyLines[b].Source == paragraph)
-                {
-                    b++;
-                }
+                b += reserved;
             }
             else
             {
