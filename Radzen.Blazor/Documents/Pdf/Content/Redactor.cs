@@ -24,6 +24,11 @@ internal static class Redactor
             return 0;
         }
 
+        if (hits.Any(static hit => hit.GeometryEstimated))
+        {
+            throw new NotSupportedException("The source font does not provide a usable width for every matched glyph, so the bounds of the match are an estimate that cannot be redacted safely.");
+        }
+
         Redact(page, hits.Select(static hit => hit.Bounds), redactionOptions, cache);
         return hits.Count;
     }
@@ -52,6 +57,16 @@ internal static class Redactor
             var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
             foreach (var run in page.ExtractPositionedText(cache))
             {
+                if (run.GeometryEstimated)
+                {
+                    if (MayReach(run, regions))
+                    {
+                        throw new NotSupportedException("The source font does not provide a usable width for every glyph shown by a text operator near a redaction region, so which of its glyphs the region covers cannot be determined safely.");
+                    }
+
+                    continue;
+                }
+
                 var removed = new bool[run.Text.Length];
                 var any = false;
                 for (var i = 0; i < removed.Length; i++)
@@ -232,6 +247,38 @@ internal static class Redactor
     {
         var points = new[] { transform.Transform(0, 0), transform.Transform(1, 0), transform.Transform(1, 1), transform.Transform(0, 1) };
         return new PdfRect(points.Min(static p => p.X), points.Min(static p => p.Y), points.Max(static p => p.X), points.Max(static p => p.Y));
+    }
+
+    // An estimated run's advances are guesses, but its origin, direction and em height are not,
+    // so it paints only within the text-space half-strip x >= 0, y within the font size,
+    // whatever the real widths are. Only a region outside that strip is provably beyond its
+    // reach; the estimated quads cannot answer this, since the real glyphs may outrun them.
+    private static bool MayReach(PositionedTextRun run, IReadOnlyList<PdfRect> regions)
+    {
+        if (!run.Matrix.TryInvert(out var inverse))
+        {
+            return true;
+        }
+
+        var top = Math.Max(run.FontSize, 0);
+        var bottom = Math.Min(run.FontSize, 0);
+        foreach (var area in regions)
+        {
+            var corners = new[]
+            {
+                inverse.Transform(area.Left, area.Bottom), inverse.Transform(area.Right, area.Bottom),
+                inverse.Transform(area.Right, area.Top), inverse.Transform(area.Left, area.Top),
+            };
+
+            // Unbounded along +x, so only the strip's own three edges can separate the two
+            // convex shapes; a NaN corner satisfies none of them and is refused.
+            if (!corners.All(p => p.X < 0) && !corners.All(p => p.Y < bottom) && !corners.All(p => p.Y > top))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IntersectsAny(PdfRect bounds, IReadOnlyList<PdfRect> regions)
