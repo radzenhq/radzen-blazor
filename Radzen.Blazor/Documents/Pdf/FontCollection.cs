@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -127,7 +128,8 @@ public sealed class FontCollection
             }
         }
 
-        return FromBytes(ReadFully(font), sharedWithCaller: false);
+        // Uncapped: a font is bounded by the caller, not by a document's size limit.
+        return FromBytes(DocumentReader.ReadFully(font, long.MaxValue), sharedWithCaller: false);
     }
 
     private static ParsedSource FromBytes(byte[] bytes, bool sharedWithCaller)
@@ -477,16 +479,4 @@ public sealed class FontCollection
     private static bool IsCollection(byte[] data)
         => data.Length >= 4
             && ((uint)data[0] << 24 | (uint)data[1] << 16 | (uint)data[2] << 8 | data[3]) == TtcTag;
-
-    private static byte[] ReadFully(Stream stream)
-    {
-        if (stream is MemoryStream ms)
-        {
-            return ms.ToArray();
-        }
-
-        using var buffer = new MemoryStream();
-        stream.CopyTo(buffer);
-        return buffer.ToArray();
-    }
 }
