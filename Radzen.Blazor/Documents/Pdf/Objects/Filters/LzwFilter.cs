@@ -88,16 +88,18 @@ internal static class LzwFilter
         int width = 9;
         int nextCode = 258;
         int previous = -1;
-        int bitPos = 0;
+        long bitPos = 0;
 
-        int totalBits = data.Length * 8;
+        // 8 * int.MaxValue does not fit an int: a >= 256 MB stage output overflowed to a
+        // negative total, skipped the loop and returned an empty stream with no error.
+        long totalBits = (long)data.Length * 8;
 
         while (bitPos + width <= totalBits)
         {
             int code = 0;
             for (int i = 0; i < width; i++)
             {
-                int bit = (data[bitPos >> 3] >> (7 - (bitPos & 7))) & 1;
+                int bit = (data[bitPos >> 3] >> (7 - (int)(bitPos & 7))) & 1;
                 code = (code << 1) | bit;
                 bitPos++;
             }
