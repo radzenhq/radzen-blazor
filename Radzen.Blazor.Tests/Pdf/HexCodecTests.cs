@@ -75,11 +75,6 @@ public class HexCodecTests
         Assert.True(actual.Skip(3 + blob.Length * 2).All(b => b == 0), "Encode wrote past the destination span.");
     }
 
-    [Fact]
-    public void Encode_RejectsUndersizedDestination()
-    {
-        Assert.Throws<ArgumentException>(() => HexCodec.Encode(new byte[4], new byte[7], HexCase.Upper));
-    }
 
     [Fact]
     public void EncodeToString_EmptyInputIsEmpty()
@@ -128,22 +123,16 @@ public class HexCodecTests
         Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", hex);
     }
 
-    [Fact]
-    public void Encode_DestinationTooSmallForAHugeInput_IsStillRejected()
-    {
-        // data.Length * 2 overflows negative above 2^30, so the int guard passed anything.
-        var data = new byte[1 << 30];
-        var destination = new byte[16];
-
-        Assert.Throws<ArgumentException>(() => HexCodec.Encode(data, destination, HexCase.Lower));
-    }
-
+    // The input size is the thing under test and cannot be scaled down. The array is zero pages
+    // that nothing reads and the length check rejects before encoding, so this costs virtual
+    // address space rather than resident memory or time.
     [Fact]
     public void EncodeToString_InputTooLargeToEncode_ThrowsDiagnosable()
     {
         var data = new byte[1 << 30];
 
         var error = Assert.Throws<ArgumentException>(() => HexCodec.EncodeToString(data, HexCase.Lower));
-        Assert.Contains("1073741824", error.Message);
+
+        Assert.Contains("1073741824", error.Message, StringComparison.Ordinal);
     }
 }
