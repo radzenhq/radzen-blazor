@@ -63,14 +63,11 @@ internal static class ContentEmitter
         }
     }
 
-    // Circle-approximation constant for a quarter arc drawn as one cubic Bezier.
-    private const double BezierArcKappa = 0.5522847498307936;
-
     // Writes a rounded-rectangle path (m/l/c ops, closed with h) starting at the bottom-left
     // corner's end point and running counterclockwise. The caller appends the paint operator.
     public static void WriteRoundedRect(ContentWriter writer, double x, double y, double width, double height, double radius)
     {
-        var offset = radius * BezierArcKappa;
+        var offset = radius * BezierGeometry.Kappa;
         var right = x + width;
         var top = y + height;
         WritePoint(writer, x + radius, y, " m\n");
