@@ -1,6 +1,5 @@
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
-using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf;
 
@@ -53,16 +52,18 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
             return;
         }
 
-        var bytes = WinAnsiText.Encode(watermark.Text, OnUnencodable.Throw, WatermarkGeometry.EncodingContext);
-        var metrics = Base14Metrics.Resolve(watermark.Font) ?? Base14Metrics.Resolve(new Font())!;
+        // This stream cannot embed a font file (Document.FontScope, CanEmbed: false), so a
+        // watermark in a registered family is rejected here by RegisterFont rather than
+        // embedded as the authored path embeds it.
+        var plan = WatermarkTextPlan.Base14(watermark.Text, watermark.Font);
         ContentEmitter.WriteTextShow(writer, new TextShowOp
         {
             FontKey = writer.RegisterFont(watermark.Font),
             Size = watermark.Font.Size,
-            X = WatermarkGeometry.Centered(metrics.MeasureString(watermark.Text, watermark.Font.Size)),
-            Baseline = WatermarkGeometry.Baseline(watermark.Font.Size),
+            X = plan.X,
+            Baseline = plan.Baseline,
             Color = watermark.Font.Color,
-            Bytes = bytes,
+            Bytes = plan.Bytes,
         });
     }
 }
