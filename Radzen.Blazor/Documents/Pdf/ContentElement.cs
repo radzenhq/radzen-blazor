@@ -62,7 +62,7 @@ public abstract class ContentElement : ITracksChanges
         if (IsArtifact)
         {
             writer.WriteName("Artifact");
-            writer.WriteRaw(" BDC\n");
+            writer.WriteRaw(" BMC\n");
         }
 
         var transformed = transform != Matrix.Identity;

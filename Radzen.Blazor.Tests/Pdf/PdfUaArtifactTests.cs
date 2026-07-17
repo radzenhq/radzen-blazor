@@ -120,7 +120,7 @@ public class PdfUaArtifactTests
     public void TaggedDocument_HeaderContentIsInsideArtifact()
     {
         var content = ContentString(AuthorBanded(ua: true));
-        Assert.Contains("/Artifact BDC", content, StringComparison.Ordinal);
+        Assert.Contains("/Artifact BMC", content, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -182,18 +182,19 @@ public class ContentElementTests
         var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
         var operators = ContentStreamTokenizer.Operators(content);
 
-        Assert.Contains("BDC", operators);
+        Assert.Contains("BMC", operators);
         Assert.Contains("EMC", operators);
 
-        var bdc = FindOperator(content, "BDC");
-        Assert.NotNull(bdc);
-        Assert.Equal(ContentTokenKind.Name, bdc!.Operands[0].Kind);
-        Assert.Equal("Artifact", bdc.Operands[0].Text);
+        var bmc = FindOperator(content, "BMC");
+        Assert.NotNull(bmc);
+        Assert.Single(bmc!.Operands);
+        Assert.Equal(ContentTokenKind.Name, bmc.Operands[0].Kind);
+        Assert.Equal("Artifact", bmc.Operands[0].Text);
 
-        var bdcIndex = operators.IndexOf("BDC");
+        var bmcIndex = operators.IndexOf("BMC");
         var emcIndex = operators.IndexOf("EMC");
         var tjIndex = operators.IndexOf("Tj");
-        Assert.True(bdcIndex < tjIndex);
+        Assert.True(bmcIndex < tjIndex);
         Assert.True(tjIndex < emcIndex);
     }
 
