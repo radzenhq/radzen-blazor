@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
@@ -158,5 +159,14 @@ public class Ascii85FilterTests
         var data = new byte[] { 0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0 };
         var decoded = Ascii85Filter.Decode(Ascii85Filter.Encode(data));
         Assert.Equal(data, decoded);
+    }
+
+    // The shared reader reports the offset; the filter's message must still name the byte.
+    [Fact]
+    public void AsciiHex_BadDigit_MessageNamesTheOffendingByte()
+    {
+        var e = Assert.Throws<InvalidDataException>(() => AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("48ZZ>")));
+
+        Assert.Contains("0x5A", e.Message);
     }
 }

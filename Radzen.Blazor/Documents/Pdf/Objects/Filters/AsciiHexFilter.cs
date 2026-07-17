@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
@@ -12,44 +11,17 @@ internal static class AsciiHexFilter
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        var output = new List<byte>();
-        int high = -1;
+        var position = 0;
 
-        foreach (byte b in data)
+        try
         {
-            if (b == (byte)'>')
-            {
-                break;
-            }
-
-            if (IsWhitespace(b))
-            {
-                continue;
-            }
-
-            int value = HexValue(b);
-            if (value < 0)
-            {
-                throw new InvalidDataException($"Invalid ASCIIHex character 0x{b:X2}.");
-            }
-
-            if (high < 0)
-            {
-                high = value;
-            }
-            else
-            {
-                output.Add((byte)((high << 4) | value));
-                high = -1;
-            }
+            return Lexer.ReadHexDigits(data, ref position, Lexer.Recovery.Strict, Lexer.HexEnd.Optional);
         }
-
-        if (high >= 0)
+        catch (DocumentParseException e)
         {
-            output.Add((byte)(high << 4));
+            // The Filters layer reports a corrupt payload as InvalidDataException (see Ascii85Filter).
+            throw new InvalidDataException($"Invalid ASCIIHex character 0x{data[e.Offset]:X2}.", e);
         }
-
-        return [.. output];
     }
 
     public static byte[] Encode(byte[] data)
@@ -68,17 +40,6 @@ internal static class AsciiHexFilter
         output[j] = (byte)'>';
         return output;
     }
-
-    static bool IsWhitespace(byte b) =>
-        b is 0 or 9 or 10 or 12 or 13 or 32;
-
-    static int HexValue(byte b) => b switch
-    {
-        >= (byte)'0' and <= (byte)'9' => b - '0',
-        >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
-        >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
-        _ => -1,
-    };
 }
 
 internal sealed class AsciiHexStreamFilter : IStreamFilter

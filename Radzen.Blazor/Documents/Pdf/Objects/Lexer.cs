@@ -66,6 +66,16 @@ internal sealed class Lexer(byte[] data, int position)
         Lenient,
     }
 
+    // Whether a hex string's closing '>' is required is a separate axis from Recovery: the
+    // 7.3.4.3 string object needs it as a delimiter, while for the 7.4.2 ASCIIHexDecode
+    // filter the stream /Length already bounds the data, so running out is legal there even
+    // though a bad digit is still fatal.
+    public enum HexEnd
+    {
+        Required,
+        Optional,
+    }
+
     public static bool IsNumberStart(byte b)
         => b is (byte)'+' or (byte)'-' or (byte)'.' or (>= (byte)'0' and <= (byte)'9');
 
@@ -389,13 +399,24 @@ internal sealed class Lexer(byte[] data, int position)
     private Token ReadHexString()
         => Token.String(TokenKind.HexString, ReadHexString(data, ref position, Recovery.Strict));
 
-    // ISO 32000-1 7.3.4.3: hex digit pairs, whitespace ignored, an odd trailing digit padded
-    // with a zero. Position enters on '<' and leaves past the '>'. A lenient reader skips
-    // bytes that are not hex digits and returns what it decoded when the '>' never arrives.
+    // ISO 32000-1 7.3.4.3: position enters on '<' and leaves past the '>', which this grammar
+    // requires. The digits themselves are read by ReadHexDigits.
     public static byte[] ReadHexString(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
         position++;
+        return ReadHexDigits(data, ref position, recovery, recovery == Recovery.Lenient ? HexEnd.Optional : HexEnd.Required, start);
+    }
+
+    // ISO 32000-1 7.3.4.3 / 7.4.2: hex digit pairs, whitespace ignored, an odd trailing digit
+    // padded with a zero, '>' ends. Position enters on the first digit and leaves past the '>'.
+    public static byte[] ReadHexDigits(byte[] data, ref int position, Recovery recovery, HexEnd end, int start = -1)
+    {
+        if (start < 0)
+        {
+            start = position;
+        }
+
         var bytes = new List<byte>();
         var hasHigh = false;
         var high = 0;
@@ -435,7 +456,7 @@ internal sealed class Lexer(byte[] data, int position)
             }
         }
 
-        return recovery == Recovery.Lenient
+        return end == HexEnd.Optional
             ? Flush(bytes, hasHigh, high)
             : throw new DocumentParseException("Unterminated hexadecimal string.", start);
     }

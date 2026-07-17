@@ -293,4 +293,60 @@ public class LexerTests
         Assert.Equal(TokenKind.Keyword, tokens[2].Kind);
         Assert.Equal("R", tokens[2].Text);
     }
+
+    private static byte[] Digits(string text, Lexer.Recovery recovery, Lexer.HexEnd end)
+    {
+        var position = 0;
+        return Lexer.ReadHexDigits(Encoding.Latin1.GetBytes(text), ref position, recovery, end);
+    }
+
+    // The two axes are independent: what a bad digit costs, and what a missing '>' costs.
+    // (Strict, Optional) is the ASCIIHexDecode filter's combination and the reason the axes
+    // cannot share one flag.
+    [Fact]
+    public void HexDigits_StrictDigit_OptionalEnd_RejectsBadDigitButAcceptsMissingEod()
+    {
+        Assert.Equal(new byte[] { 0x48, 0x65 }, Digits("4865", Lexer.Recovery.Strict, Lexer.HexEnd.Optional));
+        Assert.Throws<DocumentParseException>(() => Digits("48ZZ>", Lexer.Recovery.Strict, Lexer.HexEnd.Optional));
+    }
+
+    [Fact]
+    public void HexDigits_LenientDigit_RequiredEnd_SkipsBadDigitButRejectsMissingEod()
+    {
+        Assert.Equal(new byte[] { 0x48, 0x65 }, Digits("48Z65>", Lexer.Recovery.Lenient, Lexer.HexEnd.Required));
+        Assert.Throws<DocumentParseException>(() => Digits("4865", Lexer.Recovery.Lenient, Lexer.HexEnd.Required));
+    }
+
+    [Fact]
+    public void HexDigits_OddTrailingDigit_ZeroPads()
+    {
+        Assert.Equal(new byte[] { 0x40 }, Digits("4>", Lexer.Recovery.Strict, Lexer.HexEnd.Required));
+        Assert.Equal(new byte[] { 0x40 }, Digits("4", Lexer.Recovery.Strict, Lexer.HexEnd.Optional));
+    }
+
+    [Fact]
+    public void HexDigits_SkipsTheSameWhitespaceAsTheLexer()
+    {
+        foreach (var ws in new byte[] { 0, 9, 10, 12, 13, 32 })
+        {
+            Assert.True(Lexer.IsWhitespace(ws));
+            var position = 0;
+            var data = new byte[] { (byte)'4', ws, (byte)'8', (byte)'>' };
+            Assert.Equal(new byte[] { 0x48 }, Lexer.ReadHexDigits(data, ref position, Lexer.Recovery.Strict, Lexer.HexEnd.Required));
+        }
+    }
+
+    [Fact]
+    public void ReadHexString_UnterminatedOffset_PointsAtTheOpeningDelimiter()
+    {
+        var position = 3;
+        var data = Encoding.Latin1.GetBytes("   <4865");
+        var e = Assert.Throws<DocumentParseException>(() =>
+        {
+            var p = position;
+            Lexer.ReadHexString(data, ref p, Lexer.Recovery.Strict);
+        });
+
+        Assert.Equal(3L, e.Offset);
+    }
 }
