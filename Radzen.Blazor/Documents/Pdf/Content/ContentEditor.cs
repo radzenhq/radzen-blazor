@@ -78,7 +78,7 @@ internal static class ContentEditor
     }
 
     public static ContentEmissionResult Reemit(byte[] source, ContentCollection current, IReadOnlyList<SourceElement> original,
-        string fontPrefix, string imagePrefix, string extGStatePrefix)
+        Fonts.FontScope scope, string fontPrefix, string imagePrefix, string extGStatePrefix)
     {
         var byElement = new Dictionary<ContentElement, SourceElement>();
         foreach (var item in original)
@@ -111,7 +111,7 @@ internal static class ContentEditor
         }
 
         tail.AddRange(pending);
-        using var writer = new ContentWriter(fontPrefix, imagePrefix, extGStatePrefix);
+        using var writer = new ContentWriter(scope, fontPrefix, imagePrefix, extGStatePrefix);
         var cursor = 0;
         foreach (var item in original)
         {

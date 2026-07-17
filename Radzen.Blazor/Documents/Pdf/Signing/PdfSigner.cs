@@ -320,7 +320,10 @@ public static class PdfSigner
         }
 
         var font = new Font { Name = "Helvetica", Size = 9 };
-        return FieldAppearances.BuildSignatureAppearance(lines, appearance.Width, appearance.Height, font);
+        // Signing works on finished bytes, not a Document, so no registry or conformance level
+        // is knowable here; the appearance can only ever use a base-14 face.
+        return FieldAppearances.BuildSignatureAppearance(
+            lines, appearance.Width, appearance.Height, font, scope: default);
     }
 
     // Returns the page leaf at the given zero-based index in document order, so a

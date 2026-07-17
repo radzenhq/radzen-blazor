@@ -175,7 +175,7 @@ internal static class AnnotationEmitter
         }
 
         Populate(annotation, dictionary, context);
-        var appearance = BuildAppearance(annotation, context.Writer);
+        var appearance = BuildAppearance(annotation, context.Writer, context.Pages[context.PageIndex].Page.FontScope);
         if (appearance is not null)
         {
             dictionary["AP"] = new DictionaryObject { ["N"] = context.Writer.Add(appearance) };
@@ -302,7 +302,7 @@ internal static class AnnotationEmitter
         }
     }
 
-    private static StreamObject? BuildAppearance(Annotation annotation, IObjectWriter writer)
+    private static StreamObject? BuildAppearance(Annotation annotation, IObjectWriter writer, Fonts.FontScope scope)
     {
         var elements = AnnotationAppearanceBuilder.Build(annotation);
         if (elements.Count == 0)
@@ -310,7 +310,7 @@ internal static class AnnotationEmitter
             return null;
         }
 
-        using var content = new ContentWriter("AF", "AIm");
+        using var content = new ContentWriter(scope, "AF", "AIm");
         if (annotation.Opacity < 1)
         {
             content.WriteName("AGS");

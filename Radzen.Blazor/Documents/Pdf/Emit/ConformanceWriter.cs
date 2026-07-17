@@ -180,10 +180,10 @@ internal sealed class ConformanceWriter(Document document)
             }
         }
 
-        // Overlay text added through Page.Content emits a non-embedded base-14 Type1
-        // font, which the generated.Fonts scan above cannot see; reject it with the
-        // same error the generator raises. Loaded original text keeps its own font
-        // reference (FontResourceName) and is not re-emitted as a base-14 face.
+        // Kept as a backstop only for its timing: Page.BuildContent's resolve seam rejects this
+        // same overlay text with this same error, but not until the content stream is being
+        // written, which would leave partial bytes in the caller's stream. Loaded original text
+        // keeps its own font reference (FontResourceName) and is not re-emitted as a base-14 face.
         foreach (var page in document.Pages)
         {
             foreach (var element in page.Content)
@@ -194,7 +194,7 @@ internal sealed class ConformanceWriter(Document document)
                 }
 
                 throw Fonts.FontResolution.Base14Forbidden(
-                    Label, Fonts.FontResolution.ResolveBase14Name(text.Font), text.Font.Name);
+                    Label, Fonts.FontResolution.ResolveBase14Name(text.Font, scope: default), text.Font.Name);
             }
         }
     }

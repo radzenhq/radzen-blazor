@@ -44,6 +44,10 @@ public sealed class Page
     // page inserted into further documents still carries from the document that owns its state.
     internal Document? Owner { get; set; }
 
+    // A page with no owner is not being saved through a document, so no registry and no
+    // conformance level can apply to what is written onto it.
+    internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
+
     /// <summary>Gets the page width in points.</summary>
     public Unit Width => width;
 
@@ -343,7 +347,7 @@ public sealed class Page
 
         var reserved = new HashSet<string>(reservedResourceNames ?? []);
         AddResourceNames(reserved, editedResources);
-        var emission = ContentEditor.Reemit(content, elements, sourceElements,
+        var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
             SafePrefix("F", reserved), SafePrefix("Im", reserved), SafePrefix("GS", reserved));
         if (emission.Resources.Patterns.Count > 0)
         {
@@ -394,6 +398,7 @@ public sealed class Page
         if (pendingAppends.Count > 0)
         {
             using var pending = new ContentWriter(
+                FontScope,
                 SafePrefix("SF", reservedNames),
                 SafePrefix("SIm", reservedNames),
                 SafePrefix("SGS", reservedNames));
@@ -424,6 +429,7 @@ public sealed class Page
             }
 
             using var appended = new ContentWriter(
+                FontScope,
                 SafePrefix("SF", reservedNames),
                 SafePrefix("SIm", reservedNames),
                 SafePrefix("SGS", reservedNames));
@@ -440,7 +446,7 @@ public sealed class Page
 
         if (content is not null && sourceElements is not null)
         {
-            var emission = ContentEditor.Reemit(content, elements, sourceElements,
+            var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
                 SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames), SafePrefix("GS", reservedNames));
             return new ContentEmissionResult(emission.Bytes,
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
@@ -449,6 +455,7 @@ public sealed class Page
         // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
         // dodge the loaded page's resource names so MergeResources cannot overwrite them.
         using var writer = new ContentWriter(
+            FontScope,
             SafePrefix("F", reservedNames),
             SafePrefix("Im", reservedNames),
             SafePrefix("GS", reservedNames));
@@ -493,7 +500,7 @@ public sealed class Page
             return null;
         }
 
-        using var writer = new ContentWriter("SF", "SIm", "SGS");
+        using var writer = new ContentWriter(FontScope, "SF", "SIm", "SGS");
         foreach (var element in elements)
         {
             element.Emit(writer);

@@ -29,7 +29,8 @@ public class FieldAppearanceFontResourceTests
 
     private static DictionaryObject FontDictionaryOf(string family)
     {
-        var appearance = FieldAppearances.BuildText("a", 80, 20, new Font { Name = family, Size = 12 });
+        var appearance = FieldAppearances.BuildText(
+            "a", 80, 20, new Font { Name = family, Size = 12 }, scope: default);
         var resources = Assert.IsType<DictionaryObject>(appearance.Dictionary["Resources"]);
         var fonts = Assert.IsType<DictionaryObject>(resources["Font"]);
 

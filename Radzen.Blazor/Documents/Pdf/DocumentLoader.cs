@@ -55,7 +55,7 @@ internal static class DocumentLoader
         if (reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
             state.SourceAcroForm = form;
-            document.AcroForm = new AcroForm(reader, form);
+            document.AcroForm = new AcroForm(reader, form, document);
         }
 
         ReadAttachments(reader, catalog, document, limits);

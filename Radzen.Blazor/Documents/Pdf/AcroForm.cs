@@ -24,6 +24,7 @@ public sealed class AcroForm
     private const int CombFlag = 1 << 24;
 
     private readonly DocumentReader reader;
+    private readonly Document owner;
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
 
@@ -41,9 +42,10 @@ public sealed class AcroForm
     // self-referencing /Kids tree instead of recursing into a StackOverflow.
     private readonly HashSet<DictionaryObject> visiting = [];
 
-    internal AcroForm(DocumentReader reader, DictionaryObject dictionary)
+    internal AcroForm(DocumentReader reader, DictionaryObject dictionary, Document owner)
     {
         this.reader = reader;
+        this.owner = owner;
         Dictionary = dictionary;
 
         if (reader.GetArray(dictionary, "Fields") is { } entries)
@@ -398,7 +400,8 @@ public sealed class AcroForm
         var (width, height) = RectSize(widget);
         var (daFont, daSize) = DefaultAppearance(terminal, widget);
         var fontSize = daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize;
-        return FieldAppearances.BuildText(value, width, height, FieldAppearances.AppearanceFont(daFont, fontSize));
+        return FieldAppearances.BuildText(
+            value, width, height, FieldAppearances.AppearanceFont(daFont, fontSize), owner.FontScope);
     }
 
     private (double Width, double Height) RectSize(DictionaryObject field)

@@ -11,7 +11,7 @@ internal sealed class FormAppearanceService(Document document)
     public bool HasAppendedDefaults => appendedFormDefaults.Count > 0;
 
     public StreamObject BuildText(string value, double width, double height, Font font)
-        => FieldAppearances.BuildText(value, width, height, font);
+        => FieldAppearances.BuildText(value, width, height, font, document.FontScope);
 
     public StreamObject BuildCheck(double width, double height)
         => FieldAppearances.BuildCheck(width, height);
@@ -102,6 +102,6 @@ internal sealed class FormAppearanceService(Document document)
             _ => null,
         };
 
-    private static string BaseFontOf(Font font)
-        => Fonts.FontResolution.ResolveBase14Name(font);
+    private string BaseFontOf(Font font)
+        => Fonts.FontResolution.ResolveBase14Name(font, document.FontScope);
 }
