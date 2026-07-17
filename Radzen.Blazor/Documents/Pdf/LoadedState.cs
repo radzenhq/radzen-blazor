@@ -3,19 +3,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
 
-// The cohesive, Document-owned holder for everything a document carries because
-// some of its pages came from a parsed source: the original reader and its
-// catalog/AcroForm, the exact original bytes (for an incremental re-save), the
-// load-time metadata snapshot, per-page source attributes, and the handles that
-// let an appended loaded page re-serialize faithfully. A freshly built document
-// with no loaded or appended source pages has no LoadedState (Document.Loaded is
-// null); DocumentLoader constructs a fully loaded one, and Document.Append lazily
-// creates an append-only one (Source/SourceBytes null) to carry merged pages.
 internal sealed class LoadedState
 {
-    // Per-page source attributes captured at load and carried through Append, read
-    // on save so an untouched loaded page re-serializes with its original node,
-    // effective /Resources, media/crop boxes and rotation.
     public Dictionary<Page, DictionaryObject> SourcePages { get; } = [];
 
     public List<Page> LoadedPages { get; } = [];
@@ -30,56 +19,42 @@ internal sealed class LoadedState
 
     public Dictionary<Page, (PdfRect? Bleed, PdfRect? Trim, PdfRect? Art, int Rotate)> LoadedPageSettings { get; } = [];
 
-    // Handles for pages appended from another loaded document: each appended page's
-    // reader plus effective /Resources and source node, and each donor reader's
-    // AcroForm, imported lazily on save.
     public Dictionary<Page, (DocumentReader Reader, DictionaryObject Resources)> AppendedResources { get; } = [];
 
     public Dictionary<Page, (DocumentReader Reader, DictionaryObject Node)> AppendedPages { get; } = [];
 
     public Dictionary<DocumentReader, DictionaryObject> AppendedAcroForms { get; } = [];
 
-    // The parsed source reader and its catalog/AcroForm, set only when this document
-    // was itself loaded (null for an append-only carry state).
+    // Null for an append-only carry state: the document was not itself loaded.
     public DocumentReader? Source { get; }
 
     public DictionaryObject? SourceCatalog { get; set; }
 
     public DictionaryObject? SourceAcroForm { get; set; }
 
-    // The exact original file bytes retained by DocumentLoader, so SaveIncremental can
-    // preserve them verbatim as the prefix of the incremental output. Null unless loaded.
+    // Retained verbatim because SaveIncremental emits them as the literal prefix of its
+    // output; any normalization here would break the byte offsets the source xref records.
     public byte[]? SourceBytes { get; }
 
-    // The source /Info dictionary, so a full save can carry through the entries
-    // DocumentInfo does not model (/Trapped and any custom key).
+    // Retained so a full save carries through the /Info entries DocumentInfo does not
+    // model (/Trapped and any custom key), which would otherwise be dropped.
     public DictionaryObject? SourceInfo { get; set; }
 
     public bool OutlineRequiresRewrite { get; set; }
 
-    // Append-only carry state: created lazily when a fresh (or already-loaded)
-    // document receives pages appended from a loaded source.
     public LoadedState()
     {
     }
 
-    // Loaded state: created by DocumentLoader for a document parsed from a source.
     public LoadedState(DocumentReader source, byte[] sourceBytes)
     {
         Source = source;
         SourceBytes = sourceBytes;
     }
 
-    // Records an appended loaded page's reader and effective /Resources so its
-    // fonts/images still resolve on save.
     public void RecordAppendedResources(Page page, DocumentReader reader, DictionaryObject resources)
         => AppendedResources[page] = (reader, resources);
 
-    // Carries an appended page's source-derived attributes from the donor document's
-    // loaded state: its source node (for /Annots and widget form fields) and donor
-    // AcroForm, plus its media/crop boxes and rotation. Also carries through a chained
-    // append, since a document produced by Append records the same entries under its
-    // own keys even when it has no Source of its own.
     public void CarryAppended(Page page, Page source, LoadedState origin)
     {
         if (origin.Source is { } reader && origin.SourcePages.TryGetValue(source, out var sourceNode))
@@ -107,10 +82,8 @@ internal sealed class LoadedState
         }
     }
 
-    // Carries a page inserted into this document directly from another one. The page
-    // instance is shared with the donor rather than copied, so every entry is keyed by the
-    // page itself: its effective /Resources plus everything CarryAppended carries, and the
-    // donor's own appended handles when the page had in turn been merged into the donor.
+    // The page instance is shared with the donor rather than copied, so every entry is
+    // keyed by the page itself (hence CarryAppended(page, page, origin)).
     public void CarryForeign(Page page, LoadedState origin)
     {
         if (origin.Source is { } reader && origin.SourceResources.TryGetValue(page, out var resources))
@@ -134,7 +107,6 @@ internal sealed class LoadedState
         }
     }
 
-    // Drops the loaded AcroForm handle after FormWriter flattens it, so the next
-    // save emits no /AcroForm.
+    // Dropping the handle is what makes the next save emit no /AcroForm, after flattening.
     public void ClearAcroForm() => SourceAcroForm = null;
 }

@@ -6,12 +6,10 @@ using Radzen.Documents.Pdf.Objects;
 namespace Radzen.Documents.Pdf.Content;
 
 
-// Shared content-stream tokenizer for the page-content grammar (operators, operands,
-// arrays/dicts and BI/ID/EI inline images captured whole as a single token). Both
-// ContentInterpreter and TextSearch consume this stream; each consumer filters the
-// tokens it cares about. What the operands themselves are - numbers, strings, hex strings,
-// names - is the one PDF object syntax, read here through Objects/Lexer with lenient
-// recovery so a corrupt stream still renders. Only the operator layer lives here.
+// Only the operator layer lives here. What the operands themselves are - numbers, strings,
+// hex strings, names - is the one PDF object syntax, so it is read through Objects/Lexer
+// (lenient recovery, so a corrupt stream still renders) rather than re-implemented here: a
+// second operand grammar would drift from the one the object parser enforces.
 internal static class ContentTokenizer
 {
     internal enum TokenKind
@@ -29,11 +27,10 @@ internal static class ContentTokenizer
 
     internal readonly record struct Token(TokenKind Kind, double Number, string? Text, byte[]? Bytes, int Start, int End);
 
-    // One tokenization shared by the consumers of a single Find/Replace/Redact/materialize
-    // operation, which otherwise re-tokenize identical bytes up to three times. Scoped to the
-    // call that creates it: a longer-lived cache would trade transient churn for retention.
-    // Reference identity is the key, so an edit that swaps the byte[] cannot hit a stale entry;
-    // one slot is enough because an operation only ever moves forward onto its edited bytes.
+    // Scoped to the single operation that creates it: a longer-lived cache would trade
+    // transient churn for retention. Reference identity is the key, so an edit that swaps the
+    // byte[] cannot hit a stale entry; one slot is enough because an operation only ever moves
+    // forward onto its edited bytes.
     internal sealed class Cache
     {
         private byte[]? source;

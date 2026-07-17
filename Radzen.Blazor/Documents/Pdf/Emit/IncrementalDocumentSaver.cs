@@ -5,13 +5,9 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Serializes the changes made to a loaded Document as a PDF incremental update.
-// Only the objects the caller mutated since loading are re-emitted, over the
-// original bytes, via the low-level Objects.IncrementalUpdateWriter (the same
-// mechanism PdfSigner/DssBuilder use). Supported edits: document /Info metadata,
-// filled/checked AcroForm fields, page and annotation dictionary edits, and a
-// directly rooted page-tree reorder. Anything that would need the full-save Emit
-// pipeline to re-encode fails loud rather than silently falling back to a rewrite.
+// Serializes the changes made to a loaded Document as a PDF incremental update. Anything
+// that would need the full-save Emit pipeline to re-encode fails loud rather than silently
+// falling back to a rewrite.
 internal sealed class IncrementalDocumentSaver
 {
     private readonly Document doc;
@@ -123,10 +119,8 @@ internal sealed class IncrementalDocumentSaver
         return result;
     }
 
-    // Re-emits each loaded field/widget/form dictionary a caller mutated through
-    // AcroForm, hoisting any newly-built inline appearance stream to its own
-    // appended object. Overrides are applied in object-number order so the update
-    // is deterministic regardless of the tracking set's iteration order.
+    // Overrides are applied in object-number order so the update is deterministic
+    // regardless of the tracking set's iteration order.
     private bool WriteFieldEdits(IncrementalUpdateWriter writer, IReadOnlyDictionary<DocumentObject, int> index)
     {
         if (doc.AcroForm is not { } form || form.ChangedObjects.Count == 0)
@@ -443,9 +437,8 @@ internal sealed class IncrementalDocumentSaver
         return changed;
     }
 
-    // Emits an /Info override (or a new /Info object) only when a modeled metadata
-    // field differs from its load-time value. Unmodeled /Info keys and the values
-    // of untouched modeled keys are preserved from the original dictionary.
+    // Unmodeled /Info keys and the values of untouched modeled keys are preserved from
+    // the original dictionary.
     private bool WriteMetadata(IncrementalUpdateWriter writer, DocumentReader reader)
     {
         if (!doc.Info.IsModified)

@@ -81,11 +81,6 @@ public static class PdfSigner
             "Increase SignatureOptions.SignatureMaxSizeBytes.");
     }
 
-    // Registers a caller-built signature dictionary as a signature field/widget
-    // via an incremental update: adds the sig dictionary, the widget annotation
-    // (with an optional appearance stream), merges the AcroForm and the page
-    // /Annots, serializes, and reports where the sig dictionary starts/ends so
-    // its /ByteRange and /Contents placeholders can be patched in isolation.
     // Shared by ordinary signing and the document time-stamper.
     internal static (byte[] Bytes, int SigStart, int SigEnd) AppendSignatureField(
         byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
@@ -147,11 +142,11 @@ public static class PdfSigner
         AppendAnnotation(reader, writer, pageRef, page, fieldRef);
         var bytes = writer.ToArray();
 
-        // Bound the placeholder scan to the signature dictionary's own serialized
-        // bytes. The sig dict is the first appended object and the field is the
-        // next; every object copied from the (possibly hostile) input is an
-        // override with a lower number, so it is written before sigStart and
-        // cannot be mistaken for the real /Contents or /ByteRange placeholder.
+        // Bounds the placeholder scan. Objects are emitted in object-number order and the
+        // sig dict is the first appended one, so every object copied from the (possibly
+        // hostile) input is an override with a lower number, written before sigStart.
+        // Note the window is not the sig dict alone: a visible signature's appearance
+        // stream is added above and lands between sigStart and sigEnd.
         var sigStart = checked((int)writer.OffsetOf(signatureRef));
         var sigEnd = checked((int)writer.OffsetOf(fieldRef));
         return (bytes, sigStart, sigEnd);
@@ -198,8 +193,6 @@ public static class PdfSigner
         return signature;
     }
 
-    // A merged copy of the existing AcroForm (never dropping /Fields) with the
-    // new field appended and /SigFlags carrying SignaturesExist | AppendOnly.
     private static DictionaryObject BuildAcroForm(DocumentReader reader, DictionaryObject? existing, ReferenceObject fieldRef)
     {
         var acroForm = existing is null ? new DictionaryObject() : existing.Copy();
@@ -281,8 +274,6 @@ public static class PdfSigner
         }
     }
 
-    // The signature widget's rectangle: the visible appearance rectangle, or the
-    // historic invisible [0 0 0 0] when no appearance is requested.
     private static ArrayObject SignatureRect(SignatureAppearance? appearance)
     {
         if (appearance is null)
@@ -299,7 +290,6 @@ public static class PdfSigner
         ];
     }
 
-    // Draws the signer name, reason and signing time into the appearance box.
     private static StreamObject BuildAppearanceStream(SignatureOptions options)
     {
         var appearance = options.Appearance!;
@@ -326,8 +316,6 @@ public static class PdfSigner
             lines, appearance.Width, appearance.Height, font, scope: default);
     }
 
-    // Returns the page leaf at the given zero-based index in document order, so a
-    // visible signature can target a specific page (index 0 is the first page).
     private static (ReferenceObject Reference, DictionaryObject Page) FindPage(DocumentReader reader, DictionaryObject catalog, int index)
     {
         if (index < 0)
@@ -346,8 +334,6 @@ public static class PdfSigner
             nameof(index), index, $"The signature page index is past the last page ({counter} pages).");
     }
 
-    // Depth-first in-order walk of the page tree; returns the (ref, dict) when the
-    // running leaf counter reaches the target index.
     private static (ReferenceObject, DictionaryObject)? FindLeaf(
         DocumentReader reader, ReferenceObject nodeRef, int target, ref int counter, int depth)
     {
@@ -422,11 +408,8 @@ public static class PdfSigner
 
     internal delegate byte[] BlobProducer(SignedContent content);
 
-    // Patches /ByteRange in place (length-preserving), hands the two covered
-    // ranges to <paramref name="produceBlob"/> as views into the document itself,
-    // and hex-encodes the returned blob into the /Contents gap. Shared by ordinary
-    // signing (the blob is a CMS SignedData) and document time-stamping (an RFC
-    // 3161 token).
+    // The /ByteRange patch must be length-preserving: it happens after the ranges it
+    // describes are fixed, and any resize would invalidate them.
     internal static byte[] Embed(byte[] bytes, int sigStart, int sigEnd, int reservedBytes,
         BlobProducer produceBlob, string reservedHint)
     {
@@ -453,10 +436,10 @@ public static class PdfSigner
         return bytes;
     }
 
-    // The placeholder is the only run of exactly 2N zero hex digits following a
-    // /Contents key WITHIN the signature dictionary's own bytes [from, end). The
-    // scan is bounded to that object so a /Contents string an attacker planted in
-    // a copied input object (always written before the sig dict) cannot match.
+    // Matches the first /Contents in [from, end) whose value has the placeholder shape.
+    // [from, end) starts at the sig dict, so a /Contents an attacker planted in a copied
+    // input object (written before `from`) is out of range, and the sig dict's own
+    // placeholder is reached before anything appended after it.
     private static (int Start, int End) FindContentsGap(byte[] bytes, int from, int end, int hexDigits)
     {
         const string key = "/Contents";

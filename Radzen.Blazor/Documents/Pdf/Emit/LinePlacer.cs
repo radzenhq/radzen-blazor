@@ -1,10 +1,7 @@
 namespace Radzen.Documents.Pdf.Emit;
 
-// The widow/orphan/keep-together/keep-with-next placement policy, lifted verbatim out of
-// Paginator's paragraph loop into a pure decision so it can be unit-tested directly.
-// Given how many of a paragraph's remaining lines physically fit and the keep settings,
-// it returns how many lines to place now and whether the whole remainder moves to the
-// next page - including the progress-guards that keep the paginator from stalling.
+// The widow/orphan/keep-together/keep-with-next placement policy, kept a pure decision so it
+// can be unit-tested apart from Paginator's paragraph loop.
 internal readonly struct LinePlacementRequest
 {
     /// <summary>Lines from the current offset that physically fit in the remaining height.</summary>

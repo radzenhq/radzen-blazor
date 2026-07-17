@@ -35,17 +35,14 @@ public sealed class Page
         mediaBox = PdfRect.FromSize(0, 0, width.Point, height.Point);
     }
 
-    // Pre-generated content and resources produced by DocumentBuilder.Build; when set,
-    // the document writer emits these bytes and resources directly (see Document.SaveToStream).
     internal GeneratedPage? Generated { get; set; }
 
-    // The document this page was first added to, and whose LoadedState therefore holds the
-    // page's source-derived entries. Set once by PageCollection and never reassigned, so a
-    // page inserted into further documents still carries from the document that owns its state.
+    // Set once by PageCollection and never reassigned: a page inserted into further
+    // documents must still resolve against the document whose LoadedState holds its entries.
     internal Document? Owner { get; set; }
 
-    // A page with no owner is not being saved through a document, so no registry and no
-    // conformance level can apply to what is written onto it.
+    // A page with no owner is not being saved through a document, so no registry or
+    // conformance level can apply.
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
     /// <summary>Gets the page width in points.</summary>
@@ -200,8 +197,8 @@ public sealed class Page
         ContentReplaced = true;
     }
 
-    // Installs the bytes a page starts life with (parsed source, generator output, a merge
-    // copy). Unlike SetContent this is the page's baseline, not an edit to it.
+    // The page's baseline bytes, not an edit to them: unlike SetContent this must not set
+    // ContentReplaced, or every loaded page would be born modified.
     internal void SetLoadedContent(byte[] value) => SetContentCore(value);
 
     private void SetContentCore(byte[] value)
@@ -282,14 +279,13 @@ public sealed class Page
         textFonts = fonts;
     }
 
-    // The reverse char-code -> Unicode maps used by ExtractText, exposed so Document.Append
-    // can carry them onto a copied page (a Type0/Identity-H stream is not reversible without them).
+    // Exposed so Document.Append can carry them onto a copied page: a Type0/Identity-H
+    // stream is not reversible without them.
     internal IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
 
-    // The page's bytes for every consumer that reads content as data. Queued edits are folded
-    // in first, so a reader cannot see bytes the page has already superseded. The machinery
-    // that must observe the unflushed state - materialization, intactness, and BuildContent's
-    // raw-bytes-plus-overlay path - reads the field directly and deliberately.
+    // Folds queued edits in first, so a reader cannot see bytes the page has already
+    // superseded. Readers that must observe the unflushed state (materialization,
+    // intactness, BuildContent's raw-bytes-plus-overlay path) read the field instead.
     internal byte[]? CurrentContent
     {
         get
@@ -299,10 +295,9 @@ public sealed class Page
         }
     }
 
-    // Whether the retained bytes are still the ones this page was loaded with: they were never
-    // replaced wholesale, no elements were materialized (and so none can have been edited) and
-    // no overlay is queued. Read by PageOperations to decide whether a copy can take the bytes
-    // verbatim.
+    // Materialization implies a possible edit, so it disqualifies intactness even though no
+    // element may have changed. Read by PageOperations to decide whether a copy can take the
+    // bytes verbatim.
     internal bool ContentIsIntact => !ContentReplaced && !materialized && pendingAppends.Count == 0;
 
     // Whether the raw bytes were swapped out from under the element graph, by SetContent or by
@@ -310,10 +305,8 @@ public sealed class Page
     // materialization, so every element-level signal reads as untouched afterwards.
     internal bool ContentReplaced { get; private set; }
 
-    // Stamping a constant-size overlay onto a loaded page must not pay to parse and re-emit
-    // the whole content stream. Queuing the element leaves the raw bytes untouched, so
-    // BuildContent emits exactly the overlay the intact-append path would have produced;
-    // materializing later folds the queue in where Content.Add would have placed it.
+    // Queuing rather than adding keeps a loaded page's raw bytes intact, so stamping an
+    // overlay does not pay to parse and re-emit the whole content stream.
     internal void AppendContent(ContentElement element)
     {
         if (materialized || content is null || Generated is not null)
@@ -386,11 +379,6 @@ public sealed class Page
         ContentReplaced = true;
     }
 
-    // Resolves the content-stream bytes to write. A loaded page that was never materialized
-    // reuses its retained raw bytes. A loaded page whose original elements are intact but
-    // that gained new elements keeps its raw bytes untouched and returns the additions as a
-    // separate overlay stream. Any other modification (or a freshly authored page)
-    // re-encodes from elements; the emitters carry the resources each stream needs.
     internal ContentEmissionResult BuildContent(IReadOnlyCollection<string>? reservedNames = null)
     {
         if (!editedResources.IsEmpty)
@@ -400,8 +388,8 @@ public sealed class Page
             reservedNames = combinedNames;
         }
 
-        // Queued appends imply a loaded page that was never materialized, so its raw bytes
-        // are still intact and only the additions need emitting.
+        // Queued appends imply a never-materialized loaded page, so the raw bytes are still
+        // intact and only the additions need emitting.
         if (pendingAppends.Count > 0)
         {
             using var pending = new ContentWriter(
@@ -498,8 +486,8 @@ public sealed class Page
         return true;
     }
 
-    // A built page keeps the generator's bytes as its base; Content holds only the
-    // user's additions, emitted here as a second content stream appended on save.
+    // A built page keeps the generator's bytes as its base, so Content holds only the user's
+    // additions and they must be emitted as a second stream rather than replacing the base.
     internal ContentEmissionResult? BuildOverlay()
     {
         if (elements.Count == 0)

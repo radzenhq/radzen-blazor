@@ -9,9 +9,6 @@ using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 namespace Radzen.Documents.Pdf.Content;
 
 
-// Parses a page content stream back into ContentElement objects, folding the
-// graphics-state (q/Q, cm) and text (Tm/Td) stacks into an absolute Transform per
-// painted element. The inverse of the C3 emitter.
 internal static class ContentInterpreter
 {
     public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null, ContentTokenizer.Cache? cache = null)
@@ -74,9 +71,9 @@ internal static class ContentInterpreter
 
             var op = token.Text;
 
-            // The shared machine owns q/Q, cm, the text matrices and the text state. What it
-            // consumes has no element of its own, which is also why those operators need no
-            // passthrough: the source bytes carrying them are copied verbatim by the editor.
+            // What the machine consumes has no element of its own and needs no passthrough:
+            // the editor copies the source bytes carrying those operators verbatim, and its
+            // KnownNonElement set must stay in step with what is handled without an Add here.
             if (!interpreter.Machine.Apply(op, interpreter.Operands)
                 && !HandleGraphicsOperators(op, interpreter, target)
                 && !HandleTextOperators(op, interpreter, target)
@@ -97,11 +94,10 @@ internal static class ContentInterpreter
         FinalizeMerge(interpreter);
     }
 
-    // Writes a fold chain's accumulated bytes/text onto the run once, when the chain ends.
-    // Folding leaves the run's SourceBytes/SourceText at their pre-fold values, so every
-    // path that abandons PendingMerge must come through here. The accumulators stay inside
-    // the interpreter and are frozen onto the run here: assigning a still-growing list would
-    // leave the run aliasing a buffer that keeps changing behind its change-detection door.
+    // Folding leaves the run's SourceBytes/SourceText at their pre-fold values, so every path
+    // that abandons PendingMerge must come through here. The accumulators are frozen onto the
+    // run rather than assigned live: a still-growing list would leave the run aliasing a
+    // buffer that keeps changing behind its change-detection door.
     private static void FinalizeMerge(InterpreterState interpreter)
     {
         if (interpreter.PendingMerge is { } run && interpreter.MergeBytes.Count > 0)
@@ -199,8 +195,6 @@ internal static class ContentInterpreter
         return true;
     }
 
-    // The machine has already advanced the line and applied a " operator's own aw/ac, so
-    // every show reads the same text state a viewer would have in effect here.
     private static bool HandleTextOperators(string? op, InterpreterState interpreter, ContentCollection target)
     {
         if (!ContentShows.IsShow(op))
@@ -393,8 +387,8 @@ internal static class ContentInterpreter
 
     private sealed class InterpreterState(IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
-        // An unresolvable Tf leaves the font null so an edited run re-encodes through
-        // WinAnsi substitution rather than failing on a font that was never really there.
+        // Null fallback: an unresolvable Tf leaves Font null so an edited run re-encodes
+        // through WinAnsi rather than failing on a font that was never really there.
         public ContentStateMachine Machine { get; } = new(fonts, fallbackFont: null, new GraphicsState());
 
         public GraphicsState Graphics => (GraphicsState)Machine.State;
@@ -413,7 +407,6 @@ internal static class ContentInterpreter
         public Stack<bool> MarkedContent { get; } = new();
         public TextContent? PendingMerge { get; set; }
 
-        // Growable accumulators for the run PendingMerge points at; empty until a fold happens.
         public List<byte> MergeBytes { get; } = [];
 
         public StringBuilder MergeText { get; } = new();
@@ -450,11 +443,10 @@ internal static class ContentInterpreter
         var decoded = text.Font is not null ? text.Font.Decode(bytes) : Decode(bytes);
         var transform = textMatrix * state.Ctm;
 
-        // The spec advances the text matrix by each shown glyph's width, but the element
-        // model carries no per-run width. Rather than collapse a following show onto the
-        // same origin, fold consecutive shows that share the text matrix and text state
-        // into one run: a single combined show operator lets the renderer advance between
-        // the chunks using the font's own widths.
+        // The spec advances the text matrix by each shown glyph's width, but the element model
+        // carries no per-run width. Folding consecutive shows that share the text matrix and
+        // state into one show operator lets the renderer advance between the chunks using the
+        // font's own widths, instead of collapsing them onto the same origin.
         if (pendingMerge is { SourceBytes: { } pendingBytes, SourceText: not null }
             && pendingMerge.Transform == transform
             && pendingMerge.FontResourceName == text.FontName
@@ -465,9 +457,8 @@ internal static class ContentInterpreter
             && pendingMerge.CharSpacing == text.Spacing.CharSpacing
             && pendingMerge.IsArtifact == (artifactDepth > 0))
         {
-            // The first fold seeds the growable buffers from the run as authored; later folds
-            // append, so a k-show chain copies each chunk once instead of re-copying the whole
-            // run per show. FinalizeMerge writes the result back when the chain ends.
+            // Seed once then append, so a k-show chain copies each chunk once rather than
+            // re-copying the whole run per show.
             if (interpreter.MergeBytes.Count == 0)
             {
                 interpreter.MergeBytes.AddRange(pendingBytes.ToArray());
@@ -627,12 +618,8 @@ internal static class ContentInterpreter
 
     private readonly record struct PathOp(string Operator, double[] Operands);
 
-    // The paint disposition of a path operator: stroke/fill, whether it closes the last
-    // subpath, and even-odd vs nonzero fill.
     private readonly record struct PathPaint(bool Stroke, bool Fill, bool Close, bool EvenOdd);
 
-    // The CTM and text state live in the shared base, which is also what q/Q saves; these
-    // are the extra members only materialization needs.
     private sealed class GraphicsState : ContentGraphicsState
     {
         public Color Fill { get; set; } = Color.Black;
@@ -660,13 +647,13 @@ internal static class ContentInterpreter
     }
 }
 
-// One element of a TJ show array: a string chunk (Text set) or a numeric position
-// adjustment in thousandths of an em (Text null). Preserved so a re-emitted run keeps
-// its intra-run displacements (kerning, inter-word gaps) instead of collapsing to Tj.
+// A string chunk (Text set) or a numeric adjustment in thousandths of an em (Text null),
+// preserved so a re-emitted run keeps its intra-run displacements (kerning, inter-word gaps)
+// instead of collapsing to Tj.
 internal readonly record struct TextAdjustment(byte[]? Text, double Adjustment);
 
-// An operator with no element-model representation, captured verbatim from the decoded
-// token stream and re-emitted unchanged so a full re-encode does not silently drop it.
+// An operator with no element-model representation, kept verbatim so a full re-encode does
+// not silently drop it.
 internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : ContentElement
 {
     public string Operator => op;
@@ -702,10 +689,9 @@ internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : Con
     }
 }
 
-// A BI/ID/EI inline image, captured verbatim from the source bytes. Its payload is opaque
-// binary that the content grammar cannot rewrite, so it is only ever re-emitted unchanged
-// or dropped whole; Transform carries the CTM that maps its unit square onto the page,
-// which is what makes it bounds-testable like any other painted element.
+// A BI/ID/EI inline image. Its payload is opaque binary the content grammar cannot rewrite,
+// so it is only ever re-emitted unchanged or dropped whole; Transform carries the CTM mapping
+// its unit square onto the page, which is what makes it bounds-testable.
 internal sealed class InlineImageContent(byte[] source) : ContentElement
 {
     public byte[] Source => source;

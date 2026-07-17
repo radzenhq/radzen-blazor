@@ -53,11 +53,9 @@ internal readonly struct LaidOutNestedTable
     public int Order { get; init; }
 }
 
-// A NON-special (Stack) container nested inside a table cell or another box, laid out as
-// a first-class nested box: the decoration paints through BoxRenderer and the child
-// content recurses through TableEmitter.EmitBoxContent. Bounds is in the parent's
-// content space (same space as LaidOutNestedTable.X/Y), Radius is already clamped to the
-// box, and Style carries no ExtGState - opacity resolves per page at emit time.
+// Bounds is in the parent's content space (same space as LaidOutNestedTable.X/Y), Radius is
+// already clamped to the box, and Style carries no ExtGState - opacity resolves per page at
+// emit time.
 internal readonly struct LaidOutNestedBox
 {
     public required Container Source { get; init; }

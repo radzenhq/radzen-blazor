@@ -18,8 +18,7 @@ public sealed class DocumentReader
 {
     private readonly ReaderLimits limits;
 
-    // The resource limits this reader enforces, so read-path helpers (font/ToUnicode
-    // reconstruction) honor a caller-tightened budget instead of ReaderLimits.Default.
+    // Exposed so read-path helpers honor a caller-tightened budget, not ReaderLimits.Default.
     internal ReaderLimits Limits => limits;
     private DictionaryObject trailer = new();
     private readonly StreamDecoder decoder;
@@ -145,12 +144,9 @@ public sealed class DocumentReader
         return Parse(ReadFully(stream, snapshot.MaxFileBytes), password, snapshot);
     }
 
-    // A seekable stream is read straight into an exact-size buffer (one copy); a
-    // non-seekable stream grows a pooled buffer and is copied out once. Either way the
-    // document is never held in two full-size buffers at the same time, which matters
-    // for large files under a constrained (WASM) heap. A stream that delivers fewer bytes
-    // than its Length promised throws rather than parsing a truncated prefix, which a
-    // repair pass would happily turn into a different document.
+    // ReadExactly, not Read: a stream that delivers fewer bytes than its Length promised
+    // must throw rather than yield a truncated prefix, which a repair pass would happily
+    // turn into a different document.
     internal static byte[] ReadFully(Stream stream, long maxFileBytes)
     {
         if (stream.CanSeek)
@@ -248,11 +244,6 @@ public sealed class DocumentReader
     /// <returns>The parsed object.</returns>
     public DocumentObject GetObject(int number) => store.GetObject(number);
 
-    // A reverse map from each already-resolved (cached) object instance to its
-    // indirect object number. The incremental save path uses it to Override in
-    // place the loaded objects a caller mutated (a filled form field, the page
-    // tree root); only objects this reader has resolved appear, which is exactly
-    // the set the model exposes for editing.
     internal IReadOnlyDictionary<DocumentObject, int> BuildObjectNumberIndex()
     {
         return store.BuildObjectNumberIndex();

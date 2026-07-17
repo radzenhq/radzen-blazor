@@ -2,14 +2,10 @@ using System;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// What a font may resolve to at one emission site: the registry an embeddable face could come
-// from, the conformance label forbidding an unembedded base-14 face (null when none does), and
-// whether the site can embed a font file at all. Capability is a parameter so the generated and
-// non-embedding worlds share one decision point without sharing their timing or their remedy.
+// CanEmbed is a parameter so the embedding (GeneratorFontResolver) and non-embedding
+// (Document.FontScope) sites reach ResolveBase14Name through one decision point.
 internal readonly record struct FontScope(FontCollection? Fonts, string? Base14ForbiddenBy, bool CanEmbed);
 
-// The one policy mapping a Font to a base-14 face, and the one message rejecting an
-// unembedded base-14 face under PDF/A or PDF/UA.
 internal static class FontResolution
 {
     // Only the standard-14 set is guaranteed present in a viewer without an embedded file, so a

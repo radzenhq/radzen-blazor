@@ -4,17 +4,14 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf;
 
-// A minimal left-to-right, horizontal text shaper: identity codepoint-to-glyph mapping via the
-// resolved font's cmap with per-character fallback, and hmtx-based advances. Optional legacy
-// 'kern'-table pair kerning is applied to adjacent glyphs of the same face; it is off by default
-// so shaped advances match FontCollection.MeasureText unless kerning is requested. Both the
-// measure (FontCollection) and emit (TextLineEmitter) paths map text through this one helper so
-// the glyph/cluster sequence they draw is the one measurement summed.
+// A minimal left-to-right, horizontal shaper: identity cmap mapping with per-character
+// fallback, hmtx advances, optional legacy 'kern' pairs. Kerning is off by default so shaped
+// advances match FontCollection.MeasureText unless asked for. Both the measure (FontCollection)
+// and emit (TextLineEmitter) paths shape through this one helper, so what is measured is drawn.
 internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = false)
 {
-    // Receives the shaped run. Implemented by structs and consumed through a struct generic
-    // constraint so the JIT devirtualizes every call: measuring costs no allocation because the
-    // sink that discards glyphs has nowhere to put them, not because a second loop omits them.
+    // Implemented by structs and consumed through a struct generic constraint so the JIT
+    // devirtualizes every call; boxing this into an interface field would undo that.
     private interface IGlyphSink
     {
         void Add(ushort glyph, double advance, int cluster, SfntFont face);
@@ -51,7 +48,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         }
     }
 
-    // The one shaping loop. Measure and emit differ only in the sink, so a kern or fallback
+    // The one shaping loop: measure and emit differ only in the sink, so a kern or fallback
     // change cannot shift a measured line relative to its drawn glyphs.
     private void ShapeCore<TSink>(ReadOnlySpan<char> text, Font font, ref TSink sink)
         where TSink : struct, IGlyphSink
@@ -91,9 +88,8 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         }
     }
 
-    // Returns the shaped glyphs in visual order; advance is their total width in points. Since
-    // any kern is folded into both a glyph's advance and the running total, advance always
-    // equals the sum of the returned glyph advances.
+    // totalAdvance always equals the sum of the returned glyphs' advances, since a kern is
+    // folded into both.
     public List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
     {
         var sink = new CollectSink { Glyphs = new List<PositionedGlyph>(text.Length) };
@@ -102,7 +98,6 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         return sink.Glyphs;
     }
 
-    // The width Shape would report, without materializing the glyph list measurement discards.
     public double MeasureAdvance(ReadOnlySpan<char> text, Font font)
     {
         var sink = new MeasureSink();
@@ -110,9 +105,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         return sink.Total;
     }
 
-    // Fails loud when text needs OpenType shaping or bidirectional reordering the identity
-    // mapper cannot do, rather than emitting unshaped/unjoined/reversed glyphs. Shared by the
-    // shaper and by text measuring.
+    // Shared by the shaper and by text measuring, so both refuse the same text.
     internal static void EnsureNoComplexScript(ReadOnlySpan<char> text)
     {
         var i = 0;
@@ -133,12 +126,9 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         }
     }
 
-    // Scripts whose correct rendering requires joining/reordering (OpenType shaping) or
-    // bidirectional reordering, neither of which the identity LTR mapper can do. Emitting them
-    // as-is yields unjoined or visually reversed text, so they fail loud regardless of the
-    // section Direction flag (which is never derived from the text). Tested against code points
-    // (not UTF-16 code units) so supplementary-plane scripts and bidi controls are caught.
-    // Latin/Cyrillic/Greek/CJK/Hangul are NOT here - they render correctly without shaping.
+    // Scripts the identity LTR mapper would render unjoined or visually reversed. Tested
+    // against code points, not UTF-16 code units, so supplementary-plane scripts are caught.
+    // Latin/Cyrillic/Greek/CJK/Hangul are deliberately absent - they need no shaping.
     private static bool RequiresComplexShaping(int c)
         => c is (>= 0x0590 and <= 0x05FF)  // Hebrew (RTL)
             or (>= 0x0600 and <= 0x06FF)    // Arabic

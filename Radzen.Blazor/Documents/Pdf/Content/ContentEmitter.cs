@@ -3,8 +3,8 @@ using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
 
-// The operands of one BT..ET text show. Capability differences between callers are values
-// here (an unset one emits nothing), not separate emit paths.
+// Capability differences between callers are values here (an unset one emits nothing), not
+// separate emit paths.
 internal readonly struct TextShowOp
 {
     public required string FontKey { get; init; }
@@ -28,8 +28,8 @@ internal readonly struct TextShowOp
     public int GlyphWidth { get; init; }
     public ImmutableArray<TextAdjustment>? Adjustments { get; init; }
 
-    // Emits the trailing 0 Tr / 0 Tc / 0 Tw / 100 Tz / 0 Ts resets. The loaded-content path
-    // leaves the state set, so re-emitted bytes match what was read.
+    // The loaded-content path leaves the state set instead, so re-emitted bytes match what
+    // was read.
     public bool ResetTextState { get; init; }
 
     // Set when this show splices into a text object the caller has already opened. ISO
@@ -40,8 +40,6 @@ internal readonly struct TextShowOp
     public bool InsideTextObject { get; init; }
 }
 
-// Pure byte-writing helpers: given a ContentWriter and a draw command, they emit the
-// operators for that command. No state, so they stay static and shared across pages.
 internal static class ContentEmitter
 {
     public static void WriteClipRect(ContentWriter writer, in PdfRect clip)
@@ -56,7 +54,6 @@ internal static class ContentEmitter
         writer.WriteRaw(" re W n\n");
     }
 
-    // Sets the clip to a rounded rectangle when radius > 0, otherwise to the plain rectangle.
     public static void WriteClip(ContentWriter writer, in PdfRect clip, double radius)
     {
         if (radius > 0)
@@ -70,8 +67,8 @@ internal static class ContentEmitter
         }
     }
 
-    // Writes a rounded-rectangle path (m/l/c ops, closed with h) starting at the bottom-left
-    // corner's end point and running counterclockwise. The caller appends the paint operator.
+    // Runs counterclockwise from the bottom-left corner's end point; the caller appends the
+    // paint operator.
     public static void WriteRoundedRect(ContentWriter writer, double x, double y, double width, double height, double radius)
     {
         var offset = radius * BezierGeometry.Kappa;
@@ -104,8 +101,8 @@ internal static class ContentEmitter
         WritePoint(writer, x3, y3, " c\n");
     }
 
-    // Emits "a b c d e f cm" concatenating the transform with the CTM. Must sit inside a
-    // caller-managed q .. Q pair so the surrounding graphics state stays untouched.
+    // Must sit inside a caller-managed q .. Q pair so the surrounding graphics state stays
+    // untouched.
     public static void WriteTransform(ContentWriter writer, in Matrix matrix)
     {
         writer.WriteNumber(matrix.A);
@@ -211,9 +208,8 @@ internal static class ContentEmitter
         }
     }
 
-    // The single BT..ET text-show skeleton. Callers own their own wrapper (q/gs/cm/clip) and
-    // their own payload preparation; everything between BT and ET is emitted here so the
-    // operator order and the state-reset discipline exist once.
+    // Callers own their wrapper (q/gs/cm/clip) and payload preparation; everything between BT
+    // and ET is emitted here so the operator order and state-reset discipline exist once.
     public static void WriteTextShow(ContentWriter writer, in TextShowOp op)
     {
         if (op.InsideTextObject && (op.X != 0 || op.Baseline != 0 || op.Shear != 0))
@@ -378,8 +374,6 @@ internal static class ContentEmitter
         }
     }
 
-    // Emits a device colour (Gray g/G, CMYK k/K or a named colorspace cs+scn / CS+SCN) in
-    // place of rg/RG.
     public static void WriteDeviceColor(ContentWriter writer, DeviceColor color, bool stroke)
     {
         if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
@@ -409,8 +403,7 @@ internal static class ContentEmitter
         writer.WriteRaw("\n");
     }
 
-    // Shows a glyph string as a TJ array with per-pair kern adjustments interleaved: each
-    // kern is a TJ number (positive tightens) placed between adjacent glyph codes. Glyph
+    // A kern is a TJ number (positive tightens) placed between adjacent glyph codes. Glyph
     // codes are 2 bytes for embedded Type0 subsets and 1 byte for WinAnsi base-14 faces.
     private static void WriteKernedShow(ContentWriter writer, ReadOnlySpan<byte> bytes, double[] kerns, int glyphWidth)
     {

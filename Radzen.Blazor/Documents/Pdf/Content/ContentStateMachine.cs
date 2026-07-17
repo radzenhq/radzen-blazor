@@ -5,17 +5,16 @@ using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// Which operators paint text, and the index every consumer numbers them by. Redaction
-// correlates its edits against the index search produced, so the set and the counting rule
-// have to be one thing: a show operator added here reaches all of them at once.
+// Redaction and replacement correlate their edits against the operator index search
+// produced, so the set and the counting rule have to be one thing: a show operator added
+// here reaches all of them at once.
 internal static class ContentShows
 {
     public static bool IsShow(string? op) => op is "Tj" or "TJ" or "'" or "\"";
 }
 
-// The text state, which ISO 32000-1 8.4 makes part of the graphics state: q saves it and Q
-// restores it along with the CTM. Tz/Tc/Tw live in the nested TextSpacing because the
-// advance formula consumes them together.
+// ISO 32000-1 8.4 makes the text state part of the graphics state: q saves it and Q restores
+// it along with the CTM.
 internal struct ContentTextState()
 {
     public ReverseFont? Font = null;
@@ -33,8 +32,9 @@ internal struct ContentTextState()
     public TextSpacing Spacing = new();
 }
 
-// The graphics state q/Q saves. Consumers that track more (colors, dash, clip) derive and
-// add fields; Clone copies the runtime type, so the stack discipline stays here.
+// Deliberately does not model colour, dash or clip: consumers that track those derive and
+// add fields, and Clone's MemberwiseClone copies the runtime type, so the q/Q stack
+// discipline stays here rather than being reimplemented per consumer.
 internal class ContentGraphicsState
 {
     public Matrix Ctm = Matrix.Identity;
@@ -44,13 +44,10 @@ internal class ContentGraphicsState
     public ContentGraphicsState Clone() => (ContentGraphicsState)MemberwiseClone();
 }
 
-// The content-stream state machine: the CTM and its q/Q stack, the text state q/Q saves,
-// and the text/line matrices BT scopes. Materialization, walking, editing, replacement and
-// redaction all read a stream through this, so they cannot disagree about what an operator
-// means. Callers keep their own element/emit concerns and read the state they need.
-// fallbackFont is what an unresolvable Tf selects. Materialization passes null, so an edited
-// run re-encodes leniently through WinAnsi substitution; search and replacement pass
-// ReverseFont.WinAnsi, so a missing glyph width fails loudly instead of silently.
+// fallbackFont is what an unresolvable Tf selects. The interpreter passes null so an edited
+// run in a font that was never really there re-encodes leniently through WinAnsi rather than
+// failing. Other callers pass ReverseFont.WinAnsi, but each also substitutes WinAnsi itself
+// on a null Font, so for them the argument is redundant.
 internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFont>? fonts = null,
     ReverseFont? fallbackFont = null, ContentGraphicsState? state = null)
 {
@@ -72,16 +69,14 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
     // and an inner ET must then not be read as leaving the outer text object.
     public int TextObjectDepth { get; private set; }
 
-    // Applies op's effect on the shared state and reports whether that is all op means.
-    // False leaves op to the caller: a show operator (already advanced to its line and
-    // carrying its own spacing), or an operator this machine does not model at all.
+    // Returns false to leave op to the caller: a show operator (already advanced to its line
+    // and carrying its own spacing), or an operator this machine does not model at all.
     public bool Apply(string? op, List<Token> operands)
     {
         if (ContentShows.IsShow(op))
         {
             if (op is "'" or "\"")
             {
-                // " sets word/char spacing from its own operands before showing.
                 state.Text.Spacing.Apply(op, operands);
                 NextLine();
             }
@@ -115,7 +110,6 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
                 state.Ctm = Components(operands) * state.Ctm;
                 return true;
 
-            // BT/ET only scope the text matrices; ET leaves no state behind.
             case "BT":
                 TextObjectDepth++;
                 TextMatrix = LineMatrix = Matrix.Identity;
@@ -172,7 +166,6 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
         }
     }
 
-    // Steps the text matrix by a shown string's horizontal text-space advance.
     public void Advance(double amount) => TextMatrix = Matrix.Translate(amount, 0) * TextMatrix;
 
     private void NextLine()
