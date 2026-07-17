@@ -37,11 +37,11 @@ internal readonly struct TextShowOp
 // operators for that command. No state, so they stay static and shared across pages.
 internal static class ContentEmitter
 {
-    public static void WriteClipRect(ContentWriter writer, in Rect clip)
+    public static void WriteClipRect(ContentWriter writer, in PdfRect clip)
     {
-        writer.WriteNumber(clip.X);
+        writer.WriteNumber(clip.Left);
         writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Y);
+        writer.WriteNumber(clip.Bottom);
         writer.WriteRaw(" ");
         writer.WriteNumber(clip.Width);
         writer.WriteRaw(" ");
@@ -50,11 +50,11 @@ internal static class ContentEmitter
     }
 
     // Sets the clip to a rounded rectangle when radius > 0, otherwise to the plain rectangle.
-    public static void WriteClip(ContentWriter writer, in Rect clip, double radius)
+    public static void WriteClip(ContentWriter writer, in PdfRect clip, double radius)
     {
         if (radius > 0)
         {
-            WriteRoundedRect(writer, clip.X, clip.Y, clip.Width, clip.Height, radius);
+            WriteRoundedRect(writer, clip.Left, clip.Bottom, clip.Width, clip.Height, radius);
             writer.WriteRaw("W n\n");
         }
         else

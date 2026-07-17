@@ -238,7 +238,7 @@ public class IncrementalSaveTests
     {
         var original = BaseDocument();
         var document = Load(original);
-        document.Pages[0].Annotations.Add(new HighlightAnnotation(new Rect(10, 20, 100, 20))
+        document.Pages[0].Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(10, 20, 100, 20))
         {
             Contents = "incremental note",
         });
@@ -262,7 +262,7 @@ public class IncrementalSaveTests
         var original = BaseDocument();
         var document = Load(original);
         document.CompressOutput = true;
-        document.Pages[0].Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24))
+        document.Pages[0].Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24))
         {
             Contents = "incremental note",
         });
@@ -279,8 +279,8 @@ public class IncrementalSaveTests
     {
         var source = new Document();
         var page = source.Pages.Add();
-        page.Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24)) { Contents = "old" });
-        page.Annotations.Add(new SquareAnnotation(new Rect(40, 20, 24, 24)));
+        page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24)) { Contents = "old" });
+        page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(40, 20, 24, 24)));
         var original = source.ToArray();
         var document = Load(original);
         Assert.IsType<TextAnnotation>(document.Pages[0].Annotations[0]).Contents = "edited";
@@ -352,15 +352,15 @@ public class IncrementalSaveTests
     {
         var original = BaseDocument();
         var document = Load(original);
-        document.Pages[0].MediaBox = new Rect(10, 20, 300, 400);
-        document.Pages[0].CropBox = new Rect(20, 30, 250, 350);
+        document.Pages[0].MediaBox = PdfRect.FromSize(10, 20, 300, 400);
+        document.Pages[0].CropBox = PdfRect.FromSize(20, 30, 250, 350);
 
         var updated = SaveIncremental(document);
         AssertVerbatimPrefix(original, updated);
 
         var page = Load(updated).Pages[0];
-        Assert.Equal(new Rect(10, 20, 300, 400), page.MediaBox);
-        Assert.Equal(new Rect(20, 30, 250, 350), page.CropBox);
+        Assert.Equal(PdfRect.FromSize(10, 20, 300, 400), page.MediaBox);
+        Assert.Equal(PdfRect.FromSize(20, 30, 250, 350), page.CropBox);
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public class IncrementalSaveTests
     {
         var signed = PdfSigner.Sign(BaseDocument(), new SignatureOptions { SignerName = "Signer" }, new FixedSigner());
         var document = Load(signed);
-        document.Pages[0].Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24)) { Contents = "after signing" });
+        document.Pages[0].Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24)) { Contents = "after signing" });
 
         var updated = SaveIncremental(document);
 

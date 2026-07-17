@@ -32,8 +32,8 @@ public class AnnotationFidelityTests
     private static T TwoLines<T>(T annotation) where T : MarkupAnnotation
     {
         annotation.Areas.Clear();
-        annotation.Areas.Add(new Rect(40, 130, 100, 12));
-        annotation.Areas.Add(new Rect(40, 100, 60, 12));
+        annotation.Areas.Add(PdfRect.FromSize(40, 130, 100, 12));
+        annotation.Areas.Add(PdfRect.FromSize(40, 100, 60, 12));
         return annotation;
     }
 
@@ -49,7 +49,7 @@ public class AnnotationFidelityTests
     public void HighlightAppearancePaintsOneRectanglePerArea()
     {
         // Bounds 40 100 -> 140 142; areas are at y 30..42 and y 0..12 within it.
-        var content = MarkupAppearance(TwoLines(new HighlightAnnotation(new Rect(40, 100, 100, 42))));
+        var content = MarkupAppearance(TwoLines(new HighlightAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
         Assert.Equal(2, Occurrences(content, "\nf\n"));
         Assert.Contains("0 30 m", content);
@@ -60,7 +60,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void UnderlineAppearanceDrawsOneLinePerArea()
     {
-        var content = MarkupAppearance(TwoLines(new UnderlineAnnotation(new Rect(40, 100, 100, 42))));
+        var content = MarkupAppearance(TwoLines(new UnderlineAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
         Assert.Equal(2, Occurrences(content, "\nS\n"));
         Assert.Contains("0 31 m", content);
@@ -71,7 +71,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void StrikeOutAppearanceDrawsOneLinePerArea()
     {
-        var content = MarkupAppearance(TwoLines(new StrikeOutAnnotation(new Rect(40, 100, 100, 42))));
+        var content = MarkupAppearance(TwoLines(new StrikeOutAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
         Assert.Equal(2, Occurrences(content, "\nS\n"));
         Assert.Contains("0 36 m", content);
@@ -81,7 +81,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void SquigglyAppearanceDrawsOnePathPerArea()
     {
-        var content = MarkupAppearance(TwoLines(new SquigglyAnnotation(new Rect(40, 100, 100, 42))));
+        var content = MarkupAppearance(TwoLines(new SquigglyAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
         Assert.Equal(2, Occurrences(content, "\nS\n"));
         Assert.Contains("0 31 m", content);
@@ -93,7 +93,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void SingleAreaMarkupAppearanceIsUnchanged()
     {
-        var content = MarkupAppearance(new HighlightAnnotation(new Rect(40, 100, 100, 12)));
+        var content = MarkupAppearance(new HighlightAnnotation(PdfRect.FromSize(40, 100, 100, 12)));
 
         Assert.Equal(1, Occurrences(content, "\nf\n"));
         Assert.Contains("0 0 m", content);
@@ -117,7 +117,7 @@ public class AnnotationFidelityTests
     public void EditedInkKeepsTheLoadedStrokeWidth()
     {
         var source = new Document();
-        var ink = source.Pages.Add().Annotations.Add(new InkAnnotation(new Rect(40, 190, 100, 50)));
+        var ink = source.Pages.Add().Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(40, 190), new AnnotationPoint(80, 220) });
         ink.StrokeWidth = 4;
 
@@ -137,7 +137,7 @@ public class AnnotationFidelityTests
     public void EditedFreeTextKeepsTheLoadedDefaultAppearance()
     {
         var source = new Document();
-        source.Pages.Add().Annotations.Add(new FreeTextAnnotation(new Rect(40, 250, 120, 30))
+        source.Pages.Add().Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30))
         {
             Contents = "free text",
             Font = new Font { Name = "Courier", Size = 18 },
@@ -174,7 +174,7 @@ public class AnnotationFidelityTests
     private static byte[] WithDefaultAppearance(string da)
     {
         var source = new Document();
-        source.Pages.Add().Annotations.Add(new FreeTextAnnotation(new Rect(40, 250, 120, 30)) { Contents = "free text" });
+        source.Pages.Add().Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30)) { Contents = "free text" });
         var document = Load(source.ToArray());
         var state = document.Loaded!;
         var annotation = state.Source!.AsDictionary(

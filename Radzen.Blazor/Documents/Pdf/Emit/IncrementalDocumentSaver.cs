@@ -393,7 +393,7 @@ internal sealed class IncrementalDocumentSaver
         return (reference, node);
     }
 
-    private static void WriteBox(DictionaryObject node, string key, Rect? box)
+    private static void WriteBox(DictionaryObject node, string key, PdfRect? box)
     {
         if (box is { } value)
         {

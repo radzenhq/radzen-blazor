@@ -406,7 +406,7 @@ public sealed class AcroForm
 
     private (double Width, double Height) RectSize(DictionaryObject field)
     {
-        var rect = PdfRects.Read(reader, reader.GetArray(field, "Rect"), RectPolicy.DefaultSize(200.0, 14.0));
+        var rect = PdfRect.Read(reader, reader.GetArray(field, "Rect"), RectPolicy.DefaultSize(200.0, 14.0));
         return (rect.Width, rect.Height);
     }
 

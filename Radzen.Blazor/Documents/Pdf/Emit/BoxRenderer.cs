@@ -10,7 +10,7 @@ namespace Radzen.Documents.Pdf.Emit;
 // bottom edge, like FillDraw.
 internal static class BoxRenderer
 {
-    public static void Paint(PagePlan plan, Rect bounds, in BoxStyle style)
+    public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style)
     {
         var radius = ClampRadius(style.CornerRadius.Point, bounds.Width, bounds.Height);
 
@@ -24,8 +24,8 @@ internal static class BoxRenderer
         {
             plan.Fills.Add(new FillDraw
             {
-                X = bounds.X,
-                Y = bounds.Y,
+                X = bounds.Left,
+                Y = bounds.Bottom,
                 Width = bounds.Width,
                 Height = bounds.Height,
                 Color = style.Background ?? Color.Black,
@@ -38,8 +38,8 @@ internal static class BoxRenderer
         {
             plan.Fills.Add(new FillDraw
             {
-                X = bounds.X,
-                Y = bounds.Y,
+                X = bounds.Left,
+                Y = bounds.Bottom,
                 Width = bounds.Width,
                 Height = bounds.Height,
                 Color = background,
@@ -48,8 +48,8 @@ internal static class BoxRenderer
             });
         }
 
-        var x = bounds.X;
-        var bottom = bounds.Y;
+        var x = bounds.Left;
+        var bottom = bounds.Bottom;
         var right = x + bounds.Width;
         var top = bottom + bounds.Height;
 

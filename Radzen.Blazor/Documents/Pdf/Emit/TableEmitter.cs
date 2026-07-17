@@ -17,7 +17,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var layout = positioned.Layout;
         var x = left + (layout.Source?.LeftIndent.Point ?? 0);
         var tableRadius = 0.0;
-        var tableBounds = default(Rect);
+        var tableBounds = default(PdfRect);
         var tableMark = default(PlanMarks);
         if (layout.Source is { } table && table.CornerRadius.Point > 0)
         {
@@ -62,7 +62,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
     // The page-space box of one on-page table fragment. A table that splits across pages
     // rounds each fragment to its own box, so every fragment gets four rounded corners.
-    private static Rect FragmentBounds(in PositionedTableFragment positioned, double x, double contentTop)
+    private static PdfRect FragmentBounds(in PositionedTableFragment positioned, double x, double contentTop)
     {
         var top = double.MaxValue;
         var bottom = double.MinValue;
@@ -77,14 +77,14 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             return default;
         }
 
-        return new Rect(x, contentTop - positioned.Y - bottom, positioned.Layout.Width, bottom - top);
+        return PdfRect.FromSize(x, contentTop - positioned.Y - bottom, positioned.Layout.Width, bottom - top);
     }
 
     // Draws the rounded frame of a whole table: clips everything the table emitted (corner
     // cell backgrounds and outer border edges included; interior grid lines are only touched
     // where they meet the rounded corners) and, when the table-level borders resolve to one
     // uniform edge, strokes a single rounded-rectangle border around the perimeter.
-    private static void EmitTableFrame(PagePlan plan, Table source, in Rect bounds, double radius, PlanMarks mark)
+    private static void EmitTableFrame(PagePlan plan, Table source, in PdfRect bounds, double radius, PlanMarks mark)
     {
         plan.ApplyRoundedClip(bounds, radius, mark);
 
@@ -100,8 +100,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             plan.RoundedStrokes.Add(new RoundedStrokeDraw
             {
-                X = bounds.X,
-                Y = bounds.Y,
+                X = bounds.Left,
+                Y = bounds.Bottom,
                 Width = bounds.Width,
                 Height = bounds.Height,
                 Radius = radius,
@@ -142,7 +142,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var element = structureTree.ElementOf(cell.Cell) ?? inherited;
         var opacity = opacities.CellOpacity(cell.Cell);
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
-        var bounds = new Rect(
+        var bounds = PdfRect.FromSize(
             left + cell.Bounds.X,
             contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
             cell.Bounds.Width,
@@ -178,7 +178,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double contentWidth,
         double boundsLeft,
         double boundsRight,
-        in Rect clip,
+        in PdfRect clip,
         double radius,
         double opacity,
         StructureElement? element,
@@ -320,11 +320,11 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var plan = context.Plan;
         var nestedLeft = left + nested.X + (nested.Layout.Source?.LeftIndent.Point ?? 0);
         var nestedRadius = 0.0;
-        var nestedBounds = default(Rect);
+        var nestedBounds = default(PdfRect);
         var nestedMark = default(PlanMarks);
         if (nested.Layout.Source is { } nestedTable && nestedTable.CornerRadius.Point > 0)
         {
-            nestedBounds = new Rect(
+            nestedBounds = PdfRect.FromSize(
                 nestedLeft,
                 contentTop - (delta + nested.Y) - nested.Layout.Height,
                 nested.Layout.Width,
@@ -352,7 +352,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var plan = context.Plan;
         var opacity = opacities.ContainerOpacity(box.Source);
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
-        var bounds = new Rect(
+        var bounds = PdfRect.FromSize(
             left + box.Bounds.X,
             contentTop - (box.Bounds.Y + delta) - box.Bounds.Height,
             box.Bounds.Width,

@@ -292,7 +292,7 @@ internal static class DocumentLoader
         return fonts;
     }
 
-    private static (Unit Width, Unit Height) Dimensions(Rect? box)
+    private static (Unit Width, Unit Height) Dimensions(PdfRect? box)
         => box is { } rect
             ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
             : (PageSizes.A4.Width, PageSizes.A4.Height);
@@ -321,12 +321,10 @@ internal static class DocumentLoader
         return corners;
     }
 
-    private static Rect? ToRect(double[]? corners)
-        => corners is not null
-            ? new Rect(corners[0], corners[1], corners[2] - corners[0], corners[3] - corners[1])
-            : null;
+    private static PdfRect? ToRect(double[]? corners)
+        => corners is not null ? new PdfRect(corners[0], corners[1], corners[2], corners[3]) : null;
 
-    // The re-emitted box keeps the source coordinates rather than the corners a Rect
+    // The re-emitted box keeps the source coordinates rather than the corners a PdfRect
     // recomputes, so a fractional origin cannot shift the far edge by a rounding step.
     private static ArrayObject BoxArray(double[] corners) =>
     [
@@ -336,7 +334,7 @@ internal static class DocumentLoader
         new NumberObject(corners[3]),
     ];
 
-    private static Rect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
+    private static PdfRect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
         => ToRect(ResolveCorners(reader, reader.GetArray(page, key)));
 
     public static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;

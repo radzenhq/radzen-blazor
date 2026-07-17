@@ -21,32 +21,6 @@ public readonly struct TextPoint(double x, double y)
     public double Y { get; } = y;
 }
 
-/// <summary>Represents an axis-aligned bounding box in PDF user space.</summary>
-/// <param name="left">The minimum horizontal coordinate.</param>
-/// <param name="bottom">The minimum vertical coordinate.</param>
-/// <param name="right">The maximum horizontal coordinate.</param>
-/// <param name="top">The maximum vertical coordinate.</param>
-public readonly struct TextBounds(double left, double bottom, double right, double top)
-{
-    /// <summary>Gets the minimum horizontal coordinate.</summary>
-    public double Left { get; } = left;
-
-    /// <summary>Gets the minimum vertical coordinate.</summary>
-    public double Bottom { get; } = bottom;
-
-    /// <summary>Gets the maximum horizontal coordinate.</summary>
-    public double Right { get; } = right;
-
-    /// <summary>Gets the maximum vertical coordinate.</summary>
-    public double Top { get; } = top;
-
-    /// <summary>Gets the width.</summary>
-    public double Width => Right - Left;
-
-    /// <summary>Gets the height.</summary>
-    public double Height => Top - Bottom;
-}
-
 /// <summary>Represents a transformed text quadrilateral in PDF user space.</summary>
 /// <param name="lowerLeft">The lower-left text-space corner after transformation.</param>
 /// <param name="lowerRight">The lower-right text-space corner after transformation.</param>
@@ -67,7 +41,7 @@ public readonly struct TextQuadrilateral(TextPoint lowerLeft, TextPoint lowerRig
     public TextPoint UpperLeft { get; } = upperLeft;
 
     /// <summary>Gets the axis-aligned bounds enclosing the quadrilateral.</summary>
-    public TextBounds Bounds => TextSearch.GetBounds([LowerLeft, LowerRight, UpperRight, UpperLeft]);
+    public PdfRect Bounds => TextSearch.GetBounds([LowerLeft, LowerRight, UpperRight, UpperLeft]);
 }
 
 /// <summary>Identifies characters within a text-show operator in the page content stream.</summary>
@@ -114,7 +88,7 @@ public sealed class PositionedTextRun
     public TextQuadrilateral Quadrilateral { get; }
 
     /// <summary>Gets the axis-aligned bounds enclosing the quadrilateral.</summary>
-    public TextBounds Bounds => Quadrilateral.Bounds;
+    public PdfRect Bounds => Quadrilateral.Bounds;
 
     internal double Advance => AdvanceOffsets[^1];
 
@@ -172,7 +146,7 @@ public sealed class TextHit
     public IReadOnlyList<TextQuadrilateral> Quadrilaterals { get; }
 
     /// <summary>Gets the axis-aligned bounds enclosing all match quadrilaterals.</summary>
-    public TextBounds Bounds { get; }
+    public PdfRect Bounds { get; }
 
     /// <summary>Gets the source text-show operator references covered by the match.</summary>
     public IReadOnlyList<TextSourceReference> Sources { get; }
@@ -235,11 +209,11 @@ internal static class TextSearch
         return hits;
     }
 
-    public static TextBounds GetBounds(IReadOnlyList<TextQuadrilateral> quadrilaterals)
+    public static PdfRect GetBounds(IReadOnlyList<TextQuadrilateral> quadrilaterals)
     {
         if (quadrilaterals.Count == 0)
         {
-            return new TextBounds();
+            return new PdfRect();
         }
 
         var points = new List<TextPoint>(quadrilaterals.Count * 4);
@@ -254,11 +228,11 @@ internal static class TextSearch
         return GetBounds(points);
     }
 
-    public static TextBounds GetBounds(IReadOnlyList<TextPoint> points)
+    public static PdfRect GetBounds(IReadOnlyList<TextPoint> points)
     {
         if (points.Count == 0)
         {
-            return new TextBounds();
+            return new PdfRect();
         }
 
         var left = points[0].X;
@@ -273,7 +247,7 @@ internal static class TextSearch
             top = Math.Max(top, points[i].Y);
         }
 
-        return new TextBounds(left, bottom, right, top);
+        return new PdfRect(left, bottom, right, top);
     }
 
     private static List<PositionedTextRun> Parse(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)

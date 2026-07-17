@@ -5,10 +5,10 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>Describes an interactive annotation placed on a PDF page.</summary>
 /// <param name="bounds">The annotation bounds in PDF page coordinates.</param>
-public abstract class Annotation(Rect bounds)
+public abstract class Annotation(PdfRect bounds)
 {
     /// <summary>Gets or sets the annotation bounds in PDF page coordinates.</summary>
-    public Rect Bounds { get; set; } = bounds;
+    public PdfRect Bounds { get; set; } = bounds;
 
     /// <summary>Gets or sets the annotation color.</summary>
     public Color Color { get; set; } = Color.Yellow;
@@ -33,8 +33,8 @@ public abstract class Annotation(Rect bounds)
     internal string State()
     {
         var value = new StringBuilder();
-        Append(value, Bounds.X);
-        Append(value, Bounds.Y);
+        Append(value, Bounds.Left);
+        Append(value, Bounds.Bottom);
         Append(value, Bounds.Width);
         Append(value, Bounds.Height);
         value.Append('|').Append(Color.A).Append(',').Append(Color.R).Append(',').Append(Color.G).Append(',').Append(Color.B);

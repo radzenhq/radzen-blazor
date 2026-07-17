@@ -16,19 +16,19 @@ public class AnnotationTests
         var document = new Document();
         var page = document.Pages.Add();
         document.Pages.Add();
-        page.Annotations.Add(new TextAnnotation(new Rect(10, 20, 24, 24)) { Contents = "note", Title = "author" });
-        page.Annotations.Add(new HighlightAnnotation(new Rect(40, 50, 100, 12)) { Contents = "highlight" });
-        page.Annotations.Add(new UnderlineAnnotation(new Rect(40, 70, 100, 12)));
-        page.Annotations.Add(new StrikeOutAnnotation(new Rect(40, 90, 100, 12)));
-        page.Annotations.Add(new SquigglyAnnotation(new Rect(40, 110, 100, 12)));
-        page.Annotations.Add(new LinkAnnotation(new Rect(40, 130, 100, 12)) { Uri = new Uri("https://example.com/") });
-        page.Annotations.Add(new LinkAnnotation(new Rect(40, 145, 100, 12)) { TargetPageIndex = 1 });
-        page.Annotations.Add(new StampAnnotation(new Rect(40, 160, 80, 30)) { Name = "Approved" });
-        var ink = page.Annotations.Add(new InkAnnotation(new Rect(40, 190, 100, 50)));
+        page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24)) { Contents = "note", Title = "author" });
+        page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)) { Contents = "highlight" });
+        page.Annotations.Add(new UnderlineAnnotation(PdfRect.FromSize(40, 70, 100, 12)));
+        page.Annotations.Add(new StrikeOutAnnotation(PdfRect.FromSize(40, 90, 100, 12)));
+        page.Annotations.Add(new SquigglyAnnotation(PdfRect.FromSize(40, 110, 100, 12)));
+        page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 130, 100, 12)) { Uri = new Uri("https://example.com/") });
+        page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 145, 100, 12)) { TargetPageIndex = 1 });
+        page.Annotations.Add(new StampAnnotation(PdfRect.FromSize(40, 160, 80, 30)) { Name = "Approved" });
+        var ink = page.Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(40, 190), new AnnotationPoint(80, 220) });
-        page.Annotations.Add(new FreeTextAnnotation(new Rect(40, 250, 120, 30)) { Contents = "free text", FontSize = 11 });
-        page.Annotations.Add(new SquareAnnotation(new Rect(40, 290, 50, 50)) { InteriorColor = Color.Yellow });
-        page.Annotations.Add(new CircleAnnotation(new Rect(110, 290, 50, 50)) { InteriorColor = Color.LightGray });
+        page.Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30)) { Contents = "free text", FontSize = 11 });
+        page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(40, 290, 50, 50)) { InteriorColor = Color.Yellow });
+        page.Annotations.Add(new CircleAnnotation(PdfRect.FromSize(110, 290, 50, 50)) { InteriorColor = Color.LightGray });
 
         var loaded = Load(document.ToArray());
 
@@ -52,8 +52,8 @@ public class AnnotationTests
     {
         var source = new Document();
         var page = source.Pages.Add();
-        page.Annotations.Add(new TextAnnotation(new Rect(10, 10, 20, 20)) { Contents = "old" });
-        page.Annotations.Add(new SquareAnnotation(new Rect(40, 10, 20, 20)));
+        page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { Contents = "old" });
+        page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(40, 10, 20, 20)));
         var bytes = AddUnknownAnnotation(source.ToArray());
         var loaded = Load(bytes);
 
@@ -77,7 +77,7 @@ public class AnnotationTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Annotations.Add(new HighlightAnnotation(new Rect(20, 30, 100, 15)) { Color = Color.Yellow });
+        page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
         document.Flatten();
         var bytes = document.ToArray();
@@ -91,7 +91,7 @@ public class AnnotationTests
     public void Flatten_LoadedAnnotationBurnsItsNormalAppearance()
     {
         var source = new Document();
-        source.Pages.Add().Annotations.Add(new SquareAnnotation(new Rect(20, 30, 100, 40))
+        source.Pages.Add().Annotations.Add(new SquareAnnotation(PdfRect.FromSize(20, 30, 100, 40))
         {
             Color = Color.Red,
             InteriorColor = Color.Yellow,
@@ -199,7 +199,7 @@ public class AnnotationTests
     public void TextMarkup_EmitsUpperQuadPointsBeforeLowerQuadPoints()
     {
         var document = new Document();
-        document.Pages.Add().Annotations.Add(new HighlightAnnotation(new Rect(40, 50, 100, 12)));
+        document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
 
         var reader = DocumentReader.Parse(document.ToArray());
         var dictionary = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(PageAnnotations(reader))));
@@ -212,7 +212,7 @@ public class AnnotationTests
     public void InkAppearance_BoundsEncloseStrokePointsOutsideAnnotationBounds()
     {
         var document = new Document();
-        var ink = document.Pages.Add().Annotations.Add(new InkAnnotation(new Rect(40, 190, 100, 50)));
+        var ink = document.Pages.Add().Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(20, 180), new AnnotationPoint(160, 260) });
 
         var reader = DocumentReader.Parse(document.ToArray());
@@ -228,8 +228,8 @@ public class AnnotationTests
     public void MarkupAreaOutsideBounds_ThrowsInsteadOfClipping()
     {
         var document = new Document();
-        var markup = document.Pages.Add().Annotations.Add(new HighlightAnnotation(new Rect(40, 50, 100, 12)));
-        markup.Areas.Add(new Rect(30, 50, 20, 12));
+        var markup = document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
+        markup.Areas.Add(PdfRect.FromSize(30, 50, 20, 12));
 
         var exception = Assert.Throws<InvalidOperationException>(() => document.ToArray());
 
@@ -240,7 +240,7 @@ public class AnnotationTests
     public void EditedLink_PreservesNamedDestinationObjectType()
     {
         var source = new Document();
-        source.Pages.Add().Annotations.Add(new LinkAnnotation(new Rect(10, 20, 100, 12)) { Destination = "chapter-one" });
+        source.Pages.Add().Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 20, 100, 12)) { Destination = "chapter-one" });
         var bytes = ChangeLinkDestinationToName(source.ToArray());
         var document = Load(bytes);
         Assert.IsType<LinkAnnotation>(document.Pages[0].Annotations[0]).Contents = "edited";

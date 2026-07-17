@@ -61,7 +61,7 @@ internal static class SoftMask
     // Plans a box's drop shadow: rasterizes and blurs the rounded-rectangle coverage, wraps it
     // in a DeviceGray luminosity-mask group, registers the SMask ExtGState, and adds the
     // shadow-colour fill (in page space, offset and under the box). No-ops for an empty box.
-    public static void EmitBoxShadow(PagePlan plan, Rect bounds, double cornerRadius, BoxShadow shadow)
+    public static void EmitBoxShadow(PagePlan plan, PdfRect bounds, double cornerRadius, BoxShadow shadow)
     {
         if (bounds.Width <= 0 || bounds.Height <= 0)
         {
@@ -85,8 +85,8 @@ internal static class SoftMask
         var rectHeight = shapeHeight + (2 * margin);
 
         // Shape is centred on the box; the image adds `margin` of blur padding on every edge.
-        var left = bounds.X - spread - margin + shadow.OffsetX.Point;
-        var bottom = bounds.Y - spread - margin - shadow.OffsetY.Point;
+        var left = bounds.Left - spread - margin + shadow.OffsetX.Point;
+        var bottom = bounds.Bottom - spread - margin - shadow.OffsetY.Point;
 
         var image = TransparencyGroup.GrayImage(mask.Pixels, mask.Width, mask.Height);
 

@@ -50,7 +50,7 @@ public sealed class InkStroke : IList<AnnotationPoint>
 
 /// <summary>Represents one or more freehand ink strokes.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class InkAnnotation(Rect bounds) : Annotation(bounds)
+public sealed class InkAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets the freehand strokes.</summary>
     public IList<InkStroke> Strokes { get; } = [];

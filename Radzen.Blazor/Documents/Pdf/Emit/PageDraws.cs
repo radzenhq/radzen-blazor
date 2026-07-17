@@ -60,7 +60,7 @@ internal struct TextDraw
     // positive tightens) inserted between glyphs when kerning is enabled; null = plain Tj.
     public double[]? Kerns { get; init; }
     public StructureElement? Element { get; init; }
-    public Rect? Clip { get; set; }
+    public PdfRect? Clip { get; set; }
 
     // Corner radius of the clip path; 0 clips to the plain `re` rectangle.
     public double ClipRadius { get; set; }
@@ -79,7 +79,7 @@ internal struct ImageDraw
     public required double Height { get; init; }
     public required GeneratedImage Image { get; init; }
     public StructureElement? Element { get; init; }
-    public Rect? Clip { get; set; }
+    public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; set; }
@@ -99,7 +99,7 @@ internal struct FillDraw
 
     // Corner radius of the filled rounded rectangle; 0 fills a plain `re` rectangle.
     public double Radius { get; init; }
-    public Rect? Clip { get; set; }
+    public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 
@@ -131,7 +131,7 @@ internal struct EdgeDraw
     public required double LineWidth { get; init; }
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
-    public Rect? Clip { get; set; }
+    public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 }
@@ -296,7 +296,7 @@ internal sealed class PagePlan
     // Clips every fill, edge, image and text added after the mark to a rounded rectangle,
     // so a rounded container/cell/table confines its children to the rounded shape. Draws
     // that already carry a clip keep it - an inner rounded box wins over an outer one.
-    public void ApplyRoundedClip(Rect bounds, double radius, PlanMarks mark)
+    public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
     {
         for (var i = mark.Fills; i < Fills.Count; i++)
         {
