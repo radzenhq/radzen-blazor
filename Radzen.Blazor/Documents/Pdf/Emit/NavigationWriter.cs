@@ -72,12 +72,7 @@ internal sealed class NavigationWriter(Document document)
 
             if (item.Color is { } color)
             {
-                node["C"] = new ArrayObject
-                {
-                    new NumberObject(color.R / 255.0),
-                    new NumberObject(color.G / 255.0),
-                    new NumberObject(color.B / 255.0),
-                };
+                node["C"] = PdfColorArray.Rgb(color);
             }
 
             var flags = (item.Italic ? 1 : 0) | (item.Bold ? 2 : 0);

@@ -162,15 +162,20 @@ internal static class PageResourceBuilder
             return existing;
         }
 
-        var xobject = image.Image;
-        if (xobject.SoftMask is { } mask)
-        {
-            xobject.Image.Dictionary["SMask"] = writer.Add(mask);
-        }
-
-        var reference = writer.Add(xobject.Image);
+        var reference = WriteImage(writer, image.Image);
         cache[image] = reference;
         return reference;
+    }
+
+    // Restamped per save: the mask reference is only valid against this save's writer.
+    private static ReferenceObject WriteImage(IObjectWriter writer, ImageXObject image)
+    {
+        if (image.SoftMask is { } mask)
+        {
+            image.Image.Dictionary["SMask"] = writer.Add(mask);
+        }
+
+        return writer.Add(image.Image);
     }
 
     // Adds the fonts and image XObjects referenced by an overlay stream to a built
@@ -266,13 +271,7 @@ internal static class PageResourceBuilder
             return existing;
         }
 
-        // Restamped per save: the mask reference is only valid against this save's writer.
-        if (image.SoftMask is { } mask)
-        {
-            image.Image.Dictionary["SMask"] = writer.Add(mask);
-        }
-
-        var reference = writer.Add(image.Image);
+        var reference = WriteImage(writer, image);
         sharedImages?.TryAdd(image, reference);
         return reference;
     }

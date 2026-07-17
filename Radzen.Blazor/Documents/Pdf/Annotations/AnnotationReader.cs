@@ -262,15 +262,7 @@ internal static class AnnotationReader
                 continue;
             }
 
-            color = operands switch
-            {
-                1 => Color.FromRgb(Channel(values[0]), Channel(values[0]), Channel(values[0])),
-                3 => Color.FromRgb(Channel(values[0]), Channel(values[1]), Channel(values[2])),
-                _ => Color.FromRgb(
-                    Channel((1 - values[0]) * (1 - values[3])),
-                    Channel((1 - values[1]) * (1 - values[3])),
-                    Channel((1 - values[2]) * (1 - values[3]))),
-            };
+            color = ColorFromComponents(values);
         }
 
         return color;
@@ -305,20 +297,30 @@ internal static class AnnotationReader
             case 0:
                 return null;
             case 1:
-                var gray = Channel(Number(reader, value[0]));
-                return Color.FromRgb(gray, gray, gray);
             case 3:
-                return Color.FromRgb(Channel(Number(reader, value[0])), Channel(Number(reader, value[1])), Channel(Number(reader, value[2])));
             case 4:
-                var black = Number(reader, value[3]);
-                return Color.FromRgb(
-                    Channel((1 - Number(reader, value[0])) * (1 - black)),
-                    Channel((1 - Number(reader, value[1])) * (1 - black)),
-                    Channel((1 - Number(reader, value[2])) * (1 - black)));
+                var components = new double[value.Count];
+                for (var i = 0; i < value.Count; i++)
+                {
+                    components[i] = Number(reader, value[i]);
+                }
+
+                return ColorFromComponents(components);
             default:
                 throw new DocumentParseException("An annotation colour array must contain zero, one, three or four numbers.", -1);
         }
     }
+
+    // ISO 32000-1 Table 164 device colour components: 1 grayscale, 3 RGB, 4 CMYK.
+    private static Color ColorFromComponents(IReadOnlyList<double> values) => values.Count switch
+    {
+        1 => Color.FromRgb(Channel(values[0]), Channel(values[0]), Channel(values[0])),
+        3 => Color.FromRgb(Channel(values[0]), Channel(values[1]), Channel(values[2])),
+        _ => Color.FromRgb(
+            Channel((1 - values[0]) * (1 - values[3])),
+            Channel((1 - values[1]) * (1 - values[3])),
+            Channel((1 - values[2]) * (1 - values[3]))),
+    };
 
     private static byte Channel(double value) => ColorComponent.ToChannel(value);
 

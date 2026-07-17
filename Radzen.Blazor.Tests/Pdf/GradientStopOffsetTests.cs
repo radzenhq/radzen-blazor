@@ -68,6 +68,47 @@ public class GradientStopOffsetTests
     }
 
     [Fact]
+    public void HardStopAtDomainEnd_KeepsBoundsWithinDomain()
+    {
+        var brush = new LinearGradient(0, 0, 100, 0,
+            new GradientStop(0, Color.Red),
+            new GradientStop(0.5, Color.Green),
+            new GradientStop(1, Color.Green),
+            new GradientStop(1, Color.Blue));
+
+        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+
+        Assert.Equal(3, Num(func["FunctionType"]!));
+        var bounds = Array(func["Bounds"]!);
+        Assert.Equal(Array(func["Functions"]!).Count - 1, bounds.Count);
+        foreach (var bound in bounds)
+        {
+            var value = Num(bound);
+            Assert.True(value > 0 && value < 1, $"Bounds entry {value} is outside the open domain (0, 1).");
+        }
+    }
+
+    [Fact]
+    public void HardStopAtDomainStart_KeepsBoundsWithinDomain()
+    {
+        var brush = new LinearGradient(0, 0, 100, 0,
+            new GradientStop(0, Color.Red),
+            new GradientStop(0, Color.Green),
+            new GradientStop(0.5, Color.Green),
+            new GradientStop(1, Color.Blue));
+
+        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+
+        var bounds = Array(func["Bounds"]!);
+        Assert.Equal(Array(func["Functions"]!).Count - 1, bounds.Count);
+        foreach (var bound in bounds)
+        {
+            var value = Num(bound);
+            Assert.True(value > 0 && value < 1, $"Bounds entry {value} is outside the open domain (0, 1).");
+        }
+    }
+
+    [Fact]
     public void ThreeStops_TrailingGap_AppendsConstantSegment()
     {
         var brush = new LinearGradient(0, 0, 100, 0,

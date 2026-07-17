@@ -159,8 +159,8 @@ internal static class AnnotationEmitter
 
         dictionary["Type"] = new NameObject("Annot");
         dictionary["Subtype"] = new NameObject(annotation.Subtype);
-        dictionary["Rect"] = RectArray(annotation.Bounds);
-        dictionary["C"] = ColorArray(annotation.Color);
+        dictionary["Rect"] = PageResourceBuilder.NumberBox(annotation.Bounds);
+        dictionary["C"] = PdfColorArray.Rgb(annotation.Color);
         dictionary["CA"] = new NumberObject(annotation.Opacity);
         dictionary["F"] = new NumberObject((int)annotation.Flags);
         dictionary["P"] = context.Pages[context.PageIndex].Reference;
@@ -260,7 +260,7 @@ internal static class AnnotationEmitter
                 dictionary["BS"] = new DictionaryObject { ["W"] = new NumberObject(shape.BorderWidth) };
                 if (shape.InteriorColor is { } interior)
                 {
-                    dictionary["IC"] = ColorArray(interior);
+                    dictionary["IC"] = PdfColorArray.Rgb(interior);
                 }
 
                 break;
@@ -327,7 +327,7 @@ internal static class AnnotationEmitter
         stream.Dictionary["Type"] = new NameObject("XObject");
         stream.Dictionary["Subtype"] = new NameObject("Form");
         stream.Dictionary["FormType"] = new NumberObject(1);
-        stream.Dictionary["BBox"] = RectArray(AppearanceBounds(annotation));
+        stream.Dictionary["BBox"] = PageResourceBuilder.NumberBox(AppearanceBounds(annotation));
         var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
         if (annotation.Opacity < 1)
         {
@@ -406,21 +406,6 @@ internal static class AnnotationEmitter
             throw new InvalidOperationException("Annotation opacity must be between 0 and 1.");
         }
     }
-
-    private static ArrayObject RectArray(PdfRect bounds) =>
-    [
-        new NumberObject(bounds.Left),
-        new NumberObject(bounds.Bottom),
-        new NumberObject(bounds.Right),
-        new NumberObject(bounds.Top),
-    ];
-
-    private static ArrayObject ColorArray(Color color) =>
-    [
-        new NumberObject(color.R / 255.0),
-        new NumberObject(color.G / 255.0),
-        new NumberObject(color.B / 255.0),
-    ];
 
     private static string DefaultAppearance(FreeTextAnnotation annotation)
         => string.Create(CultureInfo.InvariantCulture, $"/{annotation.Font.Name} {annotation.Font.Size:0.###} Tf {annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg");
