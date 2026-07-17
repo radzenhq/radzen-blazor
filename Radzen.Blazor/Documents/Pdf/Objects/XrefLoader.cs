@@ -37,6 +37,19 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         return newest ?? throw new DocumentParseException("Missing trailer.", -1);
     }
 
+    // The table that actually grows is `entries`, which accumulates across every section of
+    // the /Prev chain (bounded only by distinct offsets), plus any classic section not yet
+    // merged into it. Counting per-section instead let a chain of xref streams - whose
+    // subsection counts come from a DECOMPRESSED payload, so ~8 KB yields millions of
+    // entries - build an arbitrary multiple of the cap.
+    private void RequireEntryBudget(int pending)
+    {
+        if (entries.Count + pending >= limits.MaxXrefEntries)
+        {
+            throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
+        }
+    }
+
     private DictionaryObject ReadXrefSectionAt(long offset, IndirectObjectStore store)
     {
         var index = (int)offset;
@@ -49,7 +62,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
     private DictionaryObject ParseClassicXref(int index, IndirectObjectStore store)
     {
         var section = new Dictionary<int, XrefEntry>();
-        var total = 0;
         while (true)
         {
             SkipWhitespace(ref index);
@@ -82,13 +94,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
             var count = (int)ReadLong(ref index);
             for (var i = 0; i < count; i++)
             {
-                // The xref-stream path caps entries; the classic table did not, so a hostile
-                // subsection count could build an unbounded section dictionary.
-                if (++total > limits.MaxXrefEntries)
-                {
-                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
-                }
-
                 var entryOffset = ReadLong(ref index);
                 var entryGeneration = ReadLong(ref index);
                 SkipWhitespace(ref index);
@@ -97,6 +102,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 var number = start + i;
                 if (!entries.ContainsKey(number) && !section.ContainsKey(number))
                 {
+                    RequireEntryBudget(section.Count);
                     section[number] = type == (byte)'n'
                         ? new XrefEntry(1, entryOffset, entryGeneration)
                         : new XrefEntry(0, 0, 0);
@@ -143,7 +149,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         var index = BuildIndex(dict, size);
 
         var pos = 0;
-        var total = 0;
         for (var s = 0; s + 1 < index.Count; s += 2)
         {
             var start = index[s];
@@ -161,11 +166,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
 
             for (var i = 0; i < count; i++)
             {
-                if (++total > limits.MaxXrefEntries)
-                {
-                    throw new DocumentParseException("Cross-reference table exceeds the maximum number of entries.", -1);
-                }
-
                 var field1 = ReadField(decoded, ref pos, w0);
                 var field2 = ReadField(decoded, ref pos, w1);
                 var field3 = ReadField(decoded, ref pos, w2);
@@ -173,6 +173,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 var number = start + i;
                 if (!entries.ContainsKey(number))
                 {
+                    RequireEntryBudget(0);
                     entries[number] = type switch
                     {
                         0 => new XrefEntry(0, 0, 0),
