@@ -127,4 +127,23 @@ public class HexCodecTests
 
         Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", hex);
     }
+
+    [Fact]
+    public void Encode_DestinationTooSmallForAHugeInput_IsStillRejected()
+    {
+        // data.Length * 2 overflows negative above 2^30, so the int guard passed anything.
+        var data = new byte[1 << 30];
+        var destination = new byte[16];
+
+        Assert.Throws<ArgumentException>(() => HexCodec.Encode(data, destination, HexCase.Lower));
+    }
+
+    [Fact]
+    public void EncodeToString_InputTooLargeToEncode_ThrowsDiagnosable()
+    {
+        var data = new byte[1 << 30];
+
+        var error = Assert.Throws<ArgumentException>(() => HexCodec.EncodeToString(data, HexCase.Lower));
+        Assert.Contains("1073741824", error.Message);
+    }
 }

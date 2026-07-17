@@ -32,7 +32,9 @@ internal static class HexCodec
     /// </summary>
     public static void Encode(ReadOnlySpan<byte> data, Span<byte> destination, HexCase hexCase)
     {
-        if (destination.Length < data.Length * 2)
+        // In long: data.Length * 2 overflows to negative above 2^30, and a length is never
+        // less than a negative, so the int form let every oversized input straight through.
+        if (destination.Length < (long)data.Length * 2)
         {
             throw new ArgumentException("Destination is too small for the encoded output.", nameof(destination));
         }
@@ -51,6 +53,15 @@ internal static class HexCodec
     /// </summary>
     public static string EncodeToString(ReadOnlySpan<byte> data, HexCase hexCase)
     {
+        var maxEncodable = Array.MaxLength / 2;
+
+        if (data.Length > maxEncodable)
+        {
+            throw new ArgumentException(
+                $"Cannot hex-encode {data.Length} bytes: the encoded output exceeds the maximum array length. The limit is {maxEncodable} bytes.",
+                nameof(data));
+        }
+
         var digits = Digits(hexCase);
         var chars = new char[data.Length * 2];
 
