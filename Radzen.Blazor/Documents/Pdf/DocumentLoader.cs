@@ -391,7 +391,7 @@ internal static class DocumentLoader
         if (reader.GetDictionary(catalog, "Names") is { } names
             && reader.GetDictionary(names, "EmbeddedFiles") is { } tree)
         {
-            CollectEmbeddedFiles(reader, tree, document, seen, limits, 0);
+            CollectEmbeddedFiles(reader, tree, document, seen, [], limits, 0);
         }
 
         if (reader.GetArray(catalog, "AF") is { } af)
@@ -406,11 +406,14 @@ internal static class DocumentLoader
         }
     }
 
-    private static void CollectEmbeddedFiles(DocumentReader reader, DictionaryObject node, Document document, HashSet<DictionaryObject> seen, ReaderLimits limits, int depth)
+    // `visited` bounds the walk, not `depth`: a chain of nodes each listing the same child twice
+    // is acyclic along every path, so the depth cap never fires while the node count grows as
+    // 2^depth. `seen` cannot serve here - it dedupes filespecs at the leaves, after the fan-out.
+    private static void CollectEmbeddedFiles(DocumentReader reader, DictionaryObject node, Document document, HashSet<DictionaryObject> seen, HashSet<DictionaryObject> visited, ReaderLimits limits, int depth)
     {
-        if (depth > limits.MaxPageTreeDepth)
+        if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
         {
-            throw new DocumentParseException("Maximum name tree depth exceeded.", -1);
+            throw new DocumentParseException("Cyclic or excessively deep embedded-file name tree.", -1);
         }
 
         if (reader.TryGet<ArrayObject>(node, "Kids", out var kids))
@@ -419,7 +422,7 @@ internal static class DocumentLoader
             {
                 if (reader.AsDictionary(kid) is { } child)
                 {
-                    CollectEmbeddedFiles(reader, child, document, seen, limits, depth + 1);
+                    CollectEmbeddedFiles(reader, child, document, seen, visited, limits, depth + 1);
                 }
             }
 
