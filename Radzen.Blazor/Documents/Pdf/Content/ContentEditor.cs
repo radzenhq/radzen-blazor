@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -157,8 +156,7 @@ internal static class ContentEditor
         var array = new List<Token>();
         var frameStart = -1;
         var pathStart = -1;
-        var ctm = Matrix.Identity;
-        var ctmStack = new Stack<Matrix>();
+        var machine = new ContentStateMachine();
         var pathCtm = Matrix.Identity;
         foreach (var token in tokens)
         {
@@ -185,7 +183,7 @@ internal static class ContentEditor
 
             if (token.Kind == TokenKind.InlineImage)
             {
-                result.Add(new Candidate(CandidateKind.InlineImage, token.Start, token.End, [], ctm));
+                result.Add(new Candidate(CandidateKind.InlineImage, token.Start, token.End, [], machine.Ctm));
                 operands.Clear();
                 array.Clear();
                 frameStart = -1;
@@ -199,25 +197,17 @@ internal static class ContentEditor
 
             var start = frameStart < 0 ? token.Start : frameStart;
             var op = token.Text!;
-            if (op == "q")
-            {
-                ctmStack.Push(ctm);
-            }
-            else if (op == "Q")
-            {
-                ctm = ctmStack.Count > 0 ? ctmStack.Pop() : Matrix.Identity;
-            }
-            else if (op == "cm")
-            {
-                ctm = Components(operands) * ctm;
-            }
+
+            // Only the CTM matters here, but reading it through the shared machine is what
+            // keeps the ambient spliced against identical to the one baked into the element.
+            machine.Apply(op, operands);
 
             if (op is "m" or "l" or "c" or "v" or "y" or "re" or "h" or "W" or "W*")
             {
                 if (pathStart < 0)
                 {
                     pathStart = start;
-                    pathCtm = ctm;
+                    pathCtm = machine.Ctm;
                 }
             }
             else if (op is "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n")
@@ -231,9 +221,9 @@ internal static class ContentEditor
             }
             else if (op == "Do")
             {
-                result.Add(new Candidate(CandidateKind.XObject, start, token.End, [], ctm));
+                result.Add(new Candidate(CandidateKind.XObject, start, token.End, [], machine.Ctm));
             }
-            else if (op is "Tj" or "TJ" or "'" or "\"")
+            else if (ContentShows.IsShow(op))
             {
                 var bytes = new List<byte>();
                 foreach (var operand in op == "TJ" ? array : operands)
@@ -244,11 +234,11 @@ internal static class ContentEditor
                     }
                 }
 
-                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ctm));
+                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], machine.Ctm));
             }
             else if (!KnownNonElement(op))
             {
-                result.Add(new Candidate(CandidateKind.Raw, start, token.End, [], ctm));
+                result.Add(new Candidate(CandidateKind.Raw, start, token.End, [], machine.Ctm));
             }
 
             operands.Clear();

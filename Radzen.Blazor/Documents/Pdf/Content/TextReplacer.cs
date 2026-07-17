@@ -62,7 +62,7 @@ internal static class TextReplacer
             return ReplaceMultipleShows(page, hits, replacement, options, content, cache);
         }
 
-        var shows = ParseShows(content, page.TextFonts, cache, includeEveryShow: true);
+        var shows = ParseShows(content, page.TextFonts, cache);
         var grouped = new Dictionary<int, List<TextSourceReference>>();
         foreach (var hit in hits)
         {
@@ -144,7 +144,7 @@ internal static class TextReplacer
 
     private static int ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content, ContentTokenizer.Cache? cache)
     {
-        var shows = ParseShows(content, page.TextFonts, cache, includeEveryShow: true);
+        var shows = ParseShows(content, page.TextFonts, cache);
         var grouped = new Dictionary<int, List<SourceReplacement>>();
         foreach (var hit in hits)
         {
@@ -407,14 +407,13 @@ internal static class TextReplacer
         }
     }
 
-    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache, bool includeEveryShow = false)
+    // Every show operator becomes a Show, in the order and numbering ContentShows defines,
+    // so an index a search produced selects the same operator here.
+    private static List<Show> ParseShows(byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)
     {
         var result = new List<Show>();
         var operands = new List<Token>();
-        string? fontName = null;
-        var font = ReverseFont.WinAnsi;
-        var fontSize = 0.0;
-        var spacing = new TextSpacing();
+        var machine = new ContentStateMachine(fonts, ReverseFont.WinAnsi);
         foreach (var token in ContentTokenizer.Tokenize(content, cache))
         {
             if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
@@ -428,32 +427,12 @@ internal static class TextReplacer
                 continue;
             }
 
-            spacing.Apply(token.Text, operands);
-            switch (token.Text)
+            if (!machine.Apply(token.Text, operands) && ContentShows.IsShow(token.Text))
             {
-                case "Tf":
-                    var name = LastName(operands);
-                    fontName = name;
-                    font = name is not null && fonts is not null && fonts.TryGetValue(name, out var resolved) ? resolved : ReverseFont.WinAnsi;
-                    fontSize = LastNumber(operands);
-                    break;
-                case "Tj":
-                case "'":
-                case "\"":
-                    var text = LastStringToken(operands);
-                    if (text is not null)
-                    {
-                        result.Add(new Show(result.Count, token.Text, text.Value, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
-                    }
-                    else if (includeEveryShow)
-                    {
-                        result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
-                    }
-
-                    break;
-                case "TJ" when includeEveryShow:
-                    result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
-                    break;
+                ref var text = ref machine.Text;
+                result.Add(new Show(result.Count, token.Text!, token.Text == "TJ" ? default : LastStringToken(operands) ?? default,
+                    text.FontName, text.Font ?? ReverseFont.WinAnsi, text.FontSize,
+                    text.Spacing.HorizontalScale, text.Spacing.CharSpacing, text.Spacing.WordSpacing));
             }
 
             operands.Clear();
