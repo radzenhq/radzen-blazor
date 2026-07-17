@@ -51,8 +51,6 @@ internal readonly struct LinePlacementDecision
 
 internal static class LinePlacer
 {
-    private const double Eps = 1e-6;
-
     public static LinePlacementDecision Decide(in LinePlacementRequest r)
     {
         var k = r.LinesThatFit;
@@ -67,7 +65,7 @@ internal static class LinePlacer
         {
             placeCount = nrem;
             if (first && r.KeepWithNext && hasPageContent && r.HasNextBlock &&
-                r.AfterCursor + r.NextBlockLeadingHeight > r.ContentHeight + Eps)
+                r.AfterCursor + r.NextBlockLeadingHeight > r.ContentHeight + PaginationContext.Eps)
             {
                 moveWhole = true;
             }

@@ -51,11 +51,10 @@ public static class PdfTimestamper
     {
         ArgumentNullException.ThrowIfNull(pdf);
         ArgumentNullException.ThrowIfNull(provider);
-        const int maxReservation = 16 * 1024 * 1024;
-        if (reservedBytes < 1 || reservedBytes > maxReservation)
+        if (reservedBytes < 1 || reservedBytes > PdfSigner.MaxReservation)
         {
             throw new ArgumentOutOfRangeException(nameof(reservedBytes), reservedBytes,
-                $"reservedBytes must be between 1 and {maxReservation}.");
+                $"reservedBytes must be between 1 and {PdfSigner.MaxReservation}.");
         }
 
         var signature = new DictionaryObject

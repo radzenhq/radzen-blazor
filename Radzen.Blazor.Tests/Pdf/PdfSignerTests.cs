@@ -422,4 +422,44 @@ public class PdfSignerTests
 
         Assert.True(first.SequenceEqual(second));
     }
+
+    // The reservation bound is shared by PdfSigner and PdfTimestamper because both size the
+    // same /Contents placeholder. These pin the accepted range and the message on both sides
+    // so the shared constant cannot drift unnoticed.
+    private sealed class UnusedSigner : ISigner
+    {
+        public byte[] Sign(SignedContent content) => throw new InvalidOperationException("must not be called");
+    }
+
+    private sealed class UnusedTimestampProvider : ITimestampProvider
+    {
+        public byte[] GetTimestampToken(ReadOnlySpan<byte> hash) => throw new InvalidOperationException("must not be called");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(16 * 1024 * 1024 + 1)]
+    public void Sign_SignatureMaxSizeBytesOutOfRange_Throws(int size)
+    {
+        var options = Options();
+        options.SignatureMaxSizeBytes = size;
+
+        var e = Assert.Throws<ArgumentOutOfRangeException>(
+            () => PdfSigner.Sign(BuildPdf(), options, new UnusedSigner()));
+
+        Assert.Contains("must be between 1 and 16777216", e.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(16 * 1024 * 1024 + 1)]
+    public void Timestamp_ReservedBytesOutOfRange_Throws(int reservedBytes)
+    {
+        var e = Assert.Throws<ArgumentOutOfRangeException>(
+            () => PdfTimestamper.Timestamp(BuildPdf(), new UnusedTimestampProvider(), reservedBytes));
+
+        Assert.Contains("must be between 1 and 16777216", e.Message, StringComparison.Ordinal);
+    }
 }

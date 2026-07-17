@@ -34,6 +34,10 @@ public static class PdfSigner
     internal static DocumentObject ByteRangePlaceholder()
         => new RawTokenObject("[" + "0 0 0 0".PadRight(ByteRangeInteriorWidth) + "]");
 
+    // Upper bound keeps reservedBytes * 2 (the reserved hex-digit count) well inside
+    // int range; real CMS blobs and RFC 3161 tokens are a few KB.
+    internal const int MaxReservation = 16 * 1024 * 1024;
+
     internal static DocumentObject ContentsPlaceholder(int reservedBytes)
         => new RawTokenObject("<" + new string('0', reservedBytes * 2) + ">");
 
@@ -52,13 +56,10 @@ public static class PdfSigner
         ArgumentNullException.ThrowIfNull(pdf);
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(signer);
-        // Upper bound keeps SignatureMaxSizeBytes * 2 (the reserved hex-digit
-        // count) well inside int range; real CMS blobs are a few KB.
-        const int maxReservation = 16 * 1024 * 1024;
-        if (options.SignatureMaxSizeBytes < 1 || options.SignatureMaxSizeBytes > maxReservation)
+        if (options.SignatureMaxSizeBytes < 1 || options.SignatureMaxSizeBytes > MaxReservation)
         {
             throw new ArgumentOutOfRangeException(nameof(options), options.SignatureMaxSizeBytes,
-                $"SignatureMaxSizeBytes must be between 1 and {maxReservation}.");
+                $"SignatureMaxSizeBytes must be between 1 and {MaxReservation}.");
         }
 
         if (string.IsNullOrEmpty(options.SubFilter))

@@ -169,4 +169,18 @@ public class Ascii85FilterTests
 
         Assert.Contains("0x5A", e.Message);
     }
+
+    // 2^30 is the smallest input whose encoded length exceeds the maximum byte[], so the
+    // input size is the thing under test and cannot be scaled down. The array is zero pages
+    // that nothing reads and the length check rejects before encoding, so this costs virtual
+    // address space rather than resident memory or time.
+    [Fact]
+    public void Encode_InputTooLargeToEncode_ThrowsDiagnosable()
+    {
+        var data = new byte[1 << 30];
+
+        var e = Assert.Throws<ArgumentException>(() => AsciiHexFilter.Encode(data));
+
+        Assert.Contains("ASCIIHex", e.Message, StringComparison.Ordinal);
+    }
 }
