@@ -123,13 +123,23 @@ internal static class ContentEditor
                 continue;
             }
 
+            var spliced = false;
             foreach (var inserted in insertsBefore[item.Element])
             {
+                writer.EnsureSeparated();
                 inserted.Emit(writer);
+                spliced = true;
             }
 
             if (!item.Element.IsModified)
             {
+                // Only after a splice: two raw spans are adjacent in the source and already
+                // lex apart, so padding them would move bytes that were never edited.
+                if (spliced)
+                {
+                    writer.EnsureSeparated();
+                }
+
                 writer.WriteBytes(source.AsSpan(item.Start, item.End - item.Start));
             }
             else
@@ -140,13 +150,22 @@ internal static class ContentEditor
                     run.InsideTextObject = item.InsideTextObject;
                 }
 
+                writer.EnsureSeparated();
                 item.Element.Emit(writer, Relative(item.Element.Transform, item.Ambient));
             }
         }
 
+        var appended = false;
         foreach (var inserted in tail)
         {
+            writer.EnsureSeparated();
             inserted.Emit(writer);
+            appended = true;
+        }
+
+        if (appended)
+        {
+            writer.EnsureSeparated();
         }
 
         writer.WriteBytes(source.AsSpan(cursor));

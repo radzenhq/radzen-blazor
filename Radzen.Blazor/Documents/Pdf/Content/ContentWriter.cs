@@ -77,6 +77,24 @@ public sealed class ContentWriter : IDisposable
         length += bytes.Length;
     }
 
+    // Splicing emitted content against raw source bytes fuses the two tokens either side of the
+    // join ("Tj" + "q" lexes as one "Tjq"), destroying both. Every element emits a regular
+    // character first, so a preceding regular character is exactly the fusing case; a delimiter
+    // or whitespace already ends the token and must not be padded, or untouched bytes would move.
+    internal void EnsureSeparated()
+    {
+        if (length == 0)
+        {
+            return;
+        }
+
+        var last = buffer[length - 1];
+        if (!Lexer.IsWhitespace(last) && !Lexer.IsDelimiter(last))
+        {
+            WriteRaw("\n");
+        }
+    }
+
     internal ContentEmissionResult DetachResult() => new(
         ToArray(),
         new ContentResourceManifest([.. fonts.Values], [.. images.Values], [.. patterns.Values], [.. extGStates.Values]),
