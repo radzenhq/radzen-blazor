@@ -47,9 +47,7 @@ internal static class Redactor
             return;
         }
 
-        page.ApplyPendingContentEdits();
-
-        if (page.RawContent is { Length: > 0 } raw)
+        if (page.CurrentContent is { Length: > 0 } raw)
         {
             var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
             foreach (var run in page.ExtractPositionedText(cache))
