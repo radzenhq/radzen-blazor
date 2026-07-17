@@ -358,9 +358,10 @@ public sealed class FontCollection
         return shaper;
     }
 
-    // Mirrors DocumentGenerator.EmitBase14Fragment: WinAnsi codepoints use base-14
-    // widths, non-WinAnsi codepoints served by the fallback chain use the fallback
-    // face's advances, and anything else measures as the '?' substitute.
+    // WinAnsi codepoints use base-14 widths, non-WinAnsi codepoints served by the fallback
+    // chain use the fallback face's advances, and anything else measures as the '?' substitute.
+    // Pair kerning goes through Base14Metrics.GetRunKerning, the same seam TextLineEmitter
+    // emits from, so this width is the width drawn.
     private double MeasureBase14(string text, Font font, Base14Metrics metrics)
     {
         WinAnsiEncoding.TryGetCode('?', out var question);
@@ -374,7 +375,7 @@ public sealed class FontCollection
             {
                 if (EnableKerning && prevBase14 is { } prev)
                 {
-                    sum += metrics.GetKerning(prev, (char)codepoint) * font.Size / 1000.0;
+                    sum += metrics.GetRunKerning(prev, (char)codepoint) * font.Size / 1000.0;
                 }
 
                 sum += metrics.GetWidth(code) * font.Size / 1000.0;

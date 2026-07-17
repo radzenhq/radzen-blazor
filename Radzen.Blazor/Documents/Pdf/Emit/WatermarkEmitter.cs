@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Fonts;
 using static Radzen.Documents.Pdf.Emit.GeneratorFontResolver;
 
 namespace Radzen.Documents.Pdf.Emit;
@@ -27,8 +28,8 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
             var (width, height) = ImageDecoder.Measure(image, generated.Image, plan.Size.Width.Point);
             draw.Image = new ImageDraw
             {
-                X = -width / 2,
-                Y = -height / 2,
+                X = WatermarkGeometry.Centered(width),
+                Y = WatermarkGeometry.Centered(height),
                 Width = width,
                 Height = height,
                 Image = generated,
@@ -50,10 +51,10 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
     private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Font font)
     {
         var size = font.Size;
-        var baseline = -size * 0.35;
+        var baseline = WatermarkGeometry.Baseline(size);
         if (fonts.TryResolvePrimary(font, out var primary))
         {
-            var x = -fonts.MeasureText(text, font) / 2;
+            var x = WatermarkGeometry.Centered(fonts.MeasureText(text, font));
             var i = 0;
             while (i < text.Length)
             {
@@ -93,28 +94,20 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         else
         {
             // Base-14 watermarks are WinAnsi-only; fail loud rather than silently dropping
-            // unrepresentable codepoints (which would blank or mangle the watermark).
-            foreach (var c in text)
-            {
-                if (!IsWinAnsi(c))
-                {
-                    throw new NotSupportedException(
-                        $"Watermark text contains a character (U+{(int)c:X4}) not representable in the base-14 WinAnsi encoding; register a font that covers it.");
-                }
-            }
-
+            // unrepresentable codepoints (which would blank or mangle the watermark). Encoded
+            // before the plan is touched so a rejected watermark leaves no font registered.
+            var bytes = WinAnsiText.Encode(text, OnUnencodable.Throw, WatermarkGeometry.EncodingContext);
             var metrics = Fonts.Base14Metrics.Resolve(font) ?? Fonts.Base14Metrics.Resolve(new Font())!;
-            var segment = text;
             var generated = fontResolver.ResolveBase14(font);
             plan.UsedFonts.Add(generated);
             draw.Texts.Add(new TextDraw
             {
-                X = -metrics.MeasureString(segment, size) / 2,
+                X = WatermarkGeometry.Centered(metrics.MeasureString(text, size)),
                 Baseline = baseline,
                 Size = size,
                 Color = font.Color,
                 Font = generated,
-                Bytes = EncodeWinAnsi(segment),
+                Bytes = bytes,
             });
         }
     }

@@ -435,11 +435,7 @@ internal sealed class TextLineEmitter(
                     var list = new List<double>(segment.Length - 1);
                     for (var k = 1; k < segment.Length; k++)
                     {
-                        // A pair straddling a space is never kerned: coalescing joined
-                        // separately-measured words across the space, so layout never saw it.
-                        var kern = segment[k - 1] == ' ' || segment[k] == ' '
-                            ? 0
-                            : metrics.GetKerning(segment[k - 1], segment[k]);
+                        var kern = metrics.GetRunKerning(segment[k - 1], segment[k]);
                         kernPoints += kern * size / 1000.0;
                         list.Add(-kern);
                     }
@@ -454,7 +450,7 @@ internal sealed class TextLineEmitter(
                     Size = size,
                     Color = font.Color,
                     Font = generated,
-                    Bytes = EncodeWinAnsi(segment),
+                    Bytes = WinAnsiText.Encode(segment, OnUnencodable.Substitute),
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,

@@ -1,4 +1,5 @@
 using System;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf;
 
@@ -55,4 +56,69 @@ public readonly struct Rect(double x, double y, double width, double height) : I
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(X, Y, Width, Height);
+}
+
+/// <summary>How <see cref="PdfRects.Read"/> answers a missing, short or non-numeric /Rect array.</summary>
+internal readonly struct RectPolicy
+{
+    private RectPolicy(string? missingMessage, string? nonNumericMessage, double fallbackWidth, double fallbackHeight)
+    {
+        MissingMessage = missingMessage;
+        NonNumericMessage = nonNumericMessage;
+        FallbackWidth = fallbackWidth;
+        FallbackHeight = fallbackHeight;
+    }
+
+    public string? MissingMessage { get; }
+
+    public string? NonNumericMessage { get; }
+
+    public double FallbackWidth { get; }
+
+    public double FallbackHeight { get; }
+
+    public bool Throws => MissingMessage is not null;
+
+    /// <summary>Requires exactly four resolvable numbers, throwing <see cref="DocumentParseException"/> otherwise.</summary>
+    public static RectPolicy Strict(string missingMessage, string nonNumericMessage)
+        => new(missingMessage, nonNumericMessage, 0, 0);
+
+    /// <summary>Reads a missing or short array as an empty rectangle, and any non-numeric coordinate as zero.</summary>
+    public static RectPolicy ZeroFallback { get; } = new(null, null, 0, 0);
+
+    /// <summary>Reads a missing or short array as the given size at the origin, and any non-numeric coordinate as zero.</summary>
+    public static RectPolicy DefaultSize(double width, double height) => new(null, null, width, height);
+}
+
+/// <summary>Reads a PDF /Rect array into PDF user space (Y-up, bottom-left origin).</summary>
+internal static class PdfRects
+{
+    // A legal /Rect may state its corners in either order and may hold indirect references
+    // (ISO 32000-1 7.9.5), so each coordinate is resolved and the result normalised.
+    public static TextBounds Read(DocumentReader reader, ArrayObject? value, RectPolicy policy)
+    {
+        if (value is null || value.Count < 4 || (policy.Throws && value.Count != 4))
+        {
+            return policy.Throws
+                ? throw new DocumentParseException(policy.MissingMessage!, -1)
+                : new TextBounds(0, 0, policy.FallbackWidth, policy.FallbackHeight);
+        }
+
+        var corners = new double[4];
+        for (var i = 0; i < corners.Length; i++)
+        {
+            corners[i] = reader.AsNumber(value[i]) switch
+            {
+                { } number => number,
+                null when policy.Throws => throw new DocumentParseException(policy.NonNumericMessage!, -1),
+                null => 0.0,
+            };
+        }
+
+        return new TextBounds(
+            Math.Min(corners[0], corners[2]),
+            Math.Min(corners[1], corners[3]),
+            Math.Max(corners[0], corners[2]),
+            Math.Max(corners[1], corners[3]));
+    }
 }

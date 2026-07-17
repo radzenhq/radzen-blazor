@@ -406,18 +406,8 @@ public sealed class AcroForm
 
     private (double Width, double Height) RectSize(DictionaryObject field)
     {
-        if (reader.GetArray(field, "Rect") is { } rect && rect.Count >= 4)
-        {
-            // Resolve each coordinate: a legal /Rect may hold indirect references, which
-            // read as 0 unless resolved and would collapse the appearance box to nothing.
-            var x0 = reader.AsNumber(rect[0]) ?? 0.0;
-            var y0 = reader.AsNumber(rect[1]) ?? 0.0;
-            var x1 = reader.AsNumber(rect[2]) ?? 0.0;
-            var y1 = reader.AsNumber(rect[3]) ?? 0.0;
-            return (Math.Abs(x1 - x0), Math.Abs(y1 - y0));
-        }
-
-        return (200.0, 14.0);
+        var rect = PdfRects.Read(reader, reader.GetArray(field, "Rect"), RectPolicy.DefaultSize(200.0, 14.0));
+        return (rect.Width, rect.Height);
     }
 
     // Resolves the /DA to draw the value with: the field's own /DA wins, else the widget's,

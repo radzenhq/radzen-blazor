@@ -287,18 +287,13 @@ internal static class AnnotationReader
         return annotation;
     }
 
+    // Annotation.Bounds is a Rect but holds PDF user space, so the read crosses conventions here.
     private static Rect Bounds(DocumentReader reader, ArrayObject? value)
     {
-        if (value is null || value.Count != 4)
-        {
-            throw new DocumentParseException("A modeled annotation requires a four-number /Rect array.", -1);
-        }
-
-        var x0 = Number(reader, value[0]);
-        var y0 = Number(reader, value[1]);
-        var x1 = Number(reader, value[2]);
-        var y1 = Number(reader, value[3]);
-        return new Rect(Math.Min(x0, x1), Math.Min(y0, y1), Math.Abs(x1 - x0), Math.Abs(y1 - y0));
+        var bounds = PdfRects.Read(reader, value, RectPolicy.Strict(
+            "A modeled annotation requires a four-number /Rect array.",
+            "An annotation coordinate is not numeric."));
+        return new Rect(bounds.Left, bounds.Bottom, bounds.Width, bounds.Height);
     }
 
     private static Color? ReadColor(DocumentReader reader, ArrayObject? value)
