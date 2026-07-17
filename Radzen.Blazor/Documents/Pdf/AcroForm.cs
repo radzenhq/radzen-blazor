@@ -28,10 +28,6 @@ public sealed class AcroForm
 
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
 
-    // The current root-to-node path (removed on exit), so it rejects a /Kids cycle only.
-    // It bounds neither recursion depth nor node count - see Collect.
-    private readonly HashSet<DictionaryObject> visiting = [];
-
     internal AcroForm(DocumentReader reader, DictionaryObject dictionary, Document owner)
     {
         this.reader = reader;
@@ -40,9 +36,10 @@ public sealed class AcroForm
 
         if (reader.GetArray(dictionary, "Fields") is { } entries)
         {
+            var visited = new HashSet<DictionaryObject>();
             foreach (var entry in entries)
             {
-                Collect(entry, string.Empty);
+                Collect(entry, string.Empty, visited, 0);
             }
         }
     }
@@ -64,59 +61,54 @@ public sealed class AcroForm
     private readonly record struct Terminal(DictionaryObject Field, IReadOnlyList<DictionaryObject> Widgets);
 
     // A /T on a kid is what distinguishes a non-terminal node from a terminal whose kids are
-    // merely its widget annotations (ISO 32000-1 12.7.3.1).
-    private void Collect(DocumentObject entry, string prefix)
+    // merely its widget annotations (ISO 32000-1 12.7.3.1). `visited` bounds the walk against a
+    // cyclic or DAG-shared field tree and MaxPageTreeDepth against a deep acyclic one, the same
+    // pair every other loaded tree walk (pages, name trees, outline) uses.
+    private void Collect(DocumentObject entry, string prefix, HashSet<DictionaryObject> visited, int depth)
     {
         if (reader.AsDictionary(entry) is not { } dict)
         {
             return;
         }
 
-        if (!visiting.Add(dict))
+        if (depth > reader.Limits.MaxPageTreeDepth || !visited.Add(dict))
         {
-            throw new DocumentParseException("Cyclic /Kids reference in the field tree.");
+            throw new DocumentParseException("Cyclic or excessively deep /Kids field tree.");
         }
 
-        try
+        var partial = PartialName(dict);
+        var qualified = prefix.Length == 0 ? partial : prefix + "." + partial;
+
+        var fieldKids = new List<DocumentObject>();
+        foreach (var kid in Kids(dict))
         {
-            var partial = PartialName(dict);
-            var qualified = prefix.Length == 0 ? partial : prefix + "." + partial;
-
-            var fieldKids = new List<DocumentObject>();
-            foreach (var kid in Kids(dict))
+            if (reader.AsDictionary(kid) is { } kidDict && kidDict.ContainsKey("T"))
             {
-                if (reader.AsDictionary(kid) is { } kidDict && kidDict.ContainsKey("T"))
-                {
-                    fieldKids.Add(kid);
-                }
+                fieldKids.Add(kid);
             }
-
-            if (fieldKids.Count > 0)
-            {
-                foreach (var kid in fieldKids)
-                {
-                    Collect(kid, qualified);
-                }
-
-                return;
-            }
-
-            // Two root fields legally may share a /T in malformed-but-real PDFs; keep both
-            // reachable by suffixing the collision so terminals, FieldNames and Fields agree.
-            var key = qualified;
-            for (var index = 2; terminals.ContainsKey(key); index++)
-            {
-                key = qualified + "_" + index;
-            }
-
-            terminals[key] = new Terminal(dict, WidgetsOf(dict));
-            fieldNames.Add(key);
-            fields.Add(new FormField(reader, dict, key));
         }
-        finally
+
+        if (fieldKids.Count > 0)
         {
-            visiting.Remove(dict);
+            foreach (var kid in fieldKids)
+            {
+                Collect(kid, qualified, visited, depth + 1);
+            }
+
+            return;
         }
+
+        // Two root fields legally may share a /T in malformed-but-real PDFs; keep both
+        // reachable by suffixing the collision so terminals, FieldNames and Fields agree.
+        var key = qualified;
+        for (var index = 2; terminals.ContainsKey(key); index++)
+        {
+            key = qualified + "_" + index;
+        }
+
+        terminals[key] = new Terminal(dict, WidgetsOf(dict));
+        fieldNames.Add(key);
+        fields.Add(new FormField(reader, dict, key));
     }
 
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)

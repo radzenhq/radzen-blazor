@@ -265,7 +265,9 @@ internal static class LineTokenizer
     }
 
     // A run's measured advance: the plain measurement scaled to the script size, plus
-    // letter spacing per inter-glyph gap (spacing * (code points - 1)).
+    // Measurement must match what the emitter draws: scale by /HorizontalScale (Tz, ISO
+    // 32000-1 9.4.4) or lines lay out at a width the glyphs never occupy. Tw is excluded - it
+    // only advances code 32, and word pieces never contain a space.
     private static double MeasureRun(FontCollection fonts, Run run, Font font, string text)
     {
         var advance = fonts.MeasureText(text, font) * run.ScriptScale;
@@ -275,7 +277,7 @@ internal static class LineTokenizer
             advance += spacing * (CountCodePoints(text) - 1);
         }
 
-        return advance;
+        return advance * (run.HorizontalScale / 100.0);
     }
 
     private static int CountCodePoints(string text)
