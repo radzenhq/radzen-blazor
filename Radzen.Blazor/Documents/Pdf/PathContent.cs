@@ -204,7 +204,7 @@ public sealed class PathContent : ContentElement
     /// </summary>
     /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
     public void SetFillGray(double gray)
-        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [Clamp(gray)]);
+        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
 
     /// <summary>
     /// Sets the stroke color to a DeviceGray color (the <c>G</c> operator), from 0
@@ -212,12 +212,11 @@ public sealed class PathContent : ContentElement
     /// </summary>
     /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
     public void SetStrokeGray(double gray)
-        => StrokePaint = new DeviceColor(DeviceColorKind.Gray, null, [Clamp(gray)]);
+        => StrokePaint = new DeviceColor(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
 
     private static DeviceColor Cmyk(double c, double m, double y, double k)
-        => new(DeviceColorKind.Cmyk, null, [Clamp(c), Clamp(m), Clamp(y), Clamp(k)]);
-
-    private static double Clamp(double value) => value < 0 ? 0 : value > 1 ? 1 : value;
+        => new(DeviceColorKind.Cmyk, null,
+            [UnitInterval.Clamp(c), UnitInterval.Clamp(m), UnitInterval.Clamp(y), UnitInterval.Clamp(k)]);
 
     /// <summary>
     /// Sets the dash pattern (the <c>d</c> operator). The pattern is a sequence of

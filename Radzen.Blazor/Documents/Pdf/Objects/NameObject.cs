@@ -31,20 +31,32 @@ public sealed class NameObject(string value) : DocumentObject
     // which is the case for almost every name written by the generator.
     internal static void WriteEscaped(Stream stream, string name)
     {
+        if (NeedsEscaping(name))
+        {
+            PdfBytes.WriteAscii(stream, Escape(name));
+            return;
+        }
+
+        stream.WriteByte((byte)'/');
+        PdfBytes.WriteAscii(stream, name);
+    }
+
+    // Whether any character forces the #xx-escaped form. Returning early on the first such
+    // character is safe because Escape re-scans and re-applies ThrowIfUnencodable to the rest.
+    internal static bool NeedsEscaping(string name)
+    {
         foreach (var ch in name)
         {
             ThrowIfUnencodable(ch, name);
 
             var code = ch & 0xFF;
-            if (code <= 0x20 || code >= 0x7F || IsDelimiter(code) || code == '#')
+            if (code <= 0x20 || code >= 0x7F || Lexer.IsDelimiter((byte)code) || code == '#')
             {
-                PdfBytes.WriteAscii(stream, Escape(name));
-                return;
+                return true;
             }
         }
 
-        stream.WriteByte((byte)'/');
-        PdfBytes.WriteAscii(stream, name);
+        return false;
     }
 
     internal static string Escape(string name)
@@ -57,7 +69,7 @@ public sealed class NameObject(string value) : DocumentObject
             ThrowIfUnencodable(ch, name);
 
             var code = ch & 0xFF;
-            if (code > 0x20 && code < 0x7F && !IsDelimiter(code) && code != '#')
+            if (code > 0x20 && code < 0x7F && !Lexer.IsDelimiter((byte)code) && code != '#')
             {
                 builder.Append((char)code);
             }
@@ -78,14 +90,5 @@ public sealed class NameObject(string value) : DocumentObject
         {
             throw new NotSupportedException($"Name '{name}' contains a code point (U+{(int)ch:X4}) outside the encodable range.");
         }
-    }
-
-    private static bool IsDelimiter(int code)
-    {
-        return code switch
-        {
-            '(' or ')' or '<' or '>' or '[' or ']' or '{' or '}' or '/' or '%' => true,
-            _ => false,
-        };
     }
 }

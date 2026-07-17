@@ -88,7 +88,7 @@ public class Run(string text)
     /// </summary>
     /// <param name="gray">The gray level, clamped to 0..1.</param>
     public void SetFillGray(double gray)
-        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [ClampUnit(gray)]);
+        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
 
     /// <summary>
     /// Sets the run fill colour to a DeviceCMYK colour (the <c>k</c> operator). Each
@@ -100,9 +100,8 @@ public class Run(string text)
     /// <param name="black">The black (key) component.</param>
     public void SetFillCmyk(double cyan, double magenta, double yellow, double black)
         => FillPaint = new DeviceColor(
-            DeviceColorKind.Cmyk, null, [ClampUnit(cyan), ClampUnit(magenta), ClampUnit(yellow), ClampUnit(black)]);
-
-    private static double ClampUnit(double value) => value < 0 ? 0 : value > 1 ? 1 : value;
+            DeviceColorKind.Cmyk, null,
+            [UnitInterval.Clamp(cyan), UnitInterval.Clamp(magenta), UnitInterval.Clamp(yellow), UnitInterval.Clamp(black)]);
 
     /// <summary>Gets the run font.</summary>
     public Font Font { get; } = new();
