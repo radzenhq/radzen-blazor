@@ -32,8 +32,6 @@ public sealed class StreamObject(ReadOnlyMemory<byte> data) : DocumentObject
         var encryptor = context.Encryptor;
         if (encryptor is not null)
         {
-            // Pass the dictionary so a /Type /Metadata stream is left plaintext when the
-            // writer's /EncryptMetadata flag is false.
             payload = encryptor.EncryptStream(Data, context.ObjectNumber, context.Generation, Dictionary);
         }
 

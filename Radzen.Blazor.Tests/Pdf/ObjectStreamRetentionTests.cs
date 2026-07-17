@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A decoded ObjStm payload commonly runs several times the stored size, and every member
-// parsed out of it is independently cached by object number. Once every xref entry pointing
-// into a container has published its member, nothing can ask for the container again, so
-// holding its decoded bytes for the reader's lifetime is pure retention. Dropping it must
-// never cost a re-decode, including for a file that names members that do not parse.
 public class ObjectStreamRetentionTests
 {
     private static ConcurrentDictionary<int, ObjectStream> ObjectStreamsOf(DocumentReader reader)
@@ -37,9 +32,6 @@ public class ObjectStreamRetentionTests
         return total;
     }
 
-    // Objects 1, 2 and 3 are members of the ObjStm (object 4); object 5 is the xref stream.
-    // extraBogusMembers appends type-2 entries naming indices past the container's member
-    // list: they reach the container but can never parse.
     private static byte[] HandCraftedObjStmFile(int extraBogusMembers = 0)
     {
         var b1 = "42";
@@ -121,9 +113,6 @@ public class ObjectStreamRetentionTests
         Assert.True(RetainedDecodedBytes(reader) > 0);
     }
 
-    // The eviction rule counts xref entries, not the container's own header. A crafted file
-    // whose extra entries reach the container but never parse must keep it cached: evicting
-    // on the three good members would let each bogus entry re-decode the whole payload.
     [Fact]
     public void ObjStm_EntriesThatCanNeverParseKeepTheContainerCached()
     {
@@ -152,8 +141,6 @@ public class ObjectStreamRetentionTests
         Assert.Equal("x", Assert.IsType<StringObject>(dict["B"]).Value);
         Assert.Equal("Catalog", Assert.IsType<NameObject>(Assert.IsType<DictionaryObject>(reader.GetObject(3))["Type"]).Value);
 
-        // Reference identity is what write-back and BuildObjectNumberIndex rely on; a
-        // released container must not mean a member reparses into a second instance.
         Assert.Same(first[0], reader.GetObject(1));
         Assert.Same(first[1], reader.GetObject(2));
         Assert.Same(first[2], reader.GetObject(3));
@@ -172,9 +159,6 @@ public class ObjectStreamRetentionTests
         Assert.Equal(0, RetainedDecodedBytes(reader));
     }
 
-    // The real shape of the win: a compressed document packs every non-stream object into
-    // ObjStms, so a walk of the whole graph decodes payloads several times the file's size
-    // and used to hold all of them for the reader's lifetime.
     [Fact]
     public void CompressedDocument_HoldsNoDecodedObjectStreamsAfterAFullGraphWalk()
     {

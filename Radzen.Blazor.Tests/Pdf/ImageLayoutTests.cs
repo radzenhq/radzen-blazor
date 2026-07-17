@@ -27,7 +27,6 @@ public class ImageLayoutTests
 
         var (width, height) = Measure(image);
 
-        // scale = min(80/100, 80/50) = 0.8 -> 80x40, fitting both bounds and keeping the 2:1 aspect.
         Assert.Equal(80, width, 3);
         Assert.Equal(40, height, 3);
         Assert.True(width <= 80 + 1e-6 && height <= 80 + 1e-6);
@@ -44,7 +43,6 @@ public class ImageLayoutTests
 
         var (width, height) = Measure(image);
 
-        // scale = min(80/50, 80/100) = 0.8 -> 40x80.
         Assert.Equal(40, width, 3);
         Assert.Equal(80, height, 3);
         Assert.True(width <= 80 + 1e-6 && height <= 80 + 1e-6);
@@ -59,7 +57,6 @@ public class ImageLayoutTests
 
         var (width, height) = Measure(image);
 
-        // 64x64 natural -> 48x48 pt base; min(30/48, 120/48) = 0.625 -> 30x30.
         Assert.Equal(30, width, 3);
         Assert.Equal(30, height, 3);
     }

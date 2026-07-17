@@ -8,7 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared helpers for the C4a content-interpreter / lazy-materialization tests.
 internal static class InterpreterTestSupport
 {
     public static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -19,8 +18,6 @@ internal static class InterpreterTestSupport
         return Document.LoadFromStream(stream);
     }
 
-    // Round-trips a document through save + load so its pages carry retained raw
-    // content bytes and materialize lazily on first Content access.
     public static Document SaveAndLoad(Document document) => Load(document.ToArray());
 
     public static byte[] PageContentBytes(byte[] file, int pageIndex)
@@ -29,8 +26,6 @@ internal static class InterpreterTestSupport
     public static void AssertMatrix(Matrix expected, Matrix actual)
         => AssertMatrix(expected.A, expected.B, expected.C, expected.D, expected.E, expected.F, actual);
 
-    // Matrix has no arbitrary-component constructor, so expected values that are not
-    // expressible via Translate/Scale/Rotate are asserted component-wise here.
     public static void AssertMatrix(double a, double b, double c, double d, double e, double f, Matrix actual)
     {
         Assert.Equal(a, actual.A, 3);

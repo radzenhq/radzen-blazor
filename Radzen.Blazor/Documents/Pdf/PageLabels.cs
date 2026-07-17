@@ -72,8 +72,6 @@ public sealed class PageLabel(int startPage) : ITracksChanges
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
-// Serializes Document.PageLabels as the catalog /PageLabels number tree (ISO 32000-1
-// 12.4.2): a /Nums array pairing each range's start page index with its label dict.
 internal static class PageLabelsWriter
 {
     private static string StyleName(PageLabelStyle style) => style switch
@@ -90,9 +88,7 @@ internal static class PageLabelsWriter
         var sorted = new List<PageLabel>(labels);
         sorted.Sort((a, b) => a.StartPage.CompareTo(b.StartPage));
 
-        // ISO 32000-1 12.4.2: the number tree must define a label for page index 0,
-        // start pages must be distinct, and /St ordinals are integers >= 1. Emitting
-        // any of these malformed produces a tree viewers ignore, so fail loud.
+        // ISO 32000-1 12.4.2: the number tree must define a label for page index 0.
         if (sorted[0].StartPage != 0)
         {
             throw new InvalidOperationException(

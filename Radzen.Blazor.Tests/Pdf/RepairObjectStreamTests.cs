@@ -6,15 +6,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Repair must recover objects compressed inside /Type /ObjStm containers. When a
-// modern PDF stores its catalog/pages inside an object stream and its xref is
-// unusable, the header scan only sees the container's "N G obj"; the members need
-// synthesized type-2 entries so /Root and the compressed objects still resolve.
 public class RepairObjectStreamTests
 {
-    // Objects 1 (int), 2 (dict), 3 (Catalog) live inside ObjStm object 4; object 5
-    // is the xref stream. Removing the xref stream object and startxref forces the
-    // repair scan, which can only see "4 0 obj".
     private static byte[] ObjStmFile(bool withXref)
     {
         var b1 = "42";
@@ -56,7 +49,6 @@ public class RepairObjectStreamTests
         return pdf.ToArray();
     }
 
-    // Sanity: with the xref stream present the compressed catalog resolves normally.
     [Fact]
     public void IntactXref_ResolvesCompressedCatalog()
     {

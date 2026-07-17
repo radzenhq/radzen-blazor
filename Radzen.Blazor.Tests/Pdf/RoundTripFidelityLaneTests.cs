@@ -9,8 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// fx-roundtrip lane: load->save fidelity for /Info dates+producer, embedded
-// files (/AF + /Names EmbeddedFiles), and TJ intra-run displacements.
 public class RoundTripFidelityLaneTests
 {
     private static Document Load(byte[] bytes)
@@ -28,7 +26,6 @@ public class RoundTripFidelityLaneTests
     private static string Name(DocumentReader reader, DictionaryObject dictionary, string key)
         => Assert.IsType<NameObject>(reader.Resolve(dictionary[key])).Value;
 
-    // ---- Fix 1: /Info Producer / CreationDate / ModDate survive load->save ----
 
     private static byte[] BuildWithInfo()
     {
@@ -77,7 +74,6 @@ public class RoundTripFidelityLaneTests
         Assert.Equal("Overridden", Assert.IsType<StringObject>(reader.Resolve(info["Producer"])).Value);
     }
 
-    // ---- Fix 2: embedded files / /AF / /Names EmbeddedFiles survive load->save ----
 
     private static byte[] BuildWithEmbeddedFile()
     {
@@ -112,14 +108,12 @@ public class RoundTripFidelityLaneTests
         var reader = SaveAndParse(Load(BuildWithEmbeddedFile()));
         var catalog = Catalog(reader);
 
-        // /AF associated file array survives.
         Assert.True(catalog.TryGetValue("AF", out var afObject), "catalog has /AF");
         var af = Assert.IsType<ArrayObject>(reader.Resolve(afObject!));
         var filespec = Assert.IsType<DictionaryObject>(reader.Resolve(af[0]));
         Assert.Equal("factur-x.xml", Assert.IsType<StringObject>(reader.Resolve(filespec["F"])).Value);
         Assert.Equal("Data", Name(reader, filespec, "AFRelationship"));
 
-        // /Names EmbeddedFiles name tree survives and the payload round-trips.
         var names = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Names"]));
         var tree = Assert.IsType<DictionaryObject>(reader.Resolve(names["EmbeddedFiles"]));
         var pairs = Assert.IsType<ArrayObject>(reader.Resolve(tree["Names"]));
@@ -130,7 +124,6 @@ public class RoundTripFidelityLaneTests
         Assert.Equal(Encoding.UTF8.GetBytes("<invoice/>"), reader.DecodeStream(stream));
     }
 
-    // ---- Fix 3: TJ intra-run displacements survive interpret -> re-emit ----
 
     private static DictionaryObject HelveticaFont() => new()
     {
@@ -146,7 +139,6 @@ public class RoundTripFidelityLaneTests
         var original = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td [(He) -120 (llo)] TJ ET\n");
         var document = ExtractionSupport.BuildSinglePage(_ => HelveticaFont(), original);
 
-        // Dirty the text run so the page re-encodes from materialized elements.
         TextContent? run = null;
         foreach (var element in document.Pages[0].Content)
         {

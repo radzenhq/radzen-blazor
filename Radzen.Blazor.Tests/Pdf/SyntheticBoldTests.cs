@@ -9,11 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// G1(a): when Font.Bold is requested for a registered family that has no separate
-// bold face, the run renders synthetic bold: text render mode 2 (fill+stroke,
-// "2 Tr") with a small stroke line width (~fontSize*0.03), restored to mode 0
-// afterwards. When a real bold face IS registered the styled face is used and no
-// synthetic stroke is applied.
 public class SyntheticBoldTests
 {
     private const string Family = "Liberation Sans";
@@ -72,7 +67,6 @@ public class SyntheticBoldTests
             .Select(m => double.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture))
             .ToList();
 
-        // ~Size * 0.03 = 0.6; accept anything in a plausible synthetic-stroke band.
         Assert.Contains(widths, w => w >= Size * 0.01 && w <= Size * 0.06);
     }
 
@@ -87,7 +81,6 @@ public class SyntheticBoldTests
         var end = rest.IndexOf("0 Tr", StringComparison.Ordinal);
         Assert.True(end >= 0, "expected render mode restored to 0");
 
-        // Exactly one glyph-showing op (the bold run) between mode 2 and the restore.
         var shown = Regex.Matches(rest[..end], @"(Tj|TJ)\b").Count;
         Assert.Equal(1, shown);
     }

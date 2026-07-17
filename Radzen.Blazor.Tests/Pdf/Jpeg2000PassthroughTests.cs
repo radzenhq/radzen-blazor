@@ -10,10 +10,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// JPEG2000 rides the PDF /JPXDecode filter as a raw pass-through, mirroring the
-// /DCTDecode JPEG path: only the header is parsed for dimensions and component
-// count, the compressed bytes are embedded verbatim, and no /ColorSpace is
-// emitted so the JPX stream's own colour space is used.
 public class Jpeg2000PassthroughTests
 {
     private static readonly byte[] SignatureBox =
@@ -55,8 +51,6 @@ public class Jpeg2000PassthroughTests
         Assert.Null(xobj.SoftMask);
     }
 
-    // A JP2 whose codestream is embedded without a jp2h/ihdr box still resolves
-    // its geometry from the SIZ marker inside the jp2c box.
     [Fact]
     public void Jp2FileWithoutIhdr_ReadsSizFromCodestream()
     {
@@ -102,7 +96,6 @@ public class Jpeg2000PassthroughTests
         Assert.NotEqual("JPXDecode", ImageTestHelpers.Name(xobj.Image.Dictionary, "Filter"));
     }
 
-    // SOC (FF4F) + SIZ (FF51) carrying Xsiz/Ysiz/Csiz for a single tile.
     private static byte[] RawCodestream(int width, int height, int components)
     {
         var siz = Siz(width, height, components);
@@ -116,20 +109,17 @@ public class Jpeg2000PassthroughTests
         siz[0] = 0xFF;
         siz[1] = 0x51;
         BinaryPrimitives.WriteUInt16BigEndian(siz.AsSpan(2), (ushort)lsiz);
-        // Rsiz at 4 stays zero.
-        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(6), (uint)width);  // Xsiz
-        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(10), (uint)height); // Ysiz
-        // XOsiz/YOsiz at 14/18 stay zero.
-        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(22), (uint)width);  // XTsiz
-        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(26), (uint)height); // YTsiz
-        // XTOsiz/YTOsiz at 30/34 stay zero.
-        BinaryPrimitives.WriteUInt16BigEndian(siz.AsSpan(38), (ushort)components); // Csiz
+        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(6), (uint)width);
+        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(10), (uint)height);
+        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(22), (uint)width);
+        BinaryPrimitives.WriteUInt32BigEndian(siz.AsSpan(26), (uint)height);
+        BinaryPrimitives.WriteUInt16BigEndian(siz.AsSpan(38), (ushort)components);
         for (var c = 0; c < components; c++)
         {
             var o = 40 + (3 * c);
-            siz[o] = 0x07;     // Ssiz: 8-bit unsigned
-            siz[o + 1] = 0x01; // XRsiz
-            siz[o + 2] = 0x01; // YRsiz
+            siz[o] = 0x07;
+            siz[o + 1] = 0x01;
+            siz[o + 2] = 0x01;
         }
 
         return siz;
@@ -152,15 +142,14 @@ public class Jpeg2000PassthroughTests
         return ms.ToArray();
     }
 
-    // jp2h superbox content is a single ihdr box.
     private static byte[] Ihdr(int width, int height, int components)
     {
         var content = new byte[14];
         BinaryPrimitives.WriteUInt32BigEndian(content.AsSpan(0), (uint)height);
         BinaryPrimitives.WriteUInt32BigEndian(content.AsSpan(4), (uint)width);
         BinaryPrimitives.WriteUInt16BigEndian(content.AsSpan(8), (ushort)components);
-        content[10] = 0x07; // BPC: 8-bit
-        content[11] = 0x00; // C: wavelet
+        content[10] = 0x07;
+        content[11] = 0x00;
         using var ms = new MemoryStream();
         WriteBox(ms, "ihdr", content);
         return ms.ToArray();

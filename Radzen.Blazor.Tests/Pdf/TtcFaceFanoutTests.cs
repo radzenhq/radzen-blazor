@@ -8,17 +8,8 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The SfntFont.ParseCollection guard bounds the ttcf offset TABLE (4 bytes per
-// face must fit the buffer). The quantity that actually grows is the face PARSE
-// work: each of numFonts offsets triggers a full SfntFont construction (head,
-// maxp, hhea, name, hmtx and the whole cmap), and every offset may name the same
-// face. numFonts is only bounded by data.Length/4, so an N-byte collection buys
-// N/4 full parses of an N-byte font.
 public class TtcFaceFanoutTests
 {
-    // A real face relocated so its table directory sits at faceOffset: the ttc
-    // face offset is absolute, and so are the directory's table offsets, so the
-    // whole face is simply shifted and the records rewritten.
     private static byte[] RelocatedFace(byte[] font, int faceOffset)
     {
         var moved = new byte[faceOffset + font.Length];
@@ -72,7 +63,7 @@ public class TtcFaceFanoutTests
     private static TimeSpan TimeParse(int numFonts)
     {
         var data = BuildProbe(numFonts);
-        SfntFont.ParseCollection(data);     // warm
+        SfntFont.ParseCollection(data);
 
         var watch = Stopwatch.StartNew();
         SfntFont.ParseCollection(data);
@@ -80,9 +71,6 @@ public class TtcFaceFanoutTests
         return watch.Elapsed;
     }
 
-    // Bounded probe: hold the face fixed, grow only numFonts. Before the fix the
-    // cost grew linearly with numFonts because every offset re-parsed the same
-    // face; the cap makes the collection reject instead.
     [Fact]
     public void FaceCountBeyondTheCapIsRejected()
     {
@@ -103,8 +91,6 @@ public class TtcFaceFanoutTests
         Assert.Equal(SfntFont.MaxCollectionFaces, faces.Count);
     }
 
-    // The growth this bounds, measured: parsing MaxCollectionFaces copies of one
-    // real face is the worst case the cap now permits, and it must stay quick.
     [Fact]
     public void ParsingTheCapWorthOfFacesStaysBounded()
     {
@@ -115,7 +101,6 @@ public class TtcFaceFanoutTests
             $"Parsing {SfntFont.MaxCollectionFaces} faces took {elapsed.TotalSeconds:F1} s.");
     }
 
-    // Positive control: the committed collections must still parse in full.
     [Theory]
     [InlineData("LiberationSans-RegBold.ttc")]
     [InlineData("Liberation-Subset.ttc")]

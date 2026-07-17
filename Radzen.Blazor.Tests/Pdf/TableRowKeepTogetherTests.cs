@@ -6,13 +6,8 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Row.KeepTogether: a marked row whose atomic height overflows the partial first
-// fragment but fits a fresh page is pushed there whole rather than straddling the
-// break. An unmarked row still overflows in place, and a row taller than any page
-// still renders (never vanishes, never loops).
 public class TableRowKeepTogetherTests
 {
-    // 1 header + one 3-line body row (index 1) + two single-line body rows (2, 3).
     private static (Table Table, LaidOutTable Layout, Row Tall) BuildTable()
     {
         var fonts = TablePaginationSupport.Fonts();

@@ -9,11 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Q1(a): when Font.Italic is requested for a registered family that has no italic
-// face, the run renders synthetic italic: a sheared text matrix (Tm with a non-zero
-// c shear term, ~tan(12deg) = 0.21), restored after the run. When a real italic
-// face IS registered the styled face is used and no shear is applied. Synthetic
-// italic combines with synthetic bold ("2 Tr") when both are requested.
 public class SyntheticItalicTests
 {
     private const string Family = "Liberation Sans";
@@ -92,9 +87,6 @@ public class SyntheticItalicTests
 
         Assert.True(sheared.Success, "expected a sheared Tm for the italic run");
 
-        // After the sheared run the matrix must be restored (an unsheared Tm or a
-        // new text object) before any further glyphs are shown; exactly one
-        // glyph-showing op renders under the shear.
         var rest = content[(sheared.Index + sheared.Length)..];
         var end = rest.Length;
         foreach (Match m in Regex.Matches(rest, @"(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) Tm"))

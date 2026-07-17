@@ -14,7 +14,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class NestedListTests
 {
-    // Every `x y Td (literal) Tj` text placement on the first page, in emission order.
     private static List<(double X, string Text)> TextDraws(DocumentBuilder builder)
     {
         var reader = BuildTestSupport.Read(builder);
@@ -61,12 +60,10 @@ public class NestedListTests
         var draws = TextDraws(builder);
         var texts = draws.ConvertAll(d => d.Text);
 
-        // Inner items render between their parent item and the next outer item.
         Assert.Equal(
             new[] { "Outer one", "Inner one", "Inner two", "Outer two" },
             texts.FindAll(t => t.StartsWith("Outer", StringComparison.Ordinal) || t.StartsWith("Inner", StringComparison.Ordinal)));
 
-        // Outer markers sit at the left edge, inner markers one hanging indent deeper.
         var outerMarkers = draws.FindAll(d => Math.Abs(d.X) < 1e-3 && d.Text.Length > 0);
         Assert.Equal(2, outerMarkers.Count);
         var innerMarkers = draws.FindAll(d => Math.Abs(d.X - 20) < 1e-3 && d.Text.Length > 0 && !d.Text.StartsWith("Outer", StringComparison.Ordinal));
@@ -102,7 +99,6 @@ public class NestedListTests
         var outerMarkers = draws.FindAll(d => Math.Abs(d.X) < 1e-3 && d.Text is "1." or "2." or "3.");
         Assert.Equal(new[] { "1.", "2.", "3." }, outerMarkers.ConvertAll(m => m.Text));
 
-        // The inner list restarts at 1 and its markers sit one hanging indent deeper.
         var innerMarkers = draws.FindAll(d => Math.Abs(d.X - 24) < 1e-3 && d.Text is "1." or "2." or "3.");
         Assert.Equal(new[] { "1.", "2.", "3." }, innerMarkers.ConvertAll(m => m.Text));
 
@@ -130,7 +126,6 @@ public class NestedListTests
         using var stream = new MemoryStream();
         builder.SaveToStream(stream);
 
-        // SHA-256 of this exact document captured before nested-list support existed.
         Assert.Equal(
             "52508AF33626BD972F78F37217ED1F2C8CCB38ECCD2FCC74A0D56CEFBB4DD09D",
             Convert.ToHexString(SHA256.HashData(stream.ToArray())));

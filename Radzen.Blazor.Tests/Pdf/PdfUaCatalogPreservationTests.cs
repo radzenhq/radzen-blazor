@@ -8,12 +8,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Loaded-document PdfUA re-save must merge its own catalog entries into the preserved
-// source catalog without discarding preserved data:
-//  * an indirect source /ViewerPreferences is resolved and augmented with
-//    DisplayDocTitle instead of being replaced (finding: PdfUA drops indirect prefs).
-//  * the source /Metadata stream is not imported (it would be orphaned once
-//    ConformanceWriter overwrites catalog["Metadata"]).
 public class PdfUaCatalogPreservationTests
 {
     private const string OrphanMarker = "SOURCE-ORPHAN-MARKER";
@@ -46,10 +40,6 @@ public class PdfUaCatalogPreservationTests
         return pdf.ToArray();
     }
 
-    // The source page itself is untagged, uninspectable content that PDF/UA cannot be claimed
-    // over (ConformanceWriter refuses it), so it is replaced by a built page. The load-time
-    // catalog - and with it the indirect /ViewerPreferences and orphan /Metadata this fixture
-    // exists to exercise - is preserved from the source regardless of where the pages came from.
     private static Document LoadAsPdfUa()
     {
         var document = Document.LoadFromStream(new MemoryStream(SourceWithIndirectPrefsAndMetadata()));

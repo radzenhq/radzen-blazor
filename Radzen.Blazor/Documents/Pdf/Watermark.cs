@@ -35,10 +35,6 @@ public sealed class Watermark
     private ImageXObject? decoded;
     private (bool Interpolate, bool Stencil, int[]? ColorKeyMask) decodedOptions;
 
-    // One Watermark is stamped onto every page, so its image decodes once and every page
-    // shares the XObject; decoding per page would inflate the payload once per page and
-    // emit a duplicate image stream for each. Keyed on the options ApplyOptions reads so a
-    // caller that flips one between saves is not served a stale XObject.
     internal ImageXObject DecodeImage(Image image)
     {
         var options = (image.Interpolate, image.Stencil, image.ColorKeyMask);

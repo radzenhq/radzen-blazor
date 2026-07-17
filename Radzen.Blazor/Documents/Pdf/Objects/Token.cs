@@ -1,7 +1,5 @@
 namespace Radzen.Documents.Pdf.Objects;
 
-// A value type: a large PDF lexes into tens of millions of tokens, so one heap
-// object per token would dominate the cost of opening a document.
 internal readonly struct Token
 {
     private Token(TokenKind kind, long intValue, double realValue, string text, byte[] bytes)

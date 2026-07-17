@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Pins the content-keyed parse cache: registering the same font content via fresh,
-// non-publiclyVisible MemoryStreams (the idiomatic integration call) must reuse the
-// parsed font, while distinct content must not collide and nothing may be rooted
-// permanently.
 public class FontContentCacheTests
 {
     private const string Family = "Liberation Sans";
@@ -105,8 +101,6 @@ public class FontContentCacheTests
         Assert.Equal(Family, again.FamilyName);
     }
 
-    // Real-world 22MB font: hashing content is cheap, re-parsing is not. Skipped
-    // when the harness font is absent (e.g. CI).
     [Fact]
     public void LargeRealFontParsesOnceAcrossIdiomaticRegistrations()
     {
@@ -122,8 +116,6 @@ public class FontContentCacheTests
         Assert.Same(first, second);
     }
 
-    // Unique content (sfnt ignores trailing bytes) so no other concurrently running
-    // test shares - and thus roots - this parsed face during the GC loop.
     private static byte[] UniqueSansBytes()
     {
         var bytes = SansBytes();

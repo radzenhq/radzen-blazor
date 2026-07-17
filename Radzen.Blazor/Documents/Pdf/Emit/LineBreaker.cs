@@ -7,9 +7,6 @@ internal struct LineFragment
 {
     public required Run Run { get; init; }
 
-    // The resolved font of this fragment (the run's font run through the style cascade, or the
-    // synthesized font of a marker/hyphen/leader fragment). Carried on the display-list layer so
-    // emission never reads a resolved font off the shared authoring model.
     public required Font Font { get; init; }
 
     public required string Text { get; init; }
@@ -22,7 +19,6 @@ internal struct LineFragment
 
     public required double Advance { get; init; }
 
-    // A list-item marker fragment; in tagged output it is tagged into the item's Lbl element.
     public bool IsMarker { get; init; }
 }
 

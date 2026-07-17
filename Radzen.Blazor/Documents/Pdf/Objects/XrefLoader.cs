@@ -3,9 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Loads and merges classic cross-reference tables and cross-reference streams.
-/// </summary>
 internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder decoder)
 {
     private readonly byte[] data = data;
@@ -37,11 +34,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         return newest ?? throw new DocumentParseException("Missing trailer.", -1);
     }
 
-    // The table that actually grows is `entries`, which accumulates across every section of
-    // the /Prev chain (bounded only by distinct offsets), plus any classic section not yet
-    // merged into it. Counting per-section instead let a chain of xref streams - whose
-    // subsection counts come from a DECOMPRESSED payload, so ~8 KB yields millions of
-    // entries - build an arbitrary multiple of the cap.
     private void RequireEntryBudget(int pending)
     {
         if (entries.Count + pending >= limits.MaxXrefEntries)
@@ -70,10 +62,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 index += 7;
                 var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index, limits);
 
-                // Hybrid-reference file (ISO 32000-1 7.5.8.4): the /XRefStm
-                // cross-reference stream takes precedence over this classic
-                // section, which lists compressed objects as free for the
-                // benefit of pre-1.5 readers.
+                // ISO 32000-1 7.5.8.4: in a hybrid-reference file the /XRefStm takes precedence over this classic section.
                 if (trailerDict.TryGetValue("XRefStm", out var hybrid) && hybrid is NumberObject hybridOffset)
                 {
                     ParseXrefStreamAt((long)hybridOffset.DoubleValue, store);
@@ -138,8 +127,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         var w2 = ((NumberObject)widths[2]).IntValue;
         var entryLength = w0 + w1 + w2;
 
-        // A zero or negative total width never advances `pos`, so an attacker-chosen
-        // /Size builds an unbounded table; reject it before the fill loop.
         if (w0 < 0 || w1 < 0 || w2 < 0 || entryLength <= 0)
         {
             throw new DocumentParseException("Invalid cross-reference stream entry width.", -1);
@@ -154,10 +141,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
             var start = index[s];
             var count = index[s + 1];
 
-            // A subsection whose declared count exceeds the decoded payload is a truncated
-            // or corrupt xref stream. Silently dropping the missing entries turns their
-            // objects into blank pages / lost annotations; fail loud so IsRecoverableParseFailure
-            // routes into the Repair() header scan instead (matching the classic-xref path).
             var available = (decoded.Length - pos) / entryLength;
             if (count > available)
             {
@@ -243,9 +226,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         long value = 0;
         while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
         {
-            // Classic-xref fields are fixed at 10 and 5 digits, but a corrupt file can carry
-            // an arbitrarily long run; long.Parse threw on overflow, so keep failing loudly
-            // rather than silently wrapping into a bogus offset.
             if (value > (long.MaxValue - (data[index] - '0')) / 10)
             {
                 throw new DocumentParseException("Integer is out of range.", start);

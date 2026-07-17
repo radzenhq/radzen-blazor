@@ -9,12 +9,6 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Hardening for the two font subsetters: an out-of-range glyph id (as a corrupt
-// font's cmap could yield) must fail loudly and identically in the CFF and glyf
-// paths, and the glyf subset must STRIP glyph instructions and DROP the hinting
-// tables (cvt/fpgm/prep) so the compact output stays small while outlines stay
-// intact. Fixtures reuse the shipped LiberationSans (TrueType, has cvt/fpgm/prep)
-// and NotoSansSC-Subset (CID-keyed CFF).
 public class FontSubsetHardeningTests
 {
     private static SfntFont LiberationSansRegular()
@@ -91,7 +85,7 @@ public class FontSubsetHardeningTests
         var subset = GlyfSubsetter.Subset(font, ids);
         var reparsed = SfntFont.Parse(subset);
 
-        Assert.True(reparsed.GlyphCount >= 3); // notdef + H + i
+        Assert.True(reparsed.GlyphCount >= 3);
     }
 
     [Fact]
@@ -99,14 +93,12 @@ public class FontSubsetHardeningTests
     {
         var subset = CffFont.Parse(CffSubsetter.Subset(NotoCff(), new[] { 34, 66 }));
 
-        Assert.Equal(3, subset.GlyphCount); // {0, 34, 66}
+        Assert.Equal(3, subset.GlyphCount);
     }
 
     [Fact]
     public void Glyf_Subset_DropsHintingTables()
     {
-        // Strategy: the compact subset strips glyph instructions, so the cvt/fpgm/prep
-        // hinting tables that bytecode depended on are no longer needed and are dropped.
         var font = LiberationSansRegular();
         var subset = SfntFont.Parse(GlyfSubsetter.Subset(font, GlyphIds(font, "Hello")));
 
@@ -120,14 +112,11 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Glyf_Subset_StripsGlyphInstructions()
     {
-        // 'H' carries instruction bytecode; the compact subset keeps its outline
-        // (contours, points, advance width) but carries ZERO instruction bytes.
         var font = LiberationSansRegular();
         var gidH = font.GetGlyphId('H');
         var expected = ParseSimpleGlyph(Type0EmbedSupport.OutlineBytes(font, gidH));
         Assert.True(expected.InstructionLength > 0, "'H' fixture must be hinted");
 
-        // Closure of {gidH} is {0, gidH}; ascending order assigns 'H' the new gid 1.
         var subset = GlyfSubsetter.Subset(font, new[] { gidH });
         var actual = ParseSimpleGlyph(SubsetGlyph(subset, 1));
 
@@ -151,8 +140,6 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Glyf_Subset_PreservesGlyphOutlineCoordinates()
     {
-        // Stripping instructions is a rasterization-hint change only; it must move no
-        // point. Every subset glyph's outline must equal its source glyph's outline.
         var font = LiberationSansRegular();
         var text = "Hg@Wq";
         var ids = GlyphIds(font, text);
@@ -164,7 +151,7 @@ public class FontSubsetHardeningTests
             var source = Type0EmbedSupport.OutlineBytes(font, gid);
             if (source.Length < 10 || (short)((source[0] << 8) | source[1]) < 0)
             {
-                continue; // empty or composite; simple-glyph coordinate parse only
+                continue;
             }
 
             var expected = ParseSimpleGlyph(source);
@@ -204,8 +191,6 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Parse_FontMissingHmtx_Throws()
     {
-        // hmtx is required whenever hhea is present; without it every glyph silently
-        // measures zero-width. Parsing must fail loud like a missing head/maxp/hhea.
         var stripped = StripTables(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"), "hmtx");
 
         var ex = Assert.Throws<InvalidDataException>(() => SfntFont.Parse(stripped));
@@ -215,9 +200,6 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Glyf_CompositeComponentOutOfRange_ThrowsInvalidData()
     {
-        // Corrupt eacute (a composite referencing 'e' + acute) so its first component id
-        // points past numGlyphs. The subsetter must fail loud rather than skip the component
-        // and later throw an opaque KeyNotFoundException while remapping the composite.
         var bytes = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
         var dir = SfntChecksumValidator.ReadDirectory(bytes);
         var loca = SfntChecksumValidator.ReadLocaOffsets(bytes);
@@ -225,8 +207,7 @@ public class FontSubsetHardeningTests
         var start = (int)dir["glyf"].Offset + (int)loca[eacute];
         Assert.True((short)((bytes[start] << 8) | bytes[start + 1]) < 0, "eacute fixture must be composite");
 
-        // First component record: flags at +10, componentGlyphId at +12.
-        bytes[start + 12] = 0xEA; // 60000, well past numGlyphs (2620)
+        bytes[start + 12] = 0xEA;
         bytes[start + 13] = 0x60;
 
         var font = SfntFont.Parse(bytes);
@@ -237,10 +218,7 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Cff_SeacEndcharGlyph_ThrowsNotSupported()
     {
-        // Glyph 1 is a seac composition: operands adx=0 ady=0 bchar=65 achar=65 then endchar.
-        // The compact identity-charset rewrite would break its base/accent reference, so the
-        // subsetter rejects it rather than emit a wrong glyph.
-        byte[] privateBody = [0x8B, 20]; // defaultWidthX 0
+        byte[] privateBody = [0x8B, 20];
         byte[][] charStrings = [[0x0E], [0x8B, 0x8B, 0xCC, 0xCC, 0x0E]];
         var font = CffFont.Parse(CffFixtureBuilder.Build(privateBody, charStrings));
 
@@ -250,7 +228,6 @@ public class FontSubsetHardeningTests
     [Fact]
     public void Cff_PlainEndcharGlyph_SubsetsFine()
     {
-        // Control: a normal endchar (0 operands) must NOT be misdetected as seac.
         byte[] privateBody = [0x8B, 20];
         byte[][] charStrings = [[0x0E], [0x0E]];
         var font = CffFont.Parse(CffFixtureBuilder.Build(privateBody, charStrings));
@@ -264,8 +241,6 @@ public class FontSubsetHardeningTests
 
     private readonly record struct SimpleGlyph(int InstructionLength, ushort[] EndPts, int[] Xs, int[] Ys);
 
-    // Decodes a simple-glyph outline: contour endpoints, instruction length, and
-    // absolute point coordinates (flags/deltas resolved). Instructions are skipped.
     private static SimpleGlyph ParseSimpleGlyph(byte[] g)
     {
         var contours = (short)((g[0] << 8) | g[1]);
@@ -337,7 +312,6 @@ public class FontSubsetHardeningTests
         return ReadUInt16(subset, (int)hmtx.Offset + newGid * 4);
     }
 
-    // The compact subset's new gid whose simple-glyph outline equals the given one, or -1.
     private static int FindSubsetGid(byte[] subset, SimpleGlyph expected)
     {
         var glyf = SfntChecksumValidator.ReadDirectory(subset)["glyf"];
@@ -384,9 +358,6 @@ public class FontSubsetHardeningTests
 
     private static ushort ReadUInt16(byte[] d, int o) => (ushort)((d[o] << 8) | d[o + 1]);
 
-    // Removes directory records for the given tags by compacting the table
-    // directory and decrementing numTables; table data stays in place so all
-    // surviving offsets remain valid.
     private static byte[] StripTables(byte[] font, params string[] tags)
     {
         var result = (byte[])font.Clone();

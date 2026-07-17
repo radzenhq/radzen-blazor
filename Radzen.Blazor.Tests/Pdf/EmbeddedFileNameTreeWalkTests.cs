@@ -10,12 +10,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The catalog /Names EmbeddedFiles name tree is walked by DocumentLoader.CollectEmbeddedFiles
-// on every Document.LoadFromStream of untrusted input. A name tree is a tree per ISO 32000-1
-// 7.9.6, so a node reachable twice is malformed - and if the walk follows it anyway, the depth
-// cap does not bound the work: a chain of D nodes that each list the SAME child twice is
-// acyclic along every path (so depth never exceeds D) yet spans 2^D paths. The sibling walks
-// (CollectPages, ReadNameTree, ReadPageLabelTree) all reject a revisited node; this one must too.
+// ISO 32000-1 7.9.6: a name tree is a tree; a node reachable twice is malformed
 public class EmbeddedFileNameTreeWalkTests
 {
     [Fact]
@@ -28,9 +23,6 @@ public class EmbeddedFileNameTreeWalkTests
         Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
     }
 
-    // Every level halves nothing: pre-fix the walk visits 2^Levels leaves under a depth cap of
-    // 1024 that never fires. The guard must reject the first re-entry, so this returns in the
-    // time it takes to visit two nodes regardless of Levels.
     [Fact]
     public void EmbeddedFileTree_DuplicatingChain_IsBoundedByTheVisitedSet()
     {
@@ -50,8 +42,6 @@ public class EmbeddedFileNameTreeWalkTests
         Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
         watch.Stop();
 
-        // 2^20 visits cannot happen in this budget; the assert above is the real check and this
-        // only pins that the rejection is immediate rather than after the whole DAG is walked.
         Assert.True(watch.ElapsedMilliseconds < 2000, $"Walk took {watch.ElapsedMilliseconds} ms.");
     }
 
@@ -72,8 +62,6 @@ public class EmbeddedFileNameTreeWalkTests
     [Fact]
     public void EmbeddedFileTree_SharedFilespecAcrossDistinctLeaves_LoadsItOnce_PositiveControl()
     {
-        // Two distinct leaves may legitimately name the same filespec; only NODE re-entry is
-        // malformed. AddAttachment's own `seen` set keeps this to a single attachment.
         var bytes = NameTreeFile(
             (6, "<< /Kids [7 0 R 8 0 R] >>"),
             (7, "<< /Names [(a.txt) 4 0 R] >>"),
@@ -84,8 +72,6 @@ public class EmbeddedFileNameTreeWalkTests
         Assert.Equal("a.txt", Assert.Single(document.Attachments).Name);
     }
 
-    // Objects 1-3 are the minimal catalog/pages/page, 4 the filespec the leaves point at and 5
-    // its embedded payload stream; `nodes` supplies the EmbeddedFiles tree from object 6 up.
     private static byte[] NameTreeFile(params (int Number, string Body)[] nodes)
     {
         const string Payload = "hello";

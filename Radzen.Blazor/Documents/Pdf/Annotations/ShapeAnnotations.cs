@@ -83,8 +83,6 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
     }
 
     /// <inheritdoc />
-    // Font is mutable and owned, so its own flag is what catches an edit made through the
-    // instance rather than by assigning a new one.
     public override bool IsModified => base.IsModified || Font.IsModified;
 
     internal override string Subtype => "FreeText";

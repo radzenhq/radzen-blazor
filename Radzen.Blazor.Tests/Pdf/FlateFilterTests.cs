@@ -13,7 +13,6 @@ public class FlateFilterTests
     [Fact]
     public void Decode_KnownZlibVector_ReturnsData()
     {
-        // Verified: python3 -c "import zlib;print(zlib.compress(b'data').hex())" -> 789c4b492c4904000400019b
         var input = new byte[] { 0x78, 0x9C, 0x4B, 0x49, 0x2C, 0x49, 0x04, 0x00, 0x04, 0x00, 0x01, 0x9B };
         var result = FlateFilter.Decode(input);
         Assert.Equal("data", Encoding.ASCII.GetString(result));

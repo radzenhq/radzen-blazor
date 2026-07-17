@@ -2,16 +2,11 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Shared polymorphic queries over the code block kinds (QrCode/Barcode); a non-code block
-// answers the identity (zero size, left alignment).
 internal static class CodeBlockDispatch
 {
     private static readonly SizeVisitor size = new();
     private static readonly AlignmentVisitor alignment = new();
 
-    // The caption band must be measured by breaking the caption exactly as CodeEmitter paints
-    // it, so a wrapping value reserves every line it draws; that needs fonts + resolution. Bar
-    // width and QR size depend on neither, so width-only callers may omit them.
     public static (double Width, double Height) Measure(Block block, FontCollection? fonts = null, StyleResolution? resolution = null)
         => block.Accept(size, (fonts, resolution));
 

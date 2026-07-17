@@ -9,10 +9,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Whole-file structural contract for DocumentWriter: header, indirect object
-// bodies, classic cross-reference table, and trailer (ISO 32000-1 section 7.5).
-// Assertions are crude ASCII/byte scans - offsets are verified arithmetically
-// by locating each "N 0 obj" in the output and matching the parsed xref entry.
+// ISO 32000-1 7.5: header, indirect object bodies, cross-reference table, trailer
 public class DocumentWriterTests
 {
     private sealed class WrittenPdf

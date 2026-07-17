@@ -9,25 +9,19 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The width walk and the seac walk share one Type 2 interpreter and differ only in the
-// answer they collect. The manifest test below pins the answers of a pseudo-random
-// charstring corpus so that any change to the shared walk that moves either answer -
-// including the subr-recursion and hintmask-skip paths - fails loudly.
 public class CffCharstringWalkTests
 {
     private static byte[] BuildFont(byte[][] charStrings, byte[][] localSubrs)
     {
-        // Private size covers the DICT only; the local Subr INDEX sits directly after it,
-        // which is what the Subrs operand's private-relative offset addresses.
         var subrIndex = CffIndex.Write(localSubrs);
         var dict = new List<byte>();
         CffFixtureBuilder.Int5(dict, 100);
-        dict.Add(20); // defaultWidthX
+        dict.Add(20);
         CffFixtureBuilder.Int5(dict, 200);
-        dict.Add(21); // nominalWidthX
+        dict.Add(21);
         var dictLen = dict.Count + 6;
         CffFixtureBuilder.Int5(dict, dictLen);
-        dict.Add(19); // Subrs, relative to the Private DICT
+        dict.Add(19);
         Assert.Equal(dictLen, dict.Count);
 
         var privateBody = new List<byte>(dict);
@@ -79,7 +73,7 @@ public class CffCharstringWalkTests
             var op = Operators[random.Next(Operators.Length)];
             if (op == 10 || op == 29)
             {
-                bytes.Add((byte)random.Next(32, 247)); // subr number
+                bytes.Add((byte)random.Next(32, 247));
             }
 
             bytes.Add((byte)op);
@@ -151,8 +145,6 @@ public class CffCharstringWalkTests
         }
     }
 
-    // 0x8B..0x8F encode operands 0..4; the fixture's Private DICT sets defaultWidthX=100
-    // and nominalWidthX=200. Subr 0 is addressed by -107, the single-byte form of 0 - bias.
     private const byte Zero = 0x8B;
     private const byte One = 0x8C;
     private const byte Subr0 = 32;
@@ -161,8 +153,8 @@ public class CffCharstringWalkTests
         CffFont.Parse(BuildFont([charString], subrs.Length == 0 ? [[]] : subrs));
 
     [Theory]
-    [InlineData(4, false, 100)] // endchar seac: 4 operands, no leading width
-    [InlineData(5, true, 201)] // endchar seac: leading width plus the 4 seac operands
+    [InlineData(4, false, 100)]
+    [InlineData(5, true, 201)]
     public void EndcharSeacOperandsAreReadAsWidthAndSeac(int operands, bool hasWidth, int width)
     {
         var cs = new List<byte>();
@@ -181,8 +173,6 @@ public class CffCharstringWalkTests
     [Fact]
     public void HintmaskMaskBytesAreSkippedRatherThanReadAsOperators()
     {
-        // The mask byte is 0x0E, which would decode as endchar if it were not skipped -
-        // that would end the walk early and miss the real seac endchar behind it.
         byte[] cs = [Zero, Zero, 1, 19, 0x0E, Zero, Zero, Zero, Zero, 14];
 
         Assert.True(Font(cs).UsesSeacEndchar(0));
@@ -204,17 +194,14 @@ public class CffCharstringWalkTests
         Assert.True(font.UsesSeacEndchar(0));
     }
 
-    // Charstrings come from untrusted embedded fonts. A truncated operand at the end of one
-    // must surface as a parse error, matching the convention ReadByteAt/ReadCard16 and
-    // CffRealOperandTests already hold the DICT path to - never IndexOutOfRangeException.
     [Theory]
-    [InlineData(new byte[] { 255 })] // 16.16 fixed, wants 4 more bytes
+    [InlineData(new byte[] { 255 })]
     [InlineData(new byte[] { 255, 1, 2, 3 })]
-    [InlineData(new byte[] { 28 })] // short int, wants 2 more bytes
+    [InlineData(new byte[] { 28 })]
     [InlineData(new byte[] { 28, 1 })]
-    [InlineData(new byte[] { 247 })] // two-byte positive, wants 1 more byte
-    [InlineData(new byte[] { 251 })] // two-byte negative, wants 1 more byte
-    [InlineData(new byte[] { 12 })] // escape with no sub-operator byte
+    [InlineData(new byte[] { 247 })]
+    [InlineData(new byte[] { 251 })]
+    [InlineData(new byte[] { 12 })]
     public void TruncatedOperandSurfacesAsParseError(byte[] charString)
     {
         var font = Font(charString);
@@ -231,25 +218,20 @@ public class CffCharstringWalkTests
         Assert.Throws<InvalidDataException>(() => font.GetAdvanceWidth(0));
     }
 
-    // Type 2 arithmetic escapes leave their result on the stack; only the drawing escapes
-    // (flex and friends) consume their operands. Clearing the stack for "div" would drop
-    // the leading width operand before hmoveto could resolve it.
     [Fact]
     public void DivLeavesItsResultOnTheStackSoTheWidthStillResolves()
     {
-        // width(1) 4 2 div hmoveto -> stack [1, 2] at hmoveto, so the width operand is present.
         var font = Font([One, 0x8F, 0x8D, 12, 12, 22]);
 
         Assert.Equal(201, font.GetAdvanceWidth(0));
     }
 
     [Theory]
-    [InlineData(10, 3)] // add: 1 2 add -> 3
-    [InlineData(11, -1)] // sub: 1 2 sub -> -1
-    [InlineData(24, 2)] // mul: 1 2 mul -> 2
+    [InlineData(10, 3)]
+    [InlineData(11, -1)]
+    [InlineData(24, 2)]
     public void ArithmeticEscapesLeaveOneResultOnTheStack(byte escape, int expected)
     {
-        // 1 2 <escape> endchar: the result is the only operand, so it reads as the width.
         var font = Font([One, 0x8D, 12, escape, 14]);
 
         Assert.Equal(200 + expected, font.GetAdvanceWidth(0));
@@ -258,7 +240,6 @@ public class CffCharstringWalkTests
     [Fact]
     public void DrawingEscapesStillConsumeTheirOperands()
     {
-        // width(1) then a 13-operand flex (12 35), then endchar with an empty stack.
         var cs = new List<byte> { One };
         for (var i = 0; i < 13; i++)
         {
@@ -267,15 +248,8 @@ public class CffCharstringWalkTests
 
         cs.AddRange([12, 35, 14]);
 
-        // flex clears, so endchar sees no leading width operand: defaultWidthX applies.
         Assert.Equal(100, Font([.. cs]).GetAdvanceWidth(0));
     }
 
-    // Re-pinned when the arithmetic escapes stopped discarding their result. Exactly 2 of the
-    // 785 answers moved, both widths the old walk had lost to an unconditional stack clear:
-    // 9:2 100 -> 628 (abs, 12 9, before hstem: 3 operands left, so the leading width counts)
-    // 279:0 100 -> -25821 (add, 12 10, before rmoveto). Both verified against an independent
-    // decode of those charstrings. No answer moved to an exception: the corpus never
-    // truncates an operand, so the bounds guard is not what re-pinned this.
     private const string PinnedManifestHash = "1E262A6DB348AB5736217E20572BE45F41D15EFD656639B9AED28FDF361CD554";
 }

@@ -10,21 +10,10 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// G4 regression contract.
-// (a) ImageContent.EmitBody must emit q / cm / Do positioned from Rect, and
-//     SaveToStream must register the image XObject in the page /Resources
-//     (mirroring generated-page image registration) so a stamped image is a
-//     visible /Subtype /Image XObject on reload.
-// (b) Adding content to a LOADED page must append an overlay content stream
-//     (/Contents becomes an array) and leave the original stream bytes
-//     untouched, instead of re-encoding the whole page through the lossy
-//     ContentInterpreter (which garbles Type0 text and drops TJ kerning).
 public class ImageStampOverlayRegressionTests
 {
     private static byte[] Png() => PdfTestResources.ReadAllBytes("Images/rgb.png");
 
-    // Concatenates the decoded text of every content stream of the page,
-    // whether /Contents is a single stream or an array of streams.
     private static string AllContentText(DocumentReader reader, DictionaryObject page)
     {
         Assert.True(page.TryGetValue("Contents", out var contents), "page has no /Contents");
@@ -46,7 +35,6 @@ public class ImageStampOverlayRegressionTests
         return sb.ToString();
     }
 
-    // Finds the operand of the first "/<name> Do" in the content text.
     private static string? DoName(string content)
     {
         var match = Regex.Match(content, @"/(\S+)\s+Do\b");
@@ -124,8 +112,6 @@ public class ImageStampOverlayRegressionTests
         var reader = DocumentReader.Parse(document.ToArray());
         var content = AllContentText(reader, FormTestSupport.FirstPage(reader));
 
-        // Image space is the unit square, so the cm matrix must carry the Rect
-        // width/height as scale and the Rect origin as translation.
         var cm = Regex.Match(
             content, @"([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) cm");
         Assert.True(cm.Success, "no cm operator emitted for the ImageContent stamp");

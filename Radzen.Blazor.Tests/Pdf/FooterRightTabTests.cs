@@ -12,14 +12,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Q2 regression tests: right-aligned tab stop for single-baseline footers.
-// A footer paragraph "Confidential\tPage N of M" must render the left text at the
-// left content edge and the text after the LAST '\t' flush against the RIGHT content
-// edge on the SAME baseline (MigraDoc/QuestPDF right tab stop), instead of stacking
-// on two lines or landing on the 36pt left tab grid. The paragraph opts in through a
-// public bool Paragraph.RightTabStop (reached via reflection so this file compiles
-// before the API exists); earlier tabs on the line keep the existing left-tab
-// behavior. All assertions run on the real bytes produced by DocumentBuilder.Build().
 public class FooterRightTabTests
 {
     private const double Tol = 1.0;
@@ -54,11 +46,9 @@ public class FooterRightTabTests
         return run;
     }
 
-    // Advance width of base-14 Helvetica text at the test font size.
     private static double Measure(string text)
         => new FontCollection().MeasureText(text, new Font { Size = FontSize });
 
-    // (shown text, baseline X, baseline Y) from the base-14 "x y Td (text) Tj" pattern.
     private static List<(string Text, double X, double Y)> TextRuns(DocumentReader reader, int pageIndex)
     {
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, pageIndex));
@@ -156,7 +146,6 @@ public class FooterRightTabTests
         return builder;
     }
 
-    // Footer runs = runs on the lowest baseline of the page.
     private static List<(string Text, double X, double Y)> FooterRuns(DocumentReader reader, int pageIndex)
     {
         var runs = TextRuns(reader, pageIndex);

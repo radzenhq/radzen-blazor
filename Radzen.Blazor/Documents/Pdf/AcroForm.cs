@@ -14,7 +14,6 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class AcroForm
 {
-    // Chosen on-state for a checkbox whose fixture carries no explicit /AP states.
     private const string OnState = "Yes";
 
     private readonly DocumentReader reader;
@@ -22,8 +21,6 @@ public sealed class AcroForm
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
 
-    // Drives SaveIncremental, which re-emits only these. Inert on the full-save path,
-    // which re-imports the whole form graph regardless.
     internal HashSet<DocumentObject> ChangedObjects { get; } = new(ReferenceEqualityComparer.Instance);
 
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
@@ -56,14 +53,9 @@ public sealed class AcroForm
     /// </summary>
     public IReadOnlyList<string> FieldNames => fieldNames;
 
-    // Several widgets per field is normal (the same field repeated on each page); an edit
-    // must refresh every one of them.
     private readonly record struct Terminal(DictionaryObject Field, IReadOnlyList<DictionaryObject> Widgets);
 
-    // A /T on a kid is what distinguishes a non-terminal node from a terminal whose kids are
-    // merely its widget annotations (ISO 32000-1 12.7.3.1). `visited` bounds the walk against a
-    // cyclic or DAG-shared field tree and MaxPageTreeDepth against a deep acyclic one, the same
-    // pair every other loaded tree walk (pages, name trees, outline) uses.
+    // A /T on a kid distinguishes a non-terminal node from a terminal whose kids are its widget annotations (ISO 32000-1 12.7.3.1).
     private void Collect(DocumentObject entry, string prefix, HashSet<DictionaryObject> visited, int depth)
     {
         if (reader.AsDictionary(entry) is not { } dict)
@@ -98,8 +90,6 @@ public sealed class AcroForm
             return;
         }
 
-        // Two root fields legally may share a /T in malformed-but-real PDFs; keep both
-        // reachable by suffixing the collision so terminals, FieldNames and Fields agree.
         var key = qualified;
         for (var index = 2; terminals.ContainsKey(key); index++)
         {
@@ -114,8 +104,6 @@ public sealed class AcroForm
     private IEnumerable<DocumentObject> Kids(DictionaryObject dict)
         => reader.GetArray(dict, "Kids") is { } kids ? kids : [];
 
-    // A separate widget carries no field /T; when field and widget merge the field dict is
-    // itself the widget.
     private List<DictionaryObject> WidgetsOf(DictionaryObject dict)
     {
         var widgets = new List<DictionaryObject>();
@@ -236,8 +224,6 @@ public sealed class AcroForm
     {
         if (FieldBakePolicy.CanBakeSingleLine(reader, terminal.Field, value))
         {
-            // Every widget, or a kid's stale /AP overrides the new value in a viewer. Each
-            // bakes its own /Rect, since widgets of one field need not share a size.
             foreach (var widget in terminal.Widgets)
             {
                 widget["AP"] = new DictionaryObject { ["N"] = BuildTextAppearance(terminal, widget, value) };
@@ -246,8 +232,6 @@ public sealed class AcroForm
         }
         else
         {
-            // Defer to the viewer rather than bake a wrong line - or, for a password field,
-            // one that would leak the value in cleartext. See FieldBakePolicy for the rules.
             Dictionary["NeedAppearances"] = new BooleanObject(true);
             ChangedObjects.Add(Dictionary);
             foreach (var widget in terminal.Widgets)
@@ -264,8 +248,6 @@ public sealed class AcroForm
     private DocumentObject? Inherited(DictionaryObject dict, string key)
         => FormField.InheritedAttribute(reader, dict, key);
 
-    // Throws when a mutator is applied to the wrong /FT: writing a text /V onto a button,
-    // a name /V onto a text field, etc., would emit a spec-invalid field viewers mishandle.
     private void RequireFieldType(string name, DictionaryObject field, string expected, bool allowUntyped)
     {
         if (Inherited(field, "FT") is NameObject ft)
@@ -283,9 +265,7 @@ public sealed class AcroForm
         }
     }
 
-    // The export values of a choice field's /Opt, or null when it carries none. An
-    // /Opt entry is either a text string or a [export, display] pair whose first
-    // element is the export value (ISO 32000-1 12.7.4.4).
+    // An /Opt entry is either a text string or a [export, display] pair whose first element is the export value (ISO 32000-1 12.7.4.4).
     private List<string>? OptionValues(DictionaryObject field)
     {
         if (reader.GetArray(field, "Opt") is not { } options)
@@ -330,14 +310,11 @@ public sealed class AcroForm
         ChangedObjects.Add(terminal.Field);
         foreach (var widget in terminal.Widgets)
         {
-            // Naming a state the widget has no /AP stream for would render nothing at all.
             widget["AS"] = new NameObject(HasAppearanceStates(widget) && !HasAppearanceState(widget, on) ? "Off" : on);
             ChangedObjects.Add(widget);
         }
     }
 
-    // "Yes" is only a convention, so it is a last resort: the widget's own /AP /N states
-    // are authoritative when it has any.
     private string OnStateName(DictionaryObject widget)
     {
         if (AppearanceStates(widget) is { } states)
@@ -374,8 +351,7 @@ public sealed class AcroForm
         return (rect.Width, rect.Height);
     }
 
-    // A /DA size of 0 means auto-size (ISO 32000-1 12.7.3.3); it is reported as 0 rather
-    // than resolved here, for the caller to map.
+    // A /DA size of 0 means auto-size (ISO 32000-1 12.7.3.3).
     private (string? Font, double Size) DefaultAppearance(Terminal terminal, DictionaryObject widget)
         => FieldAppearances.ParseDefaultAppearance(
             DaString(terminal.Field) ?? DaString(widget) ?? DaString(Dictionary));

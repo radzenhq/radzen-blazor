@@ -7,9 +7,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// StringObject literal escaping contract (ISO 32000-1 section 7.3.4.2).
-// Our contract: escape both parens, the backslash, the named control
-// escapes, and emit 3-digit octal for any byte outside printable ASCII.
+// StringObject literal escaping (ISO 32000-1 7.3.4.2).
 public class StringEscapingTests
 {
     private static string Serialize(string value)

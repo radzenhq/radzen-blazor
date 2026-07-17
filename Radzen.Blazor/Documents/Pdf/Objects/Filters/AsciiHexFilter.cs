@@ -17,7 +17,6 @@ internal static class AsciiHexFilter
         }
         catch (DocumentParseException e)
         {
-            // The Filters layer reports a corrupt payload as InvalidDataException (see Ascii85Filter).
             throw new InvalidDataException($"Invalid ASCIIHex character 0x{data[e.Offset]:X2}.", e);
         }
     }
@@ -26,7 +25,6 @@ internal static class AsciiHexFilter
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        // Two hex digits per byte plus the '>' terminator must fit a single array.
         var maxEncodable = (Array.MaxLength - 1) / 2;
 
         if (data.Length > maxEncodable)

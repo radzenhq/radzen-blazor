@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A created TextFieldDefinition can opt into the multiline (/Ff bit 13), password
-// (bit 14) and comb (bit 25) field flags and a /MaxLen character cap. A single-line
-// field with no cap keeps carrying neither /Ff nor /MaxLen so its bytes stay stable.
 public class TextFieldFlagsTests
 {
     private const int MultilineFlag = 1 << 12;

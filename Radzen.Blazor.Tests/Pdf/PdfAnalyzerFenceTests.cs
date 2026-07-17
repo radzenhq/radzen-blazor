@@ -9,19 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Guard-the-guard for the WASM-safety / determinism analyzer fence.
-//
-// The fence is subtle, load-bearing machinery: BannedApi.globalconfig silences RS0030/RS0031
-// everywhere (so Razor-generated code and the rest of the UI library keep compiling), and
-// path-scoped .editorconfig sections re-enable them as 'error' - plus CA1305 - only for the PDF
-// library trees, fed by BannedSymbols.txt and wired through the .csproj. Any one link breaking
-// (a severity flip, a dropped AdditionalFiles entry, a renamed tree) would silently let a banned,
-// non-deterministic / non-WASM-safe API into the deterministic PDF output with a still-green build.
-//
-// These tests assert every link of that wiring exists. The actual "does the build fail?" proof is a
-// separate, heavier out-of-process check (verify-analyzer-fence.sh) that plants a banned API in each
-// tree and asserts RS0030 - it runs here only when RUN_FENCE_BUILD_CHECK=1 so the normal Pdf suite
-// stays fast, but the script is always asserted to exist and to be the real thing.
 public class PdfAnalyzerFenceTests
 {
     private static readonly string[] FencedTrees =
@@ -55,21 +42,17 @@ public class PdfAnalyzerFenceTests
     }
 
     [Theory]
-    // Determinism / entropy / crypto (pre-existing fence).
     [InlineData("N:System.Security.Cryptography")]
     [InlineData("P:System.DateTime.Now")]
     [InlineData("P:System.DateTime.UtcNow")]
     [InlineData("M:System.Guid.NewGuid()")]
     [InlineData("P:System.Random.Shared")]
-    // Networking / offline-WASM safety (new).
     [InlineData("N:System.Net")]
     [InlineData("N:System.Net.Http")]
     [InlineData("T:System.Net.Http.HttpClient")]
-    // High-resolution / wall-clock timers (new).
     [InlineData("T:System.Diagnostics.Stopwatch")]
     [InlineData("P:System.Environment.TickCount")]
     [InlineData("P:System.Environment.TickCount64")]
-    // Filesystem entropy / temp files (new).
     [InlineData("M:System.IO.Path.GetRandomFileName()")]
     [InlineData("M:System.IO.Path.GetTempFileName()")]
     public void BannedSymbols_ContainsEntry(string symbol)
@@ -106,14 +89,12 @@ public class PdfAnalyzerFenceTests
         }
     }
 
-    // The real proof: plant a banned API and assert the build fails with RS0030. Opt-in because it
-    // runs a full out-of-process `dotnet build`. Set RUN_FENCE_BUILD_CHECK=1 to exercise it (CI can).
     [Fact]
     public void GuardScript_FailsTheBuildWhenABannedApiIsPlanted()
     {
         if (Environment.GetEnvironmentVariable("RUN_FENCE_BUILD_CHECK") != "1")
         {
-            return; // Wiring is covered by the always-on tests above; this is the heavy live check.
+            return;
         }
 
         var psi = new ProcessStartInfo("bash", $"\"{AnalyzerFenceLocator.GuardScriptPath}\" \"{ProjectDir}\"")
@@ -160,7 +141,6 @@ internal static class AnalyzerFenceLocator
 
     private static string Locate()
     {
-        // Preferred: relative to this source file (repo/Radzen.Blazor.Tests/Pdf/ -> repo/Radzen.Blazor).
         var testsDir = Directory.GetParent(Path.GetDirectoryName(ThisFile())!)?.Parent?.FullName;
         if (testsDir is not null)
         {
@@ -171,7 +151,6 @@ internal static class AnalyzerFenceLocator
             }
         }
 
-        // Fallback for build environments that rewrite CallerFilePath: walk up from the test binary.
         for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
         {
             var candidate = Path.Combine(dir.FullName, "Radzen.Blazor");

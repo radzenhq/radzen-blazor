@@ -12,16 +12,8 @@ using Xunit.Sdk;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The sibling of ContentElementChangeTrackingMatrixTests, for the annotation model. Annotations
-// used to answer "did the caller change this" by serialising every property to a string and
-// comparing; that string was hand-maintained, and a member left out of it failed silently, as a
-// dropped save. The dirty bit that replaced it fails safe, and this is what makes it safe rather
-// than merely tidy: it walks the closed set by reflection and fails the build if a member can
-// move the emitted bytes with the flag clean.
 public class AnnotationChangeTrackingMatrixTests
 {
-    // The annotation kinds AnnotationReader can produce, and so the only ones that can occupy a
-    // loaded page. Each maps to a modeled /Subtype.
     private static readonly Type[] Tracked =
     [
         typeof(TextAnnotation),
@@ -47,7 +39,6 @@ public class AnnotationChangeTrackingMatrixTests
             ink.Strokes.Add([new AnnotationPoint(25, 35), new AnnotationPoint(60, 55)]);
         }
 
-        // A link must carry exactly one target to be emittable at all.
         if (annotation is LinkAnnotation link)
         {
             link.Uri = new Uri("https://example.com/");
@@ -56,8 +47,6 @@ public class AnnotationChangeTrackingMatrixTests
         return annotation;
     }
 
-    // A loaded annotation, which is the state the flag exists to protect: the emitter preserves
-    // the original dictionary for one that reads clean.
     private static Document Loaded(Type type)
     {
         var source = new Document();
@@ -74,8 +63,6 @@ public class AnnotationChangeTrackingMatrixTests
             .ToList();
 
         Assert.NotEmpty(discovered);
-        // Equality, not containment: every modeled annotation is readable, so a new subclass
-        // must be added here deliberately rather than drift out of the matrix.
         Assert.Equal([.. discovered.Select(type => type.Name).OrderBy(name => name, StringComparer.Ordinal)],
             [.. Tracked.Select(type => type.Name).OrderBy(name => name, StringComparer.Ordinal)]);
     }
@@ -92,8 +79,6 @@ public class AnnotationChangeTrackingMatrixTests
                 checkedMembers++;
             }
 
-            // Get-only collections are mutable members too: Areas and Strokes reach the bytes
-            // without ever being assigned, so a settable-only walk would miss them entirely.
             foreach (var property in CollectionProperties(type))
             {
                 AssertDoor(type, property.Name + ".Add()", annotation => AddTo(property, annotation));
@@ -101,7 +86,6 @@ public class AnnotationChangeTrackingMatrixTests
             }
         }
 
-        // The nested owned objects, reached through their owner's flag.
         AssertDoor(typeof(InkAnnotation), "Strokes[0].Add()",
             annotation => ((InkAnnotation)annotation).Strokes[0].Add(new AnnotationPoint(70, 75)));
         checkedMembers++;
@@ -113,12 +97,9 @@ public class AnnotationChangeTrackingMatrixTests
             checkedMembers++;
         }
 
-        // Guards the walk itself: a filter that silently matched nothing would report green.
         Assert.InRange(checkedMembers, 80, 200);
     }
 
-    // The container-level truth. Element flags answer "did an annotation change", not "did the
-    // page's annotation list change": a removal leaves every survivor clean.
     [Fact]
     public void EveryStructuralMutationOfALoadedAnnotationListIsAChange()
     {
@@ -153,18 +134,10 @@ public class AnnotationChangeTrackingMatrixTests
             return;
         }
 
-        // The disjunction, short-circuited: a member the emitter genuinely ignores may leave the
-        // flag clean, but one that moved the bytes without opening a door is the bug. The
-        // comparison must be against a REBUILT dictionary: saving a clean annotation preserves
-        // its original bytes by construction, so comparing saved output directly would make this
-        // assertion vacuously true and the matrix would pass with tracking removed entirely.
         Assert.True(Rebuilt(owner, mutate).SequenceEqual(Rebuilt(owner, _ => { })),
             $"{owner.Name}.{member}: mutation changed emitted bytes but the flag stayed clean");
     }
 
-    // The bytes the model WOULD emit, independent of the flag under test. Reassigning Bounds to
-    // its own value opens the door without changing the model, forcing the emitter down the
-    // rebuild path.
     private static byte[] Rebuilt(Type owner, Action<Annotation> mutate)
     {
         var document = Loaded(owner);
@@ -230,8 +203,6 @@ public class AnnotationChangeTrackingMatrixTests
         }
     }
 
-    // Throws rather than skips on an unregistered type: a new member of a type this does not
-    // know must break the build, not quietly drop out of the matrix.
     private static object? DistinctValue(Type type, object? current, string member)
     {
         if (Nullable.GetUnderlyingType(type) is { } underlying)

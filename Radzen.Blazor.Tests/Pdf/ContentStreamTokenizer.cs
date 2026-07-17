@@ -6,14 +6,6 @@ using System.Text;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A deliberately independent reader of the emitted operator stream, kept separate from
-// Content/ContentTokenizer rather than merged with it. The production tokenizer exists to
-// render damaged input: it drops a malformed numeric run instead of reporting it, captures
-// BI..EI as one opaque token and swallows stray delimiters. Those are the exact defects an
-// emitter test must witness, so measuring the writer's output with it would let a malformed
-// operand vanish before the assertion sees it. This reader is strict and reports what is
-// actually in the bytes. Tests of the production tokenizer itself use the production type
-// directly (ContentTokenizerTests); this one is only ever pointed at bytes we emitted.
 internal enum ContentTokenKind
 {
     Number,
@@ -155,7 +147,7 @@ internal static class ContentStreamTokenizer
 
     private static ContentToken ReadLiteralString(byte[] data, ref int i)
     {
-        i++; // opening (
+        i++;
         var bytes = new List<byte>();
         var depth = 1;
         while (i < data.Length)
@@ -237,7 +229,7 @@ internal static class ContentStreamTokenizer
 
     private static ContentToken ReadHexString(byte[] data, ref int i)
     {
-        i++; // opening <
+        i++;
         var bytes = new List<byte>();
         var high = -1;
         while (i < data.Length && data[i] != (byte)'>')
@@ -272,7 +264,7 @@ internal static class ContentStreamTokenizer
 
         if (i < data.Length)
         {
-            i++; // closing >
+            i++;
         }
 
         return new ContentToken { Kind = ContentTokenKind.String, Bytes = [.. bytes] };
@@ -280,7 +272,7 @@ internal static class ContentStreamTokenizer
 
     private static ContentToken ReadName(byte[] data, ref int i)
     {
-        i++; // slash
+        i++;
         var chars = new List<char>();
         while (i < data.Length && IsRegular(data[i]))
         {
@@ -331,7 +323,7 @@ internal static class ContentStreamTokenizer
 
         if (i == start)
         {
-            i++; // never stall on an unexpected delimiter
+            i++;
         }
 
         return new ContentToken

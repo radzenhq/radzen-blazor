@@ -6,8 +6,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Coverage of the DocumentBuilder.CompressOutput / Document.CompressOutput opt-in
-// wired into DocumentWriter.UseCompressedStreams.
 public class CompressOutputTests
 {
     private static DocumentBuilder MakeBuilder()

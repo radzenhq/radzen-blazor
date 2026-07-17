@@ -11,10 +11,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Page-number/count fields must resolve to the real page number on every page, both
-// when they sit inside a footer/header TABLE cell (previously rendered the literal "0"
-// baked into PageNumberField/PageCountField) and when a band paragraph carrying a field
-// WRAPS onto several lines (previously collapsed into one overlong line).
 public class FieldResolutionTests
 {
     private const double PageWidth = 400;

@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Importing one page out of a loaded document must not serialize and re-parse the whole
-// source: importing pages one at a time from an N-page document cost N full round trips
-// (finding #125).
 public class ImportPageCostTests
 {
     private static Document Loaded(int pages)
@@ -29,7 +26,6 @@ public class ImportPageCostTests
     {
         var source = Loaded(sourcePages);
 
-        // Warm up the reader caches and the JIT so only the import itself is measured.
         new Document().ImportPage(source, 0);
 
         var before = GC.GetAllocatedBytesForCurrentThread();
@@ -43,8 +39,6 @@ public class ImportPageCostTests
         var small = ImportBytes(20);
         var large = ImportBytes(160);
 
-        // 8x the source pages must cost the same single page import; a whole-document
-        // serialize plus re-parse per call costs ~8x.
         Assert.InRange((double)large / small, 0, 2.0);
     }
 

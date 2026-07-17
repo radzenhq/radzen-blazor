@@ -6,8 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// /HorizontalScale (Tz) scales the drawn glyph advances, so line layout must measure runs at
-// that scale or wrap and align a line at a width its glyphs never occupy.
 public class HorizontalScaleMeasurementTests
 {
     private static Paragraph ScaledRun(string text, double horizontalScale)
@@ -42,8 +40,6 @@ public class HorizontalScaleMeasurementTests
         Assert.Equal(plain, fragment.Advance, 6);
     }
 
-    // A width that holds both words at 100% overflows once each word is drawn twice as wide,
-    // so the scaled paragraph wraps where the unscaled one does not.
     [Fact]
     public void DoubledScale_WrapsWhereUnscaledFits()
     {

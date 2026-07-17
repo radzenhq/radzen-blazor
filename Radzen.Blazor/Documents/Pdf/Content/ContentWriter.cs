@@ -28,9 +28,6 @@ public sealed class ContentWriter : IDisposable
 
     private readonly FontScope scope;
 
-    // The key prefixes keep overlay streams from colliding with generated resources.
-    // The scope carries the emitting document's font policy: a stream built with the default
-    // scope can only reach base-14 faces, and no conformance level forbids them.
     internal ContentWriter(FontScope scope = default, string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
     {
         this.scope = scope;
@@ -51,7 +48,6 @@ public sealed class ContentWriter : IDisposable
         return extGStates.GetOrAdd(value, key => new KeyValuePair<string, double>(key, value));
     }
 
-    // Images opt out of reuse: the same XObject registered twice gets two keys, as it always has.
     internal string RegisterImage(ImageXObject image)
         => images.Add(key => new KeyValuePair<string, ImageXObject>(key, image));
 
@@ -77,10 +73,6 @@ public sealed class ContentWriter : IDisposable
         length += bytes.Length;
     }
 
-    // Splicing emitted content against raw source bytes fuses the two tokens either side of the
-    // join ("Tj" + "q" lexes as one "Tjq"), destroying both. Every element emits a regular
-    // character first, so a preceding regular character is exactly the fusing case; a delimiter
-    // or whitespace already ends the token and must not be padded, or untouched bytes would move.
     internal void EnsureSeparated()
     {
         if (length == 0)
@@ -164,8 +156,6 @@ public sealed class ContentWriter : IDisposable
     /// <param name="value">The number to write.</param>
     /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
     /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
-    // Sub-0.001pt coordinate rounding is invisible, and 3-decimal color/matrix values quantize
-    // to the same 8-bit channels and glyph positions while shrinking the stream.
     public void WriteNumber(double value)
     {
         if (!double.IsFinite(value))

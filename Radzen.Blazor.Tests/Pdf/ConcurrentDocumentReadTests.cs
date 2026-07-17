@@ -11,12 +11,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One Document loaded once and read from many request threads (the ASP.NET Core
-// pattern) must never corrupt itself. Load resolves indirect objects lazily, so a
-// get-only accessor like FormField.Value is a silent mutator of the reader's object
-// cache and its cycle-detection marker. Concurrent reads returned another field's
-// text with no exception, threw a spurious "Cyclic object reference." for a file
-// with no cycle in it, or tore the non-concurrent cache Dictionary outright.
 public class ConcurrentDocumentReadTests
 {
     private const int FieldCount = 2000;
@@ -28,8 +22,6 @@ public class ConcurrentDocumentReadTests
     private static string Expected(string name)
         => "value" + name["field".Length..];
 
-    // Every field's /T and /V is a separate indirect object, so neither is resolved
-    // by Load - reading .Value is what forces resolution onto the read path.
     private static byte[] FormSource()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
@@ -65,8 +57,6 @@ public class ConcurrentDocumentReadTests
         return pdf.ToArray();
     }
 
-    // A stream whose /Length points back at its own object: resolving the length
-    // re-enters the same object. This is a real cycle and must stay detected.
     private static byte[] CyclicLengthSource()
     {
         var pdf = new FixturePdf().Append("%PDF-1.4\n");
@@ -129,16 +119,12 @@ public class ConcurrentDocumentReadTests
 
         for (var round = 0; round < Rounds; round++)
         {
-            // A fresh document per round: reusing one would leave every /V already
-            // cached after the first round and race nothing.
             var document = Document.LoadFromStream(new MemoryStream(source));
             var fields = document.AcroForm!.Fields;
             var current = round;
 
             RunOnWorkers(worker =>
             {
-                // Rotate each worker's start so contention stays spread across the
-                // round instead of collapsing behind whichever thread leads.
                 for (var step = 0; step < FieldCount; step++)
                 {
                     var i = (step + (worker * 31)) % FieldCount;
@@ -176,8 +162,6 @@ public class ConcurrentDocumentReadTests
         {
             for (var round = 0; round < Rounds; round++)
             {
-                // Each thread loads its own document, so cycle detection has to work
-                // on a thread that never ran the original load.
                 var exception = Record.Exception(() =>
                 {
                     var document = Document.LoadFromStream(new MemoryStream(source));

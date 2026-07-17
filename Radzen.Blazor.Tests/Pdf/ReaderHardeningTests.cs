@@ -9,14 +9,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Defensive-hardening contract for the pure-managed PDF reader. Each malicious
-// input is crafted as a byte[] here and must raise a recoverable
-// DocumentParseException quickly rather than hanging, exhausting memory, or
-// overflowing the stack. Every guard is paired with a positive control proving a
-// valid document or stream still parses/decodes unchanged.
 public class ReaderHardeningTests
 {
-    // --- Item 1: ObjectParser recursive descent depth cap -------------------
 
     [Fact]
     public void DeeplyNestedArray_Throws()
@@ -46,7 +40,6 @@ public class ReaderHardeningTests
         Assert.Equal(3, a.Count);
     }
 
-    // --- Item 5 (filters): decoded-size caps, bombs, LZW bounds -------------
 
     [Fact]
     public void FlateBomb_ExceedsCap_Throws()
@@ -65,7 +58,6 @@ public class ReaderHardeningTests
     [Fact]
     public void RunLengthBomb_ExceedsCap_Throws()
     {
-        // Each {129, X} pair emits 128 bytes (64x expansion); 64 pairs => 8192 bytes.
         var bomb = new byte[128];
         for (var i = 0; i < bomb.Length; i += 2)
         {
@@ -86,8 +78,6 @@ public class ReaderHardeningTests
     [Fact]
     public void LzwBomb_ExceedsCap_Throws()
     {
-        // clear, literal 'A', then repeatedly reference the newest code (KwKwK) so
-        // each step emits an ever-longer run. Output grows quadratically.
         var codes = new List<int> { 256, 65 };
         for (var code = 258; code < 330; code++)
         {
@@ -101,7 +91,6 @@ public class ReaderHardeningTests
     [Fact]
     public void LzwOutOfBoundsCode_Throws()
     {
-        // A first code of 300 references a table slot that does not exist yet.
         var bomb = PackLzw(new List<int> { 300 });
         Assert.Throws<DocumentParseException>(() => LzwFilter.Decode(bomb, 1, 1 << 20));
     }
@@ -109,7 +98,6 @@ public class ReaderHardeningTests
     [Fact]
     public void NormalLzw_Decodes_PositiveControl()
     {
-        // clear, 'A'(65), 'B'(66), Eod(257) -> "AB".
         var stream = PackLzw(new List<int> { 256, 65, 66, 257 });
         Assert.Equal(new byte[] { 65, 66 }, LzwFilter.Decode(stream, 1, 1 << 20));
     }
@@ -128,8 +116,6 @@ public class ReaderHardeningTests
         Assert.Equal(data, Ascii85Filter.Decode(Ascii85Filter.Encode(data), 1 << 20));
     }
 
-    // Packs a code sequence into an LZW bit stream matching the filter's decoder:
-    // 9-bit codes, MSB first, width grows to 10 when nextCode+1 hits 512.
     private static byte[] PackLzw(List<int> codes)
     {
         var bits = new List<bool>();

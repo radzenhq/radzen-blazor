@@ -95,8 +95,6 @@ public class DocumentInfo : ITracksChanges
     /// </summary>
     public bool IsModified => tracker.IsModified;
 
-    // Called once after load, which fills these same setters and would otherwise leave every
-    // loaded document born dirty.
     internal void AcceptChanges() => tracker.AcceptChanges();
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();

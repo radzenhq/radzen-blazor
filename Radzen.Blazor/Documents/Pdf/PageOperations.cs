@@ -6,9 +6,6 @@ namespace Radzen.Documents.Pdf;
 
 internal static class PageOperations
 {
-    // The re-parse runs under the limits the source itself was loaded with, so a host that
-    // tightened them against hostile input keeps that budget for imported content instead of
-    // silently falling back to the defaults.
     internal static Document Snapshot(Document source)
     {
         var bytes = source.ToArray();
@@ -16,11 +13,6 @@ internal static class PageOperations
         return Document.LoadFromStream(new MemoryStream(bytes, writable: false), limits);
     }
 
-    // A page still holding exactly the bytes, resources and rotation it was loaded with
-    // re-serializes from those alone, so DocumentMerger can copy it straight off the live
-    // source and the snapshot round trip is pure waste. Everything else (authored or edited
-    // content, a queued overlay, modeled annotations, document-level form fields) only turns
-    // into bytes when the source is saved, so it still needs the snapshot.
     internal static bool CanImportDirectly(Document target, Document source, int offset, int length)
     {
         if (ReferenceEquals(target, source) || source.FormFields.Count > 0

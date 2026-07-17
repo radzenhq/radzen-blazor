@@ -72,8 +72,6 @@ public static class PdfTimestamper
             pageIndex: 0);
 
         return PdfSigner.Embed(bytes, sigStart, sigEnd, reservedBytes,
-            // Sha2 hashes a single array, so the covered bytes are copied out here;
-            // an incremental hash over the two segments would need no copy at all.
             content => provider.GetTimestampToken(Sha2.ComputeHash256(content.ToArray()))
                 ?? throw new InvalidOperationException("The timestamp provider returned null."),
             "Increase the reservedBytes argument.");

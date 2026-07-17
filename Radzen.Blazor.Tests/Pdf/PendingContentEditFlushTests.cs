@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Every content API that reads the page's bytes as data must see queued edits. A watermark
-// is queued rather than materialized, so an API that reads the raw field without flushing
-// reports the page as it was before the watermark.
 public class PendingContentEditFlushTests
 {
     private static byte[] Source()
@@ -62,17 +59,11 @@ public class PendingContentEditFlushTests
     {
         var document = Watermarked();
 
-        // Document first: a Page read flushes, so asking the page first would hide a
-        // missing flush on the document path.
         var documentHits = document.FindText("DRAFT").Count;
 
         Assert.Equal(document.Pages[0].FindText("DRAFT").Count, documentHits);
     }
 
-    // RedactText over queued overlay text has no test here: the flush now reaches it, but
-    // ContentEditor.Reemit concatenates the overlay onto the raw bytes without a separator,
-    // so the re-emitted stream carries a bogus 'Tjq' operator that redaction rejects. Once
-    // that is fixed this deserves the same coverage as ReplaceText below.
 
     [Fact]
     public void ReplaceText_AfterWatermark_ReplacesOverlayText()

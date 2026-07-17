@@ -43,9 +43,6 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
             return;
         }
 
-        // This stream cannot embed a font file (Document.FontScope, CanEmbed: false), so a
-        // watermark in a registered family is rejected here by RegisterFont rather than
-        // embedded as the authored path embeds it.
         var plan = WatermarkTextPlan.Base14(watermark.Text, watermark.Font);
         ContentEmitter.WriteTextShow(writer, new TextShowOp
         {

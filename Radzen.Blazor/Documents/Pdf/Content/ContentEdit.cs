@@ -3,14 +3,10 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// A byte range of a content stream to replace with new bytes.
 internal readonly record struct ContentEdit(int Start, int End, byte[] Bytes);
 
 internal static class ContentEdits
 {
-    // Splices every edit in one forward pass over the source. Applying them one at a time
-    // reallocates and recopies the whole stream per edit, which is quadratic in the number
-    // of hits on a large stream.
     public static byte[] Apply(byte[] source, List<ContentEdit> edits)
     {
         if (edits.Count == 0)

@@ -5,11 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Hardening for the PNG predictor against /DecodeParms that drive unbounded
-// allocation or int32 overflow: a giant /Columns, a /Columns that wraps the
-// row-length product, and out-of-range colors/bit depths must all be rejected
-// with DocumentParseException before any buffer is sized from them. A positive
-// control proves an ordinary predictor row still decodes unchanged.
 public class PredictorHardeningTests
 {
     private static readonly byte[] SmallData = new byte[16];
@@ -25,7 +20,6 @@ public class PredictorHardeningTests
         Assert.Throws<DocumentParseException>(() => StreamPredictor.Apply(SmallData, parms));
     }
 
-    // /Columns 260000000 would allocate a ~260MB scratch row for 16 bytes of data.
     [Fact]
     public void GiantColumns_ThrowsFast()
     {
@@ -33,7 +27,6 @@ public class PredictorHardeningTests
             () => PngPredictor.Decode(SmallData, colors: 1, bitsPerComponent: 8, columns: 260000000));
     }
 
-    // /Columns 268435456 * 8 bits wraps the 32-bit row-length product to negative.
     [Fact]
     public void ColumnsThatWrapInt32_ThrowsFast()
     {
@@ -70,8 +63,6 @@ public class PredictorHardeningTests
             () => PngPredictor.Decode(new byte[6], colors: 1, bitsPerComponent: 8, columns: 4));
     }
 
-    // TIFF: /Colors 65536 wraps the int32 rowLength=colors*columns product; the colors
-    // bound rejects it before any row math (mirrors PngPredictor's MaxColors guard).
     [Fact]
     public void Tiff_ColorsOutOfRange_Throws()
     {
@@ -86,8 +77,6 @@ public class PredictorHardeningTests
             () => TiffPredictor.Decode(new byte[16], colors: 1, bitsPerComponent: 8, columns: 0));
     }
 
-    // A /Columns wider than the data leaves no whole row: reject rather than silently
-    // returning the stream unmodified (predictor not applied).
     [Fact]
     public void Tiff_ColumnsWiderThanData_Throws()
     {
@@ -95,8 +84,6 @@ public class PredictorHardeningTests
             () => TiffPredictor.Decode(new byte[4], colors: 1, bitsPerComponent: 8, columns: 260000000));
     }
 
-    // A trailing partial row (5 bytes over a 4-byte row) is corrupt input; fail loud
-    // instead of passing the dangling bytes through untouched.
     [Fact]
     public void Tiff_PartialTrailingRow_Throws()
     {

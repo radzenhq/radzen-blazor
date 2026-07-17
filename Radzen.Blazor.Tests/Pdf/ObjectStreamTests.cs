@@ -4,23 +4,12 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Object stream contract (ISO 32000-1 7.5.7). Type-2 cross-reference entries name
-// an /Type /ObjStm object plus an index; the compressed objects live in the
-// ObjStm body after a "/N objnum offset" header located by /First. GetObject on a
-// type-2 entry must return the extracted object.
+// ISO 32000-1 7.5.7 object streams.
 public class ObjectStreamTests
 {
     private static byte[] QpdfFixture() =>
         PdfTestResources.ReadAllBytes("Documents/xref-stream-objstm.pdf");
 
-    // Derived from `qpdf --show-xref`/`--show-object` on the fixture:
-    //   1/0 uncompressed  -> ObjStm (/N 4 /First 20)
-    //   2/0 compressed     -> << /Type /Catalog /Pages 3 0 R >>
-    //   3/0 compressed     -> << /Type /Pages /Count 1 /Kids [4 0 R] >>
-    //   4/0 compressed     -> << /Type /Page /Contents 6 0 R ... >>
-    //   5/0 compressed     -> << /Type /Font /BaseFont /Helvetica /Subtype /Type1 >>
-    //   6/0 uncompressed  -> content stream, 7/0 uncompressed -> the xref stream.
-    // /Size 8 with object 0 free => 7 in-use objects.
     [Fact]
     public void QpdfFixture_ObjectCountCountsInUseIncludingObjStmMembers()
     {
@@ -57,9 +46,6 @@ public class ObjectStreamTests
         Assert.Equal(4, Assert.IsType<NumberObject>(objStm.Dictionary["N"]).IntValue);
     }
 
-    // Hand-built ObjStm with three small objects (int, dict, dict). The reader
-    // decodes them without qpdf: no filter, no predictor anywhere. Object 4 is
-    // the ObjStm, object 5 is the referencing xref stream (/W [1 2 1]).
     private static byte[] HandCraftedObjStmFile()
     {
         var b1 = "42";

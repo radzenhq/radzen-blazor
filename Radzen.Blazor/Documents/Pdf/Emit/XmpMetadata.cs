@@ -143,8 +143,7 @@ internal sealed class XmpMetadata
         ("ConformanceLevel", "The conformance level of the embedded XML document"),
     ];
 
-    // PDF/A 6.6.2.3.1: properties outside the XMP predefined schemas must be
-    // declared through a pdfaExtension extension schema.
+    // PDF/A 6.6.2.3.1: properties outside the XMP predefined schemas need a pdfaExtension schema.
     private static void AppendFacturXExtensionSchema(StringBuilder builder)
     {
         builder.Append("  <rdf:Description rdf:about=\"\"\n");
@@ -180,9 +179,6 @@ internal sealed class XmpMetadata
 
     public StreamObject BuildStream() => WrapPacket(BuildPacket());
 
-    // Wraps a (possibly amended) XMP packet as the /Metadata stream object. Shared
-    // so the conformance writer, which splices identification entries into the raw
-    // packet, produces a stream dictionary identical to BuildStream's.
     public static StreamObject WrapPacket(byte[] packet)
     {
         var stream = new StreamObject(packet);
@@ -191,8 +187,6 @@ internal sealed class XmpMetadata
         return stream;
     }
 
-    // XMP dates are ISO 8601 (yyyy-MM-ddThh:mm:ss+hh:mm); the caller-supplied offset
-    // is preserved verbatim so the value round-trips without reading any clock.
     private static string FormatDate(DateTimeOffset value)
         => value.ToString("yyyy-MM-dd'T'HH:mm:sszzz", CultureInfo.InvariantCulture);
 
@@ -233,9 +227,7 @@ internal sealed class XmpMetadata
         return builder.ToString();
     }
 
-    // XML 1.0 Char production (2.2): tab, LF, CR, then U+0020..U+D7FF, U+E000..U+FFFD,
-    // U+10000..U+10FFFF. Surrogate code units pass through here; a lone surrogate is
-    // caught by UTF-8 encoding of the packet, valid pairs form a legal U+10000+ char.
+    // XML 1.0 (2.2) Char production: tab, LF, CR, U+0020..U+D7FF, U+E000..U+FFFD, U+10000..U+10FFFF.
     private static bool IsInvalidXmlChar(char ch)
         => ch < 0x20 ? ch is not ('\t' or '\n' or '\r') : ch is '\uFFFE' or '\uFFFF';
 }

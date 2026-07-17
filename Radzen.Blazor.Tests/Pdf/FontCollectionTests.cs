@@ -8,25 +8,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract pinned for FontCollection (F5). Expected metrics are derived directly from
-// the already-merged Base14Metrics (base-14) and SfntFont (registered fonts) so the
-// expectations never depend on FontCollection's own resolution path.
-//
-// Pinned decisions the implementer must follow:
-//  - Base-14 families (Helvetica/Times/Courier/Symbol/ZapfDingbats) resolve WITHOUT
-//    registration via Base14Metrics; Font.Bold/Italic pick the base-14 style variant.
-//  - Register(family, stream) stores exactly one face under the given family key (the
-//    key is the passed family string, NOT the font's internal name). For a plain TTF
-//    the single face is used; for a .ttc the face whose internal FamilyName equals the
-//    family arg is selected (no match => throw).
-//  - For a REGISTERED font, resolution is by exact family Name only. Font.Bold/Italic do
-//    NOT switch registered faces (register a bold face under its own name to use it).
-//  - Registering the same family twice: last registration wins (overwrite).
-//  - MeasureText(text, font) returns width in POINTS at font.Size: base-14 uses
-//    Base14Metrics.MeasureString; a registered sfnt font sums hmtx advances scaled by
-//    font.Size / UnitsPerEm. Kerning is applied only when EnableKerning is true.
-//  - Unknown family (not base-14, not registered) => InvalidOperationException whose
-//    Message contains the offending family name.
 public class FontCollectionTests
 {
     private static double SfntWidth(byte[] bytes, string text, double size)
@@ -60,7 +41,7 @@ public class FontCollectionTests
     public void Base14_DefaultFontNameIsMeasurable()
     {
         var fonts = new FontCollection();
-        var font = new Font { Size = 12 }; // Name defaults to "Helvetica"
+        var font = new Font { Size = 12 };
 
         Assert.True(fonts.MeasureText("Radzen", font) > 0);
     }
@@ -129,8 +110,6 @@ public class FontCollectionTests
         var boldFont = new Font { Name = "Liberation Sans Bold", Size = 12 };
         Assert.Equal(SfntWidth(boldBytes, "Hello", 12), fonts.MeasureText("Hello", boldFont), 10);
 
-        // Bold on a registered font is NOT synthesized into a different face: the bold
-        // regular-named font stays the regular face, distinct from the real bold face.
         var regularBold = new Font { Name = "Liberation Sans", Size = 12, Bold = true };
         Assert.Equal(SfntWidth(regular, "Hello", 12), fonts.MeasureText("Hello", regularBold), 10);
         Assert.NotEqual(fonts.MeasureText("Hello", boldFont), fonts.MeasureText("Hello", regularBold));
@@ -160,7 +139,6 @@ public class FontCollectionTests
         var font = new Font { Name = "Liberation Serif", Size = 12 };
         Assert.Equal(SfntWidth(serifFace, "Hello", 12), fonts.MeasureText("Hello", font), 10);
 
-        // Serif differs from Sans for the same string, proving the correct face was picked.
         var sans = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
         Assert.NotEqual(SfntWidth(sans, "Hello", 12), fonts.MeasureText("Hello", font));
     }

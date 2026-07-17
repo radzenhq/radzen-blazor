@@ -1,7 +1,6 @@
 namespace Radzen.Documents.Pdf.Objects;
 
-// Serializes the "<n> <gen> obj ... endobj" indirect-object framing (ISO 32000-1
-// 7.3.10) shared by the full-file and incremental-update writers.
+// ISO 32000-1 7.3.10: "<n> <gen> obj ... endobj" indirect-object framing.
 internal static class IndirectObjectFramer
 {
     public static long Write(CountingBufferedStream buffer, int number, int generation, DocumentObject value, WriteContext context)

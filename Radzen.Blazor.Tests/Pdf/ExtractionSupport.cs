@@ -8,22 +8,8 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared plumbing for the C4b text-extraction contract. The PINNED public API is
-// string Page.ExtractText() and string Document.ExtractText(), returning the
-// page/document text in reading order (top-to-bottom, then left-to-right) with
-// char codes reversed to Unicode through the font's /ToUnicode, /Differences or
-// the standard WinAnsi/base-14 encoding.
-//
-// L5 (full text emission with embedded fonts) is not merged, so the Type0/CID and
-// /Differences fixtures are hand-built at the object level: a real Type0 graph is
-// emitted through Type0FontEmbedder, and a content stream showing the raw codes is
-// written into a page whose /Resources reference it. The document is reloaded via
-// Document.LoadFromStream and extracted.
 internal static class ExtractionSupport
 {
-    // Builds a one-page PDF: the caller supplies the /Font resource entry (an inline
-    // dictionary or an indirect reference produced against the same writer) and the
-    // raw content-stream bytes. The document is serialized and reloaded.
     public static Document BuildSinglePage(Func<DocumentWriter, DocumentObject> font, byte[] content, string fontKey = "F1", double width = 612, double height = 792)
     {
         using var buffer = new MemoryStream();
@@ -67,7 +53,6 @@ internal static class ExtractionSupport
         return Document.LoadFromStream(reload);
     }
 
-    // "BT /<key> <size> Tf <x> <y> Td <hex codes> Tj ET" - a single positioned run.
     public static byte[] TextRun(string fontKey, double size, double x, double y, byte[] codes)
     {
         var sb = new StringBuilder();

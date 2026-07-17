@@ -12,12 +12,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R2 regression tests: hyperlinks (Run.Link -> /Link annotations with /A /URI) and
-// per-page page-number fields (PageNumberField / PageCountField inlines resolved at
-// emit time in headers/footers). All assertions run against the REAL bytes produced
-// by DocumentBuilder.Build() and reparsed with DocumentReader. The new public API
-// (Run.Link, PageNumberField, PageCountField) is reached through reflection so this
-// file compiles against the current code and fails at runtime until the API exists.
 public class HyperlinkPageNumberRegressionTests
 {
     private const double Tol = 1.0;
@@ -49,7 +43,6 @@ public class HyperlinkPageNumberRegressionTests
         return Assert.IsAssignableFrom<Run>(instance);
     }
 
-    // Normalized (X1, Y1, X2, Y2, Uri) for every /Link annotation on the page.
     private static List<(double X1, double Y1, double X2, double Y2, string Uri)> LinkAnnotations(DocumentReader reader, int pageIndex)
     {
         var page = ContentTestHelpers.Kid(reader, pageIndex);
@@ -90,7 +83,6 @@ public class HyperlinkPageNumberRegressionTests
         return links;
     }
 
-    // (shown text, baseline X, baseline Y) from the base-14 "x y Td (text) Tj" pattern.
     private static List<(string Text, double X, double Y)> TextRuns(DocumentReader reader, int pageIndex)
     {
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, pageIndex));
@@ -126,8 +118,6 @@ public class HyperlinkPageNumberRegressionTests
         Assert.True(link.X1 >= visit.X - Tol, $"link rect x1 {link.X1:F2} must not start before the line at {visit.X:F2}");
         if (target.Text == "Radzen")
         {
-            // The linked run was drawn as its own fragment: the rect starts exactly at it
-            // and must not cover the unlinked prefix.
             Assert.True(link.X1 > visit.X + Tol, $"link rect x1 {link.X1:F2} must not cover the unlinked prefix at {visit.X:F2}");
             Assert.True(link.X1 <= target.X + Tol && target.X <= link.X2, $"link rect [{link.X1:F2},{link.X2:F2}] must cover the linked text x {target.X:F2}");
         }
@@ -135,8 +125,8 @@ public class HyperlinkPageNumberRegressionTests
         Assert.True(link.Y1 - Tol <= target.Y && target.Y <= link.Y2 + Tol, $"link rect [{link.Y1:F2},{link.Y2:F2}] must cover the linked text baseline {target.Y:F2}");
     }
 
-    // veraPDF ISO 19005-3 6.3.2: every annotation must set the Print flag (bit 3 = 4)
-    // and clear Hidden/NoView, else a hyperlinked PDF/A document is non-conformant.
+    // ISO 19005-3 6.3.2: every annotation must set the Print flag (bit 3 = 4)
+    // and clear Hidden/NoView.
     [Fact]
     public void LinkAnnotation_SetsPrintFlag_ForPdfAConformance()
     {
@@ -187,7 +177,6 @@ public class HyperlinkPageNumberRegressionTests
         Assert.Equal(links.Count, links.Select(l => Math.Round(l.Y1, 1)).Distinct().Count());
     }
 
-    // Footer text on the given page: runs on the lowest baseline, joined left to right.
     private static string FooterLine(DocumentReader reader, int pageIndex)
     {
         var runs = TextRuns(reader, pageIndex);

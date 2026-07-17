@@ -6,15 +6,12 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Small line-layout edge cases: an over-wide centered/right word must not shift left of the
-// indent, and leading spaces must advance the following word (parity with leading tabs).
 public class LineBreakerWhitespaceEdgeCaseTests
 {
     [Fact]
     public void OverWideCenteredWord_DoesNotShiftLeftOfMargin()
     {
         var fonts = LineLayoutSupport.Fonts();
-        // NBSP keeps the token unbreakable so it overflows through BuildLine, not the char-splitter.
         var word = "Supercalifragilisticexpialidocious" + "\u00A0" + "Supercalifragilisticexpialidocious";
         var paragraph = LineLayoutSupport.SingleRun(word, alignment: HorizontalAlignment.Center);
 

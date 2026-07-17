@@ -10,9 +10,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R3 layout-correctness regressions: pagination progress guards, column-span clamping,
-// tables without columns, unbreakable-token overflow, rowspan height/split, and
-// negative auto column widths. Each test fails on the pre-fix engine.
 public class LayoutCorrectnessRegressionTests
 {
     private const string Family = TableLayoutSupport.Family;
@@ -20,10 +17,6 @@ public class LayoutCorrectnessRegressionTests
     private static Cell Fill(Cell cell, string text, double size = 12)
         => TableLayoutSupport.Fill(cell, text, size);
 
-    // (a) A paragraph continuation line taller than the page must not make the paginator
-    // emit empty pages forever: it either places the oversized line (one per page) or
-    // throws a clear exception. Pre-fix this loops indefinitely, so the work runs on a
-    // watchdog task and the test fails on timeout.
     [Fact]
     public void ContinuationLineTallerThanPage_PaginationTerminates()
     {
@@ -67,8 +60,6 @@ public class LayoutCorrectnessRegressionTests
         }
     }
 
-    // (a) Same guard end-to-end through Build(): the document must be produced (or a
-    // clear exception thrown), never an unbounded page explosion.
     [Fact]
     public void BuildWithOversizedContinuationLine_Terminates()
     {
@@ -113,8 +104,6 @@ public class LayoutCorrectnessRegressionTests
         }
     }
 
-    // (b) A cell whose ColumnSpan exceeds the remaining columns must be clamped and
-    // still laid out, not silently dropped.
     [Fact]
     public void ColumnSpanBeyondLastColumn_IsClampedNotDropped()
     {
@@ -140,7 +129,6 @@ public class LayoutCorrectnessRegressionTests
         Assert.Contains(wide.Lines, l => l.Line.Fragments.Any(f => f.Text.Contains("WIDE", StringComparison.Ordinal)));
     }
 
-    // (b) End-to-end: the over-spanning cell's text must survive into the produced PDF.
     [Fact]
     public void ColumnSpanBeyondLastColumn_TextSurvivesBuild()
     {
@@ -163,8 +151,6 @@ public class LayoutCorrectnessRegressionTests
         Assert.Contains("Spanned", text, StringComparison.Ordinal);
     }
 
-    // (b) A table with rows but no defined columns must not silently render empty:
-    // either columns are derived from the widest row or a clear exception is thrown.
     [Fact]
     public void TableWithRowsButNoColumns_DoesNotRenderEmpty()
     {
@@ -183,13 +169,9 @@ public class LayoutCorrectnessRegressionTests
         }
         catch (InvalidOperationException)
         {
-            // A clear exception is an acceptable outcome; silent empty output is not.
         }
     }
 
-    // (c) A single token wider than its column must not overpaint the neighbor cell:
-    // either it is broken at the column width (every laid-out line fits the content box)
-    // or the cell content is clipped in the emitted content stream ("W n").
     [Fact]
     public void UnbreakableTokenWiderThanColumn_DoesNotBleedOutsideCell()
     {
@@ -225,9 +207,6 @@ public class LayoutCorrectnessRegressionTests
             "over-wide token must be broken to the column width or clipped to the cell box");
     }
 
-    // (d) A RowSpan cell's content must contribute to the combined height of the rows
-    // it covers; pre-fix only RowSpan == 1 cells size rows, so tall spanned content
-    // overflows its bounds.
     [Fact]
     public void RowSpanCellContent_FitsWithinCoveredRows()
     {
@@ -255,8 +234,6 @@ public class LayoutCorrectnessRegressionTests
             "covered rows together must absorb the spanning cell's height");
     }
 
-    // (d) A rowspan group must not be split across page fragments: every row covered by
-    // a RowSpan > 1 cell moves as a whole to the fragment that holds its start row.
     [Fact]
     public void RowSpanGroup_IsNotSplitAcrossTableFragments()
     {
@@ -304,8 +281,6 @@ public class LayoutCorrectnessRegressionTests
         Assert.Equal(FragmentOf(1), FragmentOf(2));
     }
 
-    // (e) Fixed column widths larger than the available width must not drive auto
-    // columns negative; they clamp to zero or more.
     [Fact]
     public void FixedWidthsExceedingAvailable_AutoColumnsClampToNonNegative()
     {

@@ -14,14 +14,8 @@ using Xunit.Sdk;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Byte fidelity for a loaded page rests on every mutable member of a materialized element
-// opening a change-detection door. That used to be enforced at run time by re-serializing
-// each element and comparing; this test is what replaces it. It walks the closed set by
-// reflection and fails the build if a member can move the emitted bytes with the flag clean.
 public class ContentElementChangeTrackingMatrixTests
 {
-    // The element kinds ContentInterpreter can produce, and so the only ones that can occupy
-    // the original prefix of a loaded page. Anything else can only be appended.
     private static readonly Type[] Tracked =
     [
         typeof(TextContent),
@@ -55,7 +49,6 @@ public class ContentElementChangeTrackingMatrixTests
         return InterpreterTestSupport.Load(document.ToArray()).Pages[0].Content;
     }
 
-    // A fresh materialized element per member, so each starts from the frozen state.
     private static ContentElement Element(Type type)
     {
         foreach (var element in Materialized())
@@ -109,8 +102,6 @@ public class ContentElementChangeTrackingMatrixTests
             }
         }
 
-        // The nested owned objects. A run's Font and a path's gradient reach the emitted bytes
-        // through their owner, so the owner's flag is what must move.
         foreach (var property in SettableProperties(typeof(Font), typeof(object)))
         {
             AssertDoor(typeof(Font), property.Name, TextFixture, (_, nested) => Mutate(property, nested!));
@@ -123,14 +114,11 @@ public class ContentElementChangeTrackingMatrixTests
             checkedMembers++;
         }
 
-        // Guards the walk itself: a filter that silently matched nothing would report green.
         Assert.InRange(checkedMembers, 40, 100);
     }
 
     private static ContentElement TextFixture() => Element(typeof(TextContent));
 
-    // A loaded path carries no gradient, so one is attached and the element re-frozen: the
-    // matrix still starts from a clean, materialized element.
     private static ContentElement GradientFixture()
     {
         var path = (PathContent)Element(typeof(PathContent));
@@ -158,8 +146,6 @@ public class ContentElementChangeTrackingMatrixTests
             return;
         }
 
-        // The disjunction, short-circuited: a member the emitter genuinely ignores may leave the
-        // flag clean, but one that moved the bytes without opening a door is the bug.
         Assert.True(EmitBytes(element).SequenceEqual(baseline),
             $"{owner.Name}.{member}: mutation changed emitted bytes but the flag stayed clean");
     }
@@ -176,9 +162,6 @@ public class ContentElementChangeTrackingMatrixTests
         {
             foreach (var property in declaring.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
             {
-                // Assembly-visible setters only: a private one cannot be reached from outside.
-                // Init-only members are excluded as a category, not skipped for convenience:
-                // they cannot be assigned after construction, so they have nothing to track.
                 if (property.SetMethod is { } setter && (setter.IsPublic || setter.IsAssembly || setter.IsFamilyOrAssembly)
                     && !IsInitOnly(setter) && property.GetIndexParameters().Length == 0)
                 {
@@ -218,8 +201,6 @@ public class ContentElementChangeTrackingMatrixTests
         }
     }
 
-    // Throws rather than skips on an unregistered type: a new member of a type this does not
-    // know must break the build, not quietly drop out of the matrix.
     private static object? DistinctValue(Type type, object? current, string member)
     {
         if (Nullable.GetUnderlyingType(type) is { } underlying)

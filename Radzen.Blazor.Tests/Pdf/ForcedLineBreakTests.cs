@@ -7,9 +7,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3(c): LineBreaker treats '\n' as a forced line break, "\r\n" as a single forced
-// break, '\t' as breakable whitespace and NBSP as non-breaking. Control characters
-// never leak into fragment text.
 public class ForcedLineBreakTests
 {
     private const double Wide = 100000;

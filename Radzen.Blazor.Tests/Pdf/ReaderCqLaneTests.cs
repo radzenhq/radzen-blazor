@@ -8,13 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Lane cq-reader hardening/correctness for DocumentReader:
-//   #67 a present but non-dictionary /Encrypt must fail loud, not be treated as plaintext;
-//   #70 a cross-reference stream shorter than its /Index declares must fail loud (routing
-//       into the repair scan) instead of silently dropping objects;
-//   #71 an object-stream member whose number disagrees with the xref entry must be rejected;
-//   #66 a non-seekable source stream parses identically to a seekable one;
-//   #21 a wrong /Length still recovers to the correct endstream.
 public class ReaderCqLaneTests
 {
     private static void Copy(byte[] target, int at, byte[] source)
@@ -58,9 +51,6 @@ public class ReaderCqLaneTests
     [Fact]
     public void TruncatedXrefStream_RepairsInsteadOfDroppingObjects()
     {
-        // /Index declares 6 entries but only 3 (12 bytes) are present. The clamp used to
-        // drop objects 1 and 2, leaving /Root resolving to null; now it fails loud and the
-        // header-scan repair recovers the catalog.
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
         pdf.Object(2, "2 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n");
@@ -83,7 +73,6 @@ public class ReaderCqLaneTests
         var body = b0 + "\n" + b1;
         var off1 = (b0 + "\n").Length;
 
-        // Header claims member 0 is object 99, but the xref maps object 1 to index 0.
         var header = $"99 0 2 {off1} ";
         var stmData = header + body;
         var first = header.Length;
@@ -107,11 +96,9 @@ public class ReaderCqLaneTests
 
         var reader = DocumentReader.Parse(pdf.ToArray());
 
-        // Object 2 lives at index 1 whose header number matches, so it resolves.
         var catalog = Assert.IsType<DictionaryObject>(reader.GetObject(2));
         Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
 
-        // Object 1 maps to index 0 whose header number is 99: a mismatch, so it is rejected.
         Assert.Throws<DocumentParseException>(() => reader.GetObject(1));
     }
 

@@ -10,10 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Page-number/count fields placed in a SECTION BODY paragraph (not just a header/footer
-// band or a band-table cell) must resolve to the real page number/count. They used to
-// emit the literal "0" baked into the field, because GeneratePage emitted body lines
-// without the field-substitution pass that the band and cell paths run.
 public class BodyFieldResolutionTests
 {
     private static string[] TextRuns(DocumentReader reader, int page)

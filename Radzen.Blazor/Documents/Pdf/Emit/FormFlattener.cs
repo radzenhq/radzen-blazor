@@ -147,8 +147,6 @@ internal sealed class FormFlattener(Document document)
         var (x, y, width, height) = WidgetRect(widget);
         if (string.Equals(type.Value, "Btn", StringComparison.Ordinal))
         {
-            // A pushbutton has no /AS or /V state to redraw from, so its caption and border
-            // live only in its /AP; refuse rather than delete the widget and paint nothing.
             if (Inherited(widget, "Ff") is NumberObject pushFf
                 && (pushFf.IntValue & FieldFlags.PushButton) != 0)
             {
@@ -189,9 +187,6 @@ internal sealed class FormFlattener(Document document)
             return;
         }
 
-        // The value renders in a viewer, so dropping the widget would lose it: refuse unless
-        // the single left-aligned line this paints is what the field actually shows. Baking a
-        // password's /V here would turn it into cleartext page content.
         if (!FieldBakePolicy.CanBakeSingleLine(source!, widget, value)
             || (type.Value is "Ch" && !FieldBakePolicy.HasSingleSelection(source!, widget)))
         {

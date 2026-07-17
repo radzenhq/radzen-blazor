@@ -7,11 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Lane cq-reader: malformed and pattern-coloured content streams in ContentInterpreter.
-//   - a stream truncated inside a TJ array must degrade, not throw from a list indexer
-//     (finding #55);
-//   - the name operand of a pattern scn/SCN must survive materialize + re-emit
-//     (finding #56).
 public class ContentInterpreterHardeningTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);

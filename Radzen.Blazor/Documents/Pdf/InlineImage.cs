@@ -21,7 +21,6 @@ public sealed class InlineImage : Run
 
     internal static InlineImage FromStream(Stream stream) => new(ImageDecoder.ReadFully(stream));
 
-    /// <summary>The buffered image bytes.</summary>
     internal byte[] Data { get; }
 
     /// <summary>Gets or sets the inline width. When unset the natural width is used, deriving from <see cref="Height"/> when only that is set.</summary>

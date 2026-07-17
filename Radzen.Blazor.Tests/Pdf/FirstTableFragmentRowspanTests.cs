@@ -6,16 +6,10 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The pre-table flush check must account for the whole first body ROW GROUP that
-// TablePaginator force-places together (a rowspan closure), not just the first body
-// row. Otherwise a tall first group is drawn into the tiny space left on the current
-// page and spills below the content box.
 public class FirstTableFragmentRowspanTests
 {
     private const double Tol = 1e-6;
 
-    // Header row (1 line) then a first body row whose column-0 cell spans `span` rows, so
-    // the first group is `span` unit-height body rows tall.
     private static Table RowspanTable(int span)
     {
         var table = new Table();
@@ -47,8 +41,6 @@ public class FirstTableFragmentRowspanTests
         var fonts = TableLayoutSupport.Fonts();
         var lh = TableLayoutSupport.LineHeight(fonts);
 
-        // A 6-line content box, 4 filler lines placed first: 2 lines remain, but the
-        // header + 3-row rowspan group needs 4 lines.
         var section = PaginationSupport.Section(400, PaginationSupport.HeightForLines(lh, 6));
         for (var i = 0; i < 4; i++)
         {
@@ -70,7 +62,6 @@ public class FirstTableFragmentRowspanTests
             }
         }
 
-        // The table must move to its own fresh page rather than share the filler page.
         var tablePage = pages.Single(p => p.Tables.Count > 0);
         Assert.Empty(tablePage.Lines);
         Assert.Equal(0, tablePage.Tables[0].Y, Tol);

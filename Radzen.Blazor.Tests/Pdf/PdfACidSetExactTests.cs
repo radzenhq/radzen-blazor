@@ -10,19 +10,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// veraPDF 1.30.2 clause 6.2.11.4.2 test 2: the /CIDSet in the FontDescriptor of an
-// embedded CID font must identify ALL CIDs present in the embedded subset - not just
-// the CIDs referenced by content. These tests reload real PdfA3B Build() output and
-// re-parse the embedded FontFile2/FontFile3 with the internal SfntFont/CffFont.
-//
-// Both subsetters renumber glyphs into a COMPACT contiguous space 0..N-1 (glyf:
-// used + composite closure + notdef; CFF: used + notdef), so every gid in the
-// embedded font program is present and the CIDSet must mark exactly 0..N-1 with
-// no extra bits.
+// veraPDF clause 6.2.11.4.2: /CIDSet must identify all CIDs in the embedded subset.
 public class PdfACidSetExactTests
 {
-    // Latin accented + Cyrillic breve forms force composite glyphs in Liberation Sans,
-    // so the glyf closure embeds component glyphs that no CID references directly.
     private const string LatinSample = "Voilà - le café naïve! Мой рай";
     private const string CjkSample = "Ab Мир 中产";
 
@@ -90,12 +80,8 @@ public class PdfACidSetExactTests
         var used = UsedGids(original, LatinSample);
         var expected = Type0EmbedSupport.GlyfClosure(original, used);
 
-        // Precondition: the sample must pull composite component glyphs into the
-        // closure, otherwise this test cannot distinguish "used" from "embedded".
         Assert.True(expected.Count > used.Count + 1, "sample must embed composite component glyphs");
 
-        // Compact renumbering: numGlyphs == |used + closure + notdef|, not the
-        // original glyph count, and loca covers exactly the compact space.
         var n = (int)subset.GlyphCount;
         Assert.Equal(expected.Count, n);
         Assert.True(n < original.GlyphCount / 10,
@@ -106,8 +92,6 @@ public class PdfACidSetExactTests
         Assert.True(subset.TryGetTable("glyf", out var glyf));
         Assert.Equal((uint)glyf.Length, loca[^1]);
 
-        // All compact gids are present in the font program (every gid has a loca
-        // entry), so the CIDSet must mark exactly 0..N-1.
         AssertSameCids(Enumerable.Range(0, n).ToHashSet(), CidSetBits(reader, descriptor));
     }
 
@@ -120,10 +104,6 @@ public class PdfACidSetExactTests
         var fontFile = Assert.IsType<StreamObject>(reader.Resolve(descriptor["FontFile3"]));
         var cff = CffFont.Parse(reader.DecodeStream(fontFile));
 
-        // Compact renumbering: the CID-keyed subset holds exactly used + notdef
-        // glyphs and its charset is the identity over the compact space (CID ==
-        // new gid), even though the original Noto charset is NOT identity in the
-        // sample's gid range (中 gid 395 -> CID 9544).
         var used = UsedGids(Type0EmbedSupport.LoadNoto(), CjkSample);
         var n = cff.GlyphCount;
         Assert.Equal(used.Count + 1, n);
@@ -132,8 +112,6 @@ public class PdfACidSetExactTests
             Assert.Equal(gid, cff.Charset[gid]);
         }
 
-        // Every charstring is present in the font program, so the CIDSet must
-        // mark exactly 0..N-1.
         AssertSameCids(Enumerable.Range(0, n).ToHashSet(), CidSetBits(reader, descriptor));
     }
 }

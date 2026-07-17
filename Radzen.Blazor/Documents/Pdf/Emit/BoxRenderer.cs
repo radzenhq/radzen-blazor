@@ -2,15 +2,12 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Content emission and content clipping stay with the caller. `bounds` is in page space:
-// Y is the bottom edge, like FillDraw.
 internal static class BoxRenderer
 {
     public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style)
     {
         var radius = ClampRadius(style.CornerRadius.Point, bounds.Width, bounds.Height);
 
-        // The shadow is painted first so it sits under the box background and borders.
         if (style.Shadow is { } shadow)
         {
             SoftMask.EmitBoxShadow(plan, bounds, radius, shadow);
@@ -72,7 +69,6 @@ internal static class BoxRenderer
         EmitEdge(plan, style.Left, x, bottom, x, top, style.ExtGState);
     }
 
-    // The effective corner radius, clamped so opposite corners never overlap.
     public static double ClampRadius(double radius, double width, double height)
     {
         if (radius <= 0 || width <= 0 || height <= 0)

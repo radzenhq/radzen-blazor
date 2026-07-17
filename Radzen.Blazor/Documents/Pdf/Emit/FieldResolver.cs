@@ -5,9 +5,6 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Resolves page-number/count fields at emit time: detects paragraphs that carry fields
-// and re-breaks them with the actual page number/count substituted, so a band laid out
-// once per section renders the right value on every page.
 internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolution)
 {
     public bool HasField(Paragraph paragraph)
@@ -39,12 +36,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
             && fontA.Color.Equals(fontB.Color);
     }
 
-    // Substitutes page-number/count fields with their resolved text, then re-runs the
-    // line breaker so the paragraph wraps, honors '\n' forced breaks and tab stops, and
-    // emits ALL of its lines. Consecutive runs of the same style merge into one piece so
-    // the field text keeps its inter-word spaces intact (the breaker re-inserts the gaps
-    // and CoalesceFragments restores them at emit); tabs are re-encoded as '\t' between
-    // pieces so a trailing tab is preserved rather than dropped.
     public IReadOnlyList<LineBox> ResolveFields(
         Paragraph paragraph,
         double width,
@@ -53,9 +44,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
         HorizontalAlignment? inheritedAlignment,
         int reservedLines)
     {
-        // Text == null marks a passthrough piece: a non-text run (e.g. InlineImage) re-emitted
-        // as its ORIGINAL instance so the line breaker lays it out instead of coercing it to
-        // empty text.
         var pieces = new List<(Run Run, StringBuilder? Text, int TabsBefore)>();
         var pendingTabs = 0;
         foreach (var run in paragraph.Inlines)
@@ -70,8 +58,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
                     text = pageCount.ToString(CultureInfo.InvariantCulture);
                     break;
                 case InlineImage:
-                    // Flush a pending tab so the image keeps its tab-stop position, then re-emit
-                    // the image itself rather than dropping it as its (empty) Text.
                     if (pendingTabs > 0)
                     {
                         pieces.Add((run, new StringBuilder(), pendingTabs));
@@ -114,7 +100,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
             }
         }
 
-        // A trailing tab (no piece follows it) survives as a final tabs-only piece.
         if (pendingTabs > 0 && pieces.Count > 0)
         {
             pieces.Add((pieces[^1].Run, new StringBuilder(), pendingTabs));
@@ -142,9 +127,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
                 continue;
             }
 
-            // The synthesized run carries the original run's RESOLVED font as its authored font,
-            // so the line breaker (given this ephemeral paragraph, whose runs are not in the
-            // resolution) reads exactly the font the field text was measured and drawn with.
             var newRun = new Run(new string('\t', tabsBefore) + builderText.ToString()) { Link = run.Link };
             newRun.Font.InheritFrom(ResolvedFont(run));
             resolved.Inlines.Add(newRun);
@@ -152,10 +134,6 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
 
         var lines = LineBreaker.Break(resolved, width, fonts, inheritedAlignment, resolution);
 
-        // Every call site (band, body, table cell) laid this paragraph out ONCE with the field's
-        // single-digit placeholder and reserved exactly those lines; the content below sits at a
-        // position derived from that count. A wider resolved number that wraps to more lines would
-        // overprint it, so fail loud instead of drawing over it.
         if (lines.Count > reservedLines)
         {
             throw new InvalidOperationException(

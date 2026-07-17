@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded page whose /MediaBox has a non-zero origin must re-save with that origin
-// intact - content coordinates are preserved verbatim, so dropping the origin shifts
-// the visible content.
 public class MediaBoxOriginTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -59,8 +56,6 @@ public class MediaBoxOriginTests
         Assert.Equal(812, N(box, 3), 0.01);
     }
 
-    // A /MediaBox element may legally be an indirect reference; unresolved it reads as 0
-    // and collapses the page to nothing.
     [Fact]
     public void IndirectCoordinates_AreResolved()
     {
@@ -86,8 +81,6 @@ public class MediaBoxOriginTests
         Assert.Equal(792, N(box, 3), 0.01);
     }
 
-    // A coordinate that is not a number at all leaves the box unusable, so the page falls
-    // back to the default size rather than to a degenerate 0 x 0.
     [Fact]
     public void NonNumericCoordinate_FallsBackToDefaultSize()
     {

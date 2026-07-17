@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The per-row cell grouping that replaced the O(rows*cells) full scan in table
-// emission must not change output: cells still emit row-major in their layout order,
-// and the produced content stream is byte-for-byte stable across builds.
 public class TableRowEmissionTests
 {
     private static DocumentBuilder Author()

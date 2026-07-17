@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Filling a field with characters a base-14 WinAnsi appearance cannot encode
-// (Cyrillic/Greek/CJK invoice values) must not emit an appearance with dropped
-// glyphs, and a text appearance must honor the field /DA font size. Toggling a
-// checkbox must use the on-state named by its /AP /N, not a hardcoded "Yes".
 public class AcroFormAppearanceTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -28,7 +24,6 @@ public class AcroFormAppearanceTests
         return pdf.ToArray();
     }
 
-    // A flat text field "Name" with an 8pt /DA and no form /NeedAppearances and no /AP.
     private static byte[] TextForm()
     {
         var pdf = new FixturePdf()
@@ -42,7 +37,6 @@ public class AcroFormAppearanceTests
         return Wrap(pdf, 7);
     }
 
-    // A checkbox "Agree" whose /AP /N names its on-state <onState> and an /Off state.
     private static byte[] CheckboxForm(string onState)
     {
         const string glyph = "0 0 18 18 re f";

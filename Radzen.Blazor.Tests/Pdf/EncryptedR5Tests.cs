@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R4(c): revision 5 (Adobe ExtensionLevel 3, /V 5 /R 5) authentication. Unlike
-// revision 6, R5 hashes the password with a SINGLE SHA-256 pass over
-// password||salt||(U for owner) - the iterated algorithm 2.B loop is R6-only.
-// Files produced by Acrobat 9 use this scheme and must open.
 public class EncryptedR5Tests
 {
     private const string UserPassword = "user5";

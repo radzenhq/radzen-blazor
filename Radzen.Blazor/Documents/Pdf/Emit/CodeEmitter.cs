@@ -2,8 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Rasterizes QR codes and barcodes into filled rectangles (one per dark module/bar) and
-// emits an optional human-readable caption line under a barcode.
 internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resolution)
 {
     private static readonly Color CodeBlack = Color.FromRgb(0, 0, 0);
@@ -18,7 +16,6 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
     public void EmitCodeBlock(EmitContext context, Block source, double x, double topY)
         => source.Accept(emitVisitor ??= new EmitVisitor(this), (context, x, topY));
 
-    // Rasterizes a code block; a non-code block emits nothing (Default).
     private sealed class EmitVisitor(CodeEmitter owner) : BlockVisitor<(EmitContext Context, double X, double TopY), Nothing>
     {
         protected override Nothing Default(Block block, (EmitContext Context, double X, double TopY) args) => default;
@@ -36,8 +33,6 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
         }
     }
 
-    // Spec-mandated minimum quiet zone (light margin) each side, in modules, so 1D symbols
-    // stay scannable. EAN wants 11x, UPC-A 9x; Code128 and the rest need at least 10x.
     private static int QuietZoneModules(BarcodeType type) => type switch
     {
         BarcodeType.Ean13 or BarcodeType.Ean8 or BarcodeType.Isbn or BarcodeType.Issn => 11,
@@ -45,7 +40,6 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
         _ => 10,
     };
 
-    // One filled square per dark module, scaled so matrix plus quiet zone fits Size x Size.
     private static void EmitQrCode(PagePlan plan, QrCode qr, double x, double topY)
     {
         var matrix = Radzen.Documents.QrEncoder.EncodeUtf8(qr.Value, qr.ErrorCorrection);
@@ -74,7 +68,6 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
         }
     }
 
-    // Bars come back with X/Width in modules and Y/Height in points, so only X scales.
     private void EmitBarcode(EmitContext context, Barcode barcode, double x, double topY)
     {
         var plan = context.Plan;
@@ -101,8 +94,6 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
 
         var font = resolution.BarcodeFont(barcode) ?? barcode.Font;
         var textTop = topY - barcode.Height.Point;
-        // The same caption the band height was measured from, so a value that wraps is drawn on
-        // every line the band reserved.
         foreach (var box in CodeBlockDispatch.CaptionLines(barcode, font, fonts))
         {
             context.Text.EmitLine(context, box, x, textTop, null);

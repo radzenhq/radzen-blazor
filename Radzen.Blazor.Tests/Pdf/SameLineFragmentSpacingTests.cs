@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Spacing between separate show operators sharing a baseline: a fragment that abuts
-// the pen left by the previous one must not gain a space, while a genuine positional
-// gap still reads as a word break.
 public class SameLineFragmentSpacingTests
 {
     private static DictionaryObject Helvetica() => new()

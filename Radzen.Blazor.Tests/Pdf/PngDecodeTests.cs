@@ -152,7 +152,6 @@ public class PngDecodeTests
 
     private static byte[] RgbIdat()
     {
-        // 4x4 truecolor: each scanline is a zero filter byte plus 4 RGB pixels.
         var raw = new byte[4 * (1 + (4 * 3))];
         for (int i = 0; i < raw.Length; i++)
         {
@@ -200,20 +199,18 @@ public class PngDecodeTests
         using var ms = new MemoryStream();
         ms.Write([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
 
-        // IHDR: 1x1, 8-bit, truecolor, no compression/filter method flags, interlace = 1 (Adam7).
         byte[] ihdr =
         [
-            0x00, 0x00, 0x00, 0x01, // width 1
-            0x00, 0x00, 0x00, 0x01, // height 1
-            0x08,                   // bit depth
-            0x02,                   // colour type 2 (truecolor)
-            0x00,                   // compression
-            0x00,                   // filter
-            0x01,                   // interlace = Adam7
+            0x00, 0x00, 0x00, 0x01,
+            0x00, 0x00, 0x00, 0x01,
+            0x08,
+            0x02,
+            0x00,
+            0x00,
+            0x01,
         ];
         WriteChunk(ms, "IHDR", ihdr);
 
-        // A well-formed IDAT so decoders that scan past IHDR still reach the interlace rejection.
         byte[] idat = Deflate([0x00, 0xFF, 0x00, 0x00]);
         WriteChunk(ms, "IDAT", idat);
         WriteChunk(ms, "IEND", []);

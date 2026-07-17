@@ -53,8 +53,6 @@ public sealed class FormField
     internal static bool IsWidget(DocumentReader reader, DictionaryObject annotation)
         => string.Equals(reader.GetName(annotation, "Subtype"), "Widget", StringComparison.Ordinal);
 
-    // Renders a resolved /V into the one display string both FormField.Value reports and
-    // FormFlattener paints, so the two can never disagree about the same field.
     internal static string? ValueText(DocumentReader reader, DocumentObject? value)
         => value switch
         {
@@ -66,10 +64,6 @@ public sealed class FormField
 
     private DocumentObject? InheritedEntry(string key) => InheritedAttribute(reader, Dictionary, key);
 
-    // Walks a field/widget's /Parent chain from `dictionary` up to its root field, yielding
-    // each ancestor. The chain is a finite object graph, so revisiting a node is the only way
-    // the walk fails to terminate: track them and fail loud, matching AcroForm's /Kids descent
-    // over this same tree rather than truncating a deep-but-valid hierarchy at a fixed depth.
     internal static IEnumerable<DictionaryObject> ParentChain(DocumentReader reader, DictionaryObject dictionary)
     {
         var seen = new HashSet<DictionaryObject>(ReferenceEqualityComparer.Instance);
@@ -84,8 +78,7 @@ public sealed class FormField
         }
     }
 
-    // The nearest inheritable attribute on a field/widget's /Parent chain (ISO 32000 12.7.3.1),
-    // resolved: /V, /FT, /Ff and /Q can all be set on a non-terminal parent and inherited.
+    // /V, /FT, /Ff and /Q may be inherited from a non-terminal parent on the /Parent chain (ISO 32000 12.7.3.1).
     internal static DocumentObject? InheritedAttribute(DocumentReader reader, DictionaryObject dictionary, string key)
     {
         foreach (var current in ParentChain(reader, dictionary))
@@ -99,10 +92,7 @@ public sealed class FormField
         return null;
     }
 
-    // A multi-select choice field's /V is an array of the selected items (ISO 32000-1 12.7.4.4);
-    // the spec names no separator because it never joins them. ", " is the only join the callers
-    // can honour: the flattened appearance is a single Tj, where a newline is not a line break
-    // but an unmapped byte in the string.
+    // A multi-select choice field's /V is an array of the selected items (ISO 32000-1 12.7.4.4).
     private static string JoinValues(DocumentReader reader, ArrayObject items)
     {
         var parts = new List<string>();
@@ -119,12 +109,7 @@ public sealed class FormField
 
     private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, throwOnInvalidBytes: true);
 
-    // A PDF text string (ISO 32000 7.9.2.2) is UTF-16BE when prefixed FE FF, or UTF-8
-    // when prefixed EF BB BF (ISO 32000-2); otherwise it is PDFDocEncoding/Latin1, which
-    // StringObject.Value already exposes verbatim as chars 0-255. Both prefixes are
-    // themselves PDFDocEncodable ("þÿ", "ï»¿") and the spec resolves that by fiat: the
-    // prefix wins. The strict-UTF8 fallback only covers the residual case where the
-    // prefix is real Latin1 text, which a malformed UTF-8 remainder reveals.
+    // A PDF text string (ISO 32000 7.9.2.2) is UTF-16BE when prefixed FE FF, UTF-8 when prefixed EF BB BF (ISO 32000-2), otherwise PDFDocEncoding/Latin1.
     internal static string DecodeTextString(string raw)
     {
         if (raw.Length >= 2 && raw[0] == 0xFE && raw[1] == 0xFF)

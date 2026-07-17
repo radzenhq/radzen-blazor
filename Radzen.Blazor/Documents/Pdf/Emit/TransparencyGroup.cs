@@ -4,20 +4,15 @@ using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// A transparency-group form XObject to be written on save (ISO 32000-1 11.6.6): a form
-// XObject whose /Group dictionary declares /S /Transparency. Content is a raw content
-// stream in page space; XObjects lists the named image/form resources it draws.
+// ISO 32000-1 11.6.6: transparency-group form XObject whose /Group declares /S /Transparency.
 internal sealed class GeneratedTransparencyGroup
 {
     public required byte[] Content { get; init; }
 
-    // [x0 y0 x1 y1] form bounding box, in the coordinate space the content is written in.
     public required double[] BBox { get; init; }
 
-    // Group colour space (/CS), e.g. DeviceGray for a luminosity mask group. Null omits it.
     public string? ColorSpace { get; init; }
 
-    // /I (isolated) and /K (knockout); null omits the entry (defaulting to false per spec).
     public bool? Isolated { get; init; }
 
     public bool? Knockout { get; init; }
@@ -27,8 +22,6 @@ internal sealed class GeneratedTransparencyGroup
 
 internal static class TransparencyGroup
 {
-    // Materializes the form XObject and its child resources into the writer, returning the
-    // stream (added by the caller so the reference can be reused, e.g. as an SMask /G).
     public static StreamObject BuildForm(DocumentWriter writer, GeneratedTransparencyGroup group)
     {
         var stream = FlateFilter.EncodeStream(group.Content);
@@ -76,8 +69,6 @@ internal static class TransparencyGroup
         return stream;
     }
 
-    // Builds an 8-bit DeviceGray image XObject from a raw luminance buffer, ready to be
-    // drawn inside a luminosity-mask group.
     public static StreamObject GrayImage(byte[] samples, int width, int height)
     {
         var stream = new StreamObject(FlateFilter.Encode(samples));

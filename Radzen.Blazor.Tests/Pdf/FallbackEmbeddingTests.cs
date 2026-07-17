@@ -10,22 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L5 regression: DocumentBuilder.Build() must EMBED and EMIT the fallback face when a
-// run's primary font lacks a glyph. Author a paragraph whose run font is the primary
-// (Liberation Sans, no CJK) but whose text contains CJK covered only by the registered
-// fallback family (Noto Sans SC), wired via FontCollection.SetFallback.
-//
-// The bug: DocumentGenerator.EmitLine re-encodes every fragment through the PRIMARY
-// sfnt (EncodeType0 -> primary.GetGlyphId), so CJK code points resolve to the primary's
-// .notdef (gid 0) and the fallback face is never embedded. Layout/MeasureText and
-// ToUnicode extraction stay correct, so only rendering is broken.
-//
-// Coverage (fontTools 4.60.2): U+4E2D '中' and U+4EA7 '产' are ABSENT from Liberation
-// Sans and present in Noto (gid 395 / 396, upem 1000, CFF/CIDFontType0C). Liberation
-// embeds as glyf/CIDFontType2 (no FontFile3), so a CID-keyed FontFile3 whose ToUnicode
-// recovers those characters can only be the Noto fallback subset. The CFF subset is
-// COMPACT: used + notdef glyphs renumbered 0..N-1 with an identity charset, and the
-// content stream emits the compact ids.
 public class FallbackEmbeddingTests
 {
     private const string Latin = "Liberation Sans";
@@ -51,7 +35,6 @@ public class FallbackEmbeddingTests
 
     private static DocumentBuilder Author()
     {
-        // Guard: the primary genuinely lacks CJK so a failure means a wiring bug.
         var liberation = Type0EmbedSupport.LoadLiberation();
         foreach (var c in Chinese)
         {
@@ -100,7 +83,6 @@ public class FallbackEmbeddingTests
             fallback is not null,
             "fallback Noto face is not embedded: no CID-keyed FontFile3 recovers the CJK text");
 
-        // Compact subset: notdef + the two CJK glyphs, identity charset (CID == new gid).
         Assert.Equal(Chinese.Length + 1, fallback!.GlyphCount);
         for (var gid = 0; gid < fallback.GlyphCount; gid++)
         {
@@ -156,8 +138,6 @@ public class FallbackEmbeddingTests
         Assert.True(codesByFont.TryGetValue(fallbackKey!, out var fallbackCodes),
             "fallback font resource is never selected in the content stream");
 
-        // The fallback run must draw the compact ids of the CJK glyphs, and every
-        // emitted code must lie inside the compact subset.
         foreach (var ch in Chinese)
         {
             Assert.Contains(Type0EmbedSupport.NewGid(toUnicode!, ch), fallbackCodes!);
@@ -168,7 +148,6 @@ public class FallbackEmbeddingTests
             Assert.InRange(code, 0, fallback!.GlyphCount - 1);
         }
 
-        // The CJK code points must not be dumped as the primary face's .notdef (gid 0).
         foreach (var key in primaryKeys)
         {
             if (codesByFont.TryGetValue(key, out var codes))
@@ -235,8 +214,6 @@ public class FallbackEmbeddingTests
         return map;
     }
 
-    // Identity-H content uses 2-byte glyph-id codes; group the decoded codes by the
-    // font resource selected via the preceding Tf so we can tell which face drew what.
     private static Dictionary<string, List<int>> CodesByFont(byte[] content)
     {
         var result = new Dictionary<string, List<int>>(StringComparer.Ordinal);

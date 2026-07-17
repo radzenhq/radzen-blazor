@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-// A cycle in the source graph terminates only because ImportInstance registers an
-// object's new reference before Populate walks its contents.
 internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer)
 {
     private readonly Dictionary<DocumentObject, ReferenceObject> map = [];
@@ -11,13 +9,8 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
     private readonly HashSet<DocumentObject> fieldRoots = [];
     private readonly HashSet<DocumentObject> pruned = [];
 
-    // Pins a loaded object to an already-emitted writer reference so it is not
-    // re-imported (e.g. page dictionaries emitted before their widget annots).
     public void Seed(DocumentObject loaded, ReferenceObject reference) => map[loaded] = reference;
 
-    // Marks a loaded object so every reference to it imports as null rather than
-    // re-materializing it - used to collapse destinations and annotation /P links
-    // that point at a page removed before saving.
     public void Prune(DocumentObject loaded) => pruned.Add(loaded);
 
     public DocumentObject ImportValue(DocumentObject value)
@@ -57,8 +50,6 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
             return existing;
         }
 
-        // A scalar has no sub-graph, so the shell/Populate path below would emit an
-        // empty dictionary in place of its value.
         if (target is not StreamObject and not ArrayObject and not DictionaryObject)
         {
             var scalar = writer.Add(target);
@@ -81,9 +72,6 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         return reference;
     }
 
-    // Importing the top-most /Parent rather than the widget keeps a nested tree's
-    // /Parent<->/Kids structure, so partial /T names still combine into fully
-    // qualified names. Roots are returned once each: /Fields must not list one twice.
     public bool TryImportFieldRoot(DictionaryObject annotation, out ReferenceObject reference, out DictionaryObject? field, out string? name)
     {
         reference = null!;
@@ -112,8 +100,6 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         return true;
     }
 
-    // The destination /DR must be an inline dictionary (as ImportValue leaves it here)
-    // for later sources to union into it; a /DR that arrives as a reference is skipped.
     public void MergeFormDefaults(DictionaryObject form, DictionaryObject sourceForm)
     {
         if (!form.ContainsKey("DA") && sourceForm.TryGetValue("DA", out var da))
@@ -164,8 +150,6 @@ internal sealed class GraphImporter(DocumentReader reader, DocumentWriter writer
         }
     }
 
-    // Renaming rather than dropping a colliding field, by smallest unused suffix, is
-    // what makes a given import order reproduce identical names.
     public static void DisambiguateFieldName(DictionaryObject field, string? name, HashSet<string> usedNames)
     {
         if (name is null || usedNames.Add(name))

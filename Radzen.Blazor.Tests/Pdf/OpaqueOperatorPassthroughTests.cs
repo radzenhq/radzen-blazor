@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The element model cannot represent every content operator. Rather than silently drop
-// the ones it does not model (gs, sh, line-cap/join J/j, miter M, ...), a full re-encode
-// carries them through as opaque passthrough so a load-edit-save keeps the graphics state.
 public class OpaqueOperatorPassthroughTests
 {
     private const string StreamData = "q /GS0 gs 1 J 1 j 4 M 10 10 m 200 10 l S Q";
@@ -48,7 +45,7 @@ public class OpaqueOperatorPassthroughTests
         var page = document.Pages[0];
 
         var path = page.Content.OfType<PathContent>().First();
-        path.Thickness = 3; // force a full re-encode
+        path.Thickness = 3;
 
         var content = Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 

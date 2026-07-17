@@ -11,12 +11,6 @@ using Xunit.Sdk;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The third sibling of ContentElementChangeTrackingMatrixTests, for the document metadata model.
-// Metadata used to answer "did the caller change this since load" with per-field snapshot records
-// compared field by field: adding an /Info field meant remembering to touch the key list, both
-// BuildInfo methods AND the snapshot, and forgetting the snapshot failed silently, as a dropped
-// save. The dirty bit that replaced them fails safe, and this walks the closed set by reflection
-// so a member that can move the emitted bytes with the flag clean breaks the build.
 public class MetadataChangeTrackingMatrixTests
 {
     private static readonly Type[] Tracked =
@@ -52,7 +46,6 @@ public class MetadataChangeTrackingMatrixTests
         return Document.LoadFromStream(stream);
     }
 
-    // The instance each owner's members are probed on.
     private static object Target(Type owner, Document document) => owner switch
     {
         _ when owner == typeof(DocumentInfo) => document.Info,
@@ -63,8 +56,6 @@ public class MetadataChangeTrackingMatrixTests
         _ => throw new XunitException($"No probe target for {owner}."),
     };
 
-    // A loaded attachment carries no modeled FacturX profile, so one is attached and the model
-    // re-frozen: the matrix still starts from clean, loaded metadata.
     private static FacturXProfile Profile(Document document)
     {
         var attachment = document.Attachments[0];
@@ -101,23 +92,17 @@ public class MetadataChangeTrackingMatrixTests
             }
         }
 
-        // Get-only collections are mutable members too: nesting a child outline entry reaches
-        // the bytes without Children ever being assigned.
         AssertDoor(typeof(OutlineItem), "Children.Add()",
             document => document.Outline[0].Children.Add(new OutlineItem("added", OutlineTarget.ToPage(1))));
         checkedMembers++;
 
-        // The nested owned object, reached through its owner.
         AssertDoor(typeof(OutlineItem), "Children[0].Title",
             document => document.Outline[0].Children[0].Title = "renamed");
         checkedMembers++;
 
-        // Guards the walk itself: a filter that silently matched nothing would report green.
         Assert.InRange(checkedMembers, 15, 60);
     }
 
-    // The container-level truth. Item flags answer "did an item change", not "did the collection
-    // change": a removed outline entry, label or attachment leaves every survivor clean.
     [Fact]
     public void EveryStructuralMutationOfLoadedMetadataIsAChange()
     {
@@ -156,17 +141,10 @@ public class MetadataChangeTrackingMatrixTests
             return;
         }
 
-        // The disjunction, short-circuited: a member the writer genuinely ignores may leave the
-        // flag clean, but one that moved the bytes without opening a door is the bug. The
-        // comparison is against a REBUILT document: saving clean metadata preserves the original
-        // bytes by construction, so comparing saved output directly would be vacuously true.
         Assert.True(Rebuilt(mutate).SequenceEqual(Rebuilt(_ => { })),
             $"{owner.Name}.{member}: mutation changed emitted bytes but the flag stayed clean");
     }
 
-    // The bytes the model WOULD emit, independent of the flags under test. Reassigning tracked
-    // fields to their own values opens every door without changing the model, forcing the writer
-    // down the rebuild path.
     private static byte[] Rebuilt(Action<Document> mutate)
     {
         var document = Loaded();
@@ -222,8 +200,6 @@ public class MetadataChangeTrackingMatrixTests
         => setter.ReturnParameter.GetRequiredCustomModifiers()
             .Any(modifier => modifier.FullName == "System.Runtime.CompilerServices.IsExternalInit");
 
-    // Throws rather than skips on an unregistered type: a new member of a type this does not
-    // know must break the build, not quietly drop out of the matrix.
     private static object? DistinctValue(Type type, object? current, string member)
     {
         if (Nullable.GetUnderlyingType(type) is { } underlying)

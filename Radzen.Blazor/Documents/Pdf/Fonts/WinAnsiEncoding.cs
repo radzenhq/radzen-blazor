@@ -4,8 +4,7 @@ using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// WinAnsiEncoding per ISO 32000-1 Annex D.2. Codes 0-31, 127, 129, 141, 143, 144 and 157
-// are undefined (.notdef). Code 160 (nbsp) is named "space" per Annex D.
+// WinAnsiEncoding per ISO 32000-1 Annex D.2; code 160 (nbsp) named "space" per Annex D.
 internal static class WinAnsiEncoding
 {
     private const string Notdef = ".notdef";
@@ -46,7 +45,6 @@ internal static class WinAnsiEncoding
         "oslash", "ugrave", "uacute", "ucircumflex", "udieresis", "yacute", "thorn", "ydieresis",
     ];
 
-    // Unicode code point for each byte code (CP1252 semantics); 0 marks an undefined slot.
     private static readonly ushort[] CodePoints =
     [
         0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -118,8 +116,6 @@ internal static class WinAnsiEncoding
         return map;
     }
 
-    // Adobe glyph name -> Unicode code point, covering the WinAnsi glyph set plus the
-    // "uniXXXX"/"uXXXX..." conventions used by /Differences arrays.
     public static bool TryGetCodePointByName(string name, out int codePoint)
     {
         if (NameToCodePoint.TryGetValue(name, out codePoint))

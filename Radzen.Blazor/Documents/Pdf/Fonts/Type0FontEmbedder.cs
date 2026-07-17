@@ -10,16 +10,12 @@ using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// Builds the Type0/CID font object graph (ISO 32000-1 9.7) for a used-glyph subset.
-// Both paths renumber glyphs into a compact 0..N-1 space; under Identity-H the content
-// code is the compact gid, so CID == gid and W/CIDSet/ToUnicode are keyed by it.
+// Type0/CID font object graph per ISO 32000-1 9.7.
 internal static class Type0FontEmbedder
 {
     private const int StemV = 80;
     private const int DefaultWidth = 1000;
 
-    // compactGidMap is the renumbering the generator already applied to the content-stream
-    // codes; reusing it keeps W/CIDSet/ToUnicode from disagreeing with the drawn codes.
     public static ReferenceObject Embed(DocumentWriter writer, SfntFont font, IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort>? compactGidMap = null)
     {
         ArgumentNullException.ThrowIfNull(writer);
@@ -44,9 +40,7 @@ internal static class Type0FontEmbedder
             ["StemV"] = new NumberObject(StemV),
         };
 
-        // The CIDSet must flag exactly the glyphs present in the embedded subset
-        // (PDF/A 6.2.11.4.2): every compact gid 0..N-1 owns a loca entry (glyf)
-        // or a charstring (CFF), so all bits are set.
+        // CIDSet flags exactly the glyphs in the embedded subset (PDF/A 6.2.11.4.2).
         IReadOnlyDictionary<ushort, ushort> gidMap;
         if (font.IsCff)
         {
@@ -141,8 +135,6 @@ internal static class Type0FontEmbedder
         descriptor["FontFile3"] = writer.Add(stream);
     }
 
-    // Public because the generator's fresh-text extraction fonts must re-key by the same map
-    // the /ToUnicode CMap is built from.
     public static Dictionary<ushort, int> RemapToCompactGids(IReadOnlyDictionary<ushort, int> gidToUnicode, IReadOnlyDictionary<ushort, ushort> gidMap)
     {
         var remapped = new Dictionary<ushort, int>(gidToUnicode.Count);
@@ -246,7 +238,6 @@ internal static class Type0FontEmbedder
     {
         if (codepoint is < 0 or > 0x10FFFF or (>= 0xD800 and <= 0xDFFF))
         {
-            // Lone surrogate (or out-of-range value): emit the raw UTF-16 unit.
             WriteHex4(stream, codepoint & 0xFFFF);
         }
         else if (codepoint <= 0xFFFF)

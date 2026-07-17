@@ -101,8 +101,6 @@ public sealed class InkAnnotation : Annotation
     }
 
     /// <inheritdoc />
-    // Each stroke carries its own flag; the list itself reports add/remove/reorder, which no
-    // surviving stroke would show.
     public override bool IsModified
     {
         get

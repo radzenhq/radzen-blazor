@@ -5,9 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Widows/Orphans (default 2). Orphans bound the minimum lines kept at the BOTTOM of a
-// page when a paragraph splits; Widows bound the minimum lines carried to the TOP of
-// the next page. All line counts are exact and derived from Liberation metrics.
 public class WidowOrphanTests
 {
     private const double Tol = 1e-6;
@@ -15,8 +12,6 @@ public class WidowOrphanTests
     private static double Width(FontCollection fonts)
         => PaginationSupport.WidthForWordsPerLine(fonts, "Ha", 2, 12);
 
-    // Two fillers then a 4-line paragraph on a 5-line page: 3 of its lines fit, leaving a
-    // single-line widow unless the break is pulled up.
     private static (Section, Paragraph) WidowScenario(FontCollection fonts, int widows)
     {
         var lineH = PaginationSupport.LineHeight(fonts);
@@ -72,8 +67,6 @@ public class WidowOrphanTests
         Assert.Equal(1, pages[1].Lines.Count);
     }
 
-    // Four fillers then a 3-line paragraph on a 5-line page: only one line fits at the
-    // bottom, which the default orphan rule forbids.
     private static (Section, Paragraph) OrphanScenario(FontCollection fonts, int orphans)
     {
         var lineH = PaginationSupport.LineHeight(fonts);

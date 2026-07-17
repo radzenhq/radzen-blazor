@@ -11,14 +11,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P3: EmbeddedFiles / AF attachments (Factur-X). Pins the public
-// DocumentBuilder.Attachments collection with
-// Add(string name, byte[] data, AttachmentRelationship relationship, string mimeType)
-// and the conforming SaveToStream output: an /EmbeddedFiles name tree under
-// Catalog /Names, a Catalog /AF array of /Filespec dictionaries carrying
-// /AFRelationship and /EF /F -> an /EmbeddedFile stream (/Subtype mime,
-// /Params /Size), byte-identical round-trip of the payload, and - for a
-// factur-x.xml attachment - the fx: Factur-X block in the XMP packet.
 public class EmbeddedFileAttachmentTests
 {
     private const string MissingApi =

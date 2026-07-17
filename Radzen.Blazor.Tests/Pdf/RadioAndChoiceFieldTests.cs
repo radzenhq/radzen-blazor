@@ -10,11 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Creating radio button groups and choice fields on a generated document: a
-// RadioGroupFieldDefinition saves as a parent /Btn field (Radio flag) with one kid
-// widget per option, a ChoiceFieldDefinition saves as a /Ch field (/Opt, combo flag
-// for combo boxes) with a generated selected-value appearance, and Flatten renders
-// the selection statically and drops the form.
 public class RadioAndChoiceFieldTests
 {
     private const int RadioFlag = 1 << 15;
@@ -178,7 +173,6 @@ public class RadioAndChoiceFieldTests
             .Where(annot => FormTestSupport.NameValue(reader, annot, "Subtype") == "Widget")
             .ToList();
 
-        // Three radio kids plus the combo and list box widgets.
         Assert.Equal(5, widgets.Count);
         Assert.Equal(3, widgets.Count(w => w.ContainsKey("Parent")));
 

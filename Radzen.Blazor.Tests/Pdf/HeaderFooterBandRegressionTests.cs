@@ -10,16 +10,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Regression tests for two header/footer band defects, asserted on the REAL emitted
-// PDF (Build -> bytes -> content-stream Td positions / reload -> ExtractText):
-//
-// 1) A header band taller than the top margin must push the body content down (body
-//    starts below the header's bottom edge), a footer band taller than the bottom
-//    margin must pull the body's end up (body ends above the footer band, footer
-//    stays on the page), and pagination must break pages on the REDUCED body height.
-//
-// 2) A Header/Footer whose Blocks contain a Table must render the table (cell text
-//    present in the page output), exactly like a table in the body flow.
 public class HeaderFooterBandRegressionTests
 {
     private const double Tol = 0.5;
@@ -29,8 +19,6 @@ public class HeaderFooterBandRegressionTests
     private const double HeaderFontSize = 30;
     private const double BodyFontSize = 12;
 
-    // Line height and top-to-baseline offset straight from the shared LineBreaker
-    // (base-14 metrics, same path Build() uses when no font is registered).
     private static (double Height, double Baseline) LineMetrics(double size)
     {
         var paragraph = new Paragraph();
@@ -48,8 +36,6 @@ public class HeaderFooterBandRegressionTests
         return paragraph;
     }
 
-    // (shown text, baseline Y in PDF space, i.e. origin at the page BOTTOM) pairs, in
-    // emission order, from the base-14 literal-string "x y Td (text) Tj" pattern.
     private static List<(string Text, double Y)> TextRuns(string content)
     {
         var runs = new List<(string, double)>();

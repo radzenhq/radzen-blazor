@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ContentWriter rents a pooled buffer and must return it once ToArray has copied the
-// bytes out. Repeated builds and page materializations that drop pooled buffers would
-// corrupt later output once the pool reuses them; identical output across many
-// iterations shows the pooled buffers are recycled safely.
 public class ContentWriterDisposalTests
 {
     private static byte[] BuildInvoiceLike()

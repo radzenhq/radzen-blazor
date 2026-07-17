@@ -4,9 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Appending a document produced by DocumentBuilder must carry each generated page's
-// text-extraction fonts, otherwise its Type0/Identity-H content cannot be reversed to
-// Unicode and ExtractText() returns garbage for the merged pages.
 public class AppendTextExtractionTests
 {
     [Fact]

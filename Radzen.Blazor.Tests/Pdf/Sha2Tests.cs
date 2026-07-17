@@ -6,12 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Known-answer tests for the hand-rolled SHA-2 primitives that back the PDF/A
-// document /ID and the ISO 32000-2 revision 6 (AESV3) key derivation. Vectors are
-// the FIPS 180-4 / NIST CAVP published digests, verified with python3 hashlib.
-//   public static byte[] Sha2.ComputeHash256(byte[] data)
-//   public static byte[] Sha2.ComputeHash384(byte[] data)
-//   public static byte[] Sha2.ComputeHash512(byte[] data)
+// FIPS 180-4 / NIST CAVP digests; also back ISO 32000-2 revision 6 key derivation.
 public class Sha2Tests
 {
     private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
@@ -38,8 +33,6 @@ public class Sha2Tests
         Assert.Equal(expected, Hex(Sha2.ComputeHash256(Ascii(input))));
     }
 
-    // 55 fits with the length word in one block; 56 forces a second block; 64 is an
-    // exact block fill (all three exercise the 512-bit padding boundary).
     [Theory]
     [InlineData(55, "9f4390f8d30c2dd92ec9f095b65e2b9ae9b0a925a5258e241c9f1e910f734318")]
     [InlineData(56, "b35439a4ac6f0948b6d6f9e3c6af0f5f590ce20f1bde7090ef7970686ec6738a")]
@@ -56,8 +49,6 @@ public class Sha2Tests
         Assert.Equal("cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0", Hex(Sha2.ComputeHash256(input)));
     }
 
-    // The incremental hasher must agree with the one-shot API for any chunking, including
-    // chunks that straddle, exactly fill and overshoot the 64-byte compression block.
     [Theory]
     [InlineData(1)]
     [InlineData(7)]
@@ -107,8 +98,6 @@ public class Sha2Tests
         Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(hasher.Finish()));
     }
 
-    // Mixed span/byte appends around block boundaries are how BuildDocumentId feeds the
-    // seed: null-terminated text interleaved with page content.
     [Fact]
     public void Sha256Hasher_MixedAppends_MatchOneShot()
     {
@@ -163,8 +152,6 @@ public class Sha2Tests
         Assert.Equal(expected, Hex(Sha2.ComputeHash512(Ascii(input))));
     }
 
-    // SHA-384/512 pad to a 1024-bit block with a 128-bit length: 111 keeps a single
-    // block, 112 forces a second, 128 is an exact block fill.
     [Theory]
     [InlineData(111, "3c37955051cb5c3026f94d551d5b5e2ac38d572ae4e07172085fed81f8466b8f90dc23a8ffcdea0b8d8e58e8fdacc80a")]
     [InlineData(112, "187d4e07cb306103c69967bf544d0dfbe9042577599c73c330abc0cb64c61236d5ed565ee19119d8c31779a38f791fcd")]

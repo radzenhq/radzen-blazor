@@ -7,11 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C2 merge contract. Pins:
-//   void Document.Append(Document other)
-// Append deep-copies the object closure of each page in 'other' into this
-// document (NO resource dedup). Appended pages get a correct /Parent and NEW
-// object numbers; the source document is left untouched.
 public class AppendMergeTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -92,7 +87,6 @@ public class AppendMergeTests
         for (var i = 0; i < kids.Count; i++)
         {
             var contents = Assert.IsType<ReferenceObject>(DocumentLoadTests.Kid(reader, i)["Contents"]);
-            // Pages 1 and 3 carry byte-identical content yet must not be deduplicated.
             Assert.True(contentNumbers.Add(contents.ObjectNumber));
         }
 

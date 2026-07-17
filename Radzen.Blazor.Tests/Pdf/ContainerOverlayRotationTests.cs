@@ -11,21 +11,8 @@ using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Container overlay (z-stack) layout and content rotation.
-//
-// Overlay: a first-class box (like a Stack container) whose decoration paints through
-// BoxRenderer; its children share the box origin, each laid out from the box top-left
-// (inset by the padding) and merged in declaration order (later children on top within
-// each draw kind). The box height is the tallest child's.
-//
-// Rotation: a rotated container places as a first-class box carrying a page-space
-// rotation matrix (about the box center); BoxEmitter bakes it into the box's draws via
-// PagePlan.ApplyTransform, which rotates edge endpoints, converts fills to equivalent
-// solid strokes, and carries the matrix on text/image draws which ContentEmitter wraps
-// in a balanced q cm .. Q. Rotated content is NOT clipped to the original box.
 public class ContainerOverlayRotationTests
 {
-    // ---------------------------------------------------------------- overlay
 
     [Fact]
     public void Overlay_ChildrenShareBoxOrigin_DecorationCoversTallestChild()
@@ -44,7 +31,6 @@ public class ContainerOverlayRotationTests
         var pages = Paginator.Paginate(section, fonts);
         var page = Assert.Single(pages);
 
-        // The overlay is a single first-class box - no lowered tables.
         Assert.Empty(page.Tables);
         var box = Assert.Single(page.Boxes);
         Assert.Same(container, box.Source);
@@ -53,11 +39,8 @@ public class ContainerOverlayRotationTests
         Assert.Equal(0, box.Bounds.X, 6);
         Assert.Equal(400, box.Bounds.Width, 6);
 
-        // The decoration carries the container background/borders through BoxStyle.
         Assert.Equal(container.Background, box.Style.Background);
 
-        // Both children's lines are inset by the padding (X = 10) and share the box top
-        // (first line of each child at Y = padding), in declaration order.
         var firstShort = box.Content.Lines.First(l => ReferenceEquals(l.Source, shortText));
         var firstTall = box.Content.Lines.First(l => ReferenceEquals(l.Source, tallText));
         Assert.Equal(10, firstShort.X, 6);
@@ -65,12 +48,10 @@ public class ContainerOverlayRotationTests
         Assert.Equal(10, firstShort.Y, 6);
         Assert.Equal(firstShort.Y, firstTall.Y, 6);
 
-        // The short child precedes the tall child in the merged line list (later on top).
         Assert.True(
             box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, shortText))
             < box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, tallText)));
 
-        // The box spans the tallest child: its inner height is the multi-line child's.
         var tallHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, tallText)).Sum(l => l.Line.Height);
         var shortHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, shortText)).Sum(l => l.Line.Height);
         Assert.True(tallHeight > shortHeight);
@@ -95,7 +76,6 @@ public class ContainerOverlayRotationTests
         var page = Assert.Single(document.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
-        // The background fill is present and both children paint after it, in order.
         Assert.Contains("re f", content);
         var under = content.IndexOf("(UNDERLAY) Tj", StringComparison.Ordinal);
         var over = content.IndexOf("(OVERLAY) Tj", StringComparison.Ordinal);
@@ -103,7 +83,6 @@ public class ContainerOverlayRotationTests
         Assert.True(over >= 0, "second child present");
         Assert.True(under < over, "children paint in declaration order (later on top)");
 
-        // Both children start at the same box origin: identical Td coordinates.
         var underTd = TdBefore(content, "UNDERLAY");
         var overTd = TdBefore(content, "OVERLAY");
         Assert.Equal(underTd.X, overTd.X, 4);
@@ -122,7 +101,6 @@ public class ContainerOverlayRotationTests
         Assert.Throws<NotSupportedException>(() => Paginator.Paginate(section, fonts));
     }
 
-    // --------------------------------------------------------------- rotation
 
     [Fact]
     public void RotatedContainer_BoxCarriesPivotCenteredRotationMatrix()
@@ -139,7 +117,6 @@ public class ContainerOverlayRotationTests
         var pages = Paginator.Paginate(section, fonts);
         var page = Assert.Single(pages);
 
-        // A rotated Stack container is a first-class box, not a lowered table.
         Assert.Empty(page.Tables);
         var box = Assert.Single(page.Boxes);
         Assert.True(box.Transform.HasValue, "box carries the rotation transform");
@@ -151,8 +128,6 @@ public class ContainerOverlayRotationTests
         Assert.Equal(-sin, transform.C, 9);
         Assert.Equal(cos, transform.D, 9);
 
-        // Pivot = box center (page space, y up): the center maps to itself and a point
-        // one unit to its right rotates by 30 degrees around it.
         var centerX = 100.0;
         var centerY = 600 - box.Bounds.Height / 2;
         var (px, py) = transform.Transform(centerX, centerY);
@@ -167,7 +142,7 @@ public class ContainerOverlayRotationTests
     public void ApplyTransform_RotatesEdges_ConvertsFillsToSolidStrokes_TagsTexts()
     {
         var plan = new PagePlan { Size = PageSizes.A4 };
-        plan.Fills.Add(Fill(0, 0, 10, 10)); // pre-mark draw stays untouched
+        plan.Fills.Add(Fill(0, 0, 10, 10));
 
         var mark = plan.Mark();
         plan.Fills.Add(Fill(10, 20, 100, 40));
@@ -186,8 +161,6 @@ public class ContainerOverlayRotationTests
         var rotate90 = Matrix.Rotate(90);
         plan.ApplyTransform(rotate90, mark);
 
-        // The pre-mark fill is untouched; the post-mark fill became a solid stroke along
-        // its rotated centerline (width = rect height), inserted before the border edge.
         var fill = Assert.Single(plan.Fills);
         Assert.Equal(10, fill.Width, 6);
 
@@ -195,15 +168,15 @@ public class ContainerOverlayRotationTests
         var converted = plan.Edges[0];
         Assert.Equal(BorderStyle.Solid, converted.Style);
         Assert.Equal(40, converted.LineWidth, 6);
-        Assert.Equal(-40, converted.X1, 6); // (10, 40) rotated 90deg -> (-40, 10)
+        Assert.Equal(-40, converted.X1, 6);
         Assert.Equal(10, converted.Y1, 6);
-        Assert.Equal(-40, converted.X2, 6); // (110, 40) rotated 90deg -> (-40, 110)
+        Assert.Equal(-40, converted.X2, 6);
         Assert.Equal(110, converted.Y2, 6);
 
         var border = plan.Edges[1];
-        Assert.Equal(-20, border.X1, 6); // (10, 20) -> (-20, 10)
+        Assert.Equal(-20, border.X1, 6);
         Assert.Equal(10, border.Y1, 6);
-        Assert.Equal(-20, border.X2, 6); // (110, 20) -> (-20, 110)
+        Assert.Equal(-20, border.X2, 6);
         Assert.Equal(110, border.Y2, 6);
         Assert.Equal(2, border.LineWidth, 6);
 
@@ -214,8 +187,6 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void WriteTextDraw_WithTransform_EmitsBalancedQ_Cm_Q_WithRotationOperands()
     {
-        // Rotation of 30 degrees about (100, 200):
-        // e = cx - cx*cos + cy*sin, f = cy - cx*sin - cy*cos.
         var transform = Matrix.Translate(-100, -200) * Matrix.Rotate(30) * Matrix.Translate(100, 200);
         var text = Text(72, 700) with { Transform = transform };
 
@@ -227,11 +198,10 @@ public class ContainerOverlayRotationTests
         Assert.Equal(1, lines.Count(line => line == "q"));
         Assert.Equal(1, lines.Count(line => line == "Q"));
         Assert.Equal("q", lines[0]);
-        Assert.Equal("Q", lines[^2]); // last line is empty after the trailing \n
+        Assert.Equal("Q", lines[^2]);
 
         var cm = Assert.Single(lines, line => line.EndsWith(" cm", StringComparison.Ordinal));
         var operands = cm[..^3].Split(' ').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
-        // The writer quantizes operands to 3 decimals, so compare with that tolerance.
         var (cos, sin) = (Math.Cos(Math.PI / 6), Math.Sin(Math.PI / 6));
         double[] expected = [cos, sin, -sin, cos, 100 - (100 * cos) + (200 * sin), 200 - (100 * sin) - (200 * cos)];
         Assert.Equal(6, operands.Length);
@@ -240,7 +210,6 @@ public class ContainerOverlayRotationTests
             Assert.True(Math.Abs(expected[i] - operands[i]) < 1e-3, $"cm operand {i}: expected {expected[i]}, got {operands[i]}");
         }
 
-        // The cm precedes the text object so the show is transformed.
         Assert.True(content.IndexOf(" cm\n", StringComparison.Ordinal) < content.IndexOf("BT\n", StringComparison.Ordinal));
     }
 
@@ -307,16 +276,10 @@ public class ContainerOverlayRotationTests
         var document = builder.Build();
         var page = Assert.Single(document.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
-        // The blurred drop shadow installs a luminosity soft mask through an ExtGState (gs).
         Assert.Contains(" gs", content);
     }
 
-    // ------------------------------------------------------------- regression
 
-    // Built with the pre-change generator (commit ce34920e): a paragraph, a plain
-    // vertical container (padding 8, gray background, 1pt borders, two paragraphs)
-    // and a closing paragraph, all default base-14 text on a default A4 section.
-    // The generator emits no /ID and no dates, so the comparison is whole-file.
     private const string PlainContainerBaseline =
         "JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgL01hcmtJbmZvIDw8IC9NYXJrZWQg" +
         "dHJ1ZSA+PiAvU3RydWN0VHJlZVJvb3QgNSAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAg" +
@@ -360,11 +323,6 @@ public class ContainerOverlayRotationTests
         Assert.Equal(Convert.FromBase64String(PlainContainerBaseline), bytes);
     }
 
-    // Built with the pre-change generator (commit 7174dca7, overlay still lowered to a
-    // synthetic single-cell decoration table + one child table each): a paragraph, an
-    // OVERLAY container (padding 8, gray background, 1pt borders, two paragraphs sharing
-    // the box origin) and a closing paragraph on a default A4 section. The first-class
-    // overlay box must reproduce these bytes exactly for the decoration + children.
     private const string PlainOverlayBaseline =
         "JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgL01hcmtJbmZvIDw8IC9NYXJrZWQg" +
         "dHJ1ZSA+PiAvU3RydWN0VHJlZVJvb3QgNSAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAg" +
@@ -428,8 +386,6 @@ public class ContainerOverlayRotationTests
         var page = Assert.Single(document.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
-        // The rounded background fills a Bezier path (h f) and the uniform border strokes
-        // the same rounded path (h S) - both through BoxRenderer, no square "re f" fill.
         Assert.Contains("h\nf\n", content);
         Assert.Contains("h\nS\n", content);
         Assert.DoesNotContain("re f", content);
@@ -437,7 +393,6 @@ public class ContainerOverlayRotationTests
         Assert.True(over >= 0, "child text present over the rounded decoration");
     }
 
-    // ----------------------------------------------------------------- helpers
 
     private static (double X, double Y) TdBefore(string content, string text)
     {

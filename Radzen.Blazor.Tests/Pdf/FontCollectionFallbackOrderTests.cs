@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The style fallback (no exact (family, bold, italic) face, no regular face) picks a face by
-// walking the registrations. Which face it lands on decides which bytes get embedded, so the
-// walk order is part of the contract rather than an artifact of the backing dictionary.
 public class FontCollectionFallbackOrderTests
 {
     private static double Width(byte[] bytes, string text, double size)
@@ -41,8 +38,6 @@ public class FontCollectionFallbackOrderTests
         var bold = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Bold.ttf");
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
-        // Neither an exact (regular, non-italic) face nor a regular face is registered, so a
-        // plain request falls back. Bold was registered first, so bold is the answer.
         var fonts = Collection((true, false, bold), (false, true, serif));
         var plain = new Font { Name = "Fallback Family", Size = 12 };
 
@@ -55,8 +50,6 @@ public class FontCollectionFallbackOrderTests
         var bold = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Bold.ttf");
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
-        // The same two faces registered the other way round: the answer tracks registration
-        // order, so it is the caller's choice rather than the dictionary's enumeration.
         var fonts = Collection((false, true, serif), (true, false, bold));
         var plain = new Font { Name = "Fallback Family", Size = 12 };
 
@@ -72,8 +65,6 @@ public class FontCollectionFallbackOrderTests
         var fonts = Collection((true, false, bold), (false, true, serif), (true, false, bold));
         var plain = new Font { Name = "Fallback Family", Size = 12 };
 
-        // Overwriting the bold face does not move it behind the serif face: last registration wins on
-        // value, first registration wins on order.
         Assert.Equal(Width(bold, "Hello", 12), fonts.MeasureText("Hello", plain), 10);
     }
 
@@ -83,8 +74,6 @@ public class FontCollectionFallbackOrderTests
         var bold = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Bold.ttf");
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
-        // An exact (family, bold, italic) hit never consults the fallback walk, so it answers
-        // the same face whichever order the two were registered in.
         var boldFirst = Collection((true, false, bold), (false, true, serif));
         var italicFirst = Collection((false, true, serif), (true, false, bold));
         var request = new Font { Name = "Fallback Family", Size = 12, Italic = true };

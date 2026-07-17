@@ -15,8 +15,5 @@ public abstract class DocumentObject
     /// <param name="stream">The destination stream.</param>
     public void Write(Stream stream) => Write(stream, WriteContext.None);
 
-    // Context-threaded serialization: an explicit write context replaces the former
-    // thread-static encryption ambient. Composite objects pass it to their children;
-    // StringObject/StreamObject encrypt through context.Encryptor when it is present.
     internal abstract void Write(Stream stream, WriteContext context);
 }

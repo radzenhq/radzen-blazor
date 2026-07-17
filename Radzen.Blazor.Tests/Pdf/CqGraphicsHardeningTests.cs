@@ -10,22 +10,19 @@ using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Fail-loud and bounded-work hardening for the graphics lane: names, blur kernels,
-// gradient stops, watermark encoding, pattern dedup and rotated rounded geometry.
 public class CqGraphicsHardeningTests
 {
     private static double Num(DocumentObject o) => Assert.IsType<NumberObject>(o).DoubleValue;
 
     private static ArrayObject Arr(DocumentObject o) => Assert.IsType<ArrayObject>(o);
 
-    // ---- #8: names above Latin-1 cannot be masked to a different resource ----
 
     [Fact]
     public void XObjectName_AboveLatin1_ThrowsOnSave()
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new XObjectContent("Ł1")); // U+0141 & 0xFF == 'A'
+        page.Content.Add(new XObjectContent("Ł1"));
 
         Assert.Throws<NotSupportedException>(() => document.ToArray());
     }
@@ -41,14 +38,12 @@ public class CqGraphicsHardeningTests
         Assert.Contains("/#A9x Do", Encoding.Latin1.GetString(bytes), StringComparison.Ordinal);
     }
 
-    // ---- #14: an extreme blur must not blow up the raster ----
 
     [Fact]
     public void HugeBlur_ProducesBoundedRaster()
     {
         var mask = GaussianBlur.Render(250, 250, 0, 200);
 
-        // Before the kernel cap this was ~1712x1712 (~7e9 MACs); the cap keeps it small.
         Assert.True(mask.Width < 400, $"width {mask.Width} should be bounded");
         Assert.True(mask.Height < 400, $"height {mask.Height} should be bounded");
 
@@ -65,7 +60,6 @@ public class CqGraphicsHardeningTests
         Assert.True(soft, "a blurred shape still has a soft edge");
     }
 
-    // ---- #27: gradient stop offsets are validated and hard stops stay valid ----
 
     [Fact]
     public void GradientStop_OffsetOutOfRange_Throws()
@@ -102,14 +96,13 @@ public class CqGraphicsHardeningTests
         }
     }
 
-    // ---- #34: base-14 watermark rejects non-WinAnsi text instead of blanking it ----
 
     [Fact]
     public void Watermark_NonWinAnsiText_ThrowsInsteadOfDropping()
     {
         var builder = new DocumentBuilder();
         var section = builder.Sections.Add();
-        section.Watermark = new Watermark { Text = "机密" }; // "机密"
+        section.Watermark = new Watermark { Text = "机密" };
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Body");
         section.Blocks.Add(paragraph);
@@ -117,7 +110,6 @@ public class CqGraphicsHardeningTests
         Assert.Throws<NotSupportedException>(() => builder.ToArray());
     }
 
-    // ---- #44: one gradient brush reused on the content writer emits one pattern ----
 
     [Fact]
     public void ContentWriter_SameBrush_RegistersOnePattern()
@@ -145,7 +137,6 @@ public class CqGraphicsHardeningTests
         Assert.Equal(2, writer.Patterns.Count);
     }
 
-    // ---- #81: a rotated box cannot silently square its rounded corners ----
 
     [Fact]
     public void ApplyTransform_RotatedRoundedFill_Throws()
@@ -185,8 +176,6 @@ public class CqGraphicsHardeningTests
         Assert.Throws<NotSupportedException>(() => plan.ApplyTransform(Matrix.Rotate(30), mark));
     }
 
-    // A clipped range holding edges but no fills reaches ApplyTransform without tripping
-    // the fill guard; the edge rebuild used to drop Clip/ClipRadius without a word.
     [Fact]
     public void ApplyTransform_RotatedEdgeWithRoundedClip_ThrowsNamingTheEdge()
     {
@@ -214,8 +203,6 @@ public class CqGraphicsHardeningTests
         Assert.Null(edge.Clip);
     }
 
-    // A square clip on an edge stays droppable: the fill guard permits it too, and
-    // ApplyRoundedClip(radius: 0) is a live path for a rotated table.
     [Fact]
     public void ApplyTransform_RotatedEdgeWithSquareClip_DoesNotThrow()
     {
@@ -228,8 +215,6 @@ public class CqGraphicsHardeningTests
         Assert.Single(plan.Edges);
     }
 
-    // The production route to the hole: a non-uniform border keeps the frame off the
-    // RoundedStroke path (which guards itself), and no cell background means no fill.
     [Fact]
     public void RotatedContainer_RoundedTableWithBorderEdgesAndNoFills_Throws()
     {

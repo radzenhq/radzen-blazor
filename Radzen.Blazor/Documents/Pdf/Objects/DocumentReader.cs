@@ -17,8 +17,6 @@ namespace Radzen.Documents.Pdf.Objects;
 public sealed class DocumentReader
 {
     private readonly ReaderLimits limits;
-
-    // Exposed so read-path helpers honor a caller-tightened budget, not ReaderLimits.Default.
     internal ReaderLimits Limits => limits;
     private DictionaryObject trailer = new();
     private readonly StreamDecoder decoder;
@@ -144,9 +142,6 @@ public sealed class DocumentReader
         return Parse(ReadFully(stream, snapshot.MaxFileBytes), password, snapshot);
     }
 
-    // ReadExactly, not Read: a stream that delivers fewer bytes than its Length promised
-    // must throw rather than yield a truncated prefix, which a repair pass would happily
-    // turn into a different document.
     internal static byte[] ReadFully(Stream stream, long maxFileBytes)
     {
         if (stream.CanSeek)
@@ -270,9 +265,6 @@ public sealed class DocumentReader
 
         var encryptObjectNumber = encryptObject is ReferenceObject reference ? reference.ObjectNumber : -1;
 
-        // A present /Encrypt that does not resolve to a dictionary (an array, a dangling
-        // reference resolving to null, a corrupt value) cannot be honored; processing the
-        // document as plaintext would feed ciphertext into the filters and emit garbage.
         if (Resolve(encryptObject) is not DictionaryObject encrypt)
         {
             throw new DocumentParseException("The /Encrypt entry is not a dictionary.", -1);
@@ -310,10 +302,6 @@ public sealed class DocumentReader
         }
     }
 
-    // Malformed cross-reference data throws plain BCL exceptions (a /Type /XRef
-    // stream missing /W, mistyped dictionary values, truncated entries, corrupt
-    // Flate payloads); all of them mean the xref is unusable and the repair scan
-    // should run.
     private static bool IsRecoverableParseFailure(Exception exception)
         => exception is DocumentParseException
             or KeyNotFoundException

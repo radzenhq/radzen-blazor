@@ -5,10 +5,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-
-// Write-only stream that batches small writes into a pooled buffer before
-// forwarding them to the destination, while tracking the total byte count so
-// callers can record offsets without an intermediate full-file copy.
 [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "The destination stream is owned by the caller.")]
 internal sealed class CountingBufferedStream(Stream inner) : Stream
 {

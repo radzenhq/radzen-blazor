@@ -75,12 +75,8 @@ public static class DssBuilder
 
         var (reader, rootRef, catalog, writer) = IncrementalEditSession.Begin(pdf, "Augmenting");
 
-        // Merge with any existing /DSS so a multi-signature document (or a later
-        // re-augmentation) keeps the earlier validation material instead of dropping it.
         var existingDss = reader.GetDictionary(catalog, "DSS");
 
-        // Start from a copy of the prior /DSS so any keys beyond the four managed
-        // arrays (e.g. proprietary entries from another tool) survive augmentation.
         var dss = existingDss is not null ? existingDss.Copy() : new DictionaryObject();
         dss["Type"] = new NameObject("DSS");
 
@@ -95,8 +91,6 @@ public static class DssBuilder
         {
             vri ??= new DictionaryObject();
             var key = Sha1.ComputeHashHex(signatureContents);
-            // Merge into any prior entry for this same signature rather than
-            // replacing it, so references gathered in earlier passes survive.
             var entry = reader.GetDictionary(vri, key) is { } priorEntry
                     ? priorEntry.Copy()
                     : new DictionaryObject { ["Type"] = new NameObject("VRI") };
@@ -120,11 +114,6 @@ public static class DssBuilder
         return writer.ToArray();
     }
 
-    // Carries the existing /DSS array for <paramref name="key"/> over into
-    // <paramref name="target"/>, appends a stream for each new item, and returns
-    // the reference for every item. A new item whose bytes match a stream already
-    // present is not stored again - its existing reference is reused - so repeated
-    // B-LTA refreshes with the same material do not grow the file without bound.
     private static ReferenceObject[] MergeStreams(
         IncrementalUpdateWriter writer, DocumentReader reader, DictionaryObject? existing,
         DictionaryObject target, string key, byte[][] items)
@@ -168,8 +157,6 @@ public static class DssBuilder
         return refs;
     }
 
-    // Appends the references to a /VRI entry's array, carrying any prior entries
-    // and skipping references already present so re-runs stay idempotent.
     private static void UnionArray(DictionaryObject entry, string key, DocumentReader reader, ReferenceObject[] refs)
     {
         var array = new ArrayObject();

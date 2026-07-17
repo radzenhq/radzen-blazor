@@ -7,12 +7,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Container is a decorated block: it wraps child blocks in a box with padding, background,
-// borders, an optional fixed width and horizontal alignment. A Stack container is placed
-// as a first-class box everywhere: section body (PaginatedPage.Boxes), header/footer bands
-// (PaginatedPage.HeaderBoxes/FooterBoxes) and nested inside a cell or another box
-// (LaidOutBoxContent.Boxes); only overlay containers still lower onto the table engine.
-// Child content is inset by the padding and the box decoration is drawn exactly like a cell's.
 public class ContainerLayoutTests
 {
     private static Paragraph Text(string text, double size = 12)
@@ -79,7 +73,6 @@ public class ContainerLayoutTests
         Assert.Equal(box.Content.Height + 12, box.Bounds.Height, 6);
         Assert.Null(box.Transform);
 
-        // The band table follows the box: placed below it and ordered after it.
         var fragment = Assert.Single(page.HeaderTables);
         Assert.Equal(box.Bounds.Height, fragment.Y, 6);
         Assert.True(box.Order < fragment.Order, "band box precedes the band table");

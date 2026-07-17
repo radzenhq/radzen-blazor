@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Marked content interpretation: only /Artifact BDC/BMC sequences mark their enclosed
-// content as artifacts. Real structure tags (/P, /Span, ...) must keep their content as
-// genuine, non-decorative page content while staying marked-content balanced.
 public class MarkedContentArtifactTests
 {
     private static ContentCollection Materialize(string rawStream)

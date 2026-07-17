@@ -7,14 +7,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract for the standard security handler key derivation and password
-// validation (ISO 32000-1 algorithm 2 / 2.A). Pins:
-//   internal StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, byte[] password)
-//   internal byte[] FileKey { get; }
-//   internal bool IsUserPassword { get; }
-//   internal bool IsOwnerPassword { get; }
-// Driven entirely through the qpdf fixtures: the /Encrypt dictionary and /ID
-// are never encrypted, so the current reader extracts them without a password.
+// ISO 32000-1 algorithm 2 / 2.A: key derivation and password validation.
 public class SecurityHandlerTests
 {
     private static readonly byte[] Empty = [];
@@ -29,7 +22,6 @@ public class SecurityHandlerTests
         return new StandardSecurityHandler(encrypt, documentId, password);
     }
 
-    // Empty user password validates; the derived file key length matches the revision.
     [Theory]
     [InlineData("encrypted-rc4-40.pdf", 5)]
     [InlineData("encrypted-rc4-128.pdf", 16)]
@@ -54,8 +46,7 @@ public class SecurityHandlerTests
         Assert.False(handler.IsOwnerPassword);
     }
 
-    // The RC4-40 fixture was generated with owner password "owner"; the owner path
-    // (algorithm 2 step (a) via the /O entry) must validate it.
+    // ISO 32000-1 algorithm 2 step (a): owner path via the /O entry.
     [Fact]
     public void OwnerPassword_ValidatesRc4()
     {
@@ -64,7 +55,6 @@ public class SecurityHandlerTests
         Assert.Equal(5, handler.FileKey.Length);
     }
 
-    // User-password fixture: empty password is rejected, the real user password validates.
     [Fact]
     public void UserPasswordFixture_RequiresPassword()
     {
@@ -75,7 +65,7 @@ public class SecurityHandlerTests
         Assert.Equal(16, handler.FileKey.Length);
     }
 
-    // R6 (AESV3) owner path via algorithm 2.A on the owner-password fixture.
+    // ISO 32000-1 algorithm 2.A: R6 (AESV3) owner path.
     [Fact]
     public void OwnerPassword_ValidatesAes256()
     {

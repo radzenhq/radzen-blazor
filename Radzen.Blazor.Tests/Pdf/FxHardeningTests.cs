@@ -15,15 +15,8 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Untrusted-parse allocation hardening (fx-hardening lane): every attacker-controlled
-// 32-bit length/count is validated against the remaining bytes and a ReaderLimits cap
-// BEFORE allocating, so malformed fonts/images/streams raise a recoverable typed
-// exception rather than OOM, IndexOutOfRangeException, or silent wrong output. Each
-// guard is paired with a positive control proving valid input is unaffected, and the
-// threading fixes are pinned by proving a caller-tightened ReaderLimits is honored.
 public class FxHardeningTests
 {
-    // --- Cmap format 12 numGroups drives three uint[] before any bounds check ----
 
     [Fact]
     public void CmapFormat12_OversizedNumGroups_Throws()
@@ -39,8 +32,6 @@ public class FxHardeningTests
         Assert.Equal(6, (int)mapper.GetGlyphId(0x1F601));
     }
 
-    // A whole cmap table with one format 12 subtable; numGroups is written verbatim so a
-    // hostile value can be injected while the buffer stays tiny.
     private static byte[] Format12Cmap(long numGroups)
     {
         var bytes = new List<byte>();
@@ -53,23 +44,22 @@ public class FxHardeningTests
             bytes.Add((byte)v);
         }
 
-        U16(0);   // version
-        U16(1);   // numTables
-        U16(3);   // platformID
-        U16(10);  // encodingID
-        U32(12);  // subtable offset
+        U16(0);
+        U16(1);
+        U16(3);
+        U16(10);
+        U32(12);
 
-        U16(12);  // format
-        U16(0);   // reserved
-        U32(16 + 2 * 12); // length (only the two real groups written below)
-        U32(0);   // language
+        U16(12);
+        U16(0);
+        U32(16 + 2 * 12);
+        U32(0);
         U32(numGroups);
         U32(0x1F600); U32(0x1F600); U32(5);
         U32(0x1F601); U32(0x1F603); U32(6);
         return bytes.ToArray();
     }
 
-    // --- CFF Private DICT size sizes a byte[] and copies before any bounds check ----
 
     [Fact]
     public void CffPrivateDictSizePastEnd_Throws()
@@ -79,7 +69,7 @@ public class FxHardeningTests
             var dict = new List<byte>();
             CffFixtureBuilder.Int5(dict, cs);
             dict.Add(17);
-            CffFixtureBuilder.Int5(dict, 0x7FFF_FFFF); // Private DICT size runs off the font
+            CffFixtureBuilder.Int5(dict, 0x7FFF_FFFF);
             CffFixtureBuilder.Int5(dict, priv);
             dict.Add(18);
             return [.. dict];
@@ -97,7 +87,6 @@ public class FxHardeningTests
 
     private static byte[][] ThreeCharStrings() => [[0x0E], [0x0E], [239, 0x0E]];
 
-    // --- SfntFont.TryGetTable sizes/copies a table record before any bounds check ----
 
     [Fact]
     public void SfntTableRecordPastEnd_Throws()
@@ -117,24 +106,20 @@ public class FxHardeningTests
     [Fact]
     public void SfntTableRecordPastEnd_MemoryVariant_Throws()
     {
-        // The zero-copy accessor must fail with the same diagnosable exception as its
-        // byte[] twin, not an opaque ArgumentOutOfRangeException from AsMemory.
         var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 0xFFFF_FFF0u));
         Assert.Throws<InvalidDataException>(() => font.TryGetTableMemory("TEST", out _));
     }
 
     [Theory]
-    [InlineData(new byte[] { 29 })]             // bare 32-bit integer prefix, no payload
-    [InlineData(new byte[] { 28 })]             // bare 16-bit integer prefix, no payload
-    [InlineData(new byte[] { 12 })]             // escape operator with no second byte
-    [InlineData(new byte[] { 0xF7 })]           // 2-byte positive integer, second byte missing
+    [InlineData(new byte[] { 29 })]
+    [InlineData(new byte[] { 28 })]
+    [InlineData(new byte[] { 12 })]
+    [InlineData(new byte[] { 0xF7 })]
     public void CffDictTruncatedOperand_ThrowsInvalidData(byte[] dict)
     {
         Assert.Throws<InvalidDataException>(() => CffDict.Parse(dict));
     }
 
-    // Minimal TrueType sfnt carrying the required head/maxp/hhea tables plus one "TEST"
-    // table whose record length is caller-supplied so an out-of-range record can be forged.
     private static byte[] MinimalSfnt(uint bogusTableLength)
     {
         const int numTables = 5;
@@ -164,14 +149,14 @@ public class FxHardeningTests
         void Record(string tag, long offset, long length)
         {
             buffer.AddRange(Encoding.ASCII.GetBytes(tag));
-            U32(0); // checksum (ignored)
+            U32(0);
             U32(offset);
             U32(length);
         }
 
-        U32(0x00010000); // sfnt version
+        U32(0x00010000);
         U16(numTables);
-        U16(0); U16(0); U16(0); // searchRange/entrySelector/rangeShift
+        U16(0); U16(0); U16(0);
         Record("head", headOffset, head.Length);
         Record("maxp", maxpOffset, maxp.Length);
         Record("hhea", hheaOffset, hhea.Length);
@@ -186,15 +171,14 @@ public class FxHardeningTests
         return buffer.ToArray();
     }
 
-    // --- ImageDecoder: truncated PNG IDAT, and threaded MaxImagePixels ----
 
     [Fact]
     public void PngTruncatedIdat_Throws()
     {
         using var ms = new MemoryStream();
         ms.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
-        WriteChunk(ms, "IHDR", Ihdr(4, 4, 8, 6));       // 4x4 RGBA -> needs 4 scanlines
-        WriteChunk(ms, "IDAT", FlateFilter.Encode(new byte[17])); // only one scanline
+        WriteChunk(ms, "IHDR", Ihdr(4, 4, 8, 6));
+        WriteChunk(ms, "IDAT", FlateFilter.Encode(new byte[17]));
         WriteChunk(ms, "IEND", []);
 
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(ms.ToArray()));
@@ -203,10 +187,10 @@ public class FxHardeningTests
     [Fact]
     public void ImageDecoder_HonorsTightenedMaxImagePixels()
     {
-        var png = PdfTestResources.ReadAllBytes("Images/rgb.png"); // 64x64 = 4096 pixels
+        var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
         var tight = new ReaderLimits { MaxImagePixels = 100 };
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png, tight));
-        Assert.NotNull(ImageDecoder.Decode(png)); // default limits accept it
+        Assert.NotNull(ImageDecoder.Decode(png));
     }
 
     private static byte[] Ihdr(int width, int height, byte bitDepth, byte colorType)
@@ -226,15 +210,13 @@ public class FxHardeningTests
         stream.Write(length);
         stream.Write(Encoding.ASCII.GetBytes(type));
         stream.Write(body);
-        stream.Write(stackalloc byte[4]); // CRC placeholder
+        stream.Write(stackalloc byte[4]);
     }
 
-    // --- ASCII85 5-tuple overflows uint ----
 
     [Fact]
     public void Ascii85_TupleOverflows32Bits_Throws()
     {
-        // Five 'u' (0x75) encode 84*(85^4+...+1) = 0x1_08C5_9DC4 > 0xFFFFFFFF.
         var data = Encoding.ASCII.GetBytes("uuuuu~>");
         Assert.Throws<InvalidDataException>(() => Ascii85Filter.Decode(data));
     }
@@ -242,17 +224,14 @@ public class FxHardeningTests
     [Fact]
     public void Ascii85_MaxValidTuple_StillDecodes()
     {
-        // "s8W-!" is exactly 0xFFFFFFFF.
         var decoded = Ascii85Filter.Decode(Encoding.ASCII.GetBytes("s8W-!~>"));
         Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }, decoded);
     }
 
-    // --- LZW accepts a code beyond the next dictionary slot (KwKwK abuse) ----
 
     [Fact]
     public void Lzw_CodeBeyondNextSlot_Throws()
     {
-        // clear, 'A', then code 300 while the next slot is only 258.
         var bomb = PackLzw([256, 65, 300]);
         Assert.Throws<DocumentParseException>(() => LzwFilter.Decode(bomb, 1, 1 << 20));
     }
@@ -260,7 +239,6 @@ public class FxHardeningTests
     [Fact]
     public void Lzw_ValidKwKwK_StillDecodes()
     {
-        // clear, 'A'(65), then code 258 == nextCode is the legal KwKwK ("AA") -> "AAA".
         var stream = PackLzw([256, 65, 258]);
         Assert.Equal(new byte[] { 65, 65, 65 }, LzwFilter.Decode(stream, 1, 1 << 20));
     }
@@ -304,7 +282,6 @@ public class FxHardeningTests
         return bytes;
     }
 
-    // --- ObjStm member offset -> raw IndexOutOfRangeException on post-Load GetObject ----
 
     [Fact]
     public void ObjStmNegativeMemberOffset_ThrowsDocumentParseException()
@@ -329,9 +306,9 @@ public class FxHardeningTests
 
         var offset5 = pdf.Position;
         var payload = new byte[12];
-        Copy(payload, 0, FixturePdf.XrefStreamEntry(2, 4, 0));            // obj 1: compressed, ObjStm 4 index 0
-        Copy(payload, 4, FixturePdf.XrefStreamEntry(1, (int)offset4, 0)); // obj 4
-        Copy(payload, 8, FixturePdf.XrefStreamEntry(1, (int)offset5, 0)); // obj 5
+        Copy(payload, 0, FixturePdf.XrefStreamEntry(2, 4, 0));
+        Copy(payload, 4, FixturePdf.XrefStreamEntry(1, (int)offset4, 0));
+        Copy(payload, 8, FixturePdf.XrefStreamEntry(1, (int)offset5, 0));
 
         pdf.Append("5 0 obj\n<< /Type /XRef /Size 6 /Index [1 1 4 2] /W [1 2 1] /Root 4 0 R /Length 12 >>\nstream\n")
             .Append(payload)
@@ -348,15 +325,12 @@ public class FxHardeningTests
         }
     }
 
-    // --- Classic xref table has no entry cap unlike the xref-stream path ----
-    // The cap applies both to ParseClassicXref and the repair scan, so recovery
-    // cannot bypass a caller-tightened budget. Defaults still use the xref directly.
 
     [Fact]
     public void ClassicXref_TightenedMaxXrefEntries_Throws()
     {
         var file = ClassicXrefFile();
-        var tight = new ReaderLimits { MaxXrefEntries = 2 }; // below the 4 declared entries
+        var tight = new ReaderLimits { MaxXrefEntries = 2 };
 
         Assert.Throws<DocumentParseException>(() => DocumentReader.Parse(file, null, tight));
     }
@@ -386,7 +360,6 @@ public class FxHardeningTests
         return pdf.ToArray();
     }
 
-    // --- ObjectParser uses the caller's ReaderLimits, not the default ----
 
     [Fact]
     public void ObjectParser_HonorsTightenedNestingDepth()
@@ -394,21 +367,20 @@ public class FxHardeningTests
         var bytes = Encoding.Latin1.GetBytes("[[[1]]]");
         var tight = new ReaderLimits { MaxObjectNestingDepth = 2 };
         Assert.Throws<DocumentParseException>(() => ObjectParser.Parse(bytes, 0, tight));
-        Assert.NotNull(ObjectParser.Parse(bytes, 0)); // default depth accepts it
+        Assert.NotNull(ObjectParser.Parse(bytes, 0));
     }
 
-    // --- ToUnicodeCMap uses the caller's ReaderLimits, not the default ----
 
     [Fact]
     public void ToUnicode_HonorsTightenedMaxCMapEntries()
     {
         var cmap = Encoding.ASCII.GetBytes(
             "1 begincodespacerange <0000> <FFFF> endcodespacerange\n" +
-            "1 beginbfrange <0003> <012C> <0041> endbfrange\n"); // 298-entry incremental range
+            "1 beginbfrange <0003> <012C> <0041> endbfrange\n");
         var tight = new ReaderLimits { MaxCMapEntries = 100 };
         Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap, tight));
 
-        var (map, _) = ToUnicodeCMap.Parse(cmap); // default cap accepts it
+        var (map, _) = ToUnicodeCMap.Parse(cmap);
         Assert.Equal("A", map[0x0003]);
     }
 }

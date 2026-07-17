@@ -6,7 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L4b: how a laid-out table splits across page fragments given a uniform available height.
 public class TablePaginationTests
 {
     [Fact]
@@ -29,7 +28,6 @@ public class TablePaginationTests
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = TableLayout.Layout(table, 300, fonts);
 
-        // Fits header + 4 body rows per fragment: 4 + 4 + 2 = 3 fragments.
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.Equal(3, fragments.Count);
@@ -89,7 +87,6 @@ public class TablePaginationTests
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         var body = fragments.SelectMany(TablePaginationSupport.BodyRows).ToArray();
-        // Source rows 1..10 are the body (row 0 is the header).
         Assert.Equal(Enumerable.Range(1, 10).ToArray(), body);
     }
 
@@ -113,7 +110,6 @@ public class TablePaginationTests
             }
 
             Assert.Equal(y, fragment.Height, 6);
-            // First body row sits directly below the repeated header.
             Assert.Equal(lh, fragment.Rows[fragment.HeaderRowCount].Y, 6);
         }
     }
@@ -129,12 +125,10 @@ public class TablePaginationTests
 
         var fragments = TablePaginator.Paginate(layout, table, available);
 
-        // Header + 4 body == 5 rows == 5*lh, which is <= 5.4*lh and cannot grow to 6*lh.
         Assert.Equal(5 * lh, fragments[0].Height, 6);
         Assert.Equal(5 * lh, fragments[1].Height, 6);
         Assert.True(fragments[0].Height <= available + 1e-6);
         Assert.True(fragments[1].Height <= available + 1e-6);
-        // Last fragment: header + 2 body == 3*lh.
         Assert.Equal(3 * lh, fragments[2].Height, 6);
     }
 
@@ -146,7 +140,6 @@ public class TablePaginationTests
         var table = TablePaginationSupport.Build(headers: 1, bodies: 100);
         var layout = TableLayout.Layout(table, 300, fonts);
 
-        // Header + 4 body per fragment -> ceil(100 / 4) == 25 fragments.
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.Equal(25, fragments.Count);
@@ -166,7 +159,6 @@ public class TablePaginationTests
         var table = TablePaginationSupport.Build(headers: 0, bodies: 10);
         var layout = TableLayout.Layout(table, 300, fonts);
 
-        // No header consumes space: 4 body rows per fragment -> 4 + 4 + 2.
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
 
         Assert.Equal(3, fragments.Count);
@@ -206,7 +198,6 @@ public class TablePaginationTests
         header.IsHeader = true;
         TableLayoutSupport.Fill(header.Cells[0], "H0");
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "R0");
-        // A 6-line-tall atomic row that cannot fit even alongside the header.
         var tall = TablePaginationSupport.AddTallRow(table, 6, "T");
         tall.KeepTogether = true;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "R1");
@@ -217,7 +208,6 @@ public class TablePaginationTests
         var available = TablePaginationSupport.Capacity(lh, 5);
         var fragments = TablePaginator.Paginate(layout, table, available);
 
-        // Fragment 1: header + R0. Fragment 2: header + oversized row (overflows). Fragment 3: header + R1.
         Assert.Equal(3, fragments.Count);
         Assert.Equal([1], TablePaginationSupport.BodyRows(fragments[0]).ToArray());
 
@@ -238,7 +228,6 @@ public class TablePaginationTests
         var table = TablePaginationSupport.Build(headers: 1, bodies: 5);
         var layout = TableLayout.Layout(table, 300, fonts);
 
-        // Header + 3 body per fragment -> 3 + 2.
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
 
         Assert.Equal(2, fragments.Count);

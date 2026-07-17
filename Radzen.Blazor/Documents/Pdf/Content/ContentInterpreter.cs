@@ -44,8 +44,6 @@ internal static class ContentInterpreter
                         }
                     }
 
-                    // An array left unterminated by a truncated stream consumes every remaining
-                    // token, so the span ends at the last one rather than at the missing ']'.
                     var end = i < tokens.Count ? tokens[i].End : tokens[^1].End;
                     interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], token.Start, end));
                     continue;
@@ -71,9 +69,6 @@ internal static class ContentInterpreter
 
             var op = token.Text;
 
-            // What the machine consumes has no element of its own and needs no passthrough:
-            // the editor copies the source bytes carrying those operators verbatim, and its
-            // KnownNonElement set must stay in step with what is handled without an Add here.
             if (!interpreter.Machine.Apply(op, interpreter.Operands)
                 && !HandleGraphicsOperators(op, interpreter, target)
                 && !HandleTextOperators(op, interpreter, target)
@@ -94,10 +89,6 @@ internal static class ContentInterpreter
         FinalizeMerge(interpreter);
     }
 
-    // Folding leaves the run's SourceBytes/SourceText at their pre-fold values, so every path
-    // that abandons PendingMerge must come through here. The accumulators are frozen onto the
-    // run rather than assigned live: a still-growing list would leave the run aliasing a
-    // buffer that keeps changing behind its change-detection door.
     private static void FinalizeMerge(InterpreterState interpreter)
     {
         if (interpreter.PendingMerge is { } run && interpreter.MergeBytes.Count > 0)
@@ -387,8 +378,6 @@ internal static class ContentInterpreter
 
     private sealed class InterpreterState(IReadOnlyDictionary<string, ReverseFont>? fonts)
     {
-        // Null fallback: an unresolvable Tf leaves Font null so an edited run re-encodes
-        // through WinAnsi rather than failing on a font that was never really there.
         public ContentStateMachine Machine { get; } = new(fonts, fallbackFont: null, new GraphicsState());
 
         public GraphicsState Graphics => (GraphicsState)Machine.State;
@@ -437,16 +426,9 @@ internal static class ContentInterpreter
             return;
         }
 
-        // A loaded run in an embedded/Type0 font carries multi-byte codes; decode Text via
-        // the font's reverse map (as text extraction does) instead of per-byte WinAnsi,
-        // which drops the 0x00 high bytes. SourceBytes still re-emits the run verbatim.
         var decoded = text.Font is not null ? text.Font.Decode(bytes) : Decode(bytes);
         var transform = textMatrix * state.Ctm;
 
-        // The spec advances the text matrix by each shown glyph's width, but the element model
-        // carries no per-run width. Folding consecutive shows that share the text matrix and
-        // state into one show operator lets the renderer advance between the chunks using the
-        // font's own widths, instead of collapsing them onto the same origin.
         if (pendingMerge is { SourceBytes: { } pendingBytes, SourceText: not null }
             && pendingMerge.Transform == transform
             && pendingMerge.FontResourceName == text.FontName
@@ -457,8 +439,6 @@ internal static class ContentInterpreter
             && pendingMerge.CharSpacing == text.Spacing.CharSpacing
             && pendingMerge.IsArtifact == (artifactDepth > 0))
         {
-            // Seed once then append, so a k-show chain copies each chunk once rather than
-            // re-copying the whole run per show.
             if (interpreter.MergeBytes.Count == 0)
             {
                 interpreter.MergeBytes.AddRange(pendingBytes.ToArray());
@@ -483,8 +463,6 @@ internal static class ContentInterpreter
             SourceBytes = bytes,
             SourceText = decoded,
             SourceFont = text.Font,
-            // Only carry the TJ array when it holds a numeric adjustment; a plain string
-            // (Tj or a single-element TJ) re-emits through the simpler Tj path unchanged.
             SourceAdjustments = HasAdjustment(tjSegments) ? [.. tjSegments!] : null,
             Color = state.Fill,
             FillPaint = state.FillPaint,
@@ -567,8 +545,6 @@ internal static class ContentInterpreter
         pathOps.Clear();
     }
 
-    // An empty clipping path bounds nothing, so it keeps whatever the enclosing clip was
-    // rather than widening it back to unbounded.
     private static PdfRect? Intersect(PdfRect? current, PdfRect? added)
     {
         if (added is not { } bounds)
@@ -640,29 +616,18 @@ internal static class ContentInterpreter
 
         public double DashPhase { get; set; }
 
-        // A bounding box the current clipping path is known to fit inside, or null while no
-        // clip is active. Only ever a superset of the real region, so it can bound an
-        // operator that paints the whole clip (sh) without under-reporting its extent.
         public PdfRect? Clip { get; set; }
     }
 }
 
-// A string chunk (Text set) or a numeric adjustment in thousandths of an em (Text null),
-// preserved so a re-emitted run keeps its intra-run displacements (kerning, inter-word gaps)
-// instead of collapsing to Tj.
 internal readonly record struct TextAdjustment(byte[]? Text, double Adjustment);
 
-// An operator with no element-model representation, kept verbatim so a full re-encode does
-// not silently drop it.
 internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : ContentElement
 {
     public string Operator => op;
 
-    // The clip in effect where the operator appeared, or null if unclipped. An operator
-    // that paints without a shape of its own (sh) can only be bounded by this.
     public PdfRect? ClipBounds { get; init; }
 
-    /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
         foreach (var operand in operands)
@@ -689,14 +654,10 @@ internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : Con
     }
 }
 
-// A BI/ID/EI inline image. Its payload is opaque binary the content grammar cannot rewrite,
-// so it is only ever re-emitted unchanged or dropped whole; Transform carries the CTM mapping
-// its unit square onto the page, which is what makes it bounds-testable.
 internal sealed class InlineImageContent(byte[] source) : ContentElement
 {
     public byte[] Source => source;
 
-    /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
         writer.WriteBytes(source);

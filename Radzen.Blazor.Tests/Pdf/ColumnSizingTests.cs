@@ -5,7 +5,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L4a column-sizing contract. See TableLayoutSupport for the pinned model.
 public class ColumnSizingTests
 {
     [Fact]

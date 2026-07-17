@@ -15,7 +15,6 @@ public class ListTests
     private static string PageText(DocumentBuilder builder)
         => BuildTestSupport.Reload(builder).Pages[0].ExtractText();
 
-    // Every `x y Td (literal) Tj` text placement on the first page, in emission order.
     private static List<(double X, string Text)> TextDraws(DocumentBuilder builder)
     {
         var reader = BuildTestSupport.Read(builder);
@@ -50,7 +49,6 @@ public class ListTests
 
         var draws = TextDraws(builder);
 
-        // A non-empty bullet marker at the left edge and item text at the hanging indent, per item.
         var markers = draws.FindAll(d => Math.Abs(d.X) < 1e-3 && d.Text.Length > 0);
         Assert.Equal(2, markers.Count);
         Assert.All(markers, m => Assert.NotEqual("Alpha", m.Text));
@@ -105,7 +103,6 @@ public class ListTests
         var marker = draws.Find(d => d.Text == "1.");
         Assert.Equal(0, marker.X, 3);
 
-        // The item wraps, and every content line lands at the hanging indent, never under the marker.
         var contentLines = draws.FindAll(d => d.Text != "1." && d.Text.Length > 0);
         Assert.True(contentLines.Count >= 2, "content wrapped to at least two lines");
         Assert.All(contentLines, line => Assert.Equal(20, line.X, 3));

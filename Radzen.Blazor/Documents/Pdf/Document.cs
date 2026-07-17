@@ -25,26 +25,16 @@ public sealed class Document
         Pages = new PageCollection(this);
     }
 
-    // The document's load/merge/incremental state, encapsulated in one owned object.
-    // Null for a freshly built document that carries no loaded or appended source
-    // pages; set by DocumentLoader (fully loaded) or lazily by Append (carry only).
     internal LoadedState? Loaded { get; private set; }
 
-    // Builds a loaded document around the state DocumentLoader constructed, instead of
-    // letting the loader set the document's fields one by one from outside.
     internal static Document CreateLoaded(LoadedState state)
     {
         ArgumentNullException.ThrowIfNull(state);
         return new Document { Loaded = state };
     }
 
-    // Lazily creates the append-only carry state so Document.Append can record merged
-    // loaded pages on a document that was not itself loaded.
     internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
-    // Adopts a page inserted straight from another document, keyed by the same Page
-    // instance rather than by a copy as Append does. A built page carries its closure on
-    // the page itself, so only a donor with loaded state has anything to carry.
     internal void CarryForeignPage(Page page, Document donor)
     {
         if (donor.Loaded is { } origin)
@@ -53,8 +43,6 @@ public sealed class Document
         }
     }
 
-    // The eight modeled /Info fields captured as strings, for a cheap value comparison
-    // between the load-time metadata and the current metadata on the incremental path.
     /// <summary>Gets the document metadata.</summary>
     public DocumentInfo Info { get; } = new();
 
@@ -125,48 +113,27 @@ public sealed class Document
     /// </summary>
     public DocumentXmpMetadata Xmp { get; } = new();
 
-    // Logical structure tree of a generated document (Tagged PDF). Set by the
-    // generator; null for loaded or hand-assembled documents.
     internal StructureElement? Structure { get; set; }
 
-    // Non-standard structure roles mapped to standard types, emitted as the
-    // /StructTreeRoot /RoleMap. Set by the generator; empty maps write no /RoleMap.
     internal RoleMap RoleMap { get; set; } = new();
 
-    // PDF/A conformance level requested at build time; drives XMP metadata,
-    // the sRGB output intent, the trailer /ID and full-embedding enforcement.
     internal PdfAConformance Conformance { get; set; }
 
-    // The faces registered at build time; null for loaded or hand-assembled documents.
-    // Kept so text added after Build() can tell an embeddable family from an unknown one.
     internal FontCollection? Fonts { get; set; }
 
-    // The policy for every stream emitted on top of this document's pages: appearance streams,
-    // overlays and annotations, none of which can embed a font file. Mirrors ConformanceWriter's
-    // label so the seam and its validate-before-write backstop reject with one message.
     internal Fonts.FontScope FontScope => new(
         Fonts,
         Conformance != PdfAConformance.None ? "PDF/A" : PdfUA ? "PDF/UA" : null,
         CanEmbed: false);
 
-    // PDF/UA-1 identification requested at build time; drives the pdfuaid XMP
-    // entry, the DisplayDocTitle viewer preference and tagging enforcement.
     internal bool PdfUA { get; set; }
 
-    // Natural language of the document (catalog /Lang); required by PDF/UA.
     internal string? Language { get; set; }
 
-    // Set by the generator when the authoring DOM has a List the structure tree left
-    // untagged (lists are only tagged for PDF/UA). PDF/A Level-A rejects untagged real
-    // content, so the conformance writer fails loud rather than claim conformance.
     internal bool HasUntaggedListContent { get; set; }
 
-    // Named destinations recorded at emit time (Run.Anchor); emitted on save as
-    // the catalog /Names /Dests name tree.
     internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
 
-    // Loaded?.Source is the "was parsed from a file" signal: an unloaded document (and an
-    // append-only carry state) has nothing to preserve, so its outline is always written.
     internal bool OutlineChanged => Loaded?.Source is null
         || Loaded.OutlineRequiresRewrite
         || outline.StructureChanged
@@ -189,8 +156,6 @@ public sealed class Document
         return false;
     }
 
-    // Called once after load, which fills the metadata model through its own setters and would
-    // otherwise leave every loaded document born dirty.
     internal void AcceptMetadataChanges()
     {
         Info.AcceptChanges();
@@ -342,8 +307,6 @@ public sealed class Document
     {
         ArgumentNullException.ThrowIfNull(other);
 
-        // The merger carries content as raw bytes only; a page holding a queued overlay or
-        // element edits keeps them outside those bytes, so it has to be serialized first.
         foreach (var page in other.Pages)
         {
             if (!page.ContentIsIntact)

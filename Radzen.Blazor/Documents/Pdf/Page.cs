@@ -37,12 +37,8 @@ public sealed class Page
 
     internal GeneratedPage? Generated { get; set; }
 
-    // Set once by PageCollection and never reassigned: a page inserted into further
-    // documents must still resolve against the document whose LoadedState holds its entries.
     internal Document? Owner { get; set; }
 
-    // A page with no owner is not being saved through a document, so no registry or
-    // conformance level can apply.
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
     /// <summary>Gets the page width in points.</summary>
@@ -151,15 +147,10 @@ public sealed class Page
 
             rotate = value;
 
-            // An explicit rotation supersedes the source page's, which the saver would
-            // otherwise re-emit whenever this value is 0.
             Owner?.Loaded?.SourceRotations.Remove(this);
         }
     }
 
-    // A source /Rotate is any multiple of 90 (including negative and over-360 values) and
-    // is normalized to the 0-359 range the public setter accepts; a non-conforming value
-    // is kept verbatim so it still round-trips.
     internal void SetLoadedRotate(int degrees)
         => rotate = degrees % 90 == 0 ? ((degrees % 360) + 360) % 360 : degrees;
 
@@ -192,13 +183,9 @@ public sealed class Page
         ArgumentNullException.ThrowIfNull(value);
         SetContentCore(value);
 
-        // ResetMaterialization makes the page look freshly loaded again, so without this bit
-        // nothing would report the replacement and a save would keep the pre-SetContent bytes.
         ContentReplaced = true;
     }
 
-    // The page's baseline bytes, not an edit to them: unlike SetContent this must not set
-    // ContentReplaced, or every loaded page would be born modified.
     internal void SetLoadedContent(byte[] value) => SetContentCore(value);
 
     private void SetContentCore(byte[] value)
@@ -279,13 +266,8 @@ public sealed class Page
         textFonts = fonts;
     }
 
-    // Exposed so Document.Append can carry them onto a copied page: a Type0/Identity-H
-    // stream is not reversible without them.
     internal IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
 
-    // Folds queued edits in first, so a reader cannot see bytes the page has already
-    // superseded. Readers that must observe the unflushed state (materialization,
-    // intactness, BuildContent's raw-bytes-plus-overlay path) read the field instead.
     internal byte[]? CurrentContent
     {
         get
@@ -295,18 +277,10 @@ public sealed class Page
         }
     }
 
-    // Materialization implies a possible edit, so it disqualifies intactness even though no
-    // element may have changed. Read by PageOperations to decide whether a copy can take the
-    // bytes verbatim.
     internal bool ContentIsIntact => !ContentReplaced && !materialized && pendingAppends.Count == 0;
 
-    // Whether the raw bytes were swapped out from under the element graph, by SetContent or by
-    // a redaction/replacement rewrite. Element flags cannot see this: the replacement resets
-    // materialization, so every element-level signal reads as untouched afterwards.
     internal bool ContentReplaced { get; private set; }
 
-    // Queuing rather than adding keeps a loaded page's raw bytes intact, so stamping an
-    // overlay does not pay to parse and re-emit the whole content stream.
     internal void AppendContent(ContentElement element)
     {
         if (materialized || content is null || Generated is not null)
@@ -332,8 +306,6 @@ public sealed class Page
             return;
         }
 
-        // Materializing is not editing: with the original prefix intact and nothing appended the
-        // re-emit would reproduce the bytes already held, so skip it rather than claim a replace.
         if (OriginalElementsIntact() && elements.Count == materializedCount)
         {
             ResetMaterialization();
@@ -388,8 +360,6 @@ public sealed class Page
             reservedNames = combinedNames;
         }
 
-        // Queued appends imply a never-materialized loaded page, so the raw bytes are still
-        // intact and only the additions need emitting.
         if (pendingAppends.Count > 0)
         {
             using var pending = new ContentWriter(
@@ -408,9 +378,6 @@ public sealed class Page
                 new ContentEmissionResult(pendingOverlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
         }
 
-        // An empty collection means "reuse the raw bytes" only when nothing was ever
-        // materialized from them; once it was, empty means the caller removed everything
-        // and reusing the raw bytes would restore the removed content.
         if (elements.Count == 0 && materializedCount == 0)
         {
             return new ContentEmissionResult(content, editedResources);
@@ -447,8 +414,6 @@ public sealed class Page
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
 
-        // A full re-emit registers fresh base-14 fonts and image XObjects; its keys must
-        // dodge the loaded page's resource names so MergeResources cannot overwrite them.
         using var writer = new ContentWriter(
             FontScope,
             SafePrefix("F", reservedNames),
@@ -464,12 +429,8 @@ public sealed class Page
             ContentResourceManifest.Combine(editedResources, authored.Resources), isEmitted: true);
     }
 
-    // Prefix identity, not just a count: removing one original and appending one new element
-    // leaves the count unchanged, so a count test alone would pass it as intact and the
-    // removed content would come back from the raw bytes.
     private bool OriginalElementsIntact()
     {
-        // The count guard also keeps the prefix walk in range once elements were removed.
         if (sourceElements is null || elements.Count < materializedCount)
         {
             return false;
@@ -486,8 +447,6 @@ public sealed class Page
         return true;
     }
 
-    // A built page keeps the generator's bytes as its base, so Content holds only the user's
-    // additions and they must be emitted as a second stream rather than replacing the base.
     internal ContentEmissionResult? BuildOverlay()
     {
         if (elements.Count == 0)
@@ -523,8 +482,6 @@ public sealed class Page
         materializedCount = elements.Count;
         sourceElements = ContentEditor.Map(content, elements, cache);
 
-        // The interpreter builds these elements through the same tracked setters a caller
-        // would use, so without this every loaded page would be born modified and re-encode.
         foreach (var element in elements)
         {
             element.AcceptChanges();
@@ -533,8 +490,6 @@ public sealed class Page
         FlushPendingAppends();
     }
 
-    // Queued appends join the elements only after materializedCount is fixed and the original
-    // prefix is frozen, so they count as additions rather than as original content.
     private void FlushPendingAppends()
     {
         foreach (var element in pendingAppends)
@@ -553,8 +508,6 @@ public sealed class Page
         sourceElements = null;
     }
 
-    // Emitter keys are prefix+index; a prefix that no reserved name begins with can never
-    // equal one, so extend it with a non-digit until it is disjoint from every loaded name.
     private static string SafePrefix(string baseName, IReadOnlyCollection<string>? reserved)
     {
         if (reserved is null || reserved.Count == 0)

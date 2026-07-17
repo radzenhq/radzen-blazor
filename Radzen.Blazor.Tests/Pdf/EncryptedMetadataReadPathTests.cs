@@ -6,10 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Read-path wiring for ISO 32000-1 7.6.3.2: when an encrypted document declares
-// /EncryptMetadata false its /Metadata stream is stored as plaintext XMP, so the
-// reader must NOT run it through the stream cipher. A normal stream in the same
-// document must still decrypt.
+// ISO 32000-1 7.6.3.2: /Metadata stored as plaintext XMP when /EncryptMetadata is false; the reader must not run it through the stream cipher.
 public class EncryptedMetadataReadPathTests
 {
     private static readonly byte[] DocumentId = CryptoFixtureSupport.FixedBytes(16, 5);
@@ -17,8 +14,7 @@ public class EncryptedMetadataReadPathTests
     private const string Xmp =
         "<?xpacket begin=\"\"?><x:xmpmeta xmlns:x=\"adobe:ns:meta/\"><rdf:RDF/></x:xmpmeta><?xpacket end=\"r\"?>";
 
-    // Algorithm 2 with the /EncryptMetadata false extension: 0xFFFFFFFF is appended
-    // before the 50-round MD5 spin (ISO 32000-1 7.6.3.3 step (f)).
+    // ISO 32000-1 7.6.3.3 step (f): 0xFFFFFFFF appended before the 50-round MD5 spin when /EncryptMetadata is false.
     private static byte[] FileKeyNoMetadata(byte[] owner, int permissions, byte[] documentId)
     {
         var p = new[]

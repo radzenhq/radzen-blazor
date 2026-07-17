@@ -3,8 +3,6 @@ using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
 
-// Capability differences between callers are values here (an unset one emits nothing), not
-// separate emit paths.
 internal readonly struct TextShowOp
 {
     public required string FontKey { get; init; }
@@ -21,22 +19,14 @@ internal readonly struct TextShowOp
     public double StrokeWidth { get; init; }
     public double Shear { get; init; }
 
-    // The show payload, already prepared by the caller: Adjustments wins (verbatim TJ array),
-    // else Kerns (per-pair kerned TJ over Bytes), else a plain Tj of Bytes.
     public ReadOnlyMemory<byte> Bytes { get; init; }
     public double[]? Kerns { get; init; }
     public int GlyphWidth { get; init; }
     public ImmutableArray<TextAdjustment>? Adjustments { get; init; }
 
-    // The loaded-content path leaves the state set instead, so re-emitted bytes match what
-    // was read.
     public bool ResetTextState { get; init; }
 
-    // Set when this show splices into a text object the caller has already opened. ISO
-    // 32000-1 9.4.1 forbids nesting one, and a nested BT would reset the text and line
-    // matrices the enclosing object's later operators still position against. The live text
-    // matrix already sits at the run's origin, so no BT/ET and no Td are emitted; X and
-    // Baseline must be zero because the caller carries the origin in the ambient instead.
+    // ISO 32000-1 9.4.1 forbids nesting text objects.
     public bool InsideTextObject { get; init; }
 }
 
@@ -67,8 +57,6 @@ internal static class ContentEmitter
         }
     }
 
-    // Runs counterclockwise from the bottom-left corner's end point; the caller appends the
-    // paint operator.
     public static void WriteRoundedRect(ContentWriter writer, double x, double y, double width, double height, double radius)
     {
         var offset = radius * BezierGeometry.Kappa;
@@ -101,8 +89,6 @@ internal static class ContentEmitter
         WritePoint(writer, x3, y3, " c\n");
     }
 
-    // Must sit inside a caller-managed q .. Q pair so the surrounding graphics state stays
-    // untouched.
     public static void WriteTransform(ContentWriter writer, in Matrix matrix)
     {
         writer.WriteNumber(matrix.A);
@@ -123,8 +109,6 @@ internal static class ContentEmitter
         WriteImagePlacement(writer, image.Image.Key, image.X, image.Y, image.Width, image.Height,
             image.ExtGState, image.Transform, image.Clip, image.ClipRadius, image.StencilColor);
 
-    // Emits q [gs] [transform cm] [clip] [rg] <w 0 0 h x y cm> /key Do Q. Every optional argument
-    // emits nothing when unset, so a bare key+geometry call produces the plain placement.
     public static void WriteImagePlacement(
         ContentWriter writer, string key, double x, double y, double width, double height,
         string? extGState = null, Matrix? transform = null, PdfRect? clip = null,
@@ -137,8 +121,6 @@ internal static class ContentEmitter
             writer.WriteRaw(" gs\n");
         }
 
-        // The transform precedes the clip so the clip rectangle (given in the same
-        // pre-transform coordinates as the image box) rotates with the image.
         if (transform is { } t)
         {
             WriteTransform(writer, t);
@@ -217,8 +199,6 @@ internal static class ContentEmitter
         }
     }
 
-    // Callers own their wrapper (q/gs/cm/clip) and payload preparation; everything between BT
-    // and ET is emitted here so the operator order and state-reset discipline exist once.
     public static void WriteTextShow(ContentWriter writer, in TextShowOp op)
     {
         if (op.InsideTextObject && (op.X != 0 || op.Baseline != 0 || op.Shear != 0))
@@ -256,8 +236,6 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tw\n");
         }
 
-        // 0 (the default for draws that never set it) means "unchanged"; only a genuinely
-        // non-100 scale emits Tz, so default text stays byte identical.
         var horizontalScale = op.HorizontalScale != 0 && op.HorizontalScale != 100;
         if (horizontalScale)
         {
@@ -271,8 +249,6 @@ internal static class ContentEmitter
             writer.WriteRaw(" Ts\n");
         }
 
-        // Synthetic bold draws in fill+stroke (mode 2); an explicit invisible/other mode
-        // wins. Both reset to 0 Tr after the show since Tr persists across BT/ET.
         var renderMode = op.RenderMode != 0 ? op.RenderMode : op.StrokeWidth > 0 ? 2 : 0;
         if (op.StrokeWidth > 0 && renderMode == 2)
         {
@@ -287,8 +263,6 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tr\n");
         }
 
-        // Positioning inside an open text object would discard where that object left the
-        // text and line matrices; the ambient transform carries the origin instead.
         if (!op.InsideTextObject)
         {
             WritePosition(writer, op);
@@ -302,7 +276,6 @@ internal static class ContentEmitter
                 writer.WriteRaw("0 Tr\n");
             }
 
-            // Tc/Ts/Tw/Tz persist across BT/ET, so non-default values are reset after the show.
             if (op.CharSpacing != 0)
             {
                 writer.WriteRaw("0 Tc\n");
@@ -330,7 +303,6 @@ internal static class ContentEmitter
         }
     }
 
-    // Shear needs the full Tm form; a plain origin rides the shorter Td.
     private static void WritePosition(ContentWriter writer, in TextShowOp op)
     {
         if (op.Shear != 0)
@@ -412,8 +384,6 @@ internal static class ContentEmitter
         writer.WriteRaw("\n");
     }
 
-    // A kern is a TJ number (positive tightens) placed between adjacent glyph codes. Glyph
-    // codes are 2 bytes for embedded Type0 subsets and 1 byte for WinAnsi base-14 faces.
     private static void WriteKernedShow(ContentWriter writer, ReadOnlySpan<byte> bytes, double[] kerns, int glyphWidth)
     {
         writer.WriteRaw("[");
@@ -432,8 +402,6 @@ internal static class ContentEmitter
         writer.WriteRaw("] TJ\n");
     }
 
-    // Layout emits original gids; the compact map renumbers them into the embedded
-    // subset's 0..N-1 space so the 2-byte Identity-H code equals the new gid.
     public static byte[] RemapBytes(in TextDraw text)
     {
         if (text.Font.CompactGidMap is not { } gidMap)

@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// C4a: the dirty-flag contract. A loaded page that is merely READ (materialized but
-// not modified) re-emits its content stream byte-identically by reusing the retained
-// raw bytes. A page whose Content is MODIFIED (element added or mutated) re-encodes
-// from the elements, and the change survives a subsequent reload.
 public class DirtyReencodeTests
 {
     private static Document BuildContentDocument()
@@ -37,7 +33,7 @@ public class DirtyReencodeTests
 
         var loaded = InterpreterTestSupport.Load(original);
         var content = loaded.Pages[0].Content;
-        Assert.True(content.Count > 0); // force lazy materialization, but do not modify
+        Assert.True(content.Count > 0);
 
         var resaved = loaded.ToArray();
 
@@ -132,8 +128,6 @@ public class DirtyReencodeTests
         var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
         var roundTripped = reloaded.Pages[0].Content[0];
 
-        // The materialized element already folded its baseline into Transform (position
-        // is x=y=0), so overwriting Transform replaces the placement wholesale.
         InterpreterTestSupport.AssertMatrix(Matrix.Translate(15, 25), roundTripped.Transform);
     }
 }

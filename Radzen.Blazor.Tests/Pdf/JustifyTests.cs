@@ -6,9 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Justify contract: every line except the last stretches so its right edge lands exactly
-// on maxWidth. The extra space is distributed EQUALLY across the inter-word gaps; word
-// advances are unchanged. The last line is left-aligned (not stretched).
 public class JustifyTests
 {
     private const string Sentence =

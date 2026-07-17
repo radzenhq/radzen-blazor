@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Parses the legacy 'kern' table (OpenType/Windows version 0) horizontal format-0
-// subtables into pair advance adjustments in font design units, keyed by
-// (leftGlyphId << 16) | rightGlyphId. The Apple version-1.0 header (uint32 0x00010000)
-// and non-format-0 subtables are ignored, yielding no pairs from them.
 internal static class KernTable
 {
     public static Dictionary<int, int> Parse(byte[] data)
@@ -35,8 +31,6 @@ internal static class KernTable
             var minimum = (coverage & 0x0002) != 0;
             if (format == 0 && horizontal && !minimum)
             {
-                // Bound the pair loop by this subtable, not the whole table: an overstated
-                // nPairs must not read the following subtable's bytes as kern pairs.
                 var end = length > 0 ? Math.Min(reader.Length, pos + length) : reader.Length;
                 ParseFormat0(ref reader, pos + 6, end, map);
             }
@@ -66,7 +60,7 @@ internal static class KernTable
             nPairs = (ushort)maxPairs;
         }
 
-        var p = offset + 8; // skip searchRange, entrySelector, rangeShift
+        var p = offset + 8;
         for (var i = 0; i < nPairs && p + 6 <= end; i++)
         {
             var left = reader.ReadUInt16At(p);

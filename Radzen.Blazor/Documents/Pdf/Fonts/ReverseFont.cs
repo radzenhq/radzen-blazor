@@ -5,10 +5,6 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts;
 
-// A char-code -> Unicode reverse mapping for a single font resource, used by text
-// extraction. Simple fonts consume one byte per code and map through their WinAnsi
-// base encoding overlaid with any /Differences; Type0/Identity-H fonts consume two
-// bytes per code and map through the emitted /ToUnicode CMap.
 internal sealed class ReverseFont
 {
     private readonly int bytesPerCode;
@@ -127,7 +123,6 @@ internal sealed class ReverseFont
         return true;
     }
 
-    // The forward map never changes after construction, so the reverse lookup is built once.
     private ReverseMap BuildReverseMap()
     {
         var codes = new Dictionary<string, int>(map.Count, StringComparer.Ordinal);
@@ -186,9 +181,7 @@ internal sealed class ReverseFont
         return new ReverseFont(1, simple, simpleWidths, MissingWidth(reader, fontDict));
     }
 
-    // ISO 32000-1 9.6.2.1 Table 122: the width for a code whose width /Widths does not specify,
-    // defaulting to 0. It is /DW's analogue for a simple font. No descriptor means no entry to
-    // default, so those fonts keep reporting no width rather than inventing a zero advance.
+    // ISO 32000-1 9.6.2.1 Table 122: default width for a code /Widths does not specify.
     private static double? MissingWidth(DocumentReader reader, DictionaryObject fontDict)
         => reader.GetDictionary(fontDict, "FontDescriptor") is { } descriptor
             ? reader.GetNumber(descriptor, "MissingWidth") ?? 0
@@ -330,9 +323,6 @@ internal sealed class ReverseFont
 
     private static Dictionary<int, string> BuildWinAnsiMap() => BuildBaseMap(null);
 
-    // A simple font's base encoding: /Encoding may be the name itself, or a dictionary whose
-    // /BaseEncoding names it. Anything else (absent, or a base this table does not model such
-    // as MacExpertEncoding) keeps the WinAnsi default the emitter writes.
     private static string? BaseEncodingName(DocumentReader reader, DictionaryObject fontDict)
     {
         if (fontDict.TryGetValue("Encoding", out var value) && value is { } encodingValue

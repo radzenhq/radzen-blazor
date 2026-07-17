@@ -1,19 +1,13 @@
 namespace Radzen.Documents.Pdf.Emit;
 
-// The widow/orphan/keep-together/keep-with-next placement policy, kept a pure decision so it
-// can be unit-tested apart from Paginator's paragraph loop.
 internal readonly struct LinePlacementRequest
 {
-    /// <summary>Lines from the current offset that physically fit in the remaining height.</summary>
     public required int LinesThatFit { get; init; }
 
-    /// <summary>Lines still unplaced in the paragraph (from the current offset).</summary>
     public required int RemainingLines { get; init; }
 
-    /// <summary>True while placing the paragraph's first slice (before any continuation break).</summary>
     public required bool IsFirst { get; init; }
 
-    /// <summary>True when the page already holds content, so a move-whole is allowed.</summary>
     public required bool HasPageContent { get; init; }
 
     public required int Widows { get; init; }
@@ -24,28 +18,19 @@ internal readonly struct LinePlacementRequest
 
     public required bool KeepWithNext { get; init; }
 
-    /// <summary>
-    /// Keep-with-next look-ahead: true when a following block exists and its leading
-    /// height was resolved. Only meaningful on the first slice of the last fitting group.
-    /// </summary>
     public bool HasNextBlock { get; init; }
 
-    /// <summary>Cursor after placing the paragraph's remaining lines plus its SpacingAfter.</summary>
     public double AfterCursor { get; init; }
 
-    /// <summary>The next block's SpacingBefore plus its first-fragment height.</summary>
     public double NextBlockLeadingHeight { get; init; }
 
-    /// <summary>The section body content height, the fit boundary for the look-ahead.</summary>
     public double ContentHeight { get; init; }
 }
 
 internal readonly struct LinePlacementDecision
 {
-    /// <summary>How many lines to place on the current page now.</summary>
     public int PlaceCount { get; init; }
 
-    /// <summary>True to flush and re-place the whole remaining paragraph on a fresh page.</summary>
     public bool MoveWhole { get; init; }
 }
 
@@ -83,8 +68,6 @@ internal static class LinePlacer
                 kept = nrem - r.Widows;
             }
 
-            // A continuation break still makes progress: never stall on an empty page
-            // (a line taller than the page is placed alone) and never strand < 1 line.
             placeCount = kept >= 1 ? kept : (k > 0 || hasPageContent ? k : 1);
         }
         else if (k < r.Orphans)
@@ -111,8 +94,6 @@ internal static class LinePlacer
             }
         }
 
-        // A page must always make progress: placing zero lines (e.g. Orphans=0 with a
-        // Widows pull-up) would flush a spurious blank page, so treat it as move-whole.
         if (placeCount == 0 && !moveWhole)
         {
             moveWhole = true;

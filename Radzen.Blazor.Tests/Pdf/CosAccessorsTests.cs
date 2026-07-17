@@ -4,14 +4,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Typed COS accessors resolve an indirect reference and then type-check, returning
-// null (or false for TryGet) for a missing or wrong-typed entry - the exact
-// semantics the hand-rolled resolve-and-cast call sites they replace relied on.
 public class CosAccessorsTests
 {
-    // Object 1 holds a dictionary exercising every accessor: direct scalars, an
-    // indirect reference (/Ref -> object 2, a name), a wrong-typed entry, and a
-    // dangling reference (/Dangling -> free object 9) that resolves to null.
     private static DocumentReader Reader()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n")

@@ -18,9 +18,6 @@ internal static class FlateFilter
 
     public static byte[] Decode(ReadOnlyMemory<byte> data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
-    // maxOutput bounds the decompressed size so a compression bomb aborts with a
-    // recoverable DocumentParseException instead of exhausting memory. A fixed-size
-    // read loop is used rather than CopyTo so the cap is checked before each grow.
     public static byte[] Decode(ReadOnlyMemory<byte> data, long maxOutput)
     {
         if (data.Length == 0)
@@ -46,8 +43,6 @@ internal static class FlateFilter
         return output.ToArray();
     }
 
-    // Array-backed memory - every caller in practice - is inflated in place; only an
-    // exotic MemoryManager-backed segment pays for a copy.
     private static MemoryStream AsStream(ReadOnlyMemory<byte> data)
         => MemoryMarshal.TryGetArray(data, out var segment)
             ? new MemoryStream(segment.Array!, segment.Offset, segment.Count, writable: false)
@@ -62,8 +57,6 @@ internal static class FlateFilter
 
     public static byte[] Encode(ReadOnlySpan<byte> data)
     {
-        // ZLibStream emits nothing for a zero-length write, so produce a canonical
-        // empty zlib stream (header, empty stored block, Adler-32 of no data).
         if (data.Length == 0)
         {
             return [0x78, 0x9C, 0x03, 0x00, 0x00, 0x00, 0x00, 0x01];

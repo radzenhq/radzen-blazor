@@ -2,8 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// A rasterized shadow coverage buffer: an 8-bit DeviceGray image (white = fully covered)
-// plus the point-space margin the blur added on every edge beyond the shape bounds.
 internal readonly struct ShadowMask
 {
     public required byte[] Pixels { get; init; }
@@ -12,19 +10,13 @@ internal readonly struct ShadowMask
     public required double MarginPoints { get; init; }
 }
 
-// Array math only, so it runs unchanged under WASM and is deterministic for identical inputs.
 internal static class GaussianBlur
 {
     private const double MaxShapePixels = 512;
     private const double BaseScale = 2.0;
 
-    // Direct convolution is O((shape+2r)^2 * (2r+1)); uncapped it can pin a WASM thread for
-    // seconds. Reducing scale (never raising it) bounds r here and shape via MaxShapePixels,
-    // so both factors stay bounded. Blurs under the cap keep their scale and are byte-identical.
     private const int MaxKernelRadius = 64;
 
-    // The buffer is padded by the kernel radius on every side so the softened edge fully fades
-    // inside it; that padding is returned as MarginPoints.
     public static ShadowMask Render(double shapeWidthPt, double shapeHeightPt, double radiusPt, double blurPt)
     {
         var maxShape = Math.Max(shapeWidthPt, shapeHeightPt);
@@ -34,7 +26,6 @@ internal static class GaussianBlur
             scale = MaxShapePixels / maxShape;
         }
 
-        // kernelRadius = ceil(3 * blurPt * scale / 2) <= MaxKernelRadius bounds the convolution.
         if (blurPt > 0)
         {
             var kernelScale = 2.0 * MaxKernelRadius / (3.0 * blurPt);

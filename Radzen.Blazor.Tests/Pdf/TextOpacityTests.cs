@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Run.Opacity paints a text run through a page /ExtGState (/ca fill, /CA stroke)
-// selected with the gs operator; Container.Opacity extends past the box decoration
-// to the child content's draws (fills, text, images). All of it is additive:
-// default opacity emits no ExtGState and no gs, byte-identically.
 public class TextOpacityTests
 {
     private static Paragraph Text(string text)

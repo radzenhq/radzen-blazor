@@ -11,10 +11,6 @@ internal static class LineLayouter
     internal static double AdvanceToTabStop(double position)
         => (Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
-    // The resolved font of a run (its authored font run through the style cascade), from the
-    // per-save StyleResolution when present, else the authored font: a synthesized run (TOC,
-    // field, barcode) carries its resolved font as its authored Font, and a direct-test
-    // paragraph has no resolution at all.
     private static Font ResolvedFont(StyleResolution? resolution, Paragraph paragraph)
         => resolution?.ParagraphFont(paragraph) ?? paragraph.Font;
 
@@ -39,9 +35,6 @@ internal static class LineLayouter
             Resolution = resolution,
             SortedTabStops = wrapStops,
         };
-        // The marker (bullet/number) is carried by the first CONTENT line, not the first box:
-        // an item whose text starts with a break produces a leading empty line that cannot hold
-        // it, so the marker stays pending until a non-empty line is built.
         var markerPending = true;
         var tokenization = LineTokenizer.Tokenize(paragraph, fonts, resolution);
         var pieces = tokenization.Pieces;
@@ -75,8 +68,6 @@ internal static class LineLayouter
         return boxes;
     }
 
-    // An empty segment (empty paragraph or blank forced-break line) occupies one line
-    // of the paragraph's resolved font instead of collapsing to zero height.
     private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts, StyleResolution? resolution)
     {
         var font = ResolvedFont(resolution, paragraph);
@@ -90,10 +81,6 @@ internal static class LineLayouter
         };
     }
 
-    // Position where the word after `word` starts, given `word` ends at `position`: the inter-word
-    // gap, then each tab advances to the next stop. With explicit `stops` this mirrors
-    // ExplicitTabPlacement's placement (next stop beyond the cursor, else the default grid) so wrapping
-    // fit and final placement agree; with no stops it is the plain 36pt-grid default.
     private static double NextStart(double position, LineWord word, List<TabStop>? stops = null)
     {
         var p = position + word.GapAfter;
@@ -107,8 +94,6 @@ internal static class LineLayouter
         return p;
     }
 
-    // Paragraph tab stops sorted by position for the wrap fit; null when there are none so the
-    // default-grid path stays byte-identical.
     private static List<TabStop>? SortedTabStops(Paragraph paragraph)
     {
         if (paragraph.TabStops.Count == 0)
@@ -148,9 +133,6 @@ internal static class LineLayouter
                 }
             }
 
-            // If the break after the terminal word renders a soft hyphen, its width must fit
-            // within the measure too; back off words that no longer fit with it (a lone word
-            // at i cannot be moved and overflows only by the tiny hyphen).
             while (j > i && words[j].SoftHyphenAfter && j < words.Count - 1
                 && LineNaturalWidth(words, i, j, stops) + words[j].HyphenWidth > max)
             {
@@ -164,8 +146,6 @@ internal static class LineLayouter
         return lines;
     }
 
-    // Natural end position of words[i..j] (advances, inter-word gaps and tab advances), the
-    // same accumulation Wrap's inner loop performs; used to re-test a soft-hyphen terminal.
     private static double LineNaturalWidth(List<LineWord> words, int i, int j, List<TabStop>? stops)
     {
         var end = words[i].Width;
@@ -177,9 +157,6 @@ internal static class LineLayouter
         return end;
     }
 
-    // A word is emergency-breakable only when every piece carries real text; inline images and
-    // empty pieces cannot be split at character granularity, and a non-breaking space (U+00A0)
-    // keeps its word intact (it overflows rather than breaks, honoring the author's intent).
     private static bool IsHyphenBreak(char c) => c is '-' or '\u2013' or '\u2014';
 
     private static bool IsBreakable(LineWord word, List<LinePiece> pieces)
@@ -196,9 +173,6 @@ internal static class LineLayouter
         return true;
     }
 
-    // A single token wider than the measure is split at character (code point) granularity so no
-    // line exceeds max. Surrogate pairs stay intact; at least one code point is placed per line so
-    // progress is guaranteed even when a single glyph is wider than max.
     private static void OversizedWordPlacement(
         List<LineBox> boxes,
         LineWord word,
@@ -212,9 +186,6 @@ internal static class LineLayouter
         var fragments = new List<LineFragment>();
         var lineWidth = 0.0;
         var markerPending = includeMarker;
-        // A long oversized token (e.g. a URL) is measured one code point at a time; cache the
-        // per-(font, code point) advance so a repeated character is measured once, not per
-        // occurrence with a fresh substring each time.
         var advances = new Dictionary<(Font, int), double>();
 
         for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
@@ -224,8 +195,8 @@ internal static class LineLayouter
             var font = piece.Font;
             var fragStart = 0;
             var fragAdvance = 0.0;
-            var hyphenBreak = -1;      // char index just past the latest '-'/dash in [fragStart, i)
-            var hyphenAdvance = 0.0;   // fragAdvance accumulated up to hyphenBreak
+            var hyphenBreak = -1;
+            var hyphenAdvance = 0.0;
             var i = 0;
             while (i < text.Length)
             {
@@ -243,8 +214,6 @@ internal static class LineLayouter
                 var step = fragAdvance > 0 ? advance + piece.Run.LetterSpacing.Point : advance;
                 if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
-                    // Prefer breaking just after a hyphen/dash over splitting mid-glyph; the
-                    // tail after the hyphen is re-measured fresh on the next line.
                     if (hyphenBreak > fragStart && hyphenBreak <= i)
                     {
                         fragments.Add(MakeCharFragment(piece, fragStart, hyphenBreak, hyphenAdvance));
@@ -328,7 +297,6 @@ internal static class LineLayouter
             _ => 0,
         };
 
-        // A lone glyph wider than max would drive x0 negative; clamp so the line never shifts left of the indent.
         if (x0 < 0)
         {
             x0 = 0;
@@ -421,7 +389,6 @@ internal static class LineLayouter
         var max = context.MaxWidth;
         var paragraph = context.Paragraph;
 
-        // Natural placement from 0; tab stops are relative to the line origin.
         var cursor = 0.0;
         var fi = 0;
         for (var w = first; w <= last; w++)
@@ -470,15 +437,9 @@ internal static class LineLayouter
             }
         }
 
-        // A soft-hyphen break renders a trailing '-' in the preceding text's font; its width is
-        // reserved here so right/center alignment and justification account for it and it never
-        // spills past the measure.
         var breakHyphen = words[last].SoftHyphenAfter && last < words.Count - 1 && span.Length > 0;
         var hyphenWidth = breakHyphen ? words[last].HyphenWidth : 0.0;
 
-        // Optional-break boundaries (soft hyphen / ZWSP) and no-gap boundaries (inline-image
-        // edges with no space) carry no word space and are not stretched by justification, so
-        // only real inter-word gaps are counted and widened.
         var gapCount = 0;
         for (var w = first; w < last; w++)
         {
@@ -515,8 +476,6 @@ internal static class LineLayouter
         }
         else
         {
-            // The reserved hyphen widens the line for right/center placement so the glyphs shift
-            // left by its width and the hyphen ends exactly at the measure.
             var alignWidth = naturalWidth + hyphenWidth;
             x0 = alignment switch
             {
@@ -525,7 +484,6 @@ internal static class LineLayouter
                 _ => 0,
             };
 
-            // An over-wide word would drive x0 negative; clamp so the line never shifts left of the indent.
             if (x0 < 0)
             {
                 x0 = 0;
@@ -541,8 +499,6 @@ internal static class LineLayouter
             }
         }
 
-        // The hyphen is placed after the span shift (final positions) and before the marker
-        // insert (which shifts list indices, invalidating the span).
         if (breakHyphen)
         {
             var tail = span[^1];
@@ -598,9 +554,6 @@ internal static class LineLayouter
         return box;
     }
 
-    // Explicit tab stops: place each tab-delimited segment against the next stop at or beyond the
-    // cursor, applying that stop's alignment. Paragraph-alignment shifting is not applied here so the
-    // stops stay put; wrapped lines with no tabs still land left at the indent.
     private static LinePlacement ExplicitTabPlacement(
         Span<LineFragment> span,
         List<LineFragment> fragments,
@@ -662,9 +615,6 @@ internal static class LineLayouter
                     _ => stopPos,
                 };
 
-            // A right/center/decimal segment wider than the space before its stop would start
-            // left of where the previous segment ended and paint over it; clamp to gapStart so
-            // it flows left-aligned from the cursor instead, matching word-processor behavior.
             if (tabsBefore > 0 && start < gapStart)
             {
                 start = gapStart;
@@ -714,9 +664,6 @@ internal static class LineLayouter
         return new LinePlacement(naturalWidth, default);
     }
 
-    // A run of the leader character right-aligned to the tab position (gapEnd), filling as
-    // much of [gapStart, gapEnd) as whole leader glyphs allow. XOffset already carries the
-    // paragraph indent so leaders share the segments' coordinate space.
     private static LineFragment BuildLeader(char leader, double gapStart, double gapEnd, double indent, Font font, FontCollection fonts)
     {
         var text = leader.ToString();
@@ -741,8 +688,6 @@ internal static class LineLayouter
         };
     }
 
-    // Segment width (advances plus interior word gaps) and the offset from the segment start to its
-    // first '.' (decimal alignment); falls back to the full width when there is no separator.
     private static (double Width, double DecimalOffset) MeasureSegment(
         Span<LineFragment> span, List<LineWord> words, int wStart, int wEnd, int fiStart, FontCollection fonts)
     {
@@ -802,7 +747,6 @@ internal static class LineLayouter
         var fragments = box.Fragments;
         for (var i = 0; i < fragments.Count; i++)
         {
-            // An inline image sits on the baseline: its full height is both extent and ascent.
             var (h, asc) = fragments[i].Run is InlineImage image
                 ? (image.EffectiveSize().Height, image.EffectiveSize().Height)
                 : FontExtent(fragments[i].Font, fonts);
@@ -819,9 +763,6 @@ internal static class LineLayouter
         box.Baseline = baseline;
     }
 
-    // Scales the full-size extent down to the script size and grows it by the text
-    // rise (above the baseline for superscript, below for subscript) so the line
-    // reserves the risen glyphs' actual vertical span.
     private static (double Height, double Ascent) ScriptExtent(Run run, Font font, double height, double ascent)
     {
         var scale = run.ScriptScale;

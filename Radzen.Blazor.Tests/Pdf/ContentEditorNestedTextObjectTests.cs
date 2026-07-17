@@ -7,9 +7,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 9.4.1: text objects shall not be nested. A modified run spliced back inside
-// the source's live BT..ET must not open a second one, and must not clobber the text and
-// line matrices the enclosing text object's later operators still depend on.
+// ISO 32000-1 9.4.1: text objects shall not be nested
 public class ContentEditorNestedTextObjectTests
 {
     [Fact]
@@ -27,8 +25,6 @@ public class ContentEditorNestedTextObjectTests
         Assert.Equal(1, Count(content, "ET"));
     }
 
-    // The enclosing text object's line matrix survives the splice: the following run's
-    // "5 0 Td" is relative to the line matrix the source's "10 10 Td" established.
     [Fact]
     public void ModifiedTextInsideTextObject_KeepsFollowingRunsPosition()
     {
@@ -48,8 +44,6 @@ public class ContentEditorNestedTextObjectTests
         InterpreterTestSupport.AssertMatrix(expected, actual[1].Transform);
     }
 
-    // The colour the edited run sets is scoped, so the following run - copied verbatim and
-    // carrying no colour operator of its own - keeps the fill the source left it.
     [Fact]
     public void ModifiedTextInsideTextObject_DoesNotLeakStateOntoFollowingRuns()
     {

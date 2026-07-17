@@ -11,10 +11,6 @@ internal static class PngPredictor
 
         int bpp = BytesPerPixel(colors, bitsPerComponent);
 
-        // Row length is attacker-controlled through /DecodeParms; compute it as a long so a
-        // hostile /Columns (e.g. 268435456) cannot wrap the int32 product, and require the
-        // decoded stream to hold at least one full row so a huge /Columns cannot force a giant
-        // scratch allocation for data that decodes to nothing.
         long rowLengthLong = ((long)colors * bitsPerComponent * columns + 7) / 8;
         if (rowLengthLong + 1 > data.Length)
         {
@@ -128,10 +124,7 @@ internal static class PngPredictor
         }
     }
 
-    // ceil(colors * bitsPerComponent / 8) per the PNG spec (which ISO 32000-1 7.4.4.4 defers
-    // to): a sub-byte pixel still advances one byte, and a wide pixel (e.g. RGB at 4 bpc = 12
-    // bits) advances two, so the filter's left neighbour is read at the right offset. Floor
-    // would pick the wrong one.
+    // ceil(colors * bitsPerComponent / 8) per the PNG spec (ISO 32000-1 7.4.4.4 defers to it).
     static int BytesPerPixel(int colors, int bitsPerComponent) =>
         (colors * bitsPerComponent + 7) / 8;
 

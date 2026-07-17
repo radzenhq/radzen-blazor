@@ -14,14 +14,6 @@ using Xunit.Abstractions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Manual-run allocation/time profiler for the realistic invoice scenario. Not part of the
-// regular suite: it no-ops unless RADZEN_PDF_PROFILE=1 and RADZEN_PDF_PROFILE_FONT points
-// at a large Unicode TrueType font (e.g. Arial Unicode MS). Run with:
-//
-//   RADZEN_PDF_PROFILE=1 \
-//   RADZEN_PDF_PROFILE_FONT=/path/to/ArialUnicode.ttf \
-//   dotnet test Radzen.Blazor.Tests --filter FullyQualifiedName~AllocationProfilerHarness \
-//     --logger "console;verbosity=detailed"
 public class AllocationProfilerHarness(ITestOutputHelper output)
 {
     private const string Family = "Arial Unicode MS";
@@ -75,7 +67,6 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
     private static DocumentBuilder BuildInvoice(byte[] fontBytes)
     {
         var builder = new DocumentBuilder();
-        // Exposed buffer lets the weak-keyed parse cache key on the array's identity.
         builder.Fonts.Register(Family, new MemoryStream(fontBytes, 0, fontBytes.Length, writable: false, publiclyVisible: true));
 
         var section = builder.Sections.Add();
@@ -204,7 +195,6 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         output.WriteLine($"Font: {fontPath} ({fontBytes.Length / (1024.0 * 1024.0):F1} MB), iterations={iterations}");
         output.WriteLine($"{"phase",-34} {"alloc",13} {"time",13}");
 
-        // COLD: first full document on this thread, includes first font parse and all JIT.
         var cold = Measure(() =>
         {
             using var stream = new MemoryStream();
@@ -212,8 +202,6 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         });
         Report("full pipeline COLD", cold);
 
-        // WARM full pipeline: register (parse) + build + save per document, as a server would
-        // when it does not cache the FontCollection between requests.
         long pdfSize = 0;
         var warmFull = Median(iterations, () =>
         {
@@ -224,14 +212,12 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         Report("full pipeline WARM (median)", warmFull);
         output.WriteLine($"PDF size: {pdfSize / 1024.0:F1} KB");
 
-        // Phase: font parse alone.
         Report("SfntFont.Parse", Median(iterations, () => SfntFont.Parse(fontBytes)));
 
         var font = SfntFont.Parse(fontBytes);
         var gids = UsedGlyphs(font);
         output.WriteLine($"glyphs used: {gids.Count} of {font.GlyphCount}");
 
-        // Phase: cmap lookups for the whole invoice text, x100 to be measurable.
         Report("cmap GetGlyphId x100 docs", Median(iterations, () =>
         {
             for (var r = 0; r < 100; r++)
@@ -246,10 +232,8 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
             }
         }));
 
-        // Phase: glyf subset alone.
         Report("GlyfSubsetter.Subset", Median(iterations, () => GlyfSubsetter.Subset(font, gids)));
 
-        // Phase: full Type0 embed (subset + CIDSet + ToUnicode + flate) into a throwaway writer.
         var gidToUnicode = new Dictionary<ushort, int>();
         foreach (var text in AllInvoiceText())
         {
@@ -266,11 +250,9 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
             Type0FontEmbedder.Embed(writer, font, gidToUnicode);
         }));
 
-        // Phase: registration amortized - one builder, repeated Build() (layout + embed only).
         var prebuilt = BuildInvoice(fontBytes);
         Report("Build() (font pre-registered)", Median(iterations, () => prebuilt.Build()));
 
-        // Phase: serialization of an already built Document.
         var document = prebuilt.Build();
         Report("SaveToStream (prebuilt doc)", Median(iterations, () =>
         {
@@ -278,16 +260,12 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
             document.SaveToStream(stream);
         }));
 
-        // Comparison: fresh array identity per build defeats the parse cache and shows
-        // the uncached (pre-cache) cost.
         Report("full WARM (fresh array, no cache)", Median(iterations, () =>
         {
             using var stream = new MemoryStream();
             BuildInvoice((byte[])fontBytes.Clone()).SaveToStream(stream);
         }));
 
-        // Leak check: once the source array is unreachable the cache entry must be
-        // collectible - the parsed font must not be rooted by the static cache.
         var (fontRef, bytesRef) = BuildAndRelease(fontPath);
         GC.Collect();
         GC.WaitForPendingFinalizers();
@@ -296,9 +274,6 @@ public class AllocationProfilerHarness(ITestOutputHelper output)
         Assert.False(fontRef.IsAlive);
         Assert.False(bytesRef.IsAlive);
 
-        // Baseline: same invoice with a small (~140 KB) Latin font shows how much of the
-        // pipeline cost scales with font size. Cyrillic falls back to notdef there; layout
-        // shape stays comparable.
         var smallFont = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
         Report("full WARM w/ small font", Median(iterations, () =>
         {

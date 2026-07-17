@@ -6,9 +6,6 @@ using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The same Watermark object, naming the same registered family, is accepted by the authored
-// (section) path and rejected by the post-build Document.AddWatermark path. That asymmetry is
-// the documented CanEmbed boundary of every overlay stream, not a watermark-specific gap.
 public class WatermarkFontCapabilityTests
 {
     private static Watermark Registered() =>
@@ -33,7 +30,6 @@ public class WatermarkFontCapabilityTests
         Assert.Null(Record.Exception(() => builder.Build()));
     }
 
-    // The capability gap. Same public Watermark, same family, same document's fonts.
     [Fact]
     public void BuiltDocumentRejectsRegisteredWatermarkFont()
     {
@@ -47,7 +43,6 @@ public class WatermarkFontCapabilityTests
         Assert.Contains("cannot embed", error.Message, StringComparison.Ordinal);
     }
 
-    // A loaded document has no font registry at all, so the same family is simply unknown.
     [Fact]
     public void LoadedDocumentRejectsRegisteredWatermarkFont()
     {

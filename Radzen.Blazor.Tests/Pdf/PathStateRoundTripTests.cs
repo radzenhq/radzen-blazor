@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded page whose elements are mutated re-encodes its whole content stream from
-// the parsed elements. Dash (d), clip (W/W*), even-odd fill (f*), CMYK (k) and named
-// colorspace (cs/scn) must survive that decode -> re-emit round-trip.
 public class PathStateRoundTripTests
 {
     private const string Source =
@@ -30,8 +27,6 @@ public class PathStateRoundTripTests
         page.SetContent(InterpreterTestSupport.Ascii(Source));
 
         var loaded = InterpreterTestSupport.Load(document.ToArray());
-        // Mutating an existing element forces a full re-encode from elements
-        // (not the untouched-page raw passthrough or the append overlay path).
         loaded.Pages[0].Content[0].Transform = Matrix.Translate(5, 5);
 
         return InterpreterTestSupport.PageContentBytes(loaded.ToArray(), 0);
@@ -56,7 +51,7 @@ public class PathStateRoundTripTests
         var content = ReencodeAfterMutation();
 
         var dash = FindOperation(content, "d");
-        Assert.Equal(3, dash.Num(1), 3); // [ 3 2 ] 0 : array elements then phase
+        Assert.Equal(3, dash.Num(1), 3);
         Assert.Equal(2, dash.Num(2), 3);
         Assert.Equal(0, dash.Num(4), 3);
 

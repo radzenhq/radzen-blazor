@@ -5,16 +5,12 @@ using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// Redaction and replacement correlate their edits against the operator index search
-// produced, so the set and the counting rule have to be one thing: a show operator added
-// here reaches all of them at once.
 internal static class ContentShows
 {
     public static bool IsShow(string? op) => op is "Tj" or "TJ" or "'" or "\"";
 }
 
-// ISO 32000-1 8.4 makes the text state part of the graphics state: q saves it and Q restores
-// it along with the CTM.
+// ISO 32000-1 8.4: the text state is part of the graphics state, saved by q and restored by Q.
 internal struct ContentTextState()
 {
     public ReverseFont? Font = null;
@@ -32,9 +28,6 @@ internal struct ContentTextState()
     public TextSpacing Spacing = new();
 }
 
-// Deliberately does not model colour, dash or clip: consumers that track those derive and
-// add fields, and Clone's MemberwiseClone copies the runtime type, so the q/Q stack
-// discipline stays here rather than being reimplemented per consumer.
 internal class ContentGraphicsState
 {
     public Matrix Ctm = Matrix.Identity;
@@ -44,10 +37,6 @@ internal class ContentGraphicsState
     public ContentGraphicsState Clone() => (ContentGraphicsState)MemberwiseClone();
 }
 
-// fallbackFont is what an unresolvable Tf selects. The interpreter passes null so an edited
-// run in a font that was never really there re-encodes leniently through WinAnsi rather than
-// failing. Other callers pass ReverseFont.WinAnsi, but each also substitutes WinAnsi itself
-// on a null Font, so for them the argument is redundant.
 internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFont>? fonts = null,
     ReverseFont? fallbackFont = null, ContentGraphicsState? state = null)
 {
@@ -64,13 +53,9 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
 
     public Matrix LineMatrix { get; private set; } = Matrix.Identity;
 
-    // ISO 32000-1 9.4.1 forbids nesting text objects, so this is 0 or 1 for a conformant
-    // stream. It is a count rather than a flag because a malformed stream can nest anyway,
-    // and an inner ET must then not be read as leaving the outer text object.
+    // ISO 32000-1 9.4.1 forbids nesting text objects.
     public int TextObjectDepth { get; private set; }
 
-    // Returns false to leave op to the caller: a show operator (already advanced to its line
-    // and carrying its own spacing), or an operator this machine does not model at all.
     public bool Apply(string? op, List<Token> operands)
     {
         if (ContentShows.IsShow(op))
@@ -95,9 +80,7 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
                 stack.Push(state.Clone());
                 return true;
 
-            // ISO 32000-1 8.4.4: Q restores the most recently saved state. An unbalanced Q
-            // has nothing to restore, so the state in effect stands rather than resetting to
-            // a default that was never saved.
+            // ISO 32000-1 8.4.4: Q restores the most recently saved state.
             case "Q":
                 if (stack.Count > 0)
                 {

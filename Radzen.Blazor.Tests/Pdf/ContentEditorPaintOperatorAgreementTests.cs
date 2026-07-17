@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The interpreter (which materializes elements) and the editor (which maps byte ranges to
-// those elements) must agree on which operators produce an element. When they disagree the
-// public Page.Content getter throws from ContentEditor.Map.
 public class ContentEditorPaintOperatorAgreementTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);

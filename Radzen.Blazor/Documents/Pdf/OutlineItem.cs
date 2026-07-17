@@ -30,7 +30,6 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
     }
 
     /// <summary>Gets or sets the location the entry navigates to, or <c>null</c> when unavailable.</summary>
-    // OutlineTarget is immutable, so assignment is the only way it can change.
     public OutlineTarget? Target
     {
         get => target;
@@ -112,19 +111,12 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
-// The page-destination fit the viewer applies when navigating to a page target.
 internal enum OutlineFit
 {
-    // The library default: [page /XYZ 0 top 0], i.e. the top of the page at the
-    // current zoom (kept so untouched outlines re-serialize byte-identically).
     PageTop,
-    // [page /Fit]: fit the whole page in the window.
     Fit,
-    // [page /FitH top]: fit the page width, positioning the given top coordinate.
     FitHorizontal,
-    // [page /FitR left bottom right top]: fit the given rectangle in the window.
     Rectangle,
-    // [page /XYZ left top zoom]: position the given point at the given zoom.
     Coordinates,
 }
 

@@ -8,12 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Hardening of the loaded-form mutators, the flattener and the attachment writer:
-// mutators reject a wrong /FT, a baked text appearance is skipped (deferred to the
-// viewer via /NeedAppearances) for multiline/comb/password fields rather than baked
-// wrong or in cleartext, indirect /Rect coordinates resolve, colliding root /T names
-// stay reachable, flatten refuses a visible signature it cannot reproduce and joins a
-// multi-select list box value, and duplicate attachment names fail loud.
 public class FormFieldHardeningTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -45,7 +39,6 @@ public class FormFieldHardeningTests
         return Document.LoadFromStream(new MemoryStream(document.ToArray()));
     }
 
-    // The visible normal appearance text of a field, or null when it has none.
     private static string? OptionalAppearanceText(DocumentReader reader, DictionaryObject field)
     {
         if (!field.TryGetValue("AP", out var apObject) || reader.Resolve(apObject!) is not DictionaryObject ap
@@ -74,7 +67,6 @@ public class FormFieldHardeningTests
         return null;
     }
 
-    // #0 - the field-type guard on each mutator.
 
     [Fact]
     public void FillFieldRejectsButtonField()
@@ -104,7 +96,6 @@ public class FormFieldHardeningTests
         Assert.Throws<ArgumentException>(() => document.AcroForm!.SelectRadioOption("Name", "x"));
     }
 
-    // #1 - multiline/comb/password appearances are deferred, not baked wrong or in cleartext.
 
     [Fact]
     public void FillPasswordFieldDoesNotBakeValueIntoAppearance()
@@ -156,7 +147,6 @@ public class FormFieldHardeningTests
             && Assert.IsType<BooleanObject>(reader.Resolve(need!)).Value);
     }
 
-    // #2 - indirect /Rect coordinates resolve so the baked appearance box is not collapsed.
 
     private static byte[] IndirectRectForm()
     {
@@ -190,7 +180,6 @@ public class FormFieldHardeningTests
         Assert.True(((NumberObject)reader.Resolve(bbox[3])).DoubleValue > 0.0);
     }
 
-    // #38 - two root fields sharing a /T both stay reachable under disambiguated names.
 
     private static byte[] DuplicateNameForm()
     {
@@ -224,9 +213,6 @@ public class FormFieldHardeningTests
         Assert.Equal("BBB", form.Fields[1].Value);
     }
 
-    // #55 - a multi-select list box (/V array) renders as stacked highlighted /Opt entries
-    // (ISO 32000-1 12.7.4.4). Joining its selections into one line invented a string the field
-    // never shows and dropped the unselected options, so flatten refuses it instead.
 
     private static byte[] MultiSelectListForm()
     {
@@ -241,6 +227,7 @@ public class FormFieldHardeningTests
     }
 
     [Fact]
+    // ISO 32000-1 12.7.4.4: a multi-select list box (/V array) renders as stacked highlighted /Opt entries, so flatten refuses to join it into one line.
     public void FlattenRefusesMultiSelectListBoxSelections()
     {
         var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm()));
@@ -249,7 +236,6 @@ public class FormFieldHardeningTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // #13 - a visible signature appearance the redraw heuristic cannot reproduce fails loud.
 
     private static byte[] SignatureForm(bool withAppearance)
     {
@@ -290,7 +276,6 @@ public class FormFieldHardeningTests
             && reader.Resolve(annots!) is ArrayObject array && array.Count > 0);
     }
 
-    // #95 - duplicate attachment names fail loud rather than collide in the name tree.
 
     [Fact]
     public void DuplicateAttachmentNamesThrowOnSave()

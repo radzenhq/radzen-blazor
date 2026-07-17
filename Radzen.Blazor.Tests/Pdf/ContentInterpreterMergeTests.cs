@@ -8,11 +8,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Lane cq-reader: text-showing round-trip fidelity in ContentInterpreter.
-//   - consecutive shows with no intervening Td/Tm advance the text matrix in the spec,
-//     so they must not collapse onto one origin (finding #7);
-//   - a non-RGB text fill and the " operator's word/char spacing must survive (finding #42);
-//   - the dash array must come only from the array immediately preceding d (finding #98).
 public class ContentInterpreterMergeTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -47,8 +42,6 @@ public class ContentInterpreterMergeTests
 
         var body = Emit(content[0]);
 
-        // One show, both chunks present in order: the renderer advances between them
-        // using the font's own widths instead of overprinting at the same origin.
         Assert.Equal(1, body.Split("BT").Length - 1);
         Assert.Contains("(Hello)", body);
         Assert.Contains("( world)", body);
@@ -113,7 +106,6 @@ public class ContentInterpreterMergeTests
     [Fact]
     public void DashArray_TakesOnlyTheImmediatelyPrecedingArray()
     {
-        // The TJ array must not leak into the following d operator's dash pattern.
         var content = Materialize("[(a) -20 (b)] TJ 0 d 0 0 m 10 10 l S");
 
         var path = Assert.IsType<PathContent>(content.Last());

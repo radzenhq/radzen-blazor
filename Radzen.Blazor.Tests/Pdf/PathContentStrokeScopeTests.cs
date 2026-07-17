@@ -6,9 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Optional stroke state (line cap J, join j, miter M, rendering intent ri and dash d)
-// persists in the graphics state, so a path that sets it must confine it to a q..Q scope;
-// otherwise it leaks onto later paths that expect the viewer defaults (ISO 32000-1 8.4.2).
+// ISO 32000-1 8.4.2 graphics state; stroke state confined to a q..Q scope.
 public class PathContentStrokeScopeTests
 {
     private static IReadOnlyList<string> Operators(params PathContent[] paths)
@@ -73,12 +71,10 @@ public class PathContentStrokeScopeTests
 
         var operators = Operators(dashed, Line());
 
-        // Exactly one dash operator: the plain second path must not re-emit or inherit it.
         var first = IndexOf(operators, "d");
         Assert.True(first >= 0);
         Assert.Equal(-1, IndexOf(operators, "d", first + 1));
 
-        // The dashed path's scope closes (Q) before the second path strokes (its S).
         var restore = IndexOf(operators, "Q", first);
         var firstStroke = IndexOf(operators, "S");
         var secondStroke = IndexOf(operators, "S", firstStroke + 1);

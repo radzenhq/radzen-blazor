@@ -8,8 +8,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// NameObject escaping contract (ISO 32000-1 section 7.3.5): "#xx" for
-// delimiters, whitespace, the number sign, and bytes outside 0x21-0x7E.
+// ISO 32000-1 7.3.5 name object escaping.
 public class NameEscapingTests
 {
     private static string Serialize(string name)

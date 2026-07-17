@@ -7,8 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The pluggable stream-filter registry: every built-in filter (and its inline-image
-// abbreviation) resolves to a decoder, and an unknown name is fail-loud.
 public class StreamFilterRegistryTests
 {
     [Theory]

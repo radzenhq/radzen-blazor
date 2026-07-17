@@ -1,9 +1,5 @@
 namespace Radzen.Documents.Pdf.Emit;
 
-// Copies source pages onto a target document, carrying each page's resource closure,
-// annotations, boxes and rotation. A page's content is carried as its raw bytes alone,
-// so a caller must not route a page here whose ContentIsIntact is false: queued appends
-// and materialized element edits live outside those bytes and would be dropped.
 internal static class DocumentMerger
 {
     internal static void Append(Document target, Document other)
@@ -41,9 +37,6 @@ internal static class DocumentMerger
             page.SetLoadedContent([.. content]);
         }
 
-        // Carry the source page's resource closure so appended fonts/images still
-        // resolve: a built page keeps its GeneratedPage; a loaded page keeps a
-        // handle to its reader and effective /Resources, imported lazily on save.
         if (source.Generated is { } generated)
         {
             page.Generated = generated;
@@ -59,10 +52,6 @@ internal static class DocumentMerger
             page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(reader, loadedResources));
         }
 
-        // Carry each appended page's source node (for its /Annots and any widget
-        // form fields), donor AcroForm, and its media/crop boxes and rotation, so a
-        // merged loaded page re-serializes identically. Delegates to the target's
-        // own LoadedState rather than reaching into raw dictionaries.
         if (origin is not null)
         {
             target.EnsureLoaded().CarryAppended(page, source, origin);

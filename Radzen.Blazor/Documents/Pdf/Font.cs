@@ -89,9 +89,6 @@ public class Font : ITracksChanges
 
     internal Color? ColorValue => color;
 
-    // Fills any property this font leaves unset from the next font in the cascade. Deliberately
-    // flag-silent, writing the backing fields directly: it is cascade-only layout resolution and
-    // the cascade's shared fonts never appear on a materialized run.
     internal void InheritFrom(Font parent)
     {
         name ??= parent.name;

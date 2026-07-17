@@ -4,15 +4,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A simple font's base encoding comes from its /Encoding: a name-valued /Encoding or an
-// encoding dictionary's /BaseEncoding selects the table, and /Differences overlays it.
-// Extraction used to hard-code WinAnsi, so every code >= 0x80 of a MacRomanEncoding font
-// decoded to the wrong character (finding #69).
 public class SimpleFontBaseEncodingTests
 {
-    // MacRoman and WinAnsi disagree on all of these:
-    //   0xA5 bullet (WinAnsi yen), 0x8E eacute (WinAnsi Zcaron),
-    //   0xD0 endash (WinAnsi Eth), 0xA0 dagger (WinAnsi nbsp).
     private static readonly byte[] Divergent = [0x41, 0xA5, 0x8E, 0xD0, 0xA0];
 
     private static DictionaryObject SimpleFont(DocumentObject encoding) => new()
@@ -56,7 +49,6 @@ public class SimpleFontBaseEncodingTests
             ["Differences"] = new ArrayObject { new NumberObject(0xA5), new NameObject("Euro") },
         };
 
-        // 0xA5 is remapped by /Differences; 0x8E still comes from the MacRoman base.
         Assert.Equal("A€é", Extract(encoding, [0x41, 0xA5, 0x8E]));
     }
 

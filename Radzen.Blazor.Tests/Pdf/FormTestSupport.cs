@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared helpers for the C5 forms / stamp / metadata contract tests. Reloads are
-// inspected through the low-level DocumentReader so the assertions pin the exact
-// object-graph the writer must produce (/V, /AP, /AS, /Annots, /Info).
 internal static class FormTestSupport
 {
     public const string Fixture = "Documents/form-simple.pdf";
@@ -41,7 +38,6 @@ internal static class FormTestSupport
         return (DictionaryObject)reader.Resolve(form!);
     }
 
-    // Descends the page tree to the first leaf page dictionary.
     public static DictionaryObject FirstPage(DocumentReader reader)
     {
         var catalog = Catalog(reader);
@@ -55,7 +51,6 @@ internal static class FormTestSupport
         return node;
     }
 
-    // Finds a terminal AcroForm field (widget) by its /T name.
     public static DictionaryObject Field(DocumentReader reader, string name)
     {
         var form = AcroForm(reader);
@@ -78,8 +73,6 @@ internal static class FormTestSupport
     public static string? NameValue(DocumentReader reader, DictionaryObject dict, string key)
         => dict.TryGetValue(key, out var value) && reader.Resolve(value!) is NameObject name ? name.Value : null;
 
-    // Decodes the normal (/N) appearance stream of a field, following a single
-    // level of state sub-dictionary when present.
     public static string NormalAppearanceText(DocumentReader reader, DictionaryObject field)
     {
         Assert.True(field.TryGetValue("AP", out var apObject), "field has no /AP");

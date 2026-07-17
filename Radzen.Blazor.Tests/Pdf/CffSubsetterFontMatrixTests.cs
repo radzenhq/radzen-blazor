@@ -5,25 +5,17 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// G5(b): CffSubsetter must carry the source Top DICT FontMatrix (operator 12 7,
-// key 1207) into the rebuilt Top DICT. A CFF with a non-default matrix (here
-// 0.0005 = 2048 units per em) that loses its FontMatrix is rendered at the
-// default 1000-upem scale, i.e. glyphs twice their intended size.
 public class CffSubsetterFontMatrixTests
 {
-    // "0.0005": nibbles 0 a 0 0 0 5 f, padded with a second f.
     private static readonly byte[] RealHalfThousandth = [30, 0x0A, 0x00, 0x05, 0xFF];
 
     private static byte[] SourceWithFontMatrix()
     {
-        // FontMatrix [0.0005 0 0 0.0005 0 0]; 0x8B is integer 0.
         byte[] fontMatrix =
         [
             .. RealHalfThousandth, 0x8B, 0x8B, .. RealHalfThousandth, 0x8B, 0x8B, 12, 7,
         ];
 
-        // Integer-encoded widths keep this fixture independent of real-number
-        // decoding in the Private DICT path: defaultWidthX 500, nominalWidthX 0.
         byte[] privateDict = [28, 0x01, 0xF4, 20, 0x8B, 21];
         byte[][] charStrings = [[0x0E], [0x0E]];
         return CffFixtureBuilder.Build(privateDict, charStrings, fontMatrix);
@@ -72,9 +64,6 @@ public class CffSubsetterFontMatrixTests
         Assert.Equal(500, subset.GetAdvanceWidth(1));
     }
 
-    // A name-keyed source carries FontMatrix only in its Top DICT. The subset must emit it
-    // exactly once (in the Top DICT); writing it into the FD dict too would make a viewer
-    // that concatenates the two matrices scale glyphs by the square of the intended factor.
     [Fact]
     public void Subset_DoesNotAlsoWriteFontMatrixIntoFdDict()
     {

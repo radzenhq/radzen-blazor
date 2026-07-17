@@ -141,8 +141,6 @@ public class AnnotationTests
         return xobjects is null ? [] : [.. xobjects.Keys];
     }
 
-    // Two pages that inherit one /Resources from their /Pages node, each carrying a
-    // Square annotation whose /AP /N is its own form XObject.
     private static byte[] SharedResourcesWithAppearances()
     {
         var content = Encoding.ASCII.GetBytes("q Q");

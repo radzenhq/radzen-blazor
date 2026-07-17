@@ -8,12 +8,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Incremental-update contract (ISO 32000-1 7.5.6): the original bytes stay a
-// byte-for-byte prefix of the output, added/overridden objects are appended
-// after the original end-of-file, and a new cross-reference section (matching
-// the original file's style) chains to the previous one via /Prev. This is the
-// foundation digital signatures build on: a signature covers a byte range of
-// the file, so nothing before the appended section may move.
+// ISO 32000-1 7.5.6: the original bytes stay a byte-for-byte prefix; appended objects chain a new xref section via /Prev.
 public class IncrementalUpdateWriterTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -60,8 +55,6 @@ public class IncrementalUpdateWriterTests
         return buffer.ToArray();
     }
 
-    // Object 3 lives at generation 1 (a number reclaimed from the free list by a prior
-    // full save, as Acrobat produces) and is referenced as "3 1 R" by the page.
     private static byte[] BuildGenerationOneDocument()
     {
         var bodies = new (int Number, int Generation, string Body)[]
@@ -201,9 +194,7 @@ public class IncrementalUpdateWriterTests
             ((NumberObject)reader.Trailer["Size"]).IntValue);
     }
 
-    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation, so an
-    // override of an object living at generation 1 must keep that generation. Emitting
-    // gen 0 leaves the in-document "3 1 R" references resolving to null in strict readers.
+    // ISO 32000-1 7.3.10: an indirect reference matches on number AND generation, so an override keeps the object's generation.
     [Fact]
     public void Override_PreservesNonZeroGenerationOfTheOverriddenObject()
     {
@@ -282,7 +273,6 @@ public class IncrementalUpdateWriterTests
         Assert.Equal("stream update", ((StringObject)newObject["Marker"]).Value);
         Assert.IsType<DictionaryObject>(Catalog(reader));
 
-        // The appended xref stream itself occupies one more object number.
         Assert.Equal(originalSize + 2, ((NumberObject)reader.Trailer["Size"]).IntValue);
         Assert.Equal(FindStartXref(original), ((NumberObject)reader.Trailer["Prev"]).IntValue);
     }
@@ -344,7 +334,6 @@ public class IncrementalUpdateWriterTests
 
         var second = new IncrementalUpdateWriter(afterFirst);
         var reference = (ReferenceObject)DocumentReader.Parse(afterFirst).Trailer["RadzenNew"];
-        // Custom trailer keys are not inherited across updates; each trailer restates them.
         second.Trailer["RadzenNew"] = second.Override(reference.ObjectNumber, new StringObject("second"));
         var afterSecond = second.ToArray();
 

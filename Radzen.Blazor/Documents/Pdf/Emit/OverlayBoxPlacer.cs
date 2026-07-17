@@ -3,21 +3,11 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Places container blocks as first-class boxes: overlay containers (children stacked at the
-// box origin) and Stack containers (measured content), plus the shared box/image geometry
-// helpers. The section body, header/footer bands and the keep-with-next look-ahead all route
-// through here so a container lays out identically wherever it appears.
 internal static class OverlayBoxPlacer
 {
     internal static bool IsSpecial(Container container)
         => container.Layout == ContainerLayout.Overlay;
 
-    // Lays out an overlay container as a first-class box: each child is measured and
-    // positioned independently at the box top-left (inset by the padding), and the
-    // results are merged in declaration order (nested tables/boxes reordered onto one
-    // increasing sequence so emission interleaves them in that order). The box inner
-    // height is the tallest child's; content positions are box-local (the emitter shifts
-    // them by the box Y).
     internal static (LaidOutBoxContent Content, double Indent, double BoxWidth, double BoxHeight) LayoutOverlay(
         Container container,
         double availableWidth,
@@ -62,9 +52,6 @@ internal static class OverlayBoxPlacer
         return (content, indent, boxWidth, innerHeight + (2 * padding));
     }
 
-    // Appends one overlay child's nested tables and boxes onto the shared sequence,
-    // renumbering their Order to keep declaration order (later children on top) while
-    // preserving each child's own table/box interleave.
     private static int MergeNested(
         LaidOutBoxContent child,
         List<LaidOutNestedTable> tables,
@@ -95,8 +82,6 @@ internal static class OverlayBoxPlacer
             _ => 0,
         };
 
-    // Measures a Stack container's content at the box's inner width (box width minus the
-    // padding on both sides); content measures with no inherited alignment.
     internal static BoxContentLayout.Measured MeasureBox(
         Container container,
         double contentWidth,
@@ -108,9 +93,6 @@ internal static class OverlayBoxPlacer
         return BoxContentLayout.Measure(container.Blocks, innerWidth, null, fonts, measureImage, resolution);
     }
 
-    // Positions a measured Stack container as a first-class box at y. Content is
-    // positioned box-local (Y from the box top); the emitter shifts it by the box's
-    // page Y, with left/top content alignment defaults.
     internal static PositionedBox BuildBox(
         Container container,
         BoxContentLayout.Measured measured,

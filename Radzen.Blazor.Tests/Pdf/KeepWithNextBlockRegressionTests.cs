@@ -7,11 +7,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Regression tests for KeepWithNext when the NEXT block is a Table or an Image.
-// The look-ahead used to only consider a following Paragraph, so a heading with
-// KeepWithNext stayed stranded at the bottom of a page while its table/image broke
-// to the next page. Asserted on the real emitted PDF (Build -> bytes -> per-page
-// decoded content streams).
 public class KeepWithNextBlockRegressionTests
 {
     private const double PageWidth = 400;
@@ -46,8 +41,6 @@ public class KeepWithNextBlockRegressionTests
     private static bool Shows(string content, string text)
         => Regex.IsMatch(content, Regex.Escape("(" + text + ")") + @"\s*Tj");
 
-    // Fills page 1 so the remaining body height is in [1, 2) body lines: the heading
-    // fits, but any following block taller than one extra body line cannot.
     private static (DocumentBuilder Builder, Section Section) AuthorNearlyFullPage()
     {
         var builder = new DocumentBuilder();

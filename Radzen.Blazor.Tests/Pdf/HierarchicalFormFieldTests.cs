@@ -7,12 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A hierarchical AcroForm addresses its terminals by fully qualified dotted names
-// (parent /T + "." + child /T). The non-terminal parent must not surface as a
-// fillable field; its terminal descendants - including one whose widget is a
-// SEPARATE /Kids annotation - must be enumerable and fillable, and filling a
-// separate-widget terminal must refresh the widget's appearance so its stale /AP
-// does not win in a viewer.
 public class HierarchicalFormFieldTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -30,9 +24,6 @@ public class HierarchicalFormFieldTests
         return pdf.ToArray();
     }
 
-    // obj5 = parent "address" whose kids are the terminals "city" (merged
-    // widget/field) and "zip" (a field with a SEPARATE widget kid obj8 carrying a
-    // stale /AP). obj9 = flat root field "Name".
     private static byte[] HierarchicalForm()
     {
         const string stale = "/Tx BMC q (STALE) Tj Q EMC";

@@ -56,11 +56,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         ArgumentNullException.ThrowIfNull(original);
         ArgumentNullException.ThrowIfNull(reader);
 
-        // An incremental update over an encrypted original would either drop /Encrypt from
-        // the newest trailer (readers then treat the still-encrypted originals as plaintext)
-        // or write the appended objects in plaintext under a passthrough /Encrypt (readers
-        // then "decrypt" them into garbage). This writer has no encryption scope, so both
-        // outcomes corrupt silently; refuse the input as PdfSigner/DssBuilder already do.
         if (reader.IsEncrypted)
         {
             throw new NotSupportedException(
@@ -121,9 +116,7 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
                 $"Object number must be between 1 and {originalMaxNumber} to override an existing object.");
         }
 
-        // A reference matches on number AND generation (ISO 32000-1 7.3.10), so an object
-        // whose number was reclaimed from the free list lives at a non-zero generation and
-        // the existing "N G R" references only resolve if the override keeps G.
+        // ISO 32000-1 7.3.10: a reference matches on number and generation, so an override keeps G.
         var generation = reader.GenerationOf(objectNumber);
         objects[objectNumber] = value;
         generations[objectNumber] = generation;
@@ -140,8 +133,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
     /// <returns>The bytes of the updated document.</returns>
     public byte[] ToArray()
     {
-        // Sized for the original plus the appended section so growth never re-copies the
-        // whole document, which for a large original is several LOH allocations of it.
         using var buffer = new PooledBufferStream(original.Length + (64 * 1024));
         WriteTo(buffer);
         return buffer.ToArray();
@@ -261,8 +252,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         return xrefOffset;
     }
 
-    // /Size covers the whole chain: the original objects plus everything added
-    // by this update (and the cross-reference stream itself when one is written).
     private DictionaryObject BuildTrailer(int size)
     {
         var result = new DictionaryObject();

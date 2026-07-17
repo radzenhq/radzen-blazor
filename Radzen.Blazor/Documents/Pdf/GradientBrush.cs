@@ -41,8 +41,6 @@ public abstract class GradientBrush : ITracksChanges
             throw new ArgumentException("A gradient requires at least one colour stop.", nameof(stops));
         }
 
-        // A Type 3 stitching function requires a non-decreasing offset sequence within [0 1];
-        // equal adjacent offsets (CSS hard stops) are allowed and split by an epsilon at build.
         for (var i = 0; i < stops.Length; i++)
         {
             var stop = stops[i];
@@ -58,8 +56,6 @@ public abstract class GradientBrush : ITracksChanges
             }
         }
 
-        // Wrapped, not just cloned: an array handed out as IReadOnlyList can be cast back and
-        // written through, which no change-detection door would ever see.
         Stops = new ReadOnlyCollection<GradientStop>((GradientStop[])stops.Clone());
     }
 

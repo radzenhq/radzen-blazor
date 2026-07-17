@@ -7,15 +7,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A run drawn in a loaded Type0/embedded font carries 2-byte codes. Materialization must
-// decode its Text through the font's /ToUnicode map (as text extraction does) rather than
-// pushing raw bytes through WinAnsi, which drops the 0x00 high bytes and yields empty text.
-// The original show bytes are preserved so an unrelated edit survives the load-edit-save
-// cycle with the embedded glyphs intact.
 public class EmbeddedFontTextMaterializeTests
 {
-    // Codes 0x0001..0x0003 are undefined in WinAnsi (both bytes drop), so a per-byte
-    // WinAnsi decode yields "" while the /ToUnicode map resolves them to "ABC".
     private const string StreamData = "BT /F0 12 Tf 72 700 Td <000100020003> Tj ET";
 
     private const string ToUnicode =
@@ -74,7 +67,7 @@ public class EmbeddedFontTextMaterializeTests
     {
         var document = Load();
         var text = document.Pages[0].Content.OfType<TextContent>().First();
-        text.Color = Color.Red; // unrelated edit forces a full re-encode
+        text.Color = Color.Red;
 
         using var stream = new MemoryStream(document.ToArray());
         var reloaded = Document.LoadFromStream(stream);

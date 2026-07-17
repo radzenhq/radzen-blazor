@@ -9,16 +9,10 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Hardening for ImageDecoder against hostile PNG/JPEG headers: oversized or
-// wrapped IHDR dimensions, a PLTE chunk length that runs off the buffer, and a
-// truncated JPEG frame must all be rejected quickly with InvalidDataException
-// (the decoder's own failure type) rather than OOM or an unbounded slice/read.
-// Positive controls prove the ordinary fixtures still decode unchanged.
 public class ImageDecoderHardeningTests
 {
     private static readonly byte[] Signature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
-    // 30000 x 20000 RGBA = 600M pixels, an ~1.8GB decode from a 65-byte header.
     [Fact]
     public void Png_OversizedDimensions_ThrowsFast()
     {
@@ -26,7 +20,6 @@ public class ImageDecoderHardeningTests
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
     }
 
-    // 60000 x 40000 overflows a 32-bit pixel count; the checked long product rejects it.
     [Fact]
     public void Png_DimensionsThatWrapInt32_ThrowsFast()
     {
@@ -41,7 +34,6 @@ public class ImageDecoderHardeningTests
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
     }
 
-    // A PLTE claiming 0x80000000 bytes must be rejected, not sliced out of range.
     [Fact]
     public void Png_PaletteLengthPastBuffer_ThrowsFast()
     {
@@ -54,7 +46,6 @@ public class ImageDecoderHardeningTests
         Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(ms.ToArray()));
     }
 
-    // 7-byte JPEG: a start-of-frame marker with no room for its frame header.
     [Fact]
     public void Jpeg_TruncatedStartOfFrame_ThrowsFast()
     {
@@ -111,6 +102,6 @@ public class ImageDecoderHardeningTests
         stream.Write(length);
         stream.Write(Encoding.ASCII.GetBytes(type));
         stream.Write(body);
-        stream.Write(stackalloc byte[4]); // CRC placeholder; the decoder does not verify it.
+        stream.Write(stackalloc byte[4]);
     }
 }

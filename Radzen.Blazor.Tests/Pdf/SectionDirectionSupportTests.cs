@@ -6,8 +6,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// The engine does not implement RTL / vertical shaping yet; setting a non-default
-// Direction or WritingMode must fail loudly at build rather than silently laying out LTR.
 public class SectionDirectionSupportTests
 {
     [Fact]

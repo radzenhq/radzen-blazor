@@ -16,7 +16,6 @@ public sealed class Image : Block
 
     internal static Image FromStream(Stream stream) => new(ImageDecoder.ReadFully(stream));
 
-    /// <summary>The buffered image bytes.</summary>
     internal byte[] Data { get; }
 
     /// <summary>Gets or sets the rendered width. When <see langword="null"/> the natural width is used.</summary>
@@ -80,8 +79,6 @@ public sealed class Image : Block
     /// </summary>
     public int[]? ColorKeyMask { get; set; }
 
-    // True when the image opts into any XObject-dictionary option, so emission can keep the
-    // default path (and its bytes) untouched for an image that uses none of them.
     internal bool HasXObjectOptions => Interpolate || Stencil || ColorKeyMask is not null;
 
     internal (Unit Width, Unit Height)? FitBox { get; private set; }

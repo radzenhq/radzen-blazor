@@ -16,7 +16,6 @@ public class PngAlphaBitDepthTests
     [Fact]
     public void SixteenBitGrayAlpha_DownsamplesHighBytes()
     {
-        // 2x1 gray+alpha, big-endian: p0 gray=0xAABB a=0xCCDD, p1 gray=0x1122 a=0x3344.
         byte[] scanline = [0x00, 0xAA, 0xBB, 0xCC, 0xDD, 0x11, 0x22, 0x33, 0x44];
         var png = BuildPng(2, 1, 16, colorType: 4, scanline);
 
@@ -35,7 +34,6 @@ public class PngAlphaBitDepthTests
     [Fact]
     public void SixteenBitRgba_DownsamplesHighBytes()
     {
-        // 2x1 RGBA, big-endian high bytes: p0 = 10 20 30 / a 40, p1 = 50 60 70 / a 80.
         byte[] scanline =
         [
             0x00,
@@ -59,7 +57,6 @@ public class PngAlphaBitDepthTests
     [Fact]
     public void EightBitRgba_DecodesUnchanged()
     {
-        // 2x1 RGBA 8-bit: p0 = 10 20 30 a40, p1 = 50 60 70 a80.
         byte[] scanline = [0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80];
         var png = BuildPng(2, 1, 8, colorType: 6, scanline);
 

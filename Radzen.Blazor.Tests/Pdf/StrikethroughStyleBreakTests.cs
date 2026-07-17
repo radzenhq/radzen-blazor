@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A strikethrough group must break when the run's color or size changes, so adjacent
-// struck runs of different color each get their own line in their own color instead of
-// one line drawn in the first run's color.
 public class StrikethroughStyleBreakTests
 {
     private const double Size = 12;
@@ -24,7 +21,7 @@ public class StrikethroughStyleBreakTests
         foreach (Match m in pattern.Matches(content))
         {
             double N(int g) => double.Parse(m.Groups[g].Value, CultureInfo.InvariantCulture);
-            if (N(5) == N(7)) // horizontal
+            if (N(5) == N(7))
             {
                 list.Add(new Stroke(N(1), N(2), N(3), N(4), N(6)));
             }
@@ -55,7 +52,6 @@ public class StrikethroughStyleBreakTests
         Assert.Contains(strokes, s => s is { R: 1, G: 0, B: 0 });
         Assert.Contains(strokes, s => s is { R: 0, G: 0, B: 1 });
 
-        // The two lines do not overlap: the red run sits left of the blue run.
         var redLine = Assert.Single(strokes, s => s.R == 1);
         var blueLine = Assert.Single(strokes, s => s.B == 1);
         Assert.True(redLine.X2 <= blueLine.X1 + 0.5, "each run keeps its own segment");

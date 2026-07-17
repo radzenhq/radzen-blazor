@@ -21,16 +21,9 @@ internal readonly struct PositionedTableFragment
 
     public required double Y { get; init; }
 
-    /// <summary>
-    /// Placement sequence within the section body, shared with <see cref="PositionedBox.Order"/>
-    /// so page emission can interleave boxes and table fragments in document order.
-    /// </summary>
     public int Order { get; init; }
 }
 
-// Bounds is in content space (X from the content-box left, Y from the content-box top,
-// Y == Bounds.Top). Style carries no ExtGState - the box's own opacity is registered per
-// page by the emitter.
 internal readonly struct PositionedBox
 {
     public required Container Source { get; init; }
@@ -45,10 +38,6 @@ internal readonly struct PositionedBox
 
     public required double Opacity { get; init; }
 
-    /// <summary>
-    /// Page-space transform to apply to every draw this box produces (a rotated
-    /// container), or <see langword="null"/> for none.
-    /// </summary>
     public Matrix? Transform { get; init; }
 
     public int Order { get; init; }
@@ -64,7 +53,6 @@ internal readonly struct PositionedImage
 
     public required double Height { get; init; }
 
-    /// <summary>Horizontal offset of the image from the container left edge (alignment).</summary>
     public double XOffset { get; init; }
 }
 
@@ -78,7 +66,6 @@ internal readonly struct PositionedCode
 
     public required double Height { get; init; }
 
-    /// <summary>Horizontal offset of the code from the container left edge (alignment).</summary>
     public double XOffset { get; init; }
 }
 
@@ -141,10 +128,8 @@ internal sealed class PaginatedPage
 
     internal IReadOnlyList<PositionedBox> FooterBoxes => FooterLayer.Boxes;
 
-    /// <summary>Header band top edge, measured down from the page top.</summary>
     public double HeaderTop { get; init; }
 
-    /// <summary>Footer band top edge, measured down from the page top.</summary>
     public double FooterTop { get; init; }
 
 }
@@ -196,8 +181,6 @@ internal static class Paginator
         context.Finish();
     }
 
-    // Default fails loud: a block kind reaching here is not valid as direct section content
-    // (e.g. a List that escaped expansion).
     private sealed class SectionPlacer(PaginationContext context)
         : BlockVisitor<int, Nothing>
     {

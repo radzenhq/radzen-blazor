@@ -9,10 +9,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 transparency: a transparency-group form XObject, an /SMask luminosity soft
-// mask installed through an ExtGState, and the pure-managed blurred drop shadow that is
-// built on top of them. Every feature is opt-in; a document that sets no shadow stays
-// byte-identical, which the last test pins directly.
 public class SoftMaskShadowTests
 {
     private static string Content(DocumentBuilder builder)
@@ -47,7 +43,6 @@ public class SoftMaskShadowTests
         return builder;
     }
 
-    // ---- Builder-level: ExtGState /SMask entry ----
 
     [Fact]
     public void ExtGStateDictionary_Default_HasNoSMask()
@@ -65,10 +60,7 @@ public class SoftMaskShadowTests
         Assert.Equal(new[] { "Type", "ca", "CA", "SMask" }, dict.Keys);
     }
 
-    // ---- End-to-end: a shadow builds the transparency group + luminosity soft mask ----
 
-    // The transparency-group form is referenced only by the SMask /G (an indirect object),
-    // not the page /XObject resources, so it is reached through the ExtGState soft mask.
     private static StreamObject ShadowGroupForm(DocumentReader reader)
     {
         var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
@@ -135,18 +127,15 @@ public class SoftMaskShadowTests
     public void Shadow_PaintsMaskedFill_UnderBoxBackground()
     {
         var content = Content(ShadowDocument());
-        // The shadow selects an ExtGState (gs) and paints a rectangle (re f).
         Assert.Contains(" gs", content, StringComparison.Ordinal);
         Assert.Contains(" re f", content, StringComparison.Ordinal);
 
-        // The shadow fill precedes the white box background fill (255 255 255 -> "1 1 1 rg").
         var firstFill = content.IndexOf(" re f", StringComparison.Ordinal);
         var background = content.IndexOf("1 1 1 rg", StringComparison.Ordinal);
         Assert.True(firstFill >= 0 && background >= 0, "expected both a shadow fill and the box background");
         Assert.True(firstFill < background, "the shadow must paint before the box background");
     }
 
-    // ---- Byte-safety and determinism ----
 
     [Fact]
     public void Shadow_IsDeterministic_AcrossBuilds()

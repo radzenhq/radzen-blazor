@@ -1,6 +1,3 @@
-// Generated from the Adobe Core 14 AFM kern pairs (Core14_AFMs.tar, Adobe Systems).
-// Regenerate from the AFM fixtures; do not edit by hand. Pairs are WinAnsi code
-// points 'left right value' (value in 1/1000 em, negative tightens), '|'-separated.
 namespace Radzen.Documents.Pdf.Fonts;
 
 internal static class Base14KernData

@@ -6,10 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 7.6.5: for V>=4 the file-key length is taken from the crypt-filter
-// dictionary, not the top-level /Length. An AESV2 file that carries /Length only
-// inside /CF/StdCF must still derive a 16-byte key so the empty user password
-// validates against /U instead of raising a spurious InvalidPasswordException.
+// ISO 32000-1 7.6.5: for V>=4 the file-key length comes from the crypt-filter dictionary, not the top-level /Length.
 public class EncryptionCryptFilterKeyLengthTests
 {
     [Fact]

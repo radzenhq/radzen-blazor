@@ -3,14 +3,8 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// The keep-with-next look-ahead. Shares the per-section layout caches with the main placement
-// loop and warms them as a side effect, so a later placement reuses the measurement.
 internal static class NextBlockHeightResolver
 {
-    // The required height of the header rows plus the first body ROW GROUP: the minimum a
-    // table needs on a page before its first fragment breaks early. The first group is the
-    // rowspan closure TablePaginator force-places as one unit, so it must be measured whole
-    // or the flush check would let a tall group spill past the page bottom.
     internal static double TableFirstFragmentHeight(Table table, LaidOutTable layout)
         => TablePaginator.FirstBodyGroupHeight(layout, table);
 
@@ -51,8 +45,6 @@ internal static class NextBlockHeightResolver
         return result.Found;
     }
 
-    // Default reports no minimum: a block kind a page can start mid-way, or that never
-    // breaks meaningfully here.
     private sealed class NextHeightVisitor(
         IReadOnlyList<LineBox>?[] broken,
         LaidOutTable?[] tableLayouts,
@@ -83,7 +75,6 @@ internal static class NextBlockHeightResolver
                 return default;
             }
 
-            // A Stack container never splits, so its first height is the whole box.
             var measured = boxMeasures[next] ??= OverlayBoxPlacer.MeasureBox(container, contentWidth, fonts, measureImage, resolution);
             return new NextBlockHeight { Found = true, Height = measured.Height + (2 * container.Padding.Point) };
         }

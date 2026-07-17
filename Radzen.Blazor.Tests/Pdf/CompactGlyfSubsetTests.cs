@@ -10,15 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Package C1: compact TrueType (glyf) subsetting through the full Build() pipeline.
-// The embedded CIDFontType2 subset renumbers glyphs into a contiguous 0..N-1 space
-// (used glyphs + composite closure + .notdef), the content stream emits the NEW
-// compact gid as the 2-byte Identity-H code (so CID == new gid, CIDToGIDMap stays
-// Identity), and W / CIDSet / ToUnicode are keyed by the new gid. The CIDSet must
-// mark exactly 0..N-1 - every glyph in the font program - per veraPDF 6.2.11.4.2.
-//
-// Fixture: LiberationSans-Regular.ttf (2620 glyphs). The sample mixes English,
-// Cyrillic and precomposed accents so the closure pulls in composite components.
 public class CompactGlyfSubsetTests
 {
     private const string Sample = "Naïve café fjord - Мой рай!";
@@ -154,8 +145,6 @@ public class CompactGlyfSubsetTests
         var (_, _, descriptor) = FontGraph(reader);
         var bytes = FontFile2(reader, descriptor);
 
-        // Identity subsetting carried full-length loca/hmtx/cmap/name (tens of KB);
-        // the compact subset for ~30 glyphs must stay in the single-digit KB range.
         Assert.True(bytes.Length < 16_000, $"embedded FontFile2 is {bytes.Length} bytes; expected a compact subset");
     }
 
@@ -202,7 +191,6 @@ public class CompactGlyfSubsetTests
             shown.Append(toUnicode[code]);
         }
 
-        // Every non-space character of the sample is shown under its compact code.
         var text = shown.ToString();
         foreach (var ch in Sample.Distinct())
         {

@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Document navigation: outline (bookmark) tree, named destinations recorded from
-// Run.Anchor, internal GoTo links via Run.LinkToAnchor, and Page.Rotate on generated
-// pages. All assertions run against the real bytes produced by DocumentBuilder.Build().
 public class NavigationOutlineTests
 {
     private static DocumentBuilder TwoSectionDocument()

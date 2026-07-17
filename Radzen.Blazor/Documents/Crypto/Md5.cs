@@ -41,7 +41,6 @@ public static class Md5
         return (x << c) | (x >> (32 - c));
     }
 
-    // assumes whole bytes as input
     /// <summary>
     /// Calculates the MD5 hash.
     /// </summary>
@@ -59,35 +58,29 @@ public static class Md5
     {
         ArgumentNullException.ThrowIfNull(input);
 
-        uint a0 = 0x67452301;   // A
-        uint b0 = 0xefcdab89;   // B
-        uint c0 = 0x98badcfe;   // C
-        uint d0 = 0x10325476;   // D
+        uint a0 = 0x67452301;
+        uint b0 = 0xefcdab89;
+        uint c0 = 0x98badcfe;
+        uint d0 = 0x10325476;
 
-        // Pad so the byte length is congruent to 56 (mod 64). C# % can be negative, so normalize.
         var addLength = (((56 - ((input.Length + 1) % 64)) % 64) + 64) % 64;
         var processedInput = new byte[input.Length + 1 + addLength + 8];
         Array.Copy(input, processedInput, input.Length);
-        processedInput[input.Length] = 0x80; // add 1
+        processedInput[input.Length] = 0x80;
 
-        // Length in bits as a 64-bit little-endian value; (ulong) avoids the int32 overflow
-        // that produced a wrong digest for inputs >= 256 MB and drops all 8 length bytes.
         byte[] length = BitConverter.GetBytes((ulong)input.Length * 8);
         Array.Copy(length, 0, processedInput, processedInput.Length - 8, 8);
 
         for (int i = 0; i < processedInput.Length / 64; ++i)
         {
-            // copy the input to M
             uint[] M = new uint[16];
             for (int j = 0; j < 16; ++j)
             {
                 M[j] = BitConverter.ToUInt32(processedInput, (i * 64) + (j * 4));
             }
 
-            // initialize round variables
             uint A = a0, B = b0, C = c0, D = d0, F = 0, g = 0;
 
-            // primary loop
             for (uint ki = 0; ki < 64; ++ki)
             {
                 if (ki <= 15)

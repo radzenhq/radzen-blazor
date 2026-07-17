@@ -108,8 +108,6 @@ internal static class Redactor
                 case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
                     content.RemoveAt(i);
                     break;
-                // An operator with no modeled shape paints somewhere inside the clip in
-                // effect, and nowhere else; an unclipped one can paint anywhere at all.
                 case RawContent unmodeled when MayPaint(unmodeled.Operator)
                     && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
                     throw new NotSupportedException($"A redaction region intersects content painted by the '{unmodeled.Operator}' operator. Its extent cannot be determined safely from the content stream.");
@@ -237,9 +235,6 @@ internal static class Redactor
         }
     }
 
-    // Every unmodeled operator is assumed to put marks on the page unless it is one of the
-    // few known to only mutate graphics state or annotate the stream. Guessing the other
-    // way round would let an unrecognised painting operator survive a redaction silently.
     private static bool MayPaint(string op) => op is not ("gs" or "ri" or "i" or "j" or "J" or "M"
         or "BX" or "EX" or "MP" or "DP" or "d0" or "d1");
 
@@ -249,10 +244,6 @@ internal static class Redactor
         return new PdfRect(points.Min(static p => p.X), points.Min(static p => p.Y), points.Max(static p => p.X), points.Max(static p => p.Y));
     }
 
-    // An estimated run's advances are guesses, but its origin, direction and em height are not,
-    // so it paints only within the text-space half-strip x >= 0, y within the font size,
-    // whatever the real widths are. Only a region outside that strip is provably beyond its
-    // reach; the estimated quads cannot answer this, since the real glyphs may outrun them.
     private static bool MayReach(PositionedTextRun run, IReadOnlyList<PdfRect> regions)
     {
         if (!run.Matrix.TryInvert(out var inverse))
@@ -270,8 +261,6 @@ internal static class Redactor
                 inverse.Transform(area.Right, area.Top), inverse.Transform(area.Left, area.Top),
             };
 
-            // Unbounded along +x, so only the strip's own three edges can separate the two
-            // convex shapes; a NaN corner satisfies none of them and is refused.
             if (!corners.All(p => p.X < 0) && !corners.All(p => p.Y < bottom) && !corners.All(p => p.Y > top))
             {
                 return true;

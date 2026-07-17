@@ -142,8 +142,6 @@ internal sealed class ObjectParser
         }
     }
 
-    // Bounds mutual recursion through arrays and dictionaries so a body of nested
-    // openers ('[' or '<<') raises a recoverable error instead of overflowing the stack.
     private void EnterContainer()
     {
         if (++depth > limits.MaxObjectNestingDepth)

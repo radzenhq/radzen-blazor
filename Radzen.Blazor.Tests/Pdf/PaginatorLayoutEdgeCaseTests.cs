@@ -6,8 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Small layout edge cases: a SpacingBefore taller than the page must not push the first
-// line off the bottom, and Orphans=0 must not emit a spurious blank first page.
 public class PaginatorLayoutEdgeCaseTests
 {
     [Fact]

@@ -5,8 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The ' and " text-show operators (next-line show, and spacing + next-line show) must
-// materialize and extract their string like Tj rather than being dropped.
 public class ShowTextOperatorTests
 {
     private static ContentCollection Materialize(string rawStream)

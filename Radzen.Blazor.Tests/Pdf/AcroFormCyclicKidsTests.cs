@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A hostile field tree whose /Kids references an ancestor must fail loud instead of
-// recursing until an uncatchable StackOverflowException; a normal nested tree still
-// enumerates every terminal field.
 public class AcroFormCyclicKidsTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -26,7 +23,6 @@ public class AcroFormCyclicKidsTests
         return pdf.ToArray();
     }
 
-    // obj5 "parent" /Kids [6 0 R]; obj6 "child" /Kids [5 0 R] points back to its ancestor.
     private static byte[] CyclicFormSource()
     {
         var pdf = new FixturePdf()
@@ -40,7 +36,6 @@ public class AcroFormCyclicKidsTests
         return Wrap(pdf, 7);
     }
 
-    // obj5 "address" with terminal kids "city" (obj6) and "zip" (obj7).
     private static byte[] NestedFormSource()
     {
         var pdf = new FixturePdf()

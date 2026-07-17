@@ -110,10 +110,6 @@ internal static class AnnotationFlattener
         return true;
     }
 
-    // Sibling pages under a /Pages node that declares /Resources all record the same
-    // parsed dictionary instance, and an appended page shares it with its donor, so
-    // the appearance XObject is registered into a private copy taken on first use:
-    // mutating in place would leak this page's appearance into every sharer.
     private static DictionaryObject PrivateXObjects(DocumentReader reader, LoadedState loaded, Page page, HashSet<Page> owned)
     {
         loaded.SourceResources.TryGetValue(page, out var resources);

@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Annotations used to answer "did the caller change this since load" by serialising every
-// property into a pipe-delimited string and comparing it. These pin the dirty bit that
-// replaced it, including the blind spots the string had.
 public class AnnotationChangeTrackingTests
 {
     private static Document Load(byte[] bytes)
@@ -43,9 +40,6 @@ public class AnnotationChangeTrackingTests
         Assert.True(loaded.Pages[0].Annotations.HasChanges);
     }
 
-    // The string compared Appearance.Content.Count, not the content, so an element edit that
-    // left the count alone was invisible and the save was silently dropped. The element's own
-    // flag is what closes that.
     [Fact]
     public void EditingAnAppearanceElementMarksTheAnnotationModified()
     {
@@ -61,7 +55,6 @@ public class AnnotationChangeTrackingTests
         Assert.True(annotation.IsModified);
     }
 
-    // The container-level truth: removing an element leaves every survivor clean.
     [Fact]
     public void RemovingAnAppearanceElementMarksTheAnnotationModified()
     {
@@ -77,7 +70,6 @@ public class AnnotationChangeTrackingTests
         Assert.True(annotation.IsModified);
     }
 
-    // A removed annotation is a container change: no surviving annotation is touched by it.
     [Fact]
     public void RemovingALoadedAnnotationIsAChange()
     {
@@ -117,10 +109,6 @@ public class AnnotationChangeTrackingTests
         Assert.True(annotation.IsModified);
     }
 
-    // The deliberate cost of the unconditional Set<T>, and the one behavior change of the fold:
-    // the string compare found a self-assignment identical and preserved the original bytes,
-    // where the bit re-encodes. It fails in the safe direction - a spurious re-encode, never a
-    // dropped edit - and matches what ContentElement has always done.
     [Fact]
     public void AssigningAPropertyToItsOwnValueMarksTheAnnotationModified()
     {

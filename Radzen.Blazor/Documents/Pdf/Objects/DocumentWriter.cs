@@ -88,8 +88,6 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         return new ReferenceObject(objects.Count, 0);
     }
 
-    // Resolves a reference returned by Add back to the registered object so a later
-    // writer (e.g. conformance metadata) can amend an imported dictionary in place.
     internal DocumentObject? Resolve(ReferenceObject reference)
         => reference.ObjectNumber >= 1 && reference.ObjectNumber <= objects.Count
             ? objects[reference.ObjectNumber - 1]
@@ -142,17 +140,12 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
 
     private static long WriteIndirectObject(CountingBufferedStream buffer, int number, DocumentObject value, EncryptionWriter? encryption, int encryptNumber)
     {
-        // The /Encrypt dictionary and the document /ID are never themselves encrypted.
         var context = encryption is not null && number != encryptNumber
             ? new WriteContext(encryption, number, 0)
             : WriteContext.None;
         return IndirectObjectFramer.Write(buffer, number, 0, value, context);
     }
 
-    // Packs eligible objects into an object stream, writes the remaining objects
-    // top-level, then emits a cross-reference stream in place of the classic
-    // table and trailer. Stream objects, the /Encrypt dictionary and the
-    // cross-reference stream itself are never packed.
     private void CloseCompressed(CountingBufferedStream buffer, EncryptionWriter? encryption, int encryptNumber)
     {
         var builder = new ObjectStreamBuilder();
@@ -160,9 +153,7 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         var offsets = new long[count];
         var packedIndex = new int[count];
 
-        // Packed bodies are serialized outside any encryption scope: strings
-        // inside an object stream are protected by encrypting the stream data,
-        // not individually (ISO 32000-1 7.6.1).
+        // Object stream contents are not individually encrypted (ISO 32000-1 7.6.1).
         for (var i = 0; i < count; i++)
         {
             packedIndex[i] = objects[i] is not StreamObject && i + 1 != encryptNumber
@@ -200,7 +191,6 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         var size = xrefNumber + 1;
         var rows = new XrefRow[size];
 
-        // The head of the free list: object 0, generation 65535.
         rows[0] = new XrefRow(0, 0, 65535);
         for (var i = 0; i < offsets.Length; i++)
         {
@@ -223,8 +213,6 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         WriteIndirectObject(buffer, xrefNumber, xref, null, -1);
     }
 
-    // Builds the /Encrypt dictionary, wires it and a fresh /ID into the trailer,
-    // and returns the writer that will encrypt every other object's bytes.
     private (EncryptionWriter? Writer, int EncryptNumber) PrepareEncryption()
     {
         if (Encryption is null)

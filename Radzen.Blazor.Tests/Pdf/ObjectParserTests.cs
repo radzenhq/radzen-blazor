@@ -6,9 +6,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Object-graph contract for the internal ObjectParser (ISO 32000-1 section 7.3).
-// Pins: internal static DocumentObject ObjectParser.Parse(byte[] data, int position);
-// malformed input throws public DocumentParseException (with a byte Offset).
+// ISO 32000-1 7.3 object grammar.
 public class ObjectParserTests
 {
     private static DocumentObject Parse(string text)
@@ -116,7 +114,6 @@ public class ObjectParserTests
     [Fact]
     public void Dictionary_ReferenceValue()
     {
-        // Requires 2-token lookahead over "int int R".
         var dict = Assert.IsType<DictionaryObject>(Parse("<< /Kids 3 0 R >>"));
         var reference = Assert.IsType<ReferenceObject>(dict["Kids"]);
         Assert.Equal(3, reference.ObjectNumber);
@@ -134,7 +131,6 @@ public class ObjectParserTests
     [Fact]
     public void Array_TrailingIntegerIsNumberNotReference()
     {
-        // "1 2" with no following R must stay two numbers, not a reference.
         var array = Assert.IsType<ArrayObject>(Parse("[ 1 2 ]"));
         Assert.Equal(2, array.Count);
         Assert.Equal(1, Assert.IsType<NumberObject>(array[0]).IntValue);

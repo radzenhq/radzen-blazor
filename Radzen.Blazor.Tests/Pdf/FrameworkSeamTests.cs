@@ -9,13 +9,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The polymorphic PDF bases expose their extension hooks as protected/protected-internal and new
-// image formats plug in through the public ImageDecoder.Register. These subclasses/decoders use
-// only externally reachable members and assert the pipeline dispatches to them.
 public class FrameworkSeamTests
 {
-    // An external ContentElement whose protected EmitBody paints a distinctive rectangle
-    // through the public ContentWriter primitives.
     private sealed class RectangleElement : ContentElement
     {
         protected override void EmitBody(ContentWriter writer)
@@ -58,8 +53,6 @@ public class FrameworkSeamTests
         Assert.Equal(78, rectangle.Num(3), 3);
     }
 
-    // An external GradientBrush kind: it subclasses the base through its now-protected constructor
-    // and supplies its own protected ShadingType/BuildCoords.
     private sealed class SweepGradient : GradientBrush
     {
         public SweepGradient(params GradientStop[] stops)
@@ -120,7 +113,6 @@ public class FrameworkSeamTests
         Assert.DoesNotContain(members, member => member.Name is "EmitCreatedField" or "PopulateWidget");
     }
 
-    // A custom image format ("RZIM" magic) decoding to a 1x1 grayscale image XObject.
     private sealed class RzimImageDecoder : IImageDecoder
     {
         public static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x4D];
@@ -150,8 +142,6 @@ public class FrameworkSeamTests
     {
         ImageDecoder.Register(new RzimImageDecoder());
 
-        // The built-ins yield on the foreign RZIM magic, so a non-throwing decode into the exact
-        // 1x1 DeviceGray shape only the custom decoder produces proves it was dispatched.
         var decoded = ImageDecoder.Decode([.. RzimImageDecoder.Magic, 0x00, 0x01]);
 
         Assert.Equal(1, ImageTestHelpers.Int(decoded.Image.Dictionary, "Width"));

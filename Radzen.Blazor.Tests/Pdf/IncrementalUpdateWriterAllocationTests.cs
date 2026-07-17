@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A signature or annotation update appends a few KB to a document that may be tens of MB.
-// ToArray must not double-buffer the original through a capacity-less MemoryStream: the
-// doubling chain plus the final copy costs several multiples of the file size, all on the
-// LOH, which is exactly what the sibling PooledBufferStream exists to avoid.
 public class IncrementalUpdateWriterAllocationTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -21,7 +17,6 @@ public class IncrementalUpdateWriterAllocationTests
         var document = new Document();
         document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page zero) Tj ET"));
 
-        // A stream of incompressible bytes gives the original a predictable size.
         var payload = new byte[padding];
         new Random(7).NextBytes(payload);
         document.Pages.Add(PageSizes.A4).SetContent(payload);
@@ -54,7 +49,6 @@ public class IncrementalUpdateWriterAllocationTests
 
         var bytes = Measure(() => Update(original));
 
-        // The returned array is unavoidable; anything much beyond it is buffering overhead.
         var budget = original.Length * 2L;
         Assert.True(
             bytes < budget,
@@ -73,8 +67,6 @@ public class IncrementalUpdateWriterAllocationTests
         var smallBytes = Measure(() => Update(small)) - small.Length;
         var largeBytes = Measure(() => Update(large)) - large.Length;
 
-        // Both should be ~one working buffer, so the excess grows linearly at worst,
-        // never with the ~3x multiplier a doubling MemoryStream applies.
         Assert.True(
             largeBytes < smallBytes + (large.Length - small.Length) * 2L,
             $"Excess grew from {smallBytes} to {largeBytes} between a {small.Length} and {large.Length} byte original.");

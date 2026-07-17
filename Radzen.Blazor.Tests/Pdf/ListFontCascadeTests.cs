@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// List content flows through the same font cascade a paragraph uses:
-// item run -> item.Font -> list.Font -> surrounding cell/row/table context ->
-// document Normal default. Marker glyphs share the item-level font, so a list
-// with no explicit font renders in the resolved default (never base-14 Helvetica).
 public class ListFontCascadeTests
 {
     [Fact]

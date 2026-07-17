@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// AcroForm on a loaded document can set the selection of a list box / combo box
-// (choice field: /V, /I and a regenerated /AP text appearance) and pick a radio
-// option (button group: parent /V plus each kid widget's /AS). The fixtures are
-// produced through the field-creation path, then reloaded so they arrive as a
-// live loaded form the way a real filled document would.
 public class AcroFormChoiceRadioSelectionTests
 {
     private static Document BuildLoadedForm()

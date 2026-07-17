@@ -7,17 +7,6 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Every expectation is derived from the exact fixture NotoSansSC-Subset.otf with
-// fontTools 4.60.2 against font["CFF "].cff: fontNames[0], getGlyphOrder length,
-// ROS, charset (cidNNNNN names -> CID), FDSelect (format 3), len(FDArray), and
-// advance widths from the Type 2 charstring width machinery (which agree with hmtx).
-// This is a CID-keyed CFF (ROS Adobe-Identity-0), 658 glyphs, 11 FDArray entries.
-//
-// Coverage note: the only CFF fixture is CID-keyed, so the non-CID (name-keyed)
-// parsing path is NOT exercised here. GetFd's non-CID contract is pinned by a
-// negative test below (throws when the font is CID-keyed is not applicable, so we
-// instead pin that GetFd returns a valid FD for this CID font). INDEX/DICT
-// primitives are unit-tested on hand-built bytes in CffIndexTests.
 public class CffParserTests
 {
     private static CffFont ParseCff()
@@ -63,7 +52,6 @@ public class CffParserTests
         Assert.Equal(0, cff.Charset[0]);
     }
 
-    // charset[gid] -> CID for the CID-keyed font (name cidNNNNN -> NNNNN; .notdef -> 0).
     [Theory]
     [InlineData(0, 0)]
     [InlineData(1, 1)]
@@ -82,8 +70,6 @@ public class CffParserTests
         Assert.Equal(expectedCid, cff.Charset[glyphIndex]);
     }
 
-    // Advance widths come from the Type 2 charstring width operand (defaultWidthX /
-    // nominalWidthX in the per-FD Private DICT). Hardcoded fonttools numbers.
     [Theory]
     [InlineData(0, 1000)]
     [InlineData(1, 224)]
@@ -104,7 +90,6 @@ public class CffParserTests
         Assert.Equal(expected, cff.GetAdvanceWidth(glyphIndex));
     }
 
-    // Cross-check: CFF charstring widths must agree with the sfnt hmtx for the same gid.
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
@@ -130,7 +115,6 @@ public class CffParserTests
         Assert.Equal(11, cff.FdCount);
     }
 
-    // FDSelect format 3 -> FD index per glyph.
     [Theory]
     [InlineData(0, 3)]
     [InlineData(1, 8)]
@@ -166,7 +150,6 @@ public class CffParserTests
     [Fact]
     public void Parse_GarbageBytes_Throws()
     {
-        // First byte is the CFF major version; 0x00 is not a valid CFF header.
         var garbage = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x63, 0x63, 0x63, 0x63 };
 
         Assert.Throws<InvalidDataException>(() => CffFont.Parse(garbage));

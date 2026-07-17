@@ -5,10 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Alignment contract for the L2 line breaker. v1 supports LTR only, so Start resolves
-// to Left and End resolves to Right. Left/Start put the first fragment at x=0; Right/End
-// shift the line by (maxWidth - lineWidth); Center shifts by half that. Word gaps stay a
-// single natural space in all non-Justify modes (Justify is covered separately).
 public class AlignmentTests
 {
     private const string Phrase = "The quick brown";

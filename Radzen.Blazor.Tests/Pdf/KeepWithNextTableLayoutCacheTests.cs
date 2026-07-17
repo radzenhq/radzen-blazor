@@ -5,10 +5,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A KeepWithNext block before a table triggers a first-height look-ahead on that table.
-// The table must be laid out only ONCE and shared with PlaceTable, not laid out twice.
-// TableLayout.Layout invokes measureImage once per image cell, so a counting measureImage
-// over a single-image table is a faithful proxy for the number of layout passes.
 public class KeepWithNextTableLayoutCacheTests
 {
     [Fact]

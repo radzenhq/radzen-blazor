@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Unmappable input in the emit layer fails loud rather than painting something that
-// silently disagrees with what was asked for: a gradient fill cannot survive the
-// fill-to-stroke conversion a rotation forces, and PDF/A cannot pair DeviceCMYK image
-// data with the sRGB output intent it emits.
 public class EmitFailLoudTests
 {
     [Fact]

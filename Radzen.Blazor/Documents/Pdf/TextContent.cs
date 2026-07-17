@@ -49,8 +49,6 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref color, value);
     }
 
-    // A run owns its font, but Font is settable, so one instance can be shared by two runs;
-    // asking the font rather than having it push back keeps that from misfiring.
     /// <inheritdoc/>
     public override bool IsModified => base.IsModified || Font.IsModified;
 
@@ -60,25 +58,18 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         Font.AcceptChanges();
     }
 
-    // Resource name captured when materializing a loaded page; when set, re-emission
-    // keeps the original /Font reference instead of registering a base-14 face.
     internal string? FontResourceName
     {
         get => fontResourceName;
         set => Set(ref fontResourceName, value);
     }
 
-    // Original show-string bytes captured when materializing a loaded page. A Type0/CID
-    // run carries 2-byte codes that a WinAnsi re-encode would corrupt, so it is re-emitted
-    // verbatim. The plain generate path leaves this null and encodes via WinAnsi.
     internal ReadOnlyMemory<byte>? SourceBytes
     {
         get => sourceBytes;
         set => Set(ref sourceBytes, value);
     }
 
-    // The decoded text as materialized. When the caller has edited Text away from this,
-    // SourceBytes no longer describes it and the run is re-encoded through WinAnsi.
     internal string? SourceText
     {
         get => sourceText;
@@ -91,26 +82,18 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref sourceFont, value);
     }
 
-    // The TJ show array a loaded run carried (interleaved string chunks and numeric
-    // displacements). Re-emitted verbatim so kerning/inter-word gaps survive a re-encode;
-    // null for an authored run or an edited one, which re-encode through the Tj path.
     internal ImmutableArray<TextAdjustment>? SourceAdjustments
     {
         get => sourceAdjustments;
         set => Set(ref sourceAdjustments, value);
     }
 
-    // Non-RGB fill (CMYK/gray/named color space) captured when materializing a loaded run.
-    // When set it overrides Color so a re-encode preserves the original color space instead
-    // of collapsing to the last rg color or black. Null for authored runs (which use Color).
     internal DeviceColor? FillPaint
     {
         get => fillPaint;
         set => Set(ref fillPaint, value);
     }
 
-    // Word spacing (Tw) and character spacing (Tc) captured from a loaded run (the "
-    // operator or a preceding Tc/Tw). Zero for authored runs, which keep the defaults.
     internal double WordSpacing
     {
         get => wordSpacing;
@@ -123,10 +106,6 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref charSpacing, value);
     }
 
-    // Set by the editor when this run splices back inside a source BT..ET that is still open.
-    // It moves the emitted bytes, so it tracks like any other member; the editor only ever
-    // sets it on a run it has already decided to re-emit, so the door it opens is never the
-    // one that decides.
     internal bool InsideTextObject
     {
         get => insideTextObject;
@@ -138,12 +117,6 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     {
         var key = FontResourceName ?? writer.RegisterFont(Font);
 
-        // A translucent colour paints through a constant-alpha /ExtGState; gs persists in the
-        // graphics state, so it is scoped by q..Q to keep the alpha off later elements. A
-        // device fill paint replaces Color, and carries no alpha of its own.
-        // Splicing into a live text object also needs the scope: the colour and text state
-        // set here would otherwise leak onto the runs that follow inside the same BT..ET,
-        // which are copied verbatim and expect the state the source left them.
         var alpha = FillPaint is null ? Color.A / 255.0 : 1;
         var scoped = alpha < 1 || InsideTextObject;
         if (scoped)
@@ -199,7 +172,5 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         return Encode(Text);
     }
 
-    // A character outside WinAnsi is drawn as a visible '?' rather than dropped, matching the
-    // main text pipeline (EmitBase14Fragment) and honoring the fail-loud invariant.
     private static byte[] Encode(string text) => WinAnsiText.Encode(text, OnUnencodable.Substitute);
 }

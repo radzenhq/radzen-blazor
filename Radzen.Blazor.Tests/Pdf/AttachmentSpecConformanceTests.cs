@@ -10,11 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Spec-conformance contract for embedded file attachments (PDF 2.0 / PDF/A-3
-// associated files): /Filespec carries /F, /UF, /Desc and /AFRelationship, /EF
-// holds both /F and /UF stream references, the embedded stream carries /Params
-// /Size + /ModDate, the catalog /AF array lists every filespec, and the produced
-// bytes are reproducible for identical inputs.
 public class AttachmentSpecConformanceTests
 {
     private static readonly byte[] InvoiceXml = Encoding.UTF8.GetBytes(
@@ -238,7 +233,6 @@ public class AttachmentSpecConformanceTests
         Assert.Equal(MaskDocumentId(first), MaskDocumentId(second));
     }
 
-    // The trailer /ID is a pair of 32-hex-char strings derived from a random seed.
     private static string MaskDocumentId(byte[] pdf)
         => Regex.Replace(Encoding.Latin1.GetString(pdf), @"\(([0-9A-F]{32})\)", "(ID)");
 }

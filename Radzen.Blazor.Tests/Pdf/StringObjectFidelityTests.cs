@@ -6,10 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R4(c): StringObject.Write must not corrupt characters above U+00FF by masking
-// each char to its low byte. A value containing such characters must survive a
-// write/parse round trip - either preserved directly or written as a PDF text
-// string (UTF-16BE or UTF-8 with BOM, ISO 32000-2 7.9.2.2).
+// PDF text string: UTF-16BE or UTF-8 with BOM (ISO 32000-2 7.9.2.2).
 public class StringObjectFidelityTests
 {
     private static string RoundTrip(string value)
@@ -20,7 +17,6 @@ public class StringObjectFidelityTests
         return DecodeTextString(parsed.Value);
     }
 
-    // The parser yields one char per raw byte; interpret a BOM if present.
     private static string DecodeTextString(string raw)
     {
         var bytes = new byte[raw.Length];

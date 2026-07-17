@@ -6,8 +6,7 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 7.6.3.2: when /EncryptMetadata is false the /Metadata stream is left
-// as plaintext XMP, so it must not be run through the cipher on the way out.
+// ISO 32000-1 7.6.3.2: a plaintext /Metadata stream (/EncryptMetadata false) must not be run through the cipher on the way out.
 public class EncryptionMetadataStreamTests
 {
     private const string Xmp =

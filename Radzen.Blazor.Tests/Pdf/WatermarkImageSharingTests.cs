@@ -8,9 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One Watermark carrying one image, stamped over N pages, is a single picture: it decodes
-// once and every page references one shared image XObject, rather than inflating the payload
-// and emitting a duplicate image stream per page.
 public class WatermarkImageSharingTests
 {
     private static Document Watermarked(int pages, string png = "Images/rgb.png", Action<Image>? configure = null)
@@ -28,7 +25,6 @@ public class WatermarkImageSharingTests
         return document;
     }
 
-    // The object number each page's watermark XObject resolves to, in page order.
     private static List<int> WatermarkImageRefs(byte[] pdf)
     {
         var reader = DocumentReader.Parse(pdf);
@@ -75,8 +71,6 @@ public class WatermarkImageSharingTests
     [Fact]
     public void ImageWatermark_PayloadIsEmittedOnceNotPerPage()
     {
-        // Against a text-only watermark of the same page count, an image watermark costs one
-        // payload; per-page duplication would cost ten.
         var text = new Document();
         for (var i = 0; i < 10; i++)
         {
@@ -105,7 +99,6 @@ public class WatermarkImageSharingTests
         single.ToArray();
         var onePage = GC.GetAllocatedBytesForCurrentThread() - before;
 
-        // Ten pages sharing one decode stay far below ten independent decodes.
         Assert.True(tenPages < onePage * 3, $"one page {onePage} bytes, ten pages {tenPages} bytes");
     }
 
@@ -162,8 +155,6 @@ public class WatermarkImageSharingTests
         second.Pages.Add();
         second.AddWatermark(watermark);
 
-        // The mask reference is stamped onto a shared XObject, so each save must re-resolve
-        // it against its own object numbers rather than keep the previous save's.
         foreach (var pdf in new[] { first.ToArray(), second.ToArray() })
         {
             var reader = DocumentReader.Parse(pdf);
@@ -174,7 +165,6 @@ public class WatermarkImageSharingTests
             Assert.Equal("Image", ((NameObject)mask.Dictionary["Subtype"]!).Value);
         }
 
-        // The image and its mask, once each: the two pages of the first document share them.
         Assert.Equal(2, ImageStreamCount(first.ToArray()));
         Assert.Equal(2, ImageStreamCount(second.ToArray()));
     }

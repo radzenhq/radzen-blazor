@@ -7,9 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Dot-leader tab stops: a tab stop may carry a Leader char that fills the tab gap with
-// repeated leader glyphs (e.g. the dots in "Chapter 1 ...... 5"). A stop with no leader
-// (the default) produces no extra fragment, so existing tab layouts are unchanged.
 public class TabLeaderTests
 {
     private const double Tol = 0.5;
@@ -40,12 +37,9 @@ public class TabLeaderTests
         var leader = fragments.Single(f => f.Text.Length > 0 && f.Text.All(c => c == '.'));
         var dotWidth = Width(fonts, ".");
 
-        // The leader lives strictly inside the gap between "Left" and the stop at 100.
         Assert.True(leader.XOffset >= Width(fonts, "Left") - Tol, "leader starts after the label");
         Assert.True(leader.XOffset + leader.Advance <= 100 + Tol, "leader ends at or before the stop");
-        // It is right-aligned to the stop: the last dot sits within one dot of the stop.
         Assert.True(100 - (leader.XOffset + leader.Advance) < dotWidth + Tol, "leader reaches the stop");
-        // The tabbed text still lands on the stop.
         Assert.Equal(100.0, Fragment(lines, "Right").XOffset, Tol);
     }
 
@@ -76,7 +70,7 @@ public class TabLeaderTests
         var number = fragments.Single(f => f.Text == "5");
         var leader = fragments.Single(f => f.Text.Length > 0 && f.Text.All(c => c == '.'));
 
-        Assert.Equal(200.0, number.XOffset + number.Advance, Tol); // right tab
+        Assert.Equal(200.0, number.XOffset + number.Advance, Tol);
         Assert.True(leader.XOffset + leader.Advance <= number.XOffset + Tol, "dots stop before the number");
     }
 }

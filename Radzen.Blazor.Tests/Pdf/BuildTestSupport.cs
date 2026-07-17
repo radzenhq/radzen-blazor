@@ -7,18 +7,6 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared plumbing for the L5 end-to-end DocumentBuilder.Build() tests. The PINNED
-// PUBLIC API on DocumentBuilder is:
-//
-//   Document Build();
-//   void SaveToStream(Stream stream);   // == Build().SaveToStream(stream)
-//   byte[] ToArray();                   // == Build().ToArray()
-//
-// Build() runs the layout engine over builder.Sections and emits one physical Page
-// per laid-out page; registered sfnt fonts embed as Type0/CID, base-14 families embed
-// by name, and Image blocks decode to XObjects. These helpers reload the produced
-// bytes (through the merged reader/extractor) and walk the page tree so the tests can
-// assert on the real PDF rather than on intermediate objects.
 internal static class BuildTestSupport
 {
     public const string Latin = "Liberation Sans";

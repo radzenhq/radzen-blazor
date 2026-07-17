@@ -7,17 +7,14 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A terminal field's /V and /T may be UTF-16BE text strings carrying the FE FF byte
-// order mark (ISO 32000 7.9.2.2); FormField must decode them to .NET strings instead
-// of surfacing the raw bytes as mojibake. A field with no own /V inherits it from an
-// ancestor field's /V, and a multi-select choice /V is an array of text strings.
+// ISO 32000 7.9.2.2: /V and /T may be UTF-16BE text strings carrying the FE FF byte order mark, which must be decoded rather than surfaced as bytes.
 public class FormFieldTextDecodeTests
 {
-    private const string Faktura = "Фактура"; // "Faktura" in Cyrillic
-    private const string Sofia = "София";               // "Sofia" in Cyrillic
+    private const string Faktura = "Фактура";
+    private const string Sofia = "София";
     private const string A = "А";
     private const string Be = "Б";
-    private const string Imya = "Имя";                            // "Name" in Cyrillic
+    private const string Imya = "Имя";
 
     private static string Utf16BeHex(string text)
     {
@@ -119,8 +116,8 @@ public class FormFieldTextDecodeTests
         Assert.Equal(Imya, document.AcroForm!.Fields.Single().Name);
     }
 
-    // ISO 32000-2 7.9.2.2 additionally allows a text string to be UTF-8 prefixed EF BB BF.
     [Fact]
+    // ISO 32000-2 7.9.2.2: a text string may be UTF-8 prefixed with EF BB BF.
     public void Utf8ValueDecodes()
     {
         Assert.Equal(Faktura, ValueOf(Load(), "utf8"));
@@ -157,9 +154,6 @@ public class FormFieldTextDecodeTests
         Assert.Equal(Sofia, document.Info.Title);
     }
 
-    // EF BB BF is itself PDFDocEncodable ("ï»¿"). The spec makes the prefix win, but a
-    // remainder that is not valid UTF-8 is far likelier to be Latin1 than a broken
-    // producer, so it must survive verbatim rather than be replacement-charactered.
     [Fact]
     public void Utf8PrefixWithInvalidRemainderStaysVerbatim()
     {

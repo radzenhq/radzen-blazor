@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 19005 categorically forbids an /Encrypt dictionary. Pins that requesting
-// PDF/A output together with DocumentBuilder.Encryption fails loud instead of
-// writing a pdfaid conformance claim onto an encrypted file.
 public class PdfAEncryptionRejectionTests
 {
     private static DocumentBuilder Author(PdfAConformance conformance)

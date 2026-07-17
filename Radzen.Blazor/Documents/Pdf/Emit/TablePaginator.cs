@@ -31,21 +31,16 @@ internal static class TablePaginator
     public static IReadOnlyList<TableFragment> Paginate(LaidOutTable layout, Table source, double availableHeight)
         => Paginate(layout, source, availableHeight, availableHeight);
 
-    // The first fragment may get less room than the rest (it starts at the flow cursor);
-    // subsequent fragments start at the top of a fresh page.
     public static IReadOnlyList<TableFragment> Paginate(
         LaidOutTable layout, Table source, double firstAvailable, double subsequentAvailable)
     {
         var (headers, bodies, headerHeight) = SplitRows(layout, source);
 
-        // Rows covered by a RowSpan > 1 cell move between fragments as one group.
         var reach = BuildReach(layout, source.Rows.Count);
 
         List<TableFragment> fragments = [];
         var body = 0;
 
-        // The first fragment starts at the flow cursor (firstAvailable); once anything is
-        // emitted every later fragment starts fresh at subsequentAvailable.
         var onFirst = true;
         while (true)
         {
@@ -59,8 +54,6 @@ internal static class TablePaginator
 
                 var fits = running + groupHeight <= available + 1e-6;
 
-                // A KeepTogether group that overflows the partial first fragment but fits a
-                // fresh page is pushed there whole instead of being force-split at the break.
                 if (placed.Count == 0 && !fits && onFirst && available + 1e-6 < subsequentAvailable
                     && headerHeight + groupHeight <= subsequentAvailable + 1e-6
                     && GroupKeepTogether(source, bodies, body, last))
@@ -93,7 +86,6 @@ internal static class TablePaginator
                     continue;
                 }
 
-                // A header-only (or empty) table still yields a single fragment.
                 if (fragments.Count == 0)
                 {
                     fragments.Add(BuildFragment(1, layout, headers, placed));
@@ -114,8 +106,6 @@ internal static class TablePaginator
         return fragments;
     }
 
-    // reach[r] is the last row the group starting at r must include: every row spanned by a
-    // RowSpan > 1 cell moves between fragments as one unit.
     private static int[] BuildReach(LaidOutTable layout, int rowCount)
     {
         var reach = new int[rowCount];
@@ -162,7 +152,6 @@ internal static class TablePaginator
         return (headers, bodies, headerHeight);
     }
 
-    // The rowspan closure starting at bodies[start]: the rows Paginate places as one unit.
     private static (int Last, double GroupHeight) NextGroup(
         LaidOutTable layout, List<int> bodies, int[] reach, int start)
     {
@@ -179,9 +168,6 @@ internal static class TablePaginator
         return (last, groupHeight);
     }
 
-    // Height of the header rows plus the first body row group - the rowspan closure Paginate
-    // force-places as one unit. Paginator's page-flush check needs the identical measurement,
-    // so both consume the same SplitRows/NextGroup helpers.
     internal static double FirstBodyGroupHeight(LaidOutTable layout, Table source)
     {
         var (_, bodies, headerHeight) = SplitRows(layout, source);

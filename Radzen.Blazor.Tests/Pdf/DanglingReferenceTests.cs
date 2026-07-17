@@ -6,14 +6,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// ISO 32000-1 7.3.10: an indirect reference to a free or nonexistent object is
-// valid and resolves to null. A page /Annots holding such a dangling reference
-// (common after incremental saves or annotation deletion) must load, resolve to
-// null, and survive a save round trip - not abort with "Object not found".
+// ISO 32000-1 7.3.10: an indirect reference to a free or nonexistent object resolves to null
 public class DanglingReferenceTests
 {
-    // Objects 1-4 in use; the page's /Annots [9 0 R] points at object 9, which the
-    // cross-reference table marks free.
     private static byte[] FileWithDanglingAnnot()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");

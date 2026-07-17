@@ -5,8 +5,6 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class PaginationContext
 {
-    // Fit tolerance for "does this height fit the remaining content height", in points.
-    // LinePlacer decides the same predicate and must not disagree with it.
     internal const double Eps = 1e-6;
     private readonly List<PaginatedPage> pages;
     private readonly FontCollection fonts;
@@ -149,8 +147,6 @@ internal sealed class PaginationContext
         }
     }
 
-    // A rotated container turns about its own centre in page space: shift that centre to the
-    // origin, rotate, shift back.
     private Matrix? RotationAboutCenter(Container container, double indent, double boxWidth, double boxHeight)
     {
         if (container.Rotation == 0)

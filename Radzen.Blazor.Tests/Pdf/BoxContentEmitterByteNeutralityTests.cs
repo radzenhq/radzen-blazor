@@ -5,11 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Layer 2 guard: extracting TableEmitter.EmitCell's content emission into the shared
-// EmitBoxContent helper must be byte-neutral. This document exercises every path the
-// helper owns: band cells with per-page page-number/count field resolution, cell
-// images and nested tables, across two pages. The generator emits no /ID or dates, so
-// two independent builds must match exactly.
 public class BoxContentEmitterByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)

@@ -10,14 +10,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// #48 follow-up: the overflow guard in FieldResolver is not a band concern. A body
-// paragraph and a table cell are paginated/sized from the field's PLACEHOLDER layout
-// too, so a resolved value that wraps to more lines than were laid out overprints the
-// content below it exactly as it would in a band. Every call site reserves; every call
-// site must pass its reservation.
 public class FieldOverflowGuardCoverageTests
 {
-    // (text, baseline) for every show on the page, in emission order.
     private static List<(string Text, double Y)> PlacedText(DocumentReader reader, int page)
     {
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, page));
@@ -60,8 +54,6 @@ public class FieldOverflowGuardCoverageTests
         return paragraph;
     }
 
-    // A section whose content width fits "ending on page 0" on one line but not
-    // "ending on page 10", plus enough page breaks to make the resolved count "10".
     private static DocumentBuilder Author(out Section section)
     {
         var builder = new DocumentBuilder();
@@ -114,9 +106,6 @@ public class FieldOverflowGuardCoverageTests
         Assert.Contains("reserved", ex!.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // The guard must not fire when the resolved value still fits: all reserved lines render,
-    // each on its own baseline. This is what the two throw tests would otherwise pass by
-    // vacuously refusing to emit anything.
     [Fact]
     public void BodyFieldParagraph_ResolvedValueFitsReservedLines_RendersWithoutOverprinting()
     {

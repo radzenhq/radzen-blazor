@@ -9,14 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// P2: PDF/A-3 conformance mode. Pins the public DocumentBuilder.Conformance
-// option (enum PdfAConformance { None, PdfA3B, PdfA3A }) and the conforming
-// SaveToStream output: unfiltered /Metadata XMP with pdfaid part/conformance
-// and dc/xmp/pdf entries consistent with DocumentInfo, an sRGB GTS_PDFA1
-// /OutputIntents entry (DestOutputProfile ICC stream /N 3), a trailer /ID,
-// no /Encrypt, fully embedded subset fonts with CIDSet, a hard error for
-// base-14 fonts referenced by name, and Level A tagging (MarkInfo +
-// StructTreeRoot).
 public class PdfAConformanceTests
 {
     private const string MissingApi =

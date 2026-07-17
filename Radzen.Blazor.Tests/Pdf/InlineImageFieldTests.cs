@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A paragraph that carries BOTH an inline image and a page-number/count field must
-// render both: field resolution must not coerce the non-text InlineImage run to its
-// empty Text and silently drop it.
 public class InlineImageFieldTests
 {
     [Fact]

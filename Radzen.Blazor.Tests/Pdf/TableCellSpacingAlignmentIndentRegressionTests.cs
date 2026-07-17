@@ -10,16 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// G2 regression tests, all asserting on the REAL PDF bytes produced by
-// DocumentBuilder.Build() (content stream reparsed via DocumentReader + the
-// content-stream tokenizer):
-//   (a) Paragraph.SpacingBefore/SpacingAfter apply inside table cells and count
-//       toward the cell (row) height, matching body-flow behavior.
-//   (b) Horizontal alignment cascade: CELL beats COLUMN, and a paragraph's
-//       named-Style alignment beats alignment inherited from row/column/cell.
-//   (c) Table.LeftIndent reduces the layout width, so an indented auto-width
-//       table stays inside the right content edge in body, header-band and
-//       nested-table paths.
 public class TableCellSpacingAlignmentIndentRegressionTests
 {
     private const double Tol = 0.5;
@@ -30,7 +20,6 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     private static List<ContentOperation> Ops(DocumentBuilder builder)
         => ContentStreamTokenizer.Parse(PageBytes(builder));
 
-    // (text, baseline X, baseline Y) from the base-14 "x y Td (text) Tj" pattern.
     private static List<(string Text, double X, double Y)> TextRuns(DocumentBuilder builder)
     {
         var content = Encoding.Latin1.GetString(PageBytes(builder));
@@ -80,7 +69,6 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         return (builder, section);
     }
 
-    // ----- (a) paragraph spacing inside cells -----
 
     private static DocumentBuilder TwoParagraphCell(double spacingBefore)
     {
@@ -147,7 +135,6 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         Assert.Equal(20, delta, Tol);
     }
 
-    // ----- (b) alignment cascade -----
 
     private static Table OneCellTable(Section section, string text)
     {
@@ -210,11 +197,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         Assert.Equal(expected, Run(builder, "MidMe").X, Tol);
     }
 
-    // ----- (c) LeftIndent reduces layout width -----
 
-    // Page 400pt wide, margins 50 -> content spans x in [50, 350]. An auto-width
-    // table indented by 100 must lay out at 300 - 100 = 200pt wide: left edge at
-    // 150, right edge at the 350 content edge.
     private static void AssertIndentedEdges(DocumentBuilder builder)
     {
         var vertical = VerticalSegments(builder);
@@ -274,8 +257,6 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         var minX = vertical.Min(s => s.X1);
         var maxX = vertical.Max(s => s.X1);
 
-        // Outer cell spans [50, 250]; the nested table starts at 50 + 80 = 130 and
-        // must end at the outer cell's right edge.
         Assert.Equal(130, minX, Tol);
         Assert.True(maxX <= 250 + Tol, $"indented nested table must not cross the outer cell right edge (right edge at {maxX})");
     }

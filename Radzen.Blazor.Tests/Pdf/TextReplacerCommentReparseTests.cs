@@ -7,13 +7,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A content-stream comment (ISO 32000-1 7.2.4) may sit between a show operator's string
-// operand and the operator keyword. The PreserveAdvance TJ-rewrite must find the operator
-// past that comment rather than reject the stream as malformed.
+// Content-stream comment per ISO 32000-1 7.2.4
 public class TextReplacerCommentReparseTests
 {
-    // /F0 gives A width 200 and B width 900, so replacing A with B changes the advance and
-    // forces the [...] TJ rewrite that has to locate the Tj operator after the comment.
     private static Document LoadedWidthDocumentWithComment()
     {
         const string streamData = "BT /F0 10 Tf 72 700 Td (A) % kern\nTj (Z) Tj ET";

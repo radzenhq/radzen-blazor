@@ -7,16 +7,6 @@ using System.Threading;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Retrieves and caches indirect objects, including object-stream members.
-/// </summary>
-/// <remarks>
-/// Objects resolve lazily, so reads of a loaded document mutate this store and are
-/// expected to run concurrently (one document served from several request threads).
-/// Reads are safe; mutation of a loaded document from several threads is not.
-/// <see cref="entries"/>, <see cref="security"/> and <see cref="encryptObjectNumber"/>
-/// are written only while loading, before the document is handed to any reader.
-/// </remarks>
 internal sealed class IndirectObjectStore(
     byte[] data,
     ReaderLimits limits,
@@ -30,17 +20,9 @@ internal sealed class IndirectObjectStore(
     private readonly ConcurrentDictionary<int, DocumentObject> cache = [];
     private readonly ConcurrentDictionary<int, ObjectStream> objectStreams = [];
     private readonly NullObject nullObject = new();
-    // Not System.Threading.Lock: this project targets net8.0, which does not have it. The lock
-    // is taken once per store to seed memberCounts, so a monitor's cost is not worth a
-    // conditionally-compiled field.
     private readonly object memberCountsLock = new();
     private Dictionary<int, int>? memberCounts;
 
-    // Being mid-parse is a property of one resolution stack, not of the store: two
-    // threads resolving the same object are not a cycle, but a store-wide marker
-    // reported one and aborted a legitimate read. Resolution recurses synchronously,
-    // so the current thread's set is exactly that stack. The store is part of the key
-    // because one thread may resolve through two documents at once (merge/import).
     [ThreadStatic]
     private static HashSet<(IndirectObjectStore Store, int Number)>? parsing;
     private readonly StreamDecoder decoder = decoder;
@@ -50,8 +32,7 @@ internal sealed class IndirectObjectStore(
 
     internal bool IsEncrypted => security is not null;
 
-    // Type-2 entries carry an index into an object stream in Field3, not a generation;
-    // members of an object stream are always generation 0 (ISO 32000-1 7.5.7).
+    // ISO 32000-1 7.5.7: object-stream members are always generation 0; type-2 Field3 is the member index.
     internal int GenerationOf(int number)
         => entries.TryGetValue(number, out var entry) && entry.Type == 1 ? (int)entry.Field3 : 0;
 
@@ -62,16 +43,12 @@ internal sealed class IndirectObjectStore(
             return cached;
         }
 
-        // An indirect reference to a free or nonexistent object resolves to null
-        // (ISO 32000-1 7.3.10), so dangling refs left by incremental updates or
-        // annotation deletion never abort a load, save or merge.
+        // ISO 32000-1 7.3.10: a reference to a free or nonexistent object resolves to null.
         if (!entries.TryGetValue(number, out var entry) || !entry.InUse)
         {
             return nullObject;
         }
 
-        // Guards cyclic references (e.g. a stream /Length pointing back at its own
-        // object) that would otherwise recurse without bound.
         var inProgress = parsing ??= [];
         var marker = (this, number);
         if (!inProgress.Add(marker))
@@ -100,9 +77,6 @@ internal sealed class IndirectObjectStore(
             inProgress.Remove(marker);
         }
 
-        // Two threads may parse the same object at once. Publishing with GetOrAdd lets
-        // one instance win for everyone, so the reference identity that write-back and
-        // BuildObjectNumberIndex rely on stays single-valued per object number.
         var published = cache.GetOrAdd(number, value);
         if (entry.Type == 2 && ReferenceEquals(published, value))
         {
@@ -112,18 +86,10 @@ internal sealed class IndirectObjectStore(
         return published;
     }
 
-    // A decoded ObjStm payload is dead weight once every xref entry pointing into it has
-    // published its member: those numbers then answer from cache and no path can ask for
-    // the container again, so dropping it can never cost a re-decode. Counting from the
-    // xref rather than the ObjStm header is what makes that hold under a crafted file -
-    // an entry naming an out-of-range index reaches GetObjectStream but never publishes,
-    // so it keeps the count above zero instead of being evicted out from under itself.
     private void ReleaseDrainedObjectStream(int streamNumber)
     {
         if (objectStreams.TryGetValue(streamNumber, out var container) && container.MemberResolved())
         {
-            // Safe against a concurrent reader: it holds its own container reference and
-            // reads it happily, and only a future lookup misses.
             objectStreams.TryRemove(streamNumber, out _);
         }
     }
@@ -186,9 +152,6 @@ internal sealed class IndirectObjectStore(
         security = handler;
         encryptObjectNumber = objectNumber;
 
-        // Objects cached before the handler existed were not decrypted. Clearing is
-        // unsynchronized against readers, which is safe only because this runs while
-        // loading, before the document is shared.
         cache.Clear();
         objectStreams.Clear();
         memberCounts = null;
@@ -256,9 +219,6 @@ internal sealed class IndirectObjectStore(
             throw new DocumentParseException("Object stream index out of range.", -1);
         }
 
-        // The ObjStm header pairs (object number, offset) are attacker-controlled; if the
-        // member at this index is not the object we were asked for, the xref table and the
-        // stream header disagree and honoring the offset would serve an arbitrary object.
         if (container.Members[index].Number != expectedNumber)
         {
             throw new DocumentParseException("Object stream member number does not match the requested object.", -1);
@@ -266,8 +226,6 @@ internal sealed class IndirectObjectStore(
 
         var offset = container.Members[index].Offset;
 
-        // First and the member offset are attacker-controlled; a negative or out-of-range
-        // start would surface as a raw IndexOutOfRangeException from the lexer after Load.
         var start = (long)container.First + offset;
         if (offset < 0 || start < 0 || start > container.Data.Length)
         {
@@ -311,9 +269,6 @@ internal sealed class IndirectObjectStore(
         var count = ((NumberObject)stream.Dictionary["N"]).IntValue;
         var first = ((NumberObject)stream.Dictionary["First"]).IntValue;
 
-        // A trusted /N would size the member list and drive the fill loop; clamp it
-        // to what the decoded payload can hold (each member occupies at least two
-        // bytes) and to the configured maximum before allocating.
         if (count < 0)
         {
             count = 0;
@@ -453,7 +408,6 @@ internal sealed class IndirectObjectStore(
         }
         catch (DocumentParseException)
         {
-            // A cyclic or dangling /Length reference; fall back to the endstream scan.
             return -1;
         }
 
@@ -462,8 +416,6 @@ internal sealed class IndirectObjectStore(
             return number.IntValue;
         }
 
-        // A /Length pointing at a free object now resolves to null; fall back to
-        // the endstream scan rather than treating it as a hard failure.
         if (resolved is NullObject)
         {
             return -1;
@@ -472,8 +424,6 @@ internal sealed class IndirectObjectStore(
         throw new DocumentParseException("Invalid stream length.", -1);
     }
 
-    // Repair registers type-2 entries only after it has decoded each container, so the
-    // count built during a repair is zero and eviction stays off for a repaired document.
     public void ResetForRepair()
     {
         entries.Clear();
@@ -501,8 +451,6 @@ internal sealed class ObjectStream(byte[] data, int first, List<ObjectStreamMemb
 
     public List<ObjectStreamMember> Members { get; } = members;
 
-    // Distinct member numbers publish at most once each, so this reaches zero exactly
-    // once; a container built with no counted members drops below zero and never does.
     internal bool MemberResolved() => Interlocked.Decrement(ref unresolved) == 0;
 }
 

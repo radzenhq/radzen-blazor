@@ -7,10 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Widget-level fidelity of the loaded-form surface: /FT is inheritable so a terminal
-// kid reports its parent's type; a field rendered by several widget kids must have
-// every one of them refreshed by FillField/CheckField, not just the first; and the
-// flattener must not silently delete a pushbutton whose appearance it cannot redraw.
 public class FormWidgetFidelityTests
 {
     private static byte[] Wrap(FixturePdf pdf, int count)
@@ -28,7 +24,6 @@ public class FormWidgetFidelityTests
         return pdf.ToArray();
     }
 
-    // #45 - /FT is inheritable (ISO 32000-1 12.7.3.1): obj5 carries /FT for its kids.
 
     private static byte[] InheritedTypeForm()
     {
@@ -46,6 +41,7 @@ public class FormWidgetFidelityTests
     }
 
     [Fact]
+    // ISO 32000-1 12.7.3.1: /FT is inheritable, so a terminal kid reports its parent's field type.
     public void FieldTypeReadsTheInheritedFieldType()
     {
         var document = Document.LoadFromStream(new MemoryStream(InheritedTypeForm()));
@@ -63,7 +59,6 @@ public class FormWidgetFidelityTests
         document.AcroForm.CheckField(field.Name);
     }
 
-    // #46 - obj5 is one text field shown twice: two widget-only kids, each with a stale /AP.
 
     private static byte[] MultiWidgetForm()
     {
@@ -101,8 +96,6 @@ public class FormWidgetFidelityTests
         }
     }
 
-    // Each widget bakes its own /Rect, so a second widget of a different size is not
-    // just a copy of the first stream.
     [Fact]
     public void EachWidgetBakesItsOwnAppearanceBox()
     {
@@ -145,8 +138,6 @@ public class FormWidgetFidelityTests
         Assert.Equal("Yes", FormTestSupport.NameValue(reader, Kid(reader, field, 1), "AS"));
     }
 
-    // #62 - a pushbutton (/Ff bit 17) has no /AS or /V state to redraw from, so its
-    // appearance cannot be reproduced; flatten must fail loud rather than delete it.
 
     private static byte[] PushButtonForm(bool withAppearance)
     {

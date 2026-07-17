@@ -10,11 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// veraPDF 1.30.2 clause 6.6.2.3.1 tests 1 and 2: the fx: Factur-X properties in the
-// XMP packet are not predefined by the XMP spec, so a PDF/A file must declare them
-// through a pdfaExtension:schemas block (pdfaSchema entry with namespaceURI/prefix
-// and a pdfaProperty entry per property). These tests reload real PdfA3B Build()
-// output with a factur-x.xml attachment and parse the /Metadata packet as XML.
 public class FacturXXmpExtensionSchemaTests
 {
     private const string FxNamespace = "urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#";
@@ -51,7 +46,6 @@ public class FacturXXmpExtensionSchemaTests
         return XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
     }
 
-    // XMP allows both element and rdf shorthand attribute form for simple values.
     private static string? Value(XElement scope, XName name)
         => scope.Element(name)?.Value ?? scope.Attribute(name)?.Value;
 

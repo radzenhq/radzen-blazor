@@ -20,7 +20,7 @@ internal sealed class NameTable
         var table = new NameTable();
         var reader = new SfntReader(data, offset);
 
-        reader.ReadUInt16(); // format
+        reader.ReadUInt16();
         var count = reader.ReadUInt16();
         var stringOffset = reader.ReadUInt16();
         var storageBase = offset + stringOffset;
@@ -104,7 +104,6 @@ internal sealed class NameTable
             return Encoding.BigEndianUnicode.GetString(data, start, length);
         }
 
-        // Platform 1 (Mac Roman): treat as Latin-1 for the ASCII range used by names.
         var chars = new char[length];
         for (var i = 0; i < length; i++)
         {

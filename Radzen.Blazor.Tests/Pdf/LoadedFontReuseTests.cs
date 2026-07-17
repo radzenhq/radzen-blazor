@@ -5,9 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A font dictionary shared by every page (typically through /Resources inherited from the
-// /Pages node) must be reversed once at load, not once per page: building it decodes and
-// parses the whole /ToUnicode CMap.
 public class LoadedFontReuseTests
 {
     private static byte[] SharedFontDocument(int pages)

@@ -7,9 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Axial (type 2) and radial (type 3) shading dictionaries and the shading Pattern
-// (PatternType 2) built from a public LinearGradient/RadialGradient brush, per
-// ISO 32000-1 8.7.4.5.2, 8.7.4.5.3 and 8.7.4.5.5.
+// ISO 32000-1 8.7.4.5.2, 8.7.4.5.3, 8.7.4.5.5: axial (type 2) and radial (type 3) shadings and the shading Pattern (PatternType 2).
 public class GradientShadingTests
 {
     private static DictionaryObject Dict(DocumentObject o) => Assert.IsType<DictionaryObject>(o);
@@ -137,8 +135,6 @@ public class GradientShadingTests
         Assert.Equal(Num(c0[0]), Num(c1[0]), 3);
     }
 
-    // The shading type and coords are polymorphic on the brush kind, so ShadingBuilder never
-    // type-tests: a base-typed reference reports the right /ShadingType and /Coords arity.
     [Fact]
     public void ShadingType_AndCoords_DispatchOnBrushKind()
     {

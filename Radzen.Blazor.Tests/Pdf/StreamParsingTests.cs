@@ -6,15 +6,11 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 #nullable enable
 
-// Stream-object contract (ISO 32000-1 section 7.3.8) exercised through the
-// public DocumentReader over hand-built fixtures. Covers /Length as a direct
-// integer and as an indirect reference, and both LF and CRLF after "stream".
+// Stream-object contract (ISO 32000-1 7.3.8).
 public class StreamParsingTests
 {
     private static string Data(StreamObject stream) => Encoding.Latin1.GetString(stream.Data.ToArray());
 
-    // Wraps a single stream object (number 1) plus optional extra objects into a
-    // complete classic file with an xref covering objects 0..count-1.
     private static byte[] Build(FixturePdf pdf, int count)
     {
         var xref = pdf.Position;
@@ -80,7 +76,6 @@ public class StreamParsingTests
     [Fact]
     public void IndirectLength_ResolvedFromOtherObject()
     {
-        // The classic hard case: /Length points to a NumberObject defined elsewhere.
         var pdf = new FixturePdf()
             .Append("%PDF-1.7\n")
             .Object(1, "1 0 obj\n<< /Length 2 0 R >>\nstream\nHello\nendstream\nendobj\n")

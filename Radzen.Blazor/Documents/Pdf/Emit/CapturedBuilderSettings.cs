@@ -2,7 +2,6 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// Captures the builder's top-level settings by reference at build time; only DocumentInfo is cloned.
 internal sealed class CapturedBuilderSettings
 {
     private CapturedBuilderSettings(DocumentBuilder builder)

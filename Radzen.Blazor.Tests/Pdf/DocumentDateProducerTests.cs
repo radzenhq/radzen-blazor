@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Feature 1: caller-supplied CreationDate/ModificationDate (no clock) and Producer on
-// DocumentInfo are written to the /Info dictionary AND mirrored into an XMP packet.
-// With none set the output stays byte identical to the pre-feature build.
 public class DocumentDateProducerTests
 {
     private static readonly DateTimeOffset Created =

@@ -59,15 +59,12 @@ internal static class DocumentLoader
         ReadPageLabels(reader, catalog, document, state, limits);
         ReadXmp(reader, catalog, document);
 
-        // Reading went through the tracked setters, so without this freeze every loaded
-        // document would report itself as modified.
         document.AcceptMetadataChanges();
 
         return document;
     }
 
-    // The inheritable page attributes (ISO 32000-1 Table 30): a leaf without its own entry
-    // must re-save the ancestor's value.
+    // The inheritable page attributes (ISO 32000-1 Table 30).
     private readonly struct InheritedAttributes
     {
         public ArrayObject? Box { get; init; }
@@ -79,8 +76,6 @@ internal static class DocumentLoader
         public int? Rotate { get; init; }
     }
 
-    // A visited-set of page-node object numbers is the primary guard against a
-    // cyclic /Kids graph; MaxPageTreeDepth is a backstop for a deep acyclic tree.
     private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, LoadedState state, ReaderLimits limits, HashSet<int> visited, int depth)
     {
         if (depth > limits.MaxPageTreeDepth)
@@ -161,8 +156,6 @@ internal static class DocumentLoader
             state.SourceResources[page] = resources;
         }
 
-        // Resolved, not the source arrays: an element held as an indirect reference re-emits
-        // as 0 otherwise.
         if (mediaCorners is not null)
         {
             state.SourceBoxes[page] = BoxArray(mediaCorners);
@@ -173,16 +166,12 @@ internal static class DocumentLoader
             state.SourceCropBoxes[page] = BoxArray(cropCorners);
         }
 
-        // Append copies the page rather than sharing it, so the rotation must be carried.
         if (page.Rotate != 0)
         {
             state.SourceRotations[page] = page.Rotate;
         }
     }
 
-    // One /Pages-inherited /Resources is typically shared by every page, so without this cache
-    // each page re-decodes the same /ToUnicode CMaps. ReverseFont is immutable and the cache
-    // dies with the reader it is keyed by, so sharing entries is safe.
     private static readonly ConditionalWeakTable<DocumentReader, Dictionary<DictionaryObject, Fonts.ReverseFont>> ReverseFonts = [];
 
     public static Dictionary<string, Fonts.ReverseFont> BuildTextFonts(DocumentReader reader, DictionaryObject? resources)
@@ -221,8 +210,7 @@ internal static class DocumentLoader
             ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
             : (PageSizes.A4.Width, PageSizes.A4.Height);
 
-    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10). A
-    // non-numeric coordinate reads as absent rather than collapsing the page to zero size.
+    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10).
     private static double[]? ResolveCorners(DocumentReader reader, ArrayObject? box)
     {
         if (box is null || box.Count < 4)
@@ -247,8 +235,6 @@ internal static class DocumentLoader
     private static PdfRect? ToRect(double[]? corners)
         => corners is not null ? new PdfRect(corners[0], corners[1], corners[2], corners[3]) : null;
 
-    // Keeps the source coordinates rather than the corners PdfRect recomputes, so a
-    // fractional origin cannot shift the far edge by a rounding step.
     private static ArrayObject BoxArray(double[] corners) =>
     [
         new NumberObject(corners[0]),
@@ -337,9 +323,7 @@ internal static class DocumentLoader
             ? ParseDate(FormField.DecodeTextString(text))
             : null;
 
-    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSSOHH'mm'. Every field after the
-    // year is optional; the offset O is +, -, or Z (or absent). A value that does not
-    // parse is dropped rather than throwing so a re-save keeps every other Info entry.
+    // ISO 32000-1 7.9.4 date string: D:YYYYMMDDHHmmSSOHH'mm'; every field after the year is optional, the offset O is +, -, or Z.
     private static DateTimeOffset? ParseDate(string raw)
     {
         var s = raw.StartsWith("D:", StringComparison.Ordinal) ? raw[2..] : raw;
@@ -374,8 +358,6 @@ internal static class DocumentLoader
         }
     }
 
-    // Both the /Names EmbeddedFiles tree and the /AF array must be read, or a loaded
-    // Factur-X invoice loses its XML on save. AttachmentWriter re-emits what this populates.
     private static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
     {
         var seen = new HashSet<DictionaryObject>();
@@ -398,9 +380,6 @@ internal static class DocumentLoader
         }
     }
 
-    // `visited` bounds the walk, not `depth`: a chain of nodes each listing the same child twice
-    // is acyclic along every path, so the depth cap never fires while the node count grows as
-    // 2^depth. `seen` cannot serve here - it dedupes filespecs at the leaves, after the fan-out.
     private static void CollectEmbeddedFiles(DocumentReader reader, DictionaryObject node, Document document, HashSet<DictionaryObject> seen, HashSet<DictionaryObject> visited, ReaderLimits limits, int depth)
     {
         if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
@@ -638,8 +617,6 @@ internal static class DocumentLoader
             return null;
         }
 
-        // /XYZ null null 0 ("retain the current value") is legal and common, so a null
-        // coordinate must not fail the load.
         double Argument(int index)
             => index < array.Count && reader.AsNumber(array[index]) is { } number ? number : 0;
 

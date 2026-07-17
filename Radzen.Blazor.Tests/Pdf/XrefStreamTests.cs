@@ -6,16 +6,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Cross-reference stream contract (ISO 32000-1 7.5.8). DocumentReader.Parse must
-// accept a file whose cross-reference section is a /Type /XRef stream instead of
-// a classic "xref" table. Field decoding is pinned with a hand-built stream that
-// uses no predictor and no filter, so the expectations are independent of qpdf.
+// Cross-reference stream per ISO 32000-1 7.5.8
 public class XrefStreamTests
 {
-    // qpdf-generated fixture (see `qpdf --show-xref`): object 1 is the ObjStm,
-    // objects 2-5 are compressed inside it (2=Catalog, 3=Pages, 4=Page, 5=Font),
-    // object 6 is the content stream, object 7 is the /Type /XRef stream itself.
-    // Trailer (= the xref stream dict): /Root 2 0 R, /Size 8, /W [1 2 1].
     private static byte[] QpdfFixture() =>
         PdfTestResources.ReadAllBytes("Documents/xref-stream-objstm.pdf");
 
@@ -62,9 +55,6 @@ public class XrefStreamTests
         Assert.Contains("Hello encrypted world", text);
     }
 
-    // Hand-built minimal xref stream: /W [1 2 1], no /Filter, no predictor, so
-    // the stream payload is raw 4-byte entries. /Index [1 4] lists objects 1-4;
-    // object 0 is implicitly free. All entries are type 1 (uncompressed).
     private static byte[] RawXrefStreamFile()
     {
         var pdf = new FixturePdf().Append("%PDF-1.5\n");
@@ -110,10 +100,7 @@ public class XrefStreamTests
             Assert.IsType<DictionaryObject>(reader.GetObject(3))["Type"]).Value);
     }
 
-    // Hybrid update: the newest section is an xref stream whose /Prev points back
-    // to a classic "xref" table (ISO 32000-1 7.5.8 with a classic predecessor).
-    // Objects 1-2 live in the classic table; object 3 is added in the increment
-    // and is listed (with the xref stream itself, object 4) by the xref stream.
+    // Hybrid xref stream with classic predecessor per ISO 32000-1 7.5.8
     private static byte[] HybridPrevFile()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");

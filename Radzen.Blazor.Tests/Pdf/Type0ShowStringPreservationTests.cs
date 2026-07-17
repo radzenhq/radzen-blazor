@@ -7,14 +7,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Editing an unrelated element on a loaded page re-encodes the whole content stream.
-// Type0/CID show-strings are 2-byte codes; round-tripping them through WinAnsi would
-// corrupt or drop bytes. A materialized resource-font run must re-emit its original
-// show-string bytes verbatim, while the plain generate path keeps WinAnsi encoding.
 public class Type0ShowStringPreservationTests
 {
-    // 2-byte CIDs whose high byte (0x00) is undefined in WinAnsi, so a decode/re-encode
-    // round trip drops it and mangles the run.
     private static readonly byte[] CidBytes = [0x00, 0x41, 0x00, 0x42, 0x00, 0x43];
 
     private const string Type0Stream =
@@ -38,7 +32,7 @@ public class Type0ShowStringPreservationTests
         var content = loaded.Pages[0].Content;
 
         var path = content.OfType<PathContent>().First();
-        path.Thickness = 5; // unrelated mutation forces a full re-encode
+        path.Thickness = 5;
 
         var resaved = loaded.ToArray();
 

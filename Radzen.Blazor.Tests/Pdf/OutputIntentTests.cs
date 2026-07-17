@@ -6,7 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract for the sRGB /OutputIntent dictionary (PDF/A GTS_PDFA1).
 public class OutputIntentTests
 {
     private static DictionaryObject Build() => OutputIntentBuilder.BuildSrgb("sRGB");

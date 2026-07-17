@@ -9,13 +9,8 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The behaviour that the retired re-serialize-and-compare snapshot used to guarantee: an
-// untouched loaded page keeps its original bytes, an edited one re-encodes, and the two
-// savers never disagree about which of those is the case.
 public class LoadedContentChangeDetectionTests
 {
-    // Authored then round-tripped, so the loaded page carries a real base-14 font resource
-    // with widths: ReplaceText and Redact need the source font's metrics.
     private static Document Loaded()
     {
         var document = new Document();
@@ -31,7 +26,6 @@ public class LoadedContentChangeDetectionTests
     private static bool Contains(byte[] haystack, string needle)
         => Encoding.ASCII.GetString(haystack).Contains(needle, StringComparison.Ordinal);
 
-    // --- Prefix identity ---
 
     [Fact]
     public void RemovingAnOriginalElement_DropsItFromTheSavedContent()
@@ -58,8 +52,6 @@ public class LoadedContentChangeDetectionTests
         Assert.True(Contains(content, "(Beta)"));
     }
 
-    // The remove-one-add-one hazard: the element count is unchanged, so a saver that checked
-    // only the count would take the raw-bytes path and resurrect the removed element.
     [Fact]
     public void RemovingOneOriginalAndAddingOne_DoesNotResurrectTheRemovedElement()
     {
@@ -77,7 +69,6 @@ public class LoadedContentChangeDetectionTests
         Assert.True(Contains(content, "(Gamma)"));
     }
 
-    // --- Round-trip ---
 
     [Fact]
     public void UntouchedLoadedPage_StaysByteIdentical()
@@ -86,7 +77,6 @@ public class LoadedContentChangeDetectionTests
         var before = SavedContent(original);
 
         var reloaded = InterpreterTestSupport.Load(original.ToArray());
-        // Materializing alone must not count as an edit.
         Assert.Equal(2, reloaded.Pages[0].Content.Count);
 
         Assert.Equal(before, SavedContent(reloaded));
@@ -106,7 +96,6 @@ public class LoadedContentChangeDetectionTests
         Assert.True(Contains(content, "(Beta)"));
     }
 
-    // --- C7: flags are sticky for the object's lifetime, never cleared by a save ---
 
     [Fact]
     public void SavingTwice_WritesTheEditIntoBothOutputs()
@@ -135,7 +124,6 @@ public class LoadedContentChangeDetectionTests
         Assert.True(run.IsModified, "save must not clear an element's modified flag");
     }
 
-    // --- Save-path agreement ---
 
     public static TheoryData<string> EditPaths => new()
     {
@@ -171,8 +159,6 @@ public class LoadedContentChangeDetectionTests
             case "NestedFontSize":
                 ((TextContent)page.Content[0]).Font.Size = 22;
                 break;
-            // Queues an overlay without materializing, so the raw bytes stay intact and only
-            // pendingAppends carries the edit.
             case "QueuedAppend":
                 document.AddWatermark("Draft");
                 break;
@@ -181,8 +167,6 @@ public class LoadedContentChangeDetectionTests
         }
     }
 
-    // The full saver and the incremental saver must never disagree about whether a page was
-    // edited: one of them silently writing the pre-edit bytes is the loss this design prevents.
     [Theory]
     [MemberData(nameof(EditPaths))]
     public void BothSaversAgreeThatAnEditExists(string edit)
@@ -203,8 +187,6 @@ public class LoadedContentChangeDetectionTests
         }
         catch (NotSupportedException)
         {
-            // The incremental saver refuses a content edit rather than appending one, so its
-            // refusal is exactly its answer to "was this page edited?".
             incrementalSaverSeesEdit = true;
         }
 
@@ -212,8 +194,6 @@ public class LoadedContentChangeDetectionTests
         Assert.Equal(fullSaverSeesEdit, incrementalSaverSeesEdit);
     }
 
-    // SetContent replaces the bytes and resets materialization, so every element-level signal
-    // reads as untouched afterwards. Nothing but the page's own replaced bit can report it.
     [Fact]
     public void SetContentOnALoadedPage_WritesTheReplacementBytes()
     {
@@ -227,8 +207,6 @@ public class LoadedContentChangeDetectionTests
         Assert.False(Contains(content, "(Beta)"));
     }
 
-    // Reading Content materializes but edits nothing, so a replacement pass that finds no match
-    // must leave the page reported as unedited rather than as wholesale replaced.
     [Fact]
     public void MaterializingThenReplacingNothing_LeavesThePageUnedited()
     {
@@ -257,8 +235,6 @@ public class LoadedContentChangeDetectionTests
         Assert.Equal(2, incremental.Pages[0].Content.Count);
 
         using var stream = new MemoryStream();
-        // Nothing changed at all, so the incremental saver reports "no change" rather than
-        // refusing an unsupported content edit.
         Assert.Throws<InvalidOperationException>(() => incremental.SaveIncremental(stream));
     }
 }

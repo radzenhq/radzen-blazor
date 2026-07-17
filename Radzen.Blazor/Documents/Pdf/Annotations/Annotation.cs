@@ -80,16 +80,12 @@ public abstract class Annotation(PdfRect bounds) : ITracksChanges
     /// <summary>Marks this annotation modified without assigning a tracked field.</summary>
     protected void Touch() => tracker.Touch();
 
-    // Called once over a loaded page's annotations after reading, which builds them through
-    // these same setters and would otherwise leave every loaded annotation born dirty.
     internal virtual void AcceptChanges()
     {
         tracker.AcceptChanges();
         Appearance?.AcceptChanges();
     }
 
-    // Explicit so the overridable public IsModified/AcceptChanges do not themselves implement an
-    // internal interface member (CA2119); subclass overrides are still reached through them.
     bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();

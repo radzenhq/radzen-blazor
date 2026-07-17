@@ -8,10 +8,6 @@ using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Shared plumbing for the P3 style-cascade / line-break / underline / fallback tests.
-// Parses the decoded first-page content stream produced by DocumentBuilder.Build()
-// into the raw text-positioning and path operators so tests can assert on the real
-// emitted PDF operators (Tf sizes, Td positions, stroked/filled line geometry).
 internal static class CascadeTestSupport
 {
     public static string FirstPageContent(DocumentBuilder builder)
@@ -45,8 +41,6 @@ internal static class CascadeTestSupport
         return positions;
     }
 
-    // Horizontal drawn spans: 'm/l' segments with equal y, and 're' rectangles
-    // (reported at their vertical midline). Covers both ways an underline can be drawn.
     public static List<(double X, double Y, double Width)> HorizontalSpans(string content)
     {
         var spans = new List<(double, double, double)>();

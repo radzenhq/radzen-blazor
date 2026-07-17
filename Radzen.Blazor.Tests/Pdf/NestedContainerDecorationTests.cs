@@ -5,10 +5,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A nested table (inside a cell) and a nested container (inside a cell or box) must paint
-// their decoration exactly like their top-level counterparts: nested table rows keep their
-// backgrounds, and nested containers keep gradient backgrounds and the graphics-state
-// options (blend/overprint) a top-level box honours.
 public class NestedContainerDecorationTests
 {
     private static List<ContentOperation> Ops(DocumentBuilder builder)
@@ -46,8 +42,6 @@ public class NestedContainerDecorationTests
         return false;
     }
 
-    // A row background on a table nested inside a cell paints a filled rectangle, just as a
-    // top-level table row does. Green is 0, 0.502, 0 in rg space and no other draw uses it.
     [Fact]
     public void NestedTable_PaintsRowBackground()
     {
@@ -71,9 +65,6 @@ public class NestedContainerDecorationTests
             "nested table row background emits a fill in the row background color");
     }
 
-    // A gradient background on a container nested inside a cell realizes as a shading pattern
-    // (/Pattern cs + scn), the same as a top-level container. A dropped gradient would fall
-    // back to a solid fill or nothing.
     [Fact]
     public void NestedContainer_PaintsGradientBackground()
     {

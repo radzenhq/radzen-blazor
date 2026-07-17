@@ -6,9 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Emergency intra-word breaking: a single token wider than the measure is split at code-point
-// granularity so no line overflows, and Right/Center alignment of such a line never yields a
-// negative offset. Words that fit keep their pre-existing geometry.
 public class EmergencyBreakTests
 {
     private const string Token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";

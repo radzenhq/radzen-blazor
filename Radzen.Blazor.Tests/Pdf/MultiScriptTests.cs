@@ -6,10 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L5 test 1 + 3: the first true end-to-end round trip. Author English (Liberation),
-// Bulgarian/Cyrillic (Liberation) and CJK (Noto) paragraphs, Build -> save -> reload,
-// and prove Type0 embedding + content emission + extraction agree. The subset prefix
-// on the embedded Type0 /BaseFont is pinned to the standard ^[A-Z]{6}\+ tag.
 public class MultiScriptTests
 {
     private const string English = "Invoice";
@@ -18,8 +14,6 @@ public class MultiScriptTests
 
     private static DocumentBuilder AuthorThreeScripts()
     {
-        // Coverage guard: every code point must exist in its fixture face so a failing
-        // round trip means a wiring bug, not a missing glyph.
         var liberation = Type0EmbedSupport.LoadLiberation();
         foreach (var c in English + Bulgarian)
         {
@@ -73,7 +67,6 @@ public class MultiScriptTests
         var reader = BuildTestSupport.Read(AuthorThreeScripts());
         var type0 = BuildTestSupport.Type0Fonts(reader);
 
-        // Both registered sfnt families embed as Type0/CID.
         Assert.True(type0.Count >= 2, "both registered fonts embed as Type0");
         foreach (var font in type0)
         {

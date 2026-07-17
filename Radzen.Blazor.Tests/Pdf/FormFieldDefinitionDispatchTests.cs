@@ -8,8 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Public field definitions carry intent only; internal form services translate that intent
-// into flattened content and COS objects.
 public class FormFieldDefinitionDispatchTests
 {
     [Fact]
@@ -66,11 +64,10 @@ public class FormFieldDefinitionDispatchTests
 
         var parent = SingleEmittedField(radio);
         Assert.Equal("Btn", ((NameObject)parent["FT"]!).Value);
-        Assert.False(parent.ContainsKey("Subtype")); // a parent group field, not a widget itself
+        Assert.False(parent.ContainsKey("Subtype"));
         Assert.Equal(2, ((ArrayObject)parent["Kids"]!).Count);
     }
 
-    // Runs the created-field emission and returns the object added to the AcroForm fields list.
     private static DictionaryObject SingleEmittedField(FormFieldDefinition definition)
     {
         using var stream = new MemoryStream();

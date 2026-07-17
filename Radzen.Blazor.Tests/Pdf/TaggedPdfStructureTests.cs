@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L7: Build() output must be Tagged PDF. Pins the catalog wiring (/MarkInfo,
-// /StructTreeRoot, /ParentTree), the structure element tree derived from the
-// authoring DOM (Document -> Sect -> P/Table/Figure, TR -> TH/TD), the role
-// map for Heading1..6 -> H1..6, and BDC /MCID marked content linking the
-// content stream back to the structure elements.
 public class TaggedPdfStructureTests
 {
     private sealed class Node
@@ -111,8 +106,6 @@ public class TaggedPdfStructureTests
         return values;
     }
 
-    // /K kids are either child structure elements (dict with /S), bare MCID
-    // integers, or MCR dicts. Elements become Children; MCIDs land in Mcids.
     private static List<Node> KidsOf(DocumentReader reader, DictionaryObject parent)
     {
         var nodes = new List<Node>();

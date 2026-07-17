@@ -6,9 +6,6 @@ namespace Radzen.Documents.Pdf.Signing;
 internal readonly record struct IncrementalEditSession(
     DocumentReader Reader, ReferenceObject RootReference, DictionaryObject Catalog, IncrementalUpdateWriter Writer)
 {
-    // Parses the document, rejects encryption, resolves /Root to the catalog, and opens an
-    // incremental-update writer. <paramref name="operation"/> is the leading verb of the
-    // "... encrypted documents is not supported." message (e.g. "Signing", "Augmenting").
     internal static IncrementalEditSession Begin(byte[] pdf, string operation)
     {
         var reader = DocumentReader.Parse(pdf);

@@ -4,12 +4,10 @@ using System.Security.Cryptography;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// BCL-only helpers for building encrypted PDF fixtures in-test (ISO 32000-1
-// algorithms 2/3/5 for the R4 handler, ISO 32000-2 algorithm 2.B for R6).
-// Deliberately independent of the library under test.
+// ISO 32000-1 algorithms 2/3/5 (R4 handler), ISO 32000-2 algorithm 2.B (R6)
 internal static class CryptoFixtureSupport
 {
-    // ISO 32000-1 standard password padding.
+    // ISO 32000-1 standard password padding
     public static readonly byte[] Pad32 =
     [
         0x28, 0xBF, 0x4E, 0x5E, 0x4E, 0x75, 0x8A, 0x41, 0x64, 0x00, 0x4E, 0x56, 0xFF, 0xFA, 0x01, 0x08,
@@ -76,7 +74,7 @@ internal static class CryptoFixtureSupport
         return result;
     }
 
-    // Algorithm 3 for empty user and owner passwords, R >= 3, 128-bit key.
+    // ISO 32000-1 Algorithm 3: empty user and owner passwords, R >= 3, 128-bit key
     public static byte[] R4OwnerEntry()
     {
         var hash = System.Security.Cryptography.MD5.HashData(Pad32);
@@ -95,7 +93,7 @@ internal static class CryptoFixtureSupport
         return value;
     }
 
-    // Algorithm 2 for an empty user password, R4, 128-bit key, metadata encrypted.
+    // ISO 32000-1 Algorithm 2: empty user password, R4, 128-bit key, metadata encrypted
     public static byte[] R4FileKey(byte[] ownerEntry, int permissions, byte[] documentId)
     {
         var p = new byte[]
@@ -114,7 +112,7 @@ internal static class CryptoFixtureSupport
         return hash[..16];
     }
 
-    // Algorithm 5, R >= 3: 16 significant bytes + 16 bytes of padding.
+    // ISO 32000-1 Algorithm 5: R >= 3, 16 significant bytes + 16 bytes padding
     public static byte[] R4UserEntry(byte[] fileKey, byte[] documentId)
     {
         var value = Rc4(fileKey, System.Security.Cryptography.MD5.HashData(Concat(Pad32, documentId)));
@@ -126,7 +124,7 @@ internal static class CryptoFixtureSupport
         return Concat(value, new byte[16]);
     }
 
-    // Algorithm 1 object key for the AESV2 crypt filter.
+    // ISO 32000-1 Algorithm 1: object key for the AESV2 crypt filter
     public static byte[] AesV2ObjectKey(byte[] fileKey, int objectNumber, int generation)
     {
         var extra = new byte[]
@@ -140,7 +138,6 @@ internal static class CryptoFixtureSupport
         return System.Security.Cryptography.MD5.HashData(Concat(fileKey, extra, AesSalt))[..16];
     }
 
-    // Encrypts with AES-CBC/PKCS7 and prepends the IV, the PDF stream layout.
     public static byte[] AesEncrypt(byte[] key, byte[] iv, byte[] plain)
     {
         using var aes = Aes.Create();
@@ -164,7 +161,7 @@ internal static class CryptoFixtureSupport
         return encryptor.TransformFinalBlock(plain, 0, plain.Length);
     }
 
-    // ISO 32000-2 algorithm 2.B hash used by the R6 handler.
+    // ISO 32000-2 algorithm 2.B hash
     public static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)
     {
         var k = SHA256.HashData(Concat(password, salt, userData));

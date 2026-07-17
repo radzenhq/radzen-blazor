@@ -32,8 +32,6 @@ public class ContentSpacingDivergenceTests
         return Document.LoadFromStream(input);
     }
 
-    // The " operator sets word spacing for every following show, so a PreserveAdvance
-    // replacement that drops a space must compensate for the word spacing it removed.
     [Fact]
     public void ReplaceText_AfterQuoteShowSetsWordSpacing_PreservesFollowingOrigin()
     {
@@ -49,8 +47,7 @@ public class ContentSpacingDivergenceTests
         Assert.Equal(before, after, 6);
     }
 
-    // ISO 32000-1 8.4: q/Q save and restore the entire graphics state, text state included.
-    // A Tc set inside a q/Q scope therefore does not reach a show after the Q.
+    // ISO 32000-1 8.4: q/Q save and restore the entire graphics state, text state included
     [Fact]
     public void ExtractPositionedText_CharSpacingScopedByQ_DoesNotReachLaterShow()
     {
@@ -63,8 +60,6 @@ public class ContentSpacingDivergenceTests
         Assert.Equal(plainRun.Bounds.Right, scopedRun.Bounds.Right, 6);
     }
 
-    // The replacement's advance compensation is measured against the text state the show
-    // actually ran under, so a Tc the Q discarded must not enter the adjustment.
     [Fact]
     public void ReplaceText_CharSpacingScopedByQ_CompensatesWithoutIt()
     {
@@ -82,9 +77,6 @@ public class ContentSpacingDivergenceTests
         Assert.Equal(plainZ, scopedZ, 6);
     }
 
-    // A standalone Tc/Tw is part of the text state the run was drawn under, so it reaches the
-    // materialized run. The source operators are copied verbatim either way, so only the
-    // model can show the difference.
     [Fact]
     public void MaterializedRun_CapturesPrecedingCharAndWordSpacing()
     {
@@ -96,9 +88,6 @@ public class ContentSpacingDivergenceTests
         Assert.Equal(2, run.WordSpacing);
     }
 
-    // An operator's operands are the last n numbers on the frame, so a TL preceded by a
-    // stray number takes the trailing one. The two copies of this read disagreed: one took
-    // the first number, the other the last.
     [Fact]
     public void NextLine_AfterLeadingWithStrayOperand_UsesTheTrailingNumber()
     {
@@ -111,8 +100,6 @@ public class ContentSpacingDivergenceTests
         Assert.Equal(plainB.Bounds.Bottom, strayB.Bounds.Bottom, 6);
     }
 
-    // A zero font size makes the em width zero, which would make every positive gap clear the
-    // word-break threshold. The composition rule falls back to the previous run's em instead.
     private const string ZeroSizeRun = "BT /F0 10 Tf 1 0 0 1 72 700 Tm (A) Tj /F0 0 Tf 1 0 0 1 79.67 700 Tm (B) Tj ET";
 
     [Fact]

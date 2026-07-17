@@ -6,9 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// #48: a header/footer band reserves lines by laying the field paragraph out once with the
-// single-digit placeholder. If a wider resolved page number wraps to more lines than were
-// reserved it would overprint the content below, so ResolveFields fails loud instead.
 public class FieldBandOverflowTests
 {
     private static void Sized(Run run)
@@ -21,7 +18,7 @@ public class FieldBandOverflowTests
     {
         var paragraph = new Paragraph();
         Sized(paragraph.Inlines.Add("ending on page "));
-        Sized(paragraph.Inlines.Add(new PageNumberField())); // placeholder "0"
+        Sized(paragraph.Inlines.Add(new PageNumberField()));
         return paragraph;
     }
 
@@ -31,8 +28,6 @@ public class FieldBandOverflowTests
         var fonts = LineLayoutSupport.Fonts();
         var resolver = new FieldResolver(fonts, new StyleResolution());
 
-        // Width fits "ending on page 0" (the placeholder) on one line but not "ending on page
-        // 1000", which wraps its number to a second line.
         var width = fonts.MeasureText("ending on page 0", LineLayoutSupport.FontAt(12)) + 1;
         var reserved = LineBreaker.Break(FieldParagraph(), width, fonts).Count;
         Assert.Equal(1, reserved);

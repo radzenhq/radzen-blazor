@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Stamping a constant-size overlay onto a loaded page must not parse and re-emit the
-// page's whole content stream: AddWatermark's cost is O(pages), not O(content bytes).
-// The overlay still has to land byte-for-byte where the materializing path put it.
 public class LoadedPageWatermarkAppendTests
 {
     private static byte[] Source(int pages, int linesPerPage)

@@ -209,8 +209,6 @@ internal static class AnnotationReader
         return annotation;
     }
 
-    // /BS and /DA are rebuilt from the model whenever an annotation is re-emitted, so what
-    // the source stated has to land on the model or the edit silently reverts it.
     private static FreeTextAnnotation ReadFreeText(FreeTextAnnotation annotation, DocumentReader reader, DictionaryObject dictionary)
     {
         if (reader.GetString(dictionary, "DA") is not { } da)
@@ -228,8 +226,7 @@ internal static class AnnotationReader
         return annotation;
     }
 
-    // The colour of a /DA: the operand of its last non-stroking colour operator (ISO 32000-1
-    // 12.7.3.3). A /Pattern or /CS-based colour has no direct model equivalent and is ignored.
+    // /DA colour: last non-stroking colour operator operand (ISO 32000-1 12.7.3.3).
     private static Color? DefaultAppearanceColor(string da)
     {
         var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);

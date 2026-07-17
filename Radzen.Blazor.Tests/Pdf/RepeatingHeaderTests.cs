@@ -6,8 +6,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Blazor.Pdf.Tests;
 
-// L4b: header rows (Row.IsHeader) repeat at the top of every fragment, and the border resolution
-// at a break (bottom border at the fragment end, header redrawn at the next fragment top).
 public class RepeatingHeaderTests
 {
     [Fact]
@@ -35,7 +33,6 @@ public class RepeatingHeaderTests
         var table = TablePaginationSupport.Build(headers: 2, bodies: 8);
         var layout = TableLayout.Layout(table, 300, fonts);
 
-        // Header (2 rows) + 3 body per fragment.
         var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.True(fragments.Count >= 3);
@@ -67,7 +64,6 @@ public class RepeatingHeaderTests
         var oneFragments = TablePaginator.Paginate(oneLayout, oneHeader, available);
         var twoFragments = TablePaginator.Paginate(twoLayout, twoHeader, available);
 
-        // 1 header -> 4 body/fragment (ceil(20/4)=5); 2 headers -> 3 body/fragment (ceil(20/3)=7).
         Assert.Equal(5, oneFragments.Count);
         Assert.Equal(7, twoFragments.Count);
         Assert.True(twoFragments.Count > oneFragments.Count);
@@ -104,13 +100,11 @@ public class RepeatingHeaderTests
         {
             var fragment = fragments[i];
             var last = fragment.Rows[^1];
-            // Bottom border of a fragment is drawn at the closing edge of its last row.
             Assert.Equal(fragment.Height, last.Y + last.Height, 6);
 
             if (i + 1 < fragments.Count)
             {
                 var nextTop = fragments[i + 1].Rows[0];
-                // The header is redrawn at the top edge of the following fragment.
                 Assert.True(nextTop.IsHeader);
                 Assert.Equal(0, nextTop.Y, 6);
                 Assert.Equal(fragment.Rows[0].SourceRow, nextTop.SourceRow);
@@ -132,7 +126,6 @@ public class RepeatingHeaderTests
         foreach (var fragment in fragments)
         {
             Assert.Equal(expected, TablePaginationSupport.HeaderRows(fragment).ToArray());
-            // Repeated header rows keep their laid-out height.
             Assert.All(
                 fragment.Rows.Where(r => r.IsHeader),
                 r => Assert.Equal(layout.RowHeights[r.SourceRow], r.Height, 6));

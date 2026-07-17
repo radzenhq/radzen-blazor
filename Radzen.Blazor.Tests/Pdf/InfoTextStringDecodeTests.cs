@@ -6,13 +6,9 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded Info dictionary string may be a UTF-16BE text string carrying a leading
-// FE FF byte order mark (ISO 32000 7.9.2.2); it must decode to the .NET string, while
-// a plain PDFDocEncoding/Latin1 value keeps round-tripping verbatim.
+// ISO 32000 7.9.2.2: a text string may be UTF-16BE with a leading FE FF byte order mark.
 public class InfoTextStringDecodeTests
 {
-    // The raw bytes of a UTF-16BE literal (FE FF BOM + big-endian code units) exposed
-    // one-byte-per-char, exactly as StringObject.Value would surface them once loaded.
     private static string Utf16BeLiteral(string text)
     {
         var builder = new StringBuilder();

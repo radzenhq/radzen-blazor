@@ -5,21 +5,14 @@ using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// Walks a content stream's token grammar over the shared ContentStateMachine and hands each
-// text-show operator to a consumer. The consumer decodes the shown string however it needs
-// and returns the horizontal text-space advance the pen moved, which steps the text matrix.
 internal sealed class ContentTextWalker
 {
     private readonly ContentStateMachine machine;
 
     private ContentTextWalker(ContentStateMachine machine) => this.machine = machine;
 
-    // The show operator token being handled: its End is where the operator's bytes stop, past
-    // any comment or whitespace between the operand and the operator that the tokenizer skipped.
     public Token Operator { get; private set; }
 
-    // op is the show operator ("Tj", "TJ", "'" or "\""); array holds the flattened
-    // string/number elements of the last TJ array and is only meaningful when op is "TJ".
     public delegate double ShowHandler(ContentTextWalker walker, string op, List<Token> operands, List<Token> array, int operatorIndex);
 
     public Matrix Ctm => machine.Ctm;

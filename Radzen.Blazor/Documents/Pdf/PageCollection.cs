@@ -74,9 +74,6 @@ public sealed class PageCollection : IReadOnlyList<Page>
         Adopt(page);
     }
 
-    // A page from another document keeps its source node, contents and resources in the
-    // donor's LoadedState, which this document's save path cannot see; carry those entries
-    // over, or the page emits no /Resources for a content stream that still names them.
     private void Adopt(Page page)
     {
         if (owner is null || ReferenceEquals(page.Owner, owner))

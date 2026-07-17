@@ -9,11 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A CornerRadius > 0 Cell/Container clips its CHILD content (fills, edges, images, texts)
-// to the rounded rectangle, so child cell backgrounds no longer poke past the rounded
-// corners. Table.CornerRadius rounds a whole table without a wrapper Container: one
-// rounded border around the fragment perimeter and the table's draws clipped to it.
-// CornerRadius == 0 everywhere stays byte-identical to a document that never set it.
 public class RoundedClipTests
 {
     private static DocumentBuilder RoundedContainerBuilder(double radius, Action<Container>? configure = null)
@@ -90,9 +85,6 @@ public class RoundedClipTests
         return count;
     }
 
-    // The Bezier segments of the rounded path that a marker ("h\nW n\n" for a clip,
-    // "h\nS\n" for a stroke, "h\nf\n" for a fill) terminates - four "x1 y1 x2 y2 x3 y3 c"
-    // lines that fully determine the path's bounds and radius.
     private static List<string> PathCurves(string content, string marker, int occurrence = 0)
     {
         var index = -1;
@@ -126,8 +118,6 @@ public class RoundedClipTests
     {
         var content = FirstPageContent(RoundedContainerBuilder(8));
 
-        // The child cell's square background (re f) sits inside a q .. Q group whose clip
-        // is a rounded path: four Beziers closed with h, set as clip with W n.
         Assert.Contains("h\nW n\n", content);
         var clip = content.IndexOf("h\nW n\n", StringComparison.Ordinal);
         var groupEnd = content.IndexOf("Q\n", clip, StringComparison.Ordinal);
@@ -140,8 +130,6 @@ public class RoundedClipTests
     {
         var content = FirstPageContent(RoundedContainerBuilder(8));
 
-        // The container's own rounded background fill and the child clip trace the same
-        // rounded rectangle, so Clip == container bounds and ClipRadius == the clamped radius.
         Assert.Equal(PathCurves(content, "h\nf\n"), PathCurves(content, "h\nW n\n"));
     }
 
@@ -154,7 +142,6 @@ public class RoundedClipTests
 
         var stroke = content.IndexOf("h\nS\n", StringComparison.Ordinal);
         Assert.True(stroke >= 0, "rounded border stroke missing");
-        // The stroke group (q .. h S Q) contains no clip of its own.
         var groupStart = content.LastIndexOf("q\n", stroke, StringComparison.Ordinal);
         Assert.DoesNotContain("W n", content[groupStart..stroke]);
     }
@@ -172,7 +159,6 @@ public class RoundedClipTests
     {
         var content = FirstPageContent(RoundedTableBuilder(8));
 
-        // All four square cell backgrounds carry the rounded clip.
         Assert.Equal(4, Count(content, "re f\n"));
         Assert.True(Count(content, "h\nW n\n") >= 4);
         var frame = PathCurves(content, "h\nS\n");
@@ -187,7 +173,6 @@ public class RoundedClipTests
     {
         var content = FirstPageContent(RoundedTableBuilder(8));
 
-        // Cell edge strokes (x1 y1 m x2 y2 l S) are clipped to the rounded table box too.
         var edge = content.IndexOf(" l\nS\nQ\n", StringComparison.Ordinal);
         Assert.True(edge >= 0, "no edge stroke found");
         var groupStart = content.LastIndexOf("q\n", edge, StringComparison.Ordinal);
@@ -203,10 +188,8 @@ public class RoundedClipTests
         static double Num(string line, int index)
             => double.Parse(line.Split(' ')[index], CultureInfo.InvariantCulture);
 
-        // First curve ends at (right, bottom + r); its control y1 sits on the bottom edge.
         var bottom = Num(curves[0], 1);
         var radius = Num(curves[0], 5) - bottom;
-        // Third curve ends at (left, top - r), so top - bottom is the fragment height.
         var height = Num(curves[2], 5) + radius - bottom;
         Assert.True(height is > 0 and < 300, $"unexpected table height {height}");
         Assert.Equal(height / 2, radius, 2);

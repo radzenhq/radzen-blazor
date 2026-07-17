@@ -6,14 +6,11 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// An oversized image/QR/barcode in a table cell must be clipped to the cell box so it
-// cannot overpaint the neighbouring cell, matching how overflowing cell text is clipped.
 public class TableCellOverflowClipTests
 {
     private static List<ContentOperation> Ops(DocumentBuilder builder)
         => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
 
-    // Clip rectangles emitted as "x y w h re W n".
     private static List<(double X, double W)> ClipRects(List<ContentOperation> ops)
     {
         var rects = new List<(double, double)>();
@@ -62,9 +59,6 @@ public class TableCellOverflowClipTests
         var clips = ClipRects(ops);
         Assert.NotEmpty(clips);
 
-        // The QR modules really extend past the narrow cell, and the clip's right edge
-        // sits well left of the rightmost module, so the module fills cannot paint into
-        // the neighbouring cell.
         var clipRight = clips.Min(c => c.X + c.W);
         Assert.True(moduleRight > clipRight + 1,
             $"QR modules (right {moduleRight}) should overflow the clip box (right {clipRight})");

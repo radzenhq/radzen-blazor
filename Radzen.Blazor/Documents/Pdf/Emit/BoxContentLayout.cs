@@ -18,10 +18,6 @@ internal readonly struct LaidOutBoxContent
     public required IReadOnlyList<LaidOutNestedBox> Boxes { get; init; }
 }
 
-// Measures and positions a block sequence inside a fixed-width content box. Table cells
-// and (later) containers share this single primitive. Split into Measure/Position so
-// TableLayout can measure every cell once, solve row heights, and only then position -
-// a single-shot Layout would re-run measurement (and the measureImage callback) per cell.
 internal static class BoxContentLayout
 {
     internal readonly struct CellItem
@@ -64,7 +60,6 @@ internal static class BoxContentLayout
     {
         var effective = resolution ?? new StyleResolution();
         var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, effective);
-        // Lists expand to marker paragraphs exactly as in section content.
         foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth, resolution: effective))
         {
             block.Accept(visitor, default);
@@ -73,10 +68,6 @@ internal static class BoxContentLayout
         return new Measured { Items = visitor.Items, Height = visitor.Height };
     }
 
-    // Measures each block into the flat CellItem list, accumulating the running height.
-    // A page break inside a cell is a no-op (a cell cannot break across pages by itself);
-    // any other unsupported block type fails loud through Default. Lists and special
-    // containers never reach here - ExpandBlocks expands or rejects them first.
     private sealed class MeasureVisitor(
         double contentWidth,
         HorizontalAlignment? align,
@@ -149,9 +140,6 @@ internal static class BoxContentLayout
 
         public override Nothing Visit(Container container, Nothing context)
         {
-            // A Stack container nests as a first-class box (ExpandBlocks throws for
-            // overlay/rotated ones before this point): its content measures at the box's
-            // inner width and the box adds the padding on both axes.
             var padding = container.Padding.Point;
             var boxWidth = container.Width?.Point ?? contentWidth;
             var inner = Measure(container.Blocks, Math.Max(0, boxWidth - (2 * padding)), null, fonts, measureImage, resolution);
@@ -183,8 +171,6 @@ internal static class BoxContentLayout
         var laidCodes = new List<LaidOutCode>();
         var nestedTables = new List<LaidOutNestedTable>();
         var nestedBoxes = new List<LaidOutNestedBox>();
-        // Shared placement sequence so emission interleaves nested tables and boxes in
-        // document order.
         var order = 0;
         var cursorY = contentBox.Top + offset;
         foreach (var item in measured.Items)
@@ -231,9 +217,6 @@ internal static class BoxContentLayout
             }
             else if (item.Box is { } box && item.BoxContent is { } boxContent)
             {
-                // The box honors its OWN alignment to place itself within the content box;
-                // its content is positioned box-local (X/Y from the box's top-left corner,
-                // left/top defaults) and the emitter shifts it by the box position.
                 var padding = box.Padding.Point;
                 var indent = Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
                 var innerBox = new Rect(padding, padding, Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
@@ -265,9 +248,6 @@ internal static class BoxContentLayout
 
     private static HorizontalAlignment BlockAlignment(Block code) => CodeBlockDispatch.Alignment(code);
 
-    // Non-text content honors its OWN alignment, falling back to the cell's only when the
-    // block leaves it at the default Left. The factor matches how text resolves alignment
-    // (Right/End flush right, Center centered, Left/Start/Justify flush left).
     private static double AlignFactor(HorizontalAlignment blockAlignment, HorizontalAlignment cellAlignment)
         => (blockAlignment == HorizontalAlignment.Left ? cellAlignment : blockAlignment) switch
         {

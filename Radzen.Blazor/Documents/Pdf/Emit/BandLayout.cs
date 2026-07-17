@@ -2,8 +2,6 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// The laid-out content of a header or footer band: a band never page-breaks, so every block
-// places whole at a running cursor and the band's Height is the final cursor.
 internal sealed class BandLayout
 {
     public PageLayer Content { get; } = new();
@@ -11,8 +9,6 @@ internal sealed class BandLayout
     public double Height { get; set; }
 }
 
-// Lays out header/footer bands and resolves the section page size. Bands share the section
-// body's block/box/table/image placement helpers but run at a single non-breaking cursor.
 internal static class BandLayouter
 {
     public static BandLayout Layout(
@@ -24,7 +20,6 @@ internal static class BandLayouter
     {
         var result = new BandLayout();
         var visitor = new BandVisitor(result, width, fonts, measureImage, resolution);
-        // Lists expand to marker paragraphs exactly as in section content.
         foreach (var block in BlockExpander.ExpandBlocks(band.Blocks, width, resolution: resolution))
         {
             block.Accept(visitor, default);
@@ -34,9 +29,6 @@ internal static class BandLayouter
         return result;
     }
 
-    // Lays a header/footer band out at a running cursor: a band never page-breaks, so a
-    // container/table/image/code/paragraph places whole and a page break is a no-op. Any
-    // other block type is unsupported in a band (Default fails loud).
     private sealed class BandVisitor(
         BandLayout result,
         double width,
@@ -45,8 +37,6 @@ internal static class BandLayouter
         StyleResolution resolution)
         : BlockVisitor<Nothing, Nothing>
     {
-        // Placement sequence shared by band table fragments and band boxes so page
-        // emission can interleave them in document order.
         private int order;
 
         public double Cursor { get; private set; }
@@ -56,8 +46,6 @@ internal static class BandLayouter
 
         public override Nothing Visit(Container container, Nothing context)
         {
-            // A Stack container in a band is a first-class box, like the section body;
-            // a band never page-breaks, so the box places whole at the running cursor.
             var measured = OverlayBoxPlacer.MeasureBox(container, width, fonts, measureImage, resolution);
             var box = OverlayBoxPlacer.BuildBox(container, measured, width, Cursor, order++, transform: null);
             result.Content.Boxes.Add(box);
@@ -118,7 +106,6 @@ internal static class BandLayouter
             return default;
         }
 
-        // A header/footer band cannot page-break, so a page break inside one is a no-op.
         public override Nothing Visit(PageBreak block, Nothing context) => default;
 
         public override Nothing Visit(Paragraph paragraph, Nothing context)

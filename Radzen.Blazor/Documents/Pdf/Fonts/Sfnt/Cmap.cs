@@ -4,12 +4,8 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
-// Character-to-glyph mapper built from a whole cmap table. Supports formats 4
-// and 12; when both are present the format 12 subtable wins (full Unicode range).
 internal sealed class Cmap
 {
-    // Covers Latin, Latin Extended, Greek and Cyrillic; entries store glyph+1 so 0
-    // means "not resolved yet". Writes are idempotent, so races are benign.
     private const int MemoSize = 0x800;
 
     private readonly ICmapSubtable subtable;
@@ -43,8 +39,6 @@ internal sealed class Cmap
     {
         var glyph = subtable.GetGlyphId(codepoint);
 
-        // Microsoft symbol (3,0) fonts key their cmap in the F000-F0FF PUA, so a raw
-        // .notdef miss on a 0x00-0xFF code is retried with the 0xF000 offset applied.
         if (glyph == 0 && symbol && (uint)codepoint <= 0xFF)
         {
             glyph = subtable.GetGlyphId(0xF000 | codepoint);
@@ -62,15 +56,9 @@ internal sealed class Cmap
     public static Cmap Parse(byte[] data, int tableOffset)
     {
         var reader = new SfntReader(data, tableOffset);
-        reader.ReadUInt16(); // version
+        reader.ReadUInt16();
         var numTables = reader.ReadUInt16();
 
-        // Only the best-scoring subtable is ever used, and Score needs just the record's
-        // platform/encoding plus the subtable's 2-byte format word. Parsing every record
-        // eagerly made the work numTables (up to 65535) times the cost of one subtable,
-        // and nothing stops all records naming the same 256 KB one. Score first, then
-        // parse the single winner: the number of full parses is what grows, and it is
-        // now 1 regardless of numTables.
         var bestOffset = -1;
         var bestFormat = 0;
         var bestScore = -1;
@@ -113,7 +101,6 @@ internal sealed class Cmap
 
     private static int Score(int platformId, int encodingId, int format)
     {
-        // Prefer format 12 over 4, and Unicode/Windows encodings over others.
         var score = format == 12 ? 200 : 100;
 
         if (platformId == 3 && (encodingId == 10 || encodingId == 1))
@@ -161,14 +148,14 @@ internal sealed class Format4Subtable : ICmapSubtable
     public static Format4Subtable Parse(byte[] data, int offset)
     {
         var reader = new SfntReader(data, offset);
-        reader.ReadUInt16(); // format
-        reader.ReadUInt16(); // length
-        reader.ReadUInt16(); // language
+        reader.ReadUInt16();
+        reader.ReadUInt16();
+        reader.ReadUInt16();
         var segCount = reader.ReadUInt16() / 2;
 
-        reader.ReadUInt16(); // searchRange
-        reader.ReadUInt16(); // entrySelector
-        reader.ReadUInt16(); // rangeShift
+        reader.ReadUInt16();
+        reader.ReadUInt16();
+        reader.ReadUInt16();
 
         var endCode = new ushort[segCount];
         for (var i = 0; i < segCount; i++)
@@ -176,7 +163,7 @@ internal sealed class Format4Subtable : ICmapSubtable
             endCode[i] = reader.ReadUInt16();
         }
 
-        reader.ReadUInt16(); // reservedPad
+        reader.ReadUInt16();
 
         var startCode = new ushort[segCount];
         for (var i = 0; i < segCount; i++)
@@ -214,7 +201,6 @@ internal sealed class Format4Subtable : ICmapSubtable
 
         var c = (ushort)codepoint;
 
-        // First segment whose endCode >= c, matching the spec's ordered-segment search.
         var lo = 0;
         var hi = endCode.Length - 1;
         while (lo < hi)
@@ -272,15 +258,12 @@ internal sealed class Format12Subtable : ICmapSubtable
     public static Format12Subtable Parse(byte[] data, int offset)
     {
         var reader = new SfntReader(data, offset);
-        reader.ReadUInt16(); // format
-        reader.ReadUInt16(); // reserved
-        reader.ReadUInt32(); // length
-        reader.ReadUInt32(); // language
+        reader.ReadUInt16();
+        reader.ReadUInt16();
+        reader.ReadUInt32();
+        reader.ReadUInt32();
         var numGroups = reader.ReadUInt32();
 
-        // numGroups is attacker-controlled; three uint[] of that count would allocate
-        // up to ~48 GB. Require the three groups (12 bytes each) after the 16-byte
-        // header to fit the subtable data before allocating.
         if (numGroups > int.MaxValue || (long)offset + 16 + ((long)numGroups * 12) > data.Length)
         {
             throw new InvalidDataException("cmap format 12 group count exceeds the subtable bounds.");

@@ -7,9 +7,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Flatten bakes a single left-aligned WinAnsi line. AcroForm.CanBakeAppearance already
-// refuses that bake for a multiline/password/comb field or a non-zero /Q; the flattener
-// must refuse the same shapes rather than paint a wrong - or password-leaking - line.
 public class FlattenBakeFidelityTests
 {
     private static byte[] TextForm(string extra, string value)
@@ -55,8 +52,6 @@ public class FlattenBakeFidelityTests
 
     private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
 
-    // The headline defect: /Ff 8192 is a password field whose value must never render as
-    // cleartext page content.
     [Fact]
     public void FlattenRefusesPasswordFieldRatherThanPaintCleartext()
     {
@@ -83,7 +78,6 @@ public class FlattenBakeFidelityTests
         Assert.DoesNotContain("hunter2", content);
     }
 
-    // /Ff 4096 is multiline: the bake would collapse every line onto one.
     [Fact]
     public void FlattenRefusesMultilineField()
     {
@@ -92,7 +86,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // /Ff 16777216 is comb: the bake would lose the evenly spaced cells.
     [Fact]
     public void FlattenRefusesCombField()
     {
@@ -101,7 +94,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // /Q 1 is centered: the bake left-aligns, jumping the text.
     [Fact]
     public void FlattenRefusesCenteredQuadding()
     {
@@ -118,8 +110,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // A value the baked WinAnsi line cannot encode would be painted as wrong glyphs.
-    // \376\377 is the UTF-16BE BOM of a PDF text string; \116\055 is U+4E2D.
     [Fact]
     public void FlattenRefusesNonWinAnsiValue()
     {
@@ -128,7 +118,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // A plain left-aligned single-line text field is exactly what the bake is faithful to.
     [Fact]
     public void FlattenStillBakesAPlainTextField()
     {
@@ -139,10 +128,8 @@ public class FlattenBakeFidelityTests
         Assert.Contains("(Sofia) Tj", content);
     }
 
-    // ISO 32000-1 12.7.4.4: a list box renders every /Opt entry stacked vertically with the
-    // selected ones highlighted. The single-line bake cannot express that, so it must refuse
-    // rather than paint a lossy "Red, Blue" and discard the /AP that renders it correctly.
     [Fact]
+    // ISO 32000-1 12.7.4.4: a list box renders each /Opt entry stacked with selected ones highlighted; a single-line bake cannot express that.
     public void FlattenRefusesMultiSelectListBox()
     {
         var document = Load(ChoiceForm(string.Empty, "[(Red) (Blue)]"));
@@ -150,7 +137,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // An array /V is the multi-select storage form even when one entry is selected.
     [Fact]
     public void FlattenRefusesArrayValuedListBoxWithOneSelection()
     {
@@ -159,8 +145,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // A scalar /V is a single selection, which is the one line this paints. Radzen's own
-    // authored list box stores /V this way and bakes a single-line /AP for it.
     [Fact]
     public void FlattenBakesAScalarValuedListBox()
     {
@@ -171,7 +155,6 @@ public class FlattenBakeFidelityTests
         Assert.Contains("(Red) Tj", content);
     }
 
-    // /Ff 131072 is a combo box: it does render its value as one left-aligned line.
     [Fact]
     public void FlattenBakesAComboBox()
     {
@@ -182,7 +165,6 @@ public class FlattenBakeFidelityTests
         Assert.Contains("(Red) Tj", content);
     }
 
-    // A combo box holds one value; a multi-select combo is still not one line.
     [Fact]
     public void FlattenRefusesMultiSelectComboBox()
     {
@@ -191,8 +173,6 @@ public class FlattenBakeFidelityTests
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
-    // Refusal must not depend on the value being present: an empty field paints nothing
-    // either way, and deleting it loses no rendering.
     [Fact]
     public void FlattenDropsAnEmptyPasswordFieldWithoutAppearance()
     {

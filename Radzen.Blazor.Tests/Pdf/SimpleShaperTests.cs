@@ -9,20 +9,6 @@ using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Contract pinned for the internal text-shaping helper SimpleShaper (the ITextShaper /
-// GlyphRun / PositionedGlyph public seam was dropped; nothing implements a complex shaper).
-//
-// Pinned shape:
-//  - internal SimpleShaper(FontCollection fonts, bool enableKerning = false)
-//  - List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double advance);
-//    identity codepoint->glyph via the resolved font's cmap; per-glyph Advance = hmtx
-//    advance * font.Size / UnitsPerEm; advance out = sum of per-glyph advances.
-//  - PositionedGlyph { ushort GlyphId; double Advance; int Cluster; SfntFont Face; } (internal)
-//
-// KERN FINDING: Liberation Sans DOES ship a legacy format-0 'kern' table (908 pairs; A/V =
-// -152 units). The default helper pins NO kerning: MeasureText and the shaped advance are
-// both pure hmtx sums, so they stay equal (asserted below). Legacy 'kern' is applied only
-// when enableKerning is set, so default byte output is unchanged.
 public class SimpleShaperTests
 {
     private static FontCollection LiberationSans()
@@ -79,7 +65,6 @@ public class SimpleShaperTests
 
         var glyphs = shaper.Shape("AV", font, out var advance);
 
-        // Legacy 'kern' is not applied by default: total == sum, not sum - 152 units.
         Assert.Equal(glyphs[0].Advance + glyphs[1].Advance, advance, 10);
     }
 
@@ -108,10 +93,6 @@ public class SimpleShaperTests
             }
         });
 
-        // Width measurement is the hottest layout path (once per token, per line-break
-        // candidate): it must not build a glyph list it throws away. 1000 calls measure 0
-        // bytes; a discarded glyph list per call costs ~500,000. The budget sits far from
-        // both, so only a per-call allocation trips it, never measurement noise.
         Assert.True(bytes < 50_000, $"1000 MeasureText calls allocated {bytes} bytes.");
     }
 
@@ -144,10 +125,6 @@ public class SimpleShaperTests
         "ÄÖÜ Привет", "tab\tseparated", "😀 emoji", "VA.VA.VA", "To,Yo.We",
     ];
 
-    // Raw bit patterns of the widths the two hand-copied loops produced before they were merged
-    // into ShapeCore, captured per corpus entry. Pinned as bits, not with a tolerance: a
-    // reordered sum or a changed kern guard shifts the last mantissa bits and slides drawn text
-    // against its measured line, which a tolerance would wave through.
     public static TheoryData<bool, double, long[]> PinnedWidths => new()
     {
         { false, 7, [0, 4616942783519784960, 4621446383147155456, 4628576441175375872, 4631437782747709440, 4635943066002259968, 4640925898080518144, 4630934137702711296, 4631686959570354176, 4627426764329582592, 4629673204024082432, 4629452889381666816] },
@@ -195,10 +172,6 @@ public class SimpleShaperTests
             }
         });
 
-        // MeasureSink is a struct reached through a struct generic constraint, so the shared
-        // ShapeCore builds no glyph list on the measure path. Zero allocation is the reason the
-        // two loops were allowed to be merged; if this regresses, the merge cost a real win.
-        // 1000 calls measure 0 bytes against ~500,000 for a glyph list per call.
         Assert.True(bytes < 50_000, $"1000 MeasureAdvance calls allocated {bytes} bytes.");
     }
 

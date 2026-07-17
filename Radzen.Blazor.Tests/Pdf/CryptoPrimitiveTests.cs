@@ -7,18 +7,13 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Known-answer tests for the hand-rolled crypto primitives used by the PDF
-// standard security handler. Pins:
-//   public static byte[] Md5.ComputeHash(byte[] data)
-//   internal static byte[] Rc4.Transform(byte[] key, byte[] data)
-//   internal static byte[] AesCbc.Decrypt(byte[] key, byte[] data)  // data = IV(16) || ciphertext, PKCS7 stripped
 public class CryptoPrimitiveTests
 {
     private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    // MD5 vectors verified with python3 hashlib (RFC 1321 suite plus block boundaries).
+    // RFC 1321 MD5 test vectors
     [Theory]
     [InlineData("", "d41d8cd98f00b204e9800998ecf8427e")]
     [InlineData("a", "0cc175b9c0f1b6a831c399e269772661")]
@@ -29,7 +24,6 @@ public class CryptoPrimitiveTests
         Assert.Equal(expected, Hex(Md5.ComputeHash(Ascii(input))));
     }
 
-    // Block-boundary inputs (55/56 force one vs two MD5 blocks; 64 exercises exact block fill).
     [Theory]
     [InlineData(55, "ef1772b6dff9a122358552954ad0df65")]
     [InlineData(56, "3b0c8ac703f828b04c6c197006d17218")]
@@ -56,7 +50,6 @@ public class CryptoPrimitiveTests
     [Fact]
     public void HashHexApis_PreserveTheirEstablishedCasing()
     {
-        // "abc" spans all 16 nibble values; "a" starts with 0x0c, pinning the leading zero.
         Assert.Equal("900150983cd24fb0d6963f7d28e17f72", Md5.ComputeHashHex(Ascii("abc")));
         Assert.Equal("0cc175b9c0f1b6a831c399e269772661", Md5.ComputeHashHex(Ascii("a")));
         Assert.Equal(32, Md5.ComputeHashHex(Ascii("")).Length);
@@ -64,8 +57,6 @@ public class CryptoPrimitiveTests
         Assert.Equal(Convert.FromHexString("A9993E364706816ABA3E25717850C26C9CD0D89D"), Sha1.ComputeHash(Ascii("abc")));
     }
 
-    // RC4 is symmetric; Transform decrypts and encrypts. Classic vectors verified
-    // with a hand-rolled python RC4.
     [Theory]
     [InlineData("Key", "Plaintext", "bbf316e8d940af0ad3")]
     [InlineData("Wiki", "pedia", "1021bf0420")]
@@ -83,7 +74,6 @@ public class CryptoPrimitiveTests
         Assert.Equal("Attack at dawn", Encoding.ASCII.GetString(Rc4.Transform(key, cipher)));
     }
 
-    // AES-128-CBC. key/iv/plaintext fixed; ciphertext produced by openssl enc -aes-128-cbc (PKCS7).
     [Fact]
     public void AesCbc_128_DecryptRemovesPadding()
     {
@@ -95,7 +85,6 @@ public class CryptoPrimitiveTests
         Assert.Equal("Hello AES-CBC PDF decrypt test!!", Encoding.ASCII.GetString(plain));
     }
 
-    // AES-256-CBC, same plaintext, openssl enc -aes-256-cbc.
     [Fact]
     public void AesCbc_256_DecryptRemovesPadding()
     {
@@ -107,9 +96,7 @@ public class CryptoPrimitiveTests
         Assert.Equal("Hello AES-CBC PDF decrypt test!!", Encoding.ASCII.GetString(plain));
     }
 
-    // NIST-anchored: FIPS-197 AES-128 key with a zero IV, so the first cipher block
-    // equals the published KAT 3ad77bb40d7a3660a89ecaf32466ef97. openssl PKCS7-padded
-    // a single 16-byte plaintext block; Decrypt recovers it after stripping the pad block.
+    // FIPS-197 AES-128 KAT: zero IV, first cipher block = 3ad77bb40d7a3660a89ecaf32466ef97
     [Fact]
     public void AesCbc_128_NistAnchoredSingleBlock()
     {

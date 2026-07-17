@@ -10,11 +10,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// PAdES LTV building blocks. B-T = document timestamp (DocTimeStamp), B-LT =
-// Document Security Store (DSS), B-LTA = DSS + archival timestamp. Every
-// operation is an incremental update: the input bytes stay a verbatim prefix,
-// and the crypto/network is delegated (ITimestampProvider mirrors ISigner) so
-// the library stays WASM-safe and deterministic.
 public class PdfLtvTests
 {
     private static byte[] BuildPdf()
@@ -104,7 +99,6 @@ public class PdfLtvTests
         return array.Select(item => reader.DecodeStream((StreamObject)reader.Resolve(item))).ToArray();
     }
 
-    // ---- B-T : document timestamp -------------------------------------------
 
     [Fact]
     public void Timestamp_AppendsDocTimeStampFieldAsIncrementalUpdate()
@@ -140,11 +134,9 @@ public class PdfLtvTests
         Assert.Equal(stamped.Length, gapEnd + tail);
 
         var content = CoveredContent(stamped, gapStart, gapEnd, tail);
-        // The provider must receive the SHA-256 of exactly the covered bytes.
         Assert.NotNull(provider.LastHash);
         Assert.True(SHA256.HashData(content).SequenceEqual(provider.LastHash!));
 
-        // ...and the returned token lands verbatim in /Contents (zero-padded).
         var stored = DecodeContentsHex(stamped, gapStart, gapEnd);
         Assert.True(stored[..token.Length].SequenceEqual(token));
         Assert.All(stored[token.Length..], b => Assert.Equal(0, b));
@@ -171,7 +163,6 @@ public class PdfLtvTests
         Assert.Throws<InvalidOperationException>(() => PdfTimestamper.Timestamp(original, provider, 64));
     }
 
-    // ---- B-LT : Document Security Store --------------------------------------
 
     [Fact]
     public void AddValidationData_WritesDssWithOpaqueStreams()
@@ -210,7 +201,6 @@ public class PdfLtvTests
     {
         var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
 
-        // Pull the signature's /Contents value out of the signed file.
         var signedReader = DocumentReader.Parse(signed);
         var (gapStart, gapEnd, _) = ByteRange(signedReader, SignatureValue(signedReader, 0));
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
@@ -242,7 +232,6 @@ public class PdfLtvTests
         var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
 
-        // Two successive augmentations must accumulate, not overwrite.
         var first = DssBuilder.AddValidationData(signed, [cert1], null, null, contents);
         var second = DssBuilder.AddValidationData(first, [cert2], null, null, contents);
 
@@ -254,8 +243,6 @@ public class PdfLtvTests
         Assert.True(certs[0].SequenceEqual(cert1));
         Assert.True(certs[1].SequenceEqual(cert2));
 
-        // The VRI entry for this signature accumulates references from both
-        // passes rather than dropping the first pass's certificate.
         var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
         var key = Convert.ToHexString(SHA1.HashData(contents));
         var entry = (DictionaryObject)reader.Resolve(vri[key]);
@@ -276,8 +263,6 @@ public class PdfLtvTests
         var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
 
-        // First pass indexes a cert under the signature; second pass indexes a CRL
-        // under the SAME signature. Both must survive in that signature's VRI entry.
         var first = DssBuilder.AddValidationData(signed, [certA], null, null, contents);
         var second = DssBuilder.AddValidationData(first, null, null, [crlB], contents);
 
@@ -316,7 +301,6 @@ public class PdfLtvTests
     {
         var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
 
-        // Craft a prior /DSS carrying a proprietary key another tool might have written.
         var withDss = InjectDssWithCustomKey(signed);
 
         var augmented = DssBuilder.AddValidationData(withDss, [Enumerable.Range(0, 10).Select(i => (byte)i).ToArray()], null, null);
@@ -371,7 +355,6 @@ public class PdfLtvTests
         Assert.Throws<ArgumentException>(() => DssBuilder.AddValidationData(signed, null, null, null));
     }
 
-    // ---- B-LTA : DSS + archival timestamp ------------------------------------
 
     [Fact]
     public void SignThenDssThenTimestamp_ProducesStackedIncrementalUpdates()
@@ -388,25 +371,17 @@ public class PdfLtvTests
 
         var reader = DocumentReader.Parse(lta);
 
-        // The signature, the DSS and the archival DocTimeStamp are all present.
         var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]);
         Assert.Equal(2, fields.Count);
         Assert.Equal("adbe.pkcs7.detached", ((NameObject)SignatureValue(reader, 0)["SubFilter"]).Value);
         Assert.Equal("ETSI.RFC3161", ((NameObject)SignatureValue(reader, 1)["SubFilter"]).Value);
         Assert.True(Dss(reader).ContainsKey("Certs"));
 
-        // The original signature's byte range is untouched: it still ends at the
-        // signed file's length, proving DSS+timestamp stacked without disturbing it.
         var (_, gapEnd, tail) = ByteRange(reader, SignatureValue(reader, 0));
         Assert.Equal(signed.Length, gapEnd + tail);
     }
 
-    // ---- byte-safety ---------------------------------------------------------
 
-    // Refactoring PdfSigner to share the incremental-update plumbing with the
-    // timestamper must not perturb a byte of ordinary signing output. This is
-    // the SHA-256 of a fixed doc signed with a fixed blob captured before the
-    // refactor.
     [Fact]
     public void Signing_IsByteIdenticalToPreLtvBaseline()
     {

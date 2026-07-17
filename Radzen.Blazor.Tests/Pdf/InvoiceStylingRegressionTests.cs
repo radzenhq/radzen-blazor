@@ -14,11 +14,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// R1 regression tests for the invoice styling blockers. Every assertion runs against
-// the REAL PDF bytes produced by DocumentBuilder.Build() (reparsed with DocumentReader
-// and the content-stream tokenizer). Items that add new public API (Table.LeftIndent,
-// Row.Borders, Paragraph.LeftIndent) are exercised through reflection so this file
-// compiles against the current code and fails at runtime until the API exists.
 public class InvoiceStylingRegressionTests
 {
     private const double Tol = 0.5;
@@ -29,7 +24,6 @@ public class InvoiceStylingRegressionTests
     private static List<ContentOperation> Ops(DocumentBuilder builder)
         => ContentStreamTokenizer.Parse(PageBytes(builder));
 
-    // (text, baseline X, baseline Y) tuples from the base-14 "x y Td (text) Tj" pattern.
     private static List<(string Text, double X, double Y)> TextRuns(DocumentBuilder builder)
     {
         var content = Encoding.Latin1.GetString(PageBytes(builder));
@@ -86,8 +80,6 @@ public class InvoiceStylingRegressionTests
         return table;
     }
 
-    // (a) Borders.Bottom.Width = 0.5 with Style left at None (exactly what the invoice
-    // services do) must render a solid bottom rule.
     [Fact]
     public void CellBorderWidthWithoutStyle_RendersSolidBottomRule()
     {
@@ -103,7 +95,6 @@ public class InvoiceStylingRegressionTests
         Assert.Contains(ops, op => op.Operator == "w" && op.Operands.Count == 1 && Math.Abs(op.Num(0) - 0.5) < 0.005);
     }
 
-    // (a) Same rule at the table level: Borders.Width = 1 without Style paints the grid.
     [Fact]
     public void TableBorderWidthWithoutStyle_RendersGrid()
     {
@@ -119,8 +110,6 @@ public class InvoiceStylingRegressionTests
             "table borders with Width > 0 must draw vertical edges");
     }
 
-    // (b) An empty AddParagraph() is the invoices' vertical spacer: it must advance the
-    // flow by one line of its resolved font, not by zero.
     [Fact]
     public void EmptyParagraph_AdvancesFlowByOneLine()
     {
@@ -143,12 +132,9 @@ public class InvoiceStylingRegressionTests
 
         var extra = Gap(withSpacer: true) - Gap(withSpacer: false);
 
-        // Default font is 10pt, so one empty line is at least ~10pt tall.
         Assert.True(extra >= 8, $"an empty paragraph must occupy one line of its font height, added only {extra:0.##}pt");
     }
 
-    // (f) '\t' advances to the next default tab stop so the ID:/No: value columns of the
-    // invoice header align, instead of being measured as a single space.
     [Fact]
     public void Tab_AdvancesToNextDefaultTabStop()
     {
@@ -172,7 +158,6 @@ public class InvoiceStylingRegressionTests
             $"a tab after a short label must advance to the first default tab stop, advanced {advance:0.##}pt");
     }
 
-    // (c) Table.LeftIndent shifts the table's column origin (totals tables sit on the right).
     [Fact]
     public void TableLeftIndent_ShiftsColumnOrigin()
     {
@@ -193,8 +178,6 @@ public class InvoiceStylingRegressionTests
             $"Table.LeftIndent = 200pt must shift cell content by 200pt, shifted {shift:0.##}pt");
     }
 
-    // (d) Row.Borders cascades to the cells' unset edges, so a row-level bottom rule
-    // (header underline / totals rule) spans every cell of the row.
     [Fact]
     public void RowBorders_BottomRule_SpansAllRowCells()
     {
@@ -221,7 +204,6 @@ public class InvoiceStylingRegressionTests
         Assert.True(span >= 190, $"the row bottom rule must span both cells (~200pt), spanned {span:0.##}pt");
     }
 
-    // (e) Paragraph.LeftIndent indents the paragraph's lines (quote bullets).
     [Fact]
     public void ParagraphLeftIndent_ShiftsLineOrigin()
     {
@@ -242,8 +224,6 @@ public class InvoiceStylingRegressionTests
             $"Paragraph.LeftIndent = 50pt must shift the line origin by 50pt, shifted {shift:0.##}pt");
     }
 
-    // (g) An Image with no Width/Height must not render at 1px = 1pt: a 2000px logo has
-    // to be clamped so it fits the content width, preserving aspect ratio.
     [Fact]
     public void ImageWithoutExplicitSize_FitsContentWidth()
     {
@@ -260,7 +240,6 @@ public class InvoiceStylingRegressionTests
             $"clamping must preserve the aspect ratio, drew {width:0.##}x{height:0.##}pt");
     }
 
-    // (g) Explicit Width/Height keep winning over any default sizing.
     [Fact]
     public void ImageWithExplicitSize_UsesGivenSize()
     {
@@ -297,8 +276,8 @@ public class InvoiceStylingRegressionTests
         var ihdr = new byte[13];
         BinaryPrimitives.WriteUInt32BigEndian(ihdr, (uint)width);
         BinaryPrimitives.WriteUInt32BigEndian(ihdr.AsSpan(4), (uint)height);
-        ihdr[8] = 8; // bit depth
-        ihdr[9] = 0; // grayscale
+        ihdr[8] = 8;
+        ihdr[9] = 0;
         WriteChunk(ms, "IHDR", ihdr);
 
         var raw = new byte[(width + 1) * height];

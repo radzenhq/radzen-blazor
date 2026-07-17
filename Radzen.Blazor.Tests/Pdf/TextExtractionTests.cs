@@ -6,8 +6,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// End-to-end extraction over the merged authoring/reload path (C3 emit -> C4a
-// materialize). Pins string Page.ExtractText() and string Document.ExtractText().
 public class TextExtractionTests
 {
     private static Document Reload(Document document)
@@ -31,8 +29,6 @@ public class TextExtractionTests
     [Fact]
     public void SimpleBase14_PreservesLatin1Characters()
     {
-        // e-acute (U+00E9), sterling (U+00A3) and euro (U+20AC) are all WinAnsi
-        // codes distinct from their UTF-8 byte sequences, so a wrong decode shows.
         var text = "Café £5 costs €10";
         var document = new Document();
         var page = document.Pages.Add();
@@ -58,8 +54,6 @@ public class TextExtractionTests
         var document = new Document();
         var page = document.Pages.Add();
 
-        // Added out of visual order; extraction must reorder by descending Y then
-        // ascending X. "Left" and "Right" share a baseline to exercise the X tiebreak.
         page.Content.Add(new TextContent("Right", 300, 500));
         page.Content.Add(new TextContent("Charlie", 72, 600));
         page.Content.Add(new TextContent("Alpha", 72, 700));

@@ -43,8 +43,6 @@ internal sealed class PngImageDecoder : IImageDecoder
         return true;
     }
 
-    // A lone IDAT chunk - the overwhelmingly common case - is inflated straight out of the
-    // source buffer; only a split payload has to be joined, and then at its exact size.
     private static ReadOnlyMemory<byte> JoinIdat(byte[] data, List<Range>? chunks)
     {
         if (chunks is null)
@@ -88,8 +86,6 @@ internal sealed class PngImageDecoder : IImageDecoder
         long pos = PngSignature.Length;
         while (pos + 8 <= data.Length)
         {
-            // The chunk length is an unsigned 32-bit count; reject one that runs past the
-            // buffer so a hostile length (e.g. a 0x80000000 PLTE) cannot slice out of range.
             uint length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)pos));
             long body = pos + 8;
             if (length > data.Length - body)
@@ -153,8 +149,6 @@ internal sealed class PngImageDecoder : IImageDecoder
         var compressed = JoinIdat(data, idat);
         var raw = FlateFilter.Decode(compressed, limits.MaxDecodedStreamBytes);
 
-        // Secondary compression-bomb guard mirroring DocumentReader: a tiny IDAT that inflates
-        // past the ratio ceiling is rejected once the decoded output clears the floor.
         if (raw.LongLength > limits.ExpansionRatioFloorBytes
             && compressed.Length > 0
             && raw.LongLength / compressed.Length > limits.MaxDecodeExpansionRatio)
@@ -164,9 +158,6 @@ internal sealed class PngImageDecoder : IImageDecoder
 
         var samples = PngPredictor.Decode(raw, channels, bitDepth, width);
 
-        // A truncated IDAT decodes to fewer scanlines than IHDR promises; the downstream
-        // per-pixel unpackers index samples by the header dimensions and would read out of
-        // range. Reject a short sample buffer rather than crashing or emitting garbage.
         var bytesPerRow = (((long)width * channels * bitDepth) + 7) / 8;
         if (samples.Length < (long)height * bytesPerRow)
         {
@@ -184,9 +175,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         };
     }
 
-    // PNG restricts which bit depths a colour type may use (ISO/IEC 15948 Table 11.1);
-    // an out-of-table pair (e.g. RGBA at 4-bit) yields a zero-stride sample layout that
-    // would silently decode to garbage, so reject it up front.
+    // ISO/IEC 15948 Table 11.1: allowed bit depths per colour type.
     private static void ValidatePngBitDepth(int colorType, int bitDepth)
     {
         var valid = colorType switch
@@ -205,8 +194,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         }
     }
 
-    // Grayscale/truecolor samples pass straight through; a tRNS chunk on these colour types
-    // is a colour key rather than an alpha channel, mapped to /Mask per ISO 32000-1 8.9.6.4.
+    // ISO 32000-1 8.9.6.4: a tRNS colour key on grayscale/truecolor maps to /Mask.
     private static ImageXObject BuildColorKeyedPng(
         int width, int height, int bitDepth, NameObject colorSpace, byte[] samples, byte[]? transparency, int components)
     {
@@ -219,8 +207,6 @@ internal sealed class PngImageDecoder : IImageDecoder
                 throw new InvalidDataException("PNG tRNS chunk is truncated for the colour type.");
             }
 
-            // tRNS stores one 16-bit key per component regardless of bit depth; the key value
-            // is already in the sample's integer range, so it maps directly to a [key key] pair.
             var mask = new ArrayObject();
             for (var c = 0; c < components; c++)
             {
@@ -269,7 +255,6 @@ internal sealed class PngImageDecoder : IImageDecoder
             return new ImageXObject(image, null);
         }
 
-        // The color path passes packed indices straight to PDF, but the 8-bit soft mask needs one index per pixel.
         var pixels = UnpackIndices(indices, width, height, bitDepth);
         var alpha = new byte[width * height];
         for (var i = 0; i < alpha.Length; i++)
@@ -282,7 +267,6 @@ internal sealed class PngImageDecoder : IImageDecoder
         return new ImageXObject(image, mask);
     }
 
-    // Expand a paletted scanline buffer, where sub-8-bit indices are packed MSB-first and each row is byte padded, to one index per pixel.
     private static byte[] UnpackIndices(byte[] indices, int width, int height, int bitDepth)
     {
         if (bitDepth == 8)
@@ -310,7 +294,6 @@ internal sealed class PngImageDecoder : IImageDecoder
     private static ImageXObject BuildAlphaPng(int width, int height, NameObject colorSpace, byte[] samples, int colorChannels, int bitDepth)
     {
         var pixelCount = width * height;
-        // PNG restricts gray+alpha/RGBA to 8 or 16 bit; 16-bit samples are big-endian, downsampled to their high byte.
         var bytesPerSample = bitDepth / 8;
         var stride = (colorChannels + 1) * bytesPerSample;
         var color = new byte[pixelCount * colorChannels];

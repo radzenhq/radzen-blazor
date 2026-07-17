@@ -9,10 +9,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// One shared DocumentBuilder rendered from many request threads (the ASP.NET Core
-// pattern) must never let one save corrupt another. Style resolution was mutating the
-// shared model - nulling then re-assigning a paragraph's style alignment - so a
-// concurrent save could read the transient null and lay a centered heading out left.
 public class ConcurrentSaveTests
 {
     private const string Heading = "Heading";
@@ -91,7 +87,6 @@ public class ConcurrentSaveTests
 
         var positions = CascadeTestSupport.TdPositions(content);
         Assert.Contains(positions, p => Math.Abs(p.X - expectedX) < 1);
-        // The list content still starts at the left content edge, so the centered X is a real shift.
         Assert.Contains(positions, p => Math.Abs(p.X - 40) < 1);
 
         var sizes = CascadeTestSupport.TfSizes(content);

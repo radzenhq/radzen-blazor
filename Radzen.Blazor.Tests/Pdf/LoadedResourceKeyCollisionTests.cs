@@ -8,10 +8,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// A loaded page whose font resource is named /F0 must not have that resource clobbered
-// when a full re-encode registers a fresh base-14 face: the emitter's default keys start
-// at F0/Im0 and MergeResources lets emitted entries win, so a colliding key would replace
-// the loaded font. The re-emit must allocate keys that dodge the loaded page's names.
 public class LoadedResourceKeyCollisionTests
 {
     private const string StreamData = "BT /F0 12 Tf 72 700 Td (Hi) Tj ET";
@@ -59,7 +55,6 @@ public class LoadedResourceKeyCollisionTests
         var document = Document.LoadFromStream(stream);
         var page = document.Pages[0];
 
-        // Mutate an existing element to force a full re-encode, then add a base-14 run.
         var existing = page.Content.OfType<TextContent>().First();
         existing.Color = Color.Red;
         page.Content.Add(new TextContent("New", 72, 680) { Font = new Font { Name = "Helvetica" } });
@@ -74,7 +69,6 @@ public class LoadedResourceKeyCollisionTests
         Assert.True(fonts.ContainsKey("F0"));
         Assert.Equal("CLOBBERCANARY", BaseFont(reader, fonts["F0"]));
 
-        // The freshly registered base-14 face lives under its own, non-colliding key.
         Assert.Contains(fonts.Keys, k => k != "F0" && BaseFont(reader, fonts[k]) == "Helvetica");
     }
 }

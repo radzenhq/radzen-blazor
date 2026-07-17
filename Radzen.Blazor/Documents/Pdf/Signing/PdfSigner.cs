@@ -29,13 +29,9 @@ public static class PdfSigner
 {
     internal const int ByteRangeInteriorWidth = 40;
 
-    // The fixed-width /ByteRange and /Contents placeholders, shared with the
-    // document time-stamper so the in-place patch logic sees an identical shape.
     internal static DocumentObject ByteRangePlaceholder()
         => new RawTokenObject("[" + "0 0 0 0".PadRight(ByteRangeInteriorWidth) + "]");
 
-    // Upper bound keeps reservedBytes * 2 (the reserved hex-digit count) well inside
-    // int range; real CMS blobs and RFC 3161 tokens are a few KB.
     internal const int MaxReservation = 16 * 1024 * 1024;
 
     internal static DocumentObject ContentsPlaceholder(int reservedBytes)
@@ -82,7 +78,6 @@ public static class PdfSigner
             "Increase SignatureOptions.SignatureMaxSizeBytes.");
     }
 
-    // Shared by ordinary signing and the document time-stamper.
     internal static (byte[] Bytes, int SigStart, int SigEnd) AppendSignatureField(
         byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
     {
@@ -107,8 +102,6 @@ public static class PdfSigner
             ["P"] = pageRef,
         };
 
-        // A visible signature carries a generated appearance; the invisible default
-        // keeps the zero rect and no /AP so unchanged callers stay byte-identical.
         if (appearanceStream is not null)
         {
             field["AP"] = new DictionaryObject { ["N"] = writer.Add(appearanceStream) };
@@ -131,11 +124,6 @@ public static class PdfSigner
         AppendAnnotation(reader, writer, pageRef, page, fieldRef);
         var bytes = writer.ToArray();
 
-        // Bounds the placeholder scan. Objects are emitted in object-number order and the
-        // sig dict is the first appended one, so every object copied from the (possibly
-        // hostile) input is an override with a lower number, written before sigStart.
-        // Note the window is not the sig dict alone: a visible signature's appearance
-        // stream is added above and lands between sigStart and sigEnd.
         var sigStart = checked((int)writer.OffsetOf(signatureRef));
         var sigEnd = checked((int)writer.OffsetOf(fieldRef));
         return (bytes, sigStart, sigEnd);
@@ -236,9 +224,6 @@ public static class PdfSigner
         }
     }
 
-    // A visible signature's rectangle and appearance BBox derive directly from
-    // these numbers, so reject values that would yield a degenerate, inverted or
-    // non-finite widget the viewer renders as nothing or garbage.
     private static void ValidateAppearance(SignatureAppearance appearance)
     {
         RequireFinite(appearance.X, nameof(appearance.X));
@@ -299,8 +284,6 @@ public static class PdfSigner
         }
 
         var font = new Font { Name = "Helvetica", Size = 9 };
-        // Signing works on finished bytes, not a Document, so no registry or conformance level
-        // is knowable here; the appearance can only ever use a base-14 face.
         return FieldAppearances.BuildSignatureAppearance(
             lines, appearance.Width, appearance.Height, font, scope: default);
     }
@@ -326,8 +309,6 @@ public static class PdfSigner
     private static (ReferenceObject, DictionaryObject)? FindLeaf(
         DocumentReader reader, ReferenceObject nodeRef, int target, ref int counter, int depth)
     {
-        // The same tree the loader accepted must not be rejected here, so the cap is the
-        // reader's configured page-tree limit rather than a constant private to signing.
         if (depth > reader.Limits.MaxPageTreeDepth)
         {
             throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
@@ -397,8 +378,6 @@ public static class PdfSigner
 
     internal delegate byte[] BlobProducer(SignedContent content);
 
-    // The /ByteRange patch must be length-preserving: it happens after the ranges it
-    // describes are fixed, and any resize would invalidate them.
     internal static byte[] Embed(byte[] bytes, int sigStart, int sigEnd, int reservedBytes,
         BlobProducer produceBlob, string reservedHint)
     {
@@ -425,10 +404,6 @@ public static class PdfSigner
         return bytes;
     }
 
-    // Matches the first /Contents in [from, end) whose value has the placeholder shape.
-    // [from, end) starts at the sig dict, so a /Contents an attacker planted in a copied
-    // input object (written before `from`) is out of range, and the sig dict's own
-    // placeholder is reached before anything appended after it.
     private static (int Start, int End) FindContentsGap(byte[] bytes, int from, int end, int hexDigits)
     {
         const string key = "/Contents";
@@ -536,8 +511,6 @@ public static class PdfSigner
         return -1;
     }
 
-    // Emits a pre-formatted token verbatim; used for the fixed-width
-    // /ByteRange and /Contents placeholders that are patched in place later.
     private sealed class RawTokenObject(string token) : DocumentObject
     {
         internal override void Write(Stream stream, WriteContext context)

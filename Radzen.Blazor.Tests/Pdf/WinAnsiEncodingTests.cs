@@ -4,8 +4,7 @@ using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// WinAnsiEncoding per ISO 32000-1 Annex D.2. Spot-check values cross-checked against
-// python3 "chr(u).encode('cp1252')" for the printable/high-range code points.
+// WinAnsiEncoding per ISO 32000-1 Annex D.2
 public class WinAnsiEncodingTests
 {
     [Theory]
@@ -14,13 +13,13 @@ public class WinAnsiEncodingTests
     [InlineData('0', 48)]
     [InlineData(' ', 32)]
     [InlineData('~', 126)]
-    [InlineData('€', 128)]   // euro
-    [InlineData('™', 153)]   // trademark
-    [InlineData('“', 147)]   // left double quote
-    [InlineData('”', 148)]   // right double quote
-    [InlineData('é', 233)]   // e acute
-    [InlineData(' ', 160)]   // nbsp -> space slot in Annex D
-    [InlineData('ÿ', 255)]   // y dieresis
+    [InlineData('€', 128)]
+    [InlineData('™', 153)]
+    [InlineData('“', 147)]
+    [InlineData('”', 148)]
+    [InlineData('é', 233)]
+    [InlineData(' ', 160)]
+    [InlineData('ÿ', 255)]
     public void TryGetCode_MapsKnownChars(char c, int expected)
     {
         Assert.True(WinAnsiEncoding.TryGetCode(c, out var code));
@@ -28,9 +27,9 @@ public class WinAnsiEncodingTests
     }
 
     [Theory]
-    [InlineData('Б')]   // Cyrillic Be
-    [InlineData('α')]   // Greek alpha
-    [InlineData('中')]   // CJK
+    [InlineData('Б')]
+    [InlineData('α')]
+    [InlineData('中')]
     public void TryGetCode_ReturnsFalseForUnencodable(char c)
     {
         Assert.False(WinAnsiEncoding.TryGetCode(c, out var code));

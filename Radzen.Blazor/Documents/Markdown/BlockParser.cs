@@ -156,12 +156,12 @@ class BlockParser
 
             switch (container.Matches(this))
             {
-                case BlockMatch.Match: // we've matched, keep going
+                case BlockMatch.Match:
                     break;
-                case BlockMatch.Skip: // we've failed to match a block
+                case BlockMatch.Skip:
                     allMatched = false;
                     break;
-                case BlockMatch.Break: // we've hit end of line for fenced code close and can return
+                case BlockMatch.Break:
                     return;
                 default: 
                     throw new InvalidOperationException("Invalid continue result");
@@ -211,12 +211,9 @@ class BlockParser
             }
         }
 
-        // What remains at the offset is a text line.  Add the text to the
-        // appropriate container.
 
         if (!AllClosed && !Blank && this.Tip is Paragraph or Table) 
         {
-            // lazy paragraph continuation
             if (Tip is Paragraph paragraph)
             {
                 paragraph.AddLine(this);
@@ -228,9 +225,7 @@ class BlockParser
         }
         else 
         {
-            // not a lazy continuation
 
-            // finalize any blocks not matched
             CloseUnmatchedBlocks();
 
             if (container is Leaf leaf)
@@ -285,7 +280,7 @@ class BlockParser
             parent.Add(node);
         }
 
-        var columnNumber = offset + 1; // offset 0 = column 1
+        var columnNumber = offset + 1;
 
         node.Range.Start.Line = LineNumber;
         node.Range.Start.Column = columnNumber;
@@ -387,9 +382,8 @@ class BlockParser
 
     private readonly Dictionary<string, LinkReference> linkReferences = [];
 
-    // https://spec.commonmark.org/0.31.2/#html-blocks
     internal static readonly Regex[] HtmlBlockOpenRegex = [
-        new (@"."), // dummy for 1 based indexing
+        new (@"."),
         new (@"^<(?:script|pre|textarea|style)(?:\s|>|$)", RegexOptions.IgnoreCase),
         new (@"^<!--"),
         new (@"^<[?]"),
@@ -400,7 +394,7 @@ class BlockParser
     ];
 
     private static readonly Regex[] HtmlBlockCloseRegex = [
-        new (@"."), // dummy for 1 based indexing
+        new (@"."),
         new (@"</(?:script|pre|textarea|style)>", RegexOptions.IgnoreCase),
         new (@"-->"),
         new (@"\?>"),

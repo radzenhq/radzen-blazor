@@ -4,9 +4,6 @@ using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// The public MeasureText must not kern a pair straddling a space: the draw side never does
-// (see KerningSpaceBoundaryTests), so a kerned measure would report a width narrower than
-// anything that can be drawn.
 public class MeasureKerningSpaceTests
 {
     private static FontCollection Kerned() => new() { EnableKerning = true };

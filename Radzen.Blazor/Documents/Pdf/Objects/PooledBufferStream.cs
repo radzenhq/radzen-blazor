@@ -4,10 +4,6 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-
-// Write-only growable buffer backed by ArrayPool. Collapses the MemoryStream
-// double buffering on the save path: growth swaps pooled arrays and ToArray
-// performs the single exact-size copy.
 internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Stream
 {
     private byte[]? buffer = ArrayPool<byte>.Shared.Rent(initialCapacity);
