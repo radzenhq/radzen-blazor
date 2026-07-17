@@ -32,13 +32,6 @@ internal static class HexCodec
     /// </summary>
     public static void Encode(ReadOnlySpan<byte> data, Span<byte> destination, HexCase hexCase)
     {
-        // In long: data.Length * 2 overflows to negative above 2^30, and a length is never
-        // less than a negative, so the int form let every oversized input straight through.
-        if (destination.Length < (long)data.Length * 2)
-        {
-            throw new ArgumentException("Destination is too small for the encoded output.", nameof(destination));
-        }
-
         var digits = Digits(hexCase);
 
         for (var i = 0; i < data.Length; i++)
