@@ -307,4 +307,103 @@ public class ContentTokenizerTests
 
         Assert.Equal("Hello\nWorld\nHi", extracted);
     }
+
+    // An inline image with no /L, wrapped in q/Q. The payload is spliced in verbatim.
+    private static byte[] InlineImageStream(string dictionary, IEnumerable<byte> payload, string trailer = "\nEI\nQ\n")
+    {
+        var stream = new List<byte>();
+        stream.AddRange(Ascii("q\nBI " + dictionary + " ID "));
+        stream.AddRange(payload);
+        stream.AddRange(Ascii(trailer));
+        return stream.ToArray();
+    }
+
+    private static string[] Operators(byte[] stream) => ContentTokenizer
+        .Tokenize(stream)
+        .Where(t => t.Kind == ContentTokenizer.TokenKind.Operator)
+        .Select(t => t.Text!)
+        .ToArray();
+
+    // A binary-compressed payload's encoded length is unknowable without decoding, so the
+    // tokenizer scans for EI. Compressed bytes can spell a whitespace-bounded EI of their
+    // own; the bytes that follow such a false EI are the image tail, not operators.
+    [Fact]
+    public void Tokenize_FilteredInlineImageWithoutLength_DoesNotTerminateOnPayloadBytesSpellingEI()
+    {
+        var payload = new List<byte> { 0x78, 0x9c, 0x01, 0x20 };
+        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
+
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl", payload)));
+    }
+
+    // ASCII85 marks its own end with "~>", which the alphabet ('!'..'u', plus z and y) cannot
+    // contain, so the payload end is exact and an embedded EI is never even a candidate.
+    [Fact]
+    public void Tokenize_Ascii85InlineImageWithoutLength_EndsAtEndOfDataMarker()
+    {
+        var payload = Ascii("87cURD] EI ]i<~>");
+
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /A85", payload)));
+    }
+
+    // ASCIIHex ends at '>'.
+    [Fact]
+    public void Tokenize_AsciiHexInlineImageWithoutLength_EndsAtEndOfDataMarker()
+    {
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /AHx", Ascii("48656C6C6F>"))));
+    }
+
+    // Run-length data is length-prefixed runs closed by a 128 byte, so its end is exact even
+    // though a literal run here carries the bytes " EI ".
+    [Fact]
+    public void Tokenize_RunLengthInlineImageWithoutLength_EndsAtEndOfDataMarker()
+    {
+        var payload = new List<byte> { 3 };
+        payload.AddRange(Ascii(" EI "));
+        payload.Add(128);
+
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /RL", payload)));
+    }
+
+    // /Filter lists filters in the order a reader applies them to decode, so the bytes on the
+    // page are in the format of the first - here ASCII85, whose end-of-data marker bounds them.
+    [Fact]
+    public void Tokenize_InlineImageFilterArray_MeasuresPayloadWithFirstFilter()
+    {
+        var payload = Ascii("87cURD] EI ]i<~>");
+
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F [/A85 /Fl]", payload)));
+    }
+
+    // The residual, pinned rather than blessed: when the image is truncated and no candidate
+    // EI validates, the scan has nothing better to go on and takes the first candidate, so the
+    // payload tail after it still leaks out as junk operators. This is the pre-existing
+    // behavior, kept deliberately because the alternative - swallowing every remaining byte of
+    // a stream whose image happens to be malformed - loses real content. Only the /L, geometry
+    // and self-terminating-filter paths above are exact; a binary-compressed payload with no
+    // /L cannot be measured at the tokenizer layer without decoding it.
+    [Fact]
+    public void Tokenize_FilteredInlineImageWithNoPlausibleTerminator_TakesFirstCandidate()
+    {
+        var payload = new List<byte> { 0x78, 0x9c };
+        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
+
+        var tokens = ContentTokenizer.Tokenize(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl", payload, string.Empty));
+
+        Assert.Equal(new[] { "q", "\x01\x02\x03" }, tokens.Where(t => t.Kind == ContentTokenizer.TokenKind.Operator).Select(t => t.Text).ToArray());
+        Assert.Single(tokens, t => t.Kind == ContentTokenizer.TokenKind.InlineImage);
+    }
+
+    // An explicit /L still wins over every scan, including when the payload spells EI.
+    [Fact]
+    public void Tokenize_FilteredInlineImageWithLength_UsesDeclaredLength()
+    {
+        var payload = new List<byte>();
+        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
+
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl /L 8", payload)));
+    }
 }
