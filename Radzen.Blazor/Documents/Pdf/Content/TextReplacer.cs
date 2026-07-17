@@ -42,7 +42,6 @@ internal static class TextReplacer
         ArgumentNullException.ThrowIfNull(search);
         ArgumentNullException.ThrowIfNull(replacement);
         options ??= new ReplaceTextOptions();
-        page.ApplyPendingContentEdits();
         var cache = new ContentTokenizer.Cache();
         var hits = page.FindText(search, options.Search, -1, cache);
         if (hits.Count == 0)
@@ -50,7 +49,7 @@ internal static class TextReplacer
             return 0;
         }
 
-        var content = page.RawContent ?? throw new NotSupportedException("Text replacement requires an existing serialized content stream.");
+        var content = page.CurrentContent ?? throw new NotSupportedException("Text replacement requires an existing serialized content stream.");
         var hasMultipleShowMatch = false;
         foreach (var hit in hits)
         {

@@ -223,11 +223,7 @@ public sealed class Page
     /// <c>/ToUnicode</c> CMap, <c>/Differences</c> array or standard WinAnsi encoding.
     /// </summary>
     /// <returns>The page text, or an empty string when the page has no text.</returns>
-    public string ExtractText()
-    {
-        ApplyPendingContentEdits();
-        return TextSearch.ExtractText(content, textFonts);
-    }
+    public string ExtractText() => TextSearch.ExtractText(CurrentContent, textFonts);
 
     /// <summary>
     /// Extracts decoded text-show runs in reading order with transformed em-box
@@ -241,10 +237,7 @@ public sealed class Page
     public IReadOnlyList<PositionedTextRun> ExtractPositionedText() => ExtractPositionedText(null);
 
     internal IReadOnlyList<PositionedTextRun> ExtractPositionedText(ContentTokenizer.Cache? cache)
-    {
-        ApplyPendingContentEdits();
-        return TextSearch.Extract(content, textFonts, cache);
-    }
+        => TextSearch.Extract(CurrentContent, textFonts, cache);
 
     /// <summary>Finds text in this page across adjacent text-show operators.</summary>
     /// <remarks>
@@ -256,10 +249,7 @@ public sealed class Page
     /// <param name="options">The matching options, or <c>null</c> for defaults.</param>
     /// <returns>The matches in reading order.</returns>
     public IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options = null)
-    {
-        ApplyPendingContentEdits();
-        return TextSearch.Find(content, textFonts, text, options, -1);
-    }
+        => FindText(text, options, -1);
 
     /// <summary>Replaces every matching text occurrence using the source font encoding.</summary>
     /// <remarks>Matches may span contiguous <c>Tj</c> operators with the same font and text state. Unsupported show operators or incompatible text states cause an exception.</remarks>
@@ -285,7 +275,7 @@ public sealed class Page
         => Redactor.RedactText(this, text, searchOptions, redactionOptions);
 
     internal IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options, int pageIndex, ContentTokenizer.Cache? cache = null)
-        => TextSearch.Find(content, textFonts, text, options, pageIndex, cache);
+        => TextSearch.Find(CurrentContent, textFonts, text, options, pageIndex, cache);
 
     internal void SetTextFonts(IReadOnlyDictionary<string, Fonts.ReverseFont> fonts)
     {
@@ -296,7 +286,18 @@ public sealed class Page
     // can carry them onto a copied page (a Type0/Identity-H stream is not reversible without them).
     internal IReadOnlyDictionary<string, Fonts.ReverseFont>? TextFonts => textFonts;
 
-    internal byte[]? RawContent => content;
+    // The page's bytes for every consumer that reads content as data. Queued edits are folded
+    // in first, so a reader cannot see bytes the page has already superseded. The machinery
+    // that must observe the unflushed state - materialization, intactness, and BuildContent's
+    // raw-bytes-plus-overlay path - reads the field directly and deliberately.
+    internal byte[]? CurrentContent
+    {
+        get
+        {
+            ApplyPendingContentEdits();
+            return content;
+        }
+    }
 
     // Whether the retained bytes are still the ones this page was loaded with: they were never
     // replaced wholesale, no elements were materialized (and so none can have been edited) and
@@ -326,7 +327,7 @@ public sealed class Page
 
     internal void SetReservedResourceNames(IReadOnlyCollection<string> names) => reservedResourceNames = names;
 
-    internal void ApplyPendingContentEdits()
+    private void ApplyPendingContentEdits()
     {
         if (pendingAppends.Count > 0)
         {

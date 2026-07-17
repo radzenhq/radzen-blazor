@@ -6,8 +6,14 @@ using System.Text;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-// Minimal PDF content-stream tokenizer used only by the C3 tests to assert on the
-// emitted operator stream. Not a product type.
+// A deliberately independent reader of the emitted operator stream, kept separate from
+// Content/ContentTokenizer rather than merged with it. The production tokenizer exists to
+// render damaged input: it drops a malformed numeric run instead of reporting it, captures
+// BI..EI as one opaque token and swallows stray delimiters. Those are the exact defects an
+// emitter test must witness, so measuring the writer's output with it would let a malformed
+// operand vanish before the assertion sees it. This reader is strict and reports what is
+// actually in the bytes. Tests of the production tokenizer itself use the production type
+// directly (ContentTokenizerTests); this one is only ever pointed at bytes we emitted.
 internal enum ContentTokenKind
 {
     Number,
