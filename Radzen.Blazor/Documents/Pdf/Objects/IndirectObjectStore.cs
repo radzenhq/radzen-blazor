@@ -30,7 +30,10 @@ internal sealed class IndirectObjectStore(
     private readonly ConcurrentDictionary<int, DocumentObject> cache = [];
     private readonly ConcurrentDictionary<int, ObjectStream> objectStreams = [];
     private readonly NullObject nullObject = new();
-    private readonly Lock memberCountsLock = new();
+    // Not System.Threading.Lock: this project targets net8.0, which does not have it. The lock
+    // is taken once per store to seed memberCounts, so a monitor's cost is not worth a
+    // conditionally-compiled field.
+    private readonly object memberCountsLock = new();
     private Dictionary<int, int>? memberCounts;
 
     // Being mid-parse is a property of one resolution stack, not of the store: two
