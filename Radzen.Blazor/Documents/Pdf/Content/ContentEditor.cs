@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
@@ -256,27 +257,6 @@ internal static class ContentEditor
         }
 
         return result;
-    }
-
-    private static Matrix Components(List<Token> operands)
-    {
-        var numbers = new List<double>(6);
-        foreach (var operand in operands)
-        {
-            if (operand.Kind == TokenKind.Number)
-            {
-                numbers.Add(operand.Number);
-            }
-        }
-
-        if (numbers.Count < 6)
-        {
-            return Matrix.Identity;
-        }
-
-        var first = numbers.Count - 6;
-        return Matrix.FromComponents(numbers[first], numbers[first + 1], numbers[first + 2],
-            numbers[first + 3], numbers[first + 4], numbers[first + 5]);
     }
 
     // The interpreter bakes the absolute CTM into every element, but a re-emitted element is

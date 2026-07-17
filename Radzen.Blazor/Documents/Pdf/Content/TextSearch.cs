@@ -156,11 +156,6 @@ public sealed class TextHit
 
 internal static class TextSearch
 {
-    private const double AverageGlyphEm = 0.5;
-    private const double LineTolerance = 0.5;
-    private const double SpaceGapEm = 0.2;
-    private const double TjSpaceThreshold = 200.0;
-
     public static IReadOnlyList<PositionedTextRun> Extract(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache = null)
     {
         var runs = Parse(content, fonts, cache);
@@ -296,7 +291,7 @@ internal static class TextSearch
             else if (element.Kind == TokenKind.Number)
             {
                 var advance = advanceOffsets[^1] - element.Number / 1000.0 * fontSize * scale;
-                if (element.Number <= -TjSpaceThreshold)
+                if (element.Number <= -TextComposition.TjSpaceThreshold)
                 {
                     builder.Append(' ');
                     advanceOffsets.Add(advance);
@@ -317,7 +312,7 @@ internal static class TextSearch
         var advance = advanceOffsets[^1];
         foreach (var code in font.DecodeCodes(bytes))
         {
-            var widthEm = font.TryGetWidth(code.Code, out var width) ? width / 1000.0 : AverageGlyphEm;
+            var widthEm = font.TryGetWidth(code.Code, out var width) ? width / 1000.0 : TextComposition.AverageGlyphEm;
             var glyphAdvance = GlyphMetrics.Advance(widthEm, fontSize, charSpacing, wordSpacing, code.IsWordSpace);
             for (var i = 0; i < code.Text.Length; i++)
             {
@@ -367,19 +362,10 @@ internal static class TextSearch
     }
 
     private static void Sort(List<PositionedTextRun> runs)
-    {
-        runs.Sort(static (a, b) =>
-        {
-            var aOrigin = a.Matrix.Transform(0, 0);
-            var bOrigin = b.Matrix.Transform(0, 0);
-            if (Math.Abs(aOrigin.Y - bOrigin.Y) > LineTolerance)
-            {
-                return bOrigin.Y.CompareTo(aOrigin.Y);
-            }
+        => runs.Sort(static (a, b) => TextComposition.Compare(Place(a), Place(b)));
 
-            return aOrigin.X.CompareTo(bOrigin.X);
-        });
-    }
+    private static TextComposition.Placement Place(PositionedTextRun run)
+        => TextComposition.Place(run.Matrix, run.Advance, run.FontSize);
 
     private static ComposedText Compose(IReadOnlyList<PositionedTextRun> runs)
     {
@@ -389,18 +375,10 @@ internal static class TextSearch
         for (var runIndex = 0; runIndex < runs.Count; runIndex++)
         {
             var run = runs[runIndex];
-            if (previous is not null)
+            if (previous is not null
+                && TextComposition.Separator(Place(previous), previous.Text, Place(run), run.Text) is { } separator)
             {
-                var previousOrigin = previous.Matrix.Transform(0, 0);
-                var origin = run.Matrix.Transform(0, 0);
-                if (Math.Abs(origin.Y - previousOrigin.Y) > LineTolerance)
-                {
-                    AddCharacter(text, characters, '\n', -1, -1);
-                }
-                else if (NeedsSpace(previous, run))
-                {
-                    AddCharacter(text, characters, ' ', -1, -1);
-                }
+                AddCharacter(text, characters, separator, -1, -1);
             }
 
             for (var characterIndex = 0; characterIndex < run.Text.Length; characterIndex++)
@@ -412,23 +390,6 @@ internal static class TextSearch
         }
 
         return new ComposedText(text.ToString(), characters);
-    }
-
-    private static bool NeedsSpace(PositionedTextRun previous, PositionedTextRun current)
-    {
-        if (previous.Text.Length == 0 || current.Text.Length == 0
-            || char.IsWhiteSpace(previous.Text[^1]) || char.IsWhiteSpace(current.Text[0]))
-        {
-            return false;
-        }
-
-        var previousOrigin = previous.Matrix.Transform(0, 0);
-        var currentOrigin = current.Matrix.Transform(0, 0);
-        var previousPen = previous.Matrix.Transform(previous.Advance, 0);
-        var emPoint = current.Matrix.Transform(current.FontSize, 0);
-        var gap = currentOrigin.X - previousPen.X;
-        var em = Math.Abs(emPoint.X - currentOrigin.X);
-        return gap > SpaceGapEm * em;
     }
 
     private static void AddCharacter(StringBuilder text, List<CharacterSource> characters, char value, int runIndex, int characterIndex)

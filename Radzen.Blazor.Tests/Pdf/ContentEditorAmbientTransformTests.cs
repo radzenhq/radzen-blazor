@@ -81,5 +81,24 @@ public class ContentEditorAmbientTransformTests
         InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
     }
 
+    // A cm short of six operands is read by zero-filling the missing leading operand, so the
+    // ambient the editor splices against has to be read the same way the interpreter read it.
+    [Fact]
+    public void ModifiedTextUnderMalformedCm_KeepsItsTransform()
+    {
+        var document = new Document();
+        document.Pages.Add().SetContent(Content("q 1 2 3 4 5 cm BT /F1 12 Tf 10 10 Td (Hi) Tj ET Q"));
+
+        var loaded = InterpreterTestSupport.SaveAndLoad(document);
+        var run = loaded.Pages[0].Content.OfType<TextContent>().Single();
+        var expected = run.Transform;
+        run.Color = Color.Red;
+
+        var reloaded = InterpreterTestSupport.SaveAndLoad(loaded);
+        var actual = reloaded.Pages[0].Content.OfType<TextContent>().Single();
+
+        InterpreterTestSupport.AssertMatrix(expected, actual.Transform);
+    }
+
     private static byte[] Content(string value) => Encoding.ASCII.GetBytes(value);
 }

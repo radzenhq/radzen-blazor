@@ -414,9 +414,7 @@ internal static class TextReplacer
         string? fontName = null;
         var font = ReverseFont.WinAnsi;
         var fontSize = 0.0;
-        var scale = 1.0;
-        var charSpacing = 0.0;
-        var wordSpacing = 0.0;
+        var spacing = new TextSpacing();
         foreach (var token in ContentTokenizer.Tokenize(content, cache))
         {
             if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
@@ -430,6 +428,7 @@ internal static class TextReplacer
                 continue;
             }
 
+            spacing.Apply(token.Text, operands);
             switch (token.Text)
             {
                 case "Tf":
@@ -438,25 +437,22 @@ internal static class TextReplacer
                     font = name is not null && fonts is not null && fonts.TryGetValue(name, out var resolved) ? resolved : ReverseFont.WinAnsi;
                     fontSize = LastNumber(operands);
                     break;
-                case "Tz": scale = LastNumber(operands) / 100.0; break;
-                case "Tc": charSpacing = LastNumber(operands); break;
-                case "Tw": wordSpacing = LastNumber(operands); break;
                 case "Tj":
                 case "'":
                 case "\"":
                     var text = LastStringToken(operands);
                     if (text is not null)
                     {
-                        result.Add(new Show(result.Count, token.Text, text.Value, fontName, font, fontSize, scale, charSpacing, wordSpacing));
+                        result.Add(new Show(result.Count, token.Text, text.Value, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
                     }
                     else if (includeEveryShow)
                     {
-                        result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, scale, charSpacing, wordSpacing));
+                        result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
                     }
 
                     break;
                 case "TJ" when includeEveryShow:
-                    result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, scale, charSpacing, wordSpacing));
+                    result.Add(new Show(result.Count, token.Text, default, fontName, font, fontSize, spacing.HorizontalScale, spacing.CharSpacing, spacing.WordSpacing));
                     break;
             }
 
