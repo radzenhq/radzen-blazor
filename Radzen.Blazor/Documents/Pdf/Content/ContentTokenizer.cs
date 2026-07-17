@@ -167,11 +167,13 @@ internal static class ContentTokenizer
     }
 
     // After a BI operator, skip the inline-image dict and its binary payload, resuming
-    // past the EI that ends the image. The exact payload length is computed from the
-    // dictionary (an explicit /L, or /W /H /BPC and the color-space component count for
-    // an unfiltered image) so a payload that happens to contain the bytes "EI" is not
-    // mistaken for the terminator. Only a filtered image with no /L - whose decoded
-    // length the tokenizer cannot know - falls back to the whitespace-bounded EI scan.
+    // past the EI that ends the image. The end of the payload is computed exactly whenever
+    // the dictionary allows it - an explicit /L, or /W /H /BPC and the color-space component
+    // count for an unfiltered image, or the encoding's own end-of-data marker when the first
+    // filter is self-terminating - so a payload that happens to contain the bytes "EI" is not
+    // mistaken for the terminator. Only an image whose first filter is a binary compressor
+    // with no /L - whose encoded length the tokenizer cannot know without decoding - falls
+    // back to the EI scan, which is why that scan validates its candidates.
     private static void SkipInlineImage(byte[] data, ref int position)
     {
         var image = ParseInlineImageDictionary(data, ref position);
@@ -186,42 +188,173 @@ internal static class ContentTokenizer
             position++;
         }
 
-        // When the payload length is known, jump straight to it - but only commit if an EI
+        // When the payload end is known, jump straight to it - but only commit if an EI
         // actually follows. A declared geometry that disagrees with the real payload (a
-        // malformed image) falls through to the whitespace-bounded EI scan instead.
-        var length = InlineImagePayloadLength(image);
-        if (length >= 0 && position + length <= data.Length)
+        // malformed image) falls through to the EI scan instead.
+        var end = InlineImagePayloadEnd(data, position, image);
+        if (end >= 0)
         {
-            var probe = position + (int)length;
+            var probe = end;
             while (probe < data.Length && IsWhitespace(data[probe]))
             {
                 probe++;
             }
 
-            if (probe + 1 < data.Length && data[probe] == (byte)'E' && data[probe + 1] == (byte)'I'
-                && (probe + 2 >= data.Length || IsWhitespace(data[probe + 2]) || IsDelimiter(data[probe + 2])))
+            if (IsInlineImageTerminator(data, probe))
             {
                 position = probe + 2;
                 return;
             }
         }
 
-        // EI ends the payload when bounded by whitespace/delimiter/EOF on the trailing side.
-        // A preceding whitespace is the common case but not required: streams that pack the
-        // image data flush against EI ("dataEI") must still terminate here rather than
-        // swallowing the remainder of the content stream.
-        while (position < data.Length)
+        ScanForInlineImageTerminator(data, ref position);
+    }
+
+    // Last resort for a payload of unknowable length. EI ends the payload when bounded by
+    // whitespace/delimiter/EOF on the trailing side. A preceding whitespace is the common
+    // case but not required: streams that pack the image data flush against EI ("dataEI")
+    // must still terminate here rather than swallowing the remainder of the content stream.
+    // Compressed payload bytes can spell a whitespace-bounded EI of their own, so a candidate
+    // is only taken when what follows it reads as a plausible operator stream; the bytes
+    // after a false EI are the tail of the image and essentially never do. Candidates inside
+    // the payload always precede the real one, so taking the first that validates can only
+    // improve on taking the first outright, which is what happens if none validates.
+    private static void ScanForInlineImageTerminator(byte[] data, ref int position)
+    {
+        var first = -1;
+        var probe = position;
+        while (probe < data.Length)
         {
-            if (data[position] == (byte)'E' && position + 1 < data.Length && data[position + 1] == (byte)'I'
-                && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2])))
+            if (IsInlineImageTerminator(data, probe))
             {
-                position += 2;
-                return;
+                if (first < 0)
+                {
+                    first = probe + 2;
+                }
+
+                if (LooksLikeOperatorStream(data, probe + 2))
+                {
+                    position = probe + 2;
+                    return;
+                }
             }
 
-            position++;
+            probe++;
         }
+
+        position = first < 0 ? data.Length : first;
     }
+
+    private static bool IsInlineImageTerminator(byte[] data, int position)
+        => position + 1 < data.Length && data[position] == (byte)'E' && data[position + 1] == (byte)'I'
+            && (position + 2 >= data.Length || IsWhitespace(data[position + 2]) || IsDelimiter(data[position + 2]));
+
+    // How many tokens past a candidate EI must read as content before it is believed. Enough
+    // to get past the operands of the first operator or two; the check is only ever separating
+    // real operators from compressed-image tails, which diverge almost immediately.
+    private const int InlineImageValidationBudget = 8;
+
+    private static bool LooksLikeOperatorStream(byte[] data, int position)
+    {
+        for (var seen = 0; seen < InlineImageValidationBudget;)
+        {
+            SkipTokenWhitespace(data, ref position);
+            if (position >= data.Length)
+            {
+                return true;
+            }
+
+            var b = data[position];
+            switch (b)
+            {
+                case (byte)'[':
+                case (byte)']':
+                    position++;
+                    seen++;
+                    continue;
+
+                case (byte)'(':
+                    Lexer.ReadLiteralString(data, ref position, Lexer.Recovery.Lenient);
+                    seen++;
+                    continue;
+
+                case (byte)'/':
+                    Lexer.ReadName(data, ref position);
+                    seen++;
+                    continue;
+
+                case (byte)'<':
+                    if (position + 1 < data.Length && data[position + 1] == (byte)'<')
+                    {
+                        position += 2;
+                    }
+                    else
+                    {
+                        Lexer.ReadHexString(data, ref position, Lexer.Recovery.Lenient);
+                    }
+
+                    seen++;
+                    continue;
+
+                case (byte)'>':
+                    if (position + 1 >= data.Length || data[position + 1] != (byte)'>')
+                    {
+                        return false;
+                    }
+
+                    position += 2;
+                    seen++;
+                    continue;
+
+                case (byte)')':
+                case (byte)'{':
+                case (byte)'}':
+                    return false;
+            }
+
+            if (IsNumberStart(b))
+            {
+                if (Lexer.ReadNumber(data, ref position, Lexer.Recovery.Lenient) is null)
+                {
+                    return false;
+                }
+
+                seen++;
+                continue;
+            }
+
+            var keywordStart = position;
+            while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
+            {
+                position++;
+            }
+
+            if (position == keywordStart || !IsContentOperator(Latin1(data, keywordStart, position - keywordStart)))
+            {
+                return false;
+            }
+
+            seen++;
+        }
+
+        return true;
+    }
+
+    private static readonly HashSet<string> ContentOperators =
+    [
+        "q", "Q", "cm", "w", "J", "j", "M", "d", "ri", "i", "gs",
+        "m", "l", "c", "v", "y", "h", "re",
+        "S", "s", "f", "F", "f*", "B", "B*", "b", "b*", "n",
+        "W", "W*",
+        "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts", "Tj", "TJ", "'", "\"",
+        "d0", "d1",
+        "CS", "cs", "SC", "SCN", "sc", "scn", "G", "g", "RG", "rg", "K", "k",
+        "sh", "Do", "BI",
+        "MP", "DP", "BMC", "BDC", "EMC",
+        "BX", "EX",
+    ];
+
+    private static bool IsContentOperator(string keyword) => ContentOperators.Contains(keyword);
 
     // Reads the key/value pairs between BI and ID into the fields needed to size the
     // payload; leaves position just past the ID keyword.
@@ -240,12 +373,12 @@ internal static class ContentTokenizer
             {
                 var key = Lexer.ReadName(data, ref position);
                 SkipTokenWhitespace(data, ref position);
-                var value = ReadInlineToken(data, ref position);
-                image.Set(key, value);
+                var value = ReadInlineToken(data, ref position, out var raw);
+                image.Set(key, value, raw);
                 continue;
             }
 
-            var keyword = ReadInlineToken(data, ref position);
+            var keyword = ReadInlineToken(data, ref position, out _);
             if (keyword == "ID")
             {
                 return image;
@@ -280,8 +413,10 @@ internal static class ContentTokenizer
     // Reads a single dictionary value: a name (returned with a leading '/'), an
     // array/dictionary (skipped and returned as null), or a bare token (number, boolean
     // or keyword). Only the shapes the payload-length computation needs are distinguished.
-    private static string? ReadInlineToken(byte[] data, ref int position)
+    // raw carries the value's source text, which a composite needs to name its first filter.
+    private static string? ReadInlineToken(byte[] data, ref int position, out string? raw)
     {
+        raw = null;
         if (position >= data.Length)
         {
             return null;
@@ -290,12 +425,14 @@ internal static class ContentTokenizer
         var b = data[position];
         if (b == (byte)'/')
         {
-            return "/" + Lexer.ReadName(data, ref position);
+            return raw = "/" + Lexer.ReadName(data, ref position);
         }
 
         if (b == (byte)'[' || b == (byte)'<')
         {
+            var compositeStart = position;
             SkipInlineComposite(data, ref position);
+            raw = Latin1(data, compositeStart, position - compositeStart);
             return null;
         }
 
@@ -307,7 +444,7 @@ internal static class ContentTokenizer
 
         if (position > start)
         {
-            return Latin1(data, start, position - start);
+            return raw = Latin1(data, start, position - start);
         }
 
         // A stray delimiter that is not a name/array/dict start: consume one byte so the
@@ -343,6 +480,66 @@ internal static class ContentTokenizer
         }
     }
 
+    // The absolute index one past the end of the payload starting at start, or -1 when it
+    // cannot be established without decoding.
+    private static int InlineImagePayloadEnd(byte[] data, int start, InlineImage image)
+    {
+        var length = InlineImagePayloadLength(image);
+        if (length >= 0)
+        {
+            return start + length <= data.Length ? start + (int)length : -1;
+        }
+
+        // The bytes on the page are in the format of the FIRST filter in the chain (the
+        // /Filter array lists filters in the order a reader applies them to decode). Those
+        // encodings that mark their own end can be measured exactly without decoding.
+        return image.FirstFilter switch
+        {
+            "/AHx" or "/ASCIIHexDecode" => IndexAfter(data, start, (byte)'>'),
+            "/A85" or "/ASCII85Decode" => IndexAfterAscii85(data, start),
+            "/RL" or "/RunLengthDecode" => IndexAfterRunLength(data, start),
+            _ => -1,
+        };
+    }
+
+    private static int IndexAfter(byte[] data, int start, byte marker)
+    {
+        var index = System.Array.IndexOf(data, marker, start);
+        return index < 0 ? -1 : index + 1;
+    }
+
+    // '~' is outside the ASCII85 alphabet, so "~>" occurs only as the end-of-data marker.
+    private static int IndexAfterAscii85(byte[] data, int start)
+    {
+        for (var index = start; index + 1 < data.Length; index++)
+        {
+            if (data[index] == (byte)'~' && data[index + 1] == (byte)'>')
+            {
+                return index + 2;
+            }
+        }
+
+        return -1;
+    }
+
+    // Run-length data is a chain of length-prefixed runs closed by a 128 byte.
+    private static int IndexAfterRunLength(byte[] data, int start)
+    {
+        var index = start;
+        while (index < data.Length)
+        {
+            var run = data[index];
+            if (run == 128)
+            {
+                return index + 1;
+            }
+
+            index += run < 128 ? run + 2 : 2;
+        }
+
+        return -1;
+    }
+
     private static long InlineImagePayloadLength(InlineImage image)
     {
         if (image.Length >= 0)
@@ -350,8 +547,8 @@ internal static class ContentTokenizer
             return image.Length;
         }
 
-        // A filtered image's on-disk length is its compressed size, which cannot be
-        // derived from the geometry; defer to the EI scan.
+        // A filtered image's on-disk length is its encoded size, which cannot be derived
+        // from the geometry.
         if (image.Filtered)
         {
             return -1;
@@ -393,9 +590,30 @@ internal static class ContentTokenizer
 
         public bool Filtered { get; private set; }
 
+        public string? FirstFilter { get; private set; }
+
         private string? colorSpace;
 
-        public void Set(string key, string? value)
+        // The first name in a raw "[/Fl /AHx]" style filter list, or null when the list is
+        // a decode-parms dictionary or has no leading name.
+        private static string? FirstNameIn(string? raw)
+        {
+            var slash = raw is null || !raw.StartsWith('[') ? -1 : raw.IndexOf('/', System.StringComparison.Ordinal);
+            if (slash < 0)
+            {
+                return null;
+            }
+
+            var end = slash + 1;
+            while (end < raw!.Length && !IsWhitespace((byte)raw[end]) && !IsDelimiter((byte)raw[end]))
+            {
+                end++;
+            }
+
+            return raw[slash..end];
+        }
+
+        public void Set(string key, string? value, string? raw)
         {
             switch (key)
             {
@@ -423,8 +641,9 @@ internal static class ContentTokenizer
                     break;
                 case "F" or "Filter":
                     // A null value means an array/dict filter list; a slash name is a
-                    // single filter. Either way the payload is compressed.
+                    // single filter. Either way the payload is encoded.
                     Filtered = value is null || value.StartsWith('/');
+                    FirstFilter = value is not null && value.StartsWith('/') ? value : FirstNameIn(raw);
                     break;
             }
         }
