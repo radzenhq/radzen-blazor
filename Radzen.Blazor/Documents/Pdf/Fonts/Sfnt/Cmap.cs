@@ -65,7 +65,14 @@ internal sealed class Cmap
         reader.ReadUInt16(); // version
         var numTables = reader.ReadUInt16();
 
-        ICmapSubtable? best = null;
+        // Only the best-scoring subtable is ever used, and Score needs just the record's
+        // platform/encoding plus the subtable's 2-byte format word. Parsing every record
+        // eagerly made the work numTables (up to 65535) times the cost of one subtable,
+        // and nothing stops all records naming the same 256 KB one. Score first, then
+        // parse the single winner: the number of full parses is what grows, and it is
+        // now 1 regardless of numTables.
+        var bestOffset = -1;
+        var bestFormat = 0;
         var bestScore = -1;
         var bestSymbol = false;
 
@@ -77,19 +84,13 @@ internal sealed class Cmap
             var next = reader.Position;
 
             var format = new SfntReader(data, subtableOffset).ReadUInt16();
-            ICmapSubtable? parsed = format switch
-            {
-                4 => Format4Subtable.Parse(data, subtableOffset),
-                12 => Format12Subtable.Parse(data, subtableOffset),
-                _ => null,
-            };
-
-            if (parsed != null)
+            if (format is 4 or 12)
             {
                 var score = Score(platformId, encodingId, format);
                 if (score > bestScore)
                 {
-                    best = parsed;
+                    bestOffset = subtableOffset;
+                    bestFormat = format;
                     bestScore = score;
                     bestSymbol = platformId == 3 && encodingId == 0;
                 }
@@ -98,10 +99,14 @@ internal sealed class Cmap
             reader.Position = next;
         }
 
-        if (best == null)
+        if (bestOffset < 0)
         {
             throw new InvalidDataException("No supported cmap subtable (format 4 or 12) found.");
         }
+
+        ICmapSubtable best = bestFormat == 4
+            ? Format4Subtable.Parse(data, bestOffset)
+            : Format12Subtable.Parse(data, bestOffset);
 
         return new Cmap(best, bestSymbol);
     }

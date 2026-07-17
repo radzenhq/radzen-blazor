@@ -62,6 +62,16 @@ public sealed class ReaderLimits
     /// </summary>
     public int MaxFontWidthEntries { get; init; } = 1_000_000;
 
+    /// <summary>
+    /// Maximum number of Type 2 charstring operations interpreted while reading one glyph of a
+    /// CFF font, counted across the glyph's charstring and every subr it calls. Subr calls
+    /// multiply: a chain of subrs that each call the next k times performs k^depth operations
+    /// while holding one operand and staying inside the nesting limit, so neither the 48-entry
+    /// argument stack nor the depth cap bounds it. This is the only cap on that product.
+    /// Default 1,000,000.
+    /// </summary>
+    public int MaxCharstringOperations { get; init; } = 1_000_000;
+
     /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
     public long MaxImagePixels { get; init; } = 64L * 1024 * 1024;
 
@@ -84,6 +94,7 @@ public sealed class ReaderLimits
         RequirePositive(MaxObjectStreamCount, nameof(MaxObjectStreamCount));
         RequirePositive(MaxCMapEntries, nameof(MaxCMapEntries));
         RequirePositive(MaxFontWidthEntries, nameof(MaxFontWidthEntries));
+        RequirePositive(MaxCharstringOperations, nameof(MaxCharstringOperations));
         RequirePositive(MaxImagePixels, nameof(MaxImagePixels));
         RequirePositive(MaxFileBytes, nameof(MaxFileBytes));
 
@@ -100,6 +111,7 @@ public sealed class ReaderLimits
             MaxObjectStreamCount = MaxObjectStreamCount,
             MaxCMapEntries = MaxCMapEntries,
             MaxFontWidthEntries = MaxFontWidthEntries,
+            MaxCharstringOperations = MaxCharstringOperations,
             MaxImagePixels = MaxImagePixels,
             MaxFileBytes = MaxFileBytes,
         };

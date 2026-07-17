@@ -10,6 +10,12 @@ internal sealed class SfntFont
 {
     private const uint TtcTag = 0x74746366; // 'ttcf'
 
+    // Faces in one ttcf collection. A spec constant rather than a ReaderLimits knob:
+    // ReaderLimits governs reading a PDF and is not threaded into font parsing, and
+    // this bounds a font-format structure whose real-world size (the largest shipping
+    // collections carry a few dozen faces) is a property of the format, not of a document.
+    internal const int MaxCollectionFaces = 256;
+
     private readonly byte[] data;
     private readonly TableDirectory directory;
     private readonly NameTable names;
@@ -222,10 +228,21 @@ internal sealed class SfntFont
             reader.ReadUInt16(); // minorVersion
             var numFonts = reader.ReadUInt32();
 
-            // numFonts is attacker-controlled; a 16-byte header claiming billions of faces
-            // would size a multi-GB list before a single face offset is read. The offset
-            // table (4 bytes per face) must fit after the 12-byte collection header.
-            if (numFonts > int.MaxValue || 12 + ((long)numFonts * 4) > data.Length)
+            // What grows here is the number of FACE PARSES: each offset costs a whole font
+            // (head/maxp/hhea/name/hmtx and the entire cmap), and nothing requires the
+            // offsets to differ. Requiring only that the 4-byte-per-face offset table fit
+            // the buffer bounds the table, not the work, and still permits data.Length/4
+            // parses of one face - measured at 102,000 faces and 11.6 s from an 818 KB
+            // collection, growing quadratically with size. Cap the face count itself.
+            if (numFonts > MaxCollectionFaces)
+            {
+                throw new InvalidDataException(
+                    $"TrueType collection face count {numFonts} exceeds the supported maximum of {MaxCollectionFaces}.");
+            }
+
+            // Independently, the offset table must actually be present: a header may claim
+            // a legal face count the buffer cannot supply.
+            if (12 + ((long)numFonts * 4) > data.Length)
             {
                 throw new InvalidDataException("TrueType collection font count exceeds the header bounds.");
             }

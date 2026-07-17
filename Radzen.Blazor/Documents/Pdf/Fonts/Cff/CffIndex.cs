@@ -92,18 +92,34 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
         // Offsets are 1-based relative to the byte before the object data block.
         var dataBase = offsetArrayStart + ((count + 1) * offSize) - 1;
         var offsets = new int[count + 1];
+
+        // GetBytes sizes an allocation from the gap between adjacent offsets, so every offset
+        // is checked here rather than there: each is attacker-chosen and independent, and
+        // validating only offsets[count] leaves the other count of them free to name any
+        // address. Checking once at Read keeps GetBytes (per glyph, per subr call) branch-free.
+        var previous = (long)dataBase;
         for (var i = 0; i <= count; i++)
         {
-            offsets[i] = dataBase + ReadOffset(data, offsetArrayStart + (i * offSize), offSize);
+            var raw = ReadOffset(data, offsetArrayStart + (i * offSize), offSize);
+
+            // 1-based, so raw 0 would address the byte before the data block. Widened to long
+            // because a 4-byte offset spans the full uint range and would otherwise wrap.
+            if (raw < 1)
+            {
+                throw new InvalidDataException("CFF INDEX offset is out of range.");
+            }
+
+            var absolute = dataBase + raw;
+            if (absolute < previous || absolute > data.Length)
+            {
+                throw new InvalidDataException("CFF INDEX offset extends past the end of the data.");
+            }
+
+            previous = absolute;
+            offsets[i] = (int)absolute;
         }
 
-        var endOffset = offsets[count];
-        if (endOffset < 0 || endOffset > data.Length)
-        {
-            throw new InvalidDataException("CFF INDEX extends past the end of the data.");
-        }
-
-        return new CffIndex(data, offsets, endOffset);
+        return new CffIndex(data, offsets, offsets[count]);
     }
 
     private static int ReadCard16(byte[] data, int offset)
@@ -118,10 +134,10 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
         return data[offset];
     }
 
-    private static int ReadOffset(byte[] data, int offset, int size)
+    private static long ReadOffset(byte[] data, int offset, int size)
     {
         Require(data, offset, size);
-        var value = 0;
+        var value = 0L;
         for (var i = 0; i < size; i++)
         {
             value = (value << 8) | data[offset + i];

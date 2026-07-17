@@ -18,6 +18,7 @@ internal sealed class CffFont
     private readonly CffIndex globalSubrs;
     private readonly int globalBias;
     private readonly bool isCidKeyed;
+    private readonly ReaderLimits limits;
 
     private CffFont(
         string? fontName,
@@ -30,8 +31,10 @@ internal sealed class CffFont
         int[] fdSelect,
         FdInfo[] fdArray,
         CffIndex charStrings,
-        CffIndex globalSubrs)
+        CffIndex globalSubrs,
+        ReaderLimits limits)
     {
+        this.limits = limits;
         FontMatrix = fontMatrix;
         FontName = fontName;
         Registry = registry;
@@ -80,7 +83,7 @@ internal sealed class CffFont
         var fd = fdArray[GetFd(glyphIndex)];
         var charString = charStrings.GetBytes(glyphIndex);
 
-        var context = new WidthContext(fd, globalSubrs, globalBias);
+        var context = new WidthContext(fd, globalSubrs, globalBias, limits.MaxCharstringOperations);
         context.Run(charString);
 
         var width = context.Width ?? fd.DefaultWidthX;
@@ -96,7 +99,7 @@ internal sealed class CffFont
     internal bool UsesSeacEndchar(int glyphIndex)
     {
         var fd = fdArray[GetFd(glyphIndex)];
-        var context = new SeacContext(fd, globalSubrs, globalBias);
+        var context = new SeacContext(fd, globalSubrs, globalBias, limits.MaxCharstringOperations);
         context.Run(charStrings.GetBytes(glyphIndex));
         return context.Seac;
     }
@@ -126,9 +129,13 @@ internal sealed class CffFont
         return result;
     }
 
-    public static CffFont Parse(byte[] cffData)
+    // limits bounds the charstring walk. The font bytes reach here from the public
+    // FontCollection.Register(string, Stream), so they are attacker-controlled.
+    public static CffFont Parse(byte[] cffData, ReaderLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(cffData);
+
+        var effectiveLimits = (limits ?? ReaderLimits.Default).Snapshot();
 
         if (cffData.Length < 4 || cffData[0] != 1)
         {
@@ -184,7 +191,7 @@ internal sealed class CffFont
             fdSelect = [];
         }
 
-        return new CffFont(fontName, registry, ordering, supplement, isCidKeyed, fontMatrix, charset, fdSelect, fdArray, charStrings, globalSubrs);
+        return new CffFont(fontName, registry, ordering, supplement, isCidKeyed, fontMatrix, charset, fdSelect, fdArray, charStrings, globalSubrs, effectiveLimits);
     }
 
     private static int[] ReadCharset(byte[] data, Dictionary<int, double[]> topDict, int glyphCount)
@@ -403,16 +410,22 @@ internal sealed class CffFont
 
     // Walks a Type 2 charstring: operand decoding, stem counting, hintmask skipping and
     // subr dispatch. Subclasses supply only the answer they are after, via Visit.
-    private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
+    private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
     {
         // Type 2 charstring spec section 3.1: the argument stack holds at most 48 entries.
-        // Subr nesting fans out, so pushes grow as (calls per subr)^(nesting depth) and the
-        // depth-10 limit alone leaves a few dozen font bytes able to demand billions of them.
+        // This bounds stack depth only. It does not bound the walk: a subr that pops what it
+        // pushes leaves the stack at 0 or 1 forever, so a font built from callsubr alone never
+        // reaches 48 no matter how many operations it demands. MaxCharstringOperations bounds
+        // that count; the two caps guard different quantities and neither implies the other.
         private const int MaxStackEntries = 48;
 
         protected readonly List<double> stack = [];
         private int hintCount;
         private bool done;
+
+        // Walk-wide, deliberately not reset per Run: the whole point is to bound the product of
+        // the nested calls, which a per-invocation counter would never see.
+        private int operations;
 
         protected FdInfo Fd => fd;
 
@@ -432,6 +445,12 @@ internal sealed class CffFont
             var i = 0;
             while (i < cs.Length && !done)
             {
+                if (++operations > maxOperations)
+                {
+                    done = true;
+                    return;
+                }
+
                 int b = cs[i];
                 if (b >= 32 || b == 28)
                 {
@@ -628,8 +647,8 @@ internal sealed class CffFont
     // Recovers the optional leading width operand: it sits before the first
     // stem/moveto/endchar operator when the operand count exceeds what that operator
     // consumes, so the first such operator settles the question either way.
-    private sealed class WidthContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
-        : CharstringContext(fd, globalSubrs, globalBias)
+    private sealed class WidthContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
+        : CharstringContext(fd, globalSubrs, globalBias, maxOperations)
     {
         public double? Width { get; private set; }
 
@@ -651,8 +670,8 @@ internal sealed class CffFont
 
     // Decides whether the charstring terminates in an endchar seac (an endchar with 4 or 5
     // operands, the 5th form carrying a leading width).
-    private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
-        : CharstringContext(fd, globalSubrs, globalBias)
+    private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias, int maxOperations)
+        : CharstringContext(fd, globalSubrs, globalBias, maxOperations)
     {
         public bool Seac { get; private set; }
 
