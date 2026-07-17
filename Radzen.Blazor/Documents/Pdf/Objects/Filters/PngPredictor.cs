@@ -128,8 +128,12 @@ internal static class PngPredictor
         }
     }
 
+    // ceil(colors * bitsPerComponent / 8) per the PNG spec (which ISO 32000-1 7.4.4.4 defers
+    // to): a sub-byte pixel still advances one byte, and a wide pixel (e.g. RGB at 4 bpc = 12
+    // bits) advances two, so the filter's left neighbour is read at the right offset. Floor
+    // would pick the wrong one.
     static int BytesPerPixel(int colors, int bitsPerComponent) =>
-        Math.Max(1, colors * bitsPerComponent / 8);
+        (colors * bitsPerComponent + 7) / 8;
 
     static int RowLength(int colors, int bitsPerComponent, int columns) =>
         (colors * bitsPerComponent * columns + 7) / 8;
