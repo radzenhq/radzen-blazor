@@ -14,6 +14,10 @@ internal sealed class ContentTextWalker
 
     private ContentTextWalker(ContentStateMachine machine) => this.machine = machine;
 
+    // The show operator token being handled: its End is where the operator's bytes stop, past
+    // any comment or whitespace between the operand and the operator that the tokenizer skipped.
+    public Token Operator { get; private set; }
+
     // op is the show operator ("Tj", "TJ", "'" or "\""); array holds the flattened
     // string/number elements of the last TJ array and is only meaningful when op is "TJ".
     public delegate double ShowHandler(ContentTextWalker walker, string op, List<Token> operands, List<Token> array, int operatorIndex);
@@ -23,6 +27,8 @@ internal sealed class ContentTextWalker
     public Matrix TextMatrix => machine.TextMatrix;
 
     public ReverseFont? Font => machine.Text.Font;
+
+    public string? FontName => machine.Text.FontName;
 
     public double FontSize => machine.Text.FontSize;
 
@@ -88,6 +94,7 @@ internal sealed class ContentTextWalker
 
             if (!machine.Apply(token.Text, operands) && ContentShows.IsShow(token.Text))
             {
+                walker.Operator = token;
                 machine.Advance(show(walker, token.Text!, operands, array, operatorIndex++));
             }
 
