@@ -98,6 +98,34 @@ public class FontEntryLimitTests
         Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
     }
 
+    // A singleton range ending at int.MaxValue declares span 1 and slips past the size cap,
+    // then an int counter wraps to int.MinValue and the loop never ends. The endpoint itself
+    // must be rejected.
+    [Fact]
+    public void CidWidthRange_SingletonAtIntMaxValue_ThrowsFast()
+    {
+        var reader = DocumentReader.Parse(WidthPdf("[2147483647 2147483647 500]"), null, ReaderLimits.Default);
+        var font = FontDict(reader);
+
+        var watch = Stopwatch.StartNew();
+        Assert.Throws<DocumentParseException>(() => ReverseFont.Build(reader, font));
+        watch.Stop();
+
+        Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
+    }
+
+    // A high but non-wrapping singleton CID still materializes: the wrap guard rejects only
+    // int.MaxValue, not any large code.
+    [Fact]
+    public void CidWidthRange_HighSingleton_StillResolvesWidth()
+    {
+        var reader = DocumentReader.Parse(WidthPdf("[65535 65535 700]"), null, ReaderLimits.Default);
+        var font = ReverseFont.Build(reader, FontDict(reader));
+
+        Assert.True(font.TryGetWidth(65535, out var width));
+        Assert.Equal(700, width);
+    }
+
     [Fact]
     public void CidWidthRange_BeyondMaxFontWidthEntries_Throws()
     {

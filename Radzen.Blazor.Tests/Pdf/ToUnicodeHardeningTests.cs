@@ -29,6 +29,26 @@ public class ToUnicodeHardeningTests
         Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
     }
 
+    // A singleton bfrange ending at int.MaxValue declares span 1 and passes both the codespace
+    // and total-entry caps, then an int counter wraps and the loop never terminates. The
+    // endpoint must be rejected.
+    [Fact]
+    public void SingletonIncrementalBfrangeAtIntMaxValue_ThrowsFast()
+    {
+        var cmap = Cmap("1 beginbfrange <7fffffff> <7fffffff> <0041> endbfrange");
+        Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
+    }
+
+    // A high but non-wrapping singleton bfrange still maps: the wrap guard rejects only
+    // int.MaxValue, not any large source code.
+    [Fact]
+    public void HighSingletonIncrementalBfrange_StillMaps()
+    {
+        var (map, _) = ToUnicodeCMap.Parse(Cmap("1 beginbfrange <7ffffffe> <7ffffffe> <0041> endbfrange"));
+
+        Assert.Equal("A", map[0x7ffffffe]);
+    }
+
     [Fact]
     public void NormalBfrange_StillMapsCorrectly()
     {

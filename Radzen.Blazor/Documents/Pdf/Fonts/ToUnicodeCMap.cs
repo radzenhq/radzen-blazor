@@ -97,26 +97,17 @@ internal static class ToUnicodeCMap
             }
             else if (index < tokens.Count && tokens[index].Hex is { } dst)
             {
-                if (high < low)
-                {
-                    index++;
-                    continue;
-                }
-
-                // A well-formed incremental bfrange walks one contiguous run inside the
-                // source codespace; an attacker-sized span (e.g. <0000> <7fffffff>) would
-                // otherwise materialize billions of dictionary entries and exhaust memory.
-                var span = (long)high - low + 1;
-                if (span > MaxCodespaceSpan(lowBytes.Length)
-                    || (long)map.Count + span > limits.MaxCMapEntries)
+                // The source-codespace bound is width-specific (an incremental bfrange must walk
+                // one contiguous run inside the codespace); the total-entries cap and the
+                // endpoint (wrap) check are shared with the CID /W range form.
+                if (high >= low && (long)high - low + 1 > MaxCodespaceSpan(lowBytes.Length))
                 {
                     throw new DocumentParseException("ToUnicode bfrange exceeds the permitted CMap size.");
                 }
 
-                for (var code = low; code <= high; code++)
-                {
-                    map[code] = Incremental(dst, code - low);
-                }
+                CodeRangeExpander.Expand(low, high, map.Count, limits.MaxCMapEntries,
+                    "ToUnicode bfrange exceeds the permitted CMap size.",
+                    code => map[code] = Incremental(dst, code - low));
 
                 index++;
             }
