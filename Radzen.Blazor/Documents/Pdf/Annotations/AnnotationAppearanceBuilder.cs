@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Content;
 
 namespace Radzen.Documents.Pdf;
 
@@ -172,16 +173,8 @@ internal static class AnnotationAppearanceBuilder
 
     private static PathContent Ellipse(double width, double height)
     {
-        const double kappa = 0.552284749831;
-        var rx = width / 2;
-        var ry = height / 2;
         var path = new PathContent();
-        path.MoveTo(width, ry);
-        path.CurveTo(width, ry + ry * kappa, rx + rx * kappa, height, rx, height);
-        path.CurveTo(rx - rx * kappa, height, 0, ry + ry * kappa, 0, ry);
-        path.CurveTo(0, ry - ry * kappa, rx - rx * kappa, 0, rx, 0);
-        path.CurveTo(rx + rx * kappa, 0, width, ry - ry * kappa, width, ry);
-        path.Close();
+        BezierGeometry.AppendEllipse(path, width / 2, height / 2, width / 2, height / 2);
         return path;
     }
 }

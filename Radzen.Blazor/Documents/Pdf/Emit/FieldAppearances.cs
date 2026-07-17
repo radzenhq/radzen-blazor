@@ -90,7 +90,7 @@ internal static class FieldAppearances
             Stroke = true,
             Thickness = Math.Max(1.0, extent * 0.08),
         };
-        Circle(path, x + width / 2.0, y + height / 2.0, extent * 0.42);
+        BezierGeometry.AppendCircle(path, x + width / 2.0, y + height / 2.0, extent * 0.42);
         return path;
     }
 
@@ -99,33 +99,8 @@ internal static class FieldAppearances
     public static PathContent RadioDot(double x, double y, double width, double height)
     {
         var path = new PathContent { Fill = true };
-        Circle(path, x + width / 2.0, y + height / 2.0, Math.Min(width, height) * 0.22);
+        BezierGeometry.AppendCircle(path, x + width / 2.0, y + height / 2.0, Math.Min(width, height) * 0.22);
         return path;
-    }
-
-    // Approximates a circle with four cubic Bezier arcs.
-    private static void Circle(PathContent path, double cx, double cy, double r)
-    {
-        const double Kappa = 0.5522847498307936;
-        var k = r * Kappa;
-        path.MoveTo(Unit.FromPoint(cx + r), Unit.FromPoint(cy));
-        path.CurveTo(
-            Unit.FromPoint(cx + r), Unit.FromPoint(cy + k),
-            Unit.FromPoint(cx + k), Unit.FromPoint(cy + r),
-            Unit.FromPoint(cx), Unit.FromPoint(cy + r));
-        path.CurveTo(
-            Unit.FromPoint(cx - k), Unit.FromPoint(cy + r),
-            Unit.FromPoint(cx - r), Unit.FromPoint(cy + k),
-            Unit.FromPoint(cx - r), Unit.FromPoint(cy));
-        path.CurveTo(
-            Unit.FromPoint(cx - r), Unit.FromPoint(cy - k),
-            Unit.FromPoint(cx - k), Unit.FromPoint(cy - r),
-            Unit.FromPoint(cx), Unit.FromPoint(cy - r));
-        path.CurveTo(
-            Unit.FromPoint(cx + k), Unit.FromPoint(cy - r),
-            Unit.FromPoint(cx + r), Unit.FromPoint(cy - k),
-            Unit.FromPoint(cx + r), Unit.FromPoint(cy));
-        path.Close();
     }
 
     // The check-mark glyph drawn for a checked box, positioned inside the given
