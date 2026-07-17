@@ -1,5 +1,4 @@
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -75,21 +74,17 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         }
         else
         {
-            // Base-14 watermarks are WinAnsi-only; fail loud rather than silently dropping
-            // unrepresentable codepoints (which would blank or mangle the watermark). Encoded
-            // before the plan is touched so a rejected watermark leaves no font registered.
-            var bytes = WinAnsiText.Encode(text, OnUnencodable.Throw, WatermarkGeometry.EncodingContext);
-            var metrics = Fonts.Base14Metrics.Resolve(font) ?? Fonts.Base14Metrics.Resolve(new Font())!;
+            var text14 = WatermarkTextPlan.Base14(text, font);
             var generated = fontResolver.ResolveBase14(font);
             plan.UsedFonts.Add(generated);
             draw.Texts.Add(new TextDraw
             {
-                X = WatermarkGeometry.Centered(metrics.MeasureString(text, size)),
-                Baseline = baseline,
+                X = text14.X,
+                Baseline = text14.Baseline,
                 Size = size,
                 Color = font.Color,
                 Font = generated,
-                Bytes = bytes,
+                Bytes = text14.Bytes,
             });
         }
     }
