@@ -221,7 +221,7 @@ internal static class ToUnicodeCMap
         {
             var b = data[position];
 
-            if (b is 0 or 9 or 10 or 12 or 13 or 32)
+            if (Lexer.IsWhitespace(b))
             {
                 position++;
                 continue;
@@ -267,7 +267,11 @@ internal static class ToUnicodeCMap
         return tokens;
     }
 
-    private static bool IsBreak(byte b) => b is 0 or 9 or 10 or 12 or 13 or 32 or (byte)'<' or (byte)'[' or (byte)']' or (byte)'%';
+    // Not Lexer.IsDelimiter: that also breaks on '(' ')' '>' '/' '{' '}', which would lift a
+    // keyword out of a bracketed run, so a name like /CMapName (beginbfchar) would start a
+    // bfchar section. Only the delimiters Tokenize itself dispatches on end a keyword here.
+    private static bool IsBreak(byte b)
+        => Lexer.IsWhitespace(b) || b is (byte)'<' or (byte)'[' or (byte)']' or (byte)'%';
 
     private static string Latin1(byte[] data, int start, int length)
     {

@@ -1,6 +1,4 @@
 using System;
-using System.Globalization;
-using System.Text;
 
 namespace Radzen.Documents.Crypto;
 
@@ -50,16 +48,7 @@ public static class Md5
     /// <param name="input">The input bytes.</param>
     /// <returns>The lowercase hexadecimal MD5 digest.</returns>
     public static string ComputeHashHex(byte[] input)
-    {
-        var digest = ComputeHash(input);
-        var result = new StringBuilder(32);
-        foreach (var b in digest)
-        {
-            result.Append(b.ToString("x2", CultureInfo.InvariantCulture));
-        }
-
-        return result.ToString();
-    }
+        => HexCodec.EncodeToString(ComputeHash(input), HexCase.Lower);
 
     /// <summary>
     /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
