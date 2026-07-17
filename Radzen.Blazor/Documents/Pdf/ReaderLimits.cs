@@ -56,6 +56,12 @@ public sealed class ReaderLimits
     /// <summary>Maximum number of entries materialized from a /ToUnicode CMap. Default 1,000,000.</summary>
     public int MaxCMapEntries { get; init; } = 1_000_000;
 
+    /// <summary>
+    /// Maximum number of per-code width entries materialized from a font's width table
+    /// (a CID font /W array). Default 1,000,000.
+    /// </summary>
+    public int MaxFontWidthEntries { get; init; } = 1_000_000;
+
     /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
     public long MaxImagePixels { get; init; } = 64L * 1024 * 1024;
 
@@ -77,6 +83,7 @@ public sealed class ReaderLimits
         RequirePositive(MaxXrefEntries, nameof(MaxXrefEntries));
         RequirePositive(MaxObjectStreamCount, nameof(MaxObjectStreamCount));
         RequirePositive(MaxCMapEntries, nameof(MaxCMapEntries));
+        RequirePositive(MaxFontWidthEntries, nameof(MaxFontWidthEntries));
         RequirePositive(MaxImagePixels, nameof(MaxImagePixels));
         RequirePositive(MaxFileBytes, nameof(MaxFileBytes));
 
@@ -92,6 +99,7 @@ public sealed class ReaderLimits
             MaxXrefEntries = MaxXrefEntries,
             MaxObjectStreamCount = MaxObjectStreamCount,
             MaxCMapEntries = MaxCMapEntries,
+            MaxFontWidthEntries = MaxFontWidthEntries,
             MaxImagePixels = MaxImagePixels,
             MaxFileBytes = MaxFileBytes,
         };

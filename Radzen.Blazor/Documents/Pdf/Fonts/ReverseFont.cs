@@ -215,6 +215,7 @@ internal sealed class ReverseFont
         }
 
         var result = new Dictionary<int, double>();
+        var limit = reader.Limits.MaxFontWidthEntries;
         if (reader.GetArray(descendant, "W") is { } widths)
         {
             for (var i = 0; i < widths.Count;)
@@ -228,6 +229,11 @@ internal sealed class ReverseFont
                 var next = i < widths.Count ? reader.Resolve(widths[i++]) : null;
                 if (next is ArrayObject run)
                 {
+                    if ((long)result.Count + run.Count > limit)
+                    {
+                        throw new DocumentParseException("A CID font /W array exceeds the permitted width-table size.");
+                    }
+
                     for (var offset = 0; offset < run.Count; offset++)
                     {
                         if (reader.Resolve(run[offset]) is not NumberObject width)
@@ -241,6 +247,15 @@ internal sealed class ReverseFont
                 else if (next is NumberObject endObject && i < widths.Count
                     && reader.Resolve(widths[i++]) is NumberObject width)
                 {
+                    // A c_first c_last w range costs ~15 input bytes per arbitrary span, so an
+                    // attacker-sized c_last (e.g. 0 2147483647 500) would materialize billions of
+                    // width entries. Reject before the loop rather than after it has run.
+                    var span = (long)endObject.IntValue - start + 1;
+                    if (span > 0 && (long)result.Count + span > limit)
+                    {
+                        throw new DocumentParseException("A CID font /W array exceeds the permitted width-table size.");
+                    }
+
                     for (var cid = start; cid <= endObject.IntValue; cid++)
                     {
                         result[cid] = width.DoubleValue;
