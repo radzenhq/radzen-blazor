@@ -223,7 +223,11 @@ public sealed class Page
     /// <c>/ToUnicode</c> CMap, <c>/Differences</c> array or standard WinAnsi encoding.
     /// </summary>
     /// <returns>The page text, or an empty string when the page has no text.</returns>
-    public string ExtractText() => TextExtractor.Extract(content, textFonts);
+    public string ExtractText()
+    {
+        ApplyPendingContentEdits();
+        return TextSearch.ExtractText(content, textFonts);
+    }
 
     /// <summary>
     /// Extracts decoded text-show runs in reading order with transformed em-box
@@ -234,10 +238,13 @@ public sealed class Page
     /// expose glyph outlines or shaping clusters. Form XObject text is not included.
     /// </remarks>
     /// <returns>The positioned text-show runs, or an empty list when the page has no text.</returns>
-    public IReadOnlyList<PositionedTextRun> ExtractPositionedText() => TextSearch.Extract(content, textFonts);
+    public IReadOnlyList<PositionedTextRun> ExtractPositionedText() => ExtractPositionedText(null);
 
     internal IReadOnlyList<PositionedTextRun> ExtractPositionedText(ContentTokenizer.Cache? cache)
-        => TextSearch.Extract(content, textFonts, cache);
+    {
+        ApplyPendingContentEdits();
+        return TextSearch.Extract(content, textFonts, cache);
+    }
 
     /// <summary>Finds text in this page across adjacent text-show operators.</summary>
     /// <remarks>
@@ -249,7 +256,10 @@ public sealed class Page
     /// <param name="options">The matching options, or <c>null</c> for defaults.</param>
     /// <returns>The matches in reading order.</returns>
     public IReadOnlyList<TextHit> FindText(string text, TextSearchOptions? options = null)
-        => TextSearch.Find(content, textFonts, text, options, -1);
+    {
+        ApplyPendingContentEdits();
+        return TextSearch.Find(content, textFonts, text, options, -1);
+    }
 
     /// <summary>Replaces every matching text occurrence using the source font encoding.</summary>
     /// <remarks>Matches may span contiguous <c>Tj</c> operators with the same font and text state. Unsupported show operators or incompatible text states cause an exception.</remarks>

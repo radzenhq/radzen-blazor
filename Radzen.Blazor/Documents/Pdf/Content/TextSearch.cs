@@ -163,6 +163,13 @@ internal static class TextSearch
         return runs;
     }
 
+    public static string ExtractText(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache = null)
+    {
+        var runs = Parse(content, fonts, cache);
+        Sort(runs);
+        return Compose(runs).Text;
+    }
+
     public static IReadOnlyList<TextHit> Find(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, string text, TextSearchOptions? options, int pageIndex, ContentTokenizer.Cache? cache = null)
     {
         ArgumentNullException.ThrowIfNull(text);

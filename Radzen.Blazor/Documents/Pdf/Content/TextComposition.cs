@@ -2,11 +2,11 @@ using System;
 
 namespace Radzen.Documents.Pdf.Content;
 
-// The reading-order rule shared by extraction and search: runs sort by descending Y then
-// ascending X, a Y step beyond LineTolerance breaks a line, and a same-line gap clearing
-// SpaceGapEm reads as a word break. The advance behind a Placement is the caller's model -
-// search measures real glyph widths, extraction estimates - but the rule applied to it is
-// one job, so ExtractText and FindText cannot disagree about where a separator belongs.
+// The reading-order rule: runs sort by descending Y then ascending X, a Y step beyond
+// LineTolerance breaks a line, and a same-line gap clearing SpaceGapEm reads as a word
+// break. ExtractText and FindText cannot disagree about where a separator belongs because
+// both compose the runs TextSearch parses, so the rule and the measured advance it reads
+// are the same on both paths.
 internal static class TextComposition
 {
     public const double LineTolerance = 0.5;
@@ -16,8 +16,8 @@ internal static class TextComposition
     // rely on this for word breaks; the authoring path never emits TJ arrays.
     public const double TjSpaceThreshold = 200.0;
 
-    // Stands in for a width the font does not provide, and is the whole advance model of
-    // estimated extraction; it only ever feeds the gap test, never the emitted text.
+    // Stands in for a width the font does not provide; it only ever feeds the gap test,
+    // never the emitted text.
     public const double AverageGlyphEm = 0.5;
 
     // Two same-line fragments read as separate words only when the X gap between the

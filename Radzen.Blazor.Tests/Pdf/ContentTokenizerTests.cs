@@ -12,7 +12,7 @@ using Radzen.Documents.Pdf.Content;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // The single shared content-stream tokenizer feeds both ContentInterpreter and
-// TextExtractor. These assert its token stream directly and that both consumers
+// TextSearch. These assert its token stream directly and that both consumers
 // produce consistent output for a stream exercising text, TJ arrays, hex strings,
 // paths, marked-content dictionaries and inline images.
 public class ContentTokenizerTests
