@@ -295,17 +295,16 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         // Nested tables and nested boxes interleave in document order (the shared Order
         // sequence assigned by BoxContentLayout.Position).
-        var ti = 0;
-        var bi = 0;
-        while (ti < tables.Count || bi < boxes.Count)
+        var cursor = OrderedMerge.ByOrder(tables, static t => t.Order, boxes, static b => b.Order);
+        while (cursor.MoveNext())
         {
-            if (bi >= boxes.Count || (ti < tables.Count && tables[ti].Order <= boxes[bi].Order))
+            if (cursor.IsTable)
             {
-                EmitNestedTable(context, tables[ti++], element, left, contentTop, delta);
+                EmitNestedTable(context, tables[cursor.TableIndex], element, left, contentTop, delta);
             }
             else
             {
-                EmitNestedBox(context, boxes[bi++], element, left, contentTop, delta);
+                EmitNestedBox(context, boxes[cursor.BoxIndex], element, left, contentTop, delta);
             }
         }
 

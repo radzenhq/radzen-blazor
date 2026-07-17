@@ -403,18 +403,16 @@ internal sealed class DocumentGenerator
         double left,
         double top)
     {
-        var plan = context.Plan;
-        var t = 0;
-        var bx = 0;
-        while (t < tables.Count || bx < boxes.Count)
+        var cursor = OrderedMerge.ByOrder(tables, static t => t.Order, boxes, static b => b.Order);
+        while (cursor.MoveNext())
         {
-            if (bx >= boxes.Count || (t < tables.Count && tables[t].Order <= boxes[bx].Order))
+            if (cursor.IsTable)
             {
-                tableEmitter.EmitFragment(context, tables[t++], left, top);
+                tableEmitter.EmitFragment(context, tables[cursor.TableIndex], left, top);
             }
             else
             {
-                boxEmitter.EmitBox(context, boxes[bx++], left, top);
+                boxEmitter.EmitBox(context, boxes[cursor.BoxIndex], left, top);
             }
         }
     }

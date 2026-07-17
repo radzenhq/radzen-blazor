@@ -71,17 +71,16 @@ internal static class OverlayBoxPlacer
         List<LaidOutNestedBox> boxes,
         int order)
     {
-        var ti = 0;
-        var bi = 0;
-        while (ti < child.Tables.Count || bi < child.Boxes.Count)
+        var cursor = OrderedMerge.ByOrder(child.Tables, static t => t.Order, child.Boxes, static b => b.Order);
+        while (cursor.MoveNext())
         {
-            if (bi >= child.Boxes.Count || (ti < child.Tables.Count && child.Tables[ti].Order <= child.Boxes[bi].Order))
+            if (cursor.IsTable)
             {
-                tables.Add(child.Tables[ti++] with { Order = order++ });
+                tables.Add(child.Tables[cursor.TableIndex] with { Order = order++ });
             }
             else
             {
-                boxes.Add(child.Boxes[bi++] with { Order = order++ });
+                boxes.Add(child.Boxes[cursor.BoxIndex] with { Order = order++ });
             }
         }
 

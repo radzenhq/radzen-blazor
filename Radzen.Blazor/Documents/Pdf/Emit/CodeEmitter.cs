@@ -100,16 +100,10 @@ internal sealed class CodeEmitter(FontCollection fonts, StyleResolution resoluti
         }
 
         var font = resolution.BarcodeFont(barcode) ?? barcode.Font;
-        // The synthesized caption run/paragraph carry the resolved barcode font as their authored
-        // font, so the line breaker reads exactly the font the caption is measured and drawn with.
-        var run = new Run(barcode.Value);
-        run.Font.InheritFrom(font);
-        var paragraph = new Paragraph { AlignmentValue = HorizontalAlignment.Center };
-        paragraph.Font.InheritFrom(font);
-        paragraph.Inlines.Add(run);
-
         var textTop = topY - barcode.Height.Point;
-        foreach (var box in LineBreaker.Break(paragraph, barcode.Width.Point, fonts))
+        // The same caption the band height was measured from, so a value that wraps is drawn on
+        // every line the band reserved.
+        foreach (var box in CodeBlockDispatch.CaptionLines(barcode, font, fonts))
         {
             context.Text.EmitLine(context, box, x, textTop, null);
             textTop -= box.Height;
