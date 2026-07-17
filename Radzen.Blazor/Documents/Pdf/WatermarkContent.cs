@@ -32,17 +32,8 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
         var decoded = watermark.DecodeImage(image);
         var (width, height) = ImageDecoder.Measure(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
-        writer.WriteRaw("q\n");
-        writer.WriteNumber(width);
-        writer.WriteRaw(" 0 0 ");
-        writer.WriteNumber(height);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(WatermarkGeometry.Centered(width));
-        writer.WriteRaw(" ");
-        writer.WriteNumber(WatermarkGeometry.Centered(height));
-        writer.WriteRaw(" cm\n");
-        writer.WriteName(key);
-        writer.WriteRaw(" Do\nQ\n");
+        ContentEmitter.WriteImagePlacement(
+            writer, key, WatermarkGeometry.Centered(width), WatermarkGeometry.Centered(height), width, height);
     }
 
     private void WriteText(ContentWriter writer)

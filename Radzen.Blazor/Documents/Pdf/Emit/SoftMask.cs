@@ -91,15 +91,7 @@ internal static class SoftMask
         var image = TransparencyGroup.GrayImage(mask.Pixels, mask.Width, mask.Height);
 
         using var content = new ContentWriter();
-        content.WriteRaw("q\n");
-        content.WriteNumber(rectWidth);
-        content.WriteRaw(" 0 0 ");
-        content.WriteNumber(rectHeight);
-        content.WriteRaw(" ");
-        content.WriteNumber(left);
-        content.WriteRaw(" ");
-        content.WriteNumber(bottom);
-        content.WriteRaw(" cm\n/Sm Do\nQ\n");
+        ContentEmitter.WriteImagePlacement(content, "Sm", left, bottom, rectWidth, rectHeight);
 
         var group = new GeneratedTransparencyGroup
         {
