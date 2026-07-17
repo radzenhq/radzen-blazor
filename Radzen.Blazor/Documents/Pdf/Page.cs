@@ -195,10 +195,13 @@ public sealed class Page
     }
 
     /// <summary>
-    /// Gets the raw content stream previously set with <see cref="SetContent"/>,
-    /// or <c>null</c> when no content has been set.
+    /// Gets the stored raw content stream: the bytes last set with <see cref="SetContent"/>
+    /// or loaded from a source, or <c>null</c> when none has been set. Edits queued through
+    /// <see cref="Content"/> or appended overlays are flushed into these bytes only when the
+    /// document is serialized, so this returns the pre-edit stream while such edits are pending.
+    /// Read <see cref="Content"/> for the current elements.
     /// </summary>
-    /// <returns>The raw content bytes, or <c>null</c>.</returns>
+    /// <returns>The stored raw content bytes, or <c>null</c>.</returns>
     public byte[]? GetContent() => content;
 
     /// <summary>
