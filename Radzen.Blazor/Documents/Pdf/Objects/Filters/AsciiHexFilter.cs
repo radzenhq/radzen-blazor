@@ -5,8 +5,6 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class AsciiHexFilter
 {
-    const string HexDigits = "0123456789ABCDEF";
-
     public static byte[] Decode(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -29,15 +27,8 @@ internal static class AsciiHexFilter
         ArgumentNullException.ThrowIfNull(data);
 
         var output = new byte[data.Length * 2 + 1];
-        int j = 0;
-
-        foreach (byte b in data)
-        {
-            output[j++] = (byte)HexDigits[b >> 4];
-            output[j++] = (byte)HexDigits[b & 0x0F];
-        }
-
-        output[j] = (byte)'>';
+        HexCodec.Encode(data, output, HexCase.Upper);
+        output[^1] = (byte)'>';
         return output;
     }
 }

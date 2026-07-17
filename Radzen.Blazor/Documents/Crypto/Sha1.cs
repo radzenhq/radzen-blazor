@@ -94,18 +94,7 @@ public static class Sha1
     /// <param name="data">The bytes to hash.</param>
     /// <returns>The 40-character uppercase hexadecimal digest.</returns>
     public static string ComputeHashHex(byte[] data)
-    {
-        var digest = ComputeHash(data);
-        const string hex = "0123456789ABCDEF";
-        var chars = new char[digest.Length * 2];
-        for (var i = 0; i < digest.Length; i++)
-        {
-            chars[i * 2] = hex[digest[i] >> 4];
-            chars[i * 2 + 1] = hex[digest[i] & 0xF];
-        }
-
-        return new string(chars);
-    }
+        => HexCodec.EncodeToString(ComputeHash(data), HexCase.Upper);
 
     private static byte[] Pad(byte[] data)
     {

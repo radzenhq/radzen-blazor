@@ -210,18 +210,7 @@ public static class Sha2
         WriteUInt32(data, offset + 4, (uint)value);
     }
 
-    private static string ToHex(byte[] digest)
-    {
-        const string hex = "0123456789abcdef";
-        var chars = new char[digest.Length * 2];
-        for (var i = 0; i < digest.Length; i++)
-        {
-            chars[i * 2] = hex[digest[i] >> 4];
-            chars[i * 2 + 1] = hex[digest[i] & 0xF];
-        }
-
-        return new string(chars);
-    }
+    private static string ToHex(byte[] digest) => HexCodec.EncodeToString(digest, HexCase.Lower);
 }
 
 /// <summary>
