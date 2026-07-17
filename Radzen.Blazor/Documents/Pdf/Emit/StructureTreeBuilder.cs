@@ -69,11 +69,17 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
     private Mapper mapper => cachedMapper ??= new Mapper(this, builder);
 
+    // True when the output is fully tagged (PDF/UA or PDF/A Level-A). Real content that
+    // would otherwise be emitted as /Artifact (a Container's children) must be tagged then,
+    // so it is not hidden from assistive technology while the file claims conformance.
+    private bool TaggingActive
+        => builder.PdfUA
+            || builder.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
+
     // Maps each block into the tagged structure tree. The types that carry no logical
-    // structure of their own (PageBreak is pure pagination; Container/Barcode/QrCode/
-    // TableOfContents render as decorative /Artifact content in fully tagged output) map
-    // to nothing but are overridden explicitly so Default can fail loud on a block type
-    // nobody mapped - it must never silently vanish from accessible output.
+    // Blocks with no structure of their own are mapped explicitly (not by Default) so an
+    // unmapped block type fails loud rather than vanishing from accessible output. A Stack
+    // Container has no element itself but its children are descended into and mapped in place.
     private sealed class Mapper(StructureTreeBuilder tree, DocumentBuilder builder) : BlockVisitor<StructureElement, Nothing>
     {
         protected override Nothing Default(Block block, StructureElement parent)
@@ -137,7 +143,21 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
         public override Nothing Visit(PageBreak block, StructureElement parent) => default;
 
-        public override Nothing Visit(Container block, StructureElement parent) => default;
+        public override Nothing Visit(Container block, StructureElement parent)
+        {
+            // Overlay (and rotated) containers are lowered onto a different emit path that
+            // does not resolve per-child structure elements, so only Stack containers - whose
+            // children flow through the tagged box-content path - are descended into here.
+            if (tree.TaggingActive && block.Layout == ContainerLayout.Stack)
+            {
+                foreach (var child in block.Blocks)
+                {
+                    tree.MapBlock(child, parent);
+                }
+            }
+
+            return default;
+        }
 
         public override Nothing Visit(Barcode block, StructureElement parent) => default;
 

@@ -27,16 +27,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var rowIndex = RowIndex(layout);
         foreach (var row in positioned.Fragment.Rows)
         {
-            if (layout.Source?.Rows[row.SourceRow].Background is { } background)
+            if (layout.Source is { } source && row.SourceRow < source.Rows.Count)
             {
-                plan.Fills.Add(new FillDraw
-                {
-                    X = x,
-                    Y = contentTop - (positioned.Y + row.Y + row.Height),
-                    Width = layout.Width,
-                    Height = row.Height,
-                    Color = background,
-                });
+                PaintRowBackground(plan, source.Rows[row.SourceRow], x, contentTop - (positioned.Y + row.Y + row.Height), layout.Width, row.Height);
             }
 
             var rowCells = row.SourceRow < rowIndex.Length ? rowIndex[row.SourceRow] : null;
@@ -106,6 +99,21 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 LineWidth = edge.Width,
                 Color = edge.Color,
                 Style = edge.Style,
+            });
+        }
+    }
+
+    private static void PaintRowBackground(PagePlan plan, Row row, double x, double bottom, double width, double height)
+    {
+        if (row.Background is { } background)
+        {
+            plan.Fills.Add(new FillDraw
+            {
+                X = x,
+                Y = bottom,
+                Width = width,
+                Height = height,
+                Color = background,
             });
         }
     }
@@ -204,6 +212,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             var line = cellLines[li];
             // Fields (page number/count) in a band-table cell resolve per page here,
             // re-broken to the cell's content width, replacing the placeholder layout.
+            // A container tags each child block into its own structure element; a table cell
+            // leaves its blocks unmapped and inherits the cell's element (the passed element).
+            var lineElement = structureTree.ElementOf(line.Source) ?? element;
             if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
                 var reserved = 0;
@@ -215,7 +226,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 var y = line.Y;
                 foreach (var box in context.Fields.ResolveFields(paragraph, contentWidth, pageNumber, pageCount, resolution.Alignment(paragraph), reserved))
                 {
-                    context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), element, opacity);
+                    context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), lineElement, opacity);
                     overflows |= box.Width > contentWidth + 0.01;
                     y += box.Height;
                 }
@@ -224,7 +235,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
             else
             {
-                context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), element, opacity);
+                context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), lineElement, opacity);
                 overflows |= line.Line.Width > contentWidth + 0.01;
                 li++;
             }
@@ -259,7 +270,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Width = image.Width,
                 Height = image.Height,
                 Image = xobject,
-                Element = element,
+                Element = structureTree.ElementOf(image.Source) ?? element,
                 ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
             });
             plan.UsedImages.Add(xobject);
@@ -331,6 +342,20 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             nestedMark = plan.Mark();
         }
 
+        if (nested.Layout.Source is { } nestedSource)
+        {
+            var rowTop = 0.0;
+            var rowHeights = nested.Layout.RowHeights;
+            for (var r = 0; r < rowHeights.Count && r < nestedSource.Rows.Count; r++)
+            {
+                PaintRowBackground(
+                    plan, nestedSource.Rows[r], nestedLeft,
+                    contentTop - (delta + nested.Y) - (rowTop + rowHeights[r]),
+                    nested.Layout.Width, rowHeights[r]);
+                rowTop += rowHeights[r];
+            }
+        }
+
         foreach (var nestedCell in nested.Layout.Cells)
         {
             EmitCell(context, nested.Layout, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
@@ -345,23 +370,12 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
     private void EmitNestedBox(EmitContext context, in LaidOutNestedBox box, StructureElement? element, double left, double contentTop, double delta)
     {
         var plan = context.Plan;
-        var opacity = opacities.ContainerOpacity(box.Source);
-        var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
         var bounds = PdfRect.FromSize(
             left + box.Bounds.X,
             contentTop - (box.Bounds.Y + delta) - box.Bounds.Height,
             box.Bounds.Width,
             box.Bounds.Height);
-        BoxRenderer.Paint(plan, bounds, new BoxStyle
-        {
-            Background = box.Style.Background,
-            Top = box.Style.Top,
-            Right = box.Style.Right,
-            Bottom = box.Style.Bottom,
-            Left = box.Style.Left,
-            CornerRadius = box.Style.CornerRadius,
-            ExtGState = extGState,
-        });
+        var opacity = ContainerDecoration.Paint(plan, opacities, bounds, box.Source, box.Style);
 
         var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
         EmitBoxContent(
