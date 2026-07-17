@@ -1,11 +1,9 @@
 namespace Radzen.Documents.Pdf.Emit;
 
-// Appends the pages of one document onto another, carrying each source page's
-// resource closure, annotations, boxes and rotation. Extracted from Document to
-// keep the page/metadata model separate from the import/merge orchestration; the
-// state it populates still lives on the target Document, read on save by the
-// feature writers. Behavior and populated state are identical to the previous
-// inline implementation.
+// Copies source pages onto a target document, carrying each page's resource closure,
+// annotations, boxes and rotation. A page's content is carried as its raw bytes alone,
+// so a caller must not route a page here whose ContentIsIntact is false: queued appends
+// and materialized element edits live outside those bytes and would be dropped.
 internal static class DocumentMerger
 {
     internal static void Append(Document target, Document other)
