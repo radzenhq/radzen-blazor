@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -54,6 +55,20 @@ internal sealed class Lexer(byte[] data, int position)
             or (byte)'[' or (byte)']' or (byte)'{' or (byte)'}'
             or (byte)'/' or (byte)'%';
 
+    // What counts as a number, a string or a hex string is one grammar (ISO 32000-1 7.3);
+    // only what to do with malformed input differs. A file object must be rejected so a
+    // corrupt document cannot be silently misread, while a content stream must recover and
+    // keep rendering, so recovery is a parameter of the shared readers below - never a
+    // second grammar.
+    public enum Recovery
+    {
+        Strict,
+        Lenient,
+    }
+
+    public static bool IsNumberStart(byte b)
+        => b is (byte)'+' or (byte)'-' or (byte)'.' or (>= (byte)'0' and <= (byte)'9');
+
     public Token Next()
     {
         SkipWhitespaceAndComments();
@@ -92,7 +107,7 @@ internal sealed class Lexer(byte[] data, int position)
             case (byte)'/':
                 return ReadName();
             default:
-                if (b == (byte)'+' || b == (byte)'-' || b == (byte)'.' || (b >= (byte)'0' && b <= (byte)'9'))
+                if (IsNumberStart(b))
                 {
                     return ReadNumber();
                 }
@@ -124,7 +139,14 @@ internal sealed class Lexer(byte[] data, int position)
         }
     }
 
-    private Token ReadNumber()
+    private Token ReadNumber() => ReadNumber(data, ref position, Recovery.Strict)!.Value;
+
+    // ISO 32000-1 7.3.3: a number is an optional sign, digits and at most one decimal point.
+    // There is no exponent notation in PDF, so "1e3" is malformed input in every context and
+    // must never parse as 1000. A numeric object runs to the next whitespace or delimiter, so
+    // the whole run is validated rather than stopping at the first byte that does not fit.
+    // Lenient callers get null for a malformed run and skip it; strict callers get an exception.
+    public static Token? ReadNumber(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
         while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
@@ -134,6 +156,7 @@ internal sealed class Lexer(byte[] data, int position)
 
         var length = position - start;
         var hasDot = false;
+        var hasDigit = false;
         for (var i = 0; i < length; i++)
         {
             var c = data[start + i];
@@ -141,57 +164,64 @@ internal sealed class Lexer(byte[] data, int position)
             {
                 if (i != 0)
                 {
-                    throw new DocumentParseException("Malformed number.", start);
+                    return Malformed(start, recovery);
                 }
             }
             else if (c == (byte)'.')
             {
                 if (hasDot)
                 {
-                    throw new DocumentParseException("Malformed number.", start);
+                    return Malformed(start, recovery);
                 }
 
                 hasDot = true;
             }
-            else if (c < (byte)'0' || c > (byte)'9')
+            else if (c >= (byte)'0' && c <= (byte)'9')
             {
-                throw new DocumentParseException("Malformed number.", start);
+                hasDigit = true;
+            }
+            else
+            {
+                return Malformed(start, recovery);
             }
         }
 
-        // A trailing '.' is legal in PDF but not to TryParse, so leave room to append '0'.
-        var chars = length < 128 ? stackalloc char[length + 1] : new char[length + 1];
-        for (var i = 0; i < length; i++)
+        if (!hasDigit)
         {
-            chars[i] = (char)data[start + i];
+            return Malformed(start, recovery);
         }
 
+        var text = data.AsSpan(start, length);
         if (hasDot)
         {
-            var text = chars[..length];
-            if (data[position - 1] == (byte)'.')
-            {
-                chars[length] = '0';
-                text = chars;
-            }
-
-            if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var real))
-            {
-                throw new DocumentParseException("Malformed number.", start);
-            }
-
-            return Token.Real(real);
+            return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var real)
+                ? Token.Real(real)
+                : Malformed(start, recovery);
         }
 
-        if (!long.TryParse(chars[..length], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var integer))
+        if (long.TryParse(text, NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out var integer))
         {
-            throw new DocumentParseException("Malformed number.", start);
+            return Token.Integer(integer);
         }
 
-        return Token.Integer(integer);
+        // An integer too large for long is out of range per ISO 32000-1 Annex C rather than
+        // ungrammatical, so a lenient reader keeps the approximate magnitude.
+        return recovery == Recovery.Lenient
+            && double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var approximate)
+            ? Token.Real(approximate)
+            : Malformed(start, recovery);
     }
 
-    private Token ReadName()
+    private static Token? Malformed(int start, Recovery recovery)
+        => recovery == Recovery.Lenient ? null : throw new DocumentParseException("Malformed number.", start);
+
+    private Token ReadName() => Token.Name(ReadName(data, ref position));
+
+    // ISO 32000-1 7.3.5: a name runs to the next whitespace or delimiter, with #XX decoding
+    // to one byte. Names are the same in both grammars and cannot be malformed - a '#' that
+    // is not followed by two hex digits is simply a literal '#' - so there is no recovery
+    // parameter here.
+    public static string ReadName(byte[] data, ref int position)
     {
         position++;
         var start = position;
@@ -210,10 +240,10 @@ internal sealed class Lexer(byte[] data, int position)
             }
         }
 
-        return Token.Name(escaped ? DecodeEscapedName(start) : Decode(start, position - start));
+        return escaped ? DecodeEscapedName(data, start, position) : Decode(data, start, position - start);
     }
 
-    private string DecodeEscapedName(int start)
+    private static string DecodeEscapedName(byte[] data, int start, int position)
     {
         var bytes = new List<byte>(position - start);
         var at = start;
@@ -237,6 +267,12 @@ internal sealed class Lexer(byte[] data, int position)
     }
 
     private Token ReadLiteralString()
+        => Token.String(TokenKind.StringLiteral, ReadLiteralString(data, ref position, Recovery.Strict));
+
+    // ISO 32000-1 7.3.4.2: balanced parentheses, backslash escapes, octal escapes, and an
+    // unescaped CR/LF/CRLF decoding to a single LF. Position enters on '(' and leaves past
+    // the matching ')'; a lenient reader returns what it decoded when the string never closes.
+    public static byte[] ReadLiteralString(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
         position++;
@@ -253,7 +289,7 @@ internal sealed class Lexer(byte[] data, int position)
                     break;
                 }
 
-                ReadStringEscape(bytes);
+                ReadStringEscape(data, ref position, bytes);
             }
             else if (b == (byte)'(')
             {
@@ -265,7 +301,7 @@ internal sealed class Lexer(byte[] data, int position)
                 depth--;
                 if (depth == 0)
                 {
-                    return Token.String(TokenKind.StringLiteral, [.. bytes]);
+                    return [.. bytes];
                 }
 
                 bytes.Add(b);
@@ -284,10 +320,12 @@ internal sealed class Lexer(byte[] data, int position)
             }
         }
 
-        throw new DocumentParseException("Unterminated string.", start);
+        return recovery == Recovery.Lenient
+            ? [.. bytes]
+            : throw new DocumentParseException("Unterminated string.", start);
     }
 
-    private void ReadStringEscape(List<byte> bytes)
+    private static void ReadStringEscape(byte[] data, ref int position, List<byte> bytes)
     {
         var e = data[position];
         position++;
@@ -349,6 +387,12 @@ internal sealed class Lexer(byte[] data, int position)
     }
 
     private Token ReadHexString()
+        => Token.String(TokenKind.HexString, ReadHexString(data, ref position, Recovery.Strict));
+
+    // ISO 32000-1 7.3.4.3: hex digit pairs, whitespace ignored, an odd trailing digit padded
+    // with a zero. Position enters on '<' and leaves past the '>'. A lenient reader skips
+    // bytes that are not hex digits and returns what it decoded when the '>' never arrives.
+    public static byte[] ReadHexString(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
         position++;
@@ -361,12 +405,7 @@ internal sealed class Lexer(byte[] data, int position)
             position++;
             if (b == (byte)'>')
             {
-                if (hasHigh)
-                {
-                    bytes.Add((byte)(high << 4));
-                }
-
-                return Token.String(TokenKind.HexString, [.. bytes]);
+                return Flush(bytes, hasHigh, high);
             }
 
             if (IsWhitespace(b))
@@ -376,6 +415,11 @@ internal sealed class Lexer(byte[] data, int position)
 
             if (!TryHex(b, out var value))
             {
+                if (recovery == Recovery.Lenient)
+                {
+                    continue;
+                }
+
                 throw new DocumentParseException("Malformed hexadecimal string.", position - 1);
             }
 
@@ -391,7 +435,19 @@ internal sealed class Lexer(byte[] data, int position)
             }
         }
 
-        throw new DocumentParseException("Unterminated hexadecimal string.", start);
+        return recovery == Recovery.Lenient
+            ? Flush(bytes, hasHigh, high)
+            : throw new DocumentParseException("Unterminated hexadecimal string.", start);
+    }
+
+    private static byte[] Flush(List<byte> bytes, bool hasHigh, int high)
+    {
+        if (hasHigh)
+        {
+            bytes.Add((byte)(high << 4));
+        }
+
+        return [.. bytes];
     }
 
     private Token ReadKeyword()
@@ -407,7 +463,7 @@ internal sealed class Lexer(byte[] data, int position)
             throw new DocumentParseException("Unexpected character.", start);
         }
 
-        return Token.Keyword(Decode(start, position - start));
+        return Token.Keyword(Decode(data, start, position - start));
     }
 
     private static Dictionary<int, string[]> BuildInterned()
@@ -437,7 +493,7 @@ internal sealed class Lexer(byte[] data, int position)
 
     // The same handful of names and keywords repeat once per object across the whole file,
     // so hand back the canonical instance instead of a fresh string for each occurrence.
-    private string Decode(int start, int length)
+    private static string Decode(byte[] data, int start, int length)
     {
         if (length is > 0 and <= MaxInternedLength
             && Interned.TryGetValue(BucketKey(length, data[start]), out var candidates))

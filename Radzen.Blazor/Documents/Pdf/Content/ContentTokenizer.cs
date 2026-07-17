@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -10,8 +9,9 @@ namespace Radzen.Documents.Pdf.Content;
 // Shared content-stream tokenizer for the page-content grammar (operators, operands,
 // arrays/dicts and BI/ID/EI inline images captured whole as a single token). Both
 // ContentInterpreter and TextExtractor consume this stream; each consumer filters the
-// tokens it cares about. This is the content-stream grammar, distinct from the PDF
-// object/file grammar in Objects/Lexer.cs.
+// tokens it cares about. What the operands themselves are - numbers, strings, hex strings,
+// names - is the one PDF object syntax, read here through Objects/Lexer with lenient
+// recovery so a corrupt stream still renders. Only the operator layer lives here.
 internal static class ContentTokenizer
 {
     internal enum TokenKind
@@ -90,12 +90,12 @@ internal static class ContentTokenizer
 
                 case (byte)'(':
                     var literalStart = position;
-                    tokens.Add(new Token(TokenKind.String, 0, null, ReadLiteralString(data, ref position), literalStart, position));
+                    tokens.Add(new Token(TokenKind.String, 0, null, Lexer.ReadLiteralString(data, ref position, Lexer.Recovery.Lenient), literalStart, position));
                     continue;
 
                 case (byte)'/':
                     var nameStart = position;
-                    tokens.Add(new Token(TokenKind.Name, 0, ReadName(data, ref position), null, nameStart, position));
+                    tokens.Add(new Token(TokenKind.Name, 0, Lexer.ReadName(data, ref position), null, nameStart, position));
                     continue;
 
                 case (byte)'<':
@@ -107,7 +107,7 @@ internal static class ContentTokenizer
                     }
 
                     var hexStart = position;
-                    tokens.Add(new Token(TokenKind.String, 0, null, ReadHexString(data, ref position), hexStart, position));
+                    tokens.Add(new Token(TokenKind.String, 0, null, Lexer.ReadHexString(data, ref position, Lexer.Recovery.Lenient), hexStart, position));
                     continue;
 
                 case (byte)'>':
@@ -130,18 +130,14 @@ internal static class ContentTokenizer
             if (IsNumberStart(b))
             {
                 var start = position;
-                while (position < data.Length && IsNumberChar(data[position]))
+                var number = Lexer.ReadNumber(data, ref position, Lexer.Recovery.Lenient);
+                if (number is { } value)
                 {
-                    position++;
+                    tokens.Add(new Token(TokenKind.Number, value.RealValue, null, null, start, position));
                 }
 
-                // Numbers are ASCII, so the UTF-8 overload is the same parser over the raw
-                // bytes and saves a transient string per numeric operand.
-                if (double.TryParse(data.AsSpan(start, position - start), NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
-                {
-                    tokens.Add(new Token(TokenKind.Number, value, null, null, start, position));
-                    continue;
-                }
+                // A malformed numeric run is dropped rather than executed as an operand.
+                continue;
             }
 
             var keywordStart = position;
@@ -242,7 +238,7 @@ internal static class ContentTokenizer
 
             if (data[position] == (byte)'/')
             {
-                var key = ReadName(data, ref position);
+                var key = Lexer.ReadName(data, ref position);
                 SkipTokenWhitespace(data, ref position);
                 var value = ReadInlineToken(data, ref position);
                 image.Set(key, value);
@@ -294,7 +290,7 @@ internal static class ContentTokenizer
         var b = data[position];
         if (b == (byte)'/')
         {
-            return "/" + ReadName(data, ref position);
+            return "/" + Lexer.ReadName(data, ref position);
         }
 
         if (b == (byte)'[' || b == (byte)'<')
@@ -448,186 +444,11 @@ internal static class ContentTokenizer
                 : fallback;
     }
 
-    private static byte[] ReadLiteralString(byte[] data, ref int position)
-    {
-        var bytes = new List<byte>();
-        var depth = 0;
-        position++;
-
-        while (position < data.Length)
-        {
-            var b = data[position++];
-            if (b == '\\')
-            {
-                if (position >= data.Length)
-                {
-                    break;
-                }
-
-                var e = data[position++];
-                switch (e)
-                {
-                    case (byte)'n': bytes.Add((byte)'\n'); break;
-                    case (byte)'r': bytes.Add((byte)'\r'); break;
-                    case (byte)'t': bytes.Add((byte)'\t'); break;
-                    case (byte)'b': bytes.Add((byte)'\b'); break;
-                    case (byte)'f': bytes.Add((byte)'\f'); break;
-                    case (byte)'(': bytes.Add((byte)'('); break;
-                    case (byte)')': bytes.Add((byte)')'); break;
-                    case (byte)'\\': bytes.Add((byte)'\\'); break;
-                    case (byte)'\r':
-                        if (position < data.Length && data[position] == '\n')
-                        {
-                            position++;
-                        }
-
-                        break;
-                    case (byte)'\n':
-                        break;
-                    default:
-                        if (e is >= (byte)'0' and <= (byte)'7')
-                        {
-                            var value = e - '0';
-                            for (var k = 0; k < 2 && position < data.Length && data[position] is >= (byte)'0' and <= (byte)'7'; k++)
-                            {
-                                value = (value * 8) + (data[position++] - '0');
-                            }
-
-                            bytes.Add((byte)value);
-                        }
-                        else
-                        {
-                            bytes.Add(e);
-                        }
-
-                        break;
-                }
-
-                continue;
-            }
-
-            if (b == '(')
-            {
-                depth++;
-                bytes.Add(b);
-                continue;
-            }
-
-            if (b == ')')
-            {
-                if (depth == 0)
-                {
-                    break;
-                }
-
-                depth--;
-                bytes.Add(b);
-                continue;
-            }
-
-            // ISO 32000-1 7.3.4.2: an unescaped CR, LF or CRLF is an end-of-line marker and
-            // decodes to a single LF, matching Objects/Lexer.ReadLiteralString.
-            if (b == 13)
-            {
-                bytes.Add(10);
-                if (position < data.Length && data[position] == 10)
-                {
-                    position++;
-                }
-
-                continue;
-            }
-
-            bytes.Add(b);
-        }
-
-        return [.. bytes];
-    }
-
-    private static byte[] ReadHexString(byte[] data, ref int position)
-    {
-        var bytes = new List<byte>();
-        position++;
-        var high = -1;
-
-        while (position < data.Length && data[position] != '>')
-        {
-            var b = data[position++];
-            if (IsWhitespace(b))
-            {
-                continue;
-            }
-
-            var digit = HexDigit(b);
-            if (digit < 0)
-            {
-                continue;
-            }
-
-            if (high < 0)
-            {
-                high = digit;
-            }
-            else
-            {
-                bytes.Add((byte)((high << 4) | digit));
-                high = -1;
-            }
-        }
-
-        if (high >= 0)
-        {
-            bytes.Add((byte)(high << 4));
-        }
-
-        if (position < data.Length)
-        {
-            position++;
-        }
-
-        return [.. bytes];
-    }
-
-    private static string ReadName(byte[] data, ref int position)
-    {
-        position++;
-        var builder = new StringBuilder();
-        while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-        {
-            var b = data[position++];
-            if (b == '#' && position + 1 < data.Length)
-            {
-                var hi = HexDigit(data[position]);
-                var lo = HexDigit(data[position + 1]);
-                if (hi >= 0 && lo >= 0)
-                {
-                    builder.Append((char)((hi << 4) | lo));
-                    position += 2;
-                    continue;
-                }
-            }
-
-            builder.Append((char)b);
-        }
-
-        return builder.ToString();
-    }
-
-    private static int HexDigit(byte b) => b switch
-    {
-        >= (byte)'0' and <= (byte)'9' => b - '0',
-        >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
-        >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
-        _ => -1,
-    };
-
     private static string Latin1(byte[] data, int start, int length) => Encoding.Latin1.GetString(data, start, length);
 
     private static bool IsWhitespace(byte b) => Lexer.IsWhitespace(b);
 
     private static bool IsDelimiter(byte b) => Lexer.IsDelimiter(b);
 
-    private static bool IsNumberStart(byte b) => b is (byte)'+' or (byte)'-' or (byte)'.' or (>= (byte)'0' and <= (byte)'9');
-
-    private static bool IsNumberChar(byte b) => b is (byte)'+' or (byte)'-' or (byte)'.' or (byte)'e' or (byte)'E' or (>= (byte)'0' and <= (byte)'9');
+    private static bool IsNumberStart(byte b) => Lexer.IsNumberStart(b);
 }

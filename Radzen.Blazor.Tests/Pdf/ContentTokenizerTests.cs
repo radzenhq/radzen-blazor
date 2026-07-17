@@ -154,7 +154,8 @@ public class ContentTokenizerTests
 
     // Numeric operands are parsed straight from the source bytes. These pin the accepted
     // grammar, including the forms PDF permits that a hand-rolled span parser gets wrong:
-    // a trailing decimal point, a leading sign and a leading decimal point.
+    // a trailing decimal point, a leading sign and a leading decimal point. The grammar
+    // itself is shared with the file-object lexer and pinned in PdfGrammarTests.
     [Theory]
     [InlineData("4.", 4.0)]
     [InlineData("3. Tj", 3.0)]
@@ -163,8 +164,6 @@ public class ContentTokenizerTests
     [InlineData(".5", 0.5)]
     [InlineData("-5", -5.0)]
     [InlineData("007", 7.0)]
-    [InlineData("6.02E23", 6.02E23)]
-    [InlineData("1e-5", 1e-5)]
     public void Tokenize_NumericOperand_AcceptsEveryPermittedForm(string source, double expected)
     {
         var tokens = ContentTokenizer.Tokenize(Ascii(source));
@@ -179,6 +178,11 @@ public class ContentTokenizerTests
     [InlineData("4.-5")]
     [InlineData("-.")]
     [InlineData(".")]
+    // ISO 32000-1 7.3.3 has no exponent notation, so these are malformed operands rather
+    // than large numbers; they used to parse as 1e-5 and 6.02E23 here while the file-object
+    // lexer rejected them.
+    [InlineData("1e-5")]
+    [InlineData("6.02E23")]
     public void Tokenize_MalformedNumber_EmitsNoNumberToken(string source)
     {
         var tokens = ContentTokenizer.Tokenize(Ascii(source));

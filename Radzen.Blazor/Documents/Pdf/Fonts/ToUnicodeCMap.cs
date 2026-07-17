@@ -216,7 +216,7 @@ internal static class ToUnicodeCMap
             switch (b)
             {
                 case (byte)'<':
-                    tokens.Add(Token.FromHex(ReadHex(data, ref position)));
+                    tokens.Add(Token.FromHex(Lexer.ReadHexString(data, ref position, Lexer.Recovery.Lenient)));
                     continue;
                 case (byte)'[':
                     tokens.Add(Token.ArrayStart);
@@ -252,52 +252,6 @@ internal static class ToUnicodeCMap
 
         return tokens;
     }
-
-    private static byte[] ReadHex(byte[] data, ref int position)
-    {
-        position++;
-        var bytes = new List<byte>();
-        var high = -1;
-
-        while (position < data.Length && data[position] != '>')
-        {
-            var digit = HexDigit(data[position++]);
-            if (digit < 0)
-            {
-                continue;
-            }
-
-            if (high < 0)
-            {
-                high = digit;
-            }
-            else
-            {
-                bytes.Add((byte)((high << 4) | digit));
-                high = -1;
-            }
-        }
-
-        if (high >= 0)
-        {
-            bytes.Add((byte)(high << 4));
-        }
-
-        if (position < data.Length)
-        {
-            position++;
-        }
-
-        return [.. bytes];
-    }
-
-    private static int HexDigit(byte b) => b switch
-    {
-        >= (byte)'0' and <= (byte)'9' => b - '0',
-        >= (byte)'a' and <= (byte)'f' => b - 'a' + 10,
-        >= (byte)'A' and <= (byte)'F' => b - 'A' + 10,
-        _ => -1,
-    };
 
     private static bool IsBreak(byte b) => b is 0 or 9 or 10 or 12 or 13 or 32 or (byte)'<' or (byte)'[' or (byte)']' or (byte)'%';
 
