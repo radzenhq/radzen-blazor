@@ -315,7 +315,7 @@ public sealed class PathContent : ContentElement
 
             if (StrokePaint is { } strokePaint)
             {
-                EmitDeviceColor(writer, strokePaint, stroke: true);
+                ContentEmitter.WriteDeviceColor(writer, strokePaint, stroke: true);
             }
             else
             {
@@ -376,7 +376,7 @@ public sealed class PathContent : ContentElement
             }
             else if (FillPaint is { } fillPaint)
             {
-                EmitDeviceColor(writer, fillPaint, stroke: false);
+                ContentEmitter.WriteDeviceColor(writer, fillPaint, stroke: false);
             }
             else
             {
@@ -450,36 +450,6 @@ public sealed class PathContent : ContentElement
         }
 
         return hasPoint ? new TextBounds(left, bottom, right, top) : null;
-    }
-
-    private static void EmitDeviceColor(ContentWriter writer, DeviceColor color, bool stroke)
-    {
-        if (color.Kind == DeviceColorKind.Named && color.ColorSpace is { } name)
-        {
-            writer.WriteName(name);
-            writer.WriteRaw(stroke ? " CS\n" : " cs\n");
-        }
-
-        foreach (var operand in color.Operands)
-        {
-            writer.WriteNumber(operand);
-            writer.WriteRaw(" ");
-        }
-
-        if (color.PatternName is { } pattern)
-        {
-            writer.WriteName(pattern);
-            writer.WriteRaw(" ");
-        }
-
-        var op = color.Kind switch
-        {
-            DeviceColorKind.Named => stroke ? "SCN" : "scn",
-            DeviceColorKind.Gray => stroke ? "G" : "g",
-            _ => stroke ? "K" : "k",
-        };
-        writer.WriteRaw(op);
-        writer.WriteRaw("\n");
     }
 
     private readonly record struct Segment(string Operator, double[] Operands);

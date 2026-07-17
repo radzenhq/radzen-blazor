@@ -68,6 +68,15 @@ internal sealed class Base14Metrics
     public double GetKerning(char left, char right)
         => kernByPair.TryGetValue((left << 16) | right, out var value) ? value : 0.0;
 
+    /// <summary>
+    /// Returns the kerning actually applied to an ordered pair within a drawn run: as
+    /// <see cref="GetKerning"/>, except that a pair straddling a space is never kerned.
+    /// Layout measures word by word, so no drawn run ever saw the space pair; measurement and
+    /// emission both go through here so the width measured is the width drawn.
+    /// </summary>
+    public double GetRunKerning(char left, char right)
+        => left == ' ' || right == ' ' ? 0.0 : GetKerning(left, right);
+
     public double MeasureString(string text, double size)
     {
         double sum = 0;

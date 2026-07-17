@@ -32,8 +32,8 @@ internal static class FieldAppearances
     }
 
     // A visible signature widget appearance: the given text lines stacked from the
-    // top of the box down, each in the supplied base-14 font. Non-encodable glyphs
-    // are dropped by the WinAnsi text encoder rather than failing the whole stream.
+    // top of the box down, each in the supplied base-14 font. Non-encodable glyphs are
+    // substituted with '?' by TextContent's encoder rather than failing the whole stream.
     public static StreamObject BuildSignatureAppearance(
         IReadOnlyList<string> lines, double width, double height, Font font, FontScope scope)
     {
@@ -143,18 +143,7 @@ internal static class FieldAppearances
         return path;
     }
 
-    public static bool CanEncode(string value)
-    {
-        foreach (var c in value)
-        {
-            if (!WinAnsiEncoding.CanEncode(c))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    public static bool CanEncode(string value) => WinAnsiText.CanEncode(value);
 
     // Reads the font resource name and size from a "/Font size Tf" default-appearance string.
     public static (string? Font, double Size) ParseDefaultAppearance(string? da)

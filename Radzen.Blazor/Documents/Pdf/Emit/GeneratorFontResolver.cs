@@ -34,20 +34,6 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     public static bool IsWinAnsi(int codepoint)
         => codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out _);
 
-    public static byte[] EncodeWinAnsi(string text)
-    {
-        var bytes = new List<byte>(text.Length);
-        foreach (var c in text)
-        {
-            if (WinAnsiEncoding.TryGetCode(c, out var code))
-            {
-                bytes.Add(code);
-            }
-        }
-
-        return [.. bytes];
-    }
-
     // Reverse maps for fresh (unsaved) text extraction: embedded Type0 fonts decode
     // their glyph-id codes through the accumulated gid-to-Unicode table, mirroring
     // the /ToUnicode CMap the embedder writes on save.

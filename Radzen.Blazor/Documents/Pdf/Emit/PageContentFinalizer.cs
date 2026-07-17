@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 using static Radzen.Documents.Pdf.Content.ContentEmitter;
@@ -384,22 +383,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             writer.WriteRaw(" gs\n");
         }
 
-        var radians = watermark.Rotation * Math.PI / 180;
-        var cos = Math.Cos(radians);
-        var sin = Math.Sin(radians);
-        var negSin = sin == 0 ? 0 : -sin;
-        writer.WriteNumber(cos);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(sin);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(negSin);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(cos);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(watermark.CenterX);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(watermark.CenterY);
-        writer.WriteRaw(" cm\n");
+        WatermarkGeometry.WriteRotation(writer, watermark.Rotation, watermark.CenterX, watermark.CenterY);
         if (watermark.Image is { } image)
         {
             WriteImageDraw(writer, image);
