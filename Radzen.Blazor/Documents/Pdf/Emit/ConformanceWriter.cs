@@ -175,8 +175,7 @@ internal sealed class ConformanceWriter(Document document)
             {
                 if (font.Sfnt is null)
                 {
-                    throw new InvalidOperationException(
-                        $"{Label} forbids the standard-14 font '{font.Base14 ?? "Helvetica"}' referenced by name; register an embeddable font file with DocumentBuilder.Fonts instead.");
+                    throw Fonts.FontResolution.Base14Forbidden(Label, font.Base14Name, family: null);
                 }
             }
         }
@@ -194,9 +193,8 @@ internal sealed class ConformanceWriter(Document document)
                     continue;
                 }
 
-                var name = Fonts.Base14Metrics.Resolve(text.Font)?.PostScriptName ?? "Helvetica";
-                throw new InvalidOperationException(
-                    $"{Label} forbids the standard-14 font '{name}' referenced by name; register an embeddable font file for '{text.Font.Name}' with DocumentBuilder.Fonts instead.");
+                throw Fonts.FontResolution.Base14Forbidden(
+                    Label, Fonts.FontResolution.ResolveBase14Name(text.Font), text.Font.Name);
             }
         }
     }

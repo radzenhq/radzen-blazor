@@ -15,6 +15,10 @@ internal sealed class GeneratedFont
 
     public string? Base14 { get; init; }
 
+    // The face a non-sfnt font is emitted as; the resolver always sets Base14, so the
+    // fallback only guards a GeneratedFont built with neither face.
+    public string Base14Name => Base14 ?? "Helvetica";
+
     public SfntFont? Sfnt { get; init; }
 
     public Dictionary<ushort, int> GidToUnicode { get; } = [];

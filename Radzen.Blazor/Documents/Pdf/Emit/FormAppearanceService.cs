@@ -103,5 +103,5 @@ internal sealed class FormAppearanceService(Document document)
         };
 
     private static string BaseFontOf(Font font)
-        => Fonts.Base14Metrics.Resolve(font)?.PostScriptName ?? "Helvetica";
+        => Fonts.FontResolution.ResolveBase14Name(font);
 }

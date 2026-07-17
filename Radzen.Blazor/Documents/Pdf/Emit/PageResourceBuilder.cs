@@ -148,7 +148,7 @@ internal static class PageResourceBuilder
         }
         else
         {
-            reference = Base14FontDictionary(font.Base14 ?? "Helvetica");
+            reference = Base14FontDictionary(font.Base14Name);
         }
 
         cache[font] = reference;

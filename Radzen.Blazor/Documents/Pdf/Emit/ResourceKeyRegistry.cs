@@ -15,23 +15,33 @@ internal sealed class ResourceKeyRegistry<TIdentity, TValue>(
     where TIdentity : notnull
 {
     private readonly List<TValue> values = [];
-    private readonly Dictionary<TIdentity, string> keysByIdentity = new(comparer);
+    private readonly Dictionary<TIdentity, int> indexByIdentity = new(comparer);
 
     public IReadOnlyList<TValue> Values => values;
 
     public int Count => values.Count;
 
     public string GetOrAdd(TIdentity identity, Func<string, TValue> create)
+        => KeyAt(GetOrAddIndex(identity, create));
+
+    // For callers whose registered value carries its own key and is needed back.
+    public TValue GetOrAddValue(TIdentity identity, Func<string, TValue> create)
+        => values[GetOrAddIndex(identity, create)];
+
+    private int GetOrAddIndex(TIdentity identity, Func<string, TValue> create)
     {
-        if (keysByIdentity.TryGetValue(identity, out var existing))
+        if (indexByIdentity.TryGetValue(identity, out var existing))
         {
             return existing;
         }
 
-        var key = Add(create);
-        keysByIdentity[identity] = key;
-        return key;
+        var index = values.Count;
+        Add(create);
+        indexByIdentity[identity] = index;
+        return index;
     }
+
+    private string KeyAt(int index) => prefix + index.ToString(CultureInfo.InvariantCulture);
 
     // Appends an entry that opts out of reuse: it consumes an ordinal but is never handed back.
     public string Add(Func<string, TValue> create)
