@@ -1,34 +1,40 @@
-using System.Text;
-
 namespace Radzen.Documents.Pdf;
 
 /// <summary>Represents a rubber-stamp annotation.</summary>
 /// <param name="bounds">The annotation bounds.</param>
 public sealed class StampAnnotation(PdfRect bounds) : Annotation(bounds)
 {
+    private string name = "Draft";
+
     /// <summary>Gets or sets the stamp name.</summary>
-    public string Name { get; set; } = "Draft";
+    public string Name
+    {
+        get => name;
+        set => Set(ref name, value);
+    }
 
     internal override string Subtype => "Stamp";
-
-    internal override void AppendState(StringBuilder value) => value.Append('|').Append(Name);
 }
 
 /// <summary>Base class for square and circle annotations.</summary>
 /// <param name="bounds">The annotation bounds.</param>
 public abstract class ShapeAnnotation(PdfRect bounds) : Annotation(bounds)
 {
+    private double borderWidth = 1;
+    private Color? interiorColor;
+
     /// <summary>Gets or sets the border width in points.</summary>
-    public double BorderWidth { get; set; } = 1;
+    public double BorderWidth
+    {
+        get => borderWidth;
+        set => Set(ref borderWidth, value);
+    }
 
     /// <summary>Gets or sets the optional interior fill color.</summary>
-    public Color? InteriorColor { get; set; }
-
-    internal override void AppendState(StringBuilder value)
+    public Color? InteriorColor
     {
-        Append(value, BorderWidth);
-        value.Append('|').Append(InteriorColor?.A).Append(',').Append(InteriorColor?.R).Append(',')
-            .Append(InteriorColor?.G).Append(',').Append(InteriorColor?.B);
+        get => interiorColor;
+        set => Set(ref interiorColor, value);
     }
 }
 
@@ -52,9 +58,15 @@ public sealed class CircleAnnotation(PdfRect bounds) : ShapeAnnotation(bounds)
 /// <param name="bounds">The annotation bounds.</param>
 public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
 {
+    private Font font = new();
+    private Color textColor = Color.Black;
 
     /// <summary>Gets or sets the text font.</summary>
-    public Font Font { get; set; } = new();
+    public Font Font
+    {
+        get => font;
+        set => Set(ref font, value);
+    }
 
     /// <summary>Gets or sets the font size in points.</summary>
     public double FontSize
@@ -64,14 +76,22 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
     }
 
     /// <summary>Gets or sets the text color.</summary>
-    public Color TextColor { get; set; } = Color.Black;
+    public Color TextColor
+    {
+        get => textColor;
+        set => Set(ref textColor, value);
+    }
+
+    /// <inheritdoc />
+    // Font is mutable and owned, so its own flag is what catches an edit made through the
+    // instance rather than by assigning a new one.
+    public override bool IsModified => base.IsModified || Font.IsModified;
 
     internal override string Subtype => "FreeText";
 
-    internal override void AppendState(StringBuilder value)
+    internal override void AcceptChanges()
     {
-        value.Append('|').Append(Font.Name);
-        Append(value, Font.Size);
-        value.Append('|').Append(TextColor.A).Append(',').Append(TextColor.R).Append(',').Append(TextColor.G).Append(',').Append(TextColor.B);
+        base.AcceptChanges();
+        Font.AcceptChanges();
     }
 }

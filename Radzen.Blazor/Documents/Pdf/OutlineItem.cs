@@ -13,32 +13,107 @@ namespace Radzen.Documents.Pdf;
 /// <param name="target">The location the entry navigates to, or <c>null</c> for a non-navigating entry.</param>
 public sealed class OutlineItem(string title, OutlineTarget? target)
 {
+    private readonly TrackedList<OutlineItem> children = [];
+    private bool touched;
+    private string title = title;
+    private OutlineTarget? target = target;
+    private Color? color;
+    private bool bold;
+    private bool italic;
+    private bool collapsed;
+
     /// <summary>Gets or sets the title shown in the bookmark panel.</summary>
-    public string Title { get; set; } = title;
+    public string Title
+    {
+        get => title;
+        set => Set(ref title, value);
+    }
 
     /// <summary>Gets or sets the location the entry navigates to, or <c>null</c> when unavailable.</summary>
-    public OutlineTarget? Target { get; set; } = target;
+    // OutlineTarget is immutable, so assignment is the only way it can change.
+    public OutlineTarget? Target
+    {
+        get => target;
+        set => Set(ref target, value);
+    }
 
     /// <summary>Gets the child entries nested under this one.</summary>
-    public IList<OutlineItem> Children { get; } = [];
+    public IList<OutlineItem> Children => children;
 
     /// <summary>
     /// Gets or sets the colour of the entry's title text (the <c>/C</c> entry). When
     /// <see langword="null"/> the viewer's default colour is used and no <c>/C</c> is written.
     /// </summary>
-    public Color? Color { get; set; }
+    public Color? Color
+    {
+        get => color;
+        set => Set(ref color, value);
+    }
 
     /// <summary>Gets or sets whether the entry's title is bold (the <c>/F</c> bit 2). Defaults to <see langword="false"/>.</summary>
-    public bool Bold { get; set; }
+    public bool Bold
+    {
+        get => bold;
+        set => Set(ref bold, value);
+    }
 
     /// <summary>Gets or sets whether the entry's title is italic (the <c>/F</c> bit 1). Defaults to <see langword="false"/>.</summary>
-    public bool Italic { get; set; }
+    public bool Italic
+    {
+        get => italic;
+        set => Set(ref italic, value);
+    }
 
     /// <summary>
     /// Gets or sets whether the entry is initially collapsed, hiding its descendants. A
     /// collapsed entry is written with a negative <c>/Count</c>. Defaults to <see langword="false"/>.
     /// </summary>
-    public bool Collapsed { get; set; }
+    public bool Collapsed
+    {
+        get => collapsed;
+        set => Set(ref collapsed, value);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this entry or any descendant has been modified since the
+    /// document was loaded.
+    /// </summary>
+    public bool IsModified
+    {
+        get
+        {
+            if (touched || children.StructureChanged)
+            {
+                return true;
+            }
+
+            foreach (var child in children)
+            {
+                if (child.IsModified)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    private void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    internal void AcceptChanges()
+    {
+        touched = false;
+        children.AcceptStructure();
+        foreach (var child in children)
+        {
+            child.AcceptChanges();
+        }
+    }
 }
 
 // The page-destination fit the viewer applies when navigating to a page target.

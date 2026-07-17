@@ -16,6 +16,9 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
+    private readonly TrackedList<OutlineItem> outline = [];
+    private readonly TrackedList<PageLabel> pageLabels = [];
+
     /// <summary>Initializes an empty PDF document.</summary>
     public Document()
     {
@@ -52,13 +55,6 @@ public sealed class Document
 
     // The eight modeled /Info fields captured as strings, for a cheap value comparison
     // between the load-time metadata and the current metadata on the incremental path.
-    internal static string?[] InfoSnapshot(DocumentInfo info) =>
-    [
-        info.Title, info.Author, info.Subject, info.Keywords, info.Creator, info.Producer,
-        info.CreationDate?.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
-        info.ModificationDate?.ToString("O", System.Globalization.CultureInfo.InvariantCulture),
-    ];
-
     /// <summary>Gets the document metadata.</summary>
     public DocumentInfo Info { get; } = new();
 
@@ -115,10 +111,10 @@ public sealed class Document
     /// with the given style, prefix and start ordinal. When empty no <c>/PageLabels</c>
     /// entry is written.
     /// </summary>
-    public IList<PageLabel> PageLabels { get; } = [];
+    public IList<PageLabel> PageLabels => pageLabels;
 
     /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
-    public IList<OutlineItem> Outline { get; } = [];
+    public IList<OutlineItem> Outline => outline;
 
     /// <summary>Gets the files embedded in the document.</summary>
     public AttachmentCollection Attachments { get; } = [];
@@ -169,12 +165,61 @@ public sealed class Document
     // the catalog /Names /Dests name tree.
     internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
 
-    internal bool OutlineChanged => Loaded?.OutlineRequiresRewrite == true
-        || Loaded?.LoadedOutlineSnapshot is not { } snapshot
-        || !OutlineSnapshot.Matches(snapshot, Outline);
+    // Loaded?.Source is the "was parsed from a file" signal: an unloaded document (and an
+    // append-only carry state) has nothing to preserve, so its outline is always written.
+    internal bool OutlineChanged => Loaded?.Source is null
+        || Loaded.OutlineRequiresRewrite
+        || outline.StructureChanged
+        || AnyModified(outline);
 
-    internal bool PageLabelsChanged => Loaded?.LoadedPageLabelsSnapshot is not { } snapshot
-        || !PageLabelSnapshot.Matches(snapshot, PageLabels);
+    internal bool PageLabelsChanged => Loaded?.Source is null
+        || pageLabels.StructureChanged
+        || AnyModified(pageLabels);
+
+    private static bool AnyModified(TrackedList<OutlineItem> items)
+    {
+        foreach (var item in items)
+        {
+            if (item.IsModified)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool AnyModified(TrackedList<PageLabel> items)
+    {
+        foreach (var item in items)
+        {
+            if (item.IsModified)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Called once after load, which fills the metadata model through its own setters and would
+    // otherwise leave every loaded document born dirty.
+    internal void AcceptMetadataChanges()
+    {
+        Info.AcceptChanges();
+        Attachments.AcceptChanges();
+        outline.AcceptStructure();
+        foreach (var item in outline)
+        {
+            item.AcceptChanges();
+        }
+
+        pageLabels.AcceptStructure();
+        foreach (var label in pageLabels)
+        {
+            label.AcceptChanges();
+        }
+    }
 
     /// <summary>
     /// Loads a physical document from a stream. The stream is read in full and

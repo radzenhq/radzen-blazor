@@ -83,7 +83,7 @@ internal static class AnnotationEmitter
         foreach (var entry in annotations.Entries)
         {
             if (entry.Annotation is null
-                || (entry.Original is not null && string.Equals(entry.State, entry.Annotation.State(), StringComparison.Ordinal)))
+                || (entry.Original is not null && !entry.Annotation.IsModified))
             {
                 result.Add(Preserve(entry));
                 continue;
@@ -114,7 +114,7 @@ internal static class AnnotationEmitter
                 continue;
             }
 
-            if (entry.Original is not null && string.Equals(entry.State, entry.Annotation.State(), StringComparison.Ordinal))
+            if (entry.Original is not null && !entry.Annotation.IsModified)
             {
                 result.Add(Import(entry, context));
                 continue;

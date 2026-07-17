@@ -32,6 +32,11 @@ public enum PageLabelStyle
 /// <param name="startPage">The zero-based index of the first page in the range.</param>
 public sealed class PageLabel(int startPage)
 {
+    private bool touched;
+    private PageLabelStyle? style;
+    private string? prefix;
+    private int start = 1;
+
     /// <summary>Gets the zero-based index of the first page this range labels.</summary>
     public int StartPage { get; } = startPage;
 
@@ -39,13 +44,36 @@ public sealed class PageLabel(int startPage)
     /// Gets or sets the numbering style. When <see langword="null"/> the pages carry only
     /// the <see cref="Prefix"/> (no numeric portion).
     /// </summary>
-    public PageLabelStyle? Style { get; set; }
+    public PageLabelStyle? Style
+    {
+        get => style;
+        set => Set(ref style, value);
+    }
 
     /// <summary>Gets or sets the label prefix (the <c>/P</c> entry). When <see langword="null"/> no prefix is written.</summary>
-    public string? Prefix { get; set; }
+    public string? Prefix
+    {
+        get => prefix;
+        set => Set(ref prefix, value);
+    }
 
     /// <summary>Gets or sets the ordinal of the first page in the range (the <c>/St</c> entry). Defaults to 1.</summary>
-    public int Start { get; set; } = 1;
+    public int Start
+    {
+        get => start;
+        set => Set(ref start, value);
+    }
+
+    /// <summary>Gets a value indicating whether this range has been modified since the document was loaded.</summary>
+    public bool IsModified => touched;
+
+    private void Set<T>(ref T field, T value)
+    {
+        field = value;
+        touched = true;
+    }
+
+    internal void AcceptChanges() => touched = false;
 }
 
 // Serializes Document.PageLabels as the catalog /PageLabels number tree (ISO 32000-1

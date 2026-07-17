@@ -75,8 +75,7 @@ internal sealed class IncrementalDocumentSaver
             throw Unsupported("Editing catalog-level document features");
         }
 
-        if (doc.Loaded!.LoadedAttachmentSnapshot is not { } attachments
-            || !AttachmentSnapshot.Matches(attachments, doc.Attachments))
+        if (doc.Attachments.IsModified)
         {
             throw Unsupported("Editing attachments");
         }
@@ -448,8 +447,7 @@ internal sealed class IncrementalDocumentSaver
     // of untouched modeled keys are preserved from the original dictionary.
     private bool WriteMetadata(IncrementalUpdateWriter writer, DocumentReader reader)
     {
-        var current = Document.InfoSnapshot(doc.Info);
-        if (doc.Loaded!.LoadedInfoSnapshot is { } snapshot && Same(snapshot, current))
+        if (!doc.Info.IsModified)
         {
             return false;
         }
@@ -583,21 +581,4 @@ internal sealed class IncrementalDocumentSaver
         return a.AsSpan().SequenceEqual(b);
     }
 
-    private static bool Same(string?[] a, string?[] b)
-    {
-        if (a.Length != b.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < a.Length; i++)
-        {
-            if (!string.Equals(a[i], b[i], StringComparison.Ordinal))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

@@ -12,6 +12,7 @@ namespace Radzen.Documents.Pdf;
 public sealed class ContentCollection : IReadOnlyList<ContentElement>
 {
     private readonly List<ContentElement> items = [];
+    private bool structureChanged;
 
     /// <summary>Gets the number of elements in the collection.</summary>
     public int Count => items.Count;
@@ -32,6 +33,7 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     {
         ArgumentNullException.ThrowIfNull(element);
         items.Add(element);
+        structureChanged = true;
         return element;
     }
 
@@ -45,6 +47,7 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     {
         ArgumentNullException.ThrowIfNull(element);
         items.Insert(index, element);
+        structureChanged = true;
         return element;
     }
 
@@ -54,17 +57,59 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
     public bool Remove(ContentElement element)
     {
         ArgumentNullException.ThrowIfNull(element);
-        return items.Remove(element);
+        var removed = items.Remove(element);
+        structureChanged |= removed;
+        return removed;
     }
 
     /// <summary>Removes the element at the specified paint-order index.</summary>
     /// <param name="index">The zero-based element index.</param>
-    public void RemoveAt(int index) => items.RemoveAt(index);
+    public void RemoveAt(int index)
+    {
+        items.RemoveAt(index);
+        structureChanged = true;
+    }
 
     /// <inheritdoc />
     public IEnumerator<ContentElement> GetEnumerator() => items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    internal void Clear() => items.Clear();
+    internal void Clear()
+    {
+        structureChanged |= items.Count > 0;
+        items.Clear();
+    }
+
+    // Element flags answer "did an element change", not "did the collection change": a removed
+    // element leaves every survivor clean.
+    internal bool IsModified
+    {
+        get
+        {
+            if (structureChanged)
+            {
+                return true;
+            }
+
+            foreach (var item in items)
+            {
+                if (item.IsModified)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    internal void AcceptChanges()
+    {
+        structureChanged = false;
+        foreach (var item in items)
+        {
+            item.AcceptChanges();
+        }
+    }
 }

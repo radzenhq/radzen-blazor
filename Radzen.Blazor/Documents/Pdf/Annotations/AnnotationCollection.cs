@@ -42,7 +42,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     public T Add<T>(T annotation) where T : Annotation
     {
         ArgumentNullException.ThrowIfNull(annotation);
-        entries.Add(new Entry(annotation, null, null, null, null));
+        entries.Add(new Entry(annotation, null, null, null));
         structureChanged = true;
         return annotation;
     }
@@ -55,11 +55,11 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
         ArgumentNullException.ThrowIfNull(annotation);
         if (index == Count)
         {
-            entries.Add(new Entry(annotation, null, null, null, null));
+            entries.Add(new Entry(annotation, null, null, null));
         }
         else
         {
-            entries.Insert(EntryIndex(index), new Entry(annotation, null, null, null, null));
+            entries.Insert(EntryIndex(index), new Entry(annotation, null, null, null));
         }
 
         structureChanged = true;
@@ -128,7 +128,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
 
             foreach (var entry in entries)
             {
-                if (entry.Annotation is { } annotation && !string.Equals(entry.State, annotation.State(), StringComparison.Ordinal))
+                if (entry.Annotation is { IsModified: true })
                 {
                     return true;
                 }
@@ -141,7 +141,10 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     internal void Load(Annotation? annotation, DocumentReader reader, DocumentObject original, DictionaryObject? dictionary)
     {
         loaded = true;
-        entries.Add(new Entry(annotation, reader, original, dictionary, annotation?.State()));
+        // Reading builds the annotation through its tracked setters, which would otherwise
+        // leave every loaded annotation born dirty.
+        annotation?.AcceptChanges();
+        entries.Add(new Entry(annotation, reader, original, dictionary));
     }
 
     internal void RemoveLoadedSubtype(string subtype)
@@ -178,6 +181,5 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
         Annotation? Annotation,
         DocumentReader? Reader,
         DocumentObject? Original,
-        DictionaryObject? Dictionary,
-        string? State);
+        DictionaryObject? Dictionary);
 }

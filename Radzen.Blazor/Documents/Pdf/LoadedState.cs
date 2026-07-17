@@ -1,5 +1,4 @@
 using Radzen.Documents.Pdf.Objects;
-using System;
 using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf;
@@ -52,21 +51,11 @@ internal sealed class LoadedState
     // preserve them verbatim as the prefix of the incremental output. Null unless loaded.
     public byte[]? SourceBytes { get; }
 
-    // The document metadata as read at load time, so SaveIncremental emits an /Info
-    // override only when the caller actually changed a modeled metadata field.
-    public string?[]? LoadedInfoSnapshot { get; set; }
-
     // The source /Info dictionary, so a full save can carry through the entries
     // DocumentInfo does not model (/Trapped and any custom key).
     public DictionaryObject? SourceInfo { get; set; }
 
-    public IReadOnlyList<OutlineSnapshot>? LoadedOutlineSnapshot { get; set; }
-
     public bool OutlineRequiresRewrite { get; set; }
-
-    public IReadOnlyList<PageLabelSnapshot>? LoadedPageLabelsSnapshot { get; set; }
-
-    public IReadOnlyList<AttachmentSnapshot>? LoadedAttachmentSnapshot { get; set; }
 
     // Append-only carry state: created lazily when a fresh (or already-loaded)
     // document receives pages appended from a loaded source.
@@ -148,58 +137,4 @@ internal sealed class LoadedState
     // Drops the loaded AcroForm handle after FormWriter flattens it, so the next
     // save emits no /AcroForm.
     public void ClearAcroForm() => SourceAcroForm = null;
-}
-
-internal sealed record AttachmentSnapshot(
-    Attachment Attachment,
-    string? Description,
-    DateTimeOffset ModificationDate,
-    FacturXProfile? FacturX,
-    string? DocumentType,
-    string? Version,
-    string? ConformanceLevel)
-{
-    public static IReadOnlyList<AttachmentSnapshot> Capture(AttachmentCollection attachments)
-    {
-        var result = new List<AttachmentSnapshot>(attachments.Count);
-        foreach (var attachment in attachments)
-        {
-            result.Add(new AttachmentSnapshot(
-                attachment,
-                attachment.Description,
-                attachment.ModificationDate,
-                attachment.FacturX,
-                attachment.FacturX?.DocumentType,
-                attachment.FacturX?.Version,
-                attachment.FacturX?.ConformanceLevel));
-        }
-
-        return result;
-    }
-
-    public static bool Matches(IReadOnlyList<AttachmentSnapshot> snapshot, AttachmentCollection attachments)
-    {
-        if (snapshot.Count != attachments.Count)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < snapshot.Count; i++)
-        {
-            var expected = snapshot[i];
-            var actual = attachments[i];
-            if (!ReferenceEquals(expected.Attachment, actual)
-                || expected.Description != actual.Description
-                || expected.ModificationDate != actual.ModificationDate
-                || !ReferenceEquals(expected.FacturX, actual.FacturX)
-                || expected.DocumentType != actual.FacturX?.DocumentType
-                || expected.Version != actual.FacturX?.Version
-                || expected.ConformanceLevel != actual.FacturX?.ConformanceLevel)
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }
