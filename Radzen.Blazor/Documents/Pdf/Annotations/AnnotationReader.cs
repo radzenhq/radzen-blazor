@@ -107,7 +107,7 @@ internal static class AnnotationReader
                 maxY = Math.Max(maxY, y);
             }
 
-            annotation.Areas.Add(new Rect(minX, minY, maxX - minX, maxY - minY));
+            annotation.Areas.Add(new PdfRect(minX, minY, maxX, maxY));
         }
 
         return annotation;
@@ -287,14 +287,10 @@ internal static class AnnotationReader
         return annotation;
     }
 
-    // Annotation.Bounds is a Rect but holds PDF user space, so the read crosses conventions here.
-    private static Rect Bounds(DocumentReader reader, ArrayObject? value)
-    {
-        var bounds = PdfRects.Read(reader, value, RectPolicy.Strict(
+    private static PdfRect Bounds(DocumentReader reader, ArrayObject? value)
+        => PdfRect.Read(reader, value, RectPolicy.Strict(
             "A modeled annotation requires a four-number /Rect array.",
             "An annotation coordinate is not numeric."));
-        return new Rect(bounds.Left, bounds.Bottom, bounds.Width, bounds.Height);
-    }
 
     private static Color? ReadColor(DocumentReader reader, ArrayObject? value)
     {

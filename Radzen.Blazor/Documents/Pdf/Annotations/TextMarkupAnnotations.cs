@@ -5,7 +5,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>Represents a sticky-note text annotation.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class TextAnnotation(Rect bounds) : Annotation(bounds)
+public sealed class TextAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets or sets whether the note is initially open.</summary>
     public bool Open { get; set; }
@@ -20,17 +20,17 @@ public sealed class TextAnnotation(Rect bounds) : Annotation(bounds)
 
 /// <summary>Base class for text markup annotations.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public abstract class MarkupAnnotation(Rect bounds) : Annotation(bounds)
+public abstract class MarkupAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets the rectangular text areas covered by the markup.</summary>
-    public IList<Rect> Areas { get; } = [bounds];
+    public IList<PdfRect> Areas { get; } = [bounds];
 
     internal override void AppendState(StringBuilder value)
     {
         foreach (var area in Areas)
         {
-            Append(value, area.X);
-            Append(value, area.Y);
+            Append(value, area.Left);
+            Append(value, area.Bottom);
             Append(value, area.Width);
             Append(value, area.Height);
         }
@@ -39,7 +39,7 @@ public abstract class MarkupAnnotation(Rect bounds) : Annotation(bounds)
 
 /// <summary>Represents highlighted text.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class HighlightAnnotation(Rect bounds) : MarkupAnnotation(bounds)
+public sealed class HighlightAnnotation(PdfRect bounds) : MarkupAnnotation(bounds)
 {
 
     internal override string Subtype => "Highlight";
@@ -47,7 +47,7 @@ public sealed class HighlightAnnotation(Rect bounds) : MarkupAnnotation(bounds)
 
 /// <summary>Represents underlined text.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class UnderlineAnnotation(Rect bounds) : MarkupAnnotation(bounds)
+public sealed class UnderlineAnnotation(PdfRect bounds) : MarkupAnnotation(bounds)
 {
 
     internal override string Subtype => "Underline";
@@ -55,7 +55,7 @@ public sealed class UnderlineAnnotation(Rect bounds) : MarkupAnnotation(bounds)
 
 /// <summary>Represents struck-out text.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class StrikeOutAnnotation(Rect bounds) : MarkupAnnotation(bounds)
+public sealed class StrikeOutAnnotation(PdfRect bounds) : MarkupAnnotation(bounds)
 {
 
     internal override string Subtype => "StrikeOut";
@@ -63,7 +63,7 @@ public sealed class StrikeOutAnnotation(Rect bounds) : MarkupAnnotation(bounds)
 
 /// <summary>Represents text marked with a squiggly underline.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class SquigglyAnnotation(Rect bounds) : MarkupAnnotation(bounds)
+public sealed class SquigglyAnnotation(PdfRect bounds) : MarkupAnnotation(bounds)
 {
 
     internal override string Subtype => "Squiggly";

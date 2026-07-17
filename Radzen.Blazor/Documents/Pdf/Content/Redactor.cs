@@ -24,18 +24,18 @@ internal static class Redactor
             return 0;
         }
 
-        Redact(page, hits.Select(static hit => new Rect(hit.Bounds.Left, hit.Bounds.Bottom, hit.Bounds.Width, hit.Bounds.Height)), redactionOptions, cache);
+        Redact(page, hits.Select(static hit => hit.Bounds), redactionOptions, cache);
         return hits.Count;
     }
 
-    public static void Redact(Page page, IEnumerable<Rect> areas, RedactionOptions? options, ContentTokenizer.Cache? cache = null)
+    public static void Redact(Page page, IEnumerable<PdfRect> areas, RedactionOptions? options, ContentTokenizer.Cache? cache = null)
     {
         ArgumentNullException.ThrowIfNull(areas);
         cache ??= new ContentTokenizer.Cache();
         var regions = areas.ToArray();
         foreach (var area in regions)
         {
-            if (!double.IsFinite(area.X) || !double.IsFinite(area.Y) || !double.IsFinite(area.Width) || !double.IsFinite(area.Height)
+            if (!double.IsFinite(area.Left) || !double.IsFinite(area.Bottom) || !double.IsFinite(area.Right) || !double.IsFinite(area.Top)
                 || area.Width <= 0 || area.Height <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(areas), "Redaction regions must have finite coordinates and positive dimensions.");
@@ -87,7 +87,7 @@ internal static class Redactor
 
                     content.RemoveAt(i);
                     break;
-                case ImageContent image when IntersectsAny(Bounds(image.Rect), regions):
+                case ImageContent image when IntersectsAny(image.Bounds, regions):
                     content.RemoveAt(i);
                     break;
                 case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
@@ -230,20 +230,16 @@ internal static class Redactor
     private static bool MayPaint(string op) => op is not ("gs" or "ri" or "i" or "j" or "J" or "M"
         or "BX" or "EX" or "MP" or "DP" or "d0" or "d1");
 
-    private static TextBounds Bounds(Rect rect)
-        => new(Math.Min(rect.Left, rect.Right), Math.Min(rect.Top, rect.Bottom), Math.Max(rect.Left, rect.Right), Math.Max(rect.Top, rect.Bottom));
-
-    private static TextBounds UnitBounds(Matrix transform)
+    private static PdfRect UnitBounds(Matrix transform)
     {
         var points = new[] { transform.Transform(0, 0), transform.Transform(1, 0), transform.Transform(1, 1), transform.Transform(0, 1) };
-        return new TextBounds(points.Min(static p => p.X), points.Min(static p => p.Y), points.Max(static p => p.X), points.Max(static p => p.Y));
+        return new PdfRect(points.Min(static p => p.X), points.Min(static p => p.Y), points.Max(static p => p.X), points.Max(static p => p.Y));
     }
 
-    private static bool IntersectsAny(TextBounds bounds, IReadOnlyList<Rect> regions)
+    private static bool IntersectsAny(PdfRect bounds, IReadOnlyList<PdfRect> regions)
     {
-        foreach (var region in regions)
+        foreach (var area in regions)
         {
-            var area = Bounds(region);
             if (bounds.Left < area.Right && bounds.Right > area.Left && bounds.Bottom < area.Top && bounds.Top > area.Bottom)
             {
                 return true;

@@ -160,7 +160,7 @@ public class LoadedContentChangeDetectionTests
                 page.ReplaceText("Alpha", "Omega");
                 break;
             case "Redact":
-                page.Redact([new Rect(0, 690, 200, 30)]);
+                page.Redact([PdfRect.FromSize(0, 690, 200, 30)]);
                 break;
             case "ContentAdd":
                 page.Content.Add(new TextContent("Gamma", 10, 660));

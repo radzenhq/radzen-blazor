@@ -29,7 +29,7 @@ public class SoftMaskDedupTests
     public void IdenticalShadows_ShareOneSoftMaskState()
     {
         var plan = Plan();
-        var bounds = new Rect(50, 500, 200, 100);
+        var bounds = PdfRect.FromSize(50, 500, 200, 100);
 
         SoftMask.EmitBoxShadow(plan, bounds, 6, Shadow());
         SoftMask.EmitBoxShadow(plan, bounds, 6, Shadow());
@@ -44,8 +44,8 @@ public class SoftMaskDedupTests
     {
         var plan = Plan();
 
-        SoftMask.EmitBoxShadow(plan, new Rect(50, 500, 200, 100), 6, Shadow());
-        SoftMask.EmitBoxShadow(plan, new Rect(50, 200, 200, 100), 6, Shadow());
+        SoftMask.EmitBoxShadow(plan, PdfRect.FromSize(50, 500, 200, 100), 6, Shadow());
+        SoftMask.EmitBoxShadow(plan, PdfRect.FromSize(50, 200, 200, 100), 6, Shadow());
 
         Assert.Equal(2, SoftMaskStates(plan));
         Assert.NotEqual(plan.Fills[0].ExtGState, plan.Fills[1].ExtGState);

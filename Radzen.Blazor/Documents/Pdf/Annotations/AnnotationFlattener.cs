@@ -29,7 +29,7 @@ internal static class AnnotationFlattener
                 {
                     page.Content.Add(new FlattenedAnnotationContent(appearance)
                     {
-                        Transform = Matrix.Translate(annotation.Bounds.X, annotation.Bounds.Y),
+                        Transform = Matrix.Translate(annotation.Bounds.Left, annotation.Bounds.Bottom),
                     });
                 }
             }
@@ -104,8 +104,8 @@ internal static class AnnotationFlattener
                 0,
                 0,
                 scaleY,
-                annotation.Bounds.X - x0 * scaleX,
-                annotation.Bounds.Y - y0 * scaleY),
+                annotation.Bounds.Left - x0 * scaleX,
+                annotation.Bounds.Bottom - y0 * scaleY),
         });
         return true;
     }

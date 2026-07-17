@@ -19,8 +19,8 @@ public sealed class ImageContent : ContentElement
         EncodedXObject = encodedXObject;
     }
 
-    /// <summary>Gets or sets the placement rectangle.</summary>
-    public Rect Rect { get; set; }
+    /// <summary>Gets or sets the placement rectangle in PDF user space.</summary>
+    public PdfRect Bounds { get; set; }
 
     internal byte[] EncodedXObject { get; }
 
@@ -30,13 +30,13 @@ public sealed class ImageContent : ContentElement
         var key = writer.RegisterImage(EncodedXObject);
 
         writer.WriteRaw("q\n");
-        writer.WriteNumber(Rect.Width);
+        writer.WriteNumber(Bounds.Width);
         writer.WriteRaw(" 0 0 ");
-        writer.WriteNumber(Rect.Height);
+        writer.WriteNumber(Bounds.Height);
         writer.WriteRaw(" ");
-        writer.WriteNumber(Rect.X);
+        writer.WriteNumber(Bounds.Left);
         writer.WriteRaw(" ");
-        writer.WriteNumber(Rect.Y);
+        writer.WriteNumber(Bounds.Bottom);
         writer.WriteRaw(" cm\n");
         writer.WriteName(key);
         writer.WriteRaw(" Do\nQ\n");

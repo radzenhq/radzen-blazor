@@ -354,7 +354,7 @@ internal sealed class DocumentSaver
     // Writes /BleedBox, /TrimBox or /ArtBox to a page node. An explicit value on the Page
     // wins; otherwise a loaded page re-emits the box its source node carried (previously
     // dropped). A page with neither adds nothing, so untouched output stays byte identical.
-    private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, Rect? value)
+    private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, PdfRect? value)
     {
         if (value is { } rect)
         {

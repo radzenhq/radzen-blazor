@@ -260,9 +260,9 @@ public class ContentElementTests
     [Fact]
     public void ImageContent_ExposesRect()
     {
-        var image = new ImageContent([1, 2, 3, 4]) { Rect = new Rect(10, 20, 100, 50) };
+        var image = new ImageContent([1, 2, 3, 4]) { Bounds = PdfRect.FromSize(10, 20, 100, 50) };
 
-        Assert.Equal(new Rect(10, 20, 100, 50), image.Rect);
+        Assert.Equal(PdfRect.FromSize(10, 20, 100, 50), image.Bounds);
         Assert.IsAssignableFrom<ContentElement>(image);
     }
 
@@ -271,7 +271,7 @@ public class ContentElementTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new ImageContent([0, 0, 0, 0]) { Rect = new Rect(0, 0, 10, 10) });
+        page.Content.Add(new ImageContent([0, 0, 0, 0]) { Bounds = PdfRect.FromSize(0, 0, 10, 10) });
 
         Assert.Throws<NotSupportedException>(() => document.ToArray());
     }

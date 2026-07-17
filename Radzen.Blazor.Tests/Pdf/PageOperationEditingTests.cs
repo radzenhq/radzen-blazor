@@ -11,13 +11,13 @@ public class PageOperationEditingTests
     public void MediaAndCropBoxes_RoundTripAfterEditing()
     {
         var document = Reload(Create("PAGE"));
-        document.Pages[0].MediaBox = new Rect(10, 20, 300, 400);
-        document.Pages[0].CropBox = new Rect(25, 35, 250, 325);
+        document.Pages[0].MediaBox = PdfRect.FromSize(10, 20, 300, 400);
+        document.Pages[0].CropBox = PdfRect.FromSize(25, 35, 250, 325);
 
         var reloaded = Reload(document);
 
-        Assert.Equal(new Rect(10, 20, 300, 400), reloaded.Pages[0].MediaBox);
-        Assert.Equal(new Rect(25, 35, 250, 325), reloaded.Pages[0].CropBox);
+        Assert.Equal(PdfRect.FromSize(10, 20, 300, 400), reloaded.Pages[0].MediaBox);
+        Assert.Equal(PdfRect.FromSize(25, 35, 250, 325), reloaded.Pages[0].CropBox);
         Assert.Equal(300, reloaded.Pages[0].Width.Point);
         Assert.Equal(400, reloaded.Pages[0].Height.Point);
         Assert.Contains("PAGE", reloaded.Pages[0].ExtractText());

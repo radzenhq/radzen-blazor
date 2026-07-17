@@ -48,12 +48,26 @@ public class RedactionCoverageTests
     private static Document LoadedInlineImageDocument()
         => LoadedDocument($"q 100 0 0 100 10 10 cm {InlineImage} Q 450 450 10 10 re f");
 
+    // A redaction region is PDF user space, not top-left: on a 792pt page it must remove the
+    // rectangle sharing its coordinates and leave the one mirrored across the centre line.
+    [Fact]
+    public void Redact_RegionIsMeasuredInPdfUserSpace()
+    {
+        var loaded = LoadedDocument("100 100 50 50 re f 100 642 50 50 re f");
+
+        loaded.Pages[0].Redact(new[] { PdfRect.FromSize(100, 100, 50, 50) });
+        var content = SavedContent(loaded);
+
+        Assert.DoesNotContain("100 100 50 50 re", content, StringComparison.Ordinal);
+        Assert.Contains("100 642 50 50 re", content, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void Redact_RegionIntersectingInlineImage_RemovesTheImage()
     {
         var loaded = LoadedInlineImageDocument();
 
-        loaded.Pages[0].Redact(new[] { new Rect(0, 0, 200, 200) });
+        loaded.Pages[0].Redact(new[] { PdfRect.FromSize(0, 0, 200, 200) });
 
         Assert.DoesNotContain("BI", SavedContent(loaded), StringComparison.Ordinal);
     }
@@ -63,7 +77,7 @@ public class RedactionCoverageTests
     {
         var loaded = LoadedInlineImageDocument();
 
-        loaded.Pages[0].Redact(new[] { new Rect(400, 400, 100, 100) });
+        loaded.Pages[0].Redact(new[] { PdfRect.FromSize(400, 400, 100, 100) });
         var content = SavedContent(loaded);
 
         Assert.Contains(InlineImage, content, StringComparison.Ordinal);
@@ -76,7 +90,7 @@ public class RedactionCoverageTests
         var loaded = LoadedDocument("q 10 10 100 100 re W n /Sh0 sh Q");
 
         var exception = Assert.Throws<NotSupportedException>(
-            () => loaded.Pages[0].Redact(new[] { new Rect(0, 0, 200, 200) }));
+            () => loaded.Pages[0].Redact(new[] { PdfRect.FromSize(0, 0, 200, 200) }));
 
         Assert.Contains("sh", exception.Message, StringComparison.Ordinal);
     }
@@ -86,7 +100,7 @@ public class RedactionCoverageTests
     {
         var loaded = LoadedDocument("q 10 10 100 100 re W n /Sh0 sh Q");
 
-        loaded.Pages[0].Redact(new[] { new Rect(400, 400, 100, 100) });
+        loaded.Pages[0].Redact(new[] { PdfRect.FromSize(400, 400, 100, 100) });
 
         Assert.Contains("sh", SavedContent(loaded), StringComparison.Ordinal);
     }
@@ -97,7 +111,7 @@ public class RedactionCoverageTests
         var loaded = LoadedDocument("/Sh0 sh");
 
         var exception = Assert.Throws<NotSupportedException>(
-            () => loaded.Pages[0].Redact(new[] { new Rect(400, 400, 100, 100) }));
+            () => loaded.Pages[0].Redact(new[] { PdfRect.FromSize(400, 400, 100, 100) }));
 
         Assert.Contains("sh", exception.Message, StringComparison.Ordinal);
     }

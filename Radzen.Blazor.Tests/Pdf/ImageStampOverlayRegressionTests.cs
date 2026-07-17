@@ -84,7 +84,7 @@ public class ImageStampOverlayRegressionTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new ImageContent(Png()) { Rect = new Rect(100, 500, 96, 48) });
+        page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
         var reader = DocumentReader.Parse(document.ToArray());
         AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
@@ -94,7 +94,7 @@ public class ImageStampOverlayRegressionTests
     public void ImageStampOnLoadedPage_EmitsVisibleImageXObject()
     {
         var document = FormTestSupport.LoadFixture();
-        document.Pages[0].Content.Add(new ImageContent(Png()) { Rect = new Rect(100, 500, 96, 48) });
+        document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
         var reader = FormTestSupport.Reload(document);
         AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
@@ -108,7 +108,7 @@ public class ImageStampOverlayRegressionTests
         BuildTestSupport.AddText(section, "Body", "Helvetica");
 
         var document = builder.Build();
-        document.Pages[0].Content.Add(new ImageContent(Png()) { Rect = new Rect(72, 72, 96, 48) });
+        document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
 
         var reader = DocumentReader.Parse(document.ToArray());
         AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
@@ -119,7 +119,7 @@ public class ImageStampOverlayRegressionTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new ImageContent(Png()) { Rect = new Rect(100, 500, 96, 48) });
+        page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
         var reader = DocumentReader.Parse(document.ToArray());
         var content = AllContentText(reader, FormTestSupport.FirstPage(reader));
@@ -170,7 +170,7 @@ public class ImageStampOverlayRegressionTests
     {
         var original = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td [(He) -120 (llo)] TJ ET\n");
         var document = ExtractionSupport.BuildSinglePage(_ => HelveticaFont(), original);
-        document.Pages[0].Content.Add(new ImageContent(Png()) { Rect = new Rect(100, 100, 96, 48) });
+        document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 100, 96, 48) });
 
         var reader = DocumentReader.Parse(document.ToArray());
         var page = FormTestSupport.FirstPage(reader);

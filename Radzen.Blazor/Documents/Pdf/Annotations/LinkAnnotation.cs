@@ -5,7 +5,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>Represents a link to a URI, named destination or page.</summary>
 /// <param name="bounds">The clickable bounds.</param>
-public sealed class LinkAnnotation(Rect bounds) : Annotation(bounds)
+public sealed class LinkAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets or sets the target URI.</summary>
     public Uri? Uri { get; set; }

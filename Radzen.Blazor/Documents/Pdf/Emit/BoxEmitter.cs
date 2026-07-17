@@ -12,7 +12,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
     {
         var plan = context.Plan;
         var mark = plan.Mark();
-        var bounds = new Rect(
+        var bounds = PdfRect.FromSize(
             left + box.Bounds.X,
             contentTop - box.Bounds.Y - box.Bounds.Height,
             box.Bounds.Width,

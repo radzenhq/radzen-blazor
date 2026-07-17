@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>Represents a rubber-stamp annotation.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class StampAnnotation(Rect bounds) : Annotation(bounds)
+public sealed class StampAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets or sets the stamp name.</summary>
     public string Name { get; set; } = "Draft";
@@ -16,7 +16,7 @@ public sealed class StampAnnotation(Rect bounds) : Annotation(bounds)
 
 /// <summary>Base class for square and circle annotations.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public abstract class ShapeAnnotation(Rect bounds) : Annotation(bounds)
+public abstract class ShapeAnnotation(PdfRect bounds) : Annotation(bounds)
 {
     /// <summary>Gets or sets the border width in points.</summary>
     public double BorderWidth { get; set; } = 1;
@@ -34,7 +34,7 @@ public abstract class ShapeAnnotation(Rect bounds) : Annotation(bounds)
 
 /// <summary>Represents a square or rectangular annotation.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class SquareAnnotation(Rect bounds) : ShapeAnnotation(bounds)
+public sealed class SquareAnnotation(PdfRect bounds) : ShapeAnnotation(bounds)
 {
 
     internal override string Subtype => "Square";
@@ -42,7 +42,7 @@ public sealed class SquareAnnotation(Rect bounds) : ShapeAnnotation(bounds)
 
 /// <summary>Represents a circular or elliptical annotation.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class CircleAnnotation(Rect bounds) : ShapeAnnotation(bounds)
+public sealed class CircleAnnotation(PdfRect bounds) : ShapeAnnotation(bounds)
 {
 
     internal override string Subtype => "Circle";
@@ -50,7 +50,7 @@ public sealed class CircleAnnotation(Rect bounds) : ShapeAnnotation(bounds)
 
 /// <summary>Represents text displayed directly on the page.</summary>
 /// <param name="bounds">The annotation bounds.</param>
-public sealed class FreeTextAnnotation(Rect bounds) : Annotation(bounds)
+public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
 {
 
     /// <summary>Gets or sets the text font.</summary>

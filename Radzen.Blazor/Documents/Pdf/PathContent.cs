@@ -421,7 +421,7 @@ public sealed class PathContent : ContentElement
         _ => "n",
     };
 
-    internal TextBounds? GetBounds()
+    internal PdfRect? GetBounds()
     {
         var hasPoint = false;
         var left = 0.0;
@@ -449,7 +449,7 @@ public sealed class PathContent : ContentElement
             }
         }
 
-        return hasPoint ? new TextBounds(left, bottom, right, top) : null;
+        return hasPoint ? new PdfRect(left, bottom, right, top) : null;
     }
 
     private readonly record struct Segment(string Operator, double[] Operands);

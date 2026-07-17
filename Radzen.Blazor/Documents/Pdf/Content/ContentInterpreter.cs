@@ -649,7 +649,7 @@ internal static class ContentInterpreter
 
     // An empty clipping path bounds nothing, so it keeps whatever the enclosing clip was
     // rather than widening it back to unbounded.
-    private static TextBounds? Intersect(TextBounds? current, TextBounds? added)
+    private static PdfRect? Intersect(PdfRect? current, PdfRect? added)
     {
         if (added is not { } bounds)
         {
@@ -661,7 +661,7 @@ internal static class ContentInterpreter
             return bounds;
         }
 
-        return new TextBounds(
+        return new PdfRect(
             Math.Max(existing.Left, bounds.Left),
             Math.Max(existing.Bottom, bounds.Bottom),
             Math.Min(existing.Right, bounds.Right),
@@ -736,7 +736,7 @@ internal static class ContentInterpreter
         // A bounding box the current clipping path is known to fit inside, or null while no
         // clip is active. Only ever a superset of the real region, so it can bound an
         // operator that paints the whole clip (sh) without under-reporting its extent.
-        public TextBounds? Clip { get; set; }
+        public PdfRect? Clip { get; set; }
 
         public GraphicsState Clone() => new()
         {
@@ -768,7 +768,7 @@ internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : Con
 
     // The clip in effect where the operator appeared, or null if unclipped. An operator
     // that paints without a shape of its own (sh) can only be bounded by this.
-    public TextBounds? ClipBounds { get; init; }
+    public PdfRect? ClipBounds { get; init; }
 
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)

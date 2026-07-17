@@ -4,7 +4,7 @@ using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf;
 
-internal sealed class WatermarkContent(Watermark watermark, Rect box) : ContentElement
+internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : ContentElement
 {
     protected override void EmitBody(ContentWriter writer)
     {
@@ -16,7 +16,7 @@ internal sealed class WatermarkContent(Watermark watermark, Rect box) : ContentE
         }
 
         WatermarkGeometry.WriteRotation(
-            writer, watermark.Rotation, box.X + box.Width / 2, box.Y + box.Height / 2);
+            writer, watermark.Rotation, box.Left + box.Width / 2, box.Bottom + box.Height / 2);
 
         WriteImage(writer);
         WriteText(writer);

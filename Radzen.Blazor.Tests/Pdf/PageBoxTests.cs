@@ -16,9 +16,9 @@ public class PageBoxTests
         var document = new Document();
         var page = document.Pages.Add(PageSizes.A4);
         page.SetContent(Encoding.ASCII.GetBytes("BT (b) Tj ET"));
-        page.BleedBox = new Rect(10, 10, 575, 821);
-        page.TrimBox = new Rect(20, 20, 555, 801);
-        page.ArtBox = new Rect(30, 30, 535, 781);
+        page.BleedBox = PdfRect.FromSize(10, 10, 575, 821);
+        page.TrimBox = PdfRect.FromSize(20, 20, 555, 801);
+        page.ArtBox = PdfRect.FromSize(30, 30, 535, 781);
         return document;
     }
 
@@ -66,7 +66,7 @@ public class PageBoxTests
     {
         using var stream = new MemoryStream(WithBoxes().ToArray());
         var reloaded = Document.LoadFromStream(stream);
-        reloaded.Pages[0].TrimBox = new Rect(0, 0, 595, 842);
+        reloaded.Pages[0].TrimBox = PdfRect.FromSize(0, 0, 595, 842);
         var reader = DocumentReader.Parse(reloaded.ToArray());
         Assert.Equal(new[] { 0.0, 0, 595, 842 }, Box(reader, ContentTestHelpers.Kid(reader, 0), "TrimBox"));
     }

@@ -57,7 +57,7 @@ public class PdfRectPolicyTests
         var reader = Reader();
         foreach (var array in new[] { Numbers(10, 20, 110, 70), Numbers(110, 70, 10, 20) })
         {
-            var bounds = PdfRects.Read(reader, array, Strict);
+            var bounds = PdfRect.Read(reader, array, Strict);
             Assert.Equal(10, bounds.Left);
             Assert.Equal(20, bounds.Bottom);
             Assert.Equal(110, bounds.Right);
@@ -74,17 +74,17 @@ public class PdfRectPolicyTests
     public void StrictRequiresExactlyFourNumbers(int count)
     {
         var array = Numbers([.. new double[count]]);
-        Assert.Equal("missing", Assert.Throws<DocumentParseException>(() => PdfRects.Read(Reader(), array, Strict)).Message);
+        Assert.Equal("missing", Assert.Throws<DocumentParseException>(() => PdfRect.Read(Reader(), array, Strict)).Message);
     }
 
     [Fact]
     public void StrictRejectsAMissingArrayAndANonNumericCoordinate()
     {
         var reader = Reader();
-        Assert.Equal("missing", Assert.Throws<DocumentParseException>(() => PdfRects.Read(reader, null, Strict)).Message);
+        Assert.Equal("missing", Assert.Throws<DocumentParseException>(() => PdfRect.Read(reader, null, Strict)).Message);
 
         var array = Array(new NumberObject(0), new NameObject("Bad"), new NumberObject(2), new NumberObject(3));
-        Assert.Equal("non-numeric", Assert.Throws<DocumentParseException>(() => PdfRects.Read(reader, array, Strict)).Message);
+        Assert.Equal("non-numeric", Assert.Throws<DocumentParseException>(() => PdfRect.Read(reader, array, Strict)).Message);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class PdfRectPolicyTests
         var reader = Reader();
         foreach (var array in new ArrayObject?[] { null, Numbers(1, 2, 3) })
         {
-            var bounds = PdfRects.Read(reader, array, RectPolicy.ZeroFallback);
+            var bounds = PdfRect.Read(reader, array, RectPolicy.ZeroFallback);
             Assert.Equal(0, bounds.Left);
             Assert.Equal(0, bounds.Bottom);
             Assert.Equal(0, bounds.Width);
@@ -107,7 +107,7 @@ public class PdfRectPolicyTests
         var reader = Reader();
         foreach (var array in new ArrayObject?[] { null, Numbers(1, 2, 3) })
         {
-            var bounds = PdfRects.Read(reader, array, RectPolicy.DefaultSize(200, 14));
+            var bounds = PdfRect.Read(reader, array, RectPolicy.DefaultSize(200, 14));
             Assert.Equal(200, bounds.Width);
             Assert.Equal(14, bounds.Height);
         }
@@ -119,7 +119,7 @@ public class PdfRectPolicyTests
     public void FallbackPoliciesReadANonNumericCoordinateAsZero()
     {
         var array = Array(new NumberObject(10), new NumberObject(20), new NameObject("Bad"), new NumberObject(70));
-        var bounds = PdfRects.Read(Reader(), array, RectPolicy.DefaultSize(200, 14));
+        var bounds = PdfRect.Read(Reader(), array, RectPolicy.DefaultSize(200, 14));
         Assert.Equal(0, bounds.Left);
         Assert.Equal(20, bounds.Bottom);
         Assert.Equal(10, bounds.Right);
@@ -133,7 +133,7 @@ public class PdfRectPolicyTests
     {
         var reader = Reader("4 0 obj\n110\nendobj\n");
         var array = Array(new NumberObject(10), new NumberObject(20), new ReferenceObject(4, 0), new NumberObject(70));
-        var bounds = PdfRects.Read(reader, array, Strict);
+        var bounds = PdfRect.Read(reader, array, Strict);
         Assert.Equal(110, bounds.Right);
         Assert.Equal(100, bounds.Width);
     }

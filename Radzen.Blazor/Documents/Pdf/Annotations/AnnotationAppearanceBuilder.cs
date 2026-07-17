@@ -17,11 +17,11 @@ internal static class AnnotationAppearanceBuilder
         return annotation switch
         {
             HighlightAnnotation highlight => Markup(highlight, static (area, color) =>
-                Rectangle(area.X, area.Y, area.Width, area.Height, color, fill: true, stroke: false, 0)),
+                Rectangle(area.Left, area.Bottom, area.Width, area.Height, color, fill: true, stroke: false, 0)),
             UnderlineAnnotation underline => Markup(underline, static (area, color) =>
-                Line(area.X, area.Y + 1, area.X + area.Width, area.Y + 1, color, 1)),
+                Line(area.Left, area.Bottom + 1, area.Right, area.Bottom + 1, color, 1)),
             StrikeOutAnnotation strikeOut => Markup(strikeOut, static (area, color) =>
-                Line(area.X, area.Y + area.Height / 2, area.X + area.Width, area.Y + area.Height / 2, color, 1)),
+                Line(area.Left, area.Bottom + area.Height / 2, area.Right, area.Bottom + area.Height / 2, color, 1)),
             SquigglyAnnotation squiggly => Markup(squiggly, static (area, color) => Squiggle(area, color)),
             TextAnnotation => [Note(width, height, annotation.Color)],
             StampAnnotation stamp => Stamp(width, height, annotation.Color, stamp.Name),
@@ -35,13 +35,13 @@ internal static class AnnotationAppearanceBuilder
 
     // One primitive per markup area so the appearance agrees with the /QuadPoints the
     // emitter writes: a markup spanning wrapped lines must not paint the gaps between them.
-    private static IReadOnlyList<ContentElement> Markup(MarkupAnnotation annotation, Func<Rect, Color, ContentElement> build)
+    private static IReadOnlyList<ContentElement> Markup(MarkupAnnotation annotation, Func<PdfRect, Color, ContentElement> build)
     {
         var result = new List<ContentElement>(annotation.Areas.Count);
         foreach (var area in annotation.Areas)
         {
             result.Add(build(
-                new Rect(area.X - annotation.Bounds.X, area.Y - annotation.Bounds.Y, area.Width, area.Height),
+                PdfRect.FromSize(area.Left - annotation.Bounds.Left, area.Bottom - annotation.Bounds.Bottom, area.Width, area.Height),
                 annotation.Color));
         }
 
@@ -70,10 +70,10 @@ internal static class AnnotationAppearanceBuilder
             }
 
             var path = new PathContent { Stroke = true, StrokeColor = annotation.Color, Thickness = annotation.StrokeWidth };
-            path.MoveTo(stroke[0].X - annotation.Bounds.X, stroke[0].Y - annotation.Bounds.Y);
+            path.MoveTo(stroke[0].X - annotation.Bounds.Left, stroke[0].Y - annotation.Bounds.Bottom);
             for (var i = 1; i < stroke.Count; i++)
             {
-                path.LineTo(stroke[i].X - annotation.Bounds.X, stroke[i].Y - annotation.Bounds.Y);
+                path.LineTo(stroke[i].X - annotation.Bounds.Left, stroke[i].Y - annotation.Bounds.Bottom);
             }
 
             result.Add(path);
@@ -120,15 +120,15 @@ internal static class AnnotationAppearanceBuilder
         return path;
     }
 
-    private static PathContent Squiggle(Rect area, Color color)
+    private static PathContent Squiggle(PdfRect area, Color color)
     {
         var path = new PathContent { Stroke = true, StrokeColor = color, Thickness = 1 };
-        path.MoveTo(area.X, area.Y + 1);
+        path.MoveTo(area.Left, area.Bottom + 1);
         var x = 0.0;
         while (x < area.Width)
         {
-            path.LineTo(area.X + Math.Min(area.Width, x + 2), area.Y + 3);
-            path.LineTo(area.X + Math.Min(area.Width, x + 4), area.Y + 1);
+            path.LineTo(area.Left + Math.Min(area.Width, x + 2), area.Bottom + 3);
+            path.LineTo(area.Left + Math.Min(area.Width, x + 4), area.Bottom + 1);
             x += 4;
         }
 

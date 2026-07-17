@@ -203,13 +203,13 @@ internal static class AnnotationEmitter
                 {
                     ValidateMarkupArea(markup, area);
                     quadPoints.Add(new NumberObject(area.Left));
-                    quadPoints.Add(new NumberObject(area.Bottom));
+                    quadPoints.Add(new NumberObject(area.Top));
                     quadPoints.Add(new NumberObject(area.Right));
-                    quadPoints.Add(new NumberObject(area.Bottom));
+                    quadPoints.Add(new NumberObject(area.Top));
                     quadPoints.Add(new NumberObject(area.Left));
-                    quadPoints.Add(new NumberObject(area.Top));
+                    quadPoints.Add(new NumberObject(area.Bottom));
                     quadPoints.Add(new NumberObject(area.Right));
-                    quadPoints.Add(new NumberObject(area.Top));
+                    quadPoints.Add(new NumberObject(area.Bottom));
                 }
 
                 dictionary["QuadPoints"] = quadPoints;
@@ -327,14 +327,7 @@ internal static class AnnotationEmitter
         stream.Dictionary["Type"] = new NameObject("XObject");
         stream.Dictionary["Subtype"] = new NameObject("Form");
         stream.Dictionary["FormType"] = new NumberObject(1);
-        var box = AppearanceBounds(annotation);
-        stream.Dictionary["BBox"] = new ArrayObject
-        {
-            new NumberObject(box.Left),
-            new NumberObject(box.Top),
-            new NumberObject(box.Right),
-            new NumberObject(box.Bottom),
-        };
+        stream.Dictionary["BBox"] = RectArray(AppearanceBounds(annotation));
         var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
         if (annotation.Opacity < 1)
         {
@@ -352,11 +345,11 @@ internal static class AnnotationEmitter
         return stream;
     }
 
-    private static Rect AppearanceBounds(Annotation annotation)
+    private static PdfRect AppearanceBounds(Annotation annotation)
     {
         if (annotation is not InkAnnotation ink)
         {
-            return new Rect(0, 0, annotation.Bounds.Width, annotation.Bounds.Height);
+            return PdfRect.FromSize(0, 0, annotation.Bounds.Width, annotation.Bounds.Height);
         }
 
         var minX = 0.0;
@@ -372,8 +365,8 @@ internal static class AnnotationEmitter
                     throw new InvalidOperationException("Ink stroke points must have finite coordinates.");
                 }
 
-                var x = point.X - annotation.Bounds.X;
-                var y = point.Y - annotation.Bounds.Y;
+                var x = point.X - annotation.Bounds.Left;
+                var y = point.Y - annotation.Bounds.Bottom;
                 minX = Math.Min(minX, x);
                 minY = Math.Min(minY, y);
                 maxX = Math.Max(maxX, x);
@@ -381,19 +374,19 @@ internal static class AnnotationEmitter
             }
         }
 
-        return new Rect(minX, minY, maxX - minX, maxY - minY);
+        return new PdfRect(minX, minY, maxX, maxY);
     }
 
-    private static void ValidateMarkupArea(MarkupAnnotation annotation, Rect area)
+    private static void ValidateMarkupArea(MarkupAnnotation annotation, PdfRect area)
     {
-        if (!double.IsFinite(area.X) || !double.IsFinite(area.Y) || !double.IsFinite(area.Width)
-            || !double.IsFinite(area.Height) || area.Width <= 0 || area.Height <= 0)
+        if (!double.IsFinite(area.Left) || !double.IsFinite(area.Bottom) || !double.IsFinite(area.Right)
+            || !double.IsFinite(area.Top) || area.Width <= 0 || area.Height <= 0)
         {
             throw new InvalidOperationException("Markup areas must be finite and have positive width and height.");
         }
 
         var bounds = annotation.Bounds;
-        if (area.Left < bounds.Left || area.Top < bounds.Top || area.Right > bounds.Right || area.Bottom > bounds.Bottom)
+        if (area.Left < bounds.Left || area.Bottom < bounds.Bottom || area.Right > bounds.Right || area.Top > bounds.Top)
         {
             throw new InvalidOperationException("Markup areas must be contained within the annotation bounds.");
         }
@@ -402,8 +395,8 @@ internal static class AnnotationEmitter
     private static void Validate(Annotation annotation)
     {
         var bounds = annotation.Bounds;
-        if (!double.IsFinite(bounds.X) || !double.IsFinite(bounds.Y) || !double.IsFinite(bounds.Width)
-            || !double.IsFinite(bounds.Height) || bounds.Width <= 0 || bounds.Height <= 0)
+        if (!double.IsFinite(bounds.Left) || !double.IsFinite(bounds.Bottom) || !double.IsFinite(bounds.Right)
+            || !double.IsFinite(bounds.Top) || bounds.Width <= 0 || bounds.Height <= 0)
         {
             throw new InvalidOperationException("Annotation bounds must be finite and have positive width and height.");
         }
@@ -414,12 +407,12 @@ internal static class AnnotationEmitter
         }
     }
 
-    private static ArrayObject RectArray(Rect bounds) =>
+    private static ArrayObject RectArray(PdfRect bounds) =>
     [
         new NumberObject(bounds.Left),
-        new NumberObject(bounds.Top),
-        new NumberObject(bounds.Right),
         new NumberObject(bounds.Bottom),
+        new NumberObject(bounds.Right),
+        new NumberObject(bounds.Top),
     ];
 
     private static ArrayObject ColorArray(Color color) =>

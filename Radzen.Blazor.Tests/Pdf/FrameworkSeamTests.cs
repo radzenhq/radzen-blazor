@@ -167,7 +167,7 @@ public class FrameworkSeamTests
 
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new ImageContent([.. RzimImageDecoder.Magic, 0x2A]) { Rect = new Rect(0, 0, 10, 10) });
+        page.Content.Add(new ImageContent([.. RzimImageDecoder.Magic, 0x2A]) { Bounds = PdfRect.FromSize(0, 0, 10, 10) });
 
         var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
 

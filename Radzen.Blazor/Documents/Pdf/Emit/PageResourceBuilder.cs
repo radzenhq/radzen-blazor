@@ -379,11 +379,11 @@ internal static class PageResourceBuilder
         new NumberObject(DocumentLoader.Number(box[3])),
     ];
 
-    public static ArrayObject NumberBox(Rect box) =>
+    public static ArrayObject NumberBox(PdfRect box) =>
     [
-        new NumberObject(box.X),
-        new NumberObject(box.Y),
-        new NumberObject(box.X + box.Width),
-        new NumberObject(box.Y + box.Height),
+        new NumberObject(box.Left),
+        new NumberObject(box.Bottom),
+        new NumberObject(box.Right),
+        new NumberObject(box.Top),
     ];
 }

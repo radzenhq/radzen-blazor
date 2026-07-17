@@ -386,7 +386,7 @@ public class ContentEditingTests
         var loaded = LoadedDocumentWithText("before SECRET after");
         var secret = loaded.FindText("SECRET").Single();
 
-        loaded.Pages[0].Redact(new[] { new Rect(secret.Bounds.Left, secret.Bounds.Bottom, secret.Bounds.Width, secret.Bounds.Height) });
+        loaded.Pages[0].Redact(new[] { secret.Bounds });
         var saved = loaded.ToArray();
         var reloaded = InterpreterTestSupport.Load(saved);
         var text = reloaded.ExtractText();
@@ -402,7 +402,7 @@ public class ContentEditingTests
         var loaded = LoadedSimpleWidthDocument("BT /F0 10 Tf 72 700 Td [(AA) -50 (BB) 75 (A)] TJ ET");
         var secret = loaded.FindText("BB").Single();
 
-        loaded.Pages[0].Redact(new[] { new Rect(secret.Bounds.Left, secret.Bounds.Bottom, secret.Bounds.Width, secret.Bounds.Height) });
+        loaded.Pages[0].Redact(new[] { secret.Bounds });
         var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
         var text = reloaded.ExtractText();
 

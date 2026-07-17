@@ -27,7 +27,7 @@ public class EmptiedPageContentTests
     {
         var loaded = LoadedSinglePathDocument();
 
-        loaded.Pages[0].Redact([new Rect(0, 0, 612, 792)]);
+        loaded.Pages[0].Redact([PdfRect.FromSize(0, 0, 612, 792)]);
 
         Assert.DoesNotContain("re", SavedPageContent(loaded));
     }
@@ -37,7 +37,7 @@ public class EmptiedPageContentTests
     {
         var loaded = LoadedSinglePathDocument();
 
-        loaded.Pages[0].Redact([new Rect(0, 0, 612, 792)]);
+        loaded.Pages[0].Redact([PdfRect.FromSize(0, 0, 612, 792)]);
         var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
 
         Assert.Empty(reloaded.Pages[0].Content);

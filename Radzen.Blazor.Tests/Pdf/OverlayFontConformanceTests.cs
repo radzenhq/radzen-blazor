@@ -41,7 +41,7 @@ public class OverlayFontConformanceTests
     public void PdfA3B_OverlayImageOnly_SavesWithoutError()
     {
         var document = Author(PdfAConformance.PdfA3B).Build();
-        document.Pages[0].Content.Add(new ImageContent(Png()) { Rect = new Rect(72, 72, 96, 48) });
+        document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
 
         Assert.NotEmpty(document.ToArray());
     }

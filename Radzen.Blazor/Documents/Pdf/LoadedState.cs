@@ -29,7 +29,7 @@ internal sealed class LoadedState
 
     public Dictionary<Page, int> SourceRotations { get; } = [];
 
-    public Dictionary<Page, (Rect? Bleed, Rect? Trim, Rect? Art, int Rotate)> LoadedPageSettings { get; } = [];
+    public Dictionary<Page, (PdfRect? Bleed, PdfRect? Trim, PdfRect? Art, int Rotate)> LoadedPageSettings { get; } = [];
 
     // Handles for pages appended from another loaded document: each appended page's
     // reader plus effective /Resources and source node, and each donor reader's

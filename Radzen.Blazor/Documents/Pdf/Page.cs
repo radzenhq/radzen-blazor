@@ -21,8 +21,8 @@ public sealed class Page
     private int rotate;
     private Unit width;
     private Unit height;
-    private Rect mediaBox;
-    private Rect? cropBox;
+    private PdfRect mediaBox;
+    private PdfRect? cropBox;
     private IReadOnlyDictionary<string, Fonts.ReverseFont>? textFonts;
     private IReadOnlyList<ContentEditor.SourceElement>? sourceElements;
     private ContentResourceManifest editedResources = ContentResourceManifest.Empty;
@@ -32,7 +32,7 @@ public sealed class Page
     {
         this.width = width;
         this.height = height;
-        mediaBox = new Rect(0, 0, width.Point, height.Point);
+        mediaBox = PdfRect.FromSize(0, 0, width.Point, height.Point);
     }
 
     // Pre-generated content and resources produced by DocumentBuilder.Build; when set,
@@ -59,7 +59,7 @@ public sealed class Page
     /// Changing the box changes the page dimensions but does not scale, translate or
     /// otherwise modify existing content coordinates.
     /// </summary>
-    public Rect MediaBox
+    public PdfRect MediaBox
     {
         get => mediaBox;
         set
@@ -74,7 +74,7 @@ public sealed class Page
     /// Existing content keeps its original coordinates. Set to <see langword="null"/>
     /// to remove an explicit or preserved crop box.
     /// </summary>
-    public Rect? CropBox
+    public PdfRect? CropBox
     {
         get => cropBox;
         set
@@ -93,11 +93,11 @@ public sealed class Page
 
     internal bool CropBoxSet { get; private set; }
 
-    internal void SetPreservedMediaBox(Rect value) => SetMediaBox(value, false);
+    internal void SetPreservedMediaBox(PdfRect value) => SetMediaBox(value, false);
 
-    internal void SetPreservedCropBox(Rect value) => cropBox = value;
+    internal void SetPreservedCropBox(PdfRect value) => cropBox = value;
 
-    private void SetMediaBox(Rect value, bool explicitlySet)
+    private void SetMediaBox(PdfRect value, bool explicitlySet)
     {
         mediaBox = value;
         width = Unit.FromPoint(value.Width);
@@ -105,10 +105,10 @@ public sealed class Page
         MediaBoxSet = explicitlySet;
     }
 
-    private static void ValidateBox(Rect value, string parameterName)
+    private static void ValidateBox(PdfRect value, string parameterName)
     {
-        if (!double.IsFinite(value.X) || !double.IsFinite(value.Y)
-            || !double.IsFinite(value.Width) || !double.IsFinite(value.Height)
+        if (!double.IsFinite(value.Left) || !double.IsFinite(value.Bottom)
+            || !double.IsFinite(value.Right) || !double.IsFinite(value.Top)
             || value.Width <= 0 || value.Height <= 0)
         {
             throw new ArgumentOutOfRangeException(parameterName, value, "Page boxes must have finite coordinates and positive dimensions.");
@@ -117,28 +117,24 @@ public sealed class Page
 
     /// <summary>
     /// Gets or sets the bleed box (<c>/BleedBox</c>): the region to which page contents
-    /// are clipped when output in a production environment. The rectangle is in PDF user
-    /// space, where <c>X, Y</c> is the lower-left corner and the box spans to
-    /// <c>X + Width, Y + Height</c>. When <see langword="null"/> no bleed box is written
-    /// unless one was preserved from a loaded page.
+    /// are clipped when output in a production environment. When <see langword="null"/> no
+    /// bleed box is written unless one was preserved from a loaded page.
     /// </summary>
-    public Rect? BleedBox { get; set; }
+    public PdfRect? BleedBox { get; set; }
 
     /// <summary>
     /// Gets or sets the trim box (<c>/TrimBox</c>): the intended finished dimensions of
-    /// the page after trimming. Coordinates follow the same convention as
-    /// <see cref="BleedBox"/>. When <see langword="null"/> no trim box is written unless
+    /// the page after trimming. When <see langword="null"/> no trim box is written unless
     /// one was preserved from a loaded page.
     /// </summary>
-    public Rect? TrimBox { get; set; }
+    public PdfRect? TrimBox { get; set; }
 
     /// <summary>
     /// Gets or sets the art box (<c>/ArtBox</c>): the extent of the page's meaningful
-    /// content as intended by its creator. Coordinates follow the same convention as
-    /// <see cref="BleedBox"/>. When <see langword="null"/> no art box is written unless
-    /// one was preserved from a loaded page.
+    /// content as intended by its creator. When <see langword="null"/> no art box is written
+    /// unless one was preserved from a loaded page.
     /// </summary>
-    public Rect? ArtBox { get; set; }
+    public PdfRect? ArtBox { get; set; }
 
     /// <summary>
     /// Gets or sets the clockwise viewing rotation of the page in degrees.
@@ -267,7 +263,7 @@ public sealed class Page
     /// <summary>Irreversibly removes page content intersecting the specified regions.</summary>
     /// <param name="areas">The redaction regions in PDF user-space coordinates.</param>
     /// <param name="options">The redaction appearance options, or <c>null</c> for no fill.</param>
-    public void Redact(IEnumerable<Rect> areas, RedactionOptions? options = null)
+    public void Redact(IEnumerable<PdfRect> areas, RedactionOptions? options = null)
         => Redactor.Redact(this, areas, options);
 
     /// <summary>Finds text and irreversibly redacts the bounds of every match.</summary>
