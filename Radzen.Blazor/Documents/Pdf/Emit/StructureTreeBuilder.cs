@@ -128,7 +128,7 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
         public override Nothing Visit(Container block, StructureElement parent)
         {
-            if (tree.TaggingActive && block.Layout == ContainerLayout.Stack)
+            if (tree.TaggingActive)
             {
                 foreach (var child in block.Blocks)
                 {
