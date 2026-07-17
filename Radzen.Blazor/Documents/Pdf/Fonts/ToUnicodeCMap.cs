@@ -48,7 +48,7 @@ internal static class ToUnicodeCMap
                     {
                         if (tokens[i].Hex is { } src && i + 1 < tokens.Count && tokens[i + 1].Hex is { } dst)
                         {
-                            map[Code(src)] = Utf16(dst);
+                            Add(map, Code(src), Utf16(dst), limits);
                         }
                     }
 
@@ -84,7 +84,7 @@ internal static class ToUnicodeCMap
                 {
                     if (tokens[index].Hex is { } entry)
                     {
-                        map[code] = Utf16(entry);
+                        Add(map, code, Utf16(entry), limits);
                     }
                 }
 
@@ -123,6 +123,20 @@ internal static class ToUnicodeCMap
         }
 
         return index;
+    }
+
+    // Every materialized entry passes through here so MaxCMapEntries bounds the whole map
+    // rather than a single section: bfchar and array-form bfrange each cost only a few input
+    // bytes per entry, so a large stream still reaches millions of entries without a cap.
+    // Overwriting an existing code is always allowed - it materializes nothing new.
+    private static void Add(Dictionary<int, string> map, int code, string text, ReaderLimits limits)
+    {
+        if (map.Count >= limits.MaxCMapEntries && !map.ContainsKey(code))
+        {
+            throw new DocumentParseException("ToUnicode CMap exceeds the permitted CMap size.");
+        }
+
+        map[code] = text;
     }
 
     // Number of code points addressable by a source code of the given byte width;
