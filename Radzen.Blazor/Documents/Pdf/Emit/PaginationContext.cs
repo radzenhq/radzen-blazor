@@ -5,7 +5,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class PaginationContext
 {
-    private const double Eps = 1e-6;
+    // Fit tolerance for "does this height fit the remaining content height", in points.
+    // LinePlacer decides the same predicate and must not disagree with it.
+    internal const double Eps = 1e-6;
     private readonly List<PaginatedPage> pages;
     private readonly FontCollection fonts;
     private readonly Func<Image, double, (double Width, double Height)>? measureImage;
