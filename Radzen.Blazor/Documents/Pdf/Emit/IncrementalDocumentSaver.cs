@@ -105,6 +105,7 @@ internal sealed class IncrementalDocumentSaver
 
     private Dictionary<Page, ReferenceObject> SourcePageReferences(IReadOnlyDictionary<DocumentObject, int> index)
     {
+        var reader = doc.Loaded!.Source!;
         var result = new Dictionary<Page, ReferenceObject>();
         foreach (var pair in doc.Loaded!.SourcePages)
         {
@@ -113,7 +114,10 @@ internal sealed class IncrementalDocumentSaver
                 throw Unsupported("A page whose dictionary is not an indirect object");
             }
 
-            result[pair.Key] = new ReferenceObject(number, 0);
+            // A reference matches on number AND generation (ISO 32000-1 7.3.10): a page whose
+            // number was reclaimed from the free list lives at a non-zero generation, and
+            // naming it "N 0 R" in a rewritten /Kids resolves to nothing.
+            result[pair.Key] = new ReferenceObject(number, reader.GenerationOf(number));
         }
 
         return result;

@@ -351,9 +351,11 @@ public static class PdfSigner
     private static (ReferenceObject, DictionaryObject)? FindLeaf(
         DocumentReader reader, ReferenceObject nodeRef, int target, ref int counter, int depth)
     {
-        if (depth > 64)
+        // The same tree the loader accepted must not be rejected here, so the cap is the
+        // reader's configured page-tree limit rather than a constant private to signing.
+        if (depth > reader.Limits.MaxPageTreeDepth)
         {
-            throw new DocumentParseException("The page tree is too deep.", -1);
+            throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
         }
 
         if (reader.AsDictionary(nodeRef) is not { } node)
