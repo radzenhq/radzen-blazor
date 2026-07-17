@@ -93,7 +93,7 @@ public static class DssBuilder
 
         // Start from a copy of the prior /DSS so any keys beyond the four managed
         // arrays (e.g. proprietary entries from another tool) survive augmentation.
-        var dss = existingDss is not null ? PdfSigner.Copy(existingDss) : new DictionaryObject();
+        var dss = existingDss is not null ? existingDss.Copy() : new DictionaryObject();
         dss["Type"] = new NameObject("DSS");
 
         var certRefs = MergeStreams(writer, reader, existingDss, dss, "Certs", certs);
@@ -101,7 +101,7 @@ public static class DssBuilder
         var crlRefs = MergeStreams(writer, reader, existingDss, dss, "CRLs", crls);
 
         DictionaryObject? vri = existingDss is not null && reader.GetDictionary(existingDss, "VRI") is { } priorVri
-                ? PdfSigner.Copy(priorVri)
+                ? priorVri.Copy()
                 : null;
         if (signatureContents is not null)
         {
@@ -110,7 +110,7 @@ public static class DssBuilder
             // Merge into any prior entry for this same signature rather than
             // replacing it, so references gathered in earlier passes survive.
             var entry = reader.GetDictionary(vri, key) is { } priorEntry
-                    ? PdfSigner.Copy(priorEntry)
+                    ? priorEntry.Copy()
                     : new DictionaryObject { ["Type"] = new NameObject("VRI") };
             UnionArray(entry, "Cert", reader, certRefs);
             UnionArray(entry, "OCSP", reader, ocspRefs);
@@ -125,7 +125,7 @@ public static class DssBuilder
 
         var dssRef = writer.Add(dss);
 
-        var newCatalog = PdfSigner.Copy(catalog);
+        var newCatalog = catalog.Copy();
         newCatalog["DSS"] = dssRef;
         writer.Override(rootRef.ObjectNumber, newCatalog);
 

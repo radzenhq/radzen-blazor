@@ -296,7 +296,7 @@ internal sealed class DocumentSaver
         // PDF/A-4 (ISO 19005-4, 6.1.3) forbids the trailer /Info key; the
         // document metadata lives in the XMP stream instead.
         var isPart4 = doc.Conformance is PdfAConformance.PdfA4 or PdfAConformance.PdfA4E or PdfAConformance.PdfA4F;
-        var info = isPart4 ? null : BuildInfo();
+        var info = isPart4 ? null : BuildInfo(doc.Info, doc.Loaded?.SourceInfo);
         if (info is not null)
         {
             writer.Trailer["Info"] = writer.Add(info);
@@ -308,14 +308,29 @@ internal sealed class DocumentSaver
         writer.Close();
     }
 
+    // The one mapping from DocumentInfo to the modeled /Info values, in InfoKeys order, so a
+    // full save and an incremental save cannot disagree about what a modeled field is worth.
+    private static string?[] InfoValues(DocumentInfo meta) =>
+    [
+        meta.Title,
+        meta.Author,
+        meta.Subject,
+        meta.Keywords,
+        meta.Creator,
+        meta.Producer,
+        meta.CreationDate is { } created ? PdfDate(created) : null,
+        meta.ModificationDate is { } modified ? PdfDate(modified) : null,
+    ];
+
     // The modeled keys are rebuilt from DocumentInfo, so a field cleared to null is
     // omitted. Entries DocumentInfo does not model (/Trapped, custom keys) are not the
-    // saver's to drop and carry through from the source dictionary.
-    private DictionaryObject? BuildInfo()
+    // saver's to drop and carry through from the source dictionary. Null when the result
+    // would carry no entry at all.
+    internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source)
     {
         DictionaryObject? info = null;
 
-        if (doc.Loaded?.SourceInfo is { } source)
+        if (source is not null)
         {
             foreach (var pair in source)
             {
@@ -327,26 +342,15 @@ internal sealed class DocumentSaver
             }
         }
 
-        void Set(string key, string? value)
+        var values = InfoValues(meta);
+        for (var i = 0; i < InfoKeys.Length; i++)
         {
-            if (value is null)
+            if (values[i] is { } value)
             {
-                return;
+                info ??= new DictionaryObject();
+                info[InfoKeys[i]] = new StringObject(value);
             }
-
-            info ??= new DictionaryObject();
-            info[key] = new StringObject(value);
         }
-
-        var meta = doc.Info;
-        Set("Title", meta.Title);
-        Set("Author", meta.Author);
-        Set("Subject", meta.Subject);
-        Set("Keywords", meta.Keywords);
-        Set("Creator", meta.Creator);
-        Set("Producer", meta.Producer);
-        Set("CreationDate", meta.CreationDate is { } created ? PdfDate(created) : null);
-        Set("ModDate", meta.ModificationDate is { } modified ? PdfDate(modified) : null);
 
         return info;
     }

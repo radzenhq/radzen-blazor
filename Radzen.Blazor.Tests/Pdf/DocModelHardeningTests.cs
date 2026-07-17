@@ -73,6 +73,37 @@ public class DocModelHardeningTests
         Assert.Contains("file size", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    // A seekable stream whose Length over-reports (a growing file, a wrapper over a partial
+    // download) must fail the same way through both entry points rather than one of them
+    // parsing whatever bytes did arrive.
+    [Fact]
+    public void Load_SeekableStreamShorterThanLength_ThrowsLikeReader()
+    {
+        var bytes = ValidPdfBytes();
+
+        using var readerStream = new OverReportingStream(bytes, 100);
+        Assert.Throws<EndOfStreamException>(() => DocumentReader.Parse(readerStream));
+
+        using var loaderStream = new OverReportingStream(bytes, 100);
+        Assert.Throws<EndOfStreamException>(() => Document.LoadFromStream(loaderStream));
+    }
+
+    private sealed class OverReportingStream(byte[] data, int overstate) : Stream
+    {
+        private readonly MemoryStream inner = new(data);
+
+        public override bool CanRead => true;
+        public override bool CanSeek => true;
+        public override bool CanWrite => false;
+        public override long Length => inner.Length + overstate;
+        public override long Position { get => inner.Position; set => inner.Position = value; }
+        public override int Read(byte[] buffer, int offset, int count) => inner.Read(buffer, offset, count);
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => inner.Seek(offset, origin);
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+    }
+
     private sealed class NonSeekableStream(byte[] data) : Stream
     {
         private readonly MemoryStream inner = new(data);

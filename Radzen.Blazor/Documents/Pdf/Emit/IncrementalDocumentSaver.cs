@@ -14,8 +14,6 @@ namespace Radzen.Documents.Pdf.Emit;
 // pipeline to re-encode fails loud rather than silently falling back to a rewrite.
 internal sealed class IncrementalDocumentSaver
 {
-    private static readonly string[] InfoKeys = DocumentSaver.InfoKeys;
-
     private readonly Document doc;
 
     internal IncrementalDocumentSaver(Document document) => doc = document;
@@ -209,7 +207,7 @@ internal sealed class IncrementalDocumentSaver
 
         if (!unchanged)
         {
-            var updated = Copy(pagesNode);
+            var updated = pagesNode.Copy();
             var kids = new ArrayObject();
             if (appendOnly)
             {
@@ -261,8 +259,8 @@ internal sealed class IncrementalDocumentSaver
             }
 
             var updated = page.CropBoxSet && page.CropBox is null
-                ? CopyExcept(sourceNode, "CropBox")
-                : Copy(sourceNode);
+                ? sourceNode.Copy("CropBox")
+                : sourceNode.Copy();
             if (page.MediaBoxSet)
             {
                 updated["MediaBox"] = PageResourceBuilder.NumberBox(page.MediaBox);
@@ -426,7 +424,7 @@ internal sealed class IncrementalDocumentSaver
             {
                 var updated = pageOverrides.TryGetValue(reference.ObjectNumber, out var existing)
                     ? existing
-                    : Copy(source);
+                    : source.Copy();
                 updated["Annots"] = annotations.Count == 0 ? new NullObject() : annotations;
                 pageOverrides[reference.ObjectNumber] = updated;
             }
@@ -464,7 +462,9 @@ internal sealed class IncrementalDocumentSaver
             original = reader.AsDictionary(infoValue);
         }
 
-        var info = BuildInfo(original);
+        // An /Info whose every modeled field is null and that carried no unmodeled key emits as
+        // an empty override, which is what removes the entries.
+        var info = DocumentSaver.BuildInfo(doc.Info, original) ?? new DictionaryObject();
 
         if (number is int existing)
         {
@@ -476,42 +476,6 @@ internal sealed class IncrementalDocumentSaver
         }
 
         return true;
-    }
-
-    // The emitted modeled keys are exactly the non-null modeled values, matching what a
-    // full save writes (DocumentSaver.BuildInfo): a field cleared to null is omitted from
-    // the override, which removes it. Unmodeled keys carry over from the original.
-    private DictionaryObject BuildInfo(DictionaryObject? original)
-    {
-        var meta = doc.Info;
-        var values = new string?[]
-        {
-            meta.Title, meta.Author, meta.Subject, meta.Keywords, meta.Creator, meta.Producer,
-            meta.CreationDate is { } created ? DocumentSaver.PdfDate(created) : null,
-            meta.ModificationDate is { } modified ? DocumentSaver.PdfDate(modified) : null,
-        };
-
-        var info = new DictionaryObject();
-        if (original is not null)
-        {
-            foreach (var pair in original)
-            {
-                if (Array.IndexOf(InfoKeys, pair.Key) < 0)
-                {
-                    info[pair.Key] = pair.Value;
-                }
-            }
-        }
-
-        for (var i = 0; i < InfoKeys.Length; i++)
-        {
-            if (values[i] is { } value)
-            {
-                info[InfoKeys[i]] = new StringObject(value);
-            }
-        }
-
-        return info;
     }
 
     // Deep-copies a dictionary, replacing any inline stream (an appearance stream a
@@ -546,30 +510,6 @@ internal sealed class IncrementalDocumentSaver
         }
     }
 
-    private static DictionaryObject Copy(DictionaryObject source)
-    {
-        var copy = new DictionaryObject();
-        foreach (var pair in source)
-        {
-            copy[pair.Key] = pair.Value;
-        }
-
-        return copy;
-    }
-
-    private static DictionaryObject CopyExcept(DictionaryObject source, string omittedKey)
-    {
-        var copy = new DictionaryObject();
-        foreach (var pair in source)
-        {
-            if (!string.Equals(pair.Key, omittedKey, StringComparison.Ordinal))
-            {
-                copy[pair.Key] = pair.Value;
-            }
-        }
-
-        return copy;
-    }
 
     private static bool Same(byte[]? a, byte[]? b)
     {
