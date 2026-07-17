@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf.Fonts.Cff;
 
 // CFF font parser (Adobe Technical Note 5176). Supports name-keyed and CID-keyed
 // (ROS) fonts: charset, per-FD Private DICTs, FDArray/FDSelect, and enough Type 2
-// charstring interpretation to recover the advance width operand.
+// charstring interpretation to recover the advance width operand and detect seac.
 internal sealed class CffFont
 {
     private readonly int[] charset;
@@ -81,7 +81,7 @@ internal sealed class CffFont
         var charString = charStrings.GetBytes(glyphIndex);
 
         var context = new WidthContext(fd, globalSubrs, globalBias);
-        context.Run(charString, 0);
+        context.Run(charString);
 
         var width = context.Width ?? fd.DefaultWidthX;
         return (int)Math.Round(width, MidpointRounding.AwayFromZero);
@@ -97,7 +97,7 @@ internal sealed class CffFont
     {
         var fd = fdArray[GetFd(glyphIndex)];
         var context = new SeacContext(fd, globalSubrs, globalBias);
-        context.Run(charStrings.GetBytes(glyphIndex), 0);
+        context.Run(charStrings.GetBytes(glyphIndex));
         return context.Seac;
     }
 
@@ -400,30 +400,93 @@ internal sealed class CffFont
         public double[]? FontMatrix => fontMatrix;
     }
 
-    // Type 2 charstring operand decoding and subr dispatch, shared by the partial
-    // interpreters below. Each derives its own Run: they walk the same bytes for
-    // different answers, so the dispatch loops are deliberately not shared.
+    // Walks a Type 2 charstring: operand decoding, stem counting, hintmask skipping and
+    // subr dispatch. Subclasses supply only the answer they are after, via Visit.
     private abstract class CharstringContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
     {
         protected readonly List<double> stack = [];
-        protected bool done;
+        private int hintCount;
+        private bool done;
 
         protected FdInfo Fd => fd;
 
-        protected CffIndex GlobalSubrs => globalSubrs;
+        // Called with the operator's operands still on the stack. Returning true ends the walk.
+        protected abstract bool Visit(int op);
 
-        protected int GlobalBias => globalBias;
+        public void Run(byte[] cs) => Run(cs, 0);
 
-        public abstract void Run(byte[] cs, int depth);
+        private void Run(byte[] cs, int depth)
+        {
+            if (depth > 10)
+            {
+                done = true;
+                return;
+            }
 
-        // Returns true once the walk is finished, so callers that must stop at the first
-        // answer can return immediately rather than resuming their dispatch loop.
-        protected bool RunSubr(CffIndex? subrs, int bias, int depth)
+            var i = 0;
+            while (i < cs.Length && !done)
+            {
+                int b = cs[i];
+                if (b >= 32 || b == 28)
+                {
+                    i = ReadOperand(cs, i, b);
+                    continue;
+                }
+
+                i++;
+                switch (b)
+                {
+                    case 1:
+                    case 3:
+                    case 18:
+                    case 23:
+                    case 19:
+                    case 20:
+                        if (Visit(b))
+                        {
+                            return;
+                        }
+
+                        hintCount += stack.Count / 2;
+                        stack.Clear();
+                        if (b == 19 || b == 20)
+                        {
+                            i += (hintCount + 7) / 8;
+                        }
+
+                        break;
+                    case 10:
+                        RunSubr(Fd.LocalSubrs, Fd.LocalBias, depth);
+                        break;
+                    case 11:
+                        return;
+                    case 29:
+                        RunSubr(globalSubrs, globalBias, depth);
+                        break;
+                    case 12:
+                        i++;
+                        stack.Clear();
+                        break;
+                    default:
+                        if (Visit(b))
+                        {
+                            return;
+                        }
+
+                        stack.Clear();
+                        break;
+                }
+            }
+        }
+
+        protected void Stop() => done = true;
+
+        private void RunSubr(CffIndex? subrs, int bias, int depth)
         {
             if (subrs is null || stack.Count == 0)
             {
                 stack.Clear();
-                return false;
+                return;
             }
 
             var index = (int)stack[^1] + bias;
@@ -431,11 +494,10 @@ internal sealed class CffFont
             if (index < 0 || index >= subrs.Count)
             {
                 done = true;
-                return true;
+                return;
             }
 
             Run(subrs.GetBytes(index), depth + 1);
-            return done;
         }
 
         protected int ReadOperand(byte[] cs, int i, int b)
@@ -469,155 +531,47 @@ internal sealed class CffFont
         }
     }
 
-    // Executes a Type 2 charstring only far enough to recover the optional leading width
-    // operand. The width sits before the first stem/moveto/endchar operator when the
-    // operand count exceeds what that operator consumes. Subr calls are executed because
-    // real charstrings can dispatch into a subr before emitting the first such operator.
+    // Recovers the optional leading width operand: it sits before the first
+    // stem/moveto/endchar operator when the operand count exceeds what that operator
+    // consumes, so the first such operator settles the question either way.
     private sealed class WidthContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
         : CharstringContext(fd, globalSubrs, globalBias)
     {
         public double? Width { get; private set; }
 
-        public override void Run(byte[] cs, int depth)
+        protected override bool Visit(int op) => op switch
         {
-            if (depth > 10)
-            {
-                done = true;
-                return;
-            }
+            21 => ResolveWidth(stack.Count > 2),
+            4 or 22 => ResolveWidth(stack.Count > 1),
+            1 or 3 or 18 or 23 or 19 or 20 or 14 => ResolveWidth(stack.Count % 2 == 1),
+            _ => false,
+        };
 
-            var i = 0;
-            while (i < cs.Length && !done)
-            {
-                int b = cs[i];
-                if (b >= 32 || b == 28)
-                {
-                    i = ReadOperand(cs, i, b);
-                    continue;
-                }
-
-                i++;
-                switch (b)
-                {
-                    case 1:
-                    case 3:
-                    case 18:
-                    case 23:
-                    case 19:
-                    case 20:
-                        ResolveWidth(stack.Count % 2 == 1);
-                        return;
-                    case 21:
-                        ResolveWidth(stack.Count > 2);
-                        return;
-                    case 4:
-                    case 22:
-                        ResolveWidth(stack.Count > 1);
-                        return;
-                    case 14:
-                        ResolveWidth(stack.Count % 2 == 1);
-                        return;
-                    case 10:
-                        if (RunSubr(Fd.LocalSubrs, Fd.LocalBias, depth))
-                        {
-                            return;
-                        }
-
-                        break;
-                    case 11:
-                        return;
-                    case 29:
-                        if (RunSubr(GlobalSubrs, GlobalBias, depth))
-                        {
-                            return;
-                        }
-
-                        break;
-                    case 12:
-                        i++;
-                        stack.Clear();
-                        break;
-                    default:
-                        stack.Clear();
-                        break;
-                }
-            }
-        }
-
-        private void ResolveWidth(bool hasWidth)
+        private bool ResolveWidth(bool hasWidth)
         {
             Width = hasWidth ? Fd.NominalWidthX + stack[0] : Fd.DefaultWidthX;
-            done = true;
+            Stop();
+            return true;
         }
     }
 
-    // Walks a Type 2 charstring far enough to decide whether it terminates in an endchar
-    // seac (an endchar with 4 or 5 operands). Tracks stem hints so hintmask/cntrmask mask
-    // bytes are skipped correctly, and follows local/global subrs, so a residual operand
-    // count at endchar is not mistaken for a seac.
+    // Decides whether the charstring terminates in an endchar seac (an endchar with 4 or 5
+    // operands, the 5th form carrying a leading width).
     private sealed class SeacContext(FdInfo fd, CffIndex globalSubrs, int globalBias)
         : CharstringContext(fd, globalSubrs, globalBias)
     {
-        private int hintCount;
-
         public bool Seac { get; private set; }
 
-        public override void Run(byte[] cs, int depth)
+        protected override bool Visit(int op)
         {
-            if (depth > 10)
+            if (op != 14)
             {
-                done = true;
-                return;
+                return false;
             }
 
-            var i = 0;
-            while (i < cs.Length && !done)
-            {
-                int b = cs[i];
-                if (b >= 32 || b == 28)
-                {
-                    i = ReadOperand(cs, i, b);
-                    continue;
-                }
-
-                i++;
-                switch (b)
-                {
-                    case 1:
-                    case 3:
-                    case 18:
-                    case 23:
-                        hintCount += stack.Count / 2;
-                        stack.Clear();
-                        break;
-                    case 19:
-                    case 20:
-                        hintCount += stack.Count / 2;
-                        stack.Clear();
-                        i += (hintCount + 7) / 8; // skip the mask bytes
-                        break;
-                    case 14:
-                        Seac = stack.Count >= 4;
-                        done = true;
-                        return;
-                    case 10:
-                        RunSubr(Fd.LocalSubrs, Fd.LocalBias, depth);
-                        break;
-                    case 29:
-                        RunSubr(GlobalSubrs, GlobalBias, depth);
-                        break;
-                    case 11:
-                        return;
-                    case 12:
-                        i++;
-                        stack.Clear();
-                        break;
-                    default:
-                        stack.Clear();
-                        break;
-                }
-            }
+            Seac = stack.Count >= 4;
+            Stop();
+            return true;
         }
-
     }
 }
