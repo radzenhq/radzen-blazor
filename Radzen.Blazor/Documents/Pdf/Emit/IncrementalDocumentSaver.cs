@@ -294,8 +294,7 @@ internal sealed class IncrementalDocumentSaver
 
             foreach (var value in annotations)
             {
-                if (reader.AsDictionary(value) is { } annotation
-                    && reader.GetName(annotation, "Subtype") == "Widget")
+                if (reader.AsDictionary(value) is { } annotation && FormField.IsWidget(reader, annotation))
                 {
                     throw Unsupported("Removing a page that owns form widgets");
                 }

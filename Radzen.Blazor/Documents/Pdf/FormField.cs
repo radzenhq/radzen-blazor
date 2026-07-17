@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -46,12 +47,20 @@ public sealed class FormField
     /// the selected state name for a button, or the selected item(s) for a choice
     /// field. A field with no own <c>/V</c> inherits it from an ancestor field.
     /// </summary>
-    public string? Value
-        => InheritedEntry("V") switch
+    public string? Value => ValueText(reader, InheritedEntry("V"));
+
+    // An annotation is a form widget iff its /Subtype is /Widget (ISO 32000-1 12.5.6.19).
+    internal static bool IsWidget(DocumentReader reader, DictionaryObject annotation)
+        => string.Equals(reader.GetName(annotation, "Subtype"), "Widget", StringComparison.Ordinal);
+
+    // Renders a resolved /V into the one display string both FormField.Value reports and
+    // FormFlattener paints, so the two can never disagree about the same field.
+    internal static string? ValueText(DocumentReader reader, DocumentObject? value)
+        => value switch
         {
             StringObject text => DecodeTextString(text.Value),
             NameObject name => name.Value,
-            ArrayObject items => JoinValues(items),
+            ArrayObject items => JoinValues(reader, items),
             _ => null,
         };
 
@@ -90,7 +99,11 @@ public sealed class FormField
         return null;
     }
 
-    private string JoinValues(ArrayObject items)
+    // A multi-select choice field's /V is an array of the selected items (ISO 32000-1 12.7.4.4);
+    // the spec names no separator because it never joins them. ", " is the only join the callers
+    // can honour: the flattened appearance is a single Tj, where a newline is not a line break
+    // but an unmapped byte in the string.
+    private static string JoinValues(DocumentReader reader, ArrayObject items)
     {
         var parts = new List<string>();
         foreach (var item in items)
@@ -101,7 +114,7 @@ public sealed class FormField
             }
         }
 
-        return string.Join("\n", parts);
+        return string.Join(", ", parts);
     }
 
     private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, throwOnInvalidBytes: true);

@@ -1,6 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -133,11 +132,7 @@ internal sealed class FormFlattener(Document document)
         document.AcroForm = null;
     }
 
-    private bool IsWidget(DictionaryObject annot)
-    {
-        var source = Source;
-        return string.Equals(source!.GetName(annot, "Subtype"), "Widget", StringComparison.Ordinal);
-    }
+    private bool IsWidget(DictionaryObject annot) => FormField.IsWidget(Source!, annot);
 
     private void DrawWidget(Page page, DictionaryObject widget, string? formDa)
     {
@@ -191,7 +186,7 @@ internal sealed class FormFlattener(Document document)
             return;
         }
 
-        var value = ChoiceOrTextValue(Inherited(widget, "V"));
+        var value = FormField.ValueText(source!, Inherited(widget, "V"));
         if (string.IsNullOrEmpty(value))
         {
             return;
@@ -207,29 +202,6 @@ internal sealed class FormFlattener(Document document)
         {
             Font = font,
         });
-    }
-
-    private string? ChoiceOrTextValue(DocumentObject? value)
-    {
-        var source = Source;
-        switch (value)
-        {
-            case StringObject stored:
-                return FormField.DecodeTextString(stored.Value);
-            case ArrayObject items:
-                var parts = new List<string>();
-                foreach (var item in items)
-                {
-                    if (source!.AsString(item) is { } text)
-                    {
-                        parts.Add(FormField.DecodeTextString(text));
-                    }
-                }
-
-                return string.Join(", ", parts);
-            default:
-                return null;
-        }
     }
 
     private bool HasVisibleAppearance(DictionaryObject widget)
