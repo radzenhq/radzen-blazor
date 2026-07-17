@@ -18,6 +18,12 @@ public sealed class FontCollection
     private const int SignatureWindow = 64 * 1024;
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
+
+    // Registration keys in first-registration order. Dictionary enumeration order is not
+    // contractual (see Emit/PageDraws.cs OrderedSet), and the style fallback below picks the
+    // first matching face, so the chosen face - and the bytes it embeds - must not ride on it.
+    private readonly List<(string Family, bool Bold, bool Italic)> registrationOrder = [];
+
     private readonly List<string> fallback = [];
 
     // The single shaping seam both measurement and emission map text through. Cached and
@@ -99,7 +105,13 @@ public sealed class FontCollection
         // embedded unless the caller holds a license and explicitly opts in.
         face.EnsureEmbeddable(AllowRestrictedEmbedding);
         face.EnsureRenderable(AllowDegradedFonts);
-        registered[(family, bold, italic)] = face;
+        var key = (family, bold, italic);
+        if (!registered.ContainsKey(key))
+        {
+            registrationOrder.Add(key);
+        }
+
+        registered[key] = face;
     }
 
     // Faces are always parsed from a private copy, and a hit is verified byte-for-byte
@@ -464,11 +476,11 @@ public sealed class FontCollection
             return true;
         }
 
-        foreach (var pair in registered)
+        foreach (var key in registrationOrder)
         {
-            if (string.Equals(pair.Key.Family, family, StringComparison.Ordinal))
+            if (string.Equals(key.Family, family, StringComparison.Ordinal))
             {
-                face = pair.Value;
+                face = registered[key];
                 return true;
             }
         }

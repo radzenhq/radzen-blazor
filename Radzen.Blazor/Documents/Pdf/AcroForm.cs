@@ -17,12 +17,6 @@ public sealed class AcroForm
     // Chosen on-state for a checkbox whose fixture carries no explicit /AP states.
     private const string OnState = "Yes";
 
-    // Text-field /Ff flags (ISO 32000-1 table 228): bit 13 multiline, bit 14 password,
-    // bit 25 comb. A baked single left-aligned line is faithful for none of these.
-    private const int MultilineFlag = 1 << 12;
-    private const int PasswordFlag = 1 << 13;
-    private const int CombFlag = 1 << 24;
-
     private readonly DocumentReader reader;
     private readonly Document owner;
     private readonly List<FormField> fields = [];
@@ -288,7 +282,7 @@ public sealed class AcroForm
     private bool CanBakeAppearance(DictionaryObject field)
     {
         var flags = Inherited(field, "Ff") is NumberObject ff ? ff.IntValue : 0;
-        if ((flags & (MultilineFlag | PasswordFlag | CombFlag)) != 0)
+        if ((flags & (FieldFlags.Multiline | FieldFlags.Password | FieldFlags.Comb)) != 0)
         {
             return false;
         }
