@@ -62,7 +62,16 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 index += 7;
                 var trailerDict = (DictionaryObject)ObjectParser.Parse(data, index, limits);
 
-                // ISO 32000-1 7.5.8.4: in a hybrid-reference file the /XRefStm takes precedence over this classic section.
+                foreach (var pair in section)
+                {
+                    if (pair.Value.InUse && !entries.ContainsKey(pair.Key))
+                    {
+                        entries[pair.Key] = pair.Value;
+                    }
+                }
+
+                // ISO 32000-1 7.5.8.4: /XRefStm supersedes the free entries this standard section uses to mask
+                // compressed objects, but is consulted before /Prev - so in-use entries of this section win.
                 if (trailerDict.TryGetValue("XRefStm", out var hybrid) && hybrid is NumberObject hybridOffset)
                 {
                     ParseXrefStreamAt((long)hybridOffset.DoubleValue, store);
