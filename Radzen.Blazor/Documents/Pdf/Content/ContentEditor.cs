@@ -8,9 +8,9 @@ namespace Radzen.Documents.Pdf.Content;
 
 internal static class ContentEditor
 {
-    internal sealed record SourceElement(ContentElement Element, int Start, int End, Matrix Ambient);
+    internal sealed record SourceElement(ContentElement Element, int Start, int End, Matrix Ambient, bool InsideTextObject);
 
-    private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes, Matrix Ambient);
+    private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes, Matrix Ambient, bool InsideTextObject = false);
 
     private enum CandidateKind
     {
@@ -66,7 +66,7 @@ internal static class ContentEditor
                 candidateIndex++;
             }
 
-            result.Add(new SourceElement(element, start, end, candidate.Ambient));
+            result.Add(new SourceElement(element, start, end, candidate.Ambient, candidate.InsideTextObject));
         }
 
         if (candidateIndex != candidates.Count)
@@ -135,6 +135,11 @@ internal static class ContentEditor
             else
             {
                 ValidateModification(item.Element);
+                if (item.Element is TextContent run)
+                {
+                    run.InsideTextObject = item.InsideTextObject;
+                }
+
                 item.Element.Emit(writer, Relative(item.Element.Transform, item.Ambient));
             }
         }
@@ -234,7 +239,13 @@ internal static class ContentEditor
                     }
                 }
 
-                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], machine.Ctm));
+                // A show splices back where the source text object is still open, so its
+                // ambient is the full text rendering space: the live text matrix as well as
+                // the CTM. Both are what the interpreter baked into the element's transform,
+                // so an unmoved run comes back out relative to identity.
+                var insideText = machine.TextObjectDepth > 0;
+                var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
+                result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
             }
             else if (!KnownNonElement(op))
             {

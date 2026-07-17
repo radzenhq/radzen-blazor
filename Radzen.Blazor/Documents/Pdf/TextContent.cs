@@ -26,6 +26,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
     private DeviceColor? fillPaint;
     private double wordSpacing;
     private double charSpacing;
+    private bool insideTextObject;
 
     /// <summary>Gets or sets the text to draw.</summary>
     public string Text
@@ -122,6 +123,16 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref charSpacing, value);
     }
 
+    // Set by the editor when this run splices back inside a source BT..ET that is still open.
+    // It moves the emitted bytes, so it tracks like any other member; the editor only ever
+    // sets it on a run it has already decided to re-emit, so the door it opens is never the
+    // one that decides.
+    internal bool InsideTextObject
+    {
+        get => insideTextObject;
+        set => Set(ref insideTextObject, value);
+    }
+
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
@@ -130,10 +141,18 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         // A translucent colour paints through a constant-alpha /ExtGState; gs persists in the
         // graphics state, so it is scoped by q..Q to keep the alpha off later elements. A
         // device fill paint replaces Color, and carries no alpha of its own.
+        // Splicing into a live text object also needs the scope: the colour and text state
+        // set here would otherwise leak onto the runs that follow inside the same BT..ET,
+        // which are copied verbatim and expect the state the source left them.
         var alpha = FillPaint is null ? Color.A / 255.0 : 1;
-        if (alpha < 1)
+        var scoped = alpha < 1 || InsideTextObject;
+        if (scoped)
         {
             writer.WriteRaw("q\n");
+        }
+
+        if (alpha < 1)
+        {
             writer.WriteName(writer.RegisterOpacity(alpha));
             writer.WriteRaw(" gs\n");
         }
@@ -151,9 +170,10 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
             WordSpacing = WordSpacing,
             Bytes = adjustments is null ? EncodeText() : default,
             Adjustments = adjustments,
+            InsideTextObject = InsideTextObject,
         });
 
-        if (alpha < 1)
+        if (scoped)
         {
             writer.WriteRaw("Q\n");
         }
