@@ -33,20 +33,36 @@ public sealed class Watermark
     internal Image? Image { get; private set; }
 
     private ImageXObject? decoded;
+    private Image? decodedImage;
     private (bool Interpolate, bool Stencil, int[]? ColorKeyMask) decodedOptions;
 
     internal ImageXObject DecodeImage(Image image)
     {
         var options = (image.Interpolate, image.Stencil, image.ColorKeyMask);
-        if (decoded is null || decodedOptions.Interpolate != options.Interpolate
+        if (decoded is null || !ReferenceEquals(decodedImage, image)
+            || decodedOptions.Interpolate != options.Interpolate
             || decodedOptions.Stencil != options.Stencil
             || !ColorKeyMaskEqual(decodedOptions.ColorKeyMask, options.ColorKeyMask))
         {
             decoded = ImageDecoder.ApplyOptions(ImageDecoder.Decode(image.Data), image);
+            decodedImage = image;
             decodedOptions = (options.Interpolate, options.Stencil, options.ColorKeyMask?.ToArray());
         }
 
         return decoded;
+    }
+
+    internal void Validate()
+    {
+        if (!double.IsFinite(Opacity) || Opacity < 0 || Opacity > 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(Opacity), Opacity, "Watermark opacity must be between 0 and 1.");
+        }
+
+        if (!double.IsFinite(Rotation))
+        {
+            throw new ArgumentOutOfRangeException(nameof(Rotation), Rotation, "Watermark rotation must be finite.");
+        }
     }
 
     private static bool ColorKeyMaskEqual(int[]? first, int[]? second)

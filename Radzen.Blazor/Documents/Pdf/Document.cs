@@ -367,15 +367,7 @@ public sealed class Document
     public void AddWatermark(Watermark watermark)
     {
         ArgumentNullException.ThrowIfNull(watermark);
-        if (!double.IsFinite(watermark.Opacity) || watermark.Opacity < 0 || watermark.Opacity > 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(watermark), watermark.Opacity, "Watermark opacity must be between 0 and 1.");
-        }
-
-        if (!double.IsFinite(watermark.Rotation))
-        {
-            throw new ArgumentOutOfRangeException(nameof(watermark), watermark.Rotation, "Watermark rotation must be finite.");
-        }
+        watermark.Validate();
 
         foreach (var page in Pages)
         {
