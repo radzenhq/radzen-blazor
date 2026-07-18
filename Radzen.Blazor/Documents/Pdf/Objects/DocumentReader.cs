@@ -290,11 +290,13 @@ public sealed class DocumentReader
         return [];
     }
 
-    private void Load()
+    private void Load() => Load(LoadFromXref);
+
+    private void Load(Action loadFromXref)
     {
         try
         {
-            LoadFromXref();
+            loadFromXref();
         }
         catch (Exception exception) when (IsRecoverableParseFailure(exception))
         {
@@ -302,15 +304,19 @@ public sealed class DocumentReader
         }
     }
 
+    internal static DocumentReader ParseWithXrefLoad(byte[] data, Action loadFromXref)
+    {
+        var reader = new DocumentReader(data, ReaderLimits.Default.Snapshot());
+        reader.Load(loadFromXref);
+        return reader;
+    }
+
     private static bool IsRecoverableParseFailure(Exception exception)
         => exception is DocumentParseException
             or KeyNotFoundException
-            or InvalidCastException
             or ArgumentException
             or OverflowException
-            or IndexOutOfRangeException
             or FormatException
-            or InvalidOperationException
             or EndOfStreamException
             or InvalidDataException;
 
