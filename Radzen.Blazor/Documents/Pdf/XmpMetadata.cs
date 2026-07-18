@@ -104,15 +104,14 @@ public sealed class DocumentXmpMetadata
     {
         XNamespace x = "adobe:ns:meta/";
         XNamespace rdf = RdfNamespace;
-        var padding = string.Concat(Enumerable.Repeat("                                                                                \n", 24));
         return new XDocument(
-            new XProcessingInstruction("xpacket", "begin=\"\uFEFF\" id=\"W5M0MpCehiHzreSzNTczkc9d\""),
+            new XProcessingInstruction("xpacket", Emit.XmpPacketFraming.BeginInstruction),
             new XText("\n"),
             new XElement(x + "xmpmeta",
                 new XElement(rdf + "RDF",
                     new XElement(rdf + "Description", new XAttribute(rdf + "about", "")))),
-            new XText("\n" + padding),
-            new XProcessingInstruction("xpacket", "end=\"w\""));
+            new XText("\n" + Emit.XmpPacketFraming.Padding),
+            new XProcessingInstruction("xpacket", Emit.XmpPacketFraming.EndInstruction));
     }
 
     private static XDocument Parse(byte[] value)

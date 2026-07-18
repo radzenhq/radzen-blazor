@@ -328,31 +328,11 @@ internal sealed class ConformanceWriter(Document document)
         return preferences;
     }
 
-    private const string PdfUaExtensionSchema =
-        "  <rdf:Description rdf:about=\"\"\n"
-        + "   xmlns:pdfaExtension=\"http://www.aiim.org/pdfa/ns/extension/\"\n"
-        + "   xmlns:pdfaSchema=\"http://www.aiim.org/pdfa/ns/schema#\"\n"
-        + "   xmlns:pdfaProperty=\"http://www.aiim.org/pdfa/ns/property#\">\n"
-        + "   <pdfaExtension:schemas>\n"
-        + "    <rdf:Bag>\n"
-        + "     <rdf:li rdf:parseType=\"Resource\">\n"
-        + "      <pdfaSchema:schema>PDF/UA identification schema</pdfaSchema:schema>\n"
-        + "      <pdfaSchema:namespaceURI>http://www.aiim.org/pdfua/ns/id/</pdfaSchema:namespaceURI>\n"
-        + "      <pdfaSchema:prefix>pdfuaid</pdfaSchema:prefix>\n"
-        + "      <pdfaSchema:property>\n"
-        + "       <rdf:Seq>\n"
-        + "        <rdf:li rdf:parseType=\"Resource\">\n"
-        + "         <pdfaProperty:name>part</pdfaProperty:name>\n"
-        + "         <pdfaProperty:valueType>Integer</pdfaProperty:valueType>\n"
-        + "         <pdfaProperty:category>internal</pdfaProperty:category>\n"
-        + "         <pdfaProperty:description>PDF/UA version identifier</pdfaProperty:description>\n"
-        + "        </rdf:li>\n"
-        + "       </rdf:Seq>\n"
-        + "      </pdfaSchema:property>\n"
-        + "     </rdf:li>\n"
-        + "    </rdf:Bag>\n"
-        + "   </pdfaExtension:schemas>\n"
-        + "  </rdf:Description>\n";
+    private static readonly string PdfUaExtensionSchema = XmpExtensionSchema.Build(
+        "PDF/UA identification schema",
+        "http://www.aiim.org/pdfua/ns/id/",
+        "pdfuaid",
+        [("part", "Integer", "internal", "PDF/UA version identifier")]);
 
     private static string InsertAfter(string packet, string anchor, string insertion)
         => packet.Insert(RequireAnchor(packet, anchor) + anchor.Length, insertion);
