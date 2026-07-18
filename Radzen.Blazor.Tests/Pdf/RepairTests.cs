@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
@@ -113,6 +114,20 @@ public class RepairTests
     public void EmptyInput_ThrowsDocumentParseException()
     {
         Assert.Throws<DocumentParseException>(() => DocumentReader.Parse(Array.Empty<byte>()));
+    }
+
+    [Fact]
+    public void ObjectHeaderInsideStreamDoesNotReplaceRealObjectOffset()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "1 0 obj\n<< /Type /Catalog >>\nendobj\n"
+            + "2 0 obj\n<< /Length 36 >>\nstream\n"
+            + "1 0 obj\n<< /Type /Fake >>\nendobj\n"
+            + "endstream\nendobj\n");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.Equal(0, offsets[1]);
     }
 
     private static byte[] TruncateAfter(byte[] bytes, string marker)

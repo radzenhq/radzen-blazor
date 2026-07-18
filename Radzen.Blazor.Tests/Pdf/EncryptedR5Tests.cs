@@ -34,10 +34,10 @@ public class EncryptedR5Tests
         return result;
     }
 
-    private static byte[] R5File()
+    private static byte[] R5File(string userPassword = UserPassword)
     {
         var zeroIv = new byte[16];
-        var userPw = Encoding.UTF8.GetBytes(UserPassword);
+        var userPw = Encoding.UTF8.GetBytes(userPassword);
         var ownerPw = Encoding.UTF8.GetBytes(OwnerPassword);
 
         var userValidationSalt = CryptoFixtureSupport.FixedBytes(8, 11);
@@ -114,5 +114,15 @@ public class EncryptedR5Tests
 
         Assert.True(reader.IsEncrypted);
         Assert.Contains("(r5-marker) Tj", ContentText(reader), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void R5PasswordUsesUtf8WithoutSaslprep()
+    {
+        const string Password = "sec\u00adret";
+
+        var reader = DocumentReader.Parse(R5File(Password), Password);
+
+        Assert.True(reader.IsEncrypted);
     }
 }

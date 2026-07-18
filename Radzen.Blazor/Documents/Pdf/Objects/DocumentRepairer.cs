@@ -213,7 +213,7 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
                 throw new DocumentParseException("Recovered cross-reference table exceeds the maximum number of entries.", -1);
             }
 
-            map[objectNumber] = i;
+            map.TryAdd(objectNumber, i);
             i = p + 2;
         }
 

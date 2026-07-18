@@ -210,8 +210,9 @@ internal static class LineLayouter
                     advances[(font, codepoint)] = baseAdvance;
                 }
 
-                var advance = baseAdvance * piece.Run.ScriptScale;
-                var step = fragAdvance > 0 ? advance + piece.Run.LetterSpacing.Point : advance;
+                var step = RunTextAdvance.Calculate(
+                    baseAdvance, 1, codepoint == ' ' ? 1 : 0, piece.Run,
+                    leadingCharacterSpacing: lineWidth > 0 || fragAdvance > 0);
                 if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
                     if (hyphenBreak > fragStart && hyphenBreak <= i)
@@ -242,7 +243,8 @@ internal static class LineLayouter
                     fragAdvance = 0.0;
                     hyphenBreak = -1;
                     hyphenAdvance = 0.0;
-                    step = advance;
+                    step = RunTextAdvance.Calculate(
+                        baseAdvance, 1, codepoint == ' ' ? 1 : 0, piece.Run);
                 }
 
                 fragAdvance += step;

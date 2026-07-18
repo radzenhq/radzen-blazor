@@ -56,6 +56,13 @@ public class PredictorHardeningTests
     }
 
     [Fact]
+    public void Png_InvalidRowFilter_ThrowsDocumentParseException()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => PngPredictor.Decode([5, 0, 0, 0, 0], colors: 1, bitsPerComponent: 8, columns: 4));
+    }
+
+    [Fact]
     public void Tiff_ColorsOutOfRange_Throws()
     {
         Assert.Throws<DocumentParseException>(
@@ -81,5 +88,12 @@ public class PredictorHardeningTests
     {
         Assert.Throws<DocumentParseException>(
             () => TiffPredictor.Decode(new byte[5], colors: 1, bitsPerComponent: 8, columns: 4));
+    }
+
+    [Fact]
+    public void Tiff_InvalidBitDepth_ThrowsDocumentParseException()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => TiffPredictor.Decode(new byte[4], colors: 1, bitsPerComponent: 4, columns: 4));
     }
 }

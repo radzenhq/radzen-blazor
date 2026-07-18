@@ -48,7 +48,7 @@ internal static class PngPredictor
                     2 => raw + b,
                     3 => raw + ((a + b) >> 1),
                     4 => raw + Paeth(a, b, c),
-                    _ => throw new InvalidOperationException($"Unsupported PNG filter type {filter}."),
+                    _ => throw new DocumentParseException($"Unsupported PNG filter type {filter}."),
                 };
 
                 output[dst + i] = (byte)value;

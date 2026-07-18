@@ -55,11 +55,7 @@ internal static class LoadedAppearancePainter
         }
 
         var xobjects = PrivateXObjects(reader, loaded, page, owned);
-        var name = namePrefix;
-        while (xobjects.ContainsKey(name))
-        {
-            name += "z";
-        }
+        var name = ResourceNameAllocator.Available(namePrefix, xobjects.Keys, false);
 
         xobjects[name] = appearanceReference;
         var scaleX = target.Width / width;
@@ -114,23 +110,10 @@ internal static class LoadedAppearancePainter
             return (DictionaryObject)resources!["XObject"]!;
         }
 
-        var copy = new DictionaryObject();
-        var xobjects = new DictionaryObject();
-        if (resources is not null)
-        {
-            foreach (var key in resources.Keys)
-            {
-                copy[key] = resources[key];
-            }
-
-            if (reader.GetDictionary(resources, "XObject") is { } shared)
-            {
-                foreach (var key in shared.Keys)
-                {
-                    xobjects[key] = shared[key];
-                }
-            }
-        }
+        var copy = resources?.Copy() ?? new DictionaryObject();
+        var xobjects = resources is not null && reader.GetDictionary(resources, "XObject") is { } shared
+            ? shared.Copy()
+            : new DictionaryObject();
 
         copy["XObject"] = xobjects;
         loaded.SourceResources[page] = copy;

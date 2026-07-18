@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf;
 
@@ -216,13 +217,10 @@ internal static class Redactor
             }
 
             var code = run.Font.DecodeCodes(bytes)[0];
-            if (!run.Font.TryGetWidth(code.Code, out var width))
-            {
-                throw new NotSupportedException($"The source font does not provide a usable width for character code {code.Code}.");
-            }
-
             writer.WriteString(bytes);
-            var nominalAdvance = GlyphMetrics.Advance(width / 1000.0, run.FontSize, run.CharSpacing, run.WordSpacing, code.IsWordSpace) * run.Scale;
+            var nominalAdvance = LoadedGlyphAdvance.Calculate(
+                run.Font, code.Code, code.IsWordSpace, run.FontSize, run.Scale,
+                run.CharSpacing, run.WordSpacing, MissingWidthPolicy.Throw, out _);
             WriteAdvance(writer, desiredAdvance - nominalAdvance, denominator);
         }
 

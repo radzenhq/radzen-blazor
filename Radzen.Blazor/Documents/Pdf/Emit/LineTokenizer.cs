@@ -52,7 +52,6 @@ internal static class LineTokenizer
         var words = new List<LineWord>();
         segments.Add(words);
         var pieces = new List<LinePiece>();
-        var spaceWidths = new Dictionary<Font, double>();
         var current = default(LineWord);
         var hasCurrent = false;
 
@@ -140,7 +139,9 @@ internal static class LineTokenizer
                                 hasCurrent = true;
                             }
 
-                            current.GapAfter += SpaceWidthMeasurer.SpaceWidth(fonts, runFont, spaceWidths);
+                            current.GapAfter += RunTextAdvance.Measure(
+                                fonts, run, runFont, " ",
+                                leadingCharacterSpacing: true, trailingCharacterSpacing: true);
                         }
 
                         i++;
@@ -166,7 +167,7 @@ internal static class LineTokenizer
                         if (q > sub)
                         {
                             var segment = text[sub..q];
-                            var advance = MeasureRun(fonts, run, runFont, segment);
+                            var advance = RunTextAdvance.Measure(fonts, run, runFont, segment);
                             if (!hasCurrent || current.GapAfter > 0 || current.TabsAfter > 0)
                             {
                                 if (hasCurrent)
@@ -218,32 +219,6 @@ internal static class LineTokenizer
         }
 
         return new LineTokenization(segments, pieces);
-    }
-
-    // Scale by /HorizontalScale (Tz, ISO 32000-1 9.4.4) to match what the emitter draws.
-    private static double MeasureRun(FontCollection fonts, Run run, Font font, string text)
-    {
-        var advance = fonts.MeasureText(text, font) * run.ScriptScale;
-        var spacing = run.LetterSpacing.Point;
-        if (spacing != 0 && text.Length > 0)
-        {
-            advance += spacing * (CountCodePoints(text) - 1);
-        }
-
-        return advance * (run.HorizontalScale / 100.0);
-    }
-
-    private static int CountCodePoints(string text)
-    {
-        var count = 0;
-        var i = 0;
-        while (i < text.Length)
-        {
-            i += char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1]) ? 2 : 1;
-            count++;
-        }
-
-        return count;
     }
 
 }

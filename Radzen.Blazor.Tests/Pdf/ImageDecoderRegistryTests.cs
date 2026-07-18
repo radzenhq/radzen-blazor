@@ -80,6 +80,17 @@ public class ImageDecoderRegistryTests
         }
     }
 
+    [Fact]
+    public void RegisteringSameDecoderAgainDoesNotAddAnotherProbe()
+    {
+        var decoder = new CountingDecoder();
+        ImageDecoder.Register(decoder);
+        ImageDecoder.Register(decoder);
+
+        Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode([0xEF, 0xFE, 0xFD]));
+        Assert.Equal(1, decoder.Probes);
+    }
+
     private sealed class StubDecoder(byte[] magic) : IImageDecoder
     {
         public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
@@ -95,6 +106,18 @@ public class ImageDecoderRegistryTests
             stream.Dictionary["Height"] = new NumberObject(1);
             xobject = new ImageXObject(stream, null);
             return true;
+        }
+    }
+
+    private sealed class CountingDecoder : IImageDecoder
+    {
+        public int Probes;
+
+        public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        {
+            Interlocked.Increment(ref Probes);
+            xobject = null;
+            return false;
         }
     }
 }

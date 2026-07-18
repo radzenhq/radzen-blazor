@@ -18,6 +18,9 @@ public readonly struct PageSize(Unit width, Unit height) : IEquatable<PageSize>
     /// <summary>Gets the page height.</summary>
     public Unit Height { get; } = height;
 
+    internal (Unit Width, Unit Height) Effective(PageOrientation orientation)
+        => orientation == PageOrientation.Landscape ? (Height, Width) : (Width, Height);
+
     /// <summary>
     /// Determines whether two page sizes are equal.
     /// </summary>

@@ -67,7 +67,12 @@ internal sealed class StandardSecurityHandler
         FileKey = [];
 
         // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-normalized UTF-8.
-        Authenticate(revision >= 5 ? EncodeR6Password(password) : Encoding.Latin1.GetBytes(password));
+        Authenticate(revision switch
+        {
+            5 => Encoding.UTF8.GetBytes(password),
+            >= 6 => EncodeR6Password(password),
+            _ => Encoding.Latin1.GetBytes(password),
+        });
     }
 
     private enum CryptMethod

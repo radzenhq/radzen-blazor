@@ -10,7 +10,7 @@ internal static class TiffPredictor
 
         if (bitsPerComponent != 8)
         {
-            throw new NotSupportedException("Only 8 bits per component is supported.");
+            throw new DocumentParseException("TIFF predictor supports only 8 bits per component.");
         }
 
         PredictorParameters.ValidateColorsAndColumns(colors, columns, "TIFF");

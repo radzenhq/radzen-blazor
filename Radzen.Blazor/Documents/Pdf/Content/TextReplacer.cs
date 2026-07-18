@@ -435,15 +435,12 @@ internal static class TextReplacer
         var value = 0.0;
         foreach (var code in font.DecodeCodes(codes))
         {
-            if (!font.TryGetWidth(code.Code, out var width))
-            {
-                throw new NotSupportedException($"The source font does not provide a usable width for character code {code.Code}.");
-            }
-
-            value += GlyphMetrics.Advance(width / 1000.0, show.FontSize, show.CharSpacing, show.WordSpacing, code.IsWordSpace);
+            value += LoadedGlyphAdvance.Calculate(
+                font, code.Code, code.IsWordSpace, show.FontSize, show.Scale,
+                show.CharSpacing, show.WordSpacing, MissingWidthPolicy.Throw, out _);
         }
 
-        return value * show.Scale;
+        return value;
     }
 
 }

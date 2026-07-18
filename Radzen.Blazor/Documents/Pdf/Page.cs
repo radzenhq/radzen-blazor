@@ -354,7 +354,7 @@ public sealed class Page
         var reserved = new HashSet<string>(reservedResourceNames ?? []);
         AddResourceNames(reserved, editedResources);
         var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-            SafePrefix("F", reserved), SafePrefix("Im", reserved), SafePrefix("GS", reserved), SafePrefix("P", reserved));
+            ResourceNameAllocator.Available("F", reserved, true), ResourceNameAllocator.Available("Im", reserved, true), ResourceNameAllocator.Available("GS", reserved, true), ResourceNameAllocator.Available("P", reserved, true));
         if (emission.Resources.Patterns.Count > 0)
         {
             throw new NotSupportedException("Inserted gradient content cannot be composed with raw content editing because pattern resource names cannot be allocated safely.");
@@ -411,10 +411,10 @@ public sealed class Page
         {
             using var pending = new ContentWriter(
                 FontScope,
-                SafePrefix("SF", reservedNames),
-                SafePrefix("SIm", reservedNames),
-                SafePrefix("SGS", reservedNames),
-                SafePrefix("SP", reservedNames));
+                ResourceNameAllocator.Available("SF", reservedNames, true),
+                ResourceNameAllocator.Available("SIm", reservedNames, true),
+                ResourceNameAllocator.Available("SGS", reservedNames, true),
+                ResourceNameAllocator.Available("SP", reservedNames, true));
             foreach (var element in pendingAppends)
             {
                 element.Emit(pending);
@@ -440,10 +440,10 @@ public sealed class Page
 
             using var appended = new ContentWriter(
                 FontScope,
-                SafePrefix("SF", reservedNames),
-                SafePrefix("SIm", reservedNames),
-                SafePrefix("SGS", reservedNames),
-                SafePrefix("SP", reservedNames));
+                ResourceNameAllocator.Available("SF", reservedNames, true),
+                ResourceNameAllocator.Available("SIm", reservedNames, true),
+                ResourceNameAllocator.Available("SGS", reservedNames, true),
+                ResourceNameAllocator.Available("SP", reservedNames, true));
             for (var i = materializedCount; i < elements.Count; i++)
             {
                 elements[i].Emit(appended);
@@ -458,17 +458,17 @@ public sealed class Page
         if (content is not null && sourceElements is not null)
         {
             var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-                SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames), SafePrefix("GS", reservedNames), SafePrefix("P", reservedNames));
+                ResourceNameAllocator.Available("F", reservedNames, true), ResourceNameAllocator.Available("Im", reservedNames, true), ResourceNameAllocator.Available("GS", reservedNames, true), ResourceNameAllocator.Available("P", reservedNames, true));
             return new ContentEmissionResult(emission.Bytes,
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
 
         using var writer = new ContentWriter(
             FontScope,
-            SafePrefix("F", reservedNames),
-            SafePrefix("Im", reservedNames),
-            SafePrefix("GS", reservedNames),
-            SafePrefix("P", reservedNames));
+            ResourceNameAllocator.Available("F", reservedNames, true),
+            ResourceNameAllocator.Available("Im", reservedNames, true),
+            ResourceNameAllocator.Available("GS", reservedNames, true),
+            ResourceNameAllocator.Available("P", reservedNames, true));
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -555,35 +555,6 @@ public sealed class Page
         materialized = false;
         materializedCount = 0;
         sourceElements = null;
-    }
-
-    private static string SafePrefix(string baseName, IReadOnlyCollection<string>? reserved)
-    {
-        if (reserved is null || reserved.Count == 0)
-        {
-            return baseName;
-        }
-
-        var prefix = baseName;
-        while (StartsWithAny(reserved, prefix))
-        {
-            prefix += "z";
-        }
-
-        return prefix;
-    }
-
-    private static bool StartsWithAny(IReadOnlyCollection<string> names, string prefix)
-    {
-        foreach (var name in names)
-        {
-            if (name.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static void AddResourceNames(HashSet<string> names, ContentResourceManifest resources)

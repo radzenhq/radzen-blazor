@@ -16,6 +16,8 @@ internal readonly struct SfntGlyphRun
     public required double Advance { get; init; }
 
     public int GlyphCount => Bytes.Length / 2;
+
+    public required int WordSpaceCount { get; init; }
 }
 
 internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver fontResolver)
@@ -86,10 +88,13 @@ internal struct SfntRunAccumulator(
     private ushort previousGid = 0;
     private int previousCodepoint = 0;
     private int glyphCount = 0;
+    private int wordSpaceCount = 0;
 
     public double Advance { get; private set; } = 0;
 
     public int GlyphCount => glyphCount;
+
+    public int WordSpaceCount => wordSpaceCount;
 
     public byte[] Bytes => [.. bytes];
 
@@ -111,6 +116,10 @@ internal struct SfntRunAccumulator(
         previousGid = gid;
         previousCodepoint = codepoint;
         glyphCount++;
+        if (codepoint == ' ')
+        {
+            wordSpaceCount++;
+        }
     }
 
     public SfntGlyphRun ToRun() => new()
@@ -120,5 +129,6 @@ internal struct SfntRunAccumulator(
         Bytes = Bytes,
         Kerns = Kerns,
         Advance = Advance,
+        WordSpaceCount = wordSpaceCount,
     };
 }
