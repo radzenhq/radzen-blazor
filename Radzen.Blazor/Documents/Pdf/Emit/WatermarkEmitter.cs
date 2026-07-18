@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 
 namespace Radzen.Documents.Pdf.Emit;
@@ -5,9 +6,11 @@ namespace Radzen.Documents.Pdf.Emit;
 internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolver fontResolver, ImageStore imageStore)
 {
     private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
+    private readonly Dictionary<Image, GeneratedImage> appliedImages = [];
 
     public void Plan(PagePlan plan, Watermark watermark)
     {
+        watermark.Validate();
         var draw = new WatermarkDraw
         {
             CenterX = plan.Size.Width.Point / 2,
@@ -21,6 +24,11 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         if (watermark.Image is { } image)
         {
             var generated = imageStore.Decode(image);
+            if (image.HasXObjectOptions)
+            {
+                generated = ApplyOptions(watermark, image, generated);
+            }
+
             var (width, height) = ImageDecoder.Measure(image, generated.Image, plan.Size.Width.Point);
             draw.Image = new ImageDraw
             {
@@ -39,6 +47,17 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
         }
 
         plan.Watermark = draw;
+    }
+
+    private GeneratedImage ApplyOptions(Watermark watermark, Image image, GeneratedImage baseImage)
+    {
+        if (!appliedImages.TryGetValue(image, out var applied))
+        {
+            applied = new GeneratedImage { Key = baseImage.Key + "w", Image = watermark.DecodeImage(image) };
+            appliedImages[image] = applied;
+        }
+
+        return applied;
     }
 
     private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Font font)
