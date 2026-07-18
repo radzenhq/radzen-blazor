@@ -75,17 +75,17 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
     {
         var list = target.AddList(ListStyle.Bullet);
         list.Font.Name = options.BodyFontName;
-        AddListItems(list, unorderedList, string.Empty);
+        AddListItems(list, unorderedList);
     }
 
     public override void VisitOrderedList(Radzen.Documents.Markdown.OrderedList orderedList)
     {
         var list = target.AddList(ListStyle.Number);
         list.Font.Name = options.BodyFontName;
-        AddListItems(list, orderedList, string.Empty);
+        AddListItems(list, orderedList);
     }
 
-    private void AddListItems(List list, Radzen.Documents.Markdown.List source, string indent)
+    private void AddListItems(List list, Radzen.Documents.Markdown.List source)
     {
         foreach (var child in source.Children)
         {
@@ -95,42 +95,31 @@ internal sealed class MarkdownPdfRenderer(BlockCollection target, MarkdownPdfOpt
             }
 
             var pdfItem = list.AddItem();
-            var pendingIndent = indent;
 
             foreach (var block in item.Children)
             {
                 switch (block)
                 {
                     case Radzen.Documents.Markdown.Paragraph paragraph:
-                        AppendIndent(pdfItem.Inlines, ref pendingIndent);
                         RenderInlines(paragraph.Children, pdfItem.Inlines);
                         break;
                     case Radzen.Documents.Markdown.List nestedList:
-                        AddListItems(list, nestedList, indent + "    ");
+                        var style = nestedList is Radzen.Documents.Markdown.OrderedList ? ListStyle.Number : ListStyle.Bullet;
+                        var nestedPdfList = pdfItem.AddList(style);
+                        nestedPdfList.Font.Name = options.BodyFontName;
+                        AddListItems(nestedPdfList, nestedList);
                         break;
                     case Radzen.Documents.Markdown.FencedCodeBlock fenced:
-                        AppendIndent(pdfItem.Inlines, ref pendingIndent);
                         pdfItem.Inlines.Add(fenced.Value.TrimEnd('\n')).Font.Name = options.ResolvedMonospaceFontName;
                         break;
                     case Radzen.Documents.Markdown.IndentedCodeBlock indented:
-                        AppendIndent(pdfItem.Inlines, ref pendingIndent);
                         pdfItem.Inlines.Add(indented.Value.TrimEnd('\n')).Font.Name = options.ResolvedMonospaceFontName;
                         break;
                     case Radzen.Documents.Markdown.BlockQuote quote:
-                        AppendIndent(pdfItem.Inlines, ref pendingIndent);
                         RenderInlines(FlattenInlines(quote), pdfItem.Inlines);
                         break;
                 }
             }
-        }
-    }
-
-    private static void AppendIndent(InlineCollection inlines, ref string pendingIndent)
-    {
-        if (pendingIndent.Length > 0)
-        {
-            inlines.Add(pendingIndent);
-            pendingIndent = string.Empty;
         }
     }
 

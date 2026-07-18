@@ -88,7 +88,7 @@ public sealed class Attachment : ITracksChanges
     internal Attachment(string name, byte[] data, AttachmentRelationship relationship, string mimeType)
     {
         Name = name;
-        Data = data;
+        Data = (byte[])data.Clone();
         Relationship = relationship;
         MimeType = mimeType;
     }

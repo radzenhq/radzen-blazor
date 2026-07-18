@@ -111,17 +111,35 @@ public class MarkdownPdfTests
     }
 
     [Fact]
-    public void NestedList_IsFlattenedIntoParentListWithIndentedItems()
+    public void NestedList_IsAttachedAsTheItemNestedList()
     {
         var blocks = new BlockCollection();
 
         MarkdownPdf.Render(blocks, "- A\n  - B\n- C");
 
         var list = Assert.IsType<List>(Assert.Single(blocks));
-        Assert.Equal(3, list.Items.Count);
+        Assert.Equal(2, list.Items.Count);
         Assert.Equal("A", list.Items[0].Text);
-        Assert.Equal("    B", list.Items[1].Text);
-        Assert.Equal("C", list.Items[2].Text);
+        Assert.Equal("C", list.Items[1].Text);
+
+        var nested = Assert.IsType<List>(list.Items[0].NestedList);
+        Assert.Equal(ListStyle.Bullet, nested.Style);
+        Assert.Equal("B", Assert.Single(nested.Items).Text);
+        Assert.Null(list.Items[1].NestedList);
+    }
+
+    [Fact]
+    public void NestedOrderedList_KeepsTheNestedNumberStyle()
+    {
+        var blocks = new BlockCollection();
+
+        MarkdownPdf.Render(blocks, "- A\n  1. B\n  2. C");
+
+        var list = Assert.IsType<List>(Assert.Single(blocks));
+        var item = Assert.Single(list.Items);
+        var nested = Assert.IsType<List>(item.NestedList);
+        Assert.Equal(ListStyle.Number, nested.Style);
+        Assert.Equal(["B", "C"], nested.Items.Select(i => i.Text));
     }
 
     [Fact]
