@@ -1,7 +1,6 @@
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -16,9 +15,7 @@ namespace Radzen.Documents.Pdf.Content;
 /// </summary>
 public sealed class ContentWriter : IDisposable
 {
-    private byte[] buffer = ArrayPool<byte>.Shared.Rent(1024);
-    private int length;
-    private bool returned;
+    private readonly PooledByteAccumulator accumulator = new(1024);
     private readonly ResourceKeyRegistry<string, KeyValuePair<string, string>> fonts;
     private readonly ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>> images;
     private readonly ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
@@ -65,22 +62,19 @@ public sealed class ContentWriter : IDisposable
             key => new KeyValuePair<string, DictionaryObject>(key, ShadingBuilder.BuildPattern(gradient)));
     }
 
-    internal byte[] ToArray() => buffer.AsSpan(0, length).ToArray();
+    internal byte[] ToArray() => accumulator.ToArray();
 
-    internal void WriteBytes(ReadOnlySpan<byte> bytes)
-    {
-        bytes.CopyTo(Reserve(bytes.Length));
-        length += bytes.Length;
-    }
+    internal void WriteBytes(ReadOnlySpan<byte> bytes) => accumulator.Write(bytes);
 
     internal void EnsureSeparated()
     {
-        if (length == 0)
+        var written = accumulator.WrittenSpan;
+        if (written.Length == 0)
         {
             return;
         }
 
-        var last = buffer[length - 1];
+        var last = written[^1];
         if (!Lexer.IsWhitespace(last) && !Lexer.IsDelimiter(last))
         {
             WriteRaw("\n");
@@ -128,9 +122,9 @@ public sealed class ContentWriter : IDisposable
     /// <param name="text">The raw content-stream text; every character must be within the Latin-1 range.</param>
     public void WriteRaw(ReadOnlySpan<char> text)
     {
-        var destination = Reserve(text.Length);
+        var destination = accumulator.Reserve(text.Length);
         Latin1ByteEncoder.Encode(text, destination);
-        length += text.Length;
+        accumulator.Advance(text.Length);
     }
 
     /// <summary>Writes <paramref name="name"/> as a PDF name object, escaping characters that require it.</summary>
@@ -220,44 +214,8 @@ public sealed class ContentWriter : IDisposable
         Append((byte)')');
     }
 
-    private void Append(byte value)
-    {
-        if (length == buffer.Length)
-        {
-            Grow(1);
-        }
-
-        buffer[length++] = value;
-    }
-
-    private Span<byte> Reserve(int size)
-    {
-        if (buffer.Length - length < size)
-        {
-            Grow(size);
-        }
-
-        return buffer.AsSpan(length, size);
-    }
-
-    private void Grow(int size)
-    {
-        var pool = ArrayPool<byte>.Shared;
-        var replacement = pool.Rent(Math.Max(buffer.Length * 2, length + size));
-        buffer.AsSpan(0, length).CopyTo(replacement);
-        pool.Return(buffer);
-        buffer = replacement;
-    }
+    private void Append(byte value) => accumulator.Append(value);
 
     /// <summary>Returns the pooled internal buffer. Call only after the emitted bytes have been read out.</summary>
-    public void Dispose()
-    {
-        if (returned)
-        {
-            return;
-        }
-
-        returned = true;
-        ArrayPool<byte>.Shared.Return(buffer);
-    }
+    public void Dispose() => accumulator.Return();
 }
