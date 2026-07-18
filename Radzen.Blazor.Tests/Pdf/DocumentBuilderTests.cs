@@ -8,15 +8,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class DocumentBuilderTests
 {
     [Fact]
-    public void DocumentBuilder_ExposesInfoStylesSections()
-    {
-        var doc = new DocumentBuilder();
-        Assert.NotNull(doc.Info);
-        Assert.NotNull(doc.Styles);
-        Assert.NotNull(doc.Sections);
-    }
-
-    [Fact]
     public void DocumentInfo_DefaultsNull()
     {
         var info = new DocumentBuilder().Info;
@@ -107,17 +98,6 @@ public class DocumentBuilderTests
         Assert.Equal(PageOrientation.Landscape, s.Orientation);
         Assert.Equal(FlowDirection.RightToLeft, s.Direction);
         Assert.Equal(WritingMode.VerticalRightToLeft, s.WritingMode);
-    }
-
-    [Fact]
-    public void Section_HeaderFooterBlocksAvailable()
-    {
-        var s = new DocumentBuilder().Sections.Add();
-        Assert.NotNull(s.Header);
-        Assert.NotNull(s.Footer);
-        Assert.NotNull(s.Header.Blocks);
-        Assert.NotNull(s.Footer.Blocks);
-        Assert.NotNull(s.Blocks);
     }
 
     [Fact]

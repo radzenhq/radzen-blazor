@@ -65,6 +65,8 @@ public class FontEmbedPermissionTests
     public void EnsureEmbeddable_OptInOverrideAllowsRestrictedFont()
     {
         var face = SfntFont.Parse(WithFsType(Liberation(), 0x0002));
+
+        Assert.True(face.EmbeddingRestricted);
         face.EnsureEmbeddable(allowRestricted: true);
     }
 

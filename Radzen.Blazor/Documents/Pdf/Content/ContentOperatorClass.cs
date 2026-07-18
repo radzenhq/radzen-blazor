@@ -5,8 +5,6 @@ internal static class ContentOperatorClass
     public static bool IsPathConstruction(string? op) => op is
         "m" or "l" or "c" or "v" or "y" or "re" or "h" or "W" or "W*";
 
-    public static bool IsClip(string? op) => op is "W" or "W*";
-
     public static bool IsPathPainting(string? op) => op is
         "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n";
 

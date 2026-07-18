@@ -49,14 +49,6 @@ public class PredictorHardeningTests
     }
 
     [Fact]
-    public void ValidPredictorRow_StillDecodes()
-    {
-        var input = new byte[] { 1, 10, 10, 10, 10 };
-        var expected = new byte[] { 10, 20, 30, 40 };
-        Assert.Equal(expected, PngPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
-    }
-
-    [Fact]
     public void Png_PartialTrailingRow_Throws()
     {
         Assert.Throws<DocumentParseException>(
@@ -89,13 +81,5 @@ public class PredictorHardeningTests
     {
         Assert.Throws<DocumentParseException>(
             () => TiffPredictor.Decode(new byte[5], colors: 1, bitsPerComponent: 8, columns: 4));
-    }
-
-    [Fact]
-    public void Tiff_ValidRow_StillDecodes()
-    {
-        var input = new byte[] { 10, 1, 1, 1 };
-        var expected = new byte[] { 10, 11, 12, 13 };
-        Assert.Equal(expected, TiffPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
     }
 }

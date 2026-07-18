@@ -92,6 +92,7 @@ public class GeneratedPageRedactionTests
         page.Redact(new[] { PdfRect.FromSize(page.Width.Point + 10, page.Height.Point + 10, 5, 5) },
             new RedactionOptions { FillColor = Color.Black });
 
+        Assert.Contains(page.Content, e => e is PathContent { Fill: true });
         using var buffer = new MemoryStream(document.ToArray());
         Document.LoadFromStream(buffer);
     }
