@@ -72,8 +72,14 @@ public static class PdfTimestamper
             pageIndex: 0);
 
         return PdfSigner.Embed(bytes, sigStart, sigEnd, reservedBytes,
-            content => provider.GetTimestampToken(Sha2.ComputeHash256(content.ToArray()))
-                ?? throw new InvalidOperationException("The timestamp provider returned null."),
+            content =>
+            {
+                var hasher = new Sha256Hasher();
+                hasher.Append(content.First);
+                hasher.Append(content.Second);
+                return provider.GetTimestampToken(hasher.Finish())
+                    ?? throw new InvalidOperationException("The timestamp provider returned null.");
+            },
             "Increase the reservedBytes argument.");
     }
 }
