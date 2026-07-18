@@ -1,4 +1,5 @@
 #nullable enable
+
 using System;
 using System.IO;
 using Radzen.Documents.Pdf;
@@ -19,17 +20,67 @@ public class GeneratedPageRedactionTests
         return builder.Build();
     }
 
-    [Fact]
-    public void Redact_RegionOverImageOnGeneratedPage_FailsLoudInsteadOfLeavingImageRecoverable()
+    private static Document GeneratedTextPage(string text)
     {
+        var builder = new DocumentBuilder();
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, text, "Helvetica", 24);
+        return builder.Build();
+    }
+
+    private static bool Contains(byte[] haystack, byte[] needle)
+    {
+        for (var i = 0; i + needle.Length <= haystack.Length; i++)
+        {
+            var match = true;
+            for (var j = 0; j < needle.Length; j++)
+            {
+                if (haystack[i + j] != needle[j])
+                {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (match)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    [Fact]
+    public void Redact_RegionOverImageOnGeneratedPage_RemovesImageBytesFromOutput()
+    {
+        var jpeg = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
+        Assert.True(Contains(GeneratedImagePage().ToArray(), jpeg));
+
         var document = GeneratedImagePage();
         var page = document.Pages[0];
         var whole = PdfRect.FromSize(0, 0, page.Width.Point, page.Height.Point);
 
-        var exception = Assert.Throws<NotSupportedException>(
-            () => page.Redact(new[] { whole }, new RedactionOptions { FillColor = Color.Black }));
+        page.Redact(new[] { whole }, new RedactionOptions { FillColor = Color.Black });
 
-        Assert.Contains("A redaction region intersects", exception.Message, StringComparison.Ordinal);
+        var redacted = document.ToArray();
+        Assert.False(Contains(redacted, jpeg));
+        using var buffer = new MemoryStream(redacted);
+        Document.LoadFromStream(buffer);
+    }
+
+    [Fact]
+    public void RedactText_OnGeneratedPage_RemovesTextAfterReload()
+    {
+        var document = GeneratedTextPage("SENSITIVE");
+        var page = document.Pages[0];
+
+        var count = page.RedactText("SENSITIVE", null, new RedactionOptions { FillColor = Color.Black });
+
+        Assert.Equal(1, count);
+        using var buffer = new MemoryStream(document.ToArray());
+        var reloaded = Document.LoadFromStream(buffer);
+        Assert.DoesNotContain("SENSITIVE", reloaded.Pages[0].ExtractText(), StringComparison.Ordinal);
     }
 
     [Fact]

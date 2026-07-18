@@ -30,22 +30,38 @@ internal static class PageResourceBuilder
         DocumentWriter writer,
         GeneratedPage page,
         Dictionary<GeneratedFont, DocumentObject> fontRefs,
-        Dictionary<GeneratedImage, ReferenceObject> imageRefs)
+        Dictionary<GeneratedImage, ReferenceObject> imageRefs,
+        IReadOnlySet<string>? referencedKeys = null)
     {
         var resources = new ResourceDictionaryBuilder();
 
         foreach (var font in page.Fonts)
         {
+            if (referencedKeys is not null && !referencedKeys.Contains(font.Key))
+            {
+                continue;
+            }
+
             resources.Add("Font", font.Key, ResolveFont(writer, font, fontRefs));
         }
 
         foreach (var image in page.Images)
         {
+            if (referencedKeys is not null && !referencedKeys.Contains(image.Key))
+            {
+                continue;
+            }
+
             resources.Add("XObject", image.Key, ResolveImage(writer, image, imageRefs));
         }
 
         foreach (var state in page.ExtGStates)
         {
+            if (referencedKeys is not null && !referencedKeys.Contains(state.Key))
+            {
+                continue;
+            }
+
             DocumentObject? softMask = null;
             if (state.SoftMask is { } mask)
             {
@@ -69,10 +85,29 @@ internal static class PageResourceBuilder
 
         foreach (var pattern in page.Patterns)
         {
+            if (referencedKeys is not null && !referencedKeys.Contains(pattern.Key))
+            {
+                continue;
+            }
+
             resources.Add("Pattern", pattern.Key, writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient)));
         }
 
         return resources.Build();
+    }
+
+    public static IReadOnlySet<string> ReferencedResourceKeys(byte[] content)
+    {
+        var keys = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var token in Content.ContentTokenizer.Tokenize(content, new Content.ContentTokenizer.Cache()))
+        {
+            if (token.Kind == Content.ContentTokenizer.TokenKind.Name && token.Text is { } name)
+            {
+                keys.Add(name);
+            }
+        }
+
+        return keys;
     }
 
     public static DictionaryObject ExtGStateDictionary(

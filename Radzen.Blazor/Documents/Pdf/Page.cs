@@ -17,6 +17,7 @@ public sealed class Page
     private readonly AnnotationCollection annotations = [];
     private byte[]? content;
     private bool materialized;
+    private bool editingGenerated;
     private int materializedCount;
     private int rotate;
     private Unit width;
@@ -354,6 +355,19 @@ public sealed class Page
         ContentReplaced = true;
     }
 
+    internal bool IsEditingGenerated => editingGenerated;
+
+    internal void BeginGeneratedEdit()
+    {
+        if (Generated is null || editingGenerated)
+        {
+            return;
+        }
+
+        editingGenerated = true;
+        ResetMaterialization();
+    }
+
     internal ContentEmissionResult BuildContent(IReadOnlyCollection<string>? reservedNames = null)
     {
         if (!editedResources.IsEmpty)
@@ -477,7 +491,7 @@ public sealed class Page
         }
 
         materialized = true;
-        if (content is null || Generated is not null)
+        if (content is null || (Generated is not null && !editingGenerated))
         {
             FlushPendingAppends();
             return;

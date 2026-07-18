@@ -52,33 +52,30 @@ internal static class Redactor
             return;
         }
 
-        var generated = page.Generated is not null;
+        page.BeginGeneratedEdit();
+
+        Func<string, bool> isRemovableXObject = static _ => false;
+        if (page.Generated is { } generated)
+        {
+            var imageNames = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var image in generated.Images)
+            {
+                imageNames.Add(image.Key);
+            }
+
+            isRemovableXObject = imageNames.Contains;
+        }
 
         if (page.CurrentContent is { Length: > 0 } raw)
         {
             var selected = SelectIntersectingGlyphs(page, regions, cache);
             if (selected.Count > 0)
             {
-                if (generated)
-                {
-                    throw GeneratedContentNotSupported();
-                }
-
                 page.ApplyEditedContent(RemoveTextGlyphs(raw, selected, cache));
             }
-
-            if (generated)
-            {
-                var elements = new ContentCollection();
-                ContentInterpreter.Materialize(raw, elements, page.TextFonts, cache);
-                SweepElements(elements, regions, removeInPlace: false);
-            }
         }
 
-        if (!generated)
-        {
-            SweepElements(page.Content, regions, removeInPlace: true);
-        }
+        SweepElements(page.Content, regions, isRemovableXObject);
 
         if (options?.FillColor is { } fill)
         {
@@ -129,7 +126,7 @@ internal static class Redactor
         return selected;
     }
 
-    private static void SweepElements(ContentCollection content, IReadOnlyList<PdfRect> regions, bool removeInPlace)
+    private static void SweepElements(ContentCollection content, IReadOnlyList<PdfRect> regions, Func<string, bool> isRemovableXObject)
     {
         for (var i = content.Count - 1; i >= 0; i--)
         {
@@ -141,15 +138,21 @@ internal static class Redactor
                         throw new NotSupportedException("A redaction region intersects a clipping path that cannot be removed safely.");
                     }
 
-                    RemoveOrReject(content, i, removeInPlace);
+                    content.RemoveAt(i);
                     break;
                 case ImageContent image when IntersectsAny(image.Bounds, regions):
-                    RemoveOrReject(content, i, removeInPlace);
+                    content.RemoveAt(i);
                     break;
                 case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
-                    throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
+                    if (!isRemovableXObject(xobject.Name))
+                    {
+                        throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
+                    }
+
+                    content.RemoveAt(i);
+                    break;
                 case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
-                    RemoveOrReject(content, i, removeInPlace);
+                    content.RemoveAt(i);
                     break;
                 case RawContent unmodeled when MayPaint(unmodeled.Operator)
                     && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
@@ -159,19 +162,6 @@ internal static class Redactor
             }
         }
     }
-
-    private static void RemoveOrReject(ContentCollection content, int index, bool removeInPlace)
-    {
-        if (!removeInPlace)
-        {
-            throw GeneratedContentNotSupported();
-        }
-
-        content.RemoveAt(index);
-    }
-
-    private static NotSupportedException GeneratedContentNotSupported()
-        => new("A redaction region intersects content on a freshly generated page, whose content stream cannot be edited in place to remove it irreversibly. Save the document and redact the reloaded copy.");
 
     private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected, ContentTokenizer.Cache? cache)
     {
