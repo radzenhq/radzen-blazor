@@ -61,12 +61,13 @@ public readonly struct Rect(double x, double y, double width, double height) : I
 
 internal readonly struct RectPolicy
 {
-    private RectPolicy(string? missingMessage, string? nonNumericMessage, double fallbackWidth, double fallbackHeight)
+    private RectPolicy(string? missingMessage, string? nonNumericMessage, double fallbackWidth, double fallbackHeight, bool rejectNonNumeric)
     {
         MissingMessage = missingMessage;
         NonNumericMessage = nonNumericMessage;
         FallbackWidth = fallbackWidth;
         FallbackHeight = fallbackHeight;
+        RejectNonNumeric = rejectNonNumeric;
     }
 
     public string? MissingMessage { get; }
@@ -77,14 +78,18 @@ internal readonly struct RectPolicy
 
     public double FallbackHeight { get; }
 
+    public bool RejectNonNumeric { get; }
+
     public bool Throws => MissingMessage is not null;
 
     public static RectPolicy Strict(string missingMessage, string nonNumericMessage)
-        => new(missingMessage, nonNumericMessage, 0, 0);
+        => new(missingMessage, nonNumericMessage, 0, 0, false);
 
-    public static RectPolicy ZeroFallback { get; } = new(null, null, 0, 0);
+    public static RectPolicy ZeroFallback { get; } = new(null, null, 0, 0, false);
 
-    public static RectPolicy DefaultSize(double width, double height) => new(null, null, width, height);
+    public static RectPolicy DefaultSize(double width, double height) => new(null, null, width, height, false);
+
+    public static RectPolicy Rejecting { get; } = new(null, null, 0, 0, true);
 }
 
 /// <summary>
@@ -143,31 +148,46 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(Left, Bottom, Right, Top);
 
-    // /Rect corners may be in either order and may be indirect references (ISO 32000-1 7.9.5).
     internal static PdfRect Read(DocumentReader reader, ArrayObject? value, RectPolicy policy)
+        => ResolveCorners(reader, value, policy) is { } corners
+            ? Normalize(corners)
+            : FromSize(0, 0, policy.FallbackWidth, policy.FallbackHeight);
+
+    // /Rect corners may be in either order and may be indirect references (ISO 32000-1 7.9.5).
+    internal static double[]? ResolveCorners(DocumentReader reader, ArrayObject? value, RectPolicy policy)
     {
         if (value is null || value.Count < 4 || (policy.Throws && value.Count != 4))
         {
             return policy.Throws
                 ? throw new DocumentParseException(policy.MissingMessage!, -1)
-                : FromSize(0, 0, policy.FallbackWidth, policy.FallbackHeight);
+                : null;
         }
 
         var corners = new double[4];
         for (var i = 0; i < corners.Length; i++)
         {
-            corners[i] = reader.AsNumber(value[i]) switch
+            switch (reader.AsNumber(value[i]))
             {
-                { } number => number,
-                null when policy.Throws => throw new DocumentParseException(policy.NonNumericMessage!, -1),
-                null => 0.0,
-            };
+                case { } number:
+                    corners[i] = number;
+                    break;
+                case null when policy.Throws:
+                    throw new DocumentParseException(policy.NonNumericMessage!, -1);
+                case null when policy.RejectNonNumeric:
+                    return null;
+                default:
+                    corners[i] = 0.0;
+                    break;
+            }
         }
 
-        return new PdfRect(
+        return corners;
+    }
+
+    internal static PdfRect Normalize(double[] corners)
+        => new(
             Math.Min(corners[0], corners[2]),
             Math.Min(corners[1], corners[3]),
             Math.Max(corners[0], corners[2]),
             Math.Max(corners[1], corners[3]));
-    }
 }

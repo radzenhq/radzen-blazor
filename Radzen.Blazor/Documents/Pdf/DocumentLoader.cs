@@ -111,10 +111,10 @@ internal static class DocumentLoader
             return;
         }
 
-        var mediaCorners = ResolveCorners(reader, box);
-        var cropCorners = ResolveCorners(reader, cropBox);
-        var mediaBox = ToRect(mediaCorners);
-        var cropRect = ToRect(cropCorners);
+        var mediaCorners = PdfRect.ResolveCorners(reader, box, RectPolicy.Rejecting);
+        var cropCorners = PdfRect.ResolveCorners(reader, cropBox, RectPolicy.Rejecting);
+        var mediaBox = NormalizedBox(mediaCorners);
+        var cropRect = NormalizedBox(cropCorners);
         var (width, height) = Dimensions(mediaBox);
         var page = new Page(width, height);
         if (mediaBox is { } preservedMediaBox)
@@ -210,30 +210,8 @@ internal static class DocumentLoader
             ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
             : (PageSizes.A4.Width, PageSizes.A4.Height);
 
-    // A box coordinate may legally be an indirect reference (ISO 32000-1 7.3.10).
-    private static double[]? ResolveCorners(DocumentReader reader, ArrayObject? box)
-    {
-        if (box is null || box.Count < 4)
-        {
-            return null;
-        }
-
-        var corners = new double[4];
-        for (var i = 0; i < corners.Length; i++)
-        {
-            if (reader.AsNumber(box[i]) is not { } corner)
-            {
-                return null;
-            }
-
-            corners[i] = corner;
-        }
-
-        return corners;
-    }
-
-    private static PdfRect? ToRect(double[]? corners)
-        => corners is not null ? new PdfRect(corners[0], corners[1], corners[2], corners[3]) : null;
+    private static PdfRect? NormalizedBox(double[]? corners)
+        => corners is not null ? PdfRect.Normalize(corners) : null;
 
     private static ArrayObject BoxArray(double[] corners) =>
     [
@@ -244,7 +222,7 @@ internal static class DocumentLoader
     ];
 
     private static PdfRect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
-        => ToRect(ResolveCorners(reader, reader.GetArray(page, key)));
+        => NormalizedBox(PdfRect.ResolveCorners(reader, reader.GetArray(page, key), RectPolicy.Rejecting));
 
     public static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
 
