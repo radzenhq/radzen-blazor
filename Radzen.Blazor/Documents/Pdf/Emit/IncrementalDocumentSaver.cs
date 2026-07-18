@@ -363,9 +363,9 @@ internal sealed class IncrementalDocumentSaver
             node["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
         }
 
-        WriteBox(node, "BleedBox", page.BleedBox);
-        WriteBox(node, "TrimBox", page.TrimBox);
-        WriteBox(node, "ArtBox", page.ArtBox);
+        PageBoxEmitter.WriteIfPresent(node, "BleedBox", page.BleedBox);
+        PageBoxEmitter.WriteIfPresent(node, "TrimBox", page.TrimBox);
+        PageBoxEmitter.WriteIfPresent(node, "ArtBox", page.ArtBox);
 
         if (page.Rotate != 0)
         {
@@ -390,14 +390,6 @@ internal sealed class IncrementalDocumentSaver
 
         var reference = writer.Add(node);
         return (reference, node);
-    }
-
-    private static void WriteBox(DictionaryObject node, string key, PdfRect? box)
-    {
-        if (box is { } value)
-        {
-            node[key] = PageResourceBuilder.NumberBox(value);
-        }
     }
 
     private bool WriteAnnotationEdits(
@@ -476,29 +468,5 @@ internal sealed class IncrementalDocumentSaver
     }
 
     private static DocumentObject HoistStreams(DocumentObject value, IncrementalUpdateWriter writer)
-    {
-        switch (value)
-        {
-            case StreamObject stream:
-                return writer.Add(stream);
-            case DictionaryObject dictionary:
-                var copiedDictionary = new DictionaryObject();
-                foreach (var key in dictionary.Keys)
-                {
-                    copiedDictionary[key] = HoistStreams(dictionary[key], writer);
-                }
-
-                return copiedDictionary;
-            case ArrayObject array:
-                var copiedArray = new ArrayObject();
-                foreach (var item in array)
-                {
-                    copiedArray.Add(HoistStreams(item, writer));
-                }
-
-                return copiedArray;
-            default:
-                return value;
-        }
-    }
+        => CosGraphRewriter.Rewrite(value, node => node is StreamObject stream ? writer.Add(stream) : null);
 }

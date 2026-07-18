@@ -339,9 +339,9 @@ internal sealed class DocumentSaver
 
     private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, PdfRect? value)
     {
-        if (value is { } rect)
+        if (value is not null)
         {
-            pageNode[key] = PageResourceBuilder.NumberBox(rect);
+            PageBoxEmitter.WriteIfPresent(pageNode, key, value);
             return;
         }
 

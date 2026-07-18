@@ -90,11 +90,7 @@ public sealed class AcroForm
             return;
         }
 
-        var key = qualified;
-        for (var index = 2; terminals.ContainsKey(key); index++)
-        {
-            key = qualified + "_" + index;
-        }
+        var key = FieldNameUniquifier.MakeUnique(qualified, terminals.ContainsKey);
 
         terminals[key] = new Terminal(dict, WidgetsOf(dict));
         fieldNames.Add(key);

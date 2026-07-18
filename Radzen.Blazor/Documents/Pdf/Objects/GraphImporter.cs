@@ -14,32 +14,19 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
     public void Prune(DocumentObject loaded) => pruned.Add(loaded);
 
     public DocumentObject ImportValue(DocumentObject value)
+        => CosGraphRewriter.Rewrite(value, ImportLeaf);
+
+    private DocumentObject? ImportLeaf(DocumentObject node)
     {
-        switch (value)
+        switch (node)
         {
             case ReferenceObject reference:
                 var resolved = reader.Resolve(reference);
                 return pruned.Contains(resolved) ? new NullObject() : ImportInstance(resolved);
             case StreamObject:
-                return ImportInstance(value);
-            case DictionaryObject dictionary:
-                var inlineDict = new DictionaryObject();
-                foreach (var key in dictionary.Keys)
-                {
-                    inlineDict[key] = ImportValue(dictionary[key]);
-                }
-
-                return inlineDict;
-            case ArrayObject array:
-                var inlineArray = new ArrayObject();
-                foreach (var item in array)
-                {
-                    inlineArray.Add(ImportValue(item));
-                }
-
-                return inlineArray;
+                return ImportInstance(node);
             default:
-                return value;
+                return null;
         }
     }
 
@@ -152,20 +139,17 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
 
     public static void DisambiguateFieldName(DictionaryObject field, string? name, HashSet<string> usedNames)
     {
-        if (name is null || usedNames.Add(name))
+        if (name is null)
         {
             return;
         }
 
-        var index = 2;
-        string candidate;
-        do
+        var unique = FieldNameUniquifier.MakeUnique(name, usedNames.Contains);
+        usedNames.Add(unique);
+        if (!string.Equals(unique, name, System.StringComparison.Ordinal))
         {
-            candidate = name + "_" + index++;
+            field["T"] = new StringObject(unique);
         }
-        while (!usedNames.Add(candidate));
-
-        field["T"] = new StringObject(candidate);
     }
 
     private bool IsWidget(DictionaryObject annotation) => FormField.IsWidget(reader, annotation);
