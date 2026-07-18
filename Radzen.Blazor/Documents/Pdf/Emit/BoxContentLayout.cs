@@ -190,7 +190,7 @@ internal static class BoxContentLayout
                 laidImages.Add(new LaidOutImage
                 {
                     Source = image,
-                    X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(image.Alignment, align)),
+                    X = contentBox.Left + HorizontalAlignmentOffset.Of(Effective(image.Alignment, align), contentBox.Width, item.Width),
                     Y = cursorY,
                     Width = item.Width,
                     Height = item.Height,
@@ -201,7 +201,7 @@ internal static class BoxContentLayout
                 laidCodes.Add(new LaidOutCode
                 {
                     Source = code,
-                    X = contentBox.Left + ((contentBox.Width - item.Width) * AlignFactor(BlockAlignment(code), align)),
+                    X = contentBox.Left + HorizontalAlignmentOffset.Of(Effective(BlockAlignment(code), align), contentBox.Width, item.Width),
                     Y = cursorY,
                 });
             }
@@ -218,7 +218,7 @@ internal static class BoxContentLayout
             else if (item.Box is { } box && item.BoxContent is { } boxContent)
             {
                 var padding = box.Padding.Point;
-                var indent = Math.Max(0, (contentBox.Width - item.Width) * AlignFactor(box.Alignment, HorizontalAlignment.Left));
+                var indent = Math.Max(0, HorizontalAlignmentOffset.Of(box.Alignment, contentBox.Width, item.Width));
                 var innerBox = new Rect(padding, padding, Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
                 nestedBoxes.Add(new LaidOutNestedBox
                 {
@@ -248,11 +248,6 @@ internal static class BoxContentLayout
 
     private static HorizontalAlignment BlockAlignment(Block code) => CodeBlockDispatch.Alignment(code);
 
-    private static double AlignFactor(HorizontalAlignment blockAlignment, HorizontalAlignment cellAlignment)
-        => (blockAlignment == HorizontalAlignment.Left ? cellAlignment : blockAlignment) switch
-        {
-            HorizontalAlignment.Right or HorizontalAlignment.End => 1.0,
-            HorizontalAlignment.Center => 0.5,
-            _ => 0.0,
-        };
+    private static HorizontalAlignment Effective(HorizontalAlignment blockAlignment, HorizontalAlignment cellAlignment)
+        => blockAlignment == HorizontalAlignment.Left ? cellAlignment : blockAlignment;
 }

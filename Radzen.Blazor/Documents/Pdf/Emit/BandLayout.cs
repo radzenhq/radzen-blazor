@@ -81,7 +81,7 @@ internal static class BandLayouter
                 Y = Cursor,
                 Width = imageWidth,
                 Height = imageHeight,
-                XOffset = OverlayBoxPlacer.AlignImage(image.Alignment, width, imageWidth),
+                XOffset = HorizontalAlignmentOffset.Of(image.Alignment, width, imageWidth),
             });
             Cursor += imageHeight;
             return default;
@@ -100,7 +100,7 @@ internal static class BandLayouter
                 Y = Cursor,
                 Width = codeWidth,
                 Height = codeHeight,
-                XOffset = OverlayBoxPlacer.AlignImage(Paginator.CodeAlignment(block), width, codeWidth),
+                XOffset = HorizontalAlignmentOffset.Of(Paginator.CodeAlignment(block), width, codeWidth),
             });
             Cursor += codeHeight;
             return default;
