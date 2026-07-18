@@ -60,6 +60,7 @@ namespace Radzen.Blazor
 
         IJSObjectReference? _jsRef;
         bool _needsUpdate;
+        bool _visibleChanged;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -87,6 +88,11 @@ namespace Radzen.Blazor
             var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
             var readOnlyChanged = parameters.DidParameterChange(nameof(ReadOnly), ReadOnly);
 
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visibleChanged = true;
+            }
+
             await base.SetParametersAsync(parameters);
 
             if (strokeColorChanged || strokeWidthChanged || disabledChanged || readOnlyChanged)
@@ -100,8 +106,17 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
+            if (firstRender || _visibleChanged)
             {
+                _visibleChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                    _jsRef = null;
+                }
+
                 if (Visible && JSRuntime != null)
                 {
                     _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(

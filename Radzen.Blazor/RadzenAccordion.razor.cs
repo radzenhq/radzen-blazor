@@ -345,6 +345,7 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? accordionJs;
+        bool _visibleChanged;
         bool shouldRender = true;
 
         /// <inheritdoc />
@@ -358,10 +359,22 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender && accordionJs == null && JSRuntime != null)
+            if ((firstRender || _visibleChanged) && JSRuntime != null)
             {
-                accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createAccordion", Element, Multiple);
+                _visibleChanged = false;
+
+                if (accordionJs != null)
+                {
+                    await accordionJs.InvokeVoidAsync("dispose");
+                    await accordionJs.DisposeAsync();
+                    accordionJs = null;
+                }
+
+                if (Visible)
+                {
+                    accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createAccordion", Element, Multiple);
+                }
             }
         }
 
@@ -465,6 +478,11 @@ namespace Radzen.Blazor
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             _itemRefreshPending = false;
+
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visibleChanged = true;
+            }
 
             if (parameters.DidParameterChange(nameof(Multiple), Multiple) && accordionJs != null)
             {

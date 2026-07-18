@@ -755,7 +755,7 @@ namespace Radzen.Blazor
             bool minChanged = parameters.DidParameterChange(nameof(Min), Min);
             bool maxChanged = parameters.DidParameterChange(nameof(Max), Max);
 
-            if (minChanged || maxChanged)
+            if (minChanged || maxChanged || parameters.DidParameterChange(nameof(Visible), Visible))
             {
                 _jsParamsChanged = true;
             }

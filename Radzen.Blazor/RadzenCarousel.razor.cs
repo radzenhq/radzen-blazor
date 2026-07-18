@@ -338,6 +338,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visibleChanged = true;
+            }
+
             var shouldUpdate = false;
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
@@ -495,6 +500,7 @@ namespace Radzen.Blazor
 
         ElementReference itemsElement;
         IJSObjectReference? scrollDisposable;
+        bool _visibleChanged;
 
         /// <summary>
         /// Called from JavaScript when the user scrolls the carousel items container.
@@ -534,8 +540,20 @@ namespace Radzen.Blazor
                 var ts = TimeSpan.FromMilliseconds(Interval + (AnimationDuration ?? 0));
                 timer = new System.Threading.Timer(state => InvokeAsync(Next),
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
+            }
 
-                if (JSRuntime != null)
+            if ((firstRender || _visibleChanged) && JSRuntime != null)
+            {
+                _visibleChanged = false;
+
+                if (scrollDisposable != null)
+                {
+                    await scrollDisposable.InvokeVoidAsync("dispose");
+                    await scrollDisposable.DisposeAsync();
+                    scrollDisposable = null;
+                }
+
+                if (Visible)
                 {
                     scrollDisposable = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createCarousel", itemsElement, Reference);

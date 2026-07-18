@@ -453,6 +453,7 @@ namespace Radzen.Blazor
             {
                 var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
                 shouldClose = !visible;
+                _jsParamsChanged = true;
             }
 
             if (parameters.DidParameterChange(nameof(OpenOnFocus), OpenOnFocus))

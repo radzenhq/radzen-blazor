@@ -320,16 +320,46 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? _jsRef;
+        bool _visibleChanged;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visibleChanged = true;
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender && Visible && JSRuntime != null)
+            if ((firstRender || _visibleChanged) && JSRuntime != null)
             {
-                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createSplitButton", Element, PopupID);
+                _visibleChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                    _jsRef = null;
+                }
+
+                if (Visible)
+                {
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createSplitButton", Element, PopupID);
+                }
+                else
+                {
+                    IsOpen = false;
+
+                    await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+                }
             }
         }
 

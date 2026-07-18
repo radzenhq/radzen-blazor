@@ -1,6 +1,7 @@
 ﻿using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -295,6 +296,55 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
 
             Assert.Contains(@$"autofocus", component.Markup);
+        }
+
+        [Fact]
+        public void SplitButton_RecreatesClickHandler_WhenVisibleToggled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderWithItems(ctx);
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, false));
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.destroyPopup"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+        }
+
+        [Fact]
+        public void SplitButton_CreatesClickHandler_WhenInitiallyHiddenBecomesVisible()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenSplitButton>(parameters => parameters
+                .Add(p => p.Text, "Save")
+                .Add(p => p.Visible, false));
+
+            Assert.Equal(0, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Visible, true));
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
+        }
+
+        [Fact]
+        public void SplitButton_DoesNotRecreateClickHandler_OnUnrelatedRender()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = RenderWithItems(ctx);
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Text, "Updated"));
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createSplitButton"));
         }
 
         [Fact]

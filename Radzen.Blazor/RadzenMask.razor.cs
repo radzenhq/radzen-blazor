@@ -162,7 +162,8 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(Mask), Mask) ||
                 parameters.DidParameterChange(nameof(Pattern), Pattern) ||
-                parameters.DidParameterChange(nameof(CharacterPattern), CharacterPattern))
+                parameters.DidParameterChange(nameof(CharacterPattern), CharacterPattern) ||
+                parameters.DidParameterChange(nameof(Visible), Visible))
             {
                 _jsParamsChanged = true;
             }
@@ -179,17 +180,21 @@ namespace Radzen.Blazor
             {
                 _jsParamsChanged = false;
 
-                await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
-                if (!Immediate)
+                if (_jsRef != null)
                 {
-                    if (_jsRef != null)
-                    {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
-                    }
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                    _jsRef = null;
+                }
 
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                        "Radzen.createMask", Element, GetId(), Mask, Pattern, CharacterPattern);
+                if (Visible)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
+                    if (!Immediate)
+                    {
+                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                            "Radzen.createMask", Element, GetId(), Mask, Pattern, CharacterPattern);
+                    }
                 }
             }
         }

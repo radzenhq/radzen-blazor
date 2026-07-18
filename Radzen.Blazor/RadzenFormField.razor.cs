@@ -77,15 +77,39 @@ namespace Radzen.Blazor
     public partial class RadzenFormField : RadzenComponent, IAsyncDisposable
     {
         private IJSObjectReference? _jsRef;
+        private bool _visibleChanged;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visibleChanged = true;
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender)
+            if ((firstRender || _visibleChanged) && JSRuntime != null)
             {
-                _jsRef = await JSRuntime!.InvokeAsync<IJSObjectReference>("Radzen.createFormField", Element);
+                _visibleChanged = false;
+
+                if (_jsRef != null)
+                {
+                    await _jsRef.InvokeVoidAsync("dispose");
+                    await _jsRef.DisposeAsync();
+                    _jsRef = null;
+                }
+
+                if (Visible)
+                {
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createFormField", Element);
+                }
             }
         }
 

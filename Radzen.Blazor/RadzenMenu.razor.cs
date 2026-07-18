@@ -90,7 +90,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (parameters.DidParameterChange(nameof(ClickToOpen), ClickToOpen))
+            if (parameters.DidParameterChange(nameof(ClickToOpen), ClickToOpen) ||
+                parameters.DidParameterChange(nameof(Visible), Visible))
             {
                 _clickToOpenChanged = true;
             }
@@ -103,7 +104,7 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if ((firstRender || _clickToOpenChanged) && Visible && JSRuntime != null)
+            if ((firstRender || _clickToOpenChanged) && JSRuntime != null)
             {
                 _clickToOpenChanged = false;
 
@@ -111,10 +112,14 @@ namespace Radzen.Blazor
                 {
                     await _jsRef.InvokeVoidAsync("dispose");
                     await _jsRef.DisposeAsync();
+                    _jsRef = null;
                 }
 
-                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createMenu", Element, ClickToOpen);
+                if (Visible)
+                {
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createMenu", Element, ClickToOpen);
+                }
             }
         }
 

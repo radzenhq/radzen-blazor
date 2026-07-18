@@ -56,6 +56,7 @@ namespace Radzen.Blazor
             base.Dispose();
             _jsRef?.InvokeVoidAsync("dispose");
             _jsRef?.DisposeAsync();
+            _jsRef = null;
             GC.SuppressFinalize(this);
         }
 
@@ -312,21 +313,19 @@ namespace Radzen.Blazor
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
 
-                    if (_jsParamsChanged || firstRender)
+                    _jsParamsChanged = false;
+
+                    if (_jsRef != null)
                     {
-                        _jsParamsChanged = false;
-
-                        if (_jsRef != null)
-                        {
-                            await _jsRef.InvokeVoidAsync("dispose");
-                            await _jsRef.DisposeAsync();
-                        }
-
-                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                            "Radzen.createUpload", Element,
-                            !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
-                            ParameterName, Method, Stream);
+                        await _jsRef.InvokeVoidAsync("dispose");
+                        await _jsRef.DisposeAsync();
+                        _jsRef = null;
                     }
+
+                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createUpload", Element,
+                        !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
+                        ParameterName, Method, Stream);
                 }
             }
         }
