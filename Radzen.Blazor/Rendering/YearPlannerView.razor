@@ -154,8 +154,23 @@
 @code {
     void OnFocus()
     {
-        CurrentDate = CurrentDate != default(DateTime) ? CurrentDate : StartDate; 
         CurrentMonth = CurrentMonth != -1 ? CurrentMonth : 0;
+
+        if (CurrentDate == default(DateTime) || CurrentDate < StartDate || CurrentDate >= EndDate)
+        {
+            CurrentDate = MonthStart(CurrentMonth);
+        }
+    }
+
+    DateTime MonthStart(int monthIndex)
+    {
+        var calendar = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
+        var startMonthNumber = (int)StartMonth + 1;
+        var startYear = Scheduler != null
+            ? calendar.GetYear(Scheduler.CurrentDate.Date) + (calendar.GetMonth(Scheduler.CurrentDate.Date) < startMonthNumber ? -1 : 0)
+            : calendar.GetYear(StartDate.AddDays(7));
+        var offsetMonth = ((monthIndex + (int)StartMonth) % 12) + 1;
+        return new DateTime(startYear + (offsetMonth <= monthIndex ? 1 : 0), offsetMonth, 1, calendar);
     }
 
     ElementReference view;
@@ -292,9 +307,14 @@
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
-        if(CurrentDate == default(DateTime))
+        if (CurrentMonth == -1)
         {
-            CurrentDate = StartDate.AddDays(1);
+            CurrentMonth = 0;
+        }
+
+        if (CurrentDate == default(DateTime) || CurrentDate < StartDate || CurrentDate >= EndDate)
+        {
+            CurrentDate = MonthStart(CurrentMonth);
         }
 
         var key = args.Code != null ? args.Code : args.Key;
@@ -328,9 +348,7 @@
         else if (key == "ArrowUp" || key == "ArrowDown")
         {
             CurrentMonth = Math.Clamp(CurrentMonth + (key == "ArrowUp" ? -1 : 1), 0, 11);
-
-            var navCal = (Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Calendar;
-            CurrentDate = new DateTime(navCal.GetYear(CurrentDate), CurrentMonth + 1, 1, navCal);
+            CurrentDate = MonthStart(CurrentMonth);
 
             preventKeyPress = true;
             stopKeydownPropagation = true;
