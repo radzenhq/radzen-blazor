@@ -347,30 +347,9 @@ internal sealed class IncrementalDocumentSaver
         {
             ["Type"] = new NameObject("Page"),
             ["Parent"] = parent,
-            ["MediaBox"] = page.MediaBoxSet
-                ? PageResourceBuilder.NumberBox(page.MediaBox)
-                :
-                [
-                    new NumberObject(0.0),
-                    new NumberObject(0.0),
-                    new NumberObject(page.Width.Point),
-                    new NumberObject(page.Height.Point),
-                ],
         };
 
-        if (page.CropBoxSet && page.CropBox is { } cropBox)
-        {
-            node["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
-        }
-
-        PageBoxEmitter.WriteIfPresent(node, "BleedBox", page.BleedBox);
-        PageBoxEmitter.WriteIfPresent(node, "TrimBox", page.TrimBox);
-        PageBoxEmitter.WriteIfPresent(node, "ArtBox", page.ArtBox);
-
-        if (page.Rotate != 0)
-        {
-            node["Rotate"] = new NumberObject(page.Rotate);
-        }
+        PageResourceBuilder.EmitPageGeometry(doc, page, node);
 
         if (emission.Bytes is not null)
         {
