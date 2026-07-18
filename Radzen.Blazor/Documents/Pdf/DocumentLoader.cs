@@ -365,7 +365,13 @@ internal static class DocumentLoader
         if (reader.GetDictionary(catalog, "Names") is { } names
             && reader.GetDictionary(names, "EmbeddedFiles") is { } tree)
         {
-            CollectEmbeddedFiles(reader, tree, document, seen, [], limits, 0);
+            WalkNameTree(reader, tree, "Names", [], limits, 0, (_, value) =>
+            {
+                if (reader.AsDictionary(value) is { } filespec)
+                {
+                    AddAttachment(reader, filespec, document, seen);
+                }
+            });
         }
 
         if (reader.GetArray(catalog, "AF") is { } af)
@@ -380,37 +386,49 @@ internal static class DocumentLoader
         }
     }
 
-    private static void CollectEmbeddedFiles(DocumentReader reader, DictionaryObject node, Document document, HashSet<DictionaryObject> seen, HashSet<DictionaryObject> visited, ReaderLimits limits, int depth)
+    // ISO 32000-1 7.9.6 (name trees) and 7.9.7 (number trees).
+    private static void WalkNameTree(
+        DocumentReader reader,
+        DictionaryObject node,
+        string leafKey,
+        HashSet<DictionaryObject> visited,
+        ReaderLimits limits,
+        int depth,
+        Action<DocumentObject, DocumentObject> leaf)
     {
         if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
         {
-            throw new DocumentParseException("Cyclic or excessively deep embedded-file name tree.", -1);
+            throw new DocumentParseException("Cyclic or excessively deep name tree.", -1);
         }
 
-        if (reader.TryGet<ArrayObject>(node, "Kids", out var kids))
+        if (reader.GetArray(node, "Kids") is { } kids)
         {
             foreach (var kid in kids)
             {
-                if (reader.AsDictionary(kid) is { } child)
+                if (reader.AsDictionary(kid) is not { } child)
                 {
-                    CollectEmbeddedFiles(reader, child, document, seen, visited, limits, depth + 1);
+                    throw new DocumentParseException("A name-tree child is not a dictionary.", -1);
                 }
+
+                WalkNameTree(reader, child, leafKey, visited, limits, depth + 1, leaf);
             }
 
             return;
         }
 
-        if (reader.GetArray(node, "Names") is not { } pairs)
+        if (reader.GetArray(node, leafKey) is not { } pairs)
         {
             return;
         }
 
-        for (var i = 1; i < pairs.Count; i += 2)
+        if (pairs.Count % 2 != 0)
         {
-            if (reader.AsDictionary(pairs[i]) is { } filespec)
-            {
-                AddAttachment(reader, filespec, document, seen);
-            }
+            throw new DocumentParseException("A name tree has an odd-length leaf array.", -1);
+        }
+
+        for (var i = 0; i < pairs.Count; i += 2)
+        {
+            leaf(pairs[i], pairs[i + 1]);
         }
     }
 
@@ -644,111 +662,34 @@ internal static class DocumentLoader
         if (reader.GetDictionary(catalog, "Names") is { } names
             && reader.GetDictionary(names, "Dests") is { } tree)
         {
-            ReadNameTree(reader, tree, result, [], limits, 0);
+            WalkNameTree(reader, tree, "Names", [], limits, 0, (key, value) =>
+            {
+                var name = reader.AsString(key)
+                    ?? throw new DocumentParseException("A destination name-tree key is not a string.", -1);
+                result[name] = value;
+            });
         }
 
         return result;
-    }
-
-    private static void ReadNameTree(
-        DocumentReader reader,
-        DictionaryObject node,
-        Dictionary<string, DocumentObject> target,
-        HashSet<DictionaryObject> visited,
-        ReaderLimits limits,
-        int depth)
-    {
-        if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
-        {
-            throw new DocumentParseException("Cyclic or excessively deep destination name tree.", -1);
-        }
-
-        if (reader.GetArray(node, "Kids") is { } kids)
-        {
-            foreach (var kid in kids)
-            {
-                if (reader.AsDictionary(kid) is not { } child)
-                {
-                    throw new DocumentParseException("A destination name-tree child is not a dictionary.", -1);
-                }
-
-                ReadNameTree(reader, child, target, visited, limits, depth + 1);
-            }
-        }
-
-        if (reader.GetArray(node, "Names") is { } pairs)
-        {
-            if (pairs.Count % 2 != 0)
-            {
-                throw new DocumentParseException("A destination name tree has an odd /Names array.", -1);
-            }
-
-            for (var i = 0; i < pairs.Count; i += 2)
-            {
-                var key = reader.AsString(pairs[i])
-                    ?? throw new DocumentParseException("A destination name-tree key is not a string.", -1);
-                target[key] = pairs[i + 1];
-            }
-        }
     }
 
     private static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, Document document, LoadedState state, ReaderLimits limits)
     {
         if (reader.GetDictionary(catalog, "PageLabels") is { } tree)
         {
-            ReadPageLabelTree(reader, tree, document.PageLabels, [], limits, 0);
-        }
-    }
-
-    private static void ReadPageLabelTree(
-        DocumentReader reader,
-        DictionaryObject node,
-        IList<PageLabel> target,
-        HashSet<DictionaryObject> visited,
-        ReaderLimits limits,
-        int depth)
-    {
-        if (depth > limits.MaxPageTreeDepth || !visited.Add(node))
-        {
-            throw new DocumentParseException("Cyclic or excessively deep page-label number tree.", -1);
-        }
-
-        if (reader.GetArray(node, "Kids") is { } kids)
-        {
-            foreach (var kid in kids)
+            WalkNameTree(reader, tree, "Nums", [], limits, 0, (key, value) =>
             {
-                if (reader.AsDictionary(kid) is not { } child)
+                var startPage = reader.AsInt(key)
+                    ?? throw new DocumentParseException("A page-label range key is not an integer.", -1);
+                var dictionary = reader.AsDictionary(value)
+                    ?? throw new DocumentParseException("A page-label range value is not a dictionary.", -1);
+                document.PageLabels.Add(new PageLabel(startPage)
                 {
-                    throw new DocumentParseException("A page-label number-tree child is not a dictionary.", -1);
-                }
-
-                ReadPageLabelTree(reader, child, target, visited, limits, depth + 1);
-            }
-        }
-
-        if (reader.GetArray(node, "Nums") is not { } pairs)
-        {
-            return;
-        }
-
-        if (pairs.Count % 2 != 0)
-        {
-            throw new DocumentParseException("A page-label number tree has an odd /Nums array.", -1);
-        }
-
-        for (var i = 0; i < pairs.Count; i += 2)
-        {
-            var startPage = reader.AsInt(pairs[i])
-                ?? throw new DocumentParseException("A page-label range key is not an integer.", -1);
-            var dictionary = reader.AsDictionary(pairs[i + 1])
-                ?? throw new DocumentParseException("A page-label range value is not a dictionary.", -1);
-            var label = new PageLabel(startPage)
-            {
-                Style = ReadPageLabelStyle(reader.GetName(dictionary, "S")),
-                Prefix = Text(reader, dictionary, "P"),
-                Start = reader.GetInt(dictionary, "St") ?? 1,
-            };
-            target.Add(label);
+                    Style = ReadPageLabelStyle(reader.GetName(dictionary, "S")),
+                    Prefix = Text(reader, dictionary, "P"),
+                    Start = reader.GetInt(dictionary, "St") ?? 1,
+                });
+            });
         }
     }
 
