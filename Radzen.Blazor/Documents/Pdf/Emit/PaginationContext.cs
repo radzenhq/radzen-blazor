@@ -136,13 +136,7 @@ internal sealed class PaginationContext
                 Cursor = 0;
             }
 
-            current.Tables.Add(new PositionedTableFragment
-            {
-                Layout = layout,
-                Fragment = fragments[f],
-                Y = Cursor,
-                Order = tableOrder,
-            });
+            current.Tables.Add(FlowContentPlacer.Table(layout, fragments[f], Cursor, tableOrder));
             Cursor += fragments[f].Height;
         }
     }
@@ -209,21 +203,14 @@ internal sealed class PaginationContext
 
     public void PlaceImage(Image image)
     {
-        var (imageWidth, imageHeight) = measureImage is null ? Paginator.MeasureImage(image, contentWidth) : measureImage(image, contentWidth);
+        var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(image, contentWidth, measureImage);
         if (Cursor + imageHeight > contentHeight + Eps && HasPageContent)
         {
             Flush();
             Cursor = 0;
         }
 
-        current.Images.Add(new PositionedImage
-        {
-            Source = image,
-            Y = Cursor,
-            Width = imageWidth,
-            Height = imageHeight,
-            XOffset = HorizontalAlignmentOffset.Of(image.Alignment, contentWidth, imageWidth),
-        });
+        current.Images.Add(FlowContentPlacer.Image(image, contentWidth, Cursor, imageWidth, imageHeight));
         Cursor += imageHeight;
     }
 
@@ -236,14 +223,7 @@ internal sealed class PaginationContext
             Cursor = 0;
         }
 
-        current.Codes.Add(new PositionedCode
-        {
-            Source = block,
-            Y = Cursor,
-            Width = codeWidth,
-            Height = codeHeight,
-            XOffset = HorizontalAlignmentOffset.Of(Paginator.CodeAlignment(block), contentWidth, codeWidth),
-        });
+        current.Codes.Add(FlowContentPlacer.Code(block, contentWidth, Cursor, codeWidth, codeHeight));
         Cursor += codeHeight;
     }
 
