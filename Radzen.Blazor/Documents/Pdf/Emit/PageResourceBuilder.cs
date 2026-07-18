@@ -361,6 +361,49 @@ internal static class PageResourceBuilder
         }
     }
 
+    public static void EmitPageGeometry(Document document, Page page, DictionaryObject node)
+    {
+        node["MediaBox"] = MediaBox(document, page);
+
+        var loaded = document.Loaded;
+        if (page.CropBoxSet && page.CropBox is { } explicitCropBox)
+        {
+            node["CropBox"] = NumberBox(explicitCropBox);
+        }
+        else if (!page.CropBoxSet && loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
+        {
+            node["CropBox"] = NumberBox(cropBox);
+        }
+
+        EmitAuxiliaryBox(document, node, page, "BleedBox", page.BleedBox);
+        EmitAuxiliaryBox(document, node, page, "TrimBox", page.TrimBox);
+        EmitAuxiliaryBox(document, node, page, "ArtBox", page.ArtBox);
+
+        if (page.Rotate != 0)
+        {
+            node["Rotate"] = new NumberObject(page.Rotate);
+        }
+        else if (loaded is not null && loaded.SourceRotations.TryGetValue(page, out var rotation))
+        {
+            node["Rotate"] = new NumberObject(rotation);
+        }
+    }
+
+    private static void EmitAuxiliaryBox(Document document, DictionaryObject node, Page page, string key, PdfRect? value)
+    {
+        if (value is not null)
+        {
+            PageBoxEmitter.WriteIfPresent(node, key, value);
+            return;
+        }
+
+        if (document.Loaded?.Source is { } source && document.Loaded.SourcePages.TryGetValue(page, out var sourceNode)
+            && source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
+        {
+            node[key] = NumberBox(box);
+        }
+    }
+
     public static ArrayObject MediaBox(Document document, Page page)
     {
         if (page.MediaBoxSet)

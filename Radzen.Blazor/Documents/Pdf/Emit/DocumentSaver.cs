@@ -46,6 +46,7 @@ internal sealed class DocumentSaver
         var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
         var imageRefs = new Dictionary<GeneratedImage, ReferenceObject>();
         var sharedImages = new Dictionary<ImageXObject, ReferenceObject>(ReferenceEqualityComparer.Instance);
+        var emittedContent = new Dictionary<Page, List<byte[]>>();
 
         var kids = new ArrayObject();
         foreach (var page in doc.Pages)
@@ -54,30 +55,9 @@ internal sealed class DocumentSaver
             {
                 ["Type"] = new NameObject("Page"),
                 ["Parent"] = pagesRef,
-                ["MediaBox"] = PageResourceBuilder.MediaBox(doc, page),
             };
 
-            if (page.CropBoxSet && page.CropBox is { } explicitCropBox)
-            {
-                pageNode["CropBox"] = PageResourceBuilder.NumberBox(explicitCropBox);
-            }
-            else if (!page.CropBoxSet && loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
-            {
-                pageNode["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
-            }
-
-            WriteAuxiliaryBox(pageNode, page, "BleedBox", page.BleedBox);
-            WriteAuxiliaryBox(pageNode, page, "TrimBox", page.TrimBox);
-            WriteAuxiliaryBox(pageNode, page, "ArtBox", page.ArtBox);
-
-            if (page.Rotate != 0)
-            {
-                pageNode["Rotate"] = new NumberObject(page.Rotate);
-            }
-            else if (loaded is not null && loaded.SourceRotations.TryGetValue(page, out var rotation))
-            {
-                pageNode["Rotate"] = new NumberObject(rotation);
-            }
+            PageResourceBuilder.EmitPageGeometry(doc, page, pageNode);
 
             var pageRef = writer.Add(pageNode);
             if (importer is not null && loaded!.SourcePages.TryGetValue(page, out var sourceNode))
@@ -91,6 +71,8 @@ internal sealed class DocumentSaver
 
         foreach (var (page, pageNode, _) in pageNodes)
         {
+            var contentBytes = new List<byte[]>();
+            emittedContent[page] = contentBytes;
             if (page.Generated is { } generated)
             {
                 IReadOnlySet<string>? referenced = null;
@@ -100,6 +82,7 @@ internal sealed class DocumentSaver
                     var editedContent = page.CurrentContent ?? generated.Content;
                     referenced = PageResourceBuilder.ReferencedResourceKeys(editedContent);
                     pageNode["Contents"] = writer.Add(new StreamObject(editedContent));
+                    contentBytes.Add(editedContent);
                 }
                 else
                 {
@@ -108,6 +91,11 @@ internal sealed class DocumentSaver
                     pageNode["Contents"] = overlay is null
                         ? generatedRef
                         : new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay.Bytes!)) };
+                    contentBytes.Add(generated.Content);
+                    if (overlay is not null)
+                    {
+                        contentBytes.Add(overlay.Bytes!);
+                    }
                 }
 
                 var resources = PageResourceBuilder.BuildGeneratedResources(writer, generated, fontRefs, imageRefs, referenced);
@@ -146,6 +134,11 @@ internal sealed class DocumentSaver
                 pageNode["Contents"] = emission.Overlay is null
                     ? contentRef
                     : new ArrayObject { contentRef, writer.Add(new StreamObject(emission.Overlay.Bytes!)) };
+                contentBytes.Add(emission.Bytes);
+                if (emission.Overlay is not null)
+                {
+                    contentBytes.Add(emission.Overlay.Bytes!);
+                }
             }
 
             var activeResources = emission.Resources.IsEmpty && emission.Overlay is not null
@@ -285,12 +278,12 @@ internal sealed class DocumentSaver
         // ISO 32000-1 7.5.5: trailer /ID.
         if (doc.Encryption is null && (doc.IncludeDocumentId || doc.Conformance != PdfAConformance.None || doc.PdfUA))
         {
-            writer.Trailer["ID"] = BuildDocumentId();
+            writer.Trailer["ID"] = BuildDocumentId(emittedContent);
         }
 
         // ISO 19005-4 6.1.3: PDF/A-4 forbids the trailer /Info key.
         var isPart4 = doc.Conformance is PdfAConformance.PdfA4 or PdfAConformance.PdfA4E or PdfAConformance.PdfA4F;
-        var info = isPart4 ? null : BuildInfo(doc.Info, doc.Loaded?.SourceInfo);
+        var info = isPart4 ? null : BuildInfo(doc.Info, doc.Loaded?.SourceInfo, importer);
         if (info is not null)
         {
             writer.Trailer["Info"] = writer.Add(info);
@@ -314,7 +307,7 @@ internal sealed class DocumentSaver
         meta.ModificationDate is { } modified ? PdfDate(modified) : null,
     ];
 
-    internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source)
+    internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source, GraphImporter? importer = null)
     {
         DictionaryObject? info = null;
 
@@ -325,7 +318,7 @@ internal sealed class DocumentSaver
                 if (Array.IndexOf(InfoKeys, pair.Key) < 0)
                 {
                     info ??= new DictionaryObject();
-                    info[pair.Key] = pair.Value;
+                    info[pair.Key] = importer is null ? pair.Value : importer.ImportValue(pair.Value);
                 }
             }
         }
@@ -341,21 +334,6 @@ internal sealed class DocumentSaver
         }
 
         return info;
-    }
-
-    private void WriteAuxiliaryBox(DictionaryObject pageNode, Page page, string key, PdfRect? value)
-    {
-        if (value is not null)
-        {
-            PageBoxEmitter.WriteIfPresent(pageNode, key, value);
-            return;
-        }
-
-        if (doc.Loaded?.Source is { } source && doc.Loaded.SourcePages.TryGetValue(page, out var sourceNode)
-            && source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
-        {
-            pageNode[key] = PageResourceBuilder.NumberBox(box);
-        }
     }
 
     // ISO 32000-1 Table 28: PageLayout/PageMode catalog entries. Table 150: /ViewerPreferences.
@@ -410,7 +388,7 @@ internal sealed class DocumentSaver
     }
 
     // ISO 32000-1 14.4: both /ID halves equal at creation time.
-    private ArrayObject BuildDocumentId()
+    private ArrayObject BuildDocumentId(IReadOnlyDictionary<Page, List<byte[]>> emittedContent)
     {
         var seed = new Radzen.Documents.Crypto.Sha256Hasher();
 
@@ -439,9 +417,12 @@ internal sealed class DocumentSaver
         {
             Text(page.Width.Point.ToString("R", CultureInfo.InvariantCulture));
             Text(page.Height.Point.ToString("R", CultureInfo.InvariantCulture));
-            if (page.GetContent() is { } content)
+            if (emittedContent.TryGetValue(page, out var contentBytes))
             {
-                seed.Append(content);
+                foreach (var bytes in contentBytes)
+                {
+                    seed.Append(bytes);
+                }
             }
 
             seed.Append((byte)0);
