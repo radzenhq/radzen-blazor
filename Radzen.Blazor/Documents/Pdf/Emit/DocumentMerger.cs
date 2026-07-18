@@ -36,8 +36,7 @@ internal static class DocumentMerger
         page.BleedBox = source.BleedBox;
         page.TrimBox = source.TrimBox;
         page.ArtBox = source.ArtBox;
-        var content = source.GetContent();
-        if (content is not null)
+        if (source.RawContent is { } content)
         {
             page.SetLoadedContent([.. content]);
         }

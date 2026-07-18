@@ -223,14 +223,17 @@ public sealed class Page
     }
 
     /// <summary>
-    /// Gets the stored raw content stream: the bytes last set with <see cref="SetContent"/>
+    /// Gets a copy of the stored raw content stream: the bytes last set with <see cref="SetContent"/>
     /// or loaded from a source, or <c>null</c> when none has been set. Edits queued through
     /// <see cref="Content"/> or appended overlays are flushed into these bytes only when the
     /// document is serialized, so this returns the pre-edit stream while such edits are pending.
-    /// Read <see cref="Content"/> for the current elements.
+    /// The returned array is a copy; mutating it does not change the page - call
+    /// <see cref="SetContent"/> to replace the stored bytes. Read <see cref="Content"/> for the current elements.
     /// </summary>
-    /// <returns>The stored raw content bytes, or <c>null</c>.</returns>
-    public byte[]? GetContent() => content;
+    /// <returns>A copy of the stored raw content bytes, or <c>null</c>.</returns>
+    public byte[]? GetContent() => content is null ? null : (byte[])content.Clone();
+
+    internal byte[]? RawContent => content;
 
     /// <summary>
     /// Extracts the visible text of this page in reading order: top to bottom, then
