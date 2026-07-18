@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts;
@@ -232,7 +233,7 @@ internal static class ToUnicodeCMap
                 continue;
             }
 
-            tokens.Add(Token.FromKeyword(Latin1(data, start, position - start)));
+            tokens.Add(Token.FromKeyword(Encoding.Latin1.GetString(data, start, position - start)));
         }
 
         return tokens;
@@ -240,17 +241,6 @@ internal static class ToUnicodeCMap
 
     private static bool IsBreak(byte b)
         => Lexer.IsWhitespace(b) || b is (byte)'<' or (byte)'[' or (byte)']' or (byte)'%';
-
-    private static string Latin1(byte[] data, int start, int length)
-    {
-        var chars = new char[length];
-        for (var i = 0; i < length; i++)
-        {
-            chars[i] = (char)data[start + i];
-        }
-
-        return new string(chars);
-    }
 
     private readonly record struct Token(string? Keyword, byte[]? Hex, bool IsArrayStart, bool IsArrayEnd)
     {
