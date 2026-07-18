@@ -245,7 +245,7 @@ internal sealed class PngImageDecoder : IImageDecoder
             new NameObject("Indexed"),
             new NameObject("DeviceRGB"),
             new NumberObject(hival),
-            new StringObject(BytesToString(palette)),
+            new StringObject(Encoding.Latin1.GetString(palette)),
         };
 
         var image = BuildImage(width, height, bitDepth, colorSpace, indices);
@@ -317,14 +317,4 @@ internal sealed class PngImageDecoder : IImageDecoder
     private static StreamObject BuildImage(int width, int height, int bitsPerComponent, DocumentObject colorSpace, byte[] samples)
         => ImageXObjectShell.FlateImage(samples, width, height, bitsPerComponent, colorSpace);
 
-    private static string BytesToString(byte[] bytes)
-    {
-        var chars = new char[bytes.Length];
-        for (var i = 0; i < bytes.Length; i++)
-        {
-            chars[i] = (char)bytes[i];
-        }
-
-        return new string(chars);
-    }
 }
