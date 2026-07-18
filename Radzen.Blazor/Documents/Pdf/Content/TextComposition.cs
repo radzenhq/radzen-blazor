@@ -23,7 +23,13 @@ internal static class TextComposition
     }
 
     public static int Compare(Placement a, Placement b)
-        => Math.Abs(a.Y - b.Y) > LineTolerance ? b.Y.CompareTo(a.Y) : a.X.CompareTo(b.X);
+    {
+        var lineA = Line(a.Y);
+        var lineB = Line(b.Y);
+        return lineA != lineB ? lineB.CompareTo(lineA) : a.X.CompareTo(b.X);
+    }
+
+    private static long Line(double y) => (long)Math.Round(y / LineTolerance, MidpointRounding.AwayFromZero);
 
     public static char? Separator(Placement previous, string previousText, Placement current, string currentText)
     {

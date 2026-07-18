@@ -39,13 +39,7 @@ internal sealed class AppendedFormImporter(Document document, FormAppearanceServ
                 continue;
             }
 
-            var imported = new ArrayObject();
-            foreach (var annot in annots)
-            {
-                imported.Add(importer.ImportValue(annot));
-            }
-
-            node["Annots"] = imported;
+            node["Annots"] = PageAnnotationImport.Import(importer, annots);
 
             if (!loaded.AppendedAcroForms.TryGetValue(reader, out var sourceForm))
             {

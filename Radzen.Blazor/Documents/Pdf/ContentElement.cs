@@ -69,18 +69,7 @@ public abstract class ContentElement : ITracksChanges
         if (transformed)
         {
             writer.WriteRaw("q\n");
-            writer.WriteNumber(transform.A);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(transform.B);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(transform.C);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(transform.D);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(transform.E);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(transform.F);
-            writer.WriteRaw(" cm\n");
+            ContentEmitter.WriteTransform(writer, transform);
         }
 
         EmitBody(writer);
