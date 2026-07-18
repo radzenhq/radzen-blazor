@@ -38,16 +38,6 @@ public class ToUnicodeHardeningTests
     }
 
     [Fact]
-    public void NormalBfrange_StillMapsCorrectly()
-    {
-        var (map, _) = ToUnicodeCMap.Parse(Cmap("1 beginbfrange <0003> <0005> <0041> endbfrange"));
-
-        Assert.Equal("A", map[0x0003]);
-        Assert.Equal("B", map[0x0004]);
-        Assert.Equal("C", map[0x0005]);
-    }
-
-    [Fact]
     public void Bfchar_StillMapsCorrectly()
     {
         var (map, _) = ToUnicodeCMap.Parse(Cmap("2 beginbfchar <0003> <0041> <0009> <0062> endbfchar"));

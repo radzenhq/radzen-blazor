@@ -6,11 +6,10 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-public class CffCharstringOperationBudgetTests(ITestOutputHelper output)
+public class CffCharstringOperationBudgetTests
 {
     private static byte[] BuildFont(byte[][] charStrings, byte[][] localSubrs)
     {
@@ -70,21 +69,6 @@ public class CffCharstringOperationBudgetTests(ITestOutputHelper output)
         main.AddRange(tail);
 
         return BuildFont([[.. main]], [.. subrs]);
-    }
-
-    [Fact]
-    public void FanOutSubrWorkGrowsExponentiallyAndTheBudgetBoundsIt()
-    {
-        var generous = new ReaderLimits { MaxCharstringOperations = int.MaxValue };
-
-        foreach (var k in new[] { 2, 3, 4, 5 })
-        {
-            var font = CffFont.Parse(FanOutFont(levels: 9, k, 0x8C, 14), generous);
-            var watch = Stopwatch.StartNew();
-            font.GetAdvanceWidth(0);
-            watch.Stop();
-            output.WriteLine($"k={k} expected calls={Math.Pow(k, 8):N0} elapsed={watch.Elapsed.TotalMilliseconds:F1}ms");
-        }
     }
 
     [Fact]

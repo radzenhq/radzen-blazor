@@ -162,14 +162,8 @@ public class LayoutCorrectnessRegressionTests
         var row = table.Rows.Add();
         Fill(row.Cells.AddCell(), "Orphan");
 
-        try
-        {
-            var text = BuildTestSupport.Reload(builder).ExtractText();
-            Assert.Contains("Orphan", text, StringComparison.Ordinal);
-        }
-        catch (InvalidOperationException)
-        {
-        }
+        var text = BuildTestSupport.Reload(builder).ExtractText();
+        Assert.Contains("Orphan", text, StringComparison.Ordinal);
     }
 
     [Fact]

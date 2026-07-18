@@ -114,7 +114,6 @@ public class HeaderFooterTests
     public void BodyLines_StayWithinTheContentHeight()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
         var section = BuildMultiPage(fonts, out _, out _);
 
         var pages = Paginator.Paginate(section, fonts);

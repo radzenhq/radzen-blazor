@@ -128,7 +128,6 @@ public class LineBreakTests
     public void LineWidth_EqualsSumOfAdvancesPlusInteriorSpaces()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var words = Words;
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
         const double MaxWidth = 160.0;

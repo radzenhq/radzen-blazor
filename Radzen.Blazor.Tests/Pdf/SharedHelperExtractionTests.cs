@@ -140,7 +140,9 @@ public class SharedHelperExtractionTests
     {
         var data = new byte[predictor == "PNG" ? (PredictorParameters.MaxColors * 4) + 1 : PredictorParameters.MaxColors * 4];
 
-        Decode(predictor, data, colors: PredictorParameters.MaxColors, columns: 4);
+        var decoded = Decode(predictor, data, colors: PredictorParameters.MaxColors, columns: 4);
+
+        Assert.Equal(PredictorParameters.MaxColors * 4, decoded.Length);
     }
 
     private static byte[] Decode(string predictor, byte[] data, int colors, int columns)
