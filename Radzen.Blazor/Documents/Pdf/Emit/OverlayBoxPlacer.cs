@@ -17,7 +17,7 @@ internal static class OverlayBoxPlacer
     {
         var padding = container.Padding.Point;
         var boxWidth = container.Width?.Point ?? availableWidth;
-        var indent = Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
+        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
         var innerWidth = Math.Max(0, boxWidth - (2 * padding));
 
         var lines = new List<LaidOutLine>();
@@ -74,14 +74,6 @@ internal static class OverlayBoxPlacer
         return order;
     }
 
-    internal static double AlignImage(HorizontalAlignment alignment, double containerWidth, double imageWidth)
-        => alignment switch
-        {
-            HorizontalAlignment.Center => (containerWidth - imageWidth) / 2.0,
-            HorizontalAlignment.Right or HorizontalAlignment.End => containerWidth - imageWidth,
-            _ => 0,
-        };
-
     internal static BoxContentLayout.Measured MeasureBox(
         Container container,
         double contentWidth,
@@ -103,7 +95,7 @@ internal static class OverlayBoxPlacer
     {
         var padding = container.Padding.Point;
         var boxWidth = container.Width?.Point ?? availableWidth;
-        var indent = Math.Max(0, AlignImage(container.Alignment, availableWidth, boxWidth));
+        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
         var innerWidth = Math.Max(0, boxWidth - (2 * padding));
         var boxHeight = measured.Height + (2 * padding);
         var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);

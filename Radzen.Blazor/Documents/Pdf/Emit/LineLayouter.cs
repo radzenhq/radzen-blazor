@@ -290,12 +290,7 @@ internal static class LineLayouter
         var inheritedAlignment = context.InheritedAlignment;
         var paragraph = context.Paragraph;
         var alignment = paragraph.ResolveAlignment(inheritedAlignment);
-        var x0 = alignment switch
-        {
-            HorizontalAlignment.Right or HorizontalAlignment.End => max - width,
-            HorizontalAlignment.Center => (max - width) / 2.0,
-            _ => 0,
-        };
+        var x0 = HorizontalAlignmentOffset.Of(alignment, max, width);
 
         if (x0 < 0)
         {
@@ -477,12 +472,7 @@ internal static class LineLayouter
         else
         {
             var alignWidth = naturalWidth + hyphenWidth;
-            x0 = alignment switch
-            {
-                HorizontalAlignment.Right or HorizontalAlignment.End => max - alignWidth,
-                HorizontalAlignment.Center => (max - alignWidth) / 2.0,
-                _ => 0,
-            };
+            x0 = HorizontalAlignmentOffset.Of(alignment, max, alignWidth);
 
             if (x0 < 0)
             {

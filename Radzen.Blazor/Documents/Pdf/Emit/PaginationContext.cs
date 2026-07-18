@@ -165,7 +165,7 @@ internal sealed class PaginationContext
     {
         var padding = container.Padding.Point;
         var boxWidth = container.Width?.Point ?? contentWidth;
-        var indent = Math.Max(0, OverlayBoxPlacer.AlignImage(container.Alignment, contentWidth, boxWidth));
+        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, contentWidth, boxWidth));
         var measured = boxMeasures[index] ??= OverlayBoxPlacer.MeasureBox(container, contentWidth, fonts, measureImage, resolution);
         var boxHeight = measured.Height + (2 * padding);
 
@@ -222,7 +222,7 @@ internal sealed class PaginationContext
             Y = Cursor,
             Width = imageWidth,
             Height = imageHeight,
-            XOffset = OverlayBoxPlacer.AlignImage(image.Alignment, contentWidth, imageWidth),
+            XOffset = HorizontalAlignmentOffset.Of(image.Alignment, contentWidth, imageWidth),
         });
         Cursor += imageHeight;
     }
@@ -242,7 +242,7 @@ internal sealed class PaginationContext
             Y = Cursor,
             Width = codeWidth,
             Height = codeHeight,
-            XOffset = OverlayBoxPlacer.AlignImage(Paginator.CodeAlignment(block), contentWidth, codeWidth),
+            XOffset = HorizontalAlignmentOffset.Of(Paginator.CodeAlignment(block), contentWidth, codeWidth),
         });
         Cursor += codeHeight;
     }
