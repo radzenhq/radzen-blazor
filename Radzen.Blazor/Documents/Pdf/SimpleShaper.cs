@@ -53,6 +53,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
 
         SfntFont? previousFace = null;
         ushort previousGlyph = 0;
+        var previousCodepoint = 0;
         var count = 0;
         var i = 0;
         while (i < text.Length)
@@ -61,7 +62,8 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
             var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
 
-            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
+            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0
+                && codepoint != ' ' && previousCodepoint != ' ')
             {
                 var kern = previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
                 if (kern != 0)
@@ -74,6 +76,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
             count++;
             previousFace = face;
             previousGlyph = glyph;
+            previousCodepoint = codepoint;
             i += codepoint > 0xFFFF ? 2 : 1;
         }
     }

@@ -121,12 +121,12 @@ internal sealed class DocumentGenerator
         imageStore = new();
         resolution = StyleResolver.Resolve(builder);
         structureTree = new(builder, resolution);
-        textEmitter = new(fonts, fontResolver, imageStore, resolution);
+        textEmitter = new(fonts, fontResolver, imageStore, resolution, structureTree);
         codeEmitter = new(fonts, resolution);
         imageEmitter = new(imageStore, structureTree);
         fieldResolver = new(fonts, resolution);
         var opacities = new OpacityResolver(builder);
-        tableEmitter = new(imageStore, structureTree, resolution, opacities);
+        tableEmitter = new(imageStore, structureTree, opacities);
         boxEmitter = new(tableEmitter, opacities);
         watermarkEmitter = new(fonts, fontResolver, imageStore);
     }
@@ -309,38 +309,12 @@ internal sealed class DocumentGenerator
             return;
         }
 
-        var bodyLines = layer.Lines;
-        var b = 0;
-        while (b < bodyLines.Count)
-        {
-            var line = bodyLines[b];
-            if (line.Source is Paragraph paragraph && fieldResolver.HasField(paragraph))
-            {
-                var element = structureTree.ElementOf(paragraph);
-                var reserved = 0;
-                while (b + reserved < bodyLines.Count && bodyLines[b + reserved].Source == paragraph)
-                {
-                    reserved++;
-                }
-
-                var y = line.Y;
-                foreach (var box in fieldResolver.ResolveFields(paragraph, width, context.PageNumber, context.PageCount, resolution.Alignment(paragraph), reserved))
-                {
-                    textEmitter.EmitLine(context, box, left, top - y, element);
-                    y += box.Height;
-                }
-
-                b += reserved;
-            }
-            else
-            {
-                textEmitter.EmitLine(
-                    context, line.Line, left, top - line.Y,
-                    structureTree.ElementOf(line.Source),
-                    markerElement: structureTree.MarkerElementOf(line.Source));
-                b++;
-            }
-        }
+        textEmitter.EmitFieldExpandedLines(
+            context, layer.Lines,
+            static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
+            left, top, delta: 0, width,
+            opacity: 1, inherited: null, resolveStructure: true,
+            overflowThreshold: double.PositiveInfinity);
 
         EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
 
