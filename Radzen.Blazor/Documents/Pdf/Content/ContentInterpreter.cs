@@ -11,7 +11,7 @@ namespace Radzen.Documents.Pdf.Content;
 
 internal static class ContentInterpreter
 {
-    public static void Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null, ContentTokenizer.Cache? cache = null)
+    public static IReadOnlyList<ContentEditor.SourceElement> Materialize(byte[] content, ContentCollection target, IReadOnlyDictionary<string, ReverseFont>? fonts = null, ContentTokenizer.Cache? cache = null)
     {
         var tokens = ContentTokenizer.Tokenize(content, cache);
         var interpreter = new InterpreterState(fonts);
@@ -20,11 +20,13 @@ internal static class ContentInterpreter
         {
             if (frame.IsInlineImage)
             {
-                target.Add(new InlineImageContent(frame.InlineImage.Bytes!)
+                var inline = new InlineImageContent(frame.InlineImage.Bytes!)
                 {
                     Transform = interpreter.Graphics.Ctm,
                     IsArtifact = interpreter.ArtifactDepth > 0,
-                });
+                };
+                target.Add(inline);
+                interpreter.AddSpan(inline, frame.InlineImage.Start, frame.InlineImage.End, interpreter.Graphics.Ctm, false);
                 FinalizeMerge(interpreter);
                 interpreter.ResetOperandFrame();
                 continue;
@@ -33,6 +35,8 @@ internal static class ContentInterpreter
             LoadOperands(interpreter, frame);
 
             var op = frame.Operator.Text;
+            interpreter.FrameStart = frame.FrameStart < 0 ? frame.Operator.Start : frame.FrameStart;
+            interpreter.OperatorEnd = frame.Operator.End;
 
             if (!interpreter.Machine.Apply(op, interpreter.Operands)
                 && !HandleGraphicsOperators(op, interpreter, target)
@@ -53,6 +57,7 @@ internal static class ContentInterpreter
         }
 
         FinalizeMerge(interpreter);
+        return interpreter.Spans;
     }
 
     private static void LoadOperands(InterpreterState interpreter, ContentOperandFrame frame)
@@ -99,6 +104,7 @@ internal static class ContentInterpreter
         }
 
         interpreter.PendingMerge = null;
+        interpreter.PendingSpanIndex = -1;
         interpreter.MergeBytes.Clear();
         interpreter.MergeText.Clear();
         interpreter.MergeAdjustments = null;
@@ -168,11 +174,13 @@ internal static class ContentInterpreter
             case "Do":
                 if (LastName(operands) is { } xobject)
                 {
-                    target.Add(new XObjectContent(xobject)
+                    var xObjectContent = new XObjectContent(xobject)
                     {
                         Transform = state.Ctm,
                         IsArtifact = interpreter.ArtifactDepth > 0,
-                    });
+                    };
+                    target.Add(xObjectContent);
+                    interpreter.AddSpan(xObjectContent, interpreter.FrameStart, interpreter.OperatorEnd, state.Ctm, false);
                 }
 
                 break;
@@ -199,6 +207,12 @@ internal static class ContentInterpreter
     {
         var operands = interpreter.Operands;
         var state = interpreter.Graphics;
+        if (ContentOperatorClass.IsPathConstruction(op) && interpreter.PathStart < 0)
+        {
+            interpreter.PathStart = interpreter.FrameStart;
+            interpreter.PathAmbient = state.Ctm;
+        }
+
         switch (op)
         {
             case "W":
@@ -272,50 +286,50 @@ internal static class ContentInterpreter
                 break;
 
             case "S":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "s":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: false, Close: true, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: false, Close: true, EvenOdd: false), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "f":
             case "F":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "f*":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: false, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "B":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: false), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "B*":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: true, Close: false, EvenOdd: true), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "b":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: false), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "b*":
-                EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: true), interpreter.ClipMode, interpreter.ArtifactDepth);
+                EmitPath(interpreter, target, state,new PathPaint(Stroke: true, Fill: true, Close: true, EvenOdd: true), interpreter.ClipMode);
                 interpreter.ClipMode = PathClipMode.None;
                 break;
 
             case "n":
                 if (interpreter.ClipMode != PathClipMode.None)
                 {
-                    EmitPath(target, interpreter.PathOps, state, new PathPaint(Stroke: false, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode, interpreter.ArtifactDepth);
+                    EmitPath(interpreter, target, state,new PathPaint(Stroke: false, Fill: false, Close: false, EvenOdd: false), interpreter.ClipMode);
                 }
 
                 interpreter.PathOps.Clear();
@@ -366,11 +380,13 @@ internal static class ContentInterpreter
     {
         if (op is not null)
         {
-            target.Add(new RawContent(op, [.. interpreter.Operands])
+            var raw = new RawContent(op, [.. interpreter.Operands])
             {
                 IsArtifact = interpreter.ArtifactDepth > 0,
                 ClipBounds = interpreter.Graphics.Clip,
-            });
+            };
+            target.Add(raw);
+            interpreter.AddSpan(raw, interpreter.FrameStart, interpreter.OperatorEnd, interpreter.Graphics.Ctm, false);
         }
     }
 
@@ -393,6 +409,16 @@ internal static class ContentInterpreter
         public int ArtifactDepth { get; set; }
         public Stack<bool> MarkedContent { get; } = new();
         public TextContent? PendingMerge { get; set; }
+
+        public int FrameStart { get; set; }
+        public int OperatorEnd { get; set; }
+        public int PathStart { get; set; } = -1;
+        public Matrix PathAmbient { get; set; }
+        public List<ContentEditor.SourceElement> Spans { get; } = [];
+        public int PendingSpanIndex { get; set; } = -1;
+
+        public void AddSpan(ContentElement element, int start, int end, Matrix ambient, bool insideTextObject)
+            => Spans.Add(new ContentEditor.SourceElement(element, start, end, ambient, insideTextObject));
 
         public List<byte> MergeBytes { get; } = [];
 
@@ -449,6 +475,12 @@ internal static class ContentInterpreter
             interpreter.MergeAdjustments!.AddRange(tjSegments ?? [new TextAdjustment(bytes, 0)]);
             interpreter.MergeBytes.AddRange(bytes);
             interpreter.MergeText.Append(decoded);
+            if (interpreter.PendingSpanIndex >= 0)
+            {
+                interpreter.Spans[interpreter.PendingSpanIndex] =
+                    interpreter.Spans[interpreter.PendingSpanIndex] with { End = interpreter.OperatorEnd };
+            }
+
             return;
         }
 
@@ -470,6 +502,10 @@ internal static class ContentInterpreter
             IsArtifact = artifactDepth > 0,
         };
         target.Add(run);
+        var insideText = interpreter.Machine.TextObjectDepth > 0;
+        var ambient = insideText ? interpreter.Machine.TextMatrix * state.Ctm : state.Ctm;
+        interpreter.AddSpan(run, interpreter.FrameStart, interpreter.OperatorEnd, ambient, insideText);
+        interpreter.PendingSpanIndex = interpreter.Spans.Count - 1;
         interpreter.PendingMerge = run;
     }
 
@@ -491,7 +527,7 @@ internal static class ContentInterpreter
         return false;
     }
 
-    private static void EmitPath(ContentCollection target, List<PathOp> pathOps, GraphicsState state, PathPaint paint, PathClipMode clip, int artifactDepth)
+    private static void EmitPath(InterpreterState interpreter, ContentCollection target, GraphicsState state, PathPaint paint, PathClipMode clip)
     {
         var path = new PathContent
         {
@@ -507,10 +543,10 @@ internal static class ContentInterpreter
             DashArray = state.DashArray,
             DashPhase = state.DashPhase,
             Transform = state.Ctm,
-            IsArtifact = artifactDepth > 0,
+            IsArtifact = interpreter.ArtifactDepth > 0,
         };
 
-        foreach (var op in pathOps)
+        foreach (var op in interpreter.PathOps)
         {
             switch (op.Operator)
             {
@@ -540,7 +576,11 @@ internal static class ContentInterpreter
         }
 
         target.Add(path);
-        pathOps.Clear();
+        var start = interpreter.PathStart >= 0 ? interpreter.PathStart : interpreter.FrameStart;
+        var ambient = interpreter.PathStart >= 0 ? interpreter.PathAmbient : state.Ctm;
+        interpreter.AddSpan(path, start, interpreter.OperatorEnd, ambient, false);
+        interpreter.PathStart = -1;
+        interpreter.PathOps.Clear();
     }
 
     private static PdfRect? Intersect(PdfRect? current, PdfRect? added)

@@ -28,26 +28,26 @@ public class ContentOperatorClassificationAgreementTests
 
     [Theory]
     [MemberData(nameof(StateOperators))]
-    public void StateOperator_ProducesNoElement_AndMapsSafely(string stream)
+    public void StateOperator_ProducesNoElement_WithSpanPerElement(string stream)
     {
         var content = Ascii(stream);
         var elements = new ContentCollection();
-        ContentInterpreter.Materialize(content, elements);
+        var spans = ContentInterpreter.Materialize(content, elements);
 
         Assert.DoesNotContain(elements, e => e is RawContent);
-        ContentEditor.Map(content, elements);
+        Assert.Equal(elements.Count, spans.Count);
     }
 
     [Theory]
     [MemberData(nameof(UnknownOperators))]
-    public void UnknownOperator_ProducesRawElement_AndMapsSafely(string stream)
+    public void UnknownOperator_ProducesRawElement_WithSpanPerElement(string stream)
     {
         var content = Ascii(stream);
         var elements = new ContentCollection();
-        ContentInterpreter.Materialize(content, elements);
+        var spans = ContentInterpreter.Materialize(content, elements);
 
         Assert.Single(elements.OfType<RawContent>());
-        ContentEditor.Map(content, elements);
+        Assert.Equal(elements.Count, spans.Count);
     }
 
     [Fact]

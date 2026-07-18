@@ -1,81 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using static Radzen.Documents.Pdf.Content.ContentOperands;
-using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf.Content;
 
 internal static class ContentEditor
 {
     internal sealed record SourceElement(ContentElement Element, int Start, int End, Matrix Ambient, bool InsideTextObject);
-
-    private readonly record struct Candidate(CandidateKind Kind, int Start, int End, byte[] TextBytes, Matrix Ambient, bool InsideTextObject = false);
-
-    private enum CandidateKind
-    {
-        Text,
-        Path,
-        XObject,
-        InlineImage,
-        Raw,
-    }
-
-    public static IReadOnlyList<SourceElement> Map(byte[] content, ContentCollection elements, ContentTokenizer.Cache? cache = null)
-    {
-        var candidates = Candidates(content, cache);
-        var result = new List<SourceElement>(elements.Count);
-        var candidateIndex = 0;
-        foreach (var element in elements)
-        {
-            if (candidateIndex >= candidates.Count)
-            {
-                throw new NotSupportedException("The content stream cannot be mapped safely to editable elements.");
-            }
-
-            var candidate = candidates[candidateIndex];
-            var expected = Kind(element);
-            if (candidate.Kind != expected)
-            {
-                throw new NotSupportedException("The content stream contains an operator sequence that cannot be edited safely.");
-            }
-
-            var start = candidate.Start;
-            var end = candidate.End;
-            if (element is TextContent { SourceBytes: { } sourceBytes })
-            {
-                var combined = new List<byte>();
-                while (candidateIndex < candidates.Count && candidates[candidateIndex].Kind == CandidateKind.Text)
-                {
-                    var part = candidates[candidateIndex++];
-                    combined.AddRange(part.TextBytes);
-                    end = part.End;
-                    if (Same(combined, sourceBytes.Span))
-                    {
-                        break;
-                    }
-                }
-
-                if (!Same(combined, sourceBytes.Span))
-                {
-                    throw new NotSupportedException("The text-show operators cannot be mapped safely to the materialized text run.");
-                }
-            }
-            else
-            {
-                candidateIndex++;
-            }
-
-            result.Add(new SourceElement(element, start, end, candidate.Ambient, candidate.InsideTextObject));
-        }
-
-        if (candidateIndex != candidates.Count)
-        {
-            throw new NotSupportedException("The content stream contains painting operators that were not materialized safely.");
-        }
-
-        return result;
-    }
 
     public static ContentEmissionResult Reemit(byte[] source, ContentCollection current, IReadOnlyList<SourceElement> original,
         Fonts.FontScope scope, string fontPrefix, string imagePrefix, string extGStatePrefix, string patternPrefix)
@@ -170,78 +100,6 @@ internal static class ContentEditor
         return writer.DetachResult();
     }
 
-    private static List<Candidate> Candidates(byte[] content, ContentTokenizer.Cache? cache)
-    {
-        var tokens = ContentTokenizer.Tokenize(content, cache);
-        var result = new List<Candidate>();
-        var pathStart = -1;
-        var clipPending = false;
-        var machine = new ContentStateMachine();
-        var pathCtm = Matrix.Identity;
-        foreach (var frame in ContentOperandScan.Scan(tokens))
-        {
-            if (frame.IsInlineImage)
-            {
-                result.Add(new Candidate(CandidateKind.InlineImage, frame.InlineImage.Start, frame.InlineImage.End, [], machine.Ctm));
-                continue;
-            }
-
-            var op = frame.Operator.Text!;
-            var start = frame.FrameStart < 0 ? frame.Operator.Start : frame.FrameStart;
-
-            machine.Apply(op, frame.Operands);
-
-            if (ContentOperatorClass.IsPathConstruction(op))
-            {
-                if (pathStart < 0)
-                {
-                    pathStart = start;
-                    pathCtm = machine.Ctm;
-                }
-
-                clipPending |= ContentOperatorClass.IsClip(op);
-            }
-            else if (ContentOperatorClass.IsPathPainting(op))
-            {
-                if (pathStart >= 0 && (op != "n" || clipPending))
-                {
-                    result.Add(new Candidate(CandidateKind.Path, pathStart, frame.Operator.End, [], pathCtm));
-                }
-
-                pathStart = -1;
-                clipPending = false;
-            }
-            else if (op == "Do")
-            {
-                result.Add(new Candidate(CandidateKind.XObject, start, frame.Operator.End, [], machine.Ctm));
-            }
-            else if (ContentShows.IsShow(op))
-            {
-                if (op == "TJ" || LastStringToken(frame.Operands) is not null)
-                {
-                    var bytes = new List<byte>();
-                    foreach (var operand in op == "TJ" ? frame.Array : frame.Operands)
-                    {
-                        if (operand.Kind == TokenKind.String && operand.Bytes is not null)
-                        {
-                            bytes.AddRange(operand.Bytes);
-                        }
-                    }
-
-                    var insideText = machine.TextObjectDepth > 0;
-                    var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
-                    result.Add(new Candidate(CandidateKind.Text, start, frame.Operator.End, [.. bytes], ambient, insideText));
-                }
-            }
-            else if (!ContentOperatorClass.IsStateOperator(op))
-            {
-                result.Add(new Candidate(CandidateKind.Raw, start, frame.Operator.End, [], machine.Ctm));
-            }
-        }
-
-        return result;
-    }
-
     private static Matrix Relative(Matrix transform, Matrix ambient)
     {
         if (ambient == Matrix.Identity)
@@ -256,16 +114,6 @@ internal static class ContentEditor
 
         return transform * inverse;
     }
-
-    private static CandidateKind Kind(ContentElement element) => element switch
-    {
-        TextContent => CandidateKind.Text,
-        PathContent => CandidateKind.Path,
-        XObjectContent => CandidateKind.XObject,
-        InlineImageContent => CandidateKind.InlineImage,
-        RawContent => CandidateKind.Raw,
-        _ => throw new NotSupportedException($"Loaded content element '{element.GetType().Name}' cannot be mapped safely."),
-    };
 
     private static void ValidateRemoval(ContentElement element)
     {
@@ -287,7 +135,4 @@ internal static class ContentEditor
             throw new NotSupportedException($"Modifying loaded {element.GetType().Name} is not supported.");
         }
     }
-
-    private static bool Same(List<byte> left, ReadOnlySpan<byte> right)
-        => CollectionsMarshal.AsSpan(left).SequenceEqual(right);
 }
