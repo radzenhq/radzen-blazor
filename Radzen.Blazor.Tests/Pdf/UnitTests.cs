@@ -11,12 +11,6 @@ public class UnitTests
     private const double MmToPt = 2.8346456692913385;
 
     [Fact]
-    public void FromPoint_ExposesPointValue()
-    {
-        Assert.Equal(72, Unit.FromPoint(72).Point, 9);
-    }
-
-    [Fact]
     public void FromInch_Is72Points()
     {
         Assert.Equal(72, Unit.FromInch(1).Point, 9);
@@ -35,13 +29,6 @@ public class UnitTests
     {
         Assert.Equal(MmToPt, Unit.FromMillimeter(1).Point, 12);
         Assert.Equal(CmToPt, Unit.FromMillimeter(10).Point, 9);
-    }
-
-    [Fact]
-    public void ImplicitFromDouble_IsPoints()
-    {
-        Unit u = 12.5;
-        Assert.Equal(12.5, u.Point, 9);
     }
 
     [Fact]

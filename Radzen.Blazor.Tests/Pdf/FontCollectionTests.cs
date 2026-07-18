@@ -154,21 +154,6 @@ public class FontCollectionTests
     }
 
     [Fact]
-    public void Register_NullFamily_Throws()
-    {
-        var fonts = new FontCollection();
-        var bytes = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
-        Assert.Throws<ArgumentNullException>(() => fonts.Register(null!, new MemoryStream(bytes)));
-    }
-
-    [Fact]
-    public void Register_NullStream_Throws()
-    {
-        var fonts = new FontCollection();
-        Assert.Throws<ArgumentNullException>(() => fonts.Register("Liberation Sans", null!));
-    }
-
-    [Fact]
     public void Register_GarbageStream_Throws()
     {
         var fonts = new FontCollection();

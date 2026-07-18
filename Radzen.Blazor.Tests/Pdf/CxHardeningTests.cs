@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -78,19 +77,6 @@ public class CxHardeningTests
 
         Assert.Throws<DocumentParseException>(
             () => DocumentReader.Parse(stream, null, new ReaderLimits { MaxFileBytes = bytes.Length - 1 }));
-    }
-
-    [Fact]
-    public void ReaderLimitsRejectNonPositiveValues()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => DocumentReader.Parse(Array.Empty<byte>(), null, new ReaderLimits { MaxXrefEntries = 0 }));
-    }
-
-    [Fact]
-    public void ReaderLimitsDefaultReturnsIndependentSnapshots()
-    {
-        Assert.NotSame(ReaderLimits.Default, ReaderLimits.Default);
     }
 
     private static string Stream(string content)

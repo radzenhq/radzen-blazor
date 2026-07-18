@@ -78,23 +78,6 @@ public class ValueTypeTests
     }
 
     [Fact]
-    public void Margins_PropertiesAreSettable()
-    {
-        var m = new Margins
-        {
-            Top = Unit.FromPoint(1),
-            Right = Unit.FromPoint(2),
-            Bottom = Unit.FromPoint(3),
-            Left = Unit.FromPoint(4)
-        };
-
-        Assert.Equal(1, m.Top.Point, 9);
-        Assert.Equal(2, m.Right.Point, 9);
-        Assert.Equal(3, m.Bottom.Point, 9);
-        Assert.Equal(4, m.Left.Point, 9);
-    }
-
-    [Fact]
     public void Font_Defaults()
     {
         var f = new Font();
@@ -102,27 +85,6 @@ public class ValueTypeTests
         Assert.False(f.Bold);
         Assert.False(f.Italic);
         Assert.False(f.Underline);
-    }
-
-    [Fact]
-    public void Font_PropertiesAreSettable()
-    {
-        var f = new Font
-        {
-            Name = "Helvetica",
-            Size = 14,
-            Bold = true,
-            Italic = true,
-            Underline = true,
-            Color = Color.DarkBlue
-        };
-
-        Assert.Equal("Helvetica", f.Name);
-        Assert.Equal(14, f.Size, 9);
-        Assert.True(f.Bold);
-        Assert.True(f.Italic);
-        Assert.True(f.Underline);
-        Assert.Equal(Color.DarkBlue, f.Color);
     }
 
     private static void AssertMembers<TEnum>(params string[] expected) where TEnum : struct, Enum

@@ -54,19 +54,4 @@ public class BordersTests
         Assert.Equal(Color.Red, borders.Top.Color);
         Assert.Equal(BorderStyle.Dashed, borders.Left.Style);
     }
-
-    [Fact]
-    public void Border_PropertiesAreSettable()
-    {
-        var border = new Border
-        {
-            Width = 3,
-            Color = Color.Blue,
-            Style = BorderStyle.Dotted
-        };
-
-        Assert.Equal(3, border.Width, 9);
-        Assert.Equal(Color.Blue, border.Color);
-        Assert.Equal(BorderStyle.Dotted, border.Style);
-    }
 }

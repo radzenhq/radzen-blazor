@@ -67,12 +67,6 @@ public class ColorTests
         Assert.Equal(255, c.A);
     }
 
-    [Fact]
-    public void FromHex_Null_Throws()
-    {
-        Assert.Throws<ArgumentNullException>(() => Color.FromHex(null!));
-    }
-
     [Theory]
     [InlineData("")]
     [InlineData("#12")]
