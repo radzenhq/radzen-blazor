@@ -35,6 +35,13 @@ internal static class PageOperations
         return true;
     }
 
+    internal static IReadOnlyList<Page> ImportIsolated(Document target, Document source, int offset, int length)
+    {
+        var staging = new Document();
+        Import(staging, source, offset, length);
+        return Import(target, Snapshot(staging), 0, length);
+    }
+
     internal static Document Extract(Document snapshot, int offset, int length)
     {
         var result = new Document();
@@ -49,9 +56,6 @@ internal static class PageOperations
         {
             var source = snapshot.Pages[index];
             var page = DocumentMerger.AppendPage(target, snapshot, source);
-            page.BleedBox = source.BleedBox;
-            page.TrimBox = source.TrimBox;
-            page.ArtBox = source.ArtBox;
             imported.Add(page);
         }
 
