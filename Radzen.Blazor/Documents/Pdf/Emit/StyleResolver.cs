@@ -135,30 +135,17 @@ internal static class StyleResolver
     {
         foreach (var item in list.Items)
         {
-            var itemFont = new Font();
-            itemFont.InheritFrom(item.Font);
-            itemFont.InheritFrom(list.Font);
-            foreach (var font in inherited)
-            {
-                itemFont.InheritFrom(font);
-            }
-
-            itemFont.InheritFrom(styles.Normal.Font);
-            resolution.SetItemFont(item, itemFont);
+            var itemSources = new List<Font?> { item.Font, list.Font };
+            itemSources.AddRange(inherited);
+            itemSources.Add(styles.Normal.Font);
+            resolution.SetItemFont(item, FontCascade.Resolve(itemSources));
 
             foreach (var run in item.Inlines)
             {
-                var effective = new Font();
-                effective.InheritFrom(run.Font);
-                effective.InheritFrom(item.Font);
-                effective.InheritFrom(list.Font);
-                foreach (var font in inherited)
-                {
-                    effective.InheritFrom(font);
-                }
-
-                effective.InheritFrom(styles.Normal.Font);
-                resolution.SetRunFont(run, effective);
+                var runSources = new List<Font?> { run.Font, item.Font, list.Font };
+                runSources.AddRange(inherited);
+                runSources.Add(styles.Normal.Font);
+                resolution.SetRunFont(run, FontCascade.Resolve(runSources));
             }
         }
     }
@@ -185,28 +172,18 @@ internal static class StyleResolver
 
     private static void ResolveBarcode(Barcode barcode, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
-        var effective = new Font();
-        effective.InheritFrom(barcode.Font);
-        foreach (var font in inherited)
-        {
-            effective.InheritFrom(font);
-        }
-
-        effective.InheritFrom(styles.Normal.Font);
-        resolution.SetBarcodeFont(barcode, effective);
+        var sources = new List<Font?> { barcode.Font };
+        sources.AddRange(inherited);
+        sources.Add(styles.Normal.Font);
+        resolution.SetBarcodeFont(barcode, FontCascade.Resolve(sources));
     }
 
     private static void ResolveTableOfContents(TableOfContents toc, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
-        var effective = new Font();
-        effective.InheritFrom(toc.Font);
-        foreach (var font in inherited)
-        {
-            effective.InheritFrom(font);
-        }
-
-        effective.InheritFrom(styles.Normal.Font);
-        resolution.SetTocFont(toc, effective);
+        var sources = new List<Font?> { toc.Font };
+        sources.AddRange(inherited);
+        sources.Add(styles.Normal.Font);
+        resolution.SetTocFont(toc, FontCascade.Resolve(sources));
     }
 
     private static void ResolveParagraph(Paragraph paragraph, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
@@ -226,38 +203,27 @@ internal static class StyleResolver
 
         var namedChain = StyleChain(paragraph.StyleName, styles, includeNormal: false);
 
-        var paragraphFont = new Font();
-        paragraphFont.InheritFrom(paragraph.Font);
+        var paragraphSources = new List<Font?> { paragraph.Font };
         foreach (var style in namedChain)
         {
-            paragraphFont.InheritFrom(style.Font);
+            paragraphSources.Add(style.Font);
         }
 
-        foreach (var font in inherited)
-        {
-            paragraphFont.InheritFrom(font);
-        }
-
-        paragraphFont.InheritFrom(styles.Normal.Font);
-        resolution.SetParagraphFont(paragraph, paragraphFont);
+        paragraphSources.AddRange(inherited);
+        paragraphSources.Add(styles.Normal.Font);
+        resolution.SetParagraphFont(paragraph, FontCascade.Resolve(paragraphSources));
 
         foreach (var run in paragraph.Inlines)
         {
-            var effective = new Font();
-            effective.InheritFrom(run.Font);
-            effective.InheritFrom(paragraph.Font);
+            var runSources = new List<Font?> { run.Font, paragraph.Font };
             foreach (var style in namedChain)
             {
-                effective.InheritFrom(style.Font);
+                runSources.Add(style.Font);
             }
 
-            foreach (var font in inherited)
-            {
-                effective.InheritFrom(font);
-            }
-
-            effective.InheritFrom(styles.Normal.Font);
-            resolution.SetRunFont(run, effective);
+            runSources.AddRange(inherited);
+            runSources.Add(styles.Normal.Font);
+            resolution.SetRunFont(run, FontCascade.Resolve(runSources));
         }
     }
 
