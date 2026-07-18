@@ -224,7 +224,7 @@ internal static class ContentEditor
 
             machine.Apply(op, operands);
 
-            if (op is "m" or "l" or "c" or "v" or "y" or "re" or "h" or "W" or "W*")
+            if (ContentOperatorClass.IsPathConstruction(op))
             {
                 if (pathStart < 0)
                 {
@@ -232,9 +232,9 @@ internal static class ContentEditor
                     pathCtm = machine.Ctm;
                 }
 
-                clipPending |= op is "W" or "W*";
+                clipPending |= ContentOperatorClass.IsClip(op);
             }
-            else if (op is "S" or "s" or "f" or "F" or "f*" or "B" or "B*" or "b" or "b*" or "n")
+            else if (ContentOperatorClass.IsPathPainting(op))
             {
                 if (pathStart >= 0 && (op != "n" || clipPending))
                 {
@@ -266,7 +266,7 @@ internal static class ContentEditor
                     result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
                 }
             }
-            else if (!KnownNonElement(op))
+            else if (!ContentOperatorClass.IsStateOperator(op))
             {
                 result.Add(new Candidate(CandidateKind.Raw, start, token.End, [], machine.Ctm));
             }
@@ -303,12 +303,6 @@ internal static class ContentEditor
         RawContent => CandidateKind.Raw,
         _ => throw new NotSupportedException($"Loaded content element '{element.GetType().Name}' cannot be mapped safely."),
     };
-
-    private static bool KnownNonElement(string op) => op is
-        "q" or "Q" or "cm" or "w" or "rg" or "RG" or "g" or "G" or "k" or "K"
-        or "cs" or "CS" or "scn" or "sc" or "SCN" or "SC" or "d" or "BT" or "ET"
-        or "Tf" or "TL" or "TD" or "Td" or "Tm" or "T*" or "Tc" or "Tw" or "Tz"
-        or "Ts" or "Tr" or "BDC" or "BMC" or "EMC";
 
     private static void ValidateRemoval(ContentElement element)
     {

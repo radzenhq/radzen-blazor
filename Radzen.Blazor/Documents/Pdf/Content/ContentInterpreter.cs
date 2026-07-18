@@ -73,7 +73,8 @@ internal static class ContentInterpreter
                 && !HandleGraphicsOperators(op, interpreter, target)
                 && !HandleTextOperators(op, interpreter, target)
                 && !HandlePathOperators(op, interpreter, target)
-                && !HandleMarkedContentOperators(op, interpreter))
+                && !HandleMarkedContentOperators(op, interpreter)
+                && ContentOperatorClass.IsUnknown(op))
             {
                 HandlePassthroughOperator(op, interpreter, target);
             }
