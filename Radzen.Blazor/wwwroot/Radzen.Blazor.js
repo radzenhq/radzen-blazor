@@ -1137,11 +1137,16 @@ window.Radzen = {
         el.ondragstart = function (e) { e.dataTransfer.setData('', e.target.id); };
     }
   },
-  focusElement: function (elementId) {
+  focusElement: function (elementId, onlyIfFocusNotMoved) {
     var el = document.getElementById(elementId);
-    if (el) {
-      el.focus();
+    if (!el) return;
+    if (onlyIfFocusNotMoved) {
+      var ae = document.activeElement;
+      if (ae && ae != document.body && ae != el && !ae.closest('.rz-lookup-panel, .rz-dropdown-panel, .rz-multiselect-panel')) {
+        return;
+      }
     }
+    el.focus();
   },
   focusNext: function (container, reverse) {
     if (!container) return;
@@ -2485,7 +2490,7 @@ window.Radzen = {
             if (e && e.target && e.target.tabIndex != -1) {
                 Radzen.activeElement = e.target;
             }
-            if (Radzen.activeElement) {
+            if (Radzen.activeElement && (document.activeElement == null || document.activeElement == document.body || popup && popup.contains(document.activeElement))) {
                Radzen.activeElement.focus();
             }
             Radzen.activeElement = null;

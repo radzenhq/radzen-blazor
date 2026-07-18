@@ -1354,7 +1354,7 @@ namespace Radzen.Blazor
 
             if (JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID, true);
             }
 
             OpenOnFocus = of;
