@@ -1,13 +1,11 @@
 using System;
-using System.Buffers;
 using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
 internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Stream
 {
-    private byte[]? buffer = ArrayPool<byte>.Shared.Rent(initialCapacity);
-    private int written;
+    private readonly PooledByteAccumulator accumulator = new(initialCapacity);
 
     public override bool CanRead => false;
 
@@ -15,44 +13,23 @@ internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Strea
 
     public override bool CanWrite => true;
 
-    public override long Length => written;
+    public override long Length => accumulator.Length;
 
     public override long Position
     {
-        get => written;
+        get => accumulator.Length;
         set => throw new NotSupportedException();
     }
 
-    public ReadOnlySpan<byte> WrittenSpan => Data.AsSpan(0, written);
+    public ReadOnlySpan<byte> WrittenSpan => accumulator.WrittenSpan;
 
-    private byte[] Data => buffer ?? throw new ObjectDisposedException(nameof(PooledBufferStream));
+    public byte[] ToArray() => accumulator.ToArray();
 
-    public byte[] ToArray() => WrittenSpan.ToArray();
+    public override void WriteByte(byte value) => accumulator.Append(value);
 
-    public override void WriteByte(byte value)
-    {
-        var data = Data;
-        if (written == data.Length)
-        {
-            data = Grow(1);
-        }
+    public override void Write(byte[] buffer, int offset, int count) => accumulator.Write(buffer.AsSpan(offset, count));
 
-        data[written++] = value;
-    }
-
-    public override void Write(byte[] buffer, int offset, int count) => Write(buffer.AsSpan(offset, count));
-
-    public override void Write(ReadOnlySpan<byte> source)
-    {
-        var data = Data;
-        if (source.Length > data.Length - written)
-        {
-            data = Grow(source.Length);
-        }
-
-        source.CopyTo(data.AsSpan(written));
-        written += source.Length;
-    }
+    public override void Write(ReadOnlySpan<byte> source) => accumulator.Write(source);
 
     public override void Flush()
     {
@@ -66,22 +43,11 @@ internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Strea
 
     protected override void Dispose(bool disposing)
     {
-        if (disposing && buffer is not null)
+        if (disposing)
         {
-            ArrayPool<byte>.Shared.Return(buffer);
-            buffer = null;
+            accumulator.Return();
         }
 
         base.Dispose(disposing);
-    }
-
-    private byte[] Grow(int extra)
-    {
-        var data = Data;
-        var replacement = ArrayPool<byte>.Shared.Rent(Math.Max(data.Length * 2, written + extra));
-        data.AsSpan(0, written).CopyTo(replacement);
-        ArrayPool<byte>.Shared.Return(data);
-        buffer = replacement;
-        return replacement;
     }
 }

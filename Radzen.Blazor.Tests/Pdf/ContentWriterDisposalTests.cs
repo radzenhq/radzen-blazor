@@ -1,7 +1,9 @@
 #nullable enable
 
+using System;
 using System.IO;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -26,6 +28,27 @@ public class ContentWriterDisposalTests
         {
             Assert.Equal(baseline, BuildInvoiceLike());
         }
+    }
+
+    [Fact]
+    public void WriteAfterDispose_ThrowsObjectDisposedException()
+    {
+        var writer = new ContentWriter();
+        writer.WriteRaw("q\n");
+        writer.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(() => writer.WriteRaw("Q\n"));
+        Assert.Throws<ObjectDisposedException>(() => writer.WriteNumber(1));
+        Assert.Throws<ObjectDisposedException>(() => writer.WriteString(new byte[] { 65 }));
+    }
+
+    [Fact]
+    public void RepeatedDispose_DoesNotDoubleReturnBuffer()
+    {
+        var writer = new ContentWriter();
+        writer.WriteRaw("q\n");
+        writer.Dispose();
+        writer.Dispose();
     }
 
     [Fact]
