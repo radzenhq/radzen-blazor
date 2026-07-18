@@ -122,10 +122,16 @@ internal static class TextReplacer
             using var writer = new ContentWriter();
             if (options.Layout == TextReplacementLayout.PreserveAdvance && Math.Abs(newAdvance - oldAdvance) > 0.000001)
             {
+                var denominator = show.FontSize * show.Scale;
+                if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
+                {
+                    throw new NotSupportedException("Replacing text with a zero or non-finite font scale cannot preserve positioning safely.");
+                }
+
                 writer.WriteRaw("[");
                 writer.WriteString(encoded);
                 writer.WriteRaw(" ");
-                writer.WriteNumber((newAdvance - oldAdvance) / (show.FontSize * show.Scale) * 1000.0);
+                writer.WriteNumber((newAdvance - oldAdvance) / denominator * 1000.0);
                 writer.WriteRaw("] TJ");
                 edits.Add(new ContentEdit(show.Text.Start, show.OperatorEnd, writer.ToArray()));
             }

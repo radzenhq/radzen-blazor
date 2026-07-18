@@ -70,4 +70,31 @@ public class LoadedPatternOverlayCollisionTests
         Assert.Equal(3, ShadingType(reader, (DictionaryObject)reader.Resolve(p0!)));
         Assert.True(patterns.Keys.Count >= 2, "the overlay gradient is registered under a non-colliding name");
     }
+
+    [Fact]
+    public void ReemittingModifiedContentWithInsertedGradient_PreservesTheLoadedPatternResource()
+    {
+        var document = LoadWithPatternP0();
+        var page = document.Pages[0];
+        var existing = (PathContent)page.Content[0];
+        existing.EvenOdd = true;
+
+        var path = new PathContent
+        {
+            Fill = true,
+            FillGradient = new LinearGradient(0, 0, 100, 100, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)),
+        };
+        path.MoveTo(200, 200);
+        path.LineTo(300, 200);
+        path.LineTo(300, 300);
+        path.Close();
+        page.Content.Add(path);
+
+        var reader = DocumentReader.Parse(document.ToArray());
+        var patterns = Patterns(reader);
+
+        Assert.True(patterns.TryGetValue("P0", out var p0));
+        Assert.Equal(3, ShadingType(reader, (DictionaryObject)reader.Resolve(p0!)));
+        Assert.True(patterns.Keys.Count >= 2, "the reemitted gradient is registered under a non-colliding name");
+    }
 }
