@@ -269,7 +269,9 @@ internal static class AnnotationEmitter
 
     private static void PopulateLink(LinkAnnotation link, DictionaryObject dictionary, AnnotationEmitContext context)
     {
-        var targets = (link.Uri is null ? 0 : 1) + (link.Destination is null ? 0 : 1) + (link.TargetPageIndex is null ? 0 : 1);
+        var targets = (link.Uri is null ? 0 : 1)
+            + (link.Destination is null ? 0 : 1)
+            + (link.Destination is null && link.TargetPageIndex is not null ? 1 : 0);
         if (targets != 1)
         {
             throw new InvalidOperationException("A link annotation requires exactly one URI, named destination or target page.");
@@ -298,8 +300,43 @@ internal static class AnnotationEmitter
                 throw new InvalidOperationException($"Link target page index {pageIndex} is out of range; the document has {context.Pages.Count} pages.");
             }
 
-            dictionary["Dest"] = new ArrayObject { context.Pages[pageIndex].Reference, new NameObject("Fit") };
+            var target = link.ResolvedTarget is { PageIndex: { } resolvedPage } resolved && resolvedPage == pageIndex
+                ? resolved
+                : OutlineTarget.ToPageFit(pageIndex);
+            dictionary["Dest"] = LinkDestination(target, context.Pages[pageIndex].Reference);
         }
+    }
+
+    private static ArrayObject LinkDestination(OutlineTarget target, ReferenceObject page)
+    {
+        var arguments = target.FitArguments;
+        return target.Fit switch
+        {
+            OutlineFit.Fit => [page, new NameObject("Fit")],
+            OutlineFit.FitHorizontal => [page, new NameObject("FitH"), new NumberObject(arguments[0])],
+            OutlineFit.FitVertical => [page, new NameObject("FitV"), new NumberObject(arguments[0])],
+            OutlineFit.FitBounding => [page, new NameObject("FitB")],
+            OutlineFit.FitBoundingHorizontal => [page, new NameObject("FitBH"), new NumberObject(arguments[0])],
+            OutlineFit.FitBoundingVertical => [page, new NameObject("FitBV"), new NumberObject(arguments[0])],
+            OutlineFit.Rectangle =>
+            [
+                page,
+                new NameObject("FitR"),
+                new NumberObject(arguments[0]),
+                new NumberObject(arguments[1]),
+                new NumberObject(arguments[2]),
+                new NumberObject(arguments[3]),
+            ],
+            OutlineFit.Coordinates =>
+            [
+                page,
+                new NameObject("XYZ"),
+                new NumberObject(arguments[0]),
+                new NumberObject(arguments[1]),
+                new NumberObject(arguments[2]),
+            ],
+            _ => [page, new NameObject("Fit")],
+        };
     }
 
     private static StreamObject? BuildAppearance(Annotation annotation, IObjectWriter writer, Fonts.FontScope scope)

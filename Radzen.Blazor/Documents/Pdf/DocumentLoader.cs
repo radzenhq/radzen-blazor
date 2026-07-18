@@ -31,16 +31,12 @@ internal static class DocumentLoader
         }
 
         state.SourceCatalog = catalog;
-        if (catalog.TryGetValue("Pages", out var pagesRef)
-            && reader.Resolve(pagesRef!) is DictionaryObject pagesNode)
+        if (catalog.TryGetValue("Pages", out var pagesRef) && pagesRef is not null)
         {
-            var visited = new HashSet<int>();
-            if (pagesRef is ReferenceObject pagesReference)
+            foreach (var leaf in PageTreeWalker.Enumerate(reader, pagesRef, limits, rejectInvalidKids: false))
             {
-                visited.Add(pagesReference.ObjectNumber);
+                CollectPage(reader, leaf, document, state);
             }
-
-            CollectPages(reader, pagesNode, new InheritedAttributes(), document, state, limits, visited, 0);
         }
 
         foreach (var page in document.Pages)
@@ -76,40 +72,26 @@ internal static class DocumentLoader
         public int? Rotate { get; init; }
     }
 
-    private static void CollectPages(DocumentReader reader, DictionaryObject node, InheritedAttributes inherited, Document document, LoadedState state, ReaderLimits limits, HashSet<int> visited, int depth)
+    private static void CollectPage(DocumentReader reader, PageTreeWalker.Leaf leaf, Document document, LoadedState state)
     {
-        if (depth > limits.MaxPageTreeDepth)
+        var inherited = new InheritedAttributes();
+        foreach (var pathNode in leaf.Path)
         {
-            throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
-        }
-
-        var box = reader.GetArray(node, "MediaBox") ?? inherited.Box;
-
-        var resources = reader.GetDictionary(node, "Resources") ?? inherited.Resources;
-
-        var cropBox = reader.GetArray(node, "CropBox") ?? inherited.CropBox;
-
-        var rotate = reader.GetInt(node, "Rotate") ?? inherited.Rotate;
-
-        var childInherited = new InheritedAttributes { Box = box, Resources = resources, CropBox = cropBox, Rotate = rotate };
-
-        if (reader.TryGet<ArrayObject>(node, "Kids", out var kids))
-        {
-            foreach (var kid in kids)
+            var dictionary = pathNode.Dictionary;
+            inherited = new InheritedAttributes
             {
-                if (kid is ReferenceObject reference && !visited.Add(reference.ObjectNumber))
-                {
-                    throw new DocumentParseException("Cyclic page tree reference.", -1);
-                }
-
-                if (reader.AsDictionary(kid) is { } child)
-                {
-                    CollectPages(reader, child, childInherited, document, state, limits, visited, depth + 1);
-                }
-            }
-
-            return;
+                Box = reader.GetArray(dictionary, "MediaBox") ?? inherited.Box,
+                Resources = reader.GetDictionary(dictionary, "Resources") ?? inherited.Resources,
+                CropBox = reader.GetArray(dictionary, "CropBox") ?? inherited.CropBox,
+                Rotate = reader.GetInt(dictionary, "Rotate") ?? inherited.Rotate,
+            };
         }
+
+        var node = leaf.Node.Dictionary;
+        var box = inherited.Box;
+        var resources = inherited.Resources;
+        var cropBox = inherited.CropBox;
+        var rotate = inherited.Rotate;
 
         var mediaCorners = PdfRect.ResolveCorners(reader, box, RectPolicy.Rejecting);
         var cropCorners = PdfRect.ResolveCorners(reader, cropBox, RectPolicy.Rejecting);
@@ -285,18 +267,15 @@ internal static class DocumentLoader
             return null;
         }
 
-        target.Title = Text(reader, info, "Title");
-        target.Author = Text(reader, info, "Author");
-        target.Subject = Text(reader, info, "Subject");
-        target.Keywords = Text(reader, info, "Keywords");
-        target.Creator = Text(reader, info, "Creator");
-        target.Producer = Text(reader, info, "Producer");
-        target.CreationDate = Date(reader, info, "CreationDate");
-        target.ModificationDate = Date(reader, info, "ModDate");
+        foreach (var field in DocumentInfoFields.All)
+        {
+            field.Read(reader, info, target);
+        }
+
         return info;
     }
 
-    private static DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
+    internal static DateTimeOffset? Date(DocumentReader reader, DictionaryObject dictionary, string key)
         => reader.GetString(dictionary, key) is { } text
             ? ParseDate(FormField.DecodeTextString(text))
             : null;
@@ -455,7 +434,7 @@ internal static class DocumentLoader
             ? relationship
             : AttachmentRelationship.Unspecified;
 
-    private static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
+    internal static string? Text(DocumentReader reader, DictionaryObject dictionary, string key)
         => reader.GetString(dictionary, key) is { } text
             ? FormField.DecodeTextString(text)
             : null;
@@ -562,71 +541,17 @@ internal static class DocumentLoader
             return null;
         }
 
-        var resolved = reader.Resolve(destination);
-        if (resolved is StringObject text)
-        {
-            var target = ResolveNamedOutlineTarget(reader, text.Value, destinations, pageIndexes);
-            namedDestination = target is not null;
-            return target;
-        }
-
-        if (resolved is NameObject name)
-        {
-            var target = ResolveNamedOutlineTarget(reader, name.Value, destinations, pageIndexes);
-            namedDestination = target is not null;
-            return target;
-        }
-
-        return ExplicitOutlineTarget(reader, resolved, pageIndexes);
+        var result = DestinationReader.Read(
+            reader,
+            destination,
+            page => pageIndexes.TryGetValue(page, out var index) ? index : null,
+            destinations,
+            retainAllFitTypes: false);
+        namedDestination = result.WasNamed && result.Target is not null;
+        return result.Target;
     }
 
-    private static OutlineTarget? ResolveNamedOutlineTarget(
-        DocumentReader reader,
-        string name,
-        Dictionary<string, DocumentObject> destinations,
-        Dictionary<DictionaryObject, int> pageIndexes)
-    {
-        if (!destinations.TryGetValue(name, out var destination))
-        {
-            return null;
-        }
-
-        var resolved = reader.Resolve(destination);
-        if (resolved is DictionaryObject dictionary && dictionary.TryGetValue("D", out var nested))
-        {
-            resolved = reader.Resolve(nested!);
-        }
-
-        return ExplicitOutlineTarget(reader, resolved, pageIndexes);
-    }
-
-    private static OutlineTarget? ExplicitOutlineTarget(
-        DocumentReader reader,
-        DocumentObject destination,
-        Dictionary<DictionaryObject, int> pageIndexes)
-    {
-        if (destination is not ArrayObject array || array.Count < 2
-            || reader.Resolve(array[0]) is not DictionaryObject page
-            || !pageIndexes.TryGetValue(page, out var pageIndex)
-            || reader.AsName(array[1]) is not { } fit)
-        {
-            return null;
-        }
-
-        double Argument(int index)
-            => index < array.Count && reader.AsNumber(array[index]) is { } number ? number : 0;
-
-        return fit switch
-        {
-            "Fit" => OutlineTarget.ToPageFit(pageIndex),
-            "FitH" => OutlineTarget.ToPageFitHorizontal(pageIndex, Argument(2)),
-            "FitR" => OutlineTarget.ToPageRectangle(pageIndex, Argument(2), Argument(3), Argument(4), Argument(5)),
-            "XYZ" => OutlineTarget.ToPageXYZ(pageIndex, Argument(2), Argument(3), Argument(4)),
-            _ => null,
-        };
-    }
-
-    private static Dictionary<string, DocumentObject> ReadNamedDestinations(DocumentReader reader, DictionaryObject catalog, ReaderLimits limits)
+    internal static Dictionary<string, DocumentObject> ReadNamedDestinations(DocumentReader reader, DictionaryObject catalog, ReaderLimits limits)
     {
         var result = new Dictionary<string, DocumentObject>(StringComparer.Ordinal);
         if (reader.GetDictionary(catalog, "Dests") is { } legacy)

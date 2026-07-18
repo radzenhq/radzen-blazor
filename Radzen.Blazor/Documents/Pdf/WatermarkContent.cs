@@ -32,8 +32,18 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
         var decoded = watermark.DecodeImage(image);
         var (width, height) = ImageDecoder.Measure(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
+        var imageAlpha = image.Opacity;
+        if (image.Stencil && image.StencilColor.A != 255)
+        {
+            imageAlpha *= image.StencilColor.A / 255.0;
+        }
+
+        var state = imageAlpha < 1
+            ? writer.RegisterOpacity(watermark.Opacity * imageAlpha)
+            : null;
         ContentEmitter.WriteImagePlacement(
-            writer, key, WatermarkGeometry.Centered(width), WatermarkGeometry.Centered(height), width, height);
+            writer, key, WatermarkGeometry.Centered(width), WatermarkGeometry.Centered(height), width, height,
+            state, stencilColor: image.Stencil ? image.StencilColor : null);
     }
 
     private void WriteText(ContentWriter writer)

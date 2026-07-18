@@ -2,12 +2,14 @@ using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Radzen.Documents.Pdf;
 
 internal static class AnnotationReader
 {
+    private static readonly IReadOnlyDictionary<string, DocumentObject> EmptyNamedDestinations =
+        new Dictionary<string, DocumentObject>();
+
     public static void Read(
         Page page,
         DocumentReader reader,
@@ -152,35 +154,42 @@ internal static class AnnotationReader
         IReadOnlyList<Page> pages,
         IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
     {
+        int? PageIndex(DictionaryObject target)
+        {
+            for (var i = 0; i < pages.Count; i++)
+            {
+                if (ReferenceEquals(pageDictionaries[pages[i]], target))
+                {
+                    return i;
+                }
+            }
+
+            return null;
+        }
+
+        var catalog = reader.GetDictionary(reader.Trailer, "Root")!;
         var resolved = reader.Resolve(destination);
-        if (resolved is StringObject text)
+        var named = resolved is StringObject or NameObject
+            ? DocumentLoader.ReadNamedDestinations(reader, catalog, reader.Limits)
+            : EmptyNamedDestinations;
+        var result = DestinationReader.Read(reader, destination, PageIndex, named, retainAllFitTypes: true);
+        if (result.Name is { } name)
         {
-            annotation.Destination = Text(text.Value);
+            annotation.Destination = name;
+            annotation.DestinationIsName = result.NameIsName;
+        }
+
+        if (result.Target is { PageIndex: { } targetPage } target)
+        {
+            annotation.TargetPageIndex = targetPage;
+            annotation.ResolvedTarget = target;
             return;
         }
 
-        if (resolved is NameObject name)
-        {
-            annotation.Destination = name.Value;
-            annotation.DestinationIsName = true;
-            return;
-        }
-
-        if (resolved is not ArrayObject { Count: > 0 } array || reader.AsDictionary(array[0]) is not { } target)
+        if (result.Name is null)
         {
             throw new DocumentParseException("A link annotation has an unsupported destination.", -1);
         }
-
-        for (var i = 0; i < pages.Count; i++)
-        {
-            if (ReferenceEquals(pageDictionaries[pages[i]], target))
-            {
-                annotation.TargetPageIndex = i;
-                return;
-            }
-        }
-
-        throw new DocumentParseException("A link annotation targets a page outside the document.", -1);
     }
 
     private static InkAnnotation ReadInk(InkAnnotation annotation, DocumentReader reader, DictionaryObject dictionary)
@@ -221,53 +230,15 @@ internal static class AnnotationReader
             return annotation;
         }
 
-        var (font, size) = FieldAppearances.ParseDefaultAppearance(da);
+        var appearance = DefaultAppearanceGrammar.Parse(da);
+        var (font, size) = (appearance.Font, appearance.Size);
         if (font is not null && size > 0)
         {
             annotation.Font = FieldAppearances.AppearanceFont(font, size);
         }
 
-        annotation.TextColor = DefaultAppearanceColor(da) ?? annotation.TextColor;
+        annotation.TextColor = appearance.FillColor ?? annotation.TextColor;
         return annotation;
-    }
-
-    // /DA colour: last non-stroking colour operator operand (ISO 32000-1 12.7.3.3).
-    private static Color? DefaultAppearanceColor(string da)
-    {
-        var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-        Color? color = null;
-        for (var i = 0; i < tokens.Length; i++)
-        {
-            var operands = tokens[i] switch
-            {
-                "g" => 1,
-                "rg" => 3,
-                "k" => 4,
-                _ => 0,
-            };
-
-            if (operands == 0 || i < operands)
-            {
-                continue;
-            }
-
-            var values = new double[operands];
-            var parsed = true;
-            for (var operand = 0; operand < operands; operand++)
-            {
-                parsed &= double.TryParse(
-                    tokens[i - operands + operand], NumberStyles.Float, CultureInfo.InvariantCulture, out values[operand]);
-            }
-
-            if (!parsed)
-            {
-                continue;
-            }
-
-            color = ColorFromComponents(values);
-        }
-
-        return color;
     }
 
     private static T ReadShape<T>(T annotation, DocumentReader reader, DictionaryObject dictionary) where T : ShapeAnnotation

@@ -272,6 +272,19 @@ public class RadioAndChoiceFieldTests
     }
 
     [Fact]
+    public void FlattenBeforeSaveDrawsEveryRadioOutlineAndOnlyTheSelectedDot()
+    {
+        var document = BuildDocument();
+        document.FormFields.Add(RadioGroup());
+
+        document.Flatten();
+
+        var content = AllPageContent(Reload(document));
+        Assert.Equal(3, content.Split('\n').Count(line => line == "S"));
+        Assert.Equal(1, content.Split('\n').Count(line => line == "f"));
+    }
+
+    [Fact]
     public void FlattenAfterReloadDrawsSelectionAndDropsForm()
     {
         using var stream = new MemoryStream(WithFields().ToArray());

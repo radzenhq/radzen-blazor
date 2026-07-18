@@ -20,13 +20,17 @@ internal static class ContentInterpreter
         {
             if (frame.IsInlineImage)
             {
-                var inline = new InlineImageContent(frame.InlineImage.Bytes!)
+                if (interpreter.PathStart < 0)
                 {
-                    Transform = interpreter.Graphics.Ctm,
-                    IsArtifact = interpreter.ArtifactDepth > 0,
-                };
-                target.Add(inline);
-                interpreter.AddSpan(inline, frame.InlineImage.Start, frame.InlineImage.End, interpreter.Graphics.Ctm, false);
+                    var inline = new InlineImageContent(frame.InlineImage.Bytes!)
+                    {
+                        Transform = interpreter.Graphics.Ctm,
+                        IsArtifact = interpreter.ArtifactDepth > 0,
+                    };
+                    target.Add(inline);
+                    interpreter.AddSpan(inline, frame.InlineImage.Start, frame.InlineImage.End, interpreter.Graphics.Ctm, false);
+                }
+
                 FinalizeMerge(interpreter);
                 interpreter.ResetOperandFrame();
                 continue;
@@ -172,7 +176,7 @@ internal static class ContentInterpreter
                 break;
 
             case "Do":
-                if (LastName(operands) is { } xobject)
+                if (interpreter.PathStart < 0 && LastName(operands) is { } xobject)
                 {
                     var xObjectContent = new XObjectContent(xobject)
                     {
@@ -378,7 +382,7 @@ internal static class ContentInterpreter
 
     private static void HandlePassthroughOperator(string? op, InterpreterState interpreter, ContentCollection target)
     {
-        if (op is not null)
+        if (op is not null && interpreter.PathStart < 0)
         {
             var raw = new RawContent(op, [.. interpreter.Operands])
             {

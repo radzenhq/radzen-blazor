@@ -116,6 +116,10 @@ internal enum OutlineFit
     PageTop,
     Fit,
     FitHorizontal,
+    FitVertical,
+    FitBounding,
+    FitBoundingHorizontal,
+    FitBoundingVertical,
     Rectangle,
     Coordinates,
 }
@@ -213,4 +217,7 @@ public sealed class OutlineTarget
         ArgumentOutOfRangeException.ThrowIfNegative(pageIndex);
         return new OutlineTarget { PageIndex = pageIndex, Fit = OutlineFit.Coordinates, FitArguments = [left, top, zoom] };
     }
+
+    internal static OutlineTarget FromLoaded(int pageIndex, OutlineFit fit, params double[] arguments)
+        => new() { PageIndex = pageIndex, Fit = fit, FitArguments = arguments };
 }

@@ -61,7 +61,7 @@ public class NamedDestinationPreservationTests
         return null;
     }
 
-    private static byte[] Source()
+    private static byte[] Source(string linkDestination = "(chapter2)")
     {
         var one = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-one-body) Tj ET");
         var two = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-two-body) Tj ET");
@@ -79,7 +79,7 @@ public class NamedDestinationPreservationTests
         pdf.Append("6 0 obj\n<< /Length " + two.Length + " >>\nstream\n").Append(two).Append("\nendstream\nendobj\n");
         pdf.Object(7, "7 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
         pdf.Object(8, "8 0 obj\n<< /Type /Annot /Subtype /Link /Rect [10 10 100 30] "
-            + "/A << /S /GoTo /D (chapter2) >> >>\nendobj\n");
+            + "/A << /S /GoTo /D " + linkDestination + " >> >>\nendobj\n");
         pdf.Object(9, "9 0 obj\n<< /Kids [10 0 R 11 0 R] >>\nendobj\n");
         pdf.Object(10, "10 0 obj\n<< /Limits [(chapter1) (chapter1)] "
             + "/Names [(chapter1) [3 0 R /XYZ 0 700 0]] >>\nendobj\n");
@@ -128,6 +128,36 @@ public class NamedDestinationPreservationTests
         var destination = Destination(reader, name);
         Assert.NotNull(destination);
         Assert.Equal(Number(Kids(reader)[1]), Number(destination![0]));
+    }
+
+    [Fact]
+    public void LinkAnnotationNamedTargetLoadsResolvedPageAndFit()
+    {
+        var document = Load(Source());
+
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(document.Pages[0].Annotations));
+
+        Assert.Equal("chapter2", link.Destination);
+        Assert.Equal(1, link.TargetPageIndex);
+        Assert.NotNull(link.ResolvedTarget);
+        Assert.Equal(OutlineFit.Coordinates, link.ResolvedTarget!.Fit);
+        Assert.Equal([0, 500, 0], link.ResolvedTarget.FitArguments);
+    }
+
+    [Fact]
+    public void EditedExplicitLinkRetainsItsFitTypeAndArgument()
+    {
+        var document = Load(Source("[5 0 R /FitBV 123]"));
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(document.Pages[0].Annotations));
+        link.Contents = "edited";
+
+        var reader = DocumentReader.Parse(document.ToArray());
+        var page = Assert.IsType<DictionaryObject>(reader.Resolve(Kids(reader)[0]));
+        var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(reader.GetArray(page, "Annots")!)));
+        var destination = Assert.IsType<ArrayObject>(reader.Resolve(annotation["Dest"]));
+
+        Assert.Equal("FitBV", Assert.IsType<NameObject>(reader.Resolve(destination[1])).Value);
+        Assert.Equal(123, Assert.IsType<NumberObject>(reader.Resolve(destination[2])).DoubleValue);
     }
 
     [Fact]

@@ -10,9 +10,6 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class DocumentSaver
 {
-    internal static readonly string[] InfoKeys =
-        ["Title", "Author", "Subject", "Keywords", "Creator", "Producer", "CreationDate", "ModDate"];
-
     private readonly Document doc;
 
     internal DocumentSaver(Document document) => doc = document;
@@ -295,18 +292,6 @@ internal sealed class DocumentSaver
         writer.Close();
     }
 
-    private static string?[] InfoValues(DocumentInfo meta) =>
-    [
-        meta.Title,
-        meta.Author,
-        meta.Subject,
-        meta.Keywords,
-        meta.Creator,
-        meta.Producer,
-        meta.CreationDate is { } created ? PdfDate(created) : null,
-        meta.ModificationDate is { } modified ? PdfDate(modified) : null,
-    ];
-
     internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source, GraphImporter? importer = null)
     {
         DictionaryObject? info = null;
@@ -315,7 +300,7 @@ internal sealed class DocumentSaver
         {
             foreach (var pair in source)
             {
-                if (Array.IndexOf(InfoKeys, pair.Key) < 0)
+                if (!DocumentInfoFields.Contains(pair.Key))
                 {
                     info ??= new DictionaryObject();
                     info[pair.Key] = importer is null ? pair.Value : importer.ImportValue(pair.Value);
@@ -323,13 +308,12 @@ internal sealed class DocumentSaver
             }
         }
 
-        var values = InfoValues(meta);
-        for (var i = 0; i < InfoKeys.Length; i++)
+        foreach (var field in DocumentInfoFields.All)
         {
-            if (values[i] is { } value)
+            if (field.Value(meta) is { } value)
             {
                 info ??= new DictionaryObject();
-                info[InfoKeys[i]] = new StringObject(value);
+                info[field.Key] = new StringObject(value);
             }
         }
 
