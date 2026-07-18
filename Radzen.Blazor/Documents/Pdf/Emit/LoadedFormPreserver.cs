@@ -37,13 +37,7 @@ internal sealed class LoadedFormPreserver(Document document, FormAppearanceServi
                 continue;
             }
 
-            var imported = new ArrayObject();
-            foreach (var annot in annots)
-            {
-                imported.Add(request.Importer.ImportValue(annot));
-            }
-
-            node["Annots"] = imported;
+            node["Annots"] = PageAnnotationImport.Import(request.Importer, annots);
         }
 
         if (sourceAcroForm is not null && source is not null)
