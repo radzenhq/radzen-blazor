@@ -38,7 +38,7 @@ internal sealed class XmpMetadata
     public byte[] BuildPacket()
     {
         var builder = new StringBuilder();
-        builder.Append("<?xpacket begin=\"﻿\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n");
+        builder.Append("<?xpacket ").Append(XmpPacketFraming.BeginInstruction).Append("?>\n");
         builder.Append("<x:xmpmeta xmlns:x=\"adobe:ns:meta/\">\n");
         builder.Append(" <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n");
         builder.Append("  <rdf:Description rdf:about=\"\"\n");
@@ -125,57 +125,24 @@ internal sealed class XmpMetadata
         builder.Append(" </rdf:RDF>\n");
         builder.Append("</x:xmpmeta>\n");
 
-        for (var i = 0; i < 24; i++)
-        {
-            builder.Append("                                                                                \n");
-        }
+        XmpPacketFraming.AppendPadding(builder);
 
-        builder.Append("<?xpacket end=\"w\"?>");
+        builder.Append("<?xpacket ").Append(XmpPacketFraming.EndInstruction).Append("?>");
 
         return Encoding.UTF8.GetBytes(builder.ToString());
     }
 
-    private static readonly (string Name, string Description)[] FacturXProperties =
+    private static readonly (string Name, string ValueType, string Category, string Description)[] FacturXProperties =
     [
-        ("DocumentFileName", "The name of the embedded XML document"),
-        ("DocumentType", "The type of the hybrid document in capital letters, e.g. INVOICE or ORDER"),
-        ("Version", "The actual version of the standard applying to the embedded XML document"),
-        ("ConformanceLevel", "The conformance level of the embedded XML document"),
+        ("DocumentFileName", "Text", "external", "The name of the embedded XML document"),
+        ("DocumentType", "Text", "external", "The type of the hybrid document in capital letters, e.g. INVOICE or ORDER"),
+        ("Version", "Text", "external", "The actual version of the standard applying to the embedded XML document"),
+        ("ConformanceLevel", "Text", "external", "The conformance level of the embedded XML document"),
     ];
 
-    // PDF/A 6.6.2.3.1: properties outside the XMP predefined schemas need a pdfaExtension schema.
     private static void AppendFacturXExtensionSchema(StringBuilder builder)
-    {
-        builder.Append("  <rdf:Description rdf:about=\"\"\n");
-        builder.Append("   xmlns:pdfaExtension=\"http://www.aiim.org/pdfa/ns/extension/\"\n");
-        builder.Append("   xmlns:pdfaSchema=\"http://www.aiim.org/pdfa/ns/schema#\"\n");
-        builder.Append("   xmlns:pdfaProperty=\"http://www.aiim.org/pdfa/ns/property#\">\n");
-        builder.Append("   <pdfaExtension:schemas>\n");
-        builder.Append("    <rdf:Bag>\n");
-        builder.Append("     <rdf:li rdf:parseType=\"Resource\">\n");
-        builder.Append("      <pdfaSchema:schema>Factur-X PDFA Extension Schema</pdfaSchema:schema>\n");
-        builder.Append("      <pdfaSchema:namespaceURI>").Append(FacturXNamespace).Append("</pdfaSchema:namespaceURI>\n");
-        builder.Append("      <pdfaSchema:prefix>fx</pdfaSchema:prefix>\n");
-        builder.Append("      <pdfaSchema:property>\n");
-        builder.Append("       <rdf:Seq>\n");
-
-        foreach (var (name, description) in FacturXProperties)
-        {
-            builder.Append("        <rdf:li rdf:parseType=\"Resource\">\n");
-            builder.Append("         <pdfaProperty:name>").Append(name).Append("</pdfaProperty:name>\n");
-            builder.Append("         <pdfaProperty:valueType>Text</pdfaProperty:valueType>\n");
-            builder.Append("         <pdfaProperty:category>external</pdfaProperty:category>\n");
-            builder.Append("         <pdfaProperty:description>").Append(description).Append("</pdfaProperty:description>\n");
-            builder.Append("        </rdf:li>\n");
-        }
-
-        builder.Append("       </rdf:Seq>\n");
-        builder.Append("      </pdfaSchema:property>\n");
-        builder.Append("     </rdf:li>\n");
-        builder.Append("    </rdf:Bag>\n");
-        builder.Append("   </pdfaExtension:schemas>\n");
-        builder.Append("  </rdf:Description>\n");
-    }
+        => builder.Append(XmpExtensionSchema.Build(
+            "Factur-X PDFA Extension Schema", FacturXNamespace, "fx", FacturXProperties));
 
     public StreamObject BuildStream() => WrapPacket(BuildPacket());
 
@@ -193,12 +160,24 @@ internal sealed class XmpMetadata
     private static string Escape(string value)
     {
         var builder = new StringBuilder(value.Length);
-        foreach (var ch in value)
+        for (var i = 0; i < value.Length; i++)
         {
-            if (IsInvalidXmlChar(ch))
+            var ch = value[i];
+            if (char.IsHighSurrogate(ch))
             {
-                throw new InvalidDataException(
-                    $"XMP metadata value contains U+{(int)ch:X4}, which is not a legal XML 1.0 character; remove control characters from the document metadata.");
+                if (i + 1 < value.Length && char.IsLowSurrogate(value[i + 1]))
+                {
+                    builder.Append(ch).Append(value[i + 1]);
+                    i++;
+                    continue;
+                }
+
+                throw InvalidCharacter(ch);
+            }
+
+            if (char.IsLowSurrogate(ch) || IsInvalidXmlChar(ch))
+            {
+                throw InvalidCharacter(ch);
             }
 
             switch (ch)
@@ -226,6 +205,10 @@ internal sealed class XmpMetadata
 
         return builder.ToString();
     }
+
+    private static InvalidDataException InvalidCharacter(char ch)
+        => new(
+            $"XMP metadata value contains U+{(int)ch:X4}, which is not a legal XML 1.0 character; remove control characters and unpaired surrogates from the document metadata.");
 
     // XML 1.0 (2.2) Char production: tab, LF, CR, U+0020..U+D7FF, U+E000..U+FFFD, U+10000..U+10FFFF.
     private static bool IsInvalidXmlChar(char ch)

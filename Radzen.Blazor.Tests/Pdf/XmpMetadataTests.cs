@@ -239,4 +239,36 @@ public class XmpMetadataTests
         xmp.Info.Title = title;
         Assert.NotNull(xmp.BuildPacket());
     }
+
+    private static void AssertRejectsTitle(string title)
+    {
+        var xmp = Sample();
+        xmp.Info.Title = title;
+        Assert.Throws<InvalidDataException>(() => xmp.BuildPacket());
+    }
+
+    [Fact]
+    public void BuildPacket_ThrowsOnLoneHighSurrogate()
+        => AssertRejectsTitle("lone" + (char)0xD800 + "high");
+
+    [Fact]
+    public void BuildPacket_ThrowsOnLoneLowSurrogate()
+        => AssertRejectsTitle("lone" + (char)0xDC00 + "low");
+
+    [Fact]
+    public void BuildPacket_ThrowsOnTrailingHighSurrogate()
+        => AssertRejectsTitle("trailing" + (char)0xD800);
+
+    [Fact]
+    public void BuildPacket_ThrowsOnLeadingLowSurrogate()
+        => AssertRejectsTitle((char)0xDC00 + "leadingLow");
+
+    [Fact]
+    public void BuildPacket_PreservesValidSurrogatePair()
+    {
+        var xmp = Sample();
+        xmp.Info.Title = "emoji\U0001F600done";
+        var text = Encoding.UTF8.GetString(xmp.BuildPacket());
+        Assert.Contains("emoji\U0001F600done", text);
+    }
 }
