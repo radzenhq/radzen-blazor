@@ -528,9 +528,8 @@ public sealed class Page
         }
 
         var cache = new ContentTokenizer.Cache();
-        ContentInterpreter.Materialize(content, elements, textFonts, cache);
+        sourceElements = ContentInterpreter.Materialize(content, elements, textFonts, cache);
         materializedCount = elements.Count;
-        sourceElements = ContentEditor.Map(content, elements, cache);
 
         foreach (var element in elements)
         {

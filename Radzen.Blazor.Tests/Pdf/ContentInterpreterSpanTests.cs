@@ -1,0 +1,71 @@
+#nullable enable
+
+using System.IO;
+using System.Linq;
+using System.Text;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+public class ContentInterpreterSpanTests
+{
+    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
+
+    private static void AssertSpanPerElement(string stream)
+    {
+        var content = Ascii(stream);
+        var elements = new ContentCollection();
+        var spans = ContentInterpreter.Materialize(content, elements);
+        Assert.Equal(elements.Count, spans.Count);
+    }
+
+    [Fact]
+    public void ClipDiscardPath_HasSpanPerElement() => AssertSpanPerElement("0 0 100 100 re W n");
+
+    [Fact]
+    public void NonClipDiscardPath_HasSpanPerElement() => AssertSpanPerElement("0 0 100 100 re n");
+
+    [Fact]
+    public void BareNoPaint_HasSpanPerElement() => AssertSpanPerElement("n");
+
+    [Fact]
+    public void ShowWithoutStringOperand_HasSpanPerElement() => AssertSpanPerElement("BT /F0 12 Tf Tj ET");
+
+    [Fact]
+    public void NamedDo_ProducesOneXObjectElementWithSpan()
+    {
+        var content = Ascii("/Im0 Do");
+        var elements = new ContentCollection();
+        var spans = ContentInterpreter.Materialize(content, elements);
+
+        Assert.Single(elements.OfType<XObjectContent>());
+        Assert.Equal(elements.Count, spans.Count);
+    }
+
+    [Fact]
+    public void NamelessDo_ProducesNoElementAndKeepsSpansAligned()
+    {
+        var content = Ascii("q Do Q");
+        var elements = new ContentCollection();
+        var spans = ContentInterpreter.Materialize(content, elements);
+
+        Assert.DoesNotContain(elements, e => e is XObjectContent);
+        Assert.Equal(elements.Count, spans.Count);
+    }
+
+    [Fact]
+    public void NamelessDo_InEditedPage_IsPreservedNotRejected()
+    {
+        var document = new Document();
+        var page = document.Pages.Add();
+        page.SetContent(Ascii("q Do Q"));
+        page.Content.Add(new TextContent("x", 10, 10));
+
+        using var buffer = new MemoryStream(document.ToArray());
+        var reloaded = Document.LoadFromStream(buffer);
+
+        Assert.Contains("Do", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
+    }
+}
