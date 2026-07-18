@@ -74,6 +74,12 @@ internal sealed class ObjectParser
         {
             var generation = NextToken();
             NextToken();
+            if (token.IntValue < 0 || token.IntValue > int.MaxValue
+                || generation.IntValue < 0 || generation.IntValue > int.MaxValue)
+            {
+                return new NullObject();
+            }
+
             return new ReferenceObject((int)token.IntValue, (int)generation.IntValue);
         }
 

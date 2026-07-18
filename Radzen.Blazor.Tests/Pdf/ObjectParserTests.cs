@@ -154,6 +154,18 @@ public class ObjectParserTests
     }
 
     [Fact]
+    public void Reference_ObjectNumberBeyondInt32_DoesNotWrapToReference()
+    {
+        Assert.IsType<NullObject>(Parse("4294967297 0 R"));
+    }
+
+    [Fact]
+    public void Reference_GenerationBeyondInt32_DoesNotWrapToReference()
+    {
+        Assert.IsType<NullObject>(Parse("7 4294967297 R"));
+    }
+
+    [Fact]
     public void Malformed_UnbalancedDictionary_Throws()
     {
         Assert.Throws<DocumentParseException>(() => Parse("<< /A 1"));
