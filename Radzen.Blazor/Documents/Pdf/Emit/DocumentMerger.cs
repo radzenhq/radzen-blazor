@@ -31,6 +31,11 @@ internal static class DocumentMerger
         {
             page.SetPreservedCropBox(preservedCropBox);
         }
+
+        page.SetLoadedRotate(source.Rotate);
+        page.BleedBox = source.BleedBox;
+        page.TrimBox = source.TrimBox;
+        page.ArtBox = source.ArtBox;
         var content = source.GetContent();
         if (content is not null)
         {
