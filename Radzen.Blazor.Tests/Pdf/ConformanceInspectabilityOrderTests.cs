@@ -1,0 +1,60 @@
+#nullable enable
+using System;
+using System.IO;
+using Radzen.Documents.Pdf;
+using Xunit;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+public class ConformanceInspectabilityOrderTests
+{
+    private static byte[] LoadableFileWithFontlessText()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+            + "/Resources << >> /Contents 4 0 R >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Length 20 >>\nstream\nBT (Hello) Tj ET\nendstream\nendobj\n");
+
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 5\n")
+            .Append(FixturePdf.Entry20(0, 65535, 'f'))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(1)))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(2)))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(3)))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(4)))
+            .Append("trailer\n<< /Size 5 /Root 1 0 R >>\n")
+            .Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    private static Document LoadedFontlessDocument()
+    {
+        using var stream = new MemoryStream(LoadableFileWithFontlessText());
+        return Document.LoadFromStream(stream);
+    }
+
+    private static DocumentBuilder ConformingBuilder()
+    {
+        var builder = new DocumentBuilder();
+        BuildTestSupport.RegisterLatin(builder);
+        builder.Info.Title = "Conformance";
+        var section = builder.Sections.Add();
+        BuildTestSupport.AddText(section, "Hello", BuildTestSupport.Latin);
+        builder.Conformance = PdfAConformance.PdfA2B;
+        return builder;
+    }
+
+    [Fact]
+    public void SaveToStream_UninspectablePageWithFontError_ReportsInspectabilityFirst()
+    {
+        var document = ConformingBuilder().Build();
+        document.Append(LoadedFontlessDocument());
+
+        using var stream = new MemoryStream();
+        var error = Assert.Throws<InvalidOperationException>(() => document.SaveToStream(stream));
+
+        Assert.Contains("cannot be inspected", error.Message, StringComparison.Ordinal);
+    }
+}
