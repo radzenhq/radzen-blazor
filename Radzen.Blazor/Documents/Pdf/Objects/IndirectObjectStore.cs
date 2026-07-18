@@ -130,6 +130,12 @@ internal sealed class IndirectObjectStore(
     {
         if (value is ReferenceObject reference)
         {
+            if (entries.TryGetValue(reference.ObjectNumber, out var entry) && entry.InUse
+                && GenerationOf(reference.ObjectNumber) != reference.Generation)
+            {
+                return nullObject;
+            }
+
             return GetObject(reference.ObjectNumber);
         }
 
