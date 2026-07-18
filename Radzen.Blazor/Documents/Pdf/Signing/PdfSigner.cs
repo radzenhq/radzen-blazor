@@ -82,7 +82,11 @@ public static class PdfSigner
         byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
     {
         var (reader, rootRef, catalog, writer) = IncrementalEditSession.Begin(pdf, "Signing");
-        var (pageRef, page) = FindPage(reader, catalog, pageIndex);
+        var pageLeaf = FindPage(reader, catalog, pageIndex);
+        var page = pageLeaf.Node.Dictionary;
+        var directPage = pageLeaf.Node.Source is not ReferenceObject;
+        var pageForUpdate = directPage ? page.Copy() : page;
+        var pageRef = pageLeaf.Node.Source as ReferenceObject ?? writer.Add(pageForUpdate);
 
         var signatureRef = writer.Add(signature);
 
@@ -121,7 +125,11 @@ public static class PdfSigner
             writer.Override(rootRef.ObjectNumber, newCatalog);
         }
 
-        AppendAnnotation(reader, writer, pageRef, page, fieldRef);
+        AppendAnnotation(reader, writer, pageRef, pageForUpdate, fieldRef, directPage);
+        if (directPage)
+        {
+            ReplaceDirectPage(reader, writer, pageLeaf, pageRef);
+        }
         var bytes = writer.ToArray();
 
         var sigStart = checked((int)writer.OffsetOf(signatureRef));
@@ -195,7 +203,7 @@ public static class PdfSigner
     }
 
     private static void AppendAnnotation(DocumentReader reader, IncrementalUpdateWriter writer,
-        ReferenceObject pageRef, DictionaryObject page, ReferenceObject fieldRef)
+        ReferenceObject pageRef, DictionaryObject page, ReferenceObject fieldRef, bool pageAlreadyAdded)
     {
         page.TryGetValue("Annots", out var annotsValue);
 
@@ -210,7 +218,11 @@ public static class PdfSigner
 
         annots.Add(fieldRef);
 
-        if (annotsValue is ReferenceObject annotsRef)
+        if (pageAlreadyAdded)
+        {
+            page["Annots"] = annots;
+        }
+        else if (annotsValue is ReferenceObject annotsRef)
         {
             writer.Override(annotsRef.ObjectNumber, annots);
         }
@@ -220,6 +232,39 @@ public static class PdfSigner
             newPage["Annots"] = annots;
             writer.Override(pageRef.ObjectNumber, newPage);
         }
+    }
+
+    private static void ReplaceDirectPage(
+        DocumentReader reader,
+        IncrementalUpdateWriter writer,
+        PageTreeWalker.Leaf leaf,
+        ReferenceObject pageRef)
+    {
+        DocumentObject replacement = pageRef;
+        for (var i = leaf.Path.Count - 2; i >= 0; i--)
+        {
+            var parentNode = leaf.Path[i];
+            var childNode = leaf.Path[i + 1];
+            var sourceKids = reader.GetArray(parentNode.Dictionary, "Kids")
+                ?? throw new DocumentParseException("The page tree /Kids must be an array.", -1);
+            var kids = new ArrayObject();
+            for (var kidIndex = 0; kidIndex < sourceKids.Count; kidIndex++)
+            {
+                kids.Add(kidIndex == childNode.KidIndex ? replacement : sourceKids[kidIndex]);
+            }
+
+            var parent = parentNode.Dictionary.Copy();
+            parent["Kids"] = kids;
+            if (parentNode.Source is ReferenceObject parentRef)
+            {
+                writer.Override(parentRef.ObjectNumber, parent);
+                return;
+            }
+
+            replacement = parent;
+        }
+
+        throw new DocumentParseException("The catalog /Pages must be an indirect reference.", -1);
     }
 
     private static void ValidateAppearance(SignatureAppearance appearance)
@@ -286,7 +331,7 @@ public static class PdfSigner
             lines, appearance.Width, appearance.Height, font, scope: default);
     }
 
-    private static (ReferenceObject Reference, DictionaryObject Page) FindPage(DocumentReader reader, DictionaryObject catalog, int index)
+    private static PageTreeWalker.Leaf FindPage(DocumentReader reader, DictionaryObject catalog, int index)
     {
         if (index < 0)
         {
@@ -298,56 +343,11 @@ public static class PdfSigner
             throw new DocumentParseException("The catalog /Pages must be an indirect reference.", -1);
         }
 
-        var counter = 0;
-        var found = FindLeaf(reader, rootRef, index, ref counter, 0);
-        return found ?? throw new ArgumentOutOfRangeException(
-            nameof(index), index, $"The signature page index is past the last page ({counter} pages).");
-    }
-
-    private static (ReferenceObject, DictionaryObject)? FindLeaf(
-        DocumentReader reader, ReferenceObject nodeRef, int target, ref int counter, int depth)
-    {
-        if (depth > reader.Limits.MaxPageTreeDepth)
-        {
-            throw new DocumentParseException("Maximum page tree depth exceeded.", -1);
-        }
-
-        if (reader.AsDictionary(nodeRef) is not { } node)
-        {
-            throw new DocumentParseException("A page tree node is not a dictionary.", -1);
-        }
-
-        if (!node.TryGetValue("Kids", out var kidsValue) || kidsValue is null)
-        {
-            if (counter == target)
-            {
-                return (nodeRef, node);
-            }
-
-            counter++;
-            return null;
-        }
-
-        if (reader.AsArray(kidsValue) is not { } kids)
-        {
-            throw new DocumentParseException("The page tree /Kids must be an array.", -1);
-        }
-
-        foreach (var kid in kids)
-        {
-            if (kid is not ReferenceObject kidRef)
-            {
-                throw new DocumentParseException("The page tree /Kids must hold references.", -1);
-            }
-
-            var found = FindLeaf(reader, kidRef, target, ref counter, depth + 1);
-            if (found is not null)
-            {
-                return found;
-            }
-        }
-
-        return null;
+        var leaves = PageTreeWalker.Enumerate(reader, rootRef, reader.Limits, rejectInvalidKids: true);
+        return index < leaves.Count
+            ? leaves[index]
+            : throw new ArgumentOutOfRangeException(
+                nameof(index), index, $"The signature page index is past the last page ({leaves.Count} pages).");
     }
 
     private static string UniqueFieldName(DocumentReader reader, DictionaryObject? acroForm)

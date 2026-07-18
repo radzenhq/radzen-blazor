@@ -154,7 +154,7 @@ internal static class Redactor
                 case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
                     content.RemoveAt(i);
                     break;
-                case RawContent unmodeled when MayPaint(unmodeled.Operator)
+                case RawContent unmodeled when ContentOperatorClass.MayPaintUnknown(unmodeled.Operator)
                     && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
                     throw new NotSupportedException($"A redaction region intersects content painted by the '{unmodeled.Operator}' operator. Its extent cannot be determined safely from the content stream.");
                 case RawContent:
@@ -237,9 +237,6 @@ internal static class Redactor
             writer.WriteRaw(" ");
         }
     }
-
-    private static bool MayPaint(string op) => op is not ("gs" or "ri" or "i" or "j" or "J" or "M"
-        or "BX" or "EX" or "MP" or "DP" or "d0" or "d1");
 
     private static PdfRect UnitBounds(Matrix transform)
     {

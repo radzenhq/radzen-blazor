@@ -140,6 +140,21 @@ public class ContentEditingTests
     }
 
     [Fact]
+    public void EditAfterPassthroughInsidePaintedPathSavesWithoutReorderingError()
+    {
+        var loaded = LoadedSplitShowDocument(
+            "q 0 0 1 1 re /GS1 gs f Q BT /F0 10 Tf 72 700 Td (before) Tj ET");
+        var text = Assert.Single(loaded.Pages[0].Content.OfType<TextContent>());
+        text.Text = "after";
+
+        var saved = loaded.ToArray();
+        var content = Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(saved, 0));
+
+        Assert.Contains("/GS1 gs", content, StringComparison.Ordinal);
+        Assert.Contains("after", InterpreterTestSupport.Load(saved).ExtractText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ReplaceText_InvoiceNumber_ExtractsReplacementAndPreservesFollowingOrigin()
     {
         var loaded = LoadedDocumentWithText("Invoice INV-1001");

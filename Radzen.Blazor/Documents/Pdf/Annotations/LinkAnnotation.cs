@@ -10,6 +10,7 @@ public sealed class LinkAnnotation(PdfRect bounds) : Annotation(bounds)
     private string? destination;
     private int? targetPageIndex;
     private bool destinationIsName;
+    internal OutlineTarget? ResolvedTarget;
 
     /// <summary>Gets or sets the target URI.</summary>
     public Uri? Uri
@@ -29,7 +30,15 @@ public sealed class LinkAnnotation(PdfRect bounds) : Annotation(bounds)
     public int? TargetPageIndex
     {
         get => targetPageIndex;
-        set => Set(ref targetPageIndex, value);
+        set
+        {
+            if (targetPageIndex != value)
+            {
+                ResolvedTarget = null;
+            }
+
+            Set(ref targetPageIndex, value);
+        }
     }
 
     internal bool DestinationIsName

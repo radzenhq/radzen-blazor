@@ -27,6 +27,16 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
         var fontA = ResolvedFont(a);
         var fontB = ResolvedFont(b);
         return a.Link == b.Link
+            && a.LinkToAnchor == b.LinkToAnchor
+            && a.Anchor == b.Anchor
+            && a.LetterSpacing.Equals(b.LetterSpacing)
+            && a.VerticalAlign == b.VerticalAlign
+            && a.VerticalAlignScale == b.VerticalAlignScale
+            && a.Opacity == b.Opacity
+            && a.WordSpacing.Equals(b.WordSpacing)
+            && a.HorizontalScale == b.HorizontalScale
+            && a.Invisible == b.Invisible
+            && Equals(a.FillPaint, b.FillPaint)
             && fontA.Name == fontB.Name
             && fontA.Size == fontB.Size
             && fontA.Bold == fontB.Bold
@@ -127,7 +137,8 @@ internal sealed class FieldResolver(FontCollection fonts, StyleResolution resolu
                 continue;
             }
 
-            var newRun = new Run(new string('\t', tabsBefore) + builderText.ToString()) { Link = run.Link };
+            var newRun = new Run(new string('\t', tabsBefore) + builderText.ToString());
+            run.CopyPropertiesTo(newRun);
             newRun.Font.InheritFrom(ResolvedFont(run));
             resolved.Inlines.Add(newRun);
         }

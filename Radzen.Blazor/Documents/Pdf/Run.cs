@@ -80,6 +80,21 @@ public class Run(string text)
 
     internal DeviceColor? FillPaint { get; private set; }
 
+    internal void CopyPropertiesTo(Run target)
+    {
+        target.Link = Link;
+        target.LinkToAnchor = LinkToAnchor;
+        target.Anchor = Anchor;
+        target.LetterSpacing = LetterSpacing;
+        target.VerticalAlign = VerticalAlign;
+        target.VerticalAlignScale = VerticalAlignScale;
+        target.Opacity = Opacity;
+        target.WordSpacing = WordSpacing;
+        target.HorizontalScale = HorizontalScale;
+        target.Invisible = Invisible;
+        target.FillPaint = FillPaint;
+    }
+
     /// <summary>
     /// Sets the run fill colour to a DeviceGray level (the <c>g</c> operator), 0 (black)
     /// to 1 (white). Overrides the font colour for filling.

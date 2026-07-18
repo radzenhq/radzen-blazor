@@ -30,6 +30,12 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
             }
 
             var (width, height) = ImageDecoder.Measure(image, generated.Image, plan.Size.Width.Point);
+            var imageAlpha = image.Opacity;
+            if (image.Stencil && image.StencilColor.A != 255)
+            {
+                imageAlpha *= image.StencilColor.A / 255.0;
+            }
+
             draw.Image = new ImageDraw
             {
                 X = WatermarkGeometry.Centered(width),
@@ -37,6 +43,10 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
                 Width = width,
                 Height = height,
                 Image = generated,
+                ExtGState = imageAlpha < 1
+                    ? plan.RegisterExtGState(watermark.Opacity * imageAlpha, watermark.Opacity * imageAlpha)
+                    : null,
+                StencilColor = image.Stencil ? image.StencilColor : null,
             };
             plan.UsedImages.Add(generated);
         }

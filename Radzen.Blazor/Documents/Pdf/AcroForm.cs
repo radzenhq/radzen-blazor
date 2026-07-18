@@ -349,6 +349,9 @@ public sealed class AcroForm
 
     // A /DA size of 0 means auto-size (ISO 32000-1 12.7.3.3).
     private (string? Font, double Size) DefaultAppearance(Terminal terminal, DictionaryObject widget)
-        => FieldAppearances.ParseDefaultAppearance(
+    {
+        var appearance = DefaultAppearanceGrammar.Parse(
             InheritedDefaultAppearance.Resolve(reader, widget, Dictionary));
+        return (appearance.Font, appearance.Size);
+    }
 }

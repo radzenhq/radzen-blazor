@@ -58,13 +58,14 @@ internal sealed class FormFlattener(Document document)
                     checkBox.X.Point, checkBox.Y.Point, checkBox.Width.Point, checkBox.Height.Point));
                 break;
             case RadioGroupFieldDefinition radio:
-                var selected = radio.SelectedValue is null
-                    ? null
-                    : radio.Options.Find(option => string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal));
-                if (selected is not null)
+                foreach (var option in radio.Options)
                 {
-                    page.Content.Add(FieldAppearances.RadioDot(
-                        selected.X.Point, selected.Y.Point, selected.Width.Point, selected.Height.Point));
+                    var selected = string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal);
+                    foreach (var path in FieldAppearances.RadioVisual(
+                        option.X.Point, option.Y.Point, option.Width.Point, option.Height.Point, selected))
+                    {
+                        page.Content.Add(path);
+                    }
                 }
 
                 break;
@@ -202,7 +203,7 @@ internal sealed class FormFlattener(Document document)
         }
 
         var da = InheritedDefaultAppearance.Resolve(source!, widget, sourceAcroForm);
-        var (daFont, daSize) = FieldAppearances.ParseDefaultAppearance(da);
+        var (daFont, daSize, _) = DefaultAppearanceGrammar.Parse(da);
         var font = FieldAppearances.AppearanceFont(daFont, daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize);
         page.Content.Add(new TextContent(
             value,

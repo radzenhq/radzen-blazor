@@ -206,6 +206,62 @@ public class PdfSignerTests
         return pdf.ToArray();
     }
 
+    private static byte[] DirectPageKid()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>] /Count 1 >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 3\n")
+            .Append(FixturePdf.Entry20(0, 65535, 'f'))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(1)))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(2)))
+            .Append("trailer\n<< /Size 3 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    private static byte[] CyclicPageTree()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Pages /Kids [2 0 R] /Count 1 >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 4\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number < 4; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
+    public void Sign_DirectPageDictionaryInKids_LoadsAndSigns()
+    {
+        var original = DirectPageKid();
+
+        Assert.Single(Document.LoadFromStream(new MemoryStream(original)).Pages);
+
+        var signed = PdfSigner.Sign(original, Options(), new DelegateSigner(_ => [1, 2, 3]));
+
+        var reader = DocumentReader.Parse(signed);
+        Assert.Single(reader.GetArray(DocumentLoadTests.PagesNode(reader), "Kids")!);
+        Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 0), "Annots")!);
+    }
+
+    [Fact]
+    public void Sign_CyclicPageTree_Throws()
+    {
+        var error = Assert.Throws<DocumentParseException>(
+            () => PdfSigner.Sign(CyclicPageTree(), Options(), new DelegateSigner(_ => [1])));
+
+        Assert.Contains("Cyclic page tree", error.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void Sign_PageTreeDeeperThanSixtyFive_MatchesTheLoaderPolicy()
     {

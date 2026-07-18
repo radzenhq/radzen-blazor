@@ -293,7 +293,7 @@ internal static class ContentTokenizer
                 position++;
             }
 
-            if (position == keywordStart || !IsContentOperator(Latin1(data, keywordStart, position - keywordStart)))
+            if (position == keywordStart || !ContentOperatorClass.IsContentOperator(Latin1(data, keywordStart, position - keywordStart)))
             {
                 return false;
             }
@@ -303,22 +303,6 @@ internal static class ContentTokenizer
 
         return true;
     }
-
-    private static readonly HashSet<string> ContentOperators =
-    [
-        "q", "Q", "cm", "w", "J", "j", "M", "d", "ri", "i", "gs",
-        "m", "l", "c", "v", "y", "h", "re",
-        "S", "s", "f", "F", "f*", "B", "B*", "b", "b*", "n",
-        "W", "W*",
-        "BT", "ET", "Td", "TD", "Tm", "T*", "Tc", "Tw", "Tz", "TL", "Tf", "Tr", "Ts", "Tj", "TJ", "'", "\"",
-        "d0", "d1",
-        "CS", "cs", "SC", "SCN", "sc", "scn", "G", "g", "RG", "rg", "K", "k",
-        "sh", "Do", "BI",
-        "MP", "DP", "BMC", "BDC", "EMC",
-        "BX", "EX",
-    ];
-
-    private static bool IsContentOperator(string keyword) => ContentOperators.Contains(keyword);
 
     private static InlineImage ParseInlineImageDictionary(byte[] data, ref int position)
     {

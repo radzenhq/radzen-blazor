@@ -128,6 +128,10 @@ internal sealed class NavigationWriter(Document document)
         {
             OutlineFit.Fit => [reference, new NameObject("Fit")],
             OutlineFit.FitHorizontal => [reference, new NameObject("FitH"), new NumberObject(arguments[0])],
+            OutlineFit.FitVertical => [reference, new NameObject("FitV"), new NumberObject(arguments[0])],
+            OutlineFit.FitBounding => [reference, new NameObject("FitB")],
+            OutlineFit.FitBoundingHorizontal => [reference, new NameObject("FitBH"), new NumberObject(arguments[0])],
+            OutlineFit.FitBoundingVertical => [reference, new NameObject("FitBV"), new NumberObject(arguments[0])],
             OutlineFit.Rectangle =>
             [
                 reference,

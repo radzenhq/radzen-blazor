@@ -1,6 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -228,7 +227,18 @@ internal sealed class ConformanceWriter(Document document)
             }
         }
 
-        catalog["Metadata"] = writer.Add(BuildMetadataStream(xmp, part));
+        if (part == 4)
+        {
+            xmp.PdfARevision = 2020;
+        }
+
+        if (document.PdfUA)
+        {
+            xmp.PdfUaPart = 1;
+            xmp.IncludePdfUaExtensionSchema = document.Conformance != PdfAConformance.None;
+        }
+
+        catalog["Metadata"] = writer.Add(xmp.BuildStream());
 
         if (document.Conformance != PdfAConformance.None)
         {
@@ -256,33 +266,6 @@ internal sealed class ConformanceWriter(Document document)
         {
             catalog["Lang"] = new StringObject(document.Language);
         }
-    }
-
-    private StreamObject BuildMetadataStream(XmpMetadata xmp, int part)
-    {
-        var packet = Encoding.UTF8.GetString(xmp.BuildPacket());
-
-        if (part == 4)
-        {
-            packet = InsertAfter(packet, "</pdfaid:part>\n", "   <pdfaid:rev>2020</pdfaid:rev>\n");
-        }
-
-        if (document.PdfUA)
-        {
-            packet = InsertAfter(
-                packet,
-                "xmlns:pdfaid=\"http://www.aiim.org/pdfa/ns/id/\"\n",
-                "   xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"\n");
-            packet = InsertBefore(packet, "  </rdf:Description>", "   <pdfuaid:part>1</pdfuaid:part>\n");
-
-            // PDF/A 6.6.2.3.1: pdfuaid needs an extension schema when combined with PDF/A.
-            if (document.Conformance != PdfAConformance.None)
-            {
-                packet = InsertBefore(packet, " </rdf:RDF>", PdfUaExtensionSchema);
-            }
-        }
-
-        return XmpMetadata.WrapPacket(Encoding.UTF8.GetBytes(packet));
     }
 
     private static FacturXMetadata BuildFacturX(FacturXProfile? profile)
@@ -328,27 +311,4 @@ internal sealed class ConformanceWriter(Document document)
         return preferences;
     }
 
-    private static readonly string PdfUaExtensionSchema = XmpExtensionSchema.Build(
-        "PDF/UA identification schema",
-        "http://www.aiim.org/pdfua/ns/id/",
-        "pdfuaid",
-        [("part", "Integer", "internal", "PDF/UA version identifier")]);
-
-    private static string InsertAfter(string packet, string anchor, string insertion)
-        => packet.Insert(RequireAnchor(packet, anchor) + anchor.Length, insertion);
-
-    private static string InsertBefore(string packet, string anchor, string insertion)
-        => packet.Insert(RequireAnchor(packet, anchor), insertion);
-
-    private static int RequireAnchor(string packet, string anchor)
-    {
-        var index = packet.IndexOf(anchor, StringComparison.Ordinal);
-        if (index < 0)
-        {
-            throw new InvalidOperationException(
-                $"XMP conformance amendment anchor not found: '{anchor}'.");
-        }
-
-        return index;
-    }
 }

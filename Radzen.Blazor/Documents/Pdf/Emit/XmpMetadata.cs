@@ -31,7 +31,13 @@ internal sealed class XmpMetadata
 
     public int? PdfAPart { get; set; }
 
+    public int? PdfARevision { get; set; }
+
     public string PdfAConformance { get; set; } = "";
+
+    public int? PdfUaPart { get; set; }
+
+    public bool IncludePdfUaExtensionSchema { get; set; }
 
     public FacturXMetadata? FacturX { get; set; }
 
@@ -46,6 +52,11 @@ internal sealed class XmpMetadata
         builder.Append("   xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\"\n");
         builder.Append("   xmlns:pdf=\"http://ns.adobe.com/pdf/1.3/\"\n");
         builder.Append("   xmlns:pdfaid=\"http://www.aiim.org/pdfa/ns/id/\"\n");
+        if (PdfUaPart is not null)
+        {
+            builder.Append("   xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"\n");
+        }
+
         builder.Append("   xmlns:fx=\"").Append(FacturXNamespace).Append("\">\n");
 
         if (Info.Title is { } title)
@@ -96,6 +107,11 @@ internal sealed class XmpMetadata
             builder.Append("   <pdfaid:part>").Append(part).Append("</pdfaid:part>\n");
         }
 
+        if (PdfARevision is { } revision)
+        {
+            builder.Append("   <pdfaid:rev>").Append(revision).Append("</pdfaid:rev>\n");
+        }
+
         if (!string.IsNullOrEmpty(PdfAConformance))
         {
             builder.Append("   <pdfaid:conformance>")
@@ -115,11 +131,21 @@ internal sealed class XmpMetadata
                 .Append("</fx:ConformanceLevel>\n");
         }
 
+        if (PdfUaPart is { } uaPart)
+        {
+            builder.Append("   <pdfuaid:part>").Append(uaPart).Append("</pdfuaid:part>\n");
+        }
+
         builder.Append("  </rdf:Description>\n");
 
         if (FacturX is not null)
         {
             AppendFacturXExtensionSchema(builder);
+        }
+
+        if (IncludePdfUaExtensionSchema)
+        {
+            builder.Append(PdfUaExtensionSchema);
         }
 
         builder.Append(" </rdf:RDF>\n");
@@ -139,6 +165,12 @@ internal sealed class XmpMetadata
         ("Version", "Text", "external", "The actual version of the standard applying to the embedded XML document"),
         ("ConformanceLevel", "Text", "external", "The conformance level of the embedded XML document"),
     ];
+
+    private static readonly string PdfUaExtensionSchema = XmpExtensionSchema.Build(
+        "PDF/UA identification schema",
+        "http://www.aiim.org/pdfua/ns/id/",
+        "pdfuaid",
+        [("part", "Integer", "internal", "PDF/UA version identifier")]);
 
     private static void AppendFacturXExtensionSchema(StringBuilder builder)
         => builder.Append(XmpExtensionSchema.Build(

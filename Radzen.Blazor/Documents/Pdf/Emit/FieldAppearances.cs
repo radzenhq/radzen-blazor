@@ -2,7 +2,6 @@ using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
@@ -65,14 +64,19 @@ internal static class FieldAppearances
     public static StreamObject BuildRadio(double width, double height, bool selected)
     {
         using var writer = new ContentWriter();
-        RadioBorder(0.0, 0.0, width, height).Emit(writer);
-        if (selected)
+        foreach (var path in RadioVisual(0.0, 0.0, width, height, selected))
         {
-            RadioDot(0.0, 0.0, width, height).Emit(writer);
+            path.Emit(writer);
         }
 
         return Wrap(writer, width, height);
     }
+
+    public static IReadOnlyList<PathContent> RadioVisual(
+        double x, double y, double width, double height, bool selected)
+        => selected
+            ? [RadioBorder(x, y, width, height), RadioDot(x, y, width, height)]
+            : [RadioBorder(x, y, width, height)];
 
     public static PathContent RadioBorder(double x, double y, double width, double height)
     {
@@ -107,28 +111,6 @@ internal static class FieldAppearances
     }
 
     public static bool CanEncode(string value) => WinAnsiText.CanEncode(value);
-
-    public static (string? Font, double Size) ParseDefaultAppearance(string? da)
-    {
-        if (da is null)
-        {
-            return (null, 0.0);
-        }
-
-        var tokens = da.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-        for (var i = 2; i < tokens.Length; i++)
-        {
-            if (tokens[i] == "Tf")
-            {
-                var name = tokens[i - 2];
-                var font = name.StartsWith('/') ? name[1..] : name;
-                _ = double.TryParse(tokens[i - 1], NumberStyles.Float, CultureInfo.InvariantCulture, out var size);
-                return (font, size);
-            }
-        }
-
-        return (null, 0.0);
-    }
 
     public static Font AppearanceFont(string? daFont, double size) => new()
     {
