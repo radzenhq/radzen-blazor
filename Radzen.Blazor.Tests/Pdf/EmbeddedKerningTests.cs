@@ -78,4 +78,27 @@ public class EmbeddedKerningTests
 
         Assert.Equal(plainAdvance, kernedAdvance, 10);
     }
+
+    [Fact]
+    public void KerningShaper_DoesNotKernAcrossSpaces()
+    {
+        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        new SimpleShaper(Fonts()).Shape("A A", font, out var plainAdvance);
+        new SimpleShaper(Fonts(), enableKerning: true).Shape("A A", font, out var kernedAdvance);
+
+        Assert.Equal(plainAdvance, kernedAdvance, 9);
+    }
+
+    [Fact]
+    public void KerningShaper_StillKernsNonSpacePairsWhenSpacePresent()
+    {
+        var face = SansFace();
+        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var avKern = face.GetKerning(face.GetGlyphId('A'), face.GetGlyphId('V')) * font.Size / face.UnitsPerEm;
+
+        new SimpleShaper(Fonts()).Shape("AV A", font, out var plainAdvance);
+        new SimpleShaper(Fonts(), enableKerning: true).Shape("AV A", font, out var kernedAdvance);
+
+        Assert.Equal(plainAdvance + avKern, kernedAdvance, 9);
+    }
 }

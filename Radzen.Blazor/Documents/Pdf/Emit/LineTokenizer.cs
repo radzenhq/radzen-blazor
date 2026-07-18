@@ -37,17 +37,6 @@ internal static class LineTokenizer
     private static Font ResolvedFont(StyleResolution? resolution, Run run)
         => resolution?.RunFont(run) ?? run.Font;
 
-    private static double SpaceWidth(FontCollection fonts, Font font, Dictionary<Font, double> cache)
-    {
-        if (!cache.TryGetValue(font, out var width))
-        {
-            width = fonts.MeasureText(" ", font);
-            cache[font] = width;
-        }
-
-        return width;
-    }
-
     private const char SoftHyphen = '\u00AD';
     private const char ZeroWidthSpace = '\u200B';
 
@@ -151,7 +140,7 @@ internal static class LineTokenizer
                                 hasCurrent = true;
                             }
 
-                            current.GapAfter += SpaceWidth(fonts, runFont, spaceWidths);
+                            current.GapAfter += SpaceWidthMeasurer.SpaceWidth(fonts, runFont, spaceWidths);
                         }
 
                         i++;

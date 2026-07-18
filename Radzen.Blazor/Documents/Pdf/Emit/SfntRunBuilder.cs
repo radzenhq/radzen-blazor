@@ -52,10 +52,7 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
                     (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
                 }
 
-                generated.GidToUnicode.TryAdd(gid, codepoint);
-                scratchBytes.Add((byte)(gid >> 8));
-                scratchBytes.Add((byte)(gid & 0xFF));
-                advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
+                advance += AppendGlyph(generated, scratchBytes, face, gid, codepoint, size);
                 previousGid = gid;
                 previousCodepoint = codepoint;
                 glyphCount++;
@@ -73,6 +70,14 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
         }
 
         return runs;
+    }
+
+    internal static double AppendGlyph(GeneratedFont font, List<byte> bytes, SfntFont face, ushort gid, int codepoint, double size)
+    {
+        font.GidToUnicode.TryAdd(gid, codepoint);
+        bytes.Add((byte)(gid >> 8));
+        bytes.Add((byte)(gid & 0xFF));
+        return face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
     }
 
     internal static bool HasNonZero(List<double>? values)

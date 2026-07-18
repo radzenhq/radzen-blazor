@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, StyleResolution resolution, OpacityResolver opacities)
+internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree, OpacityResolver opacities)
 {
     private readonly Dictionary<LaidOutTable, List<LaidOutCell>[]> tableRows = [];
 
@@ -176,50 +176,21 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double contentTop,
         double delta)
     {
-        var lines = content.Lines;
         var images = content.Images;
         var codes = content.Codes;
         var tables = content.Tables;
         var boxes = content.Boxes;
         var plan = context.Plan;
-        var pageNumber = context.PageNumber;
-        var pageCount = context.PageCount;
 
         var contentMark = radius > 0 ? plan.Mark() : default;
 
         var firstText = plan.Texts.Count;
-        var overflows = false;
-        var cellLines = lines;
-        var li = 0;
-        while (li < cellLines.Count)
-        {
-            var line = cellLines[li];
-            var lineElement = structureTree.ElementOf(line.Source) ?? element;
-            if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
-            {
-                var reserved = 0;
-                while (li + reserved < cellLines.Count && cellLines[li + reserved].Source == paragraph)
-                {
-                    reserved++;
-                }
-
-                var y = line.Y;
-                foreach (var box in context.Fields.ResolveFields(paragraph, contentWidth, pageNumber, pageCount, resolution.Alignment(paragraph), reserved))
-                {
-                    context.Text.EmitLine(context, box, left + line.X, contentTop - (y + delta), lineElement, opacity);
-                    overflows |= box.Width > contentWidth + 0.01;
-                    y += box.Height;
-                }
-
-                li += reserved;
-            }
-            else
-            {
-                context.Text.EmitLine(context, line.Line, left + line.X, contentTop - (line.Y + delta), lineElement, opacity);
-                overflows |= line.Line.Width > contentWidth + 0.01;
-                li++;
-            }
-        }
+        var overflows = context.Text.EmitFieldExpandedLines(
+            context, content.Lines,
+            static l => l.Line, static l => l.Source, static l => l.X, static l => l.Y,
+            left, contentTop, delta, contentWidth,
+            opacity, element, resolveStructure: true,
+            overflowThreshold: contentWidth);
 
         var cellClip = clip;
         if (overflows)

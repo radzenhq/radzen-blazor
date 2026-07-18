@@ -10,7 +10,8 @@ internal sealed class TextLineEmitter(
     FontCollection fonts,
     GeneratorFontResolver fontResolver,
     ImageStore imageStore,
-    StyleResolution resolution)
+    StyleResolution resolution,
+    StructureTreeBuilder structureTree)
 {
     private readonly List<byte> scratchBytes = [];
     private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
@@ -23,25 +24,51 @@ internal sealed class TextLineEmitter(
         double left,
         double top,
         double width)
+        => EmitFieldExpandedLines(
+            context, lines,
+            static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
+            left, top, delta: 0, width,
+            opacity: 1, inherited: null, resolveStructure: false,
+            overflowThreshold: double.PositiveInfinity);
+
+    public bool EmitFieldExpandedLines<TLine>(
+        EmitContext context,
+        IReadOnlyList<TLine> lines,
+        Func<TLine, LineBox> lineOf,
+        Func<TLine, Block> sourceOf,
+        Func<TLine, double> xOf,
+        Func<TLine, double> yOf,
+        double left,
+        double baseTop,
+        double delta,
+        double width,
+        double opacity,
+        StructureElement? inherited,
+        bool resolveStructure,
+        double overflowThreshold)
     {
-        var pageNumber = context.PageNumber;
-        var pageCount = context.PageCount;
+        var overflows = false;
         var i = 0;
         while (i < lines.Count)
         {
-            var line = lines[i];
-            if (line.Source is Paragraph paragraph && context.Fields.HasField(paragraph))
+            var current = lines[i];
+            var source = sourceOf(current);
+            var originX = left + xOf(current);
+            var element = resolveStructure ? structureTree.ElementOf(source) ?? inherited : null;
+            var marker = resolveStructure ? structureTree.MarkerElementOf(source) : null;
+            if (source is Paragraph paragraph && context.Fields.HasField(paragraph))
             {
                 var reserved = 0;
-                while (i + reserved < lines.Count && lines[i + reserved].Source == paragraph)
+                while (i + reserved < lines.Count && sourceOf(lines[i + reserved]) == source)
                 {
                     reserved++;
                 }
 
-                var y = line.Y;
-                foreach (var box in context.Fields.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph), reserved))
+                var y = yOf(current);
+                foreach (var box in context.Fields.ResolveFields(paragraph, width, context.PageNumber, context.PageCount, resolution.Alignment(paragraph), reserved))
                 {
-                    EmitLine(context, box, left, top - y, null);
+                    EmitLine(context, box, originX, baseTop - (y + delta), element, opacity, marker);
+                    overflows |= box.Width > overflowThreshold + 0.01;
                     y += box.Height;
                 }
 
@@ -49,10 +76,14 @@ internal sealed class TextLineEmitter(
             }
             else
             {
-                EmitLine(context, line.Line, left, top - line.Y, null);
+                var box = lineOf(current);
+                EmitLine(context, box, originX, baseTop - (yOf(current) + delta), element, opacity, marker);
+                overflows |= box.Width > overflowThreshold + 0.01;
                 i++;
             }
         }
+
+        return overflows;
     }
 
     public void EmitLine(EmitContext context, LineBox line, double originX, double baseline, StructureElement? element, double opacity = 1, StructureElement? markerElement = null)
@@ -247,7 +278,7 @@ internal sealed class TextLineEmitter(
                     }
                 }
 
-                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidth(current.Font, spaceWidths);
+                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidthMeasurer.SpaceWidth(fonts, current.Font, spaceWidths);
                 if (!allSpaces || Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
                     break;
@@ -282,17 +313,6 @@ internal sealed class TextLineEmitter(
         return result;
     }
 
-    private double SpaceWidth(Font font, Dictionary<Font, double> cache)
-    {
-        if (!cache.TryGetValue(font, out var width))
-        {
-            width = fonts.MeasureText(" ", font);
-            cache[font] = width;
-        }
-
-        return width;
-    }
-
     private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element, string? extGState)
     {
         var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
@@ -322,10 +342,7 @@ internal sealed class TextLineEmitter(
                         break;
                     }
 
-                    generated.GidToUnicode.TryAdd(gid, codepoint);
-                    bytes.Add((byte)(gid >> 8));
-                    bytes.Add((byte)(gid & 0xFF));
-                    advance += face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
+                    advance += SfntRunBuilder.AppendGlyph(generated, bytes, face, gid, codepoint, size);
                     i += codepoint > 0xFFFF ? 2 : 1;
                 }
 
