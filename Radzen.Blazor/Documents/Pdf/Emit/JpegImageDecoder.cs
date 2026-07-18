@@ -43,13 +43,14 @@ internal sealed class JpegImageDecoder : IImageDecoder
 
         var stream = new StreamObject(data);
         var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Image");
-        dict["Width"] = new NumberObject(width);
-        dict["Height"] = new NumberObject(height);
-        dict["ColorSpace"] = new NameObject(colorSpace);
-        dict["BitsPerComponent"] = new NumberObject(precision);
-        dict["Filter"] = new NameObject("DCTDecode");
+        ImageXObjectShell.Apply(
+            dict,
+            new NumberObject(width),
+            new NumberObject(height),
+            new NameObject(colorSpace),
+            imageMask: false,
+            new NumberObject(precision),
+            new NameObject("DCTDecode"));
 
         if (components == 4 && adobe)
         {

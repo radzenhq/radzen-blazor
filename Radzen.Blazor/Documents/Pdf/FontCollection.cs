@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace Radzen.Documents.Pdf;
 
@@ -124,7 +123,13 @@ public sealed class FontCollection
             }
         }
 
-        return FromBytes(DocumentReader.ReadFully(font, long.MaxValue), sharedWithCaller: false);
+        return FromBytes(BufferStream(font, ReaderLimits.Default), sharedWithCaller: false);
+    }
+
+    internal static byte[] BufferStream(Stream font, ReaderLimits limits)
+    {
+        ArgumentNullException.ThrowIfNull(limits);
+        return DocumentReader.ReadFully(font, limits.MaxFileBytes);
     }
 
     private static ParsedSource FromBytes(byte[] bytes, bool sharedWithCaller)
@@ -243,28 +248,8 @@ public sealed class FontCollection
         }
     }
 
-    private static ulong Signature(ReadOnlySpan<byte> head, ReadOnlySpan<byte> tail, ulong hash = 14695981039346656037)
-    {
-        hash = Fold(head, hash);
-        return Fold(tail, hash);
-
-        static ulong Fold(ReadOnlySpan<byte> data, ulong hash)
-        {
-            const ulong prime = 1099511628211;
-            var blocks = MemoryMarshal.Cast<byte, ulong>(data[..(data.Length & ~7)]);
-            foreach (var block in blocks)
-            {
-                hash = (hash ^ block) * prime;
-            }
-
-            foreach (var b in data[(data.Length & ~7)..])
-            {
-                hash = (hash ^ b) * prime;
-            }
-
-            return hash;
-        }
-    }
+    private static ulong Signature(ReadOnlySpan<byte> head, ReadOnlySpan<byte> tail, ulong hash = Fnv1a64.OffsetBasis)
+        => Fnv1a64.Hash(tail, Fnv1a64.Hash(head, hash));
 
     private static ParsedSource ParseCopy(byte[] bytes)
         => new(bytes, IsCollection(bytes), SfntFont.ParseCollection(bytes));

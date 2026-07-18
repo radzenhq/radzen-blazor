@@ -41,7 +41,13 @@ public static class ImageDecoder
         }
     }
 
-    internal static byte[] ReadFully(Stream stream) => DocumentReader.ReadFully(stream, long.MaxValue);
+    internal static byte[] ReadFully(Stream stream) => ReadFully(stream, ReaderLimits.Default);
+
+    internal static byte[] ReadFully(Stream stream, ReaderLimits limits)
+    {
+        ArgumentNullException.ThrowIfNull(limits);
+        return DocumentReader.ReadFully(stream, limits.MaxFileBytes);
+    }
 
     internal static ImageXObject Decode(byte[] imageBytes) => Decode(imageBytes, ReaderLimits.Default);
 
@@ -215,14 +221,14 @@ public static class ImageDecoder
         }
 
         var stream = new StreamObject(xobject.Image.Data);
-        var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Image");
-        dict["Width"] = source["Width"];
-        dict["Height"] = source["Height"];
-        dict["ImageMask"] = new BooleanObject(true);
-        dict["BitsPerComponent"] = new NumberObject(1);
-        dict["Filter"] = source["Filter"];
+        ImageXObjectShell.Apply(
+            stream.Dictionary,
+            source["Width"],
+            source["Height"],
+            colorSpace: null,
+            imageMask: true,
+            new NumberObject(1),
+            source["Filter"]);
         return new ImageXObject(stream, null);
     }
 

@@ -110,12 +110,7 @@ internal static class SoftMask
 
     private static string ShadowKey(ShadowMask mask, double left, double bottom, double rectWidth, double rectHeight, double alpha)
     {
-        var hash = 1469598103934665603UL;
-        foreach (var pixel in mask.Pixels)
-        {
-            hash = (hash ^ pixel) * 1099511628211UL;
-        }
-
+        var hash = Fnv1a64.Hash(mask.Pixels);
         var culture = CultureInfo.InvariantCulture;
         return string.Create(culture, $"{mask.Width}x{mask.Height}:{hash:x}:{left}:{bottom}:{rectWidth}:{rectHeight}:{alpha}");
     }

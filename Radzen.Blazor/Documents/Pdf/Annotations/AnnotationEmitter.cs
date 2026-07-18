@@ -324,10 +324,10 @@ internal static class AnnotationEmitter
 
         var emitted = content.DetachResult();
         var stream = new StreamObject(emitted.Bytes!);
-        stream.Dictionary["Type"] = new NameObject("XObject");
-        stream.Dictionary["Subtype"] = new NameObject("Form");
-        stream.Dictionary["FormType"] = new NumberObject(1);
-        stream.Dictionary["BBox"] = PageResourceBuilder.NumberBox(AppearanceBounds(annotation));
+        FormXObjectShell.ApplyHeader(
+            stream.Dictionary,
+            PageResourceBuilder.NumberBox(AppearanceBounds(annotation)),
+            formType: true);
         var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
         if (annotation.Opacity < 1)
         {

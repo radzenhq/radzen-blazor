@@ -152,9 +152,7 @@ internal static class FieldAppearances
         ];
 
         var appearance = new StreamObject(writer.ToArray());
-        appearance.Dictionary["Type"] = new NameObject("XObject");
-        appearance.Dictionary["Subtype"] = new NameObject("Form");
-        appearance.Dictionary["BBox"] = bbox;
+        FormXObjectShell.ApplyHeader(appearance.Dictionary, bbox, formType: false);
 
         var resources = BuildFontResources(writer);
         if (resources is not null)
