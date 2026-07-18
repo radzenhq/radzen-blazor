@@ -97,8 +97,6 @@ internal sealed class FormFlattener(Document document)
             return;
         }
 
-        var formDa = source.GetString(sourceAcroForm, "DA");
-
         foreach (var page in document.Pages)
         {
             if (!Loaded!.SourcePages.TryGetValue(page, out var node)
@@ -114,7 +112,7 @@ internal sealed class FormFlattener(Document document)
                 if (source.AsDictionary(entry) is { } annot && IsWidget(annot))
                 {
                     widgets++;
-                    DrawWidget(page, annot, formDa);
+                    DrawWidget(page, annot, sourceAcroForm);
                 }
                 else
                 {
@@ -134,7 +132,7 @@ internal sealed class FormFlattener(Document document)
 
     private bool IsWidget(DictionaryObject annot) => FormField.IsWidget(Source!, annot);
 
-    private void DrawWidget(Page page, DictionaryObject widget, string? formDa)
+    private void DrawWidget(Page page, DictionaryObject widget, DictionaryObject sourceAcroForm)
     {
         var source = Source;
         if (source!.GetInt(widget, "F") is { } flags && (flags & 2) != 0)
@@ -203,7 +201,7 @@ internal sealed class FormFlattener(Document document)
                 + "single left-aligned line, so flattening it would paint the wrong content.");
         }
 
-        var da = (Inherited(widget, "DA") as StringObject)?.Value ?? formDa;
+        var da = InheritedDefaultAppearance.Resolve(source!, widget, sourceAcroForm);
         var (daFont, daSize) = FieldAppearances.ParseDefaultAppearance(da);
         var font = FieldAppearances.AppearanceFont(daFont, daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize);
         page.Content.Add(new TextContent(
