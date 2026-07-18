@@ -128,8 +128,8 @@ internal sealed class TextLineEmitter(
             }
         }
 
-        EmitUnderlines(plan, line, originX, y, opacity);
-        EmitStrikethroughs(plan, line, originX, y, opacity);
+        EmitDecorations(plan, line, originX, y, opacity, underline: true);
+        EmitDecorations(plan, line, originX, y, opacity, underline: false);
         EmitLinks(plan, line, originX, y);
     }
 
@@ -205,12 +205,18 @@ internal sealed class TextLineEmitter(
         }
     }
 
-    private static void EmitUnderlines(PagePlan plan, LineBox line, double originX, double y, double opacity)
+    private static void EmitDecorations(
+        PagePlan plan, LineBox line, double originX, double y, double opacity, bool underline)
     {
         foreach (var (first, start, end) in Spans(
             line.Fragments,
-            f => f.Font.Underline && f.Text.Length > 0,
-            (f, next) => next.Run == f.Run))
+            f => (underline ? f.Font.Underline : f.Font.Strikethrough) && f.Text.Length > 0,
+            (f, next) => underline
+                ? next.Run == f.Run
+                : next.Font.Strikethrough
+                    && next.Font.Size == f.Font.Size
+                    && next.Font.Color.Equals(f.Font.Color)
+                    && next.Run.Opacity == f.Run.Opacity))
         {
             var fragment = line.Fragments[first];
             var font = fragment.Font;
@@ -218,29 +224,7 @@ internal sealed class TextLineEmitter(
                 plan,
                 originX + start,
                 originX + end,
-                y - (font.Size * 0.12),
-                font,
-                opacity * fragment.Run.Opacity);
-        }
-    }
-
-    private static void EmitStrikethroughs(PagePlan plan, LineBox line, double originX, double y, double opacity)
-    {
-        foreach (var (first, start, end) in Spans(
-            line.Fragments,
-            f => f.Font.Strikethrough && f.Text.Length > 0,
-            (f, next) => next.Font.Strikethrough
-                && next.Font.Size == f.Font.Size
-                && next.Font.Color.Equals(f.Font.Color)
-                && next.Run.Opacity == f.Run.Opacity))
-        {
-            var fragment = line.Fragments[first];
-            var font = fragment.Font;
-            AddDecorationEdge(
-                plan,
-                originX + start,
-                originX + end,
-                y + (font.Size * 0.3),
+                y + font.Size * (underline ? -0.12 : 0.3),
                 font,
                 opacity * fragment.Run.Opacity);
         }
@@ -249,7 +233,6 @@ internal sealed class TextLineEmitter(
     private List<LineFragment> CoalesceFragments(IReadOnlyList<LineFragment> fragments)
     {
         var result = new List<LineFragment>(fragments.Count);
-        var spaceWidths = new Dictionary<Font, double>();
         var i = 0;
         while (i < fragments.Count)
         {
@@ -278,7 +261,11 @@ internal sealed class TextLineEmitter(
                     }
                 }
 
-                var gapWidth = next.Start == end ? 0 : (next.Start - end) * SpaceWidthMeasurer.SpaceWidth(fonts, current.Font, spaceWidths);
+                var gapWidth = next.Start == end
+                    ? 0
+                    : RunTextAdvance.Measure(
+                        fonts, run, current.Font, text[end..next.Start],
+                        leadingCharacterSpacing: true, trailingCharacterSpacing: true);
                 if (!allSpaces || Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
                     break;
@@ -329,7 +316,7 @@ internal sealed class TextLineEmitter(
             if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
                 var generated = fontResolver.ResolveSfnt(face);
-                var glyphRun = new SfntRunAccumulator(face, generated, size, fonts.EnableKerning, kernAcrossSpaces: false, scratchBytes);
+                var glyphRun = new SfntRunAccumulator(face, generated, font.Size, fonts.EnableKerning, kernAcrossSpaces: false, scratchBytes);
                 glyphRun.Begin();
                 while (i < text.Length)
                 {
@@ -365,7 +352,9 @@ internal sealed class TextLineEmitter(
                     Kerns = glyphRun.Kerns,
                 });
 
-                x += spacing == 0 ? glyphRun.Advance : glyphRun.Advance + (spacing * glyphRun.GlyphCount);
+                x += RunTextAdvance.Calculate(
+                    glyphRun.Advance, glyphRun.GlyphCount, glyphRun.WordSpaceCount, run,
+                    trailingCharacterSpacing: true);
             }
             else
             {
@@ -401,7 +390,7 @@ internal sealed class TextLineEmitter(
                     for (var k = 1; k < segment.Length; k++)
                     {
                         var kern = metrics.GetRunKerning(segment[k - 1], segment[k]);
-                        kernPoints += kern * size / 1000.0;
+                        kernPoints += kern * font.Size / 1000.0;
                         list.Add(-kern);
                     }
 
@@ -427,7 +416,12 @@ internal sealed class TextLineEmitter(
                     Kerns = kerns,
                 });
 
-                x += metrics.MeasureString(segment, size) + kernPoints + (spacing * segment.Length);
+                x += RunTextAdvance.Calculate(
+                    metrics.MeasureString(segment, font.Size) + kernPoints,
+                    segment.Length,
+                    CountSpaces(segment),
+                    run,
+                    trailingCharacterSpacing: true);
             }
         }
     }
@@ -441,7 +435,7 @@ internal sealed class TextLineEmitter(
         var rise = run.ScriptRise(font.Size);
         var runX = startX;
 
-        foreach (var glyphRun in runBuilder.Build(fragment.Text, font, size, kernAcrossSpaces: false))
+        foreach (var glyphRun in runBuilder.Build(fragment.Text, font, font.Size, kernAcrossSpaces: false))
         {
             var face = glyphRun.Face;
             plan.UsedFonts.Add(glyphRun.Font);
@@ -466,8 +460,24 @@ internal sealed class TextLineEmitter(
                 Kerns = glyphRun.Kerns,
             });
 
-            runX += spacing == 0 ? glyphRun.Advance : glyphRun.Advance + (spacing * glyphRun.GlyphCount);
+            runX += RunTextAdvance.Calculate(
+                glyphRun.Advance, glyphRun.GlyphCount, glyphRun.WordSpaceCount, run,
+                trailingCharacterSpacing: true);
         }
+    }
+
+    private static int CountSpaces(string text)
+    {
+        var count = 0;
+        foreach (var character in text)
+        {
+            if (character == ' ')
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     private void EmitInlineImage(PagePlan plan, InlineImage image, double x, double baseline, StructureElement? element, double alpha)

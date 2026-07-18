@@ -105,8 +105,7 @@ internal static class BandLayouter
 
     public static (double Width, double Height) EffectiveSize(Section section)
     {
-        var width = section.PageSize.Width.Point;
-        var height = section.PageSize.Height.Point;
-        return section.Orientation == PageOrientation.Landscape ? (height, width) : (width, height);
+        var (width, height) = section.PageSize.Effective(section.Orientation);
+        return (width.Point, height.Point);
     }
 }

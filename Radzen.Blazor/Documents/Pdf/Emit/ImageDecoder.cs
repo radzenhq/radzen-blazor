@@ -11,6 +11,8 @@ namespace Radzen.Documents.Pdf.Emit;
 /// </summary>
 public static class ImageDecoder
 {
+    private const int RegisteredDecoderLimit = 64;
+
     private static readonly IImageDecoder[] Decoders =
     [
         new PngImageDecoder(),
@@ -34,6 +36,19 @@ public static class ImageDecoder
         lock (RegisterGate)
         {
             var snapshot = registered;
+            foreach (var existing in snapshot)
+            {
+                if (ReferenceEquals(existing, decoder))
+                {
+                    return;
+                }
+            }
+
+            if (snapshot.Length >= RegisteredDecoderLimit)
+            {
+                throw new InvalidOperationException($"No more than {RegisteredDecoderLimit} custom image decoders can be registered.");
+            }
+
             var updated = new IImageDecoder[snapshot.Length + 1];
             snapshot.CopyTo(updated, 0);
             updated[^1] = decoder;
@@ -154,10 +169,7 @@ public static class ImageDecoder
     private static ImageXObject Copy(ImageXObject xobject)
     {
         var stream = new StreamObject(xobject.Image.Data);
-        foreach (var key in xobject.Image.Dictionary.Keys)
-        {
-            stream.Dictionary[key] = xobject.Image.Dictionary[key];
-        }
+        xobject.Image.Dictionary.Copy(stream.Dictionary);
 
         return new ImageXObject(stream, xobject.SoftMask);
     }

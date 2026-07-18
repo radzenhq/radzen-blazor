@@ -51,9 +51,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <returns>The newly added page.</returns>
     public Page Add(PageSize size, PageOrientation orientation)
     {
-        var (width, height) = orientation == PageOrientation.Landscape
-            ? (size.Height, size.Width)
-            : (size.Width, size.Height);
+        var (width, height) = size.Effective(orientation);
 
         var page = new Page(width, height);
         Insert(pages.Count, page);

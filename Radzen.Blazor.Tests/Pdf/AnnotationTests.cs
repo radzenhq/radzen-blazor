@@ -11,6 +11,24 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class AnnotationTests
 {
     [Fact]
+    public void MalformedUriThrowsDocumentParseException()
+    {
+        var source = new Document();
+        source.Pages.Add().Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20))
+        {
+            Uri = new Uri("http://a.co/"),
+        });
+        var bytes = source.ToArray();
+        var valid = Encoding.ASCII.GetBytes("http://a.co/");
+        var invalid = Encoding.ASCII.GetBytes("http://[::1/");
+        var offset = bytes.AsSpan().IndexOf(valid);
+        Assert.True(offset >= 0);
+        invalid.CopyTo(bytes.AsSpan(offset));
+
+        Assert.Throws<DocumentParseException>(() => Load(bytes));
+    }
+
+    [Fact]
     public void CreatedAnnotationKinds_SaveAndReloadTheirDeclarativeState()
     {
         var document = new Document();

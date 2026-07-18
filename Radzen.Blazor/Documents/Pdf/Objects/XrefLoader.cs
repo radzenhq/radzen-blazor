@@ -95,7 +95,17 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
                 var entryOffset = ReadLong(ref index);
                 var entryGeneration = ReadLong(ref index);
                 SkipWhitespace(ref index);
+                if ((uint)index >= (uint)data.Length)
+                {
+                    throw new DocumentParseException("Truncated cross-reference entry.", index);
+                }
+
                 var type = data[index];
+                if (type is not ((byte)'n') and not ((byte)'f'))
+                {
+                    throw new DocumentParseException("Invalid cross-reference entry type.", index);
+                }
+
                 index++;
                 var number = start + i;
                 if (!entries.ContainsKey(number) && !section.ContainsKey(number))

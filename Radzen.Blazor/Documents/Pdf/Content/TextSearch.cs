@@ -335,16 +335,16 @@ internal static class TextSearch
         var estimated = false;
         foreach (var code in font.DecodeCodes(bytes))
         {
-            var known = font.TryGetWidth(code.Code, out var width);
-            estimated |= !known;
-            var widthEm = known ? width / 1000.0 : TextComposition.AverageGlyphEm;
-            var glyphAdvance = GlyphMetrics.Advance(widthEm, fontSize, charSpacing, wordSpacing, code.IsWordSpace);
+            var glyphAdvance = LoadedGlyphAdvance.Calculate(
+                font, code.Code, code.IsWordSpace, fontSize, scale, charSpacing, wordSpacing,
+                MissingWidthPolicy.Estimate, out var glyphEstimated);
+            estimated |= glyphEstimated;
             for (var i = 0; i < code.Text.Length; i++)
             {
                 builder.Append(code.Text[i]);
                 if (i == code.Text.Length - 1)
                 {
-                    advance += glyphAdvance * scale;
+                    advance += glyphAdvance;
                 }
 
                 advanceOffsets.Add(advance);
@@ -425,7 +425,7 @@ internal static class TextSearch
         text.Append(value);
     }
 
-    private static ComposedText Normalize(string text)
+    private static ComposedText Normalize(string text, IReadOnlyList<CharacterSource>? source = null)
     {
         var builder = new StringBuilder(text.Length);
         var characters = new List<CharacterSource>(text.Length);
@@ -436,14 +436,14 @@ internal static class TextSearch
             {
                 if (!inWhitespace)
                 {
-                    characters.Add(new CharacterSource(i, -1, -1));
+                    characters.Add(source is null ? new CharacterSource(i, -1, -1) : source[i]);
                     builder.Append(' ');
                     inWhitespace = true;
                 }
             }
             else
             {
-                characters.Add(new CharacterSource(i, -1, -1));
+                characters.Add(source is null ? new CharacterSource(i, -1, -1) : source[i]);
                 builder.Append(text[i]);
                 inWhitespace = false;
             }
@@ -452,32 +452,7 @@ internal static class TextSearch
         return new ComposedText(builder.ToString(), characters);
     }
 
-    private static ComposedText Normalize(ComposedText value)
-    {
-        var builder = new StringBuilder(value.Text.Length);
-        var characters = new List<CharacterSource>(value.Text.Length);
-        var inWhitespace = false;
-        for (var i = 0; i < value.Text.Length; i++)
-        {
-            if (char.IsWhiteSpace(value.Text[i]))
-            {
-                if (!inWhitespace)
-                {
-                    characters.Add(value.Characters[i]);
-                    builder.Append(' ');
-                    inWhitespace = true;
-                }
-            }
-            else
-            {
-                characters.Add(value.Characters[i]);
-                builder.Append(value.Text[i]);
-                inWhitespace = false;
-            }
-        }
-
-        return new ComposedText(builder.ToString(), characters);
-    }
+    private static ComposedText Normalize(ComposedText value) => Normalize(value.Text, value.Characters);
 
     private static bool IsWholeWord(string text, int index, int length)
         => (index == 0 || !IsWordCharacter(text[index - 1]))

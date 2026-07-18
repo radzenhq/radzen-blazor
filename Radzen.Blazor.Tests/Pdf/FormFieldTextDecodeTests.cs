@@ -173,6 +173,12 @@ public class FormFieldTextDecodeTests
     }
 
     [Fact]
+    public void TextStringWithoutBomUsesPdfDocEncoding()
+    {
+        Assert.Equal("•—€", FormField.DecodeTextString("\u0080\u0084\u00a0"));
+    }
+
+    [Fact]
     public void FilledNonAsciiValueReadsBack()
     {
         var document = Load();

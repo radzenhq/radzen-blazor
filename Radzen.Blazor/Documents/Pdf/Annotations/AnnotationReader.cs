@@ -125,7 +125,12 @@ internal static class AnnotationReader
             var kind = reader.GetName(action, "S");
             if (kind == "URI" && reader.GetString(action, "URI") is { } uri)
             {
-                annotation.Uri = new Uri(uri, UriKind.RelativeOrAbsolute);
+                if (!Uri.TryCreate(uri, UriKind.RelativeOrAbsolute, out var parsed))
+                {
+                    throw new DocumentParseException("Annotation /URI is malformed.", -1);
+                }
+
+                annotation.Uri = parsed;
             }
             else if (kind == "GoTo" && action.TryGetValue("D", out var destination))
             {
