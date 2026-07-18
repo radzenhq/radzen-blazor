@@ -1,10 +1,13 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
+using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class FormFlattener(Document document)
 {
+    private readonly HashSet<Page> ownedResources = [];
+
     private LoadedState? Loaded => document.Loaded;
 
     private DocumentReader? Source => document.Loaded?.Source;
@@ -159,6 +162,11 @@ internal sealed class FormFlattener(Document document)
             }
 
             var state = source!.GetName(widget, "AS") ?? (Inherited(widget, "V") as NameObject)?.Value;
+            if (TryPaintButtonAppearance(page, widget, state, x, y, width, height))
+            {
+                return;
+            }
+
             if (state is not null && !string.Equals(state, "Off", StringComparison.Ordinal))
             {
                 var radio = Inherited(widget, "Ff") is NumberObject ff && (ff.IntValue & FieldFlags.Radio) != 0;
@@ -205,6 +213,133 @@ internal sealed class FormFlattener(Document document)
         {
             Font = font,
         });
+    }
+
+    private bool TryPaintButtonAppearance(
+        Page page, DictionaryObject widget, string? state, double x, double y, double width, double height)
+    {
+        var source = Source!;
+        if (source.GetDictionary(widget, "AP") is not { } ap || !ap.TryGetValue("N", out var normal))
+        {
+            return false;
+        }
+
+        var resolved = source.Resolve(normal!);
+        DocumentObject reference;
+        StreamObject appearance;
+        if (resolved is StreamObject direct)
+        {
+            reference = normal!;
+            appearance = direct;
+        }
+        else if (resolved is DictionaryObject states
+            && states.TryGetValue(state ?? "Off", out var entry)
+            && source.AsStream(entry!) is { } stateStream)
+        {
+            reference = entry!;
+            appearance = stateStream;
+        }
+        else
+        {
+            return false;
+        }
+
+        if (!AppearanceMatrixIsIdentity(appearance)
+            || !TryAppearanceBox(appearance, out var x0, out var y0, out var boxWidth, out var boxHeight))
+        {
+            return false;
+        }
+
+        var xobjects = PrivateXObjects(page);
+        var name = "FFlatten";
+        while (xobjects.ContainsKey(name))
+        {
+            name += "z";
+        }
+
+        xobjects[name] = reference;
+        var scaleX = width / boxWidth;
+        var scaleY = height / boxHeight;
+        page.Content.Add(new XObjectContent(name)
+        {
+            Transform = Matrix.FromComponents(scaleX, 0, 0, scaleY, x - x0 * scaleX, y - y0 * scaleY),
+        });
+        return true;
+    }
+
+    private bool AppearanceMatrixIsIdentity(StreamObject appearance)
+    {
+        if (Source!.GetArray(appearance.Dictionary, "Matrix") is not { } matrix)
+        {
+            return true;
+        }
+
+        double[] identity = [1, 0, 0, 1, 0, 0];
+        if (matrix.Count != identity.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < identity.Length; i++)
+        {
+            if (Source!.AsNumber(matrix[i]) is not { } value || value != identity[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool TryAppearanceBox(StreamObject appearance, out double x0, out double y0, out double width, out double height)
+    {
+        x0 = y0 = width = height = 0.0;
+        if (Source!.GetArray(appearance.Dictionary, "BBox") is not { Count: 4 } box
+            || Source!.AsNumber(box[0]) is not { } left
+            || Source!.AsNumber(box[1]) is not { } bottom
+            || Source!.AsNumber(box[2]) is not { } right
+            || Source!.AsNumber(box[3]) is not { } top)
+        {
+            return false;
+        }
+
+        x0 = left;
+        y0 = bottom;
+        width = right - left;
+        height = top - bottom;
+        return width != 0.0 && height != 0.0;
+    }
+
+    private DictionaryObject PrivateXObjects(Page page)
+    {
+        var loaded = Loaded!;
+        loaded.SourceResources.TryGetValue(page, out var resources);
+        if (!ownedResources.Add(page))
+        {
+            return (DictionaryObject)resources!["XObject"]!;
+        }
+
+        var copy = new DictionaryObject();
+        var xobjects = new DictionaryObject();
+        if (resources is not null)
+        {
+            foreach (var key in resources.Keys)
+            {
+                copy[key] = resources[key];
+            }
+
+            if (Source!.GetDictionary(resources, "XObject") is { } shared)
+            {
+                foreach (var key in shared.Keys)
+                {
+                    xobjects[key] = shared[key];
+                }
+            }
+        }
+
+        copy["XObject"] = xobjects;
+        loaded.SourceResources[page] = copy;
+        return xobjects;
     }
 
     private string FieldName(DictionaryObject widget)

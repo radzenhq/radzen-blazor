@@ -21,6 +21,11 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         var names = FilterNames(filter);
         if (names.Count == 0)
         {
+            if (data.Length > limits.MaxDecodedStreamBytes)
+            {
+                throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
+            }
+
             return data.ToArray();
         }
 

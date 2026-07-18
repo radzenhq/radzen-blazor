@@ -71,6 +71,25 @@ public class FormFieldCreationTests
         return text.ToString();
     }
 
+    private static string AllPaintedContent(DocumentReader reader)
+    {
+        var text = new StringBuilder(AllPageContent(reader));
+        var page = FormTestSupport.FirstPage(reader);
+        if (reader.Resolve(page["Resources"]) is DictionaryObject resources
+            && reader.GetDictionary(resources, "XObject") is { } xobjects)
+        {
+            foreach (var key in xobjects.Keys)
+            {
+                if (reader.Resolve(xobjects[key]) is StreamObject form)
+                {
+                    text.Append('\n').Append(FormTestSupport.Decode(form));
+                }
+            }
+        }
+
+        return text.ToString();
+    }
+
     [Fact]
     public void CreatedFieldsSaveIntoAcroFormFields()
     {
@@ -172,7 +191,7 @@ public class FormFieldCreationTests
             }
         }
 
-        var content = AllPageContent(reader);
+        var content = AllPaintedContent(reader);
         Assert.Contains("Radzen Ltd", content);
         Assert.Contains("S\n", content);
     }
