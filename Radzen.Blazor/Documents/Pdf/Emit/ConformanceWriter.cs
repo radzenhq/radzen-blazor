@@ -36,6 +36,8 @@ internal sealed class ConformanceWriter(Document document)
                 "PDF/UA requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder.");
         }
 
+        ValidateInspectable();
+
         ValidateFonts();
 
         if (document.PdfUA && string.IsNullOrEmpty(document.Language))
@@ -51,7 +53,6 @@ internal sealed class ConformanceWriter(Document document)
         }
 
         ValidateTagging();
-        ValidateInspectable();
     }
 
     // Font embedding: ISO 19005-2 6.2.11.4.1. DeviceCMYK against sRGB intent: 6.2.4.3.

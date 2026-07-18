@@ -91,6 +91,16 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
                     var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
                     tr.Children.Add(td);
                     tree.blockElements[cell] = td;
+                    if (tree.TaggingActive)
+                    {
+                        foreach (var child in cell.Blocks)
+                        {
+                            if (child is not Paragraph)
+                            {
+                                tree.MapBlock(child, td);
+                            }
+                        }
+                    }
                 }
             }
 
