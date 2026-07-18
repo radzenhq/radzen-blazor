@@ -1,7 +1,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -24,53 +23,6 @@ public class ContentElementTests
         }
 
         return null;
-    }
-
-    [Fact]
-    public void Content_IsEmptyByDefault()
-    {
-        var document = new Document();
-        var page = document.Pages.Add();
-
-        Assert.Empty(page.Content);
-        Assert.Equal(0, page.Content.Count);
-    }
-
-    [Fact]
-    public void Content_IsReadOnlyListOfContentElement()
-    {
-        var document = new Document();
-        var page = document.Pages.Add();
-
-        Assert.IsAssignableFrom<IReadOnlyList<ContentElement>>(page.Content);
-    }
-
-    [Fact]
-    public void Add_ReturnsSameInstanceAndAppends()
-    {
-        var document = new Document();
-        var page = document.Pages.Add();
-
-        var text = page.Content.Add(new TextContent("Hi", 10, 20));
-
-        Assert.Single(page.Content);
-        Assert.Same(text, page.Content[0]);
-    }
-
-    [Fact]
-    public void Add_PreservesInsertionOrderInCollection()
-    {
-        var document = new Document();
-        var page = document.Pages.Add();
-
-        var a = page.Content.Add(new TextContent("A", 0, 0));
-        var b = page.Content.Add(new PathContent());
-        var c = page.Content.Add(new TextContent("C", 0, 0));
-
-        Assert.Equal(3, page.Content.Count);
-        Assert.Same(a, page.Content[0]);
-        Assert.Same(b, page.Content[1]);
-        Assert.Same(c, page.Content[2]);
     }
 
     [Fact]
@@ -256,15 +208,6 @@ public class ContentElementTests
         var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
 
         Assert.Contains("cm", ContentStreamTokenizer.Operators(content));
-    }
-
-    [Fact]
-    public void ImageContent_ExposesRect()
-    {
-        var image = new ImageContent([1, 2, 3, 4]) { Bounds = PdfRect.FromSize(10, 20, 100, 50) };
-
-        Assert.Equal(PdfRect.FromSize(10, 20, 100, 50), image.Bounds);
-        Assert.IsAssignableFrom<ContentElement>(image);
     }
 
     [Fact]

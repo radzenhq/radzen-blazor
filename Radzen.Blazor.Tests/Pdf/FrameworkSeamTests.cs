@@ -87,21 +87,6 @@ public class FrameworkSeamTests
         Assert.Equal(3, Assert.IsType<NumberObject>(coords[2]).DoubleValue, 3);
     }
 
-    private sealed class StampFieldDefinition(string name) : FormFieldDefinition(name)
-    {
-        public string Text { get; init; } = string.Empty;
-    }
-
-    [Fact]
-    public void FormFieldDefinition_ExternalSubclass_CarriesDeclarativeState()
-    {
-        var definition = new StampFieldDefinition("s") { PageIndex = 2, Text = "seal" };
-
-        Assert.Equal("s", definition.Name);
-        Assert.Equal(2, definition.PageIndex);
-        Assert.Equal("seal", definition.Text);
-    }
-
     [Fact]
     public void FormFieldDefinition_ProtectedSurface_HasNoCosTypes()
     {

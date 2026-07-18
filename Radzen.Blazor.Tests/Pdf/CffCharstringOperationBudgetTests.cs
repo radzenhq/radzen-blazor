@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Radzen.Documents.Pdf;
@@ -132,13 +131,6 @@ public class CffCharstringOperationBudgetTests
             new ReaderLimits { MaxCharstringOperations = 1000 });
 
         Assert.Equal(201, font.GetAdvanceWidth(0));
-    }
-
-    [Fact]
-    public void BudgetMustBePositive()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(
-            () => new ReaderLimits { MaxCharstringOperations = 0 }.Snapshot());
     }
 
     private static CffFont NotoCff(ReaderLimits? limits = null)

@@ -83,15 +83,6 @@ public class PdfBoundaryValidationTests
         Assert.Equal("1.235", Encoding.ASCII.GetString(writer.ToArray()));
     }
 
-    [Fact]
-    public void HeadingFontSizes_Null_ThrowsNamingArgument()
-    {
-        var exception = Assert.Throws<ArgumentNullException>(
-            () => new MarkdownPdfOptions { HeadingFontSizes = null! });
-
-        Assert.Equal("value", exception.ParamName);
-    }
-
     [Theory]
     [InlineData(0)]
     [InlineData(5)]

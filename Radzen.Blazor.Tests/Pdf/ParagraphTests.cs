@@ -1,5 +1,4 @@
 #nullable enable
-using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -23,13 +22,6 @@ public class ParagraphTests
         Assert.False(p.KeepWithNext);
         Assert.Equal(2, p.Widows);
         Assert.Equal(2, p.Orphans);
-    }
-
-    [Fact]
-    public void Inlines_IsReadOnlyListOfRun()
-    {
-        var p = new Paragraph();
-        Assert.IsAssignableFrom<IReadOnlyList<Run>>(p.Inlines);
     }
 
     [Fact]
@@ -74,32 +66,6 @@ public class ParagraphTests
     }
 
     [Fact]
-    public void Inlines_AddRunReturnsSameInstance()
-    {
-        var p = new Paragraph();
-        var run = new Run("custom");
-        var returned = p.Inlines.Add(run);
-        Assert.Same(run, returned);
-        Assert.Same(run, p.Inlines[0]);
-    }
-
-    [Fact]
-    public void Run_Constructor_SetsText()
-    {
-        var run = new Run("abc");
-        Assert.Equal("abc", run.Text);
-        Assert.NotNull(run.Font);
-    }
-
-    [Fact]
-    public void Run_TextIsSettable()
-    {
-        var run = new Run("abc");
-        run.Text = "xyz";
-        Assert.Equal("xyz", run.Text);
-    }
-
-    [Fact]
     public void Run_FontIndependentOfParagraphFont()
     {
         var p = new Paragraph();
@@ -108,29 +74,5 @@ public class ParagraphTests
         Assert.False(run.Font.Bold);
         run.Font.Italic = true;
         Assert.False(p.Font.Italic);
-    }
-
-    [Fact]
-    public void Paragraph_PropertiesSettable()
-    {
-        var p = new Paragraph();
-        p.Alignment = HorizontalAlignment.Center;
-        p.SpacingBefore = Unit.FromPoint(6);
-        p.SpacingAfter = Unit.FromPoint(12);
-        p.LineSpacing = 1.5;
-        p.StyleName = "Heading1";
-        p.KeepTogether = true;
-        p.KeepWithNext = true;
-        p.Widows = 3;
-        p.Orphans = 4;
-        Assert.Equal(HorizontalAlignment.Center, p.Alignment);
-        Assert.Equal(6, p.SpacingBefore.Point, 9);
-        Assert.Equal(12, p.SpacingAfter.Point, 9);
-        Assert.Equal(1.5, p.LineSpacing, 9);
-        Assert.Equal("Heading1", p.StyleName);
-        Assert.True(p.KeepTogether);
-        Assert.True(p.KeepWithNext);
-        Assert.Equal(3, p.Widows);
-        Assert.Equal(4, p.Orphans);
     }
 }

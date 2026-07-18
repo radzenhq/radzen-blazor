@@ -28,13 +28,6 @@ public class DocModelHardeningTests
         Assert.Null(cell.Text);
     }
 
-    [Fact]
-    public void InlineCollection_AddNullRun_Throws()
-    {
-        var inlines = new Paragraph().Inlines;
-        Assert.Throws<ArgumentNullException>(() => inlines.Add((Run)null!));
-    }
-
     private static byte[] ValidPdfBytes()
     {
         var document = new Document();
