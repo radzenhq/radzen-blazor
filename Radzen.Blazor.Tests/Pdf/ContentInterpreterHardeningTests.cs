@@ -75,4 +75,17 @@ public class ContentInterpreterHardeningTests
         Assert.Contains("/Pattern CS", body);
         Assert.Contains("/P0 SCN", body);
     }
+
+    [Fact]
+    public void NestedDictionaryOperand_DoesNotLeakIntoTheOperatorFrame()
+    {
+        var content = Materialize("/Tag << /A << /B 1 >> /C 2 >> DP 0 0 10 10 re f");
+
+        var raw = Assert.IsType<RawContent>(content[0]);
+        Assert.Equal("DP", raw.Operator);
+
+        var body = Emit(raw);
+        Assert.Equal("/Tag DP\n", body);
+        Assert.IsType<PathContent>(content[1]);
+    }
 }

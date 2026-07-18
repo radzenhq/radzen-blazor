@@ -114,21 +114,48 @@ public sealed class Page
     /// are clipped when output in a production environment. When <see langword="null"/> no
     /// bleed box is written unless one was preserved from a loaded page.
     /// </summary>
-    public PdfRect? BleedBox { get; set; }
+    public PdfRect? BleedBox
+    {
+        get => bleedBox;
+        set => bleedBox = ValidateAuxiliaryBox(value, nameof(value));
+    }
 
     /// <summary>
     /// Gets or sets the trim box (<c>/TrimBox</c>): the intended finished dimensions of
     /// the page after trimming. When <see langword="null"/> no trim box is written unless
     /// one was preserved from a loaded page.
     /// </summary>
-    public PdfRect? TrimBox { get; set; }
+    public PdfRect? TrimBox
+    {
+        get => trimBox;
+        set => trimBox = ValidateAuxiliaryBox(value, nameof(value));
+    }
 
     /// <summary>
     /// Gets or sets the art box (<c>/ArtBox</c>): the extent of the page's meaningful
     /// content as intended by its creator. When <see langword="null"/> no art box is written
     /// unless one was preserved from a loaded page.
     /// </summary>
-    public PdfRect? ArtBox { get; set; }
+    public PdfRect? ArtBox
+    {
+        get => artBox;
+        set => artBox = ValidateAuxiliaryBox(value, nameof(value));
+    }
+
+    private PdfRect? bleedBox;
+    private PdfRect? trimBox;
+    private PdfRect? artBox;
+
+    private static PdfRect? ValidateAuxiliaryBox(PdfRect? value, string parameterName)
+    {
+        if (value is { } box && (!double.IsFinite(box.Left) || !double.IsFinite(box.Bottom)
+            || !double.IsFinite(box.Right) || !double.IsFinite(box.Top)))
+        {
+            throw new ArgumentOutOfRangeException(parameterName, value, "Page boxes must have finite coordinates.");
+        }
+
+        return value;
+    }
 
     /// <summary>
     /// Gets or sets the clockwise viewing rotation of the page in degrees.
@@ -324,7 +351,7 @@ public sealed class Page
         var reserved = new HashSet<string>(reservedResourceNames ?? []);
         AddResourceNames(reserved, editedResources);
         var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-            SafePrefix("F", reserved), SafePrefix("Im", reserved), SafePrefix("GS", reserved));
+            SafePrefix("F", reserved), SafePrefix("Im", reserved), SafePrefix("GS", reserved), SafePrefix("P", reserved));
         if (emission.Resources.Patterns.Count > 0)
         {
             throw new NotSupportedException("Inserted gradient content cannot be composed with raw content editing because pattern resource names cannot be allocated safely.");
@@ -428,7 +455,7 @@ public sealed class Page
         if (content is not null && sourceElements is not null)
         {
             var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-                SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames), SafePrefix("GS", reservedNames));
+                SafePrefix("F", reservedNames), SafePrefix("Im", reservedNames), SafePrefix("GS", reservedNames), SafePrefix("P", reservedNames));
             return new ContentEmissionResult(emission.Bytes,
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
-using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf.Content;
 
@@ -12,6 +11,10 @@ internal sealed class ContentTextWalker
     private ContentTextWalker(ContentStateMachine machine) => this.machine = machine;
 
     public Token Operator { get; private set; }
+
+    public int OperandStart { get; private set; }
+
+    public int ArrayStart { get; private set; }
 
     public delegate double ShowHandler(ContentTextWalker walker, string op, List<Token> operands, List<Token> array, int operatorIndex);
 
@@ -39,59 +42,22 @@ internal sealed class ContentTextWalker
         var machine = new ContentStateMachine(fonts, ReverseFont.WinAnsi);
         var walker = new ContentTextWalker(machine);
         var operatorIndex = 0;
-        var operands = new List<Token>();
-        var array = new List<Token>();
 
-        for (var i = 0; i < tokens.Count; i++)
+        foreach (var frame in ContentOperandScan.Scan(tokens))
         {
-            var token = tokens[i];
-            switch (token.Kind)
+            if (frame.IsInlineImage)
             {
-                case TokenKind.Number:
-                case TokenKind.Name:
-                case TokenKind.String:
-                    operands.Add(token);
-                    continue;
-                case TokenKind.ArrayStart:
-                    array.Clear();
-                    for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
-                    {
-                        if (tokens[i].Kind is TokenKind.String or TokenKind.Number)
-                        {
-                            array.Add(tokens[i]);
-                        }
-                    }
-
-                    continue;
-                case TokenKind.ArrayEnd:
-                    continue;
-                case TokenKind.DictStart:
-                    for (var depth = 1; depth > 0 && ++i < tokens.Count;)
-                    {
-                        if (tokens[i].Kind == TokenKind.DictStart)
-                        {
-                            depth++;
-                        }
-                        else if (tokens[i].Kind == TokenKind.DictEnd)
-                        {
-                            depth--;
-                        }
-                    }
-
-                    continue;
-                case TokenKind.DictEnd:
-                    continue;
-                case TokenKind.Operator:
-                    break;
+                continue;
             }
 
-            if (!machine.Apply(token.Text, operands) && ContentShows.IsShow(token.Text))
+            var op = frame.Operator.Text;
+            if (!machine.Apply(op, frame.Operands) && ContentShows.IsShow(op))
             {
-                walker.Operator = token;
-                machine.Advance(show(walker, token.Text!, operands, array, operatorIndex++));
+                walker.Operator = frame.Operator;
+                walker.OperandStart = frame.OperandStart;
+                walker.ArrayStart = frame.ArrayStart;
+                machine.Advance(show(walker, op!, frame.Operands, frame.Array, operatorIndex++));
             }
-
-            operands.Clear();
         }
     }
 }

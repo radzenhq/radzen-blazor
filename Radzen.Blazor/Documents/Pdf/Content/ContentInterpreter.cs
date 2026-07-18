@@ -16,58 +16,23 @@ internal static class ContentInterpreter
         var tokens = ContentTokenizer.Tokenize(content, cache);
         var interpreter = new InterpreterState(fonts);
 
-        for (var i = 0; i < tokens.Count; i++)
+        foreach (var frame in ContentOperandScan.Scan(tokens))
         {
-            var token = tokens[i];
-            switch (token.Kind)
+            if (frame.IsInlineImage)
             {
-                case TokenKind.Number:
-                case TokenKind.Name:
-                case TokenKind.String:
-                    interpreter.Operands.Add(token);
-                    continue;
-                case TokenKind.ArrayStart:
-                    interpreter.StringBuffer.Clear();
-                    interpreter.ArrayNumbers.Clear();
-                    interpreter.TjSegments = [];
-                    for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.ArrayEnd; i++)
-                    {
-                        if (tokens[i].Kind == TokenKind.String)
-                        {
-                            interpreter.StringBuffer.AddRange(tokens[i].Bytes!);
-                            interpreter.TjSegments.Add(new TextAdjustment(tokens[i].Bytes!, 0));
-                        }
-                        else if (tokens[i].Kind == TokenKind.Number)
-                        {
-                            interpreter.ArrayNumbers.Add(tokens[i].Number);
-                            interpreter.TjSegments.Add(new TextAdjustment(null, tokens[i].Number));
-                        }
-                    }
-
-                    var end = i < tokens.Count ? tokens[i].End : tokens[^1].End;
-                    interpreter.Operands.Add(new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], token.Start, end));
-                    continue;
-                case TokenKind.DictStart:
-                    for (i++; i < tokens.Count && tokens[i].Kind != TokenKind.DictEnd; i++)
-                    {
-                    }
-
-                    continue;
-                case TokenKind.ArrayEnd:
-                case TokenKind.DictEnd:
-                    continue;
-                case TokenKind.InlineImage:
-                    target.Add(new InlineImageContent(token.Bytes!)
-                    {
-                        Transform = interpreter.Graphics.Ctm,
-                        IsArtifact = interpreter.ArtifactDepth > 0,
-                    });
-                    FinalizeMerge(interpreter);
-                    interpreter.ResetOperandFrame();
-                    continue;
+                target.Add(new InlineImageContent(frame.InlineImage.Bytes!)
+                {
+                    Transform = interpreter.Graphics.Ctm,
+                    IsArtifact = interpreter.ArtifactDepth > 0,
+                });
+                FinalizeMerge(interpreter);
+                interpreter.ResetOperandFrame();
+                continue;
             }
 
-            var op = token.Text;
+            LoadOperands(interpreter, frame);
+
+            var op = frame.Operator.Text;
 
             if (!interpreter.Machine.Apply(op, interpreter.Operands)
                 && !HandleGraphicsOperators(op, interpreter, target)
@@ -88,6 +53,38 @@ internal static class ContentInterpreter
         }
 
         FinalizeMerge(interpreter);
+    }
+
+    private static void LoadOperands(InterpreterState interpreter, ContentOperandFrame frame)
+    {
+        interpreter.Operands.Clear();
+        interpreter.ArrayNumbers.Clear();
+        interpreter.TjSegments = null;
+        interpreter.Operands.AddRange(frame.Operands);
+
+        if (!frame.HasArray)
+        {
+            return;
+        }
+
+        interpreter.StringBuffer.Clear();
+        interpreter.TjSegments = [];
+        foreach (var item in frame.Array)
+        {
+            if (item.Kind == TokenKind.String)
+            {
+                interpreter.StringBuffer.AddRange(item.Bytes!);
+                interpreter.TjSegments.Add(new TextAdjustment(item.Bytes!, 0));
+            }
+            else if (item.Kind == TokenKind.Number)
+            {
+                interpreter.ArrayNumbers.Add(item.Number);
+                interpreter.TjSegments.Add(new TextAdjustment(null, item.Number));
+            }
+        }
+
+        interpreter.Operands.Insert(frame.ArrayOperandIndex,
+            new Token(TokenKind.String, 0, null, [.. interpreter.StringBuffer], frame.ArrayStart, frame.ArrayEnd));
     }
 
     private static void FinalizeMerge(InterpreterState interpreter)
@@ -427,7 +424,7 @@ internal static class ContentInterpreter
             return;
         }
 
-        var decoded = text.Font is not null ? text.Font.Decode(bytes) : Decode(bytes);
+        var decoded = text.Font is not null ? text.Font.Decode(bytes) : ReverseFont.WinAnsi.Decode(bytes);
         var transform = textMatrix * state.Ctm;
 
         if (pendingMerge is { SourceBytes: { } pendingBytes, SourceText: not null }
@@ -578,20 +575,6 @@ internal static class ContentInterpreter
     }
 
     private static byte Channel(double value) => ColorComponent.ToChannel(value);
-
-    private static string Decode(byte[] bytes)
-    {
-        var builder = new StringBuilder(bytes.Length);
-        foreach (var b in bytes)
-        {
-            if (WinAnsiEncoding.TryGetChar(b, out var c))
-            {
-                builder.Append(c);
-            }
-        }
-
-        return builder.ToString();
-    }
 
     private readonly record struct PathOp(string Operator, double[] Operands);
 

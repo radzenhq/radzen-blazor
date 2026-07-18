@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf.Content;
-using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf;
 
@@ -166,52 +165,26 @@ internal static class Redactor
     private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected, ContentTokenizer.Cache? cache)
     {
         var edits = new List<ContentEdit>();
-        var operandsStart = -1;
-        var arrayStart = -1;
-        var showIndex = 0;
-        foreach (var token in ContentTokenizer.Tokenize(source, cache))
+        ContentTextWalker.Walk(source, null, (walker, op, operands, array, operatorIndex) =>
         {
-            if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
+            if (selected.TryGetValue(operatorIndex, out var selection))
             {
-                operandsStart = operandsStart < 0 ? token.Start : operandsStart;
-                continue;
-            }
-
-            if (token.Kind == TokenKind.ArrayStart)
-            {
-                arrayStart = token.Start;
-                continue;
-            }
-
-            if (token.Kind != TokenKind.Operator)
-            {
-                continue;
-            }
-
-            if (ContentShows.IsShow(token.Text))
-            {
-                if (selected.TryGetValue(showIndex, out var selection))
+                if (op is "'" or "\"")
                 {
-                    if (token.Text is "'" or "\"")
-                    {
-                        throw new NotSupportedException($"Redacting text shown by the '{token.Text}' operator cannot preserve line positioning safely.");
-                    }
-
-                    var start = token.Text == "TJ" ? arrayStart : operandsStart;
-                    if (start < 0)
-                    {
-                        throw new FormatException("The text-show operator has no valid operand.");
-                    }
-
-                    edits.Add(new ContentEdit(start, token.End, BuildRedactedShow(selection.Run, selection.Removed)));
+                    throw new NotSupportedException($"Redacting text shown by the '{op}' operator cannot preserve line positioning safely.");
                 }
 
-                showIndex++;
+                var start = op == "TJ" ? walker.ArrayStart : walker.OperandStart;
+                if (start < 0)
+                {
+                    throw new FormatException("The text-show operator has no valid operand.");
+                }
+
+                edits.Add(new ContentEdit(start, walker.Operator.End, BuildRedactedShow(selection.Run, selection.Removed)));
             }
 
-            operandsStart = -1;
-            arrayStart = -1;
-        }
+            return 0.0;
+        }, cache);
 
         return ContentEdits.Apply(source, edits);
     }

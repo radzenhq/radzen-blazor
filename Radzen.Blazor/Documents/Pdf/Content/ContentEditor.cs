@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
-using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
 
 namespace Radzen.Documents.Pdf.Content;
@@ -79,7 +78,7 @@ internal static class ContentEditor
     }
 
     public static ContentEmissionResult Reemit(byte[] source, ContentCollection current, IReadOnlyList<SourceElement> original,
-        Fonts.FontScope scope, string fontPrefix, string imagePrefix, string extGStatePrefix)
+        Fonts.FontScope scope, string fontPrefix, string imagePrefix, string extGStatePrefix, string patternPrefix)
     {
         var byElement = new Dictionary<ContentElement, SourceElement>();
         foreach (var item in original)
@@ -112,7 +111,7 @@ internal static class ContentEditor
         }
 
         tail.AddRange(pending);
-        using var writer = new ContentWriter(scope, fontPrefix, imagePrefix, extGStatePrefix);
+        using var writer = new ContentWriter(scope, fontPrefix, imagePrefix, extGStatePrefix, patternPrefix);
         var cursor = 0;
         foreach (var item in original)
         {
@@ -175,54 +174,22 @@ internal static class ContentEditor
     {
         var tokens = ContentTokenizer.Tokenize(content, cache);
         var result = new List<Candidate>();
-        var operands = new List<Token>();
-        var array = new List<Token>();
-        var frameStart = -1;
         var pathStart = -1;
         var clipPending = false;
         var machine = new ContentStateMachine();
         var pathCtm = Matrix.Identity;
-        foreach (var token in tokens)
+        foreach (var frame in ContentOperandScan.Scan(tokens))
         {
-            if (token.Kind is TokenKind.Number or TokenKind.Name or TokenKind.String)
+            if (frame.IsInlineImage)
             {
-                frameStart = frameStart < 0 ? token.Start : frameStart;
-                operands.Add(token);
+                result.Add(new Candidate(CandidateKind.InlineImage, frame.InlineImage.Start, frame.InlineImage.End, [], machine.Ctm));
                 continue;
             }
 
-            if (token.Kind == TokenKind.ArrayStart)
-            {
-                frameStart = frameStart < 0 ? token.Start : frameStart;
-                array.Clear();
-                continue;
-            }
+            var op = frame.Operator.Text!;
+            var start = frame.FrameStart < 0 ? frame.Operator.Start : frame.FrameStart;
 
-            if (token.Kind == TokenKind.ArrayEnd)
-            {
-                array.AddRange(operands);
-                operands.Clear();
-                continue;
-            }
-
-            if (token.Kind == TokenKind.InlineImage)
-            {
-                result.Add(new Candidate(CandidateKind.InlineImage, token.Start, token.End, [], machine.Ctm));
-                operands.Clear();
-                array.Clear();
-                frameStart = -1;
-                continue;
-            }
-
-            if (token.Kind != TokenKind.Operator)
-            {
-                continue;
-            }
-
-            var start = frameStart < 0 ? token.Start : frameStart;
-            var op = token.Text!;
-
-            machine.Apply(op, operands);
+            machine.Apply(op, frame.Operands);
 
             if (ContentOperatorClass.IsPathConstruction(op))
             {
@@ -238,7 +205,7 @@ internal static class ContentEditor
             {
                 if (pathStart >= 0 && (op != "n" || clipPending))
                 {
-                    result.Add(new Candidate(CandidateKind.Path, pathStart, token.End, [], pathCtm));
+                    result.Add(new Candidate(CandidateKind.Path, pathStart, frame.Operator.End, [], pathCtm));
                 }
 
                 pathStart = -1;
@@ -246,14 +213,14 @@ internal static class ContentEditor
             }
             else if (op == "Do")
             {
-                result.Add(new Candidate(CandidateKind.XObject, start, token.End, [], machine.Ctm));
+                result.Add(new Candidate(CandidateKind.XObject, start, frame.Operator.End, [], machine.Ctm));
             }
             else if (ContentShows.IsShow(op))
             {
-                if (op == "TJ" || LastStringToken(operands) is not null)
+                if (op == "TJ" || LastStringToken(frame.Operands) is not null)
                 {
                     var bytes = new List<byte>();
-                    foreach (var operand in op == "TJ" ? array : operands)
+                    foreach (var operand in op == "TJ" ? frame.Array : frame.Operands)
                     {
                         if (operand.Kind == TokenKind.String && operand.Bytes is not null)
                         {
@@ -263,17 +230,13 @@ internal static class ContentEditor
 
                     var insideText = machine.TextObjectDepth > 0;
                     var ambient = insideText ? machine.TextMatrix * machine.Ctm : machine.Ctm;
-                    result.Add(new Candidate(CandidateKind.Text, start, token.End, [.. bytes], ambient, insideText));
+                    result.Add(new Candidate(CandidateKind.Text, start, frame.Operator.End, [.. bytes], ambient, insideText));
                 }
             }
             else if (!ContentOperatorClass.IsStateOperator(op))
             {
-                result.Add(new Candidate(CandidateKind.Raw, start, token.End, [], machine.Ctm));
+                result.Add(new Candidate(CandidateKind.Raw, start, frame.Operator.End, [], machine.Ctm));
             }
-
-            operands.Clear();
-            array.Clear();
-            frameStart = -1;
         }
 
         return result;

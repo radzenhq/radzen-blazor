@@ -86,4 +86,14 @@ public class PageBoxTests
         Assert.DoesNotContain("/TrimBox", text);
         Assert.DoesNotContain("/ArtBox", text);
     }
+
+    [Fact]
+    public void NonFiniteAuxiliaryBox_IsRejectedAtAssignment()
+    {
+        var page = new Document().Pages.Add(PageSizes.A4);
+
+        Assert.Throws<System.ArgumentOutOfRangeException>(() => page.BleedBox = new PdfRect(0, 0, double.NaN, 100));
+        Assert.Throws<System.ArgumentOutOfRangeException>(() => page.TrimBox = new PdfRect(0, 0, 100, double.PositiveInfinity));
+        Assert.Throws<System.ArgumentOutOfRangeException>(() => page.ArtBox = new PdfRect(double.NegativeInfinity, 0, 100, 100));
+    }
 }
