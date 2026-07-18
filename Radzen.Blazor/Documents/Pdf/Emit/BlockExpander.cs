@@ -205,31 +205,10 @@ internal static class BlockExpander
     }
 
     private static Font ItemFont(ListItem item, List list, Font? inherited)
-    {
-        var font = new Font();
-        font.InheritFrom(item.Font);
-        font.InheritFrom(list.Font);
-        if (inherited != null)
-        {
-            font.InheritFrom(inherited);
-        }
-
-        return font;
-    }
+        => FontCascade.Resolve([item.Font, list.Font, inherited]);
 
     private static Font RunFont(Run run, ListItem item, List list, Font? inherited)
-    {
-        var font = new Font();
-        font.InheritFrom(run.Font);
-        font.InheritFrom(item.Font);
-        font.InheritFrom(list.Font);
-        if (inherited != null)
-        {
-            font.InheritFrom(inherited);
-        }
-
-        return font;
-    }
+        => FontCascade.Resolve([run.Font, item.Font, list.Font, inherited]);
 
     private const string BulletGlyph = "\u2022";
 
