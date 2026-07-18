@@ -159,39 +159,28 @@ internal sealed class IndirectObjectStore(
 
     private DocumentObject DecryptObject(DocumentObject value, int number, int generation)
     {
-        switch (value)
+        DocumentObject? Decrypt(DocumentObject node)
         {
-            case StringObject text:
-                var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
-                return new StringObject(Encoding.Latin1.GetString(plain.Span));
-            case StreamObject stream:
-                var decrypted = security!.DecryptStream(stream.Data, number, generation, stream.Dictionary);
-                var result = new StreamObject(decrypted);
-                foreach (var key in stream.Dictionary.Keys)
-                {
-                    result.Dictionary[key] = DecryptObject(stream.Dictionary[key], number, generation);
-                }
+            switch (node)
+            {
+                case StringObject text:
+                    var plain = security!.DecryptString(Encoding.Latin1.GetBytes(text.Value), number, generation);
+                    return new StringObject(Encoding.Latin1.GetString(plain.Span));
+                case StreamObject stream:
+                    var decrypted = security!.DecryptStream(stream.Data, number, generation, stream.Dictionary);
+                    var result = new StreamObject(decrypted);
+                    foreach (var key in stream.Dictionary.Keys)
+                    {
+                        result.Dictionary[key] = CosGraphRewriter.Rewrite(stream.Dictionary[key], Decrypt);
+                    }
 
-                return result;
-            case DictionaryObject dictionary:
-                var mapped = new DictionaryObject();
-                foreach (var key in dictionary.Keys)
-                {
-                    mapped[key] = DecryptObject(dictionary[key], number, generation);
-                }
-
-                return mapped;
-            case ArrayObject array:
-                var items = new ArrayObject();
-                foreach (var item in array)
-                {
-                    items.Add(DecryptObject(item, number, generation));
-                }
-
-                return items;
-            default:
-                return value;
+                    return result;
+                default:
+                    return null;
+            }
         }
+
+        return CosGraphRewriter.Rewrite(value, Decrypt);
     }
 
     private DocumentObject GetUncompressedObject(int number, long offset, out int generation)

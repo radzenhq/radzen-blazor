@@ -147,9 +147,7 @@ public static class PdfSigner
 
         if (options.SigningTime is { } time)
         {
-            var utc = time.ToUniversalTime();
-            signature["M"] = new StringObject(
-                "D:" + utc.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture) + "+00'00'");
+            signature["M"] = new StringObject(DocumentSaver.PdfDate(time.ToUniversalTime()));
         }
 
         if (options.Reason is not null)
