@@ -115,11 +115,7 @@ internal static class PdfBytes
         while (!text.IsEmpty)
         {
             var chunk = Math.Min(text.Length, buffer.Length);
-            for (var i = 0; i < chunk; i++)
-            {
-                buffer[i] = (byte)text[i];
-            }
-
+            Latin1ByteEncoder.Encode(text[..chunk], buffer[..chunk]);
             stream.Write(buffer[..chunk]);
             text = text[chunk..];
         }

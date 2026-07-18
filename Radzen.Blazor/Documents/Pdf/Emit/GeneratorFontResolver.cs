@@ -33,7 +33,7 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
         foreach (var font in generated.Fonts)
         {
             map[font.Key] = font.Extraction ??=
-                font.Sfnt is null ? ReverseFont.WinAnsi : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
+                font.Sfnt is null ? ReverseFont.FromBase14(font.Base14Name) : ReverseFont.FromGlyphIds(RemapGidToUnicode(font));
         }
 
         return map;
