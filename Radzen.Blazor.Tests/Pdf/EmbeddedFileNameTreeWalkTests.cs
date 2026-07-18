@@ -46,6 +46,15 @@ public class EmbeddedFileNameTreeWalkTests
     }
 
     [Fact]
+    public void EmbeddedFileTree_OddLengthNamesArray_Throws()
+    {
+        var bytes = NameTreeFile(
+            (6, "<< /Names [(a.txt) 4 0 R (b.txt)] >>"));
+
+        Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
+    }
+
+    [Fact]
     public void EmbeddedFileTree_DistinctKids_LoadsEveryAttachment_PositiveControl()
     {
         var bytes = NameTreeFile(
