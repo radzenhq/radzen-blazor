@@ -59,13 +59,7 @@ internal static class BandLayouter
             var tableOrder = order++;
             foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
             {
-                result.Content.Tables.Add(new PositionedTableFragment
-                {
-                    Layout = layout,
-                    Fragment = fragment,
-                    Y = Cursor,
-                    Order = tableOrder,
-                });
+                result.Content.Tables.Add(FlowContentPlacer.Table(layout, fragment, Cursor, tableOrder));
                 Cursor += fragment.Height;
             }
 
@@ -74,15 +68,8 @@ internal static class BandLayouter
 
         public override Nothing Visit(Image image, Nothing context)
         {
-            var (imageWidth, imageHeight) = measureImage is null ? Paginator.MeasureImage(image, width) : measureImage(image, width);
-            result.Content.Images.Add(new PositionedImage
-            {
-                Source = image,
-                Y = Cursor,
-                Width = imageWidth,
-                Height = imageHeight,
-                XOffset = HorizontalAlignmentOffset.Of(image.Alignment, width, imageWidth),
-            });
+            var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(image, width, measureImage);
+            result.Content.Images.Add(FlowContentPlacer.Image(image, width, Cursor, imageWidth, imageHeight));
             Cursor += imageHeight;
             return default;
         }
@@ -94,14 +81,7 @@ internal static class BandLayouter
         private Nothing VisitCode(Block block)
         {
             var (codeWidth, codeHeight) = Paginator.MeasureCode(block, fonts, resolution);
-            result.Content.Codes.Add(new PositionedCode
-            {
-                Source = block,
-                Y = Cursor,
-                Width = codeWidth,
-                Height = codeHeight,
-                XOffset = HorizontalAlignmentOffset.Of(Paginator.CodeAlignment(block), width, codeWidth),
-            });
+            result.Content.Codes.Add(FlowContentPlacer.Code(block, width, Cursor, codeWidth, codeHeight));
             Cursor += codeHeight;
             return default;
         }
