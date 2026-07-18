@@ -311,6 +311,7 @@ internal static class PageResourceBuilder
         CollectResourceKeys(reader, resources, "Font", names);
         CollectResourceKeys(reader, resources, "XObject", names);
         CollectResourceKeys(reader, resources, "ExtGState", names);
+        CollectResourceKeys(reader, resources, "Pattern", names);
         return names;
     }
 

@@ -369,7 +369,8 @@ public sealed class Page
                 FontScope,
                 SafePrefix("SF", reservedNames),
                 SafePrefix("SIm", reservedNames),
-                SafePrefix("SGS", reservedNames));
+                SafePrefix("SGS", reservedNames),
+                SafePrefix("SP", reservedNames));
             foreach (var element in pendingAppends)
             {
                 element.Emit(pending);
@@ -397,7 +398,8 @@ public sealed class Page
                 FontScope,
                 SafePrefix("SF", reservedNames),
                 SafePrefix("SIm", reservedNames),
-                SafePrefix("SGS", reservedNames));
+                SafePrefix("SGS", reservedNames),
+                SafePrefix("SP", reservedNames));
             for (var i = materializedCount; i < elements.Count; i++)
             {
                 elements[i].Emit(appended);
@@ -421,7 +423,8 @@ public sealed class Page
             FontScope,
             SafePrefix("F", reservedNames),
             SafePrefix("Im", reservedNames),
-            SafePrefix("GS", reservedNames));
+            SafePrefix("GS", reservedNames),
+            SafePrefix("P", reservedNames));
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -457,7 +460,7 @@ public sealed class Page
             return null;
         }
 
-        using var writer = new ContentWriter(FontScope, "SF", "SIm", "SGS");
+        using var writer = new ContentWriter(FontScope, "SF", "SIm", "SGS", "SP");
         foreach (var element in elements)
         {
             element.Emit(writer);

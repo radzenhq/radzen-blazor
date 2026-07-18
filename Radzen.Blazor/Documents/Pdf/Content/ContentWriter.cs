@@ -21,18 +21,18 @@ public sealed class ContentWriter : IDisposable
     private bool returned;
     private readonly ResourceKeyRegistry<string, KeyValuePair<string, string>> fonts;
     private readonly ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>> images;
-    private readonly ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns =
-        new("P", ReferenceKeyComparer<GradientBrush>.Instance);
+    private readonly ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
 
     private readonly ResourceKeyRegistry<double, KeyValuePair<string, double>> extGStates;
 
     private readonly FontScope scope;
 
-    internal ContentWriter(FontScope scope = default, string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS")
+    internal ContentWriter(FontScope scope = default, string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS", string patternKeyPrefix = "P")
     {
         this.scope = scope;
         fonts = new ResourceKeyRegistry<string, KeyValuePair<string, string>>(fontKeyPrefix, StringComparer.Ordinal);
         images = new ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>>(imageKeyPrefix);
+        patterns = new ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>>(patternKeyPrefix, ReferenceKeyComparer<GradientBrush>.Instance);
         extGStates = new ResourceKeyRegistry<double, KeyValuePair<string, double>>(extGStateKeyPrefix, AlphaComparer.Instance);
     }
 
@@ -129,11 +129,7 @@ public sealed class ContentWriter : IDisposable
     public void WriteRaw(ReadOnlySpan<char> text)
     {
         var destination = Reserve(text.Length);
-        for (var i = 0; i < text.Length; i++)
-        {
-            destination[i] = (byte)text[i];
-        }
-
+        Latin1ByteEncoder.Encode(text, destination);
         length += text.Length;
     }
 

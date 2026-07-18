@@ -52,72 +52,37 @@ internal static class Redactor
             return;
         }
 
+        var generated = page.Generated is not null;
+
         if (page.CurrentContent is { Length: > 0 } raw)
         {
-            var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
-            foreach (var run in page.ExtractPositionedText(cache))
-            {
-                if (run.GeometryEstimated)
-                {
-                    if (MayReach(run, regions))
-                    {
-                        throw new NotSupportedException("The source font does not provide a usable width for every glyph shown by a text operator near a redaction region, so which of its glyphs the region covers cannot be determined safely.");
-                    }
-
-                    continue;
-                }
-
-                var removed = new bool[run.Text.Length];
-                var any = false;
-                for (var i = 0; i < removed.Length; i++)
-                {
-                    removed[i] = IntersectsAny(run.CharacterQuadrilateral(i).Bounds, regions);
-                    any |= removed[i];
-                }
-
-                if (any)
-                {
-                    selected.Add(run.OperatorIndex, (run, removed));
-                }
-            }
-
+            var selected = SelectIntersectingGlyphs(page, regions, cache);
             if (selected.Count > 0)
             {
+                if (generated)
+                {
+                    throw GeneratedContentNotSupported();
+                }
+
                 page.ApplyEditedContent(RemoveTextGlyphs(raw, selected, cache));
+            }
+
+            if (generated)
+            {
+                var elements = new ContentCollection();
+                ContentInterpreter.Materialize(raw, elements, page.TextFonts, cache);
+                SweepElements(elements, regions, removeInPlace: false);
             }
         }
 
-        var content = page.Content;
-        for (var i = content.Count - 1; i >= 0; i--)
+        if (!generated)
         {
-            switch (content[i])
-            {
-                case PathContent path when path.GetBounds() is { } bounds && IntersectsAny(bounds, regions):
-                    if (path.Clip != PathClipMode.None)
-                    {
-                        throw new NotSupportedException("A redaction region intersects a clipping path that cannot be removed safely.");
-                    }
-
-                    content.RemoveAt(i);
-                    break;
-                case ImageContent image when IntersectsAny(image.Bounds, regions):
-                    content.RemoveAt(i);
-                    break;
-                case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
-                    throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
-                case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
-                    content.RemoveAt(i);
-                    break;
-                case RawContent unmodeled when MayPaint(unmodeled.Operator)
-                    && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
-                    throw new NotSupportedException($"A redaction region intersects content painted by the '{unmodeled.Operator}' operator. Its extent cannot be determined safely from the content stream.");
-                case RawContent:
-                    break;
-            }
+            SweepElements(page.Content, regions, removeInPlace: true);
         }
 
         if (options?.FillColor is { } fill)
         {
+            var content = page.Content;
             foreach (var area in regions)
             {
                 var overlay = new PathContent { Fill = true, FillColor = fill };
@@ -130,6 +95,83 @@ internal static class Redactor
             }
         }
     }
+
+    private static Dictionary<int, (PositionedTextRun Run, bool[] Removed)> SelectIntersectingGlyphs(
+        Page page, IReadOnlyList<PdfRect> regions, ContentTokenizer.Cache cache)
+    {
+        var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
+        foreach (var run in page.ExtractPositionedText(cache))
+        {
+            if (run.GeometryEstimated)
+            {
+                if (MayReach(run, regions))
+                {
+                    throw new NotSupportedException("The source font does not provide a usable width for every glyph shown by a text operator near a redaction region, so which of its glyphs the region covers cannot be determined safely.");
+                }
+
+                continue;
+            }
+
+            var removed = new bool[run.Text.Length];
+            var any = false;
+            for (var i = 0; i < removed.Length; i++)
+            {
+                removed[i] = IntersectsAny(run.CharacterQuadrilateral(i).Bounds, regions);
+                any |= removed[i];
+            }
+
+            if (any)
+            {
+                selected.Add(run.OperatorIndex, (run, removed));
+            }
+        }
+
+        return selected;
+    }
+
+    private static void SweepElements(ContentCollection content, IReadOnlyList<PdfRect> regions, bool removeInPlace)
+    {
+        for (var i = content.Count - 1; i >= 0; i--)
+        {
+            switch (content[i])
+            {
+                case PathContent path when path.GetBounds() is { } bounds && IntersectsAny(bounds, regions):
+                    if (path.Clip != PathClipMode.None)
+                    {
+                        throw new NotSupportedException("A redaction region intersects a clipping path that cannot be removed safely.");
+                    }
+
+                    RemoveOrReject(content, i, removeInPlace);
+                    break;
+                case ImageContent image when IntersectsAny(image.Bounds, regions):
+                    RemoveOrReject(content, i, removeInPlace);
+                    break;
+                case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
+                    throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
+                case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
+                    RemoveOrReject(content, i, removeInPlace);
+                    break;
+                case RawContent unmodeled when MayPaint(unmodeled.Operator)
+                    && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
+                    throw new NotSupportedException($"A redaction region intersects content painted by the '{unmodeled.Operator}' operator. Its extent cannot be determined safely from the content stream.");
+                case RawContent:
+                    break;
+            }
+        }
+    }
+
+    private static void RemoveOrReject(ContentCollection content, int index, bool removeInPlace)
+    {
+        if (!removeInPlace)
+        {
+            throw GeneratedContentNotSupported();
+        }
+
+        content.RemoveAt(index);
+    }
+
+    private static NotSupportedException GeneratedContentNotSupported()
+        => new("A redaction region intersects content on a freshly generated page, whose content stream cannot be edited in place to remove it irreversibly. Save the document and redact the reloaded copy.");
 
     private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected, ContentTokenizer.Cache? cache)
     {
