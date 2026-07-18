@@ -315,18 +315,7 @@ internal sealed class PngImageDecoder : IImageDecoder
     }
 
     private static StreamObject BuildImage(int width, int height, int bitsPerComponent, DocumentObject colorSpace, byte[] samples)
-    {
-        var stream = new StreamObject(FlateFilter.Encode(samples));
-        var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Image");
-        dict["Width"] = new NumberObject(width);
-        dict["Height"] = new NumberObject(height);
-        dict["ColorSpace"] = colorSpace;
-        dict["BitsPerComponent"] = new NumberObject(bitsPerComponent);
-        dict["Filter"] = new NameObject("FlateDecode");
-        return stream;
-    }
+        => ImageXObjectShell.FlateImage(samples, width, height, bitsPerComponent, colorSpace);
 
     private static string BytesToString(byte[] bytes)
     {

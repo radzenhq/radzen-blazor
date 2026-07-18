@@ -37,13 +37,14 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         ValidateJpeg2000Dimensions(width, height, components, limits);
 
         var stream = new StreamObject(data);
-        var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Image");
-        dict["Width"] = new NumberObject(width);
-        dict["Height"] = new NumberObject(height);
-        dict["BitsPerComponent"] = new NumberObject(8);
-        dict["Filter"] = new NameObject("JPXDecode");
+        ImageXObjectShell.Apply(
+            stream.Dictionary,
+            new NumberObject(width),
+            new NumberObject(height),
+            colorSpace: null,
+            imageMask: false,
+            new NumberObject(8),
+            new NameObject("JPXDecode"));
         return new ImageXObject(stream, null);
     }
 

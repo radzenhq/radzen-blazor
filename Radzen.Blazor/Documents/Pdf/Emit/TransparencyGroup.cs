@@ -26,16 +26,16 @@ internal static class TransparencyGroup
     {
         var stream = FlateFilter.EncodeStream(group.Content);
         var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Form");
-        dict["FormType"] = new NumberObject(1);
-        dict["BBox"] = new ArrayObject
-        {
-            new NumberObject(group.BBox[0]),
-            new NumberObject(group.BBox[1]),
-            new NumberObject(group.BBox[2]),
-            new NumberObject(group.BBox[3]),
-        };
+        FormXObjectShell.ApplyHeader(
+            dict,
+            new ArrayObject
+            {
+                new NumberObject(group.BBox[0]),
+                new NumberObject(group.BBox[1]),
+                new NumberObject(group.BBox[2]),
+                new NumberObject(group.BBox[3]),
+            },
+            formType: true);
 
         var groupDict = new DictionaryObject { ["S"] = new NameObject("Transparency") };
         if (group.ColorSpace is { } cs)
@@ -70,16 +70,5 @@ internal static class TransparencyGroup
     }
 
     public static StreamObject GrayImage(byte[] samples, int width, int height)
-    {
-        var stream = new StreamObject(FlateFilter.Encode(samples));
-        var dict = stream.Dictionary;
-        dict["Type"] = new NameObject("XObject");
-        dict["Subtype"] = new NameObject("Image");
-        dict["Width"] = new NumberObject(width);
-        dict["Height"] = new NumberObject(height);
-        dict["ColorSpace"] = new NameObject("DeviceGray");
-        dict["BitsPerComponent"] = new NumberObject(8);
-        dict["Filter"] = new NameObject("FlateDecode");
-        return stream;
-    }
+        => ImageXObjectShell.FlateImage(samples, width, height, 8, new NameObject("DeviceGray"));
 }
