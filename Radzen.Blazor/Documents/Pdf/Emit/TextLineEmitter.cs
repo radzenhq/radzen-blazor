@@ -329,9 +329,8 @@ internal sealed class TextLineEmitter(
             if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
                 var generated = fontResolver.ResolveSfnt(face);
-                var bytes = scratchBytes;
-                bytes.Clear();
-                var advance = 0.0;
+                var glyphRun = new SfntRunAccumulator(face, generated, size, fonts.EnableKerning, kernAcrossSpaces: false, scratchBytes);
+                glyphRun.Begin();
                 while (i < text.Length)
                 {
                     var codepoint = CodePointAt(text, i);
@@ -342,7 +341,7 @@ internal sealed class TextLineEmitter(
                         break;
                     }
 
-                    advance += SfntRunBuilder.AppendGlyph(generated, bytes, face, gid, codepoint, size);
+                    glyphRun.Append(gid, codepoint);
                     i += codepoint > 0xFFFF ? 2 : 1;
                 }
 
@@ -354,7 +353,7 @@ internal sealed class TextLineEmitter(
                     Size = size,
                     Color = font.Color,
                     Font = generated,
-                    Bytes = [.. bytes],
+                    Bytes = glyphRun.Bytes,
                     Element = element,
                     CharSpacing = spacing,
                     Rise = rise,
@@ -363,9 +362,10 @@ internal sealed class TextLineEmitter(
                     RenderMode = run.Invisible ? 3 : 0,
                     FillPaint = run.FillPaint,
                     ExtGState = extGState,
+                    Kerns = glyphRun.Kerns,
                 });
 
-                x += spacing == 0 ? advance : advance + (spacing * (bytes.Count / 2));
+                x += spacing == 0 ? glyphRun.Advance : glyphRun.Advance + (spacing * glyphRun.GlyphCount);
             }
             else
             {

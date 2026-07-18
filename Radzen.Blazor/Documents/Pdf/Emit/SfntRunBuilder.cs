@@ -33,40 +33,15 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
         {
             var face = glyphs[g].Face;
             var generated = fontResolver.ResolveSfnt(face);
-            scratchBytes.Clear();
-            var advance = 0.0;
-            List<double>? kernList = null;
-            ushort previousGid = 0;
-            var previousCodepoint = 0;
-            var glyphCount = 0;
+            var run = new SfntRunAccumulator(face, generated, size, kerning, kernAcrossSpaces, scratchBytes);
+            run.Begin();
             while (g < glyphs.Count && ReferenceEquals(glyphs[g].Face, face))
             {
-                var gid = glyphs[g].GlyphId;
-                var codepoint = FontCollection.CodePointAt(text, glyphs[g].Cluster);
-
-                if (kerning && glyphCount > 0)
-                {
-                    var straddlesSpace = codepoint == ' ' || previousCodepoint == ' ';
-                    var kern = straddlesSpace && !kernAcrossSpaces ? 0 : face.GetKerning(previousGid, gid);
-                    advance += kern * size / face.UnitsPerEm;
-                    (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
-                }
-
-                advance += AppendGlyph(generated, scratchBytes, face, gid, codepoint, size);
-                previousGid = gid;
-                previousCodepoint = codepoint;
-                glyphCount++;
+                run.Append(glyphs[g].GlyphId, FontCollection.CodePointAt(text, glyphs[g].Cluster));
                 g++;
             }
 
-            runs.Add(new SfntGlyphRun
-            {
-                Face = face,
-                Font = generated,
-                Bytes = [.. scratchBytes],
-                Kerns = HasNonZero(kernList) ? [.. kernList!] : null,
-                Advance = advance,
-            });
+            runs.Add(run.ToRun());
         }
 
         return runs;
@@ -97,4 +72,53 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
 
         return false;
     }
+}
+
+internal struct SfntRunAccumulator(
+    SfntFont face,
+    GeneratedFont font,
+    double size,
+    bool kerning,
+    bool kernAcrossSpaces,
+    List<byte> bytes)
+{
+    private List<double>? kernList = null;
+    private ushort previousGid = 0;
+    private int previousCodepoint = 0;
+    private int glyphCount = 0;
+
+    public double Advance { get; private set; } = 0;
+
+    public int GlyphCount => glyphCount;
+
+    public byte[] Bytes => [.. bytes];
+
+    public double[]? Kerns => SfntRunBuilder.HasNonZero(kernList) ? [.. kernList!] : null;
+
+    public void Begin() => bytes.Clear();
+
+    public void Append(ushort gid, int codepoint)
+    {
+        if (kerning && glyphCount > 0)
+        {
+            var straddlesSpace = codepoint == ' ' || previousCodepoint == ' ';
+            var kern = straddlesSpace && !kernAcrossSpaces ? 0 : face.GetKerning(previousGid, gid);
+            Advance += kern * size / face.UnitsPerEm;
+            (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
+        }
+
+        Advance += SfntRunBuilder.AppendGlyph(font, bytes, face, gid, codepoint, size);
+        previousGid = gid;
+        previousCodepoint = codepoint;
+        glyphCount++;
+    }
+
+    public SfntGlyphRun ToRun() => new()
+    {
+        Face = face,
+        Font = font,
+        Bytes = Bytes,
+        Kerns = Kerns,
+        Advance = Advance,
+    };
 }
