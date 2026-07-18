@@ -93,18 +93,24 @@ internal sealed class DocumentSaver
         {
             if (page.Generated is { } generated)
             {
-                var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content));
-                var overlay = page.BuildOverlay();
-                if (overlay is null)
+                IReadOnlySet<string>? referenced = null;
+                Content.ContentEmissionResult? overlay = null;
+                if (page.IsEditingGenerated)
                 {
-                    pageNode["Contents"] = generatedRef;
+                    var editedContent = page.CurrentContent ?? generated.Content;
+                    referenced = PageResourceBuilder.ReferencedResourceKeys(editedContent);
+                    pageNode["Contents"] = writer.Add(new StreamObject(editedContent));
                 }
                 else
                 {
-                    pageNode["Contents"] = new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay.Bytes!)) };
+                    var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content));
+                    overlay = page.BuildOverlay();
+                    pageNode["Contents"] = overlay is null
+                        ? generatedRef
+                        : new ArrayObject { generatedRef, writer.Add(new StreamObject(overlay.Bytes!)) };
                 }
 
-                var resources = PageResourceBuilder.BuildGeneratedResources(writer, generated, fontRefs, imageRefs);
+                var resources = PageResourceBuilder.BuildGeneratedResources(writer, generated, fontRefs, imageRefs, referenced);
                 if (overlay is not null)
                 {
                     resources = PageResourceBuilder.OverlayResources(writer, resources, overlay.Resources);
