@@ -1,7 +1,6 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -49,10 +48,8 @@ internal static class Type0FontEmbedder
         }
         else
         {
-            var glyfMap = EmbedGlyf(writer, font, usedGids, descriptor);
-            Debug.Assert(compactGidMap is null || SameMap(compactGidMap, glyfMap),
-                "Generator and glyf-subsetter compact gid maps diverged.");
-            gidMap = compactGidMap ?? glyfMap;
+            gidMap = compactGidMap ?? GlyfSubsetter.BuildCompactGidMap(font, usedGids);
+            EmbedGlyf(writer, font, gidMap, descriptor);
         }
 
         var cidSet = BuildFullCidSet(gidMap.Count);
@@ -99,15 +96,14 @@ internal static class Type0FontEmbedder
         return writer.Add(top);
     }
 
-    private static Dictionary<ushort, ushort> EmbedGlyf(DocumentWriter writer, SfntFont font, SortedSet<ushort> usedGids, DictionaryObject descriptor)
+    private static void EmbedGlyf(DocumentWriter writer, SfntFont font, IReadOnlyDictionary<ushort, ushort> gidMap, DictionaryObject descriptor)
     {
-        var subset = GlyfSubsetter.SubsetPooled(font, usedGids, out var subsetLength, out var gidMap);
+        var subset = GlyfSubsetter.SubsetPooled(font, gidMap, out var subsetLength);
         try
         {
             var stream = FlateFilter.EncodeStream(subset.AsSpan(0, subsetLength));
             stream.Dictionary["Length1"] = new NumberObject(subsetLength);
             descriptor["FontFile2"] = writer.Add(stream);
-            return gidMap;
         }
         finally
         {
@@ -144,24 +140,6 @@ internal static class Type0FontEmbedder
         }
 
         return remapped;
-    }
-
-    private static bool SameMap(IReadOnlyDictionary<ushort, ushort> a, IReadOnlyDictionary<ushort, ushort> b)
-    {
-        if (a.Count != b.Count)
-        {
-            return false;
-        }
-
-        foreach (var (gid, compact) in a)
-        {
-            if (!b.TryGetValue(gid, out var other) || other != compact)
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private static ArrayObject BuildWidths(SfntFont font, SortedSet<ushort> usedGids, IReadOnlyDictionary<ushort, ushort> gidMap)

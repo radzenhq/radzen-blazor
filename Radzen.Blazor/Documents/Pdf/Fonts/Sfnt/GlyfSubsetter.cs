@@ -18,7 +18,8 @@ internal static class GlyfSubsetter
 
     public static byte[] Subset(SfntFont font, IReadOnlyCollection<ushort> glyphIds)
     {
-        var rented = SubsetPooled(font, glyphIds, out var length, out _);
+        var gidMap = BuildCompactGidMap(font, glyphIds);
+        var rented = SubsetPooled(font, gidMap, out var length);
         try
         {
             return rented.AsSpan(0, length).ToArray();
@@ -39,10 +40,10 @@ internal static class GlyfSubsetter
         return BuildMap(OrderedClosure(glyfMemory.Span, loca, font.GlyphCount, glyphIds));
     }
 
-    public static byte[] SubsetPooled(SfntFont font, IReadOnlyCollection<ushort> glyphIds, out int length, out Dictionary<ushort, ushort> gidMap)
+    public static byte[] SubsetPooled(SfntFont font, IReadOnlyDictionary<ushort, ushort> gidMap, out int length)
     {
         ArgumentNullException.ThrowIfNull(font);
-        ArgumentNullException.ThrowIfNull(glyphIds);
+        ArgumentNullException.ThrowIfNull(gidMap);
 
         RequireTrueType(font, out var glyfMemory, out var locaMemory, out var headMemory);
 
@@ -50,8 +51,7 @@ internal static class GlyfSubsetter
         var head = headMemory.Span;
         var loca = new LocaTable(locaMemory.Span, ReadInt16(head, 50) != 0);
 
-        var ordered = OrderedClosure(glyf, loca, font.GlyphCount, glyphIds);
-        gidMap = BuildMap(ordered);
+        var ordered = OrderFromMap(gidMap);
         var count = ordered.Count;
 
         var glyfUpperBound = 0;
@@ -102,6 +102,24 @@ internal static class GlyfSubsetter
         }
 
         return map;
+    }
+
+    private static List<ushort> OrderFromMap(IReadOnlyDictionary<ushort, ushort> gidMap)
+    {
+        var ordered = new ushort[gidMap.Count];
+        var seen = new bool[gidMap.Count];
+        foreach (var (gid, compact) in gidMap)
+        {
+            if (compact >= gidMap.Count || seen[compact])
+            {
+                throw new ArgumentException("Compact gid map must be a bijection onto [0, N).", nameof(gidMap));
+            }
+
+            ordered[compact] = gid;
+            seen[compact] = true;
+        }
+
+        return [.. ordered];
     }
 
     private readonly ref struct LocaTable(ReadOnlySpan<byte> raw, bool longFormat)
@@ -200,7 +218,7 @@ internal static class GlyfSubsetter
         return tail;
     }
 
-    private static int FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
+    private static int FillGlyf(ReadOnlySpan<byte> glyf, LocaTable loca, List<ushort> ordered, IReadOnlyDictionary<ushort, ushort> gidMap, byte[] newGlyf, byte[] newLoca)
     {
         var offset = 0;
         for (var newGid = 0; newGid < ordered.Count; newGid++)
@@ -255,7 +273,7 @@ internal static class GlyfSubsetter
         return headLen + tailLen;
     }
 
-    private static int CopyCompositeStripped(ReadOnlySpan<byte> glyf, int start, int length, Dictionary<ushort, ushort> gidMap, byte[] newGlyf, int offset)
+    private static int CopyCompositeStripped(ReadOnlySpan<byte> glyf, int start, int length, IReadOnlyDictionary<ushort, ushort> gidMap, byte[] newGlyf, int offset)
     {
         glyf.Slice(start, length).CopyTo(newGlyf.AsSpan(offset));
 
