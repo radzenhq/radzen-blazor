@@ -142,6 +142,13 @@ public class R6PermsAndPasswordTests
     }
 
     [Fact]
+    public void BidiRandAlPasswordContainingLatinLetterThrows()
+    {
+        Assert.Throws<DocumentParseException>(
+            () => BuildEncrypt("\u05d0a\u05d1", "owner", Permissions));
+    }
+
+    [Fact]
     public void RightToLeftPassword_Authenticates()
     {
         var encrypt = BuildEncrypt("\u05d0\u05d1\u05d2", "owner", Permissions);
