@@ -241,6 +241,8 @@ internal sealed class SfntFont
             throw new InvalidDataException("Required 'head' table is missing.");
         }
 
+        ValidateRequiredTable(head, "head", 20);
+
         return new SfntReader(data).ReadUInt16At((int)head.Offset + 18);
     }
 
@@ -250,6 +252,8 @@ internal sealed class SfntFont
         {
             throw new InvalidDataException("Required 'maxp' table is missing.");
         }
+
+        ValidateRequiredTable(maxp, "maxp", 6);
 
         return new SfntReader(data).ReadUInt16At((int)maxp.Offset + 4);
     }
@@ -261,11 +265,22 @@ internal sealed class SfntFont
             throw new InvalidDataException("Required 'hhea' table is missing.");
         }
 
+        ValidateRequiredTable(hhea, "hhea", 36);
+
         var reader = new SfntReader(data, (int)hhea.Offset + 4);
         Ascent = reader.ReadInt16();
         Descent = reader.ReadInt16();
         LineGap = reader.ReadInt16();
         return reader.ReadUInt16At((int)hhea.Offset + 34);
+    }
+
+    private void ValidateRequiredTable(TableRecord record, string tag, uint minimumLength)
+    {
+        ValidateTableExtent(record.Offset, record.Length, tag);
+        if (record.Length < minimumLength)
+        {
+            throw new InvalidDataException($"Required font table '{tag}' is truncated.");
+        }
     }
 
     private void ReadPost()

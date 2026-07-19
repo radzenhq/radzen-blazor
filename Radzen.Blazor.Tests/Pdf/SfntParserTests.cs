@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.IO;
+using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -180,5 +182,31 @@ public class SfntParserTests
     public void Parse_BadMagic_Throws()
     {
         Assert.ThrowsAny<Exception>(() => SfntFont.Parse(new byte[16]));
+    }
+
+    [Theory]
+    [InlineData("head", 19u)]
+    [InlineData("maxp", 5u)]
+    [InlineData("hhea", 35u)]
+    public void Parse_RequiredTableDeclaredLengthCannotBeTruncated(string tag, uint length)
+    {
+        var bytes = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
+        var count = (bytes[4] << 8) | bytes[5];
+        for (var i = 0; i < count; i++)
+        {
+            var record = 12 + i * 16;
+            if (Encoding.ASCII.GetString(bytes, record, 4) != tag)
+            {
+                continue;
+            }
+
+            bytes[record + 12] = (byte)(length >> 24);
+            bytes[record + 13] = (byte)(length >> 16);
+            bytes[record + 14] = (byte)(length >> 8);
+            bytes[record + 15] = (byte)length;
+            break;
+        }
+
+        Assert.Throws<InvalidDataException>(() => SfntFont.Parse(bytes));
     }
 }

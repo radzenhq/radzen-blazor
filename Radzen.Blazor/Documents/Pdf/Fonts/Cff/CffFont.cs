@@ -172,6 +172,13 @@ internal sealed class CffFont
         {
             fdArray = ReadFdArray(cffData, topDict);
             fdSelect = ReadFdSelect(cffData, topDict, glyphCount);
+            foreach (var fd in fdSelect)
+            {
+                if ((uint)fd >= (uint)fdArray.Length)
+                {
+                    throw new InvalidDataException("CFF FDSelect references an entry outside FDArray.");
+                }
+            }
         }
         else
         {
