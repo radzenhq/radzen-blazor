@@ -333,6 +333,8 @@ public sealed class FontCollection
         double sum = 0;
         var i = 0;
         char? prevBase14 = null;
+        SfntFont? prevFallbackFace = null;
+        ushort prevFallbackGlyph = 0;
         while (i < text.Length)
         {
             var codepoint = CodePointAt(text, i);
@@ -345,16 +347,25 @@ public sealed class FontCollection
 
                 sum += metrics.GetWidth(code) * font.Size / 1000.0;
                 prevBase14 = (char)codepoint;
+                prevFallbackFace = null;
             }
             else if (TryResolveFallbackGlyph(codepoint, out var face, out var glyph))
             {
+                if (EnableKerning && ReferenceEquals(prevFallbackFace, face))
+                {
+                    sum += face.GetKerning(prevFallbackGlyph, glyph) * font.Size / face.UnitsPerEm;
+                }
+
                 sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
                 prevBase14 = null;
+                prevFallbackFace = face;
+                prevFallbackGlyph = glyph;
             }
             else
             {
                 sum += metrics.GetWidth(question) * font.Size / 1000.0;
                 prevBase14 = null;
+                prevFallbackFace = null;
             }
 
             i += codepoint > 0xFFFF ? 2 : 1;

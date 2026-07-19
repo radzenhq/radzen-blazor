@@ -1,7 +1,9 @@
 #nullable enable
 using System.Text;
+using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,5 +34,33 @@ public class Base14FallbackKerningTests
     public void Fallback_Run_Has_No_Kerning_When_Disabled()
     {
         Assert.DoesNotContain("TJ", Content(enableKerning: false));
+    }
+
+    [Fact]
+    public void MeasureBase14_FallbackRunIncludesTheKerningPaintedByEmitter()
+    {
+        var face = SfntFont.Parse(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"));
+        var font = new Font { Size = 12 };
+        var fonts = new FontCollection();
+        fonts.Register(BuildTestSupport.Latin, new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
+        fonts.SetFallback(BuildTestSupport.Latin);
+        var plain = fonts.MeasureText("АТ", font);
+        var expectedKern = face.GetKerning(face.GetGlyphId('А'), face.GetGlyphId('Т')) * font.Size / face.UnitsPerEm;
+
+        fonts.EnableKerning = true;
+
+        Assert.NotEqual(0, expectedKern);
+        Assert.Equal(plain + expectedKern, fonts.MeasureText("АТ", font), 9);
+    }
+
+    [Fact]
+    public void MeasureBase14_FallbackRunStaysUnkernedWhenKerningIsDisabled()
+    {
+        var fonts = new FontCollection();
+        fonts.Register(BuildTestSupport.Latin, new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
+        fonts.SetFallback(BuildTestSupport.Latin);
+        var font = new Font { Size = 12 };
+
+        Assert.Equal(fonts.MeasureText("А", font) + fonts.MeasureText("Т", font), fonts.MeasureText("АТ", font), 9);
     }
 }

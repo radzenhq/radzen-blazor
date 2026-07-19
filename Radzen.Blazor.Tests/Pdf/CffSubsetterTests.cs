@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Fonts.Cff;
@@ -171,6 +172,20 @@ public class CffSubsetterTests
         var second = CffSubsetter.Subset(font, Requested);
 
         Assert.Equal(first, second);
+    }
+
+    [Fact]
+    public void Parse_FdSelectOutsideFdArrayThrowsInvalidFontError()
+    {
+        var bytes = CffSubsetter.Subset(OriginalFont(), [34]);
+        var name = CffIndex.Read(bytes, bytes[2]);
+        var top = CffIndex.Read(bytes, name.EndOffset);
+        var dictionary = CffDict.Parse(top.GetBytes(0));
+        var offset = (int)dictionary[1237][0];
+        Assert.Equal(0, bytes[offset]);
+        bytes[offset + 1] = byte.MaxValue;
+
+        Assert.Throws<InvalidDataException>(() => CffFont.Parse(bytes));
     }
 
     [Fact]
