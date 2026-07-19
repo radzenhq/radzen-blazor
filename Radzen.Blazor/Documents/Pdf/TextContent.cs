@@ -58,6 +58,41 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         Font.AcceptChanges();
     }
 
+    internal override ContentElement DeepClone()
+    {
+        var clone = CopyStateTo(new TextContent(Text, x, y)
+        {
+            Font = ContentClone.CopyFont(Font),
+            Color = Color,
+        });
+        clone.FontResourceName = FontResourceName;
+        clone.SourceBytes = SourceBytes is { } bytes ? new ReadOnlyMemory<byte>(bytes.ToArray()) : null;
+        clone.SourceText = SourceText;
+        clone.SourceFont = SourceFont;
+        clone.SourceAdjustments = CopyAdjustments(SourceAdjustments);
+        clone.FillPaint = ContentClone.CopyDeviceColor(FillPaint);
+        clone.WordSpacing = WordSpacing;
+        clone.CharSpacing = CharSpacing;
+        clone.InsideTextObject = InsideTextObject;
+        return clone;
+    }
+
+    private static ImmutableArray<TextAdjustment>? CopyAdjustments(ImmutableArray<TextAdjustment>? source)
+    {
+        if (source is not { } adjustments)
+        {
+            return null;
+        }
+
+        var result = ImmutableArray.CreateBuilder<TextAdjustment>(adjustments.Length);
+        foreach (var adjustment in adjustments)
+        {
+            result.Add(new TextAdjustment(adjustment.Text is { } bytes ? [.. bytes] : null, adjustment.Adjustment));
+        }
+
+        return result.MoveToImmutable();
+    }
+
     internal string? FontResourceName
     {
         get => fontResourceName;

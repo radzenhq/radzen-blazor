@@ -10,6 +10,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
 {
     private readonly TrackedList<Entry> entries = [];
     private bool loaded;
+    private bool rewriteImported;
 
     /// <summary>Gets the number of modeled annotations.</summary>
     public int Count
@@ -108,7 +109,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     {
         get
         {
-            if (entries.StructureChanged)
+            if (rewriteImported || entries.StructureChanged)
             {
                 return true;
             }
@@ -132,6 +133,8 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
         entries.Add(new Entry(annotation, reader, original, dictionary));
         entries.AcceptStructure();
     }
+
+    internal void RewriteImported() => (loaded, rewriteImported) = (true, true);
 
     internal void RemoveLoadedSubtype(string subtype)
         => entries.RemoveAll(entry => entry.Dictionary is { } dictionary

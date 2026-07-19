@@ -30,6 +30,9 @@ public sealed class ImageContent : ContentElement
 
     internal byte[] EncodedXObject { get; }
 
+    internal override ContentElement DeepClone()
+        => CopyStateTo(new ImageContent([.. EncodedXObject]) { Bounds = Bounds });
+
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {

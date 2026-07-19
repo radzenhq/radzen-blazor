@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 using Radzen.Documents.Pdf.Emit;
@@ -10,6 +11,8 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Image : Block
 {
+    private double opacity = 1;
+
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     internal Image(byte[] data) => Data = data;
@@ -45,7 +48,19 @@ public sealed class Image : Block
     /// Gets or sets the opacity the image is painted with, from 0 (fully transparent)
     /// to 1 (fully opaque). Defaults to 1.
     /// </summary>
-    public double Opacity { get; set; } = 1;
+    public double Opacity
+    {
+        get => opacity;
+        set
+        {
+            if (!double.IsFinite(value) || value < 0 || value > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "Image opacity must be between 0 and 1.");
+            }
+
+            opacity = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets whether the viewer should smooth the image when it is drawn at a size

@@ -123,34 +123,7 @@ internal sealed class NavigationWriter(Document document)
         }
 
         var (page, _, reference) = pageNodes[pageIndex];
-        var arguments = target.FitArguments;
-        return target.Fit switch
-        {
-            OutlineFit.Fit => [reference, new NameObject("Fit")],
-            OutlineFit.FitHorizontal => [reference, new NameObject("FitH"), new NumberObject(arguments[0])],
-            OutlineFit.FitVertical => [reference, new NameObject("FitV"), new NumberObject(arguments[0])],
-            OutlineFit.FitBounding => [reference, new NameObject("FitB")],
-            OutlineFit.FitBoundingHorizontal => [reference, new NameObject("FitBH"), new NumberObject(arguments[0])],
-            OutlineFit.FitBoundingVertical => [reference, new NameObject("FitBV"), new NumberObject(arguments[0])],
-            OutlineFit.Rectangle =>
-            [
-                reference,
-                new NameObject("FitR"),
-                new NumberObject(arguments[0]),
-                new NumberObject(arguments[1]),
-                new NumberObject(arguments[2]),
-                new NumberObject(arguments[3]),
-            ],
-            OutlineFit.Coordinates =>
-            [
-                reference,
-                new NameObject("XYZ"),
-                new NumberObject(arguments[0]),
-                new NumberObject(arguments[1]),
-                new NumberObject(arguments[2]),
-            ],
-            _ => DestinationArray(reference, page.Height.Point),
-        };
+        return DestinationWriter.Write(target, reference, DestinationArray(reference, page.Height.Point));
     }
 
     private static ArrayObject DestinationArray(ReferenceObject pageRef, double top) =>

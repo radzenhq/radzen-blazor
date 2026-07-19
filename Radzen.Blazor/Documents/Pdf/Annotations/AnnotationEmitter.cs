@@ -10,11 +10,13 @@ internal sealed class AnnotationEmitContext
 {
     public required IObjectWriter Writer { get; init; }
 
-    public required Func<DocumentObject, DocumentObject> ImportValue { get; init; }
+    public required Func<DocumentReader?, DocumentObject, DocumentObject> ImportValue { get; init; }
 
     public required IReadOnlyList<(Page Page, DictionaryObject Node, ReferenceObject Reference)> Pages { get; init; }
 
     public required int PageIndex { get; init; }
+
+    public DocumentReader? Source { get; init; }
 }
 
 internal static class AnnotationEmitter
@@ -28,6 +30,8 @@ internal static class AnnotationEmitter
     public static void Write(
         DocumentWriter writer,
         GraphImporter? importer,
+        DocumentReader? source,
+        Dictionary<DocumentReader, GraphImporter> appendImporters,
         IReadOnlyList<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pages)
     {
         for (var pageIndex = 0; pageIndex < pages.Count; pageIndex++)
@@ -41,11 +45,11 @@ internal static class AnnotationEmitter
             var context = new AnnotationEmitContext
             {
                 Writer = writer,
-                ImportValue = importer is null
-                    ? value => throw new InvalidOperationException("A loaded annotation cannot be preserved without its source importer.")
-                    : importer.ImportValue,
+                ImportValue = (reader, value) => ImportValue(
+                    writer, importer, source, appendImporters, reader, value),
                 Pages = pages,
                 PageIndex = pageIndex,
+                Source = source,
             };
             var emitted = Build(page.Annotations, context);
             if (!page.Annotations.WasLoaded && node.TryGetValue("Annots", out var current) && current is ArrayObject existing)
@@ -70,27 +74,36 @@ internal static class AnnotationEmitter
         IncrementalUpdateWriter writer,
         AnnotationCollection annotations,
         IReadOnlyList<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pages,
-        int pageIndex)
+        int pageIndex,
+        DocumentReader source,
+        Dictionary<DocumentReader, GraphImporter> appendImporters)
     {
         var context = new AnnotationEmitContext
         {
             Writer = writer,
-            ImportValue = static value => value,
+            ImportValue = (reader, value) => ImportIncrementalValue(
+                writer, source, appendImporters, reader, value),
             Pages = pages,
             PageIndex = pageIndex,
+            Source = source,
         };
         var result = new ArrayObject();
         foreach (var entry in annotations.Entries)
         {
+            if (IsForeignPageTargetedLink(entry, context))
+            {
+                continue;
+            }
+
             if (entry.Annotation is null
                 || (entry.Original is not null && !entry.Annotation.IsModified))
             {
-                result.Add(Preserve(entry));
+                result.Add(Import(entry, context));
                 continue;
             }
 
             var dictionary = BuildDictionary(entry.Annotation, entry, context);
-            if (entry.Original is ReferenceObject original)
+            if (entry.Original is ReferenceObject original && ReferenceEquals(entry.Reader, source))
             {
                 result.Add(writer.Override(original.ObjectNumber, dictionary));
             }
@@ -108,6 +121,11 @@ internal static class AnnotationEmitter
         var result = new ArrayObject();
         foreach (var entry in annotations.Entries)
         {
+            if (IsForeignPageTargetedLink(entry, context))
+            {
+                continue;
+            }
+
             if (entry.Annotation is null)
             {
                 result.Add(Import(entry, context));
@@ -126,6 +144,11 @@ internal static class AnnotationEmitter
         return result;
     }
 
+    private static bool IsForeignPageTargetedLink(AnnotationCollection.Entry entry, AnnotationEmitContext context)
+        => entry is { Original: not null, Annotation: LinkAnnotation { Uri: null, IsModified: false } link }
+            && (link.Destination is not null || link.TargetPageIndex is not null)
+            && !ReferenceEquals(entry.Reader, context.Source);
+
     private static DocumentObject Import(AnnotationCollection.Entry entry, AnnotationEmitContext context)
     {
         if (entry.Original is null)
@@ -133,11 +156,8 @@ internal static class AnnotationEmitter
             throw new InvalidOperationException("A loaded annotation cannot be preserved without its source importer.");
         }
 
-        return context.ImportValue(entry.Original);
+        return context.ImportValue(entry.Reader, entry.Original);
     }
-
-    private static DocumentObject Preserve(AnnotationCollection.Entry entry)
-        => entry.Original ?? throw new InvalidOperationException("A loaded annotation has no original PDF object.");
 
     private static DictionaryObject BuildDictionary(
         Annotation annotation,
@@ -152,7 +172,7 @@ internal static class AnnotationEmitter
             {
                 if (!ManagedKeys.Contains(key))
                 {
-                    dictionary[key] = context.ImportValue(original[key]);
+                    dictionary[key] = context.ImportValue(entry.Reader, original[key]);
                 }
             }
         }
@@ -182,6 +202,44 @@ internal static class AnnotationEmitter
         }
 
         return dictionary;
+    }
+
+    private static DocumentObject ImportValue(
+        DocumentWriter writer,
+        GraphImporter? importer,
+        DocumentReader? source,
+        Dictionary<DocumentReader, GraphImporter> appendImporters,
+        DocumentReader? reader,
+        DocumentObject value)
+    {
+        if (reader is null)
+        {
+            throw new InvalidOperationException("A loaded annotation cannot be preserved without its source reader.");
+        }
+
+        if (ReferenceEquals(reader, source))
+        {
+            return importer!.ImportValue(value);
+        }
+
+        return GraphImporter.GetOrCreate(appendImporters, reader, writer).ImportValue(value);
+    }
+
+    private static DocumentObject ImportIncrementalValue(
+        IncrementalUpdateWriter writer,
+        DocumentReader source,
+        Dictionary<DocumentReader, GraphImporter> appendImporters,
+        DocumentReader? reader,
+        DocumentObject value)
+    {
+        if (reader is null)
+        {
+            throw new InvalidOperationException("A loaded annotation cannot be preserved without its source reader.");
+        }
+
+        return ReferenceEquals(reader, source)
+            ? value
+            : GraphImporter.GetOrCreate(appendImporters, reader, writer).ImportValue(value);
     }
 
     private static void Populate(Annotation annotation, DictionaryObject dictionary, AnnotationEmitContext context)
@@ -303,40 +361,9 @@ internal static class AnnotationEmitter
             var target = link.ResolvedTarget is { PageIndex: { } resolvedPage } resolved && resolvedPage == pageIndex
                 ? resolved
                 : OutlineTarget.ToPageFit(pageIndex);
-            dictionary["Dest"] = LinkDestination(target, context.Pages[pageIndex].Reference);
+            var page = context.Pages[pageIndex].Reference;
+            dictionary["Dest"] = DestinationWriter.Write(target, page, [page, new NameObject("Fit")]);
         }
-    }
-
-    private static ArrayObject LinkDestination(OutlineTarget target, ReferenceObject page)
-    {
-        var arguments = target.FitArguments;
-        return target.Fit switch
-        {
-            OutlineFit.Fit => [page, new NameObject("Fit")],
-            OutlineFit.FitHorizontal => [page, new NameObject("FitH"), new NumberObject(arguments[0])],
-            OutlineFit.FitVertical => [page, new NameObject("FitV"), new NumberObject(arguments[0])],
-            OutlineFit.FitBounding => [page, new NameObject("FitB")],
-            OutlineFit.FitBoundingHorizontal => [page, new NameObject("FitBH"), new NumberObject(arguments[0])],
-            OutlineFit.FitBoundingVertical => [page, new NameObject("FitBV"), new NumberObject(arguments[0])],
-            OutlineFit.Rectangle =>
-            [
-                page,
-                new NameObject("FitR"),
-                new NumberObject(arguments[0]),
-                new NumberObject(arguments[1]),
-                new NumberObject(arguments[2]),
-                new NumberObject(arguments[3]),
-            ],
-            OutlineFit.Coordinates =>
-            [
-                page,
-                new NameObject("XYZ"),
-                new NumberObject(arguments[0]),
-                new NumberObject(arguments[1]),
-                new NumberObject(arguments[2]),
-            ],
-            _ => [page, new NameObject("Fit")],
-        };
     }
 
     private static StreamObject? BuildAppearance(Annotation annotation, IObjectWriter writer, Fonts.FontScope scope)

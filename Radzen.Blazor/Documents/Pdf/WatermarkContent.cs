@@ -1,5 +1,4 @@
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emit;
 
 namespace Radzen.Documents.Pdf;
 
@@ -7,6 +6,7 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
 {
     protected override void EmitBody(ContentWriter writer)
     {
+        watermark.Validate();
         writer.WriteRaw("q\n");
         if (watermark.Opacity < 1)
         {
@@ -30,20 +30,13 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
         }
 
         var decoded = watermark.DecodeImage(image);
-        var (width, height) = ImageDecoder.Measure(image, decoded, box.Width);
+        var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
-        var imageAlpha = image.Opacity;
-        if (image.Stencil && image.StencilColor.A != 255)
-        {
-            imageAlpha *= image.StencilColor.A / 255.0;
-        }
-
-        var state = imageAlpha < 1
-            ? writer.RegisterOpacity(watermark.Opacity * imageAlpha)
+        var state = plan.Alpha < 1
+            ? writer.RegisterOpacity(watermark.Opacity * plan.Alpha)
             : null;
         ContentEmitter.WriteImagePlacement(
-            writer, key, WatermarkGeometry.Centered(width), WatermarkGeometry.Centered(height), width, height,
-            state, stencilColor: image.Stencil ? image.StencilColor : null);
+            writer, key, plan.X, plan.Y, plan.Width, plan.Height, state, stencilColor: plan.StencilColor);
     }
 
     private void WriteText(ContentWriter writer)

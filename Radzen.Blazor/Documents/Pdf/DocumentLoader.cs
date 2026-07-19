@@ -39,9 +39,12 @@ internal static class DocumentLoader
             }
         }
 
+        var namedDestinations = new Lazy<Dictionary<string, DocumentObject>>(
+            () => ReadNamedDestinations(reader, catalog, limits));
         foreach (var page in document.Pages)
         {
-            AnnotationReader.Read(page, reader, state.SourcePages[page], document.Pages, state.SourcePages);
+            AnnotationReader.Read(
+                page, reader, state.SourcePages[page], document.Pages, state.SourcePages, namedDestinations);
         }
 
         if (reader.GetDictionary(catalog, "AcroForm") is { } form)
@@ -51,7 +54,7 @@ internal static class DocumentLoader
         }
 
         ReadAttachments(reader, catalog, document, limits);
-        ReadOutline(reader, catalog, document, state, limits);
+        ReadOutline(reader, catalog, document, state, namedDestinations, limits);
         ReadPageLabels(reader, catalog, document, state, limits);
         ReadXmp(reader, catalog, document);
 
@@ -439,7 +442,13 @@ internal static class DocumentLoader
             ? FormField.DecodeTextString(text)
             : null;
 
-    private static void ReadOutline(DocumentReader reader, DictionaryObject catalog, Document document, LoadedState state, ReaderLimits limits)
+    private static void ReadOutline(
+        DocumentReader reader,
+        DictionaryObject catalog,
+        Document document,
+        LoadedState state,
+        Lazy<Dictionary<string, DocumentObject>> namedDestinations,
+        ReaderLimits limits)
     {
         if (reader.GetDictionary(catalog, "Outlines") is { } root
             && root.TryGetValue("First", out var first))
@@ -450,9 +459,10 @@ internal static class DocumentLoader
                 pageIndexes[state.SourcePages[document.Pages[i]]] = i;
             }
 
-            var destinations = ReadNamedDestinations(reader, catalog, limits);
             var requiresRewrite = false;
-            ReadOutlineLevel(reader, first!, document.Outline, pageIndexes, destinations, [], limits, 0, ref requiresRewrite);
+            ReadOutlineLevel(
+                reader, first!, document.Outline, pageIndexes,
+                namedDestinations.Value, [], limits, 0, ref requiresRewrite);
             state.OutlineRequiresRewrite = requiresRewrite;
         }
     }

@@ -28,6 +28,64 @@ public class ImageXObjectOptionTests
         return Assert.Single(images).Dictionary;
     }
 
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(-0.01)]
+    [InlineData(1.01)]
+    public void OpacityRejectsNonFiniteAndOutOfRangeValues(double value)
+    {
+        var builder = new DocumentBuilder();
+        var image = AddImage(builder, "Images/gray.png");
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => image.Opacity = value);
+    }
+
+    [Theory]
+    [InlineData(0.0)]
+    [InlineData(1.0)]
+    public void OpacityAcceptsDocumentedEndpoints(double value)
+    {
+        var builder = new DocumentBuilder();
+        var image = AddImage(builder, "Images/gray.png");
+
+        image.Opacity = value;
+
+        Assert.Equal(value, image.Opacity);
+    }
+
+    [Fact]
+    public void AppliedImageCacheReusesEntryWhileOptionsAreUnchanged()
+    {
+        var image = Image.FromStream(PdfTestResources.Open("Images/gray.png"));
+        var cache = new AppliedImageCache<int>();
+        var calls = 0;
+
+        var first = cache.Get(image, () => ++calls);
+        var second = cache.Get(image, () => ++calls);
+
+        Assert.Equal(first, second);
+        Assert.Equal(1, calls);
+    }
+
+    [Fact]
+    public void AppliedImageCacheInvalidatesWhenOptionValueOrMaskContentsChange()
+    {
+        var image = Image.FromStream(PdfTestResources.Open("Images/gray.png"));
+        var cache = new AppliedImageCache<int>();
+        var calls = 0;
+        cache.Get(image, () => ++calls);
+
+        image.Interpolate = true;
+        cache.Get(image, () => ++calls);
+        image.ColorKeyMask = [0, 1];
+        cache.Get(image, () => ++calls);
+        image.ColorKeyMask[1] = 2;
+        cache.Get(image, () => ++calls);
+
+        Assert.Equal(4, calls);
+    }
+
     [Fact]
     public void Interpolate_WhenSet_EmitsInterpolateTrueOnXObject()
     {

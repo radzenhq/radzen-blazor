@@ -9,6 +9,22 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
     private readonly HashSet<DocumentObject> fieldRoots = [];
     private readonly HashSet<DocumentObject> pruned = [];
 
+    public bool DropsUncarriedPages { get; set; }
+
+    public static GraphImporter GetOrCreate(
+        Dictionary<DocumentReader, GraphImporter> importers,
+        DocumentReader reader,
+        IObjectWriter writer)
+    {
+        if (!importers.TryGetValue(reader, out var importer))
+        {
+            importer = new GraphImporter(reader, writer) { DropsUncarriedPages = true };
+            importers[reader] = importer;
+        }
+
+        return importer;
+    }
+
     public void Seed(DocumentObject loaded, ReferenceObject reference) => map[loaded] = reference;
 
     public void Prune(DocumentObject loaded) => pruned.Add(loaded);
@@ -22,7 +38,12 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
         {
             case ReferenceObject reference:
                 var resolved = reader.Resolve(reference);
-                return pruned.Contains(resolved) ? new NullObject() : ImportInstance(resolved);
+                if (pruned.Contains(resolved) || (DropsUncarriedPages && IsUncarriedPage(resolved)))
+                {
+                    return new NullObject();
+                }
+
+                return ImportInstance(resolved);
             case StreamObject:
                 return ImportInstance(node);
             default:
@@ -153,6 +174,11 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
     }
 
     private bool IsWidget(DictionaryObject annotation) => FormField.IsWidget(reader, annotation);
+
+    private bool IsUncarriedPage(DocumentObject resolved)
+        => resolved is DictionaryObject dictionary
+            && !map.ContainsKey(resolved)
+            && reader.GetName(dictionary, "Type") is "Page" or "Pages";
 
     private void Populate(DocumentObject shell, DocumentObject target)
     {

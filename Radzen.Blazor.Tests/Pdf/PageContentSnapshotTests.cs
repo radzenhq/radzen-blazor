@@ -27,6 +27,22 @@ public class PageContentSnapshotTests
     }
 
     [Fact]
+    public void SetContent_MutatingSourceArray_DoesNotChangeStoredBytes()
+    {
+        var raw = Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm");
+        var document = new Document();
+        var page = document.Pages.Add();
+        page.SetContent(raw);
+
+        for (var i = 0; i < raw.Length; i++)
+        {
+            raw[i] = (byte)'X';
+        }
+
+        Assert.Equal(Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm"), page.GetContent());
+    }
+
+    [Fact]
     public void GetContent_MutatingReturnedArray_DoesNotLeakIntoSavedDocument()
     {
         var document = new Document();

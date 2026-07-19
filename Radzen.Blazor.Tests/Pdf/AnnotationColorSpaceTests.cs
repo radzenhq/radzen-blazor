@@ -97,7 +97,7 @@ public class AnnotationColorSpaceTests
     }
 
     [Fact]
-    public void Load_TwoComponentAnnotationColor_Throws()
+    public void Load_TwoComponentAnnotationColor_IsRetainedAsUnmodeled()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
@@ -118,6 +118,10 @@ public class AnnotationColorSpaceTests
             .Append("trailer\n<< /Size 6 /Root 1 0 R >>\n")
             .Append("startxref\n" + xref + "\n%%EOF\n");
 
-        Assert.Throws<DocumentParseException>(() => Load(pdf.ToArray()));
+        var loaded = Load(pdf.ToArray());
+
+        Assert.Empty(loaded.Pages[0].Annotations);
+        var savedReader = DocumentReader.Parse(loaded.ToArray());
+        Assert.Single(savedReader.GetArray(DocumentLoadTests.Kid(savedReader, 0), "Annots")!);
     }
 }

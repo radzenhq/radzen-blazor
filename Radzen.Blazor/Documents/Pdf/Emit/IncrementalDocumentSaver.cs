@@ -79,8 +79,7 @@ internal sealed class IncrementalDocumentSaver
                 continue;
             }
 
-            var emission = page.BuildContent();
-            if (emission.IsEmitted || emission.Overlay is not null || page.ContentReplaced)
+            if (page.WouldEmitContent)
             {
                 throw Unsupported("Editing loaded page content, including redaction and text replacement");
             }
@@ -358,16 +357,17 @@ internal sealed class IncrementalDocumentSaver
 
         if (doc.Loaded!.AppendedResources.TryGetValue(page, out var appended))
         {
-            if (!appendImporters.TryGetValue(appended.Reader, out var importer))
-            {
-                importer = new GraphImporter(appended.Reader, writer);
-                appendImporters[appended.Reader] = importer;
-            }
-
+            var importer = GraphImporter.GetOrCreate(appendImporters, appended.Reader, writer);
             node["Resources"] = PageResourceBuilder.MergeResources(importer, appended.Reader, appended.Resources, null);
         }
 
         var reference = writer.Add(node);
+        if (doc.Loaded.AppendedPages.TryGetValue(page, out var appendedPage))
+        {
+            GraphImporter.GetOrCreate(appendImporters, appendedPage.Reader, writer)
+                .Seed(appendedPage.Node, reference);
+        }
+
         return (reference, node);
     }
 
@@ -392,7 +392,8 @@ internal sealed class IncrementalDocumentSaver
                 continue;
             }
 
-            var annotations = AnnotationEmitter.BuildIncremental(writer, page.Annotations, pages, i);
+            var annotations = AnnotationEmitter.BuildIncremental(
+                writer, page.Annotations, pages, i, doc.Loaded!.Source!, appendImporters);
             if (doc.Loaded!.SourcePages.ContainsKey(page))
             {
                 var updated = pageOverrides.TryGetValue(reference.ObjectNumber, out var existing)

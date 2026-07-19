@@ -40,6 +40,26 @@ public class ReaderHardeningTests
         Assert.Equal(3, a.Count);
     }
 
+    [Theory]
+    [InlineData("+")]
+    [InlineData("-")]
+    public void StartXrefLoneSignThrowsDocumentParseException(string sign)
+    {
+        var bytes = Encoding.ASCII.GetBytes("%PDF-1.7\nstartxref\n" + sign + "\n%%EOF");
+
+        Assert.Throws<DocumentParseException>(() => PdfBytes.FindStartXref(bytes));
+    }
+
+    [Theory]
+    [InlineData("+12", 12L)]
+    [InlineData("-12", -12L)]
+    public void StartXrefSignedIntegerStillParses(string value, long expected)
+    {
+        var bytes = Encoding.ASCII.GetBytes("%PDF-1.7\nstartxref\n" + value + "\n%%EOF");
+
+        Assert.Equal(expected, PdfBytes.FindStartXref(bytes));
+    }
+
 
     [Fact]
     public void FlateBomb_ExceedsCap_Throws()

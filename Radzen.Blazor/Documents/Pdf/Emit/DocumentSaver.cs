@@ -150,12 +150,7 @@ internal sealed class DocumentSaver
             }
             else if (loaded is not null && loaded.AppendedResources.TryGetValue(page, out var appended))
             {
-                if (!appendImporters.TryGetValue(appended.Reader, out var appendImporter))
-                {
-                    appendImporter = new GraphImporter(appended.Reader, writer);
-                    appendImporters[appended.Reader] = appendImporter;
-                }
-
+                var appendImporter = GraphImporter.GetOrCreate(appendImporters, appended.Reader, writer);
                 merged = PageResourceBuilder.MergeResources(appendImporter, appended.Reader, appended.Resources, emitted);
             }
             else
@@ -207,7 +202,7 @@ internal sealed class DocumentSaver
             catalog["AcroForm"] = writer.Add(formWriter.FieldsForm(appendedFields));
         }
 
-        AnnotationEmitter.Write(writer, importer, pageNodes);
+        AnnotationEmitter.Write(writer, importer, loaded?.Source, appendImporters, pageNodes);
 
         foreach (var (pageIndex, reference) in createdWidgets)
         {

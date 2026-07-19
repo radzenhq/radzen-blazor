@@ -5,6 +5,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
+using Radzen.Documents.Pdf.Content;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -12,6 +13,17 @@ namespace Radzen.Blazor.Pdf.Tests;
 // ISO 32000-1 7.5.6: incremental save appends only the changed objects over the verbatim original bytes.
 public class IncrementalSaveTests
 {
+    private sealed class CountingContent : ContentElement
+    {
+        public int Emissions { get; private set; }
+
+        protected override void EmitBody(ContentWriter writer)
+        {
+            Emissions++;
+            writer.WriteRaw("q Q\n");
+        }
+    }
+
     private sealed class FixedSigner : ISigner
     {
         public byte[] Sign(SignedContent content) => [0x30, 0x00];
@@ -68,6 +80,25 @@ public class IncrementalSaveTests
         }
 
         pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(5), 2));
+        return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
+    }
+
+    private static byte[] UnsupportedAnnotationDocument()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [4 0 R] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Type /Annot /Subtype /Caret /Rect [10 10 30 30] /P 3 0 R /Custom 5 0 R >>\nendobj\n")
+            .Object(5, "5 0 obj\n(keep-foreign-object)\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 6\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var number = 1; number <= 5; number++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
+        }
+
         return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
     }
 
@@ -257,6 +288,50 @@ public class IncrementalSaveTests
         var fonts = reader.GetDictionary(resources!, "Font");
         Assert.NotNull(fonts);
         Assert.NotEmpty(fonts!.Keys);
+    }
+
+    [Fact]
+    public void SaveIncremental_AfterAppendImportsUnsupportedAnnotationGraphFromForeignReader()
+    {
+        var original = BaseDocument();
+        var document = Load(original);
+        document.Append(Load(UnsupportedAnnotationDocument()));
+
+        var updated = SaveIncremental(document);
+
+        AssertVerbatimPrefix(original, updated);
+        var reader = DocumentReader.Parse(updated);
+        var pages = Assert.IsType<DictionaryObject>(reader.Resolve(FormTestSupport.Catalog(reader)["Pages"]));
+        var kids = Assert.IsType<ArrayObject>(reader.Resolve(pages["Kids"]));
+        var appendedPageReference = Assert.IsType<ReferenceObject>(kids[1]);
+        var appendedPage = Assert.IsType<DictionaryObject>(reader.Resolve(appendedPageReference));
+        var annotationReference = Assert.IsType<ReferenceObject>(Assert.Single(reader.GetArray(appendedPage, "Annots")!));
+        Assert.True(annotationReference.ObjectNumber >= Assert.IsType<NumberObject>(
+            DocumentReader.Parse(original).Trailer["Size"]).IntValue);
+        var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(annotationReference));
+        Assert.Equal("Caret", reader.GetName(annotation, "Subtype"));
+        Assert.Equal(appendedPageReference.ObjectNumber, Assert.IsType<ReferenceObject>(annotation["P"]).ObjectNumber);
+        Assert.Equal("keep-foreign-object", Assert.IsType<StringObject>(reader.Resolve(annotation["Custom"])).Value);
+    }
+
+    [Fact]
+    public void SaveIncremental_AfterAppendPreservesModeledAnnotation()
+    {
+        var foreign = new Document();
+        foreign.Pages.Add().Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24))
+        {
+            Contents = "modeled foreign annotation",
+        });
+        var original = BaseDocument();
+        var document = Load(original);
+        document.Append(Load(foreign.ToArray()));
+
+        var updated = SaveIncremental(document);
+
+        AssertVerbatimPrefix(original, updated);
+        var reloaded = Load(updated);
+        var annotation = Assert.IsType<TextAnnotation>(Assert.Single(reloaded.Pages[1].Annotations));
+        Assert.Equal("modeled foreign annotation", annotation.Contents);
     }
 
     [Fact]
@@ -458,6 +533,17 @@ public class IncrementalSaveTests
 
         Assert.Contains("page content", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("SaveToStream", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PendingLoadedPageContentIsRejectedWithoutSpeculativeEmission()
+    {
+        var document = Load(BaseDocument());
+        var content = new CountingContent();
+        document.Pages[0].AppendContent(content);
+
+        Assert.Throws<NotSupportedException>(() => SaveIncremental(document));
+        Assert.Equal(0, content.Emissions);
     }
 
 

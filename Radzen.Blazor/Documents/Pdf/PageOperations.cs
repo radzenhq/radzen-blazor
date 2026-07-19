@@ -52,10 +52,12 @@ internal static class PageOperations
     internal static IReadOnlyList<Page> Import(Document target, Document snapshot, int offset, int length)
     {
         var imported = new List<Page>(length);
+        var targetPageOffset = target.Pages.Count;
         for (var index = offset; index < offset + length; index++)
         {
             var source = snapshot.Pages[index];
-            var page = DocumentMerger.AppendPage(target, snapshot, source);
+            var page = DocumentMerger.AppendPage(
+                target, snapshot, source, offset, length, targetPageOffset);
             imported.Add(page);
         }
 

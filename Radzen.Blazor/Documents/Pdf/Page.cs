@@ -209,7 +209,7 @@ public sealed class Page
     public void SetContent(byte[] value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        SetContentCore(value);
+        SetContentCore((byte[])value.Clone());
 
         ContentReplaced = true;
     }
@@ -313,6 +313,16 @@ public sealed class Page
 
     internal bool ContentIsIntact => !ContentReplaced && !materialized && pendingAppends.Count == 0;
 
+    private bool NoModeledContent => elements.Count == 0 && materializedCount == 0;
+
+    private bool OriginalContentIntact
+        => content is not null && OriginalElementsIntact() && elements.Count == materializedCount;
+
+    internal bool WouldEmitContent
+        => ContentReplaced
+            || pendingAppends.Count > 0
+            || !(NoModeledContent || OriginalContentIntact);
+
     internal bool ContentReplaced { get; private set; }
 
     internal void AppendContent(ContentElement element)
@@ -340,7 +350,7 @@ public sealed class Page
             return;
         }
 
-        if (OriginalElementsIntact() && elements.Count == materializedCount)
+        if (OriginalContentIntact)
         {
             ResetMaterialization();
             return;
@@ -426,18 +436,18 @@ public sealed class Page
                 new ContentEmissionResult(pendingOverlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
         }
 
-        if (elements.Count == 0 && materializedCount == 0)
+        if (NoModeledContent)
+        {
+            return new ContentEmissionResult(content, editedResources);
+        }
+
+        if (OriginalContentIntact)
         {
             return new ContentEmissionResult(content, editedResources);
         }
 
         if (content is not null && OriginalElementsIntact())
         {
-            if (elements.Count == materializedCount)
-            {
-                return new ContentEmissionResult(content, editedResources);
-            }
-
             using var appended = new ContentWriter(
                 FontScope,
                 ResourceNameAllocator.Available("SF", reservedNames, true),

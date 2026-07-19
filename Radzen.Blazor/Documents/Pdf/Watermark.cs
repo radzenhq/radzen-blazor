@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Radzen.Documents.Pdf.Emit;
 
 namespace Radzen.Documents.Pdf;
@@ -32,24 +31,11 @@ public sealed class Watermark
 
     internal Image? Image { get; private set; }
 
-    private ImageXObject? decoded;
-    private Image? decodedImage;
-    private (bool Interpolate, bool Stencil, int[]? ColorKeyMask) decodedOptions;
+    private readonly AppliedImageCache<ImageXObject> decoded = new();
 
     internal ImageXObject DecodeImage(Image image)
     {
-        var options = (image.Interpolate, image.Stencil, image.ColorKeyMask);
-        if (decoded is null || !ReferenceEquals(decodedImage, image)
-            || decodedOptions.Interpolate != options.Interpolate
-            || decodedOptions.Stencil != options.Stencil
-            || !ColorKeyMaskEqual(decodedOptions.ColorKeyMask, options.ColorKeyMask))
-        {
-            decoded = ImageDecoder.ApplyOptions(ImageDecoder.Decode(image.Data), image);
-            decodedImage = image;
-            decodedOptions = (options.Interpolate, options.Stencil, options.ColorKeyMask?.ToArray());
-        }
-
-        return decoded;
+        return decoded.Get(image, () => ImageDecoder.ApplyOptions(ImageDecoder.Decode(image.Data), image));
     }
 
     internal void Validate()
@@ -64,9 +50,6 @@ public sealed class Watermark
             throw new ArgumentOutOfRangeException(nameof(Rotation), Rotation, "Watermark rotation must be finite.");
         }
     }
-
-    private static bool ColorKeyMaskEqual(int[]? first, int[]? second)
-        => first is null ? second is null : second is not null && first.AsSpan().SequenceEqual(second);
 
     /// <summary>
     /// Sets the watermark image, drawn centered on the page under any <see cref="Text"/>.

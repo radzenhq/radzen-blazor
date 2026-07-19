@@ -44,22 +44,11 @@ internal static class DefaultAppearanceGrammar
             var components = AllNumbers(frame.Operands);
             if (components.Length == expected)
             {
-                color = ColorFromComponents(components);
+                color = DeviceColorConverter.FromComponents(components);
             }
         }
 
         return new DefaultAppearance(font, size, color);
     }
 
-    private static Color ColorFromComponents(double[] values) => values.Length switch
-    {
-        1 => Color.FromRgb(Channel(values[0]), Channel(values[0]), Channel(values[0])),
-        3 => Color.FromRgb(Channel(values[0]), Channel(values[1]), Channel(values[2])),
-        _ => Color.FromRgb(
-            Channel((1 - values[0]) * (1 - values[3])),
-            Channel((1 - values[1]) * (1 - values[3])),
-            Channel((1 - values[2]) * (1 - values[3]))),
-    };
-
-    private static byte Channel(double value) => ColorComponent.ToChannel(value);
 }

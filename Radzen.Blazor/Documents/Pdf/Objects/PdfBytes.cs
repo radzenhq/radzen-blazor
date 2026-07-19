@@ -54,7 +54,7 @@ internal static class PdfBytes
                 index++;
             }
 
-            if (index == start)
+            if (index == start || index == start + 1 && data[start] is (byte)'+' or (byte)'-')
             {
                 throw new DocumentParseException("Expected integer after startxref.", start);
             }

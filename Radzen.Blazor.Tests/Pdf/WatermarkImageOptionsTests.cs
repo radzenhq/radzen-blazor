@@ -72,4 +72,28 @@ public class WatermarkImageOptionsTests
             && reader.Resolve(alphaValue!) is NumberObject alpha
             && Math.Abs(alpha.DoubleValue - 0.2) < 0.000001);
     }
+
+    [Fact]
+    public void DocumentWatermarkMutationToInvalidOpacityIsRejectedWhenSaved()
+    {
+        var document = new Document();
+        document.Pages.Add();
+        var watermark = new Watermark { Text = "draft" };
+        document.AddWatermark(watermark);
+        watermark.Opacity = 1.01;
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => document.ToArray());
+    }
+
+    [Fact]
+    public void DocumentWatermarkMutationToValidOpacityStillSaves()
+    {
+        var document = new Document();
+        document.Pages.Add();
+        var watermark = new Watermark { Text = "draft" };
+        document.AddWatermark(watermark);
+        watermark.Opacity = 0.5;
+
+        Assert.NotEmpty(document.ToArray());
+    }
 }

@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
-    private readonly Dictionary<Image, GeneratedImage> prepared = [];
+    private readonly AppliedImageCache<GeneratedImage> prepared = new();
 
     private int preparedCount;
 
@@ -40,20 +39,16 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
             return generated;
         }
 
-        if (prepared.TryGetValue(source, out var cached))
+        return prepared.Get(source, () =>
         {
-            return cached;
-        }
-
-        var applied = ImageDecoder.ApplyOptions(generated.Image, source);
-        var result = ReferenceEquals(applied, generated.Image)
-            ? generated
-            : new GeneratedImage
-            {
-                Key = "Imo" + preparedCount++.ToString(CultureInfo.InvariantCulture),
-                Image = applied,
-            };
-        prepared[source] = result;
-        return result;
+            var applied = ImageDecoder.ApplyOptions(generated.Image, source);
+            return ReferenceEquals(applied, generated.Image)
+                ? generated
+                : new GeneratedImage
+                {
+                    Key = "Imo" + preparedCount++.ToString(CultureInfo.InvariantCulture),
+                    Image = applied,
+                };
+        });
     }
 }
