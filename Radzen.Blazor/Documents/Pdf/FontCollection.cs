@@ -304,13 +304,13 @@ public sealed class FontCollection
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(font);
-        SimpleShaper.EnsureNoComplexScript(text);
 
         if (TryResolvePrimary(font, out _))
         {
             return Shaper().MeasureAdvance(text, font);
         }
 
+        SimpleShaper.EnsureNoComplexScript(text);
         var base14 = Base14Metrics.Resolve(font)
             ?? throw new InvalidOperationException($"No font is registered for family '{font.Name}'.");
         return MeasureBase14(text, font, base14);

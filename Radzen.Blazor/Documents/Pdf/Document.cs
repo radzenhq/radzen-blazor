@@ -27,11 +27,7 @@ public sealed class Document
 
     internal LoadedState? Loaded { get; private set; }
 
-    internal static Document CreateLoaded(LoadedState state)
-    {
-        ArgumentNullException.ThrowIfNull(state);
-        return new Document { Loaded = state };
-    }
+    internal static Document CreateLoaded(LoadedState state) => new() { Loaded = state };
 
     internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
