@@ -23,6 +23,8 @@ public sealed class XObjectContent : ContentElement
     /// <summary>Gets the XObject resource name, without the leading slash.</summary>
     public string Name { get; }
 
+    internal override ContentElement DeepClone() => CopyStateTo(new XObjectContent(Name));
+
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {

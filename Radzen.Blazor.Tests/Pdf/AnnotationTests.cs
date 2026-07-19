@@ -11,7 +11,17 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class AnnotationTests
 {
     [Fact]
-    public void MalformedUriThrowsDocumentParseException()
+    public void MalformedNamedDestinationTree_DemotesNamedLinkButKeepsDirectLinkModeled()
+    {
+        var loaded = Load(DirectAndNamedLinksWithMalformedNameTree());
+
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(loaded.Pages[0].Annotations));
+        Assert.Equal(0, link.TargetPageIndex);
+        Assert.Equal(2, PageAnnotations(DocumentReader.Parse(loaded.ToArray())).Count);
+    }
+
+    [Fact]
+    public void MalformedUriAnnotationIsRetainedAsUnmodeled()
     {
         var source = new Document();
         source.Pages.Add().Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20))
@@ -25,7 +35,31 @@ public class AnnotationTests
         Assert.True(offset >= 0);
         invalid.CopyTo(bytes.AsSpan(offset));
 
-        Assert.Throws<DocumentParseException>(() => Load(bytes));
+        var loaded = Load(bytes);
+
+        Assert.Empty(loaded.Pages[0].Annotations);
+        Assert.Single(PageAnnotations(DocumentReader.Parse(loaded.ToArray())));
+    }
+
+    [Fact]
+    public void MalformedRectAnnotationDoesNotHideValidSibling()
+    {
+        var source = new Document();
+        var page = source.Pages.Add();
+        page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { Uri = new Uri("https://bad.example/") });
+        page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { Contents = "valid" });
+        var bytes = source.ToArray();
+        var rect = Encoding.ASCII.GetBytes("[10 10 30 30]");
+        var malformed = Encoding.ASCII.GetBytes("[10 10 /X 30]");
+        var offset = bytes.AsSpan().IndexOf(rect);
+        Assert.True(offset >= 0);
+        malformed.CopyTo(bytes.AsSpan(offset));
+
+        var loaded = Load(bytes);
+
+        Assert.Single(loaded.Pages[0].Annotations);
+        Assert.Equal("valid", Assert.IsType<TextAnnotation>(loaded.Pages[0].Annotations[0]).Contents);
+        Assert.Equal(2, PageAnnotations(DocumentReader.Parse(loaded.ToArray())).Count);
     }
 
     [Fact]
@@ -298,6 +332,26 @@ public class AnnotationTests
         var action = reader.GetDictionary(annotation, "A")!;
         action["D"] = new NameObject("chapter-one");
         return document.ToArray();
+    }
+
+    private static byte[] DirectAndNamedLinksWithMalformedNameTree()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R /Names << /Dests 6 0 R >> >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [4 0 R 5 0 R] >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Type /Annot /Subtype /Link /Rect [10 10 30 30] /Dest [3 0 R /Fit] >>\nendobj\n");
+        pdf.Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Link /Rect [40 10 60 30] /Dest (chapter) >>\nendobj\n");
+        pdf.Object(6, "6 0 obj\n<< /Names [42 [3 0 R /Fit]] >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 7\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var i = 1; i < 7; i++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(i)));
+        }
+
+        pdf.Append("trailer\n<< /Size 7 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
     }
 
     private static byte[] AddUnknownAnnotation(byte[] bytes)

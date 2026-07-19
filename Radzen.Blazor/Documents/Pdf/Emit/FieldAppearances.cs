@@ -18,10 +18,7 @@ internal static class FieldAppearances
     {
         using var writer = new ContentWriter(scope);
         writer.WriteRaw("/Tx BMC\nq\n");
-        new TextContent(value, Unit.FromPoint(2.0), Unit.FromPoint(Baseline(height, font.Size)))
-        {
-            Font = font,
-        }.Emit(writer);
+        Text(value, 0.0, 0.0, height, font).Emit(writer);
         writer.WriteRaw("Q\nEMC\n");
 
         return Wrap(writer, width, height);
@@ -112,6 +109,12 @@ internal static class FieldAppearances
 
     public static bool CanEncode(string value) => WinAnsiText.CanEncode(value);
 
+    public static TextContent Text(string value, double x, double y, double height, Font font)
+        => new(value, Unit.FromPoint(x + 2.0), Unit.FromPoint(y + Baseline(height, font.Size)))
+        {
+            Font = font,
+        };
+
     public static Font AppearanceFont(string? daFont, double size) => new()
     {
         Name = daFont switch
@@ -120,7 +123,7 @@ internal static class FieldAppearances
             "TiRo" or "Times" or "Times-Roman" => "Times-Roman",
             _ => "Helvetica",
         },
-        Size = size,
+        Size = size > 0.0 ? size : DefaultFontSize,
     };
 
     private static StreamObject Wrap(ContentWriter writer, double width, double height)

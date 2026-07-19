@@ -60,6 +60,14 @@ internal sealed class LoadedState
                 AppendedAcroForms[reader] = form;
             }
         }
+        else if (origin.AppendedPages.TryGetValue(source, out var appendedNode))
+        {
+            AppendedPages[page] = appendedNode;
+            if (origin.AppendedAcroForms.TryGetValue(appendedNode.Reader, out var appendedForm))
+            {
+                AppendedAcroForms[appendedNode.Reader] = appendedForm;
+            }
+        }
 
         if (origin.SourceBoxes.TryGetValue(source, out var box))
         {
@@ -90,13 +98,9 @@ internal sealed class LoadedState
 
         CarryAppended(page, page, origin);
 
-        if (origin.AppendedPages.TryGetValue(page, out var appendedNode))
+        if (page.Annotations.WasLoaded)
         {
-            AppendedPages[page] = appendedNode;
-            if (origin.AppendedAcroForms.TryGetValue(appendedNode.Reader, out var appendedForm))
-            {
-                AppendedAcroForms[appendedNode.Reader] = appendedForm;
-            }
+            page.Annotations.RewriteImported();
         }
     }
 

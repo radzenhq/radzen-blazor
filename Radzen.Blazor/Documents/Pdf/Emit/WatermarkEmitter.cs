@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 
 namespace Radzen.Documents.Pdf.Emit;
@@ -6,7 +5,7 @@ namespace Radzen.Documents.Pdf.Emit;
 internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolver fontResolver, ImageStore imageStore)
 {
     private readonly SfntRunBuilder runBuilder = new(fonts, fontResolver);
-    private readonly Dictionary<Image, GeneratedImage> appliedImages = [];
+    private readonly AppliedImageCache<GeneratedImage> appliedImages = new();
 
     public void Plan(PagePlan plan, Watermark watermark)
     {
@@ -29,24 +28,19 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
                 generated = ApplyOptions(watermark, image, generated);
             }
 
-            var (width, height) = ImageDecoder.Measure(image, generated.Image, plan.Size.Width.Point);
-            var imageAlpha = image.Opacity;
-            if (image.Stencil && image.StencilColor.A != 255)
-            {
-                imageAlpha *= image.StencilColor.A / 255.0;
-            }
+            var imagePlan = WatermarkImagePlan.Create(image, generated.Image, plan.Size.Width.Point);
 
             draw.Image = new ImageDraw
             {
-                X = WatermarkGeometry.Centered(width),
-                Y = WatermarkGeometry.Centered(height),
-                Width = width,
-                Height = height,
+                X = imagePlan.X,
+                Y = imagePlan.Y,
+                Width = imagePlan.Width,
+                Height = imagePlan.Height,
                 Image = generated,
-                ExtGState = imageAlpha < 1
-                    ? plan.RegisterExtGState(watermark.Opacity * imageAlpha, watermark.Opacity * imageAlpha)
+                ExtGState = imagePlan.Alpha < 1
+                    ? plan.RegisterExtGState(watermark.Opacity * imagePlan.Alpha, watermark.Opacity * imagePlan.Alpha)
                     : null,
-                StencilColor = image.Stencil ? image.StencilColor : null,
+                StencilColor = imagePlan.StencilColor,
             };
             plan.UsedImages.Add(generated);
         }
@@ -60,15 +54,11 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
     }
 
     private GeneratedImage ApplyOptions(Watermark watermark, Image image, GeneratedImage baseImage)
-    {
-        if (!appliedImages.TryGetValue(image, out var applied))
+        => appliedImages.Get(image, () => new GeneratedImage
         {
-            applied = new GeneratedImage { Key = baseImage.Key + "w", Image = watermark.DecodeImage(image) };
-            appliedImages[image] = applied;
-        }
-
-        return applied;
-    }
+            Key = baseImage.Key + "w",
+            Image = watermark.DecodeImage(image),
+        });
 
     private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Font font)
     {

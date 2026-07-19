@@ -61,7 +61,7 @@ public class NamedDestinationPreservationTests
         return null;
     }
 
-    private static byte[] Source(string linkDestination = "(chapter2)")
+    internal static byte[] Source(string linkDestination = "(chapter2)")
     {
         var one = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-one-body) Tj ET");
         var two = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (page-two-body) Tj ET");
@@ -158,6 +158,24 @@ public class NamedDestinationPreservationTests
 
         Assert.Equal("FitBV", Assert.IsType<NameObject>(reader.Resolve(destination[1])).Value);
         Assert.Equal(123, Assert.IsType<NumberObject>(reader.Resolve(destination[2])).DoubleValue);
+    }
+
+    [Fact]
+    public void ClonedResolvedNamedDestinationLink_KeepsXyzCoordinates()
+    {
+        var extracted = Load(Source()).Pages.ExtractPages(..).ToArray();
+
+        var reader = DocumentReader.Parse(extracted);
+        var page = Assert.IsType<DictionaryObject>(reader.Resolve(Kids(reader)[0]));
+        var annotation = Assert.IsType<DictionaryObject>(
+            reader.Resolve(Assert.Single(reader.GetArray(page, "Annots")!)));
+        var destination = Assert.IsType<ArrayObject>(reader.Resolve(annotation["Dest"]));
+
+        Assert.Equal(Number(Kids(reader)[1]), Number(destination[0]));
+        Assert.Equal("XYZ", Assert.IsType<NameObject>(reader.Resolve(destination[1])).Value);
+        Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(destination[2])).DoubleValue);
+        Assert.Equal(500.0, Assert.IsType<NumberObject>(reader.Resolve(destination[3])).DoubleValue);
+        Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(destination[4])).DoubleValue);
     }
 
     [Fact]

@@ -336,9 +336,8 @@ public sealed class AcroForm
     {
         var (width, height) = RectSize(widget);
         var (daFont, daSize) = DefaultAppearance(terminal, widget);
-        var fontSize = daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize;
         return FieldAppearances.BuildText(
-            value, width, height, FieldAppearances.AppearanceFont(daFont, fontSize), owner.FontScope);
+            value, width, height, FieldAppearances.AppearanceFont(daFont, daSize), owner.FontScope);
     }
 
     private (double Width, double Height) RectSize(DictionaryObject field)

@@ -132,4 +132,88 @@ public class ForeignPageInsertTests
         var importedFonts = Assert.IsType<DictionaryObject>(importedReader.Resolve(PageResources(importedReader, 0)["Font"]));
         Assert.Equal(importedFonts.Keys.OrderBy(k => k), insertedFonts.Keys.OrderBy(k => k));
     }
+
+    [Fact]
+    public void Insert_ForeignLoadedPage_PreservesUnmodifiedAnnotations()
+    {
+        var sourceDocument = new Document();
+        sourceDocument.Pages.Add().Annotations.Add(
+            new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "note" });
+        var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
+
+        var target = new Document();
+        target.Pages.Insert(0, source.Pages[0]);
+
+        var reader = DocumentReader.Parse(target.ToArray());
+        var annotation = reader.AsDictionary(
+            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 0), "Annots")!))!;
+        Assert.Equal("note", reader.GetString(annotation, "Contents"));
+    }
+
+    [Fact]
+    public void Insert_ForeignLoadedPage_DropsCrossPageLinkAndDoesNotLeakTargetPage()
+    {
+        var sourceDocument = new Document();
+        sourceDocument.Pages.Add().Annotations.Add(
+            new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
+        sourceDocument.Pages.Add();
+        var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
+
+        var target = new Document();
+        target.Pages.Insert(0, source.Pages[0]);
+
+        var bytes = target.ToArray();
+        var reader = DocumentReader.Parse(bytes);
+        var text = System.Text.Encoding.Latin1.GetString(bytes);
+        Assert.Equal(1, DocumentLoadTests.PageCount(reader));
+        Assert.Equal(0, System.Text.RegularExpressions.Regex.Matches(text, @"/Subtype\s*/Link\b").Count);
+        Assert.Equal(1, System.Text.RegularExpressions.Regex.Matches(text, @"/Type\s*/Page\b").Count);
+    }
+
+    [Fact]
+    public void Insert_ForeignLink_RetargetedToCurrentDocument_IsEmitted()
+    {
+        var sourceDocument = new Document();
+        sourceDocument.Pages.Add().Annotations.Add(
+            new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
+        sourceDocument.Pages.Add();
+        var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
+
+        var target = new Document();
+        target.Pages.Add();
+        target.Pages.Insert(1, source.Pages[0]);
+        Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[0]).TargetPageIndex = 0;
+
+        var reader = DocumentReader.Parse(target.ToArray());
+        var annotation = reader.AsDictionary(
+            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 1), "Annots")!))!;
+        Assert.True(annotation.ContainsKey("Dest"));
+    }
+
+    [Fact]
+    public void Insert_ModifiedForeignAnnotationImportsUnmanagedValuesFromEntryReader()
+    {
+        var sourceDocument = new Document();
+        sourceDocument.Info.Title = "foreign-info";
+        sourceDocument.Pages.Add().Annotations.Add(
+            new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "before" });
+        var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
+        var sourceReader = source.Loaded!.Source!;
+        var sourcePage = source.Loaded.SourcePages[source.Pages[0]];
+        var sourceAnnotation = sourceReader.AsDictionary(Assert.Single(sourceReader.GetArray(sourcePage, "Annots")!))!;
+        sourceAnnotation["ForeignInfo"] = sourceReader.Trailer["Info"];
+
+        var targetDocument = new Document();
+        targetDocument.Info.Title = "target-info";
+        targetDocument.Pages.Add();
+        var target = InterpreterTestSupport.Load(targetDocument.ToArray());
+        target.Pages.Insert(0, source.Pages[0]);
+        Assert.IsType<TextAnnotation>(target.Pages[0].Annotations[0]).Contents = "after";
+
+        var reader = DocumentReader.Parse(target.ToArray());
+        var annotation = reader.AsDictionary(Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 0), "Annots")!))!;
+        var info = reader.AsDictionary(annotation["ForeignInfo"])!;
+
+        Assert.Equal("foreign-info", reader.GetString(info, "Title"));
+    }
 }

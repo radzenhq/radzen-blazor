@@ -15,7 +15,8 @@ internal static class AnnotationReader
         DocumentReader reader,
         DictionaryObject pageDictionary,
         IReadOnlyList<Page> pages,
-        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries,
+        Lazy<Dictionary<string, DocumentObject>> namedDestinations)
     {
         if (reader.GetArray(pageDictionary, "Annots") is not { } annotations)
         {
@@ -30,7 +31,16 @@ internal static class AnnotationReader
                 continue;
             }
 
-            page.Annotations.Load(Create(reader, dictionary, pages, pageDictionaries), reader, original, dictionary);
+            try
+            {
+                page.Annotations.Load(
+                    Create(reader, dictionary, pages, pageDictionaries, namedDestinations),
+                    reader, original, dictionary);
+            }
+            catch (DocumentParseException)
+            {
+                page.Annotations.Load(null, reader, original, dictionary);
+            }
         }
     }
 
@@ -38,7 +48,8 @@ internal static class AnnotationReader
         DocumentReader reader,
         DictionaryObject dictionary,
         IReadOnlyList<Page> pages,
-        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries,
+        Lazy<Dictionary<string, DocumentObject>> namedDestinations)
     {
         var subtype = reader.GetName(dictionary, "Subtype");
         if (subtype is not ("Text" or "Highlight" or "Underline" or "StrikeOut" or "Squiggly"
@@ -59,7 +70,8 @@ internal static class AnnotationReader
             "Underline" => Markup(new UnderlineAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
             "StrikeOut" => Markup(new StrikeOutAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
             "Squiggly" => Markup(new SquigglyAnnotation(bounds), reader, reader.GetArray(dictionary, "QuadPoints")),
-            "Link" => ReadLink(new LinkAnnotation(bounds), reader, dictionary, pages, pageDictionaries),
+            "Link" => ReadLink(
+                new LinkAnnotation(bounds), reader, dictionary, pages, pageDictionaries, namedDestinations),
             "Stamp" => new StampAnnotation(bounds) { Name = reader.GetName(dictionary, "Name") ?? "Draft" },
             "Ink" => ReadInk(new InkAnnotation(bounds), reader, dictionary),
             "FreeText" => ReadFreeText(new FreeTextAnnotation(bounds), reader, dictionary),
@@ -120,7 +132,8 @@ internal static class AnnotationReader
         DocumentReader reader,
         DictionaryObject dictionary,
         IReadOnlyList<Page> pages,
-        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries,
+        Lazy<Dictionary<string, DocumentObject>> namedDestinations)
     {
         if (reader.GetDictionary(dictionary, "A") is { } action)
         {
@@ -136,12 +149,12 @@ internal static class AnnotationReader
             }
             else if (kind == "GoTo" && action.TryGetValue("D", out var destination))
             {
-                ReadDestination(annotation, reader, destination!, pages, pageDictionaries);
+                ReadDestination(annotation, reader, destination!, pages, pageDictionaries, namedDestinations);
             }
         }
         else if (dictionary.TryGetValue("Dest", out var destination))
         {
-            ReadDestination(annotation, reader, destination!, pages, pageDictionaries);
+            ReadDestination(annotation, reader, destination!, pages, pageDictionaries, namedDestinations);
         }
 
         return annotation;
@@ -152,7 +165,8 @@ internal static class AnnotationReader
         DocumentReader reader,
         DocumentObject destination,
         IReadOnlyList<Page> pages,
-        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries)
+        IReadOnlyDictionary<Page, DictionaryObject> pageDictionaries,
+        Lazy<Dictionary<string, DocumentObject>> namedDestinations)
     {
         int? PageIndex(DictionaryObject target)
         {
@@ -167,12 +181,12 @@ internal static class AnnotationReader
             return null;
         }
 
-        var catalog = reader.GetDictionary(reader.Trailer, "Root")!;
         var resolved = reader.Resolve(destination);
-        var named = resolved is StringObject or NameObject
-            ? DocumentLoader.ReadNamedDestinations(reader, catalog, reader.Limits)
+        var destinations = resolved is StringObject or NameObject
+            ? namedDestinations.Value
             : EmptyNamedDestinations;
-        var result = DestinationReader.Read(reader, destination, PageIndex, named, retainAllFitTypes: true);
+        var result = DestinationReader.Read(
+            reader, resolved, PageIndex, destinations, retainAllFitTypes: true);
         if (result.Name is { } name)
         {
             annotation.Destination = name;
@@ -278,24 +292,11 @@ internal static class AnnotationReader
                     components[i] = Number(reader, value[i]);
                 }
 
-                return ColorFromComponents(components);
+                return DeviceColorConverter.FromComponents(components);
             default:
                 throw new DocumentParseException("An annotation colour array must contain zero, one, three or four numbers.", -1);
         }
     }
-
-    // ISO 32000-1 Table 164 device colour components: 1 grayscale, 3 RGB, 4 CMYK.
-    private static Color ColorFromComponents(IReadOnlyList<double> values) => values.Count switch
-    {
-        1 => Color.FromRgb(Channel(values[0]), Channel(values[0]), Channel(values[0])),
-        3 => Color.FromRgb(Channel(values[0]), Channel(values[1]), Channel(values[2])),
-        _ => Color.FromRgb(
-            Channel((1 - values[0]) * (1 - values[3])),
-            Channel((1 - values[1]) * (1 - values[3])),
-            Channel((1 - values[2]) * (1 - values[3]))),
-    };
-
-    private static byte Channel(double value) => ColorComponent.ToChannel(value);
 
     private static double Number(DocumentReader reader, DocumentObject value)
         => reader.Resolve(value) is NumberObject number

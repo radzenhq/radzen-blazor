@@ -51,6 +51,15 @@ public abstract class ContentElement : ITracksChanges
 
     internal virtual void AcceptChanges() => tracker.AcceptChanges();
 
+    internal virtual ContentElement DeepClone() => (ContentElement)MemberwiseClone();
+
+    internal T CopyStateTo<T>(T target) where T : ContentElement
+    {
+        target.Transform = Transform;
+        target.IsArtifact = IsArtifact;
+        return target;
+    }
+
     bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();

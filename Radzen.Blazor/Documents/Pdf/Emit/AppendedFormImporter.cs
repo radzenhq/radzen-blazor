@@ -19,7 +19,16 @@ internal sealed class AppendedFormImporter(Document document, FormAppearanceServ
     {
         var fields = new List<DocumentObject>();
         RegisterExistingFieldNames();
-        foreach (var (page, node, reference) in pageNodes)
+
+        foreach (var (page, _, reference) in pageNodes)
+        {
+            if (Loaded is { } loaded && loaded.AppendedPages.TryGetValue(page, out var appended))
+            {
+                GraphImporter.GetOrCreate(appendImporters, appended.Reader, writer).Seed(appended.Node, reference);
+            }
+        }
+
+        foreach (var (page, _, _) in pageNodes)
         {
             if (Loaded is not { } loaded || !loaded.AppendedPages.TryGetValue(page, out var appended))
             {
@@ -27,19 +36,11 @@ internal sealed class AppendedFormImporter(Document document, FormAppearanceServ
             }
 
             var reader = appended.Reader;
-            if (!appendImporters.TryGetValue(reader, out var importer))
-            {
-                importer = new GraphImporter(reader, writer);
-                appendImporters[reader] = importer;
-            }
-
-            importer.Seed(appended.Node, reference);
+            var importer = GraphImporter.GetOrCreate(appendImporters, reader, writer);
             if (reader.GetArray(appended.Node, "Annots") is not { } annots)
             {
                 continue;
             }
-
-            node["Annots"] = PageAnnotationImport.Import(importer, annots);
 
             if (!loaded.AppendedAcroForms.TryGetValue(reader, out var sourceForm))
             {

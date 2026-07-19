@@ -39,14 +39,8 @@ internal sealed class FormFlattener(Document document)
                     return;
                 }
 
-                var textBaseline = FieldAppearances.Baseline(text.Height.Point, text.Font.Size);
-                page.Content.Add(new TextContent(
-                    text.Value,
-                    text.X + Unit.FromPoint(2.0),
-                    text.Y + Unit.FromPoint(textBaseline))
-                {
-                    Font = text.Font,
-                });
+                page.Content.Add(FieldAppearances.Text(
+                    text.Value, text.X.Point, text.Y.Point, text.Height.Point, text.Font));
                 break;
             case CheckBoxFieldDefinition checkBox:
                 if (!checkBox.Checked)
@@ -75,14 +69,8 @@ internal sealed class FormFlattener(Document document)
                     return;
                 }
 
-                var choiceBaseline = FieldAppearances.Baseline(choice.Height.Point, choice.Font.Size);
-                page.Content.Add(new TextContent(
-                    choice.Value,
-                    choice.X + Unit.FromPoint(2.0),
-                    choice.Y + Unit.FromPoint(choiceBaseline))
-                {
-                    Font = choice.Font,
-                });
+                page.Content.Add(FieldAppearances.Text(
+                    choice.Value, choice.X.Point, choice.Y.Point, choice.Height.Point, choice.Font));
                 break;
             default:
                 throw new NotSupportedException($"Form field definition type '{definition.GetType().FullName}' is not supported.");
@@ -204,14 +192,8 @@ internal sealed class FormFlattener(Document document)
 
         var da = InheritedDefaultAppearance.Resolve(source!, widget, sourceAcroForm);
         var (daFont, daSize, _) = DefaultAppearanceGrammar.Parse(da);
-        var font = FieldAppearances.AppearanceFont(daFont, daSize > 0.0 ? daSize : FieldAppearances.DefaultFontSize);
-        page.Content.Add(new TextContent(
-            value,
-            Unit.FromPoint(x + 2.0),
-            Unit.FromPoint(y + FieldAppearances.Baseline(height, font.Size)))
-        {
-            Font = font,
-        });
+        var font = FieldAppearances.AppearanceFont(daFont, daSize);
+        page.Content.Add(FieldAppearances.Text(value, x, y, height, font));
     }
 
     private bool TryPaintButtonAppearance(

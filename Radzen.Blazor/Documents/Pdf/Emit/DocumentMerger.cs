@@ -4,13 +4,20 @@ internal static class DocumentMerger
 {
     internal static void Append(Document target, Document other)
     {
+        var pageOffset = target.Pages.Count;
         foreach (var source in other.Pages)
         {
-            AppendPage(target, other, source);
+            AppendPage(target, other, source, 0, other.Pages.Count, pageOffset);
         }
     }
 
-    internal static Page AppendPage(Document target, Document other, Page source)
+    internal static Page AppendPage(
+        Document target,
+        Document other,
+        Page source,
+        int sourcePageOffset,
+        int sourcePageCount,
+        int targetPageOffset)
     {
         var origin = other.Loaded;
         var page = new Page(source.Width, source.Height);
@@ -41,6 +48,35 @@ internal static class DocumentMerger
             page.SetLoadedContent([.. content]);
         }
 
+        if (source.Annotations.WasLoaded)
+        {
+            page.Annotations.RewriteImported();
+        }
+
+        foreach (var entry in source.Annotations.Entries)
+        {
+            if (entry.Annotation is null)
+            {
+                page.Annotations.Load(null, entry.Reader!, entry.Original!, entry.Dictionary);
+                continue;
+            }
+
+            if (AnnotationCloner.Clone(
+                entry.Annotation, sourcePageOffset, sourcePageCount, targetPageOffset) is not { } clone)
+            {
+                continue;
+            }
+
+            if (!entry.Annotation.IsModified && entry.Original is not null && PreserveLoadedVerbatim(entry.Annotation))
+            {
+                page.Annotations.Load(clone, entry.Reader!, entry.Original!, entry.Dictionary);
+            }
+            else
+            {
+                page.Annotations.Add(clone);
+            }
+        }
+
         if (source.Generated is { } generated)
         {
             page.Generated = generated;
@@ -55,6 +91,12 @@ internal static class DocumentMerger
             page.SetTextFonts(DocumentLoader.BuildTextFonts(reader, loadedResources));
             page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(reader, loadedResources));
         }
+        else if (origin is not null && origin.AppendedResources.TryGetValue(source, out var appended))
+        {
+            target.EnsureLoaded().RecordAppendedResources(page, appended.Reader, appended.Resources);
+            page.SetTextFonts(DocumentLoader.BuildTextFonts(appended.Reader, appended.Resources));
+            page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(appended.Reader, appended.Resources));
+        }
 
         if (origin is not null)
         {
@@ -64,4 +106,8 @@ internal static class DocumentMerger
         target.Pages.Insert(target.Pages.Count, page);
         return page;
     }
+
+    private static bool PreserveLoadedVerbatim(Annotation annotation)
+        => annotation is not LinkAnnotation
+            || annotation is LinkAnnotation { Destination: null, TargetPageIndex: null };
 }

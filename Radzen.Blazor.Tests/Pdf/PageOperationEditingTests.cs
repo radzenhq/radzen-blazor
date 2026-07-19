@@ -1,5 +1,8 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -56,6 +59,76 @@ public class PageOperationEditingTests
         Assert.Equal(["ONE", "TWO"], PageTexts(Reload(split[0])));
         Assert.Equal(["THREE", "FOUR"], PageTexts(Reload(split[1])));
         Assert.Equal(["FIVE"], PageTexts(Reload(split[2])));
+    }
+
+    [Fact]
+    public void ExtractPages_DroppedLinkAndOutOfRangePageAreAbsentFromSavedObjects()
+    {
+        var source = Reload(Create("ONE", "TWO", "THREE"));
+        source.Pages[0].Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 2 });
+        source.Pages[0].Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { TargetPageIndex = 0 });
+
+        var bytes = source.Pages.ExtractPages(0..1).ToArray();
+        var extracted = Document.LoadFromStream(new MemoryStream(bytes));
+
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(extracted.Pages[0].Annotations));
+        Assert.Equal(0, link.TargetPageIndex);
+        var text = Encoding.Latin1.GetString(bytes);
+        Assert.Equal(1, Regex.Matches(text, @"/Subtype\s*/Link\b").Count);
+        Assert.Equal(1, Regex.Matches(text, @"/Type\s*/Page\b").Count);
+    }
+
+    [Fact]
+    public void ExtractPages_ResolvedNamedDestinationSurvivesWhenTargetIsRetainedAndDropsWhenExcluded()
+    {
+        var source = Document.LoadFromStream(new MemoryStream(NamedDestinationPreservationTests.Source()));
+
+        var retained = Reload(source.Pages.ExtractPages(..));
+        var excluded = Reload(source.Pages.ExtractPages(0..1));
+
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(retained.Pages[0].Annotations));
+        Assert.Null(link.Destination);
+        Assert.Equal(1, link.TargetPageIndex);
+        Assert.Empty(excluded.Pages[0].Annotations);
+    }
+
+    [Fact]
+    public void Split_DropsCrossPageLinkAndRebasesRetainedPageLink()
+    {
+        var source = Reload(Create("ONE", "TWO", "THREE"));
+        source.Pages[1].Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 0 });
+        source.Pages[1].Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { TargetPageIndex = 1 });
+
+        var split = source.Pages.Split(1);
+        var first = Reload(split[0]);
+        var second = Reload(split[1]);
+
+        Assert.Empty(first.Pages[0].Annotations);
+        var link = Assert.IsType<LinkAnnotation>(Assert.Single(second.Pages[0].Annotations));
+        Assert.Equal(0, link.TargetPageIndex);
+    }
+
+    [Fact]
+    public void ImportPages_RebasesLinksForEmptyAndNonEmptyTargets()
+    {
+        var source = new Document();
+        var sourcePage = source.Pages.Add();
+        sourcePage.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
+        sourcePage.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { Uri = new Uri("https://example.com/") });
+        source.Pages.Add();
+
+        var empty = new Document();
+        empty.ImportPages(source, ..);
+        var nonEmpty = new Document();
+        nonEmpty.Pages.Add();
+        nonEmpty.Pages.Add();
+        nonEmpty.ImportPages(source, ..);
+
+        Assert.Equal(1, Assert.IsType<LinkAnnotation>(empty.Pages[0].Annotations[0]).TargetPageIndex);
+        Assert.Equal(3, Assert.IsType<LinkAnnotation>(nonEmpty.Pages[2].Annotations[0]).TargetPageIndex);
+        Assert.Equal("https://example.com/", Assert.IsType<LinkAnnotation>(nonEmpty.Pages[2].Annotations[1]).Uri?.AbsoluteUri);
+        var reloaded = Reload(nonEmpty);
+        Assert.Equal(3, Assert.IsType<LinkAnnotation>(reloaded.Pages[2].Annotations[0]).TargetPageIndex);
     }
 
     [Fact]

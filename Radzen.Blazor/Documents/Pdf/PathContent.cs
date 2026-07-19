@@ -84,6 +84,60 @@ public sealed class PathContent : ContentElement
         FillGradient?.AcceptChanges();
     }
 
+    internal override ContentElement DeepClone()
+    {
+        var clone = CopyStateTo(new PathContent
+        {
+            Stroke = Stroke,
+            Fill = Fill,
+            Thickness = Thickness,
+            StrokeColor = StrokeColor,
+            FillColor = FillColor,
+            FillGradient = CopyGradient(FillGradient),
+            Cap = Cap,
+            Join = Join,
+            MiterLimit = MiterLimit,
+            Intent = Intent,
+            EvenOdd = EvenOdd,
+            Clip = Clip,
+            DashArray = DashArray is { } dash ? new ReadOnlyMemory<double>(dash.ToArray()) : null,
+            DashPhase = DashPhase,
+            FillPaint = ContentClone.CopyDeviceColor(FillPaint),
+            StrokePaint = ContentClone.CopyDeviceColor(StrokePaint),
+        });
+        foreach (var segment in segments)
+        {
+            clone.segments.Add(new Segment(segment.Operator, [.. segment.Operands]));
+        }
+
+        return clone;
+    }
+
+    private static GradientBrush? CopyGradient(GradientBrush? source)
+    {
+        if (source is null)
+        {
+            return null;
+        }
+
+        var stops = new GradientStop[source.Stops.Count];
+        for (var i = 0; i < stops.Length; i++)
+        {
+            stops[i] = new GradientStop(source.Stops[i].Offset, source.Stops[i].Color);
+        }
+
+        GradientBrush target = source switch
+        {
+            LinearGradient linear => new LinearGradient(linear.X0, linear.Y0, linear.X1, linear.Y1, stops),
+            RadialGradient radial => new RadialGradient(
+                radial.X0, radial.Y0, radial.R0, radial.X1, radial.Y1, radial.R1, stops),
+            _ => throw new NotSupportedException($"Gradient type '{source.GetType().FullName}' is not supported."),
+        };
+        target.ExtendStart = source.ExtendStart;
+        target.ExtendEnd = source.ExtendEnd;
+        return target;
+    }
+
     /// <summary>
     /// Gets or sets the line cap style (the <c>J</c> operator). When null (the
     /// default), no cap operator is emitted and the viewer default (butt) applies.
