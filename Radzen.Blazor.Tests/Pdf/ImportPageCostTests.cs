@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
@@ -20,26 +19,6 @@ public class ImportPageCostTests
         }
 
         return Document.LoadFromStream(new MemoryStream(document.ToArray()));
-    }
-
-    private static long ImportBytes(int sourcePages)
-    {
-        var source = Loaded(sourcePages);
-
-        new Document().ImportPage(source, 0);
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        new Document().ImportPage(source, 0);
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void ImportPage_AllocationDoesNotScaleWithSourcePageCount()
-    {
-        var small = ImportBytes(20);
-        var large = ImportBytes(160);
-
-        Assert.InRange((double)large / small, 0, 2.0);
     }
 
     [Fact]

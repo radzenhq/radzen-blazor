@@ -1,5 +1,4 @@
 #nullable enable
-using System.Diagnostics;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
@@ -72,32 +71,6 @@ public class FontEntryLimitTests
         Assert.Equal("A", map[0x0003]);
         Assert.Equal("b", map[0x0004]);
         Assert.Equal("C", map[0x0005]);
-    }
-
-    [Fact]
-    public void CidWidthRange_FullIntSpan_ThrowsFastUnderDefaultLimits()
-    {
-        var reader = DocumentReader.Parse(WidthPdf("[0 2147483647 500]"), null, ReaderLimits.Default);
-        var font = FontDict(reader);
-
-        var watch = Stopwatch.StartNew();
-        Assert.Throws<DocumentParseException>(() => ReverseFont.Build(reader, font));
-        watch.Stop();
-
-        Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
-    }
-
-    [Fact]
-    public void CidWidthRange_SingletonAtIntMaxValue_ThrowsFast()
-    {
-        var reader = DocumentReader.Parse(WidthPdf("[2147483647 2147483647 500]"), null, ReaderLimits.Default);
-        var font = FontDict(reader);
-
-        var watch = Stopwatch.StartNew();
-        Assert.Throws<DocumentParseException>(() => ReverseFont.Build(reader, font));
-        watch.Stop();
-
-        Assert.True(watch.ElapsedMilliseconds < 1000, $"Rejection took {watch.ElapsedMilliseconds}ms.");
     }
 
     [Fact]

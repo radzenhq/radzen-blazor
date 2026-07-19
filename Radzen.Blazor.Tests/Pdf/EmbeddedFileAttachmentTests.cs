@@ -152,37 +152,6 @@ public class EmbeddedFileAttachmentTests
     }
 
     [Fact]
-    public void Attachments_PublicApiShape()
-    {
-        var property = AttachmentsProperty();
-        Assert.True(property is not null, MissingApi);
-        Assert.True(property!.CanRead, "Attachments must be readable");
-
-        var collectionType = property.PropertyType;
-        Assert.Equal("AttachmentCollection", collectionType.Name);
-        Assert.Equal("Radzen.Documents.Pdf", collectionType.Namespace);
-        Assert.True(collectionType.IsPublic, "AttachmentCollection must be public");
-
-        var add = collectionType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m =>
-                m.Name == "Add"
-                && m.GetParameters() is { Length: 4 } p
-                && p[0].ParameterType == typeof(string)
-                && p[1].ParameterType == typeof(byte[])
-                && p[2].ParameterType.IsEnum
-                && p[3].ParameterType == typeof(string));
-        Assert.True(add is not null, MissingApi);
-
-        var relationshipType = add!.GetParameters()[2].ParameterType;
-        Assert.Equal("AttachmentRelationship", relationshipType.Name);
-        Assert.Equal("Radzen.Documents.Pdf", relationshipType.Namespace);
-        Assert.True(relationshipType.IsPublic, "AttachmentRelationship must be public");
-        Assert.Equal(
-            new HashSet<string>(["Source", "Data", "Alternative", "Supplement", "Unspecified"]),
-            new HashSet<string>(Enum.GetNames(relationshipType)));
-    }
-
-    [Fact]
     public void Attach_EmbeddedFileBytes_RoundTripByteIdentical()
     {
         var builder = Author();

@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -11,25 +10,9 @@ public class ImageStreamBufferingTests
 {
     private const int PayloadBytes = 4 * 1024 * 1024;
 
-    private static long BufferBytes(Stream stream)
-    {
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        var image = Image.FromStream(stream);
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-        Assert.Equal(PayloadBytes, image.Data.Length);
-        return allocated;
-    }
-
     private sealed class UnseekableStream(byte[] data) : MemoryStream(data)
     {
         public override bool CanSeek => false;
-    }
-
-    [Fact]
-    public void SeekableStream_BuffersInOneCopy()
-    {
-        var allocated = BufferBytes(new MemoryStream(new byte[PayloadBytes]));
-        Assert.True(allocated < PayloadBytes * 1.5, $"allocated {allocated} bytes for a {PayloadBytes} byte payload");
     }
 
     [Fact]

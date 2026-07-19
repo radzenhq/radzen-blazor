@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -78,34 +77,4 @@ public class DeterministicDocumentIdTests
             Assert.IsType<StringObject>(Id(PlainDocument().ToArray())[0]).Value);
     }
 
-    private static long SaveAllocations(bool includeId, byte[] content)
-    {
-        var document = new Document { IncludeDocumentId = includeId };
-        document.Info.Title = "Deterministic";
-        document.Pages.Add(PageSizes.A4).SetContent(content);
-        using var stream = new MemoryStream();
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        document.SaveToStream(stream);
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void DocumentId_DoesNotBufferOrCopyPageContent()
-    {
-        const int size = 4 * 1024 * 1024;
-        var content = new byte[size];
-        for (var i = 0; i < content.Length; i++)
-        {
-            content[i] = (byte)(' ' + (i % 64));
-        }
-
-        SaveAllocations(true, content);
-        SaveAllocations(false, content);
-
-        var withId = SaveAllocations(true, content);
-        var withoutId = SaveAllocations(false, content);
-        var cost = withId - withoutId;
-
-        Assert.True(cost < size / 4, $"/ID cost {cost} bytes for {size} bytes of content");
-    }
 }

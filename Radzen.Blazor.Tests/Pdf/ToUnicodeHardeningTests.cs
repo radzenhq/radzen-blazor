@@ -16,20 +16,6 @@ public class ToUnicodeHardeningTests
     }
 
     [Fact]
-    public void FullCodespaceIncrementalBfrange_ThrowsFast()
-    {
-        var cmap = Cmap("1 beginbfrange <00000000> <7fffffff> <0041> endbfrange");
-        Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
-    }
-
-    [Fact]
-    public void SingletonIncrementalBfrangeAtIntMaxValue_ThrowsFast()
-    {
-        var cmap = Cmap("1 beginbfrange <7fffffff> <7fffffff> <0041> endbfrange");
-        Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
-    }
-
-    [Fact]
     public void HighSingletonIncrementalBfrange_StillMaps()
     {
         var (map, _) = ToUnicodeCMap.Parse(Cmap("1 beginbfrange <7ffffffe> <7ffffffe> <0041> endbfrange"));

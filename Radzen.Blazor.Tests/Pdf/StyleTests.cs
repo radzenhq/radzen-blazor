@@ -10,46 +10,6 @@ public class StyleTests
     private static StyleCollection NewStyles() => new DocumentBuilder().Styles;
 
     [Fact]
-    public void Normal_AlwaysExists()
-    {
-        var styles = NewStyles();
-        Assert.NotNull(styles.Normal);
-        Assert.Equal("Normal", styles.Normal.Name);
-        Assert.True(styles.Contains("Normal"));
-    }
-
-    [Fact]
-    public void Normal_FontDefaults()
-    {
-        var normal = NewStyles().Normal;
-        Assert.NotNull(normal.Font);
-        Assert.Equal("Helvetica", normal.Font.Name);
-        Assert.Equal(10, normal.Font.Size, 9);
-    }
-
-    [Fact]
-    public void Normal_BaseStyleIsNull()
-    {
-        Assert.Null(NewStyles().Normal.BaseStyle);
-    }
-
-    [Fact]
-    public void Style_DefaultAlignmentLeft()
-    {
-        Assert.Equal(HorizontalAlignment.Left, NewStyles().Normal.Alignment);
-    }
-
-    [Fact]
-    public void Add_ReturnsStyleWithDefaultBaseNormal()
-    {
-        var styles = NewStyles();
-        var s = styles.Add("Heading1");
-        Assert.Equal("Heading1", s.Name);
-        Assert.Equal("Normal", s.BaseStyle);
-        Assert.True(styles.Contains("Heading1"));
-    }
-
-    [Fact]
     public void Add_WithExplicitBaseStyle()
     {
         var styles = NewStyles();

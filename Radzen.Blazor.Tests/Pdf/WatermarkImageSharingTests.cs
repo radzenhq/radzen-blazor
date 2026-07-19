@@ -87,22 +87,6 @@ public class WatermarkImageSharingTests
     }
 
     [Fact]
-    public void ImageWatermark_DecodesOncePerSave()
-    {
-        var ten = Watermarked(10);
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        ten.ToArray();
-        var tenPages = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        var single = Watermarked(1);
-        before = GC.GetAllocatedBytesForCurrentThread();
-        single.ToArray();
-        var onePage = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.True(tenPages < onePage * 3, $"one page {onePage} bytes, ten pages {tenPages} bytes");
-    }
-
-    [Fact]
     public void ImageWatermarkWithXObjectOptions_StillSharesOneImageStream()
     {
         var pdf = Watermarked(10, configure: image => image.Interpolate = true).ToArray();

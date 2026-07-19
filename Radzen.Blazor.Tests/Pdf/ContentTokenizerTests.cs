@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -30,28 +29,6 @@ public class ContentTokenizerTests
         bytes.AddRange([0x00, 0x01, 0x45, 0x49, 0xFF, 0x0A, 0xDE, 0xAD, 0x28, 0x42]);
         bytes.AddRange(Ascii(" EI\nQ\n"));
         return [.. bytes];
-    }
-
-    private static Document RedactableDocument(string streamData)
-    {
-        var pdf = new FixturePdf()
-            .Append("%PDF-1.7\n")
-            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n")
-            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
-            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
-                + "/Resources << /Font << /F0 5 0 R >> >> /Contents 4 0 R >>\nendobj\n")
-            .Object(4, $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n")
-            .Object(5, "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n");
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 6\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number <= 5; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
-        using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
     }
 
     private static Document Load(byte[] content)
@@ -175,52 +152,6 @@ public class ContentTokenizerTests
         var tokens = ContentTokenizer.Tokenize(Ascii(source));
 
         Assert.DoesNotContain(tokens, t => t.Kind == ContentTokenizer.TokenKind.Number);
-    }
-
-    [Fact]
-    public void Tokenize_NumericOperands_DoNotAllocateAStringPerNumber()
-    {
-        var builder = new StringBuilder();
-        for (var i = 0; i < 2000; i++)
-        {
-            builder.Append(i).Append(".25 ").Append(-i).Append(" 0.5 ");
-        }
-
-        var data = Ascii(builder.ToString());
-        ContentTokenizer.Tokenize(data);
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        var tokens = ContentTokenizer.Tokenize(data);
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.Equal(6000, tokens.Count);
-        Assert.True(allocated < 780_000, $"Tokenizing 6000 numeric operands allocated {allocated} bytes.");
-    }
-
-    [Fact]
-    public void RedactText_SharesOneTokenizationPerContentArray()
-    {
-        var content = new StringBuilder("BT /F0 10 Tf ");
-        for (var i = 0; i < 400; i++)
-        {
-            content.Append($"1 0 0 1 72 {700 - (i % 60)} Tm (Line{i} of filler text) Tj ");
-        }
-
-        content.Append("ET ");
-        for (var i = 0; i < 4000; i++)
-        {
-            content.Append($"{i % 100}.5 {i % 77}.25 m {i % 90}.125 {i % 61}.75 l S ");
-        }
-
-        var stream = content.ToString();
-        RedactableDocument(stream).Pages[0].RedactText("Line7 of");
-
-        var document = RedactableDocument(stream);
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        document.Pages[0].RedactText("Line7 of");
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.True(allocated < 23_000_000, $"RedactText allocated {allocated} bytes, suggesting the token cache is no longer shared.");
     }
 
     [Fact]

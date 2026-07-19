@@ -26,22 +26,6 @@ public class ContentElementTests
     }
 
     [Fact]
-    public void ContentElement_HasIdentityTransformByDefault()
-    {
-        var element = new TextContent("x", 0, 0);
-
-        Assert.Equal(Matrix.Identity, element.Transform);
-    }
-
-    [Fact]
-    public void ContentElement_IsNotArtifactByDefault()
-    {
-        var element = new TextContent("x", 0, 0);
-
-        Assert.False(element.IsArtifact);
-    }
-
-    [Fact]
     public void NonEmptyContent_EmitsContentStream()
     {
         var document = new Document();

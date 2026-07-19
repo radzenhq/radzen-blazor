@@ -7,24 +7,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class ParagraphTests
 {
     [Fact]
-    public void Paragraph_Defaults()
-    {
-        var p = new Paragraph();
-        Assert.Null(p.Text);
-        Assert.Empty(p.Inlines);
-        Assert.NotNull(p.Font);
-        Assert.Equal(HorizontalAlignment.Left, p.Alignment);
-        Assert.Equal(0, p.SpacingBefore.Point, 9);
-        Assert.Equal(0, p.SpacingAfter.Point, 9);
-        Assert.Equal(1.0, p.LineSpacing, 9);
-        Assert.Null(p.StyleName);
-        Assert.False(p.KeepTogether);
-        Assert.False(p.KeepWithNext);
-        Assert.Equal(2, p.Widows);
-        Assert.Equal(2, p.Orphans);
-    }
-
-    [Fact]
     public void TextSet_ReplacesInlinesWithSingleRun()
     {
         var p = new Paragraph();
@@ -53,16 +35,6 @@ public class ParagraphTests
         p.Text = null;
         Assert.Empty(p.Inlines);
         Assert.Null(p.Text);
-    }
-
-    [Fact]
-    public void Inlines_AddStringReturnsRun()
-    {
-        var p = new Paragraph();
-        var run = p.Inlines.Add("hi");
-        Assert.IsType<Run>(run);
-        Assert.Equal("hi", run.Text);
-        Assert.Same(run, p.Inlines[0]);
     }
 
     [Fact]

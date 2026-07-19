@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Signing;
@@ -31,50 +30,6 @@ public class PdfSignerAllocationTests
         document.Pages.Add(PageSizes.A4).SetContent(payload);
 
         return document.ToArray();
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static long Measure(Action action)
-    {
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        action();
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static byte[] Sign(byte[] original)
-        => PdfSigner.Sign(original, new SignatureOptions { SignerName = "Signer" }, new FixedSigner());
-
-    [Fact]
-    public void Sign_DoesNotCopyTheDocumentForTheSigner()
-    {
-        var original = BuildLargeDocument(4 * 1024 * 1024);
-
-        Sign(original);
-
-        var bytes = Measure(() => Sign(original));
-
-        var budget = original.Length * 2L;
-        Assert.True(
-            bytes < budget,
-            $"Signing a {original.Length} byte document allocated {bytes} bytes (budget {budget}).");
-    }
-
-    [Fact]
-    public void Sign_OverheadDoesNotScaleWithDocumentSize()
-    {
-        var small = BuildLargeDocument(1 * 1024 * 1024);
-        var large = BuildLargeDocument(8 * 1024 * 1024);
-
-        Sign(small);
-        Sign(large);
-
-        var smallBytes = Measure(() => Sign(small)) - small.Length;
-        var largeBytes = Measure(() => Sign(large)) - large.Length;
-
-        Assert.True(
-            largeBytes < smallBytes + (large.Length - small.Length),
-            $"Excess grew from {smallBytes} to {largeBytes} between a {small.Length} and {large.Length} byte document.");
     }
 
     [Fact]

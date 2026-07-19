@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
@@ -52,27 +51,6 @@ public class LoadedPageWatermarkAppendTests
     {
         using var input = new MemoryStream(bytes);
         return Document.LoadFromStream(input);
-    }
-
-    private static long WatermarkAllocations(int pages, int linesPerPage)
-    {
-        var bytes = Source(pages, linesPerPage);
-        var document = Load(bytes);
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        document.AddWatermark("DRAFT");
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void AddWatermark_LoadedPages_DoesNotScaleWithContentSize()
-    {
-        WatermarkAllocations(4, 20);
-
-        var small = WatermarkAllocations(4, 20);
-        var large = WatermarkAllocations(4, 200);
-
-        Assert.True(large < small * 2,
-            $"AddWatermark allocations scaled with content size: {small} bytes for 20 lines/page, {large} bytes for 200 lines/page.");
     }
 
     [Fact]

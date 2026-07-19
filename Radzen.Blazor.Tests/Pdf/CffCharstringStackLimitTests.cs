@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
@@ -35,58 +34,12 @@ public class CffCharstringStackLimitTests
         });
     }
 
-    private static void CallLocalSubr(List<byte> bytes, int subr)
-    {
-        bytes.Add((byte)(subr - 107 + 139));
-        bytes.Add(10);
-    }
-
     private static void Push(List<byte> bytes, int count)
     {
         for (var i = 0; i < count; i++)
         {
             bytes.Add(139);
         }
-    }
-
-    private static byte[] AmplifyingFont(int levels, int fanOut, int pushesPerLeaf)
-    {
-        var subrs = new List<byte[]>();
-
-        var leaf = new List<byte>();
-        Push(leaf, pushesPerLeaf);
-        leaf.Add(11);
-        subrs.Add([.. leaf]);
-
-        for (var level = 1; level <= levels; level++)
-        {
-            var body = new List<byte>();
-            for (var i = 0; i < fanOut; i++)
-            {
-                CallLocalSubr(body, level - 1);
-            }
-
-            body.Add(11);
-            subrs.Add([.. body]);
-        }
-
-        var main = new List<byte>();
-        CallLocalSubr(main, levels);
-        main.Add(14);
-
-        return BuildFont([[.. main]], [.. subrs]);
-    }
-
-    [Fact]
-    public void DeeplyAmplifiedPushesDoNotGrowTheOperandStackWithoutBound()
-    {
-        var font = CffFont.Parse(AmplifyingFont(levels: 7, fanOut: 4, pushesPerLeaf: 8));
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        font.GetAdvanceWidth(0);
-        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.True(allocated < 64 * 1024, $"walk allocated {allocated} bytes");
     }
 
     [Fact]

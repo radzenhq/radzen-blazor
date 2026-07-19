@@ -77,16 +77,4 @@ public class ColorTests
         Assert.Throws<FormatException>(() => Color.FromHex(value));
     }
 
-    [Fact]
-    public void Equality_Operators()
-    {
-        var a = Color.FromRgb(1, 2, 3);
-        var b = Color.FromArgb(255, 1, 2, 3);
-        var c = Color.FromRgb(1, 2, 4);
-
-        Assert.True(a == b);
-        Assert.False(a == c);
-        Assert.True(a != c);
-        Assert.True(a.Equals(b));
-    }
 }

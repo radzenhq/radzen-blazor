@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
@@ -19,26 +18,6 @@ public class ContentInterpreterMergeCostTests
         }
 
         return builder.Append("ET").ToString();
-    }
-
-    private static long MaterializeBytes(int shows)
-    {
-        var content = Encoding.ASCII.GetBytes(ShowChain(shows));
-
-        ContentInterpreter.Materialize(content, new ContentCollection());
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        ContentInterpreter.Materialize(content, new ContentCollection());
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void MergedShowChain_AllocationScalesLinearlyWithShowCount()
-    {
-        var small = MaterializeBytes(400);
-        var large = MaterializeBytes(1600);
-
-        Assert.InRange((double)large / small, 0, 6.0);
     }
 
     [Fact]

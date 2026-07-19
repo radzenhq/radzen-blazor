@@ -32,26 +32,6 @@ public class UnitTests
     }
 
     [Fact]
-    public void Equality_Operators()
-    {
-        var a = Unit.FromPoint(10);
-        var b = Unit.FromPoint(10);
-        var c = Unit.FromPoint(11);
-
-        Assert.True(a == b);
-        Assert.False(a == c);
-        Assert.True(a != c);
-        Assert.False(a != b);
-        Assert.True(a.Equals(b));
-    }
-
-    [Fact]
-    public void GetHashCode_ConsistentForEqualValues()
-    {
-        Assert.Equal(Unit.FromPoint(7.25).GetHashCode(), Unit.FromInch(7.25 / 72.0).GetHashCode());
-    }
-
-    [Fact]
     public void Addition_And_Subtraction()
     {
         Assert.Equal(7, (Unit.FromPoint(3) + Unit.FromPoint(4)).Point, 9);

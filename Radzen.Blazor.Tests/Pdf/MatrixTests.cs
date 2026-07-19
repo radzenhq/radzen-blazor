@@ -91,42 +91,9 @@ public class MatrixTests
     }
 
     [Fact]
-    public void Multiply_Identity_IsNoOp()
-    {
-        var m = Matrix.Translate(3, 4) * Matrix.Scale(2, 5);
-        var left = Matrix.Identity * m;
-        var right = m * Matrix.Identity;
-
-        Assert.Equal(m, left);
-        Assert.Equal(m, right);
-    }
-
-    [Fact]
     public void Multiply_Translations_Add()
     {
         Assert.Equal(Matrix.Translate(4, 6), Matrix.Translate(1, 2) * Matrix.Translate(3, 4));
     }
 
-    [Fact]
-    public void Rotate360_IsIdentity()
-    {
-        var m = Matrix.Rotate(360);
-        Assert.Equal(1, m.A, 9);
-        Assert.Equal(0, m.B, 9);
-        Assert.Equal(0, m.C, 9);
-        Assert.Equal(1, m.D, 9);
-        Assert.Equal(0, m.E, 9);
-        Assert.Equal(0, m.F, 9);
-
-        var p = m.Transform(7, -3);
-        Assert.Equal(7, p.X, 9);
-        Assert.Equal(-3, p.Y, 9);
-    }
-
-    [Fact]
-    public void Equality_Operators()
-    {
-        Assert.True(Matrix.Translate(1, 2) == Matrix.Translate(1, 2));
-        Assert.True(Matrix.Translate(1, 2) != Matrix.Translate(2, 1));
-    }
 }

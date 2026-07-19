@@ -336,7 +336,7 @@ public class ContainerLayoutTests
         var section = PaginationSupport.Section(400, 600);
         var paragraph = section.Blocks.Add(Text("plain"));
 
-        var expanded = Paginator.ExpandBlocks(section.Blocks, 400);
+        var expanded = BlockExpander.ExpandBlocks(section.Blocks, 400);
 
         Assert.Same(paragraph, Assert.Single(expanded));
     }

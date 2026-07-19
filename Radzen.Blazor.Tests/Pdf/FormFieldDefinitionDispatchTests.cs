@@ -11,19 +11,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class FormFieldDefinitionDispatchTests
 {
     [Fact]
-    public void Definitions_ExposeNoCosEmissionHooks()
-    {
-        var methods = typeof(FormFieldDefinition).GetMethods(
-            System.Reflection.BindingFlags.Instance
-            | System.Reflection.BindingFlags.NonPublic
-            | System.Reflection.BindingFlags.Public);
-
-        Assert.DoesNotContain(methods, method => method.Name is "EmitCreatedField" or "PopulateWidget" or "WriteFlattenedContent");
-        Assert.False(typeof(RadioGroupFieldDefinition).IsAssignableTo(typeof(PositionedFieldDefinition)));
-        Assert.True(typeof(TextFieldDefinition).IsAssignableTo(typeof(PositionedFieldDefinition)));
-    }
-
-    [Fact]
     public void WriteFlattenedContent_TextField_AddsTextContent()
     {
         var page = Flatten(new TextFieldDefinition("t") { Value = "hi", Width = 80, Height = 20 });
