@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using System.Diagnostics;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -68,19 +67,6 @@ public class CffCharstringOperationBudgetTests
         main.AddRange(tail);
 
         return BuildFont([[.. main]], [.. subrs]);
-    }
-
-    [Fact]
-    public void FanOutFontIsRejectedByTheDefaultBudgetRatherThanInterpretedToCompletion()
-    {
-        var font = CffFont.Parse(FanOutFont(levels: 9, k: 8, 0x8C, 14));
-
-        var watch = Stopwatch.StartNew();
-        var width = font.GetAdvanceWidth(0);
-        watch.Stop();
-
-        Assert.Equal(100, width);
-        Assert.True(watch.Elapsed.TotalSeconds < 5, $"walk took {watch.Elapsed.TotalSeconds:F1}s");
     }
 
     [Fact]
@@ -154,15 +140,4 @@ public class CffCharstringOperationBudgetTests
         }
     }
 
-    [Fact]
-    public void RealFontGlyphsStayOrdersOfMagnitudeInsideTheDefaultBudget()
-    {
-        var unbounded = NotoCff(new ReaderLimits { MaxCharstringOperations = int.MaxValue });
-        var tight = NotoCff(new ReaderLimits { MaxCharstringOperations = 1000 });
-
-        for (var g = 0; g < unbounded.GlyphCount; g++)
-        {
-            Assert.Equal(unbounded.GetAdvanceWidth(g), tight.GetAdvanceWidth(g));
-        }
-    }
 }

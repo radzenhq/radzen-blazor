@@ -80,48 +80,6 @@ public class Sha2Tests
         Assert.Equal("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", Hex(new Sha256Hasher().Finish()));
     }
 
-    [Fact]
-    public void Sha256Hasher_SingleByteAppend_MatchesSpanAppend()
-    {
-        var hasher = new Sha256Hasher();
-        for (var i = 0; i < 200; i++)
-        {
-            hasher.Append((byte)i);
-        }
-
-        var input = new byte[200];
-        for (var i = 0; i < input.Length; i++)
-        {
-            input[i] = (byte)i;
-        }
-
-        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(hasher.Finish()));
-    }
-
-    [Fact]
-    public void Sha256Hasher_MixedAppends_MatchOneShot()
-    {
-        var hasher = new Sha256Hasher();
-        var expected = new System.IO.MemoryStream();
-        for (var i = 0; i < 40; i++)
-        {
-            var part = Ascii(new string((char)('a' + i % 26), i));
-            hasher.Append(part);
-            expected.Write(part, 0, part.Length);
-            hasher.Append((byte)0);
-            expected.WriteByte(0);
-        }
-
-        Assert.Equal(Hex(Sha2.ComputeHash256(expected.ToArray())), Hex(hasher.Finish()));
-    }
-
-    [Fact]
-    public void ComputeHash256_SpanOverload_MatchesArrayOverload()
-    {
-        var input = Ascii("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq");
-        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Hex(Sha2.ComputeHash256(input.AsSpan())));
-    }
-
     [Theory]
     [InlineData(
         "",

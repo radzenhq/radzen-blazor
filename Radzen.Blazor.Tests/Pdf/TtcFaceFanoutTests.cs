@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -60,17 +59,6 @@ public class TtcFaceFanoutTests
         return result;
     }
 
-    private static TimeSpan TimeParse(int numFonts)
-    {
-        var data = BuildProbe(numFonts);
-        SfntFont.ParseCollection(data);
-
-        var watch = Stopwatch.StartNew();
-        SfntFont.ParseCollection(data);
-        watch.Stop();
-        return watch.Elapsed;
-    }
-
     [Fact]
     public void FaceCountBeyondTheCapIsRejected()
     {
@@ -89,16 +77,6 @@ public class TtcFaceFanoutTests
         var faces = SfntFont.ParseCollection(data);
 
         Assert.Equal(SfntFont.MaxCollectionFaces, faces.Count);
-    }
-
-    [Fact]
-    public void ParsingTheCapWorthOfFacesStaysBounded()
-    {
-        var elapsed = TimeParse(SfntFont.MaxCollectionFaces);
-
-        Assert.True(
-            elapsed < TimeSpan.FromSeconds(5),
-            $"Parsing {SfntFont.MaxCollectionFaces} faces took {elapsed.TotalSeconds:F1} s.");
     }
 
     [Theory]

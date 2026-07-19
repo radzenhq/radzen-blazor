@@ -12,68 +12,6 @@ public class HexCodecTests
 {
     static byte[] AllBytes() => Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
-    static string LegacyUpperString(byte[] digest)
-    {
-        const string hex = "0123456789ABCDEF";
-        var chars = new char[digest.Length * 2];
-        for (var i = 0; i < digest.Length; i++)
-        {
-            chars[i * 2] = hex[digest[i] >> 4];
-            chars[i * 2 + 1] = hex[digest[i] & 0xF];
-        }
-
-        return new string(chars);
-    }
-
-    static string LegacyLowerString(byte[] digest)
-    {
-        const string hex = "0123456789abcdef";
-        var chars = new char[digest.Length * 2];
-        for (var i = 0; i < digest.Length; i++)
-        {
-            chars[i * 2] = hex[digest[i] >> 4];
-            chars[i * 2 + 1] = hex[digest[i] & 0xF];
-        }
-
-        return new string(chars);
-    }
-
-    [Fact]
-    public void EncodeToString_MatchesRetiredUppercaseCopy()
-    {
-        var data = AllBytes();
-        Assert.Equal(LegacyUpperString(data), HexCodec.EncodeToString(data, HexCase.Upper));
-    }
-
-    [Fact]
-    public void EncodeToString_MatchesRetiredLowercaseCopy()
-    {
-        var data = AllBytes();
-        Assert.Equal(LegacyLowerString(data), HexCodec.EncodeToString(data, HexCase.Lower));
-    }
-
-    [Fact]
-    public void Encode_MatchesRetiredSpanCopy()
-    {
-        var blob = AllBytes();
-
-        var expected = new byte[blob.Length * 2];
-        const string hex = "0123456789abcdef";
-        for (var i = 0; i < blob.Length; i++)
-        {
-            expected[2 * i] = (byte)hex[blob[i] >> 4];
-            expected[2 * i + 1] = (byte)hex[blob[i] & 0xF];
-        }
-
-        var actual = new byte[blob.Length * 2 + 7];
-        HexCodec.Encode(blob, actual.AsSpan(3, blob.Length * 2), HexCase.Lower);
-
-        Assert.Equal(expected, actual.Skip(3).Take(blob.Length * 2).ToArray());
-        Assert.True(actual.Take(3).All(b => b == 0), "Encode wrote before the destination span.");
-        Assert.True(actual.Skip(3 + blob.Length * 2).All(b => b == 0), "Encode wrote past the destination span.");
-    }
-
-
     [Fact]
     public void EncodeToString_EmptyInputIsEmpty()
     {

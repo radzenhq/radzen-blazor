@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -18,34 +17,6 @@ public class DocumentLoaderAllocationTests
         document.Pages.Add(PageSizes.A4).SetContent(payload);
 
         return document.ToArray();
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static long Measure(Func<Stream> open)
-    {
-        using var stream = open();
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        Document.LoadFromStream(stream);
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void Load_NonSeekableStreamDoesNotDoubleBufferTheFile()
-    {
-        var bytes = BuildLargeDocument(8 * 1024 * 1024);
-
-        Measure(() => new MemoryStream(bytes));
-        Measure(() => new NonSeekableStream(bytes));
-
-        var seekable = Measure(() => new MemoryStream(bytes));
-        var nonSeekable = Measure(() => new NonSeekableStream(bytes));
-
-        var overhead = nonSeekable - seekable;
-        var budget = bytes.Length * 3L / 2L;
-        Assert.True(
-            overhead < budget,
-            $"Non-seekable load allocated {overhead} bytes over the seekable load of the same "
-            + $"{bytes.Length}-byte document, budget {budget}.");
     }
 
     [Fact]

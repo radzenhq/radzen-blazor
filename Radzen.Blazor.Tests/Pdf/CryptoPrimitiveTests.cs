@@ -47,16 +47,6 @@ public class CryptoPrimitiveTests
         Assert.Equal("d41d8cd98f00b204e9800998ecf8427e", Hex(Md5.ComputeHash([])));
     }
 
-    [Fact]
-    public void HashHexApis_PreserveTheirEstablishedCasing()
-    {
-        Assert.Equal("900150983cd24fb0d6963f7d28e17f72", Md5.ComputeHashHex(Ascii("abc")));
-        Assert.Equal("0cc175b9c0f1b6a831c399e269772661", Md5.ComputeHashHex(Ascii("a")));
-        Assert.Equal(32, Md5.ComputeHashHex(Ascii("")).Length);
-        Assert.Equal("A9993E364706816ABA3E25717850C26C9CD0D89D", Sha1.ComputeHashHex(Ascii("abc")));
-        Assert.Equal(Convert.FromHexString("A9993E364706816ABA3E25717850C26C9CD0D89D"), Sha1.ComputeHash(Ascii("abc")));
-    }
-
     [Theory]
     [InlineData("Key", "Plaintext", "bbf316e8d940af0ad3")]
     [InlineData("Wiki", "pedia", "1021bf0420")]

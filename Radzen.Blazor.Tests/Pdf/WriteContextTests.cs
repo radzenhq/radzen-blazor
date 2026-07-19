@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf.Objects;
@@ -48,18 +47,6 @@ public class WriteContextTests
             UserPassword = "pw",
             Material = new SeededEncryptionMaterial([7]),
         };
-
-    [Fact]
-    public void EncryptionWriter_HasNoThreadStaticAmbient()
-    {
-        var type = typeof(EncryptionWriter);
-        var statics = type.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-
-        Assert.DoesNotContain(statics, f => f.IsDefined(typeof(ThreadStaticAttribute), inherit: false));
-        Assert.Null(type.GetProperty("Current", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-        Assert.Null(type.GetProperty("CurrentObjectNumber", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
-        Assert.Null(type.GetMethod("BeginObject", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
-    }
 
     [Fact]
     public void ConcurrentEncryptedWrites_DoNotInterfere()

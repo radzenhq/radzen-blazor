@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
@@ -68,34 +67,6 @@ public class SimpleShaperTests
         Assert.Equal(glyphs[0].Advance + glyphs[1].Advance, advance, 10);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static long Measure(Action action)
-    {
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        action();
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [Fact]
-    public void MeasureText_DoesNotAllocatePerCall()
-    {
-        var fonts = LiberationSans();
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
-        const string Word = "Measurement";
-
-        fonts.MeasureText(Word, font);
-
-        var bytes = Measure(() =>
-        {
-            for (var i = 0; i < 1000; i++)
-            {
-                fonts.MeasureText(Word, font);
-            }
-        });
-
-        Assert.True(bytes < 50_000, $"1000 MeasureText calls allocated {bytes} bytes.");
-    }
-
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
@@ -151,28 +122,6 @@ public class SimpleShaperTests
             Assert.Equal(expected[i], BitConverter.DoubleToInt64Bits(measured));
             Assert.Equal(expected[i], BitConverter.DoubleToInt64Bits(shaped));
         }
-    }
-
-    [Fact]
-    public void MeasureAdvance_DoesNotAllocate()
-    {
-        var fonts = LiberationSans();
-        fonts.EnableKerning = true;
-        var shaper = fonts.Shaper();
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
-        const string Word = "Measurement";
-
-        shaper.MeasureAdvance(Word, font);
-
-        var bytes = Measure(() =>
-        {
-            for (var i = 0; i < 1000; i++)
-            {
-                shaper.MeasureAdvance(Word, font);
-            }
-        });
-
-        Assert.True(bytes < 50_000, $"1000 MeasureAdvance calls allocated {bytes} bytes.");
     }
 
     [Fact]

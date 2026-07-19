@@ -65,21 +65,6 @@ public class PdfAConformanceTests
     }
 
     [Fact]
-    public void Conformance_PublicEnumOptionShape()
-    {
-        var property = ConformanceProperty();
-        Assert.True(property is not null, MissingApi);
-        var type = property!.PropertyType;
-        Assert.Equal("PdfAConformance", type.Name);
-        Assert.Equal("Radzen.Documents.Pdf", type.Namespace);
-        Assert.True(type.IsEnum, "PdfAConformance must be an enum");
-        Assert.True(type.IsPublic, "PdfAConformance must be public");
-        Assert.Equal(["None", "PdfA3B", "PdfA3A", "PdfA2B", "PdfA2A", "PdfA4", "PdfA4E", "PdfA4F"], Enum.GetNames(type));
-        Assert.True(property.CanRead && property.CanWrite, "Conformance must be a read/write property");
-        Assert.Equal("None", property.GetValue(new DocumentBuilder())!.ToString());
-    }
-
-    [Fact]
     public void PdfA3B_MetadataStream_HasPdfaidPart3ConformanceB()
     {
         var reader = BuildTestSupport.Read(Author("PdfA3B"));

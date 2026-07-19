@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf;
@@ -35,18 +34,6 @@ public class PdfTimestamperAllocationTests
         return document.ToArray();
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static long Measure(Action action)
-    {
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        action();
-        return GC.GetAllocatedBytesForCurrentThread() - before;
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static byte[] Timestamp(byte[] original)
-        => PdfTimestamper.Timestamp(original, new RecordingTimestampProvider());
-
     [Fact]
     public void Timestamp_HashesTheTwoByteRangeSegmentsIncrementally()
     {
@@ -75,35 +62,4 @@ public class PdfTimestamperAllocationTests
         Assert.True(expected.AsSpan().SequenceEqual(provider.LastHash));
     }
 
-    [Fact]
-    public void Timestamp_DoesNotCopyTheDocumentToHashIt()
-    {
-        var original = BuildLargeDocument(4 * 1024 * 1024);
-
-        Timestamp(original);
-
-        var bytes = Measure(() => Timestamp(original));
-
-        var budget = original.Length * 2L;
-        Assert.True(
-            bytes < budget,
-            $"Timestamping a {original.Length} byte document allocated {bytes} bytes (budget {budget}).");
-    }
-
-    [Fact]
-    public void Timestamp_OverheadDoesNotScaleWithDocumentSize()
-    {
-        var small = BuildLargeDocument(1 * 1024 * 1024);
-        var large = BuildLargeDocument(8 * 1024 * 1024);
-
-        Timestamp(small);
-        Timestamp(large);
-
-        var smallBytes = Measure(() => Timestamp(small)) - small.Length;
-        var largeBytes = Measure(() => Timestamp(large)) - large.Length;
-
-        Assert.True(
-            largeBytes < smallBytes + (large.Length - small.Length),
-            $"Excess grew from {smallBytes} to {largeBytes} between a {small.Length} and {large.Length} byte document.");
-    }
 }

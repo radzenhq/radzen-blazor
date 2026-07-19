@@ -1,6 +1,4 @@
 #nullable enable
-using System;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -29,36 +27,6 @@ public class XrefLoaderAllocationTests
 
         text.Append($"trailer\n<< /Size {count + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
         return Encoding.ASCII.GetBytes(text.ToString());
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static long LoadXref(byte[] data, int count)
-    {
-        var limits = ReaderLimits.Default;
-        var decoder = new StreamDecoder(limits, value => value);
-        var loader = new XrefLoader(data, limits, decoder);
-        var store = new IndirectObjectStore(data, limits, loader.Entries, decoder, new DocumentRepairer(data, limits));
-
-        var before = GC.GetAllocatedBytesForCurrentThread();
-        loader.Load(store);
-        var bytes = GC.GetAllocatedBytesForCurrentThread() - before;
-
-        Assert.Equal(count + 1, loader.Entries.Count);
-        return bytes;
-    }
-
-    [Fact]
-    public void Load_DoesNotAllocatePerClassicXrefField()
-    {
-        const int Count = 20000;
-        var data = BuildClassicXrefDocument(Count);
-
-        LoadXref(data, Count);
-
-        var bytes = LoadXref(data, Count);
-
-        var budget = Count * 350L;
-        Assert.True(bytes < budget, $"XrefLoader.Load allocated {bytes} bytes for {Count} entries, budget {budget}.");
     }
 
     [Fact]

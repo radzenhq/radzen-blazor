@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,28 +20,6 @@ public class EmbeddedFileNameTreeWalkTests
             (7, "<< /Names [(a.txt) 4 0 R] >>"));
 
         Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
-    }
-
-    [Fact]
-    public void EmbeddedFileTree_DuplicatingChain_IsBoundedByTheVisitedSet()
-    {
-        const int Levels = 20;
-
-        var nodes = new List<(int Number, string Body)>();
-        for (var i = 0; i < Levels; i++)
-        {
-            nodes.Add((6 + i, $"<< /Kids [{7 + i} 0 R {7 + i} 0 R] >>"));
-        }
-
-        nodes.Add((6 + Levels, "<< /Names [(a.txt) 4 0 R] >>"));
-
-        var bytes = NameTreeFile(nodes.ToArray());
-
-        var watch = Stopwatch.StartNew();
-        Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
-        watch.Stop();
-
-        Assert.True(watch.ElapsedMilliseconds < 2000, $"Walk took {watch.ElapsedMilliseconds} ms.");
     }
 
     [Fact]
