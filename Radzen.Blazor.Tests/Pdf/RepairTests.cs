@@ -130,6 +130,83 @@ public class RepairTests
         Assert.Equal(0, offsets[1]);
     }
 
+    [Fact]
+    public void IncrementalUpdate_RepairKeepsLatestObjectRevision()
+    {
+        var text = "1 0 obj\n<< /Type /Catalog /V 1 >>\nendobj\n"
+            + "1 0 obj\n<< /Type /Catalog /V 2 >>\nendobj\n";
+        var data = Encoding.ASCII.GetBytes(text);
+        var latest = text.IndexOf("1 0 obj", text.IndexOf("1 0 obj", StringComparison.Ordinal) + 1, StringComparison.Ordinal);
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.Equal(latest, offsets[1]);
+    }
+
+    [Fact]
+    public void ObjectHeaderInsideStringDoesNotReplaceRealObjectOffset()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "1 0 obj\n<< /Type /Catalog >>\nendobj\n"
+            + "2 0 obj\n<< /Note (see 1 0 obj here) >>\nendobj\n");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.Equal(0, offsets[1]);
+    }
+
+    [Fact]
+    public void StreamWordInsideStringDoesNotHideLaterObjects()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "1 0 obj\n<< /Note (a stream\nhere) >>\nendobj\n"
+            + "2 0 obj\n<< /Type /Catalog >>\nendobj\n");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.True(offsets.ContainsKey(2));
+    }
+
+    [Fact]
+    public void UnbalancedStringDoesNotHideLaterObjects()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "garbage ( truncated string never closed\n"
+            + "1 0 obj\n<< /Type /Catalog >>\nendobj\n"
+            + "2 0 obj\n<< /Type /Page >>\nendobj\n");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.True(offsets.ContainsKey(1));
+        Assert.True(offsets.ContainsKey(2));
+    }
+
+    [Fact]
+    public void UnterminatedStreamDoesNotHideLaterObjects()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "1 0 obj\n<< /Length 20 >>\nstream\nsome binary no end marker\n"
+            + "2 0 obj\n<< /Type /Page >>\nendobj\n");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.True(offsets.ContainsKey(2));
+    }
+
+    [Fact]
+    public void GarbageObjectHeaderInCorruptTailDoesNotClobberRealObject()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "3 0 obj\n<< /Type /Page >>\nendobj\n"
+            + "5 0 obj\n<< /Type /Catalog >>\nendobj\n"
+            + "6 0 obj (unterminated note mentioning 3 0 obj at the end");
+
+        var offsets = new DocumentRepairer(data, ReaderLimits.Default).ScannedOffsets();
+
+        Assert.Equal(0, offsets[3]);
+    }
+
+
     private static byte[] TruncateAfter(byte[] bytes, string marker)
     {
         var text = Encoding.Latin1.GetString(bytes);
