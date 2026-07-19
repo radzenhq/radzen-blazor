@@ -60,7 +60,7 @@ internal static class BoxContentLayout
     {
         var effective = resolution ?? new StyleResolution();
         var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, effective);
-        foreach (var block in Paginator.ExpandBlocks(blocks, contentWidth, resolution: effective))
+        foreach (var block in BlockExpander.ExpandBlocks(blocks, contentWidth, resolution: effective))
         {
             block.Accept(visitor, default);
         }

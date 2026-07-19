@@ -245,12 +245,4 @@ internal static class Paginator
 
     internal static HorizontalAlignment CodeAlignment(Block block) => CodeBlockDispatch.Alignment(block);
 
-    internal static IReadOnlyList<Block> ExpandBlocks(
-        BlockCollection blocks,
-        double availableWidth,
-        bool keepSpecialContainers = false,
-        IReadOnlyDictionary<string, int>? tocPages = null,
-        FontCollection? fonts = null,
-        StyleResolution? resolution = null)
-        => BlockExpander.ExpandBlocks(blocks, availableWidth, keepSpecialContainers, tocPages, fonts, resolution);
 }

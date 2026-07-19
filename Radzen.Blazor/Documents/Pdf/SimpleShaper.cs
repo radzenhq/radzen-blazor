@@ -45,8 +45,6 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
     private void ShapeCore<TSink>(ReadOnlySpan<char> text, Font font, ref TSink sink)
         where TSink : struct, IGlyphSink
     {
-        ArgumentNullException.ThrowIfNull(font);
-
         EnsureNoComplexScript(text);
 
         var primary = fonts.ResolvePrimarySfnt(font);
