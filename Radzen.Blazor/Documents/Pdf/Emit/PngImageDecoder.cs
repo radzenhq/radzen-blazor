@@ -26,22 +26,7 @@ internal sealed class PngImageDecoder : IImageDecoder
     }
 
     private static bool IsPng(byte[] data)
-    {
-        if (data.Length < PngSignature.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < PngSignature.Length; i++)
-        {
-            if (data[i] != PngSignature[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+        => PdfBytes.Matches(data, PngSignature);
 
     private static ReadOnlyMemory<byte> JoinIdat(byte[] data, List<Range>? chunks)
     {
@@ -149,9 +134,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         var compressed = JoinIdat(data, idat);
         var raw = FlateFilter.Decode(compressed, limits.MaxDecodedStreamBytes);
 
-        if (raw.LongLength > limits.ExpansionRatioFloorBytes
-            && compressed.Length > 0
-            && raw.LongLength / compressed.Length > limits.MaxDecodeExpansionRatio)
+        if (StreamDecoder.ExceedsExpansionRatio(raw.LongLength, compressed.Length, limits))
         {
             throw new InvalidDataException("PNG image data expansion ratio exceeds the maximum.");
         }
