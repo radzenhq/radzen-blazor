@@ -363,8 +363,7 @@ public sealed class Page
 
         var reserved = new HashSet<string>(reservedResourceNames ?? []);
         AddResourceNames(reserved, editedResources);
-        var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-            ResourceNameAllocator.Available("F", reserved, true), ResourceNameAllocator.Available("Im", reserved, true), ResourceNameAllocator.Available("GS", reserved, true), ResourceNameAllocator.Available("P", reserved, true));
+        var emission = Reemit(reserved);
         if (emission.Resources.Patterns.Count > 0)
         {
             throw new NotSupportedException("Inserted gradient content cannot be composed with raw content editing because pattern resource names cannot be allocated safely.");
@@ -419,18 +418,7 @@ public sealed class Page
 
         if (pendingAppends.Count > 0)
         {
-            using var pending = new ContentWriter(
-                FontScope,
-                ResourceNameAllocator.Available("SF", reservedNames, true),
-                ResourceNameAllocator.Available("SIm", reservedNames, true),
-                ResourceNameAllocator.Available("SGS", reservedNames, true),
-                ResourceNameAllocator.Available("SP", reservedNames, true));
-            foreach (var element in pendingAppends)
-            {
-                element.Emit(pending);
-            }
-
-            var pendingOverlay = pending.DetachResult();
+            var pendingOverlay = EmitOverlay(pendingAppends, reservedNames);
             return new ContentEmissionResult(content,
                 ContentResourceManifest.Combine(editedResources, pendingOverlay.Resources),
                 new ContentEmissionResult(pendingOverlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
@@ -448,18 +436,7 @@ public sealed class Page
 
         if (content is not null && OriginalElementsIntact())
         {
-            using var appended = new ContentWriter(
-                FontScope,
-                ResourceNameAllocator.Available("SF", reservedNames, true),
-                ResourceNameAllocator.Available("SIm", reservedNames, true),
-                ResourceNameAllocator.Available("SGS", reservedNames, true),
-                ResourceNameAllocator.Available("SP", reservedNames, true));
-            for (var i = materializedCount; i < elements.Count; i++)
-            {
-                elements[i].Emit(appended);
-            }
-
-            var overlay = appended.DetachResult();
+            var overlay = EmitOverlay(ElementsFrom(materializedCount), reservedNames);
             return new ContentEmissionResult(content,
                 ContentResourceManifest.Combine(editedResources, overlay.Resources),
                 new ContentEmissionResult(overlay.Bytes, ContentResourceManifest.Empty, isEmitted: true));
@@ -467,8 +444,7 @@ public sealed class Page
 
         if (content is not null && sourceElements is not null)
         {
-            var emission = ContentEditor.Reemit(content, elements, sourceElements, FontScope,
-                ResourceNameAllocator.Available("F", reservedNames, true), ResourceNameAllocator.Available("Im", reservedNames, true), ResourceNameAllocator.Available("GS", reservedNames, true), ResourceNameAllocator.Available("P", reservedNames, true));
+            var emission = Reemit(reservedNames);
             return new ContentEmissionResult(emission.Bytes,
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
@@ -508,19 +484,37 @@ public sealed class Page
     }
 
     internal ContentEmissionResult? BuildOverlay()
-    {
-        if (elements.Count == 0)
-        {
-            return null;
-        }
+        => elements.Count == 0 ? null : EmitOverlay(elements, null);
 
-        using var writer = new ContentWriter(FontScope, "SF", "SIm", "SGS", "SP");
-        foreach (var element in elements)
+    private ContentEmissionResult Reemit(IEnumerable<string>? reservedNames)
+        => ContentEditor.Reemit(content!, elements, sourceElements!, FontScope,
+            ResourceNameAllocator.Available("F", reservedNames, true),
+            ResourceNameAllocator.Available("Im", reservedNames, true),
+            ResourceNameAllocator.Available("GS", reservedNames, true),
+            ResourceNameAllocator.Available("P", reservedNames, true));
+
+    private ContentEmissionResult EmitOverlay(IEnumerable<ContentElement> items, IEnumerable<string>? reservedNames)
+    {
+        using var writer = new ContentWriter(
+            FontScope,
+            ResourceNameAllocator.Available("SF", reservedNames, true),
+            ResourceNameAllocator.Available("SIm", reservedNames, true),
+            ResourceNameAllocator.Available("SGS", reservedNames, true),
+            ResourceNameAllocator.Available("SP", reservedNames, true));
+        foreach (var element in items)
         {
             element.Emit(writer);
         }
 
         return writer.DetachResult();
+    }
+
+    private IEnumerable<ContentElement> ElementsFrom(int start)
+    {
+        for (var i = start; i < elements.Count; i++)
+        {
+            yield return elements[i];
+        }
     }
 
     private void EnsureMaterialized()
