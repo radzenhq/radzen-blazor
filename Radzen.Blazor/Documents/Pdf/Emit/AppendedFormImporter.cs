@@ -76,9 +76,9 @@ internal sealed class AppendedFormImporter(Document document, FormAppearanceServ
         {
             foreach (var field in rootFields)
             {
-                if (source.AsDictionary(field) is { } dict && source.GetString(dict, "T") is { } text)
+                if (source.AsDictionary(field) is { } dict && GraphImporter.DecodedName(source, dict) is { } name)
                 {
-                    usedFieldNames.Add(text);
+                    usedFieldNames.Add(name);
                 }
             }
         }

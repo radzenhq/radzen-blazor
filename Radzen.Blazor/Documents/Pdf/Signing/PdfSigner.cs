@@ -346,7 +346,7 @@ public static class PdfSigner
         {
             foreach (var item in fields)
             {
-                if (reader.AsDictionary(item) is { } field && reader.GetString(field, "T") is { } name)
+                if (reader.AsDictionary(item) is { } field && GraphImporter.DecodedName(reader, field) is { } name)
                 {
                     names.Add(name);
                 }
