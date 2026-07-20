@@ -45,9 +45,8 @@ internal static class LoadedAppearancePainter
             return false;
         }
 
-        var width = right - x0;
-        var height = top - y0;
-        if (width == 0 || height == 0)
+        var bbox = PdfRect.Normalize([x0, y0, right, top]);
+        if (bbox.Width == 0 || bbox.Height == 0)
         {
             return strict
                 ? throw new DocumentParseException("An annotation appearance /BBox must have nonzero dimensions.", -1)
@@ -58,12 +57,12 @@ internal static class LoadedAppearancePainter
         var name = ResourceNameAllocator.Available(namePrefix, xobjects.Keys, false);
 
         xobjects[name] = appearanceReference;
-        var scaleX = target.Width / width;
-        var scaleY = target.Height / height;
+        var scaleX = target.Width / bbox.Width;
+        var scaleY = target.Height / bbox.Height;
         page.Content.Add(new XObjectContent(name)
         {
             Transform = Matrix.FromComponents(
-                scaleX, 0, 0, scaleY, target.Left - x0 * scaleX, target.Bottom - y0 * scaleY),
+                scaleX, 0, 0, scaleY, target.Left - bbox.Left * scaleX, target.Bottom - bbox.Bottom * scaleY),
         });
         return true;
     }
