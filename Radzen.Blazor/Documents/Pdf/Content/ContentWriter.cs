@@ -3,6 +3,7 @@ using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 
 using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf.Content;
@@ -183,35 +184,9 @@ public sealed class ContentWriter : IDisposable
     /// <param name="bytes">The raw string bytes to write.</param>
     public void WriteString(ReadOnlySpan<byte> bytes)
     {
-        Append((byte)'(');
-        foreach (var b in bytes)
-        {
-            switch (b)
-            {
-                case (byte)'\\':
-                case (byte)'(':
-                case (byte)')':
-                    Append((byte)'\\');
-                    Append(b);
-                    break;
-                default:
-                    if (b < 0x20 || b == 0x7F)
-                    {
-                        Append((byte)'\\');
-                        Append((byte)('0' + ((b >> 6) & 0x7)));
-                        Append((byte)('0' + ((b >> 3) & 0x7)));
-                        Append((byte)('0' + (b & 0x7)));
-                    }
-                    else
-                    {
-                        Append(b);
-                    }
-
-                    break;
-            }
-        }
-
-        Append((byte)')');
+        var builder = new StringBuilder(bytes.Length + 2);
+        PdfLiteralString.AppendEscaped(builder, bytes, binary: true);
+        WriteRaw(builder.ToString());
     }
 
     private void Append(byte value) => accumulator.Append(value);
