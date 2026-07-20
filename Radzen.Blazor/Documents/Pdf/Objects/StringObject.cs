@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text;
 
@@ -33,52 +34,7 @@ public sealed class StringObject(string value) : DocumentObject
         }
 
         var builder = new StringBuilder(bytes.Length + 2);
-        builder.Append('(');
-
-        foreach (var b in bytes)
-        {
-            var code = (int)b;
-            switch (code)
-            {
-                case '\\':
-                    builder.Append("\\\\");
-                    break;
-                case '(':
-                    builder.Append("\\(");
-                    break;
-                case ')':
-                    builder.Append("\\)");
-                    break;
-                case '\n':
-                    builder.Append("\\n");
-                    break;
-                case '\r':
-                    builder.Append("\\r");
-                    break;
-                case '\t':
-                    builder.Append("\\t");
-                    break;
-                case '\b':
-                    builder.Append("\\b");
-                    break;
-                case '\f':
-                    builder.Append("\\f");
-                    break;
-                default:
-                    if (code >= 0x20 && code <= 0x7E)
-                    {
-                        builder.Append((char)code);
-                    }
-                    else
-                    {
-                        builder.Append('\\').Append(ToOctal(code));
-                    }
-
-                    break;
-            }
-        }
-
-        builder.Append(')');
+        PdfLiteralString.AppendEscaped(builder, bytes, binary: false);
         PdfBytes.WriteAscii(stream, builder.ToString());
     }
 
@@ -105,12 +61,61 @@ public sealed class StringObject(string value) : DocumentObject
         return raw;
     }
 
-    private static string ToOctal(int code)
+}
+
+internal static class PdfLiteralString
+{
+    // ISO 32000-1 7.3.4.2: a literal string is parenthesised; the backslash and unbalanced
+    // parentheses are escaped, the named control escapes and three-digit octal escapes are
+    // permitted, and any other byte may be written raw.
+    public static void AppendEscaped(StringBuilder builder, ReadOnlySpan<byte> bytes, bool binary)
     {
-        var digits = new char[3];
-        digits[0] = (char)('0' + ((code >> 6) & 0x7));
-        digits[1] = (char)('0' + ((code >> 3) & 0x7));
-        digits[2] = (char)('0' + (code & 0x7));
-        return new string(digits);
+        builder.Append('(');
+        foreach (var b in bytes)
+        {
+            switch (b)
+            {
+                case (byte)'\\':
+                    builder.Append("\\\\");
+                    break;
+                case (byte)'(':
+                    builder.Append("\\(");
+                    break;
+                case (byte)')':
+                    builder.Append("\\)");
+                    break;
+                case (byte)'\n' when !binary:
+                    builder.Append("\\n");
+                    break;
+                case (byte)'\r' when !binary:
+                    builder.Append("\\r");
+                    break;
+                case (byte)'\t' when !binary:
+                    builder.Append("\\t");
+                    break;
+                case (byte)'\b' when !binary:
+                    builder.Append("\\b");
+                    break;
+                case (byte)'\f' when !binary:
+                    builder.Append("\\f");
+                    break;
+                default:
+                    if ((b >= 0x20 && b <= 0x7E) || (binary && b >= 0x80))
+                    {
+                        builder.Append((char)b);
+                    }
+                    else
+                    {
+                        builder.Append('\\');
+                        builder.Append((char)('0' + ((b >> 6) & 0x7)));
+                        builder.Append((char)('0' + ((b >> 3) & 0x7)));
+                        builder.Append((char)('0' + (b & 0x7)));
+                    }
+
+                    break;
+            }
+        }
+
+        builder.Append(')');
     }
 }
