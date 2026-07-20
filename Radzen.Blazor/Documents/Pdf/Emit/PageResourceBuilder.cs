@@ -206,29 +206,9 @@ internal static class PageResourceBuilder
     public static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentResourceManifest manifest)
     {
         var emitted = BuildResources(writer, manifest);
-        if (emitted is null)
-        {
-            return resources;
-        }
-
-        resources ??= new DictionaryObject();
-        foreach (var key in emitted.Keys)
-        {
-            if (resources.TryGetValue(key, out var existing) && existing is DictionaryObject target
-                && emitted[key] is DictionaryObject added)
-            {
-                foreach (var name in added.Keys)
-                {
-                    target[name] = added[name];
-                }
-            }
-            else
-            {
-                resources[key] = emitted[key];
-            }
-        }
-
-        return resources;
+        return emitted is null
+            ? resources
+            : MergeResourceCategories(resources ?? new DictionaryObject(), emitted, static value => value, static value => value as DictionaryObject);
     }
 
     // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats are symbolic with a built-in encoding; /WinAnsiEncoding would remap their glyphs.
@@ -299,11 +279,18 @@ internal static class PageResourceBuilder
         DocumentReader reader,
         DictionaryObject loaded,
         DictionaryObject? emitted)
+        => MergeResourceCategories(loaded, emitted, importer.ImportValue, reader.AsDictionary);
+
+    private static DictionaryObject MergeResourceCategories(
+        DictionaryObject baseResources,
+        DictionaryObject? emitted,
+        Func<DocumentObject, DocumentObject> copy,
+        Func<DocumentObject, DictionaryObject?> asDictionary)
     {
         var result = new DictionaryObject();
-        foreach (var key in loaded.Keys)
+        foreach (var key in baseResources.Keys)
         {
-            result[key] = importer.ImportValue(loaded[key]);
+            result[key] = copy(baseResources[key]);
         }
 
         if (emitted is null)
@@ -316,11 +303,11 @@ internal static class PageResourceBuilder
             if (result.ContainsKey(key) && emitted[key] is DictionaryObject added)
             {
                 var combined = new DictionaryObject();
-                if (reader.AsDictionary(loaded[key]) is { } sub)
+                if (asDictionary(baseResources[key]) is { } sub)
                 {
                     foreach (var name in sub.Keys)
                     {
-                        combined[name] = importer.ImportValue(sub[name]);
+                        combined[name] = copy(sub[name]);
                     }
                 }
 
