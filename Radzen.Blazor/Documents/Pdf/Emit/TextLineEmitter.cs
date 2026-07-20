@@ -300,13 +300,45 @@ internal sealed class TextLineEmitter(
         return result;
     }
 
+    private static TextDraw BuildTextDraw(
+        Run run,
+        Font font,
+        double x,
+        double baseline,
+        double size,
+        GeneratedFont generated,
+        byte[] bytes,
+        StructureElement? element,
+        string? extGState,
+        double[]? kerns,
+        double strokeWidth = 0,
+        double shear = 0)
+        => new()
+        {
+            X = x,
+            Baseline = baseline,
+            Size = size,
+            Color = font.Color,
+            Font = generated,
+            Bytes = bytes,
+            StrokeWidth = strokeWidth,
+            Shear = shear,
+            CharSpacing = run.LetterSpacing.Point,
+            Rise = run.ScriptRise(font.Size),
+            WordSpacing = run.WordSpacing.Point,
+            HorizontalScale = run.HorizontalScale,
+            RenderMode = run.Invisible ? 3 : 0,
+            FillPaint = run.FillPaint,
+            ExtGState = extGState,
+            Element = element,
+            Kerns = kerns,
+        };
+
     private void EmitBase14Fragment(PagePlan plan, LineFragment fragment, Font font, double startX, double y, StructureElement? element, string? extGState)
     {
         var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
         var run = fragment.Run;
         var size = font.Size * run.ScriptScale;
-        var spacing = run.LetterSpacing.Point;
-        var rise = run.ScriptRise(font.Size);
         var text = fragment.Text;
         var x = startX;
 
@@ -316,7 +348,7 @@ internal sealed class TextLineEmitter(
             if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
             {
                 var generated = fontResolver.ResolveSfnt(face);
-                var glyphRun = new SfntRunAccumulator(face, generated, font.Size, fonts.EnableKerning, kernAcrossSpaces: false, scratchBytes);
+                var glyphRun = new SfntRunAccumulator(face, generated, font.Size, fonts.EnableKerning, scratchBytes);
                 glyphRun.Begin();
                 while (i < text.Length)
                 {
@@ -333,24 +365,7 @@ internal sealed class TextLineEmitter(
                 }
 
                 plan.UsedFonts.Add(generated);
-                plan.Texts.Add(new TextDraw
-                {
-                    X = x,
-                    Baseline = y,
-                    Size = size,
-                    Color = font.Color,
-                    Font = generated,
-                    Bytes = glyphRun.Bytes,
-                    Element = element,
-                    CharSpacing = spacing,
-                    Rise = rise,
-                    WordSpacing = run.WordSpacing.Point,
-                    HorizontalScale = run.HorizontalScale,
-                    RenderMode = run.Invisible ? 3 : 0,
-                    FillPaint = run.FillPaint,
-                    ExtGState = extGState,
-                    Kerns = glyphRun.Kerns,
-                });
+                plan.Texts.Add(BuildTextDraw(run, font, x, y, size, generated, glyphRun.Bytes, element, extGState, glyphRun.Kerns));
 
                 x += RunTextAdvance.Calculate(
                     glyphRun.Advance, glyphRun.GlyphCount, glyphRun.WordSpaceCount, run,
@@ -397,24 +412,9 @@ internal sealed class TextLineEmitter(
                     kerns = SfntRunBuilder.HasNonZero(list) ? [.. list] : null;
                 }
 
-                plan.Texts.Add(new TextDraw
-                {
-                    X = x,
-                    Baseline = y,
-                    Size = size,
-                    Color = font.Color,
-                    Font = generated,
-                    Bytes = WinAnsiText.Encode(segment, OnUnencodable.Substitute),
-                    Element = element,
-                    CharSpacing = spacing,
-                    Rise = rise,
-                    WordSpacing = run.WordSpacing.Point,
-                    HorizontalScale = run.HorizontalScale,
-                    RenderMode = run.Invisible ? 3 : 0,
-                    FillPaint = run.FillPaint,
-                    ExtGState = extGState,
-                    Kerns = kerns,
-                });
+                plan.Texts.Add(BuildTextDraw(
+                    run, font, x, y, size, generated,
+                    WinAnsiText.Encode(segment, OnUnencodable.Substitute), element, extGState, kerns));
 
                 x += RunTextAdvance.Calculate(
                     metrics.MeasureString(segment, font.Size) + kernPoints,
@@ -431,34 +431,16 @@ internal sealed class TextLineEmitter(
         var run = fragment.Run;
         var font = fragment.Font;
         var size = font.Size * run.ScriptScale;
-        var spacing = run.LetterSpacing.Point;
-        var rise = run.ScriptRise(font.Size);
         var runX = startX;
 
-        foreach (var glyphRun in runBuilder.Build(fragment.Text, font, font.Size, kernAcrossSpaces: false))
+        foreach (var glyphRun in runBuilder.Build(fragment.Text, font, font.Size))
         {
             var face = glyphRun.Face;
             plan.UsedFonts.Add(glyphRun.Font);
-            plan.Texts.Add(new TextDraw
-            {
-                X = runX,
-                Baseline = y,
-                Size = size,
-                Color = font.Color,
-                Font = glyphRun.Font,
-                Bytes = glyphRun.Bytes,
-                Element = element,
-                StrokeWidth = font.Bold && !face.Bold ? size * 0.03 : 0,
-                Shear = font.Italic && !face.Italic ? 0.21 : 0,
-                CharSpacing = spacing,
-                Rise = rise,
-                WordSpacing = run.WordSpacing.Point,
-                HorizontalScale = run.HorizontalScale,
-                RenderMode = run.Invisible ? 3 : 0,
-                FillPaint = run.FillPaint,
-                ExtGState = extGState,
-                Kerns = glyphRun.Kerns,
-            });
+            plan.Texts.Add(BuildTextDraw(
+                run, font, runX, y, size, glyphRun.Font, glyphRun.Bytes, element, extGState, glyphRun.Kerns,
+                font.Bold && !face.Bold ? size * 0.03 : 0,
+                font.Italic && !face.Italic ? 0.21 : 0));
 
             runX += RunTextAdvance.Calculate(
                 glyphRun.Advance, glyphRun.GlyphCount, glyphRun.WordSpaceCount, run,

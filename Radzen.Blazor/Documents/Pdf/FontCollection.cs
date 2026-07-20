@@ -335,6 +335,7 @@ public sealed class FontCollection
         char? prevBase14 = null;
         SfntFont? prevFallbackFace = null;
         ushort prevFallbackGlyph = 0;
+        var prevFallbackCodepoint = 0;
         while (i < text.Length)
         {
             var codepoint = CodePointAt(text, i);
@@ -342,10 +343,10 @@ public sealed class FontCollection
             {
                 if (EnableKerning && prevBase14 is { } prev)
                 {
-                    sum += metrics.GetRunKerning(prev, (char)codepoint) * font.Size / 1000.0;
+                    sum += FontMetric.Scale(metrics.GetRunKerning(prev, (char)codepoint), font.Size, 1000);
                 }
 
-                sum += metrics.GetWidth(code) * font.Size / 1000.0;
+                sum += FontMetric.Scale(metrics.GetWidth(code), font.Size, 1000);
                 prevBase14 = (char)codepoint;
                 prevFallbackFace = null;
             }
@@ -353,17 +354,19 @@ public sealed class FontCollection
             {
                 if (EnableKerning && ReferenceEquals(prevFallbackFace, face))
                 {
-                    sum += face.GetKerning(prevFallbackGlyph, glyph) * font.Size / face.UnitsPerEm;
+                    sum += SimpleShaper.PairKerning(
+                        face, prevFallbackGlyph, glyph, prevFallbackCodepoint, codepoint, font.Size);
                 }
 
-                sum += face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+                sum += face.AdvanceInUserSpace(glyph, font.Size);
                 prevBase14 = null;
                 prevFallbackFace = face;
                 prevFallbackGlyph = glyph;
+                prevFallbackCodepoint = codepoint;
             }
             else
             {
-                sum += metrics.GetWidth(question) * font.Size / 1000.0;
+                sum += FontMetric.Scale(metrics.GetWidth(question), font.Size, 1000);
                 prevBase14 = null;
                 prevFallbackFace = null;
             }

@@ -58,12 +58,11 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         {
             var codepoint = FontCollection.CodePointAt(text, i);
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
-            var advance = face.GetAdvanceWidth(glyph) * font.Size / face.UnitsPerEm;
+            var advance = face.AdvanceInUserSpace(glyph, font.Size);
 
-            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0
-                && codepoint != ' ' && previousCodepoint != ' ')
+            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
             {
-                var kern = previousFace!.GetKerning(previousGlyph, glyph) * font.Size / previousFace.UnitsPerEm;
+                var kern = PairKerning(previousFace!, previousGlyph, glyph, previousCodepoint, codepoint, font.Size);
                 if (kern != 0)
                 {
                     sink.Kern(kern);
@@ -93,6 +92,16 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         ShapeCore(text, font, ref sink);
         return sink.Total;
     }
+
+    internal static double PairKerning(
+        SfntFont face, ushort left, ushort right, int leftCodepoint, int rightCodepoint, double size)
+        => leftCodepoint == ' ' || rightCodepoint == ' '
+            ? 0
+            : face.KerningInUserSpace(left, right, size);
+
+    internal static double TrailingKerning(
+        SfntFont face, ushort glyph, double shapedAdvance, double size)
+        => shapedAdvance - face.AdvanceInUserSpace(glyph, size);
 
     internal static void EnsureNoComplexScript(ReadOnlySpan<char> text)
     {

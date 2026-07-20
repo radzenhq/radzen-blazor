@@ -1,5 +1,3 @@
-using Radzen.Documents.Pdf.Content;
-
 namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolver fontResolver, ImageStore imageStore)
@@ -47,7 +45,7 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
 
         if (!string.IsNullOrEmpty(watermark.Text))
         {
-            PlanText(plan, draw, watermark.Text, watermark.Font);
+            PlanText(plan, draw, watermark.Text, watermark);
         }
 
         plan.Watermark = draw;
@@ -60,42 +58,47 @@ internal sealed class WatermarkEmitter(FontCollection fonts, GeneratorFontResolv
             Image = watermark.DecodeImage(image),
         });
 
-    private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Font font)
+    private void PlanText(PagePlan plan, WatermarkDraw draw, string text, Watermark watermark)
     {
+        var font = watermark.Font;
         var size = font.Size;
-        var baseline = WatermarkGeometry.Baseline(size);
-        if (fonts.TryResolvePrimary(font, out _))
+        var textPlan = WatermarkTextPlanning.Plan(text, watermark, fonts);
+        var extGState = textPlan.AlphaOverride is { } alpha
+            ? plan.RegisterExtGState(alpha, alpha)
+            : null;
+        if (textPlan.IsSfnt)
         {
-            var x = WatermarkGeometry.Centered(fonts.MeasureText(text, font));
-            foreach (var glyphRun in runBuilder.Build(text, font, size, kernAcrossSpaces: true))
+            var x = textPlan.X;
+            foreach (var glyphRun in runBuilder.Build(text, font, size))
             {
                 plan.UsedFonts.Add(glyphRun.Font);
                 draw.Texts.Add(new TextDraw
                 {
                     X = x,
-                    Baseline = baseline,
+                    Baseline = textPlan.Baseline,
                     Size = size,
                     Color = font.Color,
                     Font = glyphRun.Font,
                     Bytes = glyphRun.Bytes,
                     Kerns = glyphRun.Kerns,
+                    ExtGState = extGState,
                 });
                 x += glyphRun.Advance;
             }
         }
         else
         {
-            var text14 = WatermarkTextPlan.Base14(text, font);
             var generated = fontResolver.ResolveBase14(font);
             plan.UsedFonts.Add(generated);
             draw.Texts.Add(new TextDraw
             {
-                X = text14.X,
-                Baseline = text14.Baseline,
+                X = textPlan.X,
+                Baseline = textPlan.Baseline,
                 Size = size,
                 Color = font.Color,
                 Font = generated,
-                Bytes = text14.Bytes,
+                Bytes = textPlan.Base14Bytes!,
+                ExtGState = extGState,
             });
         }
     }
