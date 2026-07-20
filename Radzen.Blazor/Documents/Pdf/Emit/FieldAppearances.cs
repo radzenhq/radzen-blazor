@@ -143,10 +143,11 @@ internal static class FieldAppearances
             new NumberObject(height),
         ];
 
-        var appearance = new StreamObject(writer.ToArray());
+        var emitted = writer.DetachResult();
+        var appearance = new StreamObject(emitted.Bytes!);
         FormXObjectShell.ApplyHeader(appearance.Dictionary, bbox, formType: false);
 
-        var resources = BuildFontResources(writer);
+        var resources = BuildResources(emitted.Resources);
         if (resources is not null)
         {
             appearance.Dictionary["Resources"] = resources;
@@ -155,15 +156,25 @@ internal static class FieldAppearances
         return appearance;
     }
 
-    private static DictionaryObject? BuildFontResources(ContentWriter writer)
+    private static DictionaryObject? BuildResources(ContentResourceManifest manifest)
     {
-        DictionaryObject? fonts = null;
-        foreach (var (baseFont, key) in writer.Fonts)
+        if (manifest.Images.Count > 0 || manifest.Patterns.Count > 0)
         {
-            fonts ??= new DictionaryObject();
-            fonts[key] = PageResourceBuilder.Base14FontDictionary(baseFont);
+            throw new NotSupportedException(
+                "A field appearance stream cannot reference an image or shading-pattern resource.");
         }
 
-        return fonts is null ? null : new DictionaryObject { ["Font"] = fonts };
+        var resources = new ResourceDictionaryBuilder();
+        foreach (var (baseFont, key) in manifest.Fonts)
+        {
+            resources.Add("Font", key, PageResourceBuilder.Base14FontDictionary(baseFont));
+        }
+
+        foreach (var (key, opacity) in manifest.ExtGStates)
+        {
+            resources.Add("ExtGState", key, PageResourceBuilder.ExtGStateDictionary(opacity, opacity));
+        }
+
+        return resources.Build();
     }
 }
