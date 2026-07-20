@@ -104,7 +104,7 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
 
         reference = ImportInstance(root);
         field = instances.TryGetValue(root, out var shell) ? shell as DictionaryObject : null;
-        name = reader.GetString(root, "T");
+        name = DecodedName(reader, root);
         return true;
     }
 
@@ -157,6 +157,10 @@ internal sealed class GraphImporter(DocumentReader reader, IObjectWriter writer)
             }
         }
     }
+
+    // A /T field name is a PDF text string (ISO 32000-1 12.7.3.1).
+    public static string? DecodedName(DocumentReader reader, DictionaryObject field)
+        => reader.GetString(field, "T") is { } text ? FormField.DecodeTextString(text) : null;
 
     public static void DisambiguateFieldName(DictionaryObject field, string? name, HashSet<string> usedNames)
     {

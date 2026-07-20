@@ -119,10 +119,7 @@ public sealed class AcroForm
         return widgets;
     }
 
-    private string PartialName(DictionaryObject dict)
-        => reader.GetString(dict, "T") is { } text
-            ? FormField.DecodeTextString(text)
-            : string.Empty;
+    private string PartialName(DictionaryObject dict) => GraphImporter.DecodedName(reader, dict) ?? string.Empty;
 
     /// <summary>
     /// Sets the text value of a field and regenerates its normal appearance
