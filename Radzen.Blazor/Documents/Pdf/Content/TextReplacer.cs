@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
@@ -95,18 +96,12 @@ internal static class TextReplacer
             var oldAdvance = 0.0;
             var newAdvance = 0.0;
             group.Value.Sort(static (left, right) => right.CharacterOffset.CompareTo(left.CharacterOffset));
-            var nextOffset = decoded.Length;
+            ValidateNonOverlapping([.. Enumerable.Reverse(group.Value)], decoded);
             foreach (var reference in group.Value)
             {
-                if (reference.CharacterOffset + reference.CharacterLength > nextOffset)
-                {
-                    throw new InvalidOperationException("Overlapping text matches cannot be replaced safely.");
-                }
-
                 oldAdvance += Advance(show.Font, decoded.Substring(reference.CharacterOffset, reference.CharacterLength), show);
                 newAdvance += Advance(show.Font, replacement, show);
                 changed = changed.Remove(reference.CharacterOffset, reference.CharacterLength).Insert(reference.CharacterOffset, replacement);
-                nextOffset = reference.CharacterOffset;
             }
 
             if (!show.Font.TryEncode(changed, out var encoded))
@@ -130,8 +125,7 @@ internal static class TextReplacer
 
                 writer.WriteRaw("[");
                 writer.WriteString(encoded);
-                writer.WriteRaw(" ");
-                writer.WriteNumber((newAdvance - oldAdvance) / denominator * 1000.0);
+                writer.WriteTjAdjustment(newAdvance - oldAdvance, denominator);
                 writer.WriteRaw("] TJ");
                 edits.Add(new ContentEdit(show.Text.Start, show.OperatorEnd, writer.ToArray()));
             }
@@ -202,7 +196,7 @@ internal static class TextReplacer
             var show = shows[group.Key];
             var decoded = show.Font.Decode(show.Text.Bytes!);
             group.Value.Sort(static (left, right) => left.Source.CharacterOffset.CompareTo(right.Source.CharacterOffset));
-            ValidateNonOverlapping(group.Value, decoded);
+            ValidateNonOverlapping([.. group.Value.Select(static item => item.Source)], decoded);
             edits.Add(BuildMultipleShowEdit(show, decoded, group.Value, options.Layout));
         }
 
@@ -335,14 +329,8 @@ internal static class TextReplacer
 
             writer.WriteString(encoded);
             var oldText = decoded.Substring(item.Source.CharacterOffset, item.Source.CharacterLength);
-            var adjustment = (Advance(show.Font, item.Replacement, show) - Advance(show.Font, oldText, show)) / denominator * 1000.0;
-            if (Math.Abs(adjustment) > 0.000001)
-            {
-                writer.WriteRaw(" ");
-                writer.WriteNumber(adjustment);
-                writer.WriteRaw(" ");
-            }
-
+            writer.WriteTjAdjustment(
+                Advance(show.Font, item.Replacement, show) - Advance(show.Font, oldText, show), denominator);
             offset = item.Source.CharacterOffset + item.Source.CharacterLength;
         }
 
@@ -396,18 +384,18 @@ internal static class TextReplacer
         }
     }
 
-    private static void ValidateNonOverlapping(IReadOnlyList<SourceReplacement> replacements, string decoded)
+    private static void ValidateNonOverlapping(IReadOnlyList<TextSourceReference> sources, string decoded)
     {
         var nextOffset = 0;
-        foreach (var item in replacements)
+        foreach (var source in sources)
         {
-            ValidateRange(item.Source, decoded);
-            if (item.Source.CharacterOffset < nextOffset)
+            ValidateRange(source, decoded);
+            if (source.CharacterOffset < nextOffset)
             {
                 throw new InvalidOperationException("Overlapping text matches cannot be replaced safely.");
             }
 
-            nextOffset = item.Source.CharacterOffset + item.Source.CharacterLength;
+            nextOffset = source.CharacterOffset + source.CharacterLength;
         }
     }
 
