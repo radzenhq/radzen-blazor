@@ -140,38 +140,35 @@ internal sealed class NavigationWriter(Document document)
         var annots = new ArrayObject();
         foreach (var link in links)
         {
-            ArrayObject rect =
-            [
-                new NumberObject(link.X1),
-                new NumberObject(link.Y1),
-                new NumberObject(link.X2),
-                new NumberObject(link.Y2),
-            ];
-
-            ArrayObject border = [new NumberObject(0.0), new NumberObject(0.0), new NumberObject(0.0)];
-
             annots.Add(writer.Add(new DictionaryObject
             {
                 ["Type"] = new NameObject("Annot"),
                 ["Subtype"] = new NameObject("Link"),
-                ["Rect"] = rect,
-                ["Border"] = border,
+                ["Rect"] = PageResourceBuilder.NumberBox(new PdfRect(link.X1, link.Y1, link.X2, link.Y2)),
+                ["Border"] = new ArrayObject { new NumberObject(0.0), new NumberObject(0.0), new NumberObject(0.0) },
                 // ISO 19005-3 6.3.2: Print flag (bit 3 = 4) set, Hidden/NoView clear.
                 ["F"] = new NumberObject(4),
                 ["A"] = link.Destination is { } destination
-                    ? new DictionaryObject
-                    {
-                        ["S"] = new NameObject("GoTo"),
-                        ["D"] = new StringObject(destination),
-                    }
-                    : new DictionaryObject
-                    {
-                        ["S"] = new NameObject("URI"),
-                        ["URI"] = new StringObject(link.Uri!),
-                    },
+                    ? LinkAction.GoTo(new StringObject(destination))
+                    : LinkAction.Uri(link.Uri!),
             }));
         }
 
         return annots;
     }
+}
+
+internal static class LinkAction
+{
+    public static DictionaryObject Uri(string uri) => new()
+    {
+        ["S"] = new NameObject("URI"),
+        ["URI"] = new StringObject(uri),
+    };
+
+    public static DictionaryObject GoTo(DocumentObject destination) => new()
+    {
+        ["S"] = new NameObject("GoTo"),
+        ["D"] = destination,
+    };
 }

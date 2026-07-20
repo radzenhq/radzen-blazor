@@ -292,20 +292,9 @@ public static class PdfSigner
     }
 
     private static ArrayObject SignatureRect(SignatureAppearance? appearance)
-    {
-        if (appearance is null)
-        {
-            return [new NumberObject(0), new NumberObject(0), new NumberObject(0), new NumberObject(0)];
-        }
-
-        return
-        [
-            new NumberObject(appearance.X),
-            new NumberObject(appearance.Y),
-            new NumberObject(appearance.X + appearance.Width),
-            new NumberObject(appearance.Y + appearance.Height),
-        ];
-    }
+        => appearance is null
+            ? PageResourceBuilder.NumberBox(PdfRect.FromSize(0, 0, 0, 0))
+            : PageResourceBuilder.NumberBox(PdfRect.FromSize(appearance.X, appearance.Y, appearance.Width, appearance.Height));
 
     private static StreamObject BuildAppearanceStream(SignatureOptions options)
     {
