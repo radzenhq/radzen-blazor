@@ -35,14 +35,20 @@ internal static class ContentEmitter
 {
     public static void WriteClipRect(ContentWriter writer, in PdfRect clip)
     {
-        writer.WriteNumber(clip.Left);
+        WriteRectangle(writer, clip.Left, clip.Bottom, clip.Width, clip.Height);
+        writer.WriteRaw(" W n\n");
+    }
+
+    public static void WriteRectangle(ContentWriter writer, double x, double y, double width, double height)
+    {
+        writer.WriteNumber(x);
         writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Bottom);
+        writer.WriteNumber(y);
         writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Width);
+        writer.WriteNumber(width);
         writer.WriteRaw(" ");
-        writer.WriteNumber(clip.Height);
-        writer.WriteRaw(" re W n\n");
+        writer.WriteNumber(height);
+        writer.WriteRaw(" re");
     }
 
     public static void WriteClip(ContentWriter writer, in PdfRect clip, double radius)

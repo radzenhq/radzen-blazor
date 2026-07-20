@@ -189,14 +189,8 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             }
             else
             {
-                writer.WriteNumber(fill.X);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(fill.Y);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(fill.Width);
-                writer.WriteRaw(" ");
-                writer.WriteNumber(fill.Height);
-                writer.WriteRaw(" re f\n");
+                WriteRectangle(writer, fill.X, fill.Y, fill.Width, fill.Height);
+                writer.WriteRaw(" f\n");
             }
 
             if (grouped)
