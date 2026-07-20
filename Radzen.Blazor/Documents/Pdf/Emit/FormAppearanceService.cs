@@ -86,7 +86,7 @@ internal sealed class FormAppearanceService(Document document)
 
         foreach (var definition in document.FormFields)
         {
-            if (TextAppearance(definition) is ({ } value, _) && !CanEncode(value))
+            if (TextAppearance(definition) is not null && !FieldAppearances.CanBakeSingleLine(definition))
             {
                 form["NeedAppearances"] = new BooleanObject(true);
                 break;
