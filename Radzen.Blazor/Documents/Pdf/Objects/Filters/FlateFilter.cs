@@ -78,9 +78,22 @@ internal static class FlateFilter
         return EncodeStream(data.AsSpan());
     }
 
+    public static StreamObject EncodeStream(byte[] data, Action<DictionaryObject> configureBeforeFilter)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(configureBeforeFilter);
+
+        return EncodeStreamCore(data, configureBeforeFilter);
+    }
+
     public static StreamObject EncodeStream(ReadOnlySpan<byte> data)
+        => EncodeStreamCore(data, null);
+
+    private static StreamObject EncodeStreamCore(
+        ReadOnlySpan<byte> data, Action<DictionaryObject>? configureBeforeFilter)
     {
         var stream = new StreamObject(Encode(data));
+        configureBeforeFilter?.Invoke(stream.Dictionary);
         stream.Dictionary["Filter"] = new NameObject("FlateDecode");
         return stream;
     }

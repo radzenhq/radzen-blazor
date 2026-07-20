@@ -191,11 +191,12 @@ internal static class XrefStreamPacker
             PdfBytes.WriteBigEndian(data, ref pos, row.Field3, w2);
         }
 
-        var xref = new StreamObject(FlateFilter.Encode(data));
-        xref.Dictionary["Type"] = new NameObject("XRef");
-        xref.Dictionary[key] = value;
-        xref.Dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
-        xref.Dictionary["Filter"] = new NameObject("FlateDecode");
+        var xref = FlateFilter.EncodeStream(data, dictionary =>
+        {
+            dictionary["Type"] = new NameObject("XRef");
+            dictionary[key] = value;
+            dictionary["W"] = new ArrayObject { new NumberObject(1), new NumberObject(w1), new NumberObject(w2) };
+        });
 
         foreach (var pair in trailer)
         {
