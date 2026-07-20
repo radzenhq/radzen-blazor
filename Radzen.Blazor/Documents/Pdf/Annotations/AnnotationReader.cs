@@ -107,21 +107,13 @@ internal static class AnnotationReader
         annotation.Areas.Clear();
         for (var i = 0; i < quadPoints.Count; i += 8)
         {
-            var minX = double.PositiveInfinity;
-            var minY = double.PositiveInfinity;
-            var maxX = double.NegativeInfinity;
-            var maxY = double.NegativeInfinity;
+            var bounds = new PdfRectBounds();
             for (var point = 0; point < 8; point += 2)
             {
-                var x = Number(reader, quadPoints[i + point]);
-                var y = Number(reader, quadPoints[i + point + 1]);
-                minX = Math.Min(minX, x);
-                minY = Math.Min(minY, y);
-                maxX = Math.Max(maxX, x);
-                maxY = Math.Max(maxY, y);
+                bounds.Include(Number(reader, quadPoints[i + point]), Number(reader, quadPoints[i + point + 1]));
             }
 
-            annotation.Areas.Add(new PdfRect(minX, minY, maxX, maxY));
+            annotation.Areas.Add(bounds.ToRect());
         }
 
         return annotation;

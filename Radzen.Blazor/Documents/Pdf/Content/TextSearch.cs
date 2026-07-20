@@ -246,24 +246,13 @@ internal static class TextSearch
 
     public static PdfRect GetBounds(IReadOnlyList<TextPoint> points)
     {
-        if (points.Count == 0)
+        var bounds = new PdfRectBounds();
+        foreach (var point in points)
         {
-            return new PdfRect();
+            bounds.Include(point.X, point.Y);
         }
 
-        var left = points[0].X;
-        var right = left;
-        var bottom = points[0].Y;
-        var top = bottom;
-        for (var i = 1; i < points.Count; i++)
-        {
-            left = Math.Min(left, points[i].X);
-            right = Math.Max(right, points[i].X);
-            bottom = Math.Min(bottom, points[i].Y);
-            top = Math.Max(top, points[i].Y);
-        }
-
-        return new PdfRect(left, bottom, right, top);
+        return bounds.ToRect();
     }
 
     private static List<PositionedTextRun> Parse(byte[]? content, IReadOnlyDictionary<string, ReverseFont>? fonts, ContentTokenizer.Cache? cache)
