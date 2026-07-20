@@ -68,33 +68,7 @@ public sealed class ContentCollection : IReadOnlyList<ContentElement>
 
     internal void Clear() => items.Clear();
 
-    internal bool IsModified
-    {
-        get
-        {
-            if (items.StructureChanged)
-            {
-                return true;
-            }
+    internal bool IsModified => TrackedChanges.AnyModified(items);
 
-            foreach (var item in items)
-            {
-                if (item.IsModified)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    internal void AcceptChanges()
-    {
-        items.AcceptStructure();
-        foreach (var item in items)
-        {
-            item.AcceptChanges();
-        }
-    }
+    internal void AcceptChanges() => TrackedChanges.Accept(items);
 }

@@ -214,35 +214,9 @@ public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 
     internal void Add(Attachment attachment) => items.Add(attachment);
 
-    internal bool IsModified
-    {
-        get
-        {
-            if (items.StructureChanged)
-            {
-                return true;
-            }
+    internal bool IsModified => TrackedChanges.AnyModified(items);
 
-            foreach (var item in items)
-            {
-                if (item.IsModified)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    internal void AcceptChanges()
-    {
-        items.AcceptStructure();
-        foreach (var item in items)
-        {
-            item.AcceptChanges();
-        }
-    }
+    internal void AcceptChanges() => TrackedChanges.Accept(items);
 
     /// <summary>Returns an enumerator over the attachments in insertion order.</summary>
     /// <returns>The enumerator.</returns>

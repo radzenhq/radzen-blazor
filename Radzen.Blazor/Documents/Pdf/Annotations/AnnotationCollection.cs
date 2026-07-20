@@ -106,25 +106,8 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     internal bool WasLoaded => loaded;
 
     internal bool HasChanges
-    {
-        get
-        {
-            if (rewriteImported || entries.StructureChanged)
-            {
-                return true;
-            }
-
-            foreach (var entry in entries)
-            {
-                if (entry.Annotation is { IsModified: true })
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
+        => rewriteImported
+            || TrackedChanges.AnyModified(entries, static entry => entry.Annotation is { IsModified: true });
 
     internal void Load(Annotation? annotation, DocumentReader reader, DocumentObject original, DictionaryObject? dictionary)
     {

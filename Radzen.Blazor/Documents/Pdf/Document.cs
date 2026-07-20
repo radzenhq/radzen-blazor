@@ -132,41 +132,17 @@ public sealed class Document
 
     internal bool OutlineChanged => Loaded?.Source is null
         || Loaded.OutlineRequiresRewrite
-        || outline.StructureChanged
-        || AnyModified(outline);
+        || TrackedChanges.AnyModified(outline);
 
     internal bool PageLabelsChanged => Loaded?.Source is null
-        || pageLabels.StructureChanged
-        || AnyModified(pageLabels);
-
-    private static bool AnyModified<T>(TrackedList<T> items) where T : ITracksChanges
-    {
-        foreach (var item in items)
-        {
-            if (item.IsModified)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+        || TrackedChanges.AnyModified(pageLabels);
 
     internal void AcceptMetadataChanges()
     {
         Info.AcceptChanges();
         Attachments.AcceptChanges();
-        outline.AcceptStructure();
-        foreach (var item in outline)
-        {
-            item.AcceptChanges();
-        }
-
-        pageLabels.AcceptStructure();
-        foreach (var label in pageLabels)
-        {
-            label.AcceptChanges();
-        }
+        TrackedChanges.Accept(outline);
+        TrackedChanges.Accept(pageLabels);
     }
 
     /// <summary>
