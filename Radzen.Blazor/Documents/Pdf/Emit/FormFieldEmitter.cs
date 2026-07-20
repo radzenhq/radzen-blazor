@@ -28,13 +28,7 @@ internal static class FormFieldEmitter
             ["Type"] = new NameObject("Annot"),
             ["Subtype"] = new NameObject("Widget"),
             ["T"] = new StringObject(definition.Name),
-            ["Rect"] = new ArrayObject
-            {
-                new NumberObject(x),
-                new NumberObject(y),
-                new NumberObject(x + width),
-                new NumberObject(y + height),
-            },
+            ["Rect"] = PageResourceBuilder.NumberBox(PdfRect.FromSize(x, y, width, height)),
             ["F"] = new NumberObject(4),
             ["P"] = context.PageReference,
         };
@@ -167,13 +161,7 @@ internal static class FormFieldEmitter
             {
                 ["Type"] = new NameObject("Annot"),
                 ["Subtype"] = new NameObject("Widget"),
-                ["Rect"] = new ArrayObject
-                {
-                    new NumberObject(x),
-                    new NumberObject(y),
-                    new NumberObject(x + width),
-                    new NumberObject(y + height),
-                },
+                ["Rect"] = PageResourceBuilder.NumberBox(PdfRect.FromSize(x, y, width, height)),
                 ["F"] = new NumberObject(4),
                 ["P"] = context.PageReference,
                 ["Parent"] = parentReference,
