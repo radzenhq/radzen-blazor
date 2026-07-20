@@ -90,6 +90,13 @@ internal static class StyleResolver
         }
     }
 
+    private static Font Cascade(List<Font?> sources, List<Font> inherited, StyleCollection styles)
+    {
+        sources.AddRange(inherited);
+        sources.Add(styles.Normal.Font);
+        return FontCascade.Resolve(sources);
+    }
+
     private sealed class StyleVisitor(StyleCollection styles, StyleResolution resolution) : BlockVisitor<List<Font>, Nothing>
     {
         protected override Nothing Default(Block block, List<Font> inherited) => default;
@@ -135,17 +142,11 @@ internal static class StyleResolver
     {
         foreach (var item in list.Items)
         {
-            var itemSources = new List<Font?> { item.Font, list.Font };
-            itemSources.AddRange(inherited);
-            itemSources.Add(styles.Normal.Font);
-            resolution.SetItemFont(item, FontCascade.Resolve(itemSources));
+            resolution.SetItemFont(item, Cascade([item.Font, list.Font], inherited, styles));
 
             foreach (var run in item.Inlines)
             {
-                var runSources = new List<Font?> { run.Font, item.Font, list.Font };
-                runSources.AddRange(inherited);
-                runSources.Add(styles.Normal.Font);
-                resolution.SetRunFont(run, FontCascade.Resolve(runSources));
+                resolution.SetRunFont(run, Cascade([run.Font, item.Font, list.Font], inherited, styles));
             }
         }
     }
@@ -171,20 +172,10 @@ internal static class StyleResolver
     }
 
     private static void ResolveBarcode(Barcode barcode, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
-    {
-        var sources = new List<Font?> { barcode.Font };
-        sources.AddRange(inherited);
-        sources.Add(styles.Normal.Font);
-        resolution.SetBarcodeFont(barcode, FontCascade.Resolve(sources));
-    }
+        => resolution.SetBarcodeFont(barcode, Cascade([barcode.Font], inherited, styles));
 
     private static void ResolveTableOfContents(TableOfContents toc, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
-    {
-        var sources = new List<Font?> { toc.Font };
-        sources.AddRange(inherited);
-        sources.Add(styles.Normal.Font);
-        resolution.SetTocFont(toc, FontCascade.Resolve(sources));
-    }
+        => resolution.SetTocFont(toc, Cascade([toc.Font], inherited, styles));
 
     private static void ResolveParagraph(Paragraph paragraph, StyleCollection styles, List<Font> inherited, StyleResolution resolution)
     {
@@ -209,9 +200,7 @@ internal static class StyleResolver
             paragraphSources.Add(style.Font);
         }
 
-        paragraphSources.AddRange(inherited);
-        paragraphSources.Add(styles.Normal.Font);
-        resolution.SetParagraphFont(paragraph, FontCascade.Resolve(paragraphSources));
+        resolution.SetParagraphFont(paragraph, Cascade(paragraphSources, inherited, styles));
 
         foreach (var run in paragraph.Inlines)
         {
@@ -221,9 +210,7 @@ internal static class StyleResolver
                 runSources.Add(style.Font);
             }
 
-            runSources.AddRange(inherited);
-            runSources.Add(styles.Normal.Font);
-            resolution.SetRunFont(run, FontCascade.Resolve(runSources));
+            resolution.SetRunFont(run, Cascade(runSources, inherited, styles));
         }
     }
 

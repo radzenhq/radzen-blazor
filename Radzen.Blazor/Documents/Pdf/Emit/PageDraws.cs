@@ -252,48 +252,53 @@ internal sealed class PagePlan
 
     public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
     {
-        for (var i = mark.Fills; i < Fills.Count; i++)
+        ApplyClip(Fills, mark.Fills, fill =>
         {
-            var fill = Fills[i];
             if (fill.Clip is null)
             {
                 fill.Clip = bounds;
                 fill.ClipRadius = radius;
-                Fills[i] = fill;
             }
-        }
 
-        for (var i = mark.Edges; i < Edges.Count; i++)
+            return fill;
+        });
+        ApplyClip(Edges, mark.Edges, edge =>
         {
-            var edge = Edges[i];
             if (edge.Clip is null)
             {
                 edge.Clip = bounds;
                 edge.ClipRadius = radius;
-                Edges[i] = edge;
             }
-        }
 
-        for (var i = mark.Images; i < Images.Count; i++)
+            return edge;
+        });
+        ApplyClip(Images, mark.Images, image =>
         {
-            var image = Images[i];
             if (image.Clip is null)
             {
                 image.Clip = bounds;
                 image.ClipRadius = radius;
-                Images[i] = image;
             }
-        }
 
-        for (var i = mark.Texts; i < Texts.Count; i++)
+            return image;
+        });
+        ApplyClip(Texts, mark.Texts, text =>
         {
-            var text = Texts[i];
             if (text.Clip is null)
             {
                 text.Clip = bounds;
                 text.ClipRadius = radius;
-                Texts[i] = text;
             }
+
+            return text;
+        });
+    }
+
+    private static void ApplyClip<T>(List<T> items, int start, Func<T, T> clip)
+    {
+        for (var i = start; i < items.Count; i++)
+        {
+            items[i] = clip(items[i]);
         }
     }
 
