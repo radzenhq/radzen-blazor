@@ -81,11 +81,12 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
     /// <param name="value">The object to register.</param>
     /// <returns>An indirect reference to the registered object.</returns>
     public ReferenceObject Add(DocumentObject value)
-    {
-        ArgumentNullException.ThrowIfNull(value);
+        => IndirectObjectRegistration.Add(value, AppendObject);
 
+    private int AppendObject(DocumentObject value)
+    {
         objects.Add(value);
-        return new ReferenceObject(objects.Count, 0);
+        return objects.Count;
     }
 
     internal DocumentObject? Resolve(ReferenceObject reference)
@@ -236,5 +237,14 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         Trailer["ID"] = new ArrayObject { id, id };
 
         return (writer, reference.ObjectNumber);
+    }
+}
+
+internal static class IndirectObjectRegistration
+{
+    public static ReferenceObject Add(DocumentObject value, Func<DocumentObject, int> append)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return new ReferenceObject(append(value), 0);
     }
 }

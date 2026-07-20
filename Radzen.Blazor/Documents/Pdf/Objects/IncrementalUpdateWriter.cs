@@ -91,11 +91,13 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
     /// <param name="value">The object to append.</param>
     /// <returns>An indirect reference to the new object.</returns>
     public ReferenceObject Add(DocumentObject value)
+        => IndirectObjectRegistration.Add(value, AppendObject);
+
+    private int AppendObject(DocumentObject value)
     {
-        ArgumentNullException.ThrowIfNull(value);
         var number = nextNumber++;
         objects[number] = value;
-        return new ReferenceObject(number, 0);
+        return number;
     }
 
     /// <summary>
