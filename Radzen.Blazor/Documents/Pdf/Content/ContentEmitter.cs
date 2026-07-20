@@ -10,6 +10,7 @@ internal readonly struct TextShowOp
     public required double X { get; init; }
     public required double Baseline { get; init; }
     public Color Color { get; init; }
+    public string? ExtGState { get; init; }
     public DeviceColor? FillPaint { get; init; }
     public double CharSpacing { get; init; }
     public double WordSpacing { get; init; }
@@ -206,6 +207,13 @@ internal static class ContentEmitter
             throw new NotSupportedException("A text show spliced into an open text object must carry its origin in the ambient transform.");
         }
 
+        if (op.ExtGState is { } extGState)
+        {
+            writer.WriteRaw("q\n");
+            writer.WriteName(extGState);
+            writer.WriteRaw(" gs\n");
+        }
+
         if (!op.InsideTextObject)
         {
             writer.WriteRaw("BT\n");
@@ -300,6 +308,11 @@ internal static class ContentEmitter
         if (!op.InsideTextObject)
         {
             writer.WriteRaw("ET\n");
+        }
+
+        if (op.ExtGState is not null)
+        {
+            writer.WriteRaw("Q\n");
         }
     }
 

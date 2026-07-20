@@ -91,17 +91,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         {
             plan.Texts[i] = WithColorAlpha(plan.Texts[i], 1);
         }
-
-        if (plan.Watermark is { } watermark)
-        {
-            var outer = watermark.ExtGState is { } key && plan.FindExtGState(key) is { } state
-                ? state.FillAlpha
-                : 1;
-            for (var i = 0; i < watermark.Texts.Count; i++)
-            {
-                watermark.Texts[i] = WithColorAlpha(watermark.Texts[i], outer);
-            }
-        }
     }
 
     private TextDraw WithColorAlpha(TextDraw text, double scale)

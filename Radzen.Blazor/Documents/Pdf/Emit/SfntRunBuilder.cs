@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf.Emit;
@@ -25,21 +26,20 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
     private readonly List<SfntGlyphRun> runs = [];
     private readonly List<byte> scratchBytes = [];
 
-    public IReadOnlyList<SfntGlyphRun> Build(string text, Font font, double size, bool kernAcrossSpaces)
+    public IReadOnlyList<SfntGlyphRun> Build(string text, Font font, double size)
     {
         runs.Clear();
-        var kerning = fonts.EnableKerning;
         var glyphs = fonts.Shaper().Shape(text, font, out _);
         var g = 0;
         while (g < glyphs.Count)
         {
             var face = glyphs[g].Face;
             var generated = fontResolver.ResolveSfnt(face);
-            var run = new SfntRunAccumulator(face, generated, size, kerning, kernAcrossSpaces, scratchBytes);
+            var run = new SfntRunAccumulator(face, generated, size, fonts.EnableKerning, scratchBytes);
             run.Begin();
             while (g < glyphs.Count && ReferenceEquals(glyphs[g].Face, face))
             {
-                run.Append(glyphs[g].GlyphId, FontCollection.CodePointAt(text, glyphs[g].Cluster));
+                run.Append(glyphs[g], FontCollection.CodePointAt(text, glyphs[g].Cluster));
                 g++;
             }
 
@@ -49,12 +49,11 @@ internal sealed class SfntRunBuilder(FontCollection fonts, GeneratorFontResolver
         return runs;
     }
 
-    internal static double AppendGlyph(GeneratedFont font, List<byte> bytes, SfntFont face, ushort gid, int codepoint, double size)
+    internal static void AppendGlyph(GeneratedFont font, List<byte> bytes, ushort gid, int codepoint)
     {
         font.GidToUnicode.TryAdd(gid, codepoint);
         bytes.Add((byte)(gid >> 8));
         bytes.Add((byte)(gid & 0xFF));
-        return face.GetAdvanceWidth(gid) * size / face.UnitsPerEm;
     }
 
     internal static bool HasNonZero(List<double>? values)
@@ -81,12 +80,12 @@ internal struct SfntRunAccumulator(
     GeneratedFont font,
     double size,
     bool kerning,
-    bool kernAcrossSpaces,
     List<byte> bytes)
 {
     private List<double>? kernList = null;
     private ushort previousGid = 0;
     private int previousCodepoint = 0;
+    private double previousShapedAdvance = 0;
     private int glyphCount = 0;
     private int wordSpaceCount = 0;
 
@@ -102,19 +101,43 @@ internal struct SfntRunAccumulator(
 
     public void Begin() => bytes.Clear();
 
+    public void Append(in PositionedGlyph glyph, int codepoint)
+    {
+        if (glyphCount > 0)
+        {
+            AddKern(SimpleShaper.TrailingKerning(face, previousGid, previousShapedAdvance, size));
+        }
+
+        SfntRunBuilder.AppendGlyph(font, bytes, glyph.GlyphId, codepoint);
+        Advance += glyph.Advance;
+        previousGid = glyph.GlyphId;
+        previousCodepoint = codepoint;
+        previousShapedAdvance = glyph.Advance;
+        CountGlyph(codepoint);
+    }
+
     public void Append(ushort gid, int codepoint)
     {
         if (kerning && glyphCount > 0)
         {
-            var straddlesSpace = codepoint == ' ' || previousCodepoint == ' ';
-            var kern = straddlesSpace && !kernAcrossSpaces ? 0 : face.GetKerning(previousGid, gid);
-            Advance += kern * size / face.UnitsPerEm;
-            (kernList ??= []).Add(-kern * 1000.0 / face.UnitsPerEm);
+            var kern = SimpleShaper.PairKerning(
+                face, previousGid, gid, previousCodepoint, codepoint, size);
+            Advance += kern;
+            AddKern(kern);
         }
 
-        Advance += SfntRunBuilder.AppendGlyph(font, bytes, face, gid, codepoint, size);
+        SfntRunBuilder.AppendGlyph(font, bytes, gid, codepoint);
+        Advance += face.AdvanceInUserSpace(gid, size);
         previousGid = gid;
         previousCodepoint = codepoint;
+        CountGlyph(codepoint);
+    }
+
+    private void AddKern(double kern)
+        => (kernList ??= []).Add(size == 0 ? 0 : -FontMetric.Scale(kern, 1000, size));
+
+    private void CountGlyph(int codepoint)
+    {
         glyphCount++;
         if (codepoint == ' ')
         {

@@ -2,9 +2,11 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Emit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -109,6 +111,20 @@ public class WatermarkKerningTests
         var displacement = -TjAdjustments(PageText(Builder(kerning: true))) * font.Size / 1000.0;
 
         Assert.Equal(measured, unkerned + displacement, 2);
+    }
+
+    [Fact]
+    public void KernedSpaceContainingRun_MeasuredWidthEqualsDrawnAdvance()
+    {
+        const string text = "AV AV";
+        var fonts = Fonts(kerning: true);
+        var font = new Font { Name = "Liberation Sans", Size = 60 };
+        var builder = new SfntRunBuilder(fonts, new GeneratorFontResolver(PdfAConformance.None));
+
+        var drawnAdvance = builder.Build(text, font, font.Size).Sum(run => run.Advance);
+
+        Assert.Equal(fonts.MeasureText(text, font), drawnAdvance, 10);
+        Assert.Contains(builder.Build(text, font, font.Size), run => run.Kerns is not null);
     }
 
     [Fact]
