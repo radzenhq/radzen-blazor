@@ -4,6 +4,18 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
+internal static class FieldPageValidation
+{
+    public static void Validate(FormFieldDefinition definition, int pageCount)
+    {
+        if (definition.PageIndex < 0 || definition.PageIndex >= pageCount)
+        {
+            throw new InvalidOperationException(
+                $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {pageCount} pages.");
+        }
+    }
+}
+
 internal sealed class CreatedFieldWriter(Document document, FormAppearanceService appearances)
 {
     public List<(int PageIndex, ReferenceObject Reference)> Write(
@@ -14,11 +26,7 @@ internal sealed class CreatedFieldWriter(Document document, FormAppearanceServic
         var created = new List<(int, ReferenceObject)>();
         foreach (var definition in document.FormFields)
         {
-            if (definition.PageIndex < 0 || definition.PageIndex >= pageNodes.Count)
-            {
-                throw new InvalidOperationException(
-                    $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {pageNodes.Count} pages.");
-            }
+            FieldPageValidation.Validate(definition, pageNodes.Count);
 
             var context = new FormEmitContext(
                 writer,
