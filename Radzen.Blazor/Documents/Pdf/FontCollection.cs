@@ -8,6 +8,13 @@ using System.Runtime.CompilerServices;
 
 namespace Radzen.Documents.Pdf;
 
+internal enum Base14GlyphKind
+{
+    WinAnsi,
+    Fallback,
+    Missing,
+}
+
 /// <summary>
 /// Registers embeddable fonts, resolves font families to faces, and measures text.
 /// </summary>
@@ -338,42 +345,65 @@ public sealed class FontCollection
         while (i < text.Length)
         {
             var codepoint = CodePointAt(text, i);
-            if (codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out var code))
+            switch (ClassifyBase14Glyph(codepoint, out var code, out var face, out var glyph))
             {
-                if (EnableKerning && prevBase14 is { } prev)
-                {
-                    sum += FontMetric.Scale(metrics.GetRunKerning(prev, (char)codepoint), font.Size, 1000);
-                }
+                case Base14GlyphKind.WinAnsi:
+                    if (EnableKerning && prevBase14 is { } prev)
+                    {
+                        sum += FontMetric.Scale(metrics.GetRunKerning(prev, (char)codepoint), font.Size, 1000);
+                    }
 
-                sum += FontMetric.Scale(metrics.GetWidth(code), font.Size, 1000);
-                prevBase14 = (char)codepoint;
-                prevFallbackFace = null;
-            }
-            else if (TryResolveFallbackGlyph(codepoint, out var face, out var glyph))
-            {
-                if (EnableKerning && ReferenceEquals(prevFallbackFace, face))
-                {
-                    sum += SimpleShaper.PairKerning(
-                        face, prevFallbackGlyph, glyph, prevFallbackCodepoint, codepoint, font.Size);
-                }
+                    sum += FontMetric.Scale(metrics.GetWidth(code), font.Size, 1000);
+                    prevBase14 = (char)codepoint;
+                    prevFallbackFace = null;
+                    break;
+                case Base14GlyphKind.Fallback:
+                    if (EnableKerning && ReferenceEquals(prevFallbackFace, face))
+                    {
+                        sum += SimpleShaper.PairKerning(
+                            face!, prevFallbackGlyph, glyph, prevFallbackCodepoint, codepoint, font.Size);
+                    }
 
-                sum += face.AdvanceInUserSpace(glyph, font.Size);
-                prevBase14 = null;
-                prevFallbackFace = face;
-                prevFallbackGlyph = glyph;
-                prevFallbackCodepoint = codepoint;
-            }
-            else
-            {
-                sum += FontMetric.Scale(metrics.GetWidth(question), font.Size, 1000);
-                prevBase14 = null;
-                prevFallbackFace = null;
+                    sum += face!.AdvanceInUserSpace(glyph, font.Size);
+                    prevBase14 = null;
+                    prevFallbackFace = face;
+                    prevFallbackGlyph = glyph;
+                    prevFallbackCodepoint = codepoint;
+                    break;
+                default:
+                    sum += FontMetric.Scale(metrics.GetWidth(question), font.Size, 1000);
+                    prevBase14 = null;
+                    prevFallbackFace = null;
+                    break;
             }
 
             i += codepoint > 0xFFFF ? 2 : 1;
         }
 
         return sum;
+    }
+
+    internal Base14GlyphKind ClassifyBase14Glyph(
+        int codepoint, out byte winAnsiCode, out SfntFont? fallbackFace, out ushort fallbackGlyph)
+    {
+        if (codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out winAnsiCode))
+        {
+            fallbackFace = null;
+            fallbackGlyph = 0;
+            return Base14GlyphKind.WinAnsi;
+        }
+
+        if (TryResolveFallbackGlyph(codepoint, out var face, out fallbackGlyph))
+        {
+            winAnsiCode = 0;
+            fallbackFace = face;
+            return Base14GlyphKind.Fallback;
+        }
+
+        winAnsiCode = 0;
+        fallbackFace = null;
+        fallbackGlyph = 0;
+        return Base14GlyphKind.Missing;
     }
 
     internal static int CodePointAt(ReadOnlySpan<char> text, int index)

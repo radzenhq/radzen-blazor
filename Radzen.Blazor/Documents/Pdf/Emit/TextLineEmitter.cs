@@ -345,16 +345,15 @@ internal sealed class TextLineEmitter(
         var i = 0;
         while (i < text.Length)
         {
-            if (fonts.TryResolveFallbackGlyph(CodePointAt(text, i), out var face, out _) && !IsWinAnsi(CodePointAt(text, i)))
+            if (fonts.ClassifyBase14Glyph(CodePointAt(text, i), out _, out var face, out _) == Base14GlyphKind.Fallback)
             {
-                var generated = fontResolver.ResolveSfnt(face);
-                var glyphRun = new SfntRunAccumulator(face, generated, font.Size, fonts.EnableKerning, scratchBytes);
+                var generated = fontResolver.ResolveSfnt(face!);
+                var glyphRun = new SfntRunAccumulator(face!, generated, font.Size, fonts.EnableKerning, scratchBytes);
                 glyphRun.Begin();
                 while (i < text.Length)
                 {
                     var codepoint = CodePointAt(text, i);
-                    if (IsWinAnsi(codepoint)
-                        || !fonts.TryResolveFallbackGlyph(codepoint, out var candidate, out var gid)
+                    if (fonts.ClassifyBase14Glyph(codepoint, out _, out var candidate, out var gid) != Base14GlyphKind.Fallback
                         || candidate != face)
                     {
                         break;
@@ -377,11 +376,12 @@ internal sealed class TextLineEmitter(
                 while (i < text.Length)
                 {
                     var codepoint = CodePointAt(text, i);
-                    if (IsWinAnsi(codepoint))
+                    var kind = fonts.ClassifyBase14Glyph(codepoint, out _, out _, out _);
+                    if (kind == Base14GlyphKind.WinAnsi)
                     {
                         builderText.Append((char)codepoint);
                     }
-                    else if (!fonts.TryResolveFallbackGlyph(codepoint, out _, out _))
+                    else if (kind == Base14GlyphKind.Missing)
                     {
                         builderText.Append('?');
                     }

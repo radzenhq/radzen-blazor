@@ -63,4 +63,21 @@ public class Base14FallbackKerningTests
 
         Assert.Equal(fonts.MeasureText("А", font) + fonts.MeasureText("Т", font), fonts.MeasureText("АТ", font), 9);
     }
+
+    [Fact]
+    public void ClassifyBase14Glyph_IsTheSingleHomeSharedByMeasureAndEmit()
+    {
+        var fonts = new FontCollection();
+        fonts.Register(BuildTestSupport.Latin, new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
+        fonts.SetFallback(BuildTestSupport.Latin);
+
+        Assert.Equal(Base14GlyphKind.WinAnsi, fonts.ClassifyBase14Glyph('A', out var code, out _, out _));
+        Assert.Equal((byte)'A', code);
+
+        Assert.Equal(Base14GlyphKind.Fallback, fonts.ClassifyBase14Glyph('А', out _, out var face, out var glyph));
+        Assert.NotNull(face);
+        Assert.NotEqual(0, glyph);
+
+        Assert.Equal(Base14GlyphKind.Missing, fonts.ClassifyBase14Glyph(0x1F600, out _, out _, out _));
+    }
 }
