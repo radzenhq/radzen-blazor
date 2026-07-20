@@ -40,15 +40,13 @@ internal static class Type0FontEmbedder
         };
 
         // CIDSet flags exactly the glyphs in the embedded subset (PDF/A 6.2.11.4.2).
-        IReadOnlyDictionary<ushort, ushort> gidMap;
+        IReadOnlyDictionary<ushort, ushort> gidMap = compactGidMap ?? CompactGidMap.Build(font, usedGids);
         if (font.IsCff)
         {
-            gidMap = compactGidMap ?? CffSubsetter.BuildCompactGidMap(usedGids);
             EmbedCff(writer, font, usedGids, descriptor);
         }
         else
         {
-            gidMap = compactGidMap ?? GlyfSubsetter.BuildCompactGidMap(font, usedGids);
             EmbedGlyf(writer, font, gidMap, descriptor);
         }
 
