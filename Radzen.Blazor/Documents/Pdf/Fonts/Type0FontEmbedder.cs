@@ -270,7 +270,8 @@ internal static class Type0FontEmbedder
 
     private static int Scale(int value, double scale) => (int)Math.Round(value * scale, MidpointRounding.AwayFromZero);
 
-    private static short ReadInt16(byte[] data, int offset) => (short)((data[offset] << 8) | data[offset + 1]);
+    private static short ReadInt16(byte[] data, int offset)
+        => PdfBytes.ReadInt16BigEndian(data, offset, "Font data is too short to contain its bounding box.");
 
 
     private static string SubsetTag(IEnumerable<ushort> gids)

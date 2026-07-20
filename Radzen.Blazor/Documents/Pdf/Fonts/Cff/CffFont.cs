@@ -1,5 +1,4 @@
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -9,6 +8,7 @@ namespace Radzen.Documents.Pdf.Fonts.Cff;
 // CFF font parser: Adobe Technical Note 5176.
 internal sealed class CffFont
 {
+    private const string ReadPastEnd = "CFF read past the end of the font.";
     private readonly int[] charset;
     private readonly int[] fdSelect;
     private readonly FdInfo[] fdArray;
@@ -212,7 +212,7 @@ internal sealed class CffFont
             case 0:
                 while (glyph < glyphCount)
                 {
-                    charset[glyph++] = ReadCard16(data, p);
+                    charset[glyph++] = CffIndex.ReadCard16(data, p, ReadPastEnd);
                     p += 2;
                 }
 
@@ -220,7 +220,7 @@ internal sealed class CffFont
             case 1:
                 while (glyph < glyphCount)
                 {
-                    var first = ReadCard16(data, p);
+                    var first = CffIndex.ReadCard16(data, p, ReadPastEnd);
                     int left = ReadByteAt(data, p + 2);
                     p += 3;
                     for (var i = 0; i <= left && glyph < glyphCount; i++)
@@ -233,8 +233,8 @@ internal sealed class CffFont
             case 2:
                 while (glyph < glyphCount)
                 {
-                    var first = ReadCard16(data, p);
-                    var left = ReadCard16(data, p + 2);
+                    var first = CffIndex.ReadCard16(data, p, ReadPastEnd);
+                    var left = CffIndex.ReadCard16(data, p + 2, ReadPastEnd);
                     p += 4;
                     for (var i = 0; i <= left && glyph < glyphCount; i++)
                     {
@@ -270,13 +270,13 @@ internal sealed class CffFont
 
                 break;
             case 3:
-                var nRanges = ReadCard16(data, offset + 1);
+                var nRanges = CffIndex.ReadCard16(data, offset + 1, ReadPastEnd);
                 var p = offset + 3;
                 for (var r = 0; r < nRanges; r++)
                 {
-                    var first = ReadCard16(data, p);
+                    var first = CffIndex.ReadCard16(data, p, ReadPastEnd);
                     int fd = ReadByteAt(data, p + 2);
-                    var next = ReadCard16(data, p + 3);
+                    var next = CffIndex.ReadCard16(data, p + 3, ReadPastEnd);
                     for (var gid = first; gid < next && gid < glyphCount; gid++)
                     {
                         result[gid] = fd;
@@ -369,16 +369,6 @@ internal sealed class CffFont
         }
 
         return data[offset];
-    }
-
-    private static int ReadCard16(byte[] data, int offset)
-    {
-        if (offset < 0 || offset + 2 > data.Length)
-        {
-            throw new InvalidDataException("CFF read past the end of the font.");
-        }
-
-        return BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(offset));
     }
 
     private static int Bias(int subrCount) => subrCount < 1240 ? 107 : subrCount < 33900 ? 1131 : 32768;

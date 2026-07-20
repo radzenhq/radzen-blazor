@@ -168,9 +168,12 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
 
             for (var i = 0; i < count; i++)
             {
-                var field1 = ReadField(decoded, ref pos, w0);
-                var field2 = ReadField(decoded, ref pos, w1);
-                var field3 = ReadField(decoded, ref pos, w2);
+                var field1 = PdfBytes.ReadBigEndian(
+                    decoded, ref pos, w0, "Cross-reference stream is shorter than its /Index declares.");
+                var field2 = PdfBytes.ReadBigEndian(
+                    decoded, ref pos, w1, "Cross-reference stream is shorter than its /Index declares.");
+                var field3 = PdfBytes.ReadBigEndian(
+                    decoded, ref pos, w2, "Cross-reference stream is shorter than its /Index declares.");
                 var type = w0 == 0 ? 1 : (int)field1;
                 var number = start + i;
                 if (!entries.ContainsKey(number))
@@ -206,18 +209,6 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
         }
 
         return result;
-    }
-
-    private static long ReadField(byte[] data, ref int pos, int width)
-    {
-        long value = 0;
-        for (var i = 0; i < width; i++)
-        {
-            value = (value << 8) | data[pos];
-            pos++;
-        }
-
-        return value;
     }
 
     private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);

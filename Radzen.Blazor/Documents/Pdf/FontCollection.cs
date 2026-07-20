@@ -13,7 +13,6 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class FontCollection
 {
-    private const uint TtcTag = 0x74746366;
     private const int SignatureWindow = 64 * 1024;
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];
@@ -449,6 +448,5 @@ public sealed class FontCollection
     }
 
     private static bool IsCollection(byte[] data)
-        => data.Length >= 4
-            && ((uint)data[0] << 24 | (uint)data[1] << 16 | (uint)data[2] << 8 | data[3]) == TtcTag;
+        => SfntFont.IsCollection(data);
 }
