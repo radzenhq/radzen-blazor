@@ -545,6 +545,78 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("Three", ActiveDescendantText(component));
         }
+
+        [Fact]
+        public void Tabs_CanChangePreventDefault_KeepsCurrentTab_AndDoesNotRaiseChange()
+        {
+            using var ctx = new TestContext();
+
+            var changeRaised = false;
+            TabsCanChangeEventArgs canChangeArgs = null;
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.CanChange, (TabsCanChangeEventArgs args) => { canChangeArgs = args; args.PreventDefault(); })
+                .Add(p => p.Change, (int _) => changeRaised = true)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            secondTab.Click();
+
+            Assert.NotNull(canChangeArgs);
+            Assert.Equal(0, canChangeArgs.SelectedIndex);
+            Assert.Equal(1, canChangeArgs.NewIndex);
+            Assert.False(changeRaised);
+            Assert.Contains("First-Content", component.Markup);
+            Assert.DoesNotContain("Second-Content", component.Markup);
+        }
+
+        [Fact]
+        public void Tabs_CanChangeWithoutPreventDefault_ChangesTab()
+        {
+            using var ctx = new TestContext();
+
+            var changeRaised = false;
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.CanChange, (TabsCanChangeEventArgs _) => { })
+                .Add(p => p.Change, (int _) => changeRaised = true)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            secondTab.Click();
+
+            Assert.True(changeRaised);
+            Assert.Contains("Second-Content", component.Markup);
+            Assert.DoesNotContain("First-Content", component.Markup);
+        }
+
+        [Fact]
+        public void Tabs_ClientRender_CanChangePreventDefault_KeepsCurrentTab()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var changeRaised = false;
+
+            var component = ctx.RenderComponent<RadzenTabs>(parameters => parameters
+                .Add(p => p.RenderMode, TabRenderMode.Client)
+                .Add(p => p.SelectedIndex, 0)
+                .Add(p => p.CanChange, (TabsCanChangeEventArgs args) => args.PreventDefault())
+                .Add(p => p.Change, (int _) => changeRaised = true)
+                .Add(p => p.Tabs, TabsFragmentWithContent(("First", "First-Content"), ("Second", "Second-Content")))
+            );
+
+            var secondTab = component.FindAll("button[role='tab']")[1];
+            secondTab.Click();
+
+            Assert.False(changeRaised);
+            var selected = component.Find("li.rz-tabview-selected");
+            Assert.Contains("First", selected.TextContent);
+        }
     }
 }
 

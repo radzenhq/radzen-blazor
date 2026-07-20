@@ -91,6 +91,29 @@ namespace Radzen.Blazor
         public EventCallback<int> Change { get; set; }
 
         /// <summary>
+        /// Gets or sets the callback invoked before the selected tab changes in response to user interaction.
+        /// Invoke the <see cref="TabsCanChangeEventArgs.PreventDefault"/> method to cancel the tab change - for example to guard unsaved changes.
+        /// The callback can be asynchronous e.g. await a confirmation dialog before deciding.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenTabs CanChange=@OnCanChange&gt;
+        /// &lt;/RadzenTabs&gt;
+        /// @code {
+        ///  async Task OnCanChange(TabsCanChangeEventArgs args)
+        ///  {
+        ///    if (hasUnsavedChanges &amp;&amp; await DialogService.Confirm("Discard unsaved changes?") != true)
+        ///    {
+        ///        args.PreventDefault();
+        ///    }
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<TabsCanChangeEventArgs> CanChange { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the user can reorder tabs by dragging and dropping.
         /// When enabled, tab headers become draggable and can be rearranged by the user.
         /// </summary>
@@ -243,7 +266,21 @@ namespace Radzen.Blazor
 
         internal async Task SelectTab(RadzenTabsItem tab, bool raiseChange = false)
         {
-            selectedIndex = IndexOf(tab);
+            var newIndex = IndexOf(tab);
+
+            if (raiseChange && newIndex != selectedIndex)
+            {
+                var canChangeArgs = new TabsCanChangeEventArgs { SelectedIndex = selectedIndex, NewIndex = newIndex };
+
+                await CanChange.InvokeAsync(canChangeArgs);
+
+                if (canChangeArgs.IsDefaultPrevented)
+                {
+                    return;
+                }
+            }
+
+            selectedIndex = newIndex;
 
             SetFocusedIndex();
 
@@ -386,6 +423,15 @@ namespace Radzen.Blazor
             var index = IndexOf(tab);
             if (index != selectedIndex && JSRuntime != null)
             {
+                var canChangeArgs = new TabsCanChangeEventArgs { SelectedIndex = selectedIndex, NewIndex = index };
+
+                await CanChange.InvokeAsync(canChangeArgs);
+
+                if (canChangeArgs.IsDefaultPrevented)
+                {
+                    return;
+                }
+
                 selectedIndex = index;
                 previousSelectedIndex = selectedIndex;
                 SetFocusedIndex();
