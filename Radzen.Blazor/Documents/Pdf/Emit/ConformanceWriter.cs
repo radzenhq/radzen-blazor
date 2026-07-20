@@ -202,13 +202,7 @@ internal sealed class ConformanceWriter(Document document)
 
     public void WriteConformance(DocumentWriter writer, DictionaryObject catalog)
     {
-        var xmp = new XmpMetadata
-        {
-            Info = document.Info,
-            Producer = document.Info.Producer ?? "Radzen.Documents.Pdf",
-            CreationDate = document.Info.CreationDate,
-            ModificationDate = document.Info.ModificationDate,
-        };
+        var xmp = DocumentSaver.BaseXmp(document.Info);
 
         var part = 0;
         if (document.Conformance != PdfAConformance.None)
