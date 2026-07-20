@@ -116,15 +116,20 @@ internal sealed class PaginationContext
         Cursor = 0;
     }
 
-    public void PlaceTable(int index, Table table)
+    private void EnsureFits(double height)
     {
-        var layout = tableLayouts[index] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage, resolution);
-
-        if (HasPageContent && Cursor + NextBlockHeightResolver.TableFirstFragmentHeight(table, layout) > contentHeight + Eps)
+        if (HasPageContent && Cursor + height > contentHeight + Eps)
         {
             Flush();
             Cursor = 0;
         }
+    }
+
+    public void PlaceTable(int index, Table table)
+    {
+        var layout = tableLayouts[index] ??= TableLayout.Layout(table, Math.Max(0, contentWidth - table.LeftIndent.Point), fonts, measureImage, resolution);
+
+        EnsureFits(NextBlockHeightResolver.TableFirstFragmentHeight(table, layout));
 
         var tableOrder = order++;
         var fragments = TablePaginator.Paginate(layout, table, contentHeight - Cursor, contentHeight);
@@ -163,11 +168,7 @@ internal sealed class PaginationContext
         var measured = boxMeasures[index] ??= OverlayBoxPlacer.MeasureBox(container, contentWidth, fonts, measureImage, resolution);
         var boxHeight = measured.Height + (2 * padding);
 
-        if (HasPageContent && Cursor + boxHeight > contentHeight + Eps)
-        {
-            Flush();
-            Cursor = 0;
-        }
+        EnsureFits(boxHeight);
 
         var transform = RotationAboutCenter(container, indent, boxWidth, boxHeight);
 
@@ -179,11 +180,7 @@ internal sealed class PaginationContext
     {
         var (content, indent, boxWidth, boxHeight) = OverlayBoxPlacer.LayoutOverlay(container, contentWidth, fonts, measureImage, resolution);
 
-        if (HasPageContent && Cursor + boxHeight > contentHeight + Eps)
-        {
-            Flush();
-            Cursor = 0;
-        }
+        EnsureFits(boxHeight);
 
         var transform = RotationAboutCenter(container, indent, boxWidth, boxHeight);
 
@@ -204,11 +201,7 @@ internal sealed class PaginationContext
     public void PlaceImage(Image image)
     {
         var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(image, contentWidth, measureImage);
-        if (Cursor + imageHeight > contentHeight + Eps && HasPageContent)
-        {
-            Flush();
-            Cursor = 0;
-        }
+        EnsureFits(imageHeight);
 
         current.Images.Add(FlowContentPlacer.Image(image, contentWidth, Cursor, imageWidth, imageHeight));
         Cursor += imageHeight;
@@ -217,11 +210,7 @@ internal sealed class PaginationContext
     public void PlaceCode(Block block)
     {
         var (codeWidth, codeHeight) = Paginator.MeasureCode(block, fonts, resolution);
-        if (Cursor + codeHeight > contentHeight + Eps && HasPageContent)
-        {
-            Flush();
-            Cursor = 0;
-        }
+        EnsureFits(codeHeight);
 
         current.Codes.Add(FlowContentPlacer.Code(block, contentWidth, Cursor, codeWidth, codeHeight));
         Cursor += codeHeight;
