@@ -150,7 +150,9 @@ internal static class Type0FontEmbedder
         foreach (var gid in usedGids)
         {
             var cid = gidMap[gid];
-            var width = (int)Math.Round(font.GetAdvanceWidth(gid) * 1000.0 / font.UnitsPerEm, MidpointRounding.AwayFromZero);
+            var width = (int)Math.Round(
+                FontMetric.Scale(font.GetAdvanceWidth(gid), 1000, font.UnitsPerEm),
+                MidpointRounding.AwayFromZero);
             if (run is not null && cid == prev + 1)
             {
                 run.Add(new NumberObject(width));

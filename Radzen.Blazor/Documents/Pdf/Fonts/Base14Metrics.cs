@@ -60,7 +60,7 @@ internal sealed class Base14Metrics
     public double GetWidth(byte code) => widthByCode[code];
 
     public double GetKerning(char left, char right)
-        => kernByPair.TryGetValue((left << 16) | right, out var value) ? value : 0.0;
+        => kernByPair.TryGetValue(FontMetric.PairKey(left, right), out var value) ? value : 0.0;
 
     public double GetRunKerning(char left, char right)
         => left == ' ' || right == ' ' ? 0.0 : GetKerning(left, right);
@@ -76,7 +76,7 @@ internal sealed class Base14Metrics
             }
         }
 
-        return sum * size / 1000.0;
+        return FontMetric.Scale(sum, size, 1000);
     }
 
     public bool ContainsGlyph(char c) => WinAnsiEncoding.CanEncode(c);
@@ -184,7 +184,7 @@ internal sealed class Base14Metrics
             var left = int.Parse(parts[0], CultureInfo.InvariantCulture);
             var right = int.Parse(parts[1], CultureInfo.InvariantCulture);
             var value = int.Parse(parts[2], CultureInfo.InvariantCulture);
-            map[(left << 16) | right] = value;
+            map[FontMetric.PairKey(left, right)] = value;
         }
 
         return map;
