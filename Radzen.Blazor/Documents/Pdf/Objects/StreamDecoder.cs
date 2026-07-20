@@ -46,9 +46,7 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
                 throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
             }
 
-            if (result.LongLength > limits.ExpansionRatioFloorBytes
-                && inputLength > 0
-                && result.LongLength / inputLength > limits.MaxDecodeExpansionRatio)
+            if (ExceedsExpansionRatio(result.LongLength, inputLength, limits))
             {
                 throw new DocumentParseException("Decoded stream expansion ratio exceeds the maximum.", -1);
             }
@@ -56,6 +54,11 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
 
         return result;
     }
+
+    internal static bool ExceedsExpansionRatio(long decodedLength, long encodedLength, ReaderLimits limits)
+        => decodedLength > limits.ExpansionRatioFloorBytes
+            && encodedLength > 0
+            && decodedLength / encodedLength > limits.MaxDecodeExpansionRatio;
 
     private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput)
         => StreamFilterRegistry.Get(name).Decode(data, parms, maxOutput);

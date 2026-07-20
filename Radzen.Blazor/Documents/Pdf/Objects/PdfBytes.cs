@@ -10,6 +10,9 @@ namespace Radzen.Documents.Pdf.Objects;
 
 internal static class PdfBytes
 {
+    internal static bool Matches(ReadOnlySpan<byte> data, ReadOnlySpan<byte> prefix)
+        => data.StartsWith(prefix);
+
     internal static bool Matches(byte[] data, int index, string pattern)
     {
         if (index < 0 || index + pattern.Length > data.Length)

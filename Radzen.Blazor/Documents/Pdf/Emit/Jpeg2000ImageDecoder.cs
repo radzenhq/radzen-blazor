@@ -1,15 +1,18 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class Jpeg2000ImageDecoder : IImageDecoder
 {
     private static readonly byte[] Jp2Signature = [0x00, 0x00, 0x00, 0x0C, 0x6A, 0x50, 0x20, 0x20, 0x0D, 0x0A, 0x87, 0x0A];
+    private const uint Jp2HeaderTag = 0x6A703268;
+    private const uint ImageHeaderTag = 0x69686472;
+    private const uint CodestreamTag = 0x6A703263;
 
     public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
     {
@@ -24,13 +27,13 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
     }
 
     private static bool IsJpeg2000(byte[] data)
-        => StartsWith(data, Jp2Signature)
-            || (data.Length >= 4 && data[0] == 0xFF && data[1] == 0x4F && data[2] == 0xFF && data[3] == 0x51);
+        => PdfBytes.Matches(data, Jp2Signature)
+            || PdfBytes.Matches(data, [0xFF, 0x4F, 0xFF, 0x51]);
 
     // JPXDecode embeds verbatim with no /ColorSpace, so the JPX stream's own colour space applies (ISO 32000-1 7.4.9).
     private static ImageXObject DecodeJpeg2000(byte[] data, ReaderLimits limits)
     {
-        var (width, height, components) = StartsWith(data, Jp2Signature)
+        var (width, height, components) = PdfBytes.Matches(data, Jp2Signature)
             ? ReadJp2Header(data)
             : ReadCodestreamSiz(data, 2);
 
@@ -51,32 +54,22 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
     private static (int Width, int Height, int Components) ReadJp2Header(byte[] data)
     {
         long codestream = -1;
-        var pos = (long)Jp2Signature.Length;
-        while (pos + 8 <= data.Length)
+        foreach (var box in Boxes(data, Jp2Signature.Length, data.Length))
         {
-            var length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)pos));
-            var type = Encoding.ASCII.GetString(data, (int)pos + 4, 4);
-            var contentStart = pos + 8;
-            long contentEnd = length == 0 ? data.Length : pos + length;
-            if (length == 1 || contentEnd < contentStart || contentEnd > data.Length)
+            if (box.Type == Jp2HeaderTag)
             {
-                throw new InvalidDataException("JPEG2000 box length is invalid.");
-            }
-
-            if (type == "jp2h")
-            {
-                var ihdr = FindIhdr(data, contentStart, contentEnd);
-                if (ihdr is { } dims)
+                foreach (var child in Boxes(data, box.ContentStart, box.ContentEnd))
                 {
-                    return dims;
+                    if (child.Type == ImageHeaderTag)
+                    {
+                        return ReadIhdr(data, child);
+                    }
                 }
             }
-            else if (type == "jp2c" && codestream < 0)
+            else if (box.Type == CodestreamTag && codestream < 0)
             {
-                codestream = contentStart;
+                codestream = box.ContentStart;
             }
-
-            pos = contentEnd;
         }
 
         if (codestream >= 0)
@@ -87,37 +80,36 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         throw new InvalidDataException("JPEG2000 file has no ihdr or codestream.");
     }
 
-    private static (int Width, int Height, int Components)? FindIhdr(byte[] data, long start, long end)
+    private static (int Width, int Height, int Components) ReadIhdr(byte[] data, Jp2Box box)
     {
-        var pos = start;
-        while (pos + 8 <= end)
+        if (box.ContentEnd - box.ContentStart < 10)
         {
-            var length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)pos));
-            var type = Encoding.ASCII.GetString(data, (int)pos + 4, 4);
-            var contentStart = pos + 8;
-            long contentEnd = length == 0 ? end : pos + length;
+            throw new InvalidDataException("JPEG2000 ihdr box is truncated.");
+        }
+
+        var height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)box.ContentStart));
+        var width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)box.ContentStart + 4));
+        var components = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan((int)box.ContentStart + 8));
+        return (width, height, components);
+    }
+
+    private static IEnumerable<Jp2Box> Boxes(byte[] data, long start, long end)
+    {
+        var position = start;
+        while (position + 8 <= end)
+        {
+            var length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)position));
+            var type = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)position + 4));
+            var contentStart = position + 8;
+            long contentEnd = length == 0 ? end : position + length;
             if (length == 1 || contentEnd < contentStart || contentEnd > end)
             {
                 throw new InvalidDataException("JPEG2000 box length is invalid.");
             }
 
-            if (type == "ihdr")
-            {
-                if (contentEnd - contentStart < 10)
-                {
-                    throw new InvalidDataException("JPEG2000 ihdr box is truncated.");
-                }
-
-                var height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)contentStart));
-                var width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)contentStart + 4));
-                var components = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan((int)contentStart + 8));
-                return (width, height, components);
-            }
-
-            pos = contentEnd;
+            yield return new Jp2Box(type, contentStart, contentEnd);
+            position = contentEnd;
         }
-
-        return null;
     }
 
     private static (int Width, int Height, int Components) ReadCodestreamSiz(byte[] data, long sizPos)
@@ -154,21 +146,5 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG2000");
     }
 
-    private static bool StartsWith(byte[] data, byte[] prefix)
-    {
-        if (data.Length < prefix.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < prefix.Length; i++)
-        {
-            if (data[i] != prefix[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    private readonly record struct Jp2Box(uint Type, long ContentStart, long ContentEnd);
 }
