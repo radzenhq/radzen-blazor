@@ -64,7 +64,7 @@ internal static class FormFieldEmitter
                     widget["MaxLen"] = new NumberObject(maxLength);
                 }
 
-                if (context.Appearances.CanEncode(text.Value))
+                if (FieldAppearances.CanBakeSingleLine(text))
                 {
                     widget["AP"] = new DictionaryObject
                     {
@@ -103,7 +103,7 @@ internal static class FormFieldEmitter
 
                 widget["V"] = new StringObject(choice.Value);
                 widget["DA"] = new StringObject(context.Appearances.DefaultAppearanceOf(choice.Font));
-                if (context.Appearances.CanEncode(choice.Value))
+                if (FieldAppearances.CanBakeSingleLine(choice))
                 {
                     widget["AP"] = new DictionaryObject
                     {

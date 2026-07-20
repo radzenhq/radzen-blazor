@@ -35,6 +35,7 @@ internal sealed class FormFlattener(Document document)
                     return;
                 }
 
+                RequireBakeable(text);
                 page.Content.Add(FieldAppearances.Text(
                     text.Value, text.X.Point, text.Y.Point, text.Height.Point, text.Font));
                 break;
@@ -65,11 +66,22 @@ internal sealed class FormFlattener(Document document)
                     return;
                 }
 
+                RequireBakeable(choice);
                 page.Content.Add(FieldAppearances.Text(
                     choice.Value, choice.X.Point, choice.Y.Point, choice.Height.Point, choice.Font));
                 break;
             default:
                 throw new NotSupportedException($"Form field definition type '{definition.GetType().FullName}' is not supported.");
+        }
+    }
+
+    private static void RequireBakeable(FormFieldDefinition definition)
+    {
+        if (!FieldAppearances.CanBakeSingleLine(definition))
+        {
+            throw new NotSupportedException(
+                $"Cannot flatten the field '{definition.Name}': its value does not render as a single left-aligned line, "
+                + "so flattening it would paint the wrong content.");
         }
     }
 
@@ -120,7 +132,7 @@ internal sealed class FormFlattener(Document document)
     private void DrawWidget(Page page, DictionaryObject widget, DictionaryObject sourceAcroForm)
     {
         var source = Source;
-        if (source!.GetInt(widget, "F") is { } flags && (flags & 2) != 0)
+        if (source!.GetInt(widget, "F") is { } flags && (flags & (int)AnnotationFlags.Hidden) != 0)
         {
             return;
         }

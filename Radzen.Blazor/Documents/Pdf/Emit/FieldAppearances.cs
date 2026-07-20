@@ -109,6 +109,13 @@ internal static class FieldAppearances
 
     public static bool CanEncode(string value) => WinAnsiText.CanEncode(value);
 
+    public static bool CanBakeSingleLine(FormFieldDefinition definition) => definition switch
+    {
+        TextFieldDefinition text => CanEncode(text.Value) && !text.Multiline && !text.Password && !text.Comb,
+        ChoiceFieldDefinition choice => CanEncode(choice.Value),
+        _ => false,
+    };
+
     public static TextContent Text(string value, double x, double y, double height, Font font)
         => new(value, Unit.FromPoint(x + 2.0), Unit.FromPoint(y + Baseline(height, font.Size)))
         {
