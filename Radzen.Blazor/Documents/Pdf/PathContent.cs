@@ -234,7 +234,7 @@ public sealed class PathContent : ContentElement
     /// <param name="yellow">The yellow component.</param>
     /// <param name="black">The black (key) component.</param>
     public void SetFillCmyk(double cyan, double magenta, double yellow, double black)
-        => FillPaint = Cmyk(cyan, magenta, yellow, black);
+        => FillPaint = DeviceColor.Cmyk(cyan, magenta, yellow, black);
 
     /// <summary>
     /// Sets the stroke color to a DeviceCMYK color (the <c>K</c> operator). Each
@@ -245,7 +245,7 @@ public sealed class PathContent : ContentElement
     /// <param name="yellow">The yellow component.</param>
     /// <param name="black">The black (key) component.</param>
     public void SetStrokeCmyk(double cyan, double magenta, double yellow, double black)
-        => StrokePaint = Cmyk(cyan, magenta, yellow, black);
+        => StrokePaint = DeviceColor.Cmyk(cyan, magenta, yellow, black);
 
     /// <summary>
     /// Sets the fill color to a DeviceGray color (the <c>g</c> operator), from 0
@@ -253,7 +253,7 @@ public sealed class PathContent : ContentElement
     /// </summary>
     /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
     public void SetFillGray(double gray)
-        => FillPaint = new DeviceColor(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
+        => FillPaint = DeviceColor.Gray(gray);
 
     /// <summary>
     /// Sets the stroke color to a DeviceGray color (the <c>G</c> operator), from 0
@@ -261,11 +261,7 @@ public sealed class PathContent : ContentElement
     /// </summary>
     /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
     public void SetStrokeGray(double gray)
-        => StrokePaint = new DeviceColor(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
-
-    private static DeviceColor Cmyk(double c, double m, double y, double k)
-        => new(DeviceColorKind.Cmyk, null,
-            [UnitInterval.Clamp(c), UnitInterval.Clamp(m), UnitInterval.Clamp(y), UnitInterval.Clamp(k)]);
+        => StrokePaint = DeviceColor.Gray(gray);
 
     /// <summary>
     /// Sets the dash pattern (the <c>d</c> operator). The pattern is a sequence of
@@ -457,33 +453,28 @@ public sealed class PathContent : ContentElement
 
     internal PdfRect? GetBounds()
     {
-        var hasPoint = false;
-        var left = 0.0;
-        var right = 0.0;
-        var bottom = 0.0;
-        var top = 0.0;
+        var bounds = new PdfRectBounds();
         foreach (var segment in segments)
         {
             for (var i = 0; i + 1 < segment.Operands.Length; i += 2)
             {
                 var point = Transform.Transform(segment.Operands[i], segment.Operands[i + 1]);
-                if (!hasPoint)
-                {
-                    left = right = point.X;
-                    bottom = top = point.Y;
-                    hasPoint = true;
-                }
-                else
-                {
-                    left = Math.Min(left, point.X);
-                    right = Math.Max(right, point.X);
-                    bottom = Math.Min(bottom, point.Y);
-                    top = Math.Max(top, point.Y);
-                }
+                bounds.Include(point.X, point.Y);
             }
         }
 
-        return hasPoint ? new PdfRect(left, bottom, right, top) : null;
+        return bounds.ToRectOrNull();
+    }
+
+    internal static PathContent Rectangle(double x, double y, double width, double height)
+    {
+        var path = new PathContent();
+        path.MoveTo(x, y);
+        path.LineTo(x + width, y);
+        path.LineTo(x + width, y + height);
+        path.LineTo(x, y + height);
+        path.Close();
+        return path;
     }
 
     private readonly record struct Segment(string Operator, double[] Operands);
@@ -512,4 +503,12 @@ internal enum DeviceColorKind
     Gray,
 }
 
-internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands, string? PatternName = null);
+internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands, string? PatternName = null)
+{
+    public static DeviceColor Gray(double gray)
+        => new(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
+
+    public static DeviceColor Cmyk(double cyan, double magenta, double yellow, double black)
+        => new(DeviceColorKind.Cmyk, null,
+            [UnitInterval.Clamp(cyan), UnitInterval.Clamp(magenta), UnitInterval.Clamp(yellow), UnitInterval.Clamp(black)]);
+}
