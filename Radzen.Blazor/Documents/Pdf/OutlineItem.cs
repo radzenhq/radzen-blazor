@@ -77,35 +77,12 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
     /// Gets a value indicating whether this entry or any descendant has been modified since the
     /// document was loaded.
     /// </summary>
-    public bool IsModified
-    {
-        get
-        {
-            if (tracker.IsModified || children.StructureChanged)
-            {
-                return true;
-            }
-
-            foreach (var child in children)
-            {
-                if (child.IsModified)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
+    public bool IsModified => tracker.IsModified || TrackedChanges.AnyModified(children);
 
     internal void AcceptChanges()
     {
         tracker.AcceptChanges();
-        children.AcceptStructure();
-        foreach (var child in children)
-        {
-            child.AcceptChanges();
-        }
+        TrackedChanges.Accept(children);
     }
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
