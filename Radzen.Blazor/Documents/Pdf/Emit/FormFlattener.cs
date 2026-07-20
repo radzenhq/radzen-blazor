@@ -16,11 +16,7 @@ internal sealed class FormFlattener(Document document)
     {
         foreach (var definition in document.FormFields)
         {
-            if (definition.PageIndex < 0 || definition.PageIndex >= document.Pages.Count)
-            {
-                throw new InvalidOperationException(
-                    $"Form field '{definition.Name}' targets page {definition.PageIndex}; the document has {document.Pages.Count} pages.");
-            }
+            FieldPageValidation.Validate(definition, document.Pages.Count);
 
             WriteCreatedField(document.Pages[definition.PageIndex], definition);
         }
