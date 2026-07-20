@@ -39,11 +39,11 @@ internal sealed class ObjectStreamBuilder
             payload.Write(memberBody, 0, memberBody.Length);
         }
 
-        var stream = new StreamObject(FlateFilter.Encode(payload.ToArray()));
-        stream.Dictionary["Type"] = new NameObject("ObjStm");
-        stream.Dictionary["N"] = new NumberObject(members.Count);
-        stream.Dictionary["First"] = new NumberObject(first);
-        stream.Dictionary["Filter"] = new NameObject("FlateDecode");
-        return stream;
+        return FlateFilter.EncodeStream(payload.ToArray(), dictionary =>
+        {
+            dictionary["Type"] = new NameObject("ObjStm");
+            dictionary["N"] = new NumberObject(members.Count);
+            dictionary["First"] = new NumberObject(first);
+        });
     }
 }
