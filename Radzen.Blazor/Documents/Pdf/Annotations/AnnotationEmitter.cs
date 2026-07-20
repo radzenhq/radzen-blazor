@@ -87,36 +87,19 @@ internal static class AnnotationEmitter
             PageIndex = pageIndex,
             Source = source,
         };
-        var result = new ArrayObject();
-        foreach (var entry in annotations.Entries)
-        {
-            if (IsForeignPageTargetedLink(entry, context))
-            {
-                continue;
-            }
-
-            if (entry.Annotation is null
-                || (entry.Original is not null && !entry.Annotation.IsModified))
-            {
-                result.Add(Import(entry, context));
-                continue;
-            }
-
-            var dictionary = BuildDictionary(entry.Annotation, entry, context);
-            if (entry.Original is ReferenceObject original && ReferenceEquals(entry.Reader, source))
-            {
-                result.Add(writer.Override(original.ObjectNumber, dictionary));
-            }
-            else
-            {
-                result.Add(writer.Add(dictionary));
-            }
-        }
-
-        return result;
+        return BuildEntries(annotations, context, (dictionary, entry) =>
+            entry.Original is ReferenceObject original && ReferenceEquals(entry.Reader, source)
+                ? writer.Override(original.ObjectNumber, dictionary)
+                : writer.Add(dictionary));
     }
 
     private static ArrayObject Build(AnnotationCollection annotations, AnnotationEmitContext context)
+        => BuildEntries(annotations, context, (dictionary, _) => context.Writer.Add(dictionary));
+
+    private static ArrayObject BuildEntries(
+        AnnotationCollection annotations,
+        AnnotationEmitContext context,
+        Func<DictionaryObject, AnnotationCollection.Entry, DocumentObject> writeModeled)
     {
         var result = new ArrayObject();
         foreach (var entry in annotations.Entries)
@@ -126,19 +109,13 @@ internal static class AnnotationEmitter
                 continue;
             }
 
-            if (entry.Annotation is null)
+            if (entry.Annotation is null || (entry.Original is not null && !entry.Annotation.IsModified))
             {
                 result.Add(Import(entry, context));
                 continue;
             }
 
-            if (entry.Original is not null && !entry.Annotation.IsModified)
-            {
-                result.Add(Import(entry, context));
-                continue;
-            }
-
-            result.Add(context.Writer.Add(BuildDictionary(entry.Annotation, entry, context)));
+            result.Add(writeModeled(BuildDictionary(entry.Annotation, entry, context), entry));
         }
 
         return result;
@@ -164,7 +141,7 @@ internal static class AnnotationEmitter
         AnnotationCollection.Entry entry,
         AnnotationEmitContext context)
     {
-        Validate(annotation);
+        AnnotationValidator.Validate(annotation);
         var dictionary = new DictionaryObject();
         if (entry.Dictionary is { } original)
         {
@@ -251,15 +228,9 @@ internal static class AnnotationEmitter
                 dictionary["Name"] = new NameObject(text.Icon);
                 break;
             case MarkupAnnotation markup:
-                if (markup.Areas.Count == 0)
-                {
-                    throw new InvalidOperationException($"A /{annotation.Subtype} annotation requires at least one markup area.");
-                }
-
                 var quadPoints = new ArrayObject();
                 foreach (var area in markup.Areas)
                 {
-                    ValidateMarkupArea(markup, area);
                     quadPoints.Add(new NumberObject(area.Left));
                     quadPoints.Add(new NumberObject(area.Top));
                     quadPoints.Add(new NumberObject(area.Right));
@@ -277,22 +248,12 @@ internal static class AnnotationEmitter
                 dictionary["Border"] = new ArrayObject { new NumberObject(0), new NumberObject(0), new NumberObject(0) };
                 break;
             case StampAnnotation stamp:
-                if (string.IsNullOrWhiteSpace(stamp.Name))
-                {
-                    throw new InvalidOperationException("A stamp annotation requires a non-empty name.");
-                }
-
                 dictionary["Name"] = new NameObject(stamp.Name);
                 break;
             case InkAnnotation ink:
                 var inkList = new ArrayObject();
                 foreach (var stroke in ink.Strokes)
                 {
-                    if (stroke.Count < 2)
-                    {
-                        throw new InvalidOperationException("Every ink stroke requires at least two points.");
-                    }
-
                     var points = new ArrayObject();
                     foreach (var point in stroke)
                     {
@@ -301,11 +262,6 @@ internal static class AnnotationEmitter
                     }
 
                     inkList.Add(points);
-                }
-
-                if (inkList.Count == 0)
-                {
-                    throw new InvalidOperationException("An ink annotation requires at least one stroke.");
                 }
 
                 dictionary["InkList"] = inkList;
@@ -327,29 +283,13 @@ internal static class AnnotationEmitter
 
     private static void PopulateLink(LinkAnnotation link, DictionaryObject dictionary, AnnotationEmitContext context)
     {
-        var targets = (link.Uri is null ? 0 : 1)
-            + (link.Destination is null ? 0 : 1)
-            + (link.Destination is null && link.TargetPageIndex is not null ? 1 : 0);
-        if (targets != 1)
-        {
-            throw new InvalidOperationException("A link annotation requires exactly one URI, named destination or target page.");
-        }
-
         if (link.Uri is { } uri)
         {
-            dictionary["A"] = new DictionaryObject
-            {
-                ["S"] = new NameObject("URI"),
-                ["URI"] = new StringObject(uri.OriginalString),
-            };
+            dictionary["A"] = LinkAction.Uri(uri.OriginalString);
         }
         else if (link.Destination is { } destination)
         {
-            dictionary["A"] = new DictionaryObject
-            {
-                ["S"] = new NameObject("GoTo"),
-                ["D"] = link.DestinationIsName ? new NameObject(destination) : new StringObject(destination),
-            };
+            dictionary["A"] = LinkAction.GoTo(link.DestinationIsName ? new NameObject(destination) : new StringObject(destination));
         }
         else if (link.TargetPageIndex is { } pageIndex)
         {
@@ -416,10 +356,9 @@ internal static class AnnotationEmitter
             return PdfRect.FromSize(0, 0, annotation.Bounds.Width, annotation.Bounds.Height);
         }
 
-        var minX = 0.0;
-        var minY = 0.0;
-        var maxX = annotation.Bounds.Width;
-        var maxY = annotation.Bounds.Height;
+        var bounds = new PdfRectBounds();
+        bounds.Include(0, 0);
+        bounds.Include(annotation.Bounds.Width, annotation.Bounds.Height);
         foreach (var stroke in ink.Strokes)
         {
             foreach (var point in stroke)
@@ -429,22 +368,88 @@ internal static class AnnotationEmitter
                     throw new InvalidOperationException("Ink stroke points must have finite coordinates.");
                 }
 
-                var x = point.X - annotation.Bounds.Left;
-                var y = point.Y - annotation.Bounds.Bottom;
-                minX = Math.Min(minX, x);
-                minY = Math.Min(minY, y);
-                maxX = Math.Max(maxX, x);
-                maxY = Math.Max(maxY, y);
+                bounds.Include(point.X - annotation.Bounds.Left, point.Y - annotation.Bounds.Bottom);
             }
         }
 
-        return new PdfRect(minX, minY, maxX, maxY);
+        return bounds.ToRect();
+    }
+
+    private static string DefaultAppearance(FreeTextAnnotation annotation)
+        => string.Create(CultureInfo.InvariantCulture, $"/{annotation.Font.Name} {annotation.Font.Size:0.###} Tf {annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg");
+}
+
+internal static class AnnotationValidator
+{
+    public static bool IsHidden(Annotation annotation) => (annotation.Flags & AnnotationFlags.Hidden) != 0;
+
+    public static void Validate(Annotation annotation)
+    {
+        if (!annotation.Bounds.IsFiniteAndPositive)
+        {
+            throw new InvalidOperationException("Annotation bounds must be finite and have positive width and height.");
+        }
+
+        if (!double.IsFinite(annotation.Opacity) || annotation.Opacity < 0 || annotation.Opacity > 1)
+        {
+            throw new InvalidOperationException("Annotation opacity must be between 0 and 1.");
+        }
+
+        switch (annotation)
+        {
+            case MarkupAnnotation markup:
+                if (markup.Areas.Count == 0)
+                {
+                    throw new InvalidOperationException($"A /{annotation.Subtype} annotation requires at least one markup area.");
+                }
+
+                foreach (var area in markup.Areas)
+                {
+                    ValidateMarkupArea(markup, area);
+                }
+
+                break;
+            case StampAnnotation stamp:
+                if (string.IsNullOrWhiteSpace(stamp.Name))
+                {
+                    throw new InvalidOperationException("A stamp annotation requires a non-empty name.");
+                }
+
+                break;
+            case InkAnnotation ink:
+                var strokeCount = 0;
+                foreach (var stroke in ink.Strokes)
+                {
+                    if (stroke.Count < 2)
+                    {
+                        throw new InvalidOperationException("Every ink stroke requires at least two points.");
+                    }
+
+                    strokeCount++;
+                }
+
+                if (strokeCount == 0)
+                {
+                    throw new InvalidOperationException("An ink annotation requires at least one stroke.");
+                }
+
+                break;
+            case LinkAnnotation link:
+                var targets = (link.Uri is null ? 0 : 1)
+                    + (link.Destination is null ? 0 : 1)
+                    + (link.Destination is null && link.TargetPageIndex is not null ? 1 : 0);
+                if (targets != 1)
+                {
+                    throw new InvalidOperationException("A link annotation requires exactly one URI, named destination or target page.");
+                }
+
+                break;
+        }
     }
 
     private static void ValidateMarkupArea(MarkupAnnotation annotation, PdfRect area)
     {
-        if (!double.IsFinite(area.Left) || !double.IsFinite(area.Bottom) || !double.IsFinite(area.Right)
-            || !double.IsFinite(area.Top) || area.Width <= 0 || area.Height <= 0)
+        if (!area.IsFiniteAndPositive)
         {
             throw new InvalidOperationException("Markup areas must be finite and have positive width and height.");
         }
@@ -455,22 +460,4 @@ internal static class AnnotationEmitter
             throw new InvalidOperationException("Markup areas must be contained within the annotation bounds.");
         }
     }
-
-    private static void Validate(Annotation annotation)
-    {
-        var bounds = annotation.Bounds;
-        if (!double.IsFinite(bounds.Left) || !double.IsFinite(bounds.Bottom) || !double.IsFinite(bounds.Right)
-            || !double.IsFinite(bounds.Top) || bounds.Width <= 0 || bounds.Height <= 0)
-        {
-            throw new InvalidOperationException("Annotation bounds must be finite and have positive width and height.");
-        }
-
-        if (!double.IsFinite(annotation.Opacity) || annotation.Opacity < 0 || annotation.Opacity > 1)
-        {
-            throw new InvalidOperationException("Annotation opacity must be between 0 and 1.");
-        }
-    }
-
-    private static string DefaultAppearance(FreeTextAnnotation annotation)
-        => string.Create(CultureInfo.InvariantCulture, $"/{annotation.Font.Name} {annotation.Font.Size:0.###} Tf {annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg");
 }

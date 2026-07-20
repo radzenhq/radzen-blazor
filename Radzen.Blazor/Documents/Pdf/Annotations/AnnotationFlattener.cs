@@ -19,9 +19,19 @@ internal static class AnnotationFlattener
                     continue;
                 }
 
+                if (AnnotationValidator.IsHidden(annotation))
+                {
+                    continue;
+                }
+
                 if (TryFlattenLoadedAppearance(document, page, entry, annotation, owned))
                 {
                     continue;
+                }
+
+                if (entry.Original is null)
+                {
+                    AnnotationValidator.Validate(annotation);
                 }
 
                 var appearance = AnnotationAppearanceBuilder.Build(annotation);
