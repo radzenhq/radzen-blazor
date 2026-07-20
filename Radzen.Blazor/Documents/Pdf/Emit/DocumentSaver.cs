@@ -255,14 +255,7 @@ internal sealed class DocumentSaver
         }
         else if (doc.Info.Producer is not null || doc.Info.CreationDate is not null || doc.Info.ModificationDate is not null)
         {
-            var xmp = new XmpMetadata
-            {
-                Info = doc.Info,
-                Producer = doc.Info.Producer ?? "Radzen.Documents.Pdf",
-                CreationDate = doc.Info.CreationDate,
-                ModificationDate = doc.Info.ModificationDate,
-            };
-            catalog["Metadata"] = writer.Add(xmp.BuildStream());
+            catalog["Metadata"] = writer.Add(BaseXmp(doc.Info).BuildStream());
         }
 
         writer.Trailer["Root"] = catalogRef;
@@ -286,6 +279,14 @@ internal sealed class DocumentSaver
 
         writer.Close();
     }
+
+    internal static XmpMetadata BaseXmp(DocumentInfo info) => new()
+    {
+        Info = info,
+        Producer = info.Producer ?? "Radzen.Documents.Pdf",
+        CreationDate = info.CreationDate,
+        ModificationDate = info.ModificationDate,
+    };
 
     internal static DictionaryObject? BuildInfo(DocumentInfo meta, DictionaryObject? source, GraphImporter? importer = null)
     {
