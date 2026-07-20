@@ -40,8 +40,7 @@ internal static class Redactor
         var regions = areas.ToArray();
         foreach (var area in regions)
         {
-            if (!double.IsFinite(area.Left) || !double.IsFinite(area.Bottom) || !double.IsFinite(area.Right) || !double.IsFinite(area.Top)
-                || area.Width <= 0 || area.Height <= 0)
+            if (!area.IsFiniteAndPositive)
             {
                 throw new ArgumentOutOfRangeException(nameof(areas), "Redaction regions must have finite coordinates and positive dimensions.");
             }
@@ -229,19 +228,17 @@ internal static class Redactor
     }
 
     private static void WriteAdvance(ContentWriter writer, double advance, double denominator)
-    {
-        if (Math.Abs(advance) > 0.000001)
-        {
-            writer.WriteRaw(" ");
-            writer.WriteNumber(-advance / denominator * 1000.0);
-            writer.WriteRaw(" ");
-        }
-    }
+        => writer.WriteTjAdjustment(-advance, denominator);
 
     private static PdfRect UnitBounds(Matrix transform)
     {
-        var points = new[] { transform.Transform(0, 0), transform.Transform(1, 0), transform.Transform(1, 1), transform.Transform(0, 1) };
-        return new PdfRect(points.Min(static p => p.X), points.Min(static p => p.Y), points.Max(static p => p.X), points.Max(static p => p.Y));
+        var bounds = new PdfRectBounds();
+        foreach (var point in new[] { transform.Transform(0, 0), transform.Transform(1, 0), transform.Transform(1, 1), transform.Transform(0, 1) })
+        {
+            bounds.Include(point.X, point.Y);
+        }
+
+        return bounds.ToRect();
     }
 
     private static bool MayReach(PositionedTextRun run, IReadOnlyList<PdfRect> regions)

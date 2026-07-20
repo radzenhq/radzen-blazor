@@ -121,6 +121,10 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
     /// <summary>Gets the height.</summary>
     public double Height => Top - Bottom;
 
+    internal bool IsFiniteAndPositive
+        => double.IsFinite(Left) && double.IsFinite(Bottom) && double.IsFinite(Right) && double.IsFinite(Top)
+            && Width > 0 && Height > 0;
+
     /// <summary>Creates a rectangle from its lower-left corner and a size.</summary>
     public static PdfRect FromSize(double left, double bottom, double width, double height)
         => new(left, bottom, left + width, bottom + height);
@@ -190,4 +194,34 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
             Math.Min(corners[1], corners[3]),
             Math.Max(corners[0], corners[2]),
             Math.Max(corners[1], corners[3]));
+}
+
+internal struct PdfRectBounds
+{
+    private double left;
+    private double bottom;
+    private double right;
+    private double top;
+
+    public bool HasPoint { get; private set; }
+
+    public void Include(double x, double y)
+    {
+        if (!HasPoint)
+        {
+            left = right = x;
+            bottom = top = y;
+            HasPoint = true;
+            return;
+        }
+
+        left = Math.Min(left, x);
+        right = Math.Max(right, x);
+        bottom = Math.Min(bottom, y);
+        top = Math.Max(top, y);
+    }
+
+    public readonly PdfRect ToRect() => new(left, bottom, right, top);
+
+    public readonly PdfRect? ToRectOrNull() => HasPoint ? new PdfRect(left, bottom, right, top) : null;
 }
