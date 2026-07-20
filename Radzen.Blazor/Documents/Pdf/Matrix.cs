@@ -82,7 +82,7 @@ public readonly struct Matrix : IEquatable<Matrix>
         var radians = degrees * Math.PI / 180.0;
         var cos = Math.Cos(radians);
         var sin = Math.Sin(radians);
-        return new(cos, sin, -sin, cos, 0, 0);
+        return new(cos, sin, sin == 0 ? 0 : -sin, cos, 0, 0);
     }
 
     /// <summary>
