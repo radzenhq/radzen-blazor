@@ -29,9 +29,7 @@ internal sealed class ReverseFont
         var map = new Dictionary<int, string>(gidToUnicode.Count);
         foreach (var entry in gidToUnicode)
         {
-            map[entry.Key] = entry.Value is >= 0 and <= 0x10FFFF and (< 0xD800 or > 0xDFFF)
-                ? char.ConvertFromUtf32(entry.Value)
-                : "\uFFFD";
+            map[entry.Key] = UnicodeCodePoint.ToString(entry.Value);
         }
 
         return new ReverseFont(2, map);

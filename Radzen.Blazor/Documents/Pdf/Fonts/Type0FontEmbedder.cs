@@ -216,11 +216,8 @@ internal static class Type0FontEmbedder
 
     private static void WriteUtf16BeHex(Stream stream, int codepoint)
     {
-        if (codepoint is < 0 or > 0x10FFFF or (>= 0xD800 and <= 0xDFFF))
-        {
-            WriteHex4(stream, codepoint & 0xFFFF);
-        }
-        else if (codepoint <= 0xFFFF)
+        codepoint = UnicodeCodePoint.Sanitize(codepoint);
+        if (codepoint <= 0xFFFF)
         {
             WriteHex4(stream, codepoint);
         }
