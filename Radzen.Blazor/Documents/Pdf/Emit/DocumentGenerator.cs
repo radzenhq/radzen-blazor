@@ -222,13 +222,9 @@ internal sealed class DocumentGenerator
         document.HasUntaggedListContent = structureTree.HasUntaggedList;
         foreach (var font in fontResolver.AllFonts)
         {
-            if (font.Sfnt is { IsCff: false } sfnt)
+            if (font.Sfnt is { } sfnt)
             {
-                font.CompactGidMap = GlyfSubsetter.BuildCompactGidMap(sfnt, font.GidToUnicode.Keys);
-            }
-            else if (font.Sfnt is { IsCff: true })
-            {
-                font.CompactGidMap = Fonts.Cff.CffSubsetter.BuildCompactGidMap(font.GidToUnicode.Keys);
+                font.CompactGidMap = Fonts.CompactGidMap.Build(sfnt, font.GidToUnicode.Keys);
             }
         }
 
