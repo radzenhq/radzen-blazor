@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -12,22 +13,9 @@ internal sealed class NavigationWriter(Document document)
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
     {
         var sorted = new SortedDictionary<string, GeneratedAnchor>(document.Anchors, StringComparer.Ordinal);
-        var names = new ArrayObject();
-        foreach (var (name, anchor) in sorted)
-        {
-            names.Add(new StringObject(name));
-            names.Add(DestinationArray(pageNodes[anchor.PageIndex].Reference, anchor.Top));
-        }
-
-        var dests = writer.Add(new DictionaryObject { ["Names"] = names });
-        if (catalog.TryGetValue("Names", out var existing) && existing is DictionaryObject tree)
-        {
-            tree["Dests"] = dests;
-        }
-        else
-        {
-            catalog["Names"] = new DictionaryObject { ["Dests"] = dests };
-        }
+        NameTree.AddCategory(writer, catalog, "Dests",
+            sorted.Select(entry => (entry.Key,
+                (DocumentObject)DestinationArray(pageNodes[entry.Value.PageIndex].Reference, entry.Value.Top))));
     }
 
     public ReferenceObject WriteOutline(

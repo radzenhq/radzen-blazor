@@ -2,6 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -49,18 +50,8 @@ internal sealed class AttachmentWriter(Document document)
             af.Add(reference);
         }
 
-        var names = new ArrayObject();
-        foreach (var (name, reference) in filespecs)
-        {
-            names.Add(new StringObject(name));
-            names.Add(reference);
-        }
-
-        var nameTree = catalog.TryGetValue("Names", out var existing) && existing is DictionaryObject dictionary
-            ? dictionary
-            : new DictionaryObject();
-        nameTree["EmbeddedFiles"] = writer.Add(new DictionaryObject { ["Names"] = names });
-        catalog["Names"] = nameTree;
+        NameTree.AddCategory(writer, catalog, "EmbeddedFiles",
+            filespecs.Select(entry => (entry.Key, (DocumentObject)entry.Value)));
         catalog["AF"] = af;
     }
 }
