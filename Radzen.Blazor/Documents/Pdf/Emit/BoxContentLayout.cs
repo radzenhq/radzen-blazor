@@ -110,9 +110,7 @@ internal static class BoxContentLayout
 
         public override Nothing Visit(Image image, Nothing context)
         {
-            var (imageWidth, imageHeight) = measureImage is null
-                ? ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), contentWidth)
-                : measureImage(image, contentWidth);
+            var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(image, contentWidth, measureImage);
             Items.Add(new CellItem { Image = image, Width = imageWidth, Height = imageHeight });
             Height += imageHeight;
             return default;
