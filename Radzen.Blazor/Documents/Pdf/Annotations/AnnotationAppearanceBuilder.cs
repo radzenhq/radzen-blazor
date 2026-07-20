@@ -156,18 +156,10 @@ internal static class AnnotationAppearanceBuilder
         return path;
     }
 
-    private static PathContent RectanglePath(double width, double height) => RectanglePath(0, 0, width, height);
+    private static PathContent RectanglePath(double width, double height) => PathContent.Rectangle(0, 0, width, height);
 
     private static PathContent RectanglePath(double x, double y, double width, double height)
-    {
-        var path = new PathContent();
-        path.MoveTo(x, y);
-        path.LineTo(x + width, y);
-        path.LineTo(x + width, y + height);
-        path.LineTo(x, y + height);
-        path.Close();
-        return path;
-    }
+        => PathContent.Rectangle(x, y, width, height);
 
     private static PathContent Ellipse(double width, double height)
     {

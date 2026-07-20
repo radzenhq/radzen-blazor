@@ -81,12 +81,9 @@ internal static class Redactor
             var content = page.Content;
             foreach (var area in regions)
             {
-                var overlay = new PathContent { Fill = true, FillColor = fill };
-                overlay.MoveTo(area.Left, area.Bottom);
-                overlay.LineTo(area.Right, area.Bottom);
-                overlay.LineTo(area.Right, area.Top);
-                overlay.LineTo(area.Left, area.Top);
-                overlay.Close();
+                var overlay = PathContent.Rectangle(area.Left, area.Bottom, area.Width, area.Height);
+                overlay.Fill = true;
+                overlay.FillColor = fill;
                 content.Add(overlay);
             }
         }
