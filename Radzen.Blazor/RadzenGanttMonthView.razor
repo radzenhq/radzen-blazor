@@ -10,7 +10,8 @@
     public override string Icon => "calendar_view_month";
 
     [Parameter]
-    public override string Text { get; set; } = "Month";
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttMonthView_Text)); set => text = value; }
+    private string? text;
 
     public override string Title
     {

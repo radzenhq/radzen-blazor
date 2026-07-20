@@ -22,7 +22,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         [Parameter]
-        public override string Text { get; set; } = "Year";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.YearView_Text)); set => text = value; }
+        private string? text;
 
         private string? moreText;
 

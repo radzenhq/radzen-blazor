@@ -23,7 +23,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         [Parameter]
-        public override string Text { get; set; } = "Timeline";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.YearTimelineView_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Specifies the maximum appointnments to render in a slot.

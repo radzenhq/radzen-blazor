@@ -234,21 +234,24 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The single user typing format.</value>
         [Parameter]
-        public string? TypingFormat { get; set; } = "{0} is typing...";
+        public string? TypingFormat { get => typingFormat ?? Localize(nameof(RadzenStrings.Chat_TypingFormat)); set => typingFormat = value; }
+        private string? typingFormat;
 
         /// <summary>
         /// Gets or sets the two users typing format. <see cref="TypingTemplate" /> has preference over this property.
         /// </summary>
         /// <value>The two users typing format.</value>
         [Parameter]
-        public string? TwoUsersTypingFormat { get; set; } = "{0} and {1} are typing...";
+        public string? TwoUsersTypingFormat { get => twoUsersTypingFormat ?? Localize(nameof(RadzenStrings.Chat_TwoUsersTypingFormat)); set => twoUsersTypingFormat = value; }
+        private string? twoUsersTypingFormat;
 
         /// <summary>
         /// Gets or sets the multiple users typing format. <see cref="TypingTemplate" /> has preference over this property.
         /// </summary>
         /// <value>The two multiple typing format.</value>
         [Parameter]
-        public string? MultipleUsersTypingFormat { get; set; } = "{0} and {1} others are typing...";
+        public string? MultipleUsersTypingFormat { get => multipleUsersTypingFormat ?? Localize(nameof(RadzenStrings.Chat_MultipleUsersTypingFormat)); set => multipleUsersTypingFormat = value; }
+        private string? multipleUsersTypingFormat;
 
         /// <summary>
         /// Gets or sets the title displayed in the chat header. <see cref="TitleContent" /> has preference over this property.

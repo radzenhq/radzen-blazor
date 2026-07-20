@@ -10,7 +10,8 @@
     public override string Icon => "calendar_view_week";
 
     [Parameter]
-    public override string Text { get; set; } = "Week";
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttWeekView_Text)); set => text = value; }
+    private string? text;
 
     public override string Title
     {

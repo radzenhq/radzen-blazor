@@ -82,6 +82,23 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DialogService"/> class.
+        /// </summary>
+        /// <param name="uriHelper">The URI helper.</param>
+        /// <param name="jsRuntime">IJSRuntime instance.</param>
+        /// <param name="serviceProvider">The service provider used to resolve the localizer.</param>
+        public DialogService(NavigationManager? uriHelper, IJSRuntime? jsRuntime, IServiceProvider? serviceProvider) : this(uriHelper, jsRuntime)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
+        IServiceProvider? ServiceProvider { get; set; }
+
+        private Localizer? localizer;
+        internal Localizer Localizer => localizer ??= ServiceProvider?.GetService(typeof(Localizer)) as Localizer ?? Localizer.Default;
+        internal string Localize(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
+
         private void UriHelper_OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             while (dialogs.Count > 0)
@@ -558,12 +575,15 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Confirm(string? message = null, string? title = null, ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
         {
+            message ??= Localize(nameof(Blazor.RadzenStrings.Dialog_ConfirmMessage));
+            title ??= Localize(nameof(Blazor.RadzenStrings.Dialog_ConfirmTitle));
+
             // Validate and set default values for the dialog options
             options ??= new();
-            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
-            options.CancelButtonText = !String.IsNullOrEmpty(options.CancelButtonText) ? options.CancelButtonText : "Cancel";
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_OkText));
+            options.CancelButtonText = !String.IsNullOrEmpty(options.CancelButtonText) ? options.CancelButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_CancelText));
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
@@ -608,12 +628,14 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(RenderFragment message, string title = "Confirm", ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Confirm(RenderFragment message, string? title = null, ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
         {
+            title ??= Localize(nameof(Blazor.RadzenStrings.Dialog_ConfirmTitle));
+
             // Validate and set default values for the dialog options
             options ??= new();
-            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
-            options.CancelButtonText = !String.IsNullOrEmpty(options.CancelButtonText) ? options.CancelButtonText : "Cancel";
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_OkText));
+            options.CancelButtonText = !String.IsNullOrEmpty(options.CancelButtonText) ? options.CancelButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_CancelText));
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
@@ -658,11 +680,13 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions? options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Alert(string message = "", string? title = null, AlertOptions? options = null, CancellationToken? cancellationToken = null)
         {
+            title ??= Localize(nameof(Blazor.RadzenStrings.Dialog_AlertTitle));
+
             // Validate and set default values for the dialog options
             options ??= new();
-            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_OkText));
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
@@ -702,11 +726,13 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(RenderFragment message, string title = "Message", AlertOptions? options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Alert(RenderFragment message, string? title = null, AlertOptions? options = null, CancellationToken? cancellationToken = null)
         {
+            title ??= Localize(nameof(Blazor.RadzenStrings.Dialog_AlertTitle));
+
             // Validate and set default values for the dialog options
             options ??= new();
-            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : Localize(nameof(Blazor.RadzenStrings.Dialog_OkText));
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
@@ -1147,14 +1173,15 @@ namespace Radzen
             }
         }
 
-        private string resizeBarTitle = "Drag to resize";
+        private string? resizeBarTitle;
+        internal string? ResizeBarTitleValue => resizeBarTitle;
 
         /// <summary>
         /// Gets or sets the title of the resize bar.
         /// </summary>
         public string ResizeBarTitle
         {
-            get => resizeBarTitle;
+            get => resizeBarTitle ?? Localizer.Default.Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarTitle), System.Globalization.CultureInfo.CurrentUICulture);
             set
             {
                 if (value == resizeBarTitle)
@@ -1167,14 +1194,15 @@ namespace Radzen
             }
         }
 
-        private string resizeBarAriaLabel = "Resize side dialog";
+        private string? resizeBarAriaLabel;
+        internal string? ResizeBarAriaLabelValue => resizeBarAriaLabel;
 
         /// <summary>
         /// Gets or sets the aria label of the resize bar.
         /// </summary>
         public string ResizeBarAriaLabel
         {
-            get => resizeBarAriaLabel;
+            get => resizeBarAriaLabel ?? Localizer.Default.Get(nameof(Blazor.RadzenStrings.Dialog_ResizeBarAriaLabel), System.Globalization.CultureInfo.CurrentUICulture);
             set
             {
                 if (value == resizeBarAriaLabel)

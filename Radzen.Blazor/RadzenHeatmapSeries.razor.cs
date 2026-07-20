@@ -83,7 +83,8 @@ namespace Radzen.Blazor
         /// The label used for the intensity dimension in the tooltip. Defaults to <c>"Value"</c>.
         /// </summary>
         [Parameter]
-        public string IntensityLabel { get; set; } = "Value";
+        public string IntensityLabel { get => intensityLabel ?? Chart?.Localize(nameof(RadzenStrings.HeatmapSeries_IntensityLabel)) ?? "Value"; set => intensityLabel = value; }
+        private string? intensityLabel;
 
         /// <inheritdoc />
         public override string Color => Fill ?? ColorRange?.FirstOrDefault()?.Color ?? Stroke ?? string.Empty;

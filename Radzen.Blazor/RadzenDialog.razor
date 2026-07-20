@@ -42,7 +42,7 @@
         {
             <div @ref="resizeBarElement"
                  class="@GetResizeBarCssClass()"
-                 title="@sideOptions?.ResizeBarTitle" aria-label="@sideOptions?.ResizeBarAriaLabel">
+                 title="@(sideOptions?.ResizeBarTitleValue ?? Localize(nameof(RadzenStrings.Dialog_ResizeBarTitle)))" aria-label="@(sideOptions?.ResizeBarAriaLabelValue ?? Localize(nameof(RadzenStrings.Dialog_ResizeBarAriaLabel)))">
                 <span class="rz-resize" aria-hidden="true"></span>
             </div>
 
@@ -106,13 +106,19 @@
 
     [Inject] private DialogService? Service { get; set; }
 
+    [Inject] private IServiceProvider Services { get; set; } = default!;
+
+    private Localizer? localizer;
+    internal Localizer Localizer => localizer ??= Services.GetService(typeof(Localizer)) as Localizer ?? Localizer.Default;
+    string Localize(string key) => Localizer.Get(key, System.Globalization.CultureInfo.CurrentUICulture);
 
     /// <summary>
     /// Gets or sets the close side dialog aria label text.
     /// </summary>
     /// <value>The close side dialog aria label text.</value>
     [Parameter]
-    public string CloseSideDialogAriaLabel { get; set; } = "Close side dialog";
+    public string CloseSideDialogAriaLabel { get => closeSideDialogAriaLabel ?? Localize(nameof(RadzenStrings.Dialog_CloseSideDialogAriaLabel)); set => closeSideDialogAriaLabel = value; }
+    private string? closeSideDialogAriaLabel;
 
     private List<Dialog> dialogs = new List<Dialog>();
     private bool isSideDialogOpen;

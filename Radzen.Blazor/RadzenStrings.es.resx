@@ -1033,6 +1033,9 @@
   <data name="DataGrid_IsNotEmptyText" xml:space="preserve">
     <value>No está vacío</value>
   </data>
+  <data name="DataGrid_EmptyText" xml:space="preserve">
+    <value>No hay registros para mostrar.</value>
+  </data>
   <data name="DataGrid_CustomText" xml:space="preserve">
     <value>Personalizado</value>
   </data>
@@ -2239,5 +2242,149 @@
   </data>
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>Enlace a esta sección</value>
+  </data>
+  <data name="RequiredValidator_Text" xml:space="preserve">
+    <value>Obligatorio</value>
+  </data>
+  <data name="EmailValidator_Text" xml:space="preserve">
+    <value>Correo electrónico no válido</value>
+  </data>
+  <data name="LengthValidator_Text" xml:space="preserve">
+    <value>Longitud no válida</value>
+  </data>
+  <data name="NumericRangeValidator_Text" xml:space="preserve">
+    <value>Fuera del rango válido</value>
+  </data>
+  <data name="CompareValidator_Text" xml:space="preserve">
+    <value>El valor debe coincidir</value>
+  </data>
+  <data name="CustomValidator_Text" xml:space="preserve">
+    <value>El valor debe coincidir</value>
+  </data>
+  <data name="RegexValidator_Text" xml:space="preserve">
+    <value>El valor debe coincidir</value>
+  </data>
+  <data name="DayView_Text" xml:space="preserve">
+    <value>Día</value>
+  </data>
+  <data name="WeekView_Text" xml:space="preserve">
+    <value>Semana</value>
+  </data>
+  <data name="MultiDayView_Text" xml:space="preserve">
+    <value>Varios días</value>
+  </data>
+  <data name="MonthView_Text" xml:space="preserve">
+    <value>Mes</value>
+  </data>
+  <data name="YearView_Text" xml:space="preserve">
+    <value>Año</value>
+  </data>
+  <data name="YearPlannerView_Text" xml:space="preserve">
+    <value>Planificador</value>
+  </data>
+  <data name="YearTimelineView_Text" xml:space="preserve">
+    <value>Cronología</value>
+  </data>
+  <data name="AgendaView_Text" xml:space="preserve">
+    <value>Agenda</value>
+  </data>
+  <data name="GanttDayView_Text" xml:space="preserve">
+    <value>Día</value>
+  </data>
+  <data name="GanttWeekView_Text" xml:space="preserve">
+    <value>Semana</value>
+  </data>
+  <data name="GanttMonthView_Text" xml:space="preserve">
+    <value>Mes</value>
+  </data>
+  <data name="GanttYearView_Text" xml:space="preserve">
+    <value>Año</value>
+  </data>
+  <data name="Steps_NextText" xml:space="preserve">
+    <value>Siguiente</value>
+  </data>
+  <data name="Steps_PreviousText" xml:space="preserve">
+    <value>Anterior</value>
+  </data>
+  <data name="Steps_NextTitle" xml:space="preserve">
+    <value>Ir al siguiente paso.</value>
+  </data>
+  <data name="Steps_PreviousTitle" xml:space="preserve">
+    <value>Ir al paso anterior.</value>
+  </data>
+  <data name="Dialog_ConfirmMessage" xml:space="preserve">
+    <value>¿Confirmar?</value>
+  </data>
+  <data name="Dialog_ConfirmTitle" xml:space="preserve">
+    <value>Confirmar</value>
+  </data>
+  <data name="Dialog_AlertTitle" xml:space="preserve">
+    <value>Mensaje</value>
+  </data>
+  <data name="Dialog_OkText" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Dialog_CancelText" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Dialog_ResizeBarTitle" xml:space="preserve">
+    <value>Arrastrar para cambiar el tamaño</value>
+  </data>
+  <data name="Dialog_ResizeBarAriaLabel" xml:space="preserve">
+    <value>Cambiar el tamaño del diálogo lateral</value>
+  </data>
+  <data name="Dialog_CloseSideDialogAriaLabel" xml:space="preserve">
+    <value>Cerrar el diálogo lateral</value>
+  </data>
+  <data name="Chat_TypingFormat" xml:space="preserve">
+    <value>{0} está escribiendo...</value>
+  </data>
+  <data name="Chat_TwoUsersTypingFormat" xml:space="preserve">
+    <value>{0} y {1} están escribiendo...</value>
+  </data>
+  <data name="Chat_MultipleUsersTypingFormat" xml:space="preserve">
+    <value>{0} y {1} más están escribiendo...</value>
+  </data>
+  <data name="Chat_ClearChatTitle" xml:space="preserve">
+    <value>Borrar el historial del chat</value>
+  </data>
+  <data name="Chat_SendTitle" xml:space="preserve">
+    <value>Enviar mensaje</value>
+  </data>
+  <data name="AIChat_ClearChatTitle" xml:space="preserve">
+    <value>Borrar el historial del chat</value>
+  </data>
+  <data name="AIChat_SendTitle" xml:space="preserve">
+    <value>Enviar mensaje</value>
+  </data>
+  <data name="ContourSeries_IntensityLabel" xml:space="preserve">
+    <value>Valor</value>
+  </data>
+  <data name="HeatmapSeries_IntensityLabel" xml:space="preserve">
+    <value>Valor</value>
+  </data>
+  <data name="Spreadsheet_ChartText" xml:space="preserve">
+    <value>Gráfico</value>
+  </data>
+  <data name="Spreadsheet_ColumnChartText" xml:space="preserve">
+    <value>Gráfico de columnas</value>
+  </data>
+  <data name="Spreadsheet_BarChartText" xml:space="preserve">
+    <value>Gráfico de barras</value>
+  </data>
+  <data name="Spreadsheet_LineChartText" xml:space="preserve">
+    <value>Gráfico de líneas</value>
+  </data>
+  <data name="Spreadsheet_AreaChartText" xml:space="preserve">
+    <value>Gráfico de áreas</value>
+  </data>
+  <data name="Spreadsheet_PieChartText" xml:space="preserve">
+    <value>Gráfico circular</value>
+  </data>
+  <data name="Spreadsheet_DonutChartText" xml:space="preserve">
+    <value>Gráfico de anillos</value>
+  </data>
+  <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
+    <value>Gráfico de dispersión</value>
   </data>
 </root>

@@ -277,7 +277,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<StepsCanChangeEventArgs> CanChange { get; set; }
 
-        private string nextStep = "Next";
+        private string? nextStep;
         /// <summary>
         /// Gets or sets the next button text.
         /// </summary>
@@ -287,7 +287,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextText ?? nextStep;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextText ?? nextStep ?? Localize(nameof(RadzenStrings.Steps_NextText));
             }
             set
             {
@@ -300,7 +300,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private string previousText = "Previous";
+        private string? previousText;
         /// <summary>
         /// Gets or sets the previous button text.
         /// </summary>
@@ -310,7 +310,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousText ?? previousText;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousText ?? previousText ?? Localize(nameof(RadzenStrings.Steps_PreviousText));
             }
             set
             {
@@ -323,7 +323,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private string nextTitle = "Go to the next step.";
+        private string? nextTitle;
         /// <summary>
         /// Gets or sets the next button title attribute.
         /// </summary>
@@ -333,7 +333,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextTitle ?? nextTitle;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextTitle ?? nextTitle ?? Localize(nameof(RadzenStrings.Steps_NextTitle));
             }
             set
             {
@@ -345,7 +345,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private string previousTitle = "Go to the previous step.";
+        private string? previousTitle;
         /// <summary>
         /// Gets or sets the previous button title attribute.
         /// </summary>
@@ -355,7 +355,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousTitle ?? previousTitle;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousTitle ?? previousTitle ?? Localize(nameof(RadzenStrings.Steps_PreviousTitle));
             }
             set
             {

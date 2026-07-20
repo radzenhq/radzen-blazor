@@ -5,16 +5,16 @@
 
 <RadzenSplitButton ButtonAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart))) OpenAriaLabel=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart))) Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small"
     Disabled=@IsDisabled Click=@OnClick
-    Icon="bar_chart" Text="Chart"
+    Icon="bar_chart" Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ChartText)) ?? "Chart")
     title=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_InsertChart)) ?? "Insert Chart")>
     <ChildContent>
-        <RadzenSplitButtonItem Text="Column Chart" Value="column" Icon="bar_chart" />
-        <RadzenSplitButtonItem Text="Bar Chart" Value="bar" Icon="align_horizontal_left" />
-        <RadzenSplitButtonItem Text="Line Chart" Value="line" Icon="show_chart" />
-        <RadzenSplitButtonItem Text="Area Chart" Value="area" Icon="area_chart" />
-        <RadzenSplitButtonItem Text="Pie Chart" Value="pie" Icon="pie_chart" />
-        <RadzenSplitButtonItem Text="Donut Chart" Value="donut" Icon="donut_large" />
-        <RadzenSplitButtonItem Text="Scatter Chart" Value="scatter" Icon="scatter_plot" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ColumnChartText)) ?? "Column Chart") Value="column" Icon="bar_chart" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_BarChartText)) ?? "Bar Chart") Value="bar" Icon="align_horizontal_left" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_LineChartText)) ?? "Line Chart") Value="line" Icon="show_chart" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_AreaChartText)) ?? "Area Chart") Value="area" Icon="area_chart" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_PieChartText)) ?? "Pie Chart") Value="pie" Icon="pie_chart" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_DonutChartText)) ?? "Donut Chart") Value="donut" Icon="donut_large" />
+        <RadzenSplitButtonItem Text=@(Spreadsheet?.Localize(nameof(RadzenStrings.Spreadsheet_ScatterChartText)) ?? "Scatter Chart") Value="scatter" Icon="scatter_plot" />
     </ChildContent>
 </RadzenSplitButton>
 

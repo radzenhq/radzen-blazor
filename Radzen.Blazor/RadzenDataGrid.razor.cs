@@ -1649,7 +1649,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string ColumnWidth { get; set; } = string.Empty;
 
-        private string emptyText = "No records to display.";
+        private string? emptyText;
         /// <summary>
         /// Gets or sets the empty text shown when Data is empty collection.
         /// </summary>
@@ -1657,14 +1657,8 @@ namespace Radzen.Blazor
         [Parameter]
         public string EmptyText
         {
-            get { return emptyText; }
-            set
-            {
-                if (value != emptyText)
-                {
-                    emptyText = value;
-                }
-            }
+            get { return emptyText ?? Localize(nameof(RadzenStrings.DataGrid_EmptyText)); }
+            set { emptyText = value; }
         }
 
         /// <summary>

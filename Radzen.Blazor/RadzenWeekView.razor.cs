@@ -20,7 +20,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         [Parameter]
-        public override string Text { get; set; } = "Week";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.WeekView_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Gets or sets the time format.

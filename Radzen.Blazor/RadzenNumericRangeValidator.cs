@@ -37,7 +37,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The validation error message. Default is "Not in the valid range".</value>
         [Parameter]
-        public override string Text { get; set; } = "Not in the valid range";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.NumericRangeValidator_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Gets or sets the minimum allowed value (inclusive).

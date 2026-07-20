@@ -1033,6 +1033,9 @@
   <data name="DataGrid_IsNotEmptyText" xml:space="preserve">
     <value>空でない</value>
   </data>
+  <data name="DataGrid_EmptyText" xml:space="preserve">
+    <value>表示するレコードがありません。</value>
+  </data>
   <data name="DataGrid_CustomText" xml:space="preserve">
     <value>カスタム</value>
   </data>
@@ -2239,5 +2242,149 @@
   </data>
   <data name="Text_AnchorAriaLabel" xml:space="preserve">
     <value>このセクションへのリンク</value>
+  </data>
+  <data name="RequiredValidator_Text" xml:space="preserve">
+    <value>必須</value>
+  </data>
+  <data name="EmailValidator_Text" xml:space="preserve">
+    <value>無効なメールアドレス</value>
+  </data>
+  <data name="LengthValidator_Text" xml:space="preserve">
+    <value>無効な長さ</value>
+  </data>
+  <data name="NumericRangeValidator_Text" xml:space="preserve">
+    <value>有効な範囲外です</value>
+  </data>
+  <data name="CompareValidator_Text" xml:space="preserve">
+    <value>値が一致する必要があります</value>
+  </data>
+  <data name="CustomValidator_Text" xml:space="preserve">
+    <value>値が一致する必要があります</value>
+  </data>
+  <data name="RegexValidator_Text" xml:space="preserve">
+    <value>値が一致する必要があります</value>
+  </data>
+  <data name="DayView_Text" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="WeekView_Text" xml:space="preserve">
+    <value>週</value>
+  </data>
+  <data name="MultiDayView_Text" xml:space="preserve">
+    <value>複数日</value>
+  </data>
+  <data name="MonthView_Text" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="YearView_Text" xml:space="preserve">
+    <value>年</value>
+  </data>
+  <data name="YearPlannerView_Text" xml:space="preserve">
+    <value>プランナー</value>
+  </data>
+  <data name="YearTimelineView_Text" xml:space="preserve">
+    <value>タイムライン</value>
+  </data>
+  <data name="AgendaView_Text" xml:space="preserve">
+    <value>予定リスト</value>
+  </data>
+  <data name="GanttDayView_Text" xml:space="preserve">
+    <value>日</value>
+  </data>
+  <data name="GanttWeekView_Text" xml:space="preserve">
+    <value>週</value>
+  </data>
+  <data name="GanttMonthView_Text" xml:space="preserve">
+    <value>月</value>
+  </data>
+  <data name="GanttYearView_Text" xml:space="preserve">
+    <value>年</value>
+  </data>
+  <data name="Steps_NextText" xml:space="preserve">
+    <value>次へ</value>
+  </data>
+  <data name="Steps_PreviousText" xml:space="preserve">
+    <value>前へ</value>
+  </data>
+  <data name="Steps_NextTitle" xml:space="preserve">
+    <value>次のステップに進みます。</value>
+  </data>
+  <data name="Steps_PreviousTitle" xml:space="preserve">
+    <value>前のステップに戻ります。</value>
+  </data>
+  <data name="Dialog_ConfirmMessage" xml:space="preserve">
+    <value>確認しますか？</value>
+  </data>
+  <data name="Dialog_ConfirmTitle" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="Dialog_AlertTitle" xml:space="preserve">
+    <value>メッセージ</value>
+  </data>
+  <data name="Dialog_OkText" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Dialog_CancelText" xml:space="preserve">
+    <value>キャンセル</value>
+  </data>
+  <data name="Dialog_ResizeBarTitle" xml:space="preserve">
+    <value>ドラッグしてサイズを変更</value>
+  </data>
+  <data name="Dialog_ResizeBarAriaLabel" xml:space="preserve">
+    <value>サイドダイアログのサイズを変更</value>
+  </data>
+  <data name="Dialog_CloseSideDialogAriaLabel" xml:space="preserve">
+    <value>サイドダイアログを閉じる</value>
+  </data>
+  <data name="Chat_TypingFormat" xml:space="preserve">
+    <value>{0}が入力中...</value>
+  </data>
+  <data name="Chat_TwoUsersTypingFormat" xml:space="preserve">
+    <value>{0}と{1}が入力中...</value>
+  </data>
+  <data name="Chat_MultipleUsersTypingFormat" xml:space="preserve">
+    <value>{0}と他{1}人が入力中...</value>
+  </data>
+  <data name="Chat_ClearChatTitle" xml:space="preserve">
+    <value>チャット履歴をクリア</value>
+  </data>
+  <data name="Chat_SendTitle" xml:space="preserve">
+    <value>メッセージを送信</value>
+  </data>
+  <data name="AIChat_ClearChatTitle" xml:space="preserve">
+    <value>チャット履歴をクリア</value>
+  </data>
+  <data name="AIChat_SendTitle" xml:space="preserve">
+    <value>メッセージを送信</value>
+  </data>
+  <data name="ContourSeries_IntensityLabel" xml:space="preserve">
+    <value>値</value>
+  </data>
+  <data name="HeatmapSeries_IntensityLabel" xml:space="preserve">
+    <value>値</value>
+  </data>
+  <data name="Spreadsheet_ChartText" xml:space="preserve">
+    <value>グラフ</value>
+  </data>
+  <data name="Spreadsheet_ColumnChartText" xml:space="preserve">
+    <value>縦棒グラフ</value>
+  </data>
+  <data name="Spreadsheet_BarChartText" xml:space="preserve">
+    <value>横棒グラフ</value>
+  </data>
+  <data name="Spreadsheet_LineChartText" xml:space="preserve">
+    <value>折れ線グラフ</value>
+  </data>
+  <data name="Spreadsheet_AreaChartText" xml:space="preserve">
+    <value>面グラフ</value>
+  </data>
+  <data name="Spreadsheet_PieChartText" xml:space="preserve">
+    <value>円グラフ</value>
+  </data>
+  <data name="Spreadsheet_DonutChartText" xml:space="preserve">
+    <value>ドーナツグラフ</value>
+  </data>
+  <data name="Spreadsheet_ScatterChartText" xml:space="preserve">
+    <value>散布図</value>
   </data>
 </root>

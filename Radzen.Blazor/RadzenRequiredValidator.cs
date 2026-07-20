@@ -42,7 +42,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The validation error message. Default is "Required".</value>
         [Parameter]
-        public override string Text { get; set; } = "Required";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.RequiredValidator_Text)); set => text = value; }
+        private string? text;
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)

@@ -43,7 +43,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The validation error message. Default is "Invalid email".</value>
         [Parameter]
-        public override string Text { get; set; } = "Invalid email";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.EmailValidator_Text)); set => text = value; }
+        private string? text;
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)

@@ -21,7 +21,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         [Parameter]
-        public override string Text { get; set; } = "Agenda";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.AgendaView_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Gets or sets the time format.

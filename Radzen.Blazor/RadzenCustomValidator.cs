@@ -43,7 +43,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The validation error message. Default is "Value should match".</value>
         [Parameter]
-        public override string Text { get; set; } = "Value should match";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.CustomValidator_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Gets or sets the validation function that determines whether the component value is valid.

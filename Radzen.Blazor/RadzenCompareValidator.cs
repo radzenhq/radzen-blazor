@@ -69,7 +69,8 @@ namespace Radzen.Blazor
         /// Gets or sets the message displayed when the component is invalid. Set to <c>"Value should match"</c> by default.
         /// </summary>
         [Parameter]
-        public override string Text { get; set; } = "Value should match";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.CompareValidator_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Specifies the value to compare with.

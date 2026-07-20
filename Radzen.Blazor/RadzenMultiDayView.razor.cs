@@ -20,7 +20,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         [Parameter]
-        public override string Text { get; set; } = "Multi-Day";
+        public override string Text { get => text ?? Localize(nameof(RadzenStrings.MultiDayView_Text)); set => text = value; }
+        private string? text;
 
         /// <summary>
         /// Gets or sets the time format.

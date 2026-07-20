@@ -10,7 +10,8 @@
     public override string Icon => "calendar_today";
 
     [Parameter]
-    public override string Text { get; set; } = "Year";
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttYearView_Text)); set => text = value; }
+    private string? text;
 
     public override string Title
     {

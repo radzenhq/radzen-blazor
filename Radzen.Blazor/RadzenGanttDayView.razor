@@ -10,7 +10,8 @@
     public override string Icon => "calendar_view_day";
 
     [Parameter]
-    public override string Text { get; set; } = "Day";
+    public override string Text { get => text ?? Localize(nameof(RadzenStrings.GanttDayView_Text)); set => text = value; }
+    private string? text;
 
     public override string Title
     {
