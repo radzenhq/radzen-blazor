@@ -170,7 +170,8 @@ internal sealed class SfntFont
     public static SfntFont Parse(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
-        if (ReadTagValue(data) == TtcTag)
+        RequireHeader(data);
+        if (IsCollection(data))
         {
             throw new InvalidDataException("Font is a TrueType collection; use ParseCollection or Parse(byte[], familyName).");
         }
@@ -198,8 +199,9 @@ internal sealed class SfntFont
     public static IReadOnlyList<SfntFont> ParseCollection(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
+        RequireHeader(data);
 
-        if (ReadTagValue(data) == TtcTag)
+        if (IsCollection(data))
         {
             var reader = new SfntReader(data, 4);
             reader.ReadUInt16();
@@ -230,14 +232,15 @@ internal sealed class SfntFont
         return [new SfntFont(data, 0)];
     }
 
-    private static uint ReadTagValue(byte[] data)
+    internal static bool IsCollection(ReadOnlySpan<byte> data)
+        => SfntReader.TryReadTagValue(data, out var tag) && tag == TtcTag;
+
+    private static void RequireHeader(ReadOnlySpan<byte> data)
     {
-        if (data.Length < 4)
+        if (!SfntReader.TryReadTagValue(data, out _))
         {
             throw new InvalidDataException("Font data is too short to contain a valid header.");
         }
-
-        return ((uint)data[0] << 24) | ((uint)data[1] << 16) | ((uint)data[2] << 8) | data[3];
     }
 
     private ushort ReadHead()

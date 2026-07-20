@@ -1,6 +1,6 @@
 using System;
-using System.Buffers.Binary;
 using System.IO;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -11,6 +11,18 @@ internal struct SfntReader(byte[] data, int position = 0)
     public int Position { get; set; } = position;
 
     public readonly int Length => data.Length;
+
+    public static bool TryReadTagValue(ReadOnlySpan<byte> data, out uint value)
+    {
+        if (data.Length < 4)
+        {
+            value = 0;
+            return false;
+        }
+
+        value = PdfBytes.ReadUInt32BigEndian(data, 0, "Font data is too short to contain a valid header.");
+        return true;
+    }
 
     private readonly void Require(int count)
     {
@@ -28,8 +40,8 @@ internal struct SfntReader(byte[] data, int position = 0)
 
     public ushort ReadUInt16()
     {
-        Require(2);
-        var value = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(Position));
+        var value = PdfBytes.ReadUInt16BigEndian(
+            data, Position, "Attempt to read past the end of the sfnt data.");
         Position += 2;
         return value;
     }
@@ -38,8 +50,8 @@ internal struct SfntReader(byte[] data, int position = 0)
 
     public uint ReadUInt32()
     {
-        Require(4);
-        var value = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(Position));
+        var value = PdfBytes.ReadUInt32BigEndian(
+            data, Position, "Attempt to read past the end of the sfnt data.");
         Position += 4;
         return value;
     }

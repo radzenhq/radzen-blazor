@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;
 
@@ -63,12 +64,7 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
     }
 
     private static void WriteOffsetValue(byte[] dst, ref int pos, int value, int size)
-    {
-        for (var i = size - 1; i >= 0; i--)
-        {
-            dst[pos++] = (byte)(value >> (8 * i));
-        }
-    }
+        => PdfBytes.WriteBigEndian(dst, ref pos, value, size);
 
     public static CffIndex Read(byte[] data, int offset)
     {
@@ -114,11 +110,9 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
         return new CffIndex(data, offsets, offsets[count]);
     }
 
-    private static int ReadCard16(byte[] data, int offset)
-    {
-        Require(data, offset, 2);
-        return (data[offset] << 8) | data[offset + 1];
-    }
+    internal static int ReadCard16(
+        byte[] data, int offset, string errorMessage = "Attempt to read past the end of the CFF data.")
+        => PdfBytes.ReadUInt16BigEndian(data, offset, errorMessage);
 
     private static byte ReadByte(byte[] data, int offset)
     {
@@ -128,14 +122,9 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
 
     private static long ReadOffset(byte[] data, int offset, int size)
     {
-        Require(data, offset, size);
-        var value = 0L;
-        for (var i = 0; i < size; i++)
-        {
-            value = (value << 8) | data[offset + i];
-        }
-
-        return value;
+        var position = offset;
+        return PdfBytes.ReadBigEndian(
+            data, ref position, size, "Attempt to read past the end of the CFF data.");
     }
 
     private static void Require(byte[] data, int offset, int count)

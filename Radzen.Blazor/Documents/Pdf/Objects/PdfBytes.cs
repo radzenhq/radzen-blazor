@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -77,23 +78,61 @@ internal static class PdfBytes
         return width;
     }
 
+    internal static ushort ReadUInt16BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
+    {
+        Require(data, offset, 2, errorMessage);
+        return BinaryPrimitives.ReadUInt16BigEndian(data[offset..]);
+    }
+
+    internal static short ReadInt16BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
+        => unchecked((short)ReadUInt16BigEndian(data, offset, errorMessage));
+
+    internal static uint ReadUInt32BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
+    {
+        Require(data, offset, 4, errorMessage);
+        return BinaryPrimitives.ReadUInt32BigEndian(data[offset..]);
+    }
+
+    internal static long ReadBigEndian(ReadOnlySpan<byte> data, ref int position, int width, string errorMessage)
+    {
+        Require(data, position, width, errorMessage);
+        long value = 0;
+        for (var i = 0; i < width; i++)
+        {
+            value = (value << 8) | data[position++];
+        }
+
+        return value;
+    }
+
     internal static void WriteBigEndian(Stream stream, long value, int width)
     {
-        for (var i = width - 1; i >= 0; i--)
-        {
-            stream.WriteByte((byte)(value >> (8 * i)));
-        }
+        Span<byte> bytes = stackalloc byte[8];
+        WriteBigEndian(bytes[..width], value);
+        stream.Write(bytes[..width]);
     }
 
     internal static void WriteBigEndian(byte[] data, ref int pos, long value, int width)
     {
-        for (var i = width - 1; i >= 0; i--)
+        WriteBigEndian(data.AsSpan(pos, width), value);
+        pos += width;
+    }
+
+    private static void WriteBigEndian(Span<byte> destination, long value)
+    {
+        for (var i = destination.Length - 1; i >= 0; i--)
         {
-            data[pos + i] = (byte)value;
+            destination[i] = (byte)value;
             value >>= 8;
         }
+    }
 
-        pos += width;
+    private static void Require(ReadOnlySpan<byte> data, int offset, int count, string errorMessage)
+    {
+        if (offset < 0 || count < 0 || offset > data.Length - count)
+        {
+            throw new InvalidDataException(errorMessage);
+        }
     }
 
     internal static void WriteXrefEntry(Stream stream, long offset, int generation = 0)
