@@ -66,7 +66,7 @@ internal static class KernTable
             var left = reader.ReadUInt16At(p);
             var right = reader.ReadUInt16At(p + 2);
             var value = reader.ReadInt16At(p + 4);
-            map[(left << 16) | right] = value;
+            map[FontMetric.PairKey(left, right)] = value;
             p += 6;
         }
     }

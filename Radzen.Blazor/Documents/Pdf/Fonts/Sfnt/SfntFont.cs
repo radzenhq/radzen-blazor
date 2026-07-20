@@ -113,6 +113,12 @@ internal sealed class SfntFont
 
     public ushort GetAdvanceWidth(ushort glyphId) => metrics.GetAdvanceWidth(glyphId);
 
+    public double AdvanceInUserSpace(ushort glyphId, double size)
+        => FontMetric.Scale(GetAdvanceWidth(glyphId), size, UnitsPerEm);
+
+    public double KerningInUserSpace(ushort left, ushort right, double size)
+        => FontMetric.Scale(GetKerning(left, right), size, UnitsPerEm);
+
     private Dictionary<int, int>? kerning;
 
     public int GetKerning(ushort left, ushort right)
@@ -120,7 +126,7 @@ internal sealed class SfntFont
         kerning ??= directory.Contains("kern") && TryGetTable("kern", out var table)
             ? KernTable.Parse(table)
             : [];
-        return kerning.TryGetValue((left << 16) | right, out var value) ? value : 0;
+        return kerning.TryGetValue(FontMetric.PairKey(left, right), out var value) ? value : 0;
     }
 
     public bool TryGetTable(string tag, out byte[] data)
