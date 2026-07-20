@@ -606,19 +606,9 @@ internal static class ContentInterpreter
             Math.Min(existing.Top, bounds.Top));
     }
 
-    private static Color Rgb(List<Token> operands)
-    {
-        var n = Numbers(operands, 3);
-        return Color.FromRgb(Channel(n[0]), Channel(n[1]), Channel(n[2]));
-    }
+    private static Color Rgb(List<Token> operands) => DeviceColorConverter.FromComponents(Numbers(operands, 3));
 
-    private static Color Gray(List<Token> operands)
-    {
-        var v = Channel(Number(operands, 0));
-        return Color.FromRgb(v, v, v);
-    }
-
-    private static byte Channel(double value) => ColorComponent.ToChannel(value);
+    private static Color Gray(List<Token> operands) => DeviceColorConverter.FromComponents([Number(operands, 0)]);
 
     private readonly record struct PathOp(string Operator, double[] Operands);
 
