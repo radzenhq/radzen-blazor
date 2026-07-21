@@ -230,7 +230,7 @@ internal static class PageResourceBuilder
     }
 
     public static DictionaryObject? BuildResources(
-        IObjectWriter writer,
+        IObjectWriter? writer,
         ContentResourceManifest manifest,
         Dictionary<ImageXObject, ReferenceObject>? sharedImages = null)
     {
@@ -243,12 +243,12 @@ internal static class PageResourceBuilder
 
         foreach (var (key, image) in manifest.Images)
         {
-            resources.Add("XObject", key, ResolveManifestImage(writer, image, sharedImages));
+            resources.Add("XObject", key, ResolveManifestImage(writer!, image, sharedImages));
         }
 
         foreach (var (key, pattern) in manifest.Patterns)
         {
-            resources.Add("Pattern", key, writer.Add(pattern));
+            resources.Add("Pattern", key, writer!.Add(pattern));
         }
 
         foreach (var (key, opacity) in manifest.ExtGStates)
