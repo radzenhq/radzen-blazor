@@ -210,7 +210,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         foreach (var image in images)
         {
             contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
-            var xobject = imageStore.Decode(image.Source);
+            var xobject = imageStore.DecodeApplied(image.Source);
             var alpha = image.Source.Opacity * opacity;
             plan.Images.Add(new ImageDraw
             {
@@ -221,6 +221,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Image = xobject,
                 Element = structureTree.ElementOf(image.Source) ?? element,
                 ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
+                StencilColor = image.Source.Stencil ? image.Source.StencilColor : null,
             });
             plan.UsedImages.Add(xobject);
         }
