@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Radzen.Documents.Pdf.Content;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
@@ -8,6 +9,9 @@ internal readonly record struct DefaultAppearance(string? Font, double Size, Col
 
 internal static class DefaultAppearanceGrammar
 {
+    internal static string Write(string fontName, double size, string colorOperator)
+        => string.Create(CultureInfo.InvariantCulture, $"/{fontName} {size:0.###} Tf {colorOperator}");
+
     internal static DefaultAppearance Parse(string? value)
     {
         if (value is null)
