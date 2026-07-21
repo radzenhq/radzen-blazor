@@ -101,9 +101,7 @@ public sealed class Page
 
     private static void ValidateBox(PdfRect value, string parameterName)
     {
-        if (!double.IsFinite(value.Left) || !double.IsFinite(value.Bottom)
-            || !double.IsFinite(value.Right) || !double.IsFinite(value.Top)
-            || value.Width <= 0 || value.Height <= 0)
+        if (!value.IsFiniteAndPositive)
         {
             throw new ArgumentOutOfRangeException(parameterName, value, "Page boxes must have finite coordinates and positive dimensions.");
         }
