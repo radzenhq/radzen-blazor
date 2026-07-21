@@ -48,6 +48,26 @@ internal sealed class Lexer(byte[] data, int position)
             or (byte)'[' or (byte)']' or (byte)'{' or (byte)'}'
             or (byte)'/' or (byte)'%';
 
+    public static int SkipWhitespace(byte[] data, int index)
+    {
+        while (index < data.Length && IsWhitespace(data[index]))
+        {
+            index++;
+        }
+
+        return index;
+    }
+
+    public static int SkipRegular(byte[] data, int index)
+    {
+        while (index < data.Length && !IsWhitespace(data[index]) && !IsDelimiter(data[index]))
+        {
+            index++;
+        }
+
+        return index;
+    }
+
     // ISO 32000-1 7.3: numbers, strings and hex strings share one grammar; recovery only changes handling of malformed input.
     public enum Recovery
     {
@@ -141,10 +161,7 @@ internal sealed class Lexer(byte[] data, int position)
     public static Token? ReadNumber(byte[] data, ref int position, Recovery recovery)
     {
         var start = position;
-        while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-        {
-            position++;
-        }
+        position = SkipRegular(data, position);
 
         var length = position - start;
         var hasDot = false;
@@ -448,10 +465,7 @@ internal sealed class Lexer(byte[] data, int position)
     private Token ReadKeyword()
     {
         var start = position;
-        while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-        {
-            position++;
-        }
+        position = SkipRegular(data, position);
 
         if (position == start)
         {

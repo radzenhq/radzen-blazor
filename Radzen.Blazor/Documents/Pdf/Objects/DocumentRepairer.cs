@@ -394,15 +394,7 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
         return endstreamOffsets;
     }
 
-    private int SkipSpaces(int index)
-    {
-        while (index < data.Length && Lexer.IsWhitespace(data[index]))
-        {
-            index++;
-        }
-
-        return index;
-    }
+    private int SkipSpaces(int index) => Lexer.SkipWhitespace(data, index);
 
     private static bool IsDigit(byte b) => b >= (byte)'0' && b <= (byte)'9';
 
