@@ -61,11 +61,7 @@ internal static class ContentTokenizer
             switch (b)
             {
                 case (byte)'%':
-                    while (position < data.Length && data[position] != '\n' && data[position] != '\r')
-                    {
-                        position++;
-                    }
-
+                    position = Lexer.SkipComment(data, position);
                     continue;
 
                 case (byte)'[':
@@ -326,26 +322,7 @@ internal static class ContentTokenizer
     }
 
     private static void SkipTokenWhitespace(byte[] data, ref int position)
-    {
-        while (position < data.Length)
-        {
-            if (IsWhitespace(data[position]))
-            {
-                position++;
-            }
-            else if (data[position] == (byte)'%')
-            {
-                while (position < data.Length && data[position] != (byte)'\n' && data[position] != (byte)'\r')
-                {
-                    position++;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
+        => position = Lexer.SkipWhitespaceAndComments(data, position);
 
     private static string? ReadInlineToken(byte[] data, ref int position, out string? raw)
     {
