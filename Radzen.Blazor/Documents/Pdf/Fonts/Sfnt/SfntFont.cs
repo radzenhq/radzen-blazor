@@ -184,16 +184,28 @@ internal sealed class SfntFont
         ArgumentNullException.ThrowIfNull(data);
         ArgumentNullException.ThrowIfNull(familyName);
 
-        var faces = ParseCollection(data);
+        return SelectFace(ParseCollection(data), familyName, bold: false, italic: false);
+    }
+
+    public static SfntFont SelectFace(IReadOnlyList<SfntFont> faces, string family, bool bold, bool italic)
+    {
+        SfntFont? named = null;
         foreach (var face in faces)
         {
-            if (string.Equals(face.FamilyName, familyName, StringComparison.Ordinal))
+            if (!string.Equals(face.FamilyName, family, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (face.Bold == bold && face.Italic == italic)
             {
                 return face;
             }
+
+            named ??= face;
         }
 
-        throw new InvalidDataException($"No font face with family name '{familyName}' was found.");
+        return named ?? throw new InvalidDataException($"No font face with family name '{family}' was found.");
     }
 
     public static IReadOnlyList<SfntFont> ParseCollection(byte[] data)
