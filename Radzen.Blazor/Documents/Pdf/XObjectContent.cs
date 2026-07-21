@@ -23,11 +23,24 @@ public sealed class XObjectContent : ContentElement
     /// <summary>Gets the XObject resource name, without the leading slash.</summary>
     public string Name { get; }
 
-    internal override ContentElement DeepClone() => CopyStateTo(new XObjectContent(Name));
+    internal double? Opacity { get; init; }
+
+    internal override ContentElement DeepClone() => CopyStateTo(new XObjectContent(Name) { Opacity = Opacity });
 
     /// <inheritdoc/>
     protected override void EmitBody(ContentWriter writer)
     {
+        if (Opacity is { } opacity)
+        {
+            writer.WriteRaw("q\n");
+            writer.WriteName(writer.RegisterOpacity(opacity));
+            writer.WriteRaw(" gs\n");
+            writer.WriteName(Name);
+            writer.WriteRaw(" Do\n");
+            writer.WriteRaw("Q\n");
+            return;
+        }
+
         writer.WriteName(Name);
         writer.WriteRaw(" Do\n");
     }
