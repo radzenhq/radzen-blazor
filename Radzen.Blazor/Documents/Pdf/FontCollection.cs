@@ -93,7 +93,7 @@ public sealed class FontCollection
 
         var parsed = ParseSource(font);
         var face = parsed.IsCollection
-            ? SelectCollectionFace(parsed.Faces, family, bold, italic)
+            ? SfntFont.SelectFace(parsed.Faces, family, bold, italic)
             : parsed.Faces[0];
 
         // ISO 32000-1 9.9 / OS/2 fsType: a Restricted License Embedding font must not be embedded without a license.
@@ -259,27 +259,6 @@ public sealed class FontCollection
 
     private static ParsedSource ParseCopy(byte[] bytes)
         => new(bytes, IsCollection(bytes), SfntFont.ParseCollection(bytes));
-
-    private static SfntFont SelectCollectionFace(IReadOnlyList<SfntFont> faces, string family, bool bold, bool italic)
-    {
-        SfntFont? named = null;
-        foreach (var face in faces)
-        {
-            if (!string.Equals(face.FamilyName, family, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (face.Bold == bold && face.Italic == italic)
-            {
-                return face;
-            }
-
-            named ??= face;
-        }
-
-        return named ?? throw new InvalidDataException($"No font face with family name '{family}' was found.");
-    }
 
     /// <summary>
     /// Declares an ordered fallback chain of registered families. When the primary font lacks a
