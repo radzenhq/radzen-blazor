@@ -371,8 +371,13 @@ public sealed class FontCollection
                     prevFallbackCodepoint = codepoint;
                     break;
                 default:
+                    if (EnableKerning && prevBase14 is { } prevChar)
+                    {
+                        sum += FontMetric.Scale(metrics.GetRunKerning(prevChar, '?'), font.Size, 1000);
+                    }
+
                     sum += FontMetric.Scale(metrics.GetWidth(question), font.Size, 1000);
-                    prevBase14 = null;
+                    prevBase14 = '?';
                     prevFallbackFace = null;
                     break;
             }
