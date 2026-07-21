@@ -63,6 +63,22 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
     private static byte[] ApplyFilter(string name, byte[] data, DictionaryObject? parms, long maxOutput)
         => StreamFilterRegistry.Get(name).Decode(data, parms, maxOutput);
 
+    private DictionaryObject? ResolveMembers(DictionaryObject? parms)
+    {
+        if (parms is null)
+        {
+            return null;
+        }
+
+        var resolved = new DictionaryObject();
+        foreach (var key in parms.Keys)
+        {
+            resolved[key] = resolve(parms[key]);
+        }
+
+        return resolved;
+    }
+
     private List<string> FilterNames(DocumentObject? filter)
     {
         var names = new List<string>();
@@ -110,12 +126,12 @@ internal sealed class StreamDecoder(ReaderLimits limits, Func<DocumentObject, Do
         {
             for (var i = 0; i < count; i++)
             {
-                parms.Add(i < array.Count ? resolve(array[i]) as DictionaryObject : null);
+                parms.Add(i < array.Count ? ResolveMembers(resolve(array[i]) as DictionaryObject) : null);
             }
         }
         else
         {
-            parms.Add(source as DictionaryObject);
+            parms.Add(ResolveMembers(source as DictionaryObject));
             for (var i = 1; i < count; i++)
             {
                 parms.Add(null);
