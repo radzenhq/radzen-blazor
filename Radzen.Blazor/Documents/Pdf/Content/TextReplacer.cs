@@ -117,11 +117,7 @@ internal static class TextReplacer
             using var writer = new ContentWriter();
             if (options.Layout == TextReplacementLayout.PreserveAdvance && Math.Abs(newAdvance - oldAdvance) > 0.000001)
             {
-                var denominator = show.FontSize * show.Scale;
-                if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
-                {
-                    throw new NotSupportedException("Replacing text with a zero or non-finite font scale cannot preserve positioning safely.");
-                }
+                var denominator = ContentWriter.RequireTjScale(show.FontSize, show.Scale, "Replacing");
 
                 writer.WriteRaw("[");
                 writer.WriteString(encoded);
@@ -311,11 +307,7 @@ internal static class TextReplacer
             return new ContentEdit(show.Text.Start, show.Text.End, writer.ToArray());
         }
 
-        var denominator = show.FontSize * show.Scale;
-        if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
-        {
-            throw new NotSupportedException("Replacing text with a zero or non-finite font scale cannot preserve positioning safely.");
-        }
+        var denominator = ContentWriter.RequireTjScale(show.FontSize, show.Scale, "Replacing");
 
         writer.WriteRaw("[");
         var offset = 0;
