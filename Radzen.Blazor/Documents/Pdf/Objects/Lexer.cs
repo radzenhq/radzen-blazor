@@ -68,6 +68,39 @@ internal sealed class Lexer(byte[] data, int position)
         return index;
     }
 
+    // ISO 32000-1 7.2.4: a comment runs from '%' to the next end-of-line marker (CR or LF).
+    public static int SkipComment(byte[] data, int index)
+    {
+        while (index < data.Length && data[index] != 10 && data[index] != 13)
+        {
+            index++;
+        }
+
+        return index;
+    }
+
+    public static int SkipWhitespaceAndComments(byte[] data, int index)
+    {
+        while (index < data.Length)
+        {
+            var b = data[index];
+            if (IsWhitespace(b))
+            {
+                index++;
+            }
+            else if (b == (byte)'%')
+            {
+                index = SkipComment(data, index);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return index;
+    }
+
     // ISO 32000-1 7.3: numbers, strings and hex strings share one grammar; recovery only changes handling of malformed input.
     public enum Recovery
     {
@@ -132,28 +165,7 @@ internal sealed class Lexer(byte[] data, int position)
         }
     }
 
-    private void SkipWhitespaceAndComments()
-    {
-        while (position < data.Length)
-        {
-            var b = data[position];
-            if (IsWhitespace(b))
-            {
-                position++;
-            }
-            else if (b == (byte)'%')
-            {
-                while (position < data.Length && data[position] != 10 && data[position] != 13)
-                {
-                    position++;
-                }
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
+    private void SkipWhitespaceAndComments() => position = SkipWhitespaceAndComments(data, position);
 
     private Token ReadNumber() => ReadNumber(data, ref position, Recovery.Strict)!.Value;
 

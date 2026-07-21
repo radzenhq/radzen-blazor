@@ -213,11 +213,7 @@ internal static class ToUnicodeCMap
                     position++;
                     continue;
                 case (byte)'%':
-                    while (position < data.Length && data[position] != '\n' && data[position] != '\r')
-                    {
-                        position++;
-                    }
-
+                    position = Lexer.SkipComment(data, position);
                     continue;
             }
 

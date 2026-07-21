@@ -171,11 +171,7 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
 
             if (b == (byte)'%')
             {
-                while (i < data.Length && data[i] != (byte)'\n' && data[i] != (byte)'\r')
-                {
-                    i++;
-                }
-
+                i = Lexer.SkipComment(data, i);
                 continue;
             }
 
