@@ -352,7 +352,7 @@ internal sealed class TextLineEmitter(
                 glyphRun.Begin();
                 while (i < text.Length)
                 {
-                    var codepoint = CodePointAt(text, i);
+                    var codepoint = CodePointAt(text, i, out var codePointLength);
                     if (fonts.ClassifyBase14Glyph(codepoint, out _, out var candidate, out var gid) != Base14GlyphKind.Fallback
                         || candidate != face)
                     {
@@ -360,7 +360,7 @@ internal sealed class TextLineEmitter(
                     }
 
                     glyphRun.Append(gid, codepoint);
-                    i += codepoint > 0xFFFF ? 2 : 1;
+                    i += codePointLength;
                 }
 
                 plan.UsedFonts.Add(generated);
@@ -375,7 +375,7 @@ internal sealed class TextLineEmitter(
                 var builderText = new StringBuilder();
                 while (i < text.Length)
                 {
-                    var codepoint = CodePointAt(text, i);
+                    var codepoint = CodePointAt(text, i, out var codePointLength);
                     var kind = fonts.ClassifyBase14Glyph(codepoint, out _, out _, out _);
                     if (kind == Base14GlyphKind.WinAnsi)
                     {
@@ -390,7 +390,7 @@ internal sealed class TextLineEmitter(
                         break;
                     }
 
-                    i += codepoint > 0xFFFF ? 2 : 1;
+                    i += codePointLength;
                 }
 
                 var segment = builderText.ToString();

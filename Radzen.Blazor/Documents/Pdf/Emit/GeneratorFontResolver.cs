@@ -24,6 +24,9 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
 
     public static int CodePointAt(string text, int index) => FontCollection.CodePointAt(text, index);
 
+    public static int CodePointAt(string text, int index, out int length)
+        => FontCollection.CodePointAt(text, index, out length);
+
     public static bool IsWinAnsi(int codepoint)
         => codepoint <= 0xFFFF && WinAnsiEncoding.TryGetCode((char)codepoint, out _);
 

@@ -200,10 +200,7 @@ internal static class LineLayouter
             var i = 0;
             while (i < text.Length)
             {
-                var cpLen = char.IsHighSurrogate(text[i]) && i + 1 < text.Length && char.IsLowSurrogate(text[i + 1])
-                    ? 2
-                    : 1;
-                var codepoint = cpLen == 2 ? char.ConvertToUtf32(text[i], text[i + 1]) : text[i];
+                var codepoint = FontCollection.CodePointAt(text, i, out var cpLen);
                 if (!advances.TryGetValue((font, codepoint), out var baseAdvance))
                 {
                     baseAdvance = fonts.MeasureText(text.Substring(i, cpLen), font);

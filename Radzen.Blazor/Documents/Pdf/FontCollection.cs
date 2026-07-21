@@ -344,7 +344,7 @@ public sealed class FontCollection
         var prevFallbackCodepoint = 0;
         while (i < text.Length)
         {
-            var codepoint = CodePointAt(text, i);
+            var codepoint = CodePointAt(text, i, out var codePointLength);
             switch (ClassifyBase14Glyph(codepoint, out var code, out var face, out var glyph))
             {
                 case Base14GlyphKind.WinAnsi:
@@ -377,7 +377,7 @@ public sealed class FontCollection
                     break;
             }
 
-            i += codepoint > 0xFFFF ? 2 : 1;
+            i += codePointLength;
         }
 
         return sum;
@@ -406,10 +406,19 @@ public sealed class FontCollection
         return Base14GlyphKind.Missing;
     }
 
-    internal static int CodePointAt(ReadOnlySpan<char> text, int index)
-        => char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1])
-            ? char.ConvertToUtf32(text[index], text[index + 1])
-            : text[index];
+    internal static int CodePointAt(ReadOnlySpan<char> text, int index) => CodePointAt(text, index, out _);
+
+    internal static int CodePointAt(ReadOnlySpan<char> text, int index, out int length)
+    {
+        if (char.IsHighSurrogate(text[index]) && index + 1 < text.Length && char.IsLowSurrogate(text[index + 1]))
+        {
+            length = 2;
+            return char.ConvertToUtf32(text[index], text[index + 1]);
+        }
+
+        length = 1;
+        return text[index];
+    }
 
     internal bool TryResolvePrimary(Font font, out SfntFont primary)
     {
