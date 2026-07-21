@@ -51,7 +51,7 @@ internal static class GlyfSubsetter
         var head = headMemory.Span;
         var loca = new LocaTable(locaMemory.Span, ReadInt16(head, 50) != 0);
 
-        var ordered = OrderFromMap(gidMap);
+        var ordered = CompactGidMap.OrderFromMap(gidMap);
         var count = ordered.Count;
 
         var glyfUpperBound = 0;
@@ -102,24 +102,6 @@ internal static class GlyfSubsetter
         }
 
         return map;
-    }
-
-    private static List<ushort> OrderFromMap(IReadOnlyDictionary<ushort, ushort> gidMap)
-    {
-        var ordered = new ushort[gidMap.Count];
-        var seen = new bool[gidMap.Count];
-        foreach (var (gid, compact) in gidMap)
-        {
-            if (compact >= gidMap.Count || seen[compact])
-            {
-                throw new ArgumentException("Compact gid map must be a bijection onto [0, N).", nameof(gidMap));
-            }
-
-            ordered[compact] = gid;
-            seen[compact] = true;
-        }
-
-        return [.. ordered];
     }
 
     private readonly ref struct LocaTable(ReadOnlySpan<byte> raw, bool longFormat)
