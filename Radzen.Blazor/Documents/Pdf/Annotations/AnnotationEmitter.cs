@@ -335,10 +335,11 @@ internal static class AnnotationEmitter
         var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
         if (annotation.Opacity < 1)
         {
-            resources["ExtGState"] = new DictionaryObject
-            {
-                ["AGS"] = PageResourceBuilder.ExtGStateDictionary(annotation.Opacity, annotation.Opacity),
-            };
+            var extGStates = resources.TryGetValue("ExtGState", out var existing) && existing is DictionaryObject dict
+                ? dict
+                : new DictionaryObject();
+            extGStates["AGS"] = PageResourceBuilder.ExtGStateDictionary(annotation.Opacity, annotation.Opacity);
+            resources["ExtGState"] = extGStates;
         }
 
         if (resources.Count > 0)
