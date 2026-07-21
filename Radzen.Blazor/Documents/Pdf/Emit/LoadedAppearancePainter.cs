@@ -16,7 +16,8 @@ internal static class LoadedAppearancePainter
         PdfRect target,
         string namePrefix,
         bool strict,
-        string subject)
+        string subject,
+        double opacity = 1)
     {
         if (!MatrixIsIdentity(reader, appearance, strict, subject))
         {
@@ -63,6 +64,7 @@ internal static class LoadedAppearancePainter
         {
             Transform = Matrix.FromComponents(
                 scaleX, 0, 0, scaleY, target.Left - bbox.Left * scaleX, target.Bottom - bbox.Bottom * scaleY),
+            Opacity = opacity < 1 ? opacity : null,
         });
         return true;
     }

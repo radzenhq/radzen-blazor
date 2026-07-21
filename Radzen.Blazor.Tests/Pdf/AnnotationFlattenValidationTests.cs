@@ -68,6 +68,21 @@ public class AnnotationFlattenValidationTests
     }
 
     [Fact]
+    public void TranslucentAnnotation_FlattensWithItsOpacity()
+    {
+        var opaque = new Document();
+        opaque.Pages.Add().Annotations.Add(
+            new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
+
+        var translucent = new Document();
+        translucent.Pages.Add().Annotations.Add(
+            new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow, Opacity = 0.4 });
+
+        Assert.DoesNotContain(" gs", FlattenedContent(opaque), StringComparison.Ordinal);
+        Assert.Contains(" gs", FlattenedContent(translucent), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void HiddenAnnotation_IsClearedButNotPainted()
     {
         var document = new Document();

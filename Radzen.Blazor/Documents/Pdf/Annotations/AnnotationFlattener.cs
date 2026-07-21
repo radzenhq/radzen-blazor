@@ -37,7 +37,7 @@ internal static class AnnotationFlattener
                 var appearance = AnnotationAppearanceBuilder.Build(annotation);
                 if (appearance.Count > 0)
                 {
-                    page.Content.Add(new FlattenedAnnotationContent(appearance)
+                    page.Content.Add(new FlattenedAnnotationContent(appearance, annotation.Opacity)
                     {
                         Transform = Matrix.Translate(annotation.Bounds.Left, annotation.Bounds.Bottom),
                     });
@@ -73,16 +73,28 @@ internal static class AnnotationFlattener
 
         return LoadedAppearancePainter.TryPaint(
             reader, loaded, page, owned, normal!, stream, annotation.Bounds, "AFlatten",
-            strict: true, subject: $"/{annotation.Subtype} annotation");
+            strict: true, subject: $"/{annotation.Subtype} annotation", opacity: annotation.Opacity);
     }
 
-    private sealed class FlattenedAnnotationContent(IReadOnlyList<ContentElement> elements) : ContentElement
+    private sealed class FlattenedAnnotationContent(IReadOnlyList<ContentElement> elements, double opacity) : ContentElement
     {
         protected override void EmitBody(ContentWriter writer)
         {
+            if (opacity < 1)
+            {
+                writer.WriteRaw("q\n");
+                writer.WriteName(writer.RegisterOpacity(opacity));
+                writer.WriteRaw(" gs\n");
+            }
+
             foreach (var element in elements)
             {
                 element.Emit(writer);
+            }
+
+            if (opacity < 1)
+            {
+                writer.WriteRaw("Q\n");
             }
         }
     }
