@@ -164,17 +164,6 @@ internal static class FieldAppearances
                 "A field appearance stream cannot reference an image or shading-pattern resource.");
         }
 
-        var resources = new ResourceDictionaryBuilder();
-        foreach (var (baseFont, key) in manifest.Fonts)
-        {
-            resources.Add("Font", key, PageResourceBuilder.Base14FontDictionary(baseFont));
-        }
-
-        foreach (var (key, opacity) in manifest.ExtGStates)
-        {
-            resources.Add("ExtGState", key, PageResourceBuilder.ExtGStateDictionary(opacity, opacity));
-        }
-
-        return resources.Build();
+        return PageResourceBuilder.BuildResources(writer: null, manifest);
     }
 }
