@@ -188,11 +188,7 @@ internal static class Redactor
 
     private static byte[] BuildRedactedShow(PositionedTextRun run, IReadOnlyList<bool> removed)
     {
-        var denominator = run.FontSize * run.Scale;
-        if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
-        {
-            throw new NotSupportedException("Redacting text with a zero or non-finite font scale cannot preserve positioning safely.");
-        }
+        var denominator = ContentWriter.RequireTjScale(run.FontSize, run.Scale, "Redacting");
 
         using var writer = new ContentWriter();
         writer.WriteRaw("[");

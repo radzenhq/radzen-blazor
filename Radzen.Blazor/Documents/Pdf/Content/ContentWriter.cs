@@ -177,6 +177,18 @@ public sealed class ContentWriter : IDisposable
         WriteRaw(" ");
     }
 
+    internal static double RequireTjScale(double fontSize, double scale, string operation)
+    {
+        var denominator = fontSize * scale;
+        if (!double.IsFinite(denominator) || Math.Abs(denominator) < 0.000001)
+        {
+            throw new NotSupportedException(
+                $"{operation} text with a zero or non-finite font scale cannot preserve positioning safely.");
+        }
+
+        return denominator;
+    }
+
     /// <summary>Writes <paramref name="color"/> as an RGB triple followed by <paramref name="operatorName"/> and a newline.</summary>
     /// <param name="color">The colour to write, emitted as three 0..1 components.</param>
     /// <param name="operatorName">The colour operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
