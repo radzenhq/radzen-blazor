@@ -12,7 +12,7 @@
        aria-controls="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}")"
        aria-disabled="@(Disabled ? "true" : "false")"
        tabindex="-1"
-       @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+       @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
         {
             <span class="notranslate rzi rz-tabview-icon" aria-hidden="true" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>

@@ -598,13 +598,6 @@ namespace Radzen.Blazor
         bool preventKeyDown = true;
         bool stopKeydownPropagation;
 
-        bool stopGuardKeydownPropagation = true;
-        void OnGuardKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code ?? args.Key;
-            stopGuardKeydownPropagation = key != "Escape";
-        }
-
         int focusedIndex = -1;
         int focusedCellIndex;
 

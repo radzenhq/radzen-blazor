@@ -22,7 +22,7 @@
         }
         @if (Template != null)
         {
-            <div class=@LabelClass @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">@Template(this)</div>
+            <div class=@LabelClass @onkeydown:stopPropagation>@Template(this)</div>
         } else
         {
             <label for="@(GetHashCode())" class=@LabelClass>@Text</label>
@@ -32,7 +32,7 @@
     {
     <CascadingValue Value=this>
     <Expander Expanded=@clientExpanded Role="presentation">
-    <ul class="rz-treenode-children" role="group" @onkeydown:stopPropagation="stopKeydownPropagation" @onkeydown="OnGuardKeyDown">
+    <ul class="rz-treenode-children" role="group" @onkeydown:stopPropagation>
         @ChildContent
     </ul>
     </Expander>

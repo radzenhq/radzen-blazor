@@ -210,20 +210,6 @@ namespace Radzen.Blazor
             return true;
         }
 
-        bool stopKeydownPropagation = true;
-        void OnGuardKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code ?? args.Key;
-            var stop = key != "Escape";
-
-            if (stop == stopKeydownPropagation)
-            {
-                suppressNextRender = true;
-            }
-
-            stopKeydownPropagation = stop;
-        }
-
         string getStyle()
         {
             var order = Tabs?.AllowReorder == true ? $"order:{Index};" : null;

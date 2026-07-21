@@ -24,7 +24,7 @@
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
                 @if (@HeaderTemplate != null && ShowHeader)
                 {
-                    <div class="rz-custom-header" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <div class="rz-custom-header" @onkeydown:stopPropagation>
                         @HeaderTemplate
                     </div>
                 }
@@ -106,7 +106,7 @@
             @if (@HeaderTemplate != null && ShowHeader)
             {
                 <div class="rz-group-header">
-                    <div class="rz-custom-header" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <div class="rz-custom-header" @onkeydown:stopPropagation>
                         @HeaderTemplate
                     </div>
                 </div>
@@ -244,7 +244,7 @@
                             }
                             else
                             {
-                                <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                                <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation>
                                     <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0))">
                                         @if (EmptyTemplate != null)
                                         {
@@ -260,7 +260,7 @@
                         }
                         else
                         {
-                            <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                            <tr role="row" class=" rz-datatable-emptymessage-row" @onkeydown:stopPropagation>
                                 <td role="gridcell" class="rz-datatable-emptymessage" colspan="@(visibleColumns.Sum(c => c.GetColSpan()) + (Template != null && ShowExpandColumn ? 1 : 0) + Groups.Count)">
                                     @if (EmptyTemplate != null)
                                     {
@@ -277,7 +277,7 @@
                 </tbody>
                 @if (allColumns.Where(c => c.Visible && c.FooterTemplate != null).Any())
                 {
-                    <tfoot role="rowgroup" class="rz-datatable-tfoot" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <tfoot role="rowgroup" class="rz-datatable-tfoot" @onkeydown:stopPropagation>
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                         {
                             <tr role="row">
@@ -325,7 +325,7 @@
             @if (IsLoading)
             {
                 <div class="rz-datatable-loading"></div>
-                <div class="rz-datatable-loading-content" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                <div class="rz-datatable-loading-content" @onkeydown:stopPropagation>
                     @if(LoadingTemplate != null)
                     {
                     @LoadingTemplate
@@ -344,7 +344,7 @@
         }
         @if (@FooterTemplate != null)
         {
-            <div class="rz-custom-footer" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+            <div class="rz-custom-footer" @onkeydown:stopPropagation>
                 @FooterTemplate
             </div>
         }
@@ -656,7 +656,7 @@
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td role="gridcell" @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                <td role="gridcell" @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation>
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">

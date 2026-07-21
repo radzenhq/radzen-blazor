@@ -209,14 +209,14 @@ namespace Radzen.Blazor.Tests
             var renderCountBefore = contentRenderCount;
 
             var panel = component.Find("div.rz-tabview-panel");
-            panel.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
-            panel.KeyDown(new KeyboardEventArgs { Key = "b", Code = "KeyB" });
+            Assert.Throws<MissingEventHandlerException>(() => panel.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" }));
+            Assert.Throws<MissingEventHandlerException>(() => panel.KeyDown(new KeyboardEventArgs { Key = "b", Code = "KeyB" }));
 
             Assert.Equal(renderCountBefore, contentRenderCount);
         }
 
         [Fact]
-        public void Tabs_EscapeKeyDownInPanelContent_UpdatesPropagation()
+        public void Tabs_KeyDownInPanelContent_DoesNotDispatchToTabs()
         {
             using var ctx = new TestContext();
 
@@ -228,9 +228,9 @@ namespace Radzen.Blazor.Tests
             var renderCountBefore = component.RenderCount;
 
             var panel = component.Find("div.rz-tabview-panel");
-            panel.KeyDown(new KeyboardEventArgs { Key = "Escape", Code = "Escape" });
+            Assert.Throws<MissingEventHandlerException>(() => panel.KeyDown(new KeyboardEventArgs { Key = "Escape", Code = "Escape" }));
 
-            Assert.True(component.RenderCount > renderCountBefore);
+            Assert.Equal(renderCountBefore, component.RenderCount);
         }
 
         [Fact]

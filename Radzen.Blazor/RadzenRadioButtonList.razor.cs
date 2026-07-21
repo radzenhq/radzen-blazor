@@ -295,13 +295,6 @@ namespace Radzen.Blazor
         bool preventKeyPress = true;
         bool stopKeydownPropagation;
 
-        bool stopGuardKeydownPropagation = true;
-        void OnGuardKeyDown(KeyboardEventArgs args)
-        {
-            var key = args.Code ?? args.Key;
-            stopGuardKeydownPropagation = key != "Escape";
-        }
-
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
