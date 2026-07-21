@@ -26,8 +26,8 @@ internal static class CffSubsetter
             gids[count++] = (ushort)gid;
         }
 
-        var closure = OrderFromMap(BuildCompactGidMap(gids));
-        var glyphCount = closure.Length;
+        var closure = CompactGidMap.OrderFromMap(BuildCompactGidMap(gids));
+        var glyphCount = closure.Count;
 
         var charStrings = new byte[glyphCount][];
         var fdSelect = new int[glyphCount];
@@ -152,16 +152,6 @@ internal static class CffSubsetter
         return map;
     }
 
-    private static ushort[] OrderFromMap(IReadOnlyDictionary<ushort, ushort> gidMap)
-    {
-        var ordered = new ushort[gidMap.Count];
-        foreach (var (gid, compact) in gidMap)
-        {
-            ordered[compact] = gid;
-        }
-
-        return ordered;
-    }
 
     private static byte[] BuildIdentityCharset(int glyphCount)
     {
