@@ -136,7 +136,7 @@ internal static class Redactor
 
                     content.RemoveAt(i);
                     break;
-                case ImageContent image when IntersectsAny(image.Bounds, regions):
+                case ImageContent image when IntersectsAny(TransformedBounds(image.Bounds, image.Transform), regions):
                     content.RemoveAt(i);
                     break;
                 case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
@@ -223,10 +223,18 @@ internal static class Redactor
     private static void WriteAdvance(ContentWriter writer, double advance, double denominator)
         => writer.WriteTjAdjustment(-advance, denominator);
 
-    private static PdfRect UnitBounds(Matrix transform)
+    private static PdfRect UnitBounds(Matrix transform) => TransformedBounds(new PdfRect(0, 0, 1, 1), transform);
+
+    private static PdfRect TransformedBounds(PdfRect rect, Matrix transform)
     {
         var bounds = new PdfRectBounds();
-        foreach (var point in new[] { transform.Transform(0, 0), transform.Transform(1, 0), transform.Transform(1, 1), transform.Transform(0, 1) })
+        foreach (var point in new[]
+        {
+            transform.Transform(rect.Left, rect.Bottom),
+            transform.Transform(rect.Right, rect.Bottom),
+            transform.Transform(rect.Right, rect.Top),
+            transform.Transform(rect.Left, rect.Top),
+        })
         {
             bounds.Include(point.X, point.Y);
         }
