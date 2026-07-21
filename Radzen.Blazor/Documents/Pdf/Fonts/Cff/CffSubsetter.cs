@@ -13,7 +13,20 @@ internal static class CffSubsetter
         ArgumentNullException.ThrowIfNull(font);
         ArgumentNullException.ThrowIfNull(glyphIds);
 
-        var closure = BuildClosure(font, glyphIds);
+        var gids = new ushort[glyphIds.Count];
+        var count = 0;
+        foreach (var gid in glyphIds)
+        {
+            if (gid < 0 || gid >= font.GlyphCount)
+            {
+                throw new ArgumentOutOfRangeException(nameof(glyphIds), gid,
+                    $"Requested glyph id {gid} is outside the font's glyph range [0, {font.GlyphCount}).");
+            }
+
+            gids[count++] = (ushort)gid;
+        }
+
+        var closure = OrderFromMap(BuildCompactGidMap(gids));
         var glyphCount = closure.Length;
 
         var charStrings = new byte[glyphCount][];
@@ -139,21 +152,15 @@ internal static class CffSubsetter
         return map;
     }
 
-    private static int[] BuildClosure(CffFont font, IReadOnlyCollection<int> glyphIds)
+    private static ushort[] OrderFromMap(IReadOnlyDictionary<ushort, ushort> gidMap)
     {
-        var set = new SortedSet<int> { 0 };
-        foreach (var gid in glyphIds)
+        var ordered = new ushort[gidMap.Count];
+        foreach (var (gid, compact) in gidMap)
         {
-            if (gid < 0 || gid >= font.GlyphCount)
-            {
-                throw new ArgumentOutOfRangeException(nameof(glyphIds), gid,
-                    $"Requested glyph id {gid} is outside the font's glyph range [0, {font.GlyphCount}).");
-            }
-
-            set.Add(gid);
+            ordered[compact] = gid;
         }
 
-        return [.. set];
+        return ordered;
     }
 
     private static byte[] BuildIdentityCharset(int glyphCount)
