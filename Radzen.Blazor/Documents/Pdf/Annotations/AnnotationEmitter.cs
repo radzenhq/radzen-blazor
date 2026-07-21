@@ -376,7 +376,10 @@ internal static class AnnotationEmitter
     }
 
     private static string DefaultAppearance(FreeTextAnnotation annotation)
-        => string.Create(CultureInfo.InvariantCulture, $"/{annotation.Font.Name} {annotation.Font.Size:0.###} Tf {annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg");
+        => DefaultAppearanceGrammar.Write(
+            annotation.Font.Name,
+            annotation.Font.Size,
+            string.Create(CultureInfo.InvariantCulture, $"{annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg"));
 }
 
 internal static class AnnotationValidator
