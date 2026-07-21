@@ -193,6 +193,29 @@ public class AnnotationTests
         return xobjects is null ? [] : [.. xobjects.Keys];
     }
 
+    [Fact]
+    public void ReadFreeText_ZeroTfSize_AppliesTheNamedFontAutoSized()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [4 0 R] >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Type /Annot /Subtype /FreeText /Rect [40 250 160 280] "
+            + "/DA (/Cour 0 Tf 0 0 0 rg) /Contents (hi) >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 5\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var i = 1; i < 5; i++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(i)));
+        }
+
+        pdf.Append("trailer\n<< /Size 5 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
+
+        var annotation = Assert.IsType<FreeTextAnnotation>(Load(pdf.ToArray()).Pages[0].Annotations[0]);
+        Assert.Equal("Courier", annotation.Font.Name);
+        Assert.Equal(12.0, annotation.Font.Size);
+    }
+
     private static byte[] SharedResourcesWithAppearances()
     {
         var content = Encoding.ASCII.GetBytes("q Q");
