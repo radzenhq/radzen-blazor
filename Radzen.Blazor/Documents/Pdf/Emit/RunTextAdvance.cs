@@ -14,12 +14,7 @@ internal static class RunTextAdvance
         var wordSpaceCount = 0;
         for (var i = 0; i < text.Length; glyphCount++)
         {
-            var codePointLength = char.IsHighSurrogate(text[i])
-                && i + 1 < text.Length
-                && char.IsLowSurrogate(text[i + 1])
-                ? 2
-                : 1;
-            if (codePointLength == 1 && text[i] == ' ')
+            if (FontCollection.CodePointAt(text, i, out var codePointLength) == ' ')
             {
                 wordSpaceCount++;
             }

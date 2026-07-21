@@ -56,7 +56,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         var i = 0;
         while (i < text.Length)
         {
-            var codepoint = FontCollection.CodePointAt(text, i);
+            var codepoint = FontCollection.CodePointAt(text, i, out var codePointLength);
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
             var advance = face.AdvanceInUserSpace(glyph, font.Size);
 
@@ -74,7 +74,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
             previousFace = face;
             previousGlyph = glyph;
             previousCodepoint = codepoint;
-            i += codepoint > 0xFFFF ? 2 : 1;
+            i += codePointLength;
         }
     }
 
@@ -108,7 +108,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         var i = 0;
         while (i < text.Length)
         {
-            var codepoint = FontCollection.CodePointAt(text, i);
+            var codepoint = FontCollection.CodePointAt(text, i, out var codePointLength);
             if (RequiresComplexShaping(codepoint))
             {
                 throw new NotSupportedException(
@@ -119,7 +119,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
                     + "than produce linguistically broken output. Provide pre-shaped glyph runs if you need these scripts.");
             }
 
-            i += codepoint > 0xFFFF ? 2 : 1;
+            i += codePointLength;
         }
     }
 
