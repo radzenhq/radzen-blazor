@@ -18,3 +18,12 @@ internal static class Fnv1a64
         return hash;
     }
 }
+
+internal static class Fnv1a32
+{
+    public const uint OffsetBasis = 2166136261;
+
+    private const uint Prime = 16777619;
+
+    public static uint Combine(uint hash, uint value) => (hash ^ value) * Prime;
+}

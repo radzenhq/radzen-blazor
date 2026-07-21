@@ -274,10 +274,10 @@ internal static class Type0FontEmbedder
 
     private static string SubsetTag(IEnumerable<ushort> gids)
     {
-        uint hash = 2166136261;
+        var hash = Fnv1a32.OffsetBasis;
         foreach (var gid in gids)
         {
-            hash = (hash ^ gid) * 16777619;
+            hash = Fnv1a32.Combine(hash, gid);
         }
 
         var tag = new char[6];
