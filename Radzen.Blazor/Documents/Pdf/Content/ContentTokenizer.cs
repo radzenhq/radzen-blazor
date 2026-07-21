@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Content;
 
@@ -462,12 +463,12 @@ internal static class ContentTokenizer
         while (index < data.Length)
         {
             var run = data[index];
-            if (run == 128)
+            if (run == RunLengthFilter.Eod)
             {
                 return index + 1;
             }
 
-            index += run < 128 ? run + 2 : 2;
+            index += RunLengthFilter.PacketSpan(run);
         }
 
         return -1;
