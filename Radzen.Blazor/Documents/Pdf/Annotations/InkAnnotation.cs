@@ -6,18 +6,13 @@ namespace Radzen.Documents.Pdf;
 /// <summary>Represents one continuous stroke in an ink annotation.</summary>
 public sealed class InkStroke : IList<AnnotationPoint>
 {
-    private readonly List<AnnotationPoint> points = [];
-    private bool touched;
+    private readonly TrackedList<AnnotationPoint> points = [];
 
     /// <inheritdoc />
     public AnnotationPoint this[int index]
     {
         get => points[index];
-        set
-        {
-            points[index] = value;
-            touched = true;
-        }
+        set => points[index] = value;
     }
 
     /// <inheritdoc />
@@ -27,18 +22,10 @@ public sealed class InkStroke : IList<AnnotationPoint>
     public bool IsReadOnly => false;
 
     /// <inheritdoc />
-    public void Add(AnnotationPoint item)
-    {
-        points.Add(item);
-        touched = true;
-    }
+    public void Add(AnnotationPoint item) => points.Add(item);
 
     /// <inheritdoc />
-    public void Clear()
-    {
-        touched |= points.Count > 0;
-        points.Clear();
-    }
+    public void Clear() => points.Clear();
 
     /// <inheritdoc />
     public bool Contains(AnnotationPoint item) => points.Contains(item);
@@ -53,32 +40,19 @@ public sealed class InkStroke : IList<AnnotationPoint>
     public int IndexOf(AnnotationPoint item) => points.IndexOf(item);
 
     /// <inheritdoc />
-    public void Insert(int index, AnnotationPoint item)
-    {
-        points.Insert(index, item);
-        touched = true;
-    }
+    public void Insert(int index, AnnotationPoint item) => points.Insert(index, item);
 
     /// <inheritdoc />
-    public bool Remove(AnnotationPoint item)
-    {
-        var removed = points.Remove(item);
-        touched |= removed;
-        return removed;
-    }
+    public bool Remove(AnnotationPoint item) => points.Remove(item);
 
     /// <inheritdoc />
-    public void RemoveAt(int index)
-    {
-        points.RemoveAt(index);
-        touched = true;
-    }
+    public void RemoveAt(int index) => points.RemoveAt(index);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    internal bool IsModified => touched;
+    internal bool IsModified => points.StructureChanged;
 
-    internal void AcceptChanges() => touched = false;
+    internal void AcceptChanges() => points.AcceptStructure();
 }
 
 /// <summary>Represents one or more freehand ink strokes.</summary>
