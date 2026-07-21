@@ -3,7 +3,6 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using Radzen.Documents.Pdf.Objects.Filters;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -41,32 +40,42 @@ internal static class PdfBytes
                 continue;
             }
 
-            var index = i + pattern.Length;
-            while (index < data.Length && Lexer.IsWhitespace(data[index]))
-            {
-                index++;
-            }
-
-            var start = index;
-            if (index < data.Length && (data[index] == (byte)'+' || data[index] == (byte)'-'))
-            {
-                index++;
-            }
-
-            while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
-            {
-                index++;
-            }
-
-            if (index == start || index == start + 1 && data[start] is (byte)'+' or (byte)'-')
-            {
-                throw new DocumentParseException("Expected integer after startxref.", start);
-            }
-
-            return long.Parse(Encoding.Latin1.GetString(data, start, index - start), CultureInfo.InvariantCulture);
+            var index = Lexer.SkipWhitespace(data, i + pattern.Length);
+            return ReadInteger(data, ref index, "Expected integer after startxref.", "The startxref offset is out of range.");
         }
 
         throw new DocumentParseException("Missing startxref.", -1);
+    }
+
+    internal static long ReadInteger(byte[] data, ref int index, string emptyError, string overflowError)
+    {
+        var start = index;
+        var negative = false;
+        if (index < data.Length && (data[index] == (byte)'+' || data[index] == (byte)'-'))
+        {
+            negative = data[index] == (byte)'-';
+            index++;
+        }
+
+        var digits = index;
+        long value = 0;
+        while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
+        {
+            if (value > (long.MaxValue - (data[index] - '0')) / 10)
+            {
+                throw new DocumentParseException(overflowError, start);
+            }
+
+            value = (value * 10) + (data[index] - '0');
+            index++;
+        }
+
+        if (index == digits)
+        {
+            throw new DocumentParseException(emptyError, start);
+        }
+
+        return negative ? -value : value;
     }
 
     internal static int FieldWidth(long value)
