@@ -39,6 +39,35 @@ public class AnnotationFlattenValidationTests
         Assert.Empty(document.Pages[0].Annotations);
     }
 
+    private static byte[] LoadedHighlightPdf()
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");
+        pdf.Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [4 0 R] >>\nendobj\n");
+        pdf.Object(4, "4 0 obj\n<< /Type /Annot /Subtype /Highlight /Rect [10 10 110 30] "
+            + "/QuadPoints [10 30 110 30 10 10 110 10] /C [1 1 0] >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 5\n").Append(FixturePdf.Entry20(0, 65535, 'f'));
+        for (var i = 1; i < 5; i++)
+        {
+            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(i)));
+        }
+
+        pdf.Append("trailer\n<< /Size 5 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
+    public void LoadedModifiedInvalidAnnotation_IsRejectedOnFlattenLikeOnSave()
+    {
+        var document = Document.LoadFromStream(new MemoryStream(LoadedHighlightPdf()));
+        var markup = Assert.IsType<HighlightAnnotation>(document.Pages[0].Annotations[0]);
+        markup.Areas.Clear();
+
+        Assert.Throws<InvalidOperationException>(document.Flatten);
+    }
+
     private static string FlattenedContent(Document document)
     {
         document.Flatten();

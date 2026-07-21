@@ -29,7 +29,7 @@ internal static class AnnotationFlattener
                     continue;
                 }
 
-                if (entry.Original is null)
+                if (entry.Original is null || annotation.IsModified)
                 {
                     AnnotationValidator.Validate(annotation);
                 }
