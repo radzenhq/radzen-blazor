@@ -130,10 +130,7 @@ internal static class ContentTokenizer
             }
 
             var keywordStart = position;
-            while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-            {
-                position++;
-            }
+            position = Lexer.SkipRegular(data, position);
 
             if (position == keywordStart)
             {
@@ -171,11 +168,7 @@ internal static class ContentTokenizer
         var end = InlineImagePayloadEnd(data, position, image);
         if (end >= 0)
         {
-            var probe = end;
-            while (probe < data.Length && IsWhitespace(data[probe]))
-            {
-                probe++;
-            }
+            var probe = Lexer.SkipWhitespace(data, end);
 
             if (IsInlineImageTerminator(data, probe))
             {
@@ -289,10 +282,7 @@ internal static class ContentTokenizer
             }
 
             var keywordStart = position;
-            while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-            {
-                position++;
-            }
+            position = Lexer.SkipRegular(data, position);
 
             if (position == keywordStart || !ContentOperatorClass.IsContentOperator(Latin1(data, keywordStart, position - keywordStart)))
             {
@@ -380,10 +370,7 @@ internal static class ContentTokenizer
         }
 
         var start = position;
-        while (position < data.Length && !IsWhitespace(data[position]) && !IsDelimiter(data[position]))
-        {
-            position++;
-        }
+        position = Lexer.SkipRegular(data, position);
 
         if (position > start)
         {
