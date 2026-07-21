@@ -5,7 +5,12 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class RunLengthFilter
 {
-    const int Eod = 128;
+    internal const int Eod = 128;
+
+    // ISO 32000-1 7.4.5: a length byte below 128 is followed by length+1 literal bytes;
+    // above 128 by a single byte repeated 257-length times. Returns the packet's total
+    // span including its length byte (Eod carries no payload and is handled by the caller).
+    internal static int PacketSpan(int lengthByte) => lengthByte < Eod ? lengthByte + 2 : 2;
 
     public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
