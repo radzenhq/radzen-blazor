@@ -238,7 +238,7 @@ internal static class AnnotationReader
 
         var appearance = DefaultAppearanceGrammar.Parse(da);
         var (font, size) = (appearance.Font, appearance.Size);
-        if (font is not null && size > 0)
+        if (font is not null)
         {
             annotation.Font = FieldAppearances.AppearanceFont(font, size);
         }
