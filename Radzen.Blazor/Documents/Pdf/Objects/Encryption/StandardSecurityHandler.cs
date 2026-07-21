@@ -150,18 +150,15 @@ internal sealed class StandardSecurityHandler
             return CryptMethod.Rc4;
         }
 
-        var filterName = encrypt.TryGetValue(selector, out var selected) && selected is NameObject chosen
-            ? chosen.Value
-            : "StdCF";
+        var filter = ResolveCryptFilter(encrypt, selector, out var filterName);
         if (string.Equals(filterName, "Identity", StringComparison.Ordinal))
         {
             return CryptMethod.Identity;
         }
 
-        if (encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject cfDict)
+        if (encrypt.TryGetValue("CF", out var cf) && cf is DictionaryObject)
         {
-            if (cfDict.TryGetValue(filterName, out var filter) && filter is DictionaryObject filterDict
-                && filterDict.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
+            if (filter is not null && filter.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
             {
                 return method.Value switch
                 {
@@ -747,7 +744,7 @@ internal sealed class StandardSecurityHandler
     // ISO 32000-1 7.6.5: for V>=4 the file-key length comes from the crypt-filter dictionary. AESV2/AESV3 fix it at 16/32 bytes.
     private int DeriveCryptFilterKeyLength(DictionaryObject encrypt)
     {
-        var filter = ResolveCryptFilterDictionary(encrypt);
+        var filter = ResolveCryptFilter(encrypt, "StmF", out _);
         if (filter is not null && filter.TryGetValue("CFM", out var cfm) && cfm is NameObject method)
         {
             switch (method.Value)
@@ -769,9 +766,9 @@ internal sealed class StandardSecurityHandler
         return DeriveMd5KeyLength(GetInt(encrypt, "Length", 40));
     }
 
-    private static DictionaryObject? ResolveCryptFilterDictionary(DictionaryObject encrypt)
+    private static DictionaryObject? ResolveCryptFilter(DictionaryObject encrypt, string selector, out string filterName)
     {
-        var filterName = encrypt.TryGetValue("StmF", out var selected) && selected is NameObject chosen
+        filterName = encrypt.TryGetValue(selector, out var selected) && selected is NameObject chosen
             ? chosen.Value
             : "StdCF";
         if (string.Equals(filterName, "Identity", StringComparison.Ordinal))
