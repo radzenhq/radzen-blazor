@@ -201,7 +201,7 @@
                     }
                     @if (FilterRowActive)
                     {
-                        <tr role="row" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                        <tr role="row" @onkeydown:stopPropagation>
                              @if (ShowGroupExpandColumn)
                                 {
                                     @foreach (var g in Groups)
@@ -359,7 +359,7 @@
             <text>
                 @if (AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                 {
-                    <div class="rz-cell-filter" @onkeydown:stopPropagation="stopGuardKeydownPropagation" @onkeydown="OnGuardKeyDown">
+                    <div class="rz-cell-filter" @onkeydown:stopPropagation>
                         <div class="rz-cell-filter-content">
                             @if (column.FilterTemplate != null)
                             {
@@ -567,7 +567,7 @@
                                         }
                                         else
                                         {
-                                            <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
+                                            <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@getFilterKeyDownHandler(column)" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.Property && $"{d.FilterProperty}" == $"{column.FilterProperty}"))
                                             {
                                                 <button type="button" tabindex="-1" class="notranslate rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>

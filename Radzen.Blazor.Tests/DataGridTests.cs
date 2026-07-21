@@ -2,6 +2,7 @@ using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -4086,6 +4087,56 @@ namespace Radzen.Blazor.Tests
             Assert.Null(component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
             component.Find(".rz-column-picker th.rz-sortable-column > div").Click();
             Assert.Equal("ascending", component.Find(".rz-column-picker th.rz-sortable-column").GetAttribute("aria-sort"));
+        }
+
+        static IRenderedComponent<RadzenDataGrid<dynamic>> RenderSimpleFilterDataGrid(TestContext ctx, bool filterAsYouType)
+        {
+            return ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, new[] { new { Name = "A" }, new { Name = "B" } });
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Title", "Name");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add(p => p.AllowFiltering, true);
+                parameterBuilder.Add(p => p.FilterMode, FilterMode.Simple);
+                parameterBuilder.Add(p => p.FilterAsYouType, filterAsYouType);
+                parameterBuilder.Add(p => p.FilterDelay, 60000);
+            });
+        }
+
+        [Fact]
+        public void DataGrid_DoesNotAttachSimpleFilterKeyDownHandler_WhenFilterAsYouTypeIsDisabled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = RenderSimpleFilterDataGrid(ctx, false);
+
+            var input = component.Find(".rz-cell-filter input.rz-textbox");
+
+            Assert.Throws<MissingEventHandlerException>(() => input.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" }));
+        }
+
+        [Fact]
+        public void DataGrid_DoesNotRerender_OnSimpleFilterKeyDown_WhenFilterAsYouTypeIsEnabled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = RenderSimpleFilterDataGrid(ctx, true);
+
+            var input = component.Find(".rz-cell-filter input.rz-textbox");
+            var renderCount = component.RenderCount;
+
+            input.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA" });
+
+            Assert.Equal(renderCount, component.RenderCount);
         }
     }
 

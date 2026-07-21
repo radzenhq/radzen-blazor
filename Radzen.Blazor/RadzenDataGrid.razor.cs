@@ -781,6 +781,13 @@ namespace Radzen.Blazor
             }
         }
 
+        EventCallback<KeyboardEventArgs> getFilterKeyDownHandler(RadzenDataGridColumn<TItem> column)
+        {
+            return FilterAsYouType ?
+                EventCallback.Factory.Create(this, new Action<KeyboardEventArgs>(args => OnFilterKeyPress(args, column)).AsNonRenderingEventHandler()) :
+                default;
+        }
+
         async Task DebounceFilter(RadzenDataGridColumn<TItem> column)
         {
             if (JSRuntime != null)
