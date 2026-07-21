@@ -130,7 +130,7 @@ internal static class PdfBytes
         pos += width;
     }
 
-    private static void WriteBigEndian(Span<byte> destination, long value)
+    internal static void WriteBigEndian(Span<byte> destination, long value)
     {
         for (var i = destination.Length - 1; i >= 0; i--)
         {

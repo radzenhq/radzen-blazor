@@ -1,8 +1,8 @@
 using System;
 using System.Buffers;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts.Sfnt;
 
@@ -460,17 +460,19 @@ internal static class GlyfSubsetter
         return sum;
     }
 
-    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadUInt16BigEndian(d[o..]);
+    private const string Truncated = "Font glyf/loca table is truncated.";
 
-    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadInt16BigEndian(d[o..]);
+    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadUInt16BigEndian(d, o, Truncated);
 
-    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o) => BinaryPrimitives.ReadUInt32BigEndian(d[o..]);
+    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadInt16BigEndian(d, o, Truncated);
 
-    private static void WriteUInt16(byte[] d, int o, ushort v) => BinaryPrimitives.WriteUInt16BigEndian(d.AsSpan(o), v);
+    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadUInt32BigEndian(d, o, Truncated);
 
-    private static void WriteInt16(byte[] d, int o, short v) => BinaryPrimitives.WriteInt16BigEndian(d.AsSpan(o), v);
+    private static void WriteUInt16(byte[] d, int o, ushort v) => PdfBytes.WriteBigEndian(d.AsSpan(o, 2), v);
 
-    private static void WriteUInt32(byte[] d, int o, uint v) => BinaryPrimitives.WriteUInt32BigEndian(d.AsSpan(o), v);
+    private static void WriteInt16(byte[] d, int o, short v) => PdfBytes.WriteBigEndian(d.AsSpan(o, 2), v);
+
+    private static void WriteUInt32(byte[] d, int o, uint v) => PdfBytes.WriteBigEndian(d.AsSpan(o, 4), v);
 
     private static void WriteTag(byte[] d, int o, string tag)
     {
