@@ -224,33 +224,7 @@ internal sealed class XrefLoader(byte[] data, ReaderLimits limits, StreamDecoder
     private long ReadLong(ref int index)
     {
         SkipWhitespace(ref index);
-        var start = index;
-        var negative = false;
-        if (index < data.Length && (data[index] == (byte)'+' || data[index] == (byte)'-'))
-        {
-            negative = data[index] == (byte)'-';
-            index++;
-        }
-
-        var digits = index;
-        long value = 0;
-        while (index < data.Length && data[index] >= (byte)'0' && data[index] <= (byte)'9')
-        {
-            if (value > (long.MaxValue - (data[index] - '0')) / 10)
-            {
-                throw new DocumentParseException("Integer is out of range.", start);
-            }
-
-            value = (value * 10) + (data[index] - '0');
-            index++;
-        }
-
-        if (index == digits)
-        {
-            throw new DocumentParseException("Expected integer.", start);
-        }
-
-        return negative ? -value : value;
+        return PdfBytes.ReadInteger(data, ref index, "Expected integer.", "Integer is out of range.");
     }
 }
 
