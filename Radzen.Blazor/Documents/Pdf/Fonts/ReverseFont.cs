@@ -41,6 +41,24 @@ internal sealed class ReverseFont
     public string Decode(byte[] codes)
     {
         var builder = new StringBuilder(codes.Length);
+        EnumerateCodes(codes, strict: false, code =>
+        {
+            if (map.TryGetValue(code, out var text))
+            {
+                builder.Append(text);
+            }
+        });
+
+        return builder.ToString();
+    }
+
+    private void EnumerateCodes(byte[] codes, bool strict, Action<int> onCode)
+    {
+        if (strict && codes.Length % bytesPerCode != 0)
+        {
+            throw new FormatException("The text string ends with an incomplete character code.");
+        }
+
         for (var i = 0; i + bytesPerCode <= codes.Length; i += bytesPerCode)
         {
             var code = 0;
@@ -49,36 +67,20 @@ internal sealed class ReverseFont
                 code = (code << 8) | codes[i + j];
             }
 
-            if (map.TryGetValue(code, out var text))
-            {
-                builder.Append(text);
-            }
+            onCode(code);
         }
-
-        return builder.ToString();
     }
 
     internal IReadOnlyList<DecodedCode> DecodeCodes(byte[] codes)
     {
-        if (codes.Length % bytesPerCode != 0)
-        {
-            throw new FormatException("The text string ends with an incomplete character code.");
-        }
-
         var decoded = new List<DecodedCode>(codes.Length / bytesPerCode);
-        for (var i = 0; i < codes.Length; i += bytesPerCode)
+        EnumerateCodes(codes, strict: true, code =>
         {
-            var code = 0;
-            for (var j = 0; j < bytesPerCode; j++)
-            {
-                code = (code << 8) | codes[i + j];
-            }
-
             if (map.TryGetValue(code, out var text))
             {
                 decoded.Add(new DecodedCode(code, text, bytesPerCode == 1 && code == 32));
             }
-        }
+        });
 
         return decoded;
     }
