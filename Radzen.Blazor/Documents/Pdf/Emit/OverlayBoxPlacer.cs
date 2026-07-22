@@ -15,10 +15,7 @@ internal static class OverlayBoxPlacer
         Func<Image, double, (double Width, double Height)>? measureImage,
         StyleResolution resolution)
     {
-        var padding = container.Padding.Point;
-        var boxWidth = container.Width?.Point ?? availableWidth;
-        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
-        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
+        var (padding, boxWidth, indent, innerWidth) = Geometry(container, availableWidth);
 
         var lines = new List<LaidOutLine>();
         var images = new List<LaidOutImage>();
@@ -74,6 +71,16 @@ internal static class OverlayBoxPlacer
         return order;
     }
 
+    private static (double Padding, double BoxWidth, double Indent, double InnerWidth) Geometry(
+        Container container, double availableWidth)
+    {
+        var padding = container.Padding.Point;
+        var boxWidth = container.Width?.Point ?? availableWidth;
+        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
+        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
+        return (padding, boxWidth, indent, innerWidth);
+    }
+
     internal static BoxContentLayout.Measured MeasureBox(
         Container container,
         double contentWidth,
@@ -93,10 +100,7 @@ internal static class OverlayBoxPlacer
         int order,
         Matrix? transform)
     {
-        var padding = container.Padding.Point;
-        var boxWidth = container.Width?.Point ?? availableWidth;
-        var indent = Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
-        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
+        var (padding, boxWidth, indent, innerWidth) = Geometry(container, availableWidth);
         var boxHeight = measured.Height + (2 * padding);
         var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
         var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
