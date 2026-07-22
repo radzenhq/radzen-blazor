@@ -215,7 +215,7 @@ internal sealed class StandardSecurityHandler
     // ISO 32000-1 algorithm 7: recover the (padded) user password from /O.
     private byte[] RecoverUserPassword(byte[] password)
     {
-        var rc4Key = DeriveRc4Key(Pad(password), revision, keyLength);
+        var rc4Key = DeriveKey(Pad(password), revision, keyLength);
         var oBytes = ownerEntry.Length >= 32 ? ownerEntry[..32] : ownerEntry;
         if (revision == 2)
         {
@@ -627,9 +627,9 @@ internal sealed class StandardSecurityHandler
         return bytes.Length > 127 ? bytes[..127] : bytes;
     }
 
-    private static byte[] DeriveRc4Key(byte[] padded, int revision, int keyLength)
+    private static byte[] DeriveKey(byte[] seed, int revision, int keyLength)
     {
-        var hash = Md5.ComputeHash(padded);
+        var hash = Md5.ComputeHash(seed);
         if (revision >= 3)
         {
             for (var i = 0; i < 50; i++)
@@ -644,7 +644,7 @@ internal sealed class StandardSecurityHandler
     // ISO 32000-1 algorithm 3.
     private static byte[] ComputeOwnerEntry(byte[] ownerPassword, byte[] userPassword, int revision, int keyLength)
     {
-        var rc4Key = DeriveRc4Key(Pad(ownerPassword), revision, keyLength);
+        var rc4Key = DeriveKey(Pad(ownerPassword), revision, keyLength);
         var value = Rc4.Transform(rc4Key, Pad(userPassword));
         if (revision >= 3)
         {
@@ -682,16 +682,7 @@ internal sealed class StandardSecurityHandler
             buffer[pos + i] = 0xFF;
         }
 
-        var hash = Md5.ComputeHash(buffer);
-        if (revision >= 3)
-        {
-            for (var i = 0; i < 50; i++)
-            {
-                hash = Md5.ComputeHash(hash[..keyLength]);
-            }
-        }
-
-        return hash[..keyLength];
+        return DeriveKey(buffer, revision, keyLength);
     }
 
     // ISO 32000-1 algorithm 4 (R2) and algorithm 5 (R >= 3, padded to 32 bytes).
