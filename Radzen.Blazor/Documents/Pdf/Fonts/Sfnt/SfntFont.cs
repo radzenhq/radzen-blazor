@@ -131,10 +131,8 @@ internal sealed class SfntFont
 
     public bool TryGetTable(string tag, out byte[] data)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-        if (directory.TryGet(tag, out var record))
+        if (TryGetValidatedRecord(tag, out var record))
         {
-            ValidateTableExtent(record.Offset, record.Length, tag);
             var result = new byte[record.Length];
             Array.Copy(this.data, (int)record.Offset, result, 0, (int)record.Length);
             data = result;
@@ -147,16 +145,26 @@ internal sealed class SfntFont
 
     public bool TryGetTableMemory(string tag, out ReadOnlyMemory<byte> table)
     {
-        ArgumentNullException.ThrowIfNull(tag);
-        if (directory.TryGet(tag, out var record))
+        if (TryGetValidatedRecord(tag, out var record))
         {
-            ValidateTableExtent(record.Offset, record.Length, tag);
             table = data.AsMemory((int)record.Offset, (int)record.Length);
             return true;
         }
 
         table = default;
         return false;
+    }
+
+    private bool TryGetValidatedRecord(string tag, out TableRecord record)
+    {
+        ArgumentNullException.ThrowIfNull(tag);
+        if (!directory.TryGet(tag, out record))
+        {
+            return false;
+        }
+
+        ValidateTableExtent(record.Offset, record.Length, tag);
+        return true;
     }
 
     private void ValidateTableExtent(uint offset, uint length, string tag)
