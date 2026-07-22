@@ -1,25 +1,12 @@
 using System;
-using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Stream
+internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : WriteOnlyStream
 {
     private readonly PooledByteAccumulator accumulator = new(initialCapacity);
 
-    public override bool CanRead => false;
-
-    public override bool CanSeek => false;
-
-    public override bool CanWrite => true;
-
     public override long Length => accumulator.Length;
-
-    public override long Position
-    {
-        get => accumulator.Length;
-        set => throw new NotSupportedException();
-    }
 
     public ReadOnlySpan<byte> WrittenSpan => accumulator.WrittenSpan;
 
@@ -34,12 +21,6 @@ internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : Strea
     public override void Flush()
     {
     }
-
-    public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
-
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-
-    public override void SetLength(long value) => throw new NotSupportedException();
 
     protected override void Dispose(bool disposing)
     {

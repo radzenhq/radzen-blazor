@@ -6,26 +6,14 @@ using System.IO;
 namespace Radzen.Documents.Pdf.Objects;
 
 [SuppressMessage("Usage", "CA2213:Disposable fields should be disposed", Justification = "The destination stream is owned by the caller.")]
-internal sealed class CountingBufferedStream(Stream inner) : Stream
+internal sealed class CountingBufferedStream(Stream inner) : WriteOnlyStream
 {
     private readonly Stream inner = inner;
     private byte[]? buffer = ArrayPool<byte>.Shared.Rent(64 * 1024);
     private int count;
     private long flushed;
 
-    public override bool CanRead => false;
-
-    public override bool CanSeek => false;
-
-    public override bool CanWrite => true;
-
     public override long Length => flushed + count;
-
-    public override long Position
-    {
-        get => flushed + count;
-        set => throw new NotSupportedException();
-    }
 
     public override void WriteByte(byte value)
     {
@@ -68,12 +56,6 @@ internal sealed class CountingBufferedStream(Stream inner) : Stream
         FlushBuffer();
         inner.Flush();
     }
-
-    public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
-
-    public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-
-    public override void SetLength(long value) => throw new NotSupportedException();
 
     protected override void Dispose(bool disposing)
     {
