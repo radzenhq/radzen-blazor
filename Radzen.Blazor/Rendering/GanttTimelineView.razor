@@ -11,7 +11,7 @@
 
 <div class="rz-gantt-timeline-view">
     <div class="rz-gantt-timeline-scroll">
-      <div class="rz-gantt-timeline-content">
+      <div class="rz-gantt-timeline-content" style="@($"width:{TimelineWidthPx}px;")">
         @{
             var appointmentsByRow = BuildAppointmentsByRow();
             var links = BuildLinks();
@@ -129,7 +129,7 @@
         </svg>
         @if (ShowTodayLine)
         {
-            var todayPercent = GetXPercent(DateTime.Now);
+            var todayPercent = GetXPercent(DateTime.Now, clamp: false);
             if (todayPercent.HasValue && todayPercent.Value >= 0 && todayPercent.Value <= 100)
             {
                 <div class="rz-gantt-today-line" style="@($"inset-inline-start:{todayPercent.Value.ToInvariantString()}%;")" />
@@ -139,7 +139,7 @@
         {
             foreach (var m in Markers)
             {
-                var mPercent = GetXPercent(m.Date);
+                var mPercent = GetXPercent(m.Date, clamp: false);
                 if (mPercent.HasValue && mPercent.Value >= 0 && mPercent.Value <= 100)
                 {
                     var mColor = !string.IsNullOrWhiteSpace(m.Color) ? m.Color : null;
@@ -582,7 +582,7 @@
         return links;
     }
 
-    private double? GetXPercent(DateTime value)
+    private double? GetXPercent(DateTime value, bool clamp = true)
     {
         if (EndDate <= StartDate)
         {
@@ -591,6 +591,11 @@
 
         var rangeStart = StartDate;
         var rangeEnd = EndDate;
+        if (!clamp && (value < rangeStart || value > rangeEnd))
+        {
+            return null;
+        }
+
         var clamped = value < rangeStart ? rangeStart : (value > rangeEnd ? rangeEnd : value);
         var totalTicks = (rangeEnd - rangeStart).Ticks;
         if (totalTicks <= 0)
