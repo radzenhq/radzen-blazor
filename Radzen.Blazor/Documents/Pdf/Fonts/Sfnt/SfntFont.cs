@@ -189,6 +189,7 @@ internal sealed class SfntFont
 
     public static SfntFont SelectFace(IReadOnlyList<SfntFont> faces, string family, bool bold, bool italic)
     {
+        SfntFont? regular = null;
         SfntFont? named = null;
         foreach (var face in faces)
         {
@@ -202,10 +203,15 @@ internal sealed class SfntFont
                 return face;
             }
 
+            if (!face.Bold && !face.Italic)
+            {
+                regular ??= face;
+            }
+
             named ??= face;
         }
 
-        return named ?? throw new InvalidDataException($"No font face with family name '{family}' was found.");
+        return regular ?? named ?? throw new InvalidDataException($"No font face with family name '{family}' was found.");
     }
 
     public static IReadOnlyList<SfntFont> ParseCollection(byte[] data)

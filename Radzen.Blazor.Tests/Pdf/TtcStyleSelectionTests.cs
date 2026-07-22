@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
@@ -81,5 +82,18 @@ public class TtcStyleSelectionTests
         Assert.DoesNotContain("2 Tr", content, StringComparison.Ordinal);
 
         Assert.Contains("AB", BuildTestSupport.Reload(builder).ExtractText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SelectFaceForAbsentStylePrefersRegularOverFirstFace()
+    {
+        var faces = SfntFont.ParseCollection(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-RegBold.ttc"));
+        var regular = faces.Single(face => !face.Bold && !face.Italic);
+        var boldFirst = faces.OrderByDescending(face => face.Bold).ToList();
+
+        var selected = SfntFont.SelectFace(boldFirst, regular.FamilyName, bold: false, italic: true);
+
+        Assert.False(selected.Bold);
+        Assert.False(selected.Italic);
     }
 }
