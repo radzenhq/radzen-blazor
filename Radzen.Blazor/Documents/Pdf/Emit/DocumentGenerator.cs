@@ -291,16 +291,7 @@ internal sealed class DocumentGenerator
         if (!body)
         {
             textEmitter.EmitBandLines(context, layer.Lines, left, top, width);
-            foreach (var positioned in layer.Images)
-            {
-                imageEmitter.EmitImage(context, positioned, left, top);
-            }
-
-            foreach (var positioned in layer.Codes)
-            {
-                codeEmitter.EmitCode(context, positioned, left, top);
-            }
-
+            EmitImagesAndCodes(context, layer, left, top);
             EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
             return;
         }
@@ -313,7 +304,11 @@ internal sealed class DocumentGenerator
             overflowThreshold: double.PositiveInfinity);
 
         EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
+        EmitImagesAndCodes(context, layer, left, top);
+    }
 
+    private void EmitImagesAndCodes(EmitContext context, PageLayer layer, double left, double top)
+    {
         foreach (var positioned in layer.Images)
         {
             imageEmitter.EmitImage(context, positioned, left, top);
