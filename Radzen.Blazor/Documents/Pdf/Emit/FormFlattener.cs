@@ -149,7 +149,7 @@ internal sealed class FormFlattener(Document document)
             if (Inherited(widget, "Ff") is NumberObject pushFf
                 && (pushFf.IntValue & FieldFlags.PushButton) != 0)
             {
-                if (HasVisibleAppearance(widget))
+                if (HasVisibleAppearance(widget, SelectedState(widget)))
                 {
                     throw new NotSupportedException("Cannot flatten a pushbutton field with a visible appearance.");
                 }
@@ -157,7 +157,7 @@ internal sealed class FormFlattener(Document document)
                 return;
             }
 
-            var state = source!.GetName(widget, "AS") ?? (Inherited(widget, "V") as NameObject)?.Value;
+            var state = SelectedState(widget);
             if (TryPaintButtonAppearance(page, widget, state, x, y, width, height))
             {
                 return;
@@ -176,7 +176,7 @@ internal sealed class FormFlattener(Document document)
 
         if (type.Value is not ("Tx" or "Ch"))
         {
-            if (HasVisibleAppearance(widget))
+            if (HasVisibleAppearance(widget, SelectedState(widget)))
             {
                 throw new NotSupportedException(
                     $"Cannot flatten a /{type.Value} field with a visible appearance.");
@@ -208,47 +208,48 @@ internal sealed class FormFlattener(Document document)
     private bool TryPaintButtonAppearance(
         Page page, DictionaryObject widget, string? state, double x, double y, double width, double height)
     {
-        var source = Source!;
-        if (source.GetDictionary(widget, "AP") is not { } ap || !ap.TryGetValue("N", out var normal))
-        {
-            return false;
-        }
-
-        var resolved = source.Resolve(normal!);
-        DocumentObject reference;
-        StreamObject appearance;
-        if (resolved is StreamObject direct)
-        {
-            reference = normal!;
-            appearance = direct;
-        }
-        else if (resolved is DictionaryObject states
-            && states.TryGetValue(state ?? "Off", out var entry)
-            && source.AsStream(entry!) is { } stateStream)
-        {
-            reference = entry!;
-            appearance = stateStream;
-        }
-        else
+        if (NormalAppearance(widget, state) is not { } normal)
         {
             return false;
         }
 
         return LoadedAppearancePainter.TryPaint(
-            source, Loaded!, page, ownedResources, reference, appearance,
+            Source!, Loaded!, page, ownedResources, normal.Reference, normal.Stream,
             PdfRect.FromSize(x, y, width, height), "FFlatten", strict: false, subject: "button");
     }
+
+    private (DocumentObject Reference, StreamObject Stream)? NormalAppearance(DictionaryObject widget, string? state)
+    {
+        var source = Source!;
+        if (source.GetDictionary(widget, "AP") is not { } ap || !ap.TryGetValue("N", out var normal))
+        {
+            return null;
+        }
+
+        var resolved = source.Resolve(normal!);
+        if (resolved is StreamObject direct)
+        {
+            return (normal!, direct);
+        }
+
+        if (resolved is DictionaryObject states
+            && states.TryGetValue(state ?? "Off", out var entry)
+            && source.AsStream(entry!) is { } stateStream)
+        {
+            return (entry!, stateStream);
+        }
+
+        return null;
+    }
+
+    private string? SelectedState(DictionaryObject widget)
+        => Source!.GetName(widget, "AS") ?? (Inherited(widget, "V") as NameObject)?.Value;
 
     private string FieldName(DictionaryObject widget)
         => Inherited(widget, "T") is StringObject name ? FormField.DecodeTextString(name.Value) : "?";
 
-    private bool HasVisibleAppearance(DictionaryObject widget)
-    {
-        var source = Source;
-        return source!.GetDictionary(widget, "AP") is { } ap
-            && source!.GetStream(ap, "N") is { } stream
-            && stream.Data.Length > 0;
-    }
+    private bool HasVisibleAppearance(DictionaryObject widget, string? state)
+        => NormalAppearance(widget, state) is { } normal && normal.Stream.Data.Length > 0;
 
     private DocumentObject? Inherited(DictionaryObject widget, string key)
         => FormField.InheritedAttribute(Source!, widget, key);
