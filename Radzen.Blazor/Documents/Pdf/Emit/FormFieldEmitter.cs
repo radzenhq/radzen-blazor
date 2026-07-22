@@ -1,6 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -119,24 +118,7 @@ internal static class FormFieldEmitter
 
     private static void EmitRadioGroup(RadioGroupFieldDefinition radio, FormEmitContext context)
     {
-        if (radio.Options.Count < 2)
-        {
-            throw new InvalidOperationException($"Radio group '{radio.Name}' needs at least two options.");
-        }
-
-        var values = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var option in radio.Options)
-        {
-            if (!values.Add(option.Value))
-            {
-                throw new InvalidOperationException($"Radio group '{radio.Name}' has duplicate option value '{option.Value}'.");
-            }
-        }
-
-        if (radio.SelectedValue is not null && !values.Contains(radio.SelectedValue))
-        {
-            throw new InvalidOperationException($"Radio group '{radio.Name}' selects '{radio.SelectedValue}' which is not among its options.");
-        }
+        RadioGroupValidation.Validate(radio);
 
         var state = radio.SelectedValue ?? "Off";
         var parent = new DictionaryObject
