@@ -263,37 +263,19 @@ internal sealed class SfntFont
 
     private ushort ReadHead()
     {
-        if (!directory.TryGet("head", out var head))
-        {
-            throw new InvalidDataException("Required 'head' table is missing.");
-        }
-
-        ValidateRequiredTable(head, "head", 20);
-
+        var head = RequireTable("head", 20);
         return new SfntReader(data).ReadUInt16At((int)head.Offset + 18);
     }
 
     private ushort ReadMaxp()
     {
-        if (!directory.TryGet("maxp", out var maxp))
-        {
-            throw new InvalidDataException("Required 'maxp' table is missing.");
-        }
-
-        ValidateRequiredTable(maxp, "maxp", 6);
-
+        var maxp = RequireTable("maxp", 6);
         return new SfntReader(data).ReadUInt16At((int)maxp.Offset + 4);
     }
 
     private ushort ReadHhea()
     {
-        if (!directory.TryGet("hhea", out var hhea))
-        {
-            throw new InvalidDataException("Required 'hhea' table is missing.");
-        }
-
-        ValidateRequiredTable(hhea, "hhea", 36);
-
+        var hhea = RequireTable("hhea", 36);
         var reader = new SfntReader(data, (int)hhea.Offset + 4);
         Ascent = reader.ReadInt16();
         Descent = reader.ReadInt16();
@@ -308,6 +290,17 @@ internal sealed class SfntFont
         {
             throw new InvalidDataException($"Required font table '{tag}' is truncated.");
         }
+    }
+
+    private TableRecord RequireTable(string tag, uint minimumLength)
+    {
+        if (!directory.TryGet(tag, out var record))
+        {
+            throw new InvalidDataException($"Required '{tag}' table is missing.");
+        }
+
+        ValidateRequiredTable(record, tag, minimumLength);
+        return record;
     }
 
     private void ReadPost()
