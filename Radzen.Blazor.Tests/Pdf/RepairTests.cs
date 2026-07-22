@@ -99,6 +99,25 @@ public class RepairTests
     }
 
     [Fact]
+    public void ReconstructedRootMatchesTheCatalogWithPages()
+    {
+        var data = Encoding.ASCII.GetBytes(
+            "%PDF-1.7\n"
+            + "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
+            + "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n"
+            + "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\n"
+            + "5 0 obj\n<< /Type /Catalog >>\nendobj\n");
+
+        var document = Document.LoadFromStream(new MemoryStream(data));
+        var reader = document.Loaded!.Source!;
+        var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+
+        Assert.True(root.TryGetValue("Pages", out var pages) && pages is not null);
+        var pagesDictionary = Assert.IsType<DictionaryObject>(reader.Resolve(pages!));
+        Assert.Equal("Pages", Assert.IsType<NameObject>(pagesDictionary["Type"]).Value);
+    }
+
+    [Fact]
     public void TotalGarbage_ThrowsDocumentParseException()
     {
         var garbage = new byte[256];

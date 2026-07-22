@@ -190,27 +190,32 @@ public sealed class DocumentReader
 
     internal DictionaryObject? ReconstructCatalogWithPages()
     {
-        var catalog = FindCatalogWithPages();
-        if (catalog is not null)
+        var catalog = FindCatalogWithPages(out var number);
+        if (catalog is null)
         {
-            return catalog;
+            trailer = repairer.Repair(store);
+            catalog = FindCatalogWithPages(out number);
         }
 
-        trailer = repairer.Repair(store);
-        return FindCatalogWithPages();
+        if (catalog is not null)
+        {
+            trailer["Root"] = new ReferenceObject(number, 0);
+        }
+
+        return catalog;
     }
 
-    private DictionaryObject? FindCatalogWithPages()
+    private DictionaryObject? FindCatalogWithPages(out int number)
     {
         var numbers = new List<int>(xrefLoader.Entries.Keys);
         numbers.Sort();
         numbers.Reverse();
-        foreach (var number in numbers)
+        foreach (var candidateNumber in numbers)
         {
             DictionaryObject? candidate;
             try
             {
-                candidate = GetObject(number) as DictionaryObject;
+                candidate = GetObject(candidateNumber) as DictionaryObject;
             }
             catch (DocumentParseException)
             {
@@ -225,10 +230,12 @@ public sealed class DocumentReader
                 && pages is not null
                 && Resolve(pages) is DictionaryObject)
             {
+                number = candidateNumber;
                 return candidate;
             }
         }
 
+        number = 0;
         return null;
     }
 
