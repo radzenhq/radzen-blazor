@@ -33,6 +33,11 @@ namespace Radzen.Blazor
 
         public override (double Start, double End, double Step) Ticks(int distance)
         {
+            if (IsZoomed)
+            {
+                return (Input.Start, Input.End, 1);
+            }
+
             var count = Data?.Count ?? 0;
 
             // A single (or no) category cannot span a range edge-to-edge without collapsing the input
@@ -55,7 +60,10 @@ namespace Radzen.Blazor
 
             for (var i = 0; i < count; i++)
             {
-                yield return i;
+                if (!IsZoomed || (i >= Input.Start && i <= Input.End))
+                {
+                    yield return i;
+                }
             }
         }
     }

@@ -37,13 +37,15 @@
             builder.OpenRegion(0);
             if (series != null && Chart != null)
             {
+                var plotHeight = Chart.ValueScale.OutputSize;
+                var plotWidth = Chart.CategoryScale.OutputSize;
+
                 var labels = series.GetDataLabels(OffsetX, OffsetY, Position)
                     .Where(l => !(double.IsNaN(l.Position.X) || double.IsNaN(l.Position.Y)))
+                    .Where(l => !Chart.CategoryScale.IsZoomed || (l.Position.X >= 0 && l.Position.X <= plotWidth))
                     .ToList();
 
                 var seriesIndex = Chart.Series.IndexOf(series);
-                var plotHeight = Chart.ValueScale.OutputSize;
-                var plotWidth = Chart.CategoryScale.OutputSize;
 
                 const double fontSize = 12;
                 const double paddingX = 6;

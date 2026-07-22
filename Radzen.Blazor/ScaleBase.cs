@@ -229,6 +229,13 @@ namespace Radzen.Blazor
         public bool Round { get; set; } = true;
 
         /// <summary>
+        /// Set when <see cref="Input" /> has been narrowed to a zoomed sub-range of the full domain.
+        /// Scales whose <see cref="Ticks(int)" /> does not derive from <see cref="Input" /> use it to
+        /// constrain their domain and tick values to the visible range.
+        /// </summary>
+        internal bool IsZoomed { get; set; }
+
+        /// <summary>
         /// Determines whether the specified scale is equal to the current one.
         /// </summary>
         /// <param name="scale">The scale.</param>

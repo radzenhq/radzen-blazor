@@ -847,6 +847,7 @@ namespace Radzen.Blazor
                     End = fullCategoryStart + fullRange * ZoomEnd
                 };
                 CategoryScale.Round = false;
+                CategoryScale.IsZoomed = true;
 
                 // Recalculate step for zoomed range
                 var zoomedTicks = CategoryScale.Ticks(CategoryAxis.TickDistance);
