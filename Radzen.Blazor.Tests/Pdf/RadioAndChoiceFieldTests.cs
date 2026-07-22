@@ -354,4 +354,38 @@ public class RadioAndChoiceFieldTests
         Assert.Throws<ArgumentException>(() => new RadioOptionDefinition("Off"));
         Assert.Throws<ArgumentException>(() => new RadioOptionDefinition(string.Empty));
     }
+
+    [Fact]
+    public void FlattenRadioGroupWithFewerThanTwoOptionsThrows()
+    {
+        var document = BuildDocument();
+        var group = new RadioGroupFieldDefinition("Lonely");
+        group.Options.Add(new RadioOptionDefinition("Only") { X = 100, Y = 700, Width = 16, Height = 16 });
+        document.FormFields.Add(group);
+
+        Assert.Throws<InvalidOperationException>(document.Flatten);
+    }
+
+    [Fact]
+    public void FlattenRadioGroupWithDuplicateValuesThrows()
+    {
+        var document = BuildDocument();
+        var group = new RadioGroupFieldDefinition("Twins");
+        group.Options.Add(new RadioOptionDefinition("Same") { X = 100, Y = 700, Width = 16, Height = 16 });
+        group.Options.Add(new RadioOptionDefinition("Same") { X = 100, Y = 670, Width = 16, Height = 16 });
+        document.FormFields.Add(group);
+
+        Assert.Throws<InvalidOperationException>(document.Flatten);
+    }
+
+    [Fact]
+    public void FlattenRadioGroupWithUnknownSelectionThrows()
+    {
+        var document = BuildDocument();
+        var group = RadioGroup();
+        group.SelectedValue = "ExtraLarge";
+        document.FormFields.Add(group);
+
+        Assert.Throws<InvalidOperationException>(document.Flatten);
+    }
 }

@@ -49,6 +49,7 @@ internal sealed class FormFlattener(Document document)
                     checkBox.X.Point, checkBox.Y.Point, checkBox.Width.Point, checkBox.Height.Point));
                 break;
             case RadioGroupFieldDefinition radio:
+                RadioGroupValidation.Validate(radio);
                 foreach (var option in radio.Options)
                 {
                     var selected = string.Equals(option.Value, radio.SelectedValue, StringComparison.Ordinal);
