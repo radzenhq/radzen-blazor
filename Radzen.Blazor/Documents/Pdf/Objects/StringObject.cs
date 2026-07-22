@@ -38,17 +38,26 @@ public sealed class StringObject(string value) : DocumentObject
         PdfBytes.WriteAscii(stream, builder.ToString());
     }
 
+    internal static StringObject FromText(string value)
+    {
+        foreach (var ch in value)
+        {
+            if (ch > 0xFF || PdfDocEncoding.IsRemapped(ch))
+            {
+                return new StringObject(Encoding.Latin1.GetString(Utf16WithBom(value)));
+            }
+        }
+
+        return new StringObject(value);
+    }
+
     private static byte[] EncodeBytes(string value)
     {
         foreach (var ch in value)
         {
             if (ch > 0xFF)
             {
-                var bytes = new byte[2 + Encoding.BigEndianUnicode.GetByteCount(value)];
-                bytes[0] = 0xFE;
-                bytes[1] = 0xFF;
-                Encoding.BigEndianUnicode.GetBytes(value, 0, value.Length, bytes, 2);
-                return bytes;
+                return Utf16WithBom(value);
             }
         }
 
@@ -59,6 +68,15 @@ public sealed class StringObject(string value) : DocumentObject
         }
 
         return raw;
+    }
+
+    private static byte[] Utf16WithBom(string value)
+    {
+        var bytes = new byte[2 + Encoding.BigEndianUnicode.GetByteCount(value)];
+        bytes[0] = 0xFE;
+        bytes[1] = 0xFF;
+        Encoding.BigEndianUnicode.GetBytes(value, 0, value.Length, bytes, 2);
+        return bytes;
     }
 
 }

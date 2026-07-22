@@ -50,7 +50,7 @@ internal static class FormFieldEmitter
         {
             case TextFieldDefinition text:
                 widget["FT"] = new NameObject("Tx");
-                widget["V"] = new StringObject(text.Value);
+                widget["V"] = StringObject.FromText(text.Value);
                 widget["DA"] = new StringObject(context.Appearances.DefaultAppearanceOf(text.Font));
                 var flags = TextFieldFlags(text);
                 if (flags != 0)
@@ -90,7 +90,7 @@ internal static class FormFieldEmitter
                 var options = new ArrayObject();
                 foreach (var option in choice.Options)
                 {
-                    options.Add(new StringObject(option));
+                    options.Add(StringObject.FromText(option));
                 }
 
                 widget["FT"] = new NameObject("Ch");
@@ -100,7 +100,7 @@ internal static class FormFieldEmitter
                     widget["Ff"] = new NumberObject(FieldFlags.Combo);
                 }
 
-                widget["V"] = new StringObject(choice.Value);
+                widget["V"] = StringObject.FromText(choice.Value);
                 widget["DA"] = new StringObject(context.Appearances.DefaultAppearanceOf(choice.Font));
                 if (FieldAppearances.CanBakeSingleLine(choice))
                 {

@@ -40,7 +40,7 @@ internal sealed class NavigationWriter(Document document)
         {
             var node = new DictionaryObject
             {
-                ["Title"] = new StringObject(item.Title),
+                ["Title"] = StringObject.FromText(item.Title),
                 ["Parent"] = parentRef,
             };
             if (item.Target is { } target)
