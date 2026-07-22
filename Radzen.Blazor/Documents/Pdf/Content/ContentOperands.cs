@@ -69,30 +69,10 @@ internal static class ContentOperands
     }
 
     public static double LastNumber(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Number)
-            {
-                return operands[i].Number;
-            }
-        }
-
-        return 0.0;
-    }
+        => LastOfKind(operands, TokenKind.Number)?.Number ?? 0.0;
 
     public static string? LastName(List<Token> operands)
-    {
-        for (var i = operands.Count - 1; i >= 0; i--)
-        {
-            if (operands[i].Kind == TokenKind.Name)
-            {
-                return operands[i].Text;
-            }
-        }
-
-        return null;
-    }
+        => LastOfKind(operands, TokenKind.Name)?.Text;
 
     public static string? FirstName(List<Token> operands)
     {
@@ -108,10 +88,15 @@ internal static class ContentOperands
     }
 
     public static Token? LastStringToken(List<Token> operands)
+        => LastOfKind(operands, TokenKind.String);
+
+    public static byte[]? LastString(List<Token> operands) => LastStringToken(operands)?.Bytes;
+
+    private static Token? LastOfKind(List<Token> operands, TokenKind kind)
     {
         for (var i = operands.Count - 1; i >= 0; i--)
         {
-            if (operands[i].Kind == TokenKind.String)
+            if (operands[i].Kind == kind)
             {
                 return operands[i];
             }
@@ -119,8 +104,6 @@ internal static class ContentOperands
 
         return null;
     }
-
-    public static byte[]? LastString(List<Token> operands) => LastStringToken(operands)?.Bytes;
 
     private static int CountNumbers(List<Token> operands)
     {
