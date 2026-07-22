@@ -179,4 +179,25 @@ public class FormWidgetFidelityTests
         Assert.False(page.TryGetValue("Annots", out var annots)
             && reader.Resolve(annots!) is ArrayObject array && array.Count > 0);
     }
+
+    private static byte[] PushButtonFormWithStateAppearance()
+    {
+        var pdf = new FixturePdf()
+            .Append("%PDF-1.7\n")
+            .Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R /AcroForm 4 0 R >>\nendobj\n")
+            .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
+            .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R] >>\nendobj\n")
+            .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
+            .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Btn /Ff 65536 /T (submit) /P 3 0 R /Rect [100 700 200 730] /AP << /N << /Off 6 0 R >> >> >>\nendobj\n")
+            .Object(6, "6 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 100 30] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
+        return Wrap(pdf, 7);
+    }
+
+    [Fact]
+    public void FlattenRefusesPushButtonWithVisibleStateDictionaryAppearance()
+    {
+        var document = Document.LoadFromStream(new MemoryStream(PushButtonFormWithStateAppearance()));
+
+        Assert.Throws<NotSupportedException>(document.Flatten);
+    }
 }
