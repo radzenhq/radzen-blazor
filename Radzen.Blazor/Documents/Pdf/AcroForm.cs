@@ -134,7 +134,7 @@ public sealed class AcroForm
 
         var terminal = Find(name);
         RequireFieldType(name, terminal.Field, "Tx", allowUntyped: true);
-        terminal.Field["V"] = new StringObject(value);
+        terminal.Field["V"] = StringObject.FromText(value);
         ChangedObjects.Add(terminal.Field);
         WriteTextAppearance(terminal, value);
     }
@@ -168,7 +168,7 @@ public sealed class AcroForm
             terminal.Field["I"] = new ArrayObject { new NumberObject(index) };
         }
 
-        terminal.Field["V"] = new StringObject(value);
+        terminal.Field["V"] = StringObject.FromText(value);
         ChangedObjects.Add(terminal.Field);
         WriteTextAppearance(terminal, value);
     }

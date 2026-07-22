@@ -163,12 +163,12 @@ internal static class AnnotationEmitter
         dictionary["P"] = context.Pages[context.PageIndex].Reference;
         if (annotation.Contents is not null)
         {
-            dictionary["Contents"] = new StringObject(annotation.Contents);
+            dictionary["Contents"] = StringObject.FromText(annotation.Contents);
         }
 
         if (annotation.Title is not null)
         {
-            dictionary["T"] = new StringObject(annotation.Title);
+            dictionary["T"] = StringObject.FromText(annotation.Title);
         }
 
         Populate(annotation, dictionary, context);

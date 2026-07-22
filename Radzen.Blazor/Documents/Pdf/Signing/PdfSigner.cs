@@ -150,7 +150,7 @@ public static class PdfSigner
 
         if (options.SignerName is not null)
         {
-            signature["Name"] = new StringObject(options.SignerName);
+            signature["Name"] = StringObject.FromText(options.SignerName);
         }
 
         if (options.SigningTime is { } time)
@@ -160,17 +160,17 @@ public static class PdfSigner
 
         if (options.Reason is not null)
         {
-            signature["Reason"] = new StringObject(options.Reason);
+            signature["Reason"] = StringObject.FromText(options.Reason);
         }
 
         if (options.Location is not null)
         {
-            signature["Location"] = new StringObject(options.Location);
+            signature["Location"] = StringObject.FromText(options.Location);
         }
 
         if (options.ContactInfo is not null)
         {
-            signature["ContactInfo"] = new StringObject(options.ContactInfo);
+            signature["ContactInfo"] = StringObject.FromText(options.ContactInfo);
         }
 
         return signature;

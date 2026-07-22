@@ -66,12 +66,12 @@ internal static class StructureWriter
 
         if (element.Alt is { } alt)
         {
-            dictionary["Alt"] = new StringObject(alt);
+            dictionary["Alt"] = StringObject.FromText(alt);
         }
 
         if (element.ActualText is { } actualText)
         {
-            dictionary["ActualText"] = new StringObject(actualText);
+            dictionary["ActualText"] = StringObject.FromText(actualText);
         }
 
         // ISO 14289-1 7.5: TH must carry a Scope.

@@ -119,7 +119,7 @@ internal static class PageLabelsWriter
 
             if (label.Prefix is { } prefix)
             {
-                dictionary["P"] = new StringObject(prefix);
+                dictionary["P"] = StringObject.FromText(prefix);
             }
 
             if (label.Start != 1)

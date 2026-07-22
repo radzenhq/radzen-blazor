@@ -34,15 +34,15 @@ internal sealed class AttachmentWriter(Document document)
             var filespec = new DictionaryObject
             {
                 ["Type"] = new NameObject("Filespec"),
-                ["F"] = new StringObject(attachment.Name),
-                ["UF"] = new StringObject(attachment.Name),
+                ["F"] = StringObject.FromText(attachment.Name),
+                ["UF"] = StringObject.FromText(attachment.Name),
                 ["AFRelationship"] = new NameObject(attachment.Relationship.ToString()),
                 ["EF"] = new DictionaryObject { ["F"] = fileReference, ["UF"] = fileReference },
             };
 
             if (!string.IsNullOrEmpty(attachment.Description))
             {
-                filespec["Desc"] = new StringObject(attachment.Description);
+                filespec["Desc"] = StringObject.FromText(attachment.Description);
             }
 
             var reference = writer.Add(filespec);

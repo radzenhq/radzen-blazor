@@ -309,7 +309,7 @@ internal sealed class DocumentSaver
             if (field.Value(meta) is { } value)
             {
                 info ??= new DictionaryObject();
-                info[field.Key] = new StringObject(value);
+                info[field.Key] = StringObject.FromText(value);
             }
         }
 
