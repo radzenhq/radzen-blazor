@@ -1,0 +1,22 @@
+@using Radzen.Documents.Spreadsheet
+
+@{
+    var sourceRange = Spreadsheet.clipboard.GetSource(Worksheet);
+}
+
+@if (sourceRange != RangeRef.Invalid)
+{
+    @foreach (var rangeInfo in Context.GetRanges(sourceRange))
+    {
+        var rect = Context.GetRectangle(
+            rangeInfo.Range.Start.Row, 
+            rangeInfo.Range.Start.Column, 
+            rangeInfo.Range.End.Row, 
+            rangeInfo.Range.End.Column
+        );
+        
+        <svg class="rz-spreadsheet-copy-overlay" style="@rect.ToStyle()">
+            <rect width="100%" height="100%" />
+        </svg>
+    }
+}

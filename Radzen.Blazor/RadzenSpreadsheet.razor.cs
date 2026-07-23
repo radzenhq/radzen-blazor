@@ -431,9 +431,21 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             accessibility?.AnnounceAction(message);
         }
 
+        if (executed && IsStructuralCommand(command))
+        {
+            clipboard.Clear();
+        }
+        
         return executed;
     }
 
+    private bool IsStructuralCommand(ICommand command) => command is
+        InsertRowCommand or InsertColumnCommand or 
+        DeleteRowsCommand or DeleteColumnsCommand or 
+        SortCommand or MultiKeySortCommand or 
+        FilterCommand or TableFilterCommand or 
+        SheetAutoFilterCommand or RemoveFilterCommand;
+    
     /// <inheritdoc/>
     public void Undo()
     {
@@ -443,6 +455,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         ActiveView?.Commands.Undo();
+        clipboard.Clear();
     }
 
     /// <inheritdoc/>
@@ -454,6 +467,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         ActiveView?.Commands.Redo();
+        clipboard.Clear();
     }
 
     /// <inheritdoc/>
@@ -1531,7 +1545,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             Editor?.Cancel();
         }
-
+        clipboard.Clear();
+        
         return Task.CompletedTask;
     }
 
@@ -1547,7 +1562,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     // Approximate page size (rows) for PageUp/PageDown - a screenful without coupling to the viewport.
     private const int PageRows = 20;
 
-    private readonly SpreadsheetClipboard clipboard = new();
+    internal readonly SpreadsheetClipboard clipboard = new();
 
     /// <inheritdoc/>
     protected override void OnInitialized()
@@ -1558,7 +1573,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook = Workbook;
         StampCulture(workbook);
         Bind("Enter", _ => CycleSelectionAsync(1, 0));
-        Bind("Escape", _ => CancelEditAsync());
+        Bind("Escape", _ => CancelEditAsync(),global:true);
         Bind("Tab", _ => CycleSelectionAsync(0, 1));
         Bind("ArrowUp", _ => MoveSelectionAsync(-1, 0));
         Bind("ArrowDown", _ => MoveSelectionAsync(1, 0));

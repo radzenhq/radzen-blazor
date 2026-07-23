@@ -18,6 +18,7 @@ class SpreadsheetClipboard
     private Worksheet? sheet;
     private ClipboardOperation operation;
     private string? csv;
+    public event EventHandler? Changed;
 
     public void Copy(Worksheet sheet)
     {
@@ -25,6 +26,7 @@ class SpreadsheetClipboard
         range = sheet.Selection.Range;
         operation = ClipboardOperation.Copy;
         csv = sheet.GetDelimitedString(range.Value);
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     public void Cut(Worksheet sheet)
@@ -33,6 +35,7 @@ class SpreadsheetClipboard
         range = sheet.Selection.Range;
         operation = ClipboardOperation.Move;
         csv = sheet.GetDelimitedString(range.Value);
+        Changed?.Invoke(this, EventArgs.Empty);
     }
 
     public void Paste(Worksheet targetSheet, RangeRef destination)
@@ -142,13 +145,26 @@ class SpreadsheetClipboard
         source = RangeRef.Invalid;
         return false;
     }
-
+    
+    public RangeRef GetSource(Worksheet targetSheet) =>
+        range.HasValue && ReferenceEquals(sheet, targetSheet) ? range.Value : RangeRef.Invalid;
+    
+    public void Clear()
+    {
+        ClearInternal();
+    }
+    
     private void ClearInternal()
     {
+        var rangeHadValue = range.HasValue;
         range = null;
         sheet = null;
         csv = null;
         operation = ClipboardOperation.Copy;
+        if (rangeHadValue)
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private static void Clear(Worksheet sourceSheet, RangeRef source)

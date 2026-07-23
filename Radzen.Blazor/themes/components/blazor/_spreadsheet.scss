@@ -858,3 +858,29 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
         background-color: var(--rz-base-background-color);
     }
 }
+
+.rz-spreadsheet-copy-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    transform: translateZ(0);
+
+    rect {
+        fill: none;
+        stroke: var(--rz-secondary);
+        stroke-width: 2px;
+        stroke-dasharray: 4, 4;
+        animation: rz-spreadsheet-marching-ants 1s linear infinite;
+        will-change: stroke-dashoffset;
+
+        @media (prefers-reduced-motion: reduce) {
+            animation: none;
+        }
+    }
+}
+
+@keyframes rz-spreadsheet-marching-ants {
+    to {
+        stroke-dashoffset: -16;
+    }
+}

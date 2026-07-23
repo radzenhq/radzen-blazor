@@ -142,4 +142,65 @@ public class SpreadsheetClipboardTests
         Assert.Equal("CanCut", sheet.Cells[0, 0].Value);
         Assert.Equal("CannotCut", sheet.Cells[1, 0].Value);
     }
+    [Fact]
+    public void GetSource_ReturnsRange_OnlyForSourceSheet()
+    {
+        var sheet1 = new Worksheet(10, 10);
+        var sheet2 = new Worksheet(10, 10);
+        sheet1.Selection.Select(RangeRef.Parse("A1:B2"));
+        
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Copy(sheet1);
+        
+        Assert.Equal(RangeRef.Parse("A1:B2"), clipboard.GetSource(sheet1));
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet2)); // Isn't drawn on a different sheet
+    }
+
+    [Fact]
+    public void GetSource_SurvivesCopyPaste_ButClearsOnExternalPaste()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = "Data";
+        sheet.Selection.Select(RangeRef.Parse("A1"));
+        
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Copy(sheet);
+        
+        // Internal Paste (matches CSV, simulating a normal app paste)
+        clipboard.TryPaste(sheet, RangeRef.Parse("B1"), "Data");
+        Assert.Equal(RangeRef.Parse("A1"), clipboard.GetSource(sheet)); // Survives copy-paste
+        
+        // External Paste (doesn't match CSV, simulating paste from another app)
+        clipboard.TryPaste(sheet, RangeRef.Parse("C1"), "ExternalData");
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet)); // Clears on external paste
+    }
+
+    [Fact]
+    public void GetSource_ClearsOnCutPaste()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Cells[0, 0].Value = "Data";
+        sheet.Selection.Select(RangeRef.Parse("A1"));
+        
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Cut(sheet);
+        
+        Assert.Equal(RangeRef.Parse("A1"), clipboard.GetSource(sheet));
+        
+        clipboard.Paste(sheet, RangeRef.Parse("B1"));
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet)); // Clears after cut-paste completes
+    }
+
+    [Fact]
+    public void Clear_RemovesSource()
+    {
+        var sheet = new Worksheet(10, 10);
+        sheet.Selection.Select(RangeRef.Parse("A1"));
+        
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Copy(sheet);
+        
+        clipboard.Clear(); // Simulates the Escape key or structural edits
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet));
+    }
 }
