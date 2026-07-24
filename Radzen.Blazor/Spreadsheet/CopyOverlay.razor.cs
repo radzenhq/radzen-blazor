@@ -24,34 +24,23 @@ public partial class CopyOverlay : IDisposable
     /// <summary>
     /// Gets or sets the parent spreadsheet component.
     /// </summary>
-    [Parameter]
-    public RadzenSpreadsheet Spreadsheet { get; set; } = default!;
-
-    private readonly EventBinding<SpreadsheetClipboard> clipboardBinding;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CopyOverlay"/> class.
-    /// </summary>
-    public CopyOverlay()
+    [CascadingParameter]
+    internal SpreadsheetClipboard Clipboard { get; set; } = default!;
+    /// <inheritdoc/>
+    protected override void OnInitialized()
     {
-        clipboardBinding = new EventBinding<SpreadsheetClipboard>(
-            c => c.Changed += OnClipboardChanged,
-            c => c.Changed -= OnClipboardChanged);
+        if (Clipboard != null)
+        {
+            Clipboard.Changed += StateHasChanged;
+        }
     }
 
     /// <inheritdoc/>
-    protected override void OnParametersSet()
+    public void Dispose()
     {
-        clipboardBinding.Bind(Spreadsheet.clipboard);
-    }
-
-    private void OnClipboardChanged(object? sender, EventArgs e)
-    {
-        InvokeAsync(StateHasChanged);
-    }
-
-    void IDisposable.Dispose()
-    {
-        clipboardBinding.Dispose();
+        if (Clipboard != null)
+        {
+            Clipboard.Changed -= StateHasChanged;
+        }
     }
 }

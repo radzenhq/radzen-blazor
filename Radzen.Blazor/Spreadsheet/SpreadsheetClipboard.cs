@@ -18,7 +18,7 @@ class SpreadsheetClipboard
     private Worksheet? sheet;
     private ClipboardOperation operation;
     private string? csv;
-    public event EventHandler? Changed;
+    public event Action? Changed;
 
     public void Copy(Worksheet sheet)
     {
@@ -26,7 +26,7 @@ class SpreadsheetClipboard
         range = sheet.Selection.Range;
         operation = ClipboardOperation.Copy;
         csv = sheet.GetDelimitedString(range.Value);
-        Changed?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke();
     }
 
     public void Cut(Worksheet sheet)
@@ -35,7 +35,7 @@ class SpreadsheetClipboard
         range = sheet.Selection.Range;
         operation = ClipboardOperation.Move;
         csv = sheet.GetDelimitedString(range.Value);
-        Changed?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke();
     }
 
     public void Paste(Worksheet targetSheet, RangeRef destination)
@@ -66,8 +66,8 @@ class SpreadsheetClipboard
 
             if (operation == ClipboardOperation.Move)
             {
-                Clear(sheet, source);
-                ClearInternal();
+                ClearRange(sheet, source);
+                Clear();
             }
         }
     }
@@ -81,7 +81,7 @@ class SpreadsheetClipboard
         }
 
         // clear internal clipboard when external data is pasted
-        ClearInternal();
+        Clear();
         return false;
     }
 
@@ -151,11 +151,6 @@ class SpreadsheetClipboard
     
     public void Clear()
     {
-        ClearInternal();
-    }
-    
-    private void ClearInternal()
-    {
         var rangeHadValue = range.HasValue;
         range = null;
         sheet = null;
@@ -163,11 +158,11 @@ class SpreadsheetClipboard
         operation = ClipboardOperation.Copy;
         if (rangeHadValue)
         {
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke();
         }
     }
 
-    private static void Clear(Worksheet sourceSheet, RangeRef source)
+    private static void ClearRange(Worksheet sourceSheet, RangeRef source)
     {
         for (var sr = source.Start.Row; sr <= source.End.Row; sr++)
         {

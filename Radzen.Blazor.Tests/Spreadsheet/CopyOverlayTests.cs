@@ -12,38 +12,37 @@ public class CopyOverlayTests : TestContext
     public void CopyOverlay_RendersNothing_When_Clipboard_Empty()
     {
         var sheet = new Worksheet(10, 10);
-        var spreadsheet = new RadzenSpreadsheet();
+        var clipboard = new SpreadsheetClipboard();
         var context = new CopyMockContext(sheet);
 
         var cut = RenderComponent<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
-            .Add(p => p.Spreadsheet, spreadsheet)
-            .Add(p => p.Context, context));
+            .Add(p => p.Context, context)
+            .AddCascadingValue(clipboard));
 
         Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-overlay"));
     }
 
     [Fact]
-    public void CopyOverlay_RendersSvg_When_Clipboard_Has_Source()
+    public void CopyOverlay_RendersEdges_When_Clipboard_Has_Source()
     {
         var sheet = new Worksheet(10, 10);
         sheet.Selection.Select(RangeRef.Parse("B2:C3"));
         
-        var spreadsheet = new RadzenSpreadsheet();
-        spreadsheet.clipboard.Copy(sheet);
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Copy(sheet);
 
         var context = new CopyMockContext(sheet);
 
         var cut = RenderComponent<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet)
-            .Add(p => p.Spreadsheet, spreadsheet)
-            .Add(p => p.Context, context));
+            .Add(p => p.Context, context)
+            .AddCascadingValue(clipboard));
 
-        var svgs = cut.FindAll(".rz-spreadsheet-copy-overlay");
-        Assert.Single(svgs);
+        var overlays = cut.FindAll(".rz-spreadsheet-copy-overlay");
+        Assert.Single(overlays);
 
-        var rect = cut.Find("rect");
-        Assert.NotNull(rect);
+        Assert.NotEmpty(cut.FindAll(".rz-copy-edge"));
     }
 
     [Fact]
@@ -53,17 +52,68 @@ public class CopyOverlayTests : TestContext
         var sheet2 = new Worksheet(10, 10);
         sheet1.Selection.Select(RangeRef.Parse("A1:B2"));
 
-        var spreadsheet = new RadzenSpreadsheet();
-        spreadsheet.clipboard.Copy(sheet1); // Copied on sheet1
+        var clipboard = new SpreadsheetClipboard();
+        clipboard.Copy(sheet1); // Copied on sheet1
 
         var context = new CopyMockContext(sheet2);
 
         var cut = RenderComponent<CopyOverlay>(parameters => parameters
             .Add(p => p.Worksheet, sheet2)
-            .Add(p => p.Spreadsheet, spreadsheet)
-            .Add(p => p.Context, context));
+            .Add(p => p.Context, context)
+            .AddCascadingValue(clipboard));
 
         Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-overlay")); // Not drawn on sheet2
+    }
+    [Fact]
+    public async void RendersEdges_WhenClipboardChanged_FiresAfterInitialRender()
+    {
+        var sheet = new Worksheet(10, 10);
+        var clipboard = new SpreadsheetClipboard();
+        var context = new CopyMockContext(sheet);
+
+        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+            .Add(p => p.Worksheet, sheet)
+            .Add(p => p.Context, context)
+            .AddCascadingValue(clipboard));
+
+        Assert.Empty(cut.FindAll(".rz-copy-edge"));
+
+        sheet.Selection.Select(RangeRef.Parse("A1"));
+        await cut.InvokeAsync(() => clipboard.Copy(sheet));
+        Assert.NotEmpty(cut.FindAll(".rz-copy-edge"));
+    }
+
+    [Fact]
+    public void RendersFrozenClasses_AndTopEdgeOnly_OnSplitRange()
+    {
+        var sheet = new Worksheet(10, 10);
+        var clipboard = new SpreadsheetClipboard();
+        sheet.Selection.Select(RangeRef.Parse("A1"));
+        clipboard.Copy(sheet);
+
+        var frozenContext = new CopyMockContext(sheet);
+        frozenContext.SetOverrideRanges(new List<RangeInfo>
+        {
+            new RangeInfo
+            {
+                Range = RangeRef.Parse("A1"),
+                Top = true,
+                Right = true,
+                Bottom = false,
+                Left = true,
+                FrozenRow = true,
+                FrozenColumn = false
+            }
+        });
+
+        var cut = RenderComponent<CopyOverlay>(parameters => parameters
+            .Add(p => p.Worksheet, sheet)
+            .Add(p => p.Context, frozenContext)
+            .AddCascadingValue(clipboard));
+
+        Assert.NotNull(cut.Find(".rz-spreadsheet-frozen-row"));
+        Assert.NotEmpty(cut.FindAll(".rz-copy-edge-top"));
+        Assert.Empty(cut.FindAll(".rz-copy-edge-bottom"));
     }
 }
 
@@ -71,6 +121,7 @@ public class CopyOverlayTests : TestContext
 public class CopyMockContext : IVirtualGridContext
 {
     private SheetView? view;
+    private IEnumerable<RangeInfo>? overrideRanges;
 
     public CopyMockContext(Worksheet? sheet = null)
     {
@@ -78,6 +129,11 @@ public class CopyMockContext : IVirtualGridContext
         {
             view = new SheetView(sheet);
         }
+    }
+
+    public void SetOverrideRanges(IEnumerable<RangeInfo> ranges)
+    {
+        overrideRanges = ranges;
     }
 
     public PixelRectangle GetRectangle(int row, int column)
@@ -90,8 +146,15 @@ public class CopyMockContext : IVirtualGridContext
         return new PixelRectangle(new PixelRange(left * 100, (right + 1) * 100), new PixelRange(top * 24, (bottom + 1) * 24));
     }
 
-    public IEnumerable<RangeInfo> GetRanges(RangeRef range) =>
-        view != null ? view.GetRanges(range) : [new RangeInfo { Range = range }];
+    public IEnumerable<RangeInfo> GetRanges(RangeRef range)
+    {
+        if (overrideRanges != null)
+        {
+            return overrideRanges;
+        }
+
+        return view != null ? view.GetRanges(range) : [new RangeInfo { Range = range, Top = true, Right = true, Bottom = true, Left = true }];
+    }
 
 #pragma warning disable CS0067
     public event Action? Scrolled;

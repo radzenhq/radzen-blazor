@@ -1,22 +1,20 @@
 @using Radzen.Documents.Spreadsheet
 
-@{
-    var sourceRange = Spreadsheet.clipboard.GetSource(Worksheet);
-}
-
-@if (sourceRange != RangeRef.Invalid)
+@if (Clipboard?.GetSource(Worksheet) is { } sourceRange && sourceRange != RangeRef.Invalid)
 {
     @foreach (var rangeInfo in Context.GetRanges(sourceRange))
     {
-        var rect = Context.GetRectangle(
-            rangeInfo.Range.Start.Row, 
-            rangeInfo.Range.Start.Column, 
-            rangeInfo.Range.End.Row, 
-            rangeInfo.Range.End.Column
-        );
+        var rect = Context.GetRectangle(rangeInfo.Range.Start.Row, rangeInfo.Range.Start.Column, rangeInfo.Range.End.Row, rangeInfo.Range.End.Column);
+        var cssClass = "rz-spreadsheet-copy-overlay";
         
-        <svg class="rz-spreadsheet-copy-overlay" style="@rect.ToStyle()">
-            <rect width="100%" height="100%" />
-        </svg>
+        if (rangeInfo.FrozenRow) cssClass += " rz-spreadsheet-frozen-row";
+        if (rangeInfo.FrozenColumn) cssClass += " rz-spreadsheet-frozen-column";
+
+        <div class="@cssClass" style="@rect.ToStyle()">
+            @if (rangeInfo.Top) { <div class="rz-copy-edge rz-copy-edge-top"></div> }
+            @if (rangeInfo.Bottom) { <div class="rz-copy-edge rz-copy-edge-bottom"></div> }
+            @if (rangeInfo.Left) { <div class="rz-copy-edge rz-copy-edge-left"></div> }
+            @if (rangeInfo.Right) { <div class="rz-copy-edge rz-copy-edge-right"></div> }
+        </div>
     }
 }

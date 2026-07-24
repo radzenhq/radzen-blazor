@@ -431,20 +431,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             accessibility?.AnnounceAction(message);
         }
 
-        if (executed && IsStructuralCommand(command))
+        if (executed && command is not (PasteCommand
+                or ResizeColumnCommand or ResizeRowCommand
+                or MoveAnchoredCommand<SheetImage> or MoveAnchoredCommand<SheetChart>
+                or ResizeAnchoredCommand<SheetImage> or ResizeAnchoredCommand<SheetChart>))
         {
             clipboard.Clear();
         }
         
         return executed;
     }
-
-    private bool IsStructuralCommand(ICommand command) => command is
-        InsertRowCommand or InsertColumnCommand or 
-        DeleteRowsCommand or DeleteColumnsCommand or 
-        SortCommand or MultiKeySortCommand or 
-        FilterCommand or TableFilterCommand or 
-        SheetAutoFilterCommand or RemoveFilterCommand;
     
     /// <inheritdoc/>
     public void Undo()
@@ -455,7 +451,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         ActiveView?.Commands.Undo();
-        clipboard.Clear();
     }
 
     /// <inheritdoc/>
@@ -467,7 +462,6 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
 
         ActiveView?.Commands.Redo();
-        clipboard.Clear();
     }
 
     /// <inheritdoc/>
@@ -1544,6 +1538,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Editor?.Mode != EditMode.None)
         {
             Editor?.Cancel();
+            return Task.CompletedTask;
         }
         clipboard.Clear();
         
@@ -1573,7 +1568,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook = Workbook;
         StampCulture(workbook);
         Bind("Enter", _ => CycleSelectionAsync(1, 0));
-        Bind("Escape", _ => CancelEditAsync(),global:true);
+        Bind("Escape", _ => CancelEditAsync(), global: true);
         Bind("Tab", _ => CycleSelectionAsync(0, 1));
         Bind("ArrowUp", _ => MoveSelectionAsync(-1, 0));
         Bind("ArrowDown", _ => MoveSelectionAsync(1, 0));
@@ -1849,10 +1844,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
         if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
         {
-            if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
-        {
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" });
-        }
         }
         if (canCutPaste)
         {
