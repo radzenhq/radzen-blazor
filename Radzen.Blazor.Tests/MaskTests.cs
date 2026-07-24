@@ -280,22 +280,37 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Mask_SyncsDomValue_WhenParentRejectsInput()
+        public void Mask_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            // Render through a wrapper that holds Value at a fixed string (parent rejects
-            // the user-typed text by simply not updating its variable). Verifies that
-            // when the bound Value parameter is re-rendered unchanged after the user
-            // typed something different, Blazor still syncs the DOM input back to the
-            // bound value — the @bind:get/:set contract.
+            var boundValue = "original";
+            var component = ctx.RenderComponent<RadzenMask>(parameters =>
+            {
+                parameters.Add(p => p.Value, boundValue);
+                parameters.Add(p => p.ValueChanged, v => boundValue = v);
+            });
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", boundValue);
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void Mask_SyncsDomValue_WhenParentTransformsInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
             var wrapper = ctx.RenderComponent<RadzenMaskWrapper>();
 
             wrapper.Find("input").Change("user-typed");
 
-            Assert.Equal("fixed", wrapper.Instance.HeldValue);
-            Assert.Equal("fixed", wrapper.Find("input").GetAttribute("value"));
+            Assert.Equal("USER-TYPED", wrapper.Instance.HeldValue);
+            Assert.Equal("USER-TYPED", wrapper.Find("input").GetAttribute("value"));
         }
 
         private sealed class RadzenMaskWrapper : Microsoft.AspNetCore.Components.ComponentBase
@@ -307,7 +322,7 @@ namespace Radzen.Blazor.Tests
                 builder.OpenComponent<RadzenMask>(0);
                 builder.AddAttribute(1, nameof(RadzenMask.Value), HeldValue);
                 builder.AddAttribute(2, nameof(RadzenMask.ValueChanged),
-                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { HeldValue = v.ToUpperInvariant(); StateHasChanged(); }));
                 builder.CloseComponent();
             }
         }

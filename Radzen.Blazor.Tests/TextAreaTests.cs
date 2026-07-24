@@ -220,19 +220,37 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextArea_SyncsDomValue_WhenParentRejectsInput()
+        public void TextArea_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
             using var ctx = new TestContext();
 
-            var wrapper = ctx.RenderComponent<RadzenTextAreaRejectWrapper>();
+            var boundValue = "original";
+            var component = ctx.RenderComponent<RadzenTextArea>(parameters =>
+            {
+                parameters.Add(p => p.Value, boundValue);
+                parameters.Add(p => p.ValueChanged, v => boundValue = v);
+            });
+
+            component.Find("textarea").Change("user-typed");
+
+            Assert.Equal("user-typed", boundValue);
+            Assert.Equal("user-typed", component.Instance.Value);
+        }
+
+        [Fact]
+        public void TextArea_SyncsDomValue_WhenParentTransformsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenTextAreaTransformWrapper>();
 
             wrapper.Find("textarea").Change("user-typed");
 
-            Assert.Equal("original", wrapper.FindComponent<RadzenTextArea>().Instance.Value);
-            Assert.Equal("original", wrapper.Find("textarea").GetAttribute("value"));
+            Assert.Equal("USER-TYPED", wrapper.FindComponent<RadzenTextArea>().Instance.Value);
+            Assert.Equal("USER-TYPED", wrapper.Find("textarea").GetAttribute("value"));
         }
 
-        private sealed class RadzenTextAreaRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        private sealed class RadzenTextAreaTransformWrapper : Microsoft.AspNetCore.Components.ComponentBase
         {
             public string HeldValue { get; private set; } = "original";
 
@@ -241,7 +259,7 @@ namespace Radzen.Blazor.Tests
                 builder.OpenComponent<RadzenTextArea>(0);
                 builder.AddAttribute(1, nameof(RadzenTextArea.Value), HeldValue);
                 builder.AddAttribute(2, nameof(RadzenTextArea.ValueChanged),
-                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { HeldValue = v.ToUpperInvariant(); StateHasChanged(); }));
                 builder.CloseComponent();
             }
         }

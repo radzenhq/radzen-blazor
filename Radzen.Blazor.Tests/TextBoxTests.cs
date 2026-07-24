@@ -346,18 +346,35 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void TextBox_SyncsDomValue_WhenParentRejectsInput()
+        public void TextBox_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
             using var ctx = new TestContext();
 
-            // Wrapper holds Value at "original" and ignores ValueChanged (parent rejects).
-            // After the user types, the DOM input should be synced back to "original".
-            var wrapper = ctx.RenderComponent<RadzenTextBoxRejectWrapper>();
+            var boundValue = "original";
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Value, boundValue);
+                parameters.Add(p => p.ValueChanged, v => boundValue = v);
+            });
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", boundValue);
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void TextBox_SyncsDomValue_WhenParentTransformsInput()
+        {
+            using var ctx = new TestContext();
+
+            var wrapper = ctx.RenderComponent<RadzenTextBoxTransformWrapper>();
 
             wrapper.Find("input").Change("user-typed");
 
-            Assert.Equal("original", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
-            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+            Assert.Equal("USER-TYPED", wrapper.FindComponent<RadzenTextBox>().Instance.Value);
+            Assert.Equal("USER-TYPED", wrapper.Find("input").GetAttribute("value"));
         }
 
         private sealed class RadzenTextBoxBindWrapper : Microsoft.AspNetCore.Components.ComponentBase
@@ -386,7 +403,7 @@ namespace Radzen.Blazor.Tests
             }
         }
 
-        private sealed class RadzenTextBoxRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        private sealed class RadzenTextBoxTransformWrapper : Microsoft.AspNetCore.Components.ComponentBase
         {
             public string HeldValue { get; private set; } = "original";
 
@@ -395,7 +412,7 @@ namespace Radzen.Blazor.Tests
                 builder.OpenComponent<RadzenTextBox>(0);
                 builder.AddAttribute(1, nameof(RadzenTextBox.Value), HeldValue);
                 builder.AddAttribute(2, nameof(RadzenTextBox.ValueChanged),
-                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { HeldValue = v.ToUpperInvariant(); StateHasChanged(); }));
                 builder.CloseComponent();
             }
         }

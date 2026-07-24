@@ -476,20 +476,40 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void AutoComplete_SyncsDomValue_WhenParentRejectsInput()
+        public void AutoComplete_KeepsTypedValue_WhenBoundWithoutParameterReflow()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var wrapper = ctx.RenderComponent<RadzenAutoCompleteRejectWrapper>();
+            var boundValue = "original";
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Value, boundValue);
+                parameters.Add(p => p.ValueChanged, v => boundValue = v);
+            });
+
+            component.Find("input").Change("user-typed");
+
+            Assert.Equal("user-typed", boundValue);
+            Assert.Equal("user-typed", component.Instance.Value);
+            Assert.Equal("user-typed", component.Find("input").GetAttribute("value"));
+        }
+
+        [Fact]
+        public void AutoComplete_SyncsDomValue_WhenParentTransformsInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var wrapper = ctx.RenderComponent<RadzenAutoCompleteTransformWrapper>();
 
             wrapper.Find("input").Change("user-typed");
 
-            Assert.Equal("original", wrapper.FindComponent<RadzenAutoComplete>().Instance.Value);
-            Assert.Equal("original", wrapper.Find("input").GetAttribute("value"));
+            Assert.Equal("USER-TYPED", wrapper.FindComponent<RadzenAutoComplete>().Instance.Value);
+            Assert.Equal("USER-TYPED", wrapper.Find("input").GetAttribute("value"));
         }
 
-        private sealed class RadzenAutoCompleteRejectWrapper : Microsoft.AspNetCore.Components.ComponentBase
+        private sealed class RadzenAutoCompleteTransformWrapper : Microsoft.AspNetCore.Components.ComponentBase
         {
             public string HeldValue { get; private set; } = "original";
 
@@ -498,7 +518,7 @@ namespace Radzen.Blazor.Tests
                 builder.OpenComponent<RadzenAutoComplete>(0);
                 builder.AddAttribute(1, nameof(RadzenAutoComplete.Value), HeldValue);
                 builder.AddAttribute(2, nameof(RadzenAutoComplete.ValueChanged),
-                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, _ => StateHasChanged()));
+                    Microsoft.AspNetCore.Components.EventCallback.Factory.Create<string>(this, v => { HeldValue = v.ToUpperInvariant(); StateHasChanged(); }));
                 builder.CloseComponent();
             }
         }
