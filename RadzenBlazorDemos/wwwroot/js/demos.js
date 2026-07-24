@@ -1,6 +1,20 @@
 var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' } };
 var instances = {};
-function createEditor(element, id, ref, options) {
+function loadMonaco() {
+    return new Promise(function (resolve, reject) {
+        if (typeof window.require !== 'function') {
+            reject(new Error('Monaco loader failed to load'));
+            return;
+        }
+        window.require(['vs/editor/editor.main'], resolve, reject);
+    });
+}
+async function createEditor(element, id, ref, options) {
+    try {
+        await loadMonaco();
+    } catch (e) {
+        return null;
+    }
     var instance = monaco.editor.create(element, options);
     var subscription = instance.onDidChangeModelContent(function () {
         ref.invokeMethodAsync('OnChangeAsync', instance.getValue()).catch(function () {});

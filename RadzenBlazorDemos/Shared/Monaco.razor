@@ -37,9 +37,12 @@
                 automaticLayout = true
             });
 
-            interopValue = Value;
+            if (monaco != null)
+            {
+                interopValue = Value;
 
-            await monaco.InvokeVoidAsync("setValue", interopValue);
+                await monaco.InvokeVoidAsync("setValue", interopValue);
+            }
         }
     }
 
