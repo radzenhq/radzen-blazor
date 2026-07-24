@@ -431,9 +431,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             accessibility?.AnnounceAction(message);
         }
 
+        if (executed && command is not (PasteCommand
+                or ResizeColumnCommand or ResizeRowCommand
+                or MoveAnchoredCommand<SheetImage> or MoveAnchoredCommand<SheetChart>
+                or ResizeAnchoredCommand<SheetImage> or ResizeAnchoredCommand<SheetChart>))
+        {
+            clipboard.Clear();
+        }
+        
         return executed;
     }
-
+    
     /// <inheritdoc/>
     public void Undo()
     {
@@ -1530,8 +1538,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Editor?.Mode != EditMode.None)
         {
             Editor?.Cancel();
+            return Task.CompletedTask;
         }
-
+        clipboard.Clear();
+        
         return Task.CompletedTask;
     }
 
@@ -1547,7 +1557,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     // Approximate page size (rows) for PageUp/PageDown - a screenful without coupling to the viewport.
     private const int PageRows = 20;
 
-    private readonly SpreadsheetClipboard clipboard = new();
+    internal readonly SpreadsheetClipboard clipboard = new();
 
     /// <inheritdoc/>
     protected override void OnInitialized()
@@ -1558,7 +1568,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook = Workbook;
         StampCulture(workbook);
         Bind("Enter", _ => CycleSelectionAsync(1, 0));
-        Bind("Escape", _ => CancelEditAsync());
+        Bind("Escape", _ => CancelEditAsync(), global: true);
         Bind("Tab", _ => CycleSelectionAsync(0, 1));
         Bind("ArrowUp", _ => MoveSelectionAsync(-1, 0));
         Bind("ArrowDown", _ => MoveSelectionAsync(1, 0));
@@ -1834,10 +1844,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
         if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
         {
-            if (IsFeatureAllowed(SpreadsheetFeature.Clipboard))
-        {
             menuItems.Add(new() { Text = Localize(nameof(RadzenStrings.Spreadsheet_Copy)), Value = "copy", Icon = "content_copy" });
-        }
         }
         if (canCutPaste)
         {

@@ -858,3 +858,50 @@ $spreadsheet-splitter-background-color: var(--rz-base-200) !default;
         background-color: var(--rz-base-background-color);
     }
 }
+
+.rz-spreadsheet-copy-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+
+    &.rz-spreadsheet-frozen-row, &.rz-spreadsheet-frozen-column {
+        z-index: 3;
+    }
+
+    &.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+        z-index: 4;
+    }
+
+    .rz-copy-edge {
+        position: absolute;
+        will-change: background-position;
+    }
+
+    .rz-copy-edge-top, .rz-copy-edge-bottom {
+        height: 2px;
+        left: 0;
+        right: 0;
+        background: repeating-linear-gradient(to right, var(--rz-secondary) 0, var(--rz-secondary) 4px, transparent 4px, transparent 8px);
+    }
+
+    .rz-copy-edge-left, .rz-copy-edge-right {
+        width: 2px;
+        top: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(to bottom, var(--rz-secondary) 0, var(--rz-secondary) 4px, transparent 4px, transparent 8px);
+    }
+
+    .rz-copy-edge-top { top: -1px; animation: rz-marching-x 1s linear infinite; }
+    .rz-copy-edge-bottom { bottom: -1px; animation: rz-marching-x-reverse 1s linear infinite; }
+    .rz-copy-edge-left { left: -1px; animation: rz-marching-y-reverse 1s linear infinite; }
+    .rz-copy-edge-right { right: -1px; animation: rz-marching-y 1s linear infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .rz-copy-edge { animation: none !important; }
+    }
+}
+
+@keyframes rz-marching-x { to { background-position: 8px 0; } }
+@keyframes rz-marching-x-reverse { to { background-position: -8px 0; } }
+@keyframes rz-marching-y { to { background-position: 0 8px; } }
+@keyframes rz-marching-y-reverse { to { background-position: 0 -8px; } }
