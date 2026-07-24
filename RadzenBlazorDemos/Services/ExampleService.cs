@@ -87,7 +87,8 @@ namespace RadzenBlazorDemos
                             Faq = new []
                             {
                                 new FaqItem { Question = "When should I use the LoadData event?", Answer = "Use LoadData when the data comes from a web API or any source you query yourself - the grid passes you the current page, sort, and filter, and you return that page plus the total count." },
-                                new FaqItem { Question = "How is IQueryable binding different from LoadData?", Answer = "With IQueryable, such as Entity Framework, the grid builds and runs the query for you. With LoadData you run the query yourself and return the page, which suits REST APIs and custom back ends." }
+                                new FaqItem { Question = "How is IQueryable binding different from LoadData?", Answer = "With IQueryable, such as Entity Framework, the grid builds and runs the query for you. With LoadData you run the query yourself and return the page, which suits REST APIs and custom back ends." },
+                                new FaqItem { Question = "Does LoadData work during prerendering?", Answer = "No. LoadData is raised after the first render, which does not happen during prerendering, so the grid prerenders empty. To prerender data, load the first page in OnInitializedAsync, assign Data and Count, and persist them with PersistentComponentState (or the .NET 10 [PersistentState] attribute) so the data is not fetched again when the app becomes interactive. This applies to all components with a LoadData event." }
                             },
                             Title = "Load Blazor DataGrid Data on Demand (LoadData Event) | Free UI Components by Radzen",
                             Description = "Blazor Data Grid custom data-binding via the LoadData event.",

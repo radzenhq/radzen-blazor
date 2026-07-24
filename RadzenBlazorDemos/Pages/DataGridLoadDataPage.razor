@@ -10,3 +10,48 @@
 <RadzenExample ComponentName="DataGrid" Example="DataGridLoadData">
     <DataGridLoadData />
 </RadzenExample>
+
+<RadzenText Anchor="datagrid-loaddata#prerendering" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    LoadData and prerendering
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>LoadData</code> event is raised after the component renders for the first time, which does not happen during prerendering.
+    With prerendering enabled the DataGrid renders empty until the application becomes interactive. To include data in the prerendered HTML,
+    load the first page yourself in <code>OnInitializedAsync</code> and assign the <code>Data</code> and <code>Count</code> properties -
+    the grid skips the initial <code>LoadData</code> invocation when <code>Data</code> is set and the event takes over for subsequent paging, sorting and filtering.
+    Persist the loaded data with <code>PersistentComponentState</code> (or the <code>[PersistentState]</code> attribute in .NET 10) to avoid
+    fetching it again when the application becomes interactive. The same applies to all components with a <code>LoadData</code> event
+    such as DropDown, AutoComplete, ListBox and DataList.
+</RadzenText>
+<pre>
+<code>
+&lt;RadzenDataGrid TItem="Order" Data="@@orders" Count="@@count" LoadData="@@LoadData" AllowPaging="true" AllowSorting="true"&gt;
+    ...
+&lt;/RadzenDataGrid&gt;
+
+@@code {
+    [PersistentState]
+    public IEnumerable&lt;Order&gt; orders { get; set; }
+
+    [PersistentState]
+    public int count { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (orders == null)
+        {
+            var result = await orderService.GetOrders(skip: 0, top: 10);
+            orders = result.Items;
+            count = result.Count;
+        }
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        var result = await orderService.GetOrders(args.Skip, args.Top, args.OrderBy, args.Filter);
+        orders = result.Items;
+        count = result.Count;
+    }
+}
+</code>
+</pre>
