@@ -2113,6 +2113,7 @@ window.Radzen = {
     popup.style.display = 'block';
     popup.style.visibility = 'hidden';
     popup.onanimationend = null;
+    popup.onanimationcancel = null;
     popup.classList.remove("rz-close");
     Radzen.setPopupAriaExpanded(parent, id, true);
 
@@ -2424,6 +2425,8 @@ window.Radzen = {
                     popup = popups[i];
                 }
             }
+        } else if (popups.length == 1 && popups[0].style.display != 'none') {
+            popup = popups[0];
         } else {
             return;
         }
@@ -2439,12 +2442,21 @@ window.Radzen = {
         Radzen[id + 'FZL'] = null;
       }
 
-      popup.onanimationend = function () {
+      var hidePopup = function () {
           popup.style.display = 'none';
           popup.onanimationend = null;
+          popup.onanimationcancel = null;
       }
+      popup.onanimationend = hidePopup;
+      popup.onanimationcancel = hidePopup;
       popup.classList.add("rz-close");
       popup.classList.remove("rz-open");
+      var closeAnimationRunning = popup.getAnimations
+          ? popup.getAnimations().some(function (a) { return a.animationName == 'rz-close'; })
+          : getComputedStyle(popup).animationName.indexOf('rz-close') != -1;
+      if (!closeAnimationRunning) {
+          hidePopup();
+      }
     }
     if (popup && popup.__escapeHandler) {
         popup.removeEventListener('keydown', popup.__escapeHandler, true);
