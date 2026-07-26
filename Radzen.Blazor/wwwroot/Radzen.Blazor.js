@@ -2751,10 +2751,21 @@ window.Radzen = {
             lastDialog.options = options;
 
             if (options.resizable) {
-                dialog.offsetWidth = lastDialog.parentElement.offsetWidth;
-                dialog.offsetHeight = lastDialog.parentElement.offsetHeight;
+                var dialogElement = lastDialog.parentElement;
+
+                dialog.offsetWidth = dialogElement.offsetWidth;
+                dialog.offsetHeight = dialogElement.offsetHeight;
+
                 var dialogResize = function (e) {
                     if (!dialog) return;
+
+                    // Nothing calls back into JS when a nested dialog closes - closeDialog
+                    // only runs once the last dialog is gone - so self-dispose on detach.
+                    if (!e[0].target.isConnected) {
+                        resizer.dispose();
+                        return;
+                    }
+
                     if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
 
                         dialog.offsetWidth = e[0].target.offsetWidth;
@@ -2767,15 +2778,42 @@ window.Radzen = {
                         ).catch(function () { });
                     }
                 };
+
                 var resizeObserver = new ResizeObserver(dialogResize);
-                resizeObserver.observe(lastDialog.parentElement);
-                Radzen.dialogResizer = resizeObserver;
+                resizeObserver.observe(dialogElement);
+
+                var resizer = {
+                    disposed: false,
+                    dispose: function () {
+                        if (this.disposed) return;
+                        this.disposed = true;
+                        resizeObserver.disconnect();
+                        var index = Radzen.dialogResizers.indexOf(this);
+                        if (index != -1) {
+                            Radzen.dialogResizers.splice(index, 1);
+                        }
+                        if (Radzen.dialogResizer === this) {
+                            Radzen.dialogResizer = null;
+                        }
+                    },
+                    // Kept so that anything still calling the old single-observer API works.
+                    disconnect: function () { this.dispose(); }
+                };
+
+                // One resizer per dialog: a nested dialog used to overwrite the single
+                // global slot, orphaning the outer dialog's observer.
+                Radzen.dialogResizers = Radzen.dialogResizers || [];
+                Radzen.dialogResizers.push(resizer);
+                Radzen.dialogResizer = resizer;
             }
 
             if (options.draggable) {
                 var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
                 if (dialogTitle) {
-                    Radzen[dialogTitle] = function (e) {
+                    // Stored on the element: Radzen[dialogTitle] keyed every titlebar under
+                    // the same "[object HTMLDivElement]" string, so a nested dialog replaced
+                    // the outer dialog's handler.
+                    dialogTitle.dragHandler = function (e) {
                         var rect = lastDialog.parentElement.getBoundingClientRect();
                         var offsetX = e.clientX - rect.left;
                         var offsetY = e.clientY - rect.top;
@@ -2799,7 +2837,7 @@ window.Radzen = {
                         document.addEventListener('mouseup', stop);
                     };
 
-                    dialogTitle.addEventListener('mousedown', Radzen[dialogTitle]);
+                    dialogTitle.addEventListener('mousedown', dialogTitle.dragHandler);
                 }
             }
 
@@ -2815,9 +2853,13 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
-    if (Radzen.dialogResizer && typeof Radzen.dialogResizer.disconnect === 'function') {
-      Radzen.dialogResizer.disconnect();
+    // closeDialog only runs once the last dialog is gone, so every resizer that is
+    // still registered is finished with.
+    var resizers = (Radzen.dialogResizers || []).slice();
+    for (var i = 0; i < resizers.length; i++) {
+        resizers[i].dispose();
     }
+    Radzen.dialogResizers = [];
     Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
@@ -2825,10 +2867,9 @@ window.Radzen = {
     var lastDialog = dialogs.length && dialogs[dialogs.length - 1];
     if (lastDialog) {
         var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
-        if (dialogTitle) {
-            dialogTitle.removeEventListener('mousedown', Radzen[dialogTitle]);
-            Radzen[dialogTitle] = null;
-            delete Radzen[dialogTitle];
+        if (dialogTitle && dialogTitle.dragHandler) {
+            dialogTitle.removeEventListener('mousedown', dialogTitle.dragHandler);
+            dialogTitle.dragHandler = null;
         }
     }
 
