@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Threading.Tasks;
 using Bunit;
 using Xunit;
 
@@ -113,6 +115,27 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("22", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
             Assert.False(component.Find(".rz-fileupload").HasAttribute("tabindex"));
+        }
+
+        [Fact]
+        public async Task Upload_PassesMethodAndStream_WhenTriggeredFromCode()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenUpload>(parameters =>
+            {
+                parameters.Add(p => p.Auto, false);
+                parameters.Add(p => p.Url, "api/upload");
+                parameters.Add(p => p.Method, "PUT");
+                parameters.Add(p => p.Stream, true);
+            });
+
+            await component.InvokeAsync(() => component.Instance.Upload());
+
+            var invocation = ctx.JSInterop.Invocations["Radzen.upload"].Single();
+            Assert.Equal("api/upload", invocation.Arguments[1]);
+            Assert.Equal("PUT", invocation.Arguments[5]);
+            Assert.Equal(true, invocation.Arguments[6]);
         }
 
         [Fact]

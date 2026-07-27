@@ -245,7 +245,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
+            await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName, Method, Stream);
         }
 
         readonly IDictionary<string, string> headers = new Dictionary<string, string>();
