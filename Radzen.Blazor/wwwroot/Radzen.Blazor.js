@@ -2759,8 +2759,6 @@ window.Radzen = {
                 var dialogResize = function (e) {
                     if (!dialog) return;
 
-                    // Nothing calls back into JS when a nested dialog closes - closeDialog
-                    // only runs once the last dialog is gone - so self-dispose on detach.
                     if (!e[0].target.isConnected) {
                         resizer.dispose();
                         return;
@@ -2796,12 +2794,9 @@ window.Radzen = {
                             Radzen.dialogResizer = null;
                         }
                     },
-                    // Kept so that anything still calling the old single-observer API works.
                     disconnect: function () { this.dispose(); }
                 };
 
-                // One resizer per dialog: a nested dialog used to overwrite the single
-                // global slot, orphaning the outer dialog's observer.
                 Radzen.dialogResizers = Radzen.dialogResizers || [];
                 Radzen.dialogResizers.push(resizer);
                 Radzen.dialogResizer = resizer;
@@ -2810,9 +2805,6 @@ window.Radzen = {
             if (options.draggable) {
                 var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
                 if (dialogTitle) {
-                    // Stored on the element: Radzen[dialogTitle] keyed every titlebar under
-                    // the same "[object HTMLDivElement]" string, so a nested dialog replaced
-                    // the outer dialog's handler.
                     dialogTitle.dragHandler = function (e) {
                         var rect = lastDialog.parentElement.getBoundingClientRect();
                         var offsetX = e.clientX - rect.left;
@@ -2853,8 +2845,6 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
-    // closeDialog only runs once the last dialog is gone, so every resizer that is
-    // still registered is finished with.
     var resizers = (Radzen.dialogResizers || []).slice();
     for (var i = 0; i < resizers.length; i++) {
         resizers[i].dispose();
