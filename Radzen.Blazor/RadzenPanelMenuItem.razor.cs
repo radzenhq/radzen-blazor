@@ -113,10 +113,20 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is selected.
+        /// By default the selected state is updated automatically whenever the current URL matches <see cref="Path"/>.
+        /// Set <see cref="SelectedChanged"/> (e.g. via <c>@bind-Selected</c>) to disable that URL synchronization and control the selected state explicitly.
         /// </summary>
         /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Selected { get; set; }
+
+        /// <summary>
+        /// Gets or sets the selected changed callback. Setting it (e.g. via <c>@bind-Selected</c>) disables the automatic
+        /// selection from URL matching and the <see cref="Selected"/> parameter fully controls the selected state.
+        /// </summary>
+        /// <value>The selected changed callback.</value>
+        [Parameter]
+        public EventCallback<bool> SelectedChanged { get; set; }
 
         /// <summary>
         /// Gets or sets the child content.
@@ -293,6 +303,11 @@ namespace Radzen.Blazor
 
         private void SyncWithNavigationManager()
         {
+            if (SelectedChanged.HasDelegate)
+            {
+                return;
+            }
+
             var matches = ShouldMatch();
 
             if (matches != selected)
