@@ -71,7 +71,7 @@
 
         @if(PageSizeOptions != null && PageSizeOptions.Any())
         {
-            <RadzenDropDown TValue="int" Data="@PageSizeOptions" Value="@PageSize" Change="@OnPageSizeChanged" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", PageSizeText } })" />
+            <RadzenDropDown TValue="int" Data="@PageSizeOptions" Value="@PageSize" InputSize="@InputSize" Change="@OnPageSizeChanged" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", PageSizeText } })" />
             <span class="rz-pagesize-text">@PageSizeText</span>
         }
     </nav>

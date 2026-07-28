@@ -181,6 +181,13 @@ namespace Radzen.Blazor
         public Density Density { get; set; } = Density.Default;
 
         /// <summary>
+        /// Gets or sets the size of the page size dropdown. Set to <c>InputSize.Medium</c> by default.
+        /// </summary>
+        /// <value>The size of the page size dropdown.</value>
+        [Parameter]
+        public InputSize InputSize { get; set; } = InputSize.Medium;
+
+        /// <summary>
         /// Gets or sets the page size.
         /// </summary>
         /// <value>The page size.</value>

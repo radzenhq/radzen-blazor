@@ -49,6 +49,13 @@ namespace Radzen
         public Density Density { get; set; } = Density.Default;
 
         /// <summary>
+        /// Gets or sets the size of the page size dropdown in the pager. Set to <c>InputSize.Medium</c> by default.
+        /// </summary>
+        /// <value>The size of the page size dropdown in the pager.</value>
+        [Parameter]
+        public InputSize PagerInputSize { get; set; } = InputSize.Medium;
+
+        /// <summary>
         /// Gets or sets a value indicating whether paging is allowed. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>

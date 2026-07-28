@@ -422,6 +422,31 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DataGrid_Renders_PagerInputSizeParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowPaging, true);
+                parameterBuilder.Add<IEnumerable<int>>(p => p.PageSizeOptions, new int[] { 10, 20, 50 });
+                parameterBuilder.Add<InputSize>(p => p.PagerInputSize, InputSize.ExtraSmall);
+            });
+
+            Assert.Contains(@$"rz-input-xs", component.Markup);
+        }
+
+        [Fact]
         public void DataGrid_Renders_PagerPositionTopParameter()
         {
             using var ctx = new TestContext();

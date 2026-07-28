@@ -112,6 +112,42 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void RadzenPager_Renders_DefaultInputSize_On_PageSizeDropDown()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 20);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<IEnumerable<int>>(p => p.PageSizeOptions, new int[] { 10, 20, 50 });
+            });
+
+            Assert.Contains(@$"rz-input-md", component.Markup);
+        }
+
+        [Fact]
+        public void RadzenPager_Renders_InputSize_On_PageSizeDropDown()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 20);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<IEnumerable<int>>(p => p.PageSizeOptions, new int[] { 10, 20, 50 });
+                parameters.Add<InputSize>(p => p.InputSize, InputSize.Small);
+            });
+
+            Assert.Contains(@$"rz-input-sm", component.Markup);
+            Assert.DoesNotContain(@$"rz-input-md", component.Markup);
+        }
+
+        [Fact]
         public async Task RadzenPager_First_And_Prev_Buttons_Are_Disabled_When_On_The_First_Page()
         {
             using var ctx = new TestContext();
