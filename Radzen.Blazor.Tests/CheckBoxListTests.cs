@@ -313,6 +313,28 @@ namespace Radzen.Blazor.Tests
             Assert.Contains((int?)1, value);
             Assert.Equal("true", component.FindAll("[role=checkbox]")[0].GetAttribute("aria-checked"));
         }
+
+        [Fact]
+        public void CheckBoxList_Keydown_DoesNotRenderPreventDefault()
+        {
+            using var ctx = new TestContext();
+            var data = new List<string> { "Option 1", "Option 2", "Option 3" };
+
+            var component = ctx.RenderComponent<RadzenCheckBoxList<string>>(parameters =>
+            {
+                parameters.Add(p => p.Orientation, Orientation.Horizontal);
+                parameters.Add(p => p.Data, data);
+            });
+
+            var group = component.Find("div.rz-checkbox-list");
+            Assert.DoesNotContain(group.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            group.Focus();
+            component.Find("div.rz-checkbox-list").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            group = component.Find("div.rz-checkbox-list");
+            Assert.DoesNotContain(group.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
 

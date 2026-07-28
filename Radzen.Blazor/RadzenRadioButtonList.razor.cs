@@ -292,7 +292,6 @@ namespace Radzen.Blazor
 
         bool focused;
         int focusedIndex = -1;
-        bool preventKeyPress = true;
         bool stopKeydownPropagation;
 
         async Task OnKeyPress(KeyboardEventArgs args)
@@ -308,7 +307,6 @@ namespace Radzen.Blazor
 
             if (key == "ArrowLeft" || key == "ArrowRight" || key == "ArrowUp" || key == "ArrowDown")
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
 
                 var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
@@ -321,7 +319,6 @@ namespace Radzen.Blazor
             }
             else if (key == "Home" || key == "End")
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
 
                 var next = key == "Home" ? FindNextSelectable(-1, 1) : FindNextSelectable(allItems.Count, -1);
@@ -333,7 +330,6 @@ namespace Radzen.Blazor
             }
             else if (key == "Space" || key == "Enter")
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
 
                 if (!item.Disabled && item.Visible)
@@ -343,7 +339,6 @@ namespace Radzen.Blazor
             }
             else
             {
-                preventKeyPress = false;
                 stopKeydownPropagation = false;
             }
         }

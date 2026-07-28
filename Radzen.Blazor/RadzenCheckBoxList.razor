@@ -16,7 +16,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="group" aria-label="@Name" aria-activedescendant="@GetActiveDescendantId()" aria-disabled="@(Disabled ? "true" : "false")" @onfocus=@OnFocus @onblur=@OnBlur
-        tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation="stopKeydownPropagation">
+        tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:stopPropagation="stopKeydownPropagation">
         @if (AllowSelectAll)
         {
             <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>

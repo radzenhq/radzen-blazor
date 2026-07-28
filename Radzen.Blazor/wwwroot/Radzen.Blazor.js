@@ -6947,3 +6947,20 @@ Radzen.createSignaturePad = function(element, ref, strokeColor, strokeWidth, dis
     }
   };
 };
+Radzen.itemListKeydown = function (e) {
+  var el = e.target;
+  if (!el || !el.classList) return;
+  var radio = el.classList.contains('rz-radio-button-list');
+  var checkbox = el.classList.contains('rz-checkbox-list');
+  if (!radio && !checkbox) return;
+  var key = e.code ? e.code : e.key;
+  if (key === 'ArrowLeft' || key === 'ArrowRight' || key === 'ArrowUp' || key === 'ArrowDown') {
+    var horizontal = key === 'ArrowLeft' || key === 'ArrowRight';
+    if (radio || el.classList.contains(horizontal ? 'rz-checkbox-list-horizontal' : 'rz-checkbox-list-vertical')) {
+      e.preventDefault();
+    }
+  } else if (key === 'Home' || key === 'End' || key === 'Space' || key === 'Enter') {
+    e.preventDefault();
+  }
+};
+document.addEventListener('keydown', Radzen.itemListKeydown);

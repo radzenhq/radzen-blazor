@@ -390,6 +390,31 @@ namespace Radzen.Blazor.Tests
             Assert.True(value);
             Assert.Equal("true", component.FindAll("[role=radio]")[0].GetAttribute("aria-checked"));
         }
+
+        [Fact]
+        public void RadioButtonList_Keydown_DoesNotRenderPreventDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var value = 1;
+            var component = ctx.RenderComponent<RadzenRadioButtonList<int>>(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => value = v));
+                AddThreeItems(parameters);
+            });
+
+            var group = component.Find("[role=radiogroup]");
+            Assert.DoesNotContain(group.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+
+            group.Focus();
+            component.Find("[role=radiogroup]").KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Code = "ArrowRight" });
+
+            Assert.Equal(2, value);
+            group = component.Find("[role=radiogroup]");
+            Assert.DoesNotContain(group.Attributes, attr => attr.Name.Contains("preventdefault", System.StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
 

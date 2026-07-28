@@ -362,7 +362,6 @@ namespace Radzen.Blazor
 
         bool focused;
         int focusedIndex = -1;
-        bool preventKeyPress = true;
         bool stopKeydownPropagation;
 
         async Task OnKeyPress(KeyboardEventArgs args)
@@ -379,7 +378,6 @@ namespace Radzen.Blazor
             if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
                 (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
                 var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
 
@@ -392,14 +390,12 @@ namespace Radzen.Blazor
             }
             else if (key == "Home" || key == "End")
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
 
                 focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
-                preventKeyPress = true;
                 stopKeydownPropagation = true;
 
                 if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
@@ -409,7 +405,6 @@ namespace Radzen.Blazor
             }
             else
             {
-                preventKeyPress = false;
                 stopKeydownPropagation = false;
             }
         }
