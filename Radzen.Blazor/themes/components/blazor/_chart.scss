@@ -11,6 +11,7 @@ $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
 $chart-tooltip-border-radius: var(--rz-tooltip-border-radius) !default;
 $chart-tooltip-font-size: var(--rz-tooltip-font-size) !default;
+$chart-tooltip-max-width: min(30rem, 90vw) !default;
 $chart-tooltip-item-border-radius: var(--rz-border-radius) !default;
 $chart-tooltip-item-hover-background-color: var(--rz-grid-stripe-background-color) !default;
 $chart-marker-stroke: var(--rz-base-background-color) !default;
@@ -638,6 +639,8 @@ $chart-color-schemes: (
   position: absolute;
   top: 0;
   left: 0;
+  width: max-content;
+  max-width: var(--rz-chart-tooltip-max-width);
   pointer-events: none;
 }
 
@@ -660,7 +663,7 @@ $chart-color-schemes: (
   box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.18), 0 2px 6px -2px rgba(0, 0, 0, 0.1);
   padding: 0.5rem;
   border-radius: var(--rz-chart-tooltip-border-radius);
-  white-space: nowrap;
+  white-space: normal;
   font-size: var(--rz-chart-tooltip-font-size);
   font-variant-numeric: tabular-nums;
 }
