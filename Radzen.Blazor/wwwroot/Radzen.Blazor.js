@@ -2756,6 +2756,53 @@ window.Radzen = {
                 dialog.offsetWidth = dialogElement.offsetWidth;
                 dialog.offsetHeight = dialogElement.offsetHeight;
 
+                var userResizing = false;
+
+                var pushSize = function () {
+                    if (!dialog) return;
+                    if (dialog.offsetWidth == dialogElement.offsetWidth &&
+                        dialog.offsetHeight == dialogElement.offsetHeight) return;
+
+                    dialog.offsetWidth = dialogElement.offsetWidth;
+                    dialog.offsetHeight = dialogElement.offsetHeight;
+
+                    dialog.invokeMethodAsync(
+                        'RadzenDialog.OnResize',
+                        dialogElement.offsetWidth,
+                        dialogElement.offsetHeight
+                    ).catch(function () { });
+                };
+
+                var stopTracking = function () {
+                    document.removeEventListener('pointermove', onPointerMove, true);
+                    document.removeEventListener('pointerup', onPointerUp, true);
+                    document.removeEventListener('pointercancel', onPointerUp, true);
+                };
+
+                var onPointerMove = function (e) {
+                    if (e.buttons === 1) {
+                        userResizing = true;
+                        return;
+                    }
+
+                    onPointerUp();
+                };
+
+                var onPointerUp = function () {
+                    stopTracking();
+                    if (!userResizing) return;
+                    userResizing = false;
+                    pushSize();
+                };
+
+                var onPointerDown = function (e) {
+                    if (e.button !== 0 || !e.isPrimary || e.target !== dialogElement) return;
+
+                    document.addEventListener('pointermove', onPointerMove, true);
+                    document.addEventListener('pointerup', onPointerUp, true);
+                    document.addEventListener('pointercancel', onPointerUp, true);
+                };
+
                 var dialogResize = function (e) {
                     if (!dialog) return;
 
@@ -2764,21 +2811,19 @@ window.Radzen = {
                         return;
                     }
 
-                    if (dialog.offsetWidth != e[0].target.offsetWidth || dialog.offsetHeight != e[0].target.offsetHeight) {
-
+                    if (!userResizing) {
                         dialog.offsetWidth = e[0].target.offsetWidth;
                         dialog.offsetHeight = e[0].target.offsetHeight;
-
-                        dialog.invokeMethodAsync(
-                            'RadzenDialog.OnResize',
-                            e[0].target.offsetWidth,
-                            e[0].target.offsetHeight
-                        ).catch(function () { });
+                        return;
                     }
+
+                    pushSize();
                 };
 
                 var resizeObserver = new ResizeObserver(dialogResize);
                 resizeObserver.observe(dialogElement);
+
+                dialogElement.addEventListener('pointerdown', onPointerDown);
 
                 var resizer = {
                     disposed: false,
@@ -2786,6 +2831,8 @@ window.Radzen = {
                         if (this.disposed) return;
                         this.disposed = true;
                         resizeObserver.disconnect();
+                        dialogElement.removeEventListener('pointerdown', onPointerDown);
+                        stopTracking();
                         var index = Radzen.dialogResizers.indexOf(this);
                         if (index != -1) {
                             Radzen.dialogResizers.splice(index, 1);

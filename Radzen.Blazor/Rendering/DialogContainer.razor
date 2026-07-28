@@ -126,13 +126,13 @@
     {
         shouldRender = false;
 
-        if(Dialog?.Options?.Resize != null && w != 0 && h != 0)
+        if (w != 0 && h != 0)
         {
-            Dialog.Options.Resize(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
-        }
+            Dialog?.Options?.Resize?.Invoke(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
 
-        width = $"width: {w}px;";
-        height = $"height: {h}px;";
+            width = $"width: {w}px;";
+            height = $"height: {h}px;";
+        }
 
         shouldRender = true;
     }
