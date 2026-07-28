@@ -1298,6 +1298,14 @@ namespace Radzen.Blazor
                 || IsPolarSeries(series);
         }
 
+        private async Task WarnIfChartTooltipHostMissing()
+        {
+            if (TooltipService != null)
+            {
+                await TooltipService.WarnIfChartTooltipHostMissing(JSRuntime);
+            }
+        }
+
         internal async Task DisplayTooltip()
         {
             if (Tooltip.Visible && MouseInside)
@@ -1319,6 +1327,7 @@ namespace Radzen.Blazor
                             tooltipData = null;
                             tooltip = overlay.RenderTooltip(queryX, queryY);
                             var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
+                            await WarnIfChartTooltipHostMissing();
                             TooltipService?.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                             {
                                 ColorScheme = ColorScheme
@@ -1394,6 +1403,7 @@ namespace Radzen.Blazor
 
                         if (!Tooltip.Split && !axisMode)
                         {
+                            await WarnIfChartTooltipHostMissing();
                             TooltipService?.OpenChartTooltip(Element, snap.X + MarginLeft, snap.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                             {
                                 ColorScheme = ColorScheme
@@ -1478,6 +1488,7 @@ namespace Radzen.Blazor
                 tooltipSeries = series;
                 tooltip = series.RenderTooltip(data);
                 var point = series.GetTooltipPosition(data);
+                await WarnIfChartTooltipHostMissing();
                 TooltipService?.OpenChartTooltip(Element, point.X + MarginLeft, point.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                 {
                     ColorScheme = ColorScheme

@@ -738,6 +738,7 @@ namespace Radzen.Blazor
                 y = args.ClientY - rect.Top;
             }
 
+            await TooltipService.WarnIfChartTooltipHostMissing(JSRuntime);
             TooltipService.OpenChartTooltip(Element, x, y, tooltipService => builder =>
             {
                 builder.OpenComponent<Rendering.ChartTooltip>(0);

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,6 +88,21 @@ namespace Radzen
         /// Occurs when [on open chart tooltip].
         /// </summary>
         internal event Action<ElementReference, double, double, ChartTooltipOptions>? OnOpenChartTooltip;
+
+        private bool chartTooltipHostWarningShown;
+
+        /// <summary>
+        /// Logs a console warning the first time a chart tooltip is about to open while no RadzenChartTooltip component is subscribed to display it.
+        /// </summary>
+        /// <param name="jsRuntime">The JS runtime used to log the warning.</param>
+        internal async Task WarnIfChartTooltipHostMissing(IJSRuntime? jsRuntime)
+        {
+            if (!chartTooltipHostWarningShown && OnOpenChartTooltip == null && jsRuntime != null)
+            {
+                chartTooltipHostWarningShown = true;
+                await jsRuntime.InvokeVoidAsync("console.warn", "Chart tooltips require a RadzenChartTooltip component. Add <RadzenChartTooltip /> or <RadzenComponents /> to your application layout (typically MainLayout.razor). See https://blazor.radzen.com/get-started for details.");
+            }
+        }
 
         /// <summary>
         /// Opens a tooltip with custom HTML content near the specified element.

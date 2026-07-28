@@ -609,6 +609,7 @@ namespace Radzen.Blazor
             });
             
             // Use chart tooltip with offset to prevent flickering
+            _ = TooltipService.WarnIfChartTooltipHostMissing(JSRuntime);
             TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
         }
 
@@ -645,9 +646,10 @@ namespace Radzen.Blazor
             });
             
             // Use chart tooltip with offset to prevent flickering
+            _ = TooltipService.WarnIfChartTooltipHostMissing(JSRuntime);
             TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
         }
-        
+
         private void HideTooltip()
         {
             currentTooltipNode = null;
