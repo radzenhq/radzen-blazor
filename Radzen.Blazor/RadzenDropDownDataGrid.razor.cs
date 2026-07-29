@@ -1178,6 +1178,7 @@ namespace Radzen.Blazor
             if (JSRuntime != null)
             {
                 searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
+                await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
             }
 
             if (searchText != previousSearch)
@@ -1186,8 +1187,6 @@ namespace Radzen.Blazor
                 _view = null;
                 await InvokeAsync(RefreshAfterFilter);
             }
-
-            await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
         }
 
         async Task CloseOnEscape(KeyboardEventArgs args)
