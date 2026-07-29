@@ -1061,6 +1061,7 @@ namespace Radzen
             if (JSRuntime != null)
             {
                 searchText = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search) ?? string.Empty;
+                await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
             }
 
             if (!LoadData.HasDelegate)
@@ -1108,7 +1109,6 @@ namespace Radzen
                 await JSRuntime.InvokeVoidAsync("Radzen.updateActiveDescendant", list, null, -1);
                 await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
             }
-            await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
         }
 
         /// <summary>
