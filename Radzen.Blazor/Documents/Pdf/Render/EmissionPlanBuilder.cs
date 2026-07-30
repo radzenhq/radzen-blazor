@@ -11,6 +11,8 @@ internal sealed class EmissionPlanBuilder
     private readonly Dictionary<GeneratedFont, EmissionFont> fonts = [];
     private readonly Dictionary<GeneratedImage, EmissionImage> images = [];
 
+    private ImmutableArray<PageEmissionPlan> renderedPages;
+
     public DocumentEmissionPlan Build(
         IReadOnlyList<GeneratedPage> pages,
         StructureElement structure,
@@ -18,7 +20,6 @@ internal sealed class EmissionPlanBuilder
         RoleMap roleMap)
     {
         AssignStructureIds(structure);
-        var structureSnapshot = CaptureStructure(structure);
 
         var pageSnapshots = ImmutableArray.CreateBuilder<PageEmissionPlan>(pages.Count);
         foreach (var page in pages)
@@ -26,14 +27,17 @@ internal sealed class EmissionPlanBuilder
             pageSnapshots.Add(CapturePage(page));
         }
 
+        renderedPages = pageSnapshots.MoveToImmutable();
+        var structureSnapshot = CaptureStructure(structure);
+
         var anchorSnapshots = ImmutableDictionary.CreateBuilder<string, EmissionAnchor>(System.StringComparer.Ordinal);
         foreach (var anchor in anchors)
         {
-            anchorSnapshots.Add(anchor.Key, new EmissionAnchor(anchor.Value.PageIndex, anchor.Value.Top));
+            anchorSnapshots.Add(anchor.Key, new EmissionAnchor(renderedPages[anchor.Value.PageIndex], anchor.Value.Top));
         }
 
         return new DocumentEmissionPlan(
-            pageSnapshots.MoveToImmutable(),
+            renderedPages,
             structureSnapshot,
             anchorSnapshots.ToImmutable(),
             [.. roleMap.Entries]);
@@ -71,8 +75,14 @@ internal sealed class EmissionPlanBuilder
         {
             kids.Add(new StructureKidSnapshot(
                 kid.Child is { } child ? CaptureStructure(child) : null,
-                kid.PageIndex,
+                kid.Child is null ? renderedPages[kid.PageIndex] : null,
                 kid.Mcid));
+        }
+
+        var marks = ImmutableArray.CreateBuilder<(PageEmissionPlan Page, int Mcid)>(element.Marks.Count);
+        foreach (var (pageIndex, mcid) in element.Marks)
+        {
+            marks.Add((renderedPages[pageIndex], mcid));
         }
 
         var snapshot = new StructureElementSnapshot(
@@ -84,7 +94,7 @@ internal sealed class EmissionPlanBuilder
             element.RowSpan,
             element.ColumnSpan,
             children.MoveToImmutable(),
-            [.. element.Marks],
+            marks.MoveToImmutable(),
             kids.MoveToImmutable());
         structures.Add(element, snapshot);
         return snapshot;

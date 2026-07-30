@@ -19,6 +19,13 @@ public class ForeignPageInsertTests
         return InterpreterTestSupport.Load(document.ToArray());
     }
 
+    private static Page Release(PortableDocument document, int index)
+    {
+        var page = document.Pages[index];
+        document.Pages.RemoveAt(index);
+        return page;
+    }
+
     private static DictionaryObject PageResources(DocumentReader reader, int index)
         => Assert.IsType<DictionaryObject>(reader.Resolve(DocumentLoadTests.Kid(reader, index)["Resources"]));
 
@@ -38,7 +45,7 @@ public class ForeignPageInsertTests
         var source = LoadedWithText("Hello foreign page");
         var target = new PortableDocument();
 
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var reader = DocumentReader.Parse(target.ToArray());
         Assert.Equal(1, DocumentLoadTests.PageCount(reader));
@@ -51,7 +58,7 @@ public class ForeignPageInsertTests
         var source = LoadedWithText("Hello foreign page");
         var target = new PortableDocument();
 
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var bytes = target.ToArray();
         var reader = DocumentReader.Parse(bytes);
@@ -71,7 +78,7 @@ public class ForeignPageInsertTests
         var source = LoadedWithText("Hello foreign page");
         var target = LoadedWithText("Target own text");
 
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var reader = DocumentReader.Parse(target.ToArray());
         Assert.Equal(2, DocumentLoadTests.PageCount(reader));
@@ -83,13 +90,69 @@ public class ForeignPageInsertTests
     public void Insert_ForeignLoadedPage_LeavesDonorSaveIntact()
     {
         var source = LoadedWithText("Hello foreign page");
+        source.Pages.Add().Content.Add(new TextContent("Donor keeps this", 72, 700) { Font = new Font { Size = 12 } });
         var target = new PortableDocument();
 
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var reader = DocumentReader.Parse(source.ToArray());
         Assert.Equal(1, DocumentLoadTests.PageCount(reader));
         AssertFontsResolve(reader, 0);
+    }
+
+    [Fact]
+    public void Insert_PageStillOwnedByDonor_Throws()
+    {
+        var source = LoadedWithText("Hello foreign page");
+        var target = new PortableDocument();
+
+        var error = Assert.Throws<InvalidOperationException>(() => target.Pages.Insert(0, source.Pages[0]));
+
+        Assert.Contains("cannot belong to two documents", error.Message, StringComparison.Ordinal);
+        Assert.Empty(target.Pages);
+        Assert.Equal(1, source.Pages.Count);
+    }
+
+    [Fact]
+    public void Insert_ReleasedForeignPage_TransfersOwnershipToReceiver()
+    {
+        var source = LoadedWithText("Hello foreign page");
+        var target = new PortableDocument();
+        var page = Release(source, 0);
+
+        target.Pages.Insert(0, page);
+
+        Assert.Same(target, page.Owner);
+    }
+
+    [Fact]
+    public void EditingInsertedForeignPage_InvalidatesReceiverAfterSave()
+    {
+        var source = LoadedWithText("Hello foreign page");
+        var target = new PortableDocument();
+        target.Pages.Insert(0, Release(source, 0));
+        var before = target.ToArray();
+
+        target.Pages[0].Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "added" });
+        var after = target.ToArray();
+
+        Assert.NotEqual(before, after);
+        var reader = DocumentReader.Parse(after);
+        var annotation = reader.AsDictionary(
+            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 0), "Annots")!))!;
+        Assert.Equal("added", reader.GetString(annotation, "Contents"));
+    }
+
+    [Fact]
+    public void InsertedForeignPage_UsesReceiverConformanceForFontScope()
+    {
+        var source = LoadedWithText("Hello foreign page");
+        source.Conformance = PdfAConformance.PdfA2B;
+        var target = new PortableDocument();
+
+        target.Pages.Insert(0, Release(source, 0));
+
+        Assert.Null(target.Pages[0].FontScope.Base14ForbiddenBy);
     }
 
     [Fact]
@@ -99,7 +162,7 @@ public class ForeignPageInsertTests
         source.Pages.Add().Content.Add(new TextContent("Built page", 72, 700) { Font = new Font { Size = 12 } });
         var target = new PortableDocument();
 
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var reader = DocumentReader.Parse(target.ToArray());
         AssertFontsResolve(reader, 0);
@@ -109,11 +172,13 @@ public class ForeignPageInsertTests
     public void Insert_InvalidIndex_DoesNotAdoptPage()
     {
         var source = LoadedWithText("Hello foreign page");
+        var page = Release(source, 0);
         var target = new PortableDocument();
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => target.Pages.Insert(3, source.Pages[0]));
+        Assert.Throws<ArgumentOutOfRangeException>(() => target.Pages.Insert(3, page));
         Assert.Empty(target.Pages);
 
+        source.Pages.Insert(0, page);
         var reader = DocumentReader.Parse(source.ToArray());
         AssertFontsResolve(reader, 0);
     }
@@ -122,7 +187,7 @@ public class ForeignPageInsertTests
     public void Insert_ForeignLoadedPage_MatchesImportPageResources()
     {
         var inserted = new PortableDocument();
-        inserted.Pages.Insert(0, LoadedWithText("Hello foreign page").Pages[0]);
+        inserted.Pages.Insert(0, Release(LoadedWithText("Hello foreign page"), 0));
 
         var imported = new PortableDocument();
         imported.ImportPage(LoadedWithText("Hello foreign page"), 0);
@@ -144,7 +209,7 @@ public class ForeignPageInsertTests
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
 
         var target = new PortableDocument();
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var reader = DocumentReader.Parse(target.ToArray());
         var annotation = reader.AsDictionary(
@@ -162,7 +227,7 @@ public class ForeignPageInsertTests
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
 
         var target = new PortableDocument();
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
 
         var bytes = target.ToArray();
         var reader = DocumentReader.Parse(bytes);
@@ -183,7 +248,7 @@ public class ForeignPageInsertTests
 
         var target = new PortableDocument();
         target.Pages.Add();
-        target.Pages.Insert(1, source.Pages[0]);
+        target.Pages.Insert(1, Release(source, 0));
         Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[0]).TargetPageIndex = 0;
 
         var reader = DocumentReader.Parse(target.ToArray());
@@ -209,7 +274,7 @@ public class ForeignPageInsertTests
         targetDocument.Info.Title = "target-info";
         targetDocument.Pages.Add();
         var target = InterpreterTestSupport.Load(targetDocument.ToArray());
-        target.Pages.Insert(0, source.Pages[0]);
+        target.Pages.Insert(0, Release(source, 0));
         Assert.IsType<TextAnnotation>(target.Pages[0].Annotations[0]).Contents = "after";
 
         var reader = DocumentReader.Parse(target.ToArray());

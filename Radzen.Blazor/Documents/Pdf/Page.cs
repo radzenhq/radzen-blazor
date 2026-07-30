@@ -35,12 +35,15 @@ public sealed class Page
         this.width = width;
         this.height = height;
         mediaBox = PdfRect.FromSize(0, 0, width.Point, height.Point);
-        annotations.OwnedBy(() => Owner?.InvalidateMaterializedGraph());
+        annotations.OwnedBy(Invalidate);
+        elements.OwnedBy(Invalidate);
     }
 
     internal PageEmissionPlan? Generated { get; set; }
 
     internal PortableDocument? Owner { get; set; }
+
+    private void Invalidate() => Owner?.InvalidateMaterializedGraph();
 
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
@@ -206,7 +209,6 @@ public sealed class Page
     {
         get
         {
-            Owner?.InvalidateMaterializedGraph();
             EnsureMaterialized();
             return elements;
         }
@@ -344,6 +346,7 @@ public sealed class Page
 
     internal void AppendContent(ContentElement element)
     {
+        Invalidate();
         if (materialized || content is null || Generated is not null)
         {
             Content.Add(element);
@@ -407,6 +410,7 @@ public sealed class Page
 
     internal void ApplyEditedContent(byte[] value)
     {
+        Invalidate();
         SetContentCore(value);
         ContentReplaced = true;
     }
@@ -548,13 +552,16 @@ public sealed class Page
             return;
         }
 
-        var cache = new ContentTokenizer.Cache();
-        sourceElements = ContentInterpreter.Materialize(content, elements, textFonts, cache);
-        materializedCount = elements.Count;
-
-        foreach (var element in elements)
+        using (elements.Loading())
         {
-            element.AcceptChanges();
+            var cache = new ContentTokenizer.Cache();
+            sourceElements = ContentInterpreter.Materialize(content, elements, textFonts, cache);
+            materializedCount = elements.Count;
+
+            foreach (var element in elements)
+            {
+                element.AcceptChanges();
+            }
         }
 
         FlushPendingAppends();

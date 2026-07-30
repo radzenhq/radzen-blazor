@@ -180,6 +180,7 @@ internal sealed class DocumentMaterializer
         catalog["Type"] = new NameObject("Catalog");
         catalog["Pages"] = pagesRef;
 
+        var pageMap = EmissionPageMap.Build(doc.Pages);
         if (doc.EmissionPlan?.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
@@ -187,6 +188,7 @@ internal sealed class DocumentMaterializer
                 writer,
                 structure,
                 pageNodes,
+                pageMap,
                 doc.EmissionPlan.RoleMap,
                 annotationJoins);
         }
@@ -238,7 +240,7 @@ internal sealed class DocumentMaterializer
 
         if (doc.EmissionPlan?.Anchors.Count > 0)
         {
-            new NavigationWriter(doc).WriteDestinations(writer, catalog, pageNodes);
+            new NavigationWriter(doc).WriteDestinations(writer, catalog, pageNodes, pageMap);
         }
 
         if (doc.OutlineChanged && doc.Outline.Count > 0)
