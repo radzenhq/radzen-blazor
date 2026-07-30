@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Emission;
 using static Radzen.Documents.Pdf.Content.ContentEmitter;
+using static Radzen.Documents.Pdf.Render.DrawEmitter;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
@@ -48,17 +51,22 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     private ContentWriter writer = null!;
     private PagePlan plan = null!;
     private int pageIndex;
-    private GeneratedPage? generatedPage;
+    private IReadOnlyDictionary<EmittedFont, EmissionFont> fontPlans = null!;
+    private PageEmissionPlan? emissionPage;
 
-    public GeneratedPage Finalize(PagePlan pagePlan, int index)
+    public PageEmissionPlan Finalize(
+        PagePlan pagePlan,
+        int index,
+        IReadOnlyDictionary<EmittedFont, EmissionFont> fonts)
     {
         using var contentWriter = new ContentWriter();
         writer = contentWriter;
         plan = pagePlan;
         pageIndex = index;
+        fontPlans = fonts;
         tagged.Clear();
         taggedMarks.Clear();
-        generatedPage = null;
+        emissionPage = null;
         ApplyColorAlpha();
         PlanMarkedContent();
 
@@ -67,7 +75,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             Emit(phase);
         }
 
-        return generatedPage!;
+        return emissionPage!;
     }
 
     private void ApplyColorAlpha()
@@ -415,17 +423,19 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
     private void PackageResources()
     {
-        var usedFonts = new List<GeneratedFont>(plan.UsedFonts);
-        var usedImages = new List<GeneratedImage>(plan.UsedImages);
-        generatedPage = new GeneratedPage
+        var fonts = ImmutableArray.CreateBuilder<EmissionFont>(plan.UsedFonts.Count);
+        foreach (var font in plan.UsedFonts)
         {
-            Content = writer.ToArray(),
-            Fonts = usedFonts,
-            Images = usedImages,
-            Links = [.. plan.Links],
-            ExtGStates = [.. plan.ExtGStates],
-            Patterns = [.. plan.Patterns],
-        };
+            fonts.Add(fontPlans[font]);
+        }
+
+        emissionPage = new PageEmissionPlan(
+            writer.ToArray(),
+            fonts.MoveToImmutable(),
+            [.. plan.UsedImages],
+            [.. plan.Links],
+            [.. plan.ExtGStates],
+            [.. plan.Patterns]);
     }
 
     private static void WriteStrokeState(ContentWriter writer, Color color, double lineWidth, BorderStyle style)

@@ -3,27 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
-
-// ISO 32000-1 11.6.5.2: soft-mask subtype (/Luminosity from group color, /Alpha from shape alpha).
-internal enum SoftMaskType
-{
-    Alpha,
-    Luminosity,
-}
-
-internal sealed class GeneratedSoftMask
-{
-    public required SoftMaskType Type { get; init; }
-
-    public required GeneratedTransparencyGroup Group { get; init; }
-
-    public double[]? Backdrop { get; init; }
-
-    public string? ContentKey { get; init; }
-}
 
 internal static class SoftMask
 {
@@ -68,22 +51,22 @@ internal static class SoftMask
         using var content = new ContentWriter();
         ContentEmitter.WriteImagePlacement(content, "Sm", left, bottom, rectWidth, rectHeight);
 
-        var group = new GeneratedTransparencyGroup
-        {
-            Content = content.ToArray(),
-            BBox = [left, bottom, left + rectWidth, bottom + rectHeight],
-            ColorSpace = "DeviceGray",
-            XObjects = [new KeyValuePair<string, StreamObject>("Sm", image)],
-        };
+        // ISO 32000-1 11.6.5.2: soft-mask subtype (/Luminosity from group color, /Alpha from shape alpha).
+        var group = new EmissionTransparencyGroup(
+            content.ToArray(),
+            [left, bottom, left + rectWidth, bottom + rectHeight],
+            "DeviceGray",
+            isolated: null,
+            knockout: null,
+            [new KeyValuePair<string, EmissionStreamPayload>("Sm", EmissionStreamPayload.Capture(image))]);
 
         var alpha = shadow.Color.A / 255.0;
-        var softMask = new GeneratedSoftMask
-        {
-            Type = SoftMaskType.Luminosity,
-            Group = group,
-            ContentKey = ShadowKey(mask, left, bottom, rectWidth, rectHeight, alpha),
-        };
-        var extGState = plan.RegisterSoftMaskExtGState(alpha, alpha, softMask);
+        var softMask = new EmissionSoftMask(EmissionSoftMaskType.Luminosity, group, backdrop: null);
+        var extGState = plan.RegisterSoftMaskExtGState(
+            alpha,
+            alpha,
+            softMask,
+            ShadowKey(mask, left, bottom, rectWidth, rectHeight, alpha));
 
         plan.Fills.Add(new FillDraw
         {

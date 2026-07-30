@@ -5,7 +5,7 @@ namespace Radzen.Documents.Pdf.Render;
 
 internal readonly struct EmittedGlyphSpan
 {
-    public required GeneratedFont Font { get; init; }
+    public required EmittedFont Font { get; init; }
 
     public required byte[] Bytes { get; init; }
 

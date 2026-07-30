@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Radzen.Documents.Pdf.Render;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// A pluggable image-format decoder: it sniffs its own magic bytes and, on a match, decodes

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-namespace Radzen.Documents.Pdf.Render;
+namespace Radzen.Documents.Pdf;
 
 internal sealed class Jpeg2000ImageDecoder : IImageDecoder
 {

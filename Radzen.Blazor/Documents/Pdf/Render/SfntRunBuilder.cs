@@ -10,7 +10,7 @@ internal readonly struct SfntGlyphRun
 {
     public required SfntFont Face { get; init; }
 
-    public required GeneratedFont Font { get; init; }
+    public required EmittedFont Font { get; init; }
 
     public required byte[] Bytes { get; init; }
 

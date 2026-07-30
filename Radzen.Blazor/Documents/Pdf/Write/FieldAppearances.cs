@@ -16,59 +16,35 @@ internal static class FieldAppearances
         => height > fontSize ? (height - fontSize) / 2.0 : 2.0;
 
     public static StreamObject BuildText(string value, double width, double height, Font font, FontScope scope)
-    {
-        using var writer = new ContentWriter(scope);
-        writer.WriteRaw("/Tx BMC\nq\n");
-        Text(value, 0.0, 0.0, height, font).Emit(writer);
-        writer.WriteRaw("Q\nEMC\n");
-
-        return Wrap(writer, width, height);
-    }
+        => Appearance(scope, width, height, [Text(value, 0.0, 0.0, height, font)], "/Tx BMC\nq\n", "Q\nEMC\n");
 
     public static StreamObject BuildSignatureAppearance(
         IReadOnlyList<string> lines, double width, double height, Font font, FontScope scope)
+        => Appearance(scope, width, height, SignatureLines(lines, height, font), "q\n", "Q\n");
+
+    private static IEnumerable<ContentElement> SignatureLines(IReadOnlyList<string> lines, double height, Font font)
     {
-        using var writer = new ContentWriter(scope);
-        writer.WriteRaw("q\n");
         var lineHeight = font.EffectiveSize.Point * 1.2;
         var y = height - font.EffectiveSize.Point - 2.0;
         foreach (var line in lines)
         {
             if (line.Length > 0 && y >= 0.0)
             {
-                new TextContent(line, Unit.FromPoint(2.0), Unit.FromPoint(y)) { Font = font }.Emit(writer);
+                yield return new TextContent(line, Unit.FromPoint(2.0), Unit.FromPoint(y)) { Font = font };
             }
 
             y -= lineHeight;
         }
-
-        writer.WriteRaw("Q\n");
-        return Wrap(writer, width, height);
     }
 
     public static StreamObject BuildCheck(double width, double height)
-    {
-        using var writer = new ContentWriter();
-        CheckMark(0.0, 0.0, width, height).Emit(writer);
-        return Wrap(writer, width, height);
-    }
+        => Appearance(default, width, height, [CheckMark(0.0, 0.0, width, height)]);
 
     public static StreamObject BuildOff(double width, double height)
-    {
-        using var writer = new ContentWriter();
-        return Wrap(writer, width, height);
-    }
+        => Appearance(default, width, height, []);
 
     public static StreamObject BuildRadio(double width, double height, bool selected)
-    {
-        using var writer = new ContentWriter();
-        foreach (var path in RadioVisual(0.0, 0.0, width, height, selected))
-        {
-            path.Emit(writer);
-        }
-
-        return Wrap(writer, width, height);
-    }
+        => Appearance(default, width, height, RadioVisual(0.0, 0.0, width, height, selected));
 
     public static IReadOnlyList<PathContent> RadioVisual(
         double x, double y, double width, double height, bool selected)
@@ -134,37 +110,34 @@ internal static class FieldAppearances
         Size = size > 0.0 ? size : DefaultFontSize,
     };
 
-    private static StreamObject Wrap(ContentWriter writer, double width, double height)
-    {
-        ArrayObject bbox =
-        [
-            new NumberObject(0.0),
-            new NumberObject(0.0),
-            new NumberObject(width),
-            new NumberObject(height),
-        ];
+    private static StreamObject Appearance(
+        FontScope scope,
+        double width,
+        double height,
+        IEnumerable<ContentElement> elements,
+        string? prologue = null,
+        string? epilogue = null)
+        => AppearanceStreamBuilder.Render(
+            scope,
+            ContentResourcePrefixes.Page,
+            [
+                new NumberObject(0.0),
+                new NumberObject(0.0),
+                new NumberObject(width),
+                new NumberObject(height),
+            ],
+            formType: false,
+            elements,
+            prologue: prologue,
+            epilogue: epilogue,
+            validateResources: RejectXObjects);
 
-        var emitted = writer.DetachResult();
-        var appearance = new StreamObject(emitted.Bytes!);
-        FormXObjectShell.ApplyHeader(appearance.Dictionary, bbox, formType: false);
-
-        var resources = BuildResources(emitted.Resources);
-        if (resources is not null)
-        {
-            appearance.Dictionary["Resources"] = resources;
-        }
-
-        return appearance;
-    }
-
-    private static DictionaryObject? BuildResources(ContentResourceManifest manifest)
+    private static void RejectXObjects(ContentResourceManifest manifest)
     {
         if (manifest.ImagesForWriting.Count > 0 || manifest.Patterns.Count > 0)
         {
             throw new NotSupportedException(
                 "A field appearance stream cannot reference an image or shading-pattern resource.");
         }
-
-        return PageResourceBuilder.BuildResources(writer: null, manifest);
     }
 }

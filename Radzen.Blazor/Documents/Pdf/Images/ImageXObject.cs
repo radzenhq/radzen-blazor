@@ -1,6 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 
-namespace Radzen.Documents.Pdf.Render;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// A decoded image resource: the image XObject stream and its optional soft-mask stream.

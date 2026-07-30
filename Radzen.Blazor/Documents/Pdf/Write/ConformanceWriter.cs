@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Emission;
 using System;
+using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Write;
 
@@ -22,6 +23,8 @@ internal sealed class ConformanceWriter(PortableDocument document)
         => level is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
 
     private string Label => document.Conformance != PdfAConformance.None ? "PDF/A" : "PDF/UA";
+
+    private IReadOnlyList<PageEmissionPlan> PlannedPages() => EmissionPageMap.Build(document.Pages).Planned;
 
     public void ValidateConformance()
     {
@@ -60,7 +63,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
     {
         foreach (var page in document.Pages)
         {
-            if (page.Generated is not null)
+            if (page.IsGenerated)
             {
                 continue;
             }
@@ -118,13 +121,8 @@ internal sealed class ConformanceWriter(PortableDocument document)
     // reached through an OBJR kid and the annotation's own /StructParent entry.
     private void ValidateLinkStructure()
     {
-        foreach (var page in document.Pages)
+        foreach (var generated in PlannedPages())
         {
-            if (page.Generated is not { } generated)
-            {
-                continue;
-            }
-
             foreach (var link in generated.Links)
             {
                 if (link.StructureElementId is null)
@@ -190,13 +188,8 @@ internal sealed class ConformanceWriter(PortableDocument document)
     // ISO 19005-2 6.2.4.3: DeviceCMYK requires a CMYK output intent.
     private void ValidateImageColorSpaces()
     {
-        foreach (var page in document.Pages)
+        foreach (var generated in PlannedPages())
         {
-            if (page.Generated is not { } generated)
-            {
-                continue;
-            }
-
             foreach (var image in generated.Images)
             {
                 if (image.Image.TryGetValue("ColorSpace", out var space)
@@ -211,16 +204,11 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
     private void ValidateFonts()
     {
-        foreach (var page in document.Pages)
+        foreach (var generated in PlannedPages())
         {
-            if (page.Generated is not { } generated)
-            {
-                continue;
-            }
-
             foreach (var font in generated.Fonts)
             {
-                if (font.Sfnt is null)
+                if (!font.IsEmbedded)
                 {
                     throw Fonts.FontResolution.Base14Forbidden(Label, font.Base14Name, family: null);
                 }

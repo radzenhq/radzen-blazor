@@ -51,6 +51,7 @@ internal sealed class DocumentMaterializer
         var emittedContent = new Dictionary<Page, List<ReadOnlyMemory<byte>>>();
         var annotationJoins = new List<AnnotationElementJoin>();
 
+        var pageMap = EmissionPageMap.Build(doc.Pages);
         var kids = new ArrayObject();
         foreach (var page in doc.Pages)
         {
@@ -77,13 +78,13 @@ internal sealed class DocumentMaterializer
             var (page, pageNode, _) = pageNodes[pageIndex];
             var contentBytes = new List<ReadOnlyMemory<byte>>();
             emittedContent[page] = contentBytes;
-            if (page.Generated is { } generated)
+            if (pageMap.PlanAt(pageIndex) is { } generated)
             {
                 IReadOnlySet<string>? referenced = null;
                 Content.ContentEmissionResult? overlay = null;
                 if (page.IsEditingGenerated)
                 {
-                    var editedContent = page.CurrentContent ?? generated.Content.ToArray();
+                    var editedContent = page.CurrentContent ?? generated.ContentArray;
                     referenced = PageResourceBuilder.ReferencedResourceKeys(editedContent);
                     pageNode["Contents"] = writer.Add(new StreamObject(editedContent));
                     contentBytes.Add(editedContent);
@@ -180,7 +181,6 @@ internal sealed class DocumentMaterializer
         catalog["Type"] = new NameObject("Catalog");
         catalog["Pages"] = pagesRef;
 
-        var pageMap = EmissionPageMap.Build(doc.Pages);
         if (doc.EmissionPlan?.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };

@@ -2,7 +2,7 @@ using Radzen.Documents.Pdf.Objects;
 using System;
 using System.IO;
 
-namespace Radzen.Documents.Pdf.Render;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// Decodes an encoded image payload into an <see cref="ImageXObject"/>. Additional image

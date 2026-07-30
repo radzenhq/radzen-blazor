@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using Radzen.Documents.Geometry;
+using Radzen.Documents.Pdf.Emission;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -12,8 +14,62 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private readonly Dictionary<SourceId, StructureElement> linkElementsBySource = [];
     private readonly Dictionary<SourceId, SemanticArtifactKind> artifactsBySource = [];
     private StructureElement documentElement = null!;
+    private int nextElementId;
 
     public StructureElement DocumentElement => documentElement;
+
+    public static StructureElementSnapshot Capture(
+        StructureElement root,
+        ImmutableArray<PageEmissionPlan> pages)
+        => new StructureCapture(pages).Capture(root);
+
+    private sealed class StructureCapture(ImmutableArray<PageEmissionPlan> pages)
+    {
+        private readonly Dictionary<StructureElement, StructureElementSnapshot> captured = [];
+
+        public StructureElementSnapshot Capture(StructureElement element)
+        {
+            if (captured.TryGetValue(element, out var existing))
+            {
+                return existing;
+            }
+
+            var children = ImmutableArray.CreateBuilder<StructureElementSnapshot>(element.Children.Count);
+            foreach (var child in element.Children)
+            {
+                children.Add(Capture(child));
+            }
+
+            var kids = ImmutableArray.CreateBuilder<StructureKidSnapshot>(element.Kids.Count);
+            foreach (var kid in element.Kids)
+            {
+                kids.Add(new StructureKidSnapshot(
+                    kid.Child is { } child ? Capture(child) : null,
+                    kid.Child is null ? pages[kid.PageIndex] : null,
+                    kid.Mcid));
+            }
+
+            var marks = ImmutableArray.CreateBuilder<(PageEmissionPlan Page, int Mcid)>(element.Marks.Count);
+            foreach (var (pageIndex, mcid) in element.Marks)
+            {
+                marks.Add((pages[pageIndex], mcid));
+            }
+
+            var snapshot = new StructureElementSnapshot(
+                element.Id,
+                element.Type,
+                element.Alt,
+                element.ActualText,
+                element.HeaderScope,
+                element.RowSpan,
+                element.ColumnSpan,
+                children.MoveToImmutable(),
+                marks.MoveToImmutable(),
+                kids.MoveToImmutable());
+            captured.Add(element, snapshot);
+            return snapshot;
+        }
+    }
 
 
     public void Build() => BuildStructureTree();
@@ -70,6 +126,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
         var element = new StructureElement
         {
+            Id = nextElementId++,
             Type = StructureType(captured),
             Alt = captured.AlternateText,
             ActualText = captured.ActualText,
