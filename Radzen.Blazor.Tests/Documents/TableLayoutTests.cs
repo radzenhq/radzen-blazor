@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using Xunit;
 using Radzen.Documents;
@@ -12,6 +13,32 @@ using Radzen.Blazor.Pdf.Tests;
 
 public class TableLayoutTests
 {
+    private const int Precision = 6;
+
+    private static void AssertRect(Rect expected, Rect actual)
+    {
+        Assert.Equal(expected.X, actual.X, Precision);
+        Assert.Equal(expected.Y, actual.Y, Precision);
+        Assert.Equal(expected.Width, actual.Width, Precision);
+        Assert.Equal(expected.Height, actual.Height, Precision);
+    }
+
+    [Fact]
+    public void RowWithMoreCellsThanColumns_Throws()
+    {
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(100));
+        table.Columns.Add(Unit.FromPoint(100));
+        var row = table.Rows.Add();
+        row.Cells[0].ColumnSpan = 2;
+        row.Cells[1].Text = "overflow";
+
+        var exception = Assert.Throws<InvalidOperationException>(
+            () => IsolatedTableLayout.LayoutIsolated(table, 200, TableLayoutSupport.Fonts()));
+
+        Assert.Contains("more cells", exception.Message);
+    }
+
     [Fact]
     public void Grid2x2_FixedColumns_CellRectangles()
     {
@@ -27,19 +54,19 @@ public class TableLayoutTests
         TableLayoutSupport.Fill(r1.Cells[0], "c");
         TableLayoutSupport.Fill(r1.Cells[1], "d");
 
-        var laid = TableLayout.LayoutIsolated(table, 300, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
         Assert.Equal(250, laid.Width, 6);
         Assert.Equal(2 * lh, laid.Height, 6);
 
         var c00 = TableLayoutSupport.CellAt(laid, 0, 0).Bounds;
-        Assert.Equal(new Rect(0, 0, 100, lh), c00);
+        AssertRect(new Rect(0, 0, 100, lh), c00);
         var c01 = TableLayoutSupport.CellAt(laid, 0, 1).Bounds;
-        Assert.Equal(new Rect(100, 0, 150, lh), c01);
+        AssertRect(new Rect(100, 0, 150, lh), c01);
         var c10 = TableLayoutSupport.CellAt(laid, 1, 0).Bounds;
-        Assert.Equal(new Rect(0, lh, 100, lh), c10);
+        AssertRect(new Rect(0, lh, 100, lh), c10);
         var c11 = TableLayoutSupport.CellAt(laid, 1, 1).Bounds;
-        Assert.Equal(new Rect(100, lh, 150, lh), c11);
+        AssertRect(new Rect(100, lh, 150, lh), c11);
     }
 
     [Fact]
@@ -53,11 +80,11 @@ public class TableLayoutTests
         cell.Padding = Unit.FromPoint(5);
         TableLayoutSupport.Fill(cell, "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
-        Assert.Equal(new Rect(0, 0, 200, lh + 10), c.Bounds);
-        Assert.Equal(new Rect(5, 5, 190, lh), c.ContentBox);
+        AssertRect(new Rect(0, 0, 200, lh + 10), c.Bounds);
+        AssertRect(new Rect(5, 5, 190, lh), c.ContentBox);
         Assert.Equal(5, c.Lines[0].X, 6);
         Assert.Equal(5, c.Lines[0].Y, 6);
     }
@@ -81,7 +108,7 @@ public class TableLayoutTests
         TableLayoutSupport.Fill(row.Cells[0], "Hello Hello");
         TableLayoutSupport.Fill(row.Cells[1], "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 1000, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 1000, fonts);
         var wrapped = TableLayoutSupport.CellAt(laid, 0, 0);
         var single = TableLayoutSupport.CellAt(laid, 0, 1);
 
@@ -103,7 +130,7 @@ public class TableLayoutTests
         table.Columns.Add(Unit.FromPoint(narrowContent));
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "Hello Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 400, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 400, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal(2, c.Lines.Length);
@@ -133,7 +160,7 @@ public class TableLayoutTests
         target.VerticalAlignment = valign;
         TableLayoutSupport.Fill(target, "Hi");
 
-        var laid = TableLayout.LayoutIsolated(table, 1000, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 1000, fonts);
         Assert.Equal(3 * lh, laid.RowHeights[0], 6);
 
         var c = TableLayoutSupport.CellAt(laid, 0, 1);
@@ -150,7 +177,7 @@ public class TableLayoutTests
         table.Columns.Add(Unit.FromPoint(200));
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal(0, c.Lines[0].X, 6);
@@ -167,7 +194,7 @@ public class TableLayoutTests
         col.Alignment = HorizontalAlignment.Right;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal(200 - wHello, c.Lines[0].Line.Fragments[0].XOffset, 5);
@@ -184,7 +211,7 @@ public class TableLayoutTests
         cell.Alignment = HorizontalAlignment.Center;
         TableLayoutSupport.Fill(cell, "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal((200 - wHello) / 2.0, c.Lines[0].Line.Fragments[0].XOffset, 5);
@@ -202,7 +229,7 @@ public class TableLayoutTests
         cell.Alignment = HorizontalAlignment.Center;
         TableLayoutSupport.Fill(cell, "Hello");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
         Assert.Equal((200 - wHello) / 2.0, c.Lines[0].Line.Fragments[0].XOffset, 5);
@@ -222,11 +249,11 @@ public class TableLayoutTests
         cell.PaddingBottom = Unit.FromPoint(13);
         TableLayoutSupport.Fill(cell, "Hi");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
-        Assert.Equal(new Rect(0, 0, 200, lh + 24), c.Bounds);
-        Assert.Equal(new Rect(3, 11, 190, lh), c.ContentBox);
+        AssertRect(new Rect(0, 0, 200, lh + 24), c.Bounds);
+        AssertRect(new Rect(3, 11, 190, lh), c.ContentBox);
         Assert.Equal(3, c.Lines[0].X, 6);
         Assert.Equal(11, c.Lines[0].Y, 6);
     }
@@ -243,11 +270,11 @@ public class TableLayoutTests
         cell.PaddingLeft = Unit.FromPoint(20);
         TableLayoutSupport.Fill(cell, "Hi");
 
-        var laid = TableLayout.LayoutIsolated(table, 200, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var c = TableLayoutSupport.CellAt(laid, 0, 0);
 
-        Assert.Equal(new Rect(20, 5, 175, lh), c.ContentBox);
-        Assert.Equal(new Rect(0, 0, 200, lh + 10), c.Bounds);
+        AssertRect(new Rect(20, 5, 175, lh), c.ContentBox);
+        AssertRect(new Rect(0, 0, 200, lh + 10), c.Bounds);
     }
 
     [Fact]
@@ -273,13 +300,13 @@ public class TableLayoutTests
             }
 
             TableLayoutSupport.Fill(cell, "Hello World Again");
-            return TableLayoutSupport.CellAt(TableLayout.LayoutIsolated(table, 200, f), 0, 0);
+            return TableLayoutSupport.CellAt(IsolatedTableLayout.LayoutIsolated(table, 200, f), 0, 0);
         }
 
         var legacy = Build(fonts, perEdge: false);
         var perEdge = Build(fonts, perEdge: true);
 
-        Assert.Equal(legacy.Bounds, perEdge.Bounds);
-        Assert.Equal(legacy.ContentBox, perEdge.ContentBox);
+        AssertRect(legacy.Bounds, perEdge.Bounds);
+        AssertRect(legacy.ContentBox, perEdge.ContentBox);
     }
 }

@@ -26,7 +26,7 @@ public class HorizontalScaleMeasurementTests
         var fonts = LineLayoutSupport.Fonts();
         var plain = LineLayoutSupport.WordWidth(fonts, "Hello", 12);
 
-        var fragment = LineBreaker.Break(ScaledRun("Hello", 2.0), 1000, fonts)[0].Fragments.Single();
+        var fragment = IsolatedLineBreaker.Break(ScaledRun("Hello", 2.0), 1000, fonts)[0].Fragments.Single();
 
         Assert.Equal(plain * 2.0, fragment.Advance, 6);
     }
@@ -37,7 +37,7 @@ public class HorizontalScaleMeasurementTests
         var fonts = LineLayoutSupport.Fonts();
         var plain = LineLayoutSupport.WordWidth(fonts, "Hello", 12);
 
-        var fragment = LineBreaker.Break(ScaledRun("Hello", 1.0), 1000, fonts)[0].Fragments.Single();
+        var fragment = IsolatedLineBreaker.Break(ScaledRun("Hello", 1.0), 1000, fonts)[0].Fragments.Single();
 
         Assert.Equal(plain, fragment.Advance, 6);
     }
@@ -51,8 +51,8 @@ public class HorizontalScaleMeasurementTests
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
         var max = wHello + space + wWorld + 1.0;
 
-        var unscaled = LineBreaker.Break(ScaledRun("Hello World", 1.0), max, fonts);
-        var scaled = LineBreaker.Break(ScaledRun("Hello World", 2.0), max, fonts);
+        var unscaled = IsolatedLineBreaker.Break(ScaledRun("Hello World", 1.0), max, fonts);
+        var scaled = IsolatedLineBreaker.Break(ScaledRun("Hello World", 2.0), max, fonts);
 
         Assert.Single(unscaled);
         Assert.Equal(2, scaled.Count);

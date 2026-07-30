@@ -25,7 +25,7 @@ public class PaginationTests
             paras[i] = section.Blocks.Add(PaginationSupport.Text($"P{i}"));
         }
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(3, pages.Length);
         Assert.Equal(5, pages[0].Body.Lines.Length);
@@ -44,7 +44,7 @@ public class PaginationTests
             section.Blocks.Add(PaginationSupport.Text($"P{i}"));
         }
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal([1, 2, 3], pages.Select(p => p.Number).ToArray());
     }
@@ -60,7 +60,7 @@ public class PaginationTests
             section.Blocks.Add(PaginationSupport.Text($"P{i}"));
         }
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         for (var i = 0; i < 5; i++)
         {
@@ -83,7 +83,7 @@ public class PaginationTests
             section.Blocks.Add(PaginationSupport.Text($"P{i}"));
         }
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.All(pages, p => Assert.Equal(0.0, p.Body.Lines[0].Y, Tol));
     }
@@ -101,7 +101,7 @@ public class PaginationTests
         }
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(capture.Source(paras[0]), pages[0].Body.Lines[0].Source);
         Assert.Equal(capture.Source(paras[4]), pages[0].Body.Lines[4].Source);
@@ -123,7 +123,7 @@ public class PaginationTests
         section.Margins.Bottom = Unit.FromPoint(25);
         section.Blocks.Add(PaginationSupport.Text("only"));
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
 
         Assert.Equal(20.0, page.ContentBox.X, Tol);
         Assert.Equal(15.0, page.ContentBox.Y, Tol);
@@ -138,7 +138,7 @@ public class PaginationTests
         var section = PaginationSupport.Section(360, 480);
         section.Blocks.Add(PaginationSupport.Text("x"));
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
 
         Assert.Equal(360.0, page.Size.Width.Point, Tol);
         Assert.Equal(480.0, page.Size.Height.Point, Tol);
@@ -154,7 +154,7 @@ public class PaginationTests
         var b = section.Blocks.Add(PaginationSupport.Text("after"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(capture.Source(a), pages[0].Body.Lines.Single().Source);
@@ -171,7 +171,7 @@ public class PaginationTests
         p.SpacingBefore = Unit.FromPoint(7);
         section.Blocks.Add(p);
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
 
         Assert.Equal(7.0, page.Body.Lines[0].Y, Tol);
     }
@@ -188,7 +188,7 @@ public class PaginationTests
         var second = section.Blocks.Add(PaginationSupport.Text("second"));
 
         var capture = new LayoutCaptureContext();
-        var page = Paginator.PaginateIsolated(section, fonts, capture: capture)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture)[0];
 
         var secondLine = page.Body.Lines.Single(l => l.Source == capture.Source(second));
         Assert.Equal(lineH + 9, secondLine.Y, Tol);

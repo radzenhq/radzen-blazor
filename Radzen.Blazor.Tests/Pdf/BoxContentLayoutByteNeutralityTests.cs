@@ -60,7 +60,7 @@ public class BoxContentLayoutByteNeutralityTests
         spacedRun.Font.Size = 10;
 
         var third = table.Rows.Add();
-        var bottom = third.Cells[1];
+        var bottom = third.Cells[0];
         bottom.VerticalAlignment = VerticalAlignment.Bottom;
         Fill(bottom, "bottom");
 

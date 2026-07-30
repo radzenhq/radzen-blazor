@@ -19,7 +19,7 @@ public class RelativeColumnWidthTests
         table.Columns.Add().RelativeWidth = 1;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 300, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 300, fonts);
 
         Assert.Equal(200, laid.ColumnWidths[0], 6);
         Assert.Equal(100, laid.ColumnWidths[1], 6);
@@ -36,7 +36,7 @@ public class RelativeColumnWidthTests
         table.Columns.Add().RelativeWidth = 2;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
 
         Assert.Equal(100, laid.ColumnWidths[0], 6);
         Assert.Equal(100, laid.ColumnWidths[1], 6);
@@ -52,7 +52,7 @@ public class RelativeColumnWidthTests
         table.Columns.Add();
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
 
         Assert.Equal(300, laid.ColumnWidths[0], 6);
         Assert.Equal(100, laid.ColumnWidths[1], 6);
@@ -68,7 +68,7 @@ public class RelativeColumnWidthTests
         table.Columns.Add().RelativeWidth = 1;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 250, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 250, fonts);
 
         Assert.Equal(50, laid.ColumnWidths[0], 6);
         Assert.Equal(200, laid.ColumnWidths[1], 6);
@@ -83,7 +83,7 @@ public class RelativeColumnWidthTests
         table.Columns.Add().RelativeWidth = 1;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 900, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 900, fonts);
 
         Assert.Equal(60, laid.ColumnWidths[0], 6);
         Assert.Equal(30, laid.ColumnWidths[1], 6);

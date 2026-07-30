@@ -40,7 +40,7 @@ public class HeaderFooterTests
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out _, out _);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(3, pages.Length);
         Assert.Equal(3, pages[0].Body.Lines.Length);
@@ -55,7 +55,7 @@ public class HeaderFooterTests
         var section = BuildMultiPage(fonts, out var header, out _);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.All(pages, p => Assert.NotEmpty(p.HeaderLayer.Lines));
         Assert.All(pages, p => Assert.Equal(capture.Source(header), p.HeaderLayer.Lines[0].Source));
@@ -68,32 +68,37 @@ public class HeaderFooterTests
         var section = BuildMultiPage(fonts, out _, out var footer);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.All(pages, p => Assert.NotEmpty(p.FooterLayer.Lines));
         Assert.All(pages, p => Assert.Equal(capture.Source(footer), p.FooterLayer.Lines[0].Source));
     }
 
     [Fact]
-    public void HeaderBand_FlowsFromPageTop()
+    public void HeaderContent_SitsAtTheHeaderDistanceBelowThePageTop()
     {
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out _, out _);
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
+        var line = page.HeaderLayer.Lines[0];
 
-        Assert.Equal(0.0, page.HeaderLayer.Lines[0].Y, Tol);
+        Assert.Equal(section.HeaderDistance.Point, page.HeaderTop + line.Y, Tol);
+        Assert.True(page.HeaderTop + line.Y + line.Line.Height <= page.ContentBox.Y + Tol);
     }
 
     [Fact]
-    public void FooterBand_FlowsFromBottomMarginTop()
+    public void FooterContent_EndsAtTheFooterDistanceAboveThePageBottom()
     {
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out _, out _);
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
+        var line = page.FooterLayer.Lines[0];
+        var pageHeight = page.Size.Height.Point;
 
-        Assert.Equal(0.0, page.FooterLayer.Lines[0].Y, Tol);
+        Assert.Equal(pageHeight - section.FooterDistance.Point, page.FooterTop + line.Y + line.Line.Height, Tol);
+        Assert.True(page.FooterTop + line.Y >= page.ContentBox.Y + page.ContentBox.Height - Tol);
     }
 
     [Fact]
@@ -104,7 +109,7 @@ public class HeaderFooterTests
         var contentH = PaginationSupport.HeightForLines(lineH, 3);
         var section = BuildMultiPage(fonts, out _, out _);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.All(pages, p =>
         {
@@ -121,7 +126,7 @@ public class HeaderFooterTests
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out _, out _);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.All(pages, p => Assert.All(p.Body.Lines,
             l => Assert.True(l.Y + l.Line.Height <= p.ContentBox.Height + Tol)));
@@ -134,7 +139,7 @@ public class HeaderFooterTests
         var section = PaginationSupport.Section(500, 400);
         section.Blocks.Add(PaginationSupport.Text("solo"));
 
-        var page = Paginator.PaginateIsolated(section, fonts)[0];
+        var page = IsolatedPaginator.PaginateIsolated(section, fonts)[0];
 
         Assert.Empty(page.HeaderLayer.Lines);
         Assert.Empty(page.FooterLayer.Lines);

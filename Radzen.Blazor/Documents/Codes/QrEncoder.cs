@@ -71,6 +71,16 @@ public enum QrEyeShape
 /// </summary>
 public static class QrEncoder
 {
+    // ISO/IEC 18004:2015 - byte mode indicator.
+    private const int ByteModeIndicator = 0b0100;
+    private const int ModeIndicatorBits = 4;
+    private const int TerminatorBits = 4;
+    private const int QuietZoneModules = 4;
+    private const int TimingLine = 6;
+
+    // ISO/IEC 18004:2015 - character count indicator length for byte mode.
+    private static int ByteModeCharacterCountBits(int version) => version <= 9 ? 8 : 16;
+
     /// <summary>Encode a UTF-8 string into a QR module matrix.</summary>
     public static bool[,] EncodeUtf8(string value, QrErrorCorrection ecc, int minVersion = 1, int maxVersion = 40)
         => EncodeBytes(Encoding.UTF8.GetBytes(value ?? string.Empty), ecc, minVersion, maxVersion);
@@ -87,13 +97,13 @@ public static class QrEncoder
 
         for (int ver = minVersion; ver <= maxVersion; ver++)
         {
-            int charCountBits = ver <= 9 ? 8 : 16; // byte mode: v1-9:8, v10-40:16
+            int charCountBits = ByteModeCharacterCountBits(ver);
             var bb = new BitBuffer();
-            bb.AppendBits(0b0100, 4);                  // mode: BYTE
-            bb.AppendBits(data.Length, charCountBits); // char count
+            bb.AppendBits(ByteModeIndicator, ModeIndicatorBits);
+            bb.AppendBits(data.Length, charCountBits);
             foreach (byte b in data)
             {
-                bb.AppendBits(b, 8);                   // payload
+                bb.AppendBits(b, 8);
             }
 
             var (dataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw) = EcParams(ver, ecc);
@@ -101,15 +111,15 @@ public static class QrEncoder
 
             if (bb.Length > capacityBits)
             {
-                continue; // header+data already overflow this version
+                continue;
             }
 
-            int needed = bb.Length + Math.Min(4, capacityBits - bb.Length); // add up to 4-bit terminator
-            needed += (8 - (needed % 8)) % 8;                               // pad to byte boundary
+            int needed = bb.Length + Math.Min(TerminatorBits, capacityBits - bb.Length);
+            needed += (8 - (needed % 8)) % 8;
 
             if (needed > capacityBits)
             {
-                continue; // try next version
+                continue;
             }
 
             var dataCwBytes = BuildDataCodewords(bb, dataCw);
@@ -119,8 +129,6 @@ public static class QrEncoder
             var (m, reserved) = BuildBaseMatrix(ver);
             PlaceData(m, reserved, final);
 
-            // Apply the chosen data mask exactly once; the format bits below record which mask
-            // was used. Masking twice would XOR-cancel and leave an undecodable matrix.
             int bestMask = ChooseBestMask(m, reserved);
             ApplyMask(m, reserved, bestMask);
             WriteFormatInfo(m, reserved, ecc, bestMask);
@@ -164,7 +172,7 @@ public static class QrEncoder
         var imageHref = image is null ? null : SvgAttributes.Escape(image);
 
         int n = modules.GetLength(0);
-        int vb = n + 8;  // 4 modules of quiet zone on each side
+        int vb = n + 2 * QuietZoneModules;
         int px = vb * moduleSize;
 
         var sb = new StringBuilder(n * n + 1024);
@@ -173,9 +181,9 @@ public static class QrEncoder
         sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{backgroundFill.Color}\" fill-opacity=\"{Format(backgroundFill.Opacity)}\"/>");
 
         var baseEyeFill = eyeColor is null ? moduleFill : SvgAttributes.Color(eyeColor, nameof(eyeColor));
-        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, EyeFill(eyeColorTopLeft, baseEyeFill, nameof(eyeColorTopLeft)), "eye-mask-0");
-        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, EyeFill(eyeColorTopRight, baseEyeFill, nameof(eyeColorTopRight)), "eye-mask-1");
-        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, EyeFill(eyeColorBottomLeft, baseEyeFill, nameof(eyeColorBottomLeft)), "eye-mask-2");
+        AppendEye(sb, QuietZoneModules, QuietZoneModules, eyeShapeTopLeft ?? eyeShape, EyeFill(eyeColorTopLeft, baseEyeFill, nameof(eyeColorTopLeft)), "eye-mask-0");
+        AppendEye(sb, vb - 11, QuietZoneModules, eyeShapeTopRight ?? eyeShape, EyeFill(eyeColorTopRight, baseEyeFill, nameof(eyeColorTopRight)), "eye-mask-1");
+        AppendEye(sb, QuietZoneModules, vb - 11, eyeShapeBottomLeft ?? eyeShape, EyeFill(eyeColorBottomLeft, baseEyeFill, nameof(eyeColorBottomLeft)), "eye-mask-2");
 
         for (int r = 0; r < n; r++)
         {
@@ -191,8 +199,8 @@ public static class QrEncoder
                     continue;
                 }
 
-                var x = c + 4;
-                var y = r + 4;
+                var x = c + QuietZoneModules;
+                var y = r + QuietZoneModules;
 
                 if (moduleShape == QrModuleShape.Circle)
                 {
@@ -245,34 +253,13 @@ public static class QrEncoder
         var m = new bool[n, n];
         var reserved = new bool[n, n];
 
-        // Finder patterns + separators + timing
         DrawFinder(m, reserved, 0, 0);
         DrawFinder(m, reserved, n - 7, 0);
         DrawFinder(m, reserved, 0, n - 7);
 
-        // Timing
-        for (int i = 8; i < n - 8; i++)
-        {
-            m[6, i] = (i % 2) == 0; reserved[6, i] = true;
-            m[i, 6] = (i % 2) == 0; reserved[i, 6] = true;
-        }
-
-        // Alignment patterns
-        var ap = AlignmentPatternPositions(ver);
-        foreach (int y in ap)
-        {
-            foreach (int x in ap)
-            {
-                bool corner = (x < 9 && y < 9) || (x > n - 9 && y < 9) || (x < 9 && y > n - 9);
-                if (!corner)
-                {
-                    DrawAlignment(m, reserved, x, y);
-                }
-            }
-        }
-
-        // Dark module (always)
-        m[4 * ver + 9, 8] = true; reserved[4 * ver + 9, 8] = true;
+        DrawTiming(m, reserved);
+        DrawAlignmentPatterns(m, reserved, ver);
+        DrawDarkModule(m, reserved, ver);
 
         ReserveFormat(reserved);
 
@@ -284,7 +271,39 @@ public static class QrEncoder
         return (m, reserved);
     }
 
-    // Finder with 1-module white separator around (as reserved)
+    private static void DrawTiming(bool[,] m, bool[,] res)
+    {
+        int n = m.GetLength(0);
+        for (int i = 8; i < n - 8; i++)
+        {
+            m[TimingLine, i] = (i % 2) == 0; res[TimingLine, i] = true;
+            m[i, TimingLine] = (i % 2) == 0; res[i, TimingLine] = true;
+        }
+    }
+
+    private static void DrawAlignmentPatterns(bool[,] m, bool[,] res, int ver)
+    {
+        int n = m.GetLength(0);
+        var positions = AlignmentPatternPositions(ver);
+        foreach (int y in positions)
+        {
+            foreach (int x in positions)
+            {
+                bool overlapsFinder = (x < 9 && y < 9) || (x > n - 9 && y < 9) || (x < 9 && y > n - 9);
+                if (!overlapsFinder)
+                {
+                    DrawAlignment(m, res, x, y);
+                }
+            }
+        }
+    }
+
+    private static void DrawDarkModule(bool[,] m, bool[,] res, int ver)
+    {
+        m[4 * ver + 9, 8] = true;
+        res[4 * ver + 9, 8] = true;
+    }
+
     private static void DrawFinder(bool[,] m, bool[,] res, int x, int y)
     {
         for (int r = -1; r <= 7; r++)
@@ -319,7 +338,7 @@ public static class QrEncoder
             for (int c = -2; c <= 2; c++)
             {
                 int rr = cy + r, cc = cx + c;
-                m[rr, cc] = Math.Max(Math.Abs(r), Math.Abs(c)) != 1; // dark outer, white ring, dark center
+                m[rr, cc] = Math.Max(Math.Abs(r), Math.Abs(c)) != 1;
                 res[rr, cc] = true;
             }
         }
@@ -329,32 +348,26 @@ public static class QrEncoder
     {
         int n = res.GetLength(0);
 
-        // Row 8, left of the timing cross (cols 0..5)
         for (int c = 0; c <= 5; c++)
         {
             res[8, c] = true;
         }
 
-        // Row 8, skip col 6 (timing), then 7 and 8 are format
         res[8, 7] = true;
         res[8, 8] = true;
 
-        // Column 8, above the timing cross (rows 0..5)
         for (int r = 0; r <= 5; r++)
         {
             res[r, 8] = true;
         }
 
-        // Column 8, row 7 is format (row 6 is timing, skip it)
         res[7, 8] = true;
 
-        // Column 8, bottom 7 cells (rows n-1 down to n-7)
         for (int i = 0; i < 7; i++)
         {
             res[n - 1 - i, 8] = true;
         }
 
-        // Row 8, right side 8 cells (cols n-8 .. n-1)
         for (int i = 0; i < 8; i++)
         {
             res[8, n - 8 + i] = true;
@@ -365,9 +378,6 @@ public static class QrEncoder
     {
         int n = res.GetLength(0);
 
-        // Bottom-left version info block: 3 rows x 6 columns
-        // Rows: n-11, n-10, n-9
-        // Cols: 0..5
         for (int r = n - 11; r <= n - 9; r++)
         {
             for (int c = 0; c <= 5; c++)
@@ -376,9 +386,6 @@ public static class QrEncoder
             }
         }
 
-        // Top-right version info block: 6 rows x 3 columns
-        // Rows: 0..5
-        // Cols: n-11, n-10, n-9
         for (int r = 0; r <= 5; r++)
         {
             for (int c = n - 11; c <= n - 9; c++)
@@ -390,49 +397,29 @@ public static class QrEncoder
 
     private static void WriteVersionInfo(bool[,] m, bool[,] res, int ver)
     {
-        // BCH(18,6) with generator 0x1F25
+        // ISO/IEC 18004:2015 - version information is BCH(18,6) with generator 0x1F25, least significant bit first.
         int bits = BchEncode(ver, 0x1F25, 18, 6);
         int n = m.GetLength(0);
 
-        // Thonky table:
-        //   00 03 06 09 12 15
-        //   01 04 07 10 13 16
-        //   02 05 08 11 14 17
-        //
-        // Our bit index i = 0..17 is LSB-first, matching "0 is least significant bit".
-        // Map: bitIndex = row + col*3
         for (int col = 0; col < 6; col++)
         {
             for (int row = 0; row < 3; row++)
             {
-                int bitIndex = row + col * 3; // 0..17
+                int bitIndex = row + col * 3;
                 bool bit = ((bits >> bitIndex) & 1) != 0;
 
-                int r = n - 11 + row; // rows n-11..n-9
-                int c = col;          // cols 0..5
-                Set(m, res, r, c, bit);
+                Set(m, res, n - 11 + row, col, bit);
             }
         }
 
-        // Thonky table:
-        //   00 01 02
-        //   03 04 05
-        //   06 07 08
-        //   09 10 11
-        //   12 13 14
-        //   15 16 17
-        //
-        // Map: bitIndex = row*3 + col
         for (int row = 0; row < 6; row++)
         {
             for (int col = 0; col < 3; col++)
             {
-                int bitIndex = row * 3 + col; // 0..17
+                int bitIndex = row * 3 + col;
                 bool bit = ((bits >> bitIndex) & 1) != 0;
 
-                int r = row;               // rows 0..5
-                int c = n - 11 + col;      // cols n-11..n-9
-                Set(m, res, r, c, bit);
+                Set(m, res, row, n - 11 + col, bit);
             }
         }
     }
@@ -504,7 +491,6 @@ public static class QrEncoder
 
     private static byte[] Interleave(List<Block> blocks)
     {
-        // Interleave data bytes then EC bytes
         int totalLen = 0;
         int maxData = 0, maxEc = 0;
         foreach (var b in blocks)
@@ -552,10 +538,10 @@ public static class QrEncoder
         var gen = new List<byte> { 1 };
         for (int i = 0; i < ecCount; i++)
         {
-            gen = PolyMul(gen, new List<byte> { 1, GfPow(2, i) }); // (x - alpha^i), alpha=2
+            gen = PolyMul(gen, new List<byte> { 1, GfPow(2, i) });
         }
 
-        return gen.ToArray(); // length = ecCount + 1 (leading 1 included)
+        return gen.ToArray();
     }
 
     private static byte[] ReedSolomon(byte[] data, int ecCount)
@@ -572,9 +558,9 @@ public static class QrEncoder
                 continue;
             }
 
-            for (int j = 0; j < gen.Length; j++)           // use full generator
+            for (int j = 0; j < gen.Length; j++)
             {
-                msg[i + j] ^= GfMul((byte)factor, gen[j]); // start at i, not i+1
+                msg[i + j] ^= GfMul((byte)factor, gen[j]);
             }
         }
 
@@ -630,19 +616,20 @@ public static class QrEncoder
         int n = m.GetLength(0);
         int totalBits = codewords.Length * 8;
         int bitIndex = 0;
-        int dir = -1; // up first
+        const int upward = -1;
+        int direction = upward;
 
         for (int col = n - 1; col > 0; col -= 2)
         {
-            if (col == 6)
+            if (col == TimingLine)
             {
-                col--; // skip timing column
+                col--;
             }
 
-            int rowStart = (dir < 0) ? n - 1 : 0;
+            int rowStart = (direction < 0) ? n - 1 : 0;
             for (int i = 0; i < n; i++)
             {
-                int r = rowStart + i * dir;
+                int r = rowStart + i * direction;
                 for (int c = 0; c < 2; c++)
                 {
                     int cc = col - c;
@@ -658,7 +645,7 @@ public static class QrEncoder
                     }
                 }
             }
-            dir *= -1;
+            direction *= -1;
         }
     }
 
@@ -724,11 +711,13 @@ public static class QrEncoder
     };
 
     private static int Penalty(bool[,] m)
+        => AdjacentRunPenalty(m) + BlockPenalty(m) + FinderLikePenalty(m) + DarkBalancePenalty(m);
+
+    private static int AdjacentRunPenalty(bool[,] m)
     {
         int n = m.GetLength(0);
         int total = 0;
 
-        // N1: Runs
         for (int r = 0; r < n; r++)
         {
             int run = 1;
@@ -762,7 +751,14 @@ public static class QrEncoder
             }
         }
 
-        // N2: 2x2 blocks
+        return total;
+    }
+
+    private static int BlockPenalty(bool[,] m)
+    {
+        int n = m.GetLength(0);
+        int total = 0;
+
         for (int r = 0; r < n - 1; r++)
         {
             for (int c = 0; c < n - 1; c++)
@@ -774,7 +770,14 @@ public static class QrEncoder
             }
         }
 
-        // N3: Finder-like patterns
+        return total;
+    }
+
+    private static int FinderLikePenalty(bool[,] m)
+    {
+        int n = m.GetLength(0);
+        int total = 0;
+
         int[] p1 = { 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0 };
         int[] p2 = { 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 1 };
         for (int r = 0; r < n; r++)
@@ -799,7 +802,13 @@ public static class QrEncoder
             }
         }
 
-        // N4: Balance
+        return total;
+    }
+
+    private static int DarkBalancePenalty(bool[,] m)
+    {
+        int n = m.GetLength(0);
+
         int dark = 0;
         for (int r = 0; r < n; r++)
         {
@@ -813,9 +822,7 @@ public static class QrEncoder
         }
 
         int percent = (dark * 100 + (n * n / 2)) / (n * n);
-        total += (Math.Abs(percent - 50) / 5) * 10;
-
-        return total;
+        return (Math.Abs(percent - 50) / 5) * 10;
     }
 
     private static bool MatchRow(bool[,] m, int r, int c, int[] pat)
@@ -845,43 +852,39 @@ public static class QrEncoder
 
     private static void WriteFormatInfo(bool[,] m, bool[,] res, QrErrorCorrection ecc, int mask)
     {
-        // ECL bits: L=01, M=00, Q=11, H=10
+        // ISO/IEC 18004:2015 - error correction level indicators L=01, M=00, Q=11, H=10.
         int ecl = ecc switch { QrErrorCorrection.Low => 1, QrErrorCorrection.Medium => 0, QrErrorCorrection.Quartile => 3, QrErrorCorrection.High => 2, _ => 0 };
         int data = (ecl << 3) | (mask & 7);
 
-        // BCH(15,5) with generator 0x537, then XOR with 0x5412
+        // ISO/IEC 18004:2015 - format information is BCH(15,5) with generator 0x537, masked with 0x5412.
         int fmt = BchEncode(data, 0x537, 15, 5) ^ 0x5412;
 
-        bool GetBit(int i) => ((fmt >> (14 - i)) & 1) != 0; // i=0 is MSB
+        bool GetBitMsbFirst(int i) => ((fmt >> (14 - i)) & 1) != 0;
 
         int n = m.GetLength(0);
 
-        // row 8, cols 0..5 (bits 0..5)
         for (int i = 0; i <= 5; i++)
         {
-            Set(m, res, 8, i, GetBit(i));
-        }
-        // row 8, col 7 (bit 6)
-        Set(m, res, 8, 7, GetBit(6));
-        // row 8, col 8 (bit 7)
-        Set(m, res, 8, 8, GetBit(7));
-        // row 7, col 8 (bit 8)
-        Set(m, res, 7, 8, GetBit(8));
-        // rows 5..0, col 8 (bits 9..14)
-        for (int i = 9; i <= 14; i++)
-        {
-            Set(m, res, 14 - i, 8, GetBit(i));
+            Set(m, res, 8, i, GetBitMsbFirst(i));
         }
 
-        // col 8, rows n-1..n-7 (bits 0..6)
+        Set(m, res, 8, 7, GetBitMsbFirst(6));
+        Set(m, res, 8, 8, GetBitMsbFirst(7));
+        Set(m, res, 7, 8, GetBitMsbFirst(8));
+
+        for (int i = 9; i <= 14; i++)
+        {
+            Set(m, res, 14 - i, 8, GetBitMsbFirst(i));
+        }
+
         for (int i = 0; i <= 6; i++)
         {
-            Set(m, res, n - 1 - i, 8, GetBit(i));
+            Set(m, res, n - 1 - i, 8, GetBitMsbFirst(i));
         }
-        // row 8, cols n-8..n-1 (bits 7..14)
+
         for (int i = 7; i <= 14; i++)
         {
-            Set(m, res, 8, n - 15 + i, GetBit(i));
+            Set(m, res, 8, n - 15 + i, GetBitMsbFirst(i));
         }
     }
 
@@ -901,15 +904,12 @@ public static class QrEncoder
 
     private static void Set(bool[,] m, bool[,] res, int y, int x, bool v) { m[y, x] = v; res[y, x] = true; }
 
-    // Alignment pattern positions per version. For v1: none.
     private static readonly int[][] AlignPos = BuildAlignmentPositions();
     private static int[] AlignmentPatternPositions(int ver) => AlignPos[ver];
 
     private static int[][] BuildAlignmentPositions()
     {
-        // From QR spec table (compressed).
-        // Each row is the list of center positions for that version.
-        // v1 has no alignment patterns.
+        // ISO/IEC 18004:2015 - alignment pattern centre coordinates, indexed by version.
         return new int[][]
         {
             Array.Empty<int>(),
@@ -956,8 +956,6 @@ public static class QrEncoder
         };
     }
 
-    // Error correction parameters for each version & ECC:
-    // Returns (totalDataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw)
     private static (int totalDataCw, int ecPerBlock, int grp1Blocks, int grp1DataCw, int grp2Blocks, int grp2DataCw)
         EcParams(int ver, QrErrorCorrection ecc)
     {
@@ -968,14 +966,13 @@ public static class QrEncoder
 
         int eccIndex = ecc switch
         {
-            QrErrorCorrection.Low => 0, // L
-            QrErrorCorrection.Medium => 1, // M
-            QrErrorCorrection.Quartile => 2, // Q
-            QrErrorCorrection.High => 3, // H
+            QrErrorCorrection.Low => 0,
+            QrErrorCorrection.Medium => 1,
+            QrErrorCorrection.Quartile => 2,
+            QrErrorCorrection.High => 3,
             _ => throw new ArgumentOutOfRangeException(nameof(ecc))
         };
 
-        // EcTable[ver-1][eccIndex] = { ecPerBlock, g1Blocks, g1DataCw, g2Blocks, g2DataCw }
         var row = EcTable[ver - 1][eccIndex];
 
         int ecPerBlock = row[0];
@@ -991,291 +988,244 @@ public static class QrEncoder
     private static readonly int[][][] EcTable = BuildEcTable();
     private static int[][][] BuildEcTable()
     {
-        // Format per version:
-        // {
-        //   L: {ecPerBlock, g1Blocks, g1DataCw, g2Blocks, g2DataCw},
-        //   M: {...},
-        //   Q: {...},
-        //   H: {...}
-        // }
-        // Source: standard QR capacity tables (ISO/IEC 18004:2015), widely reproduced.
-
+        // ISO/IEC 18004:2015 - error correction characteristics, indexed by version then by error correction level,
+        // each row holding { ecPerBlock, group1Blocks, group1DataCodewords, group2Blocks, group2DataCodewords }.
         return new int[][][]
         {
-            // V1
             new[]{
-                new[]{7,1,19,0,0},   // L: 1 block, 19 data cw, 7 ec per block
-                new[]{10,1,16,0,0},  // M: 1x16
-                new[]{13,1,13,0,0},  // Q: 1x13
-                new[]{17,1,9,0,0},   // H: 1x9
+                new[]{7,1,19,0,0},
+                new[]{10,1,16,0,0},
+                new[]{13,1,13,0,0},
+                new[]{17,1,9,0,0},
             },
-            // V2
             new[]{
                 new[]{10,1,34,0,0},
                 new[]{16,1,28,0,0},
                 new[]{22,1,22,0,0},
                 new[]{28,1,16,0,0},
             },
-            // V3
             new[]{
                 new[]{15,1,55,0,0},
                 new[]{26,1,44,0,0},
-                new[]{18,2,17,0,0}, // 2 blocks of 17 (still single group in spec presentation)
+                new[]{18,2,17,0,0},
                 new[]{22,2,13,0,0},
             },
-            // V4
             new[]{
                 new[]{20,1,80,0,0},
-                new[]{18,2,32,0,0}, // 2x32
+                new[]{18,2,32,0,0},
                 new[]{26,2,24,0,0},
-                new[]{16,4,9,0,0},  // 4x9
+                new[]{16,4,9,0,0},
             },
-            // V5
             new[]{
                 new[]{26,1,108,0,0},
                 new[]{24,2,43,0,0},
-                new[]{18,2,15,2,16}, // (2x15,2x16)
+                new[]{18,2,15,2,16},
                 new[]{22,2,11,2,12},
             },
-            // V6
             new[]{
-                new[]{18,2,68,0,0}, // 2x68
+                new[]{18,2,68,0,0},
                 new[]{16,4,27,0,0},
                 new[]{24,4,19,0,0},
                 new[]{28,4,15,0,0},
             },
-            // V7
             new[]{
                 new[]{20,2,78,0,0},
                 new[]{18,4,31,0,0},
                 new[]{18,2,14,4,15},
                 new[]{26,4,13,1,14},
             },
-            // V8
             new[]{
                 new[]{24,2,97,0,0},
                 new[]{22,2,38,2,39},
                 new[]{22,4,18,2,19},
                 new[]{26,4,14,2,15},
             },
-            // V9
             new[]{
                 new[]{30,2,116,0,0},
                 new[]{22,3,36,2,37},
                 new[]{20,4,16,4,17},
                 new[]{24,4,12,4,13},
             },
-            // V10
             new[]{
                 new[]{18,2,68,2,69},
                 new[]{26,4,43,1,44},
                 new[]{24,6,19,2,20},
                 new[]{28,6,15,2,16},
             },
-            // V11
             new[]{
                 new[]{20,4,81,0,0},
                 new[]{30,1,50,4,51},
                 new[]{28,4,22,4,23},
                 new[]{24,3,12,8,13},
             },
-            // V12
             new[]{
                 new[]{24,2,92,2,93},
                 new[]{22,6,36,2,37},
                 new[]{26,4,20,6,21},
                 new[]{28,7,14,4,15},
             },
-            // V13
             new[]{
                 new[]{26,4,107,0,0},
                 new[]{22,8,37,1,38},
                 new[]{24,8,20,4,21},
                 new[]{22,12,11,4,12},
             },
-            // V14
             new[]{
                 new[]{30,3,115,1,116},
                 new[]{24,4,40,5,41},
                 new[]{20,11,16,5,17},
                 new[]{24,11,12,5,13},
             },
-            // V15
             new[]{
                 new[]{22,5,87,1,88},
                 new[]{24,5,41,5,42},
                 new[]{30,5,24,7,25},
                 new[]{24,11,12,7,13},
             },
-            // V16
             new[]{
                 new[]{24,5,98,1,99},
                 new[]{28,7,45,3,46},
                 new[]{24,15,19,2,20},
                 new[]{30,3,15,13,16},
             },
-            // V17
             new[]{
                 new[]{28,1,107,5,108},
                 new[]{28,10,46,1,47},
                 new[]{28,1,22,15,23},
                 new[]{28,2,14,17,15},
             },
-            // V18
             new[]{
                 new[]{30,5,120,1,121},
                 new[]{26,9,43,4,44},
                 new[]{28,17,22,1,23},
                 new[]{28,2,14,19,15},
             },
-            // V19
             new[]{
                 new[]{28,3,113,4,114},
                 new[]{26,3,44,11,45},
                 new[]{26,17,21,4,22},
                 new[]{26,9,13,16,14},
             },
-            // V20
             new[]{
                 new[]{28,3,107,5,108},
                 new[]{26,3,41,13,42},
                 new[]{30,15,24,5,25},
                 new[]{28,15,15,10,16},
             },
-            // V21
             new[]{
                 new[]{28,4,116,4,117},
                 new[]{26,17,42,0,0},
                 new[]{28,17,22,6,23},
                 new[]{30,19,16,6,17},
             },
-            // V22
             new[]{
                 new[]{28,2,111,7,112},
                 new[]{28,17,46,0,0},
                 new[]{30,7,24,16,25},
                 new[]{24,34,13,0,0},
             },
-            // V23
             new[]{
                 new[]{30,4,121,5,122},
                 new[]{28,4,47,14,48},
                 new[]{30,11,24,14,25},
                 new[]{30,16,15,14,16},
             },
-            // V24
             new[]{
                 new[]{30,6,117,4,118},
                 new[]{28,6,45,14,46},
                 new[]{30,11,24,16,25},
                 new[]{30,30,16,2,17},
             },
-            // V25
             new[]{
                 new[]{26,8,106,4,107},
                 new[]{28,8,47,13,48},
                 new[]{30,7,24,22,25},
                 new[]{30,22,15,13,16},
             },
-            // V26
             new[]{
                 new[]{28,10,114,2,115},
                 new[]{28,19,46,4,47},
                 new[]{28,28,22,6,23},
                 new[]{30,33,16,4,17},
             },
-            // V27
             new[]{
                 new[]{30,8,122,4,123},
                 new[]{28,22,45,3,46},
                 new[]{30,8,23,26,24},
                 new[]{30,12,15,28,16},
             },
-            // V28
             new[]{
                 new[]{30,3,117,10,118},
                 new[]{28,3,45,23,46},
                 new[]{30,4,24,31,25},
                 new[]{30,11,15,31,16},
             },
-            // V29
             new[]{
                 new[]{30,7,116,7,117},
                 new[]{28,21,45,7,46},
                 new[]{30,1,23,37,24},
                 new[]{30,19,15,26,16},
             },
-            // V30
             new[]{
                 new[]{30,5,115,10,116},
                 new[]{28,19,47,10,48},
                 new[]{30,15,24,25,25},
                 new[]{30,23,15,25,16},
             },
-            // V31
             new[]{
                 new[]{30,13,115,3,116},
                 new[]{28,2,46,29,47},
                 new[]{30,42,24,1,25},
                 new[]{30,23,15,28,16},
             },
-            // V32
             new[]{
                 new[]{30,17,115,0,0},
                 new[]{28,10,46,23,47},
                 new[]{30,10,24,35,25},
                 new[]{30,19,15,35,16},
             },
-            // V33
             new[]{
                 new[]{30,17,115,1,116},
                 new[]{28,14,46,21,47},
                 new[]{30,29,24,19,25},
                 new[]{30,11,15,46,16},
             },
-            // V34
             new[]{
                 new[]{30,13,115,6,116},
                 new[]{28,14,46,23,47},
                 new[]{30,44,24,7,25},
                 new[]{30,59,16,1,17},
             },
-            // V35
             new[]{
                 new[]{30,12,121,7,122},
                 new[]{28,12,47,26,48},
                 new[]{30,39,24,14,25},
                 new[]{30,22,15,41,16},
             },
-            // V36
             new[]{
                 new[]{30,6,121,14,122},
                 new[]{28,6,47,34,48},
                 new[]{30,46,24,10,25},
                 new[]{30,2,15,64,16},
             },
-            // V37
             new[]{
                 new[]{30,17,122,4,123},
                 new[]{28,29,46,14,47},
                 new[]{30,49,24,10,25},
                 new[]{30,24,15,46,16},
             },
-            // V38
             new[]{
                 new[]{30,4,122,18,123},
                 new[]{28,13,46,32,47},
                 new[]{30,48,24,14,25},
                 new[]{30,42,15,32,16},
             },
-            // V39
             new[]{
                 new[]{30,20,117,4,118},
                 new[]{28,40,47,7,48},
                 new[]{30,43,24,22,25},
                 new[]{30,10,15,67,16},
             },
-            // V40
             new[]{
                 new[]{30,19,118,6,119},
                 new[]{28,18,47,31,48},

@@ -20,7 +20,7 @@ public class AlignmentTests
         var lineWidth = fonts.MeasureText(Phrase, LineLayoutSupport.FontAt(12));
         var maxWidth = lineWidth + 120.0;
 
-        var lines = LineBreaker.Break(paragraph, maxWidth, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, maxWidth, fonts);
         Assert.Single(lines);
         return (lines[0], maxWidth, lineWidth);
     }

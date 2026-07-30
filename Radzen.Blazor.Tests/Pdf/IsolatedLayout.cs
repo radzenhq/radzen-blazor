@@ -20,8 +20,9 @@ internal static class Paginator
             section,
             fonts,
             LoweringContext.CreateForDocument(StyleResolution.Empty),
+            capture ?? new LayoutCaptureContext(),
             measureImage,
-            capture: capture);
+            tocPages: null);
 }
 
 internal static class TableLayout
@@ -38,7 +39,52 @@ internal static class TableLayout
             fonts,
             measureImage,
             LoweringContext.CreateForDocument(StyleResolution.Empty),
-            capture: capture);
+            capture ?? new LayoutCaptureContext());
+}
+
+internal static class TablePaginator
+{
+    public static IReadOnlyList<LaidOutTableSlice> Paginate(
+        LaidOutTable layout,
+        Table source,
+        double availableHeight,
+        LayoutCaptureContext? capture = null)
+        => Radzen.Documents.Layout.TablePaginator.Paginate(
+            layout,
+            source,
+            availableHeight,
+            capture ?? new LayoutCaptureContext());
+
+    public static IReadOnlyList<LaidOutTableSlice> Paginate(
+        LaidOutTable layout,
+        Table source,
+        double firstAvailable,
+        double subsequentAvailable,
+        LayoutCaptureContext? capture = null)
+        => Radzen.Documents.Layout.TablePaginator.Paginate(
+            layout,
+            source,
+            firstAvailable,
+            subsequentAvailable,
+            capture ?? new LayoutCaptureContext());
+}
+
+internal static class LineBreaker
+{
+    public static IReadOnlyList<LineBox> Break(
+        Paragraph paragraph,
+        double maxWidthPoints,
+        FontCollection fonts,
+        HorizontalAlignment? inheritedAlignment = null,
+        LoweringContext? resolution = null,
+        LayoutCaptureContext? capture = null)
+        => LineLayouter.Layout(
+            paragraph,
+            maxWidthPoints,
+            fonts,
+            capture ?? new LayoutCaptureContext(),
+            inheritedAlignment,
+            resolution);
 }
 
 internal static class BlockExpander

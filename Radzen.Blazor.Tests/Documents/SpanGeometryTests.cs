@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using Xunit;
 
 using Radzen.Documents;
@@ -21,9 +22,8 @@ public class SpanGeometryTests
         row.Cells[0].ColumnSpan = 2;
         TableLayoutSupport.Fill(row.Cells[0], "wide");
         TableLayoutSupport.Fill(row.Cells[1], "last");
-        TableLayoutSupport.Fill(row.Cells[2], "over");
 
-        var laid = TableLayout.LayoutIsolated(table, 1000, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 1000, fonts);
 
         Assert.Equal(2, laid.Cells.Length);
         var span = TableLayoutSupport.CellAt(laid, 0, 0);
@@ -37,7 +37,7 @@ public class SpanGeometryTests
     }
 
     [Fact]
-    public void ColSpan_CoversTrailingCell_OmittedFromLayout()
+    public void ColSpan_WithAuthoredOverflowCell_Throws()
     {
         var fonts = TableLayoutSupport.Fonts();
         var table = new Table();
@@ -48,10 +48,8 @@ public class SpanGeometryTests
         TableLayoutSupport.Fill(row.Cells[0], "wide");
         TableLayoutSupport.Fill(row.Cells[1], "gone");
 
-        var laid = TableLayout.LayoutIsolated(table, 1000, fonts);
-
-        Assert.Single(laid.Cells);
-        Assert.Equal(200, laid.Cells[0].Bounds.Width, 6);
+        Assert.Throws<InvalidOperationException>(
+            () => IsolatedTableLayout.LayoutIsolated(table, 1000, fonts));
     }
 
     [Fact]
@@ -72,9 +70,8 @@ public class SpanGeometryTests
         TableLayoutSupport.Fill(r0.Cells[0], "tall");
         TableLayoutSupport.Fill(r0.Cells[1], "Hello Hello");
         TableLayoutSupport.Fill(r1.Cells[0], "Hi");
-        TableLayoutSupport.Fill(r1.Cells[1], "gone");
 
-        var laid = TableLayout.LayoutIsolated(table, 1000, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, 1000, fonts);
 
         Assert.Equal(3, laid.Cells.Length);
         Assert.Equal(2 * lh, laid.RowHeights[0], 6);

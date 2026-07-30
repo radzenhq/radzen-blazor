@@ -28,7 +28,7 @@ public class MixedRunTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = MixedParagraph(out var r1, out var r2);
 
-        var lines = LineBreaker.Break(paragraph, 500.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 500.0, fonts);
 
         Assert.Single(lines);
         Assert.Equal(2, lines[0].Fragments.Length);
@@ -45,7 +45,7 @@ public class MixedRunTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = MixedParagraph(out _, out _);
 
-        var frags = LineBreaker.Break(paragraph, 500.0, fonts)[0].Fragments;
+        var frags = IsolatedLineBreaker.Break(paragraph, 500.0, fonts)[0].Fragments;
 
         Assert.Equal("Hello", frags[0].Text);
         Assert.Equal(0, frags[0].Start);
@@ -62,7 +62,7 @@ public class MixedRunTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = MixedParagraph(out _, out _);
 
-        var frags = LineBreaker.Break(paragraph, 500.0, fonts)[0].Fragments;
+        var frags = IsolatedLineBreaker.Break(paragraph, 500.0, fonts)[0].Fragments;
 
         Assert.Equal(fonts.MeasureText("Hello", LineLayoutSupport.FontAt(12)), frags[0].Advance, 6);
         Assert.Equal(fonts.MeasureText("World", LineLayoutSupport.FontAt(18)), frags[1].Advance, 6);
@@ -74,7 +74,7 @@ public class MixedRunTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = MixedParagraph(out _, out _);
 
-        var line = LineBreaker.Break(paragraph, 500.0, fonts)[0];
+        var line = IsolatedLineBreaker.Break(paragraph, 500.0, fonts)[0];
 
         var expected = fonts.MeasureText("Hello", LineLayoutSupport.FontAt(12))
             + fonts.MeasureText(" ", LineLayoutSupport.FontAt(12));
@@ -91,8 +91,8 @@ public class MixedRunTests
         var mixed = MixedParagraph(out _, out _);
         var small = LineLayoutSupport.SingleRun("Hello World", size: 12);
 
-        var mixedLine = LineBreaker.Break(mixed, 500.0, fonts)[0];
-        var smallLine = LineBreaker.Break(small, 500.0, fonts)[0];
+        var mixedLine = IsolatedLineBreaker.Break(mixed, 500.0, fonts)[0];
+        var smallLine = IsolatedLineBreaker.Break(small, 500.0, fonts)[0];
 
         Assert.True(mixedLine.Height > smallLine.Height);
         Assert.True(mixedLine.Height > 0);
@@ -109,8 +109,8 @@ public class MixedRunTests
         var oneAndHalf = LineLayoutSupport.SingleRun(sentence, size: 12, lineSpacing: 1.5);
         const double MaxWidth = 150.0;
 
-        var linesSingle = LineBreaker.Break(single, MaxWidth, fonts);
-        var linesWide = LineBreaker.Break(oneAndHalf, MaxWidth, fonts);
+        var linesSingle = IsolatedLineBreaker.Break(single, MaxWidth, fonts);
+        var linesWide = IsolatedLineBreaker.Break(oneAndHalf, MaxWidth, fonts);
 
         Assert.Equal(linesSingle.Count, linesWide.Count);
         Assert.True(linesSingle.Count >= 2);
@@ -130,8 +130,8 @@ public class MixedRunTests
         var oneAndHalf = LineLayoutSupport.SingleRun(sentence, size: 12, lineSpacing: 1.5);
         const double MaxWidth = 150.0;
 
-        var a = LineBreaker.Break(single, MaxWidth, fonts);
-        var b = LineBreaker.Break(oneAndHalf, MaxWidth, fonts);
+        var a = IsolatedLineBreaker.Break(single, MaxWidth, fonts);
+        var b = IsolatedLineBreaker.Break(oneAndHalf, MaxWidth, fonts);
 
         Assert.Equal(a.Count, b.Count);
         for (var i = 0; i < a.Count; i++)

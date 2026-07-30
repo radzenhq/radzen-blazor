@@ -14,6 +14,8 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class MeasurementUnitSurfaceTests
 {
+    private static readonly LayoutCaptureContext Capture = new();
+
     private static GradientStop[] Stops() =>
     [
         new GradientStop(0, Color.Red),
@@ -21,7 +23,10 @@ public class MeasurementUnitSurfaceTests
     ];
 
     private static GradientPaint Resolve(GradientBrush brush, double width, double height)
-        => GeometryCapture.Gradient(brush, GradientReference.Box(width, height))!.Value;
+        => GeometryCapture.Gradient(
+            brush,
+            GradientReference.Box(width, height),
+            Capture)!.Value;
 
     [Fact]
     public void FontSize_FromMeasurementString_IsPoints()

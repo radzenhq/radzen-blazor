@@ -51,7 +51,7 @@ public class FirstTableFragmentRowspanTests
 
         section.Blocks.Add(RowspanTable(span: 3));
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         var contentHeight = PaginationSupport.HeightForLines(lh, 6);
         foreach (var page in pages)

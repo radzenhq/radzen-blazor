@@ -37,13 +37,13 @@ public class SharedGlyphToUnicodeTests
     }
 
     [Fact]
-    public void SharedGlyph_MapsToFirstDrawnCodepoint_SoftHyphenBeforeHyphen()
+    public void LeadingSoftHyphen_IsNotDrawnBeforeSharedHyphenGlyph()
     {
         _ = SharedGid();
         var values = ToUnicodeValues($"{SoftHyphen}{Hyphen}");
 
-        Assert.Contains(SoftHyphen.ToString(), values);
-        Assert.DoesNotContain(Hyphen.ToString(), values);
+        Assert.Contains(Hyphen.ToString(), values);
+        Assert.DoesNotContain(SoftHyphen.ToString(), values);
     }
 
     [Fact]

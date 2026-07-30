@@ -17,7 +17,7 @@ public class LineBreakerWhitespaceEdgeCaseTests
         var word = "Supercalifragilisticexpialidocious" + "\u00A0" + "Supercalifragilisticexpialidocious";
         var paragraph = LineLayoutSupport.SingleRun(word, alignment: HorizontalAlignment.Center);
 
-        var lines = LineBreaker.Break(paragraph, 50.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 50.0, fonts);
 
         foreach (var frag in lines.SelectMany(l => l.Fragments))
         {
@@ -32,7 +32,7 @@ public class LineBreakerWhitespaceEdgeCaseTests
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
         var paragraph = LineLayoutSupport.SingleRun("  word");
 
-        var line = Assert.Single(LineBreaker.Break(paragraph, 1000.0, fonts));
+        var line = Assert.Single(IsolatedLineBreaker.Break(paragraph, 1000.0, fonts));
         var frag = Assert.Single(line.Fragments);
 
         Assert.Equal("word", frag.Text);

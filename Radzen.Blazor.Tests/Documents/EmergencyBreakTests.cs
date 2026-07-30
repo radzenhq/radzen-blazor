@@ -23,7 +23,7 @@ public class EmergencyBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Token, alignment: HorizontalAlignment.Right);
         var max = Measure(fonts, Token) / 4.0;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1);
         foreach (var line in lines)
@@ -40,7 +40,7 @@ public class EmergencyBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Token, alignment: HorizontalAlignment.Center);
         var max = Measure(fonts, Token) / 4.0;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1);
         foreach (var line in lines)
@@ -58,7 +58,7 @@ public class EmergencyBreakTests
         var paragraph = LineLayoutSupport.SingleRun(token);
         var max = fonts.MeasureText(token, LineLayoutSupport.FontAt(12)) / 4.0;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1);
         foreach (var line in lines)
@@ -78,7 +78,7 @@ public class EmergencyBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Token);
         var width = Measure(fonts, Token);
 
-        var lines = LineBreaker.Break(paragraph, width + 0.5, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, width + 0.5, fonts);
 
         Assert.Single(lines);
         Assert.Single(lines[0].Fragments);

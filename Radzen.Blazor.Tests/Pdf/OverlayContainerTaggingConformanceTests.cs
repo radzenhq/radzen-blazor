@@ -56,6 +56,39 @@ public class OverlayContainerTaggingConformanceTests
             });
     }
 
+    private static (Document Document, DocumentRenderer Renderer) TableAndFigure(bool tagged)
+    {
+        var document = new Document { Language = "en-US" };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "TableAndFigure";
+        var section = document.Sections.Add();
+
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(120));
+        table.Columns.Add(Unit.FromPoint(120));
+        var header = table.Rows.Add();
+        header.Cells[0].Blocks.AddParagraph().Inlines.Add("LEFT").Font.Family = BuildTestSupport.Latin;
+        header.Cells[1].Blocks.AddParagraph().Inlines.Add("RIGHT").Font.Family = BuildTestSupport.Latin;
+        var body = table.Rows.Add();
+        body.Cells[0].Blocks.AddParagraph().Inlines.Add("ONE").Font.Family = BuildTestSupport.Latin;
+        var cellImage = body.Cells[1].Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        cellImage.Width = Unit.FromPoint(60);
+        cellImage.Height = Unit.FromPoint(24);
+        cellImage.AlternateText = "Cell figure";
+
+        var figure = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        figure.Width = Unit.FromPoint(90);
+        figure.Height = Unit.FromPoint(36);
+        figure.AlternateText = "Standalone figure";
+
+        return (
+            document,
+            new DocumentRenderer
+            {
+                Accessibility = tagged ? PdfUaConformance.PdfUa1 : PdfUaConformance.None,
+            });
+    }
+
     private static List<string> DrawOperators((Document Document, DocumentRenderer Renderer) authored)
         => Ops(authored)
             .Where(operation => operation.Operator is not ("BDC" or "BMC" or "EMC" or "DP" or "MP"))
@@ -132,6 +165,17 @@ public class OverlayContainerTaggingConformanceTests
         var tagged = DrawOperators(Layered(tagged: true));
 
         Assert.Contains("Do", plain);
+        Assert.Contains(plain, operation => operation is "Tj" or "TJ");
+        Assert.Equal(plain, tagged);
+    }
+
+    [Fact]
+    public void Tagging_DoesNotChangeTheOperatorSequenceForTableAndFigureContent()
+    {
+        var plain = DrawOperators(TableAndFigure(tagged: false));
+        var tagged = DrawOperators(TableAndFigure(tagged: true));
+
+        Assert.Equal(2, plain.Count(operation => operation == "Do"));
         Assert.Contains(plain, operation => operation is "Tj" or "TJ");
         Assert.Equal(plain, tagged);
     }

@@ -20,7 +20,7 @@ public class JustifyTests
         var fonts = LineLayoutSupport.Fonts();
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
         var paragraph = LineLayoutSupport.SingleRun(Sentence, alignment: HorizontalAlignment.Justify);
-        var lines = LineBreaker.Break(paragraph, MaxWidth, fonts).ToArray();
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts).ToArray();
         Assert.True(lines.Length >= 3);
         return (lines, space);
     }

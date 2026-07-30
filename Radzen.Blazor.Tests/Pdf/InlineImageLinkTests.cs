@@ -157,6 +157,33 @@ public class InlineImageLinkTests
     }
 
     [Fact]
+    public void LinkedInlineImage_JoinsTheAnnotationToTheLinkElementNotTheFigure()
+    {
+        var (document, _) = Authored(picture =>
+        {
+            picture.Link = "https://www.radzen.com/";
+            picture.AlternateText = "The Radzen logo";
+        });
+        document.Language = "en";
+        document.Info.Title = "Doc";
+
+        var reader = BuildTestSupport.Read(
+            document,
+            new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+
+        var annotation = Assert.Single(LinkAnnotations(reader));
+        var paragraph = Descendants(reader, TaggedStructureProbe.Root(reader))
+            .Single(element => element.Type == "P");
+        var link = Assert.Single(paragraph.Children.Where(child => child.Type == "Link"));
+        var figure = Assert.Single(link.Children);
+
+        var objr = Assert.Single(link.ObjectReferences);
+
+        Assert.Same(annotation, reader.Resolve(objr["Obj"]));
+        Assert.Empty(figure.ObjectReferences);
+    }
+
+    [Fact]
     public void UnlinkedInlineImage_TagsTheFigureDirectlyUnderTheParagraph()
     {
         var (document, _) = Authored(picture => picture.AlternateText = "The Radzen logo");

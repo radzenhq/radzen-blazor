@@ -13,6 +13,8 @@ public class LineBreakTests
     private const string Sentence =
         "The quick brown fox jumps over the lazy dog and then some more words here";
 
+    private const double MaxWidth = 160.0;
+
     private static string[] Words => Sentence.Split(' ');
 
     [Fact]
@@ -22,11 +24,36 @@ public class LineBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var full = fonts.MeasureText(Sentence, LineLayoutSupport.FontAt(12));
 
-        var lines = LineBreaker.Break(paragraph, full + 1.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, full + 1.0, fonts);
 
         Assert.Single(lines);
         Assert.Equal(Words.Length, lines[0].Fragments.Length);
         Assert.Equal(full, lines[0].Width, 6);
+    }
+
+    [Fact]
+    public void ExactFitWidth_KeepsTheSentenceOnOneLine()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+        var full = fonts.MeasureText(Sentence, LineLayoutSupport.FontAt(12));
+
+        var lines = IsolatedLineBreaker.Break(paragraph, full, fonts);
+
+        Assert.Equal(new[] { Words }, LineLayoutSupport.Grouping(lines));
+    }
+
+    [Fact]
+    public void ShortText_StaysOnOneLine()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun("Hello wrapped world");
+
+        var lines = IsolatedLineBreaker.Break(paragraph, 200.0, fonts);
+
+        Assert.Equal(
+            new[] { new[] { "Hello", "wrapped", "world" } },
+            LineLayoutSupport.Grouping(lines));
     }
 
     [Fact]
@@ -36,7 +63,7 @@ public class LineBreakTests
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var widest = Words.Max(w => LineLayoutSupport.WordWidth(fonts, w, 12));
 
-        var lines = LineBreaker.Break(paragraph, widest + 1.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, widest + 1.0, fonts);
 
         Assert.Equal(Words.Length, lines.Count);
         foreach (var line in lines)
@@ -54,7 +81,7 @@ public class LineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
 
-        var lines = LineBreaker.Break(paragraph, 1.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 1.0, fonts);
 
         var nonSpace = Sentence.Count(c => c != ' ');
         Assert.Equal(nonSpace, lines.Count);
@@ -80,7 +107,7 @@ public class LineBreakTests
         var threeWords = twoWords + space + w2;
         var maxWidth = (twoWords + threeWords) / 2.0;
 
-        var lines = LineBreaker.Break(paragraph, maxWidth, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, maxWidth, fonts);
 
         Assert.Equal(2, lines[0].Fragments.Length);
         Assert.Equal("The", lines[0].Fragments[0].Text);
@@ -91,39 +118,78 @@ public class LineBreakTests
     }
 
     [Fact]
+    public void WrappedLines_FitTheMeasureAndPreserveEveryWord()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts);
+
+        Assert.True(lines.Count >= 3);
+        LineLayoutSupport.AssertFitsAndPreservesWords(fonts, lines, Words, MaxWidth);
+    }
+
+    [Fact]
+    public void WrappedLines_GroupWordsIntoPinnedLines()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts);
+
+        Assert.Equal(
+            new[]
+            {
+                new[] { "The", "quick", "brown", "fox", "jumps" },
+                new[] { "over", "the", "lazy", "dog", "and", "then" },
+                new[] { "some", "more", "words", "here" },
+            },
+            LineLayoutSupport.Grouping(lines));
+    }
+
+    [Fact]
+    public void NarrowMeasure_GroupsWordsIntoPinnedLines()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = IsolatedLineBreaker.Break(paragraph, 120.0, fonts);
+
+        Assert.Equal(
+            new[]
+            {
+                new[] { "The", "quick", "brown", "fox" },
+                new[] { "jumps", "over", "the", "lazy" },
+                new[] { "dog", "and", "then", "some" },
+                new[] { "more", "words", "here" },
+            },
+            LineLayoutSupport.Grouping(lines));
+    }
+
+    [Fact]
     public void FragmentStartAndLength_IndexIntoRunText()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var words = Words;
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var run = (Run)paragraph.Inlines[0];
 
-        var widths = words.Select(w => LineLayoutSupport.WordWidth(fonts, w, 12)).ToArray();
-        var space = LineLayoutSupport.SpaceWidth(fonts, 12);
-        const double MaxWidth = 160.0;
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts);
+        var fragments = lines.SelectMany(l => l.Fragments).ToArray();
+        var source = fragments[0].Source;
 
-        var expected = LineLayoutSupport.Wrap(widths, space, MaxWidth);
-        var lines = LineBreaker.Break(paragraph, MaxWidth, fonts);
-        var source = lines[0].Fragments[0].Source;
+        Assert.Equal(Words.Length, fragments.Length);
 
-        Assert.Equal(expected.Count, lines.Count);
-
-        for (var li = 0; li < expected.Count; li++)
+        var previousEnd = -1;
+        for (var k = 0; k < fragments.Length; k++)
         {
-            var (first, last) = expected[li];
-            var line = lines[li];
-            Assert.Equal(last - first + 1, line.Fragments.Length);
-
-            for (var k = first; k <= last; k++)
-            {
-                var frag = line.Fragments[k - first];
-                Assert.Equal(source, frag.Source);
-                Assert.Equal(words[k], frag.Text);
-                Assert.Equal(LineLayoutSupport.WordStart(words, k), frag.Start);
-                Assert.Equal(words[k].Length, frag.Length);
-                Assert.Equal(run.Text.Substring(frag.Start, frag.Length), frag.Text);
-                Assert.Equal(widths[k], frag.Advance, 6);
-            }
+            var fragment = fragments[k];
+            Assert.Equal(source, fragment.Source);
+            Assert.Equal(Words[k], fragment.Text);
+            Assert.Equal(Words[k].Length, fragment.Length);
+            Assert.True(fragment.Start > previousEnd);
+            Assert.Equal(run.Text.Substring(fragment.Start, fragment.Length), fragment.Text);
+            Assert.Equal(LineLayoutSupport.WordWidth(fonts, Words[k], 12), fragment.Advance, 6);
+            previousEnd = fragment.Start + fragment.Length;
         }
     }
 
@@ -133,9 +199,8 @@ public class LineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
-        const double MaxWidth = 160.0;
 
-        var lines = LineBreaker.Break(paragraph, MaxWidth, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts);
 
         foreach (var line in lines)
         {
@@ -154,7 +219,7 @@ public class LineBreakTests
         var width = LineLayoutSupport.WordWidth(fonts, Token, 12);
         var max = width / 3.0;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1);
         Assert.All(lines, line => Assert.True(line.Width <= max + 1e-6));
@@ -169,7 +234,7 @@ public class LineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
 
-        var lines = LineBreaker.Break(paragraph, 160.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, MaxWidth, fonts);
 
         foreach (var line in lines)
         {

@@ -12,6 +12,9 @@ public class TabStopWrapTests
 {
     private const double Tol = 0.5;
 
+    private const string Sentence =
+        "The quick brown fox jumps over the lazy dog and then some more words here today";
+
     private static double ContentWidth
         => PageSizes.A4.Width.Point - (2 * 36.0);
 
@@ -24,7 +27,7 @@ public class TabStopWrapTests
             "Label:\tInternational Business Machines Corporation Global Services Division");
         paragraph.TabStops.Add(Unit.FromPoint(455), TabAlignment.Left);
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1, "post-stop segment must wrap onto more than one line");
         foreach (var fragment in lines.SelectMany(l => l.Fragments))
@@ -32,37 +35,73 @@ public class TabStopWrapTests
             Assert.True(fragment.XOffset + fragment.Advance <= max + Tol,
                 $"fragment '{fragment.Text}' at {fragment.XOffset} overruns the {max}pt measure");
         }
+
+        Assert.Equal(
+            new[]
+            {
+                new[] { "Label:", "International" },
+                new[] { "Business", "Machines", "Corporation", "Global", "Services", "Division" },
+            },
+            LineLayoutSupport.Grouping(lines));
+
+        Assert.Equal(0.0, lines[0].Fragments[0].XOffset, Tol);
+        Assert.Equal(455.0, lines[0].Fragments[1].XOffset, Tol);
+        Assert.Equal(0.0, lines[1].Fragments[0].XOffset, Tol);
     }
 
     [Fact]
-    public void NoExplicitTabStops_WrapsOnDefaultGrid_Unchanged()
+    public void TabbedRun_ResumesAtLeftMarginOnTheContinuationLine()
     {
         var fonts = LineLayoutSupport.Fonts();
-        const string sentence =
-            "The quick brown fox jumps over the lazy dog and then some more words here today";
-        var words = sentence.Split(' ');
-        var max = 200.0;
-        var paragraph = LineLayoutSupport.SingleRun(sentence);
+        var paragraph = LineLayoutSupport.SingleRun("Name:\tAtanas Korchev of Radzen Ltd Bulgaria");
+        paragraph.TabStops.Add(Unit.FromPoint(80), TabAlignment.Left);
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 220.0, fonts);
 
-        var widths = words.Select(w => LineLayoutSupport.WordWidth(fonts, w, 12)).ToArray();
-        var space = LineLayoutSupport.SpaceWidth(fonts, 12);
-        var expected = LineLayoutSupport.Wrap(widths, space, max);
-
-        Assert.Equal(expected.Count, lines.Count);
-        var w = 0;
-        for (var li = 0; li < expected.Count; li++)
-        {
-            var (first, last) = expected[li];
-            var expectedWords = last - first + 1;
-            Assert.Equal(expectedWords, lines[li].Fragments.Length);
-            for (var f = 0; f < expectedWords; f++)
+        Assert.Equal(
+            new[]
             {
-                Assert.Equal(words[w + f], lines[li].Fragments[f].Text);
-            }
+                new[] { "Name:", "Atanas", "Korchev", "of" },
+                new[] { "Radzen", "Ltd", "Bulgaria" },
+            },
+            LineLayoutSupport.Grouping(lines));
 
-            w += expectedWords;
+        Assert.Equal(80.0, lines[0].Fragments[1].XOffset, Tol);
+        Assert.Equal(0.0, lines[1].Fragments[0].XOffset, Tol);
+        foreach (var fragment in lines.SelectMany(l => l.Fragments))
+        {
+            Assert.True(fragment.XOffset + fragment.Advance <= 220.0 + Tol,
+                $"fragment '{fragment.Text}' at {fragment.XOffset} overruns the 220pt measure");
         }
+    }
+
+    [Fact]
+    public void NoExplicitTabStops_WrapsGreedilyWithoutSplittingWords()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var max = 200.0;
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
+
+        LineLayoutSupport.AssertFitsAndPreservesWords(fonts, lines, Sentence.Split(' '), max);
+    }
+
+    [Fact]
+    public void NoExplicitTabStops_GroupsWordsIntoPinnedLines()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var paragraph = LineLayoutSupport.SingleRun(Sentence);
+
+        var lines = IsolatedLineBreaker.Break(paragraph, 200.0, fonts);
+
+        Assert.Equal(
+            new[]
+            {
+                new[] { "The", "quick", "brown", "fox", "jumps", "over", "the" },
+                new[] { "lazy", "dog", "and", "then", "some", "more", "words" },
+                new[] { "here", "today" },
+            },
+            LineLayoutSupport.Grouping(lines));
     }
 }

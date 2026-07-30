@@ -92,7 +92,7 @@ public class ByteIdentityTests
     private static byte[] ObjectBytes(byte[] file, int number)
     {
         var header = Encoding.ASCII.GetBytes($"{number} 0 obj");
-        var start = IndexOf(file, header, 0);
+        var start = IndexOfToken(file, header);
         Assert.True(start >= 0, $"object {number} header not found");
 
         var end = IndexOf(file, Encoding.ASCII.GetBytes("endobj"), start);
@@ -101,6 +101,31 @@ public class ByteIdentityTests
 
         return file[start..end];
     }
+
+    private static int IndexOfToken(byte[] file, byte[] header)
+    {
+        for (var from = 0; from <= file.Length - header.Length;)
+        {
+            var candidate = IndexOf(file, header, from);
+            if (candidate < 0)
+            {
+                return -1;
+            }
+
+            if (candidate == 0 || IsWhitespace(file[candidate - 1]))
+            {
+                return candidate;
+            }
+
+            from = candidate + 1;
+        }
+
+        return -1;
+    }
+
+    // PDF 32000-1 7.2.2 Table 1: white-space characters.
+    private static bool IsWhitespace(byte value)
+        => value is 0x00 or 0x09 or 0x0A or 0x0C or 0x0D or 0x20;
 
     private static int IndexOf(byte[] haystack, byte[] needle, int from)
     {

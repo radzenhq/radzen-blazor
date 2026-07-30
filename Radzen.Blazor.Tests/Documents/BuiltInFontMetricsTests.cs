@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using Xunit;
 using Radzen.Documents;
@@ -76,13 +77,14 @@ public class BuiltInFontMetricsTests
     }
 
     [Fact]
-    public void MeasureString_SkipsUnencodableChars()
+    public void MeasureString_ThrowsOnUnencodableChars()
     {
-        var afm = AfmReference.Load("Helvetica");
         var metrics = BuiltInFontMetrics.Resolve(MakeFont("Helvetica"))!;
 
-        var expected = afm.WidthByName["A"] + afm.WidthByName["B"];
-        Assert.Equal(expected, metrics.MeasureString("AБB", 1000));
+        var error = Assert.Throws<InvalidOperationException>(() => metrics.MeasureString("AБB", 1000));
+
+        Assert.Contains("U+0411", error.Message, StringComparison.Ordinal);
+        Assert.Contains("Helvetica", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -209,16 +211,5 @@ public class BuiltInFontMetricsTests
         var metrics = BuiltInFontMetrics.Resolve(MakeFont("Helvetica", italic: true))!;
         Assert.Equal(afm.ItalicAngle, metrics.ItalicAngle);
         Assert.NotEqual(0d, metrics.ItalicAngle);
-    }
-
-    [Theory]
-    [InlineData('A', true)]
-    [InlineData('é', true)]
-    [InlineData('ﬁ', true)]
-    [InlineData('Б', false)]
-    public void ContainsGlyph_ReflectsAvailableAfmMetrics(char c, bool expected)
-    {
-        var metrics = BuiltInFontMetrics.Resolve(MakeFont("Helvetica"))!;
-        Assert.Equal(expected, metrics.ContainsGlyph(c));
     }
 }

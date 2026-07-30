@@ -65,8 +65,7 @@ public enum BarcodeType
 /// </summary>
 public static class BarcodeEncoder
 {
-    // Code 128 patterns (0..106). Each entry is 6 digits (bar/space/bar/space/bar/space) module widths.
-    // Stop code (106) is 7 digits in the spec (includes a final bar). We keep it as 7 digits and handle it.
+    // ISO/IEC 15417 - Code 128 symbol character element widths; the stop character (106) has a seventh element.
     private static readonly string[] Code128Patterns = new[]
     {
         "212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
@@ -99,7 +98,7 @@ public static class BarcodeEncoder
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        // Code 128 subset B supports ASCII 32..127 (inclusive). We treat 127 as DEL.
+        // ISO/IEC 15417 - Code Set B encodes ASCII 32..127.
         var codes = new List<int>(value.Length + 3);
         const int startB = 104;
         const int stop = 106;
@@ -115,7 +114,7 @@ public static class BarcodeEncoder
                 throw new ArgumentException($"Code128B supports ASCII 32..127. Invalid character: U+{ascii:X4}.");
             }
 
-            // In Code128B, code value is ascii - 32
+            // ISO/IEC 15417 - the Code Set B value is the ASCII code minus 32.
             codes.Add(ascii - 32);
         }
 
@@ -141,9 +140,7 @@ public static class BarcodeEncoder
             }
         }
 
-        // Code 128 requires a 2-module termination bar after the stop pattern.
-        // Many pattern tables omit it because it can be represented by extending the
-        // final bar of the stop pattern by 2 modules.
+        // ISO/IEC 15417 - the stop character is followed by a 2-module termination bar.
         if (modules.Count > 0)
         {
             modules[^1] += 2;
@@ -154,8 +151,7 @@ public static class BarcodeEncoder
 
     private static readonly Dictionary<char, string> Code39Map = new Dictionary<char, string>()
     {
-        // Each pattern is 9 elements (bar/space alternating, starting with bar).
-        // 'n' = narrow (1), 'w' = wide (2). We expand to digits.
+        // ISO/IEC 16388 - nine alternating elements starting with a bar, narrow ('n') or wide ('w').
         ['0'] = "nnnwwnwnn",
         ['1'] = "wnnwnnnnw",
         ['2'] = "nnwwnnnnw",
@@ -199,7 +195,7 @@ public static class BarcodeEncoder
         ['/'] = "nwnwnnnwn",
         ['+'] = "nwnnnwnwn",
         ['%'] = "nnnwnwnwn",
-        ['*'] = "nwnnwnwnn", // start/stop
+        ['*'] = "nwnnwnwnn",
     };
 
     /// <summary>
@@ -211,7 +207,6 @@ public static class BarcodeEncoder
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        // Code39 traditionally uses uppercase
         var text = value.ToUpperInvariant();
 
         foreach (var ch in text)
@@ -222,8 +217,11 @@ public static class BarcodeEncoder
             }
         }
 
-        // Start + data + stop, inter-character gap (narrow space) between characters.
-        var full = "*" + text + "*";
+        const int narrow = 1;
+        const int wide = 2;
+        const string startStop = "*";
+
+        var full = startStop + text + startStop;
         var modules = new List<int>(full.Length * 10);
 
         for (int idx = 0; idx < full.Length; idx++)
@@ -231,13 +229,13 @@ public static class BarcodeEncoder
             var pat = Code39Map[full[idx]];
             for (int i = 0; i < pat.Length; i++)
             {
-                modules.Add(pat[i] == 'w' ? 2 : 1);
+                modules.Add(pat[i] == 'w' ? wide : narrow);
             }
 
-            // Inter-character gap (narrow space) except after last char.
-            if (idx != full.Length - 1)
+            bool isLastCharacter = idx == full.Length - 1;
+            if (!isLastCharacter)
             {
-                modules.Add(1);
+                modules.Add(narrow);
             }
         }
 
@@ -258,7 +256,6 @@ public static class BarcodeEncoder
         }
         if (digits.Length % 2 != 0)
         {
-            // pad with leading zero (common behavior)
             digits = "0" + digits;
         }
 
@@ -282,7 +279,7 @@ public static class BarcodeEncoder
 
         var widths = new List<int>(digits.Length * 10 + 16);
 
-        // Start: narrow bar, narrow space, narrow bar, narrow space  (1010)
+        // ISO/IEC 16390 - the start pattern is four narrow elements.
         widths.Add(narrow);
         widths.Add(narrow);
         widths.Add(narrow);
@@ -290,17 +287,17 @@ public static class BarcodeEncoder
 
         for (int i = 0; i < digits.Length; i += 2)
         {
-            var a = Pat(digits[i]);
-            var b = Pat(digits[i + 1]);
+            var barPattern = Pat(digits[i]);
+            var spacePattern = Pat(digits[i + 1]);
 
             for (int j = 0; j < 5; j++)
             {
-                widths.Add(a[j] == 'w' ? wide : narrow); // bar
-                widths.Add(b[j] == 'w' ? wide : narrow); // space
+                widths.Add(barPattern[j] == 'w' ? wide : narrow);
+                widths.Add(spacePattern[j] == 'w' ? wide : narrow);
             }
         }
 
-        // Stop: wide bar, narrow space, narrow bar (1101)
+        // ISO/IEC 16390 - the stop pattern is a wide bar, a narrow space and a narrow bar.
         widths.Add(wide);
         widths.Add(narrow);
         widths.Add(narrow);
@@ -315,7 +312,6 @@ public static class BarcodeEncoder
     /// <returns>The module widths (bar/space alternating, starting with bar).</returns>
     public static IReadOnlyList<int> EncodeCodabar(string value)
     {
-        // Wikipedia table mapping (bars: 1=wide, spaces: 0=wide) for the standard symbol set.
         var raw = (value ?? string.Empty).Trim().ToUpperInvariant();
         if (raw.Length == 0)
         {
@@ -371,9 +367,7 @@ public static class BarcodeEncoder
             var ch = text[idx];
             var (spaceBits, barBits) = Map(ch);
 
-            // Bars: 4 bits, 1=wide
             int BarWidth(int pos) => barBits[pos] == '1' ? wide : narrow;
-            // Spaces: 3 bits, 0=wide (per wikipedia mapping table)
             int SpaceWidth(int pos) => spaceBits[pos] == '0' ? wide : narrow;
 
             widths.Add(BarWidth(0));
@@ -384,8 +378,8 @@ public static class BarcodeEncoder
             widths.Add(SpaceWidth(2));
             widths.Add(BarWidth(3));
 
-            // Inter-character narrow space (except after last char).
-            if (idx != text.Length - 1)
+            bool isLastCharacter = idx == text.Length - 1;
+            if (!isLastCharacter)
             {
                 widths.Add(narrow);
             }
@@ -413,7 +407,6 @@ public static class BarcodeEncoder
 
     private static int ComputeEanCheckDigit(string digitsWithoutCheck)
     {
-        // digitsWithoutCheck is 7/11/12 digits depending on symbology.
         int sum = 0;
         bool weight3 = true;
         for (int i = digitsWithoutCheck.Length - 1; i >= 0; i--)
@@ -461,7 +454,6 @@ public static class BarcodeEncoder
 
         var sb = new StringBuilder(95);
         sb.Append("101");
-        // digits 2..7 (index 1..6)
         for (int i = 1; i <= 6; i++)
         {
             int d = digits[i] - '0';
@@ -582,7 +574,6 @@ public static class BarcodeEncoder
         var raw = new string(value.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
         if (raw.Length == 10)
         {
-            // ISBN-10 -> EAN-13: 978 + first 9 digits + EAN check
             var core = raw[..9];
             if (!core.All(char.IsDigit))
             {
@@ -612,7 +603,6 @@ public static class BarcodeEncoder
     /// <returns>The bit pattern (1=bar, 0=space).</returns>
     public static string EncodeIssnAsEan13(string value, out string checksumText)
     {
-        // ISSN EAN-13: 977 + first 7 digits + 00 + EAN check
         var raw = new string(value.Where(char.IsLetterOrDigit).ToArray()).ToUpperInvariant();
         if (raw.Length != 8)
         {
@@ -639,7 +629,6 @@ public static class BarcodeEncoder
     {
         ArgumentNullException.ThrowIfNull(value);
 
-        // Pharmacode one-track: numbers 3..131070
         var digits = new string(value.Where(char.IsDigit).ToArray());
         if (!int.TryParse(digits, NumberStyles.None, CultureInfo.InvariantCulture, out var n))
         {
@@ -666,12 +655,14 @@ public static class BarcodeEncoder
         }
         bars.Reverse();
 
+        const int gapModules = 1;
+
         double x = Math.Max(0, quietZone);
         var rects = new List<Rect>(bars.Count);
         foreach (var b in bars)
         {
             rects.Add(new Rect(x, 0, b.width, barHeight));
-            x += b.width + 1; // 1 module gap
+            x += b.width + gapModules;
         }
 
         var vbWidth = x + Math.Max(0, quietZone);
@@ -683,7 +674,6 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    // POSTNET digit encoding from Wikipedia (weights 7,4,2,1,0). 1=full bar, 0=half bar.
     private static readonly Dictionary<char, string> PostnetDigitBits = new Dictionary<char, string>()
     {
         ['0'] = "11000",
@@ -722,16 +712,21 @@ public static class BarcodeEncoder
 
         var payload = digits + checksumText;
 
+        const int barPitch = 2;
+        const int barWidth = 1;
+
         double fullH = barHeight;
         double halfH = barHeight / 2.0;
         double halfY = fullH - halfH;
 
+        Rect FullBar(double at) => new Rect(at, 0, barWidth, fullH);
+        Rect HalfBar(double at) => new Rect(at, halfY, barWidth, halfH);
+
         double x = Math.Max(0, quietZone);
         var rects = new List<Rect>();
 
-        // Start frame bar (full)
-        rects.Add(new Rect(x, 0, 1, fullH));
-        x += 2; // bar(1) + space(1)
+        rects.Add(FullBar(x));
+        x += barPitch;
 
         foreach (var ch in payload)
         {
@@ -739,16 +734,13 @@ public static class BarcodeEncoder
             for (int i = 0; i < 5; i++)
             {
                 bool full = bits[i] == '1';
-                rects.Add(full
-                    ? new Rect(x, 0, 1, fullH)
-                    : new Rect(x, halfY, 1, halfH));
-                x += 2;
+                rects.Add(full ? FullBar(x) : HalfBar(x));
+                x += barPitch;
             }
         }
 
-        // Stop frame bar (full)
-        rects.Add(new Rect(x, 0, 1, fullH));
-        x += 1;
+        rects.Add(FullBar(x));
+        x += barWidth;
 
         var vbWidth = x + Math.Max(0, quietZone);
         if (vbWidth <= 0)
@@ -759,12 +751,8 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    // RM4SCC patterns and symbol matrix from Wikipedia:
-    // Top patterns (values 1..6) and Bottom patterns (values 1..6) are:
-    // 1=0011, 2=0101, 3=0110, 4=1001, 5=1010, 6=1100
     private static readonly string[] Rm4Patterns = new[] { "0011", "0101", "0110", "1001", "1010", "1100" };
 
-    // Matrix indexed by [topValue-1, bottomValue-1]
     private static readonly char[,] Rm4Matrix = new char[6, 6]
     {
         { '0', '1', '2', '3', '4', '5' },
@@ -808,7 +796,6 @@ public static class BarcodeEncoder
             throw new ArgumentException("RM4SCC requires alphanumeric input.");
         }
 
-        // Only symbols present in the Wikipedia table (0-9, A-Z).
         foreach (var ch in text)
         {
             if (!(ch is >= '0' and <= '9') && !(ch is >= 'A' and <= 'Z'))
@@ -817,7 +804,6 @@ public static class BarcodeEncoder
             }
         }
 
-        // Compute checksum per Wikipedia: sum top values and bottom values separately, mod 6, 0 => 6.
         int sumTop = 0;
         int sumBottom = 0;
         foreach (var ch in text)
@@ -841,28 +827,31 @@ public static class BarcodeEncoder
 
         checksumText = checkChar.ToString();
 
-        // Start/stop are single bars; we use ascender for start and descender for stop.
         double h = barHeight;
         double third = h / 3.0;
         double trackerY = third;
         double trackerH = third;
 
+        Rect Tracker(double x) => new Rect(x, trackerY, 1, trackerH);
+        Rect Ascender(double x) => new Rect(x, 0, 1, trackerY + trackerH);
+        Rect Descender(double x) => new Rect(x, trackerY, 1, h - trackerY);
+        Rect FullBar(double x) => new Rect(x, 0, 1, h);
+
         Rect BarRect(double x, bool top, bool bottom)
         {
             return (top, bottom) switch
             {
-                (false, false) => new Rect(x, trackerY, 1, trackerH), // tracker
-                (true, false) => new Rect(x, 0, 1, trackerY + trackerH), // ascender (top + tracker)
-                (false, true) => new Rect(x, trackerY, 1, h - trackerY), // descender (tracker + bottom)
-                (true, true) => new Rect(x, 0, 1, h), // full
+                (false, false) => Tracker(x),
+                (true, false) => Ascender(x),
+                (false, true) => Descender(x),
+                (true, true) => FullBar(x),
             };
         }
 
         double xPos = Math.Max(0, quietZone);
         var rects = new List<Rect>();
 
-        // Start bar (ascender)
-        rects.Add(BarRect(xPos, top: true, bottom: false));
+        rects.Add(Ascender(xPos));
         xPos += 2;
 
         void AddSymbol(char ch)
@@ -884,8 +873,7 @@ public static class BarcodeEncoder
 
         AddSymbol(checkChar);
 
-        // Stop bar (descender)
-        rects.Add(BarRect(xPos, top: false, bottom: true));
+        rects.Add(Descender(xPos));
         xPos += 1;
 
         var vbWidth = xPos + Math.Max(0, quietZone);
@@ -911,12 +899,10 @@ public static class BarcodeEncoder
             throw new ArgumentException("Plessey (MSI) requires numeric input.");
         }
 
-        // Mod 10 (Luhn) check digit (common)
         int check = ComputeLuhnCheckDigit(digits);
         checksumText = check.ToString(CultureInfo.InvariantCulture);
         digits += checksumText;
 
-        // MSI map from Wikipedia.
         static string DigitMap(char d) => d switch
         {
             '0' => "100100100100",
@@ -932,14 +918,17 @@ public static class BarcodeEncoder
             _ => throw new ArgumentException("MSI requires numeric input.")
         };
 
+        const string startPattern = "110";
+        const string stopPattern = "1001";
+
         var sb = new StringBuilder();
-        sb.Append("110"); // start
+        sb.Append(startPattern);
         foreach (var ch in digits)
         {
             sb.Append(DigitMap(ch));
         }
 
-        sb.Append("1001"); // stop
+        sb.Append(stopPattern);
         return sb.ToString();
     }
 
@@ -972,7 +961,6 @@ public static class BarcodeEncoder
     /// <returns>The module widths (bar/space alternating, starting with bar).</returns>
     public static IReadOnlyList<int> EncodeTelepen(string value, out string checksumText)
     {
-        // Telepen algorithm per Wikipedia: even parity bytes, little-endian bit order, modulo-127 checksum.
         var bytes = Encoding.ASCII.GetBytes(value ?? string.Empty);
 
         int sum = 0;
@@ -999,8 +987,8 @@ public static class BarcodeEncoder
         {
             int b = b0 & 0x7F;
             int ones = CountBits(b);
-            int parityBit = (ones % 2 == 0) ? 0 : 1; // make total even
-            int byteWithParity = b | (parityBit << 7);
+            int evenParityBit = (ones % 2 == 0) ? 0 : 1;
+            int byteWithParity = b | (evenParityBit << 7);
 
             for (int i = 0; i < 8; i++)
             {
@@ -1012,38 +1000,35 @@ public static class BarcodeEncoder
         const int wide = 3;
         var widths = new List<int>();
 
+        void AddNarrowBarNarrowSpace() { widths.Add(narrow); widths.Add(narrow); }
+        void AddNarrowBarWideSpace() { widths.Add(narrow); widths.Add(wide); }
+        void AddWideBarNarrowSpace() { widths.Add(wide); widths.Add(narrow); }
+        void AddWideBarWideSpace() { widths.Add(wide); widths.Add(wide); }
+
         int idx = 0;
         while (idx < bitStream.Count)
         {
             if (bitStream[idx] == 1)
             {
-                // "1" => narrow bar, narrow space
-                widths.Add(narrow);
-                widths.Add(narrow);
+                AddNarrowBarNarrowSpace();
                 idx += 1;
                 continue;
             }
 
-            // starts with 0
             if (idx + 1 < bitStream.Count && bitStream[idx + 1] == 0)
             {
-                // "00" => wide bar, narrow space
-                widths.Add(wide);
-                widths.Add(narrow);
+                AddWideBarNarrowSpace();
                 idx += 2;
                 continue;
             }
 
             if (idx + 2 < bitStream.Count && bitStream[idx] == 0 && bitStream[idx + 1] == 1 && bitStream[idx + 2] == 0)
             {
-                // "010" => wide bar, wide space
-                widths.Add(wide);
-                widths.Add(wide);
+                AddWideBarWideSpace();
                 idx += 3;
                 continue;
             }
 
-            // General block 0 1^k 0 with k>=2
             if (idx + 3 >= bitStream.Count || bitStream[idx] != 0 || bitStream[idx + 1] != 1)
             {
                 throw new ArgumentException("Invalid Telepen bit stream.");
@@ -1060,26 +1045,20 @@ public static class BarcodeEncoder
                 throw new ArgumentException("Invalid Telepen bit stream.");
             }
 
-            int k = j - (idx + 1); // number of 1s
-            if (k < 2)
+            int oneCount = j - (idx + 1);
+            if (oneCount < 2)
             {
                 throw new ArgumentException("Invalid Telepen bit stream.");
             }
 
-            // leading "01" => narrow bar, wide space
-            widths.Add(narrow);
-            widths.Add(wide);
+            AddNarrowBarWideSpace();
 
-            // middle extra 1s (k-2) => narrow bar, narrow space
-            for (int m = 0; m < k - 2; m++)
+            for (int m = 0; m < oneCount - 2; m++)
             {
-                widths.Add(narrow);
-                widths.Add(narrow);
+                AddNarrowBarNarrowSpace();
             }
 
-            // trailing "10" => narrow bar, wide space
-            widths.Add(narrow);
-            widths.Add(wide);
+            AddNarrowBarWideSpace();
 
             idx = j + 1;
         }

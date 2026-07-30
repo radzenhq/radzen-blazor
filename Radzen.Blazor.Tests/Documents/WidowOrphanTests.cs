@@ -33,7 +33,7 @@ public class WidowOrphanTests
         var fonts = PaginationSupport.Fonts();
         var (section, _) = WidowScenario(fonts, widows: 2);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(4, pages[0].Body.Lines.Length);
@@ -48,7 +48,7 @@ public class WidowOrphanTests
         var (section, para) = WidowScenario(fonts, widows: 2);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(capture.Source(para), pages[0].Body.Lines[2].Source);
         Assert.Equal(capture.Source(para), pages[0].Body.Lines[3].Source);
@@ -65,7 +65,7 @@ public class WidowOrphanTests
         var (section, _) = WidowScenario(fonts, widows: 1);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(5, pages[0].Body.Lines.Length);
@@ -94,7 +94,7 @@ public class WidowOrphanTests
         var (section, para) = OrphanScenario(fonts, orphans: 2);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(4, pages[0].Body.Lines.Length);
@@ -110,7 +110,7 @@ public class WidowOrphanTests
         var (section, para) = OrphanScenario(fonts, orphans: 1);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(5, pages[0].Body.Lines.Length);

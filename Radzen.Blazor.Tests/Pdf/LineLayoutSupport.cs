@@ -1,9 +1,12 @@
 #nullable enable
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -40,35 +43,30 @@ internal static class LineLayoutSupport
     public static double SpaceWidth(FontCollection fonts, double size)
         => fonts.MeasureText(" ", FontAt(size));
 
-    public static List<(int First, int Last)> Wrap(double[] widths, double space, double max)
+    public static void AssertFitsAndPreservesWords(
+        FontCollection fonts,
+        IReadOnlyList<LineBox> lines,
+        string[] words,
+        double max,
+        double size = 12,
+        double tolerance = 1e-6)
     {
-        var lines = new List<(int, int)>();
-        var i = 0;
-        while (i < widths.Length)
+        Assert.NotEmpty(lines);
+        Assert.All(lines, line => Assert.NotEmpty(line.Fragments));
+        Assert.All(lines, line => Assert.True(line.Width <= max + tolerance,
+            $"line '{string.Join(" ", line.Fragments.Select(f => f.Text))}' is {line.Width}pt wide, measure is {max}pt"));
+
+        Assert.Equal(words, lines.SelectMany(l => l.Fragments).Select(f => f.Text).ToArray());
+
+        var space = SpaceWidth(fonts, size);
+        for (var i = 0; i + 1 < lines.Count; i++)
         {
-            var j = i;
-            var width = widths[i];
-            while (j + 1 < widths.Length && width + space + widths[j + 1] <= max)
-            {
-                j++;
-                width += space + widths[j];
-            }
-
-            lines.Add((i, j));
-            i = j + 1;
+            var next = lines[i + 1].Fragments[0];
+            Assert.True(lines[i].Width + space + next.Advance > max - tolerance,
+                $"line {i} could still take '{next.Text}' within {max}pt");
         }
-
-        return lines;
     }
 
-    public static int WordStart(string[] words, int k)
-    {
-        var start = 0;
-        for (var m = 0; m < k; m++)
-        {
-            start += words[m].Length + 1;
-        }
-
-        return start;
-    }
+    public static string[][] Grouping(IReadOnlyList<LineBox> lines)
+        => lines.Select(l => l.Fragments.Select(f => f.Text).ToArray()).ToArray();
 }

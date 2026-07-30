@@ -109,9 +109,31 @@ public class FrameworkSeamTests
         }
     }
 
+    private sealed class DecoderRegistryScope : IDisposable
+    {
+        private static readonly System.Reflection.FieldInfo DecoderField =
+            typeof(ImageDecoder).GetField("registered", Flags)!;
+
+        private static readonly System.Reflection.FieldInfo ProbeField =
+            typeof(ImageProbe).GetField("registered", Flags)!;
+
+        private const System.Reflection.BindingFlags Flags =
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+
+        private readonly object? decoders = DecoderField.GetValue(null);
+        private readonly object? probes = ProbeField.GetValue(null);
+
+        public void Dispose()
+        {
+            DecoderField.SetValue(null, decoders);
+            ProbeField.SetValue(null, probes);
+        }
+    }
+
     [Fact]
     public void ImageDecoder_RegisteredCustomDecoder_IsDispatched()
     {
+        using var registry = new DecoderRegistryScope();
         ImageDecoder.Register(new RzimImageDecoder());
 
         var decoded = ImageDecoder.Decode([.. RzimImageDecoder.Magic, 0x00, 0x01]);
@@ -125,6 +147,7 @@ public class FrameworkSeamTests
     [Fact]
     public void ImageContent_RegisteredCustomFormat_RoundTripsThroughPublicPipeline()
     {
+        using var registry = new DecoderRegistryScope();
         ImageDecoder.Register(new RzimImageDecoder());
 
         var document = new PortableDocument();

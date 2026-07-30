@@ -11,10 +11,15 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ResourceKeyRegistryTests
 {
+    private static readonly LayoutCaptureContext Capture = new();
+
     private static PagePlan Plan() => new() { Size = PageSizes.A4 };
 
     private static GradientPaint Paint(GradientBrush brush)
-        => GeometryCapture.Gradient(brush, GradientReference.Box(100, 100))!.Value;
+        => GeometryCapture.Gradient(
+            brush,
+            GradientReference.Box(100, 100),
+            Capture)!.Value;
 
     private static GeneratedSoftMask Mask(string? contentKey) => new()
     {

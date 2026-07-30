@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -180,19 +181,32 @@ public class RendererCaptureIsolationTests
         return renderer;
     }
 
-    private static void MutateEverything(DocumentRenderer renderer, bool tagged)
-    {
-        renderer.Producer = "Mutated Producer 9.9";
-        renderer.CompressOutput = false;
-        renderer.IncludeDocumentId = false;
+    private static readonly (string Member, System.Action<DocumentRenderer, bool> Mutate)[] RendererMutations =
+    [
+        (nameof(DocumentRenderer.Producer), static (renderer, _) => renderer.Producer = "Mutated Producer 9.9"),
+        (nameof(DocumentRenderer.CompressOutput), static (renderer, _) => renderer.CompressOutput = false),
+        (nameof(DocumentRenderer.IncludeDocumentId), static (renderer, _) => renderer.IncludeDocumentId = false),
+        (nameof(DocumentRenderer.Accessibility), static (renderer, tagged) =>
+        {
+            if (tagged)
+            {
+                renderer.Accessibility = PdfUaConformance.None;
+            }
+        }),
+        (nameof(DocumentRenderer.Conformance), static (renderer, tagged) =>
+        {
+            if (tagged)
+            {
+                renderer.Conformance = PdfAConformance.PdfA3B;
+            }
+        }),
+        (nameof(DocumentRenderer.Encryption), static (renderer, tagged) =>
+        {
+            if (tagged)
+            {
+                return;
+            }
 
-        if (tagged)
-        {
-            renderer.Accessibility = PdfUaConformance.None;
-            renderer.Conformance = PdfAConformance.PdfA3B;
-        }
-        else
-        {
             renderer.Encryption!.UserPassword = "mutated-user";
             renderer.Encryption.OwnerPassword = "mutated-owner";
             renderer.Encryption.Algorithm = EncryptionAlgorithm.Aes256;
@@ -205,61 +219,112 @@ public class RendererCaptureIsolationTests
             renderer.Encryption.AllowFormFill = false;
             renderer.Encryption.AllowAssembly = false;
             ((MutableEncryptionMaterial)renderer.Encryption.Material!).Seed = 9;
-        }
-
-        renderer.ViewerPreferences!.HideToolbar = false;
-        renderer.ViewerPreferences.HideMenubar = true;
-        renderer.ViewerPreferences.PageLayout = PdfPageLayout.SinglePage;
-        renderer.ViewerPreferences.PageMode = PdfPageMode.UseThumbs;
-        renderer.ViewerPreferences.FitWindow = true;
-        renderer.ViewerPreferences.CenterWindow = true;
-        renderer.ViewerPreferences.DisplayDocTitle = true;
-        renderer.ViewerPreferences.Direction = PdfReadingDirection.RightToLeft;
-
-        renderer.RoleMap.Add("Caption", "Span");
-
-        renderer.Outline[0].Title = "MutatedChapter";
-        renderer.Outline[0].Bold = false;
-        renderer.Outline[0].Italic = true;
-        renderer.Outline[0].Collapsed = true;
-        renderer.Outline[0].Children[0].Title = "MutatedNested";
-        renderer.Outline[0].Children.Add(new OutlineItem("MutatedExtra", OutlineTarget.ToPage(0)));
-        renderer.Outline.Add(new OutlineItem("MutatedRoot", OutlineTarget.ToPage(0)));
-
-        renderer.Attachments[0].Description = "MutatedDescription";
-        renderer.Attachments[0].ModificationDate = new System.DateTimeOffset(2020, 5, 6, 7, 8, 9, System.TimeSpan.Zero);
-        renderer.Attachments.Add("extra.txt", Encoding.ASCII.GetBytes("mutated"), AttachmentRelationship.Supplement, "text/plain");
-
-        renderer.PageLabels[0].Style = PageLabelStyle.LowercaseLetters;
-        renderer.PageLabels[0].Prefix = "MutatedPrefix";
-        renderer.PageLabels[0].Start = 77;
-
-        if (tagged)
+        }),
+        (nameof(DocumentRenderer.ViewerPreferences), static (renderer, _) =>
         {
-            return;
+            renderer.ViewerPreferences!.HideToolbar = false;
+            renderer.ViewerPreferences.HideMenubar = true;
+            renderer.ViewerPreferences.PageLayout = PdfPageLayout.SinglePage;
+            renderer.ViewerPreferences.PageMode = PdfPageMode.UseThumbs;
+            renderer.ViewerPreferences.FitWindow = true;
+            renderer.ViewerPreferences.CenterWindow = true;
+            renderer.ViewerPreferences.DisplayDocTitle = true;
+            renderer.ViewerPreferences.Direction = PdfReadingDirection.RightToLeft;
+        }),
+        (nameof(DocumentRenderer.RoleMap), static (renderer, _) => renderer.RoleMap.Add("Caption", "Span")),
+        (nameof(DocumentRenderer.Outline), static (renderer, _) =>
+        {
+            renderer.Outline[0].Title = "MutatedChapter";
+            renderer.Outline[0].Bold = false;
+            renderer.Outline[0].Italic = true;
+            renderer.Outline[0].Collapsed = true;
+            renderer.Outline[0].Children[0].Title = "MutatedNested";
+            renderer.Outline[0].Children.Add(new OutlineItem("MutatedExtra", OutlineTarget.ToPage(0)));
+            renderer.Outline.Add(new OutlineItem("MutatedRoot", OutlineTarget.ToPage(0)));
+        }),
+        (nameof(DocumentRenderer.Attachments), static (renderer, _) =>
+        {
+            renderer.Attachments[0].Description = "MutatedDescription";
+            renderer.Attachments[0].ModificationDate = new System.DateTimeOffset(2020, 5, 6, 7, 8, 9, System.TimeSpan.Zero);
+            renderer.Attachments.Add("extra.txt", Encoding.ASCII.GetBytes("mutated"), AttachmentRelationship.Supplement, "text/plain");
+        }),
+        (nameof(DocumentRenderer.PageLabels), static (renderer, _) =>
+        {
+            renderer.PageLabels[0].Style = PageLabelStyle.LowercaseLetters;
+            renderer.PageLabels[0].Prefix = "MutatedPrefix";
+            renderer.PageLabels[0].Start = 77;
+        }),
+        (nameof(DocumentRenderer.FormFields), static (renderer, tagged) =>
+        {
+            if (tagged)
+            {
+                return;
+            }
+
+            var text = (TextFieldDefinition)renderer.FormFields[0];
+            text.Value = "MutatedValue";
+            text.X = 200;
+            text.MaxLength = 4;
+            text.Font.Size = 30;
+            text.Multiline = true;
+
+            ((CheckBoxFieldDefinition)renderer.FormFields[1]).Checked = false;
+
+            var radio = (RadioGroupFieldDefinition)renderer.FormFields[2];
+            radio.SelectedValue = "two";
+            radio.Options[0].X = 300;
+            radio.Options.Add(new RadioOptionDefinition("three") { X = 80, Y = 100, Width = 12, Height = 12 });
+
+            var choice = (ChoiceFieldDefinition)renderer.FormFields[3];
+            choice.Value = "Varna";
+            choice.ComboBox = false;
+            choice.Options.Add("MutatedOption");
+            choice.Font.Size = 30;
+
+            renderer.FormFields.Add(new CheckBoxFieldDefinition("mutated") { X = 40, Y = 200, Width = 12, Height = 12 });
+        }),
+    ];
+
+    private static void MutateEverything(DocumentRenderer renderer, bool tagged)
+    {
+        foreach (var (_, mutate) in RendererMutations)
+        {
+            mutate(renderer, tagged);
         }
+    }
 
-        var text = (TextFieldDefinition)renderer.FormFields[0];
-        text.Value = "MutatedValue";
-        text.X = 200;
-        text.MaxLength = 4;
-        text.Font.Size = 30;
-        text.Multiline = true;
+    [Fact]
+    public void EverySettableDocumentRendererMember_IsCoveredByTheMutationList()
+    {
+        const System.Reflection.BindingFlags Flags =
+            System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance;
 
-        ((CheckBoxFieldDefinition)renderer.FormFields[1]).Checked = false;
+        var settable = typeof(DocumentRenderer)
+            .GetProperties(Flags)
+            .Where(property => property.SetMethod is { IsPublic: true })
+            .Select(property => property.Name)
+            .Concat(typeof(DocumentRenderer)
+                .GetFields(Flags)
+                .Where(field => !field.IsInitOnly && !field.IsLiteral)
+                .Select(field => field.Name))
+            .ToArray();
 
-        var radio = (RadioGroupFieldDefinition)renderer.FormFields[2];
-        radio.SelectedValue = "two";
-        radio.Options[0].X = 300;
-        radio.Options.Add(new RadioOptionDefinition("three") { X = 80, Y = 100, Width = 12, Height = 12 });
+        var mutated = RendererMutations.Select(entry => entry.Member).ToArray();
 
-        var choice = (ChoiceFieldDefinition)renderer.FormFields[3];
-        choice.Value = "Varna";
-        choice.ComboBox = false;
-        choice.Options.Add("MutatedOption");
-        choice.Font.Size = 30;
+        var uncovered = settable.Except(mutated, System.StringComparer.Ordinal).ToArray();
+        var unknown = mutated
+            .Where(member => typeof(DocumentRenderer).GetMember(member, Flags).Length == 0)
+            .ToArray();
 
-        renderer.FormFields.Add(new CheckBoxFieldDefinition("mutated") { X = 40, Y = 200, Width = 12, Height = 12 });
+        Assert.True(
+            uncovered.Length == 0,
+            $"Settable DocumentRenderer members missing from RendererMutations: {string.Join(", ", uncovered)}");
+
+        Assert.True(
+            unknown.Length == 0,
+            $"RendererMutations names members DocumentRenderer no longer has: {string.Join(", ", unknown)}");
+
+        Assert.Equal(mutated.Length, mutated.Distinct(System.StringComparer.Ordinal).Count());
     }
 
     private static void MutateModel(Document model)

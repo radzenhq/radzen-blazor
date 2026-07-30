@@ -169,11 +169,21 @@ public class TaggedTableSemanticsTests
         first.Cells[0].RowSpan = rowSpan;
         first.Cells[0].ColumnSpan = columnSpan;
         TableLayoutSupport.Fill(first.Cells[0], "Merged");
-        TableLayoutSupport.Fill(first.Cells[1], "Right");
+        if (columnSpan == 1)
+        {
+            TableLayoutSupport.Fill(first.Cells[1], "Right");
+        }
 
         var second = table.Rows.Add();
-        TableLayoutSupport.Fill(second.Cells[0], "Below");
-        TableLayoutSupport.Fill(second.Cells[1], "Corner");
+        if (rowSpan == 1)
+        {
+            TableLayoutSupport.Fill(second.Cells[0], "Below");
+            TableLayoutSupport.Fill(second.Cells[1], "Corner");
+        }
+        else if (columnSpan == 1)
+        {
+            TableLayoutSupport.Fill(second.Cells[0], "Below");
+        }
 
         return document;
     }
