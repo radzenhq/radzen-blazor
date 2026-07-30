@@ -8,9 +8,24 @@ namespace Radzen.Documents.Pdf;
 /// <summary>Stores the modeled annotations of a page in paint order.</summary>
 public sealed class AnnotationCollection : IReadOnlyList<Annotation>
 {
-    private readonly TrackedList<Entry> entries = [];
+    private readonly TrackedList<Entry> entries;
+    private Action? invalidate;
+    private bool loading;
     private bool loaded;
     private bool rewriteImported;
+
+    /// <summary>Initializes an empty annotation collection.</summary>
+    public AnnotationCollection() => entries = new TrackedList<Entry>(Invalidate);
+
+    internal void OwnedBy(Action owner) => invalidate = owner;
+
+    private void Invalidate()
+    {
+        if (!loading)
+        {
+            invalidate?.Invoke();
+        }
+    }
 
     /// <summary>Gets the number of modeled annotations.</summary>
     public int Count
@@ -112,9 +127,11 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     internal void Load(Annotation? annotation, DocumentReader reader, DocumentObject original, DictionaryObject? dictionary)
     {
         loaded = true;
+        loading = true;
         annotation?.AcceptChanges();
         entries.Add(new Entry(annotation, reader, original, dictionary));
         entries.AcceptStructure();
+        loading = false;
     }
 
     internal void RewriteImported() => (loaded, rewriteImported) = (true, true);

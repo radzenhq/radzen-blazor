@@ -108,10 +108,7 @@ public sealed class DocumentRenderer
     /// <param name="document">The document model to render.</param>
     /// <returns>The generated document.</returns>
     public PortableDocument Render(Document document)
-    {
-        var settings = CapturedRendererSettings.Capture(this);
-        return DocumentGenerator.Generate(document, settings);
-    }
+        => DocumentGenerator.Generate(document, RenderRequest.From(this));
 
     /// <summary>Renders the model and serializes it to the given stream.</summary>
     /// <param name="document">The document model to render.</param>
