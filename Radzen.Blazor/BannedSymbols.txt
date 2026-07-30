@@ -6,6 +6,10 @@
 
 ; --- System.Security.Cryptography: all algorithm / RNG / hashing / signing types ---
 N:System.Security.Cryptography; Do not use System.Security.Cryptography in the PDF library - reimplement in pure managed WASM-safe code.
+; The one carve-out is CryptographicOperations.FixedTimeEquals: a pure-managed, deterministic,
+; WASM-safe constant-time comparison that no reimplementation could improve on. It is suppressed
+; with a local "#pragma warning disable RS0030" at its single call site; the analyzer has no
+; allow-list, so a namespace ban plus a local suppression is the only way to express this.
 
 ; --- Non-deterministic wall-clock time ---
 P:System.DateTime.Now; Non-deterministic. Do not use wall-clock time in the PDF library.

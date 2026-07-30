@@ -3,9 +3,10 @@ using System;
 namespace Radzen.Documents.Crypto;
 
 /// <summary>
-/// Hand-rolled SHA-2 (FIPS 180-4): SHA-256, SHA-384 and SHA-512. The BCL
-/// implementations throw <see cref="PlatformNotSupportedException"/> under Blazor
-/// WebAssembly, so these managed variants are used instead.
+/// Pure-managed SHA-2 (FIPS 180-4): SHA-256, SHA-384 and SHA-512. Being free of the
+/// BCL cryptographic primitives keeps the digests available on every target the
+/// library ships to, including Blazor WebAssembly and trimmed or size-constrained
+/// builds, and keeps the produced bytes independent of the host platform.
 /// </summary>
 public static class Sha2
 {
@@ -229,6 +230,7 @@ public sealed class Sha256Hasher
     private readonly byte[] block = new byte[64];
     private int blockLength;
     private ulong length;
+    private bool finished;
 
     /// <summary>
     /// Appends <paramref name="data"/> to the running digest.
@@ -236,6 +238,7 @@ public sealed class Sha256Hasher
     /// <param name="data">The bytes to append.</param>
     public void Append(ReadOnlySpan<byte> data)
     {
+        RequireUnfinished();
         length += (ulong)data.Length;
         AppendCore(data);
     }
@@ -246,6 +249,7 @@ public sealed class Sha256Hasher
     /// <param name="value">The byte to append.</param>
     public void Append(byte value)
     {
+        RequireUnfinished();
         length++;
         block[blockLength++] = value;
         if (blockLength == 64)
@@ -261,6 +265,8 @@ public sealed class Sha256Hasher
     /// <returns>The 32-byte digest.</returns>
     public byte[] Finish()
     {
+        RequireUnfinished();
+        finished = true;
         var bitLength = length * 8;
         Span<byte> tail = stackalloc byte[72];
         tail.Clear();
@@ -281,6 +287,14 @@ public sealed class Sha256Hasher
         }
 
         return result;
+    }
+
+    private void RequireUnfinished()
+    {
+        if (finished)
+        {
+            throw new InvalidOperationException("This Sha256Hasher has already been finalized; create a new instance for another digest.");
+        }
     }
 
     private void AppendCore(ReadOnlySpan<byte> data)

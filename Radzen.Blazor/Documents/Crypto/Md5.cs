@@ -2,11 +2,7 @@ using System;
 
 namespace Radzen.Documents.Crypto;
 
-/// <summary>
-/// Pure-managed MD5 (RFC 1321). WebAssembly-safe: does not depend on the BCL
-/// cryptographic primitives that throw under Blazor WebAssembly.
-/// </summary>
-public static class Md5
+internal static class Md5
 {
     // Per-round left-rotation amounts (RFC 1321).
     private static readonly int[] Shifts = new int[64] {
@@ -41,19 +37,9 @@ public static class Md5
         return (x << c) | (x >> (32 - c));
     }
 
-    /// <summary>
-    /// Calculates the MD5 hash.
-    /// </summary>
-    /// <param name="input">The input bytes.</param>
-    /// <returns>The lowercase hexadecimal MD5 digest.</returns>
     public static string ComputeHashHex(byte[] input)
         => HexCodec.EncodeToString(ComputeHash(input), HexCase.Lower);
 
-    /// <summary>
-    /// Computes the raw 16-byte MD5 digest of the input (RFC 1321).
-    /// </summary>
-    /// <param name="input">The bytes to hash.</param>
-    /// <returns>The 16-byte digest.</returns>
     public static byte[] ComputeHash(byte[] input)
     {
         ArgumentNullException.ThrowIfNull(input);

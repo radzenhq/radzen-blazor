@@ -2,23 +2,16 @@ using System;
 
 namespace Radzen.Documents.Crypto;
 
-/// <summary>
-/// Hand-rolled RC4 stream cipher. The transform is symmetric: the same call
-/// both encrypts and decrypts.
-/// </summary>
-public static class Rc4
+internal static class Rc4
 {
-    /// <summary>
-    /// Applies the RC4 keystream to <paramref name="data"/> under <paramref name="key"/>.
-    /// Symmetric: call again with the same key to reverse the transform.
-    /// </summary>
-    /// <param name="key">The RC4 key.</param>
-    /// <param name="data">The bytes to transform.</param>
-    /// <returns>The transformed bytes.</returns>
     public static byte[] Transform(byte[] key, byte[] data)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(data);
+        if (key.Length == 0)
+        {
+            throw new ArgumentException("RC4 key must not be empty.", nameof(key));
+        }
 
         var s = new byte[256];
         for (var i = 0; i < 256; i++)
