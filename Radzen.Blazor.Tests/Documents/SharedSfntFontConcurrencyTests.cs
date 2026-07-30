@@ -107,35 +107,18 @@ public class SharedSfntFontConcurrencyTests
         Assert.Equal(expected, observed);
     }
 
-    private static readonly HashSet<string> LazyMemoizationFields = new(StringComparer.Ordinal)
-    {
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.kerning",
+    private static readonly string[] NamedLazyCaches =
+    [
         "Radzen.Documents.Fonts.Sfnt.Cmap.memo",
-    };
-
-    private static readonly HashSet<string> ParseTimeAssignedProperties = new(StringComparer.Ordinal)
-    {
-        "Radzen.Documents.Fonts.Sfnt.NameTable.FamilyName",
-        "Radzen.Documents.Fonts.Sfnt.NameTable.PostScriptName",
-        "Radzen.Documents.Fonts.Sfnt.NameTable.SubfamilyName",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.Ascent",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.Bold",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.CapHeight",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.Descent",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.FsType",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.Italic",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.ItalicAngle",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.LineGap",
-    };
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.kerning",
+    ];
 
     [Fact]
-    public void SfntFontFields_AreReadOnlyApartFromTheNamedLazyCachesAndParseTimeProperties()
+    public void SfntFontFields_AreReadOnlyApartFromTheTwoNamedLazyCaches()
         => AssertNamedLazyCacheInvariant();
 
     internal static void AssertNamedLazyCacheInvariant()
     {
-        var allowed = LazyMemoizationFields.Concat(ParseTimeAssignedProperties).ToArray();
-
         var mutable = ReachableFrom(typeof(SfntFont))
             .SelectMany(type => type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             .Where(field => !field.IsInitOnly)
@@ -143,16 +126,7 @@ public class SharedSfntFontConcurrencyTests
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
-        var unlisted = mutable.Except(allowed, StringComparer.Ordinal).ToArray();
-        var stale = allowed.Except(mutable, StringComparer.Ordinal).ToArray();
-
-        Assert.True(
-            unlisted.Length == 0,
-            $"Mutable members missing from the allow lists: {string.Join(", ", unlisted)}");
-
-        Assert.True(
-            stale.Length == 0,
-            $"Allow-listed members that are no longer mutable: {string.Join(", ", stale)}");
+        Assert.Equal(NamedLazyCaches, mutable);
     }
 
     private static string Describe(FieldInfo field)

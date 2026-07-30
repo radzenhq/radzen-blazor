@@ -80,7 +80,13 @@ internal sealed class Cmap
         {
             var platformId = reader.ReadUInt16();
             var encodingId = reader.ReadUInt16();
-            var subtableOffset = tableOffset + (int)reader.ReadUInt32();
+            var relative = reader.ReadUInt32();
+            if (relative > int.MaxValue || (long)tableOffset + relative > data.Length)
+            {
+                throw new InvalidDataException("A cmap subtable offset lies outside the font data.");
+            }
+
+            var subtableOffset = tableOffset + (int)relative;
             var next = reader.Position;
 
             var format = new SfntReader(data, subtableOffset).ReadUInt16();
@@ -196,7 +202,21 @@ internal sealed class Format4Subtable : ICmapSubtable
             idRangeOffset[i] = reader.ReadUInt16();
         }
 
+        RequireAscending(endCode);
         return new Format4Subtable(endCode, startCode, idDelta, idRangeOffset, data, idRangeOffsetBase);
+    }
+
+    // ISO/IEC 14496-22 5.2.1.3.1: the format 4 segments are sorted by increasing endCode, which the
+    // binary search in GetGlyphId relies on.
+    private static void RequireAscending(ushort[] endCode)
+    {
+        for (var i = 1; i < endCode.Length; i++)
+        {
+            if (endCode[i] <= endCode[i - 1])
+            {
+                throw new InvalidDataException("cmap format 4 segments are not sorted by increasing end code.");
+            }
+        }
     }
 
     public ushort GetGlyphId(int codepoint)
@@ -291,7 +311,31 @@ internal sealed class Format12Subtable : ICmapSubtable
             startGlyphId[i] = reader.ReadUInt32();
         }
 
+        Validate(startCharCode, endCharCode, startGlyphId);
         return new Format12Subtable(startCharCode, endCharCode, startGlyphId);
+    }
+
+    // ISO/IEC 14496-22 5.2.1.3.7: the format 12 groups are sorted by increasing start character code and
+    // do not overlap, which the binary search in GetGlyphId relies on.
+    private static void Validate(uint[] startCharCode, uint[] endCharCode, uint[] startGlyphId)
+    {
+        for (var i = 0; i < startCharCode.Length; i++)
+        {
+            if (endCharCode[i] < startCharCode[i])
+            {
+                throw new InvalidDataException("A cmap format 12 group ends before it starts.");
+            }
+
+            if (i > 0 && startCharCode[i] <= endCharCode[i - 1])
+            {
+                throw new InvalidDataException("cmap format 12 groups are not sorted by increasing start character code.");
+            }
+
+            if (startGlyphId[i] + (long)(endCharCode[i] - startCharCode[i]) > ushort.MaxValue)
+            {
+                throw new InvalidDataException("A cmap format 12 group maps a character to a glyph index above 65535.");
+            }
+        }
     }
 
     public ushort GetGlyphId(int codepoint)

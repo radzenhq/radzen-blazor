@@ -5,8 +5,13 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Fonts;
 
-internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = false)
+internal sealed class SimpleShaper(FontCollectionSnapshot fonts)
 {
+    public SimpleShaper(FontCollection fonts, bool enableKerning = false)
+        : this(fonts.Snapshot() with { EnableKerning = enableKerning })
+    {
+    }
+
     private interface IGlyphSink
     {
         void Add(ushort glyph, double advance, int cluster, SfntFont face);
@@ -54,7 +59,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
     {
         EnsureNoComplexScript(text);
 
-        var primary = fonts.ResolvePrimarySfnt(family, bold, italic);
+        var primary = fonts.ResolvePrimary(family, bold, italic);
 
         SfntFont? previousFace = null;
         ushort previousGlyph = 0;
@@ -67,7 +72,7 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
             var advance = face.AdvanceInUserSpace(glyph, size);
 
-            if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
+            if (fonts.EnableKerning && ReferenceEquals(previousFace, face) && count > 0)
             {
                 var kern = PairKerning(previousFace!, previousGlyph, glyph, previousCodepoint, codepoint, size);
                 if (kern != 0)

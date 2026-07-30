@@ -9,15 +9,26 @@ internal sealed class NameTable
     private const int PostScriptNameId = 6;
     private const int EnglishUnitedStates = 0x0409;
 
-    public string FamilyName { get; private set; } = string.Empty;
+    public NameTable()
+        : this(string.Empty, string.Empty, string.Empty)
+    {
+    }
 
-    public string SubfamilyName { get; private set; } = string.Empty;
+    private NameTable(string familyName, string subfamilyName, string postScriptName)
+    {
+        FamilyName = familyName;
+        SubfamilyName = subfamilyName;
+        PostScriptName = postScriptName;
+    }
 
-    public string PostScriptName { get; private set; } = string.Empty;
+    public string FamilyName { get; }
+
+    public string SubfamilyName { get; }
+
+    public string PostScriptName { get; }
 
     public static NameTable Parse(byte[] data, int offset)
     {
-        var table = new NameTable();
         var reader = new SfntReader(data, offset);
 
         reader.ReadUInt16();
@@ -68,10 +79,10 @@ internal sealed class NameTable
             reader.Position = next;
         }
 
-        table.FamilyName = familyName ?? familyFallback ?? string.Empty;
-        table.SubfamilyName = subfamily ?? subfamilyFallback ?? string.Empty;
-        table.PostScriptName = postScript ?? postScriptFallback ?? string.Empty;
-        return table;
+        return new NameTable(
+            familyName ?? familyFallback ?? string.Empty,
+            subfamily ?? subfamilyFallback ?? string.Empty,
+            postScript ?? postScriptFallback ?? string.Empty);
     }
 
     private static void Assign(bool preferred, string value, ref string? primary, ref string? fallback)
@@ -93,11 +104,8 @@ internal sealed class NameTable
             return string.Empty;
         }
 
-        var isUtf16 = platformId == 3 || (platformId == 0);
-        if (isUtf16 && encodingId != 0 && platformId == 3 && encodingId != 1 && encodingId != 10)
-        {
-            isUtf16 = false;
-        }
+        // ISO/IEC 14496-22 5.2.6: Windows platform encodings 0, 1 and 10 store name strings as UTF-16BE.
+        var isUtf16 = platformId == 3 && encodingId is 0 or 1 or 10;
 
         if (isUtf16)
         {
