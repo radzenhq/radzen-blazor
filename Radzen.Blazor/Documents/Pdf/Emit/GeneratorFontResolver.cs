@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -21,9 +22,14 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
         conformance != PdfAConformance.None ? "PDF/A" : null,
         CanEmbed: true);
 
-    public GeneratedFont ResolveBase14(Font font)
+    public GeneratedFont ResolveBase14(CapturedBuiltInFace face)
     {
-        var name = FontResolution.ResolveBase14Name(font, Scope);
+        var name = face.PostScriptName;
+        if (Scope.Base14ForbiddenBy is { } label)
+        {
+            throw FontResolution.Base14Forbidden(label, name, family: null);
+        }
+
         return fonts.GetOrAddValue(name, key => new GeneratedFont { Key = key, Base14 = name });
     }
 

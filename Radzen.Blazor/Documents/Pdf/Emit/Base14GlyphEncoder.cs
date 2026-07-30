@@ -9,7 +9,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
 {
-    public byte[] Encode(ImmutableArray<CapturedBuiltInGlyph> glyphs, Font font)
+    public byte[] Encode(
+        ImmutableArray<CapturedBuiltInGlyph> glyphs,
+        CapturedBuiltInFace face)
     {
         var bytes = new byte[glyphs.Length];
         List<int>? unsupported = null;
@@ -38,13 +40,15 @@ internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
 
         if (unsupported is { Count: > 0 })
         {
-            throw UnsupportedCharacters(font, unsupported);
+            throw UnsupportedCharacters(face, unsupported);
         }
 
         return bytes;
     }
 
-    private static InvalidOperationException UnsupportedCharacters(Font font, List<int> codepoints)
+    private static InvalidOperationException UnsupportedCharacters(
+        CapturedBuiltInFace face,
+        List<int> codepoints)
     {
         const int MaxReported = 8;
         var offenders = new List<string>(Math.Min(codepoints.Count, MaxReported));
@@ -55,7 +59,7 @@ internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
         }
 
         return new InvalidOperationException(
-            $"The built-in font '{font.EffectiveFamily}' cannot draw {string.Join(", ", offenders)}: a base-14 font is limited "
+            $"The built-in font '{face.PostScriptName}' cannot draw {string.Join(", ", offenders)}: a base-14 font is limited "
             + "to the WinAnsi character set. Register a font that covers these characters with "
             + $"{nameof(FontCollection)}.{nameof(FontCollection.Register)}, add such a font to the "
             + $"{nameof(FontCollection.SetFallback)} chain, or set "

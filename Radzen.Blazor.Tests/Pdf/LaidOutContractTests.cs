@@ -99,17 +99,17 @@ public class LaidOutContractTests
 
         Assert.Equal("A\u4E2DB", fragment.GlyphRun.Text);
         Assert.Equal(3, spans.Length);
-        Assert.Same(fragment.Face, spans[0].Face);
-        Assert.NotSame(spans[0].Face, spans[1].Face);
-        Assert.Same(spans[0].Face, spans[2].Face);
+        Assert.Same(fragment.Face, spans[0].Face.Sfnt);
+        Assert.NotSame(spans[0].Face.Sfnt, spans[1].Face.Sfnt);
+        Assert.Same(spans[0].Face.Sfnt, spans[2].Face.Sfnt);
         Assert.Equal(0, spans[0].XOffset);
         Assert.Equal(spans[0].Advance, spans[1].XOffset);
         Assert.Equal(spans[0].Advance + spans[1].Advance, spans[2].XOffset);
         Assert.All(
-            spans.Where(span => span.Face is not null),
+            spans.Where(span => span.IsSfnt),
             span => Assert.Contains(
                 laidOut.Fonts.Faces,
-                registered => ReferenceEquals(registered.Face, span.Face)));
+                registered => ReferenceEquals(registered.Face, span.Face.Sfnt)));
         Assert.Equal(new[] { 0, 1, 2 }, spans.SelectMany(span => span.SfntGlyphs).Select(glyph => glyph.Cluster));
     }
 
@@ -155,7 +155,8 @@ public class LaidOutContractTests
         var fragment = FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages));
         var span = Assert.Single(fragment.GlyphRun.Spans);
 
-        Assert.Null(span.Face);
+        Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
+        Assert.Equal("Helvetica", span.Face.BuiltIn.PostScriptName);
         Assert.Empty(span.SfntGlyphs);
         Assert.Equal(new[] { 'A', 0x20AC, 0xFB01 }, span.BuiltInGlyphs.Select(glyph => glyph.Codepoint));
         Assert.Equal(new[] { 0, 1, 2 }, span.BuiltInGlyphs.Select(glyph => glyph.Cluster));
@@ -163,6 +164,55 @@ public class LaidOutContractTests
         Assert.DoesNotContain(
             typeof(CapturedBuiltInGlyph).GetProperties(),
             property => property.PropertyType == typeof(byte));
+    }
+
+    [Theory]
+    [InlineData("Helvetica", false, false, "Helvetica")]
+    [InlineData("Helvetica", true, true, "Helvetica-BoldOblique")]
+    [InlineData("Times", false, true, "Times-Italic")]
+    [InlineData("Courier", true, false, "Courier-Bold")]
+    public void LaidOutBuiltInFragment_CapturesResolvedFace(
+        string family,
+        bool bold,
+        bool italic,
+        string postScriptName)
+    {
+        var document = new Document();
+        var run = Page(document).Blocks.AddParagraph("Text").Inlines[0];
+        run.Font.Family = family;
+        run.Font.Bold = bold;
+        run.Font.Italic = italic;
+
+        var span = Assert.Single(
+            FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
+                .GlyphRun.Spans);
+
+        Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
+        Assert.Equal(postScriptName, span.Face.BuiltIn.PostScriptName);
+    }
+
+    [Fact]
+    public void CapturedBuiltInAdjustment_IsInPointsUntilPdfEmission()
+    {
+        var document = new Document { Fonts = { EnableKerning = true } };
+        var run = Page(document).Blocks.AddParagraph("AV").Inlines[0];
+        run.Font.Family = "Helvetica";
+        run.Font.Size = 11.3;
+
+        var glyph = Assert.Single(
+            FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
+                .GlyphRun.Spans)
+            .BuiltInGlyphs[0];
+        var metrics = BuiltInFontMetrics.Resolve(run.Font)!;
+        var kern = metrics.GetRunKerning('A', 'V');
+        var expectedPoints = -FontMetric.Scale(kern, run.Font.EffectiveSize.Point, 1000);
+
+        Assert.Equal(expectedPoints, glyph.TextAdjustmentPoints);
+        Assert.Equal(
+            -kern,
+            SfntRunBuilder.PdfTextAdjustment(
+                glyph.TextAdjustmentPoints,
+                run.Font.EffectiveSize.Point));
     }
 
     [Fact]
@@ -209,7 +259,7 @@ public class LaidOutContractTests
 
         var laidOut = DocumentLayouter.Layout(document);
         var fragment = FirstFragment(Assert.Single(laidOut.Pages));
-        var capturedFace = Assert.Single(fragment.GlyphRun.Spans).Face;
+        var capturedFace = Assert.Single(fragment.GlyphRun.Spans).Face.Sfnt;
         var registered = Assert.Single(document.Fonts.RegisteredFaces());
         var asset = Assert.Single(laidOut.Fonts.Faces);
         var before = Render(laidOut, document);

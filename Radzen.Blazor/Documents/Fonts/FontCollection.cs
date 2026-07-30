@@ -385,7 +385,7 @@ public sealed class FontCollection
             {
                 var advance = SumAdvance(glyphs);
                 spans.Add(new CapturedGlyphSpan(
-                    face,
+                    CapturedFontFace.FromSfnt(face),
                     ImmutableArray.CreateRange(glyphs),
                     [],
                     advance,
@@ -403,7 +403,7 @@ public sealed class FontCollection
                 positionedGlyph.Advance,
                 0,
                 0,
-                font.EffectiveSize.Point == 0 ? 0 : -FontMetric.Scale(trailing, 1000, font.EffectiveSize.Point),
+                -trailing,
                 positionedGlyph.Cluster,
                 codepoint));
         }
@@ -412,7 +412,7 @@ public sealed class FontCollection
         {
             var advance = SumAdvance(glyphs);
             spans.Add(new CapturedGlyphSpan(
-                face,
+                CapturedFontFace.FromSfnt(face),
                 ImmutableArray.CreateRange(glyphs),
                 [],
                 advance,
@@ -446,7 +446,7 @@ public sealed class FontCollection
 
             var advance = FontMetric.Scale(builtInDesignAdvance, font.EffectiveSize.Point, 1000) + builtInKernAdvance;
             spans.Add(new CapturedGlyphSpan(
-                null,
+                CapturedFontFace.FromBuiltIn(metrics.PostScriptName),
                 [],
                 ImmutableArray.CreateRange(builtInGlyphs),
                 advance,
@@ -465,7 +465,7 @@ public sealed class FontCollection
             }
 
             spans.Add(new CapturedGlyphSpan(
-                fallbackFace,
+                CapturedFontFace.FromSfnt(fallbackFace),
                 ImmutableArray.CreateRange(sfntGlyphs),
                 [],
                 sfntAdvance,
@@ -499,7 +499,7 @@ public sealed class FontCollection
                     sfntGlyphs[^1] = previous with
                     {
                         Advance = previous.Advance + kern,
-                        TextAdjustment = font.EffectiveSize.Point == 0 ? 0 : -FontMetric.Scale(kern, 1000, font.EffectiveSize.Point),
+                        TextAdjustmentPoints = -kern,
                     };
                 }
 
@@ -526,7 +526,7 @@ public sealed class FontCollection
                     builtInGlyphs[^1] = previous with
                     {
                         Advance = previous.Advance + FontMetric.Scale(kern, font.EffectiveSize.Point, 1000),
-                        TextAdjustment = -kern,
+                        TextAdjustmentPoints = -FontMetric.Scale(kern, font.EffectiveSize.Point, 1000),
                     };
                 }
 
