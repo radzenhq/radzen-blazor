@@ -59,18 +59,42 @@ public sealed class PageCollection : IReadOnlyList<Page>
     }
 
     /// <summary>
-    /// Inserts an existing page at the specified index. A page taken from another
-    /// document keeps its source content and resources; the other document is left
-    /// unchanged and keeps the page too.
+    /// Inserts an existing page at the specified index. Inserting a page that
+    /// belongs to another document moves it: the page keeps its source content and
+    /// resources and this document becomes its owner, so the receiving document's
+    /// conformance and font settings govern it from then on. The other document must
+    /// have released the page first (<see cref="RemoveAt"/> or <see cref="RemoveRange"/>);
+    /// a page cannot belong to two documents at once. Use
+    /// <see cref="PortableDocument.ImportPage"/> to copy a page instead of moving it.
     /// </summary>
     /// <param name="index">The zero-based index at which to insert.</param>
     /// <param name="page">The page to insert.</param>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="page"/> is still listed in another document's pages.
+    /// </exception>
     public void Insert(int index, Page page)
     {
         ArgumentNullException.ThrowIfNull(page);
+        RequireReleasedByDonor(page);
         owner?.InvalidateMaterializedGraph();
         pages.Insert(index, page);
         Adopt(page);
+    }
+
+    internal bool Holds(Page page) => pages.Contains(page);
+
+    private void RequireReleasedByDonor(Page page)
+    {
+        if (owner is null || page.Owner is not { } donor || ReferenceEquals(donor, owner) || !donor.Pages.Holds(page))
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            "The page still belongs to another document. Inserting a page from another document moves it, and a page "
+            + "cannot belong to two documents at once because each one applies its own conformance, font and content "
+            + "settings to it. Remove the page from its current document first, or use PortableDocument.ImportPage to "
+            + "insert a copy and leave the original in place.");
     }
 
     private void Adopt(Page page)
@@ -84,10 +108,8 @@ public sealed class PageCollection : IReadOnlyList<Page>
         {
             owner.CarryForeignPage(page, donor);
         }
-        else
-        {
-            page.Owner = owner;
-        }
+
+        page.Owner = owner;
     }
 
     /// <summary>

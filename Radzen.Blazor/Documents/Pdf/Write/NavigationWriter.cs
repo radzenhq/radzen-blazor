@@ -11,7 +11,8 @@ internal sealed class NavigationWriter(PortableDocument document)
     public void WriteDestinations(
         DocumentWriter writer,
         DictionaryObject catalog,
-        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+        List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
+        EmissionPageMap pageMap)
     {
         var sorted = new SortedDictionary<string, EmissionAnchor>(StringComparer.Ordinal);
         if (document.EmissionPlan is { } plan)
@@ -24,7 +25,9 @@ internal sealed class NavigationWriter(PortableDocument document)
 
         NameTree.AddCategory(writer, catalog, "Dests",
             sorted.Select(entry => (entry.Key,
-                (DocumentObject)DestinationArray(pageNodes[entry.Value.PageIndex].Reference, entry.Value.Top))));
+                (DocumentObject)DestinationArray(
+                    pageNodes[pageMap.IndexOf(entry.Value.Page, $"named destination '{entry.Key}'")].Reference,
+                    entry.Value.Top))));
     }
 
     public ReferenceObject WriteOutline(

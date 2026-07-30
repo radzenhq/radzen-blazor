@@ -102,7 +102,7 @@ internal readonly record struct EmissionLink(
     string? Destination,
     int? StructureElementId);
 
-internal readonly record struct EmissionAnchor(int PageIndex, double Top);
+internal readonly record struct EmissionAnchor(PageEmissionPlan Page, double Top);
 
 internal sealed class EmissionExtGState(
     string key,
@@ -175,7 +175,7 @@ internal sealed class EmissionTransparencyGroup(
 
 internal readonly record struct StructureKidSnapshot(
     StructureElementSnapshot? Child,
-    int PageIndex,
+    PageEmissionPlan? Page,
     int Mcid);
 
 internal sealed class StructureElementSnapshot(
@@ -187,7 +187,7 @@ internal sealed class StructureElementSnapshot(
     int rowSpan,
     int columnSpan,
     ImmutableArray<StructureElementSnapshot> children,
-    ImmutableArray<(int PageIndex, int Mcid)> marks,
+    ImmutableArray<(PageEmissionPlan Page, int Mcid)> marks,
     ImmutableArray<StructureKidSnapshot> kids)
 {
     public int Id { get; } = id;
@@ -206,7 +206,7 @@ internal sealed class StructureElementSnapshot(
 
     public ImmutableArray<StructureElementSnapshot> Children { get; } = children;
 
-    public ImmutableArray<(int PageIndex, int Mcid)> Marks { get; } = marks;
+    public ImmutableArray<(PageEmissionPlan Page, int Mcid)> Marks { get; } = marks;
 
     public ImmutableArray<StructureKidSnapshot> Kids { get; } = kids;
 }

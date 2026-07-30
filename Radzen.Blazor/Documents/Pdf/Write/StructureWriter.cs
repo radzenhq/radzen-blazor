@@ -7,10 +7,13 @@ namespace Radzen.Documents.Pdf.Write;
 
 internal static class StructureWriter
 {
+    private const string Feature = "structure tree";
+
     public static ReferenceObject WriteStructureTree(
         DocumentWriter writer,
         StructureElementSnapshot structure,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
+        EmissionPageMap pageMap,
         IReadOnlyList<KeyValuePair<string, string>> roleMap,
         IReadOnlyList<AnnotationElementJoin> annotationJoins)
     {
@@ -47,6 +50,7 @@ internal static class StructureWriter
             structure,
             rootRef,
             pageNodes,
+            pageMap,
             parents,
             joinsByElement,
             ref annotationKey);
@@ -126,6 +130,7 @@ internal static class StructureWriter
         StructureElementSnapshot element,
         ReferenceObject parentRef,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
+        EmissionPageMap pageMap,
         Dictionary<int, List<DocumentObject>> parents,
         IReadOnlyDictionary<int, List<AnnotationElementJoin>> joinsByElement,
         ref int annotationKey)
@@ -155,7 +160,7 @@ internal static class StructureWriter
         var reference = writer.Add(dictionary);
 
         var kids = new ArrayObject();
-        var firstPage = element.Marks.Length > 0 ? element.Marks[0].PageIndex : -1;
+        var firstPage = element.Marks.Length > 0 ? pageMap.IndexOf(element.Marks[0].Page, Feature) : -1;
         if (firstPage >= 0)
         {
             dictionary["Pg"] = pageNodes[firstPage].Reference;
@@ -170,13 +175,15 @@ internal static class StructureWriter
                     child,
                     reference,
                     pageNodes,
+                    pageMap,
                     parents,
                     joinsByElement,
                     ref annotationKey));
                 continue;
             }
 
-            if (kid.PageIndex == firstPage)
+            var kidPage = pageMap.IndexOf(kid.Page!, Feature);
+            if (kidPage == firstPage)
             {
                 kids.Add(new NumberObject(kid.Mcid));
             }
@@ -185,15 +192,15 @@ internal static class StructureWriter
                 kids.Add(new DictionaryObject
                 {
                     ["Type"] = new NameObject("MCR"),
-                    ["Pg"] = pageNodes[kid.PageIndex].Reference,
+                    ["Pg"] = pageNodes[kidPage].Reference,
                     ["MCID"] = new NumberObject(kid.Mcid),
                 });
             }
 
-            if (!parents.TryGetValue(kid.PageIndex, out var entries))
+            if (!parents.TryGetValue(kidPage, out var entries))
             {
                 entries = [];
-                parents[kid.PageIndex] = entries;
+                parents[kidPage] = entries;
             }
 
             while (entries.Count <= kid.Mcid)
