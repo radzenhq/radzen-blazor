@@ -1,6 +1,6 @@
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 
-namespace Radzen.Documents.Pdf;
+namespace Radzen.Documents.Fonts;
 
 internal readonly struct PositionedGlyph(ushort glyphId, double advance, int cluster, SfntFont face)
 {
