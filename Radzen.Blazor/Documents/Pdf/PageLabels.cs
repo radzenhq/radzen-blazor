@@ -71,6 +71,8 @@ public sealed class PageLabel(int startPage) : ITracksChanges
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    void ITracksChanges.OwnedBy(Action? changed) => tracker.OwnedBy(changed);
+
 }
 
 internal static class PageLabelsWriter

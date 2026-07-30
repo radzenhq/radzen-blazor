@@ -49,7 +49,7 @@ public class ConformanceInspectabilityOrderTests
     }
 
     [Fact]
-    public void SaveToStream_UninspectablePageWithFontError_ReportsInspectabilityFirst()
+    public void SaveToStream_LoadedPageShowingTextWithoutAFont_IsRefused()
     {
         var conforming = ConformingBuilder();
         var document = conforming.Renderer.Render(conforming.Document);
@@ -58,6 +58,6 @@ public class ConformanceInspectabilityOrderTests
         using var stream = new MemoryStream();
         var error = Assert.Throws<InvalidOperationException>(() => document.SaveToStream(stream));
 
-        Assert.Contains("cannot be inspected", error.Message, StringComparison.Ordinal);
+        Assert.Contains("forbids the standard-14 font", error.Message, StringComparison.Ordinal);
     }
 }

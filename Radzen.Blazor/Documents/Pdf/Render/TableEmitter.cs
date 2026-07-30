@@ -260,9 +260,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         OrderedMerge.VisitByOrder(
             tables,
-            static table => table.Order,
+            static table => table.ZOrder,
             boxes,
-            static box => box.Order,
+            static box => box.ZOrder,
             table => EmitNestedTable(context, table, element, left, contentTop, delta, artifact),
             box => EmitNestedBox(context, box, element, left, contentTop, delta, artifact));
 

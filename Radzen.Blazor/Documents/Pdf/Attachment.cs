@@ -68,6 +68,10 @@ public sealed class FacturXProfile : ITracksChanges
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    internal void OwnedBy(Action? changed) => tracker.OwnedBy(changed);
+
+    void ITracksChanges.OwnedBy(Action? changed) => OwnedBy(changed);
+
 }
 
 /// <summary>
@@ -156,6 +160,14 @@ public sealed class Attachment : ITracksChanges
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    internal void OwnedBy(Action? changed)
+    {
+        tracker.OwnedBy(changed);
+        FacturX?.OwnedBy(changed);
+    }
+
+    void ITracksChanges.OwnedBy(Action? changed) => OwnedBy(changed);
+
     internal byte[] Data { get; }
 }
 
@@ -166,6 +178,8 @@ public sealed class Attachment : ITracksChanges
 public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 {
     private readonly TrackedList<Attachment> items = [];
+
+    internal void OwnedBy(Action? owner) => items.OwnedBy(owner);
 
     /// <summary>Gets the number of attachments.</summary>
     public int Count => items.Count;

@@ -108,6 +108,10 @@ public sealed class Font : ITracksChanges
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    internal void OwnedBy(System.Action? changed) => tracker.OwnedBy(changed);
+
+    void ITracksChanges.OwnedBy(System.Action? changed) => OwnedBy(changed);
+
     internal void InheritFrom(Font parent)
     {
         family ??= parent.family;

@@ -88,4 +88,8 @@ public sealed class DocumentInfo : ITracksChanges
     bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
+
+    internal void OwnedBy(Action? changed) => tracker.OwnedBy(changed);
+
+    void ITracksChanges.OwnedBy(Action? changed) => OwnedBy(changed);
 }

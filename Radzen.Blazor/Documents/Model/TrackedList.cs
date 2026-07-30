@@ -4,10 +4,26 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents;
 
-internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOnlyList<T>
+internal sealed class TrackedList<T> : IList<T>, IReadOnlyList<T>
 {
     private readonly List<T> items = [];
+    private Action? changed;
     private bool structureChanged;
+
+    public TrackedList()
+    {
+    }
+
+    public TrackedList(Action? changed) => this.changed = changed;
+
+    public void OwnedBy(Action? owner)
+    {
+        changed = owner;
+        foreach (var item in items)
+        {
+            Attach(item);
+        }
+    }
 
     public T this[int index]
     {
@@ -19,7 +35,9 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
                 return;
             }
 
+            Release(items[index]);
             items[index] = value;
+            Attach(value);
             Changed();
         }
     }
@@ -35,6 +53,7 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
     public void Add(T item)
     {
         items.Add(item);
+        Attach(item);
         Changed();
     }
 
@@ -42,6 +61,11 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
     {
         if (items.Count > 0)
         {
+            foreach (var item in items)
+            {
+                Release(item);
+            }
+
             items.Clear();
             Changed();
         }
@@ -58,6 +82,7 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
     public void Insert(int index, T item)
     {
         items.Insert(index, item);
+        Attach(item);
         Changed();
     }
 
@@ -66,6 +91,7 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
         var removed = items.Remove(item);
         if (removed)
         {
+            Release(item);
             Changed();
         }
 
@@ -85,6 +111,7 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
 
     public void RemoveAt(int index)
     {
+        Release(items[index]);
         items.RemoveAt(index);
         Changed();
     }
@@ -108,6 +135,22 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    private void Attach(T item)
+    {
+        if (item is ITracksChanges tracked)
+        {
+            tracked.OwnedBy(changed);
+        }
+    }
+
+    private static void Release(T item)
+    {
+        if (item is ITracksChanges tracked)
+        {
+            tracked.OwnedBy(null);
+        }
+    }
 
     private void Changed()
     {

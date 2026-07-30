@@ -59,6 +59,12 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         Font.AcceptChanges();
     }
 
+    internal override void OwnedBy(System.Action? changed)
+    {
+        base.OwnedBy(changed);
+        Font.OwnedBy(changed);
+    }
+
     internal override ContentElement DeepClone()
     {
         var clone = CopyStateTo(new TextContent(Text, x, y)

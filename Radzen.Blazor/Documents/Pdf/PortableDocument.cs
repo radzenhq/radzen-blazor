@@ -47,13 +47,41 @@ public sealed class PortableDocument
         outline = new TrackedList<OutlineItem>(InvalidateMaterializedGraph);
         pageLabels = new TrackedList<PageLabel>(InvalidateMaterializedGraph);
         formFields = new TrackedList<FormFieldDefinition>(InvalidateMaterializedGraph);
+        attachments.OwnedBy(InvalidateMaterializedGraph);
+        info.OwnedBy(InvalidateMaterializedGraph);
+        xmp.OwnedBy(InvalidateMaterializedGraph);
     }
 
     internal LoadedState? Loaded { get; private set; }
 
     internal DocumentObjectGraph? MaterializedGraph { get; set; }
 
-    internal void InvalidateMaterializedGraph() => MaterializedGraph = null;
+    private int loadingThread;
+
+    internal void InvalidateMaterializedGraph()
+    {
+        if (loadingThread != Environment.CurrentManagedThreadId)
+        {
+            MaterializedGraph = null;
+        }
+    }
+
+    private void LoadFacade(Action load)
+    {
+        lock (facadeLock)
+        {
+            var previous = loadingThread;
+            loadingThread = Environment.CurrentManagedThreadId;
+            try
+            {
+                load();
+            }
+            finally
+            {
+                loadingThread = previous;
+            }
+        }
+    }
 
     internal void AdoptMaterializedGraph(DocumentObjectGraph graph)
     {
@@ -105,11 +133,14 @@ public sealed class PortableDocument
     private void ResetGraphFacades()
     {
         info = new DocumentInfo();
+        info.OwnedBy(InvalidateMaterializedGraph);
         attachments.Clear();
         outline.Clear();
         pageLabels.Clear();
         formFields.Clear();
         xmp = new DocumentXmpMetadata();
+        xmp.OwnedBy(InvalidateMaterializedGraph);
+        viewerPreferences?.OwnedBy(null);
         viewerPreferences = null;
         acroForm = null;
         RoleMap = new RoleMap();
@@ -137,24 +168,20 @@ public sealed class PortableDocument
     {
         get
         {
-            InvalidateMaterializedGraph();
             EnsureInfoLoaded();
             return info;
         }
     }
 
-    private void EnsureInfoLoaded()
+    private void EnsureInfoLoaded() => LoadFacade(() =>
     {
-        lock (facadeLock)
+        if (!infoLoaded && Loaded?.Source is { } reader)
         {
-            if (!infoLoaded && Loaded?.Source is { } reader)
-            {
-                infoLoaded = true;
-                Loaded.SourceInfo = DocumentLoader.ReadInfo(reader, info);
-                info.AcceptChanges();
-            }
+            infoLoaded = true;
+            Loaded.SourceInfo = DocumentLoader.ReadInfo(reader, info);
+            info.AcceptChanges();
         }
-    }
+    });
 
     /// <summary>Gets the ordered collection of pages.</summary>
     public PageCollection Pages { get; }
@@ -167,8 +194,7 @@ public sealed class PortableDocument
     {
         get
         {
-            InvalidateMaterializedGraph();
-            lock (facadeLock)
+            LoadFacade(() =>
             {
                 if (!acroFormLoaded)
                 {
@@ -178,7 +204,7 @@ public sealed class PortableDocument
                         acroForm = new AcroForm(reader, form, this);
                     }
                 }
-            }
+            });
 
             return acroForm;
         }
@@ -192,7 +218,9 @@ public sealed class PortableDocument
     /// <summary>
     /// Gets the form fields to create on this document. Each definition is
     /// saved as a widget annotation on its page and listed in the catalog
-    /// <c>/AcroForm /Fields</c> with a generated appearance stream.
+    /// <c>/AcroForm /Fields</c> with a generated appearance stream. A rendered document starts
+    /// from a copy of <see cref="DocumentRenderer.FormFields"/>; from then on this list is what
+    /// <see cref="SaveToStream"/> writes.
     /// </summary>
     public IList<FormFieldDefinition> FormFields
     {
@@ -201,7 +229,9 @@ public sealed class PortableDocument
 
     /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
-    /// document is written unencrypted.
+    /// document is written unencrypted. A rendered document starts from
+    /// <see cref="DocumentRenderer.Encryption"/>; from then on this value is what
+    /// <see cref="SaveToStream"/> applies.
     /// </summary>
     public EncryptionOptions? Encryption
     {
@@ -217,7 +247,9 @@ public sealed class PortableDocument
     /// Gets or sets whether to pack indirect objects into compressed object
     /// streams (<c>/ObjStm</c>) with a cross-reference stream (<c>/XRef</c>),
     /// which typically shrinks the output. Not compatible with PDF/A-1;
-    /// leave <c>false</c> for maximum reader compatibility.
+    /// leave <c>false</c> for maximum reader compatibility. A rendered document starts from
+    /// <see cref="DocumentRenderer.CompressOutput"/>; from then on this value is what
+    /// <see cref="SaveToStream"/> applies.
     /// </summary>
     public bool CompressOutput
     {
@@ -234,7 +266,9 @@ public sealed class PortableDocument
     /// is written on the unencrypted save path. The value derives only from the
     /// document content and metadata, never from the clock or a random source.
     /// Defaults to <c>false</c> so a document that does not opt in stays byte
-    /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless.
+    /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless. A rendered
+    /// document starts from <see cref="DocumentRenderer.IncludeDocumentId"/>; from then on this
+    /// value is what <see cref="SaveToStream"/> applies.
     /// </summary>
     public bool IncludeDocumentId
     {
@@ -250,21 +284,22 @@ public sealed class PortableDocument
     /// Gets or sets the viewer preferences written to the document catalog
     /// (page layout, page mode, and the <c>/ViewerPreferences</c> flags). When
     /// <c>null</c> no viewer-preference keys are written and the output is
-    /// unchanged.
+    /// unchanged. A rendered document starts from <see cref="DocumentRenderer.ViewerPreferences"/>;
+    /// from then on this value is what <see cref="SaveToStream"/> writes.
     /// </summary>
     public ViewerPreferences? ViewerPreferences
     {
         get
         {
-            InvalidateMaterializedGraph();
-            lock (facadeLock)
+            LoadFacade(() =>
             {
                 if (!viewerPreferencesLoaded)
                 {
                     viewerPreferencesLoaded = true;
                     viewerPreferences = DocumentLoader.ReadViewerPreferences(Loaded?.Source, Loaded?.SourceCatalog);
+                    viewerPreferences?.OwnedBy(InvalidateMaterializedGraph);
                 }
-            }
+            });
 
             return viewerPreferences;
         }
@@ -272,7 +307,9 @@ public sealed class PortableDocument
         {
             InvalidateMaterializedGraph();
             viewerPreferencesLoaded = true;
+            viewerPreferences?.OwnedBy(null);
             viewerPreferences = value;
+            viewerPreferences?.OwnedBy(InvalidateMaterializedGraph);
         }
     }
 
@@ -280,35 +317,42 @@ public sealed class PortableDocument
     /// Gets the page-label ranges written to the catalog <c>/PageLabels</c> number
     /// tree. Each <see cref="PageLabel"/> starts a range whose pages a viewer numbers
     /// with the given style, prefix and start ordinal. When empty no <c>/PageLabels</c>
-    /// entry is written.
+    /// entry is written. A rendered document starts from a copy of
+    /// <see cref="DocumentRenderer.PageLabels"/>; from then on this list is what
+    /// <see cref="SaveToStream"/> writes.
     /// </summary>
     public IList<PageLabel> PageLabels
     {
         get
         {
-            InvalidateMaterializedGraph();
             EnsurePageLabelsLoaded();
             return pageLabels;
         }
     }
 
-    /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
+    /// <summary>
+    /// Gets the root entries of the document outline (bookmark) tree. A rendered document starts
+    /// from a copy of <see cref="DocumentRenderer.Outline"/>; from then on this list is what
+    /// <see cref="SaveToStream"/> writes.
+    /// </summary>
     public IList<OutlineItem> Outline
     {
         get
         {
-            InvalidateMaterializedGraph();
             EnsureOutlineLoaded();
             return outline;
         }
     }
 
-    /// <summary>Gets the files embedded in the document.</summary>
+    /// <summary>
+    /// Gets the files embedded in the document. A rendered document starts from a copy of
+    /// <see cref="DocumentRenderer.Attachments"/>; from then on this collection is what
+    /// <see cref="SaveToStream"/> embeds.
+    /// </summary>
     public AttachmentCollection Attachments
     {
         get
         {
-            InvalidateMaterializedGraph();
             EnsureAttachmentsLoaded();
             return attachments;
         }
@@ -322,68 +366,109 @@ public sealed class PortableDocument
     {
         get
         {
-            InvalidateMaterializedGraph();
             EnsureXmpLoaded();
             return xmp;
         }
     }
 
-    private void EnsureAttachmentsLoaded()
+    private void EnsureAttachmentsLoaded() => LoadFacade(() =>
     {
-        lock (facadeLock)
+        if (!attachmentsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
-            if (!attachmentsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
-            {
-                attachmentsLoaded = true;
-                DocumentLoader.ReadAttachments(reader, catalog, this, reader.Limits);
-                attachments.AcceptChanges();
-            }
+            attachmentsLoaded = true;
+            DocumentLoader.ReadAttachments(reader, catalog, this, reader.Limits);
+            attachments.AcceptChanges();
         }
-    }
+    });
 
-    private void EnsureOutlineLoaded()
+    private void EnsureOutlineLoaded() => LoadFacade(() =>
     {
-        lock (facadeLock)
+        if (!outlineLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
-            if (!outlineLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
-            {
-                outlineLoaded = true;
-                DocumentLoader.ReadOutline(reader, catalog, this, Loaded, reader.Limits);
-                TrackedChanges.Accept(outline);
-            }
+            outlineLoaded = true;
+            DocumentLoader.ReadOutline(reader, catalog, this, Loaded, reader.Limits);
+            TrackedChanges.Accept(outline);
         }
-    }
+    });
 
-    private void EnsurePageLabelsLoaded()
+    private void EnsurePageLabelsLoaded() => LoadFacade(() =>
     {
-        lock (facadeLock)
+        if (!pageLabelsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
-            if (!pageLabelsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
-            {
-                pageLabelsLoaded = true;
-                DocumentLoader.ReadPageLabels(reader, catalog, this, reader.Limits);
-                TrackedChanges.Accept(pageLabels);
-            }
+            pageLabelsLoaded = true;
+            DocumentLoader.ReadPageLabels(reader, catalog, this, reader.Limits);
+            TrackedChanges.Accept(pageLabels);
         }
-    }
+    });
 
-    private void EnsureXmpLoaded()
+    private void EnsureXmpLoaded() => LoadFacade(() =>
     {
-        lock (facadeLock)
+        if (!xmpLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
-            if (!xmpLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
-            {
-                xmpLoaded = true;
-                DocumentLoader.ReadXmp(reader, catalog, xmp);
-            }
+            xmpLoaded = true;
+            DocumentLoader.ReadXmp(reader, catalog, xmp);
         }
-    }
+    });
 
     internal DocumentEmissionPlan? EmissionPlan { get; set; }
 
-    internal RoleMap RoleMap { get; set; } = new();
+    /// <summary>
+    /// Gets the map of non-standard structure roles to standard ISO 32000-1 structure types
+    /// written as <c>/StructTreeRoot /RoleMap</c>. It is captured from
+    /// <see cref="DocumentRenderer.RoleMap"/> when the document is rendered; a role map is
+    /// meaningful only alongside a structure tree, which only rendering produces, so a loaded
+    /// document cannot be given one.
+    /// </summary>
+    public RoleMap RoleMap { get; internal set; } = new();
 
-    internal PdfAConformance Conformance { get; set; }
+    private PdfAConformance conformance;
+
+    /// <summary>
+    /// Gets or sets the PDF/A conformance level applied when this document is saved. When not
+    /// <see cref="PdfAConformance.None"/> the saved file carries the PDF/A identification in its
+    /// XMP metadata, an sRGB output intent and a document identifier, and the PDF/A rules the
+    /// library can verify are enforced at save: encryption is refused, embedded files are
+    /// restricted by part, DeviceCMYK images are refused against the sRGB intent, and every font
+    /// must be an embedded subset.
+    /// <para>
+    /// Setting this on a document loaded from an existing PDF re-saves it at that level. The
+    /// library verifies the fonts and image color spaces it can read from each page's resources
+    /// and refuses a page whose content it cannot inspect at all; it does not otherwise revalidate
+    /// content it did not produce, so declaring a level on a loaded document asserts that the
+    /// source content already conforms.
+    /// </para>
+    /// <para>
+    /// A Level A value (<see cref="PdfAConformance.PdfA2A"/>, <see cref="PdfAConformance.PdfA3A"/>)
+    /// additionally requires Tagged PDF logical structure. On a document that already has pages but
+    /// neither a render-time structure tree nor a preservable loaded one, setting a Level A value
+    /// throws: tagging is a render-time capability, produced by
+    /// <see cref="DocumentRenderer.Render(Document)"/>.
+    /// </para>
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// A Level A value was set on a populated document that has no preservable structure tree.
+    /// </exception>
+    public PdfAConformance Conformance
+    {
+        get => conformance;
+        set
+        {
+            if (Pages.Count > 0
+                && value is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A
+                && EmissionPlan?.Structure is null
+                && !HasPreservableStructureGraph)
+            {
+                throw new InvalidOperationException(
+                    $"{value} is a Tagged PDF conformance level and this document has no structure tree to write. "
+                    + "Tagging is produced while rendering, so a document that was loaded or assembled page by page "
+                    + "cannot claim it. Render the document with DocumentRenderer to obtain a tagged document, or set "
+                    + "a Level B conformance (PdfA2B, PdfA3B) instead.");
+            }
+
+            InvalidateMaterializedGraph();
+            conformance = value;
+        }
+    }
 
     internal FontCollection? Fonts { get; set; }
 
@@ -395,11 +480,25 @@ public sealed class PortableDocument
         Conformance != PdfAConformance.None ? "PDF/A" : IsPdfUa ? "PDF/UA" : null,
         CanEmbed: false);
 
-    internal PdfUaConformance Accessibility { get; set; }
+    /// <summary>
+    /// Gets the PDF/UA accessibility conformance level of this document, captured from
+    /// <see cref="DocumentRenderer.Accessibility"/> when it was rendered. PDF/UA requires Tagged
+    /// PDF logical structure, and tagging is a render-time capability: the structure tree is built
+    /// while the model is laid out. A document that was loaded from an existing PDF or assembled
+    /// page by page therefore cannot be given a PDF/UA level - render it with
+    /// <see cref="DocumentRenderer"/> instead.
+    /// </summary>
+    public PdfUaConformance Accessibility { get; internal set; }
 
     internal bool IsPdfUa => Accessibility != PdfUaConformance.None;
 
-    internal string? Language { get; set; }
+    /// <summary>
+    /// Gets the document's natural language (catalog <c>/Lang</c>, e.g. <c>"en-US"</c>), captured
+    /// from <see cref="Document.Language"/> when the document was rendered. It is written for a
+    /// rendered document only; a loaded document keeps whatever <c>/Lang</c> its catalog already
+    /// carries, because the language of tagged content is determined while rendering.
+    /// </summary>
+    public string? Language { get; internal set; }
 
     internal bool OutlineChanged => Loaded?.Source is null
         || Loaded.OutlineRequiresRewrite

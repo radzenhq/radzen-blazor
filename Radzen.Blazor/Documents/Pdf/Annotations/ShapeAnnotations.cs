@@ -94,4 +94,10 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
         base.AcceptChanges();
         Font.AcceptChanges();
     }
+
+    internal override void OwnedBy(System.Action? changed)
+    {
+        base.OwnedBy(changed);
+        Font.OwnedBy(changed);
+    }
 }
