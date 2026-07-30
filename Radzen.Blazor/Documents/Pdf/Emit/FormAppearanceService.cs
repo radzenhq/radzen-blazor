@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using System.Collections.Generic;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -24,7 +25,7 @@ internal sealed class FormAppearanceService(Document document)
     public bool CanEncode(string value) => FieldAppearances.CanEncode(value);
 
     public string DefaultAppearanceOf(Font font)
-        => DefaultAppearanceGrammar.Write(BaseFontOf(font), font.Size, "0 g");
+        => DefaultAppearanceGrammar.Write(BaseFontOf(font), font.EffectiveSize.Point, "0 g");
 
     public void RegisterAppendedDefaults(GraphImporter importer, DictionaryObject form)
         => appendedFormDefaults.Add((importer, form));

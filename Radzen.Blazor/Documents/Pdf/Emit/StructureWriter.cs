@@ -1,5 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using System.Collections.Generic;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -26,23 +27,34 @@ internal static class StructureWriter
         }
 
         var parents = new Dictionary<int, List<DocumentObject>>();
-        root["K"] = WriteStructureElement(writer, structure, rootRef, pageNodes, parents);
+        var annotationKey = pageNodes.Count;
+        root["K"] = WriteStructureElement(writer, structure, rootRef, pageNodes, parents, ref annotationKey);
 
         var keys = new List<int>(parents.Keys);
         keys.Sort();
 
         var nums = new ArrayObject();
-        foreach (var pageIndex in keys)
+        foreach (var key in keys)
         {
-            var entries = new ArrayObject();
-            foreach (var entry in parents[pageIndex])
+            var entries = parents[key];
+            if (key < pageNodes.Count)
             {
-                entries.Add(entry);
-            }
+                var array = new ArrayObject();
+                foreach (var entry in entries)
+                {
+                    array.Add(entry);
+                }
 
-            nums.Add(new NumberObject(pageIndex));
-            nums.Add(writer.Add(entries));
-            pageNodes[pageIndex].Node["StructParents"] = new NumberObject(pageIndex);
+                nums.Add(new NumberObject(key));
+                nums.Add(writer.Add(array));
+                pageNodes[key].Node["StructParents"] = new NumberObject(key);
+            }
+            else
+            {
+                // ISO 32000-1 14.7.4.4: the parent tree value of an object key is the owning element itself.
+                nums.Add(new NumberObject(key));
+                nums.Add(entries[0]);
+            }
         }
 
         root["ParentTree"] = writer.Add(new DictionaryObject { ["Nums"] = nums });
@@ -50,12 +62,23 @@ internal static class StructureWriter
         return rootRef;
     }
 
+    // ISO 14289-1 7.5: a TH must carry a Scope; ISO 32000-1 Table 345 defines the permitted values.
+    private static string? ScopeName(SemanticHeaderScope scope)
+        => scope switch
+        {
+            SemanticHeaderScope.ColumnHeader => "Column",
+            SemanticHeaderScope.RowHeader => "Row",
+            SemanticHeaderScope.ColumnAndRowHeader => "Both",
+            _ => null,
+        };
+
     private static ReferenceObject WriteStructureElement(
         DocumentWriter writer,
         StructureElement element,
         ReferenceObject parentRef,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        Dictionary<int, List<DocumentObject>> parents)
+        Dictionary<int, List<DocumentObject>> parents,
+        ref int annotationKey)
     {
         var dictionary = new DictionaryObject
         {
@@ -74,15 +97,15 @@ internal static class StructureWriter
             dictionary["ActualText"] = StringObject.FromText(actualText);
         }
 
-        // ISO 14289-1 7.5: TH must carry a Scope.
-        if (element.Type == "TH")
+        if (ScopeName(element.HeaderScope) is { } scope)
         {
             dictionary["A"] = new DictionaryObject
             {
                 ["O"] = new NameObject("Table"),
-                ["Scope"] = new NameObject("Column"),
+                ["Scope"] = new NameObject(scope),
             };
         }
+
         var reference = writer.Add(dictionary);
 
         var kids = new ArrayObject();
@@ -92,39 +115,62 @@ internal static class StructureWriter
             dictionary["Pg"] = pageNodes[firstPage].Reference;
         }
 
-        foreach (var (pageIndex, mcid) in element.Marks)
+        foreach (var kid in element.Kids)
         {
-            if (pageIndex == firstPage)
+            if (kid.Child is { } child)
             {
-                kids.Add(new NumberObject(mcid));
+                kids.Add(WriteStructureElement(writer, child, reference, pageNodes, parents, ref annotationKey));
+                continue;
+            }
+
+            if (kid.PageIndex == firstPage)
+            {
+                kids.Add(new NumberObject(kid.Mcid));
             }
             else
             {
                 kids.Add(new DictionaryObject
                 {
                     ["Type"] = new NameObject("MCR"),
-                    ["Pg"] = pageNodes[pageIndex].Reference,
-                    ["MCID"] = new NumberObject(mcid),
+                    ["Pg"] = pageNodes[kid.PageIndex].Reference,
+                    ["MCID"] = new NumberObject(kid.Mcid),
                 });
             }
 
-            if (!parents.TryGetValue(pageIndex, out var entries))
+            if (!parents.TryGetValue(kid.PageIndex, out var entries))
             {
                 entries = [];
-                parents[pageIndex] = entries;
+                parents[kid.PageIndex] = entries;
             }
 
-            while (entries.Count <= mcid)
+            while (entries.Count <= kid.Mcid)
             {
                 entries.Add(new NullObject());
             }
 
-            entries[mcid] = reference;
+            entries[kid.Mcid] = reference;
         }
 
-        foreach (var child in element.Children)
+        // ISO 32000-1 14.7.4.3: an annotation joins the structure tree through an object reference (OBJR)
+        // kid and points back into the parent tree through its own /StructParent key.
+        foreach (var annotation in element.Annotations)
         {
-            kids.Add(WriteStructureElement(writer, child, reference, pageNodes, parents));
+            kids.Add(new DictionaryObject
+            {
+                ["Type"] = new NameObject("OBJR"),
+                ["Pg"] = pageNodes[annotation.PageIndex].Reference,
+                ["Obj"] = annotation.Reference,
+            });
+
+            annotation.Annotation["StructParent"] = new NumberObject(annotationKey);
+            parents[annotationKey] = [reference];
+            annotationKey++;
+
+            if (firstPage < 0)
+            {
+                firstPage = annotation.PageIndex;
+                dictionary["Pg"] = pageNodes[annotation.PageIndex].Reference;
+            }
         }
 
         if (kids.Count > 0)

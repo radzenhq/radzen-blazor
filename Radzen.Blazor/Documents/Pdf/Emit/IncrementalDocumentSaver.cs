@@ -331,7 +331,7 @@ internal sealed class IncrementalDocumentSaver
         if (page.Generated is not null)
         {
             throw new NotSupportedException(
-                "Appending a generated (DocumentBuilder) page incrementally is not supported.");
+                "Appending a generated (DocumentRenderer) page incrementally is not supported.");
         }
 
         var emission = page.BuildContent();

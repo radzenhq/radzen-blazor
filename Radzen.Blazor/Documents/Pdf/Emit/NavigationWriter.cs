@@ -123,12 +123,13 @@ internal sealed class NavigationWriter(Document document)
         new NumberObject(0.0),
     ];
 
-    public static ArrayObject BuildLinkAnnotations(DocumentWriter writer, IReadOnlyList<GeneratedLink> links)
+    public static ArrayObject BuildLinkAnnotations(
+        DocumentWriter writer, IReadOnlyList<GeneratedLink> links, int pageIndex)
     {
         var annots = new ArrayObject();
         foreach (var link in links)
         {
-            annots.Add(writer.Add(new DictionaryObject
+            var annotation = new DictionaryObject
             {
                 ["Type"] = new NameObject("Annot"),
                 ["Subtype"] = new NameObject("Link"),
@@ -139,7 +140,16 @@ internal sealed class NavigationWriter(Document document)
                 ["A"] = link.Destination is { } destination
                     ? LinkAction.GoTo(new StringObject(destination))
                     : LinkAction.Uri(link.Uri!),
-            }));
+            };
+
+            var reference = writer.Add(annotation);
+            annots.Add(reference);
+            link.Element?.Annotations.Add(new StructureAnnotation
+            {
+                PageIndex = pageIndex,
+                Annotation = annotation,
+                Reference = reference,
+            });
         }
 
         return annots;

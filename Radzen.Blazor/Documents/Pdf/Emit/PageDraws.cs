@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -45,10 +46,9 @@ internal struct TextDraw
 
     public int RenderMode { get; init; }
 
-    public DeviceColor? FillPaint { get; init; }
-
     public double[]? Kerns { get; init; }
     public StructureElement? Element { get; init; }
+    public int Sequence { get; init; }
     public PdfRect? Clip { get; set; }
 
     public double ClipRadius { get; set; }
@@ -65,12 +65,11 @@ internal struct ImageDraw
     public required double Height { get; init; }
     public required GeneratedImage Image { get; init; }
     public StructureElement? Element { get; init; }
+    public int Sequence { get; init; }
     public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; set; }
-
-    public Color? StencilColor { get; init; }
 }
 
 internal struct FillDraw
@@ -81,12 +80,15 @@ internal struct FillDraw
     public required double Height { get; init; }
     public required Color Color { get; init; }
 
+    public StructureElement? Element { get; init; }
+    public int Sequence { get; init; }
+
     public double Radius { get; init; }
     public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
 
-    public GradientBrush? Gradient { get; init; }
+    public GradientPaint? Gradient { get; init; }
 }
 
 internal readonly struct RoundedStrokeDraw
@@ -135,11 +137,14 @@ internal sealed class PagePlan
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<GeneratedLink> Links { get; } = [];
+    private int sequence;
+
+    public int NextSequence() => sequence++;
     private readonly ResourceKeyRegistry<string, GeneratedExtGState> extGStates =
         new("GS", StringComparer.Ordinal);
 
-    private readonly ResourceKeyRegistry<GradientBrush, GeneratedPattern> patterns =
-        new("P", ReferenceKeyComparer<GradientBrush>.Instance);
+    private readonly ResourceKeyRegistry<(GradientPaint Gradient, Matrix Matrix), GeneratedPattern> patterns =
+        new("P", GradientPatternComparer.Instance);
 
     private readonly Dictionary<string, GeneratedExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
@@ -165,32 +170,21 @@ internal sealed class PagePlan
     public OrderedSet<GeneratedImage> UsedImages { get; } = [];
 
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
-        => RegisterExtGState(fillAlpha, strokeAlpha, null, null, null, null, null);
+        => RegisterExtGState(fillAlpha, strokeAlpha, null);
 
-    public string RegisterExtGState(
-        double fillAlpha,
-        double strokeAlpha,
-        BlendMode? blend,
-        bool? overprintStroke,
-        bool? overprintFill,
-        int? overprintMode,
-        RenderingIntent? intent)
+    public string RegisterExtGState(double fillAlpha, double strokeAlpha, BlendMode? blend)
     {
         fillAlpha = Math.Clamp(fillAlpha, 0, 1);
         strokeAlpha = Math.Clamp(strokeAlpha, 0, 1);
         var dedupKey = string.Create(
             CultureInfo.InvariantCulture,
-            $"a|{fillAlpha}|{strokeAlpha}|{blend}|{overprintStroke}|{overprintFill}|{overprintMode}|{intent}");
+            $"a|{fillAlpha}|{strokeAlpha}|{blend}");
         return extGStates.GetOrAdd(dedupKey, key => Track(new GeneratedExtGState
         {
             Key = key,
             FillAlpha = fillAlpha,
             StrokeAlpha = strokeAlpha,
             Blend = blend,
-            OverprintStroke = overprintStroke,
-            OverprintFill = overprintFill,
-            OverprintMode = overprintMode,
-            Intent = intent,
         }));
     }
 
@@ -223,11 +217,7 @@ internal sealed class PagePlan
         return RegisterExtGState(
             state.FillAlpha * alpha,
             state.StrokeAlpha * alpha,
-            state.Blend,
-            state.OverprintStroke,
-            state.OverprintFill,
-            state.OverprintMode,
-            state.Intent);
+            state.Blend);
     }
 
     public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
@@ -245,8 +235,10 @@ internal sealed class PagePlan
             : extGStates.Add(Create);
     }
 
-    public string RegisterPattern(GradientBrush gradient)
-        => patterns.GetOrAdd(gradient, key => new GeneratedPattern { Key = key, Gradient = gradient });
+    public string RegisterPattern(GradientPaint gradient, Matrix matrix)
+        => patterns.GetOrAdd(
+            (gradient, matrix),
+            key => new GeneratedPattern { Key = key, Pattern = ShadingBuilder.BuildPattern(gradient, matrix) });
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 
@@ -435,6 +427,67 @@ internal sealed class PagePlan
             Style = rounded.Style,
             ExtGState = rounded.ExtGState,
         });
+    }
+}
+
+internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint Gradient, Matrix Matrix)>
+{
+    public static GradientPatternComparer Instance { get; } = new();
+
+    public bool Equals(
+        (GradientPaint Gradient, Matrix Matrix) x,
+        (GradientPaint Gradient, Matrix Matrix) y)
+    {
+        var left = x.Gradient;
+        var right = y.Gradient;
+        if (!ReferenceEquals(left.Identity, right.Identity)
+            || left.Kind != right.Kind
+            || left.X0 != right.X0
+            || left.Y0 != right.Y0
+            || left.R0 != right.R0
+            || left.X1 != right.X1
+            || left.Y1 != right.Y1
+            || left.R1 != right.R1
+            || left.ExtendStart != right.ExtendStart
+            || left.ExtendEnd != right.ExtendEnd
+            || left.Stops.Length != right.Stops.Length
+            || !x.Matrix.Equals(y.Matrix))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < left.Stops.Length; i++)
+        {
+            if (left.Stops[i] != right.Stops[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public int GetHashCode((GradientPaint Gradient, Matrix Matrix) value)
+    {
+        var gradient = value.Gradient;
+        var hash = new HashCode();
+        hash.Add(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(gradient.Identity));
+        hash.Add(gradient.Kind);
+        hash.Add(gradient.X0);
+        hash.Add(gradient.Y0);
+        hash.Add(gradient.R0);
+        hash.Add(gradient.X1);
+        hash.Add(gradient.Y1);
+        hash.Add(gradient.R1);
+        hash.Add(gradient.ExtendStart);
+        hash.Add(gradient.ExtendEnd);
+        foreach (var stop in gradient.Stops)
+        {
+            hash.Add(stop);
+        }
+
+        hash.Add(value.Matrix);
+        return hash.ToHashCode();
     }
 }
 

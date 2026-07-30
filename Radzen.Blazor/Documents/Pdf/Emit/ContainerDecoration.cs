@@ -1,17 +1,14 @@
+using Radzen.Documents.Geometry;
+
 namespace Radzen.Documents.Pdf.Emit;
 
 internal static class ContainerDecoration
 {
-    public static double Paint(PagePlan plan, OpacityResolver opacities, in PdfRect bounds, Container source, in BoxStyle style)
+    public static void Paint(PagePlan plan, in PdfRect bounds, double opacity, in BoxStyle style)
     {
-        var opacity = opacities.ContainerOpacity(source);
         var extGState = opacity < 1 || style.HasGraphicsStateOptions
-            ? plan.RegisterExtGState(
-                opacity, opacity,
-                style.Blend, style.OverprintStroke, style.OverprintFill,
-                style.OverprintMode, style.Intent)
+            ? plan.RegisterExtGState(opacity, opacity, style.Blend)
             : null;
-        BoxRenderer.Paint(plan, bounds, style with { ExtGState = extGState });
-        return opacity;
+        BoxRenderer.Paint(plan, bounds, style, extGState);
     }
 }

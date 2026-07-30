@@ -10,7 +10,6 @@ internal static class ImageXObjectShell
         DocumentObject width,
         DocumentObject height,
         DocumentObject? colorSpace,
-        bool imageMask,
         DocumentObject bitsPerComponent,
         DocumentObject filter)
     {
@@ -21,11 +20,6 @@ internal static class ImageXObjectShell
         if (colorSpace is not null)
         {
             dict["ColorSpace"] = colorSpace;
-        }
-
-        if (imageMask)
-        {
-            dict["ImageMask"] = new BooleanObject(true);
         }
 
         dict["BitsPerComponent"] = bitsPerComponent;
@@ -40,7 +34,6 @@ internal static class ImageXObjectShell
             new NumberObject(width),
             new NumberObject(height),
             colorSpace,
-            imageMask: false,
             new NumberObject(bitsPerComponent),
             new NameObject("FlateDecode"));
         return stream;

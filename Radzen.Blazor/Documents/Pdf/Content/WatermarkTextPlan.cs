@@ -1,4 +1,6 @@
 using Radzen.Documents.Pdf.Fonts;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Content;
 
@@ -12,13 +14,13 @@ internal readonly struct WatermarkTextPlan
 
     public static WatermarkTextPlan Base14(string text, Font font)
     {
-        var bytes = WinAnsiText.Encode(text, OnUnencodable.Throw, WatermarkGeometry.EncodingContext);
-        var metrics = Base14Metrics.Resolve(font) ?? Base14Metrics.Resolve(new Font())!;
+        var bytes = WinAnsiText.Encode(text, OnUnencodable.Throw, "Watermark text");
+        var metrics = BuiltInFontMetrics.Resolve(font) ?? BuiltInFontMetrics.Resolve(new Font())!;
         return new WatermarkTextPlan
         {
             Bytes = bytes,
-            X = WatermarkGeometry.Centered(metrics.MeasureString(text, font.Size)),
-            Baseline = WatermarkGeometry.Baseline(font.Size),
+            X = WatermarkGeometry.Centered(metrics.MeasureString(text, font.EffectiveSize.Point)),
+            Baseline = -WatermarkGeometry.Baseline(font.EffectiveSize.Point),
         };
     }
 }

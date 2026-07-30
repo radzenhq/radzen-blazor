@@ -8,9 +8,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class JpegImageDecoder : IImageDecoder
 {
-    public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
     {
-        if (data.Length < 2 || data[0] != 0xFF || data[1] != 0xD8)
+        if (data.Length < 2 || data.Span[0] != 0xFF || data.Span[1] != 0xD8)
         {
             xobject = null;
             return false;
@@ -20,9 +20,9 @@ internal sealed class JpegImageDecoder : IImageDecoder
         return true;
     }
 
-    private static ImageXObject DecodeJpeg(byte[] data, ReaderLimits limits)
+    private static ImageXObject DecodeJpeg(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
-        var (width, height, precision, components, adobe) = ReadJpegFrame(data);
+        var (width, height, precision, components, adobe) = ReadJpegFrame(data.Span);
 
         ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG");
 
@@ -48,7 +48,6 @@ internal sealed class JpegImageDecoder : IImageDecoder
             new NumberObject(width),
             new NumberObject(height),
             new NameObject(colorSpace),
-            imageMask: false,
             new NumberObject(precision),
             new NameObject("DCTDecode"));
 
@@ -66,7 +65,7 @@ internal sealed class JpegImageDecoder : IImageDecoder
         return new ImageXObject(stream, null);
     }
 
-    private static (int Width, int Height, int Precision, int Components, bool Adobe) ReadJpegFrame(byte[] data)
+    private static (int Width, int Height, int Precision, int Components, bool Adobe) ReadJpegFrame(ReadOnlySpan<byte> data)
     {
         var adobe = false;
         var pos = 2;
@@ -91,7 +90,7 @@ internal sealed class JpegImageDecoder : IImageDecoder
                 break;
             }
 
-            var segmentLength = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos));
+            var segmentLength = BinaryPrimitives.ReadUInt16BigEndian(data[pos..]);
             if (segmentLength < 2 || pos + segmentLength > data.Length)
             {
                 throw new InvalidDataException("JPEG segment length is invalid.");
@@ -116,8 +115,8 @@ internal sealed class JpegImageDecoder : IImageDecoder
                 }
 
                 var precision = data[pos + 2];
-                var height = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 3));
-                var width = BinaryPrimitives.ReadUInt16BigEndian(data.AsSpan(pos + 5));
+                var height = BinaryPrimitives.ReadUInt16BigEndian(data[(pos + 3)..]);
+                var width = BinaryPrimitives.ReadUInt16BigEndian(data[(pos + 5)..]);
                 var components = data[pos + 7];
                 return (width, height, precision, components, adobe);
             }
@@ -128,7 +127,7 @@ internal sealed class JpegImageDecoder : IImageDecoder
         throw new InvalidDataException("No JPEG start-of-frame marker was found.");
     }
 
-    private static bool IsAdobeApp14(byte[] data, int pos, int segmentLength)
+    private static bool IsAdobeApp14(ReadOnlySpan<byte> data, int pos, int segmentLength)
         => segmentLength >= 8
             && data[pos + 2] == (byte)'A'
             && data[pos + 3] == (byte)'d'
