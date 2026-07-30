@@ -1,77 +1,52 @@
 using System.Collections.Generic;
-using System.Globalization;
 using Radzen.Documents.Geometry;
+using Radzen.Documents.Pdf.Emission;
 
 namespace Radzen.Documents.Pdf.Render;
 
 internal sealed class ImageStore
 {
-    private readonly Dictionary<SourceId, GeneratedImage> images = [];
-    private readonly Dictionary<(SourceId Key, bool Interpolate), GeneratedImage> applied = [];
-    private readonly Dictionary<(SourceId Key, bool Interpolate), GeneratedImage> watermarks = [];
-    private int imageCount;
-    private int appliedCount;
+    private readonly ResourceNameAllocator<SourceId, EmissionImage> images = new("Im");
+    private readonly ResourceNameAllocator<SourceId, EmissionImage> interpolated = new("Imo");
+    private readonly Dictionary<SourceId, EmissionImage> watermarks = [];
 
-    public GeneratedImage DecodeApplied(SourceId key, in ImagePaint paint)
+    public EmissionImage DecodeApplied(SourceId key, in ImagePaint paint)
     {
-        var generated = DecodeBytes(key, paint.Data);
+        var decoded = DecodeBytes(key, paint.Data);
+        return paint.Interpolate
+            ? interpolated.GetOrAddValue(key, name => Interpolate(name, decoded))
+            : decoded;
+    }
+
+    public EmissionImage DecodeWatermark(SourceId key, in ImagePaint paint)
+    {
+        var decoded = DecodeBytes(key, paint.Data);
         if (!paint.Interpolate)
         {
-            return generated;
+            return decoded;
         }
 
-        var cacheKey = (key, paint.Interpolate);
-        if (!applied.TryGetValue(cacheKey, out var result))
+        if (!watermarks.TryGetValue(key, out var result))
         {
-            var image = ImageDecoder.ApplyOptions(generated.Image, paint.Interpolate);
-            result = ReferenceEquals(image, generated.Image)
-                ? generated
-                : new GeneratedImage
-                {
-                    Key = "Imo" + appliedCount++.ToString(CultureInfo.InvariantCulture),
-                    Image = image,
-                };
-            applied[cacheKey] = result;
+            result = Interpolate(ResourceNameAllocator.Derive(decoded.Key, "w"), decoded);
+            watermarks[key] = result;
         }
 
         return result;
     }
 
-    public GeneratedImage DecodeWatermark(SourceId key, in ImagePaint paint)
-    {
-        var generated = DecodeBytes(key, paint.Data);
-        if (!paint.Interpolate)
-        {
-            return generated;
-        }
+    public EmissionImage DecodeBytes(SourceId key, SceneImageData data)
+        => images.GetOrAddValue(key, name => Capture(name, ImageDecoder.Decode(data.Memory)));
 
-        var cacheKey = (key, paint.Interpolate);
-        if (!watermarks.TryGetValue(cacheKey, out var result))
-        {
-            result = new GeneratedImage
-            {
-                Key = generated.Key + "w",
-                Image = ImageDecoder.ApplyOptions(generated.Image, paint.Interpolate),
-            };
-            watermarks[cacheKey] = result;
-        }
+    public static ImageXObject SourceOf(EmissionImage image) => (ImageXObject)image.Identity;
 
-        return result;
-    }
+    private static EmissionImage Interpolate(string name, EmissionImage decoded)
+        => Capture(name, ImageDecoder.ApplyOptions(SourceOf(decoded), interpolate: true));
 
-    public GeneratedImage DecodeBytes(SourceId key, SceneImageData data)
-    {
-        if (!images.TryGetValue(key, out var generated))
-        {
-            var xobject = ImageDecoder.Decode(data.Memory);
-            generated = new GeneratedImage
-            {
-                Key = "Im" + imageCount++.ToString(CultureInfo.InvariantCulture),
-                Image = xobject,
-            };
-            images[key] = generated;
-        }
-
-        return generated;
-    }
+    private static EmissionImage Capture(string key, ImageXObject xobject)
+        => new(
+            xobject,
+            key,
+            EmissionStreamPayload.Capture(xobject.Image),
+            xobject.SoftMask is { } mask ? EmissionStreamPayload.Capture(mask) : null);
 }

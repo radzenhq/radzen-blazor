@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
-namespace Radzen.Documents.Pdf.Render;
+namespace Radzen.Documents.Pdf;
 
 internal sealed class PngImageDecoder : IImageDecoder
 {

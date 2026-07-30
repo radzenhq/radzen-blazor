@@ -87,7 +87,7 @@ internal static class PageResourceBuilder
                 continue;
             }
 
-            resources.Add("Pattern", pattern.Key, writer.Add(pattern.Pattern.CreateDictionary()));
+            resources.Add("Pattern", pattern.Key, writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient, pattern.Matrix)));
         }
 
         return resources.Build();
@@ -143,15 +143,9 @@ internal static class PageResourceBuilder
             return existing;
         }
 
-        DocumentObject reference;
-        if (font.Sfnt is { } sfnt)
-        {
-            reference = Fonts.Type0FontEmbedder.Embed(writer, sfnt, font.GidToUnicode, font.CompactGidMap);
-        }
-        else
-        {
-            reference = Base14FontDictionary(font.Base14Name);
-        }
+        DocumentObject reference = font.Program is { } program
+            ? Fonts.Type0FontEmbedder.Embed(writer, program)
+            : Base14FontDictionary(font.Base14Name);
 
         cache[font] = reference;
         return reference;
@@ -216,9 +210,9 @@ internal static class PageResourceBuilder
             resources.Add("Font", key, Base14FontDictionary(baseFont));
         }
 
-        foreach (var (key, image) in manifest.ImagesForWriting)
+        foreach (var image in manifest.ImagesForWriting)
         {
-            resources.Add("XObject", key, ResolveManifestImage(writer!, image, sharedImages));
+            resources.Add("XObject", image.Key, ResolveManifestImage(writer!, image, sharedImages));
         }
 
         foreach (var (key, pattern) in manifest.Patterns)
@@ -236,7 +230,7 @@ internal static class PageResourceBuilder
 
     private static ReferenceObject ResolveManifestImage(
         IObjectWriter writer,
-        EmissionImageResource image,
+        EmissionImage image,
         Dictionary<object, ReferenceObject>? sharedImages)
     {
         if (sharedImages is not null && sharedImages.TryGetValue(image.Identity, out var existing))

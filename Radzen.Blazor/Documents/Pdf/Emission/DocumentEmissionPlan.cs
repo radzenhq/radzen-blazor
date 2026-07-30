@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Geometry;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Emission;
 
@@ -24,16 +22,16 @@ internal sealed class DocumentEmissionPlan(
 }
 
 internal sealed class PageEmissionPlan(
-    ReadOnlyMemory<byte> content,
+    byte[] content,
     ImmutableArray<EmissionFont> fonts,
     ImmutableArray<EmissionImage> images,
     ImmutableArray<EmissionLink> links,
     ImmutableArray<EmissionExtGState> extGStates,
     ImmutableArray<EmissionPattern> patterns)
 {
-    private readonly byte[] content = content.ToArray();
+    public ReadOnlyMemory<byte> Content => ContentArray;
 
-    public ReadOnlyMemory<byte> Content => content;
+    public byte[] ContentArray { get; } = content;
 
     public ImmutableArray<EmissionFont> Fonts { get; } = fonts;
 
@@ -46,12 +44,57 @@ internal sealed class PageEmissionPlan(
     public ImmutableArray<EmissionPattern> Patterns { get; } = patterns;
 }
 
+internal enum EmissionFontFileKind
+{
+    Glyf,
+    Cff,
+}
+
+internal readonly record struct EmissionWidthRun(int Cid, ImmutableArray<int> Widths);
+
+internal sealed class EmissionFontProgram(
+    EmissionFontFileKind kind,
+    byte[] file,
+    byte[] cidSet,
+    ImmutableArray<EmissionWidthRun> widths,
+    byte[] toUnicode,
+    string baseName,
+    int flags,
+    ImmutableArray<int> boundingBox,
+    double italicAngle,
+    int ascent,
+    int descent,
+    int capHeight)
+{
+    public EmissionFontFileKind Kind { get; } = kind;
+
+    public ReadOnlyMemory<byte> File { get; } = file;
+
+    public ReadOnlyMemory<byte> CidSet { get; } = cidSet;
+
+    public ImmutableArray<EmissionWidthRun> Widths { get; } = widths;
+
+    public ReadOnlyMemory<byte> ToUnicode { get; } = toUnicode;
+
+    public string BaseName { get; } = baseName;
+
+    public int Flags { get; } = flags;
+
+    public ImmutableArray<int> BoundingBox { get; } = boundingBox;
+
+    public double ItalicAngle { get; } = italicAngle;
+
+    public int Ascent { get; } = ascent;
+
+    public int Descent { get; } = descent;
+
+    public int CapHeight { get; } = capHeight;
+}
+
 internal sealed class EmissionFont(
     string key,
     string? base14,
-    SfntFont? sfnt,
-    ImmutableDictionary<ushort, int> gidToUnicode,
-    ImmutableDictionary<ushort, ushort>? compactGidMap,
+    EmissionFontProgram? program,
     ReverseFont extraction)
 {
     public string Key { get; } = key;
@@ -60,37 +103,26 @@ internal sealed class EmissionFont(
 
     public string Base14Name => Base14 ?? "Helvetica";
 
-    public SfntFont? Sfnt { get; } = sfnt;
+    public EmissionFontProgram? Program { get; } = program;
 
-    public ImmutableDictionary<ushort, int> GidToUnicode { get; } = gidToUnicode;
-
-    public ImmutableDictionary<ushort, ushort>? CompactGidMap { get; } = compactGidMap;
+    public bool IsEmbedded => Program is not null;
 
     public ReverseFont Extraction { get; } = extraction;
 }
 
 internal sealed class EmissionImage(
-    string key,
-    EmissionStreamSnapshot image,
-    EmissionStreamSnapshot? softMask)
-{
-    public string Key { get; } = key;
-
-    public EmissionStreamSnapshot Image { get; } = image;
-
-    public EmissionStreamSnapshot? SoftMask { get; } = softMask;
-}
-
-internal sealed class EmissionImageResource(
     object identity,
-    EmissionStreamSnapshot image,
-    EmissionStreamSnapshot? softMask)
+    string key,
+    EmissionStreamPayload image,
+    EmissionStreamPayload? softMask)
 {
     public object Identity { get; } = identity;
 
-    public EmissionStreamSnapshot Image { get; } = image;
+    public string Key { get; } = key;
 
-    public EmissionStreamSnapshot? SoftMask { get; } = softMask;
+    public EmissionStreamPayload Image { get; } = image;
+
+    public EmissionStreamPayload? SoftMask { get; } = softMask;
 }
 
 internal readonly record struct EmissionLink(
@@ -125,11 +157,13 @@ internal sealed class EmissionExtGState(
     public bool ClearSoftMask { get; } = clearSoftMask;
 }
 
-internal sealed class EmissionPattern(string key, EmissionDictionarySnapshot pattern)
+internal sealed class EmissionPattern(string key, GradientPaint gradient, Matrix matrix)
 {
     public string Key { get; } = key;
 
-    public EmissionDictionarySnapshot Pattern { get; } = pattern;
+    public GradientPaint Gradient { get; } = gradient;
+
+    public Matrix Matrix { get; } = matrix;
 }
 
 internal enum EmissionSoftMaskType
@@ -151,16 +185,14 @@ internal sealed class EmissionSoftMask(
 }
 
 internal sealed class EmissionTransparencyGroup(
-    ReadOnlyMemory<byte> content,
+    byte[] content,
     ImmutableArray<double> boundingBox,
     string? colorSpace,
     bool? isolated,
     bool? knockout,
-    ImmutableArray<KeyValuePair<string, EmissionStreamSnapshot>> xObjects)
+    ImmutableArray<KeyValuePair<string, EmissionStreamPayload>> xObjects)
 {
-    private readonly byte[] content = content.ToArray();
-
-    public ReadOnlyMemory<byte> Content => content;
+    public ReadOnlyMemory<byte> Content { get; } = content;
 
     public ImmutableArray<double> BoundingBox { get; } = boundingBox;
 
@@ -170,7 +202,7 @@ internal sealed class EmissionTransparencyGroup(
 
     public bool? Knockout { get; } = knockout;
 
-    public ImmutableArray<KeyValuePair<string, EmissionStreamSnapshot>> XObjects { get; } = xObjects;
+    public ImmutableArray<KeyValuePair<string, EmissionStreamPayload>> XObjects { get; } = xObjects;
 }
 
 internal readonly record struct StructureKidSnapshot(
@@ -209,68 +241,4 @@ internal sealed class StructureElementSnapshot(
     public ImmutableArray<(PageEmissionPlan Page, int Mcid)> Marks { get; } = marks;
 
     public ImmutableArray<StructureKidSnapshot> Kids { get; } = kids;
-}
-
-internal sealed class EmissionStreamSnapshot
-{
-    private readonly byte[] data;
-    private readonly ImmutableArray<KeyValuePair<string, DocumentObject>> entries;
-
-    private EmissionStreamSnapshot(
-        ReadOnlyMemory<byte> data,
-        ImmutableArray<KeyValuePair<string, DocumentObject>> entries)
-    {
-        this.data = data.ToArray();
-        this.entries = entries;
-    }
-
-    public static EmissionStreamSnapshot Capture(StreamObject stream)
-        => new(stream.Data, [.. stream.Dictionary]);
-
-    public bool TryGetValue(string key, out DocumentObject? value)
-    {
-        foreach (var entry in entries)
-        {
-            if (string.Equals(entry.Key, key, StringComparison.Ordinal))
-            {
-                value = entry.Value;
-                return true;
-            }
-        }
-
-        value = null;
-        return false;
-    }
-
-    public StreamObject CreateStream()
-    {
-        var stream = new StreamObject(data);
-        foreach (var entry in entries)
-        {
-            stream.Dictionary[entry.Key] = entry.Value;
-        }
-
-        return stream;
-    }
-}
-
-internal sealed class EmissionDictionarySnapshot
-{
-    private readonly ImmutableArray<KeyValuePair<string, DocumentObject>> entries;
-
-    private EmissionDictionarySnapshot(ImmutableArray<KeyValuePair<string, DocumentObject>> entries)
-        => this.entries = entries;
-
-    public static EmissionDictionarySnapshot Capture(DictionaryObject dictionary) => new([.. dictionary]);
-
-    public DictionaryObject CreateDictionary()
-    {
-        var dictionary = new DictionaryObject();
-        foreach (var entry in entries)
-        {
-            dictionary[entry.Key] = entry.Value;
-        }
-
-        return dictionary;
-    }
 }

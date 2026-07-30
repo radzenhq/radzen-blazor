@@ -14,6 +14,8 @@ internal readonly struct StructureKid
 
 internal sealed class StructureElement : IStructureTag
 {
+    public required int Id { get; init; }
+
     public required string Type { get; init; }
 
     public string? Alt { get; init; }

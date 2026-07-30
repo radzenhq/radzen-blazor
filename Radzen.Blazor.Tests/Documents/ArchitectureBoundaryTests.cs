@@ -18,6 +18,8 @@ public class ArchitectureBoundaryTests
 
     private const string LayoutNamespace = "Radzen.Documents.Layout";
 
+    private const string FontsNamespace = "Radzen.Documents.Fonts";
+
     private const string GeometryNamespace = "Radzen.Documents.Geometry";
 
     private const string ComponentNamespace = "Radzen.Blazor";
@@ -25,6 +27,10 @@ public class ArchitectureBoundaryTests
     private const string PdfRenderNamespace = "Radzen.Documents.Pdf.Render";
 
     private const string PdfWriteNamespace = "Radzen.Documents.Pdf.Write";
+
+    private const string PdfContentNamespace = "Radzen.Documents.Pdf.Content";
+
+    private const string PdfEmissionNamespace = "Radzen.Documents.Pdf.Emission";
 
     private static readonly string[] NeutralNamespaces =
     [
@@ -450,6 +456,21 @@ public class ArchitectureBoundaryTests
         AssertNamespaceDoesNotReference(PdfWriteNamespace, PdfRenderNamespace);
     }
 
+    [Fact]
+    public void PdfContentNamespace_NeverReferencesTheRendererOrTheWriter()
+    {
+        AssertNamespaceDoesNotReference(PdfContentNamespace, PdfRenderNamespace);
+        AssertNamespaceDoesNotReference(PdfContentNamespace, PdfWriteNamespace);
+    }
+
+    [Fact]
+    public void PdfEmissionNamespace_NeverReferencesTheRendererTheWriterOrTheContentEditor()
+    {
+        AssertNamespaceDoesNotReference(PdfEmissionNamespace, PdfRenderNamespace);
+        AssertNamespaceDoesNotReference(PdfEmissionNamespace, PdfWriteNamespace);
+        AssertNamespaceDoesNotReference(PdfEmissionNamespace, PdfContentNamespace);
+    }
+
     private static void AssertNamespaceDoesNotReference(string sourceNamespace, string forbiddenNamespace)
     {
         var violations = new List<string>();
@@ -661,11 +682,25 @@ public class ArchitectureBoundaryTests
         }
     }
 
+    private static readonly Type[] ImmutableAfterParseSharedValues =
+    [
+        typeof(Radzen.Documents.Fonts.Sfnt.SfntFont),
+    ];
+
     private static bool IsMutableModelType(Type type)
-        => type.IsClass
-            && (type.Namespace == DocumentsNamespace
-                || type == typeof(Radzen.Documents.Fonts.Font)
-                || type == typeof(Radzen.Documents.Fonts.FontCollection));
+    {
+        if (!type.IsClass || Array.IndexOf(ImmutableAfterParseSharedValues, type) >= 0)
+        {
+            return false;
+        }
+
+        return type.Namespace is { } name
+            && (name == DocumentsNamespace || IsWithin(name, FontsNamespace));
+    }
+
+    [Fact]
+    public void TypesExemptedFromTheMutableModelGuard_AreImmutableAfterParse()
+        => Radzen.Blazor.Documents.Tests.SharedSfntFontConcurrencyTests.AssertNamedLazyCacheInvariant();
 
     private static void Check(List<string> violations, Type owner, string what, Type? referenced)
     {

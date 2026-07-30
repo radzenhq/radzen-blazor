@@ -314,40 +314,23 @@ internal static class AnnotationEmitter
             return null;
         }
 
-        using var content = new ContentWriter(scope, "AF", "AIm");
-        if (annotation.Opacity < 1)
-        {
-            content.WriteName("AGS");
-            content.WriteRaw(" gs\n");
-        }
-
-        foreach (var element in elements)
-        {
-            element.Emit(content);
-        }
-
-        var emitted = content.DetachResult();
-        var stream = new StreamObject(emitted.Bytes!);
-        FormXObjectShell.ApplyHeader(
-            stream.Dictionary,
+        var opaque = annotation.Opacity >= 1;
+        return AppearanceStreamBuilder.Render(
+            scope,
+            ContentResourcePrefixes.Appearance,
             PageResourceBuilder.NumberBox(AppearanceBounds(annotation)),
-            formType: true);
-        var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
-        if (annotation.Opacity < 1)
-        {
-            var extGStates = resources.TryGetValue("ExtGState", out var existing) && existing is DictionaryObject dict
-                ? dict
-                : new DictionaryObject();
-            extGStates["AGS"] = PageResourceBuilder.ExtGStateDictionary(annotation.Opacity, annotation.Opacity);
-            resources["ExtGState"] = extGStates;
-        }
-
-        if (resources.Count > 0)
-        {
-            stream.Dictionary["Resources"] = resources;
-        }
-
-        return stream;
+            formType: true,
+            elements,
+            writer,
+            prologue: opaque ? null : "/AGS gs\n",
+            augmentResources: opaque ? null : resources =>
+            {
+                var extGStates = resources.TryGetValue("ExtGState", out var existing) && existing is DictionaryObject dict
+                    ? dict
+                    : new DictionaryObject();
+                extGStates["AGS"] = PageResourceBuilder.ExtGStateDictionary(annotation.Opacity, annotation.Opacity);
+                resources["ExtGState"] = extGStates;
+            });
     }
 
     private static PdfRect AppearanceBounds(Annotation annotation)

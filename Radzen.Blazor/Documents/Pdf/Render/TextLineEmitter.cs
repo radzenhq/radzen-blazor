@@ -215,7 +215,7 @@ internal sealed class TextLineEmitter(
         double x,
         double baseline,
         double size,
-        GeneratedFont generated,
+        EmittedFont generated,
         byte[] bytes,
         StructureElement? element,
         SemanticArtifactKind? artifact,

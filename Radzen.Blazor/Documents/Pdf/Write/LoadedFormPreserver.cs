@@ -37,7 +37,7 @@ internal sealed class LoadedFormPreserver(PortableDocument document, FormAppeara
                 continue;
             }
 
-            if (page.Generated is not null)
+            if (page.IsGenerated)
             {
                 var widgets = PageAnnotationImport.ImportWidgets(request.Importer, source, annots);
                 if (widgets.Count == 0)

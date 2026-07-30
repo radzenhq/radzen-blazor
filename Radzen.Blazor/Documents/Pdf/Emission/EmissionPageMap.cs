@@ -6,24 +6,33 @@ namespace Radzen.Documents.Pdf.Emission;
 internal sealed class EmissionPageMap
 {
     private readonly Dictionary<PageEmissionPlan, int> indexes = [];
+    private readonly List<PageEmissionPlan?> byPageIndex = [];
+    private readonly List<PageEmissionPlan> planned = [];
 
     private EmissionPageMap()
     {
     }
+
+    public IReadOnlyList<PageEmissionPlan> Planned => planned;
 
     public static EmissionPageMap Build(IReadOnlyList<Page> pages)
     {
         var map = new EmissionPageMap();
         for (var index = 0; index < pages.Count; index++)
         {
-            if (pages[index].Generated is { } generated)
+            var plan = pages[index].EmissionIdentity;
+            map.byPageIndex.Add(plan);
+            if (plan is not null)
             {
-                map.indexes.TryAdd(generated, index);
+                map.indexes.TryAdd(plan, index);
+                map.planned.Add(plan);
             }
         }
 
         return map;
     }
+
+    public PageEmissionPlan? PlanAt(int pageIndex) => byPageIndex[pageIndex];
 
     public int IndexOf(PageEmissionPlan page, string feature)
         => indexes.TryGetValue(page, out var index)

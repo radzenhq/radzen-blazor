@@ -5,10 +5,18 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Fonts;
 namespace Radzen.Documents.Pdf.Content;
 
+
+internal sealed record ContentResourcePrefixes(string Font, string Image, string ExtGState, string Pattern)
+{
+    public static ContentResourcePrefixes Page { get; } = new("F", "Im", "GS", "P");
+
+    public static ContentResourcePrefixes Overlay { get; } = new("SF", "SIm", "SGS", "SP");
+
+    public static ContentResourcePrefixes Appearance { get; } = new("AF", "AIm", "GS", "P");
+}
 
 /// <summary>
 /// The write surface for a page content stream, passed to <see cref="ContentElement.EmitBody"/>.
@@ -18,21 +26,25 @@ namespace Radzen.Documents.Pdf.Content;
 public sealed class ContentWriter : IDisposable
 {
     private readonly PooledByteAccumulator accumulator = new(1024);
-    private readonly ResourceKeyRegistry<string, KeyValuePair<string, string>> fonts;
-    private readonly ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>> images;
-    private readonly ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
+    private readonly ResourceNameAllocator<string, KeyValuePair<string, string>> fonts;
+    private readonly ResourceNameAllocator<ImageXObject, KeyValuePair<string, ImageXObject>> images;
+    private readonly ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
 
-    private readonly ResourceKeyRegistry<double, KeyValuePair<string, double>> extGStates;
+    private readonly ResourceNameAllocator<double, KeyValuePair<string, double>> extGStates;
 
     private readonly FontScope scope;
 
-    internal ContentWriter(FontScope scope = default, string fontKeyPrefix = "F", string imageKeyPrefix = "Im", string extGStateKeyPrefix = "GS", string patternKeyPrefix = "P")
+    internal ContentWriter(
+        FontScope scope = default,
+        ContentResourcePrefixes? prefixes = null,
+        IEnumerable<string>? reserved = null)
     {
         this.scope = scope;
-        fonts = new ResourceKeyRegistry<string, KeyValuePair<string, string>>(fontKeyPrefix, StringComparer.Ordinal);
-        images = new ResourceKeyRegistry<ImageXObject, KeyValuePair<string, ImageXObject>>(imageKeyPrefix);
-        patterns = new ResourceKeyRegistry<GradientBrush, KeyValuePair<string, DictionaryObject>>(patternKeyPrefix, ReferenceKeyComparer<GradientBrush>.Instance);
-        extGStates = new ResourceKeyRegistry<double, KeyValuePair<string, double>>(extGStateKeyPrefix, AlphaComparer.Instance);
+        var names = prefixes ?? ContentResourcePrefixes.Page;
+        fonts = new ResourceNameAllocator<string, KeyValuePair<string, string>>(names.Font, reserved, StringComparer.Ordinal);
+        images = new ResourceNameAllocator<ImageXObject, KeyValuePair<string, ImageXObject>>(names.Image, reserved);
+        patterns = new ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>>(names.Pattern, reserved, ReferenceKeyComparer<GradientBrush>.Instance);
+        extGStates = new ResourceNameAllocator<double, KeyValuePair<string, double>>(names.ExtGState, reserved, AlphaComparer.Instance);
     }
 
     internal IEnumerable<KeyValuePair<string, string>> Fonts => fonts.Values;

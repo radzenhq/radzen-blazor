@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Geometry;
+using Radzen.Documents.Pdf.Emission;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -33,7 +34,7 @@ internal struct TextDraw
     public required double Baseline { get; init; }
     public required double Size { get; init; }
     public required Color Color { get; init; }
-    public required GeneratedFont Font { get; init; }
+    public required EmittedFont Font { get; init; }
     public required byte[] Bytes { get; init; }
     public double StrokeWidth { get; init; }
     public double Shear { get; init; }
@@ -64,7 +65,7 @@ internal struct ImageDraw
     public required double Y { get; init; }
     public required double Width { get; init; }
     public required double Height { get; init; }
-    public required GeneratedImage Image { get; init; }
+    public required EmissionImage Image { get; init; }
     public StructureElement? Element { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
@@ -141,21 +142,21 @@ internal sealed class PagePlan
     public List<RoundedStrokeDraw> RoundedStrokes { get; } = [];
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
-    public List<GeneratedLink> Links { get; } = [];
+    public List<EmissionLink> Links { get; } = [];
     private int sequence;
 
     public int NextSequence() => sequence++;
-    private readonly ResourceKeyRegistry<string, GeneratedExtGState> extGStates =
-        new("GS", StringComparer.Ordinal);
+    private readonly ResourceNameAllocator<string, EmissionExtGState> extGStates =
+        new("GS", reserved: null, StringComparer.Ordinal);
 
-    private readonly ResourceKeyRegistry<(GradientPaint Gradient, Matrix Matrix), GeneratedPattern> patterns =
-        new("P", GradientPatternComparer.Instance);
+    private readonly ResourceNameAllocator<(GradientPaint Gradient, Matrix Matrix), EmissionPattern> patterns =
+        new("P", reserved: null, GradientPatternComparer.Instance);
 
-    private readonly Dictionary<string, GeneratedExtGState> extGStatesByKey = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, EmissionExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
-    public IReadOnlyList<GeneratedExtGState> ExtGStates => extGStates.Values;
+    public IReadOnlyList<EmissionExtGState> ExtGStates => extGStates.Values;
 
-    public IReadOnlyList<GeneratedPattern> Patterns => patterns.Values;
+    public IReadOnlyList<EmissionPattern> Patterns => patterns.Values;
 
     private readonly Dictionary<(double Width, double Height, double Radius, double Blur), ShadowMask> shadowMasks = [];
 
@@ -171,8 +172,8 @@ internal sealed class PagePlan
         return mask;
     }
     public WatermarkDraw? Watermark { get; set; }
-    public OrderedSet<GeneratedFont> UsedFonts { get; } = [];
-    public OrderedSet<GeneratedImage> UsedImages { get; } = [];
+    public OrderedSet<EmittedFont> UsedFonts { get; } = [];
+    public OrderedSet<EmissionImage> UsedImages { get; } = [];
 
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
         => RegisterExtGState(fillAlpha, strokeAlpha, null);
@@ -184,22 +185,22 @@ internal sealed class PagePlan
         var dedupKey = string.Create(
             CultureInfo.InvariantCulture,
             $"a|{fillAlpha}|{strokeAlpha}|{blend}");
-        return extGStates.GetOrAdd(dedupKey, key => Track(new GeneratedExtGState
-        {
-            Key = key,
-            FillAlpha = fillAlpha,
-            StrokeAlpha = strokeAlpha,
-            Blend = blend,
-        }));
+        return extGStates.GetOrAdd(dedupKey, key => Track(new EmissionExtGState(
+            key,
+            fillAlpha,
+            strokeAlpha,
+            blend,
+            softMask: null,
+            clearSoftMask: false)));
     }
 
-    private GeneratedExtGState Track(GeneratedExtGState state)
+    private EmissionExtGState Track(EmissionExtGState state)
     {
         extGStatesByKey[state.Key] = state;
         return state;
     }
 
-    public GeneratedExtGState? FindExtGState(string key)
+    public EmissionExtGState? FindExtGState(string key)
         => extGStatesByKey.TryGetValue(key, out var state) ? state : null;
 
     public string? ApplyAlpha(string? extGState, double alpha)
@@ -225,25 +226,27 @@ internal sealed class PagePlan
             state.Blend);
     }
 
-    public string RegisterSoftMaskExtGState(double fillAlpha, double strokeAlpha, GeneratedSoftMask softMask)
+    public string RegisterSoftMaskExtGState(
+        double fillAlpha,
+        double strokeAlpha,
+        EmissionSoftMask softMask,
+        string? contentKey)
     {
-        GeneratedExtGState Create(string key) => Track(new GeneratedExtGState
-        {
-            Key = key,
-            FillAlpha = Math.Clamp(fillAlpha, 0, 1),
-            StrokeAlpha = Math.Clamp(strokeAlpha, 0, 1),
-            SoftMask = softMask,
-        });
+        EmissionExtGState Create(string key) => Track(new EmissionExtGState(
+            key,
+            Math.Clamp(fillAlpha, 0, 1),
+            Math.Clamp(strokeAlpha, 0, 1),
+            blend: null,
+            softMask,
+            clearSoftMask: false));
 
-        return softMask.ContentKey is { } contentKey
-            ? extGStates.GetOrAdd("m|" + contentKey, Create)
+        return contentKey is { } dedup
+            ? extGStates.GetOrAdd("m|" + dedup, Create)
             : extGStates.Add(Create);
     }
 
     public string RegisterPattern(GradientPaint gradient, Matrix matrix)
-        => patterns.GetOrAdd(
-            (gradient, matrix),
-            key => new GeneratedPattern { Key = key, Pattern = ShadingBuilder.BuildPattern(gradient, matrix) });
+        => patterns.GetOrAdd((gradient, matrix), key => new EmissionPattern(key, gradient, matrix));
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 

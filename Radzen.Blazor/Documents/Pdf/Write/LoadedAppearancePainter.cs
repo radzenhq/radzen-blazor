@@ -55,7 +55,7 @@ internal static class LoadedAppearancePainter
         }
 
         var xobjects = PrivateXObjects(reader, loaded, page, owned);
-        var name = ResourceNameAllocator.Available(namePrefix, xobjects.Keys, false);
+        var name = ResourceNameAllocator.Reserve(namePrefix, xobjects.Keys);
 
         xobjects[name] = appearanceReference;
         var scaleX = target.Width / bbox.Width;

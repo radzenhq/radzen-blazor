@@ -63,6 +63,6 @@ internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
             + "to the WinAnsi character set. Register a font that covers these characters with "
             + $"{nameof(FontCollection)}.{nameof(FontCollection.Register)}, add such a font to the "
             + $"{nameof(FontCollection.SetFallback)} chain, or set "
-            + $"{nameof(FontCollection)}.{nameof(FontCollection.AllowUnsupportedCharacters)} to true to draw '?' in their place.");
+            + $"{nameof(DocumentRenderer)}.{nameof(DocumentRenderer.AllowUnsupportedCharacters)} to true to draw '?' in their place.");
     }
 }

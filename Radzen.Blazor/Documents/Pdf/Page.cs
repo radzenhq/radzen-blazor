@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emission;
-using Radzen.Documents.Pdf.Write;
 namespace Radzen.Documents.Pdf;
 
 
@@ -39,7 +38,9 @@ public sealed class Page
         elements.OwnedBy(Invalidate);
     }
 
-    internal PageEmissionPlan? Generated { get; set; }
+    internal PageEmissionPlan? EmissionIdentity { get; set; }
+
+    internal bool IsGenerated => EmissionIdentity is not null;
 
     internal PortableDocument? Owner { get; set; }
 
@@ -347,7 +348,7 @@ public sealed class Page
     internal void AppendContent(ContentElement element)
     {
         Invalidate();
-        if (materialized || content is null || Generated is not null)
+        if (materialized || content is null || IsGenerated)
         {
             Content.Add(element);
             return;
@@ -419,7 +420,7 @@ public sealed class Page
 
     internal void BeginGeneratedEdit()
     {
-        if (Generated is null || editingGenerated)
+        if (!IsGenerated || editingGenerated)
         {
             return;
         }
@@ -470,12 +471,7 @@ public sealed class Page
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
 
-        using var writer = new ContentWriter(
-            FontScope,
-            ResourceNameAllocator.Available("F", reservedNames, true),
-            ResourceNameAllocator.Available("Im", reservedNames, true),
-            ResourceNameAllocator.Available("GS", reservedNames, true),
-            ResourceNameAllocator.Available("P", reservedNames, true));
+        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Page, reservedNames);
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -508,20 +504,12 @@ public sealed class Page
         => elements.Count == 0 ? null : EmitOverlay(elements, null);
 
     private ContentEmissionResult Reemit(IEnumerable<string>? reservedNames)
-        => ContentEditor.Reemit(content!, elements, sourceElements!, FontScope,
-            ResourceNameAllocator.Available("F", reservedNames, true),
-            ResourceNameAllocator.Available("Im", reservedNames, true),
-            ResourceNameAllocator.Available("GS", reservedNames, true),
-            ResourceNameAllocator.Available("P", reservedNames, true));
+        => ContentEditor.Reemit(
+            content!, elements, sourceElements!, FontScope, ContentResourcePrefixes.Page, reservedNames);
 
     private ContentEmissionResult EmitOverlay(IEnumerable<ContentElement> items, IEnumerable<string>? reservedNames)
     {
-        using var writer = new ContentWriter(
-            FontScope,
-            ResourceNameAllocator.Available("SF", reservedNames, true),
-            ResourceNameAllocator.Available("SIm", reservedNames, true),
-            ResourceNameAllocator.Available("SGS", reservedNames, true),
-            ResourceNameAllocator.Available("SP", reservedNames, true));
+        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Overlay, reservedNames);
         foreach (var element in items)
         {
             element.Emit(writer);
@@ -546,7 +534,7 @@ public sealed class Page
         }
 
         materialized = true;
-        if (content is null || (Generated is not null && !editingGenerated))
+        if (content is null || (IsGenerated && !editingGenerated))
         {
             FlushPendingAppends();
             return;

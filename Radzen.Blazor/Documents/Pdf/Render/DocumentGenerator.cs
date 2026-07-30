@@ -1,92 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using static Radzen.Documents.Pdf.Render.GeneratorFontResolver;
-using Radzen.Documents.Fonts.Sfnt;
-using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
-
-internal sealed class GeneratedFont
-{
-    public required string Key { get; init; }
-
-    public string? Base14 { get; init; }
-
-    public string Base14Name => Base14 ?? "Helvetica";
-
-    public SfntFont? Sfnt { get; init; }
-
-    public Dictionary<ushort, int> GidToUnicode { get; } = [];
-
-    public Dictionary<ushort, ushort>? CompactGidMap { get; set; }
-
-    public Fonts.ReverseFont? Extraction { get; set; }
-}
-
-internal sealed class GeneratedImage
-{
-    public required string Key { get; init; }
-
-    public required ImageXObject Image { get; init; }
-}
-
-internal sealed class GeneratedLink
-{
-    public required double X1 { get; init; }
-
-    public required double Y1 { get; init; }
-
-    public required double X2 { get; init; }
-
-    public required double Y2 { get; init; }
-
-    public string? Uri { get; init; }
-
-    public string? Destination { get; init; }
-
-    public StructureElement? Element { get; init; }
-}
-
-internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
-
-internal sealed class GeneratedExtGState
-{
-    public required string Key { get; init; }
-
-    public required double FillAlpha { get; init; }
-
-    public required double StrokeAlpha { get; init; }
-
-    public BlendMode? Blend { get; init; }
-
-    public GeneratedSoftMask? SoftMask { get; init; }
-
-    public bool ClearSoftMask { get; init; }
-}
-
-internal sealed class GeneratedPattern
-{
-    public required string Key { get; init; }
-
-    public required DictionaryObject Pattern { get; init; }
-}
-
-internal sealed class GeneratedPage
-{
-    public required byte[] Content { get; init; }
-
-    public required IReadOnlyList<GeneratedFont> Fonts { get; init; }
-
-    public required IReadOnlyList<GeneratedImage> Images { get; init; }
-
-    public IReadOnlyList<GeneratedLink> Links { get; init; } = [];
-
-    public IReadOnlyList<GeneratedExtGState> ExtGStates { get; init; } = [];
-
-    public IReadOnlyList<GeneratedPattern> Patterns { get; init; } = [];
-}
 
 internal sealed class DocumentGenerator
 {
@@ -131,9 +48,6 @@ internal sealed class DocumentGenerator
             imageStore,
             laidOut.Fonts.AllowUnsupportedCharacters);
     }
-
-    public static PortableDocument Generate(Document document, RenderRequest request)
-        => new DocumentGenerator(request, DocumentLayouter.Layout(document)).Run();
 
     internal static PortableDocument Generate(RenderRequest request, LaidOutDocument laidOut)
         => new DocumentGenerator(request, laidOut).Run();
@@ -191,25 +105,16 @@ internal sealed class DocumentGenerator
             plans.Add(GeneratePage(paginated[i]));
         }
 
-        foreach (var font in fontResolver.AllFonts)
-        {
-            if (font.Sfnt is { } sfnt)
-            {
-                font.CompactGidMap = Fonts.CompactGidMap.Build(sfnt, font.GidToUnicode.Keys);
-            }
-        }
-
-        var generatedPages = new List<GeneratedPage>(plans.Count);
-        var extractionFonts = new List<IReadOnlyDictionary<string, Fonts.ReverseFont>>(plans.Count);
+        var fontPlans = fontResolver.Plan();
+        var pages = ImmutableArray.CreateBuilder<PageEmissionPlan>(plans.Count);
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
-            var plan = plans[pageIndex];
-            var generated = new PageContentFinalizer(structureTree, markArtifacts).Finalize(plan, pageIndex);
-            generatedPages.Add(generated);
-            extractionFonts.Add(BuildExtractionFonts(generated));
+            pages.Add(new PageContentFinalizer(structureTree, markArtifacts)
+                .Finalize(plans[pageIndex], pageIndex, fontPlans));
         }
 
-        var anchors = new Dictionary<string, GeneratedAnchor>(System.StringComparer.Ordinal);
+        var emissionPages = pages.MoveToImmutable();
+        var anchors = ImmutableDictionary.CreateBuilder<string, EmissionAnchor>(System.StringComparer.Ordinal);
         for (var pageIndex = 0; pageIndex < paginated.Length; pageIndex++)
         {
             var pageHeight = paginated[pageIndex].Size.Height.Point;
@@ -217,27 +122,28 @@ internal sealed class DocumentGenerator
             {
                 if (!anchors.ContainsKey(anchor.Name))
                 {
-                    anchors[anchor.Name] = new GeneratedAnchor(
-                        pageIndex,
-                        PageSpace.FromTop(pageHeight, anchor.Top));
+                    anchors.Add(
+                        anchor.Name,
+                        new EmissionAnchor(emissionPages[pageIndex], PageSpace.FromTop(pageHeight, anchor.Top)));
                 }
             }
         }
 
-        var emission = new EmissionPlanBuilder().Build(
-            generatedPages,
-            structureTree.DocumentElement,
-            anchors,
-            request.RoleMap);
-        output.EmissionPlan = emission;
+        output.EmissionPlan = new DocumentEmissionPlan(
+            emissionPages,
+            StructureTreeBuilder.Capture(structureTree.DocumentElement, emissionPages),
+            anchors.ToImmutable(),
+            [.. request.RoleMap.Entries]);
+
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
+            var emissionPage = emissionPages[pageIndex];
             var page = new Page(plans[pageIndex].Size.Width, plans[pageIndex].Size.Height)
             {
-                Generated = emission.Pages[pageIndex],
+                EmissionIdentity = emissionPage,
             };
-            page.SetLoadedContent(emission.Pages[pageIndex].Content.ToArray());
-            page.SetTextFonts(extractionFonts[pageIndex]);
+            page.SetLoadedContent(emissionPage.ContentArray);
+            page.SetTextFonts(GeneratorFontResolver.ExtractionFonts(emissionPage));
             output.Pages.Insert(output.Pages.Count, page);
         }
 
@@ -271,16 +177,14 @@ internal sealed class DocumentGenerator
 
         foreach (var link in page.Links)
         {
-            plan.Links.Add(new GeneratedLink
-            {
-                X1 = link.Left,
-                Y1 = PageSpace.FromTop(height, link.Bottom),
-                X2 = link.Right,
-                Y2 = PageSpace.FromTop(height, link.Top),
-                Uri = link.Uri,
-                Destination = link.Anchor,
-                Element = structureTree.LinkElementOf(link.Source),
-            });
+            plan.Links.Add(new EmissionLink(
+                link.Left,
+                PageSpace.FromTop(height, link.Bottom),
+                link.Right,
+                PageSpace.FromTop(height, link.Top),
+                link.Uri,
+                link.Anchor,
+                structureTree.LinkElementOf(link.Source)?.Id));
         }
 
         if (page.Watermark is not null)
