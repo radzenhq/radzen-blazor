@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,31 +14,31 @@ internal static class BuildTestSupport
     public const string Latin = "Liberation Sans";
     public const string Cjk = "Noto Sans SC";
 
-    public static void RegisterLatin(DocumentBuilder builder)
-        => builder.Fonts.Register(Latin, new MemoryStream(
+    public static void RegisterLatin(Radzen.Documents.Document document)
+        => document.Fonts.Register(Latin, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
 
-    public static void RegisterCjk(DocumentBuilder builder)
-        => builder.Fonts.Register(Cjk, new MemoryStream(
+    public static void RegisterCjk(Radzen.Documents.Document document)
+        => document.Fonts.Register(Cjk, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf")));
 
     public static Paragraph AddText(Section section, string text, string family, double size = 12)
     {
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = family;
+        run.Font.Family = family;
         run.Font.Size = size;
         return section.Blocks.Add(paragraph);
     }
 
-    public static Document Reload(DocumentBuilder builder)
+    public static Document Reload(Radzen.Documents.Document document, DocumentRenderer? renderer = null)
     {
-        using var buffer = new MemoryStream(builder.ToArray());
+        using var buffer = new MemoryStream((renderer ?? new DocumentRenderer()).ToArray(document));
         return Document.LoadFromStream(buffer);
     }
 
-    public static DocumentReader Read(DocumentBuilder builder)
-        => DocumentReader.Parse(builder.ToArray());
+    public static DocumentReader Read(Radzen.Documents.Document document, DocumentRenderer? renderer = null)
+        => DocumentReader.Parse((renderer ?? new DocumentRenderer()).ToArray(document));
 
     public static List<(DictionaryObject Page, DictionaryObject? Resources)> PageLeaves(DocumentReader reader)
         => PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false);

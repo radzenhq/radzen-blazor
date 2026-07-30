@@ -6,6 +6,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,31 +16,31 @@ public class SyntheticItalicTests
     private const string Family = "Liberation Sans";
     private const double Size = 20;
 
-    private static DocumentBuilder Author(bool registerItalicFace, bool bold = false)
+    private static Document Author(bool registerItalicFace, bool bold = false)
     {
-        var builder = new DocumentBuilder();
-        builder.Fonts.Register(Family, new MemoryStream(
+        var document = new Document();
+        document.Fonts.Register(Family, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
         if (registerItalicFace)
         {
-            builder.Fonts.Register(Family, new MemoryStream(
+            document.Fonts.Register(Family, new MemoryStream(
                 PdfTestResources.ReadAllBytes("Fonts/LiberationSans-BoldItalic.ttf")), bold: false, italic: true);
         }
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var lead = paragraph.Inlines.Add("Upright ");
-        lead.Font.Name = Family;
+        lead.Font.Family = Family;
         lead.Font.Size = Size;
         var slanted = paragraph.Inlines.Add("Slanted");
-        slanted.Font.Name = Family;
+        slanted.Font.Family = Family;
         slanted.Font.Size = Size;
         slanted.Font.Italic = true;
         slanted.Font.Bold = bold;
         var tail = paragraph.Inlines.Add(" tail");
-        tail.Font.Name = Family;
+        tail.Font.Family = Family;
         tail.Font.Size = Size;
-        return builder;
+        return document;
     }
 
     private static List<double[]> TextMatrices(string content)
@@ -130,11 +132,11 @@ public class SyntheticItalicTests
     [Fact]
     public void SyntheticItalic_TextRemainsExtractable()
     {
-        var builder = Author(registerItalicFace: false);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(registerItalicFace: false);
+        var content = CascadeTestSupport.FirstPageContent(document);
         Assert.Contains(TextMatrices(content), IsSheared);
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("Upright", text, StringComparison.Ordinal);
         Assert.Contains("Slanted", text, StringComparison.Ordinal);
     }

@@ -7,10 +7,11 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

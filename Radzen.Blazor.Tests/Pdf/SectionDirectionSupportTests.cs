@@ -1,6 +1,8 @@
 using System;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,24 +13,24 @@ public class SectionDirectionSupportTests
     [Fact]
     public void DefaultSection_Builds()
     {
-        var builder = new DocumentBuilder();
-        builder.Sections.Add();
-        Assert.NotEmpty(builder.ToArray());
+        var document = new Document();
+        document.Sections.Add();
+        Assert.NotEmpty(new DocumentRenderer().ToArray(document));
     }
 
     [Fact]
     public void RightToLeftDirection_ThrowsOnBuild()
     {
-        var builder = new DocumentBuilder();
-        builder.Sections.Add().Direction = FlowDirection.RightToLeft;
-        Assert.Throws<NotSupportedException>(() => builder.ToArray());
+        var document = new Document();
+        document.Sections.Add().Direction = FlowDirection.RightToLeft;
+        Assert.Throws<NotSupportedException>(() => new DocumentRenderer().ToArray(document));
     }
 
     [Fact]
     public void VerticalWritingMode_ThrowsOnBuild()
     {
-        var builder = new DocumentBuilder();
-        builder.Sections.Add().WritingMode = WritingMode.VerticalRightToLeft;
-        Assert.Throws<NotSupportedException>(() => builder.ToArray());
+        var document = new Document();
+        document.Sections.Add().WritingMode = WritingMode.VerticalRightToLeft;
+        Assert.Throws<NotSupportedException>(() => new DocumentRenderer().ToArray(document));
     }
 }

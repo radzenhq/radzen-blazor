@@ -5,6 +5,8 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

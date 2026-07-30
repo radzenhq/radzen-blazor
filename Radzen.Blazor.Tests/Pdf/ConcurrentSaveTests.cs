@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,18 +15,18 @@ public class ConcurrentSaveTests
 {
     private const string Heading = "Heading";
 
-    private static DocumentBuilder Author()
+    private static Document Author()
     {
-        var builder = new DocumentBuilder();
+        var document = new Document();
 
-        var heading = builder.Styles.Add(Heading);
+        var heading = document.Styles.Add(Heading);
         heading.Alignment = HorizontalAlignment.Center;
         heading.Font.Size = 18;
         heading.Font.Bold = true;
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(2000));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
 
         for (var i = 0; i < 30; i++)
         {
@@ -37,14 +39,14 @@ public class ConcurrentSaveTests
         list.AddItem("first list item");
         list.AddItem("second list item");
 
-        return builder;
+        return document;
     }
 
     [Fact]
     public void ConcurrentSavesProduceByteIdenticalOutput()
     {
-        var builder = Author();
-        var reference = builder.ToArray();
+        var document = Author();
+        var reference = new DocumentRenderer().ToArray(document);
 
         const int threads = 8;
         const int rounds = 60;
@@ -56,7 +58,7 @@ public class ConcurrentSaveTests
             start.SignalAndWait();
             for (var round = 0; round < rounds; round++)
             {
-                var output = builder.ToArray();
+                var output = new DocumentRenderer().ToArray(document);
                 if (!output.AsSpan().SequenceEqual(reference))
                 {
                     mismatches.Add(round);
@@ -72,18 +74,18 @@ public class ConcurrentSaveTests
     [Fact]
     public void SingleSaveRendersStyleCenterAlignmentAndStyledAndListFonts()
     {
-        var referenceBuilder = new DocumentBuilder();
+        var referenceBuilder = new Document();
         var referenceSection = referenceBuilder.Sections.Add();
         referenceSection.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(2000));
-        referenceSection.Margin = Unit.FromPoint(40);
+        referenceSection.Margins.SetAll(Unit.FromPoint(40));
         var centered = referenceSection.Blocks.AddParagraph("Centered heading number 0");
         centered.Alignment = HorizontalAlignment.Center;
         centered.Font.Size = 18;
         centered.Font.Bold = true;
         var expectedX = CascadeTestSupport.TdPositions(CascadeTestSupport.FirstPageContent(referenceBuilder))[0].X;
 
-        var builder = Author();
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author();
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         var positions = CascadeTestSupport.TdPositions(content);
         Assert.Contains(positions, p => Math.Abs(p.X - expectedX) < 1);

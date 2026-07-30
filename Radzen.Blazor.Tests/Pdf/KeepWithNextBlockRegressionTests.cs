@@ -5,6 +5,10 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class KeepWithNextBlockRegressionTests
@@ -30,9 +34,9 @@ public class KeepWithNextBlockRegressionTests
         return paragraph;
     }
 
-    private static string PageContent(DocumentBuilder builder, int index, out int pageCount)
+    private static string PageContent(Document document, int index, out int pageCount)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         pageCount = leaves.Count;
         return Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[index].Page));
@@ -41,12 +45,12 @@ public class KeepWithNextBlockRegressionTests
     private static bool Shows(string content, string text)
         => Regex.IsMatch(content, Regex.Escape("(" + text + ")") + @"\s*Tj");
 
-    private static (DocumentBuilder Builder, Section Section) AuthorNearlyFullPage()
+    private static (Document Builder, Section Section) AuthorNearlyFullPage()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
-        section.Margin = Unit.FromPoint(Margin);
+        section.Margins.SetAll(Unit.FromPoint(Margin));
 
         var lineHeight = LineHeight(BodyFontSize);
         var contentHeight = PageHeight - 2 * Margin;
@@ -56,13 +60,13 @@ public class KeepWithNextBlockRegressionTests
             section.Blocks.Add(Text($"Filler{i}", BodyFontSize));
         }
 
-        return (builder, section);
+        return (document, section);
     }
 
     [Fact]
     public void KeepWithNext_BeforeTable_MovesHeadingWithTable()
     {
-        var (builder, section) = AuthorNearlyFullPage();
+        var (document, section) = AuthorNearlyFullPage();
 
         var heading = Text("LineItemsHeading", BodyFontSize);
         heading.KeepWithNext = true;
@@ -75,9 +79,9 @@ public class KeepWithNextBlockRegressionTests
         var run = cellParagraph.Inlines.Add("TallCellText");
         run.Font.Size = 30;
 
-        var page1 = PageContent(builder, 0, out var pageCount);
+        var page1 = PageContent(document, 0, out var pageCount);
         Assert.Equal(2, pageCount);
-        var page2 = PageContent(builder, 1, out _);
+        var page2 = PageContent(document, 1, out _);
 
         Assert.True(Shows(page1, "Filler0"), "fixture: filler text renders on page 1");
         Assert.True(Shows(page2, "TallCellText"), "fixture: the table row must break to page 2");
@@ -92,7 +96,7 @@ public class KeepWithNextBlockRegressionTests
     [Fact]
     public void KeepWithNext_BeforeTableWithHeaderRow_KeepsHeadingWithHeaderAndFirstRow()
     {
-        var (builder, section) = AuthorNearlyFullPage();
+        var (document, section) = AuthorNearlyFullPage();
 
         var heading = Text("TableCaption", BodyFontSize);
         heading.KeepWithNext = true;
@@ -101,14 +105,14 @@ public class KeepWithNextBlockRegressionTests
         var table = section.Blocks.AddTable();
         table.Columns.Add().Width = Unit.FromPoint(200);
         var headerRow = table.Rows.Add();
-        headerRow.IsHeader = true;
+        headerRow.RepeatOnEveryPage = true;
         headerRow.Cells[0].Blocks.AddParagraph().Inlines.Add("ColumnHead");
         var bodyRow = table.Rows.Add();
         bodyRow.Cells[0].Blocks.AddParagraph().Inlines.Add("FirstBodyRow");
 
-        var page1 = PageContent(builder, 0, out var pageCount);
+        var page1 = PageContent(document, 0, out var pageCount);
         Assert.Equal(2, pageCount);
-        var page2 = PageContent(builder, 1, out _);
+        var page2 = PageContent(document, 1, out _);
 
         Assert.True(
             Shows(page2, "ColumnHead") && Shows(page2, "FirstBodyRow"),
@@ -122,7 +126,7 @@ public class KeepWithNextBlockRegressionTests
     [Fact]
     public void KeepWithNext_BeforeImage_MovesHeadingWithImage()
     {
-        var (builder, section) = AuthorNearlyFullPage();
+        var (document, section) = AuthorNearlyFullPage();
 
         var heading = Text("FigureHeading", BodyFontSize);
         heading.KeepWithNext = true;
@@ -132,9 +136,9 @@ public class KeepWithNextBlockRegressionTests
         image.Width = Unit.FromPoint(60);
         image.Height = Unit.FromPoint(60);
 
-        var page1 = PageContent(builder, 0, out var pageCount);
+        var page1 = PageContent(document, 0, out var pageCount);
         Assert.Equal(2, pageCount);
-        var page2 = PageContent(builder, 1, out _);
+        var page2 = PageContent(document, 1, out _);
 
         Assert.False(
             Regex.IsMatch(page1, @"/\w+\s+Do\b"),

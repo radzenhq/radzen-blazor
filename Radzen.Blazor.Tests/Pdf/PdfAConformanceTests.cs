@@ -6,43 +6,49 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfAConformanceTests
 {
     private const string MissingApi =
-        "DocumentBuilder.Conformance (enum PdfAConformance) is missing - P2 PDF/A conformance mode is not implemented";
+        "DocumentRenderer.Conformance (enum PdfAConformance) is missing - P2 PDF/A conformance mode is not implemented";
 
     private static PropertyInfo? ConformanceProperty()
-        => typeof(DocumentBuilder).GetProperty("Conformance");
+        => typeof(DocumentRenderer).GetProperty("Conformance");
 
-    private static void SetConformance(DocumentBuilder builder, string name)
+    private static void SetConformance(DocumentRenderer renderer, string name)
     {
         var property = ConformanceProperty();
         Assert.True(property is not null && property.PropertyType.IsEnum && property.CanWrite, MissingApi);
         Assert.True(Enum.GetNames(property!.PropertyType).Contains(name),
             $"PdfAConformance is missing the '{name}' value");
-        property.SetValue(builder, Enum.Parse(property.PropertyType, name));
+        property.SetValue(renderer, Enum.Parse(property.PropertyType, name));
     }
 
-    private static DocumentBuilder Author(string conformance)
+    private static (Document Document, DocumentRenderer Renderer) Author(string conformance)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        var renderer = new DocumentRenderer();
+        BuildTestSupport.RegisterLatin(document);
 
-        builder.Info.Title = "PDF/A Invoice";
-        builder.Info.Author = "Radzen Ltd";
-        builder.Info.Subject = "Conformance fixture";
-        builder.Info.Creator = "Radzen.Documents.Pdf tests";
-        builder.Info.Keywords = "pdfa, invoice";
+        document.Info.Title = "PDF/A Invoice";
+        document.Info.Author = "Radzen Ltd";
+        document.Info.Subject = "Conformance fixture";
+        document.Info.Creator = "Radzen.Documents.Pdf tests";
+        document.Info.Keywords = "pdfa, invoice";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello PDF/A", BuildTestSupport.Latin);
 
-        SetConformance(builder, conformance);
-        return builder;
+        SetConformance(renderer, conformance);
+        return (document, renderer);
     }
+
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
 
     private static DictionaryObject Catalog(DocumentReader reader)
     {
@@ -67,7 +73,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_MetadataStream_HasPdfaidPart3ConformanceB()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3B"));
+        var reader = ReadAuthored(Author("PdfA3B"));
 
         var metadata = MetadataStream(reader);
         Assert.Equal("Metadata", BuildTestSupport.Name(reader, metadata.Dictionary, "Type"));
@@ -83,7 +89,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3A_MetadataStream_HasConformanceA()
     {
-        var packet = MetadataPacket(BuildTestSupport.Read(Author("PdfA3A")));
+        var packet = MetadataPacket(ReadAuthored(Author("PdfA3A")));
         Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:conformance>A</pdfaid:conformance>", packet, StringComparison.Ordinal);
     }
@@ -91,7 +97,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_Xmp_MatchesDocumentInfo()
     {
-        var packet = MetadataPacket(BuildTestSupport.Read(Author("PdfA3B")));
+        var packet = MetadataPacket(ReadAuthored(Author("PdfA3B")));
 
         Assert.Contains("<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">PDF/A Invoice</rdf:li>", packet, StringComparison.Ordinal);
         Assert.Contains("<dc:creator><rdf:Seq><rdf:li>Radzen Ltd</rdf:li>", packet, StringComparison.Ordinal);
@@ -104,7 +110,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_OutputIntents_SrgbGtsPdfa1WithIccProfile()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3B"));
+        var reader = ReadAuthored(Author("PdfA3B"));
 
         var catalog = Catalog(reader);
         Assert.True(catalog.TryGetValue("OutputIntents", out var intentsObject), "catalog has /OutputIntents");
@@ -126,7 +132,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_Trailer_HasDocumentId()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3B"));
+        var reader = ReadAuthored(Author("PdfA3B"));
 
         Assert.True(reader.Trailer.TryGetValue("ID", out var idObject), "trailer has /ID");
         var id = Assert.IsType<ArrayObject>(reader.Resolve(idObject!));
@@ -141,7 +147,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_HasNoEncryption()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3B"));
+        var reader = ReadAuthored(Author("PdfA3B"));
         Assert.False(reader.Trailer.ContainsKey("Encrypt"), "PDF/A forbids /Encrypt");
         Assert.False(reader.IsEncrypted);
     }
@@ -149,7 +155,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_AllFonts_EmbeddedSubsetsWithCidSet()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3B"));
+        var reader = ReadAuthored(Author("PdfA3B"));
 
         var fonts = BuildTestSupport.Fonts(reader);
         Assert.NotEmpty(fonts);
@@ -173,12 +179,13 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_Base14FontByName_ThrowsActionable()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello", "Helvetica");
-        SetConformance(builder, "PdfA3B");
+        var renderer = new DocumentRenderer();
+        SetConformance(renderer, "PdfA3B");
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.True(exception is not null, "base-14 font by name must throw under PDF/A");
         Assert.Contains("PDF/A", exception!.Message, StringComparison.Ordinal);
@@ -188,17 +195,17 @@ public class PdfAConformanceTests
     [Fact]
     public void None_Base14FontByName_Succeeds()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello", "Helvetica");
 
-        Assert.NotEmpty(builder.ToArray());
+        Assert.NotEmpty(new DocumentRenderer().ToArray(document));
     }
 
     [Fact]
     public void PdfA3A_OutputIsTagged()
     {
-        var reader = BuildTestSupport.Read(Author("PdfA3A"));
+        var reader = ReadAuthored(Author("PdfA3A"));
         var catalog = Catalog(reader);
 
         Assert.True(catalog.TryGetValue("MarkInfo", out var markInfoObject), "Level A requires /MarkInfo");
@@ -213,12 +220,12 @@ public class PdfAConformanceTests
     [Fact]
     public void None_ProducesNoPdfaMachinery()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Plain", BuildTestSupport.Latin);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var catalog = Catalog(reader);
 
         Assert.False(catalog.ContainsKey("OutputIntents"), "no /OutputIntents without conformance");
@@ -232,7 +239,8 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_ContentSurvives_ExtractText()
     {
-        var document = BuildTestSupport.Reload(Author("PdfA3B"));
+        var authored = Author("PdfA3B");
+        var document = BuildTestSupport.Reload(authored.Document, authored.Renderer);
         Assert.Contains("Hello PDF/A", document.Pages[0].ExtractText(), StringComparison.Ordinal);
     }
 }

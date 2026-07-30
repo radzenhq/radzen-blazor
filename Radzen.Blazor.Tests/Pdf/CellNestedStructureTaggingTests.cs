@@ -3,18 +3,21 @@ using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class CellNestedStructureTaggingTests
 {
-    private static DocumentBuilder AuthorTableWithCellImage(bool alternateText)
+    private static (Document Document, DocumentRenderer Renderer) AuthorTableWithCellImage(bool alternateText)
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        builder.Info.Title = "Cell image";
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Cell image";
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
@@ -24,11 +27,12 @@ public class CellNestedStructureTaggingTests
             image.AlternateText = "A red square";
         }
 
-        return builder;
+        return (document, builderRenderer);
     }
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static List<ContentOperation> Ops((Document Document, DocumentRenderer Renderer) authored)
+        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(
+            BuildTestSupport.Read(authored.Document, authored.Renderer), 0));
 
     private static HashSet<string> TagsWrappingText(List<ContentOperation> ops)
     {
@@ -95,34 +99,34 @@ public class CellNestedStructureTaggingTests
     [Fact]
     public void PdfUA_CellImageWithoutAltText_IsRejected()
     {
-        var builder = AuthorTableWithCellImage(alternateText: false);
-        var ex = Assert.Throws<InvalidOperationException>(() => builder.ToArray());
+        var (document, builderRenderer) = AuthorTableWithCellImage(alternateText: false);
+        var ex = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
         Assert.Contains("Figure", ex.Message);
     }
 
     [Fact]
     public void PdfUA_CellImageWithAltText_TaggedAsFigure()
     {
-        var builder = AuthorTableWithCellImage(alternateText: true);
-        Assert.Contains("Figure", TagsWrappingImages(Ops(builder)));
+        Assert.Contains("Figure", TagsWrappingImages(Ops(AuthorTableWithCellImage(alternateText: true))));
     }
 
     [Fact]
     public void PdfUA_CellListContent_IsTagged()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        builder.Info.Title = "Cell list";
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Cell list";
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
         var list = row.Cells[0].Blocks.AddList();
         var item = list.AddItem();
-        item.Font.Name = BuildTestSupport.Latin;
-        item.Inlines.Add("One").Font.Name = BuildTestSupport.Latin;
+        item.Font.Family = BuildTestSupport.Latin;
+        item.Inlines.Add("One").Font.Family = BuildTestSupport.Latin;
 
-        Assert.Contains("LBody", TagsWrappingText(Ops(builder)));
+        Assert.Contains("P", TagsWrappingText(Ops((document, builderRenderer))));
     }
 }

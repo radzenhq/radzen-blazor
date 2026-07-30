@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Document = Radzen.Documents.Document;
+
+using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Codes;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,22 +20,28 @@ public class ModelReentrancyTests
     private const string Heading = "Heading";
     private const string CellStyle = "CellHeading";
 
-    private static DocumentBuilder Author()
-    {
-        var builder = new DocumentBuilder();
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
 
-        var heading = builder.Styles.Add(Heading);
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static Document Author()
+    {
+        var document = new Document();
+
+        var heading = document.Styles.Add(Heading);
         heading.Alignment = HorizontalAlignment.Center;
         heading.Font.Size = 18;
         heading.Font.Bold = true;
 
-        var cellHeading = builder.Styles.Add(CellStyle);
+        var cellHeading = document.Styles.Add(CellStyle);
         cellHeading.Alignment = HorizontalAlignment.Right;
         cellHeading.Font.Size = 12;
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(2000));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
 
         for (var i = 0; i < 10; i++)
         {
@@ -60,38 +70,40 @@ public class ModelReentrancyTests
         var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "REENTRANT-1", Unit.FromPoint(160), Unit.FromPoint(40), showText: true);
         barcode.Font.Size = 9;
 
-        return builder;
+        return document;
     }
 
-    private static DocumentBuilder AuthorTaggedList()
+    private static (Document Document, DocumentRenderer Renderer) AuthorTaggedList()
     {
-        var builder = new DocumentBuilder { PdfUA = true };
-        builder.Info.Title = "Tagged";
-        builder.Language = "en-US";
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Tagged";
+        document.Language = "en-US";
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(800));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
 
         var list = section.Blocks.AddList(ListStyle.Bullet);
-        list.Font.Name = BuildTestSupport.Latin;
+        list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("first tagged item");
         var second = list.AddItem("second tagged item");
         var nested = second.AddList(ListStyle.Number);
-        nested.Font.Name = BuildTestSupport.Latin;
+        nested.Font.Family = BuildTestSupport.Latin;
         nested.AddItem("nested tagged one");
         nested.AddItem("nested tagged two");
 
-        return builder;
+        return (document, builderRenderer);
     }
 
     [Fact]
     public void GeneratingTwiceIsByteIdentical()
     {
-        var builder = Author();
-        var first = builder.ToArray();
-        var second = builder.ToArray();
-        var third = builder.ToArray();
+        var document = Author();
+        var builderRenderer = new DocumentRenderer();
+        var first = builderRenderer.ToArray(document);
+        var second = builderRenderer.ToArray(document);
+        var third = builderRenderer.ToArray(document);
 
         Assert.True(first.AsSpan().SequenceEqual(second), "second generation diverged from the first");
         Assert.True(first.AsSpan().SequenceEqual(third), "third generation diverged from the first");
@@ -101,21 +113,22 @@ public class ModelReentrancyTests
     public void GeneratingLeavesNoOutputAffectingScratch()
     {
         var used = Author();
-        _ = used.ToArray();
-        var afterUse = used.ToArray();
+        _ = new DocumentRenderer().ToArray(used);
+        var afterUse = new DocumentRenderer().ToArray(used);
 
         var fresh = Author();
-        var freshFirst = fresh.ToArray();
+        var freshFirst = new DocumentRenderer().ToArray(fresh);
 
         Assert.True(afterUse.AsSpan().SequenceEqual(freshFirst),
-            "a generated builder diverged from a fresh equivalent - generation left scratch behind");
+            "a generated document diverged from a fresh equivalent - generation left scratch behind");
     }
 
     [Fact]
     public void ConcurrentGenerationFromTwoThreadsIsByteIdentical()
     {
-        var builder = Author();
-        var reference = builder.ToArray();
+        var document = Author();
+        var builderRenderer = new DocumentRenderer();
+        var reference = builderRenderer.ToArray(document);
 
         const int threads = 2;
         const int rounds = 40;
@@ -127,7 +140,7 @@ public class ModelReentrancyTests
             start.SignalAndWait();
             for (var round = 0; round < rounds; round++)
             {
-                if (!builder.ToArray().AsSpan().SequenceEqual(reference))
+                if (!builderRenderer.ToArray(document).AsSpan().SequenceEqual(reference))
                 {
                     mismatches.Add(round);
                 }
@@ -142,19 +155,20 @@ public class ModelReentrancyTests
     [Fact]
     public void PublicModelStateIsUnchangedAfterGeneration()
     {
-        var builder = Author();
+        var document = Author();
+        var builderRenderer = new DocumentRenderer();
 
-        var section = builder.Sections[0];
+        var section = document.Sections[0];
         var headings = section.Blocks.OfType<Paragraph>().ToList();
         var alignmentsBefore = headings.Select(p => p.Alignment).ToList();
         var styleNamesBefore = headings.Select(p => p.StyleName).ToList();
 
-        _ = builder.ToArray();
+        _ = builderRenderer.ToArray(document);
 
         var alignmentsAfter = headings.Select(p => p.Alignment).ToList();
         var styleNamesAfter = headings.Select(p => p.StyleName).ToList();
 
-        Assert.All(alignmentsAfter, a => Assert.Equal(HorizontalAlignment.Left, a));
+        Assert.All(alignmentsAfter, Assert.Null);
         Assert.Equal(alignmentsBefore, alignmentsAfter);
         Assert.Equal(styleNamesBefore, styleNamesAfter);
     }
@@ -162,13 +176,13 @@ public class ModelReentrancyTests
     [Fact]
     public void TaggedListGeneratingTwiceIsByteIdentical()
     {
-        var builder = AuthorTaggedList();
-        var first = builder.ToArray();
-        var second = builder.ToArray();
+        var (document, builderRenderer) = AuthorTaggedList();
+        var first = builderRenderer.ToArray(document);
+        var second = builderRenderer.ToArray(document);
 
         Assert.True(first.AsSpan().SequenceEqual(second), "tagged-list second generation diverged");
 
-        var fresh = AuthorTaggedList().ToArray();
+        var fresh = RenderAuthored(AuthorTaggedList());
         Assert.True(first.AsSpan().SequenceEqual(fresh), "tagged list left scratch behind after generation");
     }
 

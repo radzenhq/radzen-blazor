@@ -2,14 +2,14 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,11 +19,11 @@ public class PdfSignerTests
 
     private static byte[] BuildPdf()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static SignatureOptions Options() => new()
@@ -35,15 +35,7 @@ public class PdfSignerTests
         SigningTime = FixedTime,
     };
 
-    private static X509Certificate2 CreateCertificate()
-    {
-        using var rsa = RSA.Create(2048);
-        var request = new CertificateRequest(
-            "CN=Radzen PDF Signing Tests", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-        return request.CreateSelfSigned(
-            new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2036, 1, 1, 0, 0, 0, TimeSpan.Zero));
-    }
+    private static TestSigningIdentity CreateCertificate() => TestSigningIdentity.Create();
 
     private sealed class DelegateSigner(Func<byte[], byte[]> sign) : ISigner
     {
@@ -59,15 +51,15 @@ public class PdfSignerTests
         }
     }
 
-    private static DelegateSigner CmsSigner(X509Certificate2 certificate)
+    private static DelegateSigner CmsSigner(TestSigningIdentity certificate)
         => new(content => Pkcs.SignDetached(certificate, content));
 
     private static class Pkcs
     {
-        public static byte[] SignDetached(X509Certificate2 certificate, byte[] content)
+        public static byte[] SignDetached(TestSigningIdentity certificate, byte[] content)
         {
             var cms = new SignedCms(new ContentInfo(content), detached: true);
-            cms.ComputeSignature(new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, certificate));
+            cms.ComputeSignature(certificate.CmsSigner());
             return cms.Encode();
         }
 

@@ -3,6 +3,8 @@ using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,11 +19,11 @@ public class DocumentSignTests
 
     private static Document BuildDocument()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static SignatureOptions Options() => new()

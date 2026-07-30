@@ -3,23 +3,34 @@ using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfAEncryptionRejectionTests
 {
-    private static DocumentBuilder Author(PdfAConformance conformance)
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        builder.Info.Title = "PDF/A Invoice";
+        document.Info.Title = "PDF/A Invoice";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello PDF/A", BuildTestSupport.Latin);
 
-        builder.Conformance = conformance;
-        return builder;
+        var builderRenderer = new DocumentRenderer();
+        builderRenderer.Conformance = conformance;
+        return (document, builderRenderer);
     }
 
     [Theory]
@@ -28,15 +39,15 @@ public class PdfAEncryptionRejectionTests
     [InlineData(PdfAConformance.PdfA4)]
     public void PdfA_WithEncryption_ThrowsActionable(PdfAConformance conformance)
     {
-        var builder = Author(conformance);
-        builder.Encryption = new EncryptionOptions
+        var (document, builderRenderer) = Author(conformance);
+        builderRenderer.Encryption = new EncryptionOptions
         {
             Material = new SeededEncryptionMaterial([7]),
             Algorithm = EncryptionAlgorithm.Aes128,
             UserPassword = "s3cret",
         };
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => builderRenderer.ToArray(document));
 
         Assert.True(exception is not null, "PDF/A output must not be encrypted");
         Assert.Contains("PDF/A forbids encryption", exception!.Message, StringComparison.Ordinal);
@@ -46,6 +57,6 @@ public class PdfAEncryptionRejectionTests
     [Fact]
     public void PdfA_WithoutEncryption_Succeeds()
     {
-        Assert.NotEmpty(Author(PdfAConformance.PdfA3B).ToArray());
+        Assert.NotEmpty(RenderAuthored(Author(PdfAConformance.PdfA3B)));
     }
 }

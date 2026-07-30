@@ -5,6 +5,8 @@ using System.Reflection;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -162,14 +164,15 @@ public class ObjectStreamRetentionTests
     [Fact]
     public void CompressedDocument_HoldsNoDecodedObjectStreamsAfterAFullGraphWalk()
     {
-        var builder = new DocumentBuilder { CompressOutput = true };
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { CompressOutput = true };
+        var section = document.Sections.Add();
         for (var i = 0; i < 2000; i++)
         {
             section.Blocks.AddParagraph($"Compressible line number {i} with repeated filler text.");
         }
 
-        var reader = DocumentReader.Parse(builder.ToArray());
+        var reader = DocumentReader.Parse(builderRenderer.ToArray(document));
         for (var number = 1; number <= reader.ObjectCount; number++)
         {
             reader.GetObject(number);

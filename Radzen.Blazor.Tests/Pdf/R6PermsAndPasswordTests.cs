@@ -5,7 +5,9 @@ using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-2 algorithm 13: /Perms is decrypted and checked against /P.

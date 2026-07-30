@@ -11,6 +11,9 @@ using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
 using Xunit;
 using Xunit.Sdk;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -218,6 +221,11 @@ public class ContentElementChangeTrackingMatrixTests
             return (double)current! + 17.25;
         }
 
+        if (type == typeof(Unit))
+        {
+            return Unit.FromPoint(((Unit)current!).Point + 17.25);
+        }
+
         if (type == typeof(string))
         {
             return (string?)current == "probe" ? "other" : "probe";
@@ -270,6 +278,16 @@ public class ContentElementChangeTrackingMatrixTests
         if (type == typeof(double))
         {
             return 19.5;
+        }
+
+        if (type == typeof(bool))
+        {
+            return true;
+        }
+
+        if (type == typeof(Color))
+        {
+            return Color.Red;
         }
 
         if (type == typeof(ReadOnlyMemory<byte>))

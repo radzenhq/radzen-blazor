@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -22,13 +23,13 @@ public class ReaderHardeningTests
     [Fact]
     public void DeeplyNestedDictionary_Throws()
     {
-        var builder = new StringBuilder();
+        var document = new StringBuilder();
         for (var i = 0; i < 5000; i++)
         {
-            builder.Append("<< /K ");
+            document.Append("<< /K ");
         }
 
-        Assert.Throws<DocumentParseException>(() => ObjectParser.Parse(Encoding.Latin1.GetBytes(builder.ToString()), 0));
+        Assert.Throws<DocumentParseException>(() => ObjectParser.Parse(Encoding.Latin1.GetBytes(document.ToString()), 0));
     }
 
     [Fact]

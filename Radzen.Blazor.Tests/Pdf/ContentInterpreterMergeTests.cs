@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentInterpreterMergeTests

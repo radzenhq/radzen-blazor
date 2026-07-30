@@ -5,18 +5,20 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class FlateWritePathTests
 {
-    private static DocumentBuilder LatinBuilder(string text)
+    private static Document LatinBuilder(string text)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Latin);
-        return builder;
+        return document;
     }
 
     private static byte[] RequireFlate(DocumentReader reader, StreamObject stream)
@@ -75,11 +77,11 @@ public class FlateWritePathTests
     [Fact]
     public void FontFile3_IsFlateEncoded_AndKeepsCidFontType0CSubtype()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterCjk(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterCjk(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "你好", BuildTestSupport.Cjk);
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
 
         var descriptor = SingleType0Descriptor(reader, out _);
         var fontFile = (StreamObject)reader.Resolve(descriptor["FontFile3"]);
@@ -123,9 +125,9 @@ public class FlateWritePathTests
     [Fact]
     public void CompressedOutput_StillRoundTripsThroughLoadAndExtractText()
     {
-        var builder = LatinBuilder("Flate round trip payload");
+        var document = LatinBuilder("Flate round trip payload");
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
 
         Assert.Contains("Flate round trip payload", text, StringComparison.Ordinal);
     }
@@ -134,10 +136,10 @@ public class FlateWritePathTests
     public void JpegXObject_KeepsDctDecodeOnly_NoDoubleCompression()
     {
         var original = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
 
         var image = Assert.Single(BuildTestSupport.ImageXObjects(reader));
         var filter = Assert.IsType<NameObject>(reader.Resolve(image.Dictionary["Filter"]));
@@ -148,10 +150,10 @@ public class FlateWritePathTests
     [Fact]
     public void PngXObject_KeepsSingleFlateFilter_NoDoubleCompression()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.png"));
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
 
         var image = Assert.Single(BuildTestSupport.ImageXObjects(reader));
         var filter = Assert.IsType<NameObject>(reader.Resolve(image.Dictionary["Filter"]));

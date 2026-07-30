@@ -1,6 +1,8 @@
 #nullable enable
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,13 +13,13 @@ public class BuildRepeatabilityTests
     {
         static byte[] Build()
         {
-            var builder = new DocumentBuilder();
-            var section = builder.Sections.Add();
+            var document = new Document();
+            var section = document.Sections.Add();
             section.Blocks.Add(FeatureEmissionTestHelpers.Text("Plain paragraph one."));
             var list = section.Blocks.AddList(ListStyle.Number);
             list.AddItem("Alpha");
             list.AddItem("Beta");
-            return builder.ToArray();
+            return new DocumentRenderer().ToArray(document);
         }
 
         Assert.Equal(Build(), Build());

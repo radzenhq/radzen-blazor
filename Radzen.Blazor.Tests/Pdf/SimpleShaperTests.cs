@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -29,7 +31,7 @@ public class SimpleShaperTests
     {
         var shaper = new SimpleShaper(LiberationSans());
         var face = SansFace();
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape("AV", font, out _);
 
@@ -49,7 +51,7 @@ public class SimpleShaperTests
     {
         var fonts = LiberationSans();
         var shaper = new SimpleShaper(fonts);
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         shaper.Shape("AV", font, out var advance);
 
@@ -60,7 +62,7 @@ public class SimpleShaperTests
     public void Shape_NoKerning_AdvanceIsSumOfGlyphAdvances()
     {
         var shaper = new SimpleShaper(LiberationSans());
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape("AV", font, out var advance);
 
@@ -74,7 +76,7 @@ public class SimpleShaperTests
     {
         var fonts = LiberationSans();
         fonts.EnableKerning = kerning;
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         foreach (var text in new[]
         {
@@ -112,7 +114,7 @@ public class SimpleShaperTests
     {
         var fonts = LiberationSans();
         fonts.EnableKerning = kerning;
-        var font = new Font { Name = "Liberation Sans", Size = size };
+        var font = new Font { Family = "Liberation Sans", Size = size };
 
         for (var i = 0; i < WidthCorpus.Length; i++)
         {
@@ -128,7 +130,7 @@ public class SimpleShaperTests
     public void Shape_UnknownFamily_ThrowsWithNameInMessage()
     {
         var shaper = new SimpleShaper(new FontCollection());
-        var font = new Font { Name = "Nonexistent Font", Size = 12 };
+        var font = new Font { Family = "Nonexistent Font", Size = 12 };
 
         var ex = Assert.Throws<InvalidOperationException>(() =>
             shaper.Shape("AV", font, out _));

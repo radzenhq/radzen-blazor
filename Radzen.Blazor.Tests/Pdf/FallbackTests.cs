@@ -3,7 +3,9 @@ using System;
 using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,7 +35,7 @@ public class FallbackTests
         var fonts = Registered();
         fonts.SetFallback("Liberation Sans", "Noto Sans SC");
         var shaper = new SimpleShaper(fonts);
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
@@ -52,7 +54,7 @@ public class FallbackTests
         var fonts = Registered();
         fonts.SetFallback("Liberation Sans", "Noto Sans SC");
         var shaper = new SimpleShaper(fonts);
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 
@@ -66,7 +68,7 @@ public class FallbackTests
     {
         var fonts = Registered();
         fonts.SetFallback("Liberation Sans", "Noto Sans SC");
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var noto = Noto();
         var expected = noto.GetAdvanceWidth(noto.GetGlyphId(Cjk)) * 12.0 / noto.UnitsPerEm;
@@ -79,7 +81,7 @@ public class FallbackTests
         var fonts = Registered();
         fonts.SetFallback("Liberation Sans", "Noto Sans SC");
         var shaper = new SimpleShaper(fonts);
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape("A", font, out _);
 
@@ -96,7 +98,7 @@ public class FallbackTests
     {
         var fonts = Registered();
         var shaper = new SimpleShaper(fonts);
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape(new[] { 'A', Cjk }, font, out _);
 

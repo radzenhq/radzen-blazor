@@ -6,6 +6,7 @@ using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

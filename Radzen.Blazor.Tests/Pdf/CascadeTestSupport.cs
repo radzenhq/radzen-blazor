@@ -5,14 +5,16 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class CascadeTestSupport
 {
-    public static string FirstPageContent(DocumentBuilder builder)
+    public static string FirstPageContent(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         return Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
     }

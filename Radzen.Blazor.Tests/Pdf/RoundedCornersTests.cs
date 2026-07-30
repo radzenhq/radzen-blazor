@@ -5,16 +5,18 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class RoundedCornersTests
 {
-    private static DocumentBuilder Builder(Action<Container>? configure = null)
+    private static Document Builder(Action<Container>? configure = null)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -22,15 +24,15 @@ public class RoundedCornersTests
         });
         var paragraph = container.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add("Panel");
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         configure?.Invoke(container);
-        return builder;
+        return document;
     }
 
-    private static string FirstPageContent(DocumentBuilder builder)
+    private static string FirstPageContent(Document document)
     {
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         return Encoding.ASCII.GetString(page.GetContent()!);
     }
 
@@ -50,13 +52,13 @@ public class RoundedCornersTests
     [Fact]
     public void RoundedFill_WithUniformBorder_EmitsTwoBezierPaths()
     {
-        var builder = Builder(container =>
+        var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
             container.Borders.Width = 1;
         });
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
 
         Assert.Equal(12, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
@@ -67,13 +69,13 @@ public class RoundedCornersTests
     [Fact]
     public void RoundedFill_PaintsUnderTheRoundedBorder()
     {
-        var builder = Builder(container =>
+        var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
             container.Borders.Width = 1;
         });
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
 
         var fill = content.IndexOf("h\nf\n", StringComparison.Ordinal);
         var stroke = content.IndexOf("h\nS\n", StringComparison.Ordinal);
@@ -84,9 +86,9 @@ public class RoundedCornersTests
     [Fact]
     public void RoundedFill_WithoutBorder_EmitsOnlyTheFillPath()
     {
-        var builder = Builder(container => container.CornerRadius = Unit.FromPoint(6));
+        var document = Builder(container => container.CornerRadius = Unit.FromPoint(6));
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
 
         Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
@@ -96,14 +98,14 @@ public class RoundedCornersTests
     [Fact]
     public void NonUniformBorder_KeepsSquareEdges_AndRoundsOnlyTheFill()
     {
-        var builder = Builder(container =>
+        var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
             container.Borders.Width = 1;
             container.Borders.Left.Width = 3;
         });
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
 
         Assert.Equal(8, Count(content, " c\n"));
         Assert.Equal(1, Count(content, "h\nf\n"));
@@ -114,13 +116,13 @@ public class RoundedCornersTests
     [Fact]
     public void CornerRadius_IsClampedToHalfTheSmallerBoxDimension()
     {
-        var builder = Builder(container =>
+        var document = Builder(container =>
         {
             container.Width = Unit.FromPoint(120);
             container.CornerRadius = Unit.FromPoint(500);
         });
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
         var (radius, width, height) = ParseRoundedFill(content);
 
         Assert.True(width > 0 && height > 0);
@@ -130,12 +132,12 @@ public class RoundedCornersTests
     [Fact]
     public void CornerRadiusZero_IsByteIdenticalToUntouched()
     {
-        var untouched = Builder(container => container.Borders.Width = 1).ToArray();
-        var zeroed = Builder(container =>
+        var untouched = new DocumentRenderer().ToArray(Builder(container => container.Borders.Width = 1));
+        var zeroed = new DocumentRenderer().ToArray(Builder(container =>
         {
             container.Borders.Width = 1;
             container.CornerRadius = Unit.FromPoint(0);
-        }).ToArray();
+        }));
 
         Assert.Equal(untouched, zeroed);
     }

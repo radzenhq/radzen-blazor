@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

@@ -2,7 +2,9 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PredictorHardeningTests

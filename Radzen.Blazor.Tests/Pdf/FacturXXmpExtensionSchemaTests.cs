@@ -7,6 +7,8 @@ using System.Xml.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -29,15 +31,16 @@ public class FacturXXmpExtensionSchemaTests
 
     private static XDocument BuildMetadata()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Invoice 42";
+        var document = new Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Invoice 42";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice body", BuildTestSupport.Latin);
-        builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, renderer);
         Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(rootObject!));
         Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
@@ -106,12 +109,13 @@ public class FacturXXmpExtensionSchemaTests
     [Fact]
     public void FacturX_Xmp_DeclaresProfileSetOnAttachment()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Invoice 42";
-        BuildTestSupport.AddText(builder.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
+        var document = new Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Invoice 42";
+        BuildTestSupport.AddText(document.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
 
-        var attachment = builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var attachment = renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
         attachment.FacturX = new FacturXProfile
         {
             DocumentType = "INVOICE",
@@ -119,7 +123,7 @@ public class FacturXXmpExtensionSchemaTests
             ConformanceLevel = "EN 16931",
         };
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, renderer);
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
         var metadata = Assert.IsType<StreamObject>(reader.Resolve(catalog["Metadata"]));
         var xmp = XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
@@ -133,15 +137,16 @@ public class FacturXXmpExtensionSchemaTests
     [Fact]
     public void FacturX_Xmp_ThrowsWhenAttachmentProfileFieldIsEmpty()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Invoice 42";
-        BuildTestSupport.AddText(builder.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
+        var document = new Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Invoice 42";
+        BuildTestSupport.AddText(document.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
 
-        var attachment = builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var attachment = renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
         attachment.FacturX = new FacturXProfile { ConformanceLevel = "" };
 
-        Assert.Throws<InvalidOperationException>(() => BuildTestSupport.Read(builder));
+        Assert.Throws<InvalidOperationException>(() => BuildTestSupport.Read(document, renderer));
     }
 
     [Fact]

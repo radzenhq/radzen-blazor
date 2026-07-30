@@ -1,6 +1,8 @@
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -8,24 +10,25 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class CompressOutputTests
 {
-    private static DocumentBuilder MakeBuilder()
+    private static Document MakeBuilder()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         for (var i = 0; i < 40; i++)
         {
             section.Blocks.AddParagraph($"Compressible line number {i} with repeated filler text.");
         }
-        return builder;
+        return document;
     }
 
     [Fact]
     public void CompressOutput_ProducesReadableFile()
     {
-        var builder = MakeBuilder();
-        builder.CompressOutput = true;
+        var document = MakeBuilder();
+        var builderRenderer = new DocumentRenderer();
+        builderRenderer.CompressOutput = true;
 
-        var bytes = builder.ToArray();
+        var bytes = builderRenderer.ToArray(document);
 
         var reader = DocumentReader.Parse(bytes);
         Assert.NotNull(reader.Resolve(reader.Trailer["Root"]!));
@@ -34,11 +37,12 @@ public class CompressOutputTests
     [Fact]
     public void CompressOutput_ShrinksOutput()
     {
-        var plain = MakeBuilder().ToArray();
+        var plain = new DocumentRenderer().ToArray(MakeBuilder());
 
+        var compressedBuilderRenderer = new DocumentRenderer();
         var compressedBuilder = MakeBuilder();
-        compressedBuilder.CompressOutput = true;
-        var compressed = compressedBuilder.ToArray();
+        compressedBuilderRenderer.CompressOutput = true;
+        var compressed = compressedBuilderRenderer.ToArray(compressedBuilder);
 
         Assert.True(compressed.Length < plain.Length,
             $"expected compressed ({compressed.Length}) < plain ({plain.Length})");
@@ -47,11 +51,12 @@ public class CompressOutputTests
     [Fact]
     public void CompressOutput_DefaultsToPlain()
     {
-        var a = MakeBuilder().ToArray();
+        var a = new DocumentRenderer().ToArray(MakeBuilder());
+var explicitFalseRenderer = new DocumentRenderer();
 
         var explicitFalse = MakeBuilder();
-        explicitFalse.CompressOutput = false;
-        var b = explicitFalse.ToArray();
+        explicitFalseRenderer.CompressOutput = false;
+        var b = explicitFalseRenderer.ToArray(explicitFalse);
 
         Assert.Equal(a.Length, b.Length);
     }

@@ -9,6 +9,9 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContainerOverlayRotationTests
@@ -28,12 +31,13 @@ public class ContainerOverlayRotationTests
         var shortText = container.Blocks.Add(PaginationSupport.Text("Short"));
         var tallText = container.Blocks.Add(PaginationSupport.Text("Tall child that wraps onto multiple lines because the box is only four hundred points wide and this text is long"));
 
-        var pages = Paginator.Paginate(section, fonts);
+        var capture = new LayoutCaptureContext();
+        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
         var page = Assert.Single(pages);
 
-        Assert.Empty(page.Tables);
-        var box = Assert.Single(page.Boxes);
-        Assert.Same(container, box.Source);
+        Assert.Empty(page.Body.Tables);
+        var box = Assert.Single(page.Body.Boxes);
+        Assert.Equal(capture.Source(container), box.Source);
         Assert.Null(box.Transform);
         Assert.Equal(0, box.Y, 6);
         Assert.Equal(0, box.Bounds.X, 6);
@@ -41,19 +45,21 @@ public class ContainerOverlayRotationTests
 
         Assert.Equal(container.Background, box.Style.Background);
 
-        var firstShort = box.Content.Lines.First(l => ReferenceEquals(l.Source, shortText));
-        var firstTall = box.Content.Lines.First(l => ReferenceEquals(l.Source, tallText));
+        var shortSource = capture.Source(shortText);
+        var tallSource = capture.Source(tallText);
+        var firstShort = box.Content.Lines.First(l => l.Source == shortSource);
+        var firstTall = box.Content.Lines.First(l => l.Source == tallSource);
         Assert.Equal(10, firstShort.X, 6);
         Assert.Equal(10, firstTall.X, 6);
         Assert.Equal(10, firstShort.Y, 6);
         Assert.Equal(firstShort.Y, firstTall.Y, 6);
 
         Assert.True(
-            box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, shortText))
-            < box.Content.Lines.ToList().FindIndex(l => ReferenceEquals(l.Source, tallText)));
+            box.Content.Lines.ToList().FindIndex(l => l.Source == shortSource)
+            < box.Content.Lines.ToList().FindIndex(l => l.Source == tallSource));
 
-        var tallHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, tallText)).Sum(l => l.Line.Height);
-        var shortHeight = box.Content.Lines.Where(l => ReferenceEquals(l.Source, shortText)).Sum(l => l.Line.Height);
+        var tallHeight = box.Content.Lines.Where(l => l.Source == tallSource).Sum(l => l.Line.Height);
+        var shortHeight = box.Content.Lines.Where(l => l.Source == shortSource).Sum(l => l.Line.Height);
         Assert.True(tallHeight > shortHeight);
         Assert.Equal(tallHeight + 20, box.Bounds.Height, 6);
     }
@@ -61,8 +67,8 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void Overlay_BuildsContentStream_BothChildrenAtSameOrigin_InDeclarationOrder()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Layout = ContainerLayout.Overlay,
@@ -72,8 +78,8 @@ public class ContainerOverlayRotationTests
         container.Blocks.AddParagraph().Inlines.Add("UNDERLAY");
         container.Blocks.AddParagraph().Inlines.Add("OVERLAY");
 
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
         Assert.Contains("re f", content);
@@ -98,7 +104,7 @@ public class ContainerOverlayRotationTests
         var inner = outer.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
         inner.Blocks.Add(PaginationSupport.Text("Nested"));
 
-        Assert.Throws<NotSupportedException>(() => Paginator.Paginate(section, fonts));
+        Assert.Throws<NotSupportedException>(() => Paginator.PaginateIsolated(section, fonts));
     }
 
 
@@ -114,28 +120,28 @@ public class ContainerOverlayRotationTests
         });
         container.Blocks.Add(PaginationSupport.Text("Tilted"));
 
-        var pages = Paginator.Paginate(section, fonts);
+        var pages = Paginator.PaginateIsolated(section, fonts);
         var page = Assert.Single(pages);
 
-        Assert.Empty(page.Tables);
-        var box = Assert.Single(page.Boxes);
+        Assert.Empty(page.Body.Tables);
+        var box = Assert.Single(page.Body.Boxes);
         Assert.True(box.Transform.HasValue, "box carries the rotation transform");
         var transform = box.Transform!.Value;
 
         var (cos, sin) = (Math.Cos(Math.PI / 6), Math.Sin(Math.PI / 6));
         Assert.Equal(cos, transform.A, 9);
-        Assert.Equal(sin, transform.B, 9);
-        Assert.Equal(-sin, transform.C, 9);
+        Assert.Equal(-sin, transform.B, 9);
+        Assert.Equal(sin, transform.C, 9);
         Assert.Equal(cos, transform.D, 9);
 
         var centerX = 100.0;
-        var centerY = 600 - box.Bounds.Height / 2;
+        var centerY = box.Bounds.Height / 2;
         var (px, py) = transform.Transform(centerX, centerY);
         Assert.Equal(centerX, px, 9);
         Assert.Equal(centerY, py, 9);
         var (qx, qy) = transform.Transform(centerX + 1, centerY);
         Assert.Equal(centerX + cos, qx, 9);
-        Assert.Equal(centerY + sin, qy, 9);
+        Assert.Equal(centerY - sin, qy, 9);
     }
 
     [Fact]
@@ -216,8 +222,8 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void RotatedContainer_WithShadow_Throws()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Width = Unit.FromPoint(200),
@@ -233,14 +239,14 @@ public class ContainerOverlayRotationTests
         });
         container.Blocks.AddParagraph().Inlines.Add("Tilted");
 
-        Assert.Throws<NotSupportedException>(() => builder.Build());
+        Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
     }
 
     [Fact]
     public void RotatedContainer_WithoutShadow_Builds()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Width = Unit.FromPoint(200),
@@ -249,16 +255,16 @@ public class ContainerOverlayRotationTests
         });
         container.Blocks.AddParagraph().Inlines.Add("Tilted");
 
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         Assert.NotNull(page.GetContent());
     }
 
     [Fact]
     public void UnrotatedContainer_WithShadow_EmitsShadow()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Width = Unit.FromPoint(200),
@@ -273,8 +279,8 @@ public class ContainerOverlayRotationTests
         });
         container.Blocks.AddParagraph().Inlines.Add("Panel");
 
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
         Assert.Contains(" gs", content);
     }
@@ -305,8 +311,8 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void PlainVerticalContainer_BuildBytes_IdenticalToPreChangeBaseline()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddParagraph().Inlines.Add("Before the box");
         var container = section.Blocks.Add(new Container
         {
@@ -318,7 +324,7 @@ public class ContainerOverlayRotationTests
         container.Blocks.AddParagraph().Inlines.Add("Second line inside");
         section.Blocks.AddParagraph().Inlines.Add("After the box");
 
-        var bytes = builder.Build().ToArray();
+        var bytes = new DocumentRenderer().Render(document).ToArray();
 
         Assert.Equal(Convert.FromBase64String(PlainContainerBaseline), bytes);
     }
@@ -348,8 +354,8 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void PlainOverlayContainer_BuildBytes_IdenticalToPreChangeBaseline()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddParagraph().Inlines.Add("Before the box");
         var container = section.Blocks.Add(new Container
         {
@@ -362,7 +368,7 @@ public class ContainerOverlayRotationTests
         container.Blocks.AddParagraph().Inlines.Add("Over");
         section.Blocks.AddParagraph().Inlines.Add("After the box");
 
-        var bytes = builder.Build().ToArray();
+        var bytes = new DocumentRenderer().Render(document).ToArray();
 
         Assert.Equal(Convert.FromBase64String(PlainOverlayBaseline), bytes);
     }
@@ -370,8 +376,8 @@ public class ContainerOverlayRotationTests
     [Fact]
     public void RoundedOverlayContainer_WithBackgroundAndBorder_RendersRoundedDecoration()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Layout = ContainerLayout.Overlay,
@@ -382,8 +388,8 @@ public class ContainerOverlayRotationTests
         container.Borders.Width = 1;
         container.Blocks.AddParagraph().Inlines.Add("Rounded overlay");
 
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
         Assert.Contains("h\nf\n", content);

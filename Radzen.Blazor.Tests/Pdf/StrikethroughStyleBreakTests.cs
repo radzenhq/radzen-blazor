@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,8 +35,8 @@ public class StrikethroughStyleBreakTests
     [Fact]
     public void AdjacentStruckRunsOfDifferentColor_EachGetOwnColoredLine()
     {
-        var builder = new DocumentBuilder();
-        var paragraph = builder.Sections.Add().Blocks.AddParagraph();
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
 
         var red = paragraph.Inlines.Add("Red ");
         red.Font.Size = Size;
@@ -46,7 +48,7 @@ public class StrikethroughStyleBreakTests
         blue.Font.Strikethrough = true;
         blue.Font.Color = Color.Blue;
 
-        var strokes = Strokes(CascadeTestSupport.FirstPageContent(builder));
+        var strokes = Strokes(CascadeTestSupport.FirstPageContent(document));
 
         Assert.Equal(2, strokes.Count);
         Assert.Contains(strokes, s => s is { R: 1, G: 0, B: 0 });
@@ -60,8 +62,8 @@ public class StrikethroughStyleBreakTests
     [Fact]
     public void AdjacentStruckRunsOfSameStyle_MergeIntoOneLine()
     {
-        var builder = new DocumentBuilder();
-        var paragraph = builder.Sections.Add().Blocks.AddParagraph();
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
         foreach (var word in new[] { "One ", "Two" })
         {
             var run = paragraph.Inlines.Add(word);
@@ -69,6 +71,6 @@ public class StrikethroughStyleBreakTests
             run.Font.Strikethrough = true;
         }
 
-        Assert.Single(Strokes(CascadeTestSupport.FirstPageContent(builder)));
+        Assert.Single(Strokes(CascadeTestSupport.FirstPageContent(document)));
     }
 }

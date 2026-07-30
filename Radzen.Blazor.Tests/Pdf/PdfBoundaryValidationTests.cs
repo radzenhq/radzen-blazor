@@ -5,9 +5,10 @@ using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Markdown;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -83,29 +84,6 @@ public class PdfBoundaryValidationTests
         Assert.Equal("1.235", Encoding.ASCII.GetString(writer.ToArray()));
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(5)]
-    [InlineData(7)]
-    public void HeadingFontSizes_WrongLength_ThrowsNamingArgument(int length)
-    {
-        var exception = Assert.Throws<ArgumentException>(
-            () => new MarkdownPdfOptions { HeadingFontSizes = new double[length] });
-
-        Assert.Equal("value", exception.ParamName);
-        Assert.Contains("exactly 6 entries", exception.Message);
-    }
-
-    [Fact]
-    public void HeadingFontSizes_SixEntries_Accepted()
-    {
-        var options = new MarkdownPdfOptions { HeadingFontSizes = [30, 20, 15, 12, 10, 8] };
-
-        MarkdownPdf.Render(new BlockCollection(), "# Title", options);
-
-        Assert.Equal(30, options.HeadingFontSizes[0]);
-    }
-
     [Fact]
     public void Register_StreamShorterThanItsLength_Throws()
     {
@@ -124,7 +102,7 @@ public class PdfBoundaryValidationTests
 
         fonts.Register("Honest", new LyingLengthStream(real, claimedLength: real.Length));
 
-        Assert.True(fonts.MeasureText("Hi", new Font { Name = "Honest", Size = 12 }) > 0);
+        Assert.True(fonts.MeasureText("Hi", new Font { Family = "Honest", Size = 12 }) > 0);
     }
 
     // ISO 32000-1 7.4.2: ASCIIHexDecode '>' EOD, but stream /Length bounds the data;

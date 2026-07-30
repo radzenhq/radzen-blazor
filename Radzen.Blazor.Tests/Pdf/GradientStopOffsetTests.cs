@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 7.10.3 (stitching functions): each adjacent stop pair interpolates over its own offset sub-range; endpoints stay constant outside [first, last].

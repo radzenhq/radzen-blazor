@@ -3,6 +3,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,14 +14,15 @@ public class EncryptionPublicApiTests
 {
     private static byte[] BuildEncrypted(EncryptionOptions options)
     {
-        var builder = new DocumentBuilder { Encryption = options };
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Encryption = options };
+        var section = document.Sections.Add();
         section.Blocks.AddParagraph("Hello encrypted world");
-        return builder.ToArray();
+        return builderRenderer.ToArray(document);
     }
 
     [Fact]
-    public void DocumentBuilderEncryption_ProducesPasswordProtectedFile()
+    public void DocumentEncryption_ProducesPasswordProtectedFile()
     {
         var bytes = BuildEncrypted(new EncryptionOptions
         {
@@ -34,7 +37,7 @@ public class EncryptionPublicApiTests
     }
 
     [Fact]
-    public void DocumentBuilderEncryption_WrongPassword_Throws()
+    public void DocumentEncryption_WrongPassword_Throws()
     {
         var bytes = BuildEncrypted(new EncryptionOptions
         {
@@ -49,14 +52,15 @@ public class EncryptionPublicApiTests
     [Fact]
     public void NoEncryption_ByteIdenticalToPlainBuild()
     {
-        var plain = new DocumentBuilder();
+        var plain = new Document();
         plain.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
 
-        var withNull = new DocumentBuilder { Encryption = null };
+        var withNull = new Document();
+        var withNullRenderer = new DocumentRenderer { Encryption = null };
         withNull.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
 
-        var a = plain.ToArray();
-        var b = withNull.ToArray();
+        var a = new DocumentRenderer().ToArray(plain);
+        var b = withNullRenderer.ToArray(withNull);
         Assert.Equal(a.Length, b.Length);
     }
 }

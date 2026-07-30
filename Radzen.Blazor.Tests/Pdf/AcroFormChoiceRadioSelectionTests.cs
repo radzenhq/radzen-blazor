@@ -5,6 +5,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,10 +14,10 @@ public class AcroFormChoiceRadioSelectionTests
 {
     private static Document BuildLoadedForm()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Survey", "Helvetica");
-        var document = builder.Build();
+        var pdf = new DocumentRenderer().Render(document);
 
         var combo = new ChoiceFieldDefinition("Country")
         {
@@ -24,7 +26,7 @@ public class AcroFormChoiceRadioSelectionTests
         combo.Options.Add("Bulgaria");
         combo.Options.Add("Germany");
         combo.Options.Add("Spain");
-        document.FormFields.Add(combo);
+        pdf.FormFields.Add(combo);
 
         var list = new ChoiceFieldDefinition("Color")
         {
@@ -33,15 +35,15 @@ public class AcroFormChoiceRadioSelectionTests
         list.Options.Add("Red");
         list.Options.Add("Green");
         list.Options.Add("Blue");
-        document.FormFields.Add(list);
+        pdf.FormFields.Add(list);
 
         var radio = new RadioGroupFieldDefinition("Size");
         radio.Options.Add(new RadioOptionDefinition("Small") { X = 100, Y = 600, Width = 16, Height = 16 });
         radio.Options.Add(new RadioOptionDefinition("Medium") { X = 100, Y = 570, Width = 16, Height = 16 });
         radio.Options.Add(new RadioOptionDefinition("Large") { X = 100, Y = 540, Width = 16, Height = 16 });
-        document.FormFields.Add(radio);
+        pdf.FormFields.Add(radio);
 
-        return Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        return Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
     }
 
     private static double[] IndicesOf(DocumentReader reader, DictionaryObject field)

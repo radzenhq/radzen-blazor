@@ -8,6 +8,8 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,16 +34,16 @@ public class FieldResolutionTests
         return list.ToArray();
     }
 
-    private static (DocumentBuilder Builder, Section Section) Author()
+    private static (Document Builder, Section Section) Author()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
-        section.Margin = Unit.FromPoint(Margin);
+        section.Margins.SetAll(Unit.FromPoint(Margin));
         section.Blocks.AddParagraph("body one");
         section.Blocks.AddPageBreak();
         section.Blocks.AddParagraph("body two");
-        return (builder, section);
+        return (document, section);
     }
 
     private static void Sized(Run run) => run.Font.Size = FontSize;
@@ -49,7 +51,7 @@ public class FieldResolutionTests
     [Fact]
     public void FooterTableCell_PageNumberField_RendersActualPageNumberPerPage()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var table = section.Footer.Blocks.AddTable();
         table.Columns.Add();
         table.Columns.Add();
@@ -62,7 +64,7 @@ public class FieldResolutionTests
         Sized(field.Inlines.Add(" of "));
         Sized(field.Inlines.Add(new PageCountField()));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
 
         for (var page = 0; page < 2; page++)
         {
@@ -81,13 +83,13 @@ public class FieldResolutionTests
     [Fact]
     public void WrappingBandParagraphWithField_EmitsAllLines()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var footer = section.Footer.Blocks.AddParagraph();
         Sized(footer.Inlines.Add(
             "This is a deliberately long footer sentence that has to wrap across several lines within the narrow content box, ending on page "));
         Sized(footer.Inlines.Add(new PageNumberField()));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var runs = Runs(reader, 0);
 
         var bodyY = Assert.Single(runs, r => r.Text.StartsWith("body", StringComparison.Ordinal)).Y;

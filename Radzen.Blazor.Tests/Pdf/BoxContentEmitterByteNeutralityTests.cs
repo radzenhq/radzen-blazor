@@ -2,6 +2,8 @@
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,16 +13,16 @@ public class BoxContentEmitterByteNeutralityTests
     {
         var paragraph = cell.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         run.Font.Size = 10;
     }
 
-    private static DocumentBuilder BuildDocument()
+    private static Document BuildDocument()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.Blocks.AddParagraph("body one");
         section.Blocks.AddPageBreak();
         section.Blocks.AddParagraph("body two");
@@ -35,16 +37,16 @@ public class BoxContentEmitterByteNeutralityTests
         rounded.Borders.Width = 0.5;
         var field = rounded.Blocks.AddParagraph();
         var page = field.Inlines.Add("Page ");
-        page.Font.Name = BuildTestSupport.Latin;
+        page.Font.Family = BuildTestSupport.Latin;
         page.Font.Size = 10;
         var number = field.Inlines.Add(new PageNumberField());
-        number.Font.Name = BuildTestSupport.Latin;
+        number.Font.Family = BuildTestSupport.Latin;
         number.Font.Size = 10;
         var of = field.Inlines.Add(" of ");
-        of.Font.Name = BuildTestSupport.Latin;
+        of.Font.Family = BuildTestSupport.Latin;
         of.Font.Size = 10;
         var count = field.Inlines.Add(new PageCountField());
-        count.Font.Name = BuildTestSupport.Latin;
+        count.Font.Family = BuildTestSupport.Latin;
         count.Font.Size = 10;
 
         var media = band.Cells[1];
@@ -72,14 +74,14 @@ public class BoxContentEmitterByteNeutralityTests
 
         Fill(row.Cells[1], "plain neighbor");
 
-        return builder;
+        return document;
     }
 
     [Fact]
     public void BandFieldsImagesNestedTablesAndRoundedCells_BuildByteIdenticalTwice()
     {
-        var golden = BuildDocument().ToArray();
-        var again = BuildDocument().ToArray();
+        var golden = new DocumentRenderer().ToArray(BuildDocument());
+        var again = new DocumentRenderer().ToArray(BuildDocument());
 
         Assert.Equal(golden, again);
     }

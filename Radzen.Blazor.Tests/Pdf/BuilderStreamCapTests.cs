@@ -5,6 +5,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,18 +21,20 @@ public class BuilderStreamCapTests
 
     private static ReaderLimits Bounded => new() { MaxFileBytes = Cap };
 
+    private static ResourceLimits BoundedResources => new() { MaxFileBytes = Cap };
+
     [Fact]
     public void ImageReadFully_RejectsUnseekableStreamPastCap()
     {
         var stream = new UnseekableStream(new byte[Cap * 4]);
-        Assert.Throws<DocumentParseException>(() => ImageDecoder.ReadFully(stream, Bounded));
+        Assert.Throws<InvalidDataException>(() => ImageDecoder.ReadFully(stream, Bounded));
     }
 
     [Fact]
     public void FontBufferStream_RejectsUnseekableStreamPastCap()
     {
         var stream = new UnseekableStream(new byte[Cap * 4]);
-        Assert.Throws<DocumentParseException>(() => FontCollection.BufferStream(stream, Bounded));
+        Assert.Throws<InvalidDataException>(() => FontCollection.BufferStream(stream, BoundedResources));
     }
 
     [Fact]

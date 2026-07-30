@@ -3,8 +3,10 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,7 +23,7 @@ public class FontParseCacheTests
     {
         var fonts = new FontCollection();
         fonts.Register(Family, stream);
-        return fonts.ResolvePrimarySfnt(new Font { Name = Family });
+        return fonts.ResolvePrimarySfnt(new Font { Family = Family });
     }
 
     [Fact]
@@ -64,7 +66,7 @@ public class FontParseCacheTests
         bytes[^1] ^= 0xFF;
         var fonts = new FontCollection();
         fonts.Register(Family, new MemoryStream(bytes, 0, bytes.Length, writable: true, publiclyVisible: true));
-        var second = fonts.ResolvePrimarySfnt(new Font { Name = Family });
+        var second = fonts.ResolvePrimarySfnt(new Font { Family = Family });
 
         Assert.NotSame(first, second);
     }

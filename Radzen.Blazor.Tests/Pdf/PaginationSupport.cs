@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
-
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Layout;
+using Radzen.Documents.Geometry;
+
 namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class PaginationSupport
@@ -19,7 +23,7 @@ internal static class PaginationSupport
         return fonts;
     }
 
-    public static Font FontAt(double size) => new() { Name = Family, Size = size };
+    public static Font FontAt(double size) => new() { Family = Family, Size = size };
 
     public static double Measure(FontCollection fonts, string text, double size)
         => fonts.MeasureText(text, FontAt(size));
@@ -35,7 +39,7 @@ internal static class PaginationSupport
     {
         var p = new Paragraph();
         var run = p.Inlines.Add(text);
-        run.Font.Name = Family;
+        run.Font.Family = Family;
         run.Font.Size = size;
         return p;
     }
@@ -58,8 +62,10 @@ internal static class PaginationSupport
         var section = new Section
         {
             PageSize = new PageSize(Unit.FromPoint(widthPt), Unit.FromPoint(heightPt)),
+            HeaderDistance = Unit.FromPoint(0),
+            FooterDistance = Unit.FromPoint(0),
         };
-        section.Margin = Unit.FromPoint(marginPt);
+        section.Margins.SetAll(Unit.FromPoint(marginPt));
         return section;
     }
 
@@ -67,5 +73,5 @@ internal static class PaginationSupport
         => (lines + 0.4) * lineHeight;
 
     public static IReadOnlyList<string> BodyTexts(PaginatedPage page)
-        => [.. page.Lines.Select(l => string.Concat(l.Line.Fragments.Select(f => f.Text)))];
+        => [.. page.Body.Lines.Select(l => string.Concat(l.Line.Fragments.Select(f => f.Text)))];
 }

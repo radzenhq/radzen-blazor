@@ -2,7 +2,9 @@
 using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -46,7 +48,7 @@ public class EmbeddedKerningTests
     public void DefaultShaper_DoesNotApplyKerning()
     {
         var shaper = new SimpleShaper(Fonts());
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
 
         var glyphs = shaper.Shape("AV", font, out var advance);
 
@@ -57,8 +59,8 @@ public class EmbeddedKerningTests
     public void KerningShaper_AppliesNegativeAdjustmentToLeftGlyph()
     {
         var face = SansFace();
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
-        var expectedKern = face.GetKerning(face.GetGlyphId('A'), face.GetGlyphId('V')) * font.Size / face.UnitsPerEm;
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
+        var expectedKern = face.GetKerning(face.GetGlyphId('A'), face.GetGlyphId('V')) * font.Size!.Value.Point / face.UnitsPerEm;
         Assert.True(expectedKern < 0);
 
         var plain = new SimpleShaper(Fonts()).Shape("AV", font, out var plainAdvance);
@@ -72,7 +74,7 @@ public class EmbeddedKerningTests
     [Fact]
     public void KerningShaper_LeavesUnkernedPairUnchanged()
     {
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
         new SimpleShaper(Fonts()).Shape("HH", font, out var plainAdvance);
         new SimpleShaper(Fonts(), enableKerning: true).Shape("HH", font, out var kernedAdvance);
 
@@ -82,7 +84,7 @@ public class EmbeddedKerningTests
     [Fact]
     public void KerningShaper_DoesNotKernAcrossSpaces()
     {
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
         new SimpleShaper(Fonts()).Shape("A A", font, out var plainAdvance);
         new SimpleShaper(Fonts(), enableKerning: true).Shape("A A", font, out var kernedAdvance);
 
@@ -93,8 +95,8 @@ public class EmbeddedKerningTests
     public void KerningShaper_StillKernsNonSpacePairsWhenSpacePresent()
     {
         var face = SansFace();
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
-        var avKern = face.GetKerning(face.GetGlyphId('A'), face.GetGlyphId('V')) * font.Size / face.UnitsPerEm;
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
+        var avKern = face.GetKerning(face.GetGlyphId('A'), face.GetGlyphId('V')) * font.Size!.Value.Point / face.UnitsPerEm;
 
         new SimpleShaper(Fonts()).Shape("AV A", font, out var plainAdvance);
         new SimpleShaper(Fonts(), enableKerning: true).Shape("AV A", font, out var kernedAdvance);

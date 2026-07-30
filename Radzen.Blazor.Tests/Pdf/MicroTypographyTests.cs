@@ -8,6 +8,9 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class MicroTypographyTests
@@ -15,23 +18,23 @@ public class MicroTypographyTests
     private const string Family = "Liberation Sans";
     private const double Size = 20;
 
-    private static DocumentBuilder Author(Action<Run> configure)
+    private static Document Author(Action<Run> configure)
     {
-        var builder = new DocumentBuilder();
-        builder.Fonts.Register(Family, new MemoryStream(
+        var document = new Document();
+        document.Fonts.Register(Family, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        var paragraph = builder.Sections.Add().Blocks.AddParagraph();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
         var lead = paragraph.Inlines.Add("Base ");
-        lead.Font.Name = Family;
+        lead.Font.Family = Family;
         lead.Font.Size = Size;
         var styled = paragraph.Inlines.Add("Styled");
-        styled.Font.Name = Family;
+        styled.Font.Family = Family;
         styled.Font.Size = Size;
         configure(styled);
         var tail = paragraph.Inlines.Add(" tail");
-        tail.Font.Name = Family;
+        tail.Font.Family = Family;
         tail.Font.Size = Size;
-        return builder;
+        return document;
     }
 
     private static List<double> Operands(string content, string op)
@@ -64,7 +67,7 @@ public class MicroTypographyTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Styled");
-        run.Font.Name = Family;
+        run.Font.Family = Family;
         run.Font.Size = Size;
         run.LetterSpacing = Unit.FromPoint(2);
 
@@ -79,7 +82,7 @@ public class MicroTypographyTests
     public void Superscript_EmitsPositiveTsAndReducedTfAboveBaseline()
     {
         var content = CascadeTestSupport.FirstPageContent(
-            Author(run => run.VerticalAlign = RunVerticalAlign.Superscript));
+            Author(run => run.VerticalAlignment = RunVerticalAlignment.Superscript));
 
         var rises = Operands(content, "Ts");
         Assert.Equal(2, rises.Count);
@@ -92,7 +95,7 @@ public class MicroTypographyTests
     public void Subscript_EmitsNegativeTs()
     {
         var content = CascadeTestSupport.FirstPageContent(
-            Author(run => run.VerticalAlign = RunVerticalAlign.Subscript));
+            Author(run => run.VerticalAlignment = RunVerticalAlignment.Subscript));
 
         var rises = Operands(content, "Ts");
         Assert.Equal(2, rises.Count);
@@ -108,9 +111,9 @@ public class MicroTypographyTests
 
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Styled");
-        run.Font.Name = Family;
+        run.Font.Family = Family;
         run.Font.Size = Size;
-        run.VerticalAlign = RunVerticalAlign.Superscript;
+        run.VerticalAlignment = RunVerticalAlignment.Superscript;
         var line = Assert.Single(LineBreaker.Break(paragraph, 500, fonts));
 
         var fragment = Assert.Single(line.Fragments);
@@ -126,7 +129,7 @@ public class MicroTypographyTests
         var explicitDefaults = CascadeTestSupport.FirstPageContent(Author(run =>
         {
             run.LetterSpacing = Unit.FromPoint(0);
-            run.VerticalAlign = RunVerticalAlign.None;
+            run.VerticalAlignment = RunVerticalAlignment.None;
         }));
 
         Assert.Equal(baseline, explicitDefaults);

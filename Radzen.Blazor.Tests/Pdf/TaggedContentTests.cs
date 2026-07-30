@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,17 +13,14 @@ public class TaggedContentTests
     [Fact]
     public void TaggedFigure_EmitsAltText()
     {
-        var builder = new DocumentBuilder
-        {
-            PdfUA = true,
-            Language = "en-US",
-        };
-        builder.Info.Title = "Alt test";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Alt test";
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.AlternateText = "A red square";
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var figure = StructureTestHelpers.FindElement(reader, "Figure");
         Assert.NotNull(figure);
         Assert.Equal("A red square",
@@ -31,21 +30,18 @@ public class TaggedContentTests
     [Fact]
     public void TaggedList_BuildsLListItemLabelAndBody()
     {
-        var builder = new DocumentBuilder
-        {
-            PdfUA = true,
-            Language = "en-US",
-        };
-        builder.Info.Title = "List test";
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "List test";
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var list = section.Blocks.AddList(ListStyle.Bullet);
-        list.Font.Name = BuildTestSupport.Latin;
+        list.Font.Family = BuildTestSupport.Latin;
         list.Font.Size = 12;
         list.AddItem("First");
         list.AddItem("Second");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var types = new List<string>();
         StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
 
@@ -58,13 +54,14 @@ public class TaggedContentTests
     [Fact]
     public void UntaggedList_StaysUntagged_WhenNotPdfUA()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var list = section.Blocks.AddList(ListStyle.Bullet);
         list.AddItem("First");
         list.AddItem("Second");
 
-        var reader = BuildTestSupport.Read(builder);
+        var builderRenderer = new DocumentRenderer();
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var types = new List<string>();
         StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
 

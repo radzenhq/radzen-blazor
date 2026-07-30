@@ -3,6 +3,9 @@ using System;
 using System.Reflection;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,10 +21,10 @@ public class StrikethroughRenderTests
         property!.SetValue(font, true);
     }
 
-    private static DocumentBuilder Author(bool strikethrough)
+    private static Document Author(bool strikethrough)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add(Text);
         run.Font.Size = Size;
@@ -30,14 +33,14 @@ public class StrikethroughRenderTests
             SetStrikethrough(run.Font);
         }
 
-        return builder;
+        return document;
     }
 
     [Fact]
     public void Strikethrough_DrawsLineAtMidHeight()
     {
-        var builder = Author(strikethrough: true);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(strikethrough: true);
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         var positions = CascadeTestSupport.TdPositions(content);
         Assert.NotEmpty(positions);
@@ -57,8 +60,8 @@ public class StrikethroughRenderTests
     [Fact]
     public void NoStrikethrough_DrawsNoLines()
     {
-        var builder = Author(strikethrough: false);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(strikethrough: false);
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         Assert.Empty(CascadeTestSupport.HorizontalSpans(content));
     }
@@ -66,8 +69,8 @@ public class StrikethroughRenderTests
     [Fact]
     public void Strikethrough_AppliesOnlyToMarkedRun()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var plain = paragraph.Inlines.Add("Plain ");
         plain.Font.Size = Size;
@@ -75,7 +78,7 @@ public class StrikethroughRenderTests
         marked.Font.Size = Size;
         SetStrikethrough(marked.Font);
 
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var content = CascadeTestSupport.FirstPageContent(document);
         var baseline = CascadeTestSupport.TdPositions(content)[0].Y;
         var spans = CascadeTestSupport.HorizontalSpans(content);
         Assert.Single(spans);
@@ -89,8 +92,8 @@ public class StrikethroughRenderTests
     [Fact]
     public void ConsecutiveStrikethroughFragments_MergeIntoSingleLine()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var first = paragraph.Inlines.Add("Struck ");
         first.Font.Size = Size;
@@ -99,7 +102,7 @@ public class StrikethroughRenderTests
         second.Font.Size = Size;
         SetStrikethrough(second.Font);
 
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var content = CascadeTestSupport.FirstPageContent(document);
         var spans = CascadeTestSupport.HorizontalSpans(content);
         Assert.Single(spans);
 
@@ -110,10 +113,10 @@ public class StrikethroughRenderTests
     [Fact]
     public void Strikethrough_TextRemainsExtractable()
     {
-        var builder = Author(strikethrough: true);
-        Assert.NotEmpty(CascadeTestSupport.HorizontalSpans(CascadeTestSupport.FirstPageContent(builder)));
+        var document = Author(strikethrough: true);
+        Assert.NotEmpty(CascadeTestSupport.HorizontalSpans(CascadeTestSupport.FirstPageContent(document)));
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("Struck", text, StringComparison.Ordinal);
         Assert.Contains("words", text, StringComparison.Ordinal);
     }

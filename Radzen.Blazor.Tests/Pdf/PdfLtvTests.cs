@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,11 +16,11 @@ public class PdfLtvTests
 {
     private static byte[] BuildPdf()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Long-term-validation body", BuildTestSupport.Latin);
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private sealed class FixedSigner(byte[] blob) : ISigner
@@ -406,10 +408,10 @@ public class PdfLtvTests
 
     private static byte[] BuildPdf_ForBaseline()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 }

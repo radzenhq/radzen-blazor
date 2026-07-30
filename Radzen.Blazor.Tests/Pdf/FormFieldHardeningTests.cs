@@ -5,6 +5,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -27,16 +29,17 @@ public class FormFieldHardeningTests
 
     private static Document BuildTextForm(Action<TextFieldDefinition> configure)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Form", "Helvetica");
-        var document = builder.Build();
+        var renderer = new DocumentRenderer();
+        var pdf = renderer.Render(document);
 
         var field = new TextFieldDefinition("field") { X = 100, Y = 700, Width = 180, Height = 20 };
         configure(field);
-        document.FormFields.Add(field);
+        pdf.FormFields.Add(field);
 
-        return Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        return Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
     }
 
     private static string? OptionalAppearanceText(DocumentReader reader, DictionaryObject field)
@@ -280,11 +283,12 @@ public class FormFieldHardeningTests
     [Fact]
     public void DuplicateAttachmentNamesThrowOnSave()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.AddText(builder.Sections.Add(), "Body", "Helvetica");
-        builder.Attachments.Add("data.xml", [1, 2, 3], AttachmentRelationship.Data, "text/xml");
-        builder.Attachments.Add("data.xml", [4, 5, 6], AttachmentRelationship.Data, "text/xml");
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.AddText(document.Sections.Add(), "Body", "Helvetica");
+        var renderer = new DocumentRenderer();
+        renderer.Attachments.Add("data.xml", [1, 2, 3], AttachmentRelationship.Data, "text/xml");
+        renderer.Attachments.Add("data.xml", [4, 5, 6], AttachmentRelationship.Data, "text/xml");
 
-        Assert.Throws<InvalidOperationException>(() => builder.Build().ToArray());
+        Assert.Throws<InvalidOperationException>(() => renderer.Render(document).ToArray());
     }
 }

@@ -2,31 +2,38 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class OverlayContainerTaggingConformanceTests
 {
-    private static DocumentBuilder Author(bool ua, PdfAConformance conformance, ContainerLayout layout, double rotation)
+    private static (Document Document, DocumentRenderer Renderer) Author(bool ua, PdfAConformance conformance, ContainerLayout layout, double rotation)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Boxed";
-        builder.PdfUA = ua;
-        builder.Conformance = conformance;
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Boxed";
+        var builderRenderer = new DocumentRenderer();
+        builderRenderer.Accessibility = ua ? PdfUaConformance.PdfUa1 : PdfUaConformance.None;
+        builderRenderer.Conformance = conformance;
         if (ua)
         {
-            builder.Language = "en-US";
+            document.Language = "en-US";
         }
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(8), Layout = layout, Rotation = rotation });
-        container.Blocks.AddParagraph().Inlines.Add("OVERLAID").Font.Name = BuildTestSupport.Latin;
-        return builder;
+        container.Blocks.AddParagraph().Inlines.Add("OVERLAID").Font.Family = BuildTestSupport.Latin;
+        return (document, builderRenderer);
     }
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static List<ContentOperation> Ops((Document Document, DocumentRenderer Renderer) authored)
+        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(
+            BuildTestSupport.Read(authored.Document, authored.Renderer), 0));
+
+    private static byte[] Rendered((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
 
     private static HashSet<string> TagsWrappingText(List<ContentOperation> ops)
     {
@@ -86,8 +93,8 @@ public class OverlayContainerTaggingConformanceTests
     [Fact]
     public void PlainDocument_OverlayContainerOutputIsByteStable()
     {
-        var a = Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0).ToArray();
-        var b = Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0).ToArray();
+        var a = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
+        var b = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
         Assert.Equal(a, b);
     }
 }

@@ -3,6 +3,8 @@ using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +14,7 @@ public class MultiScriptTests
     private const string Bulgarian = "Здравей";
     private const string Chinese = "中产";
 
-    private static DocumentBuilder AuthorThreeScripts()
+    private static Document AuthorThreeScripts()
     {
         var liberation = Type0EmbedSupport.LoadLiberation();
         foreach (var c in English + Bulgarian)
@@ -26,15 +28,15 @@ public class MultiScriptTests
             Assert.NotEqual(0, noto.GetGlyphId(c));
         }
 
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        BuildTestSupport.RegisterCjk(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        BuildTestSupport.RegisterCjk(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, English, BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, Bulgarian, BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, Chinese, BuildTestSupport.Cjk);
-        return builder;
+        return document;
     }
 
     [Fact]

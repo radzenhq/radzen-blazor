@@ -4,6 +4,9 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -37,7 +40,7 @@ public class SymbolicBase14EncodingTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Name = family } });
+        page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Family = family } });
 
         var dict = FontWithBaseFont(document, family);
 
@@ -49,7 +52,7 @@ public class SymbolicBase14EncodingTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Name = "Helvetica" } });
+        page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Family = "Helvetica" } });
 
         var dict = FontWithBaseFont(document, "Helvetica");
 

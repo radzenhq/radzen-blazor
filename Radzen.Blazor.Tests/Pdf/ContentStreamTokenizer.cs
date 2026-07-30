@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

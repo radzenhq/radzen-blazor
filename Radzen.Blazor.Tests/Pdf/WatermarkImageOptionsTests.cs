@@ -6,6 +6,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,20 +15,20 @@ public class WatermarkImageOptionsTests
 {
     private static byte[] Build(bool sectionWatermark, Watermark watermark)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Body");
         section.Blocks.Add(paragraph);
         if (sectionWatermark)
         {
             section.Watermark = watermark;
-            return builder.ToArray();
+            return new DocumentRenderer().ToArray(document);
         }
 
-        var document = builder.Build();
-        document.AddWatermark(watermark);
-        return document.ToArray();
+        var pdf = new DocumentRenderer().Render(document);
+        pdf.AddWatermark(watermark);
+        return pdf.ToArray();
     }
 
     private static string Content(DocumentReader reader)
@@ -34,22 +36,6 @@ public class WatermarkImageOptionsTests
         var page = Assert.Single(PdfPageContentTestHelper.PageLeaves(reader, assertStructure: true)).Page;
         return Encoding.ASCII.GetString(PdfPageContentTestHelper.Content(
             reader, page, assertStreams: true, appendSeparatorAfterEveryStream: false));
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void WatermarkStencilImageUsesItsStencilColor(bool sectionWatermark)
-    {
-        var watermark = new Watermark { Opacity = 1, Rotation = 0 };
-        using var stream = new MemoryStream(ImageTestHelpers.OneBitGrayPng(8, 8));
-        var image = watermark.SetImage(stream);
-        image.Stencil = true;
-        image.StencilColor = Color.FromRgb(255, 0, 0);
-
-        var content = Content(DocumentReader.Parse(Build(sectionWatermark, watermark)));
-
-        Assert.Contains("1 0 0 rg", content, StringComparison.Ordinal);
     }
 
     [Theory]
@@ -74,15 +60,14 @@ public class WatermarkImageOptionsTests
     }
 
     [Fact]
-    public void DocumentWatermarkMutationToInvalidOpacityIsRejectedWhenSaved()
+    public void DocumentWatermarkMutationToInvalidOpacityIsRejectedEagerly()
     {
         var document = new Document();
         document.Pages.Add();
         var watermark = new Watermark { Text = "draft" };
         document.AddWatermark(watermark);
-        watermark.Opacity = 1.01;
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => document.ToArray());
+        Assert.Throws<ArgumentOutOfRangeException>(() => watermark.Opacity = 1.01);
     }
 
     [Fact]

@@ -3,6 +3,9 @@ using System;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,22 +14,22 @@ public class UnderlineRenderTests
     private const string Text = "Underlined words";
     private const double Size = 12;
 
-    private static DocumentBuilder Author(bool underline)
+    private static Document Author(bool underline)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add(Text);
         run.Font.Size = Size;
         run.Font.Underline = underline;
-        return builder;
+        return document;
     }
 
     [Fact]
     public void Underline_DrawsLineUnderRun()
     {
-        var builder = Author(underline: true);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(underline: true);
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         var positions = CascadeTestSupport.TdPositions(content);
         Assert.NotEmpty(positions);
@@ -46,8 +49,8 @@ public class UnderlineRenderTests
     [Fact]
     public void NoUnderline_DrawsNoLines()
     {
-        var builder = Author(underline: false);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(underline: false);
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         Assert.Empty(CascadeTestSupport.HorizontalSpans(content));
     }
@@ -55,8 +58,8 @@ public class UnderlineRenderTests
     [Fact]
     public void Underline_AppliesOnlyToUnderlinedRun()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var plain = paragraph.Inlines.Add("Plain ");
         plain.Font.Size = Size;
@@ -64,7 +67,7 @@ public class UnderlineRenderTests
         marked.Font.Size = Size;
         marked.Font.Underline = true;
 
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var content = CascadeTestSupport.FirstPageContent(document);
         var spans = CascadeTestSupport.HorizontalSpans(content);
         Assert.Single(spans);
 

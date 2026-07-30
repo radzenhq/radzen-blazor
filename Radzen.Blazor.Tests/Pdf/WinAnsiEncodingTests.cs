@@ -1,6 +1,8 @@
 #nullable enable
 using Xunit;
 using Radzen.Documents.Pdf.Fonts;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

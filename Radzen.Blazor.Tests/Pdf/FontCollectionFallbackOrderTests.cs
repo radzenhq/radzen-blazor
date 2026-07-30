@@ -2,8 +2,10 @@
 using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -39,7 +41,7 @@ public class FontCollectionFallbackOrderTests
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
         var fonts = Collection((true, false, bold), (false, true, serif));
-        var plain = new Font { Name = "Fallback Family", Size = 12 };
+        var plain = new Font { Family = "Fallback Family", Size = 12 };
 
         Assert.Equal(Width(bold, "Hello", 12), fonts.MeasureText("Hello", plain), 10);
     }
@@ -51,7 +53,7 @@ public class FontCollectionFallbackOrderTests
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
         var fonts = Collection((false, true, serif), (true, false, bold));
-        var plain = new Font { Name = "Fallback Family", Size = 12 };
+        var plain = new Font { Family = "Fallback Family", Size = 12 };
 
         Assert.Equal(Width(serif, "Hello", 12), fonts.MeasureText("Hello", plain), 10);
     }
@@ -63,7 +65,7 @@ public class FontCollectionFallbackOrderTests
         var serif = PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
 
         var fonts = Collection((true, false, bold), (false, true, serif), (true, false, bold));
-        var plain = new Font { Name = "Fallback Family", Size = 12 };
+        var plain = new Font { Family = "Fallback Family", Size = 12 };
 
         Assert.Equal(Width(bold, "Hello", 12), fonts.MeasureText("Hello", plain), 10);
     }
@@ -76,7 +78,7 @@ public class FontCollectionFallbackOrderTests
 
         var boldFirst = Collection((true, false, bold), (false, true, serif));
         var italicFirst = Collection((false, true, serif), (true, false, bold));
-        var request = new Font { Name = "Fallback Family", Size = 12, Italic = true };
+        var request = new Font { Family = "Fallback Family", Size = 12, Italic = true };
 
         Assert.Equal(Width(serif, "Hello", 12), boldFirst.MeasureText("Hello", request), 10);
         Assert.Equal(Width(serif, "Hello", 12), italicFirst.MeasureText("Hello", request), 10);

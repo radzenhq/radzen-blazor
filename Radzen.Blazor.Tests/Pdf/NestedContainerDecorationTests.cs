@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class NestedContainerDecorationTests
 {
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
+    private static List<ContentOperation> Ops(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         return ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(reader, 0));
     }
 
@@ -45,10 +47,10 @@ public class NestedContainerDecorationTests
     [Fact]
     public void NestedTable_PaintsRowBackground()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var outer = section.Blocks.AddTable();
         outer.Columns.Add(Unit.FromPoint(300));
         var host = outer.Rows.Add().Cells[0];
@@ -60,7 +62,7 @@ public class NestedContainerDecorationTests
         innerRow.Background = Color.Green;
         TableLayoutSupport.Fill(innerRow.Cells[0], "NESTED");
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
         Assert.True(HasColorOperation(ops, "rg", 0, 0.502, 0),
             "nested table row background emits a fill in the row background color");
     }
@@ -68,10 +70,10 @@ public class NestedContainerDecorationTests
     [Fact]
     public void NestedContainer_PaintsGradientBackground()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(300));
         var host = table.Rows.Add().Cells[0];
@@ -87,9 +89,9 @@ public class NestedContainerDecorationTests
                 new GradientStop(1, Color.Blue)),
         });
         var boxed = container.Blocks.AddParagraph().Inlines.Add("BOXED");
-        boxed.Font.Name = BuildTestSupport.Latin;
+        boxed.Font.Family = BuildTestSupport.Latin;
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
         Assert.True(HasOperator(ops, "scn"),
             "nested container gradient background selects a shading pattern via scn");
     }

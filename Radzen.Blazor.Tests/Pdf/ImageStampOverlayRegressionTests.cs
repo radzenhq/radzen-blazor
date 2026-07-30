@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -91,14 +93,14 @@ public class ImageStampOverlayRegressionTests
     [Fact]
     public void ImageStampOnBuiltPage_RegistersXObjectInResources()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Helvetica");
 
-        var document = builder.Build();
-        document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
+        var pdf = new DocumentRenderer().Render(document);
+        pdf.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
 
-        var reader = DocumentReader.Parse(document.ToArray());
+        var reader = DocumentReader.Parse(pdf.ToArray());
         AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
     }
 

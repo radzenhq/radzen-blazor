@@ -5,37 +5,39 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class NavigationOutlineTests
 {
-    private static DocumentBuilder TwoSectionDocument()
+    private static Document TwoSectionDocument()
     {
-        var builder = new DocumentBuilder();
+        var document = new Document();
         foreach (var (anchor, text) in new[] { ("intro", "Introduction body"), ("details", "Details body") })
         {
-            var section = builder.Sections.Add();
+            var section = document.Sections.Add();
             section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
-            section.Margin = Unit.FromPoint(40);
+            section.Margins.SetAll(Unit.FromPoint(40));
             var paragraph = new Paragraph();
             paragraph.Inlines.Add(text).Anchor = anchor;
             section.Blocks.Add(paragraph);
         }
 
-        return builder;
+        return document;
     }
 
-    private static DocumentBuilder PlainDocument()
+    private static Document PlainDocument()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Plain content");
         section.Blocks.Add(paragraph);
-        return builder;
+        return document;
     }
 
     private static DictionaryObject Resolve(DocumentReader reader, DocumentObject value)
@@ -62,13 +64,14 @@ public class NavigationOutlineTests
     [Fact]
     public void Outline_EmitsCatalogTree_WithTitlesAndNesting()
     {
-        var builder = TwoSectionDocument();
+        var document = TwoSectionDocument();
         var child = new OutlineItem("Details", OutlineTarget.ToAnchor("details"));
         var root = new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro"));
         root.Children.Add(child);
-        builder.Outline.Add(root);
+        var renderer = new DocumentRenderer();
+        renderer.Outline.Add(root);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, renderer);
         var catalog = ContentTestHelpers.Catalog(reader);
         Assert.True(catalog.TryGetValue("Outlines", out var outlinesObject), "catalog must carry /Outlines");
         var outlines = Resolve(reader, outlinesObject!);
@@ -95,11 +98,12 @@ public class NavigationOutlineTests
     [Fact]
     public void OutlineSiblings_LinkPrevAndNext()
     {
-        var builder = TwoSectionDocument();
-        builder.Outline.Add(new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro")));
-        builder.Outline.Add(new OutlineItem("Details", OutlineTarget.ToAnchor("details")));
+        var document = TwoSectionDocument();
+        var renderer = new DocumentRenderer();
+        renderer.Outline.Add(new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro")));
+        renderer.Outline.Add(new OutlineItem("Details", OutlineTarget.ToAnchor("details")));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, renderer);
         var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
         Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
         var first = Resolve(reader, outlines["First"]);
@@ -115,10 +119,11 @@ public class NavigationOutlineTests
     [Fact]
     public void OutlinePageTarget_EmitsExplicitDestination()
     {
-        var builder = TwoSectionDocument();
-        builder.Outline.Add(new OutlineItem("Second page", OutlineTarget.ToPage(1)));
+        var document = TwoSectionDocument();
+        var renderer = new DocumentRenderer();
+        renderer.Outline.Add(new OutlineItem("Second page", OutlineTarget.ToPage(1)));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, renderer);
         var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
         var item = Resolve(reader, outlines["First"]);
         var dest = Assert.IsType<ArrayObject>(reader.Resolve(item["Dest"]));
@@ -151,12 +156,12 @@ public class NavigationOutlineTests
     [Fact]
     public void RunLinkToAnchor_EmitsGoToLinkAnnotation()
     {
-        var builder = TwoSectionDocument();
+        var document = TwoSectionDocument();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("jump to details").LinkToAnchor = "details";
-        builder.Sections[0].Blocks.Add(paragraph);
+        document.Sections[0].Blocks.Add(paragraph);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var page = ContentTestHelpers.Kid(reader, 0);
         var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
         var annot = Resolve(reader, Assert.Single(annots));
@@ -172,7 +177,7 @@ public class NavigationOutlineTests
     [Fact]
     public void GeneratedPageRotate_EmitsRotate90()
     {
-        var document = PlainDocument().Build();
+        var document = new DocumentRenderer().Render(PlainDocument());
         document.Pages[0].Rotate = 90;
 
         var reader = ContentTestHelpers.Reload(document);
@@ -183,15 +188,15 @@ public class NavigationOutlineTests
     [Fact]
     public void PageRotate_RejectsInvalidAngle()
     {
-        var document = PlainDocument().Build();
+        var document = new DocumentRenderer().Render(PlainDocument());
         Assert.Throws<ArgumentOutOfRangeException>(() => document.Pages[0].Rotate = 45);
     }
 
     [Fact]
     public void PlainDocument_EmitsNoNavigationKeys_AndStaysDeterministic()
     {
-        var bytes = PlainDocument().ToArray();
-        Assert.Equal(bytes, PlainDocument().ToArray());
+        var bytes = new DocumentRenderer().ToArray(PlainDocument());
+        Assert.Equal(bytes, new DocumentRenderer().ToArray(PlainDocument()));
 
         var text = Encoding.Latin1.GetString(bytes);
         Assert.DoesNotContain("/Outlines", text);

@@ -8,6 +8,8 @@ using System.Reflection;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Xunit.Sdk;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

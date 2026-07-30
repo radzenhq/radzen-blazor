@@ -7,12 +7,14 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class SoftMaskShadowTests
 {
-    private static string Content(DocumentBuilder builder)
-        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static string Content(Document document)
+        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
 
     private static Paragraph Text(string text)
     {
@@ -21,10 +23,10 @@ public class SoftMaskShadowTests
         return paragraph;
     }
 
-    private static DocumentBuilder ShadowDocument()
+    private static Document ShadowDocument()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -40,7 +42,7 @@ public class SoftMaskShadowTests
             },
         });
         container.Blocks.Add(Text("Shadowed panel"));
-        return builder;
+        return document;
     }
 
 
@@ -139,15 +141,15 @@ public class SoftMaskShadowTests
 
     [Fact]
     public void Shadow_IsDeterministic_AcrossBuilds()
-        => Assert.Equal(ShadowDocument().ToArray(), ShadowDocument().ToArray());
+        => Assert.Equal(new DocumentRenderer().ToArray(ShadowDocument()), new DocumentRenderer().ToArray(ShadowDocument()));
 
     [Fact]
     public void NoShadow_IsByteIdenticalAcrossBuilds()
     {
         static byte[] Build()
         {
-            var builder = new DocumentBuilder();
-            var section = builder.Sections.Add();
+            var document = new Document();
+            var section = document.Sections.Add();
             var container = section.Blocks.Add(new Container
             {
                 Padding = Unit.FromPoint(10),
@@ -155,7 +157,7 @@ public class SoftMaskShadowTests
                 CornerRadius = Unit.FromPoint(6),
             });
             container.Blocks.Add(Text("Plain panel"));
-            return builder.ToArray();
+            return new DocumentRenderer().ToArray(document);
         }
 
         Assert.Equal(Build(), Build());

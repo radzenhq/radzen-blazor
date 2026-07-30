@@ -2,6 +2,8 @@
 using System;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -9,19 +11,23 @@ public class OverlayFontConformanceTests
 {
     private static byte[] Png() => PdfTestResources.ReadAllBytes("Images/rgb.png");
 
-    private static DocumentBuilder Author(PdfAConformance conformance)
+    private static Radzen.Documents.Pdf.Document RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.Render(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance)
     {
-        var builder = new DocumentBuilder { Conformance = conformance };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = conformance };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
-        return builder;
+        return (document, builderRenderer);
     }
 
     [Fact]
     public void PdfA3B_OverlayBase14Text_ThrowsEmbeddableFontError()
     {
-        var document = Author(PdfAConformance.PdfA3B).Build();
+        var document = RenderAuthored(Author(PdfAConformance.PdfA3B));
         document.Pages[0].Content.Add(new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650)));
 
         var exception = Record.Exception(() => document.ToArray());
@@ -35,7 +41,7 @@ public class OverlayFontConformanceTests
     [Fact]
     public void PdfA3B_OverlayImageOnly_SavesWithoutError()
     {
-        var document = Author(PdfAConformance.PdfA3B).Build();
+        var document = RenderAuthored(Author(PdfAConformance.PdfA3B));
         document.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
 
         Assert.NotEmpty(document.ToArray());
@@ -44,7 +50,7 @@ public class OverlayFontConformanceTests
     [Fact]
     public void None_OverlayBase14Text_SavesWithoutError()
     {
-        var document = Author(PdfAConformance.None).Build();
+        var document = RenderAuthored(Author(PdfAConformance.None));
         document.Pages[0].Content.Add(new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650)));
 
         Assert.NotEmpty(document.ToArray());

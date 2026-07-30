@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ImageLayoutTests
@@ -61,9 +63,9 @@ public class ImageLayoutTests
         Assert.Equal(30, height, 3);
     }
 
-    private static double ImageX(DocumentBuilder builder)
+    private static double ImageX(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
         var match = Regex.Match(
@@ -73,17 +75,17 @@ public class ImageLayoutTests
         return double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
     }
 
-    private static DocumentBuilder AlignedImage(HorizontalAlignment alignment)
+    private static Document AlignedImage(HorizontalAlignment alignment)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(500), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(100);
         image.Height = Unit.FromPoint(100);
         image.Alignment = alignment;
-        return builder;
+        return document;
     }
 
     [Fact]

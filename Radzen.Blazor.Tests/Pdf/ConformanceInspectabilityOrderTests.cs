@@ -3,6 +3,8 @@ using System;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -35,21 +37,23 @@ public class ConformanceInspectabilityOrderTests
         return Document.LoadFromStream(stream);
     }
 
-    private static DocumentBuilder ConformingBuilder()
+    private static (Radzen.Documents.Document Document, DocumentRenderer Renderer) ConformingBuilder()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Conformance";
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Conformance";
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello", BuildTestSupport.Latin);
-        builder.Conformance = PdfAConformance.PdfA2B;
-        return builder;
+        var builderRenderer = new DocumentRenderer();
+        builderRenderer.Conformance = PdfAConformance.PdfA2B;
+        return (document, builderRenderer);
     }
 
     [Fact]
     public void SaveToStream_UninspectablePageWithFontError_ReportsInspectabilityFirst()
     {
-        var document = ConformingBuilder().Build();
+        var conforming = ConformingBuilder();
+        var document = conforming.Renderer.Render(conforming.Document);
         document.Append(LoadedFontlessDocument());
 
         using var stream = new MemoryStream();

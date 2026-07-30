@@ -2,6 +2,8 @@
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,10 +15,10 @@ public class TextFieldFlagsTests
 
     private static Document BuildDocument()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Form", "Helvetica");
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static TextFieldDefinition PlainField()

@@ -5,6 +5,9 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,10 +15,10 @@ public class FormFieldCreationTests
 {
     private static Document BuildDocument()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice", "Helvetica");
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static Document WithFields()
@@ -28,7 +31,7 @@ public class FormFieldCreationTests
             Width = 250,
             Height = 20,
             Value = "Radzen Ltd",
-            Font = new Font { Name = "Helvetica", Size = 12 },
+            Font = new Font { Family = "Helvetica", Size = 12 },
         });
         document.FormFields.Add(new CheckBoxFieldDefinition("Agree")
         {

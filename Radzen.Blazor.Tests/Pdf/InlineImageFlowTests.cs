@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,9 +21,9 @@ public class InlineImageFlowTests
         return image;
     }
 
-    private static List<(double X, double Y)> ImagePlacements(DocumentBuilder builder)
+    private static List<(double X, double Y)> ImagePlacements(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         var joined = new StringBuilder();
         foreach (var (page, _) in leaves)
@@ -46,16 +48,16 @@ public class InlineImageFlowTests
     [Fact]
     public void TwoInlineImages_ShareLine_SecondAdvancedByFirstWidth()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(500), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         var paragraph = section.Blocks.AddParagraph();
         AddImage(paragraph);
         AddImage(paragraph);
 
-        var placements = ImagePlacements(builder);
+        var placements = ImagePlacements(document);
         Assert.Equal(2, placements.Count);
 
         Assert.Equal(placements[0].Y, placements[1].Y, 3);
@@ -65,16 +67,16 @@ public class InlineImageFlowTests
     [Fact]
     public void InlineImage_WrapsToNextLine_WhenItDoesNotFit()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(60), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         var paragraph = section.Blocks.AddParagraph();
         AddImage(paragraph);
         AddImage(paragraph);
 
-        var placements = ImagePlacements(builder);
+        var placements = ImagePlacements(document);
         Assert.Equal(2, placements.Count);
 
         Assert.Equal(0, placements[0].X, 3);

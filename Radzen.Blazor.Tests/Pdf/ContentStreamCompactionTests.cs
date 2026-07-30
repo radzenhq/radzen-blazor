@@ -4,17 +4,19 @@ using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentStreamCompactionTests
 {
-    private static DocumentBuilder AuthorInvoice()
+    private static Document AuthorInvoice()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var heading = section.Blocks.AddParagraph("Invoice INV-42");
         heading.Alignment = HorizontalAlignment.Right;
 
@@ -24,7 +26,8 @@ public class ContentStreamCompactionTests
         table.Columns.Add();
 
         var header = table.Rows.Add();
-        header.IsHeader = true;
+        header.RepeatOnEveryPage = true;
+        header.IsHeaderRow = true;
         header.Background = Color.FromRgb(64, 96, 160);
         TableLayoutSupport.Fill(header.Cells[0], "Description");
         var priceHeader = TableLayoutSupport.Fill(header.Cells[1], "Amount");
@@ -38,7 +41,7 @@ public class ContentStreamCompactionTests
             price.Alignment = HorizontalAlignment.Right;
         }
 
-        return builder;
+        return document;
     }
 
     private static IEnumerable<ContentToken> Numbers(byte[] content)

@@ -4,6 +4,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

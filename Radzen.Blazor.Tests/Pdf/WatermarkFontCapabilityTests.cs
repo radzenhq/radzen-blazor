@@ -3,56 +3,58 @@ using System;
 using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class WatermarkFontCapabilityTests
 {
     private static Watermark Registered() =>
-        new Watermark { Text = "AVATAR", Font = { Name = "Liberation Sans", Size = 60 } };
+        new Watermark { Text = "AVATAR", Font = { Family = "Liberation Sans", Size = 60 } };
 
-    private static DocumentBuilder Builder()
+    private static Radzen.Documents.Document Builder()
     {
-        var builder = new DocumentBuilder();
-        builder.Fonts.Register("Liberation Sans", new MemoryStream(
+        var document = new Radzen.Documents.Document();
+        document.Fonts.Register("Liberation Sans", new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        return builder;
+        return document;
     }
 
     [Fact]
     public void AuthoredPageEmbedsRegisteredWatermarkFont()
     {
-        var builder = Builder();
-        var section = builder.Sections.Add();
+        var document = Builder();
+        var section = document.Sections.Add();
         section.Watermark = Registered();
         section.Blocks.Add(new Paragraph());
 
-        Assert.Null(Record.Exception(() => builder.Build()));
+        Assert.Null(Record.Exception(() => new DocumentRenderer().Render(document)));
     }
 
     [Fact]
     public void BuiltDocumentRejectsRegisteredWatermarkFont()
     {
-        var builder = Builder();
-        builder.Sections.Add().Blocks.Add(new Paragraph());
-        var document = builder.Build();
+        var document = Builder();
+        document.Sections.Add().Blocks.Add(new Paragraph());
+        var pdf = new DocumentRenderer().Render(document);
 
-        document.AddWatermark(Registered());
+        pdf.AddWatermark(Registered());
 
-        var error = Assert.Throws<NotSupportedException>(() => document.ToArray());
+        var error = Assert.Throws<NotSupportedException>(() => pdf.ToArray());
         Assert.Contains("cannot embed", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public void LoadedDocumentRejectsRegisteredWatermarkFont()
     {
-        var builder = Builder();
-        builder.Sections.Add().Blocks.Add(new Paragraph());
-        using var stream = new MemoryStream(builder.Build().ToArray());
-        var document = Document.LoadFromStream(stream);
+        var document = Builder();
+        document.Sections.Add().Blocks.Add(new Paragraph());
+        using var stream = new MemoryStream(new DocumentRenderer().Render(document).ToArray());
+        var pdf = Document.LoadFromStream(stream);
 
-        document.AddWatermark(Registered());
+        pdf.AddWatermark(Registered());
 
-        Assert.Throws<NotSupportedException>(() => document.ToArray());
+        Assert.Throws<NotSupportedException>(() => pdf.ToArray());
     }
 }

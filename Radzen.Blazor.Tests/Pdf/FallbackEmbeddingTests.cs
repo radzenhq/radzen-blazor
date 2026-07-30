@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,7 +35,7 @@ public class FallbackEmbeddingTests
         return gids;
     }
 
-    private static DocumentBuilder Author()
+    private static Document Author()
     {
         var liberation = Type0EmbedSupport.LoadLiberation();
         foreach (var c in Chinese)
@@ -41,16 +43,16 @@ public class FallbackEmbeddingTests
             Assert.Equal(0, liberation.GetGlyphId(c));
         }
 
-        var builder = new DocumentBuilder();
-        builder.Fonts.Register(Latin, new MemoryStream(
+        var document = new Document();
+        document.Fonts.Register(Latin, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        builder.Fonts.Register(Cjk, new MemoryStream(
+        document.Fonts.Register(Cjk, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf")));
-        builder.Fonts.SetFallback(Latin, Cjk);
+        document.Fonts.SetFallback(Latin, Cjk);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, RunText, Latin);
-        return builder;
+        return document;
     }
 
     [Fact]

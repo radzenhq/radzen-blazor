@@ -1,6 +1,8 @@
 #nullable enable
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -10,15 +12,15 @@ public class BoxContentLayoutByteNeutralityTests
     {
         var paragraph = cell.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         run.Font.Size = 10;
     }
 
-    private static DocumentBuilder BuildTableHeavyDocument()
+    private static Document BuildTableHeavyDocument()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
 
         var panel = section.Blocks.Add(new Container
         {
@@ -30,7 +32,7 @@ public class BoxContentLayoutByteNeutralityTests
         caption.Alignment = HorizontalAlignment.Center;
         caption.SpacingAfter = Unit.FromPoint(4);
         var run = caption.Inlines.Add("Container above a table-heavy body");
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         run.Font.Size = 10;
 
         var table = section.Blocks.AddTable();
@@ -55,7 +57,7 @@ public class BoxContentLayoutByteNeutralityTests
         para.SpacingBefore = Unit.FromPoint(6);
         para.SpacingAfter = Unit.FromPoint(3);
         var spacedRun = para.Inlines.Add("spaced right-aligned");
-        spacedRun.Font.Name = BuildTestSupport.Latin;
+        spacedRun.Font.Family = BuildTestSupport.Latin;
         spacedRun.Font.Size = 10;
 
         var third = table.Rows.Add();
@@ -70,7 +72,7 @@ public class BoxContentLayoutByteNeutralityTests
         {
             var item = list.Items.Add();
             var itemRun = item.Inlines.Add(text);
-            itemRun.Font.Name = BuildTestSupport.Latin;
+            itemRun.Font.Family = BuildTestSupport.Latin;
             itemRun.Font.Size = 10;
         }
 
@@ -85,14 +87,14 @@ public class BoxContentLayoutByteNeutralityTests
         nestedRight.VerticalAlignment = VerticalAlignment.Bottom;
         Fill(nestedRight, "nested wrapping text");
 
-        return builder;
+        return document;
     }
 
     [Fact]
     public void TableHeavyDocument_BuildsByteIdenticalTwice()
     {
-        var golden = BuildTableHeavyDocument().ToArray();
-        var again = BuildTableHeavyDocument().ToArray();
+        var golden = new DocumentRenderer().ToArray(BuildTableHeavyDocument());
+        var again = new DocumentRenderer().ToArray(BuildTableHeavyDocument());
 
         Assert.Equal(golden, again);
     }

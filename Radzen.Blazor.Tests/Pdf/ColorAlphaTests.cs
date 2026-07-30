@@ -4,6 +4,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,16 +18,16 @@ public class ColorAlphaTests
         return paragraph;
     }
 
-    private static string PageText(DocumentBuilder builder)
+    private static string PageText(Radzen.Documents.Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
         return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
     }
 
-    private static DictionaryObject? ExtGStates(DocumentBuilder builder)
+    private static DictionaryObject? ExtGStates(Radzen.Documents.Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var (_, resources) = BuildTestSupport.PageLeaves(reader)[0];
         return resources is not null
             && resources.TryGetValue("ExtGState", out var states)
@@ -37,27 +39,27 @@ public class ColorAlphaTests
     private static double Alpha(DictionaryObject states, string key, string entry)
         => ((NumberObject)((DictionaryObject)states[key]!)[entry]!).DoubleValue;
 
-    private static DocumentBuilder TextColor(Color color)
+    private static Radzen.Documents.Document TextColor(Color color)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Faded").Font.Color = color;
         section.Blocks.Add(paragraph);
-        return builder;
+        return document;
     }
 
     [Fact]
     public void TranslucentFontColor_RegistersExtGStateAndWrapsShowInGs()
     {
-        var builder = TextColor(Color.FromArgb(128, 255, 0, 0));
+        var document = TextColor(Color.FromArgb(128, 255, 0, 0));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Equal(128 / 255.0, Alpha(states!, "GS0", "ca"), 6);
         Assert.Equal(128 / 255.0, Alpha(states!, "GS0", "CA"), 6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" Tj", gs, StringComparison.Ordinal) > gs);
@@ -66,14 +68,14 @@ public class ColorAlphaTests
     [Fact]
     public void TransparentFontColor_PaintsNothing()
     {
-        var builder = TextColor(Color.Transparent);
+        var document = TextColor(Color.Transparent);
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Equal(0, Alpha(states!, "GS0", "ca"), 6);
         Assert.Equal(0, Alpha(states!, "GS0", "CA"), 6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" Tj", gs, StringComparison.Ordinal) > gs);
@@ -82,15 +84,15 @@ public class ColorAlphaTests
     [Fact]
     public void FontColorAlpha_MultipliesWithRunOpacity()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Faded");
         run.Font.Color = Color.FromArgb(128, 255, 0, 0);
         run.Opacity = 0.5;
         section.Blocks.Add(paragraph);
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (0.5 * 128 / 255.0)) < 1e-6);
     }
@@ -98,19 +100,19 @@ public class ColorAlphaTests
     [Fact]
     public void TranslucentBackground_FillPaintsThroughExtGState()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Background = Color.FromArgb(128, 0, 0, 255),
         });
         container.Blocks.Add(Text("Boxed"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (128 / 255.0)) < 1e-6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" re f", gs, StringComparison.Ordinal) > gs);
@@ -119,14 +121,14 @@ public class ColorAlphaTests
     [Fact]
     public void TranslucentBorderColor_StrokePaintsThroughExtGState()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container());
         container.Borders.Width = 2;
         container.Borders.Color = Color.FromArgb(64, 255, 0, 0);
         container.Blocks.Add(Text("Bordered"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "CA") - (64 / 255.0)) < 1e-6);
     }
@@ -134,8 +136,8 @@ public class ColorAlphaTests
     [Fact]
     public void ShadowColorAlpha_IsNotAppliedTwice()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -148,7 +150,7 @@ public class ColorAlphaTests
         });
         container.Blocks.Add(Text("Shadowed"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (160 / 255.0)) < 1e-6);
         Assert.DoesNotContain(states!.Keys, key => Alpha(states!, key, "ca") < 160 / 255.0);
@@ -159,8 +161,8 @@ public class ColorAlphaTests
     {
         static byte[] Content(bool explicitAlpha)
         {
-            var builder = new DocumentBuilder();
-            var section = builder.Sections.Add();
+            var document = new Radzen.Documents.Document();
+            var section = document.Sections.Add();
             var paragraph = new Paragraph();
             paragraph.Inlines.Add("Plain").Font.Color =
                 explicitAlpha ? Color.FromArgb(255, 255, 0, 0) : Color.FromRgb(255, 0, 0);
@@ -173,7 +175,7 @@ public class ColorAlphaTests
             });
             container.Blocks.Add(Text("Boxed"));
 
-            var reader = BuildTestSupport.Read(builder);
+            var reader = BuildTestSupport.Read(document);
             var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
             return BuildTestSupport.Content(reader, page);
         }

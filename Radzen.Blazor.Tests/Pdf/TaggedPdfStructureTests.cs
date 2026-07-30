@@ -5,6 +5,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,14 +18,15 @@ public class TaggedPdfStructureTests
         public DictionaryObject Dict = null!;
         public List<Node> Children { get; } = [];
         public List<int> Mcids { get; } = [];
+        public List<object> Kids { get; } = [];
     }
 
-    private static DocumentBuilder AuthorInvoice()
+    private static Radzen.Documents.Document AuthorInvoice()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
 
         var heading = BuildTestSupport.AddText(section, "Invoice", BuildTestSupport.Latin, 18);
         heading.StyleName = "Heading1";
@@ -36,7 +39,7 @@ public class TaggedPdfStructureTests
         table.Columns.Add();
 
         var header = table.Rows.Add();
-        header.IsHeader = true;
+        header.IsHeaderRow = true;
         TableLayoutSupport.Fill(header.Cells[0], "Item");
         TableLayoutSupport.Fill(header.Cells[1], "Price");
 
@@ -48,9 +51,9 @@ public class TaggedPdfStructureTests
         TableLayoutSupport.Fill(bread.Cells[0], "Bread");
         TableLayoutSupport.Fill(bread.Cells[1], "222");
 
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A red square";
 
-        return builder;
+        return document;
     }
 
     private static DictionaryObject Catalog(DocumentReader reader)
@@ -118,6 +121,7 @@ public class TaggedPdfStructureTests
                 var element = new Node { RawType = type.Value, Dict = dict };
                 element.Children.AddRange(KidsOf(reader, dict));
                 element.Mcids.AddRange(DirectMcids(reader, dict));
+                element.Kids.AddRange(OrderedKids(reader, dict));
                 nodes.Add(element);
             }
         }
@@ -194,12 +198,41 @@ public class TaggedPdfStructureTests
         return result;
     }
 
-    private static void CollectMcidsDepthFirst(Node node, List<int> acc)
+    private static IEnumerable<object> OrderedKids(DocumentReader reader, DictionaryObject element)
     {
-        acc.AddRange(node.Mcids);
-        foreach (var child in node.Children)
+        var children = 0;
+        var built = KidsOf(reader, element);
+        foreach (var kid in KidValues(reader, element))
         {
-            CollectMcidsDepthFirst(child, acc);
+            if (kid is NumberObject mcid)
+            {
+                yield return mcid.IntValue;
+            }
+            else if (kid is DictionaryObject dict && dict.ContainsKey("S"))
+            {
+                yield return built[children++];
+            }
+            else if (kid is DictionaryObject mcr
+                && mcr.TryGetValue("MCID", out var value)
+                && reader.Resolve(value!) is NumberObject number)
+            {
+                yield return number.IntValue;
+            }
+        }
+    }
+
+    private static void CollectMcidsInStructureOrder(Node node, List<int> acc)
+    {
+        foreach (var kid in node.Kids)
+        {
+            if (kid is int mcid)
+            {
+                acc.Add(mcid);
+            }
+            else if (kid is Node child)
+            {
+                CollectMcidsInStructureOrder(child, acc);
+            }
         }
     }
 
@@ -268,6 +301,29 @@ public class TaggedPdfStructureTests
             Assert.Equal(2, body.Children.Count);
             Assert.All(body.Children, cell => Assert.Equal("TD", Effective(reader, structRoot, cell.RawType)));
         }
+
+        Assert.All(
+            table.Children.SelectMany(row => row.Children),
+            cell => Assert.Empty(cell.Children));
+    }
+
+    [Fact]
+    public void Build_TaggedCellsNestTheirParagraphsInsideTheCell()
+    {
+        var reader = BuildTestSupport.Read(
+            AuthorInvoice(),
+            new DocumentRenderer { Conformance = PdfAConformance.PdfA2A });
+        var structRoot = StructTreeRoot(reader);
+        var sect = SectionElement(reader, structRoot);
+
+        var table = sect.Children.Single(c => Effective(reader, structRoot, c.RawType) == "Table");
+        Assert.All(table.Children.SelectMany(row => row.Children), cell =>
+        {
+            Assert.Empty(cell.Mcids);
+            var paragraph = Assert.Single(cell.Children);
+            Assert.Equal("P", Effective(reader, structRoot, paragraph.RawType));
+            Assert.NotEmpty(paragraph.Mcids);
+        });
     }
 
     [Fact]
@@ -297,7 +353,7 @@ public class TaggedPdfStructureTests
         Assert.NotEmpty(marked);
 
         var treeOrder = new List<int>();
-        CollectMcidsDepthFirst(document, treeOrder);
+        CollectMcidsInStructureOrder(document, treeOrder);
 
         Assert.Equal(treeOrder, marked.Select(m => m.Mcid).ToList());
     }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

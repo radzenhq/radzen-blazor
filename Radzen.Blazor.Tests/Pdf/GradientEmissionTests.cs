@@ -4,6 +4,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,8 +14,8 @@ public class GradientEmissionTests
     [Fact]
     public void GradientBoxBackground_EmitsPatternFill_AndShadingResource()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -24,11 +26,11 @@ public class GradientEmissionTests
         });
         container.Blocks.Add(FeatureEmissionTestHelpers.Text("Boxed"));
 
-        var content = FeatureEmissionTestHelpers.Content(builder);
+        var content = FeatureEmissionTestHelpers.Content(document);
         Assert.Contains("/Pattern cs", content, StringComparison.Ordinal);
         Assert.Contains("scn", content, StringComparison.Ordinal);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
         var patterns = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Pattern"]!));
         var pattern = Assert.IsType<DictionaryObject>(reader.Resolve(patterns[Assert.Single(patterns.Keys)]));
