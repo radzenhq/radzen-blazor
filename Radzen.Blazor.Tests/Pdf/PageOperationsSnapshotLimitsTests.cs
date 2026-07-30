@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +11,7 @@ public class PageOperationsSnapshotLimitsTests
 {
     private static byte[] OnePageFile()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("BT ET"));
         return document.ToArray();
     }
@@ -22,7 +21,7 @@ public class PageOperationsSnapshotLimitsTests
     {
         var limits = new ReaderLimits { MaxFileBytes = 1_000_000, MaxObjectNestingDepth = 7 };
         using var stream = new MemoryStream(OnePageFile());
-        var source = Document.LoadFromStream(stream, limits);
+        var source = PortableDocument.LoadFromStream(stream, limits);
 
         var snapshot = PageOperations.Snapshot(source);
 
@@ -33,7 +32,7 @@ public class PageOperationsSnapshotLimitsTests
     [Fact]
     public void Snapshot_OfABuiltDocument_UsesTheDefaultLimits()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("BT ET"));
 
         var snapshot = PageOperations.Snapshot(document);

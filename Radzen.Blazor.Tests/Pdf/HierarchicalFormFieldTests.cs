@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -45,8 +44,8 @@ public class HierarchicalFormFieldTests
         return Wrap(pdf, 12);
     }
 
-    private static Document Load()
-        => Document.LoadFromStream(new MemoryStream(HierarchicalForm()));
+    private static PortableDocument Load()
+        => PortableDocument.LoadFromStream(new MemoryStream(HierarchicalForm()));
 
     private static DictionaryObject FieldByPath(DocumentReader reader, params string[] path)
     {

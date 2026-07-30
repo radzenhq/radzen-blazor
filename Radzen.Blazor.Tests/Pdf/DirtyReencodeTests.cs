@@ -4,16 +4,15 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class DirtyReencodeTests
 {
-    private static Document BuildContentDocument()
+    private static PortableDocument BuildContentDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
 
         page.Content.Add(new TextContent("Original", 72, 700)

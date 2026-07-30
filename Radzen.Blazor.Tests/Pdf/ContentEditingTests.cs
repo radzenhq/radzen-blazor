@@ -7,21 +7,20 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentEditingTests
 {
-    private static Document LoadedDocumentWithText(string text)
+    private static PortableDocument LoadedDocumentWithText(string text)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent(text, 72, 700) { Font = new Font { Size = 12 } });
         return InterpreterTestSupport.Load(document.ToArray());
     }
 
-    private static Document LoadedSimpleWidthDocument(string streamData = "BT /F0 10 Tf 72 700 Td (AB) Tj (Z) Tj ET")
+    private static PortableDocument LoadedSimpleWidthDocument(string streamData = "BT /F0 10 Tf 72 700 Td (AB) Tj (Z) Tj ET")
     {
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
         var pdf = new FixturePdf()
@@ -42,10 +41,10 @@ public class ContentEditingTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
-    private static Document LoadedSplitShowDocument(string streamData, bool includeSecondFont = false)
+    private static PortableDocument LoadedSplitShowDocument(string streamData, bool includeSecondFont = false)
     {
         var resources = includeSecondFont
             ? "/Resources << /Font << /F0 5 0 R /F1 6 0 R >> >>"
@@ -74,10 +73,10 @@ public class ContentEditingTests
 
         pdf.Append($"trailer\n<< /Size {objectCount + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
-    private static Document LoadedSplitSubsetDocument()
+    private static PortableDocument LoadedSplitSubsetDocument()
     {
         const string streamData = "BT /F0 12 Tf 1 0 0 1 72 700 Tm <00010002> Tj "
             + "1 0 0 1 87 700 Tm <00030004000500060007> Tj "
@@ -111,13 +110,13 @@ public class ContentEditingTests
 
         pdf.Append("trailer\n<< /Size 8 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     [Fact]
     public void RemoveAt_LoadedPath_RemovesOnlyItsPaintOperators()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("0 0 m 10 0 l S\n20 0 m 30 0 l S\n"));
         var loaded = InterpreterTestSupport.Load(document.ToArray());
@@ -280,7 +279,7 @@ public class ContentEditingTests
     [Fact]
     public void RemoveAt_ThenRedactText_DoesNotRestoreRemovedContent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("SENSITIVE", 72, 720));
         page.Content.Add(new TextContent("OTHER", 72, 700));
@@ -364,7 +363,7 @@ public class ContentEditingTests
 
         pdf.Append("trailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        var document = Document.LoadFromStream(input);
+        var document = PortableDocument.LoadFromStream(input);
 
         var exception = Assert.Throws<NotSupportedException>(() => document.ReplaceText("A", "D"));
 

@@ -5,14 +5,13 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Content-stream comment per ISO 32000-1 7.2.4
 public class TextReplacerCommentReparseTests
 {
-    private static Document LoadedWidthDocumentWithComment()
+    private static PortableDocument LoadedWidthDocumentWithComment()
     {
         const string streamData = "BT /F0 10 Tf 72 700 Td (A) % kern\nTj (Z) Tj ET";
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
@@ -35,7 +34,7 @@ public class TextReplacerCommentReparseTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     [Fact]

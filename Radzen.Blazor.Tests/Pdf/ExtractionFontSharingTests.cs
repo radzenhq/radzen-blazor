@@ -5,15 +5,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ExtractionFontSharingTests
 {
-    private static Document Build(int paragraphs)
+    private static PortableDocument Build(int paragraphs)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
 
         var section = document.Sections.Add();
@@ -25,7 +24,7 @@ public class ExtractionFontSharingTests
         return new DocumentRenderer().Render(document);
     }
 
-    private static List<ReverseFont> Fonts(Document document)
+    private static List<ReverseFont> Fonts(PortableDocument document)
         => document.Pages.SelectMany(page => page.TextFonts!.Values).ToList();
 
     [Fact]

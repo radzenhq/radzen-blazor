@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -27,7 +26,7 @@ public class EncryptionMetadataTests
 
     private static byte[] EncryptedDocument(bool encryptMetadata)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Producer = "Radzen metadata test producer";
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (secret) Tj ET"));
         document.Encryption = new EncryptionOptions

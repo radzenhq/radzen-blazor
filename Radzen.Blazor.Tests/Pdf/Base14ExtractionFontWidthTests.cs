@@ -3,15 +3,14 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class Base14ExtractionFontWidthTests
 {
-    private static Radzen.Documents.Document Base14TextBuilder()
+    private static Document Base14TextBuilder()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         section.Margins.SetAll(Unit.FromPoint(0));
         BuildTestSupport.AddText(section, "Hello", "Helvetica");
@@ -27,7 +26,7 @@ public class Base14ExtractionFontWidthTests
         var generatedHit = Assert.Single(built.Pages[0].FindText("Hello"));
 
         using var buffer = new MemoryStream(new DocumentRenderer().ToArray(document));
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
         var reloadedHit = Assert.Single(reloaded.Pages[0].FindText("Hello"));
 
         Assert.False(generatedHit.GeometryEstimated, "base-14 extraction fonts carry AFM widths");

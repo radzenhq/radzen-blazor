@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_ReturnsPageIndexAndPlausibleBounds()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 20 Tf 72 700 Td (Known word) Tj ET"));
 
@@ -32,7 +31,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_RespectsCaseAndWholeWordOptions()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 12 Tf 72 700 Td (Cat catalog CAT) Tj ET"));
 
@@ -44,7 +43,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_MatchAcrossShowOperators_ReturnsTwoQuadsAndSources()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 16 Tf 40 500 Td (Hel) Tj (lo) Tj ET"));
 
@@ -70,7 +69,7 @@ public class TextSearchTests
     [Fact]
     public void ExtractPositionedText_AccountsForRotationAndScaling()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("q 0 2 -3 0 300 100 cm BT /F1 10 Tf 10 20 Td (Turn) Tj ET Q"));
 
@@ -85,7 +84,7 @@ public class TextSearchTests
     [Fact]
     public void PositionedExtraction_DoesNotChangeLegacyExtractTextOutput()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 12 Tf 72 700 Td (Alpha) Tj 0 -20 Td (Beta) Tj ET"));
         var before = page.ExtractText();
@@ -100,7 +99,7 @@ public class TextSearchTests
     [Fact]
     public void DocumentFindText_ReportsEachMatchingPageIndex()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("BT /F1 12 Tf 20 700 Td (Needle) Tj ET"));
         document.Pages.Add().SetContent(Content("BT /F1 12 Tf 20 700 Td (Needle) Tj ET"));
 
@@ -112,7 +111,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_NormalizedWhitespace_MatchesAcrossLines()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 12 Tf 72 700 Td (Alpha) Tj 0 -20 Td (Beta) Tj ET"));
 
@@ -126,7 +125,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_PartialMatchInShowArray_UsesLocalizedKerningAdjustment()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 10 Tf 0 100 Td [(AB) -2000 (CD)] TJ ET"));
 
@@ -140,7 +139,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_PartialMatchInWordSpacedRun_UsesSpaceAdvance()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Content("BT /F1 10 Tf 10 Tw 0 100 Td (A B) Tj ET"));
 
@@ -154,7 +153,7 @@ public class TextSearchTests
     [Fact]
     public void FindText_RejectsEmptySearchText()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
 
         Assert.Throws<ArgumentException>(() => page.FindText(string.Empty));

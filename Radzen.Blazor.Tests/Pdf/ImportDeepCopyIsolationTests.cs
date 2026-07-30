@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,13 +32,13 @@ public class ImportDeepCopyIsolationTests
         return pdf.ToArray();
     }
 
-    private static Document Load(byte[] b) => Document.LoadFromStream(new MemoryStream(b));
+    private static PortableDocument Load(byte[] b) => PortableDocument.LoadFromStream(new MemoryStream(b));
 
     [Fact]
     public void ImportedPage_DoesNotShareResourceGraphWithSource()
     {
         var source = Load(SourceBytes());
-        var target = new Document();
+        var target = new PortableDocument();
         var imported = target.ImportPage(source, 0);
 
         var sourceResources = source.Loaded!.SourceResources[source.Pages[0]];
@@ -58,11 +57,11 @@ public class ImportDeepCopyIsolationTests
     [Fact]
     public void UnmodifiedImport_IsByteIdenticalToWholeSourceSnapshotImport()
     {
-        var directTarget = new Document();
+        var directTarget = new PortableDocument();
         directTarget.ImportPage(Load(SourceBytes()), 0);
 
         var snapshotSource = PageOperations.Snapshot(Load(SourceBytes()));
-        var snapshotTarget = new Document();
+        var snapshotTarget = new PortableDocument();
         PageOperations.Import(snapshotTarget, snapshotSource, 0, 1);
 
         Assert.Equal(snapshotTarget.ToArray(), directTarget.ToArray());

@@ -6,15 +6,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AcroFormChoiceRadioSelectionTests
 {
-    private static Document BuildLoadedForm()
+    private static PortableDocument BuildLoadedForm()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Survey", "Helvetica");
         var pdf = new DocumentRenderer().Render(document);
@@ -43,7 +42,7 @@ public class AcroFormChoiceRadioSelectionTests
         radio.Options.Add(new RadioOptionDefinition("Large") { X = 100, Y = 540, Width = 16, Height = 16 });
         pdf.FormFields.Add(radio);
 
-        return Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
+        return PortableDocument.LoadFromStream(new MemoryStream(pdf.ToArray()));
     }
 
     private static double[] IndicesOf(DocumentReader reader, DictionaryObject field)
@@ -120,7 +119,7 @@ public class AcroFormChoiceRadioSelectionTests
         var document = BuildLoadedForm();
         document.AcroForm!.SelectRadioOption("Size", "Medium");
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
         var size = reloaded.AcroForm!.Fields.Single(f => f.Name == "Size");
         Assert.Equal("Medium", size.Value);
     }

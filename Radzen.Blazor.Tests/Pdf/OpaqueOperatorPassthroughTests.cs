@@ -6,7 +6,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -43,7 +42,7 @@ public class OpaqueOperatorPassthroughTests
     public void FullReencode_CarriesUnmodeledOperators()
     {
         using var stream = new MemoryStream(Fixture());
-        var document = Document.LoadFromStream(stream);
+        var document = PortableDocument.LoadFromStream(stream);
         var page = document.Pages[0];
 
         var path = page.Content.OfType<PathContent>().First();

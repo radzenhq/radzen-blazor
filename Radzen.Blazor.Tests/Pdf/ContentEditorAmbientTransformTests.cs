@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedTextUnderAmbientCm_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("q 2 0 0 2 0 0 cm BT /F1 12 Tf 10 10 Td (Hi) Tj ET Q"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -31,7 +30,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedPathUnderAmbientCm_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("q 3 0 0 3 50 20 cm 0 0 m 10 10 l S Q"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -48,7 +47,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedTextUnderRotatedCm_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("q 0 2 -3 0 300 100 cm BT /F1 10 Tf 10 20 Td (Turn) Tj ET Q"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -66,7 +65,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedTextUnderIdentityCm_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -83,7 +82,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedTextUnderMalformedCm_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("q 1 2 3 4 5 cm BT /F1 12 Tf 10 10 Td (Hi) Tj ET Q"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -100,7 +99,7 @@ public class ContentEditorAmbientTransformTests
     [Fact]
     public void ModifiedTextAfterUnbalancedQ_KeepsItsTransform()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Content("2 0 0 2 0 0 cm Q BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);

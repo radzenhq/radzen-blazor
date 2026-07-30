@@ -4,7 +4,7 @@ internal sealed class CapturedRendererSettings
 {
     private CapturedRendererSettings(DocumentRenderer renderer)
     {
-        Document = new Document
+        Document = new PortableDocument
         {
             Conformance = renderer.Conformance,
             Accessibility = renderer.Accessibility,
@@ -38,7 +38,7 @@ internal sealed class CapturedRendererSettings
         }
     }
 
-    public Document Document { get; }
+    public PortableDocument Document { get; }
 
     public PdfAConformance Conformance => Document.Conformance;
 

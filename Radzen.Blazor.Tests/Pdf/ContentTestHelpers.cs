@@ -4,13 +4,12 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class ContentTestHelpers
 {
-    public static DocumentReader Reload(Document document) => DocumentReader.Parse(document.ToArray());
+    public static DocumentReader Reload(PortableDocument document) => DocumentReader.Parse(document.ToArray());
 
     public static DictionaryObject Catalog(DocumentReader reader)
         => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));

@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -54,7 +53,7 @@ public class AcroFormAppearanceTests
         return Wrap(pdf, 8);
     }
 
-    private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     private static bool HasAppearanceStream(DocumentReader reader, DictionaryObject widget)
         => widget.TryGetValue("AP", out var ap) && reader.Resolve(ap!) is DictionaryObject dict

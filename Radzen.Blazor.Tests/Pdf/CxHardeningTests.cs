@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -24,7 +23,7 @@ public class CxHardeningTests
         var limits = new ReaderLimits { MaxDecodedStreamBytes = 8, MaxAggregateDecodedBytes = 10 };
 
         Assert.Throws<DocumentParseException>(
-            () => Document.LoadFromStream(new MemoryStream(bytes), limits));
+            () => PortableDocument.LoadFromStream(new MemoryStream(bytes), limits));
     }
 
     [Fact]
@@ -47,7 +46,7 @@ public class CxHardeningTests
             (1, "<< /Type /NotCatalog >>"),
             (2, "<< /Type /Pages /Kids [] /Count 0 >>"));
 
-        Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
+        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
     }
 
     [Fact]
@@ -59,7 +58,7 @@ public class CxHardeningTests
             (3, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>"),
             (4, "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>"));
 
-        Assert.Equal(2, Document.LoadFromStream(new MemoryStream(bytes)).Pages.Count);
+        Assert.Equal(2, PortableDocument.LoadFromStream(new MemoryStream(bytes)).Pages.Count);
     }
 
     [Fact]

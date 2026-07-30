@@ -23,7 +23,7 @@ public class PathContentRenderingIntentTests
 
     private static byte[] Render(PathContent path)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(path);
         return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);

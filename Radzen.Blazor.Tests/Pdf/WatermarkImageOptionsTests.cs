@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -15,7 +14,7 @@ public class WatermarkImageOptionsTests
 {
     private static byte[] Build(bool sectionWatermark, Watermark watermark)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Body");
@@ -62,7 +61,7 @@ public class WatermarkImageOptionsTests
     [Fact]
     public void DocumentWatermarkMutationToInvalidOpacityIsRejectedEagerly()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         var watermark = new Watermark { Text = "draft" };
         document.AddWatermark(watermark);
@@ -73,7 +72,7 @@ public class WatermarkImageOptionsTests
     [Fact]
     public void DocumentWatermarkMutationToValidOpacityStillSaves()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         var watermark = new Watermark { Text = "draft" };
         document.AddWatermark(watermark);

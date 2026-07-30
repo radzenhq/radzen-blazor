@@ -3,7 +3,6 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +11,7 @@ public class PathContentClipTests
 {
     private static byte[] Render(PathContent path)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(path);
         return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);

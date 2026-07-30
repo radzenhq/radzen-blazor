@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Fonts.Sfnt;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;

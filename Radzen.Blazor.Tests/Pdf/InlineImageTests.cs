@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -28,9 +27,9 @@ public class InlineImageTests
         return [.. bytes];
     }
 
-    private static Document Load(byte[] content)
+    private static PortableDocument Load(byte[] content)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(content);
         return InterpreterTestSupport.Load(document.ToArray());
     }

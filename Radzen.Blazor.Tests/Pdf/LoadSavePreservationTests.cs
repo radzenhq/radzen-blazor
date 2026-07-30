@@ -5,20 +5,19 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class LoadSavePreservationTests
 {
-    private static Document LoadSaveReload(byte[] source)
+    private static PortableDocument LoadSaveReload(byte[] source)
     {
         using var input = new MemoryStream(source);
-        var document = Document.LoadFromStream(input);
+        var document = PortableDocument.LoadFromStream(input);
         return document;
     }
 
-    private static DocumentReader SaveAndParse(Document document)
+    private static DocumentReader SaveAndParse(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
 
     private static byte[] Build(string pageExtra, string catalogExtra, string extraObjects, int objectCount)

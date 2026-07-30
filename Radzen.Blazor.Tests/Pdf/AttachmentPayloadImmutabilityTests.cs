@@ -3,7 +3,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +11,7 @@ public class AttachmentPayloadImmutabilityTests
     [Fact]
     public void MutatingTheCallerArrayDoesNotChangeTheStoredPayload()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var data = Encoding.UTF8.GetBytes("payload");
         var builderRenderer = new DocumentRenderer();
         var attachment = builderRenderer.Attachments.Add("data.bin", data, AttachmentRelationship.Supplement, "application/octet-stream");
@@ -25,7 +24,7 @@ public class AttachmentPayloadImmutabilityTests
     [Fact]
     public void MutatingTheCallerArrayDoesNotFlipIsModified()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var data = Encoding.UTF8.GetBytes("payload");
         var attachment = document.Attachments.Add("data.bin", data, AttachmentRelationship.Supplement, "application/octet-stream");
         document.Attachments.AcceptChanges();

@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -80,9 +79,9 @@ public class AppendFormMergeTests
     [Fact]
     public void Append_NestedSourceForm_KeepsTreeIntact()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
-        a.Append(Document.LoadFromStream(new MemoryStream(NestedForm())));
+        a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
         var reader = DocumentReader.Parse(a.ToArray());
         var names = RootFieldNames(reader);
@@ -103,9 +102,9 @@ public class AppendFormMergeTests
     [Fact]
     public void Append_NestedSourceForm_UnionsDefaultResourceFonts()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
-        a.Append(Document.LoadFromStream(new MemoryStream(NestedForm())));
+        a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
         var reader = DocumentReader.Parse(a.ToArray());
         var dr = (DictionaryObject)reader.Resolve(AcroForm(reader)["DR"]!)!;
@@ -117,7 +116,7 @@ public class AppendFormMergeTests
     [Fact]
     public void Append_CollidingRootName_DisambiguatesWithoutDropping()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         var page = a.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("base"));
         a.FormFields.Add(new TextFieldDefinition("Name")
@@ -128,7 +127,7 @@ public class AppendFormMergeTests
             Width = 200,
             Height = 20,
         });
-        a.Append(Document.LoadFromStream(new MemoryStream(NestedForm())));
+        a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
         var reader = DocumentReader.Parse(a.ToArray());
         var names = RootFieldNames(reader);

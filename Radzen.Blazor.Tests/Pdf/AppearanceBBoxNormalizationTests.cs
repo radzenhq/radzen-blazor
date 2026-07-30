@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -43,7 +42,7 @@ public class AppearanceBBoxNormalizationTests
 
     private static ContentOperation FlattenedTransform(string bbox)
     {
-        var document = Document.LoadFromStream(new MemoryStream(CheckBoxWithBBox(bbox)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(CheckBoxWithBBox(bbox)));
         document.Flatten();
         var reader = FormTestSupport.Reload(document);
 

@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,7 +12,7 @@ public class PathClipTests
     [Fact]
     public void PathClip_IsScoped_AndDoesNotLeak()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
 
         var clip = new PathContent { Clip = PathClipMode.NonZero };

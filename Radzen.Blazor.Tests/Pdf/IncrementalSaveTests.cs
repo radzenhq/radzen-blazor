@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -35,7 +34,7 @@ public class IncrementalSaveTests
 
     private static byte[] BaseDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Original title";
         document.Info.Author = "Original author";
         document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT /F1 12 Tf 72 720 Td (page zero) Tj ET"));
@@ -104,9 +103,9 @@ public class IncrementalSaveTests
         return pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
     }
 
-    private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
-    private static byte[] SaveIncremental(Document document)
+    private static byte[] SaveIncremental(PortableDocument document)
     {
         using var stream = new MemoryStream();
         document.SaveIncremental(stream);
@@ -139,7 +138,7 @@ public class IncrementalSaveTests
     [Fact]
     public void FreshlyBuiltDocumentThrows()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4);
 
         Assert.Throws<InvalidOperationException>(() => SaveIncremental(document));
@@ -267,7 +266,7 @@ public class IncrementalSaveTests
     [Fact]
     public void AppendedLoadedPageCarriesResourcesIncrementally()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Fonted append", BuildTestSupport.Latin);
@@ -319,7 +318,7 @@ public class IncrementalSaveTests
     [Fact]
     public void SaveIncremental_AfterAppendPreservesModeledAnnotation()
     {
-        var foreign = new Document();
+        var foreign = new PortableDocument();
         foreign.Pages.Add().Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24))
         {
             Contents = "modeled foreign annotation",
@@ -390,7 +389,7 @@ public class IncrementalSaveTests
     [Fact]
     public void EditedAndRemovedAnnotationsAreAppendedAndReParse()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var page = source.Pages.Add();
         page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24)) { Contents = "old" });
         page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(40, 20, 24, 24)));
@@ -409,7 +408,7 @@ public class IncrementalSaveTests
     [Fact]
     public void DeletedAndReorderedPagesAreAppendedAndReParse()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().SetContent(Ascii("first"));
         source.Pages.Add().SetContent(Ascii("remove"));
         source.Pages.Add().SetContent(Ascii("last"));
@@ -452,7 +451,7 @@ public class IncrementalSaveTests
     [Fact]
     public void InsertedPageIsAppendedAndPlacedInTheUpdatedPageTree()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().SetContent(Ascii("first"));
         source.Pages.Add().SetContent(Ascii("last"));
         var original = source.ToArray();

@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,17 +13,17 @@ internal static class FormTestSupport
 {
     public const string Fixture = "Documents/form-simple.pdf";
 
-    public static Document LoadFixture()
-        => Document.LoadFromStream(new MemoryStream(PdfTestResources.ReadAllBytes(Fixture)));
+    public static PortableDocument LoadFixture()
+        => PortableDocument.LoadFromStream(new MemoryStream(PdfTestResources.ReadAllBytes(Fixture)));
 
-    public static byte[] Save(Document document)
+    public static byte[] Save(PortableDocument document)
     {
         using var stream = new MemoryStream();
         document.SaveToStream(stream);
         return stream.ToArray();
     }
 
-    public static DocumentReader Reload(Document document)
+    public static DocumentReader Reload(PortableDocument document)
         => DocumentReader.Parse(Save(document));
 
     public static DictionaryObject Catalog(DocumentReader reader)

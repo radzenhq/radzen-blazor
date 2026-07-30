@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -187,7 +186,7 @@ public class CryptFilterTests
     {
         using var stream = new MemoryStream(BuildDocument("Identity", "Identity"));
 
-        var document = Document.LoadFromStream(stream, new LoadOptions { Password = "" });
+        var document = PortableDocument.LoadFromStream(stream, new LoadOptions { Password = "" });
 
         Assert.Equal(1, document.Pages.Count);
     }

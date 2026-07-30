@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf.Objects.Encryption;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -64,7 +63,7 @@ public class DeterminismManifestTests
 
     private static byte[] PlainText()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "Plain text";
         var section = document.Sections.Add();
         section.Blocks.Add(Text("The quick brown fox jumps over the lazy dog."));
@@ -74,7 +73,7 @@ public class DeterminismManifestTests
 
     private static byte[] TrueTypeSubset()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "TrueType subset";
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
@@ -84,7 +83,7 @@ public class DeterminismManifestTests
 
     private static byte[] Tables()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "Table";
         BuildTestSupport.RegisterLatin(document);
 
@@ -111,7 +110,7 @@ public class DeterminismManifestTests
 
     private static byte[] Image()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "Image";
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
@@ -122,7 +121,7 @@ public class DeterminismManifestTests
 
     private static byte[] Gradients()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "Gradients";
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
@@ -149,7 +148,7 @@ public class DeterminismManifestTests
 
     private static byte[] Encrypted()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Encrypted";
         document.Info.Producer = "Radzen determinism manifest";
         document.Pages.Add(PageSizes.A4).SetContent(
@@ -166,7 +165,7 @@ public class DeterminismManifestTests
 
     private static byte[] SignedBase()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Info.Title = "Signed";
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();

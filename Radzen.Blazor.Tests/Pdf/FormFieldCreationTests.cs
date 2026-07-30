@@ -6,22 +6,21 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class FormFieldCreationTests
 {
-    private static Document BuildDocument()
+    private static PortableDocument BuildDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice", "Helvetica");
         return new DocumentRenderer().Render(document);
     }
 
-    private static Document WithFields()
+    private static PortableDocument WithFields()
     {
         var document = BuildDocument();
         document.FormFields.Add(new TextFieldDefinition("Name")
@@ -44,7 +43,7 @@ public class FormFieldCreationTests
         return document;
     }
 
-    private static DocumentReader Reload(Document document)
+    private static DocumentReader Reload(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
 
     private static double[] RectOf(DocumentReader reader, DictionaryObject widget)
@@ -160,7 +159,7 @@ public class FormFieldCreationTests
     public void ReloadedCreatedFieldsExposeValuesThroughAcroForm()
     {
         using var stream = new MemoryStream(WithFields().ToArray());
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
 
         Assert.NotNull(reloaded.AcroForm);
         var name = reloaded.AcroForm!.Fields.Single(f => f.Name == "Name");
@@ -175,7 +174,7 @@ public class FormFieldCreationTests
     public void FlattenAfterReloadDrawsValuesAndRemovesFields()
     {
         using var stream = new MemoryStream(WithFields().ToArray());
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
         reloaded.Flatten();
 
         Assert.Null(reloaded.AcroForm);

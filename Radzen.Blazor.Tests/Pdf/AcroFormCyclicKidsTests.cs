@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -56,13 +55,13 @@ public class AcroFormCyclicKidsTests
     public void CyclicKids_ThrowsInsteadOfStackOverflow()
     {
         Assert.Throws<DocumentParseException>(
-            () => Document.LoadFromStream(new MemoryStream(CyclicFormSource())));
+            () => PortableDocument.LoadFromStream(new MemoryStream(CyclicFormSource())));
     }
 
     [Fact]
     public void NestedTree_EnumeratesAllTerminals()
     {
-        var document = Document.LoadFromStream(new MemoryStream(NestedFormSource()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(NestedFormSource()));
 
         Assert.NotNull(document.AcroForm);
         Assert.Equal(2, document.AcroForm!.FieldNames.Count);

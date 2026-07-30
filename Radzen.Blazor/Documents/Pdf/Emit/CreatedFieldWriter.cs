@@ -41,7 +41,7 @@ internal static class RadioGroupValidation
     }
 }
 
-internal sealed class CreatedFieldWriter(Document document, FormAppearanceService appearances)
+internal sealed class CreatedFieldWriter(PortableDocument document, FormAppearanceService appearances)
 {
     public List<(int PageIndex, ReferenceObject Reference)> Write(
         DocumentWriter writer,

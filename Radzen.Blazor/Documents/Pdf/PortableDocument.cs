@@ -15,7 +15,7 @@ namespace Radzen.Documents.Pdf;
 /// A physical PDF document: an ordered collection of pages plus document
 /// metadata. Serialized through the object model as a classic PDF file.
 /// </summary>
-public sealed class Document
+public sealed class PortableDocument
 {
     private readonly TrackedList<OutlineItem> outline;
     private readonly TrackedList<PageLabel> pageLabels;
@@ -35,7 +35,7 @@ public sealed class Document
     private bool acroFormLoaded = true;
 
     /// <summary>Initializes an empty PDF document.</summary>
-    public Document()
+    public PortableDocument()
     {
         Pages = new PageCollection(this);
         outline = new TrackedList<OutlineItem>(InvalidateMaterializedGraph);
@@ -91,9 +91,9 @@ public sealed class Document
         Anchors.Clear();
     }
 
-    internal static Document CreateLoaded(LoadedState state)
+    internal static PortableDocument CreateLoaded(LoadedState state)
     {
-        var document = new Document { Loaded = state };
+        var document = new PortableDocument { Loaded = state };
         document.ResetGraphFacades();
         return document;
     }
@@ -120,7 +120,7 @@ public sealed class Document
 
     internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
-    internal void CarryForeignPage(Page page, Document donor)
+    internal void CarryForeignPage(Page page, PortableDocument donor)
     {
         if (donor.Loaded is { } origin)
         {
@@ -421,7 +421,7 @@ public sealed class Document
     /// <param name="stream">The source stream.</param>
     /// <param name="options">Load options such as the decryption password.</param>
     /// <returns>The loaded document.</returns>
-    public static Document LoadFromStream(Stream stream, LoadOptions? options = null)
+    public static PortableDocument LoadFromStream(Stream stream, LoadOptions? options = null)
         => LoadFromStream(stream, ReaderLimits.Default, options);
 
     /// <summary>
@@ -432,7 +432,7 @@ public sealed class Document
     /// <param name="limits">The resource limits to enforce while reading.</param>
     /// <param name="options">Load options such as the decryption password.</param>
     /// <returns>The loaded document.</returns>
-    public static Document LoadFromStream(Stream stream, ReaderLimits limits, LoadOptions? options = null)
+    public static PortableDocument LoadFromStream(Stream stream, ReaderLimits limits, LoadOptions? options = null)
         => DocumentLoader.Load(stream, limits, options);
 
     /// <summary>
@@ -543,7 +543,7 @@ public sealed class Document
     /// deduplication) and <paramref name="other"/> is left unchanged.
     /// </summary>
     /// <param name="other">The document whose pages are copied.</param>
-    public void Append(Document other)
+    public void Append(PortableDocument other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
@@ -563,7 +563,7 @@ public sealed class Document
     /// <param name="source">The source document.</param>
     /// <param name="pageIndex">The zero-based source page index.</param>
     /// <returns>The imported page.</returns>
-    public Page ImportPage(Document source, int pageIndex)
+    public Page ImportPage(PortableDocument source, int pageIndex)
     {
         ArgumentNullException.ThrowIfNull(source);
         var imported = ImportPages(source, new Range(pageIndex, pageIndex + 1));
@@ -574,7 +574,7 @@ public sealed class Document
     /// <param name="source">The source document.</param>
     /// <param name="range">The source page range.</param>
     /// <returns>The imported pages in source order.</returns>
-    public IReadOnlyList<Page> ImportPages(Document source, Range range)
+    public IReadOnlyList<Page> ImportPages(PortableDocument source, Range range)
     {
         ArgumentNullException.ThrowIfNull(source);
         var (offset, length) = range.GetOffsetAndLength(source.Pages.Count);
@@ -594,10 +594,10 @@ public sealed class Document
     /// <summary>Creates a new document containing deep copies of all pages from the supplied documents.</summary>
     /// <param name="documents">The documents to merge in order.</param>
     /// <returns>A new merged document.</returns>
-    public static Document Merge(params Document[] documents)
+    public static PortableDocument Merge(params PortableDocument[] documents)
     {
         ArgumentNullException.ThrowIfNull(documents);
-        var result = new Document();
+        var result = new PortableDocument();
         foreach (var document in documents)
         {
             ArgumentNullException.ThrowIfNull(document);

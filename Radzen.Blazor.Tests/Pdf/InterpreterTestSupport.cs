@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,13 +13,13 @@ internal static class InterpreterTestSupport
 {
     public static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    public static Document Load(byte[] bytes)
+    public static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    public static Document SaveAndLoad(Document document) => Load(document.ToArray());
+    public static PortableDocument SaveAndLoad(PortableDocument document) => Load(document.ToArray());
 
     public static byte[] PageContentBytes(byte[] file, int pageIndex)
         => ContentTestHelpers.PageContent(DocumentReader.Parse(file), pageIndex);

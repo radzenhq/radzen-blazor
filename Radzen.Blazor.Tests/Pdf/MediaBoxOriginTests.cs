@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -36,10 +35,10 @@ public class MediaBoxOriginTests
         return Wrap(pdf, 5);
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     private static double N(ArrayObject box, int i) => Assert.IsType<NumberObject>(box[i]).DoubleValue;

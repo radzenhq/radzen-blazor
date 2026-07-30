@@ -6,13 +6,12 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class NamedDestinationPreservationTests
 {
-    private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     private static DictionaryObject Catalog(DocumentReader reader)
         => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));

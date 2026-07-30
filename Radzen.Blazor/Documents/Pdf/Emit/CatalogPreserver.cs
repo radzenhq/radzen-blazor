@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class CatalogPreserver(Document document)
+internal sealed class CatalogPreserver(PortableDocument document)
 {
     private static readonly HashSet<string> ManagedCatalogKeys = new(StringComparer.Ordinal)
     {

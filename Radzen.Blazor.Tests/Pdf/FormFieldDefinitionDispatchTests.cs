@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -67,7 +66,7 @@ public class FormFieldDefinitionDispatchTests
 
         FormFieldEmitter.Emit(
             definition,
-            new FormEmitContext(writer, page, fields, created, new FormAppearanceService(new Document())));
+            new FormEmitContext(writer, page, fields, created, new FormAppearanceService(new PortableDocument())));
 
         var reference = Assert.IsType<ReferenceObject>(Assert.Single(fields));
         return Assert.IsType<DictionaryObject>(writer.Resolve(reference));
@@ -75,7 +74,7 @@ public class FormFieldDefinitionDispatchTests
 
     private static Page Flatten(FormFieldDefinition definition)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.A4);
         document.FormFields.Add(definition);
         new FormFlattener(document).Flatten();

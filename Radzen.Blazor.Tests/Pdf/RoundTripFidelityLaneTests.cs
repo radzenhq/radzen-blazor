@@ -7,19 +7,18 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class RoundTripFidelityLaneTests
 {
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    private static DocumentReader SaveAndParse(Document document)
+    private static DocumentReader SaveAndParse(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
 
     private static DictionaryObject Catalog(DocumentReader reader)

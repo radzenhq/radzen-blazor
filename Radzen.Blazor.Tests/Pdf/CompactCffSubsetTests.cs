@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

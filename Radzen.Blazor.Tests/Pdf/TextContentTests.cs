@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -41,7 +40,7 @@ public class TextContentTests
     [Fact]
     public void Text_EmitsBtTfTjEtInOrder()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 72, 700));
 
@@ -62,7 +61,7 @@ public class TextContentTests
     [Fact]
     public void Tf_CarriesResourceNameAndSize()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Size = 18 } });
 
@@ -77,7 +76,7 @@ public class TextContentTests
     [Fact]
     public void FontResource_IsBase14Type1Helvetica()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica" } });
 
@@ -97,7 +96,7 @@ public class TextContentTests
     [Fact]
     public void Bold_MapsToHelveticaBoldBaseFont()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Bold = true } });
 
@@ -112,7 +111,7 @@ public class TextContentTests
     [Fact]
     public void Times_MapsToTimesRomanBaseFont()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Times" } });
 
@@ -127,7 +126,7 @@ public class TextContentTests
     [Fact]
     public void Courier_MapsToCourierBaseFont()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Courier" } });
 
@@ -142,7 +141,7 @@ public class TextContentTests
     [Fact]
     public void TwoDistinctFonts_ProduceTwoResources()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("a", 0, 0) { Font = new Font { Family = "Helvetica" } });
         page.Content.Add(new TextContent("b", 0, 0) { Font = new Font { Family = "Times" } });
@@ -165,7 +164,7 @@ public class TextContentTests
     [Fact]
     public void Text_IsWinAnsiEncoded()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var text = "A\u20AC\u2013z";
         page.Content.Add(new TextContent(text, 0, 0));
@@ -182,7 +181,7 @@ public class TextContentTests
     [Fact]
     public void AsciiText_RoundTripsAsWinAnsiBytes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 0, 0));
 
@@ -195,7 +194,7 @@ public class TextContentTests
     [Fact]
     public void NonWinAnsiChar_EmitsQuestionMarkPlaceholder_NotDropped()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("AΩz", 0, 0));
 
@@ -208,7 +207,7 @@ public class TextContentTests
     [Fact]
     public void TextPosition_XAndYEmitted()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("P", 72, 700));
 
@@ -236,7 +235,7 @@ public class TextContentTests
     [Fact]
     public void TextColor_EmittedAsNonStrokingRg()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("C", 0, 0) { Color = Color.Red });
 

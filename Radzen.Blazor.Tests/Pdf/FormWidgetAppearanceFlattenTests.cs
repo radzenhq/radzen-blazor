@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -88,7 +87,7 @@ public class FormWidgetAppearanceFlattenTests
     [Fact]
     public void CheckedWidgetPaintsItsOwnNormalAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(CheckBoxWithCustomAppearance("Yes")));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(CheckBoxWithCustomAppearance("Yes")));
 
         document.Flatten();
         var reader = FormTestSupport.Reload(document);
@@ -100,7 +99,7 @@ public class FormWidgetAppearanceFlattenTests
     [Fact]
     public void OffWidgetPaintsItsOffAppearanceInsteadOfVanishing()
     {
-        var document = Document.LoadFromStream(new MemoryStream(CheckBoxWithCustomAppearance("Off")));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(CheckBoxWithCustomAppearance("Off")));
 
         document.Flatten();
         var reader = FormTestSupport.Reload(document);

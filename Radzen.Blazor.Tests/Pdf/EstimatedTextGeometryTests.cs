@@ -6,7 +6,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -15,7 +14,7 @@ public class EstimatedTextGeometryTests
 {
     private static readonly PdfRect TrueXBounds = new(50, 700, 56.67, 710);
 
-    private static Document LoadedDocument(bool widthForW, bool descriptor = false, int? missingWidth = null)
+    private static PortableDocument LoadedDocument(bool widthForW, bool descriptor = false, int? missingWidth = null)
     {
         const string stream = "BT /F1 10 Tf 10 700 Td (WWWWX) Tj ET";
         var widths = widthForW ? "/FirstChar 87 /LastChar 88 /Widths [1000 667]" : "/FirstChar 88 /LastChar 88 /Widths [667]";
@@ -46,10 +45,10 @@ public class EstimatedTextGeometryTests
 
         pdf.Append($"trailer\n<< /Size {last + 1} /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
-    private static string SavedContent(Document document)
+    private static string SavedContent(PortableDocument document)
         => Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 
     [Fact]

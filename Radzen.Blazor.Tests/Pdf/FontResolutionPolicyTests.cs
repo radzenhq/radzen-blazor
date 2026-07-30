@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Fonts;
 
 using Radzen.Documents.Pdf.Objects;

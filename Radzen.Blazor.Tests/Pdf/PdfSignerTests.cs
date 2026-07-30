@@ -9,7 +9,6 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,7 +18,7 @@ public class PdfSignerTests
 
     private static byte[] BuildPdf()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
@@ -236,7 +235,7 @@ public class PdfSignerTests
     {
         var original = DirectPageKid();
 
-        Assert.Single(Document.LoadFromStream(new MemoryStream(original)).Pages);
+        Assert.Single(PortableDocument.LoadFromStream(new MemoryStream(original)).Pages);
 
         var signed = PdfSigner.Sign(original, Options(), new DelegateSigner(_ => [1, 2, 3]));
 
@@ -260,7 +259,7 @@ public class PdfSignerTests
         var original = DeepPageTree(70);
         using var certificate = CreateCertificate();
 
-        var loaded = Document.LoadFromStream(new MemoryStream(original));
+        var loaded = PortableDocument.LoadFromStream(new MemoryStream(original));
         Assert.Single(loaded.Pages);
 
         var signed = PdfSigner.Sign(original, Options(), CmsSigner(certificate));

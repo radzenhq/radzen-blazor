@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -49,10 +48,10 @@ public class LoadedPageWatermarkAppendTests
         return pdf.ToArray();
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var input = new MemoryStream(bytes);
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     [Fact]

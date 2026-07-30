@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -76,7 +75,7 @@ public class AcroFormFieldTreeBoundsTests
     {
         var limits = new ReaderLimits { MaxPageTreeDepth = 6 };
         var exception = Assert.Throws<DocumentParseException>(
-            () => Document.LoadFromStream(new MemoryStream(DeepKidsSource(40)), limits));
+            () => PortableDocument.LoadFromStream(new MemoryStream(DeepKidsSource(40)), limits));
 
         Assert.Contains("deep", exception.Message);
     }
@@ -85,7 +84,7 @@ public class AcroFormFieldTreeBoundsTests
     public void DeepFieldTree_WithinConfiguredDepth_Loads()
     {
         var limits = new ReaderLimits { MaxPageTreeDepth = 64 };
-        var document = Document.LoadFromStream(new MemoryStream(DeepKidsSource(40)), limits);
+        var document = PortableDocument.LoadFromStream(new MemoryStream(DeepKidsSource(40)), limits);
 
         Assert.Single(document.AcroForm!.Fields);
         Assert.Equal("leaf", document.AcroForm!.Fields[0].Value);
@@ -95,6 +94,6 @@ public class AcroFormFieldTreeBoundsTests
     public void SharedFieldNode_IsDiagnosedNotRevisited()
     {
         Assert.Throws<DocumentParseException>(
-            () => Document.LoadFromStream(new MemoryStream(SharedNodeSource())));
+            () => PortableDocument.LoadFromStream(new MemoryStream(SharedNodeSource())));
     }
 }

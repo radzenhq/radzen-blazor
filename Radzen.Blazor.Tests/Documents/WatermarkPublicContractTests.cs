@@ -4,7 +4,6 @@ using System.IO;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
-using ModelDocument = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -70,9 +69,9 @@ public class WatermarkPublicContractTests
     public void NonFiniteRotationIsRejectedWhenAssigned(double rotation)
         => Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Rotation = rotation });
 
-    private static ModelDocument DocumentWith(Watermark watermark)
+    private static Document DocumentWith(Watermark watermark)
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var section = document.Sections.Add();
         section.Watermark = watermark;
         section.Blocks.AddParagraph("body");

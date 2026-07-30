@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -30,7 +29,7 @@ public class ContentElementTests
     [Fact]
     public void NonEmptyContent_EmitsContentStream()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 72, 700));
 
@@ -44,7 +43,7 @@ public class ContentElementTests
     [Fact]
     public void ZOrder_TextBeforePath_MatchesAddOrder()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Z", 10, 10));
         var path = page.Content.Add(new PathContent());
@@ -63,7 +62,7 @@ public class ContentElementTests
     [Fact]
     public void ZOrder_PathBeforeText_MatchesAddOrder()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = page.Content.Add(new PathContent());
         path.MoveTo(0, 0);
@@ -80,7 +79,7 @@ public class ContentElementTests
     [Fact]
     public void Transform_NonIdentity_EmittedAsCm()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var matrix = Matrix.Scale(2, 3) * Matrix.Translate(10, 20);
         page.Content.Add(new TextContent("T", 0, 0) { Transform = matrix });
@@ -101,7 +100,7 @@ public class ContentElementTests
     [Fact]
     public void Transform_Identity_EmitsNoCm()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("T", 0, 0));
 
@@ -113,7 +112,7 @@ public class ContentElementTests
     [Fact]
     public void IsArtifact_WrapsElementInArtifactMarkedContent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("A", 0, 0) { IsArtifact = true });
 
@@ -139,7 +138,7 @@ public class ContentElementTests
     [Fact]
     public void DefaultElement_NotWrappedInArtifact()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("A", 0, 0));
 
@@ -151,7 +150,7 @@ public class ContentElementTests
     [Fact]
     public void MultipleElements_OperatorOrderMatchesElementOrder()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("first", 0, 0));
         var path = page.Content.Add(new PathContent());
@@ -172,7 +171,7 @@ public class ContentElementTests
     [Fact]
     public void NonEmptyContent_OverridesRawSetContent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("q Q"));
         page.Content.Add(new TextContent("MARKER", 10, 10));
@@ -187,7 +186,7 @@ public class ContentElementTests
     public void EmptyContent_FallsBackToRawSetContent()
     {
         var raw = Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm");
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(raw);
 
@@ -199,7 +198,7 @@ public class ContentElementTests
     [Fact]
     public void ImageContent_UndecodablePayload_ThrowsOnSave()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent([0, 0, 0, 0]) { Bounds = PdfRect.FromSize(0, 0, 10, 10) });
 

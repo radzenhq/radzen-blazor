@@ -9,7 +9,6 @@ using Radzen.Documents.Pdf.Objects.Filters;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

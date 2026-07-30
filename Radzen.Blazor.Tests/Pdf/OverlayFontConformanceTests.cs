@@ -3,7 +3,6 @@ using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,7 +10,7 @@ public class OverlayFontConformanceTests
 {
     private static byte[] Png() => PdfTestResources.ReadAllBytes("Images/rgb.png");
 
-    private static Radzen.Documents.Pdf.Document RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+    private static PortableDocument RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.Render(authored.Document);
 
     private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance)

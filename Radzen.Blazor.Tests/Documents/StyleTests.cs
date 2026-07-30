@@ -2,7 +2,6 @@
 using System;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Documents.Tests;
 

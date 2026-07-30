@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,7 +32,7 @@ public class ReversedPageBoxLoadTests
     }
 
     private static Page Load(string mediaBox, string pageExtra = "")
-        => Document.LoadFromStream(new MemoryStream(Build(mediaBox, pageExtra))).Pages[0];
+        => PortableDocument.LoadFromStream(new MemoryStream(Build(mediaBox, pageExtra))).Pages[0];
 
     [Fact]
     public void ReversedMediaBox_NormalizesToPositiveSize()

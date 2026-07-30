@@ -3,7 +3,6 @@ using System.Linq;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
-using ModelDocument = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -130,9 +129,9 @@ public class GeometryPublicContractTests
         Assert.NotEqual(first, different);
     }
 
-    private static ModelDocument PageDocument(PageOrientation orientation)
+    private static Document PageDocument(PageOrientation orientation)
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var section = document.Sections.Add();
         section.PageSize = new PageSize("300pt", "500pt");
         section.Orientation = orientation;

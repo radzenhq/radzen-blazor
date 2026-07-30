@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -87,7 +86,7 @@ public class AcroFormParentChainDepthTests
     [InlineData(40)]
     public void DeepParentChain_InheritsValueFromRoot(int levels)
     {
-        var document = Document.LoadFromStream(new MemoryStream(DeepChainSource(levels)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(DeepChainSource(levels)));
         var field = document.AcroForm!.Fields.Single();
 
         Assert.Equal("deep", field.Value);
@@ -96,7 +95,7 @@ public class AcroFormParentChainDepthTests
     [Fact]
     public void CyclicParentChain_ThrowsInsteadOfTruncatingSilently()
     {
-        var document = Document.LoadFromStream(new MemoryStream(CyclicParentSource()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(CyclicParentSource()));
         var field = document.AcroForm!.Fields.Single();
 
         var exception = Assert.Throws<DocumentParseException>(() => field.Value);

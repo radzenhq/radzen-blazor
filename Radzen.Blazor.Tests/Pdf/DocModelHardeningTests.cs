@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,7 +31,7 @@ public class DocModelHardeningTests
 
     private static byte[] ValidPdfBytes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         return document.ToArray();
     }
@@ -44,12 +43,12 @@ public class DocModelHardeningTests
 
         using (var ok = new MemoryStream(bytes))
         {
-            Assert.Single(Document.LoadFromStream(ok).Pages);
+            Assert.Single(PortableDocument.LoadFromStream(ok).Pages);
         }
 
         var limits = new ReaderLimits { MaxFileBytes = bytes.Length - 1 };
         using var stream = new MemoryStream(bytes);
-        var ex = Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(stream, limits));
+        var ex = Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(stream, limits));
         Assert.Contains("file size", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -59,7 +58,7 @@ public class DocModelHardeningTests
         var bytes = ValidPdfBytes();
         var limits = new ReaderLimits { MaxFileBytes = bytes.Length - 1 };
         using var stream = new NonSeekableStream(bytes);
-        var ex = Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(stream, limits));
+        var ex = Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(stream, limits));
         Assert.Contains("file size", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -72,7 +71,7 @@ public class DocModelHardeningTests
         Assert.Throws<EndOfStreamException>(() => DocumentReader.Parse(readerStream));
 
         using var loaderStream = new OverReportingStream(bytes, 100);
-        Assert.Throws<EndOfStreamException>(() => Document.LoadFromStream(loaderStream));
+        Assert.Throws<EndOfStreamException>(() => PortableDocument.LoadFromStream(loaderStream));
     }
 
     private sealed class OverReportingStream(byte[] data, int overstate) : Stream

@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,7 +25,7 @@ public class RendererCaptureIsolationTests
         return document;
     }
 
-    private static string Save(Radzen.Documents.Pdf.Document document)
+    private static string Save(PortableDocument document)
         => Encoding.Latin1.GetString(document.ToArray());
 
     [Fact]

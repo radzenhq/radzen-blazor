@@ -3,7 +3,6 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,7 +10,7 @@ public class GraphicsStateTests
 {
     private static ContentCollection Materialize(string rawStream)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii(rawStream));
 

@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -40,7 +39,7 @@ public class InfoIndirectReferenceImportTests
     [Fact]
     public void FullSave_ImportsIndirectInfoValueWithoutDangling()
     {
-        var document = Document.LoadFromStream(new MemoryStream(BuildPdf()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(BuildPdf()));
 
         var saved = document.ToArray();
         var reader = DocumentReader.Parse(saved);

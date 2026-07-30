@@ -5,13 +5,12 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentSpacingDivergenceTests
 {
-    private static Document Loaded(string streamData)
+    private static PortableDocument Loaded(string streamData)
     {
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
         var pdf = new FixturePdf()
@@ -31,7 +30,7 @@ public class ContentSpacingDivergenceTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     [Fact]

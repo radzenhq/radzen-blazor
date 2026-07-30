@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -60,13 +59,13 @@ public class ContentInterpreterSpanTests
     [Fact]
     public void NamelessDo_InEditedPage_IsPreservedNotRejected()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Ascii("q Do Q"));
         page.Content.Add(new TextContent("x", 10, 10));
 
         using var buffer = new MemoryStream(document.ToArray());
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
 
         Assert.Contains("Do", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
     }

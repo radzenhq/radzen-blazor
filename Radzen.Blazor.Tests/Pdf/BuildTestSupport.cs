@@ -5,7 +5,6 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,11 +13,11 @@ internal static class BuildTestSupport
     public const string Latin = "Liberation Sans";
     public const string Cjk = "Noto Sans SC";
 
-    public static void RegisterLatin(Radzen.Documents.Document document)
+    public static void RegisterLatin(Document document)
         => document.Fonts.Register(Latin, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
 
-    public static void RegisterCjk(Radzen.Documents.Document document)
+    public static void RegisterCjk(Document document)
         => document.Fonts.Register(Cjk, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf")));
 
@@ -31,13 +30,13 @@ internal static class BuildTestSupport
         return section.Blocks.Add(paragraph);
     }
 
-    public static Document Reload(Radzen.Documents.Document document, DocumentRenderer? renderer = null)
+    public static PortableDocument Reload(Document document, DocumentRenderer? renderer = null)
     {
         using var buffer = new MemoryStream((renderer ?? new DocumentRenderer()).ToArray(document));
-        return Document.LoadFromStream(buffer);
+        return PortableDocument.LoadFromStream(buffer);
     }
 
-    public static DocumentReader Read(Radzen.Documents.Document document, DocumentRenderer? renderer = null)
+    public static DocumentReader Read(Document document, DocumentRenderer? renderer = null)
         => DocumentReader.Parse((renderer ?? new DocumentRenderer()).ToArray(document));
 
     public static List<(DictionaryObject Page, DictionaryObject? Resources)> PageLeaves(DocumentReader reader)

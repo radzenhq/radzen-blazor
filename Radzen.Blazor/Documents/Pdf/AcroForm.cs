@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf;
 
 
 /// <summary>
-/// The interactive form of a loaded <see cref="Document"/>. Exposes the terminal
+/// The interactive form of a loaded <see cref="PortableDocument"/>. Exposes the terminal
 /// fields and lets a caller fill text fields (regenerating their normal
 /// appearance) and toggle button fields on. Edits mutate the live field
 /// dictionaries and are preserved when the document is saved.
@@ -17,7 +17,7 @@ public sealed class AcroForm
     private const string OnState = "Yes";
 
     private readonly DocumentReader reader;
-    private readonly Document owner;
+    private readonly PortableDocument owner;
     private readonly List<FormField> fields = [];
     private readonly List<string> fieldNames = [];
 
@@ -25,7 +25,7 @@ public sealed class AcroForm
 
     private readonly Dictionary<string, Terminal> terminals = new(StringComparer.Ordinal);
 
-    internal AcroForm(DocumentReader reader, DictionaryObject dictionary, Document owner)
+    internal AcroForm(DocumentReader reader, DictionaryObject dictionary, PortableDocument owner)
     {
         this.reader = reader;
         this.owner = owner;

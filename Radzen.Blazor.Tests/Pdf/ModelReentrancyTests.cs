@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
-using Document = Radzen.Documents.Document;
 
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Codes;

@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -19,7 +18,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void MaterializedRectangleFill_SurvivesResave()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("1 0 0 rg\n5 5 100 50 re\nf\n"));
 
@@ -37,7 +36,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void MaterializedCurves_V_And_Y_SurviveResave()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("0 0 1 RG 1 w\n10 10 m\n20 20 30 30 v\n40 40 50 50 y\nS\n"));
 
@@ -69,7 +68,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltCellBackground_SurvivesMaterializeAndResave()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
@@ -94,7 +93,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltImage_SurvivesMaterializeAndResave()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(100);
@@ -119,7 +118,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void MaterializedText_KeepsFontResource()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Serif body", "Times");
 
@@ -142,7 +141,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltPage_ContentEdit_IsHonoredOnSave()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Original body", "Helvetica");
 
@@ -160,7 +159,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltPage_Stamp_KeepsBackgroundsAndImages()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
@@ -194,7 +193,7 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltType0_FreshExtractText_ReturnsRealText()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Latin sample", BuildTestSupport.Latin);
@@ -210,10 +209,10 @@ public class RoundTripFidelityRegressionTests
         Assert.Contains("Здравей свят", reloaded, StringComparison.Ordinal);
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     private static void DirtyFirstText(Page page)

@@ -6,8 +6,8 @@ using Radzen.Documents.Pdf.Emit;
 namespace Radzen.Documents.Pdf;
 
 /// <summary>
-/// Renders a <see cref="Radzen.Documents.Document"/> into a physical PDF
-/// <see cref="Document"/>. Carries the PDF-only settings of the output: conformance,
+/// Renders a <see cref="Document"/> into a physical PDF
+/// <see cref="PortableDocument"/>. Carries the PDF-only settings of the output: conformance,
 /// accessibility, encryption, viewer preferences, attachments, outline, page labels
 /// and interactive form fields.
 /// </summary>
@@ -23,14 +23,14 @@ public sealed class DocumentRenderer
     /// Gets or sets the viewer preferences applied to the produced document
     /// (initial page layout and page mode plus the <c>/ViewerPreferences</c>
     /// flags). When <c>null</c> no viewer-preference keys are written and the
-    /// output is unchanged. Surfaces <see cref="Document.ViewerPreferences"/>.
+    /// output is unchanged. Surfaces <see cref="PortableDocument.ViewerPreferences"/>.
     /// </summary>
     public ViewerPreferences? ViewerPreferences { get; set; }
 
     /// <summary>
     /// Gets the page-label ranges applied to the produced document, written as
     /// the catalog <c>/PageLabels</c> number tree. When empty no <c>/PageLabels</c>
-    /// entry is written. Surfaces <see cref="Document.PageLabels"/>.
+    /// entry is written. Surfaces <see cref="PortableDocument.PageLabels"/>.
     /// </summary>
     public IList<PageLabel> PageLabels { get; } = [];
 
@@ -38,7 +38,7 @@ public sealed class DocumentRenderer
     /// Gets the interactive form fields to create on the produced document. Each
     /// definition is saved as a widget annotation on its page and listed in the
     /// catalog <c>/AcroForm /Fields</c>. When empty no form is written. Surfaces
-    /// <see cref="Document.FormFields"/>.
+    /// <see cref="PortableDocument.FormFields"/>.
     /// </summary>
     public IList<FormFieldDefinition> FormFields { get; } = [];
 
@@ -65,7 +65,7 @@ public sealed class DocumentRenderer
     /// its XMP metadata, is marked as Tagged PDF (/MarkInfo /Marked true with a
     /// /StructTreeRoot) and sets the DisplayDocTitle viewer preference; every font must
     /// be an embedded subset. Composable with <see cref="Conformance"/>. Requires
-    /// <see cref="Radzen.Documents.Document.Language"/> to be set.
+    /// <see cref="Document.Language"/> to be set.
     /// </summary>
     public PdfUaConformance Accessibility { get; set; }
 
@@ -95,19 +95,19 @@ public sealed class DocumentRenderer
     /// <summary>
     /// Gets or sets whether the saved file carries a deterministic trailer
     /// <c>/ID</c>. Defaults to <c>false</c> so output stays byte identical unless
-    /// opted in. See <see cref="Document.IncludeDocumentId"/>.
+    /// opted in. See <see cref="PortableDocument.IncludeDocumentId"/>.
     /// </summary>
     public bool IncludeDocumentId { get; set; }
 
     /// <summary>
     /// Runs the layout engine over the model's sections and produces a physical
-    /// <see cref="Document"/>. Paragraphs flow across pages, tables lay out and paginate
+    /// <see cref="PortableDocument"/>. Paragraphs flow across pages, tables lay out and paginate
     /// (repeating header rows), images decode and scale to their box, registered fonts
     /// embed as Type0/CID and base-14 families embed by name.
     /// </summary>
     /// <param name="document">The document model to render.</param>
     /// <returns>The generated document.</returns>
-    public Document Render(Radzen.Documents.Document document)
+    public PortableDocument Render(Document document)
     {
         var settings = CapturedRendererSettings.Capture(this);
         return DocumentGenerator.Generate(document, settings);
@@ -116,11 +116,11 @@ public sealed class DocumentRenderer
     /// <summary>Renders the model and serializes it to the given stream.</summary>
     /// <param name="document">The document model to render.</param>
     /// <param name="stream">The destination stream.</param>
-    public void SaveToStream(Radzen.Documents.Document document, Stream stream)
+    public void SaveToStream(Document document, Stream stream)
         => Render(document).SaveToStream(stream);
 
     /// <summary>Renders the model and serializes it to a byte array.</summary>
     /// <param name="document">The document model to render.</param>
     /// <returns>The complete PDF file bytes.</returns>
-    public byte[] ToArray(Radzen.Documents.Document document) => Render(document).ToArray();
+    public byte[] ToArray(Document document) => Render(document).ToArray();
 }

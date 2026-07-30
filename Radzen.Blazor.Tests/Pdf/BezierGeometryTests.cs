@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,7 +12,7 @@ public class BezierGeometryTests
 {
     private static string Emit(Action<PathContent> build)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = new PathContent { Stroke = true };
         build(path);

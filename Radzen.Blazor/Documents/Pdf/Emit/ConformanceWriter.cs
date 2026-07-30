@@ -3,7 +3,7 @@ using System;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class ConformanceWriter(Document document)
+internal sealed class ConformanceWriter(PortableDocument document)
 {
     private static (int Part, string Conformance) Identification(PdfAConformance level) => level switch
     {

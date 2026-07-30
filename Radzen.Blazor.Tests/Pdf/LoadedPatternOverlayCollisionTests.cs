@@ -4,13 +4,12 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class LoadedPatternOverlayCollisionTests
 {
-    private static Document LoadWithPatternP0()
+    private static PortableDocument LoadWithPatternP0()
     {
         const string streamData = "/Pattern cs /P0 scn 0 0 100 100 re f";
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
@@ -33,7 +32,7 @@ public class LoadedPatternOverlayCollisionTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     private static DictionaryObject Patterns(DocumentReader reader)

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class NavigationWriter(Document document)
+internal sealed class NavigationWriter(PortableDocument document)
 {
     public void WriteDestinations(
         DocumentWriter writer,

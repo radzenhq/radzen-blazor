@@ -6,15 +6,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class WatermarkImageSharingTests
 {
-    private static Document Watermarked(int pages, string png = "Images/rgb.png", Action<Image>? configure = null)
+    private static PortableDocument Watermarked(int pages, string png = "Images/rgb.png", Action<Image>? configure = null)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         for (var i = 0; i < pages; i++)
         {
             document.Pages.Add();
@@ -73,7 +72,7 @@ public class WatermarkImageSharingTests
     [Fact]
     public void ImageWatermark_PayloadIsEmittedOnceNotPerPage()
     {
-        var text = new Document();
+        var text = new PortableDocument();
         for (var i = 0; i < 10; i++)
         {
             text.Pages.Add();
@@ -104,7 +103,7 @@ public class WatermarkImageSharingTests
     [Fact]
     public void ImageWatermarkOptionsChangedBetweenSaves_ReDecodesRatherThanServingStale()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         var watermark = new Watermark();
         var image = watermark.SetImage(new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png")));
@@ -132,12 +131,12 @@ public class WatermarkImageSharingTests
         var watermark = new Watermark();
         watermark.SetImage(new MemoryStream(PdfTestResources.ReadAllBytes("Images/alpha.png")));
 
-        var first = new Document();
+        var first = new PortableDocument();
         first.Pages.Add();
         first.Pages.Add();
         first.AddWatermark(watermark);
 
-        var second = new Document();
+        var second = new PortableDocument();
         second.Pages.Add();
         second.AddWatermark(watermark);
 

@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -55,7 +54,7 @@ public class FieldNameDecodingAgreementTests
     [Fact]
     public void MergedUtf16FieldName_CollidesWithAsciiNameAfterDecoding()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         document.FormFields.Add(new TextFieldDefinition("Name")
         {
@@ -66,7 +65,7 @@ public class FieldNameDecodingAgreementTests
             Value = "value",
         });
 
-        document.Append(Document.LoadFromStream(new MemoryStream(Utf16NamedForm())));
+        document.Append(PortableDocument.LoadFromStream(new MemoryStream(Utf16NamedForm())));
 
         var names = RootFieldNames(DocumentReader.Parse(document.ToArray()));
         Assert.Contains("Name", names);

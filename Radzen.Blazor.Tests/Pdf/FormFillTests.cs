@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -62,7 +61,7 @@ public class FormFillTests
         var document = FormTestSupport.LoadFixture();
         document.AcroForm!.FillField("Name", "Radzen Ltd");
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
 
         Assert.NotNull(reloaded.AcroForm);
         var name = reloaded.AcroForm!.Fields.Single(f => f.Name == "Name");

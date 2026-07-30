@@ -4,21 +4,20 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class EmptiedPageContentTests
 {
-    private static Document LoadedSinglePathDocument()
+    private static PortableDocument LoadedSinglePathDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("10 10 100 100 re f\n"));
         return InterpreterTestSupport.Load(document.ToArray());
     }
 
-    private static string SavedPageContent(Document document, int pageIndex = 0)
+    private static string SavedPageContent(PortableDocument document, int pageIndex = 0)
         => Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), pageIndex));
 
     [Fact]
@@ -58,7 +57,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void ContentClear_RemovesEveryElementOnLoadedTextPage_TextIsGone()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent("Secret", 72, 700) { Font = new Font { Size = 12 } });
         var loaded = InterpreterTestSupport.Load(document.ToArray());
 
@@ -70,7 +69,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void RedactText_RemovesOnlyTextOnLoadedPage_TextIsGone()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent("Secret", 72, 700) { Font = new Font { Size = 12 } });
         var loaded = InterpreterTestSupport.Load(document.ToArray());
 
@@ -109,7 +108,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void EmptyContentStreamPage_NeverMaterialized_StaysByteIdentical()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent([]);
         var original = document.ToArray();
 
@@ -123,7 +122,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void EmptyContentStreamPage_Materialized_StaysByteIdentical()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent([]);
         var original = document.ToArray();
 
@@ -139,7 +138,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void AuthoredPageWithNoContent_SavesSensibly()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4);
 
         var saved = document.ToArray();
@@ -152,7 +151,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void AuthoredPageWithNoContent_ContentReadBeforeSave_SavesSensibly()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.A4);
         Assert.Empty(page.Content);
 
@@ -165,7 +164,7 @@ public class EmptiedPageContentTests
     [Fact]
     public void EmptiedLoadedPage_KeepsOtherPagesUntouched()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("10 10 100 100 re f\n"));
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("20 20 50 50 re f\n"));
         var original = document.ToArray();

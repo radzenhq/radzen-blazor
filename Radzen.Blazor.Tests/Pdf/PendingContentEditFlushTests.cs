@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,10 +32,10 @@ public class PendingContentEditFlushTests
         return pdf.ToArray();
     }
 
-    private static Document Watermarked()
+    private static PortableDocument Watermarked()
     {
         using var input = new MemoryStream(Source());
-        var document = Document.LoadFromStream(input);
+        var document = PortableDocument.LoadFromStream(input);
         document.AddWatermark("DRAFT");
         return document;
     }

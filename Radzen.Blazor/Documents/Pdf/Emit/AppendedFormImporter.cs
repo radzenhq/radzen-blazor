@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class AppendedFormImporter(Document document, FormAppearanceService appearances)
+internal sealed class AppendedFormImporter(PortableDocument document, FormAppearanceService appearances)
 {
     private readonly HashSet<string> usedFieldNames = new(StringComparer.Ordinal);
 

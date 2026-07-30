@@ -6,13 +6,12 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TextCompositionAgreementTests
 {
-    private static Document Loaded(string streamData)
+    private static PortableDocument Loaded(string streamData)
     {
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
         var pdf = new FixturePdf()
@@ -32,7 +31,7 @@ public class TextCompositionAgreementTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     private const string NarrowGlyphRun = "BT /F0 10 Tf 1 0 0 1 72 700 Tm (iiii) Tj 1 0 0 1 87 700 Tm (B) Tj ET";
@@ -58,7 +57,7 @@ public class TextCompositionAgreementTests
     [Fact]
     public void ExtractText_AfterElementRemoval_ReflectsTheEdit()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("SENSITIVE", 72, 720));
         page.Content.Add(new TextContent("KEPT", 72, 700));
@@ -76,7 +75,7 @@ public class TextCompositionAgreementTests
     [Fact]
     public void FindText_AfterElementRemoval_ReflectsTheEdit()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("SENSITIVE", 72, 720));
         var loaded = InterpreterTestSupport.Load(document.ToArray());
@@ -89,7 +88,7 @@ public class TextCompositionAgreementTests
     [Fact]
     public void ExtractPositionedText_AfterAppend_IncludesTheAppendedElement()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("ORIGINAL", 72, 720));
         var loaded = InterpreterTestSupport.Load(document.ToArray());
@@ -102,7 +101,7 @@ public class TextCompositionAgreementTests
     [Fact]
     public void ExtractText_OnUneditedLoadedPage_DoesNotForceReencode()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("STABLE", 72, 720));
         var original = document.ToArray();

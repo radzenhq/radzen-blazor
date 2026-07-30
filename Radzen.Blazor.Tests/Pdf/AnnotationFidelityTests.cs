@@ -5,17 +5,16 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AnnotationFidelityTests
 {
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     private static ArrayObject PageAnnotations(DocumentReader reader)
@@ -37,7 +36,7 @@ public class AnnotationFidelityTests
 
     private static string MarkupAppearance(MarkupAnnotation annotation)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(annotation);
         var reader = DocumentReader.Parse(document.ToArray());
         return AppearanceText(reader, Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(PageAnnotations(reader)))));
@@ -110,7 +109,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void EditedInkKeepsTheLoadedStrokeWidth()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var ink = source.Pages.Add().Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(40, 190), new AnnotationPoint(80, 220) });
         ink.StrokeWidth = 4;
@@ -130,7 +129,7 @@ public class AnnotationFidelityTests
     [Fact]
     public void EditedFreeTextKeepsTheLoadedDefaultAppearance()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30))
         {
             Contents = "free text",
@@ -164,7 +163,7 @@ public class AnnotationFidelityTests
 
     private static byte[] WithDefaultAppearance(string da)
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30)) { Contents = "free text" });
         var document = Load(source.ToArray());
         var state = document.Loaded!;

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -24,7 +23,7 @@ public class PathStateRoundTripTests
 
     private static byte[] ReencodeAfterMutation()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii(Source));
 

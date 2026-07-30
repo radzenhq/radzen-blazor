@@ -12,7 +12,6 @@ using Radzen.Documents.Pdf.Fonts;
 using Xunit;
 using Xunit.Sdk;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -47,7 +46,7 @@ public class ContentElementChangeTrackingMatrixTests
 
     private static ContentCollection Materialized()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Source());
         return InterpreterTestSupport.Load(document.ToArray()).Pages[0].Content;
     }

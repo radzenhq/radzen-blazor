@@ -6,15 +6,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PageLabelsTests
 {
-    private static Document Document(int pages)
+    private static PortableDocument Document(int pages)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         for (var i = 0; i < pages; i++)
         {
             document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (p) Tj ET"));

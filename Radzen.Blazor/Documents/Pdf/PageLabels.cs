@@ -27,7 +27,7 @@ public enum PageLabelStyle
 /// A page-label range: from <see cref="StartPage"/> onward (until the next range),
 /// pages are labelled with the given <see cref="Style"/>, optional <see cref="Prefix"/>
 /// and starting ordinal <see cref="Start"/>. Add ranges to
-/// <see cref="Document.PageLabels"/> to control the page numbers a viewer shows.
+/// <see cref="PortableDocument.PageLabels"/> to control the page numbers a viewer shows.
 /// </summary>
 /// <param name="startPage">The zero-based index of the first page in the range.</param>
 public sealed class PageLabel(int startPage) : ITracksChanges

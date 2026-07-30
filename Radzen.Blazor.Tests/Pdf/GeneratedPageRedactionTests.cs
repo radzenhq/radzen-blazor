@@ -5,15 +5,14 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class GeneratedPageRedactionTests
 {
-    private static Document GeneratedImagePage()
+    private static PortableDocument GeneratedImagePage()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         section.Margins.SetAll(Unit.FromPoint(0));
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
@@ -22,9 +21,9 @@ public class GeneratedPageRedactionTests
         return new DocumentRenderer().Render(document);
     }
 
-    private static Document GeneratedTextPage(string text)
+    private static PortableDocument GeneratedTextPage(string text)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, "Helvetica", 24);
         return new DocumentRenderer().Render(document);
@@ -68,7 +67,7 @@ public class GeneratedPageRedactionTests
         var redacted = document.ToArray();
         Assert.False(Contains(redacted, jpeg));
         using var buffer = new MemoryStream(redacted);
-        Document.LoadFromStream(buffer);
+        PortableDocument.LoadFromStream(buffer);
     }
 
     [Fact]
@@ -81,7 +80,7 @@ public class GeneratedPageRedactionTests
 
         Assert.Equal(1, count);
         using var buffer = new MemoryStream(document.ToArray());
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
         Assert.DoesNotContain("SENSITIVE", reloaded.Pages[0].ExtractText(), StringComparison.Ordinal);
     }
 
@@ -96,6 +95,6 @@ public class GeneratedPageRedactionTests
 
         Assert.Contains(page.Content, e => e is PathContent { Fill: true });
         using var buffer = new MemoryStream(document.ToArray());
-        Document.LoadFromStream(buffer);
+        PortableDocument.LoadFromStream(buffer);
     }
 }

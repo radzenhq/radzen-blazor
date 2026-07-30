@@ -7,23 +7,22 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class RoundTripIntegrityTests
 {
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
 
     [Fact]
     public void Resave_LoadedBase14Page_KeepsFontResourcesAndText()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello Resave", "Helvetica");
 
@@ -42,7 +41,7 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Resave_LoadedType0Page_KeepsEmbeddedFontAndText()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Embedded Survives", BuildTestSupport.Latin);
@@ -56,7 +55,7 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Resave_LoadedImagePage_KeepsImageXObject()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(200);
@@ -143,9 +142,9 @@ public class RoundTripIntegrityTests
     }
 
 
-    private static Document BuildBase14(string text)
+    private static PortableDocument BuildBase14(string text)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, "Helvetica");
         return new DocumentRenderer().Render(document);
@@ -172,7 +171,7 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Append_BuiltDocument_PagesCarryContent()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(BuildBase14("Appended body"));
 
         Assert.Equal(1, target.Pages.Count);
@@ -187,9 +186,9 @@ public class RoundTripIntegrityTests
     }
 
 
-    private static Radzen.Documents.Document BuilderWithLatinText(string text)
+    private static Document BuilderWithLatinText(string text)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Latin);

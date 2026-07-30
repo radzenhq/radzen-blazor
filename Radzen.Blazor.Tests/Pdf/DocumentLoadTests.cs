@@ -7,16 +7,15 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class DocumentLoadTests
 {
-    private static Document Load(byte[] bytes, LoadOptions? options = null)
+    private static PortableDocument Load(byte[] bytes, LoadOptions? options = null)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream, options);
+        return PortableDocument.LoadFromStream(stream, options);
     }
 
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
@@ -24,7 +23,7 @@ public class DocumentLoadTests
     [Fact]
     public void RoundTrip_ThreePages_PreservesCountSizesInfoAndContent()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Info.Title = "Round Trip";
         source.Info.Author = "Vasil";
         source.Info.Subject = "Subject Line";
@@ -63,7 +62,7 @@ public class DocumentLoadTests
     [Fact]
     public void RoundTrip_ReSaveReparsed_KidContentMatchesOriginals()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var a = Ascii("first");
         var b = Ascii("second");
         source.Pages.Add().SetContent(a);
@@ -102,7 +101,7 @@ public class DocumentLoadTests
     [Fact]
     public void Split_RemoveFirstPage_DropsItAndKeepsOrder()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().SetContent(Ascii("one"));
         source.Pages.Add().SetContent(Ascii("two"));
         source.Pages.Add().SetContent(Ascii("three"));
@@ -119,7 +118,7 @@ public class DocumentLoadTests
     [Fact]
     public void Reorder_InsertMovesPage()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().SetContent(Ascii("A"));
         source.Pages.Add().SetContent(Ascii("B"));
         source.Pages.Add().SetContent(Ascii("C"));

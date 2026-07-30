@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf;
 
 
 /// <summary>
-/// A single physical page in a <see cref="Document"/>. Holds the page
+/// A single physical page in a <see cref="PortableDocument"/>. Holds the page
 /// dimensions and, optionally, a raw content stream.
 /// </summary>
 public sealed class Page
@@ -38,7 +38,7 @@ public sealed class Page
 
     internal GeneratedPage? Generated { get; set; }
 
-    internal Document? Owner { get; set; }
+    internal PortableDocument? Owner { get; set; }
 
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
@@ -275,7 +275,7 @@ public sealed class Page
     /// <summary>Finds text in this page across adjacent text-show operators.</summary>
     /// <remarks>
     /// Hits use a page index of -1 when this method is called directly. Use
-    /// <see cref="Document.FindText(string, TextSearchOptions?)"/> to obtain document page indexes.
+    /// <see cref="PortableDocument.FindText(string, TextSearchOptions?)"/> to obtain document page indexes.
     /// Form XObject text and complex shaping or ligature cluster mapping are not included.
     /// </remarks>
     /// <param name="text">The non-empty text to find.</param>

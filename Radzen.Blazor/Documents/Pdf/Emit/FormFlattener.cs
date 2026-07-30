@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class FormFlattener(Document document)
+internal sealed class FormFlattener(PortableDocument document)
 {
     private readonly HashSet<Page> ownedResources = [];
 

@@ -10,9 +10,9 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class DocumentMaterializer
 {
-    private readonly Document doc;
+    private readonly PortableDocument doc;
 
-    internal DocumentMaterializer(Document document) => doc = document;
+    internal DocumentMaterializer(PortableDocument document) => doc = document;
 
     internal DocumentObjectGraph Materialize()
     {

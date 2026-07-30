@@ -12,7 +12,6 @@ using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 using Xunit;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Geometry;
 
@@ -243,7 +242,7 @@ public class LaidOutContractTests
         var rendered = Render(recaptured, document);
 
         using var buffer = new MemoryStream(rendered);
-        var reloaded = Radzen.Documents.Pdf.Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
 
         Assert.Equal("A?B", reloaded.Pages[0].ExtractText());
     }

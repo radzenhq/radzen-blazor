@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -73,10 +72,10 @@ public class FormFieldTextDecodeTests
         return Wrap(pdf, 12);
     }
 
-    private static Document Load()
-        => Document.LoadFromStream(new MemoryStream(Form()));
+    private static PortableDocument Load()
+        => PortableDocument.LoadFromStream(new MemoryStream(Form()));
 
-    private static string? ValueOf(Document document, string name)
+    private static string? ValueOf(PortableDocument document, string name)
         => document.AcroForm!.Fields.First(f => f.Name == name).Value;
 
     [Fact]
@@ -113,7 +112,7 @@ public class FormFieldTextDecodeTests
             .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R] >>\nendobj\n")
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T " + Utf16BeHex(Imya) + " /V (x) /P 3 0 R /Rect [100 700 350 720] >>\nendobj\n");
-        var document = Document.LoadFromStream(new MemoryStream(Wrap(pdf, 6)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(Wrap(pdf, 6)));
 
         Assert.Equal(Imya, document.AcroForm!.Fields.Single().Name);
     }
@@ -151,7 +150,7 @@ public class FormFieldTextDecodeTests
         pdf.Append("trailer\n<< /Size 5 /Root 1 0 R /Info 4 0 R >>\n");
         pdf.Append("startxref\n" + xref + "\n%%EOF\n");
 
-        var document = Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(pdf.ToArray()));
 
         Assert.Equal(Sofia, document.Info.Title);
     }
@@ -186,7 +185,7 @@ public class FormFieldTextDecodeTests
         var document = Load();
         document.AcroForm!.FillField("ascii", Faktura);
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(FormTestSupport.Save(document)));
 
         Assert.Equal(Faktura, ValueOf(reloaded, "ascii"));
     }

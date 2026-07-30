@@ -2,7 +2,6 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,7 +10,7 @@ public class AppendTextExtractionTests
     [Fact]
     public void Append_GeneratedPage_CarriesTextExtractionFonts()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello Append", BuildTestSupport.Latin);
@@ -19,7 +18,7 @@ public class AppendTextExtractionTests
         var built = new DocumentRenderer().Render(document);
         Assert.Contains("Hello Append", built.ExtractText());
 
-        var merged = new Document();
+        var merged = new PortableDocument();
         merged.Append(built);
 
         Assert.Contains("Hello Append", merged.ExtractText());

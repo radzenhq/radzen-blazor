@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Blazor.Pdf.Tests;

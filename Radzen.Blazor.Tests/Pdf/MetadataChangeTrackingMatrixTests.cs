@@ -9,7 +9,6 @@ using Radzen.Documents.Pdf;
 using Xunit;
 using Xunit.Sdk;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,7 +25,7 @@ public class MetadataChangeTrackingMatrixTests
 
     private static byte[] Source()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         document.Pages.Add();
         document.Info.Title = "title";
@@ -42,13 +41,13 @@ public class MetadataChangeTrackingMatrixTests
         return document.ToArray();
     }
 
-    private static Document Loaded()
+    private static PortableDocument Loaded()
     {
         using var stream = new MemoryStream(Source());
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    private static object Target(Type owner, Document document) => owner switch
+    private static object Target(Type owner, PortableDocument document) => owner switch
     {
         _ when owner == typeof(DocumentInfo) => document.Info,
         _ when owner == typeof(OutlineItem) => document.Outline[0],
@@ -58,7 +57,7 @@ public class MetadataChangeTrackingMatrixTests
         _ => throw new XunitException($"No probe target for {owner}."),
     };
 
-    private static FacturXProfile Profile(Document document)
+    private static FacturXProfile Profile(PortableDocument document)
     {
         var attachment = document.Attachments[0];
         attachment.FacturX ??= new FacturXProfile();
@@ -66,7 +65,7 @@ public class MetadataChangeTrackingMatrixTests
         return attachment.FacturX;
     }
 
-    private static bool AnythingModified(Document document)
+    private static bool AnythingModified(PortableDocument document)
         => document.Info.IsModified || document.OutlineChanged || document.PageLabelsChanged
             || document.Attachments.IsModified;
 
@@ -121,7 +120,7 @@ public class MetadataChangeTrackingMatrixTests
             document => document.Attachments.Add("extra.bin", [9], AttachmentRelationship.Data, "application/octet-stream"));
     }
 
-    private static void AssertContainer(string member, Action<Document> mutate)
+    private static void AssertContainer(string member, Action<PortableDocument> mutate)
     {
         var document = Loaded();
         Assert.False(AnythingModified(document), $"{member}: the loaded fixture was already changed.");
@@ -131,7 +130,7 @@ public class MetadataChangeTrackingMatrixTests
         Assert.True(AnythingModified(document), $"{member}: mutation left the metadata reading unchanged.");
     }
 
-    private static void AssertDoor(Type owner, string member, Action<Document> mutate)
+    private static void AssertDoor(Type owner, string member, Action<PortableDocument> mutate)
     {
         var document = Loaded();
         Assert.False(AnythingModified(document), $"{owner.Name}.{member}: the loaded fixture was already modified.");
@@ -147,7 +146,7 @@ public class MetadataChangeTrackingMatrixTests
             $"{owner.Name}.{member}: mutation changed emitted bytes but the flag stayed clean");
     }
 
-    private static byte[] Rebuilt(Action<Document> mutate)
+    private static byte[] Rebuilt(Action<PortableDocument> mutate)
     {
         var document = Loaded();
         mutate(document);

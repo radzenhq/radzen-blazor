@@ -4,7 +4,6 @@ using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,9 +12,9 @@ public class WatermarkFontCapabilityTests
     private static Watermark Registered() =>
         new Watermark { Text = "AVATAR", Font = { Family = "Liberation Sans", Size = 60 } };
 
-    private static Radzen.Documents.Document Builder()
+    private static Document Builder()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Fonts.Register("Liberation Sans", new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
         return document;
@@ -51,7 +50,7 @@ public class WatermarkFontCapabilityTests
         var document = Builder();
         document.Sections.Add().Blocks.Add(new Paragraph());
         using var stream = new MemoryStream(new DocumentRenderer().Render(document).ToArray());
-        var pdf = Document.LoadFromStream(stream);
+        var pdf = PortableDocument.LoadFromStream(stream);
 
         pdf.AddWatermark(Registered());
 

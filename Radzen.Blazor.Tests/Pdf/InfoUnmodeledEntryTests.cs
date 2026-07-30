@@ -6,13 +6,12 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class InfoUnmodeledEntryTests
 {
-    private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     private static DictionaryObject SavedInfo(byte[] saved)
     {
@@ -70,7 +69,7 @@ public class InfoUnmodeledEntryTests
     [Fact]
     public void AuthoredDocument_WritesNoUnmodeledInfoEntries()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         document.Info.Title = "Fresh";
 

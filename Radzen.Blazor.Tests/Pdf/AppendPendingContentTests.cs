@@ -5,28 +5,27 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AppendPendingContentTests
 {
-    private static Document Loaded(int pages)
+    private static PortableDocument Loaded(int pages)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         for (var i = 0; i < pages; i++)
         {
             var page = document.Pages.Add();
             page.Content.Add(new TextContent($"PAGE {i}", Unit.FromPoint(72), Unit.FromPoint(700)));
         }
 
-        return Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        return PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
     }
 
-    private static Document Reload(Document document)
-        => Document.LoadFromStream(new MemoryStream(document.ToArray()));
+    private static PortableDocument Reload(PortableDocument document)
+        => PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
 
-    private static string[] PageTexts(Document document)
+    private static string[] PageTexts(PortableDocument document)
         => document.Pages.Select(page => page.ExtractText()).ToArray();
 
     [Fact]
@@ -35,7 +34,7 @@ public class AppendPendingContentTests
         var source = Loaded(1);
         source.AddWatermark("DRAFT");
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(source);
 
         Assert.Contains("DRAFT", Reload(target).Pages[0].ExtractText());
@@ -48,7 +47,7 @@ public class AppendPendingContentTests
         source.Pages[1].Content.Clear();
         source.Pages[1].Content.Add(new TextContent("EDITED", Unit.FromPoint(72), Unit.FromPoint(700)));
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(source);
 
         Assert.Equal(["PAGE 0", "EDITED"], PageTexts(Reload(target)));
@@ -61,7 +60,7 @@ public class AppendPendingContentTests
         source.AddWatermark("DRAFT");
         var before = source.ToArray();
 
-        new Document().Append(source);
+        new PortableDocument().Append(source);
 
         Assert.Equal(before, source.ToArray());
     }
@@ -72,7 +71,7 @@ public class AppendPendingContentTests
         var source = Loaded(1);
         var expected = source.Pages[0].GetContent();
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(source);
 
         Assert.Equal(expected, target.Pages[0].GetContent());
@@ -81,10 +80,10 @@ public class AppendPendingContentTests
     [Fact]
     public void Append_OfABuiltDocumentCarriesItsContent()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Content.Add(new TextContent("BUILT", Unit.FromPoint(72), Unit.FromPoint(700)));
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(source);
 
         Assert.Equal(["BUILT"], PageTexts(Reload(target)));

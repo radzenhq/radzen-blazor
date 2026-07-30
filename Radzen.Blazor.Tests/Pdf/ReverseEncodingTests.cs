@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -100,7 +101,7 @@ public class ReverseEncodingTests
         Assert.Equal(sample, document.Pages[0].ExtractText());
     }
 
-    private static Radzen.Documents.Pdf.Document BuildType0Page(Radzen.Documents.Fonts.Sfnt.SfntFont font, string sample)
+    private static PortableDocument BuildType0Page(Radzen.Documents.Fonts.Sfnt.SfntFont font, string sample)
     {
         var map = Type0EmbedSupport.BuildMap(font, sample);
         var codes = Type0EmbedSupport.CompactCodes(font, map, sample);
