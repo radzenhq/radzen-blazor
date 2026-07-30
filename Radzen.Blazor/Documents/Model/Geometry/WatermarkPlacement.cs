@@ -8,9 +8,9 @@ internal readonly struct LaidOutWatermarkText
 
     public required FontPaint Font { get; init; }
 
-    public required double Size { get; init; }
+    public double Size => Font.Size;
 
-    public required Color Color { get; init; }
+    public Color Color => Font.Color;
 
     public required double X { get; init; }
 
@@ -49,6 +49,8 @@ internal sealed record LaidOutWatermark
     public required double Rotation { get; init; }
 
     public required double Opacity { get; init; }
+
+    public required SemanticArtifactKind Artifact { get; init; }
 
     public LaidOutWatermarkImage? Image { get; init; }
 

@@ -333,8 +333,7 @@ public sealed class PathContent : ContentElement
 
         if (Stroke)
         {
-            writer.WriteNumber(Thickness);
-            writer.WriteRaw(" w\n");
+            ContentEmitter.WriteStrokeWidth(writer, Thickness);
 
             if (StrokePaint is { } strokePaint)
             {
@@ -372,21 +371,7 @@ public sealed class PathContent : ContentElement
 
         if (DashArray is { } dash)
         {
-            writer.WriteRaw("[");
-            var pattern = dash.Span;
-            for (var i = 0; i < pattern.Length; i++)
-            {
-                if (i > 0)
-                {
-                    writer.WriteRaw(" ");
-                }
-
-                writer.WriteNumber(pattern[i]);
-            }
-
-            writer.WriteRaw("] ");
-            writer.WriteNumber(DashPhase);
-            writer.WriteRaw(" d\n");
+            ContentEmitter.WriteDashPattern(writer, dash.Span, DashPhase);
         }
 
         if (Fill)

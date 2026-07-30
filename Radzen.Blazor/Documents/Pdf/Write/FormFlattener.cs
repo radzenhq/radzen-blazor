@@ -215,7 +215,7 @@ internal sealed class FormFlattener(PortableDocument document)
 
         return LoadedAppearancePainter.TryPaint(
             Source!, Loaded!, page, ownedResources, normal.Reference, normal.Stream,
-            PdfRect.FromSize(x, y, width, height), "FFlatten", strict: false, subject: "button");
+            PdfRect.FromSize(x, y, width, height), "FFlatten");
     }
 
     private (DocumentObject Reference, StreamObject Stream)? NormalAppearance(DictionaryObject widget, string? state)

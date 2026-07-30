@@ -20,6 +20,7 @@ internal sealed class StyleResolution
     private readonly ImmutableDictionary<ListItem, bool> itemKeepTogether;
     private readonly ImmutableDictionary<TableOfContents, Font> tocFonts;
     private readonly ImmutableDictionary<Paragraph, int> headingLevels;
+    private readonly ImmutableDictionary<Paragraph, string> roles;
 
     internal StyleResolution(StyleResolutionBuilder builder)
     {
@@ -33,6 +34,7 @@ internal sealed class StyleResolution
         itemKeepTogether = builder.ItemKeepTogetherValues.ToImmutableDictionary();
         tocFonts = builder.TocFonts.ToImmutableDictionary();
         headingLevels = builder.HeadingLevels.ToImmutableDictionary();
+        roles = builder.Roles.ToImmutableDictionary();
         Opacities = builder.Opacities;
     }
 
@@ -81,6 +83,9 @@ internal sealed class StyleResolution
 
     public int HeadingLevel(Paragraph paragraph)
         => headingLevels.TryGetValue(paragraph, out var level) ? level : 0;
+
+    public string? Role(Paragraph paragraph)
+        => roles.TryGetValue(paragraph, out var role) ? role : null;
 }
 
 internal sealed class LoweringContext
@@ -196,6 +201,9 @@ internal sealed class LoweringContext
     public int HeadingLevel(Paragraph paragraph)
         => Styles.HeadingLevel(paragraph);
 
+    public string? Role(Paragraph paragraph)
+        => Styles.Role(paragraph);
+
     internal ImmutableArray<(Paragraph Paragraph, IStructureTag Reference)> TocParagraphElements()
     {
         var result = ImmutableArray.CreateBuilder<(Paragraph, IStructureTag)>(tocParagraphElements.Count);
@@ -231,6 +239,7 @@ internal sealed class StyleResolutionBuilder
     internal Dictionary<ListItem, bool> ItemKeepTogetherValues { get; } = [];
     internal Dictionary<TableOfContents, Font> TocFonts { get; } = [];
     internal Dictionary<Paragraph, int> HeadingLevels { get; } = [];
+    internal Dictionary<Paragraph, string> Roles { get; } = [];
 
     internal OpacityResolver Opacities { get; set; } = OpacityResolver.None;
 
@@ -263,6 +272,14 @@ internal sealed class StyleResolutionBuilder
 
     internal void SetHeadingLevel(Paragraph paragraph, int level)
         => HeadingLevels[paragraph] = level;
+
+    internal void SetRole(Paragraph paragraph, string? role)
+    {
+        if (role is not null)
+        {
+            Roles[paragraph] = role;
+        }
+    }
 
     internal StyleResolution Build() => new(this);
 }
@@ -408,6 +425,7 @@ internal static class StyleResolver
 
         resolution.SetAlignment(paragraph, styleAlignment);
         resolution.SetHeadingLevel(paragraph, Chain(chain, static style => style.HeadingLevel) ?? 0);
+        resolution.SetRole(paragraph, ChainRole(chain));
         resolution.SetFormat(paragraph, new ResolvedParagraphFormat
         {
             Alignment = paragraph.Alignment ?? styleAlignment ?? HorizontalAlignment.Left,
@@ -452,6 +470,19 @@ internal static class StyleResolver
             if (select(style) is { } value)
             {
                 return value;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? ChainRole(List<Style> chain)
+    {
+        foreach (var style in chain)
+        {
+            if (style.Role is { } role)
+            {
+                return role;
             }
         }
 

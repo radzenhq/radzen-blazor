@@ -59,7 +59,7 @@ internal sealed class CreatedFieldWriter(PortableDocument document, FormAppearan
                 fields,
                 created,
                 appearances);
-            FormFieldEmitter.Emit(definition, context);
+            FormFieldWriter.Emit(definition, context);
         }
 
         return created;

@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Geometry;
@@ -17,36 +15,33 @@ internal static class SoftMask
         in BoxShadowPaint shadow,
         SemanticArtifactKind artifact)
     {
-        if (bounds.Width <= 0 || bounds.Height <= 0)
+        if (BoxShadowGeometry.Shape(
+            bounds.Width,
+            bounds.Height,
+            cornerRadius,
+            shadow.Spread,
+            shadow.BlurRadius) is not { } shape)
         {
             return;
         }
 
-        var spread = shadow.Spread;
-        var shapeWidth = bounds.Width + (2 * spread);
-        var shapeHeight = bounds.Height + (2 * spread);
-        if (shapeWidth <= 0 || shapeHeight <= 0)
-        {
-            return;
-        }
+        var mask = plan.RenderShadowMask(shape.Width, shape.Height, shape.Radius, shape.Blur);
 
-        var shapeRadius = Math.Max(0, cornerRadius + spread);
-        var blur = Math.Max(0, shadow.BlurRadius);
-        var mask = plan.RenderShadowMask(shapeWidth, shapeHeight, shapeRadius, blur);
+        var placement = BoxShadowGeometry.Placement(
+            shape,
+            bounds.Left,
+            bounds.Bottom,
+            shadow.Spread,
+            mask.MarginPoints,
+            shadow.OffsetX,
+            shadow.OffsetY);
 
-        var margin = mask.MarginPoints;
-        var rectWidth = shapeWidth + (2 * margin);
-        var rectHeight = shapeHeight + (2 * margin);
+        var left = placement.Left;
+        var bottom = placement.Bottom;
+        var rectWidth = placement.Width;
+        var rectHeight = placement.Height;
 
-        var left = bounds.Left - spread - margin + shadow.OffsetX;
-        var bottom = bounds.Bottom - spread - margin - shadow.OffsetY;
-
-        var image = ImageXObjectShell.FlateImage(
-            mask.Pixels,
-            mask.Width,
-            mask.Height,
-            8,
-            new NameObject("DeviceGray"));
+        var image = new DecodedImage(mask.Pixels, mask.Width, mask.Height, 8, ImageColorSpace.DeviceGray);
 
         using var content = new ContentWriter();
         ContentEmitter.WriteImagePlacement(content, "Sm", left, bottom, rectWidth, rectHeight);
@@ -58,7 +53,7 @@ internal static class SoftMask
             "DeviceGray",
             isolated: null,
             knockout: null,
-            [new KeyValuePair<string, EmissionStreamPayload>("Sm", EmissionStreamPayload.Capture(image))]);
+            [new KeyValuePair<string, EmissionImagePayload>("Sm", EmissionImagePayload.Capture(image))]);
 
         var alpha = shadow.Color.A / 255.0;
         var softMask = new EmissionSoftMask(EmissionSoftMaskType.Luminosity, group, backdrop: null);

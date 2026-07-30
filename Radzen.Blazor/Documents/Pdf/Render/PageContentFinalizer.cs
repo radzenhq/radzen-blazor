@@ -166,6 +166,14 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             }
         }
 
+        foreach (var rounded in plan.RoundedStrokes)
+        {
+            if (rounded.Element is { } element)
+            {
+                tagged.Add(new TaggedDraw { Sequence = rounded.Sequence, Element = element });
+            }
+        }
+
         foreach (var image in plan.Images)
         {
             if (image.Element is { } element)
@@ -278,7 +286,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var rounded in plan.RoundedStrokes)
         {
-            BeginArtifactDraw(rounded.Artifact);
+            BeginMarkedDraw(rounded.Element, rounded.Artifact, rounded.Sequence);
             writer.WriteRaw("q\n");
             if (rounded.ExtGState is { } roundedState)
             {
@@ -289,7 +297,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             WriteStrokeState(writer, rounded.Color, rounded.LineWidth, rounded.Style);
             WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
             writer.WriteRaw("S\nQ\n");
-            EndArtifact();
+            EndMarkedDraw(rounded.Element, rounded.Artifact);
         }
     }
 
@@ -410,7 +418,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
         if (markArtifacts)
         {
-            BeginArtifact(SemanticArtifactKind.Watermark);
+            BeginArtifact(watermark.Artifact);
         }
 
         WriteWatermark(writer, watermark);
@@ -436,29 +444,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             [.. plan.Links],
             [.. plan.ExtGStates],
             [.. plan.Patterns]);
-    }
-
-    private static void WriteStrokeState(ContentWriter writer, Color color, double lineWidth, BorderStyle style)
-    {
-        writer.WriteColor(color, "RG");
-        writer.WriteNumber(lineWidth);
-        writer.WriteRaw(" w\n");
-        WriteDashPattern(writer, style, lineWidth);
-    }
-
-    private static void WriteDashPattern(ContentWriter writer, BorderStyle style, double lineWidth)
-    {
-        if (style is not (BorderStyle.Dashed or BorderStyle.Dotted))
-        {
-            return;
-        }
-
-        var on = style == BorderStyle.Dashed ? 3.0 : 1.0;
-        writer.WriteRaw("[");
-        writer.WriteNumber(on * lineWidth);
-        writer.WriteRaw(" ");
-        writer.WriteNumber(on * lineWidth);
-        writer.WriteRaw("] 0 d\n");
     }
 
     private static void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)

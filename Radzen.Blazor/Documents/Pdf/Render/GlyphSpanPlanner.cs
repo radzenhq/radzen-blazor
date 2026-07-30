@@ -14,7 +14,7 @@ internal readonly struct EmittedGlyphSpan
     public SfntFont? Face { get; init; }
 }
 
-internal sealed class GlyphSpanEmitter(
+internal sealed class GlyphSpanPlanner(
     GeneratorFontResolver fontResolver,
     bool allowUnsupportedCharacters)
 {

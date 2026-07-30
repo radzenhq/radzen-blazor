@@ -262,11 +262,11 @@ internal sealed class PaginationContext
     {
         var listIndent = resolution.BlockIndent(container);
         var availableWidth = AvailableWidth(container);
-        var padding = container.Padding.Point;
+        var padding = container.EffectivePadding;
         var boxWidth = container.Width?.Point ?? availableWidth;
         var indent = listIndent + Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
         var measured = blockLayouts.Box(index, container);
-        var boxHeight = measured.Height + (2 * padding);
+        var boxHeight = measured.Height + padding.Vertical;
 
         EnsureFits(boxHeight);
         PlaceMarker(container);
@@ -309,7 +309,7 @@ internal sealed class PaginationContext
             Content = content,
             Bounds = new Rect(indent, Cursor, boxWidth, boxHeight),
             Style = GeometryCapture.Box(container, boxWidth, boxHeight, capture),
-            Padding = container.Padding.Point,
+            Padding = container.EffectivePadding,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,
             ZOrder = order++,
@@ -523,7 +523,7 @@ internal sealed class PaginationContext
             }
 
             var measured = owner.blockLayouts.Box(index, container);
-            return measured.Height + (2 * container.Padding.Point);
+            return measured.Height + container.EffectivePadding.Vertical;
         }
 
         public double Image(Image image, int index)

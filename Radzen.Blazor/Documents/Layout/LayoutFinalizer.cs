@@ -145,7 +145,7 @@ internal static class LayoutFinalizer
         {
             var lines = Lines(cell.Lines, cell.ContentBox.Width);
             var tables = NestedTables(cell.Tables);
-            var boxes = NestedBoxes(cell.Boxes);
+            var boxes = Boxes(cell.Boxes);
             if (lines is null && tables is null && boxes is null)
             {
                 return null;
@@ -163,7 +163,7 @@ internal static class LayoutFinalizer
         {
             var lines = Lines(content.Lines, width);
             var tables = NestedTables(content.Tables);
-            var boxes = NestedBoxes(content.Boxes);
+            var boxes = Boxes(content.Boxes);
             if (lines is null && tables is null && boxes is null)
             {
                 return null;
@@ -197,70 +197,28 @@ internal static class LayoutFinalizer
             return result?.ToImmutable();
         }
 
-        private ImmutableArray<LaidOutBox>? NestedBoxes(ImmutableArray<LaidOutBox> boxes)
-        {
-            ImmutableArray<LaidOutBox>.Builder? result = null;
-            for (var i = 0; i < boxes.Length; i++)
-            {
-                if (Content(
-                    boxes[i].Content,
-                    InnerWidth(capture.Resolve<Container>(boxes[i].Source), boxes[i].Bounds.Width))
-                    is not { } content)
-                {
-                    continue;
-                }
-
-                result ??= boxes.ToBuilder();
-                result[i] = boxes[i] with { Content = content };
-            }
-
-            return result?.ToImmutable();
-        }
-
         private static double InnerWidth(Container container, double boundsWidth)
-            => Math.Max(0, boundsWidth - (2 * container.Padding.Point));
+            => Math.Max(0, boundsWidth - container.EffectivePadding.Horizontal);
 
         private ImmutableArray<LaidOutLine>? Lines(ImmutableArray<LaidOutLine> lines, double width)
-            => LinesCore(
-                lines,
-                width,
-                static line => line.Source,
-                static line => line.Y,
-                static (current, box, y) => new LaidOutLine
-                {
-                    Line = box,
-                    Source = current.Source,
-                    X = current.X,
-                    Y = y,
-                    ZOrder = current.ZOrder,
-                });
-
-        private ImmutableArray<T>? LinesCore<T>(
-            ImmutableArray<T> lines,
-            double width,
-            Func<T, SourceId> sourceOf,
-            Func<T, double> yOf,
-            Func<T, LineBox, double, T> replace)
         {
-            if (!HasField(lines, sourceOf))
+            if (!HasField(lines))
             {
                 return null;
             }
 
-            var result = ImmutableArray.CreateBuilder<T>(lines.Length);
+            var result = ImmutableArray.CreateBuilder<LaidOutLine>(lines.Length);
             var i = 0;
             while (i < lines.Length)
             {
                 var current = lines[i];
-                var source = sourceOf(current);
-                var paragraph = capture.Resolve<Block>(source) as Paragraph;
-                if (paragraph is not null && resolver.HasField(paragraph))
+                if (FieldParagraph(current) is { } paragraph)
                 {
-                    var reserved = Reserved(lines, i, sourceOf);
-                    var y = yOf(current);
+                    var reserved = Reserved(lines, i);
+                    var y = current.Y;
                     foreach (var box in Break(paragraph, width, reserved))
                     {
-                        result.Add(replace(current, box, y));
+                        result.Add(current with { Line = box, Y = y });
                         y += box.Height;
                     }
 
@@ -279,11 +237,11 @@ internal static class LayoutFinalizer
         private IReadOnlyList<LineBox> Break(Paragraph paragraph, double width, int reserved)
             => resolver.ResolveFields(paragraph, width, pageNumber, pageCount, resolution.Alignment(paragraph), reserved);
 
-        private static int Reserved<T>(ImmutableArray<T> lines, int start, Func<T, SourceId> sourceOf)
+        private static int Reserved(ImmutableArray<LaidOutLine> lines, int start)
         {
-            var source = sourceOf(lines[start]);
+            var source = lines[start].Source;
             var reserved = 0;
-            while (start + reserved < lines.Length && sourceOf(lines[start + reserved]) == source)
+            while (start + reserved < lines.Length && lines[start + reserved].Source == source)
             {
                 reserved++;
             }
@@ -291,12 +249,14 @@ internal static class LayoutFinalizer
             return reserved;
         }
 
-        private bool HasField<T>(ImmutableArray<T> lines, Func<T, SourceId> sourceOf)
+        private Paragraph? FieldParagraph(in LaidOutLine line)
+            => resolver.ParagraphWithFields(capture.Resolve<Block>(line.Source));
+
+        private bool HasField(ImmutableArray<LaidOutLine> lines)
         {
             foreach (var line in lines)
             {
-                if (capture.Resolve<Block>(sourceOf(line)) is Paragraph paragraph
-                    && resolver.HasField(paragraph))
+                if (FieldParagraph(line) is not null)
                 {
                     return true;
                 }

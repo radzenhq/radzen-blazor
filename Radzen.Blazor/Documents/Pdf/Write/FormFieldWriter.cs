@@ -3,7 +3,7 @@ using System;
 
 namespace Radzen.Documents.Pdf.Write;
 
-internal static class FormFieldEmitter
+internal static class FormFieldWriter
 {
     public static void Emit(FormFieldDefinition definition, FormEmitContext context)
     {
@@ -27,7 +27,7 @@ internal static class FormFieldEmitter
             ["Type"] = new NameObject("Annot"),
             ["Subtype"] = new NameObject("Widget"),
             ["T"] = new StringObject(definition.Name),
-            ["Rect"] = PageResourceBuilder.NumberBox(PdfRect.FromSize(x, y, width, height)),
+            ["Rect"] = PageBoxWriter.NumberBox(PdfRect.FromSize(x, y, width, height)),
             ["F"] = new NumberObject(4),
             ["P"] = context.PageReference,
         };
@@ -143,7 +143,7 @@ internal static class FormFieldEmitter
             {
                 ["Type"] = new NameObject("Annot"),
                 ["Subtype"] = new NameObject("Widget"),
-                ["Rect"] = PageResourceBuilder.NumberBox(PdfRect.FromSize(x, y, width, height)),
+                ["Rect"] = PageBoxWriter.NumberBox(PdfRect.FromSize(x, y, width, height)),
                 ["F"] = new NumberObject(4),
                 ["P"] = context.PageReference,
                 ["Parent"] = parentReference,

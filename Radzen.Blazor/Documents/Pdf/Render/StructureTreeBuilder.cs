@@ -13,10 +13,13 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private readonly Dictionary<SourceId, StructureElement> markerElementsBySource = [];
     private readonly Dictionary<SourceId, StructureElement> linkElementsBySource = [];
     private readonly Dictionary<SourceId, SemanticArtifactKind> artifactsBySource = [];
+    private readonly SortedSet<string> unmappedRoles = new(StringComparer.Ordinal);
     private StructureElement documentElement = null!;
     private int nextElementId;
 
     public StructureElement DocumentElement => documentElement;
+
+    public ImmutableArray<string> UnmappedRoles => [.. unmappedRoles];
 
     public static StructureElementSnapshot Capture(
         StructureElement root,
@@ -91,10 +94,6 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             {
                 elementsBySource[association.Source] = element;
             }
-            else if (snapshot.Nodes[association.Element].IsDecorative)
-            {
-                artifactsBySource[association.Source] = SemanticArtifactKind.Decorative;
-            }
 
             if (association.MarkerElement is { } markerIndex
                 && materialized[markerIndex] is { } marker)
@@ -155,10 +154,26 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
         }
 
         var style = semantics.Styles.Paragraphs[styleIndex];
-        return style.CustomRole is { } role && settings.RoleMap.Contains(role)
+        if (style.RoleIsDeclared && style.CustomRole is { } declared && !Interpretable(declared))
+        {
+            unmappedRoles.Add(declared);
+        }
+
+        if (style.HeadingLevel > 0)
+        {
+            return StandardType(style.Intent, style.HeadingLevel);
+        }
+
+        return style.CustomRole is { } role
+            && (settings.RoleMap.Contains(role) || (style.RoleIsDeclared && RoleMap.IsStandardType(role)))
             ? role
             : StandardType(style.Intent, style.HeadingLevel);
     }
+
+    // ISO 14289-1:2014 7.1: non-standard structure types shall be mapped, in the structure tree root's role
+    // map, to the nearest functionally equivalent standard type defined in ISO 32000-1:2008 14.8.4.
+    private bool Interpretable(string role)
+        => RoleMap.IsStandardType(role) || settings.RoleMap.Contains(role);
 
     // ISO 32000-1:2008 Table 333 (standard structure types) and 14.8.4.
     private static string StandardType(SemanticIntent intent, int headingLevel)
@@ -189,12 +204,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
         };
 
     private bool Materializes(SemanticStructureTier tier)
-        => tier switch
-        {
-            SemanticStructureTier.Always => true,
-            SemanticStructureTier.Structural => TaggingActive,
-            _ => settings.Accessibility != PdfUaConformance.None,
-        };
+        => tier == SemanticStructureTier.Always || TaggingActive;
 
     public bool TaggingActive
         => settings.Accessibility != PdfUaConformance.None

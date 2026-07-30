@@ -62,7 +62,7 @@ internal sealed class NavigationWriter(PortableDocument document)
 
             if (item.Color is { } color)
             {
-                node["C"] = PdfColorArray.Rgb(color);
+                node["C"] = PdfColor.Rgb(color);
             }
 
             var flags = (item.Italic ? 1 : 0) | (item.Bold ? 2 : 0);
@@ -146,7 +146,7 @@ internal sealed class NavigationWriter(PortableDocument document)
             {
                 ["Type"] = new NameObject("Annot"),
                 ["Subtype"] = new NameObject("Link"),
-                ["Rect"] = PageResourceBuilder.NumberBox(new PdfRect(link.X1, link.Y1, link.X2, link.Y2)),
+                ["Rect"] = PageBoxWriter.NumberBox(new PdfRect(link.X1, link.Y1, link.X2, link.Y2)),
                 ["Border"] = new ArrayObject { new NumberObject(0.0), new NumberObject(0.0), new NumberObject(0.0) },
                 // ISO 19005-3 6.3.2: Print flag (bit 3 = 4) set, Hidden/NoView clear.
                 ["F"] = new NumberObject(4),

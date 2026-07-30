@@ -26,6 +26,7 @@ internal static class WatermarkPlanner
             CenterY = size.Height.Point / 2,
             Rotation = watermark.Rotation,
             Opacity = watermark.Opacity,
+            Artifact = SemanticArtifactKind.Watermark,
             Image = watermark.Image is { } image ? PlanImage(image, width, capture) : null,
             Text = string.IsNullOrEmpty(watermark.Text) ? null : PlanText(watermark, watermark.Text, fonts),
         };
@@ -52,8 +53,7 @@ internal static class WatermarkPlanner
     private static LaidOutWatermarkText PlanText(Watermark watermark, string text, FontCollection fonts)
     {
         var font = watermark.Font;
-        var isSfnt = fonts.TryResolvePrimary(font, out _);
-        if (!isSfnt
+        if (!fonts.TryResolvePrimary(font, out _)
             && !string.IsNullOrEmpty(font.EffectiveFamily)
             && BuiltInFontMetrics.Resolve(font) is null)
         {
@@ -62,14 +62,12 @@ internal static class WatermarkPlanner
                 + "or use a family supplied by the built-in metrics.");
         }
 
-        var glyphRun = fonts.CaptureGlyphRun(text, font, enableBuiltInKerning: isSfnt);
+        var glyphRun = fonts.CaptureGlyphRun(text, font);
 
         return new LaidOutWatermarkText
         {
             Text = text,
             Font = GeometryCapture.Font(font),
-            Size = font.EffectiveSize.Point,
-            Color = font.EffectiveColor,
             X = WatermarkGeometry.Centered(glyphRun.Advance),
             Baseline = WatermarkGeometry.Baseline(font.EffectiveSize.Point),
             GlyphRun = glyphRun,

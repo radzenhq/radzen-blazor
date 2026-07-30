@@ -4,7 +4,7 @@ using Radzen.Documents.Pdf.Emission;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class ImageStore
+internal sealed class ImageStore(ImageDecoders decoders)
 {
     private readonly ResourceNameAllocator<SourceId, EmissionImage> images = new("Im");
     private readonly ResourceNameAllocator<SourceId, EmissionImage> interpolated = new("Imo");
@@ -36,17 +36,17 @@ internal sealed class ImageStore
     }
 
     public EmissionImage DecodeBytes(SourceId key, SceneImageData data)
-        => images.GetOrAddValue(key, name => Capture(name, ImageDecoder.Decode(data.Memory)));
+        => images.GetOrAddValue(key, name => Capture(name, decoders.Decode(data.Memory, ReaderLimits.Default)));
 
-    public static ImageXObject SourceOf(EmissionImage image) => (ImageXObject)image.Identity;
+    public static DecodedImage SourceOf(EmissionImage image) => (DecodedImage)image.Identity;
 
     private static EmissionImage Interpolate(string name, EmissionImage decoded)
         => Capture(name, ImageDecoder.ApplyOptions(SourceOf(decoded), interpolate: true));
 
-    private static EmissionImage Capture(string key, ImageXObject xobject)
+    private static EmissionImage Capture(string key, DecodedImage image)
         => new(
-            xobject,
+            image,
             key,
-            EmissionStreamPayload.Capture(xobject.Image),
-            xobject.SoftMask is { } mask ? EmissionStreamPayload.Capture(mask) : null);
+            EmissionImagePayload.Capture(image),
+            image.Alpha is { } alpha ? EmissionImagePayload.Capture(alpha) : null);
 }

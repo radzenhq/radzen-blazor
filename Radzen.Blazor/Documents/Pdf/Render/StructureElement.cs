@@ -12,7 +12,7 @@ internal readonly struct StructureKid
     public int Mcid { get; init; }
 }
 
-internal sealed class StructureElement : IStructureTag
+internal sealed class StructureElement
 {
     public required int Id { get; init; }
 

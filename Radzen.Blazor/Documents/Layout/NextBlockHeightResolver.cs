@@ -109,7 +109,7 @@ internal static class NextBlockHeightResolver
             }
 
             var measured = layouts.Box(next, container);
-            return new NextBlockHeight { Found = true, Height = measured.Height + (2 * container.Padding.Point) };
+            return new NextBlockHeight { Found = true, Height = measured.Height + container.EffectivePadding.Vertical };
         }
 
         public NextBlockHeight Image(Image image, int next)

@@ -2,7 +2,6 @@ using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Write;
 
@@ -19,7 +18,7 @@ internal sealed class AnnotationEmitContext
     public DocumentReader? Source { get; init; }
 }
 
-internal static class AnnotationEmitter
+internal static class AnnotationWriter
 {
     private static readonly HashSet<string> ManagedKeys = new(StringComparer.Ordinal)
     {
@@ -156,8 +155,8 @@ internal static class AnnotationEmitter
 
         dictionary["Type"] = new NameObject("Annot");
         dictionary["Subtype"] = new NameObject(annotation.Subtype);
-        dictionary["Rect"] = PageResourceBuilder.NumberBox(annotation.Bounds);
-        dictionary["C"] = PdfColorArray.Rgb(annotation.Color);
+        dictionary["Rect"] = PageBoxWriter.NumberBox(annotation.Bounds);
+        dictionary["C"] = PdfColor.Rgb(annotation.Color);
         dictionary["CA"] = new NumberObject(annotation.Opacity);
         dictionary["F"] = new NumberObject((int)annotation.Flags);
         dictionary["P"] = context.Pages[context.PageIndex].Reference;
@@ -274,7 +273,7 @@ internal static class AnnotationEmitter
                 dictionary["BS"] = new DictionaryObject { ["W"] = new NumberObject(shape.BorderWidth) };
                 if (shape.InteriorColor is { } interior)
                 {
-                    dictionary["IC"] = PdfColorArray.Rgb(interior);
+                    dictionary["IC"] = PdfColor.Rgb(interior);
                 }
 
                 break;
@@ -318,7 +317,7 @@ internal static class AnnotationEmitter
         return AppearanceStreamBuilder.Render(
             scope,
             ContentResourcePrefixes.Appearance,
-            PageResourceBuilder.NumberBox(AppearanceBounds(annotation)),
+            PageBoxWriter.NumberBox(AppearanceBounds(annotation)),
             formType: true,
             elements,
             writer,
@@ -363,7 +362,7 @@ internal static class AnnotationEmitter
         => DefaultAppearanceGrammar.Write(
             annotation.Font.EffectiveFamily,
             annotation.Font.EffectiveSize.Point,
-            string.Create(CultureInfo.InvariantCulture, $"{annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg"));
+            PdfColor.RgbOperator(annotation.TextColor, "rg"));
 }
 
 internal static class AnnotationValidator

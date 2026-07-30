@@ -28,16 +28,9 @@ internal static class LoweredBlockDispatch
         Block block,
         ILoweredBlockHandler<TContext, TResult> handler,
         TContext context)
-        => block switch
-        {
-            Paragraph paragraph => handler.Paragraph(paragraph, context),
-            Table table => handler.Table(table, context),
-            Image image => handler.Image(image, context),
-            Container container => handler.Container(container, context),
-            Barcode or QrCode => handler.CodeSymbol(block, context),
-            PageBreak pageBreak => handler.PageBreak(pageBreak, context),
-            _ => throw Unsupported(block),
-        };
+        => block.Accept(
+            LoweredBlockVisitor<TContext, TResult>.Instance,
+            new LoweredBlockRequest<TContext, TResult>(handler, context));
 
     internal static NotSupportedException Unsupported(Block block)
         => new(
@@ -61,5 +54,39 @@ internal static class LoweredBlockDispatch
             lowering,
             capture,
             indent);
+    }
+
+    private readonly record struct LoweredBlockRequest<TContext, TResult>(
+        ILoweredBlockHandler<TContext, TResult> Handler,
+        TContext Context);
+
+    private sealed class LoweredBlockVisitor<TContext, TResult>
+        : BlockVisitor<LoweredBlockRequest<TContext, TResult>, TResult>
+    {
+        internal static readonly LoweredBlockVisitor<TContext, TResult> Instance = new();
+
+        protected override TResult Default(Block block, LoweredBlockRequest<TContext, TResult> request)
+            => throw Unsupported(block);
+
+        public override TResult Visit(Paragraph block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.Paragraph(block, request.Context);
+
+        public override TResult Visit(Table block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.Table(block, request.Context);
+
+        public override TResult Visit(Image block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.Image(block, request.Context);
+
+        public override TResult Visit(Container block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.Container(block, request.Context);
+
+        public override TResult Visit(Barcode block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.CodeSymbol(block, request.Context);
+
+        public override TResult Visit(QrCode block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.CodeSymbol(block, request.Context);
+
+        public override TResult Visit(PageBreak block, LoweredBlockRequest<TContext, TResult> request)
+            => request.Handler.PageBreak(block, request.Context);
     }
 }

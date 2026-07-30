@@ -115,6 +115,45 @@ internal static class ContentEmitter
         WritePoint(writer, x3, y3, " c\n");
     }
 
+    public static void WriteStrokeWidth(ContentWriter writer, double width)
+    {
+        writer.WriteNumber(width);
+        writer.WriteRaw(" w\n");
+    }
+
+    public static void WriteDashPattern(ContentWriter writer, ReadOnlySpan<double> pattern, double phase)
+    {
+        writer.WriteRaw("[");
+        for (var i = 0; i < pattern.Length; i++)
+        {
+            if (i > 0)
+            {
+                writer.WriteRaw(" ");
+            }
+
+            writer.WriteNumber(pattern[i]);
+        }
+
+        writer.WriteRaw("] ");
+        writer.WriteNumber(phase);
+        writer.WriteRaw(" d\n");
+    }
+
+    public static void WriteStrokeState(ContentWriter writer, Color color, double lineWidth, BorderStyle style)
+    {
+        writer.WriteColor(color, "RG");
+        WriteStrokeWidth(writer, lineWidth);
+
+        if (style is not (BorderStyle.Dashed or BorderStyle.Dotted))
+        {
+            return;
+        }
+
+        var on = (style == BorderStyle.Dashed ? 3.0 : 1.0) * lineWidth;
+        Span<double> pattern = [on, on];
+        WriteDashPattern(writer, pattern, 0);
+    }
+
     public static void WriteTransform(ContentWriter writer, in Matrix matrix)
     {
         writer.WriteNumber(matrix.A);

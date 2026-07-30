@@ -12,7 +12,19 @@ internal sealed class FieldResolver(
     LoweringContext resolution,
     LayoutCaptureContext capture)
 {
-    public bool HasField(Paragraph paragraph)
+    private static readonly FieldParagraphVisitor fieldParagraphs = new();
+
+    public Paragraph? ParagraphWithFields(Block block) => block.Accept(fieldParagraphs, this);
+
+    private sealed class FieldParagraphVisitor : BlockVisitor<FieldResolver, Paragraph?>
+    {
+        protected override Paragraph? Default(Block block, FieldResolver resolver) => null;
+
+        public override Paragraph? Visit(Paragraph block, FieldResolver resolver)
+            => resolver.HasField(block) ? block : null;
+    }
+
+    private bool HasField(Paragraph paragraph)
     {
         foreach (var inline in paragraph.Inlines)
         {

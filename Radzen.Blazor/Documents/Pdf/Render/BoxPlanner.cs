@@ -3,7 +3,7 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class BoxEmitter(TableEmitter tables)
+internal sealed class BoxPlanner(TablePlanner tables)
 {
     public void EmitBox(EmitContext context, in LaidOutBox box, double left, double contentTop)
     {
@@ -19,15 +19,15 @@ internal sealed class BoxEmitter(TableEmitter tables)
         }
 
         var opacity = box.Opacity;
-        ContainerDecoration.Paint(
+        BoxDecorationPlanner.Paint(
             plan,
             bounds,
             opacity,
             box.Style,
-            artifact ?? SemanticArtifactKind.LayoutDecoration);
+            SemanticArtifacts.ForDecoration(artifact));
 
         var radius = BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height);
-        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Padding));
+        var innerWidth = Math.Max(0, box.Bounds.Width - box.Padding.Horizontal);
 
         tables.EmitBoxContent(
             context,

@@ -42,6 +42,9 @@ internal static class TableFragmentJoin
                 Y = y + row.Y,
                 Height = row.Height,
                 Background = layout.Decoration.RowBackground(row.SourceRow),
+                Artifact = row.IsHeader && fragment.ContainsRepeatedHeaders
+                    ? SemanticArtifactKind.RepeatedContent
+                    : null,
                 Cells = placed.MoveToImmutable(),
             });
         }

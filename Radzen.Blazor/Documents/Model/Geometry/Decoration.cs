@@ -36,5 +36,7 @@ internal readonly struct LaidOutRow
 
     public Color? Background { get; init; }
 
+    public SemanticArtifactKind? Artifact { get; init; }
+
     public required ImmutableArray<LaidOutCellPlacement> Cells { get; init; }
 }

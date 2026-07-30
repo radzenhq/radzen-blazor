@@ -2,15 +2,18 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal static class BoxRenderer
+internal static class BoxDecorationPlanner
 {
     public static void Paint(
         PagePlan plan,
-        PdfRect bounds,
+        in PdfRect bounds,
+        double opacity,
         in BoxStyle style,
-        string? extGState,
         SemanticArtifactKind artifact)
     {
+        var extGState = opacity < 1 || style.HasGraphicsStateOptions
+            ? plan.RegisterExtGState(opacity, opacity, style.Blend)
+            : null;
         var radius = BoxStyle.ClampRadius(style.CornerRadius, bounds.Width, bounds.Height);
 
         if (style.Shadow is { } shadow)

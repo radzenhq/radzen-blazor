@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using Radzen.Documents.Geometry;
 using Radzen.Documents.Pdf.Emission;
 
@@ -28,7 +27,7 @@ internal sealed class OrderedSet<T> : IEnumerable<T>
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
-internal struct TextDraw
+internal readonly struct TextDraw
 {
     public required double X { get; init; }
     public required double Baseline { get; init; }
@@ -51,15 +50,15 @@ internal struct TextDraw
     public StructureElement? Element { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
-    public PdfRect? Clip { get; set; }
+    public PdfRect? Clip { get; init; }
 
-    public double ClipRadius { get; set; }
+    public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
 
-    public Matrix? Transform { get; set; }
+    public Matrix? Transform { get; init; }
 }
 
-internal struct ImageDraw
+internal readonly struct ImageDraw
 {
     public required double X { get; init; }
     public required double Y { get; init; }
@@ -69,13 +68,13 @@ internal struct ImageDraw
     public StructureElement? Element { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
-    public PdfRect? Clip { get; set; }
-    public double ClipRadius { get; set; }
+    public PdfRect? Clip { get; init; }
+    public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
-    public Matrix? Transform { get; set; }
+    public Matrix? Transform { get; init; }
 }
 
-internal struct FillDraw
+internal readonly struct FillDraw
 {
     public required double X { get; init; }
     public required double Y { get; init; }
@@ -88,8 +87,8 @@ internal struct FillDraw
     public int Sequence { get; init; }
 
     public double Radius { get; init; }
-    public PdfRect? Clip { get; set; }
-    public double ClipRadius { get; set; }
+    public PdfRect? Clip { get; init; }
+    public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
 
     public GradientPaint? Gradient { get; init; }
@@ -105,11 +104,13 @@ internal readonly struct RoundedStrokeDraw
     public required double LineWidth { get; init; }
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
+    public StructureElement? Element { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
+    public int Sequence { get; init; }
     public string? ExtGState { get; init; }
 }
 
-internal struct EdgeDraw
+internal readonly struct EdgeDraw
 {
     public required double X1 { get; init; }
     public required double Y1 { get; init; }
@@ -119,8 +120,8 @@ internal struct EdgeDraw
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
-    public PdfRect? Clip { get; set; }
-    public double ClipRadius { get; set; }
+    public PdfRect? Clip { get; init; }
+    public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
 }
 
@@ -129,6 +130,7 @@ internal sealed class WatermarkDraw
     public required double CenterX { get; init; }
     public required double CenterY { get; init; }
     public required double Rotation { get; init; }
+    public required SemanticArtifactKind Artifact { get; init; }
     public string? ExtGState { get; init; }
     public List<TextDraw> Texts { get; } = [];
     public ImageDraw? Image { get; set; }
@@ -182,10 +184,7 @@ internal sealed class PagePlan
     {
         fillAlpha = Math.Clamp(fillAlpha, 0, 1);
         strokeAlpha = Math.Clamp(strokeAlpha, 0, 1);
-        var dedupKey = string.Create(
-            CultureInfo.InvariantCulture,
-            $"a|{fillAlpha}|{strokeAlpha}|{blend}");
-        return extGStates.GetOrAdd(dedupKey, key => Track(new EmissionExtGState(
+        return ExtGStateRegistration.RegisterAlpha(extGStates, fillAlpha, strokeAlpha, blend, key => Track(new EmissionExtGState(
             key,
             fillAlpha,
             strokeAlpha,
@@ -252,46 +251,18 @@ internal sealed class PagePlan
 
     public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
     {
-        ApplyClip(Fills, mark.Fills, fill =>
-        {
-            if (fill.Clip is null)
-            {
-                fill.Clip = bounds;
-                fill.ClipRadius = radius;
-            }
-
-            return fill;
-        });
-        ApplyClip(Edges, mark.Edges, edge =>
-        {
-            if (edge.Clip is null)
-            {
-                edge.Clip = bounds;
-                edge.ClipRadius = radius;
-            }
-
-            return edge;
-        });
-        ApplyClip(Images, mark.Images, image =>
-        {
-            if (image.Clip is null)
-            {
-                image.Clip = bounds;
-                image.ClipRadius = radius;
-            }
-
-            return image;
-        });
-        ApplyClip(Texts, mark.Texts, text =>
-        {
-            if (text.Clip is null)
-            {
-                text.Clip = bounds;
-                text.ClipRadius = radius;
-            }
-
-            return text;
-        });
+        ApplyClip(Fills, mark.Fills, fill => fill.Clip is null
+            ? fill with { Clip = bounds, ClipRadius = radius }
+            : fill);
+        ApplyClip(Edges, mark.Edges, edge => edge.Clip is null
+            ? edge with { Clip = bounds, ClipRadius = radius }
+            : edge);
+        ApplyClip(Images, mark.Images, image => image.Clip is null
+            ? image with { Clip = bounds, ClipRadius = radius }
+            : image);
+        ApplyClip(Texts, mark.Texts, text => text.Clip is null
+            ? text with { Clip = bounds, ClipRadius = radius }
+            : text);
     }
 
     private static void ApplyClip<T>(List<T> items, int start, Func<T, T> clip)
@@ -380,7 +351,7 @@ internal sealed class PagePlan
                     LineWidth = fill.Height,
                     Color = fill.Color,
                     Style = BorderStyle.Solid,
-                    Artifact = fill.Artifact ?? SemanticArtifactKind.LayoutDecoration,
+                    Artifact = SemanticArtifacts.ForDecoration(fill.Artifact),
                     ExtGState = fill.ExtGState,
                 });
             }
@@ -409,16 +380,12 @@ internal sealed class PagePlan
 
         for (var i = mark.Images; i < Images.Count; i++)
         {
-            var image = Images[i];
-            image.Transform = transform;
-            Images[i] = image;
+            Images[i] = Images[i] with { Transform = transform };
         }
 
         for (var i = mark.Texts; i < Texts.Count; i++)
         {
-            var text = Texts[i];
-            text.Transform = transform;
-            Texts[i] = text;
+            Texts[i] = Texts[i] with { Transform = transform };
         }
     }
 

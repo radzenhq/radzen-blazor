@@ -2,7 +2,7 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
+internal sealed class ImagePlanner(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
     public void EmitImage(EmitContext context, LaidOutImage positioned, double left, double top)
     {

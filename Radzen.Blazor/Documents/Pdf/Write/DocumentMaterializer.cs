@@ -61,7 +61,7 @@ internal sealed class DocumentMaterializer
                 ["Parent"] = pagesRef,
             };
 
-            PageResourceBuilder.EmitPageGeometry(doc, page, pageNode);
+            PageBoxWriter.EmitPageGeometry(doc, page, pageNode);
 
             var pageRef = writer.Add(pageNode);
             if (importer is not null && loaded!.SourcePages.TryGetValue(page, out var sourceNode))
@@ -218,7 +218,7 @@ internal sealed class DocumentMaterializer
             catalog["AcroForm"] = writer.Add(formWriter.FieldsForm(appendedFields));
         }
 
-        AnnotationEmitter.Write(writer, importer, loaded?.Source, appendImporters, pageNodes);
+        AnnotationWriter.Write(writer, importer, loaded?.Source, appendImporters, pageNodes);
 
         foreach (var (pageIndex, reference) in createdWidgets)
         {

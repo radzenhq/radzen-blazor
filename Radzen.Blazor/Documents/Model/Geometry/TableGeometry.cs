@@ -74,7 +74,7 @@ internal sealed record LaidOutBox
 
     public required BoxStyle Style { get; init; }
 
-    public required double Padding { get; init; }
+    public required BoxPadding Padding { get; init; }
 
     public required double Opacity { get; init; }
 
