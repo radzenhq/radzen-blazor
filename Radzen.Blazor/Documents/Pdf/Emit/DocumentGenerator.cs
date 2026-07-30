@@ -1,7 +1,10 @@
-using System;
 using System.Collections.Generic;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using System.Collections.Immutable;
 using static Radzen.Documents.Pdf.Emit.GeneratorFontResolver;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Layout;
+using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -42,6 +45,8 @@ internal sealed class GeneratedLink
     public string? Uri { get; init; }
 
     public string? Destination { get; init; }
+
+    public StructureElement? Element { get; init; }
 }
 
 internal readonly record struct GeneratedAnchor(int PageIndex, double Top);
@@ -56,14 +61,6 @@ internal sealed class GeneratedExtGState
 
     public BlendMode? Blend { get; init; }
 
-    public bool? OverprintStroke { get; init; }
-
-    public bool? OverprintFill { get; init; }
-
-    public int? OverprintMode { get; init; }
-
-    public RenderingIntent? Intent { get; init; }
-
     public GeneratedSoftMask? SoftMask { get; init; }
 
     public bool ClearSoftMask { get; init; }
@@ -73,7 +70,7 @@ internal sealed class GeneratedPattern
 {
     public required string Key { get; init; }
 
-    public required GradientBrush Gradient { get; init; }
+    public required DictionaryObject Pattern { get; init; }
 }
 
 internal sealed class GeneratedPage
@@ -93,133 +90,71 @@ internal sealed class GeneratedPage
 
 internal sealed class DocumentGenerator
 {
-    private readonly DocumentBuilder builder;
-    private readonly CapturedBuilderSettings settings;
-    private readonly FontCollection fonts;
+    private readonly CapturedRendererSettings settings;
+    private readonly LaidOutDocument laidOut;
+
+    private readonly StructureTreeBuilder structureTree;
     private readonly GeneratorFontResolver fontResolver;
     private readonly ImageStore imageStore;
-    private readonly StructureTreeBuilder structureTree;
-    private readonly StyleResolution resolution;
     private readonly TextLineEmitter textEmitter;
     private readonly TableEmitter tableEmitter;
     private readonly BoxEmitter boxEmitter;
     private readonly ImageEmitter imageEmitter;
-    private readonly CodeEmitter codeEmitter;
-    private readonly FieldResolver fieldResolver;
+    private readonly CodeSymbolEmitter codeSymbolEmitter;
     private readonly WatermarkEmitter watermarkEmitter;
 
     private readonly bool markArtifacts;
 
-    private DocumentGenerator(DocumentBuilder builder, CapturedBuilderSettings settings)
+    private DocumentGenerator(CapturedRendererSettings settings, LaidOutDocument laidOut)
     {
-        this.builder = builder;
         this.settings = settings;
-        markArtifacts = settings.PdfUA
+        this.laidOut = laidOut;
+        markArtifacts = settings.Accessibility != PdfUaConformance.None
             || settings.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
-        fonts = builder.Fonts;
-        fontResolver = new(settings.Conformance);
-        imageStore = new();
-        resolution = StyleResolver.Resolve(builder);
-        structureTree = new(builder, resolution);
-        textEmitter = new(fonts, fontResolver, imageStore, resolution, structureTree);
-        codeEmitter = new(fonts, resolution);
-        imageEmitter = new(imageStore, structureTree);
-        fieldResolver = new(fonts, resolution);
-        var opacities = new OpacityResolver(builder);
-        tableEmitter = new(imageStore, structureTree, opacities);
-        boxEmitter = new(tableEmitter, opacities);
-        watermarkEmitter = new(fonts, fontResolver, imageStore);
-    }
 
-    public static Document Generate(DocumentBuilder builder, CapturedBuilderSettings settings)
-    {
-        var generator = new DocumentGenerator(builder, settings);
-        var first = generator.Run();
-
-        if (!HasTableOfContents(builder))
-        {
-            return first;
-        }
-
-        var tocPages = new Dictionary<string, int>(StringComparer.Ordinal);
-        foreach (var (name, anchor) in first.Anchors)
-        {
-            tocPages[name] = anchor.PageIndex + 1;
-        }
-
-        ValidateTocAnchors(builder, tocPages);
-        return new DocumentGenerator(builder, settings).Run(tocPages);
-    }
-
-    private static bool HasTableOfContents(DocumentBuilder builder)
-    {
-        foreach (var section in builder.Sections)
-        {
-            foreach (var block in section.Blocks)
-            {
-                if (block is TableOfContents)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static void ValidateTocAnchors(DocumentBuilder builder, Dictionary<string, int> tocPages)
-    {
-        foreach (var section in builder.Sections)
-        {
-            foreach (var block in section.Blocks)
-            {
-                if (block is not TableOfContents toc)
-                {
-                    continue;
-                }
-
-                foreach (var entry in toc.Entries)
-                {
-                    if (!tocPages.ContainsKey(entry.Anchor))
-                    {
-                        throw new InvalidOperationException(
-                            $"Table of contents entry anchor '{entry.Anchor}' does not exist; set Run.Anchor on the destination run.");
-                    }
-                }
-            }
-        }
-    }
-
-    private Document Run(IReadOnlyDictionary<string, int>? tocPages = null)
-    {
-        var document = settings.CreateDocument();
-
+        structureTree = new(laidOut.Semantics, settings);
         structureTree.Build();
 
-        var paginated = new List<PaginatedPage>();
-        var watermarks = new List<Watermark?>();
-        foreach (var section in builder.Sections)
-        {
-            if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
-            {
-                throw new NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
-            }
+        fontResolver = new(settings.Conformance);
+        imageStore = new();
+        textEmitter = new(
+            fontResolver,
+            imageStore,
+            structureTree,
+            laidOut.Fonts.AllowUnsupportedCharacters);
+        codeSymbolEmitter = new(structureTree);
+        imageEmitter = new(imageStore, structureTree);
+        tableEmitter = new(imageStore, structureTree);
+        boxEmitter = new(tableEmitter);
+        watermarkEmitter = new(
+            fontResolver,
+            imageStore,
+            laidOut.Fonts.AllowUnsupportedCharacters);
+    }
 
-            foreach (var page in Paginator.Paginate(section, fonts, imageEmitter.MeasureImage, resolution, tocPages))
-            {
-                paginated.Add(page);
-                watermarks.Add(section.Watermark);
-            }
-        }
+    public static Document Generate(Radzen.Documents.Document document, CapturedRendererSettings settings)
+        => new DocumentGenerator(settings, DocumentLayouter.Layout(document)).Run();
+
+    internal static Document Generate(CapturedRendererSettings settings, LaidOutDocument laidOut)
+        => new DocumentGenerator(settings, laidOut).Run();
+
+    private Document Run()
+    {
+        var output = settings.Document;
+        output.FontSnapshot = laidOut.Fonts;
+        output.Language = laidOut.Semantics.Language;
+        PdfModelAdapter.Apply(laidOut.Info, output.Info);
+
+        var paginated = laidOut.Pages;
 
         var plans = new List<PagePlan>();
-        for (var i = 0; i < paginated.Count; i++)
+        for (var i = 0; i < paginated.Length; i++)
         {
-            plans.Add(GeneratePage(paginated[i], i + 1, paginated.Count, watermarks[i]));
+            plans.Add(GeneratePage(paginated[i]));
         }
 
-        document.Structure = structureTree.DocumentElement;
-        document.HasUntaggedListContent = structureTree.HasUntaggedList;
+        output.Structure = structureTree.DocumentElement;
+        output.HasUntaggedListContent = structureTree.HasUntaggedList;
         foreach (var font in fontResolver.AllFonts)
         {
             if (font.Sfnt is { } sfnt)
@@ -238,92 +173,121 @@ internal sealed class DocumentGenerator
             };
             page.SetLoadedContent(generated.Content);
             page.SetTextFonts(BuildExtractionFonts(generated));
-            document.Pages.Insert(document.Pages.Count, page);
+            output.Pages.Insert(output.Pages.Count, page);
         }
 
-        foreach (var (name, anchor) in textEmitter.Anchors)
+        for (var pageIndex = 0; pageIndex < paginated.Length; pageIndex++)
         {
-            document.Anchors[name] = anchor;
+            var pageHeight = paginated[pageIndex].Size.Height.Point;
+            foreach (var anchor in paginated[pageIndex].Anchors)
+            {
+                if (!output.Anchors.ContainsKey(anchor.Name))
+                {
+                    output.Anchors[anchor.Name] = new GeneratedAnchor(pageIndex, pageHeight - anchor.Top);
+                }
+            }
         }
 
-        return document;
+        output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
+        output.RoleMap = new RoleMap();
+        output.Encryption = null;
+        return output;
     }
 
-    private PagePlan GeneratePage(PaginatedPage page, int pageNumber, int pageCount, Watermark? watermark)
+    private PagePlan GeneratePage(PaginatedPage page)
     {
         var height = page.Size.Height.Point;
         var plan = new PagePlan { Size = page.Size };
         var context = new EmitContext
         {
             Plan = plan,
-            PageNumber = pageNumber,
-            PageCount = pageCount,
             Text = textEmitter,
             Tables = tableEmitter,
             Images = imageEmitter,
-            Codes = codeEmitter,
-            Fields = fieldResolver,
+            CodeSymbols = codeSymbolEmitter,
         };
         var left = page.ContentBox.X;
         var contentTop = height - page.ContentBox.Y;
-        var width = page.ContentBox.Width;
 
-        foreach (var (layer, top, body) in new[]
+        foreach (var kind in LaidOutPaintOrder.Layers)
         {
-            (page.Body, contentTop, true),
-            (page.HeaderLayer, height - page.HeaderTop, false),
-            (page.FooterLayer, height - page.FooterTop, false),
-        })
-        {
-            EmitLayer(context, layer, left, top, width, body);
+            var (layer, top) = kind switch
+            {
+                PageLayerKind.Body => (page.Body, contentTop),
+                PageLayerKind.Header => (page.HeaderLayer, height - page.HeaderTop),
+                _ => (page.FooterLayer, height - page.FooterTop),
+            };
+
+            EmitLayer(context, kind, layer, left, top);
         }
 
-        if (watermark is not null)
+        foreach (var link in page.Links)
         {
-            watermarkEmitter.Plan(plan, watermark);
+            plan.Links.Add(new GeneratedLink
+            {
+                X1 = link.Left,
+                Y1 = height - link.Bottom,
+                X2 = link.Right,
+                Y2 = height - link.Top,
+                Uri = link.Uri,
+                Destination = link.Anchor,
+                Element = structureTree.ElementOf(link.Source),
+            });
+        }
+
+        if (page.Watermark is not null)
+        {
+            watermarkEmitter.Plan(plan, page.Watermark);
         }
 
         return plan;
     }
 
-    private void EmitLayer(EmitContext context, PageLayer layer, double left, double top, double width, bool body)
+    private void EmitLayer(EmitContext context, PageLayerKind kind, PageLayer layer, double left, double top)
     {
-        if (!body)
+        var body = kind == PageLayerKind.Body;
+        foreach (var content in LaidOutPaintOrder.ContentOf(kind))
         {
-            textEmitter.EmitBandLines(context, layer.Lines, left, top, width);
-            EmitImagesAndCodes(context, layer, left, top);
-            EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
-            return;
+            switch (content)
+            {
+                case PaintContent.Lines when body:
+                    textEmitter.EmitLines(
+                        context, layer.Lines,
+                        static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
+                        left, top, delta: 0,
+                        opacity: 1, inherited: null, resolveStructure: true,
+                        overflowThreshold: double.PositiveInfinity);
+                    break;
+                case PaintContent.Lines:
+                    textEmitter.EmitBandLines(context, layer.Lines, left, top);
+                    break;
+                case PaintContent.TablesAndBoxesByOrder:
+                    EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
+                    break;
+                case PaintContent.ImagesAndCodeSymbols:
+                    EmitImagesAndCodeSymbols(context, layer, left, top);
+                    break;
+            }
         }
-
-        textEmitter.EmitFieldExpandedLines(
-            context, layer.Lines,
-            static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
-            left, top, delta: 0, width,
-            opacity: 1, inherited: null, resolveStructure: true,
-            overflowThreshold: double.PositiveInfinity);
-
-        EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
-        EmitImagesAndCodes(context, layer, left, top);
     }
 
-    private void EmitImagesAndCodes(EmitContext context, PageLayer layer, double left, double top)
+    private void EmitImagesAndCodeSymbols(EmitContext context, PageLayer layer, double left, double top)
     {
         foreach (var positioned in layer.Images)
         {
             imageEmitter.EmitImage(context, positioned, left, top);
         }
 
-        foreach (var positioned in layer.Codes)
+        foreach (var positioned in layer.CodeSymbols)
         {
-            codeEmitter.EmitCode(context, positioned, left, top);
+            codeSymbolEmitter.EmitCodeSymbol(context, positioned, left, top);
         }
     }
 
     private void EmitTablesAndBoxes(
         EmitContext context,
-        IReadOnlyList<PositionedTableFragment> tables,
-        IReadOnlyList<PositionedBox> boxes,
+        ImmutableArray<PositionedTableFragment> tables,
+        ImmutableArray<PositionedBox> boxes,
         double left,
         double top)
     {

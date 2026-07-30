@@ -1,15 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
-using static Radzen.Documents.Pdf.Content.ContentEmitter;
+using Radzen.Documents.Geometry;
 
-using Radzen.Documents.Pdf.Content;
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolution resolution)
+internal sealed class StructureTreeBuilder(DocumentSemantics semantics, CapturedRendererSettings settings)
 {
-    private readonly Dictionary<object, StructureElement> blockElements = [];
-    private readonly Dictionary<StructureElement, int> structureOrder = [];
+    private readonly Dictionary<SourceId, StructureElement> elementsBySource = [];
+    private readonly Dictionary<SourceId, StructureElement> markerElementsBySource = [];
     private StructureElement documentElement = null!;
     private bool hasUntaggedList;
 
@@ -17,275 +15,251 @@ internal sealed class StructureTreeBuilder(DocumentBuilder builder, StyleResolut
 
     public bool HasUntaggedList => hasUntaggedList;
 
-    public void Build()
-    {
-        BuildStructureTree();
-        IndexStructure();
-    }
+    public void Build() => BuildStructureTree();
 
     private void BuildStructureTree()
     {
-        documentElement = new StructureElement { Type = "Document" };
-        foreach (var section in builder.Sections)
+        var snapshot = semantics.Structure;
+        var materialized = new StructureElement?[snapshot.Nodes.Length];
+        documentElement = Materialize(0, snapshot, materialized)!;
+
+        foreach (var association in snapshot.Associations)
         {
-            var sect = new StructureElement { Type = "Sect" };
-            documentElement.Children.Add(sect);
-            foreach (var block in section.Blocks)
+            if (materialized[association.Element] is { } element)
             {
-                MapBlock(block, sect);
+                elementsBySource[association.Source] = element;
+            }
+
+            if (association.MarkerElement is { } markerIndex
+                && materialized[markerIndex] is { } marker)
+            {
+                markerElementsBySource[association.Source] = marker;
             }
         }
-    }
 
-    private void IndexStructure()
-    {
-        var index = 0;
-        var stack = new Stack<StructureElement>();
-        stack.Push(documentElement);
-        while (stack.Count > 0)
+        if (settings.Accessibility == PdfUaConformance.None)
         {
-            var element = stack.Pop();
-            structureOrder[element] = index++;
-            for (var c = element.Children.Count - 1; c >= 0; c--)
+            foreach (var list in snapshot.Lists)
             {
-                stack.Push(element.Children[c]);
-            }
-        }
-    }
-
-    private void MapBlock(Block block, StructureElement parent) => block.Accept(mapper, parent);
-
-    private Mapper? cachedMapper;
-
-    private Mapper mapper => cachedMapper ??= new Mapper(this, builder);
-
-    private bool TaggingActive
-        => builder.PdfUA
-            || builder.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
-
-    private sealed class Mapper(StructureTreeBuilder tree, DocumentBuilder builder) : BlockVisitor<StructureElement, Nothing>
-    {
-        protected override Nothing Default(Block block, StructureElement parent)
-            => throw new NotSupportedException(
-                $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
-                + "Add a Visit overload for it to this block visitor so it cannot silently vanish from accessible output.");
-
-        public override Nothing Visit(Paragraph paragraph, StructureElement parent)
-        {
-            var p = new StructureElement { Type = tree.StructureTypeFor(paragraph.StyleName) };
-            parent.Children.Add(p);
-            tree.blockElements[paragraph] = p;
-            return default;
-        }
-
-        public override Nothing Visit(Table table, StructureElement parent)
-        {
-            var element = new StructureElement { Type = "Table" };
-            parent.Children.Add(element);
-            foreach (var row in table.Rows)
-            {
-                var tr = new StructureElement { Type = "TR" };
-                element.Children.Add(tr);
-                foreach (var cell in row.Cells)
+                if (Visible(list.Visibility))
                 {
-                    var td = new StructureElement { Type = row.IsHeader ? "TH" : "TD" };
-                    tr.Children.Add(td);
-                    tree.blockElements[cell] = td;
-                    if (tree.TaggingActive)
-                    {
-                        foreach (var child in cell.Blocks)
-                        {
-                            if (child is not Paragraph)
-                            {
-                                tree.MapBlock(child, td);
-                            }
-                        }
-                    }
+                    hasUntaggedList = true;
+                    break;
                 }
             }
-
-            return default;
-        }
-
-        public override Nothing Visit(Image image, StructureElement parent)
-        {
-            var figure = new StructureElement
-            {
-                Type = "Figure",
-                Alt = image.AlternateText,
-                ActualText = image.ActualText,
-            };
-            parent.Children.Add(figure);
-            tree.blockElements[image] = figure;
-            return default;
-        }
-
-        public override Nothing Visit(List list, StructureElement parent)
-        {
-            if (builder.PdfUA)
-            {
-                tree.MapList(list, parent);
-            }
-            else
-            {
-                tree.hasUntaggedList = true;
-            }
-
-            return default;
-        }
-
-        public override Nothing Visit(PageBreak block, StructureElement parent) => default;
-
-        public override Nothing Visit(Container block, StructureElement parent)
-        {
-            if (tree.TaggingActive)
-            {
-                foreach (var child in block.Blocks)
-                {
-                    tree.MapBlock(child, parent);
-                }
-            }
-
-            return default;
-        }
-
-        public override Nothing Visit(Barcode block, StructureElement parent) => default;
-
-        public override Nothing Visit(QrCode block, StructureElement parent) => default;
-
-        public override Nothing Visit(TableOfContents block, StructureElement parent) => default;
-    }
-
-    // ISO 32000-1 14.8.4.3.3: list structure L -> LI -> {Lbl, LBody}.
-    private void MapList(List list, StructureElement parent)
-    {
-        var l = new StructureElement { Type = "L" };
-        parent.Children.Add(l);
-        foreach (var item in list.Items)
-        {
-            var li = new StructureElement { Type = "LI" };
-            l.Children.Add(li);
-            var lbl = new StructureElement { Type = "Lbl" };
-            var lbody = new StructureElement { Type = "LBody" };
-            li.Children.Add(lbl);
-            li.Children.Add(lbody);
-            resolution.SetListItemElements(item, lbl, lbody);
-            if (item.NestedList is { } nested)
-            {
-                MapList(nested, lbody);
-            }
         }
     }
 
-    private string StructureTypeFor(string? styleName)
+    private StructureElement? Materialize(
+        int index,
+        SemanticStructureTree snapshot,
+        StructureElement?[] materialized)
     {
-        var type = HeadingType(styleName);
-        if (type == "P" && styleName is not null && builder.RoleMap.Contains(styleName))
+        var captured = snapshot.Nodes[index];
+        if (!Visible(captured.Visibility))
         {
-            return styleName;
+            return null;
         }
 
-        return type;
-    }
-
-    private static string HeadingType(string? styleName)
-    {
-        if (styleName is null)
+        var element = new StructureElement
         {
-            return "P";
-        }
-
-        if (styleName.Length == 8
-            && styleName.StartsWith("Heading", StringComparison.OrdinalIgnoreCase)
-            && styleName[7] is >= '1' and <= '6')
+            Type = StructureType(captured),
+            Alt = captured.AlternateText,
+            ActualText = captured.ActualText,
+            HeaderScope = captured.HeaderScope,
+        };
+        materialized[index] = element;
+        foreach (var childIndex in captured.Children)
         {
-            return Heading(styleName[7]);
-        }
-
-        if (styleName.Length == 2
-            && (styleName[0] == 'H' || styleName[0] == 'h')
-            && styleName[1] is >= '1' and <= '6')
-        {
-            return Heading(styleName[1]);
-        }
-
-        return "P";
-    }
-
-    private static string Heading(char level) => level switch
-    {
-        '1' => "H1",
-        '2' => "H2",
-        '3' => "H3",
-        '4' => "H4",
-        '5' => "H5",
-        _ => "H6",
-    };
-
-    public StructureElement? ElementOf(object block)
-    {
-        if (block is Paragraph paragraph && resolution.BodyElementOf(paragraph) is { } body)
-        {
-            return body;
-        }
-
-        return blockElements.TryGetValue(block, out var element) ? element : null;
-    }
-
-    public StructureElement? MarkerElementOf(object block)
-        => block is Paragraph paragraph ? resolution.LabelElementOf(paragraph) : null;
-
-    public void WriteTaggedContent(
-        ContentWriter writer,
-        int pageIndex,
-        Dictionary<StructureElement, List<ImageDraw>> taggedImages,
-        Dictionary<StructureElement, List<TextDraw>> taggedTexts)
-    {
-        var elements = new List<StructureElement>(taggedImages.Count + taggedTexts.Count);
-        foreach (var element in taggedImages.Keys)
-        {
-            elements.Add(element);
-        }
-
-        foreach (var element in taggedTexts.Keys)
-        {
-            if (!taggedImages.ContainsKey(element))
+            if (Materialize(childIndex, snapshot, materialized) is { } child)
             {
-                elements.Add(element);
+                element.Children.Add(child);
+                element.Kids.Add(new StructureKid { Child = child });
             }
         }
 
-        elements.Sort((a, b) => structureOrder[a].CompareTo(structureOrder[b]));
+        return element;
+    }
+
+    private string StructureType(in SemanticStructureNode node)
+    {
+        if (node.ParagraphStyle is not { } styleIndex)
+        {
+            return StandardType(node.Intent, 0);
+        }
+
+        var style = semantics.Styles.Paragraphs[styleIndex];
+        return style.CustomRole is { } role && settings.RoleMap.Contains(role)
+            ? role
+            : StandardType(style.Intent, style.HeadingLevel);
+    }
+
+    // ISO 32000-1:2008 Table 333 (standard structure types) and 14.8.4.
+    private static string StandardType(SemanticIntent intent, int headingLevel)
+        => intent switch
+        {
+            SemanticIntent.Document => "Document",
+            SemanticIntent.Section => "Sect",
+            SemanticIntent.Paragraph => "P",
+            SemanticIntent.Heading => headingLevel is >= 1 and <= 6
+                ? string.Create(CultureInfo.InvariantCulture, $"H{headingLevel}")
+                : "H",
+            SemanticIntent.List => "L",
+            SemanticIntent.ListItem => "LI",
+            SemanticIntent.ListLabel => "Lbl",
+            SemanticIntent.ListBody => "LBody",
+            SemanticIntent.Table => "Table",
+            SemanticIntent.TableRow => "TR",
+            SemanticIntent.TableHeaderCell => "TH",
+            SemanticIntent.TableCell => "TD",
+            SemanticIntent.Figure => "Figure",
+            SemanticIntent.Navigation => "TOC",
+            SemanticIntent.NavigationEntry => "TOCI",
+            SemanticIntent.Link => "Link",
+            _ => "Reference",
+        };
+
+    private bool Visible(SemanticStructureVisibility visibility)
+        => visibility switch
+        {
+            SemanticStructureVisibility.Always => true,
+            SemanticStructureVisibility.WhenTagged => TaggingActive,
+            _ => settings.Accessibility != PdfUaConformance.None,
+        };
+
+    public bool TaggingActive
+        => settings.Accessibility != PdfUaConformance.None
+            || settings.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
+
+    public StructureElement? ElementOf(SourceId source)
+        => elementsBySource.TryGetValue(source, out var element) ? element : null;
+
+    public StructureElement? MarkerElementOf(SourceId source)
+        => markerElementsBySource.TryGetValue(source, out var element) ? element : null;
+
+    public List<TaggedSegment> PlanTaggedContent(int pageIndex, List<TaggedDraw> draws)
+    {
+        var segments = new List<TaggedSegment>();
+        if (draws.Count == 0)
+        {
+            return segments;
+        }
+
+        draws.Sort(static (a, b) => a.Sequence.CompareTo(b.Sequence));
+
+        var own = new Dictionary<StructureElement, List<TaggedDraw>>();
+        foreach (var draw in draws)
+        {
+            if (!own.TryGetValue(draw.Element, out var list))
+            {
+                list = [];
+                own[draw.Element] = list;
+            }
+
+            list.Add(draw);
+        }
+
+        var subtreeStart = new Dictionary<StructureElement, int>();
+        ComputeSubtreeStart(documentElement, own, subtreeStart);
 
         var mcid = 0;
-        foreach (var element in elements)
+        Walk(documentElement, own, subtreeStart, pageIndex, segments, ref mcid);
+        return segments;
+    }
+
+    private static int ComputeSubtreeStart(
+        StructureElement element,
+        Dictionary<StructureElement, List<TaggedDraw>> own,
+        Dictionary<StructureElement, int> subtreeStart)
+    {
+        var start = own.TryGetValue(element, out var draws) ? draws[0].Sequence : int.MaxValue;
+        foreach (var child in element.Children)
         {
-            var hasImages = taggedImages.TryGetValue(element, out var elementImages);
-            var hasTexts = taggedTexts.TryGetValue(element, out var elementTexts);
-            writer.WriteName(element.Type);
-            writer.WriteRaw(" <</MCID ");
-            writer.WriteRaw(mcid.ToString(CultureInfo.InvariantCulture));
-            writer.WriteRaw(">> BDC\n");
-
-            if (hasImages)
+            var childStart = ComputeSubtreeStart(child, own, subtreeStart);
+            if (childStart < start)
             {
-                foreach (var image in elementImages!)
-                {
-                    WriteImageDraw(writer, image);
-                }
+                start = childStart;
+            }
+        }
+
+        if (start != int.MaxValue)
+        {
+            subtreeStart[element] = start;
+        }
+
+        return start;
+    }
+
+    private static void Walk(
+        StructureElement element,
+        Dictionary<StructureElement, List<TaggedDraw>> own,
+        Dictionary<StructureElement, int> subtreeStart,
+        int pageIndex,
+        List<TaggedSegment> segments,
+        ref int mcid)
+    {
+        own.TryGetValue(element, out var draws);
+        var next = 0;
+        foreach (var child in element.Children)
+        {
+            if (!subtreeStart.TryGetValue(child, out var childStart))
+            {
+                continue;
             }
 
-            if (hasTexts)
+            var start = next;
+            while (draws is not null && next < draws.Count && draws[next].Sequence < childStart)
             {
-                foreach (var text in elementTexts!)
-                {
-                    WriteTextDraw(writer, text);
-                }
+                next++;
             }
 
-            writer.WriteRaw("EMC\n");
-            element.Marks.Add((pageIndex, mcid));
-            mcid++;
+            if (next > start)
+            {
+                AddSegment(element, draws!, start, next, pageIndex, segments, ref mcid);
+            }
+
+            Walk(child, own, subtreeStart, pageIndex, segments, ref mcid);
+            element.AdvancePast(child);
+        }
+
+        if (draws is not null && next < draws.Count)
+        {
+            AddSegment(element, draws, next, draws.Count, pageIndex, segments, ref mcid);
         }
     }
+
+    private static void AddSegment(
+        StructureElement element,
+        List<TaggedDraw> draws,
+        int start,
+        int end,
+        int pageIndex,
+        List<TaggedSegment> segments,
+        ref int mcid)
+    {
+        var content = new List<TaggedDraw>(end - start);
+        for (var i = start; i < end; i++)
+        {
+            content.Add(draws[i]);
+        }
+
+        segments.Add(new TaggedSegment(element, mcid, content));
+        element.AddMark(pageIndex, mcid);
+        mcid++;
+    }
 }
+
+internal readonly struct TaggedDraw
+{
+    public required int Sequence { get; init; }
+
+    public required StructureElement Element { get; init; }
+
+    public FillDraw? Fill { get; init; }
+
+    public ImageDraw? Image { get; init; }
+
+    public TextDraw? Text { get; init; }
+}
+
+internal sealed record TaggedSegment(StructureElement Element, int Mcid, List<TaggedDraw> Content);

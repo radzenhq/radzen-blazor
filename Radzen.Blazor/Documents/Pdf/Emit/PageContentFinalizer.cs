@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 using static Radzen.Documents.Pdf.Content.ContentEmitter;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -20,8 +21,31 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         ContentPhase.Resources,
     ];
 
-    private readonly Dictionary<StructureElement, List<ImageDraw>> taggedImages = [];
-    private readonly Dictionary<StructureElement, List<TextDraw>> taggedTexts = [];
+    internal static IReadOnlyList<PaintPhase> PaintOrder()
+    {
+        var phases = new List<PaintPhase>();
+        foreach (var phase in OrderedPhases)
+        {
+            var scene = phase switch
+            {
+                ContentPhase.Fills => PaintPhase.Fill,
+                ContentPhase.StraightStrokes or ContentPhase.RoundedStrokes => PaintPhase.Stroke,
+                ContentPhase.Images => PaintPhase.Image,
+                ContentPhase.Text => PaintPhase.Text,
+                ContentPhase.Watermark => PaintPhase.Watermark,
+                _ => (PaintPhase?)null,
+            };
+
+            if (scene is { } value && (phases.Count == 0 || phases[^1] != value))
+            {
+                phases.Add(value);
+            }
+        }
+
+        return phases;
+    }
+
+    private readonly List<TaggedDraw> tagged = [];
     private ContentWriter writer = null!;
     private PagePlan plan = null!;
     private int pageIndex;
@@ -35,8 +59,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         plan = pagePlan;
         pageIndex = index;
         wrapArtifacts = markArtifacts && HasArtifactContent(plan);
-        taggedImages.Clear();
-        taggedTexts.Clear();
+        tagged.Clear();
         generatedPage = null;
         ApplyColorAlpha();
 
@@ -78,15 +101,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             }
         }
 
-        for (var i = 0; i < plan.Images.Count; i++)
-        {
-            var image = plan.Images[i];
-            if (image.StencilColor is { } stencil && Translucent(stencil, out var alpha))
-            {
-                plan.Images[i] = image with { ExtGState = plan.ApplyAlpha(image.ExtGState, alpha) };
-            }
-        }
-
         for (var i = 0; i < plan.Texts.Count; i++)
         {
             plan.Texts[i] = WithColorAlpha(plan.Texts[i], 1);
@@ -94,9 +108,12 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     }
 
     private TextDraw WithColorAlpha(TextDraw text, double scale)
-        => text.FillPaint is null && Translucent(text.Color, out var alpha)
+        => Translucent(text.Color, out var alpha)
             ? text with { ExtGState = plan.ApplyAlpha(text.ExtGState, alpha * scale) }
             : text;
+
+    private static Matrix GradientMatrix(in FillDraw fill)
+        => Matrix.FromComponents(1, 0, 0, -1, fill.X, fill.Y + fill.Height);
 
     private static bool Translucent(Color color, out double alpha)
     {
@@ -130,7 +147,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
                 EndArtifacts();
                 break;
             case ContentPhase.TaggedContent:
-                structureTree.WriteTaggedContent(writer, pageIndex, taggedImages, taggedTexts);
+                WriteTaggedContent();
                 break;
             case ContentPhase.Watermark:
                 EmitWatermark();
@@ -154,6 +171,19 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var fill in plan.Fills)
         {
+            if (fill.Element is { } element)
+            {
+                tagged.Add(new TaggedDraw { Sequence = fill.Sequence, Element = element, Fill = fill });
+                continue;
+            }
+
+            WriteFill(fill);
+        }
+    }
+
+    private void WriteFill(in FillDraw fill)
+    {
+        {
             var grouped = fill.Clip is not null || fill.ExtGState is not null || fill.Gradient is not null;
             if (grouped)
             {
@@ -174,7 +204,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             if (fill.Gradient is { } gradient)
             {
                 writer.WriteRaw("/Pattern cs\n");
-                writer.WriteName(plan.RegisterPattern(gradient));
+                writer.WriteName(plan.RegisterPattern(gradient, GradientMatrix(fill)));
                 writer.WriteRaw(" scn\n");
             }
             else
@@ -251,7 +281,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         {
             if (image.Element is { } element)
             {
-                Accumulate(taggedImages, element, image);
+                tagged.Add(new TaggedDraw { Sequence = image.Sequence, Element = element, Image = image });
             }
             else
             {
@@ -266,12 +296,41 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         {
             if (text.Element is { } element)
             {
-                Accumulate(taggedTexts, element, text);
+                tagged.Add(new TaggedDraw { Sequence = text.Sequence, Element = element, Text = text });
             }
             else
             {
                 WriteTextDraw(writer, text);
             }
+        }
+    }
+
+    private void WriteTaggedContent()
+    {
+        foreach (var segment in structureTree.PlanTaggedContent(pageIndex, tagged))
+        {
+            writer.WriteName(segment.Element.Type);
+            writer.WriteRaw(" <</MCID ");
+            writer.WriteRaw(segment.Mcid.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteRaw(">> BDC\n");
+
+            foreach (var draw in segment.Content)
+            {
+                if (draw.Fill is { } fill)
+                {
+                    WriteFill(fill);
+                }
+                else if (draw.Image is { } image)
+                {
+                    WriteImageDraw(writer, image);
+                }
+                else if (draw.Text is { } text)
+                {
+                    WriteTextDraw(writer, text);
+                }
+            }
+
+            writer.WriteRaw("EMC\n");
         }
     }
 
@@ -351,7 +410,12 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             writer.WriteRaw(" gs\n");
         }
 
-        WatermarkGeometry.WriteRotation(writer, watermark.Rotation, watermark.CenterX, watermark.CenterY);
+        WriteTransform(
+            writer,
+            WatermarkGeometry.Rotation(
+                watermark.Rotation,
+                watermark.CenterX,
+                watermark.CenterY));
         if (watermark.Image is { } image)
         {
             WriteImageDraw(writer, image);
@@ -367,9 +431,17 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
     private static bool HasArtifactContent(PagePlan plan)
     {
-        if (plan.Fills.Count > 0 || plan.Edges.Count > 0 || plan.RoundedStrokes.Count > 0)
+        if (plan.Edges.Count > 0 || plan.RoundedStrokes.Count > 0)
         {
             return true;
+        }
+
+        foreach (var fill in plan.Fills)
+        {
+            if (fill.Element is null)
+            {
+                return true;
+            }
         }
 
         foreach (var image in plan.Images)
@@ -389,17 +461,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         }
 
         return false;
-    }
-
-    private static void Accumulate<T>(Dictionary<StructureElement, List<T>> map, StructureElement element, T draw)
-    {
-        if (!map.TryGetValue(element, out var list))
-        {
-            list = [];
-            map[element] = list;
-        }
-
-        list.Add(draw);
     }
 
     private enum ContentPhase

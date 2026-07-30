@@ -76,10 +76,6 @@ internal static class PageResourceBuilder
                 state.FillAlpha,
                 state.StrokeAlpha,
                 state.Blend,
-                state.OverprintStroke,
-                state.OverprintFill,
-                state.OverprintMode,
-                state.Intent,
                 softMask));
         }
 
@@ -90,7 +86,7 @@ internal static class PageResourceBuilder
                 continue;
             }
 
-            resources.Add("Pattern", pattern.Key, writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient)));
+            resources.Add("Pattern", pattern.Key, writer.Add(pattern.Pattern));
         }
 
         return resources.Build();
@@ -114,10 +110,6 @@ internal static class PageResourceBuilder
         double fillAlpha,
         double strokeAlpha,
         BlendMode? blend = null,
-        bool? overprintStroke = null,
-        bool? overprintFill = null,
-        int? overprintMode = null,
-        RenderingIntent? intent = null,
         DocumentObject? softMask = null)
     {
         var dictionary = new DictionaryObject
@@ -130,26 +122,6 @@ internal static class PageResourceBuilder
         if (blend is { } mode)
         {
             dictionary["BM"] = new NameObject(mode.PdfName());
-        }
-
-        if (overprintStroke is { } stroke)
-        {
-            dictionary["OP"] = new BooleanObject(stroke);
-        }
-
-        if (overprintFill is { } fill)
-        {
-            dictionary["op"] = new BooleanObject(fill);
-        }
-
-        if (overprintMode is { } opm)
-        {
-            dictionary["OPM"] = new NumberObject(opm);
-        }
-
-        if (intent is { } ri)
-        {
-            dictionary["RI"] = new NameObject(ri.PdfName());
         }
 
         if (softMask is not null)

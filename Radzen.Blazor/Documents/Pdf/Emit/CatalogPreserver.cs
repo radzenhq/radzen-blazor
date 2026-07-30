@@ -66,7 +66,7 @@ internal sealed class CatalogPreserver(Document document)
             }
 
             if (string.Equals(key, "Metadata", StringComparison.Ordinal)
-                && (document.Conformance != PdfAConformance.None || document.PdfUA))
+                && (document.Conformance != PdfAConformance.None || document.IsPdfUa))
             {
                 continue;
             }
@@ -80,6 +80,14 @@ internal sealed class CatalogPreserver(Document document)
             catalog[key] = importer.ImportValue(sourceCatalog[key]);
         }
 
+        if (document.Structure is null && document.HasPreservableStructureGraph)
+        {
+            catalog["StructTreeRoot"] = importer.ImportValue(sourceCatalog["StructTreeRoot"]!);
+            if (sourceCatalog.TryGetValue("MarkInfo", out var markInfo))
+            {
+                catalog["MarkInfo"] = importer.ImportValue(markInfo!);
+            }
+        }
     }
 
     private static void PreserveNames(GraphImporter importer, DocumentReader source, DictionaryObject catalog, DictionaryObject sourceCatalog)

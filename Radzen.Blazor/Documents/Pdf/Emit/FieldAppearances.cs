@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Fonts;
 namespace Radzen.Documents.Pdf.Emit;
 
 
@@ -29,8 +30,8 @@ internal static class FieldAppearances
     {
         using var writer = new ContentWriter(scope);
         writer.WriteRaw("q\n");
-        var lineHeight = font.Size * 1.2;
-        var y = height - font.Size - 2.0;
+        var lineHeight = font.EffectiveSize.Point * 1.2;
+        var y = height - font.EffectiveSize.Point - 2.0;
         foreach (var line in lines)
         {
             if (line.Length > 0 && y >= 0.0)
@@ -117,14 +118,14 @@ internal static class FieldAppearances
     };
 
     public static TextContent Text(string value, double x, double y, double height, Font font)
-        => new(value, Unit.FromPoint(x + 2.0), Unit.FromPoint(y + Baseline(height, font.Size)))
+        => new(value, Unit.FromPoint(x + 2.0), Unit.FromPoint(y + Baseline(height, font.EffectiveSize.Point)))
         {
             Font = font,
         };
 
     public static Font AppearanceFont(string? daFont, double size) => new()
     {
-        Name = daFont switch
+        Family = daFont switch
         {
             "Cour" or "Courier" => "Courier",
             "TiRo" or "Times" or "Times-Roman" => "Times-Roman",

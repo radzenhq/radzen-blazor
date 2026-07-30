@@ -29,26 +29,26 @@ internal sealed class ConformanceWriter(Document document)
             ValidatePdfA();
         }
 
-        if (document.PdfUA && document.Structure is null)
+        ValidateInspectable();
+
+        if (document.IsPdfUa && document.Structure is null && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
-                "PDF/UA requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder.");
+                "PDF/UA requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer.");
         }
-
-        ValidateInspectable();
 
         ValidateFonts();
 
-        if (document.PdfUA && string.IsNullOrEmpty(document.Language))
+        if (document.IsPdfUa && string.IsNullOrEmpty(document.Language))
         {
             throw new InvalidOperationException(
-                "PDF/UA requires the document's natural language to be determinable; set DocumentBuilder.Language (e.g. \"en-US\").");
+                "PDF/UA requires the document's natural language to be determinable; set Document.Language (e.g. \"en-US\").");
         }
 
-        if (document.PdfUA && string.IsNullOrEmpty(document.Info.Title))
+        if (document.IsPdfUa && string.IsNullOrEmpty(document.Info.Title))
         {
             throw new InvalidOperationException(
-                "PDF/UA requires a document title displayed by the viewer (DisplayDocTitle); set DocumentBuilder.Info.Title.");
+                "PDF/UA requires a document title displayed by the viewer (DisplayDocTitle); set Document.Info.Title.");
         }
 
         ValidateTagging();
@@ -62,17 +62,17 @@ internal sealed class ConformanceWriter(Document document)
             if (page.Generated is null)
             {
                 throw new InvalidOperationException(
-                    $"{Label} cannot be claimed for a page that did not come from DocumentBuilder: its fonts, images and "
+                    $"{Label} cannot be claimed for a page that did not come from DocumentRenderer: its fonts, images and "
                     + "colour spaces cannot be inspected, and this library will not identify a document as conformant on "
-                    + "content it has not verified. Rebuild the page with DocumentBuilder, or save without conformance "
-                    + "(PdfAConformance.None and PdfUA false).");
+                    + "content it has not verified. Rebuild the page with DocumentRenderer, or save without conformance "
+                    + "(PdfAConformance.None and PdfUaConformance.None).");
             }
         }
     }
 
     private void ValidateTagging()
     {
-        if (!document.PdfUA && !IsLevelA(document.Conformance))
+        if (!document.IsPdfUa && !IsLevelA(document.Conformance))
         {
             return;
         }
@@ -82,18 +82,35 @@ internal sealed class ConformanceWriter(Document document)
             ValidateFigureAltText(structure);
         }
 
-        if (!document.PdfUA && document.HasUntaggedListContent)
+        if (!document.IsPdfUa && document.HasUntaggedListContent)
         {
             throw new InvalidOperationException(
-                $"{Label} requires every list to be tagged, but the document has an untagged list; set DocumentBuilder.PdfUA to tag lists or remove them.");
+                $"{Label} requires every list to be tagged, but the document has an untagged list; set DocumentRenderer.Accessibility to PdfUaConformance.PdfUa1 to tag lists or remove them.");
         }
 
+        ValidateLinkStructure();
+    }
+
+    // ISO 32000-1 14.8.4.4.2 and ISO 14289-1 7.18: a link annotation belongs to a Link structure element,
+    // reached through an OBJR kid and the annotation's own /StructParent entry.
+    private void ValidateLinkStructure()
+    {
         foreach (var page in document.Pages)
         {
-            if (page.Generated is { Links.Count: > 0 })
+            if (page.Generated is not { } generated)
             {
-                throw new InvalidOperationException(
-                    $"{Label} requires every link annotation to be referenced from the structure tree, which this library does not yet emit; remove the hyperlinks (Run.Link / Run.LinkToAnchor) to produce a conforming document.");
+                continue;
+            }
+
+            foreach (var link in generated.Links)
+            {
+                if (link.Element is null)
+                {
+                    throw new InvalidOperationException(
+                        $"{Label} requires every link annotation to be referenced from the structure tree, but a hyperlink "
+                        + "sits outside the tagged content (page headers, footers and watermarks are artifacts and carry no "
+                        + "structure); move the hyperlink into the document body or remove it.");
+                }
             }
         }
     }
@@ -122,13 +139,13 @@ internal sealed class ConformanceWriter(Document document)
         if (document.Encryption is not null)
         {
             throw new InvalidOperationException(
-                "PDF/A forbids encryption; clear DocumentBuilder.Encryption or use PdfAConformance.None.");
+                "PDF/A forbids encryption; clear DocumentRenderer.Encryption or use PdfAConformance.None.");
         }
 
-        if (IsLevelA(document.Conformance) && document.Structure is null)
+        if (IsLevelA(document.Conformance) && document.Structure is null && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
-                $"{document.Conformance} requires Tagged PDF logical structure; the document has no structure tree. Build the document with DocumentBuilder or use a Level B conformance.");
+                $"{document.Conformance} requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer or use a Level B conformance.");
         }
 
         switch (document.Conformance)
@@ -139,7 +156,7 @@ internal sealed class ConformanceWriter(Document document)
                     $"{document.Conformance} only permits embedded files that are themselves PDF/A conformant, which cannot be verified; remove the attachments or use PdfA3B, PdfA3A or PdfA4F.");
             case PdfAConformance.PdfA4F when document.Attachments.Count == 0:
                 throw new InvalidOperationException(
-                    "PDF/A-4F requires at least one embedded file; add one with DocumentBuilder.Attachments or use PdfA4.");
+                    "PDF/A-4F requires at least one embedded file; add one with DocumentRenderer.Attachments or use PdfA4.");
         }
 
         ValidateImageColorSpaces();
@@ -195,7 +212,7 @@ internal sealed class ConformanceWriter(Document document)
                 }
 
                 throw Fonts.FontResolution.Base14Forbidden(
-                    Label, Fonts.FontResolution.ResolveBase14Name(text.Font, scope: default), text.Font.Name);
+                    Label, Fonts.FontResolution.ResolveBase14Name(text.Font, scope: default), text.Font.Family);
             }
         }
     }
@@ -226,7 +243,7 @@ internal sealed class ConformanceWriter(Document document)
             xmp.PdfARevision = 2020;
         }
 
-        if (document.PdfUA)
+        if (document.IsPdfUa)
         {
             xmp.PdfUaPart = 1;
             xmp.IncludePdfUaExtensionSchema = document.Conformance != PdfAConformance.None;
@@ -251,7 +268,7 @@ internal sealed class ConformanceWriter(Document document)
             }
         }
 
-        if (document.PdfUA)
+        if (document.IsPdfUa)
         {
             ResolveViewerPreferences(writer, catalog)["DisplayDocTitle"] = new BooleanObject(true);
         }

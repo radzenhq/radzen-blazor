@@ -1,8 +1,9 @@
 using System;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
+internal sealed class BoxEmitter(TableEmitter tables)
 {
     public void EmitBox(EmitContext context, in PositionedBox box, double left, double contentTop)
     {
@@ -20,10 +21,11 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
                 "A rotated box cannot preserve a box shadow; remove the shadow or the rotation.");
         }
 
-        var opacity = ContainerDecoration.Paint(plan, opacities, bounds, box.Source, box.Style);
+        var opacity = box.Opacity;
+        ContainerDecoration.Paint(plan, bounds, opacity, box.Style);
 
-        var radius = BoxRenderer.ClampRadius(box.Style.CornerRadius.Point, bounds.Width, bounds.Height);
-        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Source.Padding.Point));
+        var radius = BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height);
+        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Padding));
 
         tables.EmitBoxContent(
             context,
@@ -34,7 +36,7 @@ internal sealed class BoxEmitter(TableEmitter tables, OpacityResolver opacities)
 
         if (box.Transform is { } transform)
         {
-            plan.ApplyTransform(transform, mark);
+            plan.ApplyTransform(PageSpace.Flip(transform, plan.Size.Height.Point), mark);
         }
     }
 }

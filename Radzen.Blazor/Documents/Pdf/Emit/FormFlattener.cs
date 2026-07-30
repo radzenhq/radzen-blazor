@@ -256,7 +256,7 @@ internal sealed class FormFlattener(Document document)
 
     private (double X, double Y, double Width, double Height) WidgetRect(DictionaryObject widget)
     {
-        var rect = PdfRect.Read(Source!, Source!.GetArray(widget, "Rect"), RectPolicy.ZeroFallback);
+        var rect = RectReader.Read(Source!, Source!.GetArray(widget, "Rect"), RectPolicy.ZeroFallback);
         return (rect.Left, rect.Bottom, rect.Width, rect.Height);
     }
 }

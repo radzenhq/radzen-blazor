@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf.Emit;
 
@@ -14,7 +15,11 @@ internal sealed class GeneratorFontResolver(PdfAConformance conformance)
     public GeneratedFont ResolveSfnt(SfntFont sfnt)
         => fonts.GetOrAddValue(sfnt, key => new GeneratedFont { Key = key, Sfnt = sfnt });
 
-    private FontScope Scope => new(Fonts: null, conformance != PdfAConformance.None ? "PDF/A" : null, CanEmbed: true);
+    private FontScope Scope => new(
+        Fonts: null,
+        Snapshot: null,
+        conformance != PdfAConformance.None ? "PDF/A" : null,
+        CanEmbed: true);
 
     public GeneratedFont ResolveBase14(Font font)
     {

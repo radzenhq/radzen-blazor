@@ -1,12 +1,12 @@
-using System;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
 internal static class BoxRenderer
 {
-    public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style)
+    public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style, string? extGState)
     {
-        var radius = ClampRadius(style.CornerRadius.Point, bounds.Width, bounds.Height);
+        var radius = BoxStyle.ClampRadius(style.CornerRadius, bounds.Width, bounds.Height);
 
         if (style.Shadow is { } shadow)
         {
@@ -23,7 +23,7 @@ internal static class BoxRenderer
                 Height = bounds.Height,
                 Color = style.Background ?? Color.Black,
                 Radius = radius,
-                ExtGState = style.ExtGState,
+                ExtGState = extGState,
                 Gradient = gradient,
             });
         }
@@ -37,7 +37,7 @@ internal static class BoxRenderer
                 Height = bounds.Height,
                 Color = background,
                 Radius = radius,
-                ExtGState = style.ExtGState,
+                ExtGState = extGState,
             });
         }
 
@@ -58,30 +58,20 @@ internal static class BoxRenderer
                 LineWidth = uniform.Width,
                 Color = uniform.Color,
                 Style = uniform.Style,
-                ExtGState = style.ExtGState,
+                ExtGState = extGState,
             });
             return;
         }
 
-        EmitEdge(plan, style.Top, x, top, right, top, style.ExtGState);
-        EmitEdge(plan, style.Right, right, bottom, right, top, style.ExtGState);
-        EmitEdge(plan, style.Bottom, x, bottom, right, bottom, style.ExtGState);
-        EmitEdge(plan, style.Left, x, bottom, x, top, style.ExtGState);
+        EmitEdge(plan, style.Top, x, top, right, top, extGState);
+        EmitEdge(plan, style.Right, right, bottom, right, top, extGState);
+        EmitEdge(plan, style.Bottom, x, bottom, right, bottom, extGState);
+        EmitEdge(plan, style.Left, x, bottom, x, top, extGState);
     }
 
-    public static double ClampRadius(double radius, double width, double height)
+    private static void EmitEdge(PagePlan plan, ResolvedEdge? border, double x1, double y1, double x2, double y2, string? extGState)
     {
-        if (radius <= 0 || width <= 0 || height <= 0)
-        {
-            return 0;
-        }
-
-        return Math.Min(radius, Math.Min(width, height) / 2);
-    }
-
-    private static void EmitEdge(PagePlan plan, Border border, double x1, double y1, double x2, double y2, string? extGState)
-    {
-        if (BoxStyle.Resolve(border) is not { } edge)
+        if (border is not { } edge)
         {
             return;
         }

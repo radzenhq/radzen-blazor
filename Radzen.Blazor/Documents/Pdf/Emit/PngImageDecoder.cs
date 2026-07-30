@@ -13,9 +13,9 @@ internal sealed class PngImageDecoder : IImageDecoder
 {
     private static readonly byte[] PngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
-    public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
     {
-        if (!IsPng(data))
+        if (!IsPng(data.Span))
         {
             xobject = null;
             return false;
@@ -25,10 +25,10 @@ internal sealed class PngImageDecoder : IImageDecoder
         return true;
     }
 
-    private static bool IsPng(byte[] data)
+    private static bool IsPng(ReadOnlySpan<byte> data)
         => PdfBytes.Matches(data, PngSignature);
 
-    private static ReadOnlyMemory<byte> JoinIdat(byte[] data, List<Range>? chunks)
+    private static ReadOnlyMemory<byte> JoinIdat(ReadOnlyMemory<byte> data, List<Range>? chunks)
     {
         if (chunks is null)
         {
@@ -37,7 +37,7 @@ internal sealed class PngImageDecoder : IImageDecoder
 
         if (chunks.Count == 1)
         {
-            return data.AsMemory(chunks[0]);
+            return data[chunks[0]];
         }
 
         var total = 0;
@@ -50,7 +50,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         var offset = 0;
         foreach (var chunk in chunks)
         {
-            var span = data.AsSpan(chunk);
+            var span = data.Span[chunk];
             span.CopyTo(joined.AsSpan(offset));
             offset += span.Length;
         }
@@ -58,7 +58,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         return joined;
     }
 
-    private static ImageXObject DecodePng(byte[] data, ReaderLimits limits)
+    private static ImageXObject DecodePng(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
         var width = 0;
         var height = 0;
@@ -71,14 +71,14 @@ internal sealed class PngImageDecoder : IImageDecoder
         long pos = PngSignature.Length;
         while (pos + 8 <= data.Length)
         {
-            uint length = BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan((int)pos));
+            uint length = BinaryPrimitives.ReadUInt32BigEndian(data.Span[(int)pos..]);
             long body = pos + 8;
             if (length > data.Length - body)
             {
                 throw new InvalidDataException("PNG chunk length exceeds the available data.");
             }
 
-            var type = Encoding.ASCII.GetString(data, (int)pos + 4, 4);
+            var type = Encoding.ASCII.GetString(data.Span.Slice((int)pos + 4, 4));
             var start = (int)body;
             var count = (int)length;
 
@@ -90,21 +90,21 @@ internal sealed class PngImageDecoder : IImageDecoder
                         throw new InvalidDataException("PNG IHDR chunk is truncated.");
                     }
 
-                    width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(start));
-                    height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.AsSpan(start + 4));
-                    bitDepth = data[start + 8];
-                    colorType = data[start + 9];
-                    if (data[start + 12] != 0)
+                    width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.Span[start..]);
+                    height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.Span[(start + 4)..]);
+                    bitDepth = data.Span[start + 8];
+                    colorType = data.Span[start + 9];
+                    if (data.Span[start + 12] != 0)
                     {
                         throw new NotSupportedException("Adam7 interlaced PNG images are not supported.");
                     }
 
                     break;
                 case "PLTE":
-                    palette = data[start..(start + count)];
+                    palette = data.Span[start..(start + count)].ToArray();
                     break;
                 case "tRNS":
-                    transparency = data[start..(start + count)];
+                    transparency = data.Span[start..(start + count)].ToArray();
                     break;
                 case "IDAT":
                     (idat ??= []).Add(new Range(start, start + count));

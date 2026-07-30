@@ -114,12 +114,12 @@ internal static class ContentEmitter
 
     public static void WriteImageDraw(ContentWriter writer, in ImageDraw image) =>
         WriteImagePlacement(writer, image.Image.Key, image.X, image.Y, image.Width, image.Height,
-            image.ExtGState, image.Transform, image.Clip, image.ClipRadius, image.StencilColor);
+            image.ExtGState, image.Transform, image.Clip, image.ClipRadius);
 
     public static void WriteImagePlacement(
         ContentWriter writer, string key, double x, double y, double width, double height,
         string? extGState = null, Matrix? transform = null, PdfRect? clip = null,
-        double clipRadius = 0, Color? stencilColor = null)
+        double clipRadius = 0)
     {
         writer.WriteRaw("q\n");
         if (extGState is { } state)
@@ -136,11 +136,6 @@ internal static class ContentEmitter
         if (clip is { } c)
         {
             WriteClip(writer, c, clipRadius);
-        }
-
-        if (stencilColor is { } color)
-        {
-            writer.WriteColor(color, "rg");
         }
 
         writer.WriteNumber(width);
@@ -186,7 +181,6 @@ internal static class ContentEmitter
             X = text.X,
             Baseline = text.Baseline,
             Color = text.Color,
-            FillPaint = text.FillPaint,
             CharSpacing = text.CharSpacing,
             WordSpacing = text.WordSpacing,
             HorizontalScale = text.HorizontalScale,
@@ -250,10 +244,10 @@ internal static class ContentEmitter
             writer.WriteRaw(" Tw\n");
         }
 
-        var horizontalScale = op.HorizontalScale != 0 && op.HorizontalScale != 100;
+        var horizontalScale = op.HorizontalScale != 0 && op.HorizontalScale != 1;
         if (horizontalScale)
         {
-            writer.WriteNumber(op.HorizontalScale);
+            writer.WriteNumber(op.HorizontalScale * 100);
             writer.WriteRaw(" Tz\n");
         }
 
