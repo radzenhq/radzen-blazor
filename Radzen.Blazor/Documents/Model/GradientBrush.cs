@@ -5,22 +5,22 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// A single colour stop of a <see cref="GradientBrush"/>.
+/// A single color stop of a <see cref="GradientBrush"/>.
 /// </summary>
 /// <remarks>Initializes a new <see cref="GradientStop"/>.</remarks>
 /// <param name="offset">The position along the gradient axis, from 0 (start) to 1 (end).</param>
-/// <param name="color">The colour at this position.</param>
+/// <param name="color">The color at this position.</param>
 public sealed class GradientStop(double offset, Color color)
 {
     /// <summary>Gets the position along the gradient axis, from 0 (start) to 1 (end).</summary>
     public double Offset { get; } = offset;
 
-    /// <summary>Gets the colour at this position.</summary>
+    /// <summary>Gets the color at this position.</summary>
     public Color Color { get; } = color;
 }
 
 /// <summary>
-/// A gradient fill defined by two or more colour stops. Coordinates are box-relative and
+/// A gradient fill defined by two or more color stops. Coordinates are box-relative and
 /// top-origin: they are measured within the painted box of the element the brush fills,
 /// with (0, 0) at the box's top-left corner, x increasing to the right and y increasing
 /// downwards. An absolute <see cref="Unit"/> is an offset from that origin along the axis
@@ -38,13 +38,13 @@ public abstract class GradientBrush : ITracksChanges
     private ChangeTracker tracker;
 
     /// <summary>Initializes the shared gradient state from <paramref name="stops"/>.</summary>
-    /// <param name="stops">The colour stops, in non-decreasing offset order within [0, 1].</param>
+    /// <param name="stops">The color stops, in non-decreasing offset order within [0, 1].</param>
     private protected GradientBrush(GradientStop[] stops)
     {
         ArgumentNullException.ThrowIfNull(stops);
         if (stops.Length == 0)
         {
-            throw new ArgumentException("A gradient requires at least one colour stop.", nameof(stops));
+            throw new ArgumentException("A gradient requires at least one color stop.", nameof(stops));
         }
 
         for (var i = 0; i < stops.Length; i++)
@@ -65,7 +65,7 @@ public abstract class GradientBrush : ITracksChanges
         Stops = new ReadOnlyCollection<GradientStop>((GradientStop[])stops.Clone());
     }
 
-    /// <summary>Gets the ordered colour stops of this gradient.</summary>
+    /// <summary>Gets the ordered color stops of this gradient.</summary>
     public ReadOnlyCollection<GradientStop> Stops { get; }
 
     /// <summary>
@@ -88,14 +88,11 @@ public abstract class GradientBrush : ITracksChanges
         set => tracker.Set(ref extendEnd, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this gradient has been assigned to since it was
-    /// materialized. An element that owns a gradient folds the gradient's state into its
-    /// own modification flag.
-    /// </summary>
-    public bool IsModified => tracker.IsModified;
+    internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
@@ -109,7 +106,7 @@ public abstract class GradientBrush : ITracksChanges
 /// <param name="y0">The gradient axis start Y, down from the box's top edge.</param>
 /// <param name="x1">The gradient axis end X, from the box's left edge.</param>
 /// <param name="y1">The gradient axis end Y, down from the box's top edge.</param>
-/// <param name="stops">The colour stops, in axis order.</param>
+/// <param name="stops">The color stops, in axis order.</param>
 public sealed class LinearGradient(Unit x0, Unit y0, Unit x1, Unit y1, params GradientStop[] stops)
     : GradientBrush(stops)
 {
@@ -138,7 +135,7 @@ public sealed class LinearGradient(Unit x0, Unit y0, Unit x1, Unit y1, params Gr
 /// <param name="x1">The end circle centre X, from the box's left edge.</param>
 /// <param name="y1">The end circle centre Y, down from the box's top edge.</param>
 /// <param name="r1">The end circle radius; a relative value is a percentage of the box width.</param>
-/// <param name="stops">The colour stops, from the start circle to the end circle.</param>
+/// <param name="stops">The color stops, from the start circle to the end circle.</param>
 public sealed class RadialGradient(Unit x0, Unit y0, Unit r0, Unit x1, Unit y1, Unit r1, params GradientStop[] stops)
     : GradientBrush(stops)
 {
