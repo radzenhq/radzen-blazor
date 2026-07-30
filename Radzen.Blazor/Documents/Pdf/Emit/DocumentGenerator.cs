@@ -189,8 +189,6 @@ internal sealed class DocumentGenerator
         }
 
         output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
-        output.RoleMap = new RoleMap();
-        output.Encryption = null;
         return output;
     }
 

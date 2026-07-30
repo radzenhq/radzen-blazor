@@ -295,6 +295,11 @@ public class RendererCaptureIsolationTests
         var first = renderer.Render(model);
         var immediate = first.ToArray();
         Assert.Null(first.Fonts);
+        Assert.NotSame(renderer.RoleMap, first.RoleMap);
+        if (!tagged)
+        {
+            Assert.NotSame(renderer.Encryption, first.Encryption);
+        }
 
         MutateEverything(renderer, tagged);
         MutateModel(model);

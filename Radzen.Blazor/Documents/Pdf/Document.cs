@@ -85,6 +85,7 @@ public sealed class Document
 
         Loaded = state;
         ResetGraphFacades();
+        Encryption = graph.Encryption;
         MaterializedGraph = graph;
         Structure = null;
         Anchors.Clear();
@@ -107,6 +108,7 @@ public sealed class Document
         xmp = new DocumentXmpMetadata();
         viewerPreferences = null;
         acroForm = null;
+        RoleMap = new RoleMap();
         infoLoaded = false;
         attachmentsLoaded = false;
         outlineLoaded = false;
