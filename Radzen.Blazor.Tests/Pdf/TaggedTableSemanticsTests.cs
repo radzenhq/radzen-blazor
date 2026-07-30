@@ -89,6 +89,133 @@ public class TaggedTableSemanticsTests
         }
     }
 
+    private static Document Matrix(bool headerRow, bool headerColumn)
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Matrix";
+        BuildTestSupport.RegisterLatin(document);
+
+        var section = document.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Columns.Add();
+        table.Columns[0].IsHeaderColumn = headerColumn;
+
+        var first = table.Rows.Add();
+        first.IsHeaderRow = headerRow;
+        TableLayoutSupport.Fill(first.Cells[0], "Corner");
+        TableLayoutSupport.Fill(first.Cells[1], "Price");
+
+        var body = table.Rows.Add();
+        TableLayoutSupport.Fill(body.Cells[0], "Apple");
+        TableLayoutSupport.Fill(body.Cells[1], "111");
+
+        return document;
+    }
+
+    private static DictionaryObject Attributes(DocumentReader reader, ProbeElement element)
+        => Assert.IsType<DictionaryObject>(reader.Resolve(element.Dict["A"]!));
+
+    [Fact]
+    public void HeaderColumn_GivesItsCellsTheRowScope()
+    {
+        var reader = BuildTestSupport.Read(Matrix(headerRow: false, headerColumn: true), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        var headers = TaggedStructureProbe.All(root, "TH");
+
+        Assert.Equal(2, headers.Count);
+        Assert.All(headers, th => Assert.Equal("Row", BuildTestSupport.Name(reader, Attributes(reader, th), "Scope")));
+        Assert.Equal(2, TaggedStructureProbe.All(root, "TD").Count);
+    }
+
+    [Fact]
+    public void HeaderRowAndHeaderColumn_MeetInACellScopedToBoth()
+    {
+        var reader = BuildTestSupport.Read(Matrix(headerRow: true, headerColumn: true), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        var scopes = TaggedStructureProbe.All(root, "TH")
+            .Select(th => BuildTestSupport.Name(reader, Attributes(reader, th), "Scope"))
+            .ToList();
+
+        Assert.Equal(["Both", "Column", "Row"], scopes.OrderBy(scope => scope).ToList());
+        Assert.Single(TaggedStructureProbe.All(root, "TD"));
+    }
+
+    [Fact]
+    public void HeaderRowAlone_ScopesEveryHeaderCellToItsColumn()
+    {
+        var reader = BuildTestSupport.Read(Matrix(headerRow: true, headerColumn: false), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        var headers = TaggedStructureProbe.All(root, "TH");
+
+        Assert.Equal(2, headers.Count);
+        Assert.All(headers, th => Assert.Equal("Column", BuildTestSupport.Name(reader, Attributes(reader, th), "Scope")));
+    }
+
+    private static Document Merged(int rowSpan, int columnSpan)
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Merged";
+        BuildTestSupport.RegisterLatin(document);
+
+        var section = document.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Columns.Add();
+
+        var first = table.Rows.Add();
+        first.Cells[0].RowSpan = rowSpan;
+        first.Cells[0].ColumnSpan = columnSpan;
+        TableLayoutSupport.Fill(first.Cells[0], "Merged");
+        TableLayoutSupport.Fill(first.Cells[1], "Right");
+
+        var second = table.Rows.Add();
+        TableLayoutSupport.Fill(second.Cells[0], "Below");
+        TableLayoutSupport.Fill(second.Cells[1], "Corner");
+
+        return document;
+    }
+
+    [Fact]
+    public void SpanningCell_CarriesItsRowAndColumnSpanIntoTheStructureTree()
+    {
+        var reader = BuildTestSupport.Read(Merged(rowSpan: 2, columnSpan: 2), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        var merged = TaggedStructureProbe.All(root, "TD")[0];
+        var attributes = Attributes(reader, merged);
+
+        Assert.Equal("Table", BuildTestSupport.Name(reader, attributes, "O"));
+        Assert.Equal(2, BuildTestSupport.Int(attributes, "RowSpan"));
+        Assert.Equal(2, BuildTestSupport.Int(attributes, "ColSpan"));
+    }
+
+    [Fact]
+    public void SingleColumnSpan_IsLeftAtTheImplicitDefault()
+    {
+        var reader = BuildTestSupport.Read(Merged(rowSpan: 2, columnSpan: 1), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        var attributes = Attributes(reader, TaggedStructureProbe.All(root, "TD")[0]);
+
+        Assert.Equal(2, BuildTestSupport.Int(attributes, "RowSpan"));
+        Assert.False(attributes.ContainsKey("ColSpan"), "an unspanned column is left implicit");
+    }
+
+    [Fact]
+    public void UnspannedCells_CarryNoTableAttributes()
+    {
+        var reader = BuildTestSupport.Read(Merged(rowSpan: 1, columnSpan: 1), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+
+        Assert.All(
+            TaggedStructureProbe.All(root, "TD"),
+            td => Assert.False(td.Dict.ContainsKey("A"), "an unspanned body cell carries no table attributes"));
+    }
+
     private static Document Spanning()
     {
         var document = new Document { Language = "en-US" };

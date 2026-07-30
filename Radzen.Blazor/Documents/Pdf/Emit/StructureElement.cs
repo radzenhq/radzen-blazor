@@ -32,6 +32,10 @@ internal sealed class StructureElement : IStructureTag
 
     public SemanticHeaderScope HeaderScope { get; init; }
 
+    public int RowSpan { get; init; }
+
+    public int ColumnSpan { get; init; }
+
     public List<StructureElement> Children { get; } = [];
 
     public List<(int PageIndex, int Mcid)> Marks { get; } = [];

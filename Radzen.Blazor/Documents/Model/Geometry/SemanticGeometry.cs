@@ -3,17 +3,18 @@ using System.Collections.Immutable;
 
 namespace Radzen.Documents.Geometry;
 
-internal enum SemanticStructureVisibility
+internal enum SemanticStructureTier
 {
     Always,
-    WhenTagged,
-    WhenFullyAccessible,
+    Structural,
+    Assistive,
 }
 
 internal enum SemanticIntent
 {
     Document,
     Section,
+    Group,
     Paragraph,
     Heading,
     List,
@@ -82,7 +83,13 @@ internal readonly record struct SemanticStructureNode
 
     public SemanticHeaderScope HeaderScope { get; init; }
 
-    public required SemanticStructureVisibility Visibility { get; init; }
+    public int RowSpan { get; init; }
+
+    public int ColumnSpan { get; init; }
+
+    public bool IsDecorative { get; init; }
+
+    public required SemanticStructureTier Tier { get; init; }
 
     public required ImmutableArray<int> Children { get; init; }
 }
@@ -98,7 +105,7 @@ internal readonly record struct SemanticStructureAssociation
 
 internal readonly record struct SemanticListOccurrence
 {
-    public required SemanticStructureVisibility Visibility { get; init; }
+    public required SemanticStructureTier Tier { get; init; }
 }
 
 internal sealed record SemanticStructureTree

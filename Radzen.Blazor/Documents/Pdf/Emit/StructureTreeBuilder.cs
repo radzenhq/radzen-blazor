@@ -41,7 +41,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         {
             foreach (var list in snapshot.Lists)
             {
-                if (Visible(list.Visibility))
+                if (Materializes(list.Tier))
                 {
                     hasUntaggedList = true;
                     break;
@@ -56,7 +56,10 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         StructureElement?[] materialized)
     {
         var captured = snapshot.Nodes[index];
-        if (!Visible(captured.Visibility))
+
+        // ISO 14289-1 7.1: content that carries no meaning is real content of no interest to assistive
+        // technology and is marked as an artifact rather than tagged as a structure element.
+        if (captured.IsDecorative || !Materializes(captured.Tier))
         {
             return null;
         }
@@ -67,6 +70,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
             Alt = captured.AlternateText,
             ActualText = captured.ActualText,
             HeaderScope = captured.HeaderScope,
+            RowSpan = captured.RowSpan,
+            ColumnSpan = captured.ColumnSpan,
         };
         materialized[index] = element;
         foreach (var childIndex in captured.Children)
@@ -100,6 +105,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         {
             SemanticIntent.Document => "Document",
             SemanticIntent.Section => "Sect",
+            // ISO 32000-1 14.8.4.4: Div is the generic block-level grouping element.
+            SemanticIntent.Group => "Div",
             SemanticIntent.Paragraph => "P",
             SemanticIntent.Heading => headingLevel is >= 1 and <= 6
                 ? string.Create(CultureInfo.InvariantCulture, $"H{headingLevel}")
@@ -119,11 +126,11 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
             _ => "Reference",
         };
 
-    private bool Visible(SemanticStructureVisibility visibility)
-        => visibility switch
+    private bool Materializes(SemanticStructureTier tier)
+        => tier switch
         {
-            SemanticStructureVisibility.Always => true,
-            SemanticStructureVisibility.WhenTagged => TaggingActive,
+            SemanticStructureTier.Always => true,
+            SemanticStructureTier.Structural => TaggingActive,
             _ => settings.Accessibility != PdfUaConformance.None,
         };
 
