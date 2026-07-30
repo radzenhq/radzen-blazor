@@ -59,48 +59,56 @@ internal sealed class WatermarkEmitter(
         foreach (var span in text.GlyphRun.Spans)
         {
             var x = text.X + span.XOffset;
-            if (span.IsSfnt)
+            switch (span.Face.Kind)
             {
-                var glyphRun = runBuilder.Build(span);
-                plan.UsedFonts.Add(glyphRun.Font);
-                draw.Texts.Add(new TextDraw
+                case CapturedFontFaceKind.Sfnt:
                 {
-                    X = x,
-                    Baseline = baseline,
-                    Size = size,
-                    Color = text.Color,
-                    Font = glyphRun.Font,
-                    Bytes = glyphRun.Bytes,
-                    Kerns = glyphRun.Kerns,
-                    ExtGState = extGState,
-                });
-            }
-            else
-            {
-                var glyphs = span.BuiltInGlyphs;
-                var bytes = base14Encoder.Encode(glyphs, font);
-                var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
-                for (var i = 0; i < glyphs.Length; i++)
-                {
-                    if (i < kerns.Length)
+                    var glyphRun = runBuilder.Build(span, font.EffectiveSize.Point);
+                    plan.UsedFonts.Add(glyphRun.Font);
+                    draw.Texts.Add(new TextDraw
                     {
-                        kerns[i] = glyphs[i].TextAdjustment;
-                    }
+                        X = x,
+                        Baseline = baseline,
+                        Size = size,
+                        Color = text.Color,
+                        Font = glyphRun.Font,
+                        Bytes = glyphRun.Bytes,
+                        Kerns = glyphRun.Kerns,
+                        ExtGState = extGState,
+                    });
+                    break;
                 }
-
-                var generated = fontResolver.ResolveBase14(font);
-                plan.UsedFonts.Add(generated);
-                draw.Texts.Add(new TextDraw
+                case CapturedFontFaceKind.BuiltIn:
                 {
-                    X = x,
-                    Baseline = baseline,
-                    Size = size,
-                    Color = text.Color,
-                    Font = generated,
-                    Bytes = bytes,
-                    Kerns = SfntRunBuilder.HasNonZero(kerns) ? kerns : null,
-                    ExtGState = extGState,
-                });
+                    var face = span.Face.BuiltIn;
+                    var glyphs = span.BuiltInGlyphs;
+                    var bytes = base14Encoder.Encode(glyphs, face);
+                    var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
+                    for (var i = 0; i < glyphs.Length; i++)
+                    {
+                        if (i < kerns.Length)
+                        {
+                            kerns[i] = SfntRunBuilder.PdfTextAdjustment(
+                                glyphs[i].TextAdjustmentPoints,
+                                font.EffectiveSize.Point);
+                        }
+                    }
+
+                    var generated = fontResolver.ResolveBase14(face);
+                    plan.UsedFonts.Add(generated);
+                    draw.Texts.Add(new TextDraw
+                    {
+                        X = x,
+                        Baseline = baseline,
+                        Size = size,
+                        Color = text.Color,
+                        Font = generated,
+                        Bytes = bytes,
+                        Kerns = SfntRunBuilder.HasNonZero(kerns) ? kerns : null,
+                        ExtGState = extGState,
+                    });
+                    break;
+                }
             }
         }
     }

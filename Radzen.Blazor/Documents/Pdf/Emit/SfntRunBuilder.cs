@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Fonts;
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Geometry;
 
@@ -21,13 +22,14 @@ internal readonly struct SfntGlyphRun
 
 internal sealed class SfntRunBuilder(GeneratorFontResolver fontResolver)
 {
-    public SfntGlyphRun Build(in CapturedGlyphSpan span)
+    public SfntGlyphRun Build(in CapturedGlyphSpan span, double emSize)
     {
-        if (span.Face is not { } face)
+        if (!span.IsSfnt)
         {
             throw new InvalidOperationException("An sfnt run requires a captured sfnt face.");
         }
 
+        var face = span.Face.Sfnt;
         var generated = fontResolver.ResolveSfnt(face);
         var glyphs = span.SfntGlyphs;
         var bytes = new byte[glyphs.Length * 2];
@@ -40,7 +42,7 @@ internal sealed class SfntRunBuilder(GeneratorFontResolver fontResolver)
             bytes[i * 2 + 1] = (byte)(glyph.GlyphId & 0xFF);
             if (i < kerns.Length)
             {
-                kerns[i] = glyph.TextAdjustment;
+                kerns[i] = PdfTextAdjustment(glyph.TextAdjustmentPoints, emSize);
             }
         }
 
@@ -54,7 +56,7 @@ internal sealed class SfntRunBuilder(GeneratorFontResolver fontResolver)
         };
     }
 
-    public IReadOnlyList<SfntGlyphRun> Build(in CapturedGlyphRun captured)
+    public IReadOnlyList<SfntGlyphRun> Build(in CapturedGlyphRun captured, double emSize)
     {
         var runs = new List<SfntGlyphRun>(captured.Spans.Length);
         foreach (var span in captured.Spans)
@@ -64,7 +66,7 @@ internal sealed class SfntRunBuilder(GeneratorFontResolver fontResolver)
                 throw new InvalidOperationException("A base-14 span cannot be built as an sfnt run.");
             }
 
-            runs.Add(Build(span));
+            runs.Add(Build(span, emSize));
         }
 
         return runs;
@@ -82,4 +84,7 @@ internal sealed class SfntRunBuilder(GeneratorFontResolver fontResolver)
 
         return false;
     }
+
+    internal static double PdfTextAdjustment(double adjustmentPoints, double emSize)
+        => emSize == 0 ? 0 : FontMetric.Scale(adjustmentPoints, 1000, emSize);
 }

@@ -237,13 +237,14 @@ internal sealed class TextLineEmitter(
         foreach (var span in glyphRun.Spans)
         {
             var x = startX + span.XOffset;
-            if (span.IsSfnt)
+            switch (span.Face.Kind)
             {
-                EmitSfntSpan(plan, paint, font, span, x, y, size, element, extGState);
-            }
-            else
-            {
-                EmitBase14Span(plan, paint, font, span, x, y, size, element, extGState);
+                case CapturedFontFaceKind.Sfnt:
+                    EmitSfntSpan(plan, paint, font, span, x, y, size, element, extGState);
+                    break;
+                case CapturedFontFaceKind.BuiltIn:
+                    EmitBase14Span(plan, paint, span, x, y, size, element, extGState);
+                    break;
             }
         }
     }
@@ -259,7 +260,7 @@ internal sealed class TextLineEmitter(
         StructureElement? element,
         string? extGState)
     {
-        var glyphRun = runBuilder.Build(span);
+        var glyphRun = runBuilder.Build(span, font.EffectiveSize.Point);
         var face = glyphRun.Face;
         plan.UsedFonts.Add(glyphRun.Font);
         plan.Texts.Add(BuildTextDraw(
@@ -272,7 +273,6 @@ internal sealed class TextLineEmitter(
     private void EmitBase14Span(
         PagePlan plan,
         in FragmentPaint paint,
-        Font font,
         in CapturedGlyphSpan span,
         double x,
         double y,
@@ -280,18 +280,21 @@ internal sealed class TextLineEmitter(
         StructureElement? element,
         string? extGState)
     {
+        var face = span.Face.BuiltIn;
         var glyphs = span.BuiltInGlyphs;
-        var bytes = base14Encoder.Encode(glyphs, font);
+        var bytes = base14Encoder.Encode(glyphs, face);
         var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
         for (var i = 0; i < glyphs.Length; i++)
         {
             if (i < kerns.Length)
             {
-                kerns[i] = glyphs[i].TextAdjustment;
+                kerns[i] = SfntRunBuilder.PdfTextAdjustment(
+                    glyphs[i].TextAdjustmentPoints,
+                    paint.Font.Size);
             }
         }
 
-        var generated = fontResolver.ResolveBase14(font);
+        var generated = fontResolver.ResolveBase14(face);
         plan.UsedFonts.Add(generated);
         plan.Texts.Add(BuildTextDraw(
             paint,

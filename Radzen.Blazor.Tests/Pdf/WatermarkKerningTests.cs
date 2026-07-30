@@ -125,10 +125,10 @@ public class WatermarkKerningTests
         var captured = fonts.CaptureGlyphRun(text, font);
         var document = new SfntRunBuilder(new GeneratorFontResolver(PdfAConformance.None));
 
-        var drawnAdvance = document.Build(captured).Sum(run => run.Advance);
+        var drawnAdvance = document.Build(captured, font.EffectiveSize.Point).Sum(run => run.Advance);
 
         Assert.Equal(fonts.MeasureText(text, font), drawnAdvance, 10);
-        Assert.Contains(document.Build(captured), run => run.Kerns is not null);
+        Assert.Contains(document.Build(captured, font.EffectiveSize.Point), run => run.Kerns is not null);
     }
 
     [Fact]
