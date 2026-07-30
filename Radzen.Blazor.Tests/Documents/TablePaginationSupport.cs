@@ -15,7 +15,7 @@ internal static class TablePaginationSupport
 
     public static FontCollection Fonts() => TableLayoutSupport.Fonts();
 
-    public static double LineHeight(FontCollection fonts) => TableLayoutSupport.LineHeight(fonts);
+    public static double LineHeight() => TableLayoutSupport.LineHeight();
 
     public static Table Build(int headers, int bodies)
     {

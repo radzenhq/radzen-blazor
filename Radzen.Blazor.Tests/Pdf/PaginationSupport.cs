@@ -28,12 +28,14 @@ internal static class PaginationSupport
     public static double Measure(FontCollection fonts, string text, double size)
         => fonts.MeasureText(text, FontAt(size));
 
-    public static double LineHeight(FontCollection fonts, double size = 12, double spacing = 1.0)
-    {
-        var p = Text("Xg", size);
-        p.LineSpacing = spacing;
-        return LineBreaker.Break(p, 100000, fonts)[0].Height;
-    }
+    public const double LiberationSansLineHeightPerEm = (1854 + 434 + 67) / 2048.0;
+
+    public const double BuiltInLineHeightPerEm = 1.2;
+
+    public static double LineHeight(double size = 12, double spacing = 1.0)
+        => size * LiberationSansLineHeightPerEm * spacing;
+
+    public static double BuiltInLineHeight(double size = 12) => size * BuiltInLineHeightPerEm;
 
     public static Paragraph Text(string text, double size = 12)
     {
@@ -71,7 +73,4 @@ internal static class PaginationSupport
 
     public static double HeightForLines(double lineHeight, int lines)
         => (lines + 0.4) * lineHeight;
-
-    public static IReadOnlyList<string> BodyTexts(LaidOutPage page)
-        => [.. page.Body.Lines.Select(l => string.Concat(l.Line.Fragments.Select(f => f.Text)))];
 }

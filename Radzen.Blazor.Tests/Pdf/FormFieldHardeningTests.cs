@@ -11,21 +11,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class FormFieldHardeningTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static PortableDocument BuildTextForm(Action<TextFieldDefinition> configure)
     {
         var document = new Document();
@@ -113,8 +98,7 @@ public class FormFieldHardeningTests
         Assert.True(form.TryGetValue("NeedAppearances", out var need)
             && Assert.IsType<BooleanObject>(reader.Resolve(need!)).Value);
 
-        var appearance = OptionalAppearanceText(reader, field);
-        Assert.True(appearance is null || !appearance.Contains("hunter2"));
+        Assert.Null(OptionalAppearanceText(reader, field));
     }
 
     [Fact]
@@ -163,7 +147,7 @@ public class FormFieldHardeningTests
             .Object(7, "7 0 obj\n700\nendobj\n")
             .Object(8, "8 0 obj\n300\nendobj\n")
             .Object(9, "9 0 obj\n720\nendobj\n");
-        return Wrap(pdf, 10);
+        return FixturePdf.Wrap(pdf, 10);
     }
 
     [Fact]
@@ -193,7 +177,7 @@ public class FormFieldHardeningTests
             .Object(4, "4 0 obj\n<< /Fields [5 0 R 6 0 R] /DA (/Helv 0 Tf 0 g) >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (dup) /P 3 0 R /Rect [100 700 300 720] >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (dup) /P 3 0 R /Rect [100 660 300 680] >>\nendobj\n");
-        return Wrap(pdf, 7);
+        return FixturePdf.Wrap(pdf, 7);
     }
 
     [Fact]
@@ -225,7 +209,7 @@ public class FormFieldHardeningTests
             .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R] >>\nendobj\n")
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] /DA (/Helv 0 Tf 0 g) >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Ch /T (colors) /P 3 0 R /Rect [100 640 280 700] /Opt [(Red) (Green) (Blue)] /V [(Red) (Blue)] >>\nendobj\n");
-        return Wrap(pdf, 6);
+        return FixturePdf.Wrap(pdf, 6);
     }
 
     [Fact]
@@ -252,11 +236,11 @@ public class FormFieldHardeningTests
         {
             pdf.Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Sig /T (sig) /P 3 0 R /Rect [100 700 260 760] /AP << /N 6 0 R >> >>\nendobj\n")
                 .Object(6, "6 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 160 60] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
-            return Wrap(pdf, 7);
+            return FixturePdf.Wrap(pdf, 7);
         }
 
         pdf.Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Sig /T (sig) /P 3 0 R /Rect [0 0 0 0] >>\nendobj\n");
-        return Wrap(pdf, 6);
+        return FixturePdf.Wrap(pdf, 6);
     }
 
     [Fact]

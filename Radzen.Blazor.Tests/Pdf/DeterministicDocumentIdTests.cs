@@ -10,13 +10,11 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class DeterministicDocumentIdTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static PortableDocument PlainDocument()
     {
         var document = new PortableDocument { IncludeDocumentId = true };
         document.Info.Title = "Deterministic";
-        document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (hello) Tj ET"));
+        document.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (hello) Tj ET"));
         return document;
     }
 
@@ -54,10 +52,10 @@ public class DeterministicDocumentIdTests
     public void DocumentId_DependsOnContent()
     {
         var a = new PortableDocument { IncludeDocumentId = true };
-        a.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (alpha) Tj ET"));
+        a.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (alpha) Tj ET"));
 
         var b = new PortableDocument { IncludeDocumentId = true };
-        b.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (beta) Tj ET"));
+        b.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (beta) Tj ET"));
 
         Assert.NotEqual(
             Assert.IsType<StringObject>(Id(a.ToArray())[0]).Value,

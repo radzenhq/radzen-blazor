@@ -12,11 +12,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentInterpreterSpanTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static void AssertSpanPerElement(string stream)
     {
-        var content = Ascii(stream);
+        var content = TestBytes.Ascii(stream);
         var elements = new ContentCollection();
         var spans = ContentInterpreter.Materialize(content, elements);
         Assert.Equal(elements.Count, spans.Count);
@@ -37,7 +35,7 @@ public class ContentInterpreterSpanTests
     [Fact]
     public void NamedDo_ProducesOneXObjectElementWithSpan()
     {
-        var content = Ascii("/Im0 Do");
+        var content = TestBytes.Ascii("/Im0 Do");
         var elements = new ContentCollection();
         var spans = ContentInterpreter.Materialize(content, elements);
 
@@ -48,7 +46,7 @@ public class ContentInterpreterSpanTests
     [Fact]
     public void NamelessDo_ProducesNoElementAndKeepsSpansAligned()
     {
-        var content = Ascii("q Do Q");
+        var content = TestBytes.Ascii("q Do Q");
         var elements = new ContentCollection();
         var spans = ContentInterpreter.Materialize(content, elements);
 
@@ -61,7 +59,7 @@ public class ContentInterpreterSpanTests
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
-        page.SetContent(Ascii("q Do Q"));
+        page.SetContent(TestBytes.Ascii("q Do Q"));
         page.Content.Add(new TextContent("x", 10, 10));
 
         using var buffer = new MemoryStream(document.ToArray());

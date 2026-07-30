@@ -15,7 +15,7 @@ public class ContentEditorNestedTextObjectTests
     public void ModifiedTextInsideTextObject_DoesNotNestTextObjects()
     {
         var document = new PortableDocument();
-        document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
+        document.Pages.Add().SetContent(TestBytes.Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
         loaded.Pages[0].Content.OfType<TextContent>().Single().Color = Color.Red;
@@ -30,7 +30,7 @@ public class ContentEditorNestedTextObjectTests
     public void ModifiedTextInsideTextObject_KeepsFollowingRunsPosition()
     {
         var document = new PortableDocument();
-        document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
+        document.Pages.Add().SetContent(TestBytes.Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
         var runs = loaded.Pages[0].Content.OfType<TextContent>().ToList();
@@ -49,7 +49,7 @@ public class ContentEditorNestedTextObjectTests
     public void ModifiedTextInsideTextObject_DoesNotLeakStateOntoFollowingRuns()
     {
         var document = new PortableDocument();
-        document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
+        document.Pages.Add().SetContent(TestBytes.Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
         loaded.Pages[0].Content.OfType<TextContent>().First().Color = Color.Red;
@@ -60,8 +60,6 @@ public class ContentEditorNestedTextObjectTests
         Assert.Equal(Color.Red, actual[0].Color);
         Assert.Equal(Color.Black, actual[1].Color);
     }
-
-    private static byte[] Ascii(string value) => Encoding.ASCII.GetBytes(value);
 
     private static int Count(string content, string op)
     {

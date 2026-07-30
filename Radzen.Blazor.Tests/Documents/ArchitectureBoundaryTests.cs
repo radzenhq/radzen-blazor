@@ -49,7 +49,18 @@ public class ArchitectureBoundaryTests
         "Radzen.Documents.Spreadsheet",
     ];
 
+    private const string BareComponentNamespace = "Radzen";
+
     private static readonly string[] ForbiddenNamespaces = [PdfNamespace, ComponentNamespace];
+
+    private static readonly string[] ForbiddenExactNamespaces = [BareComponentNamespace];
+
+    private static readonly string[] BareComponentTypesTheSpreadsheetModelShares =
+    [
+        "Radzen.SortOrder",
+        "Radzen.TextAlign",
+        "Radzen.VerticalAlign",
+    ];
 
     private static readonly HashSet<string> AllowedCrossings = new(StringComparer.Ordinal);
 
@@ -175,6 +186,40 @@ public class ArchitectureBoundaryTests
 
         Assert.Empty(unreadable);
         Assert.Empty(violations);
+    }
+
+    [Fact]
+    public void OnlyTheSpreadsheetModel_CrossesIntoTheBareRadzenNamespace()
+    {
+        var owners = new List<string>();
+
+        foreach (var type in GuardedTypes())
+        {
+            var surface = type.GetFields(AllDeclared).Select(field => field.FieldType)
+                .Concat(type.GetProperties(AllDeclared).Select(property => property.PropertyType))
+                .Concat(type.GetMethods(AllDeclared).Select(method => method.ReturnType))
+                .Concat(type.GetMethods(AllDeclared).SelectMany(method => method.GetParameters()).Select(p => p.ParameterType))
+                .Concat(type.GetConstructors(AllDeclared).SelectMany(c => c.GetParameters()).Select(p => p.ParameterType));
+
+            if (surface.SelectMany(Parts).Any(part => part.Namespace == BareComponentNamespace))
+            {
+                owners.Add(type.Namespace!);
+            }
+        }
+
+        Assert.Equal(["Radzen.Documents.Spreadsheet"], owners.Distinct().OrderBy(name => name, StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void SharedBareRadzenTypes_AreEnumsCarryingNoComponentDependency()
+    {
+        foreach (var name in BareComponentTypesTheSpreadsheetModelShares)
+        {
+            var type = typeof(Block).Assembly.GetType(name);
+
+            Assert.NotNull(type);
+            Assert.True(type!.IsEnum, $"{name} is shared with the neutral spreadsheet model, so it must stay a bare enum");
+        }
     }
 
     [Fact]
@@ -715,7 +760,14 @@ public class ArchitectureBoundaryTests
                 continue;
             }
 
-            if (!ForbiddenNamespaces.Any(root => IsWithin(name, root)))
+            if (!ForbiddenNamespaces.Any(root => IsWithin(name, root))
+                && !ForbiddenExactNamespaces.Contains(name, StringComparer.Ordinal))
+            {
+                continue;
+            }
+
+            if (ForbiddenExactNamespaces.Contains(name, StringComparer.Ordinal)
+                && BareComponentTypesTheSpreadsheetModelShares.Contains(part.FullName, StringComparer.Ordinal))
             {
                 continue;
             }

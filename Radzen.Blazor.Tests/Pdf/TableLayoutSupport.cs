@@ -13,29 +13,16 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class TableLayoutSupport
 {
-    public const string Family = "Liberation Sans";
+    public const string Family = PaginationSupport.Family;
 
-    public static FontCollection Fonts()
-    {
-        var fonts = new FontCollection();
-        fonts.Register(Family, new MemoryStream(
-            PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        return fonts;
-    }
+    public static FontCollection Fonts() => PaginationSupport.Fonts();
 
-    public static Font FontAt(double size) => new() { Family = Family, Size = size };
+    public static Font FontAt(double size) => PaginationSupport.FontAt(size);
 
     public static double Measure(FontCollection fonts, string text, double size)
-        => fonts.MeasureText(text, FontAt(size));
+        => PaginationSupport.Measure(fonts, text, size);
 
-    public static double LineHeight(FontCollection fonts, double size = 12)
-    {
-        var p = new Paragraph();
-        var run = p.Inlines.Add("Xg");
-        run.Font.Family = Family;
-        run.Font.Size = size;
-        return LineBreaker.Break(p, 100000, fonts)[0].Height;
-    }
+    public static double LineHeight(double size = 12) => PaginationSupport.LineHeight(size);
 
     public static Cell Fill(Cell cell, string text, double size = 12)
     {

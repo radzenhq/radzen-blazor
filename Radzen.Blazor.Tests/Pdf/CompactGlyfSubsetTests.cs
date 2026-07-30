@@ -228,7 +228,7 @@ public class CompactGlyfSubsetTests
 
             var newGid = Type0EmbedSupport.NewGid(toUnicode, ch);
             Assert.True(widths.ContainsKey(newGid), $"W missing compact CID {newGid} for '{ch}'");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(original, original.GetGlyphId(ch)), widths[newGid]);
+            Assert.Equal(Type0EmbedSupport.LiberationSansWidth(ch), widths[newGid]);
         }
     }
 

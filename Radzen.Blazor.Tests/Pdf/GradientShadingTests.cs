@@ -6,6 +6,7 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Write;
 using Radzen.Documents;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.7.4.5.2, 8.7.4.5.3, 8.7.4.5.5: axial (type 2) and radial (type 3) shadings and the shading Pattern (PatternType 2).
@@ -142,7 +143,7 @@ public class GradientShadingTests
         var pattern = Dict(reader.Resolve(patterns![Assert.Single(patterns.Keys)])!);
         var matrix = Array(reader.Resolve(pattern["Matrix"]!)!);
 
-        var box = Assert.Single(Paginator.PaginateIsolated(
+        var box = Assert.Single(IsolatedPaginator.PaginateIsolated(
             section,
             new Radzen.Documents.Fonts.FontCollection())).Body.Boxes[0];
         Assert.Equal(1, Num(matrix[0]), 3);

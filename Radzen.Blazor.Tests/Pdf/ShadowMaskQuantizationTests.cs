@@ -71,12 +71,34 @@ public class ShadowMaskQuantizationTests
     }
 
     [Fact]
-    public void RenderProducesTheSamePixelsAsTheLegacyQuantizer()
+    public void RenderProducesAnOpaqueCoreAndATransparentCornerWithAntiAliasedEdges()
     {
         var mask = GaussianBlur.Render(shapeWidthPt: 40, shapeHeightPt: 24, radiusPt: 6, blurPt: 5);
 
+        byte At(int x, int y) => mask.Pixels[(y * mask.Width) + x];
+
         Assert.NotEmpty(mask.Pixels);
-        Assert.Contains(mask.Pixels, p => p is > 0 and < 255);
-        Assert.All(mask.Pixels, p => Assert.InRange(p, (byte)0, (byte)255));
+        Assert.Equal(mask.Width * mask.Height, mask.Pixels.Length);
+        Assert.Equal(255, At(mask.Width / 2, mask.Height / 2));
+        Assert.Equal(0, At(0, 0));
+        Assert.Contains(mask.Pixels, pixel => pixel is > 0 and < 255);
+
+        var row = mask.Height / 2;
+        for (var x = 1; x <= mask.Width / 2; x++)
+        {
+            Assert.True(
+                At(x, row) >= At(x - 1, row),
+                $"coverage falls off monotonically toward the edge, but ({x}, {row}) is darker than ({x - 1}, {row})");
+        }
+    }
+
+    [Fact]
+    public void EveryRenderedPixelIsTheProductionQuantizerAppliedToACoverageFraction()
+    {
+        var mask = GaussianBlur.Render(shapeWidthPt: 40, shapeHeightPt: 24, radiusPt: 6, blurPt: 5);
+
+        Assert.All(
+            mask.Pixels,
+            pixel => Assert.Equal(pixel, ColorComponent.ToChannel(pixel / 255f)));
     }
 }

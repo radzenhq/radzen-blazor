@@ -26,7 +26,7 @@ public class WidthArrayCompactionTests
         {
             var cid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
             Assert.True(widths.ContainsKey(cid), $"W missing compact CID {cid}");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[cid]);
+            Assert.Equal(Type0EmbedSupport.LiberationSansWidth((char)cp), widths[cid]);
         }
 
         Assert.True(

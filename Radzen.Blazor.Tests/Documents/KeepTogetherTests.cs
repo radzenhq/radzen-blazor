@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class KeepTogetherTests
 {
@@ -14,7 +15,7 @@ public class KeepTogetherTests
 
     private static (Section Section, Paragraph Para) BuildBoundary(FontCollection fonts, bool keepTogether)
     {
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var width = PaginationSupport.WidthForWordsPerLine(fonts, "Ha", 2, 12);
         var section = PaginationSupport.Section(width, PaginationSupport.HeightForLines(lineH, 5));
 
@@ -58,7 +59,7 @@ public class KeepTogetherTests
     public void KeepTogether_MovedParagraphStartsAtContentTop()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var (section, _) = BuildBoundary(fonts, keepTogether: true);
 
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
@@ -89,7 +90,7 @@ public class KeepTogetherTests
     public void KeepWithNext_PullsAHeadingToTheNextPage()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 3));
 
         section.Blocks.Add(PaginationSupport.Text("t0"));
@@ -112,7 +113,7 @@ public class KeepTogetherTests
     public void WithoutKeepWithNext_TheHeadingStaysAtTheBottom()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 3));
 
         section.Blocks.Add(PaginationSupport.Text("t0"));

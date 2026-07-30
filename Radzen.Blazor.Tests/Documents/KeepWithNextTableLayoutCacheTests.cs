@@ -6,6 +6,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class KeepWithNextTableLayoutCacheTests
 {
@@ -13,7 +14,7 @@ public class KeepWithNextTableLayoutCacheTests
     public void KeepWithNextBeforeTable_LaysOutTheTableOnce()
     {
         var fonts = PaginationSupport.Fonts();
-        var lh = PaginationSupport.LineHeight(fonts);
+        var lh = PaginationSupport.LineHeight();
 
         var section = PaginationSupport.Section(400, PaginationSupport.HeightForLines(lh, 6));
         for (var i = 0; i < 4; i++)

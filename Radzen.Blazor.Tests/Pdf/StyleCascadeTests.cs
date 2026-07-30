@@ -3,6 +3,8 @@ using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Codes;
+using System.Linq;
 using Radzen.Documents;
 using Xunit;
 
@@ -264,9 +266,9 @@ public class StyleCascadeTests
         var format = Format(document, paragraph);
 
         Assert.Equal(HorizontalAlignment.Left, format.Alignment);
-        Assert.Equal(0, format.SpacingBefore.Point);
-        Assert.Equal(0, format.SpacingAfter.Point);
-        Assert.Equal(0, format.LeftIndent.Point);
+        Assert.Equal(0, format.SpacingBefore.Point, 9);
+        Assert.Equal(0, format.SpacingAfter.Point, 9);
+        Assert.Equal(0, format.LeftIndent.Point, 9);
         Assert.False(format.KeepTogether);
         Assert.False(format.KeepWithNext);
     }
@@ -286,9 +288,9 @@ public class StyleCascadeTests
 
         var format = Format(document, paragraph);
 
-        Assert.Equal(7, format.SpacingBefore.Point);
-        Assert.Equal(11, format.SpacingAfter.Point);
-        Assert.Equal(13, format.LeftIndent.Point);
+        Assert.Equal(7, format.SpacingBefore.Point, 9);
+        Assert.Equal(11, format.SpacingAfter.Point, 9);
+        Assert.Equal(13, format.LeftIndent.Point, 9);
         Assert.True(format.KeepTogether);
         Assert.True(format.KeepWithNext);
     }
@@ -309,8 +311,8 @@ public class StyleCascadeTests
 
         var format = Format(document, paragraph);
 
-        Assert.Equal(3, format.SpacingBefore.Point);
-        Assert.Equal(5, format.LeftIndent.Point);
+        Assert.Equal(3, format.SpacingBefore.Point, 9);
+        Assert.Equal(5, format.LeftIndent.Point, 9);
         Assert.False(format.KeepTogether);
     }
 
@@ -329,8 +331,8 @@ public class StyleCascadeTests
 
         var format = Format(document, paragraph);
 
-        Assert.Equal(9, format.SpacingBefore.Point);
-        Assert.Equal(30, format.LeftIndent.Point);
+        Assert.Equal(9, format.SpacingBefore.Point, 9);
+        Assert.Equal(30, format.LeftIndent.Point, 9);
     }
 
     [Fact]
@@ -513,5 +515,80 @@ public class StyleCascadeTests
 
         Assert.True(font.IsModified);
         Assert.Null(font.Bold);
+    }
+
+    [Fact]
+    public void NamedStyle_AppliesToParagraphsInsideAContainer()
+    {
+        var document = Builder(out var section);
+        var style = document.Styles.Add("Boxed");
+        style.Font.Size = 27;
+        style.LeftIndent = Unit.FromPoint(17);
+        var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
+        var paragraph = container.Blocks.AddParagraph("Inside");
+        paragraph.StyleName = "Boxed";
+
+        Assert.Equal(17, Format(document, paragraph).LeftIndent.Point, 9);
+        Assert.Contains(27.0, CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document)));
+    }
+
+    [Fact]
+    public void NormalStyle_CascadesIntoNestedContainerParagraphs()
+    {
+        var document = Builder(out var section);
+        document.Styles.Normal.Font.Size = 23;
+        var outer = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
+        var inner = outer.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
+        inner.Blocks.AddParagraph("Nested");
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
+
+        Assert.Contains(23.0, sizes);
+        Assert.DoesNotContain(10.0, sizes);
+    }
+
+    [Fact]
+    public void NamedStyle_AppliesToHeaderAndFooterBandParagraphs()
+    {
+        var document = Builder(out var section);
+        var style = document.Styles.Add("Band");
+        style.Font.Size = 21;
+        section.Header.Blocks.AddParagraph("Head").StyleName = "Band";
+        section.Footer.Blocks.AddParagraph("Foot").StyleName = "Band";
+        section.Blocks.AddParagraph("Body");
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
+
+        Assert.Equal(2, sizes.Count(size => size == 21.0));
+        Assert.Contains(10.0, sizes);
+    }
+
+    [Fact]
+    public void BarcodeCaption_InheritsTheNormalStyleFontSizeInsideAContainer()
+    {
+        var document = Builder(out var section);
+        document.Styles.Normal.Font.Size = 19;
+        var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
+        container.Blocks.AddBarcode(
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
+
+        Assert.Contains(19.0, sizes);
+    }
+
+    [Fact]
+    public void BarcodeCaption_UsesItsOwnFontOverTheNormalStyle()
+    {
+        var document = Builder(out var section);
+        document.Styles.Normal.Font.Size = 19;
+        var barcode = section.Blocks.AddBarcode(
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
+        barcode.Font.Size = 8;
+
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
+
+        Assert.Contains(8.0, sizes);
+        Assert.DoesNotContain(19.0, sizes);
     }
 }

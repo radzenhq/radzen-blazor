@@ -13,21 +13,6 @@ public class FormWidgetAppearanceFlattenTests
     private const string YesAppearance = "1 0 0 RG 2 2 16 16 re S";
     private const string OffAppearance = "0 0 1 RG 4 4 12 12 re S";
 
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] CheckBoxWithCustomAppearance(string state)
     {
         var pdf = new FixturePdf()
@@ -45,7 +30,7 @@ public class FormWidgetAppearanceFlattenTests
                 + " >>\nstream\n" + YesAppearance + "\nendstream\nendobj\n")
             .Object(10, "10 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 20 20] /Length " + OffAppearance.Length
                 + " >>\nstream\n" + OffAppearance + "\nendstream\nendobj\n");
-        return Wrap(pdf, 11);
+        return FixturePdf.Wrap(pdf, 11);
     }
 
     private static string AllPageContent(DocumentReader reader)

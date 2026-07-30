@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Radzen.Documents;
+using Radzen.Blazor.Pdf.Tests;
 
-namespace Radzen.Blazor.Pdf.Tests;
+namespace Radzen.Blazor.Documents.Tests;
 
 internal sealed class AfmReference
 {

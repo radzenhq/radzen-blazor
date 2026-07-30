@@ -13,12 +13,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentTokenizerTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static byte[] StreamWithEverything()
     {
         var bytes = new List<byte>();
-        bytes.AddRange(Ascii(
+        bytes.AddRange(TestBytes.Ascii(
             "q 1 0 0 1 0 0 cm\n" +
             "1 0 0 RG 2 w 10 10 m 90 10 l S\n" +
             "/Span << /MCID 0 >> BDC\n" +
@@ -28,7 +26,7 @@ public class ContentTokenizerTests
             "EMC\n" +
             "BI /W 2 /H 2 /CS /RGB /BPC 8 ID "));
         bytes.AddRange([0x00, 0x01, 0x45, 0x49, 0xFF, 0x0A, 0xDE, 0xAD, 0x28, 0x42]);
-        bytes.AddRange(Ascii(" EI\nQ\n"));
+        bytes.AddRange(TestBytes.Ascii(" EI\nQ\n"));
         return [.. bytes];
     }
 
@@ -73,7 +71,7 @@ public class ContentTokenizerTests
     [Fact]
     public void Tokenize_TjArray_EmitsBracketedStringsAndNumbers()
     {
-        var tokens = ContentTokenizer.Tokenize(Ascii("[(Wor) -30 (ld)] TJ"));
+        var tokens = ContentTokenizer.Tokenize(TestBytes.Ascii("[(Wor) -30 (ld)] TJ"));
 
         Assert.Equal(ContentTokenizer.TokenKind.ArrayStart, tokens[0].Kind);
         Assert.Equal(ContentTokenizer.TokenKind.String, tokens[1].Kind);
@@ -88,7 +86,7 @@ public class ContentTokenizerTests
     [Fact]
     public void Tokenize_HexString_DecodesBytes()
     {
-        var tokens = ContentTokenizer.Tokenize(Ascii("<4869> Tj"));
+        var tokens = ContentTokenizer.Tokenize(TestBytes.Ascii("<4869> Tj"));
 
         Assert.Equal(ContentTokenizer.TokenKind.String, tokens[0].Kind);
         Assert.Equal("Hi", Encoding.ASCII.GetString(tokens[0].Bytes!));
@@ -133,7 +131,7 @@ public class ContentTokenizerTests
     [InlineData("007", 7.0)]
     public void Tokenize_NumericOperand_AcceptsEveryPermittedForm(string source, double expected)
     {
-        var tokens = ContentTokenizer.Tokenize(Ascii(source));
+        var tokens = ContentTokenizer.Tokenize(TestBytes.Ascii(source));
 
         Assert.Equal(ContentTokenizer.TokenKind.Number, tokens[0].Kind);
         Assert.Equal(expected, tokens[0].Number);
@@ -150,7 +148,7 @@ public class ContentTokenizerTests
     [InlineData("6.02E23")]
     public void Tokenize_MalformedNumber_EmitsNoNumberToken(string source)
     {
-        var tokens = ContentTokenizer.Tokenize(Ascii(source));
+        var tokens = ContentTokenizer.Tokenize(TestBytes.Ascii(source));
 
         Assert.DoesNotContain(tokens, t => t.Kind == ContentTokenizer.TokenKind.Number);
     }
@@ -168,8 +166,8 @@ public class ContentTokenizerTests
     public void Cache_EqualButDistinctArray_Retokenizes()
     {
         var cache = new ContentTokenizer.Cache();
-        var first = Ascii("(a) Tj");
-        var second = Ascii("(a) Tj");
+        var first = TestBytes.Ascii("(a) Tj");
+        var second = TestBytes.Ascii("(a) Tj");
 
         Assert.NotSame(ContentTokenizer.Tokenize(first, cache), ContentTokenizer.Tokenize(second, cache));
     }
@@ -178,8 +176,8 @@ public class ContentTokenizerTests
     public void Cache_MovedToNewArray_DoesNotServeStaleTokens()
     {
         var cache = new ContentTokenizer.Cache();
-        var original = Ascii("(before) Tj");
-        var edited = Ascii("(after) Tj (extra) Tj");
+        var original = TestBytes.Ascii("(before) Tj");
+        var edited = TestBytes.Ascii("(after) Tj (extra) Tj");
 
         ContentTokenizer.Tokenize(original, cache);
         var tokens = ContentTokenizer.Tokenize(edited, cache);
@@ -220,9 +218,9 @@ public class ContentTokenizerTests
     private static byte[] InlineImageStream(string dictionary, IEnumerable<byte> payload, string trailer = "\nEI\nQ\n")
     {
         var stream = new List<byte>();
-        stream.AddRange(Ascii("q\nBI " + dictionary + " ID "));
+        stream.AddRange(TestBytes.Ascii("q\nBI " + dictionary + " ID "));
         stream.AddRange(payload);
-        stream.AddRange(Ascii(trailer));
+        stream.AddRange(TestBytes.Ascii(trailer));
         return stream.ToArray();
     }
 
@@ -236,7 +234,7 @@ public class ContentTokenizerTests
     public void Tokenize_FilteredInlineImageWithoutLength_DoesNotTerminateOnPayloadBytesSpellingEI()
     {
         var payload = new List<byte> { 0x78, 0x9c, 0x01, 0x20 };
-        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(TestBytes.Ascii(" EI "));
         payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
 
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl", payload)));
@@ -245,7 +243,7 @@ public class ContentTokenizerTests
     [Fact]
     public void Tokenize_Ascii85InlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
-        var payload = Ascii("87cURD] EI ]i<~>");
+        var payload = TestBytes.Ascii("87cURD] EI ]i<~>");
 
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /A85", payload)));
     }
@@ -253,14 +251,14 @@ public class ContentTokenizerTests
     [Fact]
     public void Tokenize_AsciiHexInlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
-        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /AHx", Ascii("48656C6C6F>"))));
+        Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /AHx", TestBytes.Ascii("48656C6C6F>"))));
     }
 
     [Fact]
     public void Tokenize_RunLengthInlineImageWithoutLength_EndsAtEndOfDataMarker()
     {
         var payload = new List<byte> { 3 };
-        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(TestBytes.Ascii(" EI "));
         payload.Add(128);
 
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /RL", payload)));
@@ -269,7 +267,7 @@ public class ContentTokenizerTests
     [Fact]
     public void Tokenize_InlineImageFilterArray_MeasuresPayloadWithFirstFilter()
     {
-        var payload = Ascii("87cURD] EI ]i<~>");
+        var payload = TestBytes.Ascii("87cURD] EI ]i<~>");
 
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F [/A85 /Fl]", payload)));
     }
@@ -278,7 +276,7 @@ public class ContentTokenizerTests
     public void Tokenize_FilteredInlineImageWithNoPlausibleTerminator_TakesFirstCandidate()
     {
         var payload = new List<byte> { 0x78, 0x9c };
-        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(TestBytes.Ascii(" EI "));
         payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
 
         var tokens = ContentTokenizer.Tokenize(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl", payload, string.Empty));
@@ -291,7 +289,7 @@ public class ContentTokenizerTests
     public void Tokenize_FilteredInlineImageWithLength_UsesDeclaredLength()
     {
         var payload = new List<byte>();
-        payload.AddRange(Ascii(" EI "));
+        payload.AddRange(TestBytes.Ascii(" EI "));
         payload.AddRange(new byte[] { 0x00, 0x01, 0x02, 0x03 });
 
         Assert.Equal(new[] { "q", "Q" }, Operators(InlineImageStream("/W 4 /H 4 /BPC 8 /CS /G /F /Fl /L 8", payload)));

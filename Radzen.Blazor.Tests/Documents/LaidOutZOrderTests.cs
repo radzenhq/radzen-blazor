@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
@@ -116,5 +117,53 @@ public class LaidOutZOrderTests
 
         Assert.Equal(orders.Count, orders.Distinct().Count());
         Assert.Equal(orders.OrderBy(order => order).ToArray(), orders.ToArray());
+    }
+
+    [Fact]
+    public void OrderedMerge_EmitsTheTableFirstWhenTheZOrdersTie()
+    {
+        var visited = new List<string>();
+
+        OrderedMerge.VisitByOrder(
+            ImmutableArray.Create("t0", "t5"),
+            table => table == "t0" ? 0 : 5,
+            ImmutableArray.Create("b0", "b5"),
+            box => box == "b0" ? 0 : 5,
+            table => visited.Add(table),
+            box => visited.Add(box));
+
+        Assert.Equal(new[] { "t0", "b0", "t5", "b5" }, visited);
+    }
+
+    [Fact]
+    public void OrderedMerge_DrainsTheRemainingSideWhenOneRunsOut()
+    {
+        var visited = new List<string>();
+
+        OrderedMerge.VisitByOrder(
+            ImmutableArray.Create("t9"),
+            _ => 9,
+            ImmutableArray.Create("b1", "b2"),
+            box => box == "b1" ? 1 : 2,
+            table => visited.Add(table),
+            box => visited.Add(box));
+
+        Assert.Equal(new[] { "b1", "b2", "t9" }, visited);
+    }
+
+    [Fact]
+    public void OrderedMerge_VisitsNothingWhenBothSidesAreEmpty()
+    {
+        var visited = 0;
+
+        OrderedMerge.VisitByOrder(
+            ImmutableArray<string>.Empty,
+            _ => 0,
+            ImmutableArray<string>.Empty,
+            _ => 0,
+            _ => visited++,
+            _ => visited++);
+
+        Assert.Equal(0, visited);
     }
 }

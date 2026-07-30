@@ -12,22 +12,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfAConformanceTests
 {
-    private const string MissingApi =
-        "DocumentRenderer.Conformance (enum PdfAConformance) is missing - P2 PDF/A conformance mode is not implemented";
-
-    private static PropertyInfo? ConformanceProperty()
-        => typeof(DocumentRenderer).GetProperty("Conformance");
-
-    private static void SetConformance(DocumentRenderer renderer, string name)
-    {
-        var property = ConformanceProperty();
-        Assert.True(property is not null && property.PropertyType.IsEnum && property.CanWrite, MissingApi);
-        Assert.True(Enum.GetNames(property!.PropertyType).Contains(name),
-            $"PdfAConformance is missing the '{name}' value");
-        property.SetValue(renderer, Enum.Parse(property.PropertyType, name));
-    }
-
-    private static (Document Document, DocumentRenderer Renderer) Author(string conformance)
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance)
     {
         var document = new Document();
         var renderer = new DocumentRenderer();
@@ -42,7 +27,7 @@ public class PdfAConformanceTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello PDF/A", BuildTestSupport.Latin);
 
-        SetConformance(renderer, conformance);
+        renderer.Conformance = conformance;
         return (document, renderer);
     }
 
@@ -72,7 +57,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_MetadataStream_HasPdfaidPart3ConformanceB()
     {
-        var reader = ReadAuthored(Author("PdfA3B"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3B));
 
         var metadata = MetadataStream(reader);
         Assert.Equal("Metadata", BuildTestSupport.Name(reader, metadata.Dictionary, "Type"));
@@ -88,7 +73,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3A_MetadataStream_HasConformanceA()
     {
-        var packet = MetadataPacket(ReadAuthored(Author("PdfA3A")));
+        var packet = MetadataPacket(ReadAuthored(Author(PdfAConformance.PdfA3A)));
         Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:conformance>A</pdfaid:conformance>", packet, StringComparison.Ordinal);
     }
@@ -96,7 +81,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_Xmp_MatchesDocumentInfo()
     {
-        var packet = MetadataPacket(ReadAuthored(Author("PdfA3B")));
+        var packet = MetadataPacket(ReadAuthored(Author(PdfAConformance.PdfA3B)));
 
         Assert.Contains("<dc:title><rdf:Alt><rdf:li xml:lang=\"x-default\">PDF/A Invoice</rdf:li>", packet, StringComparison.Ordinal);
         Assert.Contains("<dc:creator><rdf:Seq><rdf:li>Radzen Ltd</rdf:li>", packet, StringComparison.Ordinal);
@@ -109,7 +94,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_OutputIntents_SrgbGtsPdfa1WithIccProfile()
     {
-        var reader = ReadAuthored(Author("PdfA3B"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3B));
 
         var catalog = Catalog(reader);
         Assert.True(catalog.TryGetValue("OutputIntents", out var intentsObject), "catalog has /OutputIntents");
@@ -131,7 +116,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_Trailer_HasDocumentId()
     {
-        var reader = ReadAuthored(Author("PdfA3B"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3B));
 
         Assert.True(reader.Trailer.TryGetValue("ID", out var idObject), "trailer has /ID");
         var id = Assert.IsType<ArrayObject>(reader.Resolve(idObject!));
@@ -146,7 +131,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_HasNoEncryption()
     {
-        var reader = ReadAuthored(Author("PdfA3B"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3B));
         Assert.False(reader.Trailer.ContainsKey("Encrypt"), "PDF/A forbids /Encrypt");
         Assert.False(reader.IsEncrypted);
     }
@@ -154,7 +139,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_AllFonts_EmbeddedSubsetsWithCidSet()
     {
-        var reader = ReadAuthored(Author("PdfA3B"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3B));
 
         var fonts = BuildTestSupport.Fonts(reader);
         Assert.NotEmpty(fonts);
@@ -182,12 +167,11 @@ public class PdfAConformanceTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello", "Helvetica");
         var renderer = new DocumentRenderer();
-        SetConformance(renderer, "PdfA3B");
+        renderer.Conformance = PdfAConformance.PdfA3B;
 
-        var exception = Record.Exception(() => renderer.ToArray(document));
+        var exception = Assert.Throws<InvalidOperationException>(() => renderer.ToArray(document));
 
-        Assert.True(exception is not null, "base-14 font by name must throw under PDF/A");
-        Assert.Contains("PDF/A", exception!.Message, StringComparison.Ordinal);
+        Assert.Contains("PDF/A", exception.Message, StringComparison.Ordinal);
         Assert.Contains("Helvetica", exception.Message, StringComparison.Ordinal);
     }
 
@@ -204,7 +188,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3A_OutputIsTagged()
     {
-        var reader = ReadAuthored(Author("PdfA3A"));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA3A));
         var catalog = Catalog(reader);
 
         Assert.True(catalog.TryGetValue("MarkInfo", out var markInfoObject), "Level A requires /MarkInfo");
@@ -238,7 +222,7 @@ public class PdfAConformanceTests
     [Fact]
     public void PdfA3B_ContentSurvives_ExtractText()
     {
-        var authored = Author("PdfA3B");
+        var authored = Author(PdfAConformance.PdfA3B);
         var document = BuildTestSupport.Reload(authored.Document, authored.Renderer);
         Assert.Contains("Hello PDF/A", document.Pages[0].ExtractText(), StringComparison.Ordinal);
     }

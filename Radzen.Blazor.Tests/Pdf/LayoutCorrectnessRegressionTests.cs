@@ -10,6 +10,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Blazor.Tests.Isolated;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -39,7 +40,7 @@ public class LayoutCorrectnessRegressionTests
         {
             try
             {
-                return (object)Paginator.PaginateIsolated(section, fonts);
+                return (object)IsolatedPaginator.PaginateIsolated(section, fonts);
             }
             catch (Exception exception)
             {
@@ -51,18 +52,10 @@ public class LayoutCorrectnessRegressionTests
             task.Wait(TimeSpan.FromSeconds(5)),
             "Paginator did not terminate for a continuation line taller than the page.");
 
-        if (task.Result is System.Collections.Immutable.ImmutableArray<LaidOutPage> pages)
-        {
-            Assert.InRange(pages.Length, 1, 3);
-            Assert.Equal(2, pages.Sum(p => p.Body.Lines.Length));
-            Assert.All(pages, p => Assert.True(p.Body.Lines.Length > 0, "no page may be empty"));
-        }
-        else
-        {
-            Assert.True(
-                task.Result is InvalidOperationException or NotSupportedException,
-                $"Layout must terminate with a layout diagnostic, but threw {task.Result.GetType().FullName}.");
-        }
+        var pages = Assert.IsType<System.Collections.Immutable.ImmutableArray<LaidOutPage>>(task.Result);
+
+        Assert.Equal(2, pages.Length);
+        Assert.All(pages, page => Assert.Equal(1, page.Body.Lines.Length));
     }
 
     [Fact]
@@ -99,16 +92,7 @@ public class LayoutCorrectnessRegressionTests
             task.Wait(TimeSpan.FromSeconds(10)),
             "Build() did not terminate for a continuation line taller than the page.");
 
-        if (task.Result is byte[] bytes)
-        {
-            Assert.True(bytes.Length > 0);
-        }
-        else
-        {
-            Assert.True(
-                task.Result is InvalidOperationException or NotSupportedException,
-                $"Layout must terminate with a layout diagnostic, but threw {task.Result.GetType().FullName}.");
-        }
+        Assert.NotEmpty(Assert.IsType<byte[]>(task.Result));
     }
 
     [Fact]
@@ -125,7 +109,7 @@ public class LayoutCorrectnessRegressionTests
         Fill(row.Cells[1], "WIDE");
         row.Cells[1].ColumnSpan = 5;
 
-        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 400, fonts);
 
         var wide = layout.Cells.SingleOrDefault(c => c.Column == 1);
         Assert.True(wide is not null, "cell with overflowing ColumnSpan was dropped from the layout");
@@ -189,7 +173,7 @@ public class LayoutCorrectnessRegressionTests
             return table;
         }
 
-        var layout = TableLayout.LayoutIsolated(MakeTable(new Table()), 260, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(MakeTable(new Table()), 260, fonts);
         var cell = TableLayoutSupport.CellAt(layout, 0, 0);
         Assert.True(cell.Lines.Length > 0);
         var allLinesFit = cell.Lines.All(l => l.Line.Width <= cell.ContentBox.Width + 0.5);
@@ -224,7 +208,7 @@ public class LayoutCorrectnessRegressionTests
         var row1 = table.Rows.Add();
         Fill(row1.Cells[0], "R1");
 
-        var layout = TableLayout.LayoutIsolated(table, 200, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
         var span = layout.Cells.Single(c => c.RowSpan == 2);
         var padding = 2 * row0.Cells[0].Padding.Point;
         var contentHeight = span.Lines.Sum(l => l.Line.Height);
@@ -239,7 +223,7 @@ public class LayoutCorrectnessRegressionTests
     public void RowSpanGroup_IsNotSplitAcrossTableFragments()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
 
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(100));
@@ -261,8 +245,8 @@ public class LayoutCorrectnessRegressionTests
         Fill(row3.Cells[0], "A3");
         Fill(row3.Cells[1], "B3");
 
-        var layout = TableLayout.LayoutIsolated(table, 200, fonts);
-        var fragments = TablePaginator.Paginate(layout, table, 2.4 * lh);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 200, fonts);
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, 2.4 * lh);
 
         int FragmentOf(int sourceRow)
         {
@@ -296,7 +280,7 @@ public class LayoutCorrectnessRegressionTests
         Fill(row.Cells[1], "b");
         Fill(row.Cells[2], "c");
 
-        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 400, fonts);
 
         Assert.All(layout.ColumnWidths, w => Assert.True(w >= 0, $"column width {w:F2} is negative"));
     }

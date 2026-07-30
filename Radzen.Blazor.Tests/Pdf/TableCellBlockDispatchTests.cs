@@ -13,6 +13,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Blazor.Tests.Isolated;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -30,7 +31,7 @@ public class TableCellBlockDispatchTests
 
     private static LaidOutCell LayOut(Table table, LayoutCaptureContext? capture = null)
         => TableLayoutSupport.CellAt(
-            TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts(), capture: capture),
+            IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts(), capture: capture),
             0,
             0);
 
@@ -129,9 +130,9 @@ public class TableCellBlockDispatchTests
         list.AddItem("Beta");
         list.AddItem("Gamma");
 
-        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 400, fonts);
 
-        var lineHeight = TableLayoutSupport.LineHeight(fonts);
+        var lineHeight = TableLayoutSupport.LineHeight();
         var padding = cell.Padding.Point;
         Assert.Equal(3 * lineHeight + 2 * padding, layout.RowHeights[0], 3);
     }
@@ -164,7 +165,7 @@ public class TableCellBlockDispatchTests
     {
         var (table, cell) = CellTable();
         TableLayoutSupport.Fill(cell, "Alpha");
-        var withoutBreakHeight = TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0];
+        var withoutBreakHeight = IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0];
 
         cell.Blocks.AddPageBreak();
         var laid = LayOut(table);
@@ -173,7 +174,7 @@ public class TableCellBlockDispatchTests
         Assert.Empty(laid.Images);
         Assert.Empty(laid.CodeSymbols);
         Assert.Empty(laid.Tables);
-        Assert.Equal(withoutBreakHeight, TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0], 6);
+        Assert.Equal(withoutBreakHeight, IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0], 6);
     }
 
     private sealed class UnknownBlock : Block;
@@ -184,7 +185,7 @@ public class TableCellBlockDispatchTests
         var (table, cell) = CellTable();
         cell.Blocks.Add(new UnknownBlock());
 
-        var exception = Assert.Throws<NotSupportedException>(() => TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
+        var exception = Assert.Throws<NotSupportedException>(() => IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
         Assert.Contains("UnknownBlock", exception.Message);
         Assert.Contains("reached layout before lowering", exception.Message);
     }
@@ -220,7 +221,7 @@ public class TableCellBlockDispatchTests
 
             var (table, cell) = CellTable();
             AddSample(cell, type);
-            var exception = Record.Exception(() => TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
+            var exception = Record.Exception(() => IsolatedTableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
             Assert.True(exception is null, $"Block type '{type.Name}' failed to lay out inside a table cell: {exception}");
         }
     }

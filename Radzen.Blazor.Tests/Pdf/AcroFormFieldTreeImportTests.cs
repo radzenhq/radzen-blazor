@@ -12,21 +12,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AcroFormFieldTreeImportTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] NestedFormSource()
     {
         var pdf = new FixturePdf()
@@ -40,7 +25,7 @@ public class AcroFormFieldTreeImportTests
             .Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Widget /T (zip) /Parent 5 0 R /V (1000) /P 3 0 R /Rect [100 660 350 680] >>\nendobj\n")
             .Object(8, "8 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Name /Helv >>\nendobj\n")
             .Object(9, "9 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (Name) /V (Anna) /P 3 0 R /Rect [100 600 350 620] >>\nendobj\n");
-        return Wrap(pdf, 10);
+        return FixturePdf.Wrap(pdf, 10);
     }
 
     private static byte[] Merge(bool destinationHasNameField, bool destinationHasDa)

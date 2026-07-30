@@ -17,14 +17,6 @@ public class KeepWithNextBlockRegressionTests
     private const double Margin = 40;
     private const double BodyFontSize = 12;
 
-    private static double LineHeight(double size)
-    {
-        var paragraph = new Paragraph();
-        var run = paragraph.Inlines.Add("Xg");
-        run.Font.Size = size;
-        return LineBreaker.Break(paragraph, 100000, new FontCollection())[0].Height;
-    }
-
     private static Paragraph Text(string text, double size)
     {
         var paragraph = new Paragraph();
@@ -51,7 +43,7 @@ public class KeepWithNextBlockRegressionTests
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
         section.Margins.SetAll(Unit.FromPoint(Margin));
 
-        var lineHeight = LineHeight(BodyFontSize);
+        var lineHeight = PaginationSupport.BuiltInLineHeight(BodyFontSize);
         var contentHeight = PageHeight - 2 * Margin;
         var fillers = (int)(contentHeight / lineHeight) - 1;
         for (var i = 0; i < fillers; i++)

@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class PaginatorLayoutEdgeCaseTests
 {
@@ -14,7 +15,7 @@ public class PaginatorLayoutEdgeCaseTests
     public void HugeSpacingBefore_ClampsSoFirstLineStaysOnPage()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(200, PaginationSupport.HeightForLines(lineH, 5));
         var para = PaginationSupport.Text("Alpha");
         para.SpacingBefore = Unit.FromPoint(1000);
@@ -33,7 +34,7 @@ public class PaginatorLayoutEdgeCaseTests
     public void ZeroOrphans_DoesNotEmitBlankFirstPage()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var width = PaginationSupport.WidthForWordsPerLine(fonts, "Ha", 2, 12);
         var section = PaginationSupport.Section(width, PaginationSupport.HeightForLines(lineH, 1));
         var para = PaginationSupport.Repeated("Ha", 4);

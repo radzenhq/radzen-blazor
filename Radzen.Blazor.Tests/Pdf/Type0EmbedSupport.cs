@@ -36,8 +36,37 @@ internal static class Type0EmbedSupport
         return map;
     }
 
-    public static int ScaleWidth(SfntFont font, int gid)
-        => (int)Math.Round(font.GetAdvanceWidth((ushort)gid) * 1000.0 / font.UnitsPerEm, MidpointRounding.AwayFromZero);
+    private static readonly Dictionary<char, int> LiberationSansGlyphSpaceWidths = new()
+    {
+        ['\u0020'] = 278, ['\u0021'] = 278, ['\u002D'] = 333, ['\u004E'] = 722, ['\u0052'] = 722,
+        ['\u0061'] = 556, ['\u0063'] = 500, ['\u0064'] = 556, ['\u0065'] = 556, ['\u0066'] = 278,
+        ['\u006A'] = 222, ['\u006E'] = 556, ['\u006F'] = 556, ['\u0072'] = 333, ['\u0076'] = 500,
+        ['\u007A'] = 500, ['\u00E9'] = 556, ['\u00EF'] = 278, ['\u041C'] = 833, ['\u041F'] = 719,
+        ['\u0430'] = 556, ['\u0432'] = 531, ['\u0435'] = 556, ['\u0438'] = 559, ['\u0439'] = 559,
+        ['\u043E'] = 556, ['\u0440'] = 556, ['\u0442'] = 458,
+    };
+
+    private static readonly Dictionary<char, int> NotoSansScGlyphSpaceWidths = new()
+    {
+        ['\u0020'] = 224, ['\u0041'] = 608, ['\u0062'] = 618, ['\u041C'] = 812, ['\u0438'] = 631,
+        ['\u0440'] = 620, ['\u4E2D'] = 1000, ['\u4EA7'] = 1000,
+    };
+
+    public static int LiberationSansWidth(char ch)
+    {
+        Assert.True(
+            LiberationSansGlyphSpaceWidths.TryGetValue(ch, out var width),
+            $"U+{(int)ch:X4} has no pinned Liberation Sans width in 1000-unit glyph space");
+        return width;
+    }
+
+    public static int NotoSansScWidth(char ch)
+    {
+        Assert.True(
+            NotoSansScGlyphSpaceWidths.TryGetValue(ch, out var width),
+            $"U+{(int)ch:X4} has no pinned Noto Sans SC width in 1000-unit glyph space");
+        return width;
+    }
 
     public sealed class Embedded
     {
@@ -133,18 +162,6 @@ internal static class Type0EmbedSupport
         }
 
         return result;
-    }
-
-    public static bool CidBit(byte[] cidSet, int cid)
-    {
-        var byteIndex = cid >> 3;
-        if (byteIndex >= cidSet.Length)
-        {
-            return false;
-        }
-
-        var mask = (byte)(0x80 >> (cid & 7));
-        return (cidSet[byteIndex] & mask) != 0;
     }
 
     public static HashSet<int> SetBits(byte[] cidSet)

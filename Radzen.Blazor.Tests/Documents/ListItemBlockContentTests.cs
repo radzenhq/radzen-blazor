@@ -9,6 +9,7 @@ using Xunit;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class ListItemBlockContentTests
 {
@@ -134,7 +135,7 @@ public class ListItemBlockContentTests
     public void ItemBlocks_SplitAcrossPagesThroughTheNormalFlow()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineHeight = PaginationSupport.LineHeight(fonts);
+        var lineHeight = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineHeight, 3));
         section.Blocks.Add(PaginationSupport.Text("f0"));
         section.Blocks.Add(PaginationSupport.Text("f1"));
@@ -159,7 +160,7 @@ public class ListItemBlockContentTests
     public void Label_MovesWithTheFirstContentLine()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineHeight = PaginationSupport.LineHeight(fonts);
+        var lineHeight = PaginationSupport.LineHeight();
         var width = PaginationSupport.WidthForWordsPerLine(fonts, "Ha", 2, 12);
         var section = PaginationSupport.Section(width + 18, PaginationSupport.HeightForLines(lineHeight, 2));
         section.Blocks.Add(PaginationSupport.Text("filler"));
@@ -184,7 +185,7 @@ public class ListItemBlockContentTests
         fonts.Register(
             PaginationSupport.Family,
             new System.IO.MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        var lineHeight = PaginationSupport.LineHeight(fonts);
+        var lineHeight = PaginationSupport.LineHeight();
         var section = document.Sections.Add();
         section.PageSize = new PageSize(
             Unit.FromPoint(500),

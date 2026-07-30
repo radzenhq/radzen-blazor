@@ -30,14 +30,12 @@ public class IncrementalSaveTests
         public byte[] Sign(SignedContent content) => [0x30, 0x00];
     }
 
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static byte[] BaseDocument()
     {
         var document = new PortableDocument();
         document.Info.Title = "Original title";
         document.Info.Author = "Original author";
-        document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT /F1 12 Tf 72 720 Td (page zero) Tj ET"));
+        document.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT /F1 12 Tf 72 720 Td (page zero) Tj ET"));
         return document.ToArray();
     }
 
@@ -244,7 +242,7 @@ public class IncrementalSaveTests
         Assert.Single(document.Pages);
 
         var page = document.Pages.Add(PageSizes.Letter);
-        page.SetContent(Ascii("BT /F1 12 Tf 72 720 Td (appended page) Tj ET"));
+        page.SetContent(TestBytes.Ascii("BT /F1 12 Tf 72 720 Td (appended page) Tj ET"));
 
         var updated = SaveIncremental(document);
         AssertVerbatimPrefix(original, updated);
@@ -409,9 +407,9 @@ public class IncrementalSaveTests
     public void DeletedAndReorderedPagesAreAppendedAndReParse()
     {
         var source = new PortableDocument();
-        source.Pages.Add().SetContent(Ascii("first"));
-        source.Pages.Add().SetContent(Ascii("remove"));
-        source.Pages.Add().SetContent(Ascii("last"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("first"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("remove"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("last"));
         var original = source.ToArray();
         var document = Load(original);
         document.Pages.RemoveAt(1);
@@ -452,11 +450,11 @@ public class IncrementalSaveTests
     public void InsertedPageIsAppendedAndPlacedInTheUpdatedPageTree()
     {
         var source = new PortableDocument();
-        source.Pages.Add().SetContent(Ascii("first"));
-        source.Pages.Add().SetContent(Ascii("last"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("first"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("last"));
         var original = source.ToArray();
         var document = Load(original);
-        document.Pages.Add().SetContent(Ascii("inserted"));
+        document.Pages.Add().SetContent(TestBytes.Ascii("inserted"));
         document.Pages.Move(2, 1);
 
         var updated = SaveIncremental(document);
@@ -528,7 +526,7 @@ public class IncrementalSaveTests
     public void LoadedContentEditThrowsWithFullSaveDirection()
     {
         var document = Load(BaseDocument());
-        document.Pages[0].SetContent(Ascii("replacement"));
+        document.Pages[0].SetContent(TestBytes.Ascii("replacement"));
 
         var exception = Assert.Throws<NotSupportedException>(() => SaveIncremental(document));
 
@@ -559,7 +557,7 @@ public class IncrementalSaveTests
             document.Info.Title = "Deterministic";
             document.AcroForm!.FillField("Name", "Radzen Ltd");
             var page = document.Pages.Add(PageSizes.Letter);
-            page.SetContent(Ascii("BT (extra) Tj ET"));
+            page.SetContent(TestBytes.Ascii("BT (extra) Tj ET"));
             return SaveIncremental(document);
         }
 
@@ -574,7 +572,7 @@ public class IncrementalSaveTests
         var document = Load(original);
         document.Info.Title = "Combined";
         document.AcroForm!.FillField("Name", "Radzen Ltd");
-        document.Pages.Add(PageSizes.Letter).SetContent(Ascii("BT (combined) Tj ET"));
+        document.Pages.Add(PageSizes.Letter).SetContent(TestBytes.Ascii("BT (combined) Tj ET"));
 
         var updated = SaveIncremental(document);
         AssertVerbatimPrefix(original, updated);

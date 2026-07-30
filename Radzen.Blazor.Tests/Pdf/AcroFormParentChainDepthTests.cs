@@ -11,21 +11,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AcroFormParentChainDepthTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] DeepChainSource(int levels)
     {
         var pdf = new FixturePdf()
@@ -64,7 +49,7 @@ public class AcroFormParentChainDepthTests
             pdf.Object(number, body.ToString());
         }
 
-        return Wrap(pdf, 5 + levels);
+        return FixturePdf.Wrap(pdf, 5 + levels);
     }
 
     private static byte[] CyclicParentSource()
@@ -78,7 +63,7 @@ public class AcroFormParentChainDepthTests
             .Object(5, "5 0 obj\n<< /T (root) /FT /Tx /V (v) /Kids [7 0 R] >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /T (a) /Parent 7 0 R >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /T (b) /Parent 6 0 R /Type /Annot /Subtype /Widget /Rect [100 700 350 720] >>\nendobj\n");
-        return Wrap(pdf, 8);
+        return FixturePdf.Wrap(pdf, 8);
     }
 
     [Theory]

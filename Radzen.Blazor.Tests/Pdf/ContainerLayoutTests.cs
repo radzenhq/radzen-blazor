@@ -7,6 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContainerLayoutTests
@@ -33,7 +34,7 @@ public class ContainerLayoutTests
         container.Borders.Width = 2;
         container.Blocks.Add(Text("Boxed"));
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         var page = Assert.Single(pages);
         Assert.Empty(page.Body.Tables);
@@ -65,7 +66,7 @@ public class ContainerLayoutTests
         });
         container.Blocks.Add(Text("Boxed"));
 
-        var box = Assert.Single(Assert.Single(Paginator.PaginateIsolated(section, fonts)).Body.Boxes);
+        var box = Assert.Single(Assert.Single(IsolatedPaginator.PaginateIsolated(section, fonts)).Body.Boxes);
         var line = Assert.Single(box.Content.Lines);
 
         Assert.Equal(4, line.X, 6);
@@ -81,7 +82,7 @@ public class ContainerLayoutTests
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(10) });
         container.Blocks.Add(Text("Boxed"));
 
-        var box = Assert.Single(Assert.Single(Paginator.PaginateIsolated(section, fonts)).Body.Boxes);
+        var box = Assert.Single(Assert.Single(IsolatedPaginator.PaginateIsolated(section, fonts)).Body.Boxes);
         var line = Assert.Single(box.Content.Lines);
 
         Assert.Null(container.PaddingLeft);
@@ -110,7 +111,7 @@ public class ContainerLayoutTests
         section.Blocks.Add(Text("Body"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
         var page = Assert.Single(pages);
 
         var box = Assert.Single(page.HeaderLayer.Boxes);
@@ -135,7 +136,7 @@ public class ContainerLayoutTests
         });
         container.Blocks.Add(Text("Centered box"));
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         var box = Assert.Single(Assert.Single(pages).Body.Boxes);
         Assert.Equal(200, box.Bounds.Width, 6);
@@ -152,7 +153,7 @@ public class ContainerLayoutTests
         inner.Blocks.Add(Text("Deep"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         var box = Assert.Single(Assert.Single(pages).Body.Boxes);
         Assert.Empty(box.Content.Tables);
@@ -224,7 +225,7 @@ public class ContainerLayoutTests
         var cellParagraph = nested.Rows.Add().Cells[0].Blocks.AddParagraph();
         cellParagraph.Inlines.Add("nested cell").Font.Family = PaginationSupport.Family;
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         var page = Assert.Single(pages);
         Assert.Empty(page.Body.Tables);
@@ -285,7 +286,7 @@ public class ContainerLayoutTests
         cell.Blocks.Add(container);
 
         var capture = new LayoutCaptureContext();
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
 
         var laidCell = Assert.Single(layout.Cells);
         var box = Assert.Single(laidCell.Boxes);
@@ -346,7 +347,7 @@ public class ContainerLayoutTests
         cell.Blocks.Add(outer);
 
         var capture = new LayoutCaptureContext();
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
 
         var outerBox = Assert.Single(Assert.Single(layout.Cells).Boxes);
         Assert.Equal(capture.Source(outer), outerBox.Source);
@@ -384,7 +385,7 @@ public class ContainerLayoutTests
         var section = PaginationSupport.Section(400, 600);
         var paragraph = section.Blocks.Add(Text("plain"));
 
-        var expanded = BlockExpander.ExpandBlocksIsolated(section.Blocks, 400);
+        var expanded = IsolatedBlockExpander.ExpandBlocksIsolated(section.Blocks, 400);
 
         Assert.Same(paragraph, Assert.Single(expanded));
     }

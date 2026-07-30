@@ -330,4 +330,58 @@ public class CodeElementTests
 
         Assert.NotEmpty(FilledRects(ContentTestHelpers.PageContent(reader, 0)));
     }
+
+    [Fact]
+    public void Barcode_Ean13_EmitsTheEncodedBarsThroughTheFullLayoutPipeline()
+    {
+        const string value = "4006381333931";
+        const double width = 200.0;
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Ean13, value, Unit.FromPoint(width), Unit.FromPoint(50));
+
+        var (bars, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Ean13, value, 50, 0);
+        var reader = BuildTestSupport.Read(document);
+        var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
+
+        Assert.Equal(bars.Count, rects.Count);
+        Assert.True(symbolModules > 0);
+        var left = rects.Min(rect => rect.X);
+        Assert.All(rects, rect => Assert.InRange(rect.X + rect.W - left, 0, width));
+        Assert.True(
+            rects.Max(rect => rect.X + rect.W) - left < width,
+            "EAN-13 bars fit inside the declared width once quiet zones are added");
+    }
+
+    [Fact]
+    public void Barcode_Postnet_EmitsShortAndLongBarsThroughTheFullLayoutPipeline()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.Blocks.AddBarcode(BarcodeType.Postnet, "123456789", Unit.FromPoint(200), Unit.FromPoint(30));
+
+        var reader = BuildTestSupport.Read(document);
+        var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
+
+        Assert.NotEmpty(rects);
+        Assert.True(
+            rects.Select(rect => Math.Round(rect.H, 3)).Distinct().Count() == 2,
+            "POSTNET draws exactly two bar heights");
+    }
+
+    [Fact]
+    public void Barcode_Ean13_LaysOutAsASingleCodeSymbol()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
+        section.Blocks.AddBarcode(
+            BarcodeType.Ean13, "4006381333931", Unit.FromPoint(200), Unit.FromPoint(50), showText: true);
+
+        var page = Assert.Single(Radzen.Documents.Layout.DocumentLayouter.Layout(document).Pages);
+        var symbol = Assert.Single(page.Body.CodeSymbols);
+
+        Assert.Equal(200, symbol.Width, 6);
+        Assert.NotEmpty(symbol.Caption!.Value);
+    }
 }

@@ -11,12 +11,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentInterpreterMergeTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static ContentCollection Materialize(string stream)
     {
         var target = new ContentCollection();
-        ContentInterpreter.Materialize(Ascii(stream), target);
+        ContentInterpreter.Materialize(TestBytes.Ascii(stream), target);
         return target;
     }
 

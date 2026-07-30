@@ -11,8 +11,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentOperatorClassificationAgreementTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     public static readonly TheoryData<string> StateOperators = new()
     {
         "q", "Q", "1 0 0 1 0 0 cm", "1 w", "0 0 0 rg", "0 0 0 RG", "0 g", "0 G",
@@ -31,7 +29,7 @@ public class ContentOperatorClassificationAgreementTests
     [MemberData(nameof(StateOperators))]
     public void StateOperator_ProducesNoElement_WithSpanPerElement(string stream)
     {
-        var content = Ascii(stream);
+        var content = TestBytes.Ascii(stream);
         var elements = new ContentCollection();
         var spans = ContentInterpreter.Materialize(content, elements);
 
@@ -43,7 +41,7 @@ public class ContentOperatorClassificationAgreementTests
     [MemberData(nameof(UnknownOperators))]
     public void UnknownOperator_ProducesRawElement_WithSpanPerElement(string stream)
     {
-        var content = Ascii(stream);
+        var content = TestBytes.Ascii(stream);
         var elements = new ContentCollection();
         var spans = ContentInterpreter.Materialize(content, elements);
 

@@ -52,4 +52,19 @@ internal sealed class FixturePdf
     // ISO 32000-1 7.5.8.3: xref stream entry with W=[1 2 1] - 1-byte type, 2-byte field2, 1-byte field3.
     public static byte[] XrefStreamEntry(int type, int field2, int field3)
         => new[] { (byte)type, (byte)((field2 >> 8) & 0xFF), (byte)(field2 & 0xFF), (byte)field3 };
+
+    public static byte[] Wrap(FixturePdf pdf, int count)
+    {
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 " + count + "\n");
+        pdf.Append(Entry20(0, 65535, 'f'));
+        for (var number = 1; number < count; number++)
+        {
+            pdf.Append(Entry20(pdf.OffsetOf(number)));
+        }
+
+        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
+        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
 }

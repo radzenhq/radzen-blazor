@@ -8,6 +8,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class HeaderFooterTests
 {
@@ -15,7 +16,7 @@ public class HeaderFooterTests
 
     private static Section BuildMultiPage(FontCollection fonts, out Paragraph header, out Paragraph footer)
     {
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var contentH = PaginationSupport.HeightForLines(lineH, 3);
         var section = PaginationSupport.Section(500, contentH + 40 + 50);
         section.Margins.Left = Unit.FromPoint(30);
@@ -105,7 +106,7 @@ public class HeaderFooterTests
     public void ContentBox_SitsBetweenTheMargins_OnEveryPage()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var contentH = PaginationSupport.HeightForLines(lineH, 3);
         var section = BuildMultiPage(fonts, out _, out _);
 

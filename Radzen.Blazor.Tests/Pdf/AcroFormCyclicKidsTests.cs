@@ -9,21 +9,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AcroFormCyclicKidsTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] CyclicFormSource()
     {
         var pdf = new FixturePdf()
@@ -34,7 +19,7 @@ public class AcroFormCyclicKidsTests
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /T (parent) /FT /Tx /Kids [6 0 R] >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /T (child) /Parent 5 0 R /Kids [5 0 R] >>\nendobj\n");
-        return Wrap(pdf, 7);
+        return FixturePdf.Wrap(pdf, 7);
     }
 
     private static byte[] NestedFormSource()
@@ -48,7 +33,7 @@ public class AcroFormCyclicKidsTests
             .Object(5, "5 0 obj\n<< /T (address) /FT /Tx /Kids [6 0 R 7 0 R] >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /T (city) /Parent 5 0 R /Rect [100 700 350 720] >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Widget /T (zip) /Parent 5 0 R /Rect [100 660 350 680] >>\nendobj\n");
-        return Wrap(pdf, 8);
+        return FixturePdf.Wrap(pdf, 8);
     }
 
     [Fact]

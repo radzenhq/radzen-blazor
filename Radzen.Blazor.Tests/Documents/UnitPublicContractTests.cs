@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Globalization;
 using Radzen.Documents;
 using Xunit;
 
@@ -12,6 +13,8 @@ public class UnitPublicContractTests
     [InlineData("2.54cm", 72)]
     [InlineData("25.4mm", 72)]
     [InlineData("1in", 72)]
+    [InlineData("9cm", 255.11811023622047)]
+    [InlineData("5mm", 14.173228346456693)]
     [InlineData("12", 12)]
     [InlineData(" 3.5 PT ", 3.5)]
     public void Parse_AbsoluteFormsResolveToPoints(string text, double expected)
@@ -33,8 +36,11 @@ public class UnitPublicContractTests
     public void AbsoluteFactoriesUseTypographicPointConversions()
     {
         Assert.Equal(72, Unit.FromInch(1).Point, 9);
+        Assert.Equal(144, Unit.FromInch(2).Point, 9);
         Assert.Equal(72, Unit.FromCentimeter(2.54).Point, 9);
+        Assert.Equal(28.346456692913385, Unit.FromCentimeter(1).Point, 12);
         Assert.Equal(72, Unit.FromMillimeter(25.4).Point, 9);
+        Assert.Equal(2.8346456692913385, Unit.FromMillimeter(1).Point, 12);
         Assert.Equal(12, Unit.FromPoint(12).Point, 9);
     }
 
@@ -49,6 +55,7 @@ public class UnitPublicContractTests
     public void ResolveUsesTheReferenceOnlyForRelativeUnits()
     {
         Assert.Equal(75, Unit.FromPercent(25).Resolve(300), 9);
+        Assert.Equal(0.5 * 123.456, Unit.FromPercent(50).Resolve(123.456), 9);
         Assert.Equal(25, Unit.FromPoint(25).Resolve(300), 9);
     }
 
@@ -176,12 +183,36 @@ public class UnitPublicContractTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
+    [InlineData("abc")]
     [InlineData("12px")]
     [InlineData("12em")]
     [InlineData("%")]
     [InlineData("12%%")]
     public void Parse_InvalidFormsThrowFormatException(string text)
         => Assert.Throws<FormatException>(() => Unit.Parse(text));
+
+    [Theory]
+    [InlineData("de-DE")]
+    [InlineData("fr-FR")]
+    [InlineData("ar-SA")]
+    public void ParseAndToStringUseTheInvariantDecimalSeparator(string culture)
+    {
+        var previous = CultureInfo.CurrentCulture;
+
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo(culture);
+
+            Assert.Equal(1.5, Unit.Parse("1.5pt").Point, 9);
+            Assert.Equal(12.5, Unit.Parse("12.5%").Percent, 9);
+            Assert.Equal("1.5pt", Unit.FromPoint(1.5).ToString());
+            Assert.Throws<FormatException>(() => Unit.Parse("1,5pt"));
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = previous;
+        }
+    }
 
     [Fact]
     public void Parse_NullThrowsArgumentNullException()

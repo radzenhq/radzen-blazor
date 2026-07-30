@@ -13,13 +13,6 @@ public class StrikethroughRenderTests
     private const string Text = "Struck words";
     private const double Size = 12;
 
-    private static void SetStrikethrough(Font font)
-    {
-        var property = typeof(Font).GetProperty("Strikethrough", BindingFlags.Public | BindingFlags.Instance);
-        Assert.True(property is not null, "Font.Strikethrough public property is not implemented");
-        property!.SetValue(font, true);
-    }
-
     private static Document Author(bool strikethrough)
     {
         var document = new Document();
@@ -29,7 +22,7 @@ public class StrikethroughRenderTests
         run.Font.Size = Size;
         if (strikethrough)
         {
-            SetStrikethrough(run.Font);
+            run.Font.Strikethrough = true;
         }
 
         return document;
@@ -75,7 +68,7 @@ public class StrikethroughRenderTests
         plain.Font.Size = Size;
         var marked = paragraph.Inlines.Add("Marked");
         marked.Font.Size = Size;
-        SetStrikethrough(marked.Font);
+        marked.Font.Strikethrough = true;
 
         var content = CascadeTestSupport.FirstPageContent(document);
         var baseline = CascadeTestSupport.TdPositions(content)[0].Y;
@@ -96,10 +89,10 @@ public class StrikethroughRenderTests
         var paragraph = section.Blocks.AddParagraph();
         var first = paragraph.Inlines.Add("Struck ");
         first.Font.Size = Size;
-        SetStrikethrough(first.Font);
+        first.Font.Strikethrough = true;
         var second = paragraph.Inlines.Add("through");
         second.Font.Size = Size;
-        SetStrikethrough(second.Font);
+        second.Font.Strikethrough = true;
 
         var content = CascadeTestSupport.FirstPageContent(document);
         var spans = CascadeTestSupport.HorizontalSpans(content);

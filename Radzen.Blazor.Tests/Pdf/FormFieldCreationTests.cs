@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Pdf.Signing;
+using System.Security.Cryptography.Pkcs;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -235,5 +237,55 @@ public class FormFieldCreationTests
         Assert.False(FormTestSupport.Catalog(reader).ContainsKey("AcroForm"));
         var content = AllPageContent(reader);
         Assert.Contains("Radzen Ltd", content);
+    }
+
+    [Fact]
+    public void ReloadedChoiceFieldMapsToTheChoiceFieldType()
+    {
+        var document = BuildDocument();
+        var choice = new ChoiceFieldDefinition("Country")
+        {
+            X = 100,
+            Y = 620,
+            Width = 200,
+            Height = 20,
+            Value = "Bulgaria",
+            ComboBox = true,
+        };
+        choice.Options.Add("Bulgaria");
+        choice.Options.Add("Netherlands");
+        document.FormFields.Add(choice);
+
+        using var stream = new MemoryStream(document.ToArray());
+        var reloaded = PortableDocument.LoadFromStream(stream);
+        var field = reloaded.AcroForm!.Fields.Single(entry => entry.Name == "Country");
+
+        Assert.Equal(FormFieldType.Choice, field.Type);
+        Assert.Equal("Bulgaria", field.Value);
+    }
+
+    [Fact]
+    public void ReloadedSignatureFieldMapsToTheSignatureFieldType()
+    {
+        using var certificate = TestSigningIdentity.Create();
+        var signed = PdfSigner.Sign(
+            BuildDocument().ToArray(),
+            new SignatureOptions { SignerName = "Radzen Test Signer" },
+            new CmsDetachedSigner(certificate));
+
+        using var stream = new MemoryStream(signed);
+        var reloaded = PortableDocument.LoadFromStream(stream);
+
+        Assert.Equal(FormFieldType.Signature, Assert.Single(reloaded.AcroForm!.Fields).Type);
+    }
+
+    private sealed class CmsDetachedSigner(TestSigningIdentity identity) : ISigner
+    {
+        public byte[] Sign(SignedContent content)
+        {
+            var cms = new SignedCms(new ContentInfo(content.ToArray()), detached: true);
+            cms.ComputeSignature(identity.CmsSigner());
+            return cms.Encode();
+        }
     }
 }

@@ -116,9 +116,9 @@ public class LaidOutContractTests
         Assert.Same(fragment.Face, spans[0].Face.Sfnt);
         Assert.NotSame(spans[0].Face.Sfnt, spans[1].Face.Sfnt);
         Assert.Same(spans[0].Face.Sfnt, spans[2].Face.Sfnt);
-        Assert.Equal(0, spans[0].XOffset);
-        Assert.Equal(spans[0].Advance, spans[1].XOffset);
-        Assert.Equal(spans[0].Advance + spans[1].Advance, spans[2].XOffset);
+        Assert.Equal(0, spans[0].XOffset, 9);
+        Assert.Equal(spans[0].Advance, spans[1].XOffset, 9);
+        Assert.Equal(spans[0].Advance + spans[1].Advance, spans[2].XOffset, 9);
         Assert.All(
             spans.Where(span => span.IsSfnt),
             span => Assert.Contains(
@@ -151,7 +151,7 @@ public class LaidOutContractTests
         var expectedOffset = 0.0;
         foreach (var span in positioned.Spans)
         {
-            Assert.Equal(expectedOffset, span.XOffset);
+            Assert.Equal(expectedOffset, span.XOffset, 9);
             expectedOffset += (span.Advance * paint.ScriptScale
                 + (Math.Max(0, span.GlyphCount - 1) + 1) * paint.LetterSpacing
                 + span.WordSpaceCount * paint.WordSpacing)
@@ -221,12 +221,13 @@ public class LaidOutContractTests
         var kern = metrics.GetRunKerning('A', 'V');
         var expectedPoints = -FontMetric.Scale(kern, run.Font.EffectiveSize.Point, 1000);
 
-        Assert.Equal(expectedPoints, glyph.TextAdjustmentPoints);
+        Assert.Equal(expectedPoints, glyph.TextAdjustmentPoints, 9);
         Assert.Equal(
             -kern,
             SfntRunBuilder.PdfTextAdjustment(
                 glyph.TextAdjustmentPoints,
-                run.Font.EffectiveSize.Point));
+                run.Font.EffectiveSize.Point),
+            9);
     }
 
     [Fact]
@@ -328,8 +329,8 @@ public class LaidOutContractTests
         var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
         var layout = page.Body.Boxes[0].Content.Tables[0].Layout;
 
-        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 0).Opacity);
-        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 1).Opacity);
+        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 0).Opacity, 9);
+        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 1).Opacity, 9);
     }
 
     [Fact]
@@ -491,20 +492,95 @@ public class LaidOutContractTests
     [Fact]
     public void LaidOutReachableGraph_HasNoMutableModelObjectsOrCollections()
     {
-        var document = new Document();
-        BuildTestSupport.RegisterLatin(document);
-        var section = Page(document, 500, 700);
-        var paragraph = section.Blocks.AddParagraph();
-        paragraph.Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var table = section.Blocks.AddTable();
-        table.Columns.Add(Unit.FromPoint(100));
-        table.Rows.Add().Cells[0].Blocks.AddParagraph("Cell");
-
-        var offenders = ReachableGraphOffenders(DocumentLayouter.Layout(document));
+        var offenders = ReachableGraphOffenders(DocumentLayouter.Layout(EveryFeatureDocument()));
 
         Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void EveryFeatureDocument_PopulatesEveryLaidOutLayerAndContentKind()
+    {
+        var laidOut = DocumentLayouter.Layout(EveryFeatureDocument());
+
+        Assert.True(laidOut.Pages.Length > 1, "the split table spans more than one page");
+        Assert.All(laidOut.Pages, page => Assert.NotNull(page.Watermark));
+        Assert.Contains(laidOut.Pages, page => page.HeaderLayer.Lines.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.FooterLayer.Lines.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.HeaderLayer.Boxes.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Body.Boxes.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Body.Tables.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Body.Images.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Body.CodeSymbols.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Links.Length > 0);
+        Assert.Contains(laidOut.Pages, page => page.Anchors.Length > 0);
+        Assert.Contains(
+            laidOut.Pages,
+            page => page.Body.Boxes.Any(box => box.Style.BackgroundGradient is not null));
+        Assert.Contains(
+            laidOut.Pages,
+            page => page.Body.Boxes.Any(box => box.Style.Shadow is not null));
+    }
+
+    private static Document EveryFeatureDocument()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = Page(document, 500, 400);
+        section.Watermark = new Watermark
+        {
+            Text = "DRAFT",
+            Opacity = 0.25,
+            Rotation = 30,
+            Font = { Family = BuildTestSupport.Latin, Size = 40 },
+        };
+
+        section.Header.Blocks.AddParagraph("Header band");
+        var headerBox = section.Header.Blocks.Add(new Container { Background = Color.FromRgb(220, 220, 220) });
+        headerBox.Blocks.AddParagraph("Header box");
+        section.Footer.Blocks.AddParagraph("Footer band");
+
+        var paragraph = section.Blocks.AddParagraph();
+        paragraph.Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+        paragraph.Inlines.Add(" Radzen").Link = "https://www.radzen.com/";
+        paragraph.Inlines.Add(" here").Anchor = "here";
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        section.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
+        section.Blocks.AddBarcode(
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(30), showText: true);
+
+        var gradient = section.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(8),
+            CornerRadius = Unit.FromPoint(6),
+            BackgroundGradient = new LinearGradient(
+                0, 0, 100, 0,
+                new GradientStop(0, Color.FromRgb(255, 0, 0)),
+                new GradientStop(1, Color.FromRgb(0, 0, 255))),
+            Shadow = new BoxShadow
+            {
+                Color = Color.FromArgb(160, 0, 0, 0),
+                BlurRadius = Unit.FromPoint(8),
+                OffsetX = Unit.FromPoint(2),
+                OffsetY = Unit.FromPoint(3),
+                Spread = Unit.FromPoint(1),
+            },
+        });
+        gradient.Borders.Width = 2;
+        gradient.Blocks.AddParagraph("Gradient box");
+
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(100));
+        table.Columns.Add(Unit.FromPoint(100));
+        for (var row = 0; row < 40; row++)
+        {
+            var cells = table.Rows.Add().Cells;
+            cells[0].Blocks.AddParagraph($"Cell {row}");
+            cells[1].Blocks.AddParagraph($"Value {row}");
+        }
+
+        return document;
     }
 
     private static PropertyInfo[] BehaviorFlags()
@@ -780,6 +856,11 @@ public class LaidOutContractTests
     private static bool IsImmutableArray(System.Type type)
         => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ImmutableArray<>);
 
+    private static readonly System.Type[] ImmutableFrameworkValues =
+    [
+        typeof(ReadOnlyMemory<byte>),
+    ];
+
     private static readonly System.Type[] ImmutableAfterParseSharedValues =
     [
         typeof(Radzen.Documents.Fonts.Sfnt.SfntFont),
@@ -812,6 +893,11 @@ public class LaidOutContractTests
         typeof(FontCollection).Namespace!,
     ];
 
+    private static bool IsPubliclyVisible(System.Type type)
+        => type.IsNested
+            ? type.IsNestedPublic && IsPubliclyVisible(type.DeclaringType!)
+            : type.IsPublic;
+
     private static bool IsMutable(System.Type type)
         => SettableProperties(type).Any()
             || type.GetFields(BindingFlags.Public | BindingFlags.Instance)
@@ -823,7 +909,7 @@ public class LaidOutContractTests
         var uncovered =
             from type in typeof(Document).Assembly.GetTypes()
             where type.IsClass
-                && type.IsPublic
+                && IsPubliclyVisible(type)
                 && !type.IsAbstract
                 && type.Namespace is { } declared
                 && MutableModelNamespaces.Contains(declared)
@@ -835,16 +921,38 @@ public class LaidOutContractTests
     }
 
     [Fact]
-    public void LaidOutTypes_CoverEveryTypeInTheGeometryNamespace()
+    public void LaidOutTypes_ReachEveryDataTypeInTheGeometryNamespace()
     {
         var reached = LaidOutTypes().ToHashSet();
         var unreached =
             from type in GeometryNamespaceTypes()
+            where !type.IsAbstract || !type.IsSealed
             where !reached.Contains(type)
-            select type.FullName;
+            select type.Name;
 
-        Assert.Empty(unreached);
+        Assert.Equal(
+            NonSceneGeometryNamespaceTypes,
+            unreached.OrderBy(name => name, StringComparer.Ordinal).ToArray());
     }
+
+    [Fact]
+    public void GeometryNamespaceStaticHelpers_HoldNoSceneState()
+    {
+        var offenders =
+            from type in GeometryNamespaceTypes()
+            where type.IsAbstract && type.IsSealed
+            from field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            where !field.IsLiteral && !field.IsInitOnly
+            select $"{type.Name}.{field.Name}";
+
+        Assert.Empty(offenders);
+    }
+
+    private static readonly string[] NonSceneGeometryNamespaceTypes =
+    [
+        nameof(GradientReference),
+        nameof(ResolvedParagraphFormat),
+    ];
 
     private static IEnumerable<System.Type> GeometryNamespaceTypes()
         => typeof(LaidOutDocument).Assembly.GetTypes()
@@ -926,6 +1034,11 @@ public class LaidOutContractTests
 
             if (type.Assembly != typeof(LaidOutDocument).Assembly)
             {
+                if (Array.IndexOf(ImmutableFrameworkValues, type) < 0)
+                {
+                    offenders.Add($"{path} reaches foreign type {type.FullName}");
+                }
+
                 return;
             }
 
@@ -942,7 +1055,7 @@ public class LaidOutContractTests
 
     private static IEnumerable<System.Type> LaidOutTypes()
     {
-        var seeds = GeometryNamespaceTypes().Prepend(typeof(LaidOutDocument)).ToArray();
+        var seeds = new[] { typeof(LaidOutDocument) };
         var pending = new Queue<System.Type>(seeds);
         var seen = new HashSet<System.Type>(seeds);
         while (pending.Count > 0)

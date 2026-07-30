@@ -7,7 +7,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents;
 
-namespace Radzen.Blazor.Documents.Tests;
+namespace Radzen.Blazor.Tests.Isolated;
 
 internal static class IsolatedPaginator
 {
@@ -85,4 +85,21 @@ internal static class IsolatedLineBreaker
             capture ?? new LayoutCaptureContext(),
             inheritedAlignment,
             resolution);
+}
+
+internal static class IsolatedBlockExpander
+{
+    public static ExpandedBlocks ExpandBlocksIsolated(
+        BlockCollection blocks,
+        double availableWidth,
+        bool keepSpecialContainers = false,
+        IReadOnlyDictionary<string, int>? tocPages = null,
+        FontCollection? fonts = null)
+        => Radzen.Documents.Layout.BlockExpander.ExpandBlocks(
+            blocks,
+            availableWidth,
+            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            keepSpecialContainers,
+            tocPages,
+            fonts);
 }

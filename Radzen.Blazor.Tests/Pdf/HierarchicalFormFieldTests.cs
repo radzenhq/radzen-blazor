@@ -10,21 +10,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class HierarchicalFormFieldTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] HierarchicalForm()
     {
         const string stale = "/Tx BMC q (STALE) Tj Q EMC";
@@ -41,7 +26,7 @@ public class HierarchicalFormFieldTests
             .Object(9, "9 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (Name) /V () /P 3 0 R /Rect [100 600 350 620] /DA (/Helv 12 Tf 0 g) >>\nendobj\n")
             .Object(10, "10 0 obj\n<< /FT /Tx /T (zip) /V () /Kids [8 0 R] >>\nendobj\n")
             .Object(11, "11 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 250 20] /Length " + stale.Length + " >>\nstream\n" + stale + "\nendstream\nendobj\n");
-        return Wrap(pdf, 12);
+        return FixturePdf.Wrap(pdf, 12);
     }
 
     private static PortableDocument Load()

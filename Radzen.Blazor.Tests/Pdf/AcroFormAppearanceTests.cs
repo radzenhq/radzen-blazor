@@ -10,21 +10,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AcroFormAppearanceTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] TextForm()
     {
         var pdf = new FixturePdf()
@@ -35,7 +20,7 @@ public class AcroFormAppearanceTests
             .Object(4, "4 0 obj\n<< /Fields [6 0 R] /DA (/Helv 0 Tf 0 g) /DR << /Font << /Helv 5 0 R >> >> >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Name /Helv >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (Name) /V () /P 3 0 R /Rect [100 700 350 720] /DA (/Helv 8 Tf 0 g) >>\nendobj\n");
-        return Wrap(pdf, 7);
+        return FixturePdf.Wrap(pdf, 7);
     }
 
     private static byte[] CheckboxForm(string onState)
@@ -50,7 +35,7 @@ public class AcroFormAppearanceTests
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Btn /T (Agree) /V /Off /AS /Off /P 3 0 R /Rect [100 660 118 678] /AP << /N << /" + onState + " 6 0 R /Off 7 0 R >> >> >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 18 18] /Length " + glyph.Length + " >>\nstream\n" + glyph + "\nendstream\nendobj\n")
             .Object(7, "7 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 18 18] /Length 0 >>\nstream\n\nendstream\nendobj\n");
-        return Wrap(pdf, 8);
+        return FixturePdf.Wrap(pdf, 8);
     }
 
     private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));

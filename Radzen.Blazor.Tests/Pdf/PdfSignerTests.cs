@@ -479,4 +479,43 @@ public class PdfSignerTests
 
         Assert.Contains("must be between 1 and 16777216", e.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Sign_DefaultSubFilter_IsTheDetachedPkcs7Name()
+    {
+        var signed = PdfSigner.Sign(BuildPdf(), Options(), new DelegateSigner(_ => [1, 2, 3]));
+        var reader = DocumentReader.Parse(signed);
+
+        Assert.Equal(
+            "adbe.pkcs7.detached",
+            ((NameObject)reader.Resolve(SignatureValue(reader, 0)["SubFilter"])).Value);
+    }
+
+    [Theory]
+    [InlineData("adbe.pkcs7.sha1")]
+    [InlineData("ETSI.CAdES.detached")]
+    public void Sign_CustomSubFilter_IsWrittenVerbatim(string subFilter)
+    {
+        var options = Options();
+        options.SubFilter = subFilter;
+
+        var signed = PdfSigner.Sign(BuildPdf(), options, new DelegateSigner(_ => [1, 2, 3]));
+        var reader = DocumentReader.Parse(signed);
+
+        Assert.Equal(
+            subFilter,
+            ((NameObject)reader.Resolve(SignatureValue(reader, 0)["SubFilter"])).Value);
+    }
+
+    [Fact]
+    public void Sign_EmptySubFilter_Throws()
+    {
+        var options = Options();
+        options.SubFilter = string.Empty;
+
+        var error = Assert.Throws<ArgumentException>(
+            () => PdfSigner.Sign(BuildPdf(), options, new DelegateSigner(_ => [1, 2, 3])));
+
+        Assert.Contains("SubFilter", error.Message, StringComparison.Ordinal);
+    }
 }

@@ -97,14 +97,13 @@ public class ReaderRobustnessRegressionTests
     [InlineData("-5")]
     [InlineData("-2147483648")]
     [InlineData("999999")]
-    public void WrongStreamLength_DoesNotEscapeAsArgumentOrOverflowException(string length)
+    public void WrongStreamLength_RecoversTheStreamInsteadOfThrowing(string length)
     {
         var reader = DocumentReader.Parse(FileWithStreamLength(length));
 
-        var exception = Record.Exception(() => reader.GetObject(4));
+        var recovered = Assert.IsType<StreamObject>(reader.GetObject(4));
 
-        Assert.True(exception is null || exception is DocumentParseException,
-            $"expected recovery or DocumentParseException, got {exception?.GetType().Name}: {exception?.Message}");
+        Assert.NotEmpty(recovered.Data.ToArray());
     }
 
     private static byte[] FileWithBrokenXrefStream()
