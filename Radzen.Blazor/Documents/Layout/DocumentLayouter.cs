@@ -23,52 +23,48 @@ internal static class DocumentLayouter
         StyleResolution resolution,
         Func<Image, double, (double Width, double Height)>? measureImage)
     {
-        var capture = new LayoutCaptureContext();
-        var semanticCapture = SemanticSnapshotBuilder.Capture(document, resolution, capture);
-        var semantics = semanticCapture.Builder;
-        var lowering = semanticCapture.Lowering;
-        var first = LayoutPass(document, fonts, lowering, semantics, measureImage, capture, null);
+        var first = LayoutPass(document, fonts, resolution, measureImage, null);
 
         if (!HasTableOfContents(document))
         {
-            return LayoutFinalizer.Resolve(first, fonts, lowering, capture);
+            return Resolve(first, document, fonts);
         }
 
-        var tocPages = AnchorPages(first);
+        var tocPages = AnchorPages(first.Pages);
         ValidateTocAnchors(document, tocPages);
 
         var entries = TocAnchors(document);
-        var second = LayoutPass(
-            document,
-            fonts,
-            lowering,
-            semantics,
-            measureImage,
-            capture,
-            tocPages);
-        var settled = AnchorPages(second);
+        var second = LayoutPass(document, fonts, resolution, measureImage, tocPages);
+        var settled = AnchorPages(second.Pages);
         if (AnchorsStable(tocPages, settled, entries))
         {
-            return LayoutFinalizer.Resolve(second, fonts, lowering, capture);
+            return Resolve(second, document, fonts);
         }
 
-        var third = LayoutPass(
-            document,
-            fonts,
-            lowering,
-            semantics,
-            measureImage,
-            capture,
-            settled);
-        if (!AnchorsStable(settled, AnchorPages(third), entries))
+        var third = LayoutPass(document, fonts, resolution, measureImage, settled);
+        if (!AnchorsStable(settled, AnchorPages(third.Pages), entries))
         {
             throw new InvalidOperationException(
                 "Table of contents page numbers did not settle after three layout passes; " +
                 "an entry keeps moving across a page boundary as the resolved numbers change its width.");
         }
 
-        return LayoutFinalizer.Resolve(third, fonts, lowering, capture);
+        return Resolve(third, document, fonts);
     }
+
+    private static LaidOutDocument Resolve(in LayoutPassResult pass, Document document, FontCollection fonts)
+        => LayoutFinalizer.Resolve(
+            new LaidOutDocument
+            {
+                Id = pass.Id,
+                Fonts = fonts.Snapshot(),
+                Pages = pass.Pages,
+                Semantics = pass.Semantics.Snapshot(),
+                Info = GeometryCapture.DocumentInfo(document.Info),
+            },
+            fonts,
+            pass.Lowering,
+            pass.Capture);
 
     internal static bool AnchorsStable(
         IReadOnlyDictionary<string, int> previous,
@@ -110,15 +106,23 @@ internal static class DocumentLayouter
         return anchors;
     }
 
-    private static LaidOutDocument LayoutPass(
+    private readonly record struct LayoutPassResult(
+        ImmutableArray<LaidOutPage> Pages,
+        LaidOutNodeId Id,
+        SemanticSnapshotBuilder Semantics,
+        LoweringContext Lowering,
+        LayoutCaptureContext Capture);
+
+    private static LayoutPassResult LayoutPass(
         Document document,
         FontCollection fonts,
-        LoweringContext resolution,
-        SemanticSnapshotBuilder semantics,
+        StyleResolution resolution,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages)
     {
+        var capture = new LayoutCaptureContext();
+        var semanticCapture = SemanticSnapshotBuilder.Capture(document, resolution, capture);
+        var lowering = semanticCapture.Lowering;
         var pages = new List<LaidOutPage>();
         foreach (var section in document.Sections)
         {
@@ -130,7 +134,7 @@ internal static class DocumentLayouter
             foreach (var page in Paginator.Paginate(
                 section,
                 fonts,
-                resolution,
+                lowering,
                 measureImage,
                 tocPages,
                 capture,
@@ -140,14 +144,12 @@ internal static class DocumentLayouter
             }
         }
 
-        return new LaidOutDocument
-        {
-            Id = capture.Node(),
-            Fonts = fonts.Snapshot(),
-            Pages = [.. pages],
-            Semantics = semantics.Snapshot(),
-            Info = GeometryCapture.DocumentInfo(document.Info),
-        };
+        return new LayoutPassResult(
+            [.. pages],
+            capture.Node(),
+            semanticCapture.Builder,
+            lowering,
+            capture);
     }
 
     private static bool HasTableOfContents(Document document)
@@ -189,12 +191,12 @@ internal static class DocumentLayouter
         }
     }
 
-    private static Dictionary<string, int> AnchorPages(LaidOutDocument document)
+    private static Dictionary<string, int> AnchorPages(ImmutableArray<LaidOutPage> pages)
     {
         var anchors = new Dictionary<string, int>(StringComparer.Ordinal);
-        for (var i = 0; i < document.Pages.Length; i++)
+        for (var i = 0; i < pages.Length; i++)
         {
-            var page = document.Pages[i];
+            var page = pages[i];
             CollectLayer(anchors, page.Body, i + 1);
             CollectLayer(anchors, page.HeaderLayer, i + 1);
             CollectLayer(anchors, page.FooterLayer, i + 1);

@@ -400,8 +400,8 @@ public class DocumentLayoutGeometryTests
     private const string TableOfContentsGeometry =
         """
         page 1 size 400.00x220.00 content 30.00,30.00,340.00,160.00
-          body line y=0.00 w=311.30 h=13.80 baseline=10.86 fragments=4 source=20
-          body line y=13.80 w=299.30 h=13.80 baseline=10.86 fragments=4 source=21
+          body line y=0.00 w=311.30 h=13.80 baseline=10.86 fragments=4 source=9
+          body line y=13.80 w=299.30 h=13.80 baseline=10.86 fragments=4 source=10
         page 2 size 400.00x220.00 content 30.00,30.00,340.00,160.00
           body line y=0.00 w=98.06 h=13.80 baseline=10.86 fragments=3 source=0
         page 3 size 400.00x220.00 content 30.00,30.00,340.00,160.00
