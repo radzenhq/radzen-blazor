@@ -8,6 +8,10 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class ContentElement : ITracksChanges
 {
+    internal ContentElement()
+    {
+    }
+
     private ChangeTracker tracker;
     private Matrix transform = Matrix.Identity;
     private bool isArtifact;

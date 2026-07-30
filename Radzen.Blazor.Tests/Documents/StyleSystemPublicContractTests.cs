@@ -107,9 +107,9 @@ public class StyleSystemPublicContractTests
         Assert.Null(style.HeadingLevel);
 
         style.Alignment = HorizontalAlignment.Right;
-        style.SpacingBefore = "1pt";
-        style.SpacingAfter = "2pt";
-        style.LeftIndent = "3pt";
+        style.SpacingBefore = Unit.Parse("1pt");
+        style.SpacingAfter = Unit.Parse("2pt");
+        style.LeftIndent = Unit.Parse("3pt");
         style.KeepTogether = true;
         style.KeepWithNext = true;
         style.HeadingLevel = 5;
@@ -128,9 +128,9 @@ public class StyleSystemPublicContractTests
     {
         var style = new StyleCollection().Add("Contract");
         style.Alignment = HorizontalAlignment.Right;
-        style.SpacingBefore = "1pt";
-        style.SpacingAfter = "2pt";
-        style.LeftIndent = "3pt";
+        style.SpacingBefore = Unit.Parse("1pt");
+        style.SpacingAfter = Unit.Parse("2pt");
+        style.LeftIndent = Unit.Parse("3pt");
         style.KeepTogether = true;
         style.KeepWithNext = true;
         style.HeadingLevel = 5;
@@ -174,14 +174,14 @@ public class StyleSystemPublicContractTests
     {
         var document = new Document();
         var root = document.Styles.Add("Root");
-        root.LeftIndent = "30pt";
+        root.LeftIndent = Unit.Parse("30pt");
         root.KeepWithNext = true;
         root.HeadingLevel = 3;
         var leaf = document.Styles.Add("Leaf", "Root");
         leaf.Alignment = HorizontalAlignment.Center;
         var paragraph = document.Sections.Add().Blocks.AddParagraph("Styled");
         paragraph.StyleName = "Leaf";
-        paragraph.SpacingBefore = "4pt";
+        paragraph.SpacingBefore = Unit.Parse("4pt");
 
         var format = document.Resolve(paragraph);
 
@@ -280,5 +280,21 @@ public class StyleSystemPublicContractTests
 
         Assert.Contains("First", error.Message, StringComparison.Ordinal);
         Assert.Contains("Second", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RoleIsUnsetByDefaultAndRejectsAnEmptyValue()
+    {
+        var style = new StyleCollection().Add("Contract");
+
+        Assert.Null(style.Role);
+
+        style.Role = "Callout";
+        Assert.Equal("Callout", style.Role);
+
+        style.Role = null;
+        Assert.Null(style.Role);
+
+        Assert.Throws<ArgumentException>(() => style.Role = string.Empty);
     }
 }

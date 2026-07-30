@@ -10,7 +10,15 @@ namespace Radzen.Blazor.Documents.Tests;
 
 public class ClosedModelHierarchyTests
 {
-    public static TheoryData<Type> ClosedBases() => new() { typeof(Block), typeof(Inline), typeof(TextInline) };
+    public static TheoryData<Type> ClosedBases() => new()
+    {
+        typeof(Block),
+        typeof(Inline),
+        typeof(TextInline),
+        typeof(Radzen.Documents.Pdf.ContentElement),
+        typeof(Radzen.Documents.Pdf.FormFieldDefinition),
+        typeof(Radzen.Documents.Pdf.PositionedFieldDefinition),
+    };
 
     [Theory]
     [MemberData(nameof(ClosedBases))]

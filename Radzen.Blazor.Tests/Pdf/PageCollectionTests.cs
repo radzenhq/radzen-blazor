@@ -69,4 +69,32 @@ public class PageCollectionTests
 
         Assert.Null(page.GetContent());
     }
+
+    [Fact]
+    public void Add_ExistingPage_AppendsAndTakesOwnership()
+    {
+        var document = new PortableDocument();
+        document.Pages.Add();
+        var donor = new PortableDocument();
+        var page = donor.Pages.Add(PageSizes.Letter);
+        donor.Pages.RemoveAt(0);
+
+        Assert.Same(page, document.Pages.Add(page));
+        Assert.Equal(2, document.Pages.Count);
+        Assert.Same(page, document.Pages[1]);
+    }
+
+    [Fact]
+    public void Add_PageStillOwnedByAnotherDocument_Throws()
+    {
+        var document = new PortableDocument();
+        var donor = new PortableDocument();
+        var page = donor.Pages.Add();
+
+        Assert.Throws<System.InvalidOperationException>(() => document.Pages.Add(page));
+    }
+
+    [Fact]
+    public void PageCollectionCannotBeConstructedStandalone()
+        => Assert.Empty(typeof(PageCollection).GetConstructors());
 }

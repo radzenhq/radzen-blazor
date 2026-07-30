@@ -99,6 +99,99 @@ public class StructureRoleMapTests
         Assert.Equal("P", FirstStructureRole(reader, structRoot));
     }
 
+    private static (Document Document, DocumentRenderer Renderer) AuthorWithStyleRole(
+        string styleName,
+        string role,
+        string? mapsTo)
+    {
+        var document = new Document { Language = "en" };
+        var renderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Doc";
+        BuildTestSupport.RegisterLatin(document);
+
+        if (mapsTo is not null)
+        {
+            renderer.RoleMap.Add(role, mapsTo);
+        }
+
+        if (!document.Styles.Contains(styleName))
+        {
+            document.Styles.Add(styleName);
+        }
+
+        document.Styles[styleName].Role = role;
+        var section = document.Sections.Add();
+        BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin).StyleName = styleName;
+        return (document, renderer);
+    }
+
+    [Fact]
+    public void StyleRole_ReplacesTheStyleNameAsTheRoleMapLookup()
+    {
+        var reader = ReadAuthored(AuthorWithStyleRole("Body", "Callout", "P"));
+
+        Assert.Equal("Callout", FirstStructureRole(reader, StructTreeRoot(reader)));
+    }
+
+    [Fact]
+    public void StyleRole_InheritsThroughTheBaseStyleChain()
+    {
+        var document = new Document { Language = "en" };
+        var renderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Doc";
+        BuildTestSupport.RegisterLatin(document);
+        renderer.RoleMap.Add("Callout", "P");
+        document.Styles.Add("Base").Role = "Callout";
+        document.Styles.Add("Derived", "Base");
+        BuildTestSupport.AddText(document.Sections.Add(), "Body", BuildTestSupport.Latin).StyleName = "Derived";
+
+        var reader = BuildTestSupport.Read(document, renderer);
+
+        Assert.Equal("Callout", FirstStructureRole(reader, StructTreeRoot(reader)));
+    }
+
+    [Fact]
+    public void HeadingLevel_WinsOverADeclaredRole()
+    {
+        var reader = ReadAuthored(AuthorWithStyleRole("Heading2", "Callout", "P"));
+        var structRoot = StructTreeRoot(reader);
+
+        Assert.Equal("H2", FirstStructureRole(reader, structRoot));
+        Assert.True(structRoot.ContainsKey("RoleMap"), "the declared role is still role mapped");
+    }
+
+    [Fact]
+    public void StandardStructureTypeAsARole_NeedsNoRoleMapEntry()
+    {
+        var reader = ReadAuthored(AuthorWithStyleRole("Quote", "BlockQuote", mapsTo: null));
+        var structRoot = StructTreeRoot(reader);
+
+        Assert.False(structRoot.ContainsKey("RoleMap"), "a standard type is not remapped");
+        Assert.Equal("BlockQuote", FirstStructureRole(reader, structRoot));
+    }
+
+    [Fact]
+    public void UnmappedDeclaredRole_FailsLoudlyUnderPdfUa()
+    {
+        var authored = AuthorWithStyleRole("Body", "Callout", mapsTo: null);
+
+        var error = Assert.Throws<System.InvalidOperationException>(() => RenderAuthored(authored));
+
+        Assert.Contains("Callout", error.Message, System.StringComparison.Ordinal);
+        Assert.Contains("RoleMap", error.Message, System.StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void UnmappedDeclaredRole_IsToleratedWithoutTagging()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Styles.Add("Body").Role = "Callout";
+        BuildTestSupport.AddText(document.Sections.Add(), "Body", BuildTestSupport.Latin).StyleName = "Body";
+
+        Assert.NotEmpty(new DocumentRenderer().ToArray(document));
+    }
+
     [Fact]
     public void DeclaredRole_ProducesByteIdenticalOutputAcrossBuilds()
     {

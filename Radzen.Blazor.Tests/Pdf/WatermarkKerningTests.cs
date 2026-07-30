@@ -139,3 +139,41 @@ public class WatermarkKerningTests
         Assert.DoesNotContain("TJ", content);
     }
 }
+
+public class BuiltInFontWatermarkKerningTests
+{
+    private static string PageContent(bool enableKerning)
+    {
+        var document = new Document { Fonts = { EnableKerning = enableKerning } };
+        var section = document.Sections.Add();
+        section.Watermark = new Watermark { Text = "AVATAR" };
+        section.Watermark.Font.Family = "Helvetica";
+        section.Watermark.Font.Size = 60;
+        section.Blocks.Add(new Paragraph());
+        var reader = BuildTestSupport.Read(document);
+        var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
+        return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
+    }
+
+    [Fact]
+    public void KerningEnabled_BuiltInFaceWatermarkIsKerned()
+    {
+        Assert.Contains("TJ", PageContent(enableKerning: true));
+    }
+
+    [Fact]
+    public void KerningDisabled_BuiltInFaceWatermarkIsNotKerned()
+    {
+        Assert.DoesNotContain("TJ", PageContent(enableKerning: false));
+    }
+
+    [Fact]
+    public void KerningEnabled_BuiltInFaceWatermarkIsNarrowerThanUnkerned()
+    {
+        var font = new Font { Family = "Helvetica", Size = 60 };
+
+        Assert.True(
+            new FontCollection { EnableKerning = true }.MeasureText("AVATAR", font)
+                < new FontCollection().MeasureText("AVATAR", font));
+    }
+}

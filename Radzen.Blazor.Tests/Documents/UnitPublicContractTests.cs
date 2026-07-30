@@ -36,8 +36,6 @@ public class UnitPublicContractTests
         Assert.Equal(72, Unit.FromCentimeter(2.54).Point, 9);
         Assert.Equal(72, Unit.FromMillimeter(25.4).Point, 9);
         Assert.Equal(12, Unit.FromPoint(12).Point, 9);
-        Assert.Equal(12, Unit.FromDouble(12).Point, 9);
-        Assert.Equal(12, Unit.FromString("12pt").Point, 9);
     }
 
     [Fact]
@@ -151,13 +149,28 @@ public class UnitPublicContractTests
     }
 
     [Fact]
-    public void ImplicitStringConversionUsesTheThrowingParser()
+    public void NoImplicitConversionExistsFromString()
+        => Assert.DoesNotContain(
+            typeof(Unit).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static),
+            method => method.Name == "op_Implicit" && method.GetParameters()[0].ParameterType == typeof(string));
+
+    [Fact]
+    public void ParseAndTryParseAreTheOnlyWaysToReadAMeasurementString()
     {
-        Assert.Throws<FormatException>(() =>
-        {
-            Unit unit = "not-a-unit";
-            _ = unit;
-        });
+        Assert.Null(typeof(Unit).GetMethod("FromString"));
+        Assert.Null(typeof(Unit).GetMethod("FromDouble"));
+
+        Assert.True(Unit.TryParse("2.54cm", out var parsed));
+        Assert.Equal(72, parsed.Point, 9);
+
+        Assert.True(Unit.TryParse("50%", out var relative));
+        Assert.Equal(50, relative.Percent, 9);
+
+        Assert.False(Unit.TryParse("12px", out var invalid));
+        Assert.Equal(default, invalid);
+
+        Assert.False(Unit.TryParse(null, out var missing));
+        Assert.Equal(default, missing);
     }
 
     [Theory]
@@ -197,7 +210,6 @@ public class UnitPublicContractTests
         Assert.Throws<ArgumentException>(() => Unit.FromInch(value));
         Assert.Throws<ArgumentException>(() => Unit.FromCentimeter(value));
         Assert.Throws<ArgumentException>(() => Unit.FromMillimeter(value));
-        Assert.Throws<ArgumentException>(() => Unit.FromDouble(value));
         Assert.Throws<ArgumentException>(() =>
         {
             Unit unit = value;

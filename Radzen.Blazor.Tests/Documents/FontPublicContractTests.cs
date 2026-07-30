@@ -50,7 +50,7 @@ public class FontPublicContractTests
 
         Assert.Equal(Unit.Parse("12pt"), font.Size);
 
-        font.Size = "2.54cm";
+        font.Size = Unit.Parse("2.54cm");
 
         Assert.Equal(Unit.Parse("1in"), font.Size);
     }
@@ -61,7 +61,7 @@ public class FontPublicContractTests
         var font = new Font
         {
             Family = "Contract Sans",
-            Size = "12pt",
+            Size = Unit.Parse("12pt"),
             Bold = true,
             Italic = true,
             Underline = true,
@@ -83,7 +83,7 @@ public class FontPublicContractTests
     {
         var paragraph = new Paragraph { Text = "contract" };
         paragraph.Font.Family = "Contract Sans";
-        paragraph.Font.Size = "12pt";
+        paragraph.Font.Size = Unit.Parse("12pt");
         paragraph.Font.Bold = true;
         paragraph.Font.Italic = true;
         paragraph.Font.Underline = true;

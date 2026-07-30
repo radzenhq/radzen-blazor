@@ -14,7 +14,11 @@ public sealed class Watermark
     private double opacity = 0.15;
     private double rotation = 45;
 
-    /// <summary>Gets or sets the watermark text, or <see langword="null"/> for none.</summary>
+    /// <summary>
+    /// Gets or sets the watermark text, or <see langword="null"/> for none. Text and
+    /// <see cref="Image"/> are independent: setting both paints both, the image first and the
+    /// text over it.
+    /// </summary>
     public string? Text { get; set; }
 
     /// <summary>Gets the font of the watermark text. Defaults to 72 pt.</summary>
@@ -47,6 +51,7 @@ public sealed class Watermark
     /// <summary>
     /// Gets or sets the image drawn centered on the page under any <see cref="Text"/>, or
     /// <see langword="null"/> (the default) for none. Setting <see langword="null"/> clears it.
+    /// The image never replaces the text: when both are set both are painted, the image first.
     /// </summary>
     public Image? Image { get; set; }
 

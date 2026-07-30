@@ -224,12 +224,10 @@ public static class QrEncoder
             const double imageCornerRadius = 0.75;
             const double imageBackgroundOpacity = 1.0;
 
-            double pct = Math.Clamp(imageSizePercent, 5, 60);
-            double boxModules = Math.Max(5, Math.Round(n * (pct / 100.0)));
-            double pad = Math.Max(0, imagePaddingModules);
+            double boxModules = Math.Max(5, Math.Round(n * (imageSizePercent / 100.0)));
 
-            double cutoutW = boxModules + 2 * pad;
-            double cutoutH = boxModules + 2 * pad;
+            double cutoutW = boxModules + 2 * imagePaddingModules;
+            double cutoutH = boxModules + 2 * imagePaddingModules;
 
             double centerX = vb / 2.0;
             double centerY = vb / 2.0;

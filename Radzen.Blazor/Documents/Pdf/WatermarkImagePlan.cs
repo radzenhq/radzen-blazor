@@ -9,7 +9,7 @@ internal readonly record struct WatermarkImagePlan(
     double Height,
     double Alpha)
 {
-    public static WatermarkImagePlan Create(Image image, ImageXObject decoded, double availableWidth)
+    public static WatermarkImagePlan Create(Image image, DecodedImage decoded, double availableWidth)
     {
         var (width, height) = ImageDecoder.Measure(image, decoded, availableWidth);
         return new(

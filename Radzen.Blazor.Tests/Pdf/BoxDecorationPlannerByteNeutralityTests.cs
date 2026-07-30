@@ -5,7 +5,7 @@ using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-public class BoxRendererByteNeutralityTests
+public class BoxDecorationPlannerByteNeutralityTests
 {
     private static void Fill(Cell cell, string text)
     {

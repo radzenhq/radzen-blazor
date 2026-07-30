@@ -52,6 +52,48 @@ public class ContainerLayoutTests
     }
 
     [Fact]
+    public void Container_PerSidePaddingOverridesTheScalarEdgeByEdge()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var section = PaginationSupport.Section(400, 600);
+        var container = section.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(10),
+            PaddingLeft = Unit.FromPoint(4),
+            PaddingTop = Unit.FromPoint(6),
+            PaddingBottom = Unit.FromPoint(20),
+        });
+        container.Blocks.Add(Text("Boxed"));
+
+        var box = Assert.Single(Assert.Single(Paginator.PaginateIsolated(section, fonts)).Body.Boxes);
+        var line = Assert.Single(box.Content.Lines);
+
+        Assert.Equal(4, line.X, 6);
+        Assert.Equal(6, line.Y, 6);
+        Assert.Equal(box.Content.Height + 26, box.Bounds.Height, 6);
+    }
+
+    [Fact]
+    public void Container_UnsetPerSidePaddingFallsBackToTheScalar()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var section = PaginationSupport.Section(400, 600);
+        var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(10) });
+        container.Blocks.Add(Text("Boxed"));
+
+        var box = Assert.Single(Assert.Single(Paginator.PaginateIsolated(section, fonts)).Body.Boxes);
+        var line = Assert.Single(box.Content.Lines);
+
+        Assert.Null(container.PaddingLeft);
+        Assert.Null(container.PaddingRight);
+        Assert.Null(container.PaddingTop);
+        Assert.Null(container.PaddingBottom);
+        Assert.Equal(10, line.X, 6);
+        Assert.Equal(10, line.Y, 6);
+        Assert.Equal(box.Content.Height + 20, box.Bounds.Height, 6);
+    }
+
+    [Fact]
     public void ContainerInHeaderBand_PlacesAsBandBox_InterleavedWithBandTables()
     {
         var fonts = PaginationSupport.Fonts();

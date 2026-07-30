@@ -61,9 +61,9 @@ public class UnitTests
     }
 
     [Fact]
-    public void ImplicitFromString_Parses()
+    public void ParseReadsAnInchMeasurement()
     {
-        Unit u = "1in";
+        var u = Unit.Parse("1in");
         Assert.Equal(72, u.Point, 9);
     }
 

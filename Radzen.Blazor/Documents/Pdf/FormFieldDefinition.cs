@@ -11,9 +11,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class FormFieldDefinition
 {
-    /// <summary>Initializes the shared field state with the given field name.</summary>
-    /// <param name="name">The field name; must not be null or empty.</param>
-    protected FormFieldDefinition(string name)
+    internal FormFieldDefinition(string name)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         Name = name;
@@ -29,9 +27,12 @@ public abstract class FormFieldDefinition
 
 
 /// <summary>Defines a form field represented by one rectangular widget.</summary>
-/// <param name="name">The field name; must not be null or empty.</param>
-public abstract class PositionedFieldDefinition(string name) : FormFieldDefinition(name)
+public abstract class PositionedFieldDefinition : FormFieldDefinition
 {
+    internal PositionedFieldDefinition(string name) : base(name)
+    {
+    }
+
     /// <summary>Gets or sets the left edge of the field rectangle, in PDF user space.</summary>
     public Unit X { get; set; }
 

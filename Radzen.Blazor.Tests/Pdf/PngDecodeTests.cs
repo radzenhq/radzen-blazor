@@ -19,7 +19,7 @@ public class PngDecodeTests
     [Fact]
     public void Rgb_TrueColor_ToDeviceRgbFlateXObject()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/rgb.png"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/rgb.png")));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("XObject", ImageTestHelpers.Name(dict, "Type"));
@@ -39,7 +39,7 @@ public class PngDecodeTests
     [Fact]
     public void Gray_ToDeviceGray()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/gray.png"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/gray.png")));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("Image", ImageTestHelpers.Name(dict, "Subtype"));
@@ -58,7 +58,7 @@ public class PngDecodeTests
     [Fact]
     public void Palette_ToIndexedDeviceRgb()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/palette.png"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/palette.png")));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
@@ -82,7 +82,7 @@ public class PngDecodeTests
     [Fact]
     public void Rgba_ProducesDeviceGraySoftMask()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/alpha.png"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/alpha.png")));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("DeviceRGB", ImageTestHelpers.Name(dict, "ColorSpace"));
@@ -108,7 +108,7 @@ public class PngDecodeTests
     [Fact]
     public void PaletteWithTrns_ProducesSoftMaskFromTrns()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/palette-trns.png"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/palette-trns.png")));
 
         var cs = Assert.IsType<ArrayObject>(xobj.Image.Dictionary["ColorSpace"]);
         Assert.Equal("Indexed", Assert.IsType<NameObject>(cs[0]).Value);
@@ -137,8 +137,8 @@ public class PngDecodeTests
     public void SplitIdat_DecodesSameSamplesAsSingleChunk(int chunkSize)
     {
         var idat = RgbIdat();
-        var expected = ImageDecoder.Decode(BuildRgbPng([idat]));
-        var actual = ImageDecoder.Decode(BuildRgbPng(SplitIntoChunks(idat, chunkSize)));
+        var expected = ImageTestHelpers.Xobject(ImageDecoder.Decode(BuildRgbPng([idat])));
+        var actual = ImageTestHelpers.Xobject(ImageDecoder.Decode(BuildRgbPng(SplitIntoChunks(idat, chunkSize))));
 
         Assert.Equal(
             FlateFilter.Decode(expected.Image.Data.ToArray()),

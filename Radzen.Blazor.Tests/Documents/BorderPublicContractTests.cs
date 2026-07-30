@@ -20,7 +20,7 @@ public class BorderPublicContractTests
     public void WidthIsAUnit()
     {
         var border = new Borders().Top;
-        border.Width = "2.54cm";
+        border.Width = Unit.Parse("2.54cm");
 
         Assert.Equal(Unit.Parse("1in"), border.Width);
     }
@@ -30,7 +30,7 @@ public class BorderPublicContractTests
     {
         var borders = new Borders
         {
-            Width = "2pt",
+            Width = Unit.Parse("2pt"),
             Color = Color.Red,
             Style = BorderStyle.Dashed,
         };
@@ -48,11 +48,11 @@ public class BorderPublicContractTests
     {
         var borders = new Borders
         {
-            Width = "2pt",
+            Width = Unit.Parse("2pt"),
             Color = Color.Red,
             Style = BorderStyle.Dashed,
         };
-        borders.Bottom.Width = "4pt";
+        borders.Bottom.Width = Unit.Parse("4pt");
         borders.Bottom.Color = Color.Blue;
         borders.Bottom.Style = BorderStyle.Dotted;
 
@@ -69,15 +69,15 @@ public class BorderPublicContractTests
     {
         var borders = new Borders
         {
-            Width = "2pt",
+            Width = Unit.Parse("2pt"),
             Color = Color.Red,
             Style = BorderStyle.Dashed,
         };
-        borders.Left.Width = "4pt";
+        borders.Left.Width = Unit.Parse("4pt");
         borders.Left.Color = Color.Blue;
         borders.Left.Style = BorderStyle.Dotted;
 
-        borders.Width = "6pt";
+        borders.Width = Unit.Parse("6pt");
         borders.Color = Color.Green;
         borders.Style = BorderStyle.Solid;
 
