@@ -332,13 +332,17 @@ internal sealed class SemanticSnapshotBuilder
             var inlineTier = RequireStructural(context.Tier);
             foreach (var inline in paragraph.Inlines)
             {
+                var linked = IsLink(inline);
                 if (inline is InlineImage image)
                 {
+                    var figureParent = linked
+                        ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
+                        : element;
                     var decorative = string.IsNullOrEmpty(image.AlternateText);
                     capture.Associate(
                         image,
                         capture.AddChild(
-                            element,
+                            figureParent,
                             SemanticIntent.Figure,
                             inlineTier,
                             alternateText: decorative ? null : image.AlternateText,
@@ -346,7 +350,7 @@ internal sealed class SemanticSnapshotBuilder
                     continue;
                 }
 
-                if (IsLink(inline))
+                if (linked)
                 {
                     capture.Associate(
                         inline,
@@ -366,8 +370,8 @@ internal sealed class SemanticSnapshotBuilder
                 _ => SemanticHeaderScope.None,
             };
 
-        private static bool IsLink(Run run)
-            => run.Link is { Length: > 0 } || run.LinkToAnchor is { Length: > 0 };
+        private static bool IsLink(Inline inline)
+            => inline.Link is { Length: > 0 } || inline.LinkToAnchor is { Length: > 0 };
 
         public override Nothing Visit(Table table, MappingContext context)
         {

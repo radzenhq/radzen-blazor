@@ -152,8 +152,8 @@ internal static class BlockExpander
         var stop = Math.Max(0, max - reserve);
 
         var paragraph = new Paragraph { LeftIndent = Unit.FromPoint(indent) };
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(stop), TabAlignment.Right, toc.Leader);
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(TocSentinelStop));
+        paragraph.TabStops.Add(Unit.FromPoint(stop), TabAlignment.Right, toc.Leader);
+        paragraph.TabStops.Add(Unit.FromPoint(TocSentinelStop));
         resolution.SetParagraphFont(paragraph, font);
 
         var text = SanitizeTocText(entry.Text);
@@ -229,8 +229,13 @@ internal static class BlockExpander
                 {
                     var paragraphFont = FontCascade.Resolve([paragraph.Font, item.Font, list.Font, inherited]);
                     resolution.SetParagraphFont(paragraph, paragraphFont);
-                    foreach (var run in paragraph.Inlines)
+                    foreach (var inline in paragraph.Inlines)
                     {
+                        if (inline is not TextInline run)
+                        {
+                            continue;
+                        }
+
                         resolution.SetRunFont(
                             run,
                             resolution.RunFont(run)

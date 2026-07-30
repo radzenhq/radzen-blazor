@@ -46,10 +46,24 @@ public readonly struct Matrix : IEquatable<Matrix>
     /// <summary>
     /// Creates a translation matrix.
     /// </summary>
-    public static Matrix Translate(double tx, double ty) => new(1, 0, 0, 1, tx, ty);
+    /// <exception cref="ArgumentOutOfRangeException">An argument is not finite.</exception>
+    public static Matrix Translate(double tx, double ty)
+        => new(1, 0, 0, 1, Finite(tx, nameof(tx)), Finite(ty, nameof(ty)));
 
     internal static Matrix FromComponents(double a, double b, double c, double d, double e, double f)
+        => new(
+            Finite(a, nameof(a)), Finite(b, nameof(b)), Finite(c, nameof(c)),
+            Finite(d, nameof(d)), Finite(e, nameof(e)), Finite(f, nameof(f)));
+
+    internal static Matrix FromRawComponents(double a, double b, double c, double d, double e, double f)
         => new(a, b, c, d, e, f);
+
+    internal static Matrix RawTranslate(double tx, double ty) => new(1, 0, 0, 1, tx, ty);
+
+    private static double Finite(double value, string parameterName)
+        => double.IsFinite(value)
+            ? value
+            : throw new ArgumentOutOfRangeException(parameterName, value, "A transform coefficient must be a finite number.");
 
     internal bool TryInvert(out Matrix result)
     {
@@ -73,14 +87,17 @@ public readonly struct Matrix : IEquatable<Matrix>
     /// <summary>
     /// Creates a scaling matrix.
     /// </summary>
-    public static Matrix Scale(double sx, double sy) => new(sx, 0, 0, sy, 0, 0);
+    /// <exception cref="ArgumentOutOfRangeException">An argument is not finite.</exception>
+    public static Matrix Scale(double sx, double sy)
+        => new(Finite(sx, nameof(sx)), 0, 0, Finite(sy, nameof(sy)), 0, 0);
 
     /// <summary>
     /// Creates a rotation matrix for the given angle in degrees (counterclockwise).
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="degrees"/> is not finite.</exception>
     public static Matrix Rotate(double degrees)
     {
-        var radians = degrees * Math.PI / 180.0;
+        var radians = Finite(degrees, nameof(degrees)) * Math.PI / 180.0;
         var cos = Math.Cos(radians);
         var sin = Math.Sin(radians);
         return new(cos, sin, sin == 0 ? 0 : -sin, cos, 0, 0);

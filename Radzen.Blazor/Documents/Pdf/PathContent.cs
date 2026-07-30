@@ -80,15 +80,6 @@ public sealed class PathContent : ContentElement
         set => Set(ref fillGradient, value);
     }
 
-    /// <inheritdoc/>
-    public override bool IsModified => base.IsModified || FillGradient?.IsModified == true;
-
-    internal override void AcceptChanges()
-    {
-        base.AcceptChanges();
-        FillGradient?.AcceptChanges();
-    }
-
     internal override ContentElement DeepClone()
     {
         var clone = CopyStateTo(new PathContent
@@ -131,16 +122,13 @@ public sealed class PathContent : ContentElement
             stops[i] = new GradientStop(source.Stops[i].Offset, source.Stops[i].Color);
         }
 
-        GradientBrush target = source switch
+        return source switch
         {
             LinearGradient linear => new LinearGradient(linear.X0, linear.Y0, linear.X1, linear.Y1, stops),
             RadialGradient radial => new RadialGradient(
                 radial.X0, radial.Y0, radial.R0, radial.X1, radial.Y1, radial.R1, stops),
             _ => throw new NotSupportedException($"Gradient type '{source.GetType().FullName}' is not supported."),
         };
-        target.ExtendStart = source.ExtendStart;
-        target.ExtendEnd = source.ExtendEnd;
-        return target;
     }
 
     /// <summary>

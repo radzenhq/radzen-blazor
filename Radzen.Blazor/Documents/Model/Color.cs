@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Radzen.Documents;
 
@@ -141,4 +142,14 @@ public readonly struct Color : IEquatable<Color>
 
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine(A, R, G, B);
+
+    /// <summary>
+    /// Returns the color as a hex string <see cref="FromHex"/> reads back unchanged:
+    /// <c>#RRGGBB</c> for an opaque color and <c>#RRGGBBAA</c> when the alpha channel is not
+    /// fully opaque. Digits are upper-case and culture-invariant.
+    /// </summary>
+    public override string ToString()
+        => A == 255
+            ? string.Create(CultureInfo.InvariantCulture, $"#{R:X2}{G:X2}{B:X2}")
+            : string.Create(CultureInfo.InvariantCulture, $"#{R:X2}{G:X2}{B:X2}{A:X2}");
 }

@@ -10,6 +10,8 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class QrCode : Block
 {
+    private int quietZoneModules = 4;
+
     internal QrCode(string value, Unit size)
     {
         Value = value;
@@ -28,7 +30,12 @@ public sealed class QrCode : Block
     public QrErrorCorrection ErrorCorrection { get; set; } = QrErrorCorrection.Medium;
 
     /// <summary>Gets or sets the quiet-zone width in modules on each side. Defaults to 4 (the QR specification minimum).</summary>
-    public int QuietZoneModules { get; set; } = 4;
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is negative.</exception>
+    public int QuietZoneModules
+    {
+        get => quietZoneModules;
+        set => quietZoneModules = AuthoredNumber.NonNegative(value, "QrCode.QuietZoneModules");
+    }
 
     /// <summary>Gets or sets the horizontal alignment within the container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;

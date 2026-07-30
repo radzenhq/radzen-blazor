@@ -163,11 +163,11 @@ internal static class LineLayouter
             var end = words[i].Width;
             while (j + 1 < words.Count)
             {
-                var nextEnd = NextStart(end, words[j], stops) + words[j + 1].Width;
+                var (nextEnd, through) = NextSegment(words, j, end, stops);
                 if (nextEnd <= max)
                 {
                     end = nextEnd;
-                    j++;
+                    j = through;
                 }
                 else
                 {
@@ -186,6 +186,52 @@ internal static class LineLayouter
         }
 
         return lines;
+    }
+
+    private static (double End, int Through) NextSegment(
+        List<LineWord> words, int from, double end, List<TabStop>? stops)
+    {
+        var gapStart = end + words[from].GapAfter;
+        var stopPosition = gapStart;
+        var alignment = TabAlignment.Left;
+        for (var t = 0; t < words[from].TabsAfter; t++)
+        {
+            if (stops is not null && TryNextStop(stopPosition, stops, out var next, out var nextAlignment))
+            {
+                stopPosition = next;
+                alignment = nextAlignment;
+            }
+            else
+            {
+                stopPosition = AdvanceToTabStop(stopPosition);
+                alignment = TabAlignment.Left;
+            }
+        }
+
+        if (alignment is not (TabAlignment.Right or TabAlignment.Center))
+        {
+            return (stopPosition + words[from + 1].Width, from + 1);
+        }
+
+        var through = from + 1;
+        var width = words[through].Width;
+        while (through < words.Count - 1 && words[through].TabsAfter == 0)
+        {
+            width += words[through].GapAfter + words[through + 1].Width;
+            through++;
+        }
+
+        var aligned = alignment == TabAlignment.Right
+            ? stopPosition
+            : stopPosition + (width / 2.0);
+        return (Math.Max(aligned, gapStart + width), through);
+    }
+
+    private static bool TryNextStop(
+        double cursor, List<TabStop> stops, out double position, out TabAlignment alignment)
+    {
+        var found = TryNextStop(stops, cursor, out position, out alignment, out _);
+        return found;
     }
 
     private static double LineNaturalWidth(List<LineWord> words, int i, int j, List<TabStop>? stops)
@@ -233,6 +279,7 @@ internal static class LineLayouter
         for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
         {
             var piece = pieces[p];
+            var styled = (TextInline)piece.Run;
             var text = piece.Text;
             var font = piece.Font;
             var fragStart = 0;
@@ -250,7 +297,7 @@ internal static class LineLayouter
                 }
 
                 var step = RunTextAdvance.Calculate(
-                    baseAdvance, 1, codepoint == ' ' ? 1 : 0, piece.Run,
+                    baseAdvance, 1, codepoint == ' ' ? 1 : 0, styled,
                     leadingCharacterSpacing: lineWidth > 0 || fragAdvance > 0);
                 if ((lineWidth > 0 || fragAdvance > 0) && lineWidth + fragAdvance + step > max)
                 {
@@ -293,7 +340,7 @@ internal static class LineLayouter
                     hyphenBreak = -1;
                     hyphenAdvance = 0.0;
                     step = RunTextAdvance.Calculate(
-                        baseAdvance, 1, codepoint == ' ' ? 1 : 0, piece.Run);
+                        baseAdvance, 1, codepoint == ' ' ? 1 : 0, styled);
                 }
 
                 fragAdvance += step;
@@ -460,35 +507,6 @@ internal static class LineLayouter
 
         var naturalWidth = cursor;
 
-        if (paragraph.RightTabStop)
-        {
-            var lastTab = -1;
-            for (var w = first; w < last; w++)
-            {
-                if (words[w].TabsAfter > 0)
-                {
-                    lastTab = w;
-                }
-            }
-
-            var delta = max - naturalWidth;
-            if (lastTab >= 0 && delta > 0)
-            {
-                var skip = 0;
-                for (var w = first; w <= lastTab; w++)
-                {
-                    skip += words[w].PieceCount;
-                }
-
-                for (var f = skip; f < span.Length; f++)
-                {
-                    span[f] = span[f] with { XOffset = span[f].XOffset + delta };
-                }
-
-                naturalWidth = max;
-            }
-        }
-
         var breakHyphen = words[last].SoftHyphenAfter && last < words.Count - 1 && span.Length > 0;
         var hyphenWidth = breakHyphen ? words[last].HyphenWidth : 0.0;
 
@@ -634,7 +652,7 @@ internal static class LineLayouter
             var current = fragments[i];
             var run = current.Source;
             var paint = current.Paint;
-            var text = capture.Resolve<Run>(run).Text;
+            var text = capture.Resolve<Inline>(run) is TextInline inline ? inline.LayoutText : string.Empty;
             var end = current.Start + current.Length;
             var right = current.XOffset + current.Advance;
             var j = i + 1;

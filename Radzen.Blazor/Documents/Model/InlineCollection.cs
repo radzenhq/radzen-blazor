@@ -7,18 +7,18 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// An ordered collection of the text runs in a paragraph or list item. A run belongs to exactly
-/// one collection: adding a run that already has a parent throws.
+/// An ordered collection of the inline content of a paragraph or list item. An inline belongs to
+/// exactly one collection: adding one that already has a parent throws.
 /// </summary>
-public sealed class InlineCollection : IReadOnlyList<Run>
+public sealed class InlineCollection : IReadOnlyList<Inline>
 {
-    private readonly TrackedList<Run> items = [];
+    private readonly TrackedList<Inline> items = [];
 
     /// <inheritdoc/>
     public int Count => items.Count;
 
     /// <inheritdoc/>
-    public Run this[int index] => items[index];
+    public Inline this[int index] => items[index];
 
     internal bool StructureChanged => items.StructureChanged;
 
@@ -29,20 +29,25 @@ public sealed class InlineCollection : IReadOnlyList<Run>
     /// </summary>
     /// <param name="text">The run text.</param>
     /// <returns>The newly created run.</returns>
-    public Run Add(string text) => Add(new Run(text));
+    public Run Add(string text)
+    {
+        var run = new Run(text);
+        Add(run);
+        return run;
+    }
 
     /// <summary>
-    /// Appends an existing run.
+    /// Appends existing inline content.
     /// </summary>
-    /// <param name="run">The run to append.</param>
-    /// <returns>The same <paramref name="run"/> instance.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
-    /// <exception cref="InvalidOperationException"><paramref name="run"/> already belongs to another collection.</exception>
-    public Run Add(Run run)
+    /// <param name="inline">The inline to append.</param>
+    /// <returns>The same <paramref name="inline"/> instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="inline"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException"><paramref name="inline"/> already belongs to another collection.</exception>
+    public Inline Add(Inline inline)
     {
-        ContentTree.Attach(run, this);
-        items.Add(run);
-        return run;
+        ContentTree.Attach(inline, this);
+        items.Add(inline);
+        return inline;
     }
 
     /// <summary>
@@ -52,24 +57,29 @@ public sealed class InlineCollection : IReadOnlyList<Run>
     /// <param name="text">The run text.</param>
     /// <returns>The newly created run.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
-    public Run Insert(int index, string text) => Insert(index, new Run(text));
+    public Run Insert(int index, string text)
+    {
+        var run = new Run(text);
+        Insert(index, run);
+        return run;
+    }
 
     /// <summary>
-    /// Inserts an existing run at the specified position.
+    /// Inserts existing inline content at the specified position.
     /// </summary>
     /// <param name="index">The zero-based position to insert at, from 0 to <see cref="Count"/>.</param>
-    /// <param name="run">The run to insert.</param>
-    /// <returns>The same <paramref name="run"/> instance.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
+    /// <param name="inline">The inline to insert.</param>
+    /// <returns>The same <paramref name="inline"/> instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="inline"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
-    /// <exception cref="InvalidOperationException"><paramref name="run"/> already belongs to another collection.</exception>
-    public Run Insert(int index, Run run)
+    /// <exception cref="InvalidOperationException"><paramref name="inline"/> already belongs to another collection.</exception>
+    public Inline Insert(int index, Inline inline)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(index, items.Count);
-        ContentTree.Attach(run, this);
-        items.Insert(index, run);
-        return run;
+        ContentTree.Attach(inline, this);
+        items.Insert(index, inline);
+        return inline;
     }
 
     /// <summary>
@@ -88,62 +98,62 @@ public sealed class InlineCollection : IReadOnlyList<Run>
     }
 
     /// <summary>
-    /// Removes the specified run, detaching it so it may be added elsewhere.
+    /// Removes the specified inline, detaching it so it may be added elsewhere.
     /// </summary>
-    /// <param name="run">The run to remove.</param>
-    /// <returns><see langword="true"/> if the run was in the collection; otherwise <see langword="false"/>.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
-    public bool Remove(Run run)
+    /// <param name="inline">The inline to remove.</param>
+    /// <returns><see langword="true"/> if the inline was in the collection; otherwise <see langword="false"/>.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="inline"/> is <see langword="null"/>.</exception>
+    public bool Remove(Inline inline)
     {
-        ArgumentNullException.ThrowIfNull(run);
+        ArgumentNullException.ThrowIfNull(inline);
 
-        if (!items.Remove(run))
+        if (!items.Remove(inline))
         {
             return false;
         }
 
-        ContentTree.Detach(run);
+        ContentTree.Detach(inline);
         return true;
     }
 
     /// <summary>
-    /// Removes the run at the specified position, detaching it so it may be added elsewhere.
+    /// Removes the inline at the specified position, detaching it so it may be added elsewhere.
     /// </summary>
-    /// <param name="index">The zero-based index of the run to remove.</param>
+    /// <param name="index">The zero-based index of the inline to remove.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
     public void RemoveAt(int index)
     {
-        var run = items[index];
+        var inline = items[index];
         items.RemoveAt(index);
-        ContentTree.Detach(run);
+        ContentTree.Detach(inline);
     }
 
     /// <summary>
-    /// Moves the run at <paramref name="fromIndex"/> to <paramref name="toIndex"/>, shifting the
-    /// runs in between.
+    /// Moves the inline at <paramref name="fromIndex"/> to <paramref name="toIndex"/>, shifting the
+    /// inlines in between.
     /// </summary>
-    /// <param name="fromIndex">The zero-based index of the run to move.</param>
-    /// <param name="toIndex">The zero-based index the run ends up at.</param>
+    /// <param name="fromIndex">The zero-based index of the inline to move.</param>
+    /// <param name="toIndex">The zero-based index the inline ends up at.</param>
     /// <exception cref="ArgumentOutOfRangeException">Either index is out of range.</exception>
     public void Move(int fromIndex, int toIndex) => items.Move(fromIndex, toIndex);
 
     /// <summary>
-    /// Removes every run, detaching each one so it may be added elsewhere.
+    /// Removes every inline, detaching each one so it may be added elsewhere.
     /// </summary>
     public void Clear()
     {
-        foreach (var run in items)
+        foreach (var inline in items)
         {
-            ContentTree.Detach(run);
+            ContentTree.Detach(inline);
         }
 
         items.Clear();
     }
 
-    internal void AddBorrowed(Run run) => items.Add(run);
+    internal void AddBorrowed(Inline inline) => items.Add(inline);
 
     /// <inheritdoc/>
-    public IEnumerator<Run> GetEnumerator() => items.GetEnumerator();
+    public IEnumerator<Inline> GetEnumerator() => items.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -6,12 +6,12 @@ namespace Radzen.Documents;
 /// </summary>
 public enum LineCap
 {
-    /// <summary>The stroke is squared off at the endpoint (value 0).</summary>
+    /// <summary>The stroke is squared off at the endpoint.</summary>
     Butt = 0,
 
-    /// <summary>A semicircular arc caps the endpoint (value 1).</summary>
+    /// <summary>A semicircular arc caps the endpoint.</summary>
     Round = 1,
 
-    /// <summary>The stroke extends half its width past the endpoint, squared off (value 2).</summary>
+    /// <summary>The stroke extends half its width past the endpoint, squared off.</summary>
     Square = 2,
 }

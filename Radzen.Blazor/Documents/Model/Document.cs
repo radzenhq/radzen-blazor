@@ -61,7 +61,7 @@ public sealed class Document
             LeftIndent = format.LeftIndent,
             KeepTogether = format.KeepTogether,
             KeepWithNext = format.KeepWithNext,
-            HeadingLevel = styles.HeadingLevel(paragraph),
+            HeadingLevel = styles.HeadingLevel(paragraph) is var level and > 0 ? level : null,
             Font = (styles.ParagraphFont(paragraph) ?? paragraph.Font).Effective(),
         };
     }
@@ -74,7 +74,7 @@ public sealed class Document
     /// <exception cref="System.ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
     /// <exception cref="System.ArgumentException"><paramref name="run"/> is not part of this document.</exception>
     /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public FontValues Resolve(Run run)
+    public FontValues Resolve(TextInline run)
     {
         System.ArgumentNullException.ThrowIfNull(run);
 

@@ -26,8 +26,11 @@ public readonly record struct ParagraphFormat
     /// <summary>Gets the effective keep-with-next flag.</summary>
     public required bool KeepWithNext { get; init; }
 
-    /// <summary>Gets the effective heading level, from 1 to 6, or zero when the paragraph is not a heading.</summary>
-    public required int HeadingLevel { get; init; }
+    /// <summary>
+    /// Gets the effective heading level, from 1 to 6, or <see langword="null"/> when the paragraph
+    /// is not a heading.
+    /// </summary>
+    public required int? HeadingLevel { get; init; }
 
     /// <summary>Gets the effective font values.</summary>
     public required FontValues Font { get; init; }

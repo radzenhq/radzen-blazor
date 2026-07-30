@@ -3,8 +3,7 @@ namespace Radzen.Documents;
 
 /// <summary>
 /// A color blend mode: how the color being painted is combined with the backdrop already
-/// on the page. The first twelve are separable blend modes, applied to each color component
-/// independently; the last four are non-separable.
+/// on the page.
 /// </summary>
 public enum BlendMode
 {

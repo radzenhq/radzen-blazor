@@ -17,13 +17,18 @@ internal static class GeometryCapture
             font.EffectiveStrikethrough,
             font.EffectiveColor);
 
-    public static FragmentPaint Fragment(Run run, Font font, LayoutCaptureContext capture)
-        => Fragment(run, Font(font), capture);
+    public static FragmentPaint Fragment(Inline inline, Font font, LayoutCaptureContext capture)
+        => Fragment(inline, Font(font), capture);
 
     public static FragmentPaint Fragment(
-        Run run,
+        Inline inline,
         in FontPaint font,
-        LayoutCaptureContext capture) => new()
+        LayoutCaptureContext capture)
+        => inline is TextInline text
+            ? TextFragment(text, font)
+            : ImageFragment((InlineImage)inline, font, capture);
+
+    private static FragmentPaint TextFragment(TextInline run, in FontPaint font) => new()
     {
         Font = font,
         Opacity = run.Opacity,
@@ -37,7 +42,26 @@ internal static class GeometryCapture
         Link = run.Link,
         LinkToAnchor = run.LinkToAnchor,
         Anchor = run.Anchor,
-        InlineImage = InlineImage(run, capture),
+    };
+
+    private static FragmentPaint ImageFragment(
+        InlineImage image,
+        in FontPaint font,
+        LayoutCaptureContext capture) => new()
+    {
+        Font = font,
+        Opacity = image.Opacity,
+        LetterSpacing = 0,
+        WordSpacing = 0,
+        HorizontalScale = 1,
+        ScriptScale = 1,
+        Rise = 0,
+        IsScript = false,
+        Invisible = false,
+        Link = image.Link,
+        LinkToAnchor = image.LinkToAnchor,
+        Anchor = image.Anchor,
+        InlineImage = ImagePaint(image, capture),
     };
 
     public static ImagePaint Image(Image image, LayoutCaptureContext capture) => new()
@@ -92,14 +116,12 @@ internal static class GeometryCapture
                 GradientPaintKind.Linear,
                 reference.X(linear.X0), reference.Y(linear.Y0), 0,
                 reference.X(linear.X1), reference.Y(linear.Y1), 0,
-                brush.ExtendStart, brush.ExtendEnd,
                 stops.MoveToImmutable()),
             RadialGradient radial => new GradientPaint(
                 identity,
                 GradientPaintKind.Radial,
                 reference.X(radial.X0), reference.Y(radial.Y0), reference.Radius(radial.R0),
                 reference.X(radial.X1), reference.Y(radial.Y1), reference.Radius(radial.R1),
-                brush.ExtendStart, brush.ExtendEnd,
                 stops.MoveToImmutable()),
             _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.GetType()}'."),
         };
@@ -179,13 +201,8 @@ internal static class GeometryCapture
         return run with { Spans = spans.MoveToImmutable() };
     }
 
-    private static InlineImagePaint? InlineImage(Run run, LayoutCaptureContext capture)
+    private static InlineImagePaint ImagePaint(InlineImage image, LayoutCaptureContext capture)
     {
-        if (run is not InlineImage image)
-        {
-            return null;
-        }
-
         var (width, height) = image.EffectiveSize();
         return new InlineImagePaint
         {

@@ -14,6 +14,18 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class RoleMap
 {
+    // ISO 32000-1:2008 Table 333 (standard structure types) and 14.8.4.
+    private static readonly string[] StandardTypeNames =
+    [
+        "Annot", "Art", "BibEntry", "BlockQuote", "Caption", "Code", "Div", "Document",
+        "Figure", "Form", "Formula", "H", "H1", "H2", "H3", "H4", "H5", "H6", "Index", "L",
+        "LBody", "Lbl", "LI", "Link", "NonStruct", "Note", "P", "Part", "Private", "Quote",
+        "RB", "Reference", "RP", "RT", "Ruby", "Sect", "Span", "Table", "TBody", "TD",
+        "TFoot", "TH", "THead", "TOC", "TOCI", "TR", "Warichu", "WP", "WT",
+    ];
+
+    private static readonly HashSet<string> StandardTypes = new(StandardTypeNames, StringComparer.Ordinal);
+
     private readonly SortedDictionary<string, string> map = new(StringComparer.Ordinal);
 
     /// <summary>Gets the number of declared role mappings.</summary>
@@ -27,6 +39,10 @@ public sealed class RoleMap
     /// </summary>
     /// <param name="role">The custom role name used as the structure element type.</param>
     /// <param name="structureType">The standard structure type it maps to.</param>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="role"/> is empty, or <paramref name="structureType"/> is not one of the
+    /// standard ISO 32000-1 structure types.
+    /// </exception>
     public void Add(string role, string structureType)
     {
         if (string.IsNullOrEmpty(role))
@@ -37,6 +53,15 @@ public sealed class RoleMap
         if (string.IsNullOrEmpty(structureType))
         {
             throw new ArgumentException("The standard structure type must be non-empty.", nameof(structureType));
+        }
+
+        if (!StandardTypes.Contains(structureType))
+        {
+            throw new ArgumentException(
+                $"'{structureType}' is not a standard ISO 32000-1 structure type, so a reader could not "
+                + $"interpret the role '{role}' through it. Map the role to one of: "
+                + string.Join(", ", StandardTypeNames) + ".",
+                nameof(structureType));
         }
 
         map[role] = structureType;

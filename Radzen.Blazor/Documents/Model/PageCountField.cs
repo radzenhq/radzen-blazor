@@ -3,14 +3,14 @@ namespace Radzen.Documents;
 
 /// <summary>
 /// An inline field that renders the total number of pages in the document. Resolved
-/// per page wherever it is placed, including body content. Assigning
-/// <see cref="Run.Text"/> has no effect - layout resolves the text per page.
+/// per page wherever it is placed, including body content.
 /// </summary>
-public sealed class PageCountField : Run
+public sealed class PageCountField : TextInline
 {
     /// <summary>Initializes a new <see cref="PageCountField"/>.</summary>
     public PageCountField()
-        : base("0")
     {
     }
+
+    internal override string LayoutText => "0";
 }

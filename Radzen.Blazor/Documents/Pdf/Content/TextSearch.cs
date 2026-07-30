@@ -357,7 +357,7 @@ internal static class TextSearch
         }
 
         var offsets = advanceOffsets.ToArray();
-        var matrix = Matrix.Translate(0, walker.Rise) * walker.TextMatrix * walker.Ctm;
+        var matrix = Matrix.RawTranslate(0, walker.Rise) * walker.TextMatrix * walker.Ctm;
         runs.Add(new PositionedTextRun(text, operatorIndex, Quad(matrix, 0, text.Length, offsets, walker.FontSize), offsets,
             geometryEstimated, font, walker.FontSize, walker.HorizontalScale, walker.CharSpacing, walker.WordSpacing, matrix));
     }

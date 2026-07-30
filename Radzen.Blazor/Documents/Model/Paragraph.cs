@@ -9,19 +9,27 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Paragraph : Block
 {
+    private double lineSpacing = 1.0;
+    private int widows = 2;
+    private int orphans = 2;
+
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     /// <summary>Gets the inline text runs.</summary>
     public InlineCollection Inlines { get; } = [];
 
     /// <summary>
-    /// Gets or sets the paragraph text. Getting returns the concatenation of the run texts, or
-    /// <see langword="null"/> when there are no runs. Setting <see langword="null"/> clears the runs;
-    /// setting a value replaces all runs with a single run holding that text.
+    /// Gets or sets the paragraph text. Getting returns the concatenation of the <see cref="Run"/>
+    /// texts, or <see langword="null"/> when the paragraph has no inline content; inlines that carry
+    /// no authored text, such as images and page fields, contribute nothing. Setting
+    /// <see langword="null"/> clears the inlines; setting a value replaces them all with a single
+    /// run holding that text.
     /// </summary>
     public string? Text
     {
-        get => Inlines.Count == 0 ? null : string.Concat(Inlines.Select(run => run.Text));
+        get => Inlines.Count == 0
+            ? null
+            : string.Concat(Inlines.OfType<Run>().Select(static run => run.Text));
         set
         {
             Inlines.Clear();
@@ -69,7 +77,12 @@ public sealed class Paragraph : Block
     public Unit? SpacingAfter { get; set; }
 
     /// <summary>Gets or sets the line spacing multiplier. Defaults to 1.0.</summary>
-    public double LineSpacing { get; set; } = 1.0;
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is not a finite number greater than zero.</exception>
+    public double LineSpacing
+    {
+        get => lineSpacing;
+        set => lineSpacing = AuthoredNumber.Positive(value, "Paragraph.LineSpacing");
+    }
 
     /// <summary>
     /// Gets or sets the name of the applied named style. The style supplies the font and every formatting
@@ -77,13 +90,6 @@ public sealed class Paragraph : Block
     /// not exist in <c>Document.Styles</c> fails at layout.
     /// </summary>
     public string? StyleName { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the last tab character on a line advances to a
-    /// right-aligned tab stop at the content-box right edge, making the text after it flush right
-    /// on the same baseline. Earlier tabs keep the default left tab stops. Defaults to <see langword="false"/>.
-    /// </summary>
-    public bool RightTabStop { get; set; }
 
     /// <summary>
     /// Gets the explicit tab stops. When any are defined, a '\t' advances to the next stop at or
@@ -109,8 +115,18 @@ public sealed class Paragraph : Block
     public bool? KeepWithNext { get; set; }
 
     /// <summary>Gets or sets the minimum number of lines left at the top of a page. Defaults to 2.</summary>
-    public int Widows { get; set; } = 2;
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is negative.</exception>
+    public int Widows
+    {
+        get => widows;
+        set => widows = AuthoredNumber.NonNegative(value, "Paragraph.Widows");
+    }
 
     /// <summary>Gets or sets the minimum number of lines left at the bottom of a page. Defaults to 2.</summary>
-    public int Orphans { get; set; } = 2;
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is negative.</exception>
+    public int Orphans
+    {
+        get => orphans;
+        set => orphans = AuthoredNumber.NonNegative(value, "Paragraph.Orphans");
+    }
 }

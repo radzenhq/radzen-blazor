@@ -13,7 +13,7 @@ internal sealed class StyleResolution
     private readonly ImmutableDictionary<Paragraph, HorizontalAlignment?> alignments;
     private readonly ImmutableDictionary<Paragraph, ResolvedParagraphFormat> formats;
     private readonly ImmutableDictionary<Cell, HorizontalAlignment?> cellAlignments;
-    private readonly ImmutableDictionary<Run, Font> runFonts;
+    private readonly ImmutableDictionary<TextInline, Font> runFonts;
     private readonly ImmutableDictionary<Paragraph, Font> paragraphFonts;
     private readonly ImmutableDictionary<Barcode, Font> barcodeFonts;
     private readonly ImmutableDictionary<ListItem, Font> itemFonts;
@@ -61,7 +61,7 @@ internal sealed class StyleResolution
         KeepWithNext = paragraph.KeepWithNext ?? false,
     };
 
-    public Font? RunFont(Run run)
+    public Font? RunFont(TextInline run)
         => runFonts.TryGetValue(run, out var font) ? font : null;
 
     public Font? ParagraphFont(Paragraph paragraph)
@@ -85,7 +85,7 @@ internal sealed class StyleResolution
 
 internal sealed class LoweringContext
 {
-    private readonly Dictionary<Run, Font> runFonts = [];
+    private readonly Dictionary<TextInline, Font> runFonts = [];
     private readonly Dictionary<Paragraph, Font> paragraphFonts = [];
     private readonly Dictionary<ListItem, (IStructureTag Label, IStructureTag Body)> listItemElements = [];
     private readonly Dictionary<Block, (IStructureTag Label, IStructureTag Body)> listBlockElements = [];
@@ -94,7 +94,7 @@ internal sealed class LoweringContext
     private readonly Dictionary<TocEntry, IStructureTag> tocEntryElements = [];
     private readonly Dictionary<Paragraph, IStructureTag> tocParagraphElements = [];
     private readonly Dictionary<TocEntry, IStructureTag> tocLinkElements = [];
-    private readonly Dictionary<Run, IStructureTag> runLinkElements = [];
+    private readonly Dictionary<Inline, IStructureTag> runLinkElements = [];
 
     private LoweringContext(StyleResolution styles)
     {
@@ -119,10 +119,10 @@ internal sealed class LoweringContext
     public HorizontalAlignment? CellAlignment(Cell cell)
         => Styles.CellAlignment(cell);
 
-    public Font? RunFont(Run run)
+    public Font? RunFont(TextInline run)
         => runFonts.TryGetValue(run, out var font) ? font : Styles.RunFont(run);
 
-    internal void SetRunFont(Run run, Font font)
+    internal void SetRunFont(TextInline run, Font font)
         => runFonts[run] = font;
 
     public Font? ParagraphFont(Paragraph paragraph)
@@ -179,12 +179,12 @@ internal sealed class LoweringContext
     internal IStructureTag? TocLinkElement(TocEntry entry)
         => tocLinkElements.TryGetValue(entry, out var link) ? link : null;
 
-    internal void SetRunLinkElement(Run run, IStructureTag link)
-        => runLinkElements[run] = link;
+    internal void SetRunLinkElement(Inline inline, IStructureTag link)
+        => runLinkElements[inline] = link;
 
-    internal ImmutableArray<(Run Run, IStructureTag Link)> RunLinkElements()
+    internal ImmutableArray<(Inline Inline, IStructureTag Link)> RunLinkElements()
     {
-        var result = ImmutableArray.CreateBuilder<(Run, IStructureTag)>(runLinkElements.Count);
+        var result = ImmutableArray.CreateBuilder<(Inline, IStructureTag)>(runLinkElements.Count);
         foreach (var (run, link) in runLinkElements)
         {
             result.Add((run, link));
@@ -224,7 +224,7 @@ internal sealed class StyleResolutionBuilder
     internal Dictionary<Paragraph, HorizontalAlignment?> Alignments { get; } = [];
     internal Dictionary<Paragraph, ResolvedParagraphFormat> Formats { get; } = [];
     internal Dictionary<Cell, HorizontalAlignment?> CellAlignments { get; } = [];
-    internal Dictionary<Run, Font> RunFonts { get; } = [];
+    internal Dictionary<TextInline, Font> RunFonts { get; } = [];
     internal Dictionary<Paragraph, Font> ParagraphFonts { get; } = [];
     internal Dictionary<Barcode, Font> BarcodeFonts { get; } = [];
     internal Dictionary<ListItem, Font> ItemFonts { get; } = [];
@@ -243,7 +243,7 @@ internal sealed class StyleResolutionBuilder
     internal void SetCellAlignment(Cell cell, HorizontalAlignment? alignment)
         => CellAlignments[cell] = alignment;
 
-    internal void SetRunFont(Run run, Font font)
+    internal void SetRunFont(TextInline run, Font font)
         => RunFonts[run] = font;
 
     internal void SetParagraphFont(Paragraph paragraph, Font font)
@@ -428,8 +428,13 @@ internal static class StyleResolver
 
         resolution.SetParagraphFont(paragraph, Cascade(paragraphSources, inherited, styles));
 
-        foreach (var run in paragraph.Inlines)
+        foreach (var inline in paragraph.Inlines)
         {
+            if (inline is not TextInline run)
+            {
+                continue;
+            }
+
             var runSources = new List<Font?> { run.Font, paragraph.Font };
             foreach (var style in namedChain)
             {

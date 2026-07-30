@@ -184,7 +184,7 @@ internal static class DocumentLayouter
                     if (!tocPages.ContainsKey(entry.Anchor))
                     {
                         throw new InvalidOperationException(
-                            $"Table of contents entry anchor '{entry.Anchor}' does not exist; set Run.Anchor on the destination run.");
+                            $"Table of contents entry anchor '{entry.Anchor}' does not exist; set Inline.Anchor on the destination inline.");
                     }
                 }
             }

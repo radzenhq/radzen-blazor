@@ -14,9 +14,9 @@ internal sealed class FieldResolver(
 {
     public bool HasField(Paragraph paragraph)
     {
-        foreach (var run in paragraph.Inlines)
+        foreach (var inline in paragraph.Inlines)
         {
-            if (run is PageNumberField or PageCountField)
+            if (inline is PageNumberField or PageCountField)
             {
                 return true;
             }
@@ -25,9 +25,9 @@ internal sealed class FieldResolver(
         return false;
     }
 
-    private Font ResolvedFont(Run run) => resolution.RunFont(run) ?? run.Font;
+    private Font ResolvedFont(TextInline run) => resolution.RunFont(run) ?? run.Font;
 
-    private bool SameStyle(Run a, Run b)
+    private bool SameStyle(TextInline a, TextInline b)
     {
         var fontA = ResolvedFont(a);
         var fontB = ResolvedFont(b);
@@ -58,7 +58,7 @@ internal sealed class FieldResolver(
         HorizontalAlignment? inheritedAlignment,
         int reservedLines)
     {
-        var pieces = new List<(Run Run, StringBuilder? Text, int TabsBefore)>();
+        var pieces = new List<(Inline Run, StringBuilder? Text, int TabsBefore)>();
         var pendingTabs = 0;
         foreach (var run in paragraph.Inlines)
         {
@@ -80,14 +80,15 @@ internal sealed class FieldResolver(
 
                     pieces.Add((run, null, 0));
                     continue;
-                case { } when run.GetType() == typeof(Run):
-                    text = run.Text;
+                case Run textRun:
+                    text = textRun.Text;
                     break;
                 default:
                     throw new NotSupportedException(
                         $"ResolveFields cannot resolve inline run of type '{run!.GetType().Name}'.");
             }
 
+            var styled = (TextInline)run;
             var parts = text.Split('\t');
             for (var pi = 0; pi < parts.Length; pi++)
             {
@@ -102,7 +103,8 @@ internal sealed class FieldResolver(
                     continue;
                 }
 
-                if (pendingTabs == 0 && pieces.Count > 0 && pieces[^1].Text is { } previous && SameStyle(pieces[^1].Run, run))
+                if (pendingTabs == 0 && pieces.Count > 0 && pieces[^1].Text is { } previous
+                    && pieces[^1].Run is TextInline last && SameStyle(last, styled))
                 {
                     previous.Append(part);
                 }
@@ -123,7 +125,6 @@ internal sealed class FieldResolver(
         {
             LeftIndent = resolution.Format(paragraph).LeftIndent,
             LineSpacing = paragraph.LineSpacing,
-            RightTabStop = paragraph.RightTabStop,
             Alignment = paragraph.Alignment,
         };
         resolved.Font.InheritFrom(resolution.ParagraphFont(paragraph) ?? paragraph.Font);
@@ -142,8 +143,16 @@ internal sealed class FieldResolver(
             }
 
             var newRun = new Run(new string('\t', tabsBefore) + builderText.ToString());
-            run.CopyPropertiesTo(newRun);
-            newRun.Font.InheritFrom(ResolvedFont(run));
+            if (run is TextInline source)
+            {
+                source.CopyPropertiesTo(newRun);
+                newRun.Font.InheritFrom(ResolvedFont(source));
+            }
+            else
+            {
+                newRun.Font.InheritFrom(resolution.ParagraphFont(paragraph) ?? paragraph.Font);
+            }
+
             resolved.Inlines.Add(newRun);
         }
 

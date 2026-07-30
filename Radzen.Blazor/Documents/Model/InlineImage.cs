@@ -4,19 +4,15 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// A raster image that flows inline within a paragraph line, sharing the line's baseline and
+/// A raster image that flows inline within a paragraph line, sitting on the line's baseline and
 /// advancing it by the image width. The source bytes are buffered when the image is created,
 /// so the caller may dispose the source stream immediately afterwards.
 /// </summary>
-public sealed class InlineImage : Run
+public sealed class InlineImage : Inline
 {
-    private Unit? width;
-    private Unit? height;
     private (double Width, double Height)? pixels;
 
-    internal InlineImage(byte[] data)
-        : base(string.Empty)
-        => Data = data;
+    internal InlineImage(byte[] data) => Data = data;
 
     internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, ResourceLimits.Default.MaxFileBytes));
 
@@ -24,19 +20,17 @@ public sealed class InlineImage : Run
 
     internal ImageInfo Info => ImageProbe.Inspect(Data);
 
-    /// <summary>Gets or sets the inline width. When unset the natural width is used, deriving from <see cref="Height"/> when only that is set.</summary>
-    public Unit Width
-    {
-        get => Unit.FromPoint(EffectiveSize().Width);
-        set => width = value;
-    }
+    /// <summary>
+    /// Gets or sets the drawn width, or <see langword="null"/> (the default) for the natural width.
+    /// When only <see cref="Height"/> is set the width follows from it and the image's aspect ratio.
+    /// </summary>
+    public Unit? Width { get; set; }
 
-    /// <summary>Gets or sets the inline height. When unset the natural height is used, deriving from <see cref="Width"/> when only that is set.</summary>
-    public Unit Height
-    {
-        get => Unit.FromPoint(EffectiveSize().Height);
-        set => height = value;
-    }
+    /// <summary>
+    /// Gets or sets the drawn height, or <see langword="null"/> (the default) for the natural height.
+    /// When only <see cref="Width"/> is set the height follows from it and the image's aspect ratio.
+    /// </summary>
+    public Unit? Height { get; set; }
 
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the image, carried on the
@@ -49,6 +43,6 @@ public sealed class InlineImage : Run
     internal (double Width, double Height) EffectiveSize()
     {
         var (pixelWidth, pixelHeight) = pixels ??= ImageProbe.PixelSize(Data);
-        return ImageProbe.DeriveSize(width, height, pixelWidth, pixelHeight);
+        return ImageProbe.DeriveSize(Width, Height, pixelWidth, pixelHeight);
     }
 }

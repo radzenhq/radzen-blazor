@@ -243,6 +243,14 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
         ? value.CompareTo(other.value)
         : throw new InvalidOperationException("An absolute measurement cannot be compared with a relative one.");
 
+    /// <summary>
+    /// Returns the measurement as text <see cref="Parse"/> reads back unchanged: the number in the
+    /// shortest form that round-trips, culture-invariantly, followed by <c>pt</c> for an absolute
+    /// measurement or <c>%</c> for a relative one.
+    /// </summary>
+    public override string ToString()
+        => value.ToString(CultureInfo.InvariantCulture) + (relative ? "%" : "pt");
+
     /// <inheritdoc/>
     public int CompareTo(object? obj) => obj switch
     {

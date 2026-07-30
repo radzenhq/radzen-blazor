@@ -49,8 +49,6 @@ internal readonly record struct GradientPaint(
     double X1,
     double Y1,
     double R1,
-    bool ExtendStart,
-    bool ExtendEnd,
     ImmutableArray<GradientStopPaint> Stops);
 
 internal static class GradientPaintIdentity

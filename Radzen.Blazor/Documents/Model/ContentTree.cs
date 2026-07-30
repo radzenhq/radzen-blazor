@@ -12,11 +12,11 @@ internal static class ContentTree
         block.Owner = owner;
     }
 
-    public static void Attach(Run run, InlineCollection owner)
+    public static void Attach(Inline inline, InlineCollection owner)
     {
-        ArgumentNullException.ThrowIfNull(run);
-        EnsureUnowned(run.Owner, "run");
-        run.Owner = owner;
+        ArgumentNullException.ThrowIfNull(inline);
+        EnsureUnowned(inline.Owner, "inline");
+        inline.Owner = owner;
     }
 
     public static void Attach(Section section, SectionCollection owner)
@@ -32,6 +32,13 @@ internal static class ContentTree
         EnsureUnowned(row.Owner, "row");
         EnsureAcyclic(row, owner, "row");
         row.Owner = owner;
+    }
+
+    public static void Attach(Column column, ColumnCollection owner)
+    {
+        ArgumentNullException.ThrowIfNull(column);
+        EnsureUnowned(column.Owner, "column");
+        column.Owner = owner;
     }
 
     public static void Attach(TocEntry entry, TocEntryCollection owner)
@@ -51,11 +58,13 @@ internal static class ContentTree
 
     public static void Detach(Block block) => block.Owner = null;
 
-    public static void Detach(Run run) => run.Owner = null;
+    public static void Detach(Inline inline) => inline.Owner = null;
 
     public static void Detach(Section section) => section.Owner = null;
 
     public static void Detach(Row row) => row.Owner = null;
+
+    public static void Detach(Column column) => column.Owner = null;
 
     public static void Detach(ListItem item) => item.Owner = null;
 

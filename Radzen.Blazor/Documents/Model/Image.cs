@@ -63,13 +63,17 @@ public sealed class Image : Block
     /// </summary>
     public bool Interpolate { get; set; }
 
-    internal (Unit Width, Unit Height)? FitBox { get; private set; }
+    /// <summary>
+    /// Gets or sets the box the image is scaled down to fit, or <see langword="null"/> (the default)
+    /// for none. Setting <see langword="null"/> clears it. See <see cref="FitInBox"/>.
+    /// </summary>
+    public (Unit MaxWidth, Unit MaxHeight)? FitBox { get; set; }
 
     /// <summary>
     /// Scales the image to fit within a <paramref name="maxWidth"/> x <paramref name="maxHeight"/> box
     /// while preserving aspect ratio, picking the smaller of the two scale factors so the image fits
     /// both bounds. The base aspect is taken from any explicit <see cref="Width"/>/<see cref="Height"/>,
-    /// otherwise from the image's natural size.
+    /// otherwise from the image's natural size. Equivalent to setting <see cref="FitBox"/>.
     /// </summary>
     /// <param name="maxWidth">The maximum width of the fit box.</param>
     /// <param name="maxHeight">The maximum height of the fit box.</param>

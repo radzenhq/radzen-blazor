@@ -25,7 +25,7 @@ public sealed class TabStopCollection : IReadOnlyList<TabStop>
     /// <param name="alignment">The alignment applied to the text following the tab. Defaults to <see cref="TabAlignment.Left"/>.</param>
     /// <param name="leader">The character repeated to fill the tab gap (e.g. '.' for dot leaders). '\0' (the default) fills the gap with blank space.</param>
     /// <returns>The newly created tab stop.</returns>
-    public TabStop AddTabStop(Unit position, TabAlignment alignment = TabAlignment.Left, char leader = '\0')
+    public TabStop Add(Unit position, TabAlignment alignment = TabAlignment.Left, char leader = '\0')
         => Add(new TabStop(position, alignment, leader));
 
     /// <summary>

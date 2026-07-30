@@ -104,7 +104,7 @@ internal enum OutlineFit
 
 /// <summary>
 /// The location an <see cref="OutlineItem"/> navigates to: a named anchor
-/// (see <see cref="Run.Anchor"/>) or a page by zero-based index with a fit mode.
+/// (see <see cref="Inline.Anchor"/>) or a page by zero-based index with a fit mode.
 /// </summary>
 public sealed class OutlineTarget
 {
@@ -123,7 +123,7 @@ public sealed class OutlineTarget
     internal double[] FitArguments { get; private init; } = [];
 
     /// <summary>Creates a target that navigates to the named anchor.</summary>
-    /// <param name="name">The anchor name (see <see cref="Run.Anchor"/>).</param>
+    /// <param name="name">The anchor name (see <see cref="Inline.Anchor"/>).</param>
     /// <returns>The anchor target.</returns>
     public static OutlineTarget ToAnchor(string name)
     {
