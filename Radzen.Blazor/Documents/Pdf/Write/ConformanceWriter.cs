@@ -122,6 +122,8 @@ internal sealed class ConformanceWriter(PortableDocument document)
     // map, to the nearest functionally equivalent standard type defined in ISO 32000-1:2008 14.8.4.
     private void ValidateRoleMap()
     {
+        ValidateRoleMapChains();
+
         if (document.EmissionPlan?.UnmappedRoles is not { Length: > 0 } roles)
         {
             return;
@@ -132,6 +134,51 @@ internal sealed class ConformanceWriter(PortableDocument document)
             + $"structure type, but Style.Role declares '{string.Join("', '", roles)}' with no matching "
             + "DocumentRenderer.RoleMap entry, so a reader cannot interpret the tag. Call "
             + "DocumentRenderer.RoleMap.Add(role, standardType) for each role, or clear Style.Role.");
+    }
+
+    // ISO 14289-1:2014 7.1 and Matterhorn Protocol 1.1 checkpoint 02: a role mapping chain shall terminate
+    // at a standard ISO 32000-1 structure type (02-002) and shall not be circular (02-003).
+    private void ValidateRoleMapChains()
+    {
+        if (document.EmissionPlan?.RoleMap is not { Length: > 0 } entries)
+        {
+            return;
+        }
+
+        var chain = new Dictionary<string, string>(entries.Length, StringComparer.Ordinal);
+
+        foreach (var entry in entries)
+        {
+            chain[entry.Key] = entry.Value;
+        }
+
+        foreach (var role in chain.Keys)
+        {
+            var visited = new HashSet<string>(StringComparer.Ordinal);
+            var current = role;
+
+            while (!RoleMap.IsStandardType(current))
+            {
+                if (!visited.Add(current))
+                {
+                    throw new InvalidOperationException(
+                        $"{Label} requires every role mapping to terminate at a standard ISO 32000-1 structure type, "
+                        + $"but '{role}' maps in a cycle through '{current}'. Break the cycle in "
+                        + "DocumentRenderer.RoleMap.");
+                }
+
+                if (!chain.TryGetValue(current, out var next))
+                {
+                    throw new InvalidOperationException(
+                        $"{Label} requires every role mapping to terminate at a standard ISO 32000-1 structure type, "
+                        + $"but '{role}' maps to '{current}', which is neither a standard type nor itself role "
+                        + "mapped. Add a DocumentRenderer.RoleMap entry for it, or map the role directly to a "
+                        + "standard type.");
+                }
+
+                current = next;
+            }
+        }
     }
 
     // ISO 32000-1 14.8.4.4.2 and ISO 14289-1 7.18: a link annotation belongs to a Link structure element,

@@ -56,11 +56,11 @@ public class RendererCaptureIsolationTests
         renderer.RoleMap.Add("Lead", "P");
 
         var pdf = renderer.Render(document);
-        renderer.RoleMap.Add("Caption", "P");
+        renderer.RoleMap.Add("Sidebar", "P");
 
         var saved = Save(pdf);
         Assert.Contains("/Lead", saved, System.StringComparison.Ordinal);
-        Assert.DoesNotContain("/Caption", saved, System.StringComparison.Ordinal);
+        Assert.DoesNotContain("/Sidebar", saved, System.StringComparison.Ordinal);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public class RendererCaptureIsolationTests
         }),
         (nameof(DocumentRenderer.ImageDecoders), static (renderer, _) =>
             renderer.ImageDecoders = ImageDecoders.BuiltIn),
-        (nameof(DocumentRenderer.RoleMap), static (renderer, _) => renderer.RoleMap.Add("Caption", "Span")),
+        (nameof(DocumentRenderer.RoleMap), static (renderer, _) => renderer.RoleMap.Add("Sidebar", "Span")),
         (nameof(DocumentRenderer.Outline), static (renderer, _) =>
         {
             renderer.Outline[0].Title = "MutatedChapter";
