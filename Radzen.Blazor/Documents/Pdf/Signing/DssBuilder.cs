@@ -17,8 +17,8 @@ namespace Radzen.Documents.Pdf.Signing;
 /// never parses X.509, OCSP or CRL structures - mirroring the crypto-delegation
 /// contract of <see cref="ISigner"/> and <see cref="ITimestampProvider"/>. The
 /// <c>/VRI</c> key is the uppercase base-16 SHA-1 digest of the signature's
-/// <c>/Contents</c> value, computed with the pure-managed <see cref="Sha1"/> so
-/// the code stays WASM-safe. Output is deterministic and the original bytes are
+/// <c>/Contents</c> value, computed with <see cref="Sha1"/>, which is WASM-safe.
+/// Output is deterministic and the original bytes are
 /// an exact prefix of the result. Combine with
 /// <see cref="PdfTimestamper.Timestamp(byte[], ITimestampProvider)"/> afterwards
 /// to produce a B-LTA (long-term archival) document. Any existing <c>/DSS</c> is
