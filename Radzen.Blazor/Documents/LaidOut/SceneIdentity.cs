@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal readonly record struct SourceId(int Value);
 

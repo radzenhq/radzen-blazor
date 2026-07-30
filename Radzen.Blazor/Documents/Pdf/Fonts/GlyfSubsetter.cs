@@ -2,8 +2,9 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Internal;
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts;
 

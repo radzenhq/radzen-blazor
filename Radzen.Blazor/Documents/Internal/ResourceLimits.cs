@@ -1,4 +1,4 @@
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal sealed class ResourceLimits
 {

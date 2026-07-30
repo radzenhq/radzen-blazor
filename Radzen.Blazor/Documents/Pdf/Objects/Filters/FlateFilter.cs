@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
 

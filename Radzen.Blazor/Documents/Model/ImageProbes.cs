@@ -2,6 +2,7 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Documents;
 

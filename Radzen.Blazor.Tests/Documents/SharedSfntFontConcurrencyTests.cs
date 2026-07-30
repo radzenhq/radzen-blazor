@@ -1,15 +1,15 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Radzen.Documents;
-using Radzen.Documents.Fonts;
+using System;
 using Radzen.Documents.Fonts.Sfnt;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.LaidOut;
+using Radzen.Documents;
 using Xunit;
 
 namespace Radzen.Blazor.Documents.Tests;

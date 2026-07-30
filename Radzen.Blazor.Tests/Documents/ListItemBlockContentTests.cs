@@ -1,10 +1,10 @@
 #nullable enable
-using System;
 using System.Linq;
-using Radzen.Documents;
+using System;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
+using Radzen.Documents;
 using Xunit;
-using Radzen.Documents.Geometry;
 
 namespace Radzen.Blazor.Documents.Tests;
 

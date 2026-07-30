@@ -22,6 +22,8 @@ public class ArchitectureBoundaryTests
 
     private const string GeometryNamespace = "Radzen.Documents.Geometry";
 
+    private const string LaidOutNamespace = "Radzen.Documents.LaidOut";
+
     private const string ComponentNamespace = "Radzen.Blazor";
 
     private const string PdfRenderNamespace = "Radzen.Documents.Pdf.Render";
@@ -40,6 +42,8 @@ public class ArchitectureBoundaryTests
         "Radzen.Documents.Fonts",
         "Radzen.Documents.Fonts.Sfnt",
         "Radzen.Documents.Geometry",
+        "Radzen.Documents.Internal",
+        "Radzen.Documents.LaidOut",
         "Radzen.Documents.Layout",
         "Radzen.Documents.Markdown",
         "Radzen.Documents.Spreadsheet",
@@ -322,12 +326,12 @@ public class ArchitectureBoundaryTests
     }
 
     [Fact]
-    public void GeometryTypes_ReferenceNeitherLayoutNorMutableModelTypes()
+    public void GeometryAndLaidOutTypes_ReferenceNeitherLayoutNorMutableModelTypes()
     {
         var violations = new List<string>();
         var unreadable = new List<string>();
 
-        foreach (var type in TypesWithin(GeometryNamespace))
+        foreach (var type in TypesWithin(GeometryNamespace).Concat(TypesWithin(LaidOutNamespace)))
         {
             CheckGeometryType(violations, type, "base type", type.BaseType);
 

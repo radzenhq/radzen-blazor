@@ -1,5 +1,5 @@
 using System;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Pdf.Render;
 

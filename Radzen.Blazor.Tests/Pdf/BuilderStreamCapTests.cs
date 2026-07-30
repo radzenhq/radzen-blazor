@@ -1,12 +1,13 @@
 #nullable enable
 
 using System.IO;
-using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Render;
-using Radzen.Documents.Pdf.Objects;
-using Xunit;
-using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Internal;
+using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf;
+using Radzen.Documents;
+using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

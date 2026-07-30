@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal readonly record struct ResolvedEdge(Color Color, double Width, BorderStyle Style);
 
