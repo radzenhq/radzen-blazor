@@ -12,8 +12,24 @@ public sealed class DocumentXmpMetadata
 {
     private const string RdfNamespace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private byte[]? packet;
+    private Action? changed;
 
-    internal bool IsModified { get; private set; }
+    internal void OwnedBy(Action? owner) => changed = owner;
+
+    private bool modified;
+
+    internal bool IsModified
+    {
+        get => modified;
+        private set
+        {
+            modified = value;
+            if (value)
+            {
+                changed?.Invoke();
+            }
+        }
+    }
 
     internal bool HasPacket => packet is not null;
 

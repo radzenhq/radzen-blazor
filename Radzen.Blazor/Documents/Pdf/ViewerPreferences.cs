@@ -61,28 +61,71 @@ public enum PdfReadingDirection
 /// </summary>
 public sealed class ViewerPreferences
 {
+    private ChangeTracker tracker;
+    private PdfPageLayout? pageLayout;
+    private PdfPageMode? pageMode;
+    private bool hideToolbar;
+    private bool hideMenubar;
+    private bool fitWindow;
+    private bool centerWindow;
+    private bool displayDocTitle;
+    private PdfReadingDirection? direction;
+
     /// <summary>Gets or sets the initial page layout, written as catalog <c>/PageLayout</c>.</summary>
-    public PdfPageLayout? PageLayout { get; set; }
+    public PdfPageLayout? PageLayout
+    {
+        get => pageLayout;
+        set => tracker.Set(ref pageLayout, value);
+    }
 
     /// <summary>Gets or sets the initial page mode, written as catalog <c>/PageMode</c>.</summary>
-    public PdfPageMode? PageMode { get; set; }
+    public PdfPageMode? PageMode
+    {
+        get => pageMode;
+        set => tracker.Set(ref pageMode, value);
+    }
 
     /// <summary>Gets or sets whether to hide the viewer's tool bars (<c>/HideToolbar</c>). Defaults to <see langword="false"/>.</summary>
-    public bool HideToolbar { get; set; }
+    public bool HideToolbar
+    {
+        get => hideToolbar;
+        set => tracker.Set(ref hideToolbar, value);
+    }
 
     /// <summary>Gets or sets whether to hide the viewer's menu bar (<c>/HideMenubar</c>). Defaults to <see langword="false"/>.</summary>
-    public bool HideMenubar { get; set; }
+    public bool HideMenubar
+    {
+        get => hideMenubar;
+        set => tracker.Set(ref hideMenubar, value);
+    }
 
     /// <summary>Gets or sets whether to resize the document window to fit the first displayed page (<c>/FitWindow</c>). Defaults to <see langword="false"/>.</summary>
-    public bool FitWindow { get; set; }
+    public bool FitWindow
+    {
+        get => fitWindow;
+        set => tracker.Set(ref fitWindow, value);
+    }
 
     /// <summary>Gets or sets whether to center the document window on the screen (<c>/CenterWindow</c>). Defaults to <see langword="false"/>.</summary>
-    public bool CenterWindow { get; set; }
+    public bool CenterWindow
+    {
+        get => centerWindow;
+        set => tracker.Set(ref centerWindow, value);
+    }
 
     /// <summary>Gets or sets whether the window title bar shows the document title rather than the file name (<c>/DisplayDocTitle</c>). Defaults to <see langword="false"/>.</summary>
-    public bool DisplayDocTitle { get; set; }
+    public bool DisplayDocTitle
+    {
+        get => displayDocTitle;
+        set => tracker.Set(ref displayDocTitle, value);
+    }
 
     /// <summary>Gets or sets the predominant reading direction (<c>/Direction</c>). When <see langword="null"/> no direction is written.</summary>
-    public PdfReadingDirection? Direction { get; set; }
+    public PdfReadingDirection? Direction
+    {
+        get => direction;
+        set => tracker.Set(ref direction, value);
+    }
 
+    internal void OwnedBy(System.Action? changed) => tracker.OwnedBy(changed);
 }

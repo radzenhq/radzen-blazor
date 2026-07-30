@@ -89,4 +89,12 @@ public abstract class Annotation(PdfRect bounds) : ITracksChanges
     bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
+
+    internal virtual void OwnedBy(System.Action? changed)
+    {
+        tracker.OwnedBy(changed);
+        Appearance?.OwnedBy(changed);
+    }
+
+    void ITracksChanges.OwnedBy(System.Action? changed) => OwnedBy(changed);
 }

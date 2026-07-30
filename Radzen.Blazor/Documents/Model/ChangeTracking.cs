@@ -8,6 +8,8 @@ internal interface ITracksChanges
     bool IsModified { get; }
 
     void AcceptChanges();
+
+    void OwnedBy(Action? changed);
 }
 
 internal static class TrackedChanges
@@ -46,8 +48,11 @@ internal static class TrackedChanges
 internal struct ChangeTracker
 {
     private bool touched;
+    private Action? changed;
 
     public readonly bool IsModified => touched;
+
+    public void OwnedBy(Action? owner) => changed = owner;
 
     public void Set<T>(ref T field, T value)
     {
@@ -57,10 +62,14 @@ internal struct ChangeTracker
         }
 
         field = value;
-        touched = true;
+        Touch();
     }
 
-    public void Touch() => touched = true;
+    public void Touch()
+    {
+        touched = true;
+        changed?.Invoke();
+    }
 
     public void AcceptChanges() => touched = false;
 }

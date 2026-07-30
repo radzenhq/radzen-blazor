@@ -78,7 +78,7 @@ public class ContainerLayoutTests
 
         var fragment = Assert.Single(page.HeaderLayer.Tables);
         Assert.Equal(box.Bounds.Height, fragment.Bounds.Y, 6);
-        Assert.True(box.Order < fragment.Order, "band box precedes the band table");
+        Assert.True(box.ZOrder < fragment.ZOrder, "band box precedes the band table");
     }
 
     [Fact]

@@ -60,15 +60,43 @@ internal sealed class ConformanceWriter(PortableDocument document)
     {
         foreach (var page in document.Pages)
         {
-            if (page.Generated is null)
+            if (page.Generated is not null)
             {
-                throw new InvalidOperationException(
-                    $"{Label} cannot be claimed for a page that did not come from DocumentRenderer: its fonts, images and "
-                    + "color spaces cannot be inspected, and this library will not identify a document as conformant on "
-                    + "content it has not verified. Rebuild the page with DocumentRenderer, or save without conformance "
-                    + "(PdfAConformance.None and PdfUaConformance.None).");
+                continue;
             }
+
+            if (LoadedResources(page) is { } loaded)
+            {
+                new LoadedPageInspector(loaded.Reader, Label).Inspect(loaded.Resources);
+                continue;
+            }
+
+            throw new InvalidOperationException(
+                $"{Label} cannot be claimed for a page that did not come from DocumentRenderer and carries no readable "
+                + "resources: its fonts, images and color spaces cannot be inspected, and this library will not identify "
+                + "a document as conformant on content it has not verified. Rebuild the page with DocumentRenderer, or "
+                + "save without conformance (PdfAConformance.None and PdfUaConformance.None).");
         }
+    }
+
+    private (DocumentReader Reader, DictionaryObject Resources)? LoadedResources(Page page)
+    {
+        if (document.Loaded is not { } loaded)
+        {
+            return null;
+        }
+
+        if (loaded.Source is { } source && loaded.SourceResources.TryGetValue(page, out var resources))
+        {
+            return (source, resources);
+        }
+
+        if (loaded.AppendedResources.TryGetValue(page, out var appended))
+        {
+            return (appended.Reader, appended.Resources);
+        }
+
+        return null;
     }
 
     private void ValidateTagging()

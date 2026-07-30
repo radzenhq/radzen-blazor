@@ -356,4 +356,74 @@ public class RenderedDocumentFacadeInvalidationTests
         Assert.NotEqual(first, mutated);
         Assert.Contains("Tagged facade mutation marker", Encoding.Latin1.GetString(mutated), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void ReadingEveryDocumentFacade_KeepsTheMaterializedGraph()
+    {
+        var rendered = new DocumentRenderer().Render(Authored());
+        _ = rendered.ToArray();
+
+        _ = rendered.Info;
+        _ = rendered.Pages;
+        _ = rendered.AcroForm;
+        _ = rendered.FormFields;
+        _ = rendered.ViewerPreferences;
+        _ = rendered.PageLabels;
+        _ = rendered.Outline;
+        _ = rendered.Attachments;
+        _ = rendered.Xmp;
+        _ = rendered.Pages[0].Content;
+
+        Assert.NotNull(rendered.MaterializedGraph);
+    }
+
+    [Fact]
+    public void MutatingANestedMemberThroughAPreviouslyReadFacade_ReachesTheSavedBytes()
+    {
+        var rendered = new DocumentRenderer
+        {
+            ViewerPreferences = new ViewerPreferences { HideToolbar = true },
+        }.Render(Authored());
+
+        var info = rendered.Info;
+        var outline = rendered.Outline;
+        var labels = rendered.PageLabels;
+        var attachments = rendered.Attachments;
+        var preferences = rendered.ViewerPreferences!;
+        var xmp = rendered.Xmp;
+        var content = rendered.Pages[0].Content;
+        var first = rendered.ToArray();
+
+        info.Author = "Nested author";
+        Assert.Contains("Nested author", Save(rendered), StringComparison.Ordinal);
+
+        preferences.HideMenubar = true;
+        Assert.Contains("/HideMenubar true", Save(rendered), StringComparison.Ordinal);
+
+        outline.Add(new OutlineItem("Nested chapter", OutlineTarget.ToPage(0)));
+        Assert.Contains("Nested chapter", Save(rendered), StringComparison.Ordinal);
+
+        outline[0].Title = "Renamed chapter";
+        Assert.Contains("Renamed chapter", Save(rendered), StringComparison.Ordinal);
+
+        labels.Add(new PageLabel(0) { Prefix = "Nested" });
+        Assert.Contains("Nested", Save(rendered), StringComparison.Ordinal);
+
+        labels[0].Prefix = "Relabelled";
+        Assert.Contains("Relabelled", Save(rendered), StringComparison.Ordinal);
+
+        attachments.Add("nested.txt", Encoding.ASCII.GetBytes("nested"), AttachmentRelationship.Data, "text/plain");
+        Assert.Contains("nested.txt", Save(rendered), StringComparison.Ordinal);
+
+        attachments[0].Description = "Nested description";
+        Assert.Contains("Nested description", Save(rendered), StringComparison.Ordinal);
+
+        xmp.SetProperty("http://purl.org/dc/elements/1.1/", "source", "Nested source");
+        Assert.Contains("Nested source", Save(rendered), StringComparison.Ordinal);
+
+        content.Add(new TextContent("Nested content", 72, 600) { Font = new Radzen.Documents.Fonts.Font { Size = 12 } });
+        Assert.Contains("Nested content", Save(rendered), StringComparison.Ordinal);
+
+        Assert.NotEqual(first, rendered.ToArray());
+    }
 }

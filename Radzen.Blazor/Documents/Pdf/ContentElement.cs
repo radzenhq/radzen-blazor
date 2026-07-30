@@ -64,6 +64,10 @@ public abstract class ContentElement : ITracksChanges
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    internal virtual void OwnedBy(System.Action? changed) => tracker.OwnedBy(changed);
+
+    void ITracksChanges.OwnedBy(System.Action? changed) => OwnedBy(changed);
+
     internal void Emit(ContentWriter writer) => Emit(writer, Transform);
 
     internal void Emit(ContentWriter writer, Matrix transform)

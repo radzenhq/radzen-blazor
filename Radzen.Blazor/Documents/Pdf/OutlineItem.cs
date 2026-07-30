@@ -87,6 +87,14 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
+    internal void OwnedBy(Action? changed)
+    {
+        tracker.OwnedBy(changed);
+        children.OwnedBy(changed);
+    }
+
+    void ITracksChanges.OwnedBy(Action? changed) => OwnedBy(changed);
+
 }
 
 internal enum OutlineFit

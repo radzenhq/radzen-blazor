@@ -9,4 +9,6 @@ public sealed class AnnotationAppearance
     internal bool IsModified => Content.IsModified;
 
     internal void AcceptChanges() => Content.AcceptChanges();
+
+    internal void OwnedBy(System.Action? changed) => Content.OwnedBy(changed);
 }

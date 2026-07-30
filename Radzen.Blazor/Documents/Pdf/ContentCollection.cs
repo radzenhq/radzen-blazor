@@ -12,6 +12,37 @@ namespace Radzen.Documents.Pdf;
 public sealed class ContentCollection : IReadOnlyList<ContentElement>
 {
     private readonly TrackedList<ContentElement> items = [];
+    private Action? invalidate;
+    private bool loading;
+
+    internal void OwnedBy(Action? owner)
+    {
+        invalidate = owner;
+        items.OwnedBy(Invalidate);
+    }
+
+    internal IDisposable Loading() => new LoadScope(this);
+
+    private void Invalidate()
+    {
+        if (!loading)
+        {
+            invalidate?.Invoke();
+        }
+    }
+
+    private sealed class LoadScope : IDisposable
+    {
+        private readonly ContentCollection owner;
+
+        public LoadScope(ContentCollection owner)
+        {
+            this.owner = owner;
+            owner.loading = true;
+        }
+
+        public void Dispose() => owner.loading = false;
+    }
 
     /// <summary>Gets the number of elements in the collection.</summary>
     public int Count => items.Count;

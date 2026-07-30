@@ -14,32 +14,48 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class DocumentRenderer
 {
-    /// <summary>Gets the files to embed into the produced PDF (e.g. the Factur-X invoice XML).</summary>
+    /// <summary>
+    /// Gets the files to embed into the produced PDF (e.g. the Factur-X invoice XML). Copied into the
+    /// produced document at <see cref="Render(Document)"/>; afterwards
+    /// <see cref="PortableDocument.Attachments"/> on that document governs what is saved, and changing
+    /// this collection has no effect on an already-rendered document.
+    /// </summary>
     public AttachmentCollection Attachments { get; } = [];
 
-    /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
+    /// <summary>
+    /// Gets the root entries of the document outline (bookmark) tree. Copied into the produced
+    /// document at <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.Outline"/>
+    /// on that document governs what is saved, and changing this list has no effect on an
+    /// already-rendered document.
+    /// </summary>
     public IList<OutlineItem> Outline { get; } = [];
 
     /// <summary>
     /// Gets or sets the viewer preferences applied to the produced document
     /// (initial page layout and page mode plus the <c>/ViewerPreferences</c>
     /// flags). When <c>null</c> no viewer-preference keys are written and the
-    /// output is unchanged. Surfaces <see cref="PortableDocument.ViewerPreferences"/>.
+    /// output is unchanged. Captured into the produced document at <see cref="Render(Document)"/>;
+    /// afterwards <see cref="PortableDocument.ViewerPreferences"/> on that document governs what is
+    /// saved, and changing it here has no effect on an already-rendered document.
     /// </summary>
     public ViewerPreferences? ViewerPreferences { get; set; }
 
     /// <summary>
     /// Gets the page-label ranges applied to the produced document, written as
     /// the catalog <c>/PageLabels</c> number tree. When empty no <c>/PageLabels</c>
-    /// entry is written. Surfaces <see cref="PortableDocument.PageLabels"/>.
+    /// entry is written. Copied into the produced document at <see cref="Render(Document)"/>;
+    /// afterwards <see cref="PortableDocument.PageLabels"/> on that document governs what is saved,
+    /// and changing this list has no effect on an already-rendered document.
     /// </summary>
     public IList<PageLabel> PageLabels { get; } = [];
 
     /// <summary>
     /// Gets the interactive form fields to create on the produced document. Each
     /// definition is saved as a widget annotation on its page and listed in the
-    /// catalog <c>/AcroForm /Fields</c>. When empty no form is written. Surfaces
-    /// <see cref="PortableDocument.FormFields"/>.
+    /// catalog <c>/AcroForm /Fields</c>. When empty no form is written. Copied into the produced
+    /// document at <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.FormFields"/>
+    /// on that document governs what is saved, and changing this list has no effect on an
+    /// already-rendered document.
     /// </summary>
     public IList<FormFieldDefinition> FormFields { get; } = [];
 
@@ -82,21 +98,29 @@ public sealed class DocumentRenderer
 
     /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
-    /// document is written unencrypted.
+    /// document is written unencrypted. Captured into the produced document at
+    /// <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.Encryption"/> on that
+    /// document governs what is saved, and changing it here has no effect on an already-rendered
+    /// document.
     /// </summary>
     public EncryptionOptions? Encryption { get; set; }
 
     /// <summary>
     /// Gets or sets whether the saved file packs its objects into compressed
     /// object streams with a cross-reference stream, shrinking the output at
-    /// the cost of PDF/A-1 compatibility. Defaults to <c>false</c>.
+    /// the cost of PDF/A-1 compatibility. Defaults to <c>false</c>. Captured into the produced
+    /// document at <see cref="Render(Document)"/>; afterwards
+    /// <see cref="PortableDocument.CompressOutput"/> on that document governs what is saved, and
+    /// changing it here has no effect on an already-rendered document.
     /// </summary>
     public bool CompressOutput { get; set; }
 
     /// <summary>
     /// Gets or sets whether the saved file carries a deterministic trailer
     /// <c>/ID</c>. Defaults to <c>false</c> so output stays byte identical unless
-    /// opted in. See <see cref="PortableDocument.IncludeDocumentId"/>.
+    /// opted in. Captured into the produced document at <see cref="Render(Document)"/>; afterwards
+    /// <see cref="PortableDocument.IncludeDocumentId"/> on that document governs what is saved, and
+    /// changing it here has no effect on an already-rendered document.
     /// </summary>
     public bool IncludeDocumentId { get; set; }
 
