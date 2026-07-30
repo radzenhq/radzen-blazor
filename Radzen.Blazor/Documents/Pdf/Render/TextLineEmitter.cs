@@ -22,7 +22,8 @@ internal sealed class TextLineEmitter(
             context, lines,
             left, top, delta: 0,
             opacity: 1, inherited: null, resolveStructure: false,
-            overflowThreshold: double.PositiveInfinity);
+            overflowThreshold: double.PositiveInfinity,
+            artifact: SemanticArtifactKind.Pagination);
 
     public bool EmitLines(
         EmitContext context,
@@ -33,12 +34,14 @@ internal sealed class TextLineEmitter(
         double opacity,
         StructureElement? inherited,
         bool resolveStructure,
-        double overflowThreshold)
+        double overflowThreshold,
+        SemanticArtifactKind? artifact = null)
     {
         var overflows = false;
         foreach (var current in lines)
         {
             var element = resolveStructure ? structureTree.ElementOf(current.Source) ?? inherited : null;
+            var lineArtifact = artifact ?? structureTree.ArtifactOf(current.Source);
             var marker = resolveStructure ? structureTree.MarkerElementOf(current.Source) : null;
             var box = current.Line;
             EmitLine(
@@ -49,6 +52,7 @@ internal sealed class TextLineEmitter(
                 element,
                 opacity,
                 marker,
+                lineArtifact,
                 resolveFragments: resolveStructure);
             overflows |= box.Width > overflowThreshold + 0.01;
         }
@@ -64,6 +68,7 @@ internal sealed class TextLineEmitter(
         StructureElement? element,
         double opacity = 1,
         StructureElement? markerElement = null,
+        SemanticArtifactKind? artifact = null,
         bool resolveFragments = false)
     {
         var plan = context.Plan;
@@ -74,14 +79,18 @@ internal sealed class TextLineEmitter(
             var alpha = opacity * fragment.Paint.Opacity;
             var fragElement = fragment.IsMarker && markerElement is not null ? markerElement : element;
             var captured = resolveFragments ? structureTree.ElementOf(fragment.Source) : null;
+            var capturedArtifact = resolveFragments ? structureTree.ArtifactOf(fragment.Source) : null;
             if (fragment.Paint.InlineImage is { } inlineImage)
             {
+                var imageElement = captured
+                    ?? (capturedArtifact is not null && structureTree.TaggingActive ? null : fragElement);
                 EmitInlineImage(
                     plan,
                     inlineImage,
                     originX + fragment.XOffset,
                     y,
-                    captured ?? (structureTree.TaggingActive ? null : fragElement),
+                    imageElement,
+                    imageElement is null ? capturedArtifact ?? artifact : null,
                     alpha);
                 continue;
             }
@@ -107,11 +116,13 @@ internal sealed class TextLineEmitter(
                 originX + fragment.XOffset,
                 y,
                 fragElement,
+                capturedArtifact ?? artifact,
                 extGState);
         }
 
-        EmitDecorations(plan, line, originX, y, opacity, underline: true);
-        EmitDecorations(plan, line, originX, y, opacity, underline: false);
+        var decorationArtifact = artifact ?? SemanticArtifactKind.LayoutDecoration;
+        EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: true);
+        EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: false);
     }
 
     private static IEnumerable<(int First, double Start, double End)> Spans(
@@ -145,7 +156,15 @@ internal sealed class TextLineEmitter(
 
     private static double DecorationThickness(double size) => Math.Max(size * 0.06, 0.5);
 
-    private static void AddDecorationEdge(PagePlan plan, double x1, double x2, double edgeY, double size, Color color, double alpha)
+    private static void AddDecorationEdge(
+        PagePlan plan,
+        double x1,
+        double x2,
+        double edgeY,
+        double size,
+        Color color,
+        double alpha,
+        SemanticArtifactKind artifact)
     {
         plan.Edges.Add(new EdgeDraw
         {
@@ -156,12 +175,19 @@ internal sealed class TextLineEmitter(
             LineWidth = DecorationThickness(size),
             Color = color,
             Style = BorderStyle.Solid,
+            Artifact = artifact,
             ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
         });
     }
 
     private static void EmitDecorations(
-        PagePlan plan, LineBox line, double originX, double y, double opacity, bool underline)
+        PagePlan plan,
+        LineBox line,
+        double originX,
+        double y,
+        double opacity,
+        SemanticArtifactKind artifact,
+        bool underline)
     {
         foreach (var (first, start, end) in Spans(
             line.Fragments,
@@ -182,7 +208,8 @@ internal sealed class TextLineEmitter(
                 y + size * (underline ? -0.12 : 0.3),
                 size,
                 fragment.Paint.Font.Color,
-                opacity * fragment.Paint.Opacity);
+                opacity * fragment.Paint.Opacity,
+                artifact);
         }
     }
 
@@ -194,6 +221,7 @@ internal sealed class TextLineEmitter(
         GeneratedFont generated,
         byte[] bytes,
         StructureElement? element,
+        SemanticArtifactKind? artifact,
         string? extGState,
         double[]? kerns,
         int sequence,
@@ -217,6 +245,7 @@ internal sealed class TextLineEmitter(
             RenderMode = paint.Invisible ? 3 : 0,
             ExtGState = extGState,
             Element = element,
+            Artifact = artifact,
             Kerns = kerns,
         };
 
@@ -227,6 +256,7 @@ internal sealed class TextLineEmitter(
         double startX,
         double y,
         StructureElement? element,
+        SemanticArtifactKind? artifact,
         string? extGState)
     {
         var paint = fragment.Paint;
@@ -245,6 +275,7 @@ internal sealed class TextLineEmitter(
                 emitted.Font,
                 emitted.Bytes,
                 element,
+                artifact,
                 extGState,
                 emitted.Kerns,
                 plan.NextSequence(),
@@ -253,7 +284,14 @@ internal sealed class TextLineEmitter(
         }
     }
 
-    private void EmitInlineImage(PagePlan plan, in InlineImagePaint image, double x, double baseline, StructureElement? element, double alpha)
+    private void EmitInlineImage(
+        PagePlan plan,
+        in InlineImagePaint image,
+        double x,
+        double baseline,
+        StructureElement? element,
+        SemanticArtifactKind? artifact,
+        double alpha)
     {
         var generated = imageStore.DecodeBytes(image.Key, image.Data);
         plan.Images.Add(new ImageDraw
@@ -265,6 +303,7 @@ internal sealed class TextLineEmitter(
             Height = image.Height,
             Image = generated,
             Element = element,
+            Artifact = artifact,
             ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
         });
         plan.UsedImages.Add(generated);

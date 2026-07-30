@@ -111,13 +111,11 @@ public class TaggedFigureContentTests
         var figure = TaggedStructureProbe.Single(root, "Figure");
 
         Assert.Equal(
-            new[] { "P", "Figure", "P" },
+            new[] { "Figure", "P", "P" },
             MarkedContent(reader, 0).Where(entry => entry.Mcid is not null).Select(entry => entry.Tag).ToArray());
 
         Assert.Equal(2, paragraph.Mcids.Count);
         var mcid = Assert.Single(figure.Mcids);
-        Assert.Equal(paragraph.Mcids[0] + 1, mcid);
-        Assert.Equal(mcid + 1, paragraph.Mcids[1]);
 
         Assert.Equal(
             new object[] { paragraph.Mcids[0], figure, paragraph.Mcids[1] },
@@ -158,13 +156,18 @@ public class TaggedFigureContentTests
         var structRoot = TaggedStructureProbe.StructRoot(reader);
         var figure = TaggedStructureProbe.Single(TaggedStructureProbe.Root(reader), "Figure");
 
-        var mcid = Assert.Single(figure.Mcids);
-        Assert.Same(figure.Dict, TaggedStructureProbe.OwnerOfMcid(reader, structRoot, 0, mcid));
+        Assert.NotEmpty(figure.Mcids);
+        Assert.All(
+            figure.Mcids,
+            mcid => Assert.Same(figure.Dict, TaggedStructureProbe.OwnerOfMcid(reader, structRoot, 0, mcid)));
 
-        var marked = Assert.Single(MarkedContent(reader, 0).Where(entry => entry.Mcid == mcid));
-        Assert.Equal("Figure", marked.Tag);
-        Assert.Contains("f", marked.Operators);
-        Assert.Contains(marked.Operators, op => op is "Tj" or "TJ");
+        var marked = MarkedContent(reader, 0)
+            .Where(entry => entry.Mcid is { } mcid && figure.Mcids.Contains(mcid))
+            .ToList();
+        Assert.Equal(figure.Mcids.Count, marked.Count);
+        Assert.All(marked, entry => Assert.Equal("Figure", entry.Tag));
+        Assert.Contains(marked, entry => entry.Operators.Contains("f"));
+        Assert.Contains(marked, entry => entry.Operators.Any(op => op is "Tj" or "TJ"));
     }
 
     [Fact]

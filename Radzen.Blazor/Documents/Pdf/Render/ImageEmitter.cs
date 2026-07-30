@@ -9,6 +9,7 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
         var plan = context.Plan;
         var paint = positioned.Paint;
         var xobject = imageStore.DecodeApplied(positioned.Source, paint);
+        var element = structureTree.ElementOf(positioned.Source);
         plan.Images.Add(new ImageDraw
         {
             Sequence = plan.NextSequence(),
@@ -17,7 +18,8 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
             Width = positioned.Width,
             Height = positioned.Height,
             Image = xobject,
-            Element = structureTree.ElementOf(positioned.Source),
+            Element = element,
+            Artifact = element is null ? structureTree.ArtifactOf(positioned.Source) : null,
             ExtGState = paint.Opacity < 1
                 ? plan.RegisterExtGState(paint.Opacity, paint.Opacity)
                 : null,

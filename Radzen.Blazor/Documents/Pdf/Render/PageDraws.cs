@@ -49,6 +49,7 @@ internal struct TextDraw
 
     public double[]? Kerns { get; init; }
     public StructureElement? Element { get; init; }
+    public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
     public PdfRect? Clip { get; set; }
 
@@ -66,6 +67,7 @@ internal struct ImageDraw
     public required double Height { get; init; }
     public required GeneratedImage Image { get; init; }
     public StructureElement? Element { get; init; }
+    public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
     public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
@@ -82,6 +84,7 @@ internal struct FillDraw
     public required Color Color { get; init; }
 
     public StructureElement? Element { get; init; }
+    public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
 
     public double Radius { get; init; }
@@ -102,6 +105,7 @@ internal readonly struct RoundedStrokeDraw
     public required double LineWidth { get; init; }
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
+    public SemanticArtifactKind? Artifact { get; init; }
     public string? ExtGState { get; init; }
 }
 
@@ -114,6 +118,7 @@ internal struct EdgeDraw
     public required double LineWidth { get; init; }
     public required Color Color { get; init; }
     public required BorderStyle Style { get; init; }
+    public SemanticArtifactKind? Artifact { get; init; }
     public PdfRect? Clip { get; set; }
     public double ClipRadius { get; set; }
     public string? ExtGState { get; init; }
@@ -345,6 +350,7 @@ internal sealed class PagePlan
                 LineWidth = edge.LineWidth,
                 Color = edge.Color,
                 Style = edge.Style,
+                Artifact = edge.Artifact,
                 ExtGState = edge.ExtGState,
             };
         }
@@ -372,6 +378,7 @@ internal sealed class PagePlan
                     LineWidth = fill.Height,
                     Color = fill.Color,
                     Style = BorderStyle.Solid,
+                    Artifact = fill.Artifact ?? SemanticArtifactKind.LayoutDecoration,
                     ExtGState = fill.ExtGState,
                 });
             }
@@ -426,6 +433,7 @@ internal sealed class PagePlan
             LineWidth = rounded.LineWidth,
             Color = rounded.Color,
             Style = rounded.Style,
+            Artifact = rounded.Artifact,
             ExtGState = rounded.ExtGState,
         });
     }

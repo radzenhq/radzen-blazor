@@ -27,7 +27,12 @@ internal sealed class GeneratedSoftMask
 
 internal static class SoftMask
 {
-    public static void EmitBoxShadow(PagePlan plan, PdfRect bounds, double cornerRadius, in BoxShadowPaint shadow)
+    public static void EmitBoxShadow(
+        PagePlan plan,
+        PdfRect bounds,
+        double cornerRadius,
+        in BoxShadowPaint shadow,
+        SemanticArtifactKind artifact)
     {
         if (bounds.Width <= 0 || bounds.Height <= 0)
         {
@@ -88,6 +93,7 @@ internal static class SoftMask
             Height = rectHeight,
             Color = shadow.Color,
             ExtGState = extGState,
+            Artifact = artifact,
         });
     }
 
@@ -101,7 +107,8 @@ internal static class SoftMask
                 shadow.BlurRadius.Point,
                 shadow.OffsetX.Point,
                 shadow.OffsetY.Point,
-                shadow.Spread.Point));
+                shadow.Spread.Point),
+            SemanticArtifactKind.LayoutDecoration);
 
     private static string ShadowKey(ShadowMask mask, double left, double bottom, double rectWidth, double rectHeight, double alpha)
     {

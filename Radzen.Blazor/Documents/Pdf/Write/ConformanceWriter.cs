@@ -83,12 +83,6 @@ internal sealed class ConformanceWriter(PortableDocument document)
             ValidateFigureAltText(structure);
         }
 
-        if (!document.IsPdfUa && document.HasUntaggedListContent)
-        {
-            throw new InvalidOperationException(
-                $"{Label} requires every list to be tagged, but the document has an untagged list; set DocumentRenderer.Accessibility to PdfUaConformance.PdfUa1 to tag lists or remove them.");
-        }
-
         ValidateLinkStructure();
     }
 

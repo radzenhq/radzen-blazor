@@ -571,8 +571,7 @@ public class LaidOutContractTests
         });
 
         var laidOut = DocumentLayouter.Layout(document);
-        var settings = CapturedRendererSettings.Capture(renderer);
-        Assert.Null(settings.Document.Fonts);
+        var settings = RenderRequest.From(renderer);
 
         document.Fonts.Register(
             LateFamily,
@@ -769,7 +768,7 @@ public class LaidOutContractTests
         Document document,
         DocumentRenderer? renderer = null)
     {
-        var settings = CapturedRendererSettings.Capture(renderer ?? new DocumentRenderer());
+        var settings = RenderRequest.From(renderer ?? new DocumentRenderer());
         return DocumentGenerator.Generate(settings, laidOut).ToArray();
     }
 

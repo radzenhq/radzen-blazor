@@ -17,7 +17,7 @@ internal sealed class SemanticSnapshotBuilder
     private readonly List<Node> nodes = [];
     private readonly List<ResolvedParagraphStyle> paragraphStyles = [];
     private readonly List<SemanticStructureAssociation> associations = [];
-    private readonly List<SemanticListOccurrence> lists = [];
+    private readonly List<(object Source, SemanticArtifactKind Kind)> artifactSources = [];
     private readonly Mapper mapper;
     private readonly Node document;
 
@@ -39,6 +39,9 @@ internal sealed class SemanticSnapshotBuilder
             {
                 MapBlock(block, sect, SemanticStructureTier.Always);
             }
+
+            CaptureArtifacts(section.Header.Blocks, SemanticArtifactKind.Pagination);
+            CaptureArtifacts(section.Footer.Blocks, SemanticArtifactKind.Pagination);
         }
     }
 
@@ -125,6 +128,16 @@ internal sealed class SemanticSnapshotBuilder
             });
         }
 
+        var capturedArtifacts = ImmutableArray.CreateBuilder<SemanticArtifactAssociation>(artifactSources.Count);
+        foreach (var (source, kind) in artifactSources)
+        {
+            capturedArtifacts.Add(new SemanticArtifactAssociation
+            {
+                Source = identities.Source(source),
+                Kind = kind,
+            });
+        }
+
         return new DocumentSemantics
         {
             Language = language,
@@ -136,7 +149,7 @@ internal sealed class SemanticSnapshotBuilder
             {
                 Nodes = capturedNodes.MoveToImmutable(),
                 Associations = capturedAssociations.MoveToImmutable(),
-                Lists = [.. lists],
+                Artifacts = capturedArtifacts.MoveToImmutable(),
             },
         };
     }
@@ -187,6 +200,53 @@ internal sealed class SemanticSnapshotBuilder
             Element = element.Index,
         });
 
+    private void AssociateArtifact(object source, SemanticArtifactKind kind)
+        => artifactSources.Add((source, kind));
+
+    private void CaptureArtifacts(IEnumerable<Block> blocks, SemanticArtifactKind kind)
+    {
+        foreach (var block in blocks)
+        {
+            CaptureArtifact(block, kind);
+        }
+    }
+
+    private void CaptureArtifact(Block block, SemanticArtifactKind kind)
+    {
+        AssociateArtifact(block, kind);
+        switch (block)
+        {
+            case Paragraph paragraph:
+                foreach (var inline in paragraph.Inlines)
+                {
+                    AssociateArtifact(inline, kind);
+                }
+
+                break;
+            case Table table:
+                foreach (var row in table.Rows)
+                {
+                    foreach (var cell in row.Cells)
+                    {
+                        AssociateArtifact(cell, kind);
+                        CaptureArtifacts(cell.Blocks, kind);
+                    }
+                }
+
+                break;
+            case List list:
+                foreach (var item in list.Items)
+                {
+                    CaptureArtifacts(item.Blocks, kind);
+                }
+
+                break;
+            case Container container:
+                CaptureArtifacts(container.Blocks, kind);
+                break;
+        }
+    }
+
     private (int Index, SemanticIntent Intent) CaptureParagraphStyle(Paragraph paragraph)
     {
         var level = resolution.HeadingLevel(paragraph);
@@ -202,16 +262,16 @@ internal sealed class SemanticSnapshotBuilder
 
     private void MapList(List list, Node parent)
     {
-        var l = AddChild(parent, SemanticIntent.List, SemanticStructureTier.Assistive);
+        var l = AddChild(parent, SemanticIntent.List, SemanticStructureTier.Structural);
         foreach (var item in list.Items)
         {
-            var li = AddChild(l, SemanticIntent.ListItem, SemanticStructureTier.Assistive);
-            var label = AddChild(li, SemanticIntent.ListLabel, SemanticStructureTier.Assistive);
-            var body = AddChild(li, SemanticIntent.ListBody, SemanticStructureTier.Assistive);
+            var li = AddChild(l, SemanticIntent.ListItem, SemanticStructureTier.Structural);
+            var label = AddChild(li, SemanticIntent.ListLabel, SemanticStructureTier.Structural);
+            var body = AddChild(li, SemanticIntent.ListBody, SemanticStructureTier.Structural);
             resolution.SetListItemElements(item, label, body);
             foreach (var block in item.Blocks)
             {
-                MapBlock(block, body, SemanticStructureTier.Assistive);
+                MapBlock(block, body, SemanticStructureTier.Structural);
             }
         }
     }
@@ -355,7 +415,6 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(List list, MappingContext context)
         {
-            capture.lists.Add(new SemanticListOccurrence { Tier = context.Tier });
             capture.MapList(list, context.Parent);
             return default;
         }

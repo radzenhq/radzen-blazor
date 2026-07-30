@@ -4,16 +4,15 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class StructureTreeBuilder(DocumentSemantics semantics, CapturedRendererSettings settings)
+internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRequest settings)
 {
     private readonly Dictionary<SourceId, StructureElement> elementsBySource = [];
     private readonly Dictionary<SourceId, StructureElement> markerElementsBySource = [];
+    private readonly Dictionary<SourceId, SemanticArtifactKind> artifactsBySource = [];
     private StructureElement documentElement = null!;
-    private bool hasUntaggedList;
 
     public StructureElement DocumentElement => documentElement;
 
-    public bool HasUntaggedList => hasUntaggedList;
 
     public void Build() => BuildStructureTree();
 
@@ -23,29 +22,26 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         var materialized = new StructureElement?[snapshot.Nodes.Length];
         documentElement = Materialize(0, snapshot, materialized)!;
 
+        foreach (var artifact in snapshot.Artifacts)
+        {
+            artifactsBySource[artifact.Source] = artifact.Kind;
+        }
+
         foreach (var association in snapshot.Associations)
         {
             if (materialized[association.Element] is { } element)
             {
                 elementsBySource[association.Source] = element;
             }
+            else if (snapshot.Nodes[association.Element].IsDecorative)
+            {
+                artifactsBySource[association.Source] = SemanticArtifactKind.Decorative;
+            }
 
             if (association.MarkerElement is { } markerIndex
                 && materialized[markerIndex] is { } marker)
             {
                 markerElementsBySource[association.Source] = marker;
-            }
-        }
-
-        if (settings.Accessibility == PdfUaConformance.None)
-        {
-            foreach (var list in snapshot.Lists)
-            {
-                if (Materializes(list.Tier))
-                {
-                    hasUntaggedList = true;
-                    break;
-                }
             }
         }
     }
@@ -144,14 +140,25 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
     public StructureElement? MarkerElementOf(SourceId source)
         => markerElementsBySource.TryGetValue(source, out var element) ? element : null;
 
-    public List<TaggedSegment> PlanTaggedContent(int pageIndex, List<TaggedDraw> draws)
+    public SemanticArtifactKind? ArtifactOf(SourceId source)
+        => artifactsBySource.TryGetValue(source, out var kind) ? kind : null;
+
+    public Dictionary<int, TaggedMark> PlanTaggedContent(int pageIndex, List<TaggedDraw> draws)
     {
-        var segments = new List<TaggedSegment>();
+        var marks = new Dictionary<int, TaggedMark>();
         if (draws.Count == 0)
         {
-            return segments;
+            return marks;
         }
 
+        for (var mcid = 0; mcid < draws.Count; mcid++)
+        {
+            var draw = draws[mcid];
+            marks.Add(draw.Sequence, new TaggedMark(draw.Element, mcid));
+        }
+
+        // ISO 32000-1 14.7.4.4: structure kids may reference MCIDs in reading order
+        // independently of the marked-content sequence order in the page stream.
         draws.Sort(static (a, b) => a.Sequence.CompareTo(b.Sequence));
 
         var own = new Dictionary<StructureElement, List<TaggedDraw>>();
@@ -169,9 +176,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         var subtreeStart = new Dictionary<StructureElement, int>();
         ComputeSubtreeStart(documentElement, own, subtreeStart);
 
-        var mcid = 0;
-        Walk(documentElement, own, subtreeStart, pageIndex, segments, ref mcid);
-        return segments;
+        Walk(documentElement, own, subtreeStart, pageIndex, marks);
+        return marks;
     }
 
     private static int ComputeSubtreeStart(
@@ -202,8 +208,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
         Dictionary<StructureElement, List<TaggedDraw>> own,
         Dictionary<StructureElement, int> subtreeStart,
         int pageIndex,
-        List<TaggedSegment> segments,
-        ref int mcid)
+        Dictionary<int, TaggedMark> marks)
     {
         own.TryGetValue(element, out var draws);
         var next = 0;
@@ -222,38 +227,33 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, Captured
 
             if (next > start)
             {
-                AddSegment(element, draws!, start, next, pageIndex, segments, ref mcid);
+                AddMarks(element, draws!, start, next, pageIndex, marks);
             }
 
-            Walk(child, own, subtreeStart, pageIndex, segments, ref mcid);
+            Walk(child, own, subtreeStart, pageIndex, marks);
             element.AdvancePast(child);
         }
 
         if (draws is not null && next < draws.Count)
         {
-            AddSegment(element, draws, next, draws.Count, pageIndex, segments, ref mcid);
+            AddMarks(element, draws, next, draws.Count, pageIndex, marks);
         }
     }
 
-    private static void AddSegment(
+    private static void AddMarks(
         StructureElement element,
         List<TaggedDraw> draws,
         int start,
         int end,
         int pageIndex,
-        List<TaggedSegment> segments,
-        ref int mcid)
+        Dictionary<int, TaggedMark> marks)
     {
-        var content = new List<TaggedDraw>(end - start);
         for (var i = start; i < end; i++)
         {
-            content.Add(draws[i]);
+            element.AddMark(pageIndex, marks[draws[i].Sequence].Mcid);
         }
-
-        segments.Add(new TaggedSegment(element, mcid, content));
-        element.AddMark(pageIndex, mcid);
-        mcid++;
     }
+
 }
 
 internal readonly struct TaggedDraw
@@ -262,11 +262,6 @@ internal readonly struct TaggedDraw
 
     public required StructureElement Element { get; init; }
 
-    public FillDraw? Fill { get; init; }
-
-    public ImageDraw? Image { get; init; }
-
-    public TextDraw? Text { get; init; }
 }
 
-internal sealed record TaggedSegment(StructureElement Element, int Mcid, List<TaggedDraw> Content);
+internal readonly record struct TaggedMark(StructureElement Element, int Mcid);

@@ -18,16 +18,19 @@ internal sealed class CodeSymbolEmitter(StructureTreeBuilder structureTree)
         ImmutableArray<CodeSymbolModule> modules,
         double x,
         double topY,
-        ImmutableArray<LaidOutCaptionLine>? caption)
+        ImmutableArray<LaidOutCaptionLine>? caption,
+        SemanticArtifactKind? artifact = null)
     {
         var plan = context.Plan;
-        var element = structureTree.ElementOf(source);
+        var element = artifact is null ? structureTree.ElementOf(source) : null;
+        artifact ??= element is null ? structureTree.ArtifactOf(source) : null;
         foreach (var module in modules)
         {
             plan.Fills.Add(new FillDraw
             {
                 Sequence = plan.NextSequence(),
                 Element = element,
+                Artifact = artifact,
                 X = x + module.X,
                 Y = topY - module.Y - module.Height,
                 Width = module.Width,
@@ -43,7 +46,7 @@ internal sealed class CodeSymbolEmitter(StructureTreeBuilder structureTree)
 
         foreach (var line in lines)
         {
-            context.Text.EmitLine(context, line.Line, x, topY - line.Y, element);
+            context.Text.EmitLine(context, line.Line, x, topY - line.Y, element, artifact: artifact);
         }
     }
 }

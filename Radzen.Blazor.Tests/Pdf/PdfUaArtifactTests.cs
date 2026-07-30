@@ -128,7 +128,7 @@ public class PdfUaArtifactTests
     public void TaggedDocument_HeaderContentIsInsideArtifact()
     {
         var content = ContentStringOf(AuthorBanded(ua: true));
-        Assert.Contains("/Artifact BMC", content, StringComparison.Ordinal);
+        Assert.Contains("/Artifact <</Type /Pagination>> BDC", content, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class PdfUaArtifactTests
     }
 
     [Fact]
-    public void LevelA_WithUntaggedList_Throws()
+    public void LevelA_WithList_UsesCapturedStructuralTags()
     {
         var document = new Document();
         var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3A };
@@ -204,9 +204,14 @@ public class PdfUaArtifactTests
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
-        var exception = Record.Exception(() => builderRenderer.ToArray(document));
-        Assert.NotNull(exception);
-        Assert.Contains("list", exception!.Message, StringComparison.OrdinalIgnoreCase);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var types = new List<string>();
+        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
+
+        Assert.Contains("L", types);
+        Assert.Contains("LI", types);
+        Assert.Contains("Lbl", types);
+        Assert.Contains("LBody", types);
     }
 
     [Fact]
