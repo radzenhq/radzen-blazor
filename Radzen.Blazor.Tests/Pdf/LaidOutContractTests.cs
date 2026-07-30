@@ -247,14 +247,14 @@ public class LaidOutContractTests
             "The built-in font 'Helvetica' cannot draw 'ﬁ' (U+FB01): a base-14 font is limited "
             + "to the WinAnsi character set. Register a font that covers these characters with "
             + "FontCollection.Register, add such a font to the SetFallback chain, or set "
-            + "FontCollection.AllowUnsupportedCharacters to true to draw '?' in their place.",
+            + "DocumentRenderer.AllowUnsupportedCharacters to true to draw '?' in their place.",
             error.Message);
 
-        document.Fonts.AllowUnsupportedCharacters = true;
-        Assert.Throws<InvalidOperationException>(() => Render(laidOut, document));
+        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        Assert.Throws<InvalidOperationException>(() => Render(laidOut, document, renderer));
 
-        var recaptured = DocumentLayouter.Layout(document);
-        var rendered = Render(recaptured, document);
+        var recaptured = DocumentLayouter.Layout(document, allowUnsupportedCharacters: true);
+        var rendered = Render(recaptured, document, renderer);
 
         using var buffer = new MemoryStream(rendered);
         var reloaded = PortableDocument.LoadFromStream(buffer);
@@ -760,6 +760,11 @@ public class LaidOutContractTests
     private static bool IsImmutableArray(System.Type type)
         => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ImmutableArray<>);
 
+    private static readonly System.Type[] ImmutableAfterParseSharedValues =
+    [
+        typeof(Radzen.Documents.Fonts.Sfnt.SfntFont),
+    ];
+
     private static readonly System.Type[] MutableModelRoots =
     [
         typeof(Block),
@@ -865,7 +870,7 @@ public class LaidOutContractTests
                 return;
             }
 
-            if (type == typeof(Radzen.Documents.Fonts.Sfnt.SfntFont))
+            if (Array.IndexOf(ImmutableAfterParseSharedValues, type) >= 0)
             {
                 Radzen.Blazor.Documents.Tests.SharedSfntFontConcurrencyTests.AssertNamedLazyCacheInvariant();
                 return;

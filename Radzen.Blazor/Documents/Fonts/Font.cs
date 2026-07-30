@@ -100,6 +100,15 @@ public sealed class Font : ITracksChanges
         Color = EffectiveColor,
     };
 
+    internal bool HasNoDeclaredValues
+        => family is null
+            && size is null
+            && bold is null
+            && italic is null
+            && underline is null
+            && strikethrough is null
+            && color is null;
+
     internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();

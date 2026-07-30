@@ -25,24 +25,44 @@ internal sealed class SfntFont
         UnitsPerEm = ReadHead();
         GlyphCount = ReadMaxp();
 
-        var numberOfHMetrics = ReadHhea();
-        names = directory.TryGet("name", out var name)
+        var horizontalHeader = ReadHhea();
+        Ascent = horizontalHeader.Ascent;
+        Descent = horizontalHeader.Descent;
+        LineGap = horizontalHeader.LineGap;
+
+        names = TryGetValidated("name", NameTableHeaderLength, out var name)
             ? NameTable.Parse(data, (int)name.Offset)
             : new NameTable();
 
-        metrics = directory.TryGet("hmtx", out var hmtx)
-            ? HorizontalMetrics.Parse(data, (int)hmtx.Offset, numberOfHMetrics)
-            : throw new InvalidDataException("Required 'hmtx' table is missing.");
+        metrics = HorizontalMetrics.Parse(
+            data,
+            (int)RequireTable("hmtx", (uint)horizontalHeader.NumberOfHMetrics * 4).Offset,
+            horizontalHeader.NumberOfHMetrics);
 
-        cmap = directory.TryGet("cmap", out var cmapTable)
+        cmap = TryGetValidated("cmap", CmapHeaderLength, out var cmapTable)
             ? Cmap.Parse(data, (int)cmapTable.Offset)
             : null;
 
-        ReadPost();
-        ReadOs2();
+        ItalicAngle = ReadPost();
 
-        IsCff = directory.Contains("CFF ");
+        var os2 = ReadOs2();
+        FsType = os2.FsType;
+        Bold = os2.Bold;
+        Italic = os2.Italic;
+        CapHeight = os2.CapHeight;
+
+        IsCff = HasTable("CFF ");
     }
+
+    private const uint NameTableHeaderLength = 6;
+
+    private const uint CmapHeaderLength = 4;
+
+    private const uint PostItalicAngleLength = 8;
+
+    private const uint Os2SelectionLength = 64;
+
+    private const uint Os2CapHeightLength = 90;
 
     public ushort UnitsPerEm { get; }
 
@@ -54,23 +74,23 @@ internal sealed class SfntFont
 
     public string PostScriptName => names.PostScriptName;
 
-    public short Ascent { get; private set; }
+    public short Ascent { get; }
 
-    public short Descent { get; private set; }
+    public short Descent { get; }
 
-    public short LineGap { get; private set; }
+    public short LineGap { get; }
 
-    public short CapHeight { get; private set; }
+    public short CapHeight { get; }
 
-    public double ItalicAngle { get; private set; }
+    public double ItalicAngle { get; }
 
     public bool IsCff { get; }
 
-    public bool Bold { get; private set; }
+    public bool Bold { get; }
 
-    public bool Italic { get; private set; }
+    public bool Italic { get; }
 
-    public ushort FsType { get; private set; }
+    public ushort FsType { get; }
 
     public bool EmbeddingRestricted => (FsType & 0x0002) != 0;
 
@@ -84,9 +104,9 @@ internal sealed class SfntFont
         }
     }
 
-    public bool IsVariable => directory.Contains("fvar");
+    public bool IsVariable => HasTable("fvar");
 
-    public bool IsColorFont => directory.Contains("COLR") || directory.Contains("sbix") || directory.Contains("SVG ");
+    public bool IsColorFont => HasTable("COLR") || HasTable("sbix") || HasTable("SVG ");
 
     public void EnsureRenderable(bool allowDegraded)
     {
@@ -127,7 +147,7 @@ internal sealed class SfntFont
         var cache = Volatile.Read(ref kerning);
         if (cache is null)
         {
-            var parsed = directory.Contains("kern") && TryGetTable("kern", out var table)
+            var parsed = HasTable("kern") && TryGetTable("kern", out var table)
                 ? KernTable.Parse(table)
                 : [];
             cache = Interlocked.CompareExchange(ref kerning, parsed, null) ?? parsed;
@@ -288,14 +308,17 @@ internal sealed class SfntFont
         return new SfntReader(data).ReadUInt16At((int)maxp.Offset + 4);
     }
 
-    private ushort ReadHhea()
+    private readonly record struct HorizontalHeader(short Ascent, short Descent, short LineGap, int NumberOfHMetrics);
+
+    private HorizontalHeader ReadHhea()
     {
         var hhea = RequireTable("hhea", 36);
         var reader = new SfntReader(data, (int)hhea.Offset + 4);
-        Ascent = reader.ReadInt16();
-        Descent = reader.ReadInt16();
-        LineGap = reader.ReadInt16();
-        return reader.ReadUInt16At((int)hhea.Offset + 34);
+        var ascent = reader.ReadInt16();
+        var descent = reader.ReadInt16();
+        var lineGap = reader.ReadInt16();
+        return new HorizontalHeader(
+            ascent, descent, lineGap, reader.ReadUInt16At((int)hhea.Offset + 34));
     }
 
     private void ValidateRequiredTable(TableRecord record, string tag, uint minimumLength)
@@ -318,41 +341,46 @@ internal sealed class SfntFont
         return record;
     }
 
-    private void ReadPost()
+    private double ReadPost()
+        => TryGetValidated("post", PostItalicAngleLength, out var post)
+            ? new SfntReader(data, (int)post.Offset + 4).ReadInt32() / 65536.0
+            : 0;
+
+    private readonly record struct StyleFlags(ushort FsType, bool Bold, bool Italic, short CapHeight);
+
+    private StyleFlags ReadOs2()
     {
-        if (!directory.TryGet("post", out var post))
+        if (!TryGetValidated("OS/2", Os2SelectionLength, out var os2))
         {
-            return;
-        }
-
-        var reader = new SfntReader(data, (int)post.Offset + 4);
-        ItalicAngle = reader.ReadInt32() / 65536.0;
-    }
-
-    private void ReadOs2()
-    {
-        if (!directory.TryGet("OS/2", out var os2))
-        {
-            if (directory.TryGet("head", out var head))
-            {
-                var macStyle = new SfntReader(data).ReadUInt16At((int)head.Offset + 44);
-                Bold = (macStyle & 0x01) != 0;
-                Italic = (macStyle & 0x02) != 0;
-            }
-
-            return;
+            var macStyle = new SfntReader(data).ReadUInt16At((int)RequireTable("head", 46).Offset + 44);
+            return new StyleFlags(0, (macStyle & 0x01) != 0, (macStyle & 0x02) != 0, 0);
         }
 
         var reader = new SfntReader(data);
         var version = reader.ReadUInt16At((int)os2.Offset);
-        FsType = reader.ReadUInt16At((int)os2.Offset + 8);
+        var fsType = reader.ReadUInt16At((int)os2.Offset + 8);
         var fsSelection = reader.ReadUInt16At((int)os2.Offset + 62);
-        Italic = (fsSelection & 0x01) != 0;
-        Bold = (fsSelection & 0x20) != 0;
+        var capHeight = (short)0;
 
         if (version >= 2)
         {
-            CapHeight = reader.ReadInt16At((int)os2.Offset + 88);
+            ValidateRequiredTable(os2, "OS/2", Os2CapHeightLength);
+            capHeight = reader.ReadInt16At((int)os2.Offset + 88);
         }
+
+        return new StyleFlags(fsType, (fsSelection & 0x20) != 0, (fsSelection & 0x01) != 0, capHeight);
+    }
+
+    private bool HasTable(string tag) => TryGetValidated(tag, 0, out _);
+
+    private bool TryGetValidated(string tag, uint minimumLength, out TableRecord record)
+    {
+        if (!directory.TryGet(tag, out record))
+        {
+            return false;
+        }
+
+        ValidateRequiredTable(record, tag, minimumLength);
+        return true;
     }
 }

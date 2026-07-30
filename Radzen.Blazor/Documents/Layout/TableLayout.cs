@@ -223,7 +223,7 @@ internal static class TableLayout
         => cell.Blocks.Count == 0
             && cell.ColumnSpan == 1
             && cell.RowSpan == 1
-            && !cell.Font.IsModified
+            && cell.Font.HasNoDeclaredValues
             && cell.Alignment is null
             && cell.VerticalAlignment == VerticalAlignment.Top
             && cell.Padding == default
