@@ -85,6 +85,7 @@ namespace Radzen.Blazor
                                                                      .ToString();
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         bool _clickToOpenChanged;
 
         /// <inheritdoc />
@@ -108,17 +109,35 @@ namespace Radzen.Blazor
             {
                 _clickToOpenChanged = false;
 
-                if (_jsRef != null)
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                if (jsRef != null)
                 {
-                    await _jsRef.InvokeVoidAsync("dispose");
-                    await _jsRef.DisposeAsync();
-                    _jsRef = null;
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
+                }
+
+                if (version != _jsRefVersion)
+                {
+                    return;
                 }
 
                 if (Visible)
                 {
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createMenu", Element, ClickToOpen);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }
@@ -437,8 +456,11 @@ namespace Radzen.Blazor
             {
                 NavigationManager.LocationChanged -= OnLocationChanged;
             }
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 

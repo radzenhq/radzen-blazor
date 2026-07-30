@@ -34,6 +34,7 @@ namespace Radzen.Blazor
     public partial class RadzenGoogleMap : RadzenComponent
     {
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         /// <summary>
         /// Gets or sets the data - collection of RadzenGoogleMapMarker.
         /// </summary>
@@ -224,17 +225,35 @@ namespace Radzen.Blazor
                 {
                     _visibleChanged = false;
 
-                    if (_jsRef != null)
+                    var version = ++_jsRefVersion;
+                    var jsRef = _jsRef;
+                    _jsRef = null;
+
+                    if (jsRef != null)
                     {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
-                        _jsRef = null;
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
+                    }
+
+                    if (version != _jsRefVersion)
+                    {
+                        return;
                     }
 
                     if (Visible)
                     {
-                        _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
+                        var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
                              data.Select(m => new GoogleMapMarkerData { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+
+                        if (version == _jsRefVersion)
+                        {
+                            _jsRef = created;
+                        }
+                        else if (created != null)
+                        {
+                            await created.InvokeVoidAsync("dispose");
+                            await created.DisposeAsync();
+                        }
                     }
                 }
                 else if (Visible && _jsRef != null)
@@ -250,10 +269,14 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable && _jsRef != null)
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+
+            if (IsJSRuntimeAvailable && jsRef != null)
             {
-                _jsRef.InvokeVoidAsync("dispose");
-                _jsRef.DisposeAsync();
+                jsRef.InvokeVoidAsync("dispose");
+                jsRef.DisposeAsync();
             }
 
             GC.SuppressFinalize(this);

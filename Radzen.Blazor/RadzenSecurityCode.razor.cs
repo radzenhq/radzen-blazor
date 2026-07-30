@@ -69,6 +69,7 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
 
         bool firstRender;
         bool visibleChanged;
@@ -119,14 +120,31 @@ namespace Radzen.Blazor
 
                 if (Visible && !Disabled && JSRuntime != null)
                 {
-                    if (_jsRef != null)
+                    var version = ++_jsRefVersion;
+                    var jsRef = _jsRef;
+                    _jsRef = null;
+
+                    if (jsRef != null)
                     {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
                     }
 
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSecurityCode", GetId(), Reference, Element,
-                        Type == SecurityCodeType.Numeric ? true : false);
+                    if (version == _jsRefVersion)
+                    {
+                        var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSecurityCode", GetId(), Reference, Element,
+                            Type == SecurityCodeType.Numeric ? true : false);
+
+                        if (version == _jsRefVersion)
+                        {
+                            _jsRef = created;
+                        }
+                        else if (created != null)
+                        {
+                            await created.InvokeVoidAsync("dispose");
+                            await created.DisposeAsync();
+                        }
+                    }
 
                     StateHasChanged();
                 }
@@ -138,8 +156,11 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
 
             GC.SuppressFinalize(this);
         }

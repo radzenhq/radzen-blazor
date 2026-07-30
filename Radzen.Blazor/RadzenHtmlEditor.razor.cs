@@ -529,13 +529,30 @@ namespace Radzen.Blazor
             {
                 if (Visible && JSRuntime != null)
                 {
-                    if (_jsRef != null)
+                    var version = ++_jsRefVersion;
+                    var jsRef = _jsRef;
+                    _jsRef = null;
+
+                    if (jsRef != null)
                     {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
                     }
 
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
+                    if (version == _jsRefVersion)
+                    {
+                        var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
+
+                        if (version == _jsRefVersion)
+                        {
+                            _jsRef = created;
+                        }
+                        else if (created != null)
+                        {
+                            await created.InvokeVoidAsync("dispose");
+                            await created.DisposeAsync();
+                        }
+                    }
                 }
             }
 
@@ -645,9 +662,11 @@ namespace Radzen.Blazor
 
             if (visibleChanged && !firstRender && !Visible && _jsRef != null)
             {
-                await _jsRef.InvokeVoidAsync("dispose");
-                await _jsRef.DisposeAsync();
+                _jsRefVersion++;
+                var jsRef = _jsRef;
                 _jsRef = null;
+                await jsRef.InvokeVoidAsync("dispose");
+                await jsRef.DisposeAsync();
             }
         }
 
@@ -658,17 +677,21 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
 
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
 
-            if (_jsRef != null)
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+
+            if (jsRef != null)
             {
-                _jsRef.InvokeVoid("dispose");
-                _jsRef.DisposeFireAndForget();
-                _jsRef = null;
+                jsRef.InvokeVoid("dispose");
+                jsRef.DisposeFireAndForget();
             }
 
             GC.SuppressFinalize(this);

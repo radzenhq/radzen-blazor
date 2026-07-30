@@ -151,6 +151,51 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("-1", component.Find(".rz-fileupload-choose").GetAttribute("tabindex"));
         }
+
+        [Fact]
+        public async Task Upload_DoesNotThrow_WhenDisposedWhileRecreatingJsHandler()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
+            var disposePlan = module.SetupVoid("dispose");
+
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/2"));
+
+            ctx.DisposeComponents();
+
+            disposePlan.SetVoidResult();
+
+            var unhandled = ctx.Renderer.UnhandledException;
+            var completed = await Task.WhenAny(unhandled, Task.Delay(500));
+            Assert.NotSame(unhandled, completed);
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createUpload"));
+        }
+
+        [Fact]
+        public async Task Upload_CreatesSingleJsHandler_WhenRecreationsOverlap()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var module = ctx.JSInterop.SetupModule("Radzen.createUpload", _ => true);
+            var disposePlan = module.SetupVoid("dispose");
+
+            var component = ctx.RenderComponent<RadzenUpload>(parameters => parameters.Add(p => p.Url, "upload/1"));
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/2"));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Url, "upload/3"));
+
+            disposePlan.SetVoidResult();
+
+            var unhandled = ctx.Renderer.UnhandledException;
+            var completed = await Task.WhenAny(unhandled, Task.Delay(500));
+            Assert.NotSame(unhandled, completed);
+            Assert.Equal(2, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.createUpload"));
+        }
     }
 }
 

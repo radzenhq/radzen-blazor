@@ -500,6 +500,7 @@ namespace Radzen.Blazor
 
         ElementReference itemsElement;
         IJSObjectReference? scrollDisposable;
+        int scrollDisposableVersion;
         bool _visibleChanged;
 
         /// <summary>
@@ -546,17 +547,35 @@ namespace Radzen.Blazor
             {
                 _visibleChanged = false;
 
-                if (scrollDisposable != null)
+                var version = ++scrollDisposableVersion;
+                var jsRef = scrollDisposable;
+                scrollDisposable = null;
+
+                if (jsRef != null)
                 {
-                    await scrollDisposable.InvokeVoidAsync("dispose");
-                    await scrollDisposable.DisposeAsync();
-                    scrollDisposable = null;
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
+                }
+
+                if (version != scrollDisposableVersion)
+                {
+                    return;
                 }
 
                 if (Visible)
                 {
-                    scrollDisposable = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createCarousel", itemsElement, Reference);
+
+                    if (version == scrollDisposableVersion)
+                    {
+                        scrollDisposable = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }
@@ -572,12 +591,11 @@ namespace Radzen.Blazor
                 timer = null;
             }
 
-            if (scrollDisposable != null)
-            {
-                scrollDisposable.InvokeVoid("dispose");
-                scrollDisposable.DisposeFireAndForget();
-                scrollDisposable = null;
-            }
+            scrollDisposableVersion++;
+            var jsRef = scrollDisposable;
+            scrollDisposable = null;
+            jsRef?.InvokeVoid("dispose");
+            jsRef?.DisposeFireAndForget();
 
             GC.SuppressFinalize(this);
         }

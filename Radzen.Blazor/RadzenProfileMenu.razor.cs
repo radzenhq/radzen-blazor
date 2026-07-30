@@ -30,6 +30,7 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         bool _visibleChanged;
 
         /// <inheritdoc />
@@ -52,17 +53,30 @@ namespace Radzen.Blazor
             {
                 _visibleChanged = false;
 
-                if (_jsRef != null)
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                if (jsRef != null)
                 {
-                    await _jsRef.InvokeVoidAsync("dispose");
-                    await _jsRef.DisposeAsync();
-                    _jsRef = null;
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
                 }
 
-                if (Visible)
+                if (version == _jsRefVersion && Visible)
                 {
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createProfileMenu", Element);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
 
@@ -90,8 +104,11 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 

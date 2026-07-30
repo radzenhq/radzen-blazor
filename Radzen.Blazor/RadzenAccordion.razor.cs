@@ -345,6 +345,7 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? accordionJs;
+        int accordionJsVersion;
         bool _visibleChanged;
         bool shouldRender = true;
 
@@ -363,17 +364,35 @@ namespace Radzen.Blazor
             {
                 _visibleChanged = false;
 
-                if (accordionJs != null)
+                var version = ++accordionJsVersion;
+                var jsRef = accordionJs;
+                accordionJs = null;
+
+                if (jsRef != null)
                 {
-                    await accordionJs.InvokeVoidAsync("dispose");
-                    await accordionJs.DisposeAsync();
-                    accordionJs = null;
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
+                }
+
+                if (version != accordionJsVersion)
+                {
+                    return;
                 }
 
                 if (Visible)
                 {
-                    accordionJs = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createAccordion", Element, Multiple);
+
+                    if (version == accordionJsVersion)
+                    {
+                        accordionJs = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }
@@ -506,12 +525,11 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (accordionJs != null)
-            {
-                accordionJs.InvokeVoid("dispose");
-                accordionJs.DisposeFireAndForget();
-                accordionJs = null;
-            }
+            accordionJsVersion++;
+            var jsRef = accordionJs;
+            accordionJs = null;
+            jsRef?.InvokeVoid("dispose");
+            jsRef?.DisposeFireAndForget();
         }
     }
 }

@@ -2845,6 +2845,7 @@ namespace Radzen.Blazor
         bool settingsChanged;
         bool visibleChanged;
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         internal bool firstRender = true;
 
         /// <inheritdoc />
@@ -2989,8 +2990,33 @@ namespace Radzen.Blazor
 
                 if (Visible && JSRuntime != null)
                 {
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    var version = ++_jsRefVersion;
+                    var jsRef = _jsRef;
+                    _jsRef = null;
+
+                    if (jsRef != null)
+                    {
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
+                    }
+
+                    if (version != _jsRefVersion)
+                    {
+                        return;
+                    }
+
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createDataGrid", Element);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }
@@ -3941,8 +3967,11 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
 
             if (groups != null)
             {

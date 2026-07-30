@@ -77,6 +77,7 @@ namespace Radzen.Blazor
     public partial class RadzenFormField : RadzenComponent, IAsyncDisposable
     {
         private IJSObjectReference? _jsRef;
+        private int _jsRefVersion;
         private bool _visibleChanged;
 
         /// <inheritdoc />
@@ -99,16 +100,34 @@ namespace Radzen.Blazor
             {
                 _visibleChanged = false;
 
-                if (_jsRef != null)
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                if (jsRef != null)
                 {
-                    await _jsRef.InvokeVoidAsync("dispose");
-                    await _jsRef.DisposeAsync();
-                    _jsRef = null;
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
+                }
+
+                if (version != _jsRefVersion)
+                {
+                    return;
                 }
 
                 if (Visible)
                 {
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createFormField", Element);
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createFormField", Element);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }
@@ -116,11 +135,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public async ValueTask DisposeAsync()
         {
-            if (_jsRef != null)
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+
+            if (jsRef != null)
             {
-                try { await _jsRef.InvokeVoidAsync("dispose"); } catch { }
-                try { await _jsRef.DisposeAsync(); } catch { }
-                _jsRef = null;
+                try { await jsRef.InvokeVoidAsync("dispose"); } catch { }
+                try { await jsRef.DisposeAsync(); } catch { }
             }
         }
 

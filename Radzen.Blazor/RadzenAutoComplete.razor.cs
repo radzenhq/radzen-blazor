@@ -384,6 +384,7 @@ namespace Radzen.Blazor
                                          .ToString();
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         bool _jsParamsChanged;
 
         /// <inheritdoc />
@@ -396,11 +397,14 @@ namespace Radzen.Blazor
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
 
-            if (_jsRef != null)
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+
+            if (jsRef != null)
             {
-                _jsRef.InvokeVoid("dispose");
-                _jsRef.DisposeFireAndForget();
-                _jsRef = null;
+                jsRef.InvokeVoid("dispose");
+                jsRef.DisposeFireAndForget();
             }
 
             GC.SuppressFinalize(this);
@@ -423,14 +427,33 @@ namespace Radzen.Blazor
             {
                 _jsParamsChanged = false;
 
-                if (_jsRef != null)
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                if (jsRef != null)
                 {
-                    await _jsRef.InvokeVoidAsync("dispose");
-                    await _jsRef.DisposeAsync();
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
                 }
 
-                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                if (version != _jsRefVersion)
+                {
+                    return;
+                }
+
+                var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                     "Radzen.createAutoComplete", Element, PopupID, OpenOnFocus, Reference, nameof(OnPopupOpen), nameof(OnPopupClose));
+
+                if (version == _jsRefVersion)
+                {
+                    _jsRef = created;
+                }
+                else if (created != null)
+                {
+                    await created.InvokeVoidAsync("dispose");
+                    await created.DisposeAsync();
+                }
             }
         }
 

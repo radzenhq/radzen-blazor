@@ -49,14 +49,17 @@ namespace Radzen.Blazor
     public partial class RadzenUpload : RadzenComponent
     {
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
 
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
             _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 
@@ -315,17 +318,35 @@ namespace Radzen.Blazor
 
                     _jsParamsChanged = false;
 
-                    if (_jsRef != null)
+                    var version = ++_jsRefVersion;
+                    var jsRef = _jsRef;
+                    _jsRef = null;
+
+                    if (jsRef != null)
                     {
-                        await _jsRef.InvokeVoidAsync("dispose");
-                        await _jsRef.DisposeAsync();
-                        _jsRef = null;
+                        await jsRef.InvokeVoidAsync("dispose");
+                        await jsRef.DisposeAsync();
                     }
 
-                    _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                    if (version != _jsRefVersion)
+                    {
+                        return;
+                    }
+
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
                         "Radzen.createUpload", Element,
                         !string.IsNullOrEmpty(Url) ? Url : null, Auto, Multiple,
                         ParameterName, Method, Stream);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
                 }
             }
         }

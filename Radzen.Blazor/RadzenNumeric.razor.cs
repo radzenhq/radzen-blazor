@@ -95,6 +95,7 @@ namespace Radzen.Blazor
         }
 
         IJSObjectReference? _jsRef;
+        int _jsRefVersion;
         bool _jsParamsChanged;
 
         /// <inheritdoc />
@@ -106,17 +107,34 @@ namespace Radzen.Blazor
             {
                 _jsParamsChanged = false;
 
-                if (_jsRef != null)
+                var version = ++_jsRefVersion;
+                var jsRef = _jsRef;
+                _jsRef = null;
+
+                if (jsRef != null)
                 {
-                    await _jsRef.InvokeVoidAsync("dispose");
-                    await _jsRef.DisposeAsync();
+                    await jsRef.InvokeVoidAsync("dispose");
+                    await jsRef.DisposeAsync();
                 }
 
-                var minArg = Min.HasValue ? (object)Min.Value.ToString(CultureInfo.InvariantCulture) : null;
-                var maxArg = Max.HasValue ? (object)Max.Value.ToString(CultureInfo.InvariantCulture) : null;
-                _jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>(
-                    "Radzen.createNumeric", Element, IsInteger(),
-                    Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable);
+                if (version == _jsRefVersion)
+                {
+                    var minArg = Min.HasValue ? (object)Min.Value.ToString(CultureInfo.InvariantCulture) : null;
+                    var maxArg = Max.HasValue ? (object)Max.Value.ToString(CultureInfo.InvariantCulture) : null;
+                    var created = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                        "Radzen.createNumeric", Element, IsInteger(),
+                        Culture.NumberFormat.NumberDecimalSeparator, minArg, maxArg, IsNullable);
+
+                    if (version == _jsRefVersion)
+                    {
+                        _jsRef = created;
+                    }
+                    else if (created != null)
+                    {
+                        await created.InvokeVoidAsync("dispose");
+                        await created.DisposeAsync();
+                    }
+                }
             }
 
             if (pendingSelectionStart.HasValue && JSRuntime != null)
@@ -133,8 +151,11 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
-            _jsRef?.InvokeVoidAsync("dispose");
-            _jsRef?.DisposeAsync();
+            _jsRefVersion++;
+            var jsRef = _jsRef;
+            _jsRef = null;
+            jsRef?.InvokeVoidAsync("dispose");
+            jsRef?.DisposeAsync();
             GC.SuppressFinalize(this);
         }
 
