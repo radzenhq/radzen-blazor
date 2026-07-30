@@ -10,7 +10,6 @@ using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Render;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -22,9 +21,9 @@ public class ImageMeasurementParityTests
 
     private sealed record Placed(double Width, double Height, double X, double Y);
 
-    private static List<List<Placed>> Rendered(Document document)
+    private static List<List<Placed>> Rendered(Document document, DocumentRenderer? renderer)
     {
-        var reader = BuildTestSupport.Read(document);
+        var reader = BuildTestSupport.Read(document, renderer);
         var pages = new List<List<Placed>>();
         var leaves = BuildTestSupport.PageLeaves(reader);
         for (var i = 0; i < leaves.Count; i++)
@@ -49,10 +48,10 @@ public class ImageMeasurementParityTests
     private static double Number(string value)
         => double.Parse(value, CultureInfo.InvariantCulture);
 
-    private static List<List<Placed>> LaidOut(Document document)
+    private static List<List<Placed>> LaidOut(Document document, ImageProbes probes)
     {
         var pages = new List<List<Placed>>();
-        foreach (var page in DocumentLayouter.Layout(document).Pages)
+        foreach (var page in DocumentLayouter.Layout(document, probes).Pages)
         {
             var left = page.ContentBox.X;
             var top = page.Size.Height.Point - page.ContentBox.Y;
@@ -72,10 +71,10 @@ public class ImageMeasurementParityTests
         return pages;
     }
 
-    private static void AssertPaginationAgrees(Document document)
+    private static void AssertPaginationAgrees(Document document, DocumentRenderer? renderer = null)
     {
-        var laidOut = LaidOut(document);
-        var rendered = Rendered(document);
+        var laidOut = LaidOut(document, (renderer?.ImageDecoders ?? ImageDecoders.Default).Probes);
+        var rendered = Rendered(document, renderer);
 
         Assert.Equal(laidOut.Count, rendered.Count);
         for (var i = 0; i < laidOut.Count; i++)
@@ -133,21 +132,17 @@ public class ImageMeasurementParityTests
     }
 
     [Fact]
-    public void RegisteredDecoder_BridgesToNeutralProbe_AndPaginatesIdentically()
+    public void ScopedDecoder_BridgesToItsProbeSet_AndPaginatesIdentically()
     {
-        var decoder = new BridgeDecoder();
-
         Assert.Throws<NotSupportedException>(() => ImageProbes.None.PixelSize(BridgeDecoder.Payload()));
 
-        var probes = ImageProbes.None.Add(
-            data => decoder.TryDecode(data, ReaderLimits.Default, out var xobject) ? ImageDecoder.PixelSize(xobject) : null);
+        var renderer = new DocumentRenderer { ImageDecoders = ImageDecoders.BuiltIn.Add(new BridgeDecoder()) };
+        var probes = renderer.ImageDecoders.Probes;
 
         Assert.Equal(((double)BridgeDecoder.PixelWidth, (double)BridgeDecoder.PixelHeight), probes.PixelSize(BridgeDecoder.Payload()));
         Assert.Equal(ImageFormat.Custom, probes.Format(BridgeDecoder.Payload()));
 
-        ImageDecoder.Register(decoder);
-
-        AssertPaginationAgrees(ImageFlow(BridgeDecoder.Payload(), 6, null));
+        AssertPaginationAgrees(ImageFlow(BridgeDecoder.Payload(), 6, null), renderer);
     }
 
     [Fact]
@@ -249,22 +244,16 @@ public class ImageMeasurementParityTests
             return data;
         }
 
-        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
         {
             if (!data.Span.StartsWith(Magic))
             {
-                xobject = null;
+                image = null;
                 return false;
             }
 
-            var stream = new StreamObject(new byte[PixelWidth * PixelHeight]);
-            stream.Dictionary["Type"] = new NameObject("XObject");
-            stream.Dictionary["Subtype"] = new NameObject("Image");
-            stream.Dictionary["Width"] = new NumberObject(PixelWidth);
-            stream.Dictionary["Height"] = new NumberObject(PixelHeight);
-            stream.Dictionary["ColorSpace"] = new NameObject("DeviceGray");
-            stream.Dictionary["BitsPerComponent"] = new NumberObject(8);
-            xobject = new ImageXObject(stream, null);
+            image = new DecodedImage(
+                new byte[PixelWidth * PixelHeight], PixelWidth, PixelHeight, 8, ImageColorSpace.DeviceGray);
             return true;
         }
     }
