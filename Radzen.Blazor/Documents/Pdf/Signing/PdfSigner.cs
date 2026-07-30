@@ -1,3 +1,4 @@
+using Radzen.Documents.Fonts;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -315,7 +316,7 @@ public static class PdfSigner
             lines.Add(time.ToUniversalTime().ToString("yyyy-MM-dd HH:mm 'UTC'", CultureInfo.InvariantCulture));
         }
 
-        var font = new Font { Name = "Helvetica", Size = 9 };
+        var font = new Font { Family = "Helvetica", Size = 9 };
         return FieldAppearances.BuildSignatureAppearance(
             lines, appearance.Width, appearance.Height, font, scope: default);
     }

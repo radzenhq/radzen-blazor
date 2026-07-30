@@ -3,6 +3,7 @@ using System;
 using System.Collections.Immutable;
 
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Fonts;
 namespace Radzen.Documents.Pdf;
 
 
@@ -169,7 +170,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         ContentEmitter.WriteTextShow(writer, new TextShowOp
         {
             FontKey = key,
-            Size = Font.Size,
+            Size = Font.EffectiveSize.Point,
             X = x.Point,
             Baseline = y.Point,
             Color = Color,

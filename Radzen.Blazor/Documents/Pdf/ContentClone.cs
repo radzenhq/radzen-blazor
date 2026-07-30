@@ -1,3 +1,5 @@
+using Radzen.Documents.Fonts;
+
 namespace Radzen.Documents.Pdf;
 
 internal static class ContentClone
@@ -7,7 +9,7 @@ internal static class ContentClone
 
     public static Font CopyFont(Font source) => new()
     {
-        Name = source.Name,
+        Family = source.Family,
         Size = source.Size,
         Bold = source.Bold,
         Italic = source.Italic,

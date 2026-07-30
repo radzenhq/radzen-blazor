@@ -1,3 +1,5 @@
+using Radzen.Documents.Fonts;
+
 namespace Radzen.Documents.Pdf;
 
 /// <summary>Represents a rubber-stamp annotation.</summary>
@@ -68,10 +70,10 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
         set => Set(ref font, value);
     }
 
-    /// <summary>Gets or sets the font size in points.</summary>
-    public double FontSize
+    /// <summary>Gets or sets the font size.</summary>
+    public Unit FontSize
     {
-        get => Font.Size;
+        get => Font.EffectiveSize;
         set => Font.Size = value;
     }
 

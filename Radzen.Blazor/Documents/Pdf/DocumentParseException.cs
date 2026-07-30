@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents.Pdf.Objects;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// The exception thrown when a PDF byte stream does not conform to the

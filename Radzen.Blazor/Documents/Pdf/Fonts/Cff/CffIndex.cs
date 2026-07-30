@@ -112,7 +112,7 @@ internal sealed class CffIndex(byte[] data, int[] offsets, int endOffset)
 
     internal static int ReadCard16(
         byte[] data, int offset, string errorMessage = "Attempt to read past the end of the CFF data.")
-        => PdfBytes.ReadUInt16BigEndian(data, offset, errorMessage);
+        => BigEndian.ReadUInt16BigEndian(data, offset, errorMessage);
 
     private static byte ReadByte(byte[] data, int offset)
     {

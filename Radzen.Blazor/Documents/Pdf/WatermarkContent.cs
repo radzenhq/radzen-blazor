@@ -1,13 +1,14 @@
-using System;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf;
 
-internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : ContentElement
+internal sealed class WatermarkContent(Watermark watermark, PdfRect box, ImageStore images) : ContentElement
 {
     protected override void EmitBody(ContentWriter writer)
     {
-        watermark.Validate();
         writer.WriteRaw("q\n");
         if (watermark.Opacity < 1)
         {
@@ -15,8 +16,12 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
             writer.WriteRaw(" gs\n");
         }
 
-        WatermarkGeometry.WriteRotation(
-            writer, watermark.Rotation, box.Left + box.Width / 2, box.Bottom + box.Height / 2);
+        ContentEmitter.WriteTransform(
+            writer,
+            WatermarkGeometry.Rotation(
+                watermark.Rotation,
+                box.Left + box.Width / 2,
+                box.Bottom + box.Height / 2));
 
         WriteImage(writer);
         WriteText(writer);
@@ -30,14 +35,14 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
             return;
         }
 
-        var decoded = watermark.DecodeImage(image);
+        var decoded = images.DecodeWatermark(image).Image;
         var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
         var state = plan.Alpha < 1
             ? writer.RegisterOpacity(watermark.Opacity * plan.Alpha)
             : null;
         ContentEmitter.WriteImagePlacement(
-            writer, key, plan.X, plan.Y, plan.Width, plan.Height, state, stencilColor: plan.StencilColor);
+            writer, key, plan.X, plan.Y, plan.Width, plan.Height, state);
     }
 
     private void WriteText(ContentWriter writer)
@@ -52,10 +57,10 @@ internal sealed class WatermarkContent(Watermark watermark, PdfRect box) : Conte
         ContentEmitter.WriteTextShow(writer, new TextShowOp
         {
             FontKey = fontKey,
-            Size = watermark.Font.Size,
+            Size = watermark.Font.EffectiveSize.Point,
             X = plan.X,
             Baseline = plan.Baseline,
-            Color = watermark.Font.Color,
+            Color = watermark.Font.EffectiveColor,
             Bytes = plan.Base14Bytes!,
             ExtGState = plan.AlphaOverride is { } alpha ? writer.RegisterOpacity(alpha) : null,
         });
@@ -81,9 +86,7 @@ internal static class WatermarkTextPlanning
         string text, Watermark watermark, FontCollection? fonts = null)
     {
         var font = watermark.Font;
-        double? alphaOverride = font.Color.A == 255
-            ? null
-            : Math.Clamp(watermark.Opacity * font.Color.A / 255.0, 0, 1);
+        var alphaOverride = WatermarkGeometry.AlphaOverride(watermark.Opacity, font.EffectiveColor.A);
 
         if (fonts is not null && fonts.TryResolvePrimary(font, out _))
         {
@@ -91,7 +94,7 @@ internal static class WatermarkTextPlanning
             {
                 Base14Bytes = null,
                 X = WatermarkGeometry.Centered(fonts.MeasureText(text, font)),
-                Baseline = WatermarkGeometry.Baseline(font.Size),
+                Baseline = -WatermarkGeometry.Baseline(font.EffectiveSize.Point),
                 AlphaOverride = alphaOverride,
             };
         }

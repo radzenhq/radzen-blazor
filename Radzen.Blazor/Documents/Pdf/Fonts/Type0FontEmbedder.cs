@@ -1,9 +1,10 @@
+using Radzen.Documents.Fonts;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf.Fonts.Cff;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 
@@ -269,7 +270,7 @@ internal static class Type0FontEmbedder
     private static int Scale(int value, double scale) => (int)Math.Round(value * scale, MidpointRounding.AwayFromZero);
 
     private static short ReadInt16(byte[] data, int offset)
-        => PdfBytes.ReadInt16BigEndian(data, offset, "Font data is too short to contain its bounding box.");
+        => BigEndian.ReadInt16BigEndian(data, offset, "Font data is too short to contain its bounding box.");
 
 
     private static string SubsetTag(IEnumerable<ushort> gids)

@@ -47,6 +47,11 @@ internal sealed class LoadedState
         SourceBytes = sourceBytes;
     }
 
+    public LoadedState(DocumentReader source)
+    {
+        Source = source;
+    }
+
     public void RecordAppendedResources(Page page, DocumentReader reader, DictionaryObject resources)
         => AppendedResources[page] = (reader, resources);
 

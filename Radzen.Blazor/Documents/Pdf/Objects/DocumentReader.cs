@@ -23,6 +23,7 @@ public sealed class DocumentReader
     private readonly XrefLoader xrefLoader;
     private readonly IndirectObjectStore store;
     private readonly DocumentRepairer repairer;
+    private readonly DocumentObjectGraph? graph;
 
     private DocumentReader(byte[] data, ReaderLimits limits)
     {
@@ -31,6 +32,17 @@ public sealed class DocumentReader
         repairer = new DocumentRepairer(data, limits);
         xrefLoader = new XrefLoader(data, limits, decoder);
         store = new IndirectObjectStore(data, limits, xrefLoader.Entries, decoder, repairer);
+    }
+
+    internal DocumentReader(DocumentObjectGraph graph)
+    {
+        this.graph = graph;
+        limits = ReaderLimits.Default.Snapshot();
+        trailer = graph.Trailer;
+        decoder = new StreamDecoder(limits, Resolve);
+        xrefLoader = null!;
+        store = null!;
+        repairer = null!;
     }
 
     /// <summary>
@@ -47,6 +59,11 @@ public sealed class DocumentReader
     {
         get
         {
+            if (graph is not null)
+            {
+                return graph.Objects.Count;
+            }
+
             var count = 0;
             foreach (var entry in xrefLoader.Entries.Values)
             {
@@ -64,9 +81,9 @@ public sealed class DocumentReader
     /// Gets a value indicating whether the document is encrypted (its trailer
     /// carries an <c>/Encrypt</c> entry and a security handler was constructed).
     /// </summary>
-    public bool IsEncrypted => store.IsEncrypted;
+    public bool IsEncrypted => graph is null && store.IsEncrypted;
 
-    internal int GenerationOf(int number) => store.GenerationOf(number);
+    internal int GenerationOf(int number) => graph is null ? store.GenerationOf(number) : 0;
 
     /// <summary>
     /// Parses a PDF document from a byte array.
@@ -139,54 +156,9 @@ public sealed class DocumentReader
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(limits);
         var snapshot = limits.Snapshot();
-        return Parse(ReadFully(stream, snapshot.MaxFileBytes), password, snapshot);
+        return Parse(PdfSourceBytes.ReadFully(stream, snapshot.MaxFileBytes), password, snapshot);
     }
 
-    internal static byte[] ReadFully(Stream stream, long maxFileBytes)
-    {
-        if (stream.CanSeek)
-        {
-            var remaining = stream.Length - stream.Position;
-            if (remaining < 0)
-            {
-                remaining = 0;
-            }
-
-            if (remaining > maxFileBytes || remaining > int.MaxValue)
-            {
-                throw new DocumentParseException("Maximum file size exceeded.", -1);
-            }
-
-            var buffer = new byte[remaining];
-            stream.ReadExactly(buffer, 0, buffer.Length);
-            return buffer;
-        }
-
-        using var pooled = new PooledBufferStream();
-        var chunk = new byte[81920];
-        long total = 0;
-        int read;
-        while ((read = stream.Read(chunk, 0, chunk.Length)) > 0)
-        {
-            try
-            {
-                total = checked(total + read);
-            }
-            catch (OverflowException)
-            {
-                throw new DocumentParseException("Maximum file size exceeded.", -1);
-            }
-
-            if (total > maxFileBytes || total > int.MaxValue)
-            {
-                throw new DocumentParseException("Maximum file size exceeded.", -1);
-            }
-
-            pooled.Write(chunk, 0, read);
-        }
-
-        return pooled.ToArray();
-    }
 
     internal DictionaryObject? ReconstructCatalogWithPages()
     {
@@ -244,11 +216,16 @@ public sealed class DocumentReader
     /// </summary>
     /// <param name="number">The object number.</param>
     /// <returns>The parsed object.</returns>
-    public DocumentObject GetObject(int number) => store.GetObject(number);
+    public DocumentObject GetObject(int number)
+        => graph is null
+            ? store.GetObject(number)
+            : number >= 1 && number <= graph.Objects.Count
+                ? graph.Objects[number - 1]
+                : throw new KeyNotFoundException($"Object {number} is not present.");
 
     internal IReadOnlyDictionary<DocumentObject, int> BuildObjectNumberIndex()
     {
-        return store.BuildObjectNumberIndex();
+        return graph is null ? store.BuildObjectNumberIndex() : graph.BuildObjectNumberIndex();
     }
 
     /// <summary>
@@ -260,7 +237,14 @@ public sealed class DocumentReader
     public DocumentObject Resolve(DocumentObject value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        return store.Resolve(value);
+        if (graph is null)
+        {
+            return store.Resolve(value);
+        }
+
+        return value is ReferenceObject reference
+            ? graph.Resolve(reference) ?? throw new KeyNotFoundException($"Object {reference.ObjectNumber} is not present.")
+            : value;
     }
 
     private void InitializeSecurity(string? password)

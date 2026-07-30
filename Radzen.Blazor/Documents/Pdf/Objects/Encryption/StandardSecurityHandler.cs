@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using Radzen.Documents.Crypto;
 
@@ -136,8 +138,8 @@ internal sealed class StandardSecurityHandler
         var bytes = data.ToArray();
         return cipher switch
         {
-            CryptMethod.AesV3 => AesCbc.Decrypt(FileKey, bytes),
-            CryptMethod.AesV2 => AesCbc.Decrypt(ObjectKey(objectNumber, generation, aes: true), bytes),
+            CryptMethod.AesV3 => ParseAes.Decrypt(FileKey, bytes),
+            CryptMethod.AesV2 => ParseAes.Decrypt(ObjectKey(objectNumber, generation, aes: true), bytes),
             _ => Rc4.Transform(ObjectKey(objectNumber, generation, aes: false), bytes),
         };
     }
@@ -245,7 +247,7 @@ internal sealed class StandardSecurityHandler
             {
                 IsUserPassword = true;
                 var intermediate = HashPassword(pw, u[40..48], []);
-                FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted));
+                FileKey = RequireAes256Key(ParseAes.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted));
                 VerifyPerms();
                 return;
             }
@@ -258,7 +260,7 @@ internal sealed class StandardSecurityHandler
             {
                 IsOwnerPassword = true;
                 var intermediate = HashPassword(pw, o[40..48], u[..48]);
-                FileKey = RequireAes256Key(AesCbc.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted));
+                FileKey = RequireAes256Key(ParseAes.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted));
                 VerifyPerms();
                 return;
             }
@@ -278,7 +280,7 @@ internal sealed class StandardSecurityHandler
             throw new DocumentParseException("Encryption /Perms must be exactly 16 bytes.");
         }
 
-        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry);
+        var decoded = ParseAes.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry);
         if (decoded[9] != (byte)'a' || decoded[10] != (byte)'d' || decoded[11] != (byte)'b')
         {
             throw new DocumentParseException("Encryption /Perms block failed its integrity check.");
@@ -801,22 +803,11 @@ internal sealed class StandardSecurityHandler
     }
 
     private static bool Equal(byte[] left, byte[] right, int count)
-    {
-        if (left.Length < count || right.Length < count)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < count; i++)
-        {
-            if (left[i] != right[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
+        => left.Length >= count
+            && right.Length >= count
+#pragma warning disable RS0030
+            && CryptographicOperations.FixedTimeEquals(left.AsSpan(0, count), right.AsSpan(0, count));
+#pragma warning restore RS0030
 
     private static byte[] Concat(byte[] a, byte[] b, byte[] c)
     {
@@ -834,4 +825,25 @@ internal sealed class StandardSecurityHandler
         => dictionary.TryGetValue(key, out var value) && value is StringObject text
             ? Encoding.Latin1.GetBytes(text.Value)
             : null;
+
+    private static class ParseAes
+    {
+        public static byte[] Decrypt(byte[] key, byte[] data)
+            => Guard(() => AesCbc.Decrypt(key, data));
+
+        public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] data)
+            => Guard(() => AesCbc.DecryptCbcNoPadding(key, iv, data));
+
+        private static byte[] Guard(Func<byte[]> decrypt)
+        {
+            try
+            {
+                return decrypt();
+            }
+            catch (InvalidDataException exception)
+            {
+                throw new DocumentParseException(exception.Message);
+            }
+        }
+    }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Pdf;
 
@@ -23,6 +24,7 @@ public abstract class FormFieldDefinition
 
     /// <summary>Gets or sets the zero-based index of the page carrying the field.</summary>
     public int PageIndex { get; set; }
+
 }
 
 
@@ -65,6 +67,7 @@ public sealed class TextFieldDefinition(string name) : PositionedFieldDefinition
 
     /// <summary>Gets or sets the maximum accepted character count, or <c>null</c> for no limit.</summary>
     public int? MaxLength { get; set; }
+
 }
 
 
@@ -107,6 +110,7 @@ public sealed class RadioOptionDefinition
 
     /// <summary>Gets or sets the height of the option rectangle.</summary>
     public Unit Height { get; set; }
+
 }
 
 
@@ -119,6 +123,7 @@ public sealed class RadioGroupFieldDefinition(string name) : FormFieldDefinition
 
     /// <summary>Gets or sets the initially selected option value, or <c>null</c>.</summary>
     public string? SelectedValue { get; set; }
+
 }
 
 
@@ -137,4 +142,5 @@ public sealed class ChoiceFieldDefinition(string name) : PositionedFieldDefiniti
 
     /// <summary>Gets or sets the font the value renders with. Defaults to Helvetica 10pt.</summary>
     public Font Font { get; set; } = new();
+
 }

@@ -1,3 +1,4 @@
+using Radzen.Documents.Fonts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -264,7 +265,7 @@ internal sealed class ReverseFont
 
     private static IReadOnlyDictionary<int, double>? BuildBase14Widths(string name)
     {
-        var metrics = Base14Metrics.Resolve(new Font { Name = name });
+        var metrics = BuiltInFontMetrics.Resolve(new Font { Family = name });
         if (metrics is null)
         {
             return null;
@@ -273,7 +274,13 @@ internal sealed class ReverseFont
         var result = new Dictionary<int, double>(256);
         for (var code = 0; code < 256; code++)
         {
-            result[code] = metrics.GetWidth((byte)code);
+            string? glyphName = name switch
+            {
+                "Symbol" => BuiltInFontGlyphData.Symbol.TryGetValue((byte)code, out var symbol) ? symbol : null,
+                "ZapfDingbats" => BuiltInFontGlyphData.ZapfDingbats.TryGetValue((byte)code, out var dingbat) ? dingbat : null,
+                _ => WinAnsiEncoding.GetGlyphName((byte)code),
+            };
+            result[code] = glyphName is null ? 0 : metrics.GetWidth(glyphName);
         }
 
         return result;
