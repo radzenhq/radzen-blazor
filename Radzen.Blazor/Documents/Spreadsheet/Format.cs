@@ -1,4 +1,3 @@
-using Radzen.Blazor.Rendering;
 using System;
 using System.Linq;
 
@@ -11,7 +10,7 @@ internal static class FormatColorExtensions
     public static string ToXLSXColor(this string color)
     {
         ArgumentNullException.ThrowIfNull(color);
-        var parsed = RGB.Parse(color) ?? throw new ArgumentException($"Invalid color value: {color}", nameof(color));
+        var parsed = ColorValue.Parse(color) ?? throw new ArgumentException($"Invalid color value: {color}", nameof(color));
         return $"FF{parsed.ToHex()}";
     }
 }
