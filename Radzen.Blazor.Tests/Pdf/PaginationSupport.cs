@@ -72,6 +72,6 @@ internal static class PaginationSupport
     public static double HeightForLines(double lineHeight, int lines)
         => (lines + 0.4) * lineHeight;
 
-    public static IReadOnlyList<string> BodyTexts(PaginatedPage page)
+    public static IReadOnlyList<string> BodyTexts(LaidOutPage page)
         => [.. page.Body.Lines.Select(l => string.Concat(l.Line.Fragments.Select(f => f.Text)))];
 }

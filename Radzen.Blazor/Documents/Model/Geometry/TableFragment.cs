@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace Radzen.Documents.Geometry;
 
-internal readonly struct FragmentRow
+internal readonly struct LaidOutFragmentRow
 {
     public required int SourceRow { get; init; }
 
@@ -13,11 +13,13 @@ internal readonly struct FragmentRow
     public required double Height { get; init; }
 }
 
-internal sealed record TableFragment
+internal sealed record LaidOutTableSlice
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required int Number { get; init; }
 
-    public required ImmutableArray<FragmentRow> Rows { get; init; }
+    public required ImmutableArray<LaidOutFragmentRow> Rows { get; init; }
 
     public required int HeaderRowCount { get; init; }
 

@@ -34,7 +34,7 @@ internal static class LayoutGeometry
         return text.ToString();
     }
 
-    private static void Layer(StringBuilder text, string name, PageLayer layer)
+    private static void Layer(StringBuilder text, string name, LaidOutLayer layer)
     {
         foreach (var line in layer.Lines)
         {
@@ -45,29 +45,29 @@ internal static class LayoutGeometry
         foreach (var image in layer.Images)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} image y={N(image.Y)} x={N(image.XOffset)} w={N(image.Width)} h={N(image.Height)} source={Source(image.Source)}");
+                $"  {name} image y={N(image.Y)} x={N(image.X)} w={N(image.Width)} h={N(image.Height)} source={Source(image.Source)}");
         }
 
         foreach (var code in layer.CodeSymbols)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} code y={N(code.Y)} x={N(code.XOffset)} w={N(code.Width)} h={N(code.Height)} source={Source(code.Source)}");
+                $"  {name} code y={N(code.Y)} x={N(code.X)} w={N(code.Width)} h={N(code.Height)} source={Source(code.Source)}");
         }
 
         foreach (var table in layer.Tables)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} table y={N(table.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} order={table.Order} rows={table.Fragment.Rows.Length} headers={table.Fragment.HeaderRowCount} source={Source(table.Source)}");
+                $"  {name} table y={N(table.Bounds.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} order={table.Order} rows={table.Fragment.Rows.Length} headers={table.Fragment.HeaderRowCount} source={Source(table.Source)}");
         }
 
         foreach (var box in layer.Boxes)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} box y={N(box.Y)} bounds={N(box.Bounds.X)},{N(box.Bounds.Y)},{N(box.Bounds.Width)},{N(box.Bounds.Height)} order={box.Order} opacity={N(box.Opacity)} lines={box.Content.Lines.Length} source={Source(box.Source)}");
+                $"  {name} box y={N(box.Bounds.Y)} bounds={N(box.Bounds.X)},{N(box.Bounds.Y)},{N(box.Bounds.Width)},{N(box.Bounds.Height)} order={box.Order} opacity={N(box.Opacity)} lines={box.Content.Lines.Length} source={Source(box.Source)}");
         }
     }
 
-    public static IReadOnlyList<string> LineTexts(PageLayer layer)
+    public static IReadOnlyList<string> LineTexts(LaidOutLayer layer)
     {
         var texts = new List<string>();
         foreach (var line in layer.Lines)
@@ -84,7 +84,7 @@ internal static class LayoutGeometry
         return texts;
     }
 
-    private static string Source(object source) => source.GetType().Name;
+    private static string Source(SourceId source) => source.Value.ToString(CultureInfo.InvariantCulture);
 
     private static string N(double value) => value.ToString("F2", CultureInfo.InvariantCulture);
 }
@@ -341,81 +341,81 @@ public class DocumentLayoutGeometryTests
     private const string FlowGeometry =
         """
         page 1 size 400.00x220.00 content 30.00,49.23,340.00,120.77
-          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=55.20 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=82.79 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=SourceId
-          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=SourceId
+          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=0
+          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=0
+          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=1
+          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=1
+          body line y=55.20 w=322.20 h=13.80 baseline=10.86 fragments=11 source=2
+          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=2
+          body line y=82.79 w=322.20 h=13.80 baseline=10.86 fragments=11 source=3
+          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=3
+          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=15
+          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=17
         page 2 size 400.00x220.00 content 30.00,49.23,340.00,120.77
-          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=55.20 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=82.79 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=SourceId
-          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=SourceId
+          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=4
+          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=4
+          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=5
+          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=5
+          body line y=55.20 w=322.20 h=13.80 baseline=10.86 fragments=11 source=6
+          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=6
+          body line y=82.79 w=322.20 h=13.80 baseline=10.86 fragments=11 source=7
+          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=7
+          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=15
+          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=17
         page 3 size 400.00x220.00 content 30.00,49.23,340.00,120.77
-          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=55.20 w=328.88 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=82.79 w=328.88 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=SourceId
-          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=SourceId
+          body line y=0.00 w=322.20 h=13.80 baseline=10.86 fragments=11 source=8
+          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=8
+          body line y=27.60 w=322.20 h=13.80 baseline=10.86 fragments=11 source=9
+          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=9
+          body line y=55.20 w=328.88 h=13.80 baseline=10.86 fragments=11 source=10
+          body line y=68.99 w=64.04 h=13.80 baseline=10.86 fragments=2 source=10
+          body line y=82.79 w=328.88 h=13.80 baseline=10.86 fragments=11 source=11
+          body line y=96.59 w=64.04 h=13.80 baseline=10.86 fragments=2 source=11
+          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=15
+          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=17
         page 4 size 400.00x220.00 content 30.00,49.23,340.00,120.77
-          body line y=0.00 w=328.88 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body line y=27.60 w=328.88 h=13.80 baseline=10.86 fragments=11 source=SourceId
-          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=SourceId
-          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=SourceId
+          body line y=0.00 w=328.88 h=13.80 baseline=10.86 fragments=11 source=12
+          body line y=13.80 w=64.04 h=13.80 baseline=10.86 fragments=2 source=12
+          body line y=27.60 w=328.88 h=13.80 baseline=10.86 fragments=11 source=13
+          body line y=41.40 w=64.04 h=13.80 baseline=10.86 fragments=2 source=13
+          header line y=0.00 w=50.01 h=13.80 baseline=10.86 fragments=1 source=15
+          footer line y=0.00 w=50.00 h=13.80 baseline=10.86 fragments=1 source=17
         """;
 
     private const string TableGeometry =
         """
         page 1 size 400.00x240.00 content 20.00,20.00,360.00,200.00
-          body table y=0.00 w=300.00 h=193.18 order=0 rows=14 headers=1 source=SourceId
+          body table y=0.00 w=300.00 h=193.18 order=0 rows=14 headers=1 source=114
         page 2 size 400.00x240.00 content 20.00,20.00,360.00,200.00
-          body table y=0.00 w=300.00 h=82.79 order=0 rows=6 headers=1 source=SourceId
+          body table y=0.00 w=300.00 h=82.79 order=0 rows=6 headers=1 source=114
         """;
 
     private const string GraphicsGeometry =
         """
         page 1 size 400.00x500.00 content 25.00,25.00,350.00,450.00
-          body line y=109.40 w=134.75 h=13.80 baseline=10.86 fragments=4 source=SourceId
-          body image y=61.40 x=0.00 w=48.00 h=48.00 source=SourceId
-          body box y=0.00 bounds=0.00,0.00,350.00,61.40 order=0 opacity=0.80 lines=3 source=SourceId
+          body line y=109.40 w=134.75 h=13.80 baseline=10.86 fragments=4 source=3
+          body image y=61.40 x=0.00 w=48.00 h=48.00 source=2
+          body box y=0.00 bounds=0.00,0.00,350.00,61.40 order=0 opacity=0.80 lines=3 source=7
         """;
 
     private const string TableOfContentsGeometry =
         """
         page 1 size 400.00x220.00 content 30.00,30.00,340.00,160.00
-          body line y=0.00 w=311.30 h=13.80 baseline=10.86 fragments=4 source=SourceId
-          body line y=13.80 w=299.30 h=13.80 baseline=10.86 fragments=4 source=SourceId
+          body line y=0.00 w=311.30 h=13.80 baseline=10.86 fragments=4 source=20
+          body line y=13.80 w=299.30 h=13.80 baseline=10.86 fragments=4 source=21
         page 2 size 400.00x220.00 content 30.00,30.00,340.00,160.00
-          body line y=0.00 w=98.06 h=13.80 baseline=10.86 fragments=3 source=SourceId
+          body line y=0.00 w=98.06 h=13.80 baseline=10.86 fragments=3 source=0
         page 3 size 400.00x220.00 content 30.00,30.00,340.00,160.00
-          body line y=0.00 w=116.72 h=13.80 baseline=10.86 fragments=4 source=SourceId
+          body line y=0.00 w=116.72 h=13.80 baseline=10.86 fragments=4 source=1
         page 4 size 400.00x220.00 content 30.00,30.00,340.00,160.00
-          body line y=0.00 w=98.05 h=13.80 baseline=10.86 fragments=3 source=SourceId
+          body line y=0.00 w=98.05 h=13.80 baseline=10.86 fragments=3 source=2
         """;
 
     private const string CodeGeometry =
         """
         page 1 size 400.00x400.00 content 20.00,20.00,360.00,360.00
-          body line y=0.00 w=47.36 h=13.80 baseline=10.86 fragments=2 source=SourceId
-          body code y=13.80 x=0.00 w=120.00 h=120.00 source=SourceId
-          body code y=133.80 x=0.00 w=200.00 h=52.00 source=SourceId
+          body line y=0.00 w=47.36 h=13.80 baseline=10.86 fragments=2 source=0
+          body code y=13.80 x=0.00 w=120.00 h=120.00 source=1
+          body code y=133.80 x=0.00 w=200.00 h=52.00 source=2
         """;
 }

@@ -40,10 +40,12 @@ internal readonly struct LaidOutCodeSymbol
 
     public required double Y { get; init; }
 
-    public ImmutableArray<PositionedCaptionLine>? Caption { get; init; }
+    public required double Height { get; init; }
+
+    public ImmutableArray<LaidOutCaptionLine>? Caption { get; init; }
 }
 
-internal readonly struct LaidOutNestedTable
+internal readonly struct LaidOutTablePlacement
 {
     public required LaidOutTable Layout { get; init; }
 
@@ -54,8 +56,10 @@ internal readonly struct LaidOutNestedTable
     public int Order { get; init; }
 }
 
-internal sealed record LaidOutNestedBox
+internal sealed record LaidOutBox
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required SourceId Source { get; init; }
 
     public required LaidOutBoxContent Content { get; init; }
@@ -64,17 +68,19 @@ internal sealed record LaidOutNestedBox
 
     public required BoxStyle Style { get; init; }
 
-    public required double Radius { get; init; }
-
     public required double Padding { get; init; }
 
     public required double Opacity { get; init; }
+
+    public Matrix? Transform { get; init; }
 
     public int Order { get; init; }
 }
 
 internal sealed record LaidOutCell
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required SourceId Source { get; init; }
 
     public required int Row { get; init; }
@@ -99,13 +105,15 @@ internal sealed record LaidOutCell
 
     public ImmutableArray<LaidOutCodeSymbol> CodeSymbols { get; init; } = [];
 
-    public ImmutableArray<LaidOutNestedTable> Tables { get; init; } = [];
+    public ImmutableArray<LaidOutTablePlacement> Tables { get; init; } = [];
 
-    public ImmutableArray<LaidOutNestedBox> Boxes { get; init; } = [];
+    public ImmutableArray<LaidOutBox> Boxes { get; init; } = [];
 }
 
 internal sealed class LaidOutTable
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required ImmutableArray<double> ColumnWidths { get; init; }
 
     public required ImmutableArray<double> RowHeights { get; init; }

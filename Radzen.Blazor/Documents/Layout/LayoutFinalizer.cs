@@ -16,7 +16,7 @@ internal static class LayoutFinalizer
     {
         var resolver = new FieldResolver(fonts, resolution, capture);
         var count = document.Pages.Length;
-        var pages = ImmutableArray.CreateBuilder<PaginatedPage>(count);
+        var pages = ImmutableArray.CreateBuilder<LaidOutPage>(count);
         for (var index = 0; index < count; index++)
         {
             var page = document.Pages[index];
@@ -40,13 +40,14 @@ internal static class LayoutFinalizer
             pages.Add(PageNavigationCollector.Collect(page));
         }
 
-        return LaidOutIdentitySplitter.Split(new LaidOutDocument
+        return new LaidOutDocument
         {
+            Id = document.Id,
             Fonts = document.Fonts,
             Pages = pages.MoveToImmutable(),
             Semantics = document.Semantics,
             Info = document.Info,
-        });
+        };
     }
 
     private sealed class PageState(
@@ -56,7 +57,7 @@ internal static class LayoutFinalizer
         int pageNumber,
         int pageCount)
     {
-        public PageLayer? Layer(PageLayer layer, double width)
+        public LaidOutLayer? Layer(LaidOutLayer layer, double width)
         {
             var lines = Lines(layer.Lines, width);
             var boxes = Boxes(layer.Boxes);
@@ -74,9 +75,9 @@ internal static class LayoutFinalizer
             };
         }
 
-        private ImmutableArray<PositionedBox>? Boxes(ImmutableArray<PositionedBox> boxes)
+        private ImmutableArray<LaidOutBox>? Boxes(ImmutableArray<LaidOutBox> boxes)
         {
-            ImmutableArray<PositionedBox>.Builder? result = null;
+            ImmutableArray<LaidOutBox>.Builder? result = null;
             for (var i = 0; i < boxes.Length; i++)
             {
                 if (Content(
@@ -94,9 +95,9 @@ internal static class LayoutFinalizer
             return result?.ToImmutable();
         }
 
-        private ImmutableArray<PositionedTableFragment>? Tables(ImmutableArray<PositionedTableFragment> tables)
+        private ImmutableArray<LaidOutTableFragment>? Tables(ImmutableArray<LaidOutTableFragment> tables)
         {
-            ImmutableArray<PositionedTableFragment>.Builder? result = null;
+            ImmutableArray<LaidOutTableFragment>.Builder? result = null;
             for (var i = 0; i < tables.Length; i++)
             {
                 if (Table(tables[i].Layout) is not { } layout)
@@ -129,6 +130,7 @@ internal static class LayoutFinalizer
                 ? null
                 : new LaidOutTable
                 {
+                    Id = table.Id,
                     ColumnWidths = table.ColumnWidths,
                     RowHeights = table.RowHeights,
                     Width = table.Width,
@@ -178,9 +180,9 @@ internal static class LayoutFinalizer
             };
         }
 
-        private ImmutableArray<LaidOutNestedTable>? NestedTables(ImmutableArray<LaidOutNestedTable> tables)
+        private ImmutableArray<LaidOutTablePlacement>? NestedTables(ImmutableArray<LaidOutTablePlacement> tables)
         {
-            ImmutableArray<LaidOutNestedTable>.Builder? result = null;
+            ImmutableArray<LaidOutTablePlacement>.Builder? result = null;
             for (var i = 0; i < tables.Length; i++)
             {
                 if (Table(tables[i].Layout) is not { } layout)
@@ -195,9 +197,9 @@ internal static class LayoutFinalizer
             return result?.ToImmutable();
         }
 
-        private ImmutableArray<LaidOutNestedBox>? NestedBoxes(ImmutableArray<LaidOutNestedBox> boxes)
+        private ImmutableArray<LaidOutBox>? NestedBoxes(ImmutableArray<LaidOutBox> boxes)
         {
-            ImmutableArray<LaidOutNestedBox>.Builder? result = null;
+            ImmutableArray<LaidOutBox>.Builder? result = null;
             for (var i = 0; i < boxes.Length; i++)
             {
                 if (Content(
@@ -217,19 +219,6 @@ internal static class LayoutFinalizer
 
         private static double InnerWidth(Container container, double boundsWidth)
             => Math.Max(0, boundsWidth - (2 * container.Padding.Point));
-
-        private ImmutableArray<PositionedLine>? Lines(ImmutableArray<PositionedLine> lines, double width)
-            => LinesCore(
-                lines,
-                width,
-                static line => line.Source,
-                static line => line.Y,
-                static (current, box, y) => new PositionedLine
-                {
-                    Line = box,
-                    Source = current.Source,
-                    Y = y,
-                });
 
         private ImmutableArray<LaidOutLine>? Lines(ImmutableArray<LaidOutLine> lines, double width)
             => LinesCore(

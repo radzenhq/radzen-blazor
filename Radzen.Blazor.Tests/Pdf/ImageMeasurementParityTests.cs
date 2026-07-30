@@ -63,7 +63,7 @@ public class ImageMeasurementParityTests
                 placed.Add(new Placed(
                     image.Width,
                     image.Height,
-                    left + image.XOffset,
+                    left + image.X,
                     top - image.Y - image.Height));
             }
 

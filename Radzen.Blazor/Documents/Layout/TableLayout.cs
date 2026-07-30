@@ -8,7 +8,7 @@ namespace Radzen.Documents.Layout;
 
 internal static class TableLayout
 {
-    private sealed class Placed
+    private sealed class MeasuredCell
     {
         public required Cell Cell { get; init; }
         public required int Row { get; init; }
@@ -37,7 +37,7 @@ internal static class TableLayout
         var nRows = table.Rows.Count;
         var nCols = columnWidths.Length;
         var occupied = new bool[nRows, nCols];
-        var placed = new List<Placed>();
+        var placed = new List<MeasuredCell>();
 
         for (var r = 0; r < nRows; r++)
         {
@@ -85,7 +85,7 @@ internal static class TableLayout
                     resolution,
                     capture);
 
-                placed.Add(new Placed
+                placed.Add(new MeasuredCell
                 {
                     Cell = cell,
                     Row = r,
@@ -171,6 +171,7 @@ internal static class TableLayout
 
             cells.Add(new LaidOutCell
             {
+                Id = capture.Node(),
                 Source = capture.Source(p.Cell),
                 Decoration = CellDecoration(table, p.Cell, p.Row),
                 Opacity = resolution.Opacities.CellOpacity(p.Cell),
@@ -202,6 +203,7 @@ internal static class TableLayout
 
         return new LaidOutTable
         {
+            Id = capture.Node(),
             Source = capture.Source(table),
             Decoration = GeometryCapture.Table(table, additionalLeftIndent),
             ColumnWidths = [.. columnWidths],
@@ -211,20 +213,6 @@ internal static class TableLayout
             Cells = [.. cells],
         };
     }
-
-    internal static LaidOutTable LayoutIsolated(
-        Table table,
-        double availableWidth,
-        FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage = null,
-        LayoutCaptureContext? capture = null)
-        => Layout(
-            table,
-            availableWidth,
-            fonts,
-            measureImage,
-            LoweringContext.CreateIsolated(StyleResolution.Empty),
-            capture: capture);
 
     private static BoxStyle CellDecoration(Table table, Cell cell, int row)
     {

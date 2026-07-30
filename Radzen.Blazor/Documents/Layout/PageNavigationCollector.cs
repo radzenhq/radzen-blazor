@@ -7,11 +7,11 @@ namespace Radzen.Documents.Layout;
 
 internal sealed class PageNavigationCollector
 {
-    private readonly List<PositionedLink> links = [];
-    private readonly List<PositionedAnchor> anchors = [];
+    private readonly List<LaidOutLink> links = [];
+    private readonly List<LaidOutAnchor> anchors = [];
     private readonly HashSet<string> seen = new(StringComparer.Ordinal);
 
-    public static PaginatedPage Collect(PaginatedPage page)
+    public static LaidOutPage Collect(LaidOutPage page)
     {
         var collector = new PageNavigationCollector();
         var left = page.ContentBox.X;
@@ -27,7 +27,7 @@ internal sealed class PageNavigationCollector
         };
     }
 
-    private void Layer(PageLayer layer, double left, double top)
+    private void Layer(LaidOutLayer layer, double left, double top)
     {
         foreach (var line in layer.Lines)
         {
@@ -48,16 +48,16 @@ internal sealed class PageNavigationCollector
         }
     }
 
-    private void Box(in PositionedBox box, double left, double top)
+    private void Box(in LaidOutBox box, double left, double top)
         => Content(
             box.Content,
             left,
             top,
-            box.Y,
+            box.Bounds.Y,
             box.Transform,
             Clip(left, top, box.Bounds, 0));
 
-    private void Fragment(in PositionedTableFragment positioned, double left, double top, Matrix? transform)
+    private void Fragment(in LaidOutTableFragment positioned, double left, double top, Matrix? transform)
     {
         var x = left + positioned.Layout.Decoration.LeftIndent;
         foreach (var row in positioned.Rows)
@@ -138,7 +138,7 @@ internal sealed class PageNavigationCollector
         {
             if (fragment.Paint.Anchor is { Length: > 0 } anchor && seen.Add(anchor))
             {
-                anchors.Add(new PositionedAnchor
+                anchors.Add(new LaidOutAnchor
                 {
                     Name = anchor,
                     Top = transform is { } matrix
@@ -183,7 +183,7 @@ internal sealed class PageNavigationCollector
         }
     }
 
-    private PositionedLink Link(
+    private LaidOutLink Link(
         double left, double top, double right, double bottom, in FragmentPaint paint, SourceId source, Matrix? transform, Clipping? clip)
     {
         if (clip is { } bounds)
@@ -206,7 +206,7 @@ internal sealed class PageNavigationCollector
             bottom = Math.Max(Math.Max(ay, by), Math.Max(cy, dy));
         }
 
-        return new PositionedLink
+        return new LaidOutLink
         {
             Left = left,
             Top = top,

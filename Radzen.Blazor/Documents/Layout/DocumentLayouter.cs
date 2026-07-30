@@ -119,7 +119,7 @@ internal static class DocumentLayouter
         LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages)
     {
-        var pages = new List<PaginatedPage>();
+        var pages = new List<LaidOutPage>();
         foreach (var section in document.Sections)
         {
             if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
@@ -142,6 +142,7 @@ internal static class DocumentLayouter
 
         return new LaidOutDocument
         {
+            Id = capture.Node(),
             Fonts = fonts.Snapshot(),
             Pages = [.. pages],
             Semantics = semantics.Snapshot(),
@@ -202,7 +203,7 @@ internal static class DocumentLayouter
         return anchors;
     }
 
-    private static void CollectLayer(Dictionary<string, int> anchors, PageLayer layer, int page)
+    private static void CollectLayer(Dictionary<string, int> anchors, LaidOutLayer layer, int page)
     {
         foreach (var line in layer.Lines)
         {
@@ -220,7 +221,7 @@ internal static class DocumentLayouter
         }
     }
 
-    private static void CollectFragment(Dictionary<string, int> anchors, in PositionedTableFragment positioned, int page)
+    private static void CollectFragment(Dictionary<string, int> anchors, in LaidOutTableFragment positioned, int page)
     {
         foreach (var row in positioned.Rows)
         {
@@ -253,8 +254,8 @@ internal static class DocumentLayouter
 
     private static void CollectNested(
         Dictionary<string, int> anchors,
-        ImmutableArray<LaidOutNestedTable> tables,
-        ImmutableArray<LaidOutNestedBox> boxes,
+        ImmutableArray<LaidOutTablePlacement> tables,
+        ImmutableArray<LaidOutBox> boxes,
         int page)
     {
         foreach (var nested in tables)

@@ -16,7 +16,7 @@ internal static class BoxContentLayout
         public Block? Source { get; init; }
         public Image? Image { get; init; }
         public Block? CodeSymbol { get; init; }
-        public ImmutableArray<PositionedCaptionLine>? Caption { get; init; }
+        public ImmutableArray<LaidOutCaptionLine>? Caption { get; init; }
         public LaidOutTable? Table { get; init; }
         public Container? Box { get; init; }
         public Measured? BoxContent { get; init; }
@@ -63,7 +63,7 @@ internal static class BoxContentLayout
         var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, resolution, capture);
         foreach (var block in BlockExpander.ExpandBlocks(blocks, contentWidth, resolution))
         {
-            BlockLayoutDispatch.Dispatch(block, visitor, default(Nothing));
+            LoweredBlockDispatch.Dispatch(block, visitor, default(Nothing));
         }
 
         return new Measured
@@ -81,14 +81,11 @@ internal static class BoxContentLayout
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture)
-        : IBlockLayoutHandler<Nothing, Nothing>
+        : ILoweredBlockHandler<Nothing, Nothing>
     {
         public List<CellItem> Items { get; } = [];
 
         public double Height { get; private set; }
-
-        public Nothing Unsupported(Block block, Nothing context)
-            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported inside a table cell.");
 
         private LineBox? Marker(Block block)
             => resolution.ListMarker(block) is { } marker
@@ -166,7 +163,7 @@ internal static class BoxContentLayout
 
         public Nothing Table(Table nested, Nothing context)
         {
-            var layout = BlockLayoutDispatch.LayoutTable(
+            var layout = LoweredBlockDispatch.LayoutTable(
                 nested,
                 contentWidth,
                 fonts,
@@ -235,8 +232,8 @@ internal static class BoxContentLayout
         var lines = new List<LaidOutLine>();
         var laidImages = new List<LaidOutImage>();
         var laidCodeSymbols = new List<LaidOutCodeSymbol>();
-        var nestedTables = new List<LaidOutNestedTable>();
-        var nestedBoxes = new List<LaidOutNestedBox>();
+        var nestedTables = new List<LaidOutTablePlacement>();
+        var nestedBoxes = new List<LaidOutBox>();
         var order = 0;
         var cursorY = contentBox.Top + offset;
         foreach (var item in measured.Items)
@@ -284,6 +281,7 @@ internal static class BoxContentLayout
                     Source = capture.Source(codeSymbol),
                     Modules = CodeSymbolDispatch.Modules(codeSymbol),
                     Width = item.Width,
+                    Height = item.Height,
                     Caption = item.Caption,
                     X = contentBox.Left + item.Indent
                         + HorizontalAlignmentOffset.Of(Effective(BlockAlignment(codeSymbol), align), availableWidth, item.Width),
@@ -292,7 +290,7 @@ internal static class BoxContentLayout
             }
             else if (item.Table is { } nested)
             {
-                nestedTables.Add(new LaidOutNestedTable
+                nestedTables.Add(new LaidOutTablePlacement
                 {
                     Layout = nested,
                     X = contentBox.Left,
@@ -306,13 +304,13 @@ internal static class BoxContentLayout
                 var availableWidth = Math.Max(0, contentBox.Width - item.Indent);
                 var indent = item.Indent + Math.Max(0, HorizontalAlignmentOffset.Of(box.Alignment, availableWidth, item.Width));
                 var innerBox = new Rect(padding, padding, Math.Max(0, item.Width - (2 * padding)), boxContent.Height);
-                nestedBoxes.Add(new LaidOutNestedBox
+                nestedBoxes.Add(new LaidOutBox
                 {
+                    Id = capture.Node(),
                     Source = capture.Source(box),
                     Content = Position(boxContent, innerBox, HorizontalAlignment.Left, VerticalAlignment.Top),
                     Bounds = new Rect(contentBox.Left + indent, cursorY, item.Width, item.Height),
                     Style = GeometryCapture.Box(box, item.Width, item.Height),
-                    Radius = BoxStyle.ClampRadius(box.CornerRadius.Point, item.Width, item.Height),
                     Padding = padding,
                     Opacity = item.BoxOpacity,
                     Order = order++,

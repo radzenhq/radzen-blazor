@@ -28,7 +28,7 @@ public class LaidOutContractTests
         return section;
     }
 
-    private static LineFragment FirstFragment(PaginatedPage page)
+    private static LineFragment FirstFragment(LaidOutPage page)
         => page.Body.Lines[0].Line.Fragments[0];
 
     [Fact]
@@ -79,7 +79,7 @@ public class LaidOutContractTests
 
         Assert.Equal(before, FirstFragment(page).Paint);
         Assert.Equal("https://www.radzen.com/", FirstFragment(page).Paint.LinkTarget);
-        Assert.Equal("Radzen", FirstFragment(page).Paint.RunText);
+        Assert.Equal("Radzen", FirstFragment(page).GlyphRun.Text);
     }
 
     [Fact]
@@ -470,35 +470,12 @@ public class LaidOutContractTests
     [Fact]
     public void LaidOutTypes_HaveNoSettableProperties()
     {
-        System.Type[] types =
-        [
-            typeof(PaginatedPage),
-            typeof(PageLayer),
-            typeof(LineBox),
-            typeof(LineFragment),
-            typeof(CapturedGlyphSpan),
-            typeof(FragmentPaint),
-            typeof(FontPaint),
-            typeof(ImagePaint),
-            typeof(GradientPaint),
-            typeof(BoxShadowPaint),
-            typeof(FontCollectionSnapshot),
-            typeof(RegisteredFace),
-            typeof(LaidOutCell),
-            typeof(LaidOutTable),
-            typeof(TableFragment),
-            typeof(PositionedTableFragment),
-            typeof(PositionedBox),
-            typeof(PositionedLine),
-            typeof(PositionedCodeSymbol),
-            typeof(PositionedWatermark),
-            typeof(LaidOutDocument),
-        ];
+        var offenders =
+            from type in LaidOutTypes()
+            from property in SettableProperties(type)
+            select $"{type.Name}.{property.Name}";
 
-        foreach (var type in types)
-        {
-            Assert.Empty(SettableProperties(type).Select(property => $"{type.Name}.{property.Name}"));
-        }
+        Assert.Empty(offenders);
     }
 
     [Fact]

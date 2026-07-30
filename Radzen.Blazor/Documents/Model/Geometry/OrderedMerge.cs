@@ -11,6 +11,28 @@ internal static class OrderedMerge
         ImmutableArray<TBox> boxes,
         Func<TBox, int> boxOrder)
         => new(tables, tableOrder, boxes, boxOrder);
+
+    public static void VisitByOrder<TTable, TBox>(
+        ImmutableArray<TTable> tables,
+        Func<TTable, int> tableOrder,
+        ImmutableArray<TBox> boxes,
+        Func<TBox, int> boxOrder,
+        Action<TTable> visitTable,
+        Action<TBox> visitBox)
+    {
+        var cursor = ByOrder(tables, tableOrder, boxes, boxOrder);
+        while (cursor.MoveNext())
+        {
+            if (cursor.IsTable)
+            {
+                visitTable(tables[cursor.TableIndex]);
+            }
+            else
+            {
+                visitBox(boxes[cursor.BoxIndex]);
+            }
+        }
+    }
 }
 
 internal struct OrderedCursor<TTable, TBox>(

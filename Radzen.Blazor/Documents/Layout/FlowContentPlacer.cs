@@ -11,7 +11,7 @@ internal static class FlowContentPlacer
         Func<Image, double, (double Width, double Height)>? measureImage)
         => measureImage is null ? Paginator.MeasureImage(image, width) : measureImage(image, width);
 
-    public static PositionedImage Image(
+    public static LaidOutImage Image(
         Image image,
         double width,
         double y,
@@ -26,10 +26,10 @@ internal static class FlowContentPlacer
             Y = y,
             Width = imageWidth,
             Height = imageHeight,
-            XOffset = xOffset + HorizontalAlignmentOffset.Of(image.Alignment, width, imageWidth),
+            X = xOffset + HorizontalAlignmentOffset.Of(image.Alignment, width, imageWidth),
         };
 
-    public static PositionedCodeSymbol CodeSymbol(
+    public static LaidOutCodeSymbol CodeSymbol(
         Block block,
         double width,
         double y,
@@ -46,16 +46,22 @@ internal static class FlowContentPlacer
             Y = y,
             Width = codeSymbolWidth,
             Height = codeSymbolHeight,
-            XOffset = xOffset + HorizontalAlignmentOffset.Of(Paginator.CodeSymbolAlignment(block), width, codeSymbolWidth),
+            X = xOffset + HorizontalAlignmentOffset.Of(Paginator.CodeSymbolAlignment(block), width, codeSymbolWidth),
             Caption = CodeSymbolDispatch.Caption(block, fonts, resolution),
         };
 
-    public static PositionedTableFragment Table(
+    public static LaidOutTableFragment Table(
         Table source,
         LaidOutTable layout,
-        TableFragment fragment,
+        LaidOutTableSlice fragment,
         double y,
         int order,
         LayoutCaptureContext capture)
-        => TableFragmentJoin.Join(capture.Source(source), layout, fragment, y, order);
+        => TableFragmentJoin.Join(
+            capture.Node(),
+            capture.Source(source),
+            layout,
+            fragment,
+            y,
+            order);
 }

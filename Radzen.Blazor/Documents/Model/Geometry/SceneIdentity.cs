@@ -4,6 +4,8 @@ namespace Radzen.Documents.Geometry;
 
 internal readonly record struct SourceId(int Value);
 
+internal readonly record struct LaidOutNodeId(int Value);
+
 internal sealed class SceneImageData
 {
     private readonly byte[] bytes;

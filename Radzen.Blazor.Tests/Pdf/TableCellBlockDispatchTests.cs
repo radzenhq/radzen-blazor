@@ -187,6 +187,7 @@ public class TableCellBlockDispatchTests
 
         var exception = Assert.Throws<NotSupportedException>(() => TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
         Assert.Contains("UnknownBlock", exception.Message);
+        Assert.Contains("reached layout before lowering", exception.Message);
     }
 
     [Fact]
@@ -199,6 +200,7 @@ public class TableCellBlockDispatchTests
 
         var exception = Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
         Assert.Contains("UnknownBlock", exception.Message);
+        Assert.Contains("reached layout before lowering", exception.Message);
     }
 
     [Fact]
@@ -294,6 +296,7 @@ public class TableCellBlockDispatchTests
 
         var exception = Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
         Assert.Contains("UnknownBlock", exception.Message);
+        Assert.Contains("reached layout before lowering", exception.Message);
     }
 
     private static List<(double X, string Text)> TextDraws(Document document)

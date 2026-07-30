@@ -7,10 +7,10 @@ internal sealed class CodeSymbolEmitter(StructureTreeBuilder structureTree)
 {
     private static readonly Color ModuleBlack = Color.FromRgb(0, 0, 0);
 
-    public void EmitCodeSymbol(EmitContext context, PositionedCodeSymbol positioned, double left, double top)
+    public void EmitCodeSymbol(EmitContext context, LaidOutCodeSymbol positioned, double left, double top)
         => EmitCodeSymbolModules(
             context, positioned.Source, positioned.Modules,
-            left + positioned.XOffset, top - positioned.Y, positioned.Caption);
+            left + positioned.X, PageSpace.FromTop(top, positioned.Y), positioned.Caption);
 
     public void EmitCodeSymbolModules(
         EmitContext context,
@@ -18,7 +18,7 @@ internal sealed class CodeSymbolEmitter(StructureTreeBuilder structureTree)
         ImmutableArray<CodeSymbolModule> modules,
         double x,
         double topY,
-        ImmutableArray<PositionedCaptionLine>? caption)
+        ImmutableArray<LaidOutCaptionLine>? caption)
     {
         var plan = context.Plan;
         var element = structureTree.ElementOf(source);

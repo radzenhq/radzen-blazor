@@ -59,14 +59,14 @@ public class FirstTableFragmentRowspanTests
             foreach (var frag in page.Body.Tables)
             {
                 Assert.True(
-                    frag.Y + frag.Fragment.Height <= contentHeight + Tol,
-                    $"table fragment bottom {frag.Y + frag.Fragment.Height} exceeds content height {contentHeight}");
+                    frag.Bounds.Y + frag.Fragment.Height <= contentHeight + Tol,
+                    $"table fragment bottom {frag.Bounds.Y + frag.Fragment.Height} exceeds content height {contentHeight}");
             }
         }
 
         var tablePage = pages.Single(p => p.Body.Tables.Length > 0);
         Assert.Empty(tablePage.Body.Lines);
-        Assert.Equal(0, tablePage.Body.Tables[0].Y, Tol);
+        Assert.Equal(0, tablePage.Body.Tables[0].Bounds.Y, Tol);
         Assert.Equal(4, tablePage.Body.Tables[0].Fragment.Rows.Length);
     }
 }

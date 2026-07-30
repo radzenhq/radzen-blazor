@@ -4,7 +4,7 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Layout;
 
-internal interface IBlockLayoutHandler<in TContext, out TResult>
+internal interface ILoweredBlockHandler<in TContext, out TResult>
 {
     TResult Paragraph(Paragraph paragraph, TContext context);
 
@@ -17,15 +17,13 @@ internal interface IBlockLayoutHandler<in TContext, out TResult>
     TResult CodeSymbol(Block block, TContext context);
 
     TResult PageBreak(PageBreak pageBreak, TContext context);
-
-    TResult Unsupported(Block block, TContext context);
 }
 
-internal static class BlockLayoutDispatch
+internal static class LoweredBlockDispatch
 {
     internal static TResult Dispatch<TContext, TResult>(
         Block block,
-        IBlockLayoutHandler<TContext, TResult> handler,
+        ILoweredBlockHandler<TContext, TResult> handler,
         TContext context)
         => block switch
         {
@@ -35,8 +33,13 @@ internal static class BlockLayoutDispatch
             Container container => handler.Container(container, context),
             Barcode or QrCode => handler.CodeSymbol(block, context),
             PageBreak pageBreak => handler.PageBreak(pageBreak, context),
-            _ => handler.Unsupported(block, context),
+            _ => throw Unsupported(block),
         };
+
+    internal static NotSupportedException Unsupported(Block block)
+        => new(
+            $"Block type '{block.GetType().FullName}' reached layout before lowering. "
+            + "Lowered layout accepts only Paragraph, Table, Image, Container, Barcode, QrCode and PageBreak.");
 
     internal static LaidOutTable LayoutTable(
         Table table,

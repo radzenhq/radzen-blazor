@@ -31,7 +31,7 @@ internal static class CodeSymbolDispatch
         return LineBreaker.Break(paragraph, barcode.Width.Point, fonts);
     }
 
-    public static ImmutableArray<PositionedCaptionLine>? Caption(Block block, FontCollection fonts, LoweringContext? resolution)
+    public static ImmutableArray<LaidOutCaptionLine>? Caption(Block block, FontCollection fonts, LoweringContext? resolution)
     {
         if (block is not Barcode barcode || !barcode.ShowText)
         {
@@ -39,11 +39,11 @@ internal static class CodeSymbolDispatch
         }
 
         var lines = CaptionLines(barcode, resolution?.BarcodeFont(barcode) ?? barcode.Font, fonts);
-        var positioned = ImmutableArray.CreateBuilder<PositionedCaptionLine>(lines.Count);
+        var positioned = ImmutableArray.CreateBuilder<LaidOutCaptionLine>(lines.Count);
         var y = barcode.Height.Point;
         foreach (var line in lines)
         {
-            positioned.Add(new PositionedCaptionLine { Line = line, Y = y });
+            positioned.Add(new LaidOutCaptionLine { Line = line, Y = y });
             y += line.Height;
         }
 

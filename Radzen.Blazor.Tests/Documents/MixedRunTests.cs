@@ -33,8 +33,10 @@ public class MixedRunTests
         Assert.Single(lines);
         Assert.Equal(2, lines[0].Fragments.Length);
         Assert.NotEqual(lines[0].Fragments[0].Source, lines[0].Fragments[1].Source);
-        Assert.Equal(r1.Text, lines[0].Fragments[0].Paint.RunText);
-        Assert.Equal(r2.Text, lines[0].Fragments[1].Paint.RunText);
+        var first = lines[0].Fragments[0];
+        var second = lines[0].Fragments[1];
+        Assert.Equal(r1.Text.Substring(first.Start, first.Length), first.GlyphRun.Text);
+        Assert.Equal(r2.Text.Substring(second.Start, second.Length), second.GlyphRun.Text);
     }
 
     [Fact]

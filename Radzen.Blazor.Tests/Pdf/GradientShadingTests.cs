@@ -145,7 +145,9 @@ public class GradientShadingTests
         var pattern = Dict(reader.Resolve(patterns![Assert.Single(patterns.Keys)])!);
         var matrix = Array(reader.Resolve(pattern["Matrix"]!)!);
 
-        var box = Assert.Single(Radzen.Documents.Layout.Paginator.PaginateIsolated(section, new Radzen.Documents.Fonts.FontCollection())).Body.Boxes[0];
+        var box = Assert.Single(Paginator.PaginateIsolated(
+            section,
+            new Radzen.Documents.Fonts.FontCollection())).Body.Boxes[0];
         Assert.Equal(1, Num(matrix[0]), 3);
         Assert.Equal(0, Num(matrix[1]), 3);
         Assert.Equal(0, Num(matrix[2]), 3);

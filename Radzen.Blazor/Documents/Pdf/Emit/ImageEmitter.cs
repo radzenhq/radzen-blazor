@@ -4,7 +4,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
-    public void EmitImage(EmitContext context, PositionedImage positioned, double left, double top)
+    public void EmitImage(EmitContext context, LaidOutImage positioned, double left, double top)
     {
         var plan = context.Plan;
         var paint = positioned.Paint;
@@ -12,8 +12,8 @@ internal sealed class ImageEmitter(ImageStore imageStore, StructureTreeBuilder s
         plan.Images.Add(new ImageDraw
         {
             Sequence = plan.NextSequence(),
-            X = left + positioned.XOffset,
-            Y = top - positioned.Y - positioned.Height,
+            X = left + positioned.X,
+            Y = PageSpace.Bottom(top, positioned.Y, positioned.Height),
             Width = positioned.Width,
             Height = positioned.Height,
             Image = xobject,

@@ -59,23 +59,24 @@ internal sealed class SemanticSnapshotBuilder
         var capturedAssociations = ImmutableArray.CreateBuilder<SemanticStructureAssociation>(
             associations.Count + listBlockElements.Length + tocParagraphElements.Length + runLinkElements.Length);
         capturedAssociations.AddRange(associations);
+        var lastElementBySource = new Dictionary<SourceId, int>();
+        foreach (var association in associations)
+        {
+            lastElementBySource[association.Source] = association.Element;
+        }
+
         foreach (var (block, label, body) in listBlockElements)
         {
             if (label is Node labelNode && body is Node bodyNode)
             {
-                var element = bodyNode.Index;
-                for (var i = associations.Count - 1; i >= 0; i--)
-                {
-                    if (associations[i].Source == identities.Source(block))
-                    {
-                        element = associations[i].Element;
-                        break;
-                    }
-                }
+                var source = identities.Source(block);
+                var element = lastElementBySource.TryGetValue(source, out var associated)
+                    ? associated
+                    : bodyNode.Index;
 
                 capturedAssociations.Add(new SemanticStructureAssociation
                 {
-                    Source = identities.Source(block),
+                    Source = source,
                     Element = element,
                     MarkerElement = labelNode.Index,
                 });
@@ -195,7 +196,6 @@ internal sealed class SemanticSnapshotBuilder
             Intent = intent,
             HeadingLevel = level,
             CustomRole = level == 0 ? paragraph.StyleName : null,
-            Format = resolution.Format(paragraph),
         });
         return (paragraphStyles.Count - 1, intent);
     }
@@ -262,9 +262,7 @@ internal sealed class SemanticSnapshotBuilder
         : BlockVisitor<MappingContext, Nothing>
     {
         protected override Nothing Default(Block block, MappingContext context)
-            => throw new NotSupportedException(
-                $"Block type '{block.GetType().FullName}' is not mapped into the tagged structure tree. "
-                + "Add a Visit overload for it to this block visitor so it cannot silently vanish from accessible output.");
+            => throw LoweredBlockDispatch.Unsupported(block);
 
         public override Nothing Visit(Paragraph paragraph, MappingContext context)
         {

@@ -2,7 +2,7 @@ using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Geometry;
 
-internal readonly struct PositionedWatermarkText
+internal readonly struct LaidOutWatermarkText
 {
     public required string Text { get; init; }
 
@@ -21,7 +21,7 @@ internal readonly struct PositionedWatermarkText
     public double? AlphaOverride { get; init; }
 }
 
-internal readonly struct PositionedWatermarkImage
+internal readonly struct LaidOutWatermarkImage
 {
     public required SourceId Source { get; init; }
 
@@ -38,8 +38,10 @@ internal readonly struct PositionedWatermarkImage
     public required double Alpha { get; init; }
 }
 
-internal sealed record PositionedWatermark
+internal sealed record LaidOutWatermark
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required double CenterX { get; init; }
 
     public required double CenterY { get; init; }
@@ -48,7 +50,7 @@ internal sealed record PositionedWatermark
 
     public required double Opacity { get; init; }
 
-    public PositionedWatermarkImage? Image { get; init; }
+    public LaidOutWatermarkImage? Image { get; init; }
 
-    public PositionedWatermarkText? Text { get; init; }
+    public LaidOutWatermarkText? Text { get; init; }
 }
