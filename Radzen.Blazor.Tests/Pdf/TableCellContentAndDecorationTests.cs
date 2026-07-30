@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,12 +14,12 @@ public class TableCellContentAndDecorationTests
     private static readonly string[] PaintingOperators =
         ["S", "s", "f", "F", "f*", "B", "B*", "b", "b*", "n"];
 
-    private static DocumentBuilder Author(Action<Table, Cell> configure)
+    private static Document Author(Action<Table, Cell> configure)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(200));
 
@@ -25,12 +27,12 @@ public class TableCellContentAndDecorationTests
         var cell = row.Cells[0];
         TableLayoutSupport.Fill(cell, "X");
         configure(table, cell);
-        return builder;
+        return document;
     }
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
+    private static List<ContentOperation> Ops(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         return ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(reader, 0));
     }
 
@@ -66,13 +68,13 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void BottomOnlyBorder_EmitsSingleBottomLine_NotBox()
     {
-        var builder = Author((_, cell) =>
+        var document = Author((_, cell) =>
         {
             cell.Borders.Bottom.Width = 0.5;
             cell.Borders.Bottom.Style = BorderStyle.Solid;
         });
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         var horizontalSegment = false;
         for (var i = 0; i + 1 < ops.Count; i++)
@@ -112,7 +114,7 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void PerEdgeBorders_EmitOwnWidthAndColor()
     {
-        var builder = Author((_, cell) =>
+        var document = Author((_, cell) =>
         {
             cell.Borders.Top.Width = 1;
             cell.Borders.Top.Color = Color.Red;
@@ -122,7 +124,7 @@ public class TableCellContentAndDecorationTests
             cell.Borders.Bottom.Style = BorderStyle.Solid;
         });
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         Assert.True(HasColorOperation(ops, "RG", 1, 0, 0), "top edge strokes in red");
         Assert.True(HasColorOperation(ops, "RG", 0, 0, 1), "bottom edge strokes in blue");
@@ -143,13 +145,13 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void TableBorders_ApplyToCellsWithUnsetEdges()
     {
-        var builder = Author((table, _) =>
+        var document = Author((table, _) =>
         {
             table.Borders.Width = 1;
             table.Borders.Style = BorderStyle.Solid;
         });
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         var stroked = false;
         foreach (var op in ops)
@@ -166,13 +168,13 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void DashedBorder_EmitsDashPattern()
     {
-        var builder = Author((_, cell) =>
+        var document = Author((_, cell) =>
         {
             cell.Borders.Bottom.Width = 1;
             cell.Borders.Bottom.Style = BorderStyle.Dashed;
         });
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         var dashed = false;
         foreach (var op in ops)
@@ -191,9 +193,9 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void CellBackground_EmitsFilledRectangleBeforeText()
     {
-        var builder = Author((_, cell) => cell.Background = Color.Red);
+        var document = Author((_, cell) => cell.Background = Color.Red);
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         var fill = FirstIndex(ops, "f");
         Assert.True(fill >= 0, "cell background emits a fill operator");
@@ -207,10 +209,10 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void RowBackground_EmitsFilledRectangle()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
@@ -220,7 +222,7 @@ public class TableCellContentAndDecorationTests
         TableLayoutSupport.Fill(row.Cells[1], "B");
         row.Background = Color.Blue;
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
 
         Assert.True(FirstIndex(ops, "f") >= 0, "row background emits a fill operator");
         Assert.True(HasColorOperation(ops, "rg", 0, 0, 1), "fill uses the row background color");
@@ -229,10 +231,10 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void ImageInCell_EmitsImageXObjectAndDoOperator()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
@@ -244,7 +246,7 @@ public class TableCellContentAndDecorationTests
         image.Width = Unit.FromPoint(40);
         image.Height = Unit.FromPoint(20);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         Assert.True(BuildTestSupport.ImageXObjects(reader).Count > 0,
             "cell image decodes to an image XObject");
 
@@ -255,10 +257,10 @@ public class TableCellContentAndDecorationTests
     [Fact]
     public void NestedTableInCell_ContentSurvivesRoundTrip()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var outer = section.Blocks.AddTable();
         outer.Columns.Add(Unit.FromPoint(300));
 
@@ -271,17 +273,17 @@ public class TableCellContentAndDecorationTests
         var innerRow = inner.Rows.Add();
         TableLayoutSupport.Fill(innerRow.Cells[0], "NESTED");
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("OUTER", text, StringComparison.Ordinal);
         Assert.Contains("NESTED", text, StringComparison.Ordinal);
     }
 
-    private static DocumentBuilder AuthorBandImage(bool header)
+    private static Document AuthorBandImage(bool header)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var band = header ? section.Header : section.Footer;
         var image = band.Blocks.AddImage(
             new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png")));
@@ -289,7 +291,7 @@ public class TableCellContentAndDecorationTests
         image.Height = Unit.FromPoint(25);
 
         BuildTestSupport.AddText(section, "body", BuildTestSupport.Latin);
-        return builder;
+        return document;
     }
 
     [Fact]

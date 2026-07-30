@@ -2,27 +2,37 @@
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class StructureRoleMapTests
 {
-    private static DocumentBuilder AuthorTagged(bool declareRole)
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) AuthorTagged(bool declareRole)
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en" };
-        builder.Info.Title = "Doc";
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document { Language = "en" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Doc";
+        BuildTestSupport.RegisterLatin(document);
 
         if (declareRole)
         {
-            builder.RoleMap.Add("Callout", "P");
+            builderRenderer.RoleMap.Add("Callout", "P");
         }
 
-        var section = builder.Sections.Add();
+        document.Styles.Add("Callout");
+        var section = document.Sections.Add();
         var note = BuildTestSupport.AddText(section, "See the note", BuildTestSupport.Latin);
         note.StyleName = "Callout";
 
-        return builder;
+        return (document, builderRenderer);
     }
 
     private static DictionaryObject StructTreeRoot(DocumentReader reader)
@@ -51,7 +61,7 @@ public class StructureRoleMapTests
     [Fact]
     public void DeclaredRole_EmitsRoleMapAndTagsElementWithTheRole()
     {
-        var reader = BuildTestSupport.Read(AuthorTagged(declareRole: true));
+        var reader = ReadAuthored(AuthorTagged(declareRole: true));
         var structRoot = StructTreeRoot(reader);
 
         Assert.True(structRoot.TryGetValue("RoleMap", out var mapObject), "StructTreeRoot has /RoleMap");
@@ -65,7 +75,7 @@ public class StructureRoleMapTests
     [Fact]
     public void NoDeclaredRoles_OmitsRoleMapAndKeepsStandardTag()
     {
-        var reader = BuildTestSupport.Read(AuthorTagged(declareRole: false));
+        var reader = ReadAuthored(AuthorTagged(declareRole: false));
         var structRoot = StructTreeRoot(reader);
 
         Assert.False(structRoot.ContainsKey("RoleMap"), "StructTreeRoot has no /RoleMap when no roles declared");
@@ -73,15 +83,17 @@ public class StructureRoleMapTests
     }
 
     [Fact]
-    public void UndeclaredStyleName_StaysStandardParagraph()
+    public void StyleNameWithoutADeclaredRole_StaysStandardParagraph()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en" };
-        builder.Info.Title = "Doc";
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Doc";
+        BuildTestSupport.RegisterLatin(document);
+        document.Styles.Add("Unknown");
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin).StyleName = "Unknown";
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var structRoot = StructTreeRoot(reader);
 
         Assert.False(structRoot.ContainsKey("RoleMap"), "no /RoleMap for an undeclared style");
@@ -91,8 +103,8 @@ public class StructureRoleMapTests
     [Fact]
     public void DeclaredRole_ProducesByteIdenticalOutputAcrossBuilds()
     {
-        var first = AuthorTagged(declareRole: true).ToArray();
-        var second = AuthorTagged(declareRole: true).ToArray();
+        var first = RenderAuthored(AuthorTagged(declareRole: true));
+        var second = RenderAuthored(AuthorTagged(declareRole: true));
         Assert.Equal(first, second);
     }
 }

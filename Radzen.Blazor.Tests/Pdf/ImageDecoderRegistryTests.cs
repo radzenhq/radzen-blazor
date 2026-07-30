@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -93,9 +94,9 @@ public class ImageDecoderRegistryTests
 
     private sealed class StubDecoder(byte[] magic) : IImageDecoder
     {
-        public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
         {
-            if (!data.AsSpan().StartsWith(magic))
+            if (!data.Span.StartsWith(magic))
             {
                 xobject = null;
                 return false;
@@ -113,7 +114,7 @@ public class ImageDecoderRegistryTests
     {
         public int Probes;
 
-        public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
         {
             Interlocked.Increment(ref Probes);
             xobject = null;

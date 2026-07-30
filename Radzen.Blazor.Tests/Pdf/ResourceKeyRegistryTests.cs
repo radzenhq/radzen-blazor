@@ -1,15 +1,20 @@
 #nullable enable
-
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Geometry;
+using Radzen.Documents.Layout;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ResourceKeyRegistryTests
 {
     private static PagePlan Plan() => new() { Size = PageSizes.A4 };
+
+    private static GradientPaint Paint(GradientBrush brush)
+        => GeometryCapture.Gradient(brush, GradientReference.Box(100, 100))!.Value;
 
     private static GeneratedSoftMask Mask(string? contentKey) => new()
     {
@@ -57,12 +62,12 @@ public class ResourceKeyRegistryTests
     public void EqualGradientInstances_StayDistinctPatterns()
     {
         var plan = Plan();
-        var first = new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
-        var second = new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+        var first = Paint(new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)));
+        var second = Paint(new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)));
 
-        Assert.Equal("P0", plan.RegisterPattern(first));
-        Assert.Equal("P0", plan.RegisterPattern(first));
-        Assert.Equal("P1", plan.RegisterPattern(second));
+        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P1", plan.RegisterPattern(second, Matrix.Identity));
     }
 
     [Fact]

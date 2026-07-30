@@ -5,6 +5,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -46,21 +48,21 @@ public class AppearanceBBoxNormalizationTests
         var reader = FormTestSupport.Reload(document);
 
         var page = FormTestSupport.FirstPage(reader);
-        var builder = new StringBuilder();
+        var pdf = new StringBuilder();
         var contents = reader.Resolve(page["Contents"]);
         if (contents is StreamObject single)
         {
-            builder.Append(FormTestSupport.Decode(single));
+            pdf.Append(FormTestSupport.Decode(single));
         }
         else
         {
             foreach (var entry in Assert.IsType<ArrayObject>(contents))
             {
-                builder.Append(FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(entry)))).Append('\n');
+                pdf.Append(FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(entry)))).Append('\n');
             }
         }
 
-        return ContentStreamTokenizer.Parse(Encoding.Latin1.GetBytes(builder.ToString()))
+        return ContentStreamTokenizer.Parse(Encoding.Latin1.GetBytes(pdf.ToString()))
             .Last(operation => operation.Operator == "cm");
     }
 

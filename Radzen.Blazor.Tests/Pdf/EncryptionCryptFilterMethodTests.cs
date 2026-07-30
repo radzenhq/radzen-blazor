@@ -3,6 +3,8 @@ using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

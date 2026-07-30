@@ -5,6 +5,9 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -469,13 +472,13 @@ public class AppendMergeTests
     public void Append_DeepCopiesFreeTextAndAppearanceFonts()
     {
         var text = new TextContent("appearance", Unit.FromPoint(1), Unit.FromPoint(2));
-        text.Font.Name = "Courier";
+        text.Font.Family = "Courier";
         text.Font.Size = 8;
         var annotation = new FreeTextAnnotation(PdfRect.FromSize(10, 20, 30, 40))
         {
             Appearance = new AnnotationAppearance(),
         };
-        annotation.Font.Name = "Times-Roman";
+        annotation.Font.Family = "Times-Roman";
         annotation.Font.Size = 12;
         annotation.Appearance.Content.Add(text);
         var source = new Document();
@@ -483,16 +486,16 @@ public class AppendMergeTests
         var target = new Document();
 
         target.Append(source);
-        annotation.Font.Name = "Helvetica";
+        annotation.Font.Family = "Helvetica";
         annotation.Font.Size = 20;
-        text.Font.Name = "Symbol";
+        text.Font.Family = "Symbol";
         text.Font.Size = 30;
 
         var annotationClone = Assert.IsType<FreeTextAnnotation>(target.Pages[0].Annotations[0]);
-        Assert.Equal("Times-Roman", annotationClone.Font.Name);
+        Assert.Equal("Times-Roman", annotationClone.Font.Family);
         Assert.Equal(12, annotationClone.Font.Size);
         var textClone = Assert.IsType<TextContent>(annotationClone.Appearance!.Content[0]);
-        Assert.Equal("Courier", textClone.Font.Name);
+        Assert.Equal("Courier", textClone.Font.Family);
         Assert.Equal(8, textClone.Font.Size);
     }
 

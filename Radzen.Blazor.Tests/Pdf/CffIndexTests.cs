@@ -1,6 +1,7 @@
 #nullable enable
 using Xunit;
 using Radzen.Documents.Pdf.Fonts.Cff;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

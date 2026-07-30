@@ -9,6 +9,10 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class HeaderFooterDistanceTests
@@ -35,13 +39,13 @@ public class HeaderFooterDistanceTests
         return paragraph;
     }
 
-    private static (DocumentBuilder Builder, Section Section) Author(double margin)
+    private static (Document Builder, Section Section) Author(double margin)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
-        section.Margin = Unit.FromPoint(margin);
-        return (builder, section);
+        section.Margins.SetAll(Unit.FromPoint(margin));
+        return (document, section);
     }
 
     private static List<(string Text, double Y)> TextRuns(string content)
@@ -73,11 +77,11 @@ public class HeaderFooterDistanceTests
     [Fact]
     public void Header_IsNotFlushToPhysicalPageTop()
     {
-        var (builder, section) = Author(margin: 20);
+        var (document, section) = Author(margin: 20);
         section.Header.Blocks.Add(Text("HDR"));
         section.Blocks.Add(Text("BODY"));
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
         var (_, baseline) = LineMetrics(FontSize);
 
@@ -90,11 +94,11 @@ public class HeaderFooterDistanceTests
     [Fact]
     public void Footer_SitsNearPageBottom_NotHangingFromBody()
     {
-        var (builder, section) = Author(margin: 20);
+        var (document, section) = Author(margin: 20);
         section.Footer.Blocks.Add(Text("FTR"));
         section.Blocks.Add(Text("BODY"));
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
         var (lineHeight, baseline) = LineMetrics(FontSize);
 
@@ -107,14 +111,14 @@ public class HeaderFooterDistanceTests
     [Fact]
     public void DefaultHeaderDistance_PositionsHeaderAndReducesBody()
     {
-        var (builder, section) = Author(margin: 40);
+        var (document, section) = Author(margin: 40);
         var distance = Distance(section, "HeaderDistance");
         Assert.InRange(distance, 30.0, 40.0);
 
         section.Header.Blocks.Add(Text("HDR"));
         section.Blocks.Add(Text("BODY"));
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
         var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;
         var (lineHeight, baseline) = LineMetrics(FontSize);
@@ -133,7 +137,7 @@ public class HeaderFooterDistanceTests
     [Fact]
     public void DefaultFooterDistance_PositionsFooterAndReducesBody()
     {
-        var (builder, section) = Author(margin: 40);
+        var (document, section) = Author(margin: 40);
         var distance = Distance(section, "FooterDistance");
         Assert.InRange(distance, 30.0, 40.0);
 
@@ -146,7 +150,7 @@ public class HeaderFooterDistanceTests
             section.Blocks.Add(Text($"B{i}"));
         }
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
         var bodyYs = runs.Where(r => r.Text.StartsWith("B", StringComparison.Ordinal)).Select(r => r.Y).ToList();
         Assert.NotEmpty(bodyYs);
@@ -168,7 +172,7 @@ public class HeaderFooterDistanceTests
         const double headerDistance = 20;
         const double footerDistance = 25;
 
-        var (builder, section) = Author(margin);
+        var (document, section) = Author(margin);
         SetDistance(section, "HeaderDistance", headerDistance);
         SetDistance(section, "FooterDistance", footerDistance);
 
@@ -176,7 +180,7 @@ public class HeaderFooterDistanceTests
         section.Footer.Blocks.Add(Text("FTR"));
         section.Blocks.Add(Text("BODY"));
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var headerY = Assert.Single(runs, r => r.Text == "HDR").Y;
         var footerY = Assert.Single(runs, r => r.Text == "FTR").Y;
         var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;

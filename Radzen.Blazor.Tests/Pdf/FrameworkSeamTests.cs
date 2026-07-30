@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Radzen.Documents.Pdf;
@@ -6,6 +7,8 @@ using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -59,32 +62,16 @@ public class FrameworkSeamTests
             : base(stops)
         {
         }
-
-        protected internal override int ShadingType => 7;
-
-        protected internal override ArrayObject BuildCoords() =>
-        [
-            new NumberObject(1),
-            new NumberObject(2),
-            new NumberObject(3),
-        ];
     }
 
     [Fact]
-    public void GradientBrush_ExternalSubclass_ShadingHooksAreDispatched()
+    public void GradientBrush_UnknownSubclass_IsRejected()
     {
         var brush = new SweepGradient(
             new GradientStop(0, Color.Red),
             new GradientStop(1, Color.Blue));
 
-        var shading = ShadingBuilder.BuildShading(brush);
-
-        Assert.Equal(7, Assert.IsType<NumberObject>(shading["ShadingType"]!).IntValue);
-        var coords = Assert.IsType<ArrayObject>(shading["Coords"]!);
-        Assert.Equal(3, coords.Count);
-        Assert.Equal(1, Assert.IsType<NumberObject>(coords[0]).DoubleValue, 3);
-        Assert.Equal(2, Assert.IsType<NumberObject>(coords[1]).DoubleValue, 3);
-        Assert.Equal(3, Assert.IsType<NumberObject>(coords[2]).DoubleValue, 3);
+        Assert.Throws<NotSupportedException>(() => ShadingBuilder.BuildShading(brush));
     }
 
     [Fact]
@@ -102,9 +89,9 @@ public class FrameworkSeamTests
     {
         public static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x4D];
 
-        public bool TryDecode(byte[] data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
         {
-            if (data.Length < 4 || data[0] != Magic[0] || data[1] != Magic[1] || data[2] != Magic[2] || data[3] != Magic[3])
+            if (!data.Span.StartsWith(Magic))
             {
                 xobject = null;
                 return false;

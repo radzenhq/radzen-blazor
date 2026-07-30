@@ -11,6 +11,7 @@ using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PngDecodeTests

@@ -6,6 +6,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,11 +23,11 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Resave_LoadedBase14Page_KeepsFontResourcesAndText()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello Resave", "Helvetica");
 
-        var resaved = Load(builder.ToArray()).ToArray();
+        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
 
         var reader = DocumentReader.Parse(resaved);
         var leaves = BuildTestSupport.PageLeaves(reader);
@@ -40,12 +42,12 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Resave_LoadedType0Page_KeepsEmbeddedFontAndText()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Embedded Survives", BuildTestSupport.Latin);
 
-        var resaved = Load(builder.ToArray()).ToArray();
+        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
 
         Assert.NotEmpty(BuildTestSupport.Type0Fonts(DocumentReader.Parse(resaved)));
         Assert.Contains("Embedded Survives", Load(resaved).ExtractText(), StringComparison.Ordinal);
@@ -54,14 +56,14 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Resave_LoadedImagePage_KeepsImageXObject()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(200);
         image.Height = Unit.FromPoint(100);
 
         var original = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        var resaved = Load(builder.ToArray()).ToArray();
+        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
 
         var images = BuildTestSupport.ImageXObjects(DocumentReader.Parse(resaved));
         Assert.Single(images);
@@ -143,10 +145,10 @@ public class RoundTripIntegrityTests
 
     private static Document BuildBase14(string text)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, "Helvetica");
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     [Fact]
@@ -185,21 +187,21 @@ public class RoundTripIntegrityTests
     }
 
 
-    private static DocumentBuilder BuilderWithLatinText(string text)
+    private static Radzen.Documents.Document BuilderWithLatinText(string text)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Latin);
-        return builder;
+        return document;
     }
 
     [Fact]
     public void Build_TextWithSurrogatePair_DoesNotThrow()
     {
-        var builder = BuilderWithLatinText("A😀B");
+        var document = BuilderWithLatinText("A😀B");
 
-        var bytes = builder.ToArray();
+        var bytes = new DocumentRenderer().ToArray(document);
 
         var text = Load(bytes).ExtractText();
         Assert.Contains("A", text, StringComparison.Ordinal);
@@ -209,9 +211,9 @@ public class RoundTripIntegrityTests
     [Fact]
     public void Build_TextWithLoneSurrogate_DoesNotThrow()
     {
-        var builder = BuilderWithLatinText("X\uDC00Y");
+        var document = BuilderWithLatinText("X\uDC00Y");
 
-        var bytes = builder.ToArray();
+        var bytes = new DocumentRenderer().ToArray(document);
 
         var text = Load(bytes).ExtractText();
         Assert.Contains("X", text, StringComparison.Ordinal);

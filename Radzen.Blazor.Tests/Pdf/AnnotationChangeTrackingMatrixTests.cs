@@ -9,6 +9,9 @@ using System.Reflection;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Xunit.Sdk;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -218,6 +221,11 @@ public class AnnotationChangeTrackingMatrixTests
         if (type == typeof(double))
         {
             return (double)current! + 17.25;
+        }
+
+        if (type == typeof(Unit))
+        {
+            return Unit.FromPoint(((Unit)current!).Point + 17.25);
         }
 
         if (type == typeof(string))

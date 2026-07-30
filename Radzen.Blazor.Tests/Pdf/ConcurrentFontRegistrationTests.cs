@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,8 +33,8 @@ public class ConcurrentFontRegistrationTests
 
         Task.WaitAll(sansTask, serifTask);
 
-        var sans = sansFonts.ResolvePrimarySfnt(new Font { Name = "Sans" });
-        var serif = serifFonts.ResolvePrimarySfnt(new Font { Name = "Serif" });
+        var sans = sansFonts.ResolvePrimarySfnt(new Font { Family = "Sans" });
+        var serif = serifFonts.ResolvePrimarySfnt(new Font { Family = "Serif" });
 
         Assert.NotSame(sans, serif);
         Assert.NotEqual(sans.FamilyName, serif.FamilyName);
@@ -46,11 +48,11 @@ public class ConcurrentFontRegistrationTests
         var secondFonts = new FontCollection();
         using var start = new Barrier(2);
 
-        Task<Radzen.Documents.Pdf.Fonts.Sfnt.SfntFont> RegisterAsync(FontCollection fonts) => Task.Run(() =>
+        Task<Radzen.Documents.Fonts.Sfnt.SfntFont> RegisterAsync(FontCollection fonts) => Task.Run(() =>
         {
             start.SignalAndWait();
             fonts.Register("Sans", new MemoryStream(bytes));
-            return fonts.ResolvePrimarySfnt(new Font { Name = "Sans" });
+            return fonts.ResolvePrimarySfnt(new Font { Family = "Sans" });
         });
 
         var firstTask = RegisterAsync(firstFonts);

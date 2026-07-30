@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,30 +16,30 @@ public class SyntheticBoldTests
     private const string Family = "Liberation Sans";
     private const double Size = 20;
 
-    private static DocumentBuilder Author(bool registerBoldFace)
+    private static Document Author(bool registerBoldFace)
     {
-        var builder = new DocumentBuilder();
-        builder.Fonts.Register(Family, new MemoryStream(
+        var document = new Document();
+        document.Fonts.Register(Family, new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
         if (registerBoldFace)
         {
-            builder.Fonts.Register(Family, new MemoryStream(
+            document.Fonts.Register(Family, new MemoryStream(
                 PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Bold.ttf")), bold: true, italic: false);
         }
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var paragraph = section.Blocks.AddParagraph();
         var lead = paragraph.Inlines.Add("Normal ");
-        lead.Font.Name = Family;
+        lead.Font.Family = Family;
         lead.Font.Size = Size;
         var heavy = paragraph.Inlines.Add("Heavy");
-        heavy.Font.Name = Family;
+        heavy.Font.Family = Family;
         heavy.Font.Size = Size;
         heavy.Font.Bold = true;
         var tail = paragraph.Inlines.Add(" tail");
-        tail.Font.Name = Family;
+        tail.Font.Family = Family;
         tail.Font.Size = Size;
-        return builder;
+        return document;
     }
 
     [Fact]
@@ -98,11 +100,11 @@ public class SyntheticBoldTests
     [Fact]
     public void SyntheticBold_TextRemainsExtractable()
     {
-        var builder = Author(registerBoldFace: false);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var document = Author(registerBoldFace: false);
+        var content = CascadeTestSupport.FirstPageContent(document);
         Assert.Contains("2 Tr", content, StringComparison.Ordinal);
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("Normal", text, StringComparison.Ordinal);
         Assert.Contains("Heavy", text, StringComparison.Ordinal);
     }

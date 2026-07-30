@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,13 +19,13 @@ public class HyperlinkPageNumberRegressionTests
     private const double Tol = 1.0;
     private const string Url = "https://www.radzen.com/blazor-studio/";
 
-    private static (DocumentBuilder Builder, Section Section) Author(double width = 400, double height = 300)
+    private static (Document Builder, Section Section) Author(double width = 400, double height = 300)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(width), Unit.FromPoint(height));
-        section.Margin = Unit.FromPoint(40);
-        return (builder, section);
+        section.Margins.SetAll(Unit.FromPoint(40));
+        return (document, section);
     }
 
     private static void SetLink(Run run, string url)
@@ -36,8 +38,8 @@ public class HyperlinkPageNumberRegressionTests
 
     private static Run Field(string typeName)
     {
-        var type = typeof(Run).Assembly.GetType($"Radzen.Documents.Pdf.{typeName}");
-        Assert.True(type is not null, $"public type Radzen.Documents.Pdf.{typeName} is missing");
+        var type = typeof(Run).Assembly.GetType($"Radzen.Documents.{typeName}");
+        Assert.True(type is not null, $"public type Radzen.Documents.{typeName} is missing");
         Assert.True(typeof(Run).IsAssignableFrom(type), $"{typeName} must derive from Run so it can be added to Paragraph.Inlines");
         var instance = Activator.CreateInstance(type!);
         return Assert.IsAssignableFrom<Run>(instance);
@@ -100,12 +102,12 @@ public class HyperlinkPageNumberRegressionTests
     [Fact]
     public void LinkedRun_EmitsLinkAnnotation_WithUriOverTheTextRect()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         paragraph.Inlines.Add("Visit ");
         SetLink(paragraph.Inlines.Add("Radzen"), Url);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var link = Assert.Single(LinkAnnotations(reader, 0));
         Assert.Equal(Url, link.Uri);
 
@@ -130,11 +132,11 @@ public class HyperlinkPageNumberRegressionTests
     [Fact]
     public void LinkAnnotation_SetsPrintFlag_ForPdfAConformance()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         SetLink(paragraph.Inlines.Add("Radzen"), Url);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var page = ContentTestHelpers.Kid(reader, 0);
         var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
         var annot = Assert.IsType<DictionaryObject>(reader.Resolve(annots[0]));
@@ -149,13 +151,13 @@ public class HyperlinkPageNumberRegressionTests
     [Fact]
     public void LinkOnSecondPage_AnnotationLandsOnThatPage()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         section.Blocks.AddParagraph("page one body");
         section.Blocks.AddPageBreak();
         var paragraph = section.Blocks.AddParagraph();
         SetLink(paragraph.Inlines.Add("second page link"), Url);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         Assert.Empty(LinkAnnotations(reader, 0));
         var link = Assert.Single(LinkAnnotations(reader, 1));
         Assert.Equal(Url, link.Uri);
@@ -164,12 +166,12 @@ public class HyperlinkPageNumberRegressionTests
     [Fact]
     public void WrappedLink_EmitsOneAnnotationPerLineFragment()
     {
-        var (builder, section) = Author(width: 200);
+        var (document, section) = Author(width: 200);
         var paragraph = section.Blocks.AddParagraph();
         SetLink(paragraph.Inlines.Add(
             "an intentionally long hyperlink label that cannot possibly fit on a single narrow line"), Url);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var links = LinkAnnotations(reader, 0);
 
         Assert.True(links.Count >= 2, $"a wrapped link must emit one annotation per fragment, got {links.Count}");
@@ -188,9 +190,9 @@ public class HyperlinkPageNumberRegressionTests
             .Select(r => r.Text));
     }
 
-    private static DocumentBuilder ThreePageDocumentWithNumberedFooter()
+    private static Document ThreePageDocumentWithNumberedFooter()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var footer = section.Footer.Blocks.AddParagraph();
         footer.Inlines.Add("Page ");
         footer.Inlines.Add(Field("PageNumberField"));
@@ -202,7 +204,7 @@ public class HyperlinkPageNumberRegressionTests
         section.Blocks.AddParagraph("body two");
         section.Blocks.AddPageBreak();
         section.Blocks.AddParagraph("body three");
-        return builder;
+        return document;
     }
 
     [Fact]
@@ -234,7 +236,7 @@ public class HyperlinkPageNumberRegressionTests
     [Fact]
     public void SinglePageDocument_FooterShowsPageOneOfOne()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var footer = section.Footer.Blocks.AddParagraph();
         footer.Inlines.Add("Page ");
         footer.Inlines.Add(Field("PageNumberField"));
@@ -242,7 +244,7 @@ public class HyperlinkPageNumberRegressionTests
         footer.Inlines.Add(Field("PageCountField"));
         section.Blocks.AddParagraph("only page");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         Assert.Equal("Page 1 of 1", FooterLine(reader, 0));
     }
 }

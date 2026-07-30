@@ -7,6 +7,9 @@ using System.Text;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,22 +17,22 @@ public class WatermarkKerningTests
 {
     private const string Text = "AVATAR";
 
-    private static DocumentBuilder Builder(bool kerning)
+    private static Document Builder(bool kerning)
     {
-        var builder = new DocumentBuilder { Fonts = { EnableKerning = kerning } };
-        builder.Fonts.Register("Liberation Sans", new MemoryStream(
+        var document = new Document { Fonts = { EnableKerning = kerning } };
+        document.Fonts.Register("Liberation Sans", new MemoryStream(
             PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = Text };
-        section.Watermark.Font.Name = "Liberation Sans";
+        section.Watermark.Font.Family = "Liberation Sans";
         section.Watermark.Font.Size = 60;
         section.Blocks.Add(new Paragraph());
-        return builder;
+        return document;
     }
 
-    private static string PageText(DocumentBuilder builder)
+    private static string PageText(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
         return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
     }
@@ -45,7 +48,7 @@ public class WatermarkKerningTests
     [Fact]
     public void KernedAndUnkernedWidthsDiffer()
     {
-        var font = new Font { Name = "Liberation Sans", Size = 60 };
+        var font = new Font { Family = "Liberation Sans", Size = 60 };
 
         Assert.True(Fonts(kerning: true).MeasureText(Text, font) < Fonts(kerning: false).MeasureText(Text, font));
     }
@@ -104,11 +107,11 @@ public class WatermarkKerningTests
     [Fact]
     public void Kerned_DrawnWidthEqualsTheMeasuredWidthTheMarkIsCentredFrom()
     {
-        var font = new Font { Name = "Liberation Sans", Size = 60 };
+        var font = new Font { Family = "Liberation Sans", Size = 60 };
         var measured = Fonts(kerning: true).MeasureText(Text, font);
         var unkerned = Fonts(kerning: false).MeasureText(Text, font);
 
-        var displacement = -TjAdjustments(PageText(Builder(kerning: true))) * font.Size / 1000.0;
+        var displacement = -TjAdjustments(PageText(Builder(kerning: true))) * font.Size!.Value.Point / 1000.0;
 
         Assert.Equal(measured, unkerned + displacement, 2);
     }
@@ -118,13 +121,14 @@ public class WatermarkKerningTests
     {
         const string text = "AV AV";
         var fonts = Fonts(kerning: true);
-        var font = new Font { Name = "Liberation Sans", Size = 60 };
-        var builder = new SfntRunBuilder(fonts, new GeneratorFontResolver(PdfAConformance.None));
+        var font = new Font { Family = "Liberation Sans", Size = 60 };
+        var captured = fonts.CaptureGlyphRun(text, font);
+        var document = new SfntRunBuilder(new GeneratorFontResolver(PdfAConformance.None));
 
-        var drawnAdvance = builder.Build(text, font, font.Size).Sum(run => run.Advance);
+        var drawnAdvance = document.Build(captured).Sum(run => run.Advance);
 
         Assert.Equal(fonts.MeasureText(text, font), drawnAdvance, 10);
-        Assert.Contains(builder.Build(text, font, font.Size), run => run.Kerns is not null);
+        Assert.Contains(document.Build(captured), run => run.Kerns is not null);
     }
 
     [Fact]

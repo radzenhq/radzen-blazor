@@ -8,6 +8,10 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class HeaderFooterBandRegressionTests
@@ -47,19 +51,19 @@ public class HeaderFooterBandRegressionTests
         return runs;
     }
 
-    private static (DocumentBuilder Builder, Section Section) Author()
+    private static (Document Builder, Section Section) Author()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
-        section.Margin = Unit.FromPoint(Margin);
-        return (builder, section);
+        section.Margins.SetAll(Unit.FromPoint(Margin));
+        return (document, section);
     }
 
     [Fact]
     public void TallHeader_BodyFirstLineStartsBelowHeaderBand()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         for (var i = 0; i < 3; i++)
         {
             section.Header.Blocks.Add(Text($"HDR{i}", HeaderFontSize));
@@ -67,7 +71,7 @@ public class HeaderFooterBandRegressionTests
 
         section.Blocks.Add(Text("BODY", BodyFontSize));
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var headerYs = runs.Where(r => r.Text.StartsWith("HDR", StringComparison.Ordinal)).Select(r => r.Y).ToList();
         var bodyY = Assert.Single(runs, r => r.Text == "BODY").Y;
 
@@ -89,7 +93,7 @@ public class HeaderFooterBandRegressionTests
     [Fact]
     public void TallFooter_StaysOnPage_AndBodyEndsAboveFooterBand()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         for (var i = 0; i < 3; i++)
         {
             section.Footer.Blocks.Add(Text($"FTR{i}", HeaderFontSize));
@@ -102,7 +106,7 @@ public class HeaderFooterBandRegressionTests
             section.Blocks.Add(Text($"B{i}", BodyFontSize));
         }
 
-        var runs = TextRuns(CascadeTestSupport.FirstPageContent(builder));
+        var runs = TextRuns(CascadeTestSupport.FirstPageContent(document));
         var footerYs = runs.Where(r => r.Text.StartsWith("FTR", StringComparison.Ordinal)).Select(r => r.Y).ToList();
         var bodyYs = runs.Where(r => r.Text.StartsWith("B", StringComparison.Ordinal)).Select(r => r.Y).ToList();
 
@@ -127,9 +131,9 @@ public class HeaderFooterBandRegressionTests
         var (bodyLineHeight, _) = LineMetrics(BodyFontSize);
         var (headerLineHeight, _) = LineMetrics(HeaderFontSize);
 
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
-        section.Margin = Unit.FromPoint(Margin);
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.Margins.SetAll(Unit.FromPoint(Margin));
         section.PageSize = new PageSize(
             Unit.FromPoint(PageWidth),
             Unit.FromPoint(2 * Margin + bodyLines * bodyLineHeight + 0.01));
@@ -146,7 +150,7 @@ public class HeaderFooterBandRegressionTests
             section.Blocks.Add(Text($"B{i}", BodyFontSize));
         }
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.True(
             reloaded.Pages.Count >= 2,
             $"expected the reduced body height to overflow onto a second page, got {reloaded.Pages.Count} page(s)");
@@ -166,13 +170,13 @@ public class HeaderFooterBandRegressionTests
     [Fact]
     public void HeaderTable_RendersItsCellText()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BandTable(section.Header, "HeadLogo", "HeadTitle");
         BuildTestSupport.AddText(section, "BodyLine", BuildTestSupport.Latin);
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
 
         Assert.Contains("HeadLogo", text, StringComparison.Ordinal);
         Assert.Contains("HeadTitle", text, StringComparison.Ordinal);
@@ -186,13 +190,13 @@ public class HeaderFooterBandRegressionTests
     [Fact]
     public void FooterTable_RendersItsCellText()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BandTable(section.Footer, "FootLeft", "FootRight");
         BuildTestSupport.AddText(section, "BodyLine", BuildTestSupport.Latin);
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
 
         Assert.Contains("FootLeft", text, StringComparison.Ordinal);
         Assert.Contains("FootRight", text, StringComparison.Ordinal);

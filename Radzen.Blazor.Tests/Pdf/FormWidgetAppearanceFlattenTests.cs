@@ -4,6 +4,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -56,14 +58,14 @@ public class FormWidgetAppearanceFlattenTests
             return FormTestSupport.Decode(single);
         }
 
-        var builder = new System.Text.StringBuilder();
+        var document = new System.Text.StringBuilder();
         foreach (var entry in Assert.IsType<ArrayObject>(contents))
         {
-            builder.Append(FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(entry))));
-            builder.Append('\n');
+            document.Append(FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(entry))));
+            document.Append('\n');
         }
 
-        return builder.ToString();
+        return document.ToString();
     }
 
     private static string[] PaintedAppearances(DocumentReader reader)

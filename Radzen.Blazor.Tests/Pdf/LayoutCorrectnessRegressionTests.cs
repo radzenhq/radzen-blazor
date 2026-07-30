@@ -6,8 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
-
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Layout;
+using Radzen.Documents.Geometry;
+
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class LayoutCorrectnessRegressionTests
@@ -25,10 +29,10 @@ public class LayoutCorrectnessRegressionTests
 
         var paragraph = new Paragraph();
         var top = paragraph.Inlines.Add("top\n");
-        top.Font.Name = Family;
+        top.Font.Family = Family;
         top.Font.Size = 12;
         var huge = paragraph.Inlines.Add("H");
-        huge.Font.Name = Family;
+        huge.Font.Family = Family;
         huge.Font.Size = 600;
         section.Blocks.Add(paragraph);
 
@@ -36,7 +40,7 @@ public class LayoutCorrectnessRegressionTests
         {
             try
             {
-                return (object)Paginator.Paginate(section, fonts);
+                return (object)Paginator.PaginateIsolated(section, fonts);
             }
             catch (Exception exception)
             {
@@ -48,11 +52,11 @@ public class LayoutCorrectnessRegressionTests
             task.Wait(TimeSpan.FromSeconds(5)),
             "Paginator did not terminate for a continuation line taller than the page.");
 
-        if (task.Result is IReadOnlyList<PaginatedPage> pages)
+        if (task.Result is System.Collections.Immutable.ImmutableArray<PaginatedPage> pages)
         {
-            Assert.InRange(pages.Count, 1, 3);
-            Assert.Equal(2, pages.Sum(p => p.Lines.Count));
-            Assert.All(pages, p => Assert.True(p.Lines.Count > 0, "no page may be empty"));
+            Assert.InRange(pages.Length, 1, 3);
+            Assert.Equal(2, pages.Sum(p => p.Body.Lines.Length));
+            Assert.All(pages, p => Assert.True(p.Body.Lines.Length > 0, "no page may be empty"));
         }
         else
         {
@@ -63,18 +67,18 @@ public class LayoutCorrectnessRegressionTests
     [Fact]
     public void BuildWithOversizedContinuationLine_Terminates()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(500), Unit.FromPoint(200));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         var paragraph = new Paragraph();
         var top = paragraph.Inlines.Add("top\n");
-        top.Font.Name = BuildTestSupport.Latin;
+        top.Font.Family = BuildTestSupport.Latin;
         top.Font.Size = 12;
         var huge = paragraph.Inlines.Add("HUGE");
-        huge.Font.Name = BuildTestSupport.Latin;
+        huge.Font.Family = BuildTestSupport.Latin;
         huge.Font.Size = 600;
         section.Blocks.Add(paragraph);
 
@@ -82,7 +86,7 @@ public class LayoutCorrectnessRegressionTests
         {
             try
             {
-                return (object)builder.ToArray();
+                return (object)new DocumentRenderer().ToArray(document);
             }
             catch (Exception exception)
             {
@@ -118,9 +122,9 @@ public class LayoutCorrectnessRegressionTests
         Fill(row.Cells[1], "WIDE");
         row.Cells[1].ColumnSpan = 5;
 
-        var layout = TableLayout.Layout(table, 400, fonts);
+        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
 
-        var wide = layout.Cells.SingleOrDefault(c => ReferenceEquals(c.Cell, row.Cells[1]));
+        var wide = layout.Cells.SingleOrDefault(c => c.Column == 1);
         Assert.True(wide is not null, "cell with overflowing ColumnSpan was dropped from the layout");
         Assert.Equal(1, wide!.Column);
         Assert.Equal(2, wide.ColumnSpan);
@@ -132,9 +136,9 @@ public class LayoutCorrectnessRegressionTests
     [Fact]
     public void ColumnSpanBeyondLastColumn_TextSurvivesBuild()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
 
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(100));
@@ -146,7 +150,7 @@ public class LayoutCorrectnessRegressionTests
         Fill(row.Cells[1], "Spanned");
         row.Cells[1].ColumnSpan = 5;
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("First", text, StringComparison.Ordinal);
         Assert.Contains("Spanned", text, StringComparison.Ordinal);
     }
@@ -154,15 +158,15 @@ public class LayoutCorrectnessRegressionTests
     [Fact]
     public void TableWithRowsButNoColumns_DoesNotRenderEmpty()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
 
         var table = section.Blocks.AddTable();
         var row = table.Rows.Add();
         Fill(row.Cells.AddCell(), "Orphan");
 
-        var text = BuildTestSupport.Reload(builder).ExtractText();
+        var text = BuildTestSupport.Reload(document).ExtractText();
         Assert.Contains("Orphan", text, StringComparison.Ordinal);
     }
 
@@ -182,17 +186,17 @@ public class LayoutCorrectnessRegressionTests
             return table;
         }
 
-        var layout = TableLayout.Layout(MakeTable(new Table()), 260, fonts);
+        var layout = TableLayout.LayoutIsolated(MakeTable(new Table()), 260, fonts);
         var cell = TableLayoutSupport.CellAt(layout, 0, 0);
-        Assert.True(cell.Lines.Count > 0);
+        Assert.True(cell.Lines.Length > 0);
         var allLinesFit = cell.Lines.All(l => l.Line.Width <= cell.ContentBox.Width + 0.5);
 
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         MakeTable(section.Blocks.AddTable());
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));
         var hasClip = content.Contains(" W n", StringComparison.Ordinal)
             || content.Contains(" W\nn", StringComparison.Ordinal);
@@ -217,9 +221,9 @@ public class LayoutCorrectnessRegressionTests
         var row1 = table.Rows.Add();
         Fill(row1.Cells[0], "R1");
 
-        var layout = TableLayout.Layout(table, 200, fonts);
+        var layout = TableLayout.LayoutIsolated(table, 200, fonts);
         var span = layout.Cells.Single(c => c.RowSpan == 2);
-        var padding = 2 * span.Cell.Padding.Point;
+        var padding = 2 * row0.Cells[0].Padding.Point;
         var contentHeight = span.Lines.Sum(l => l.Line.Height);
 
         Assert.True(span.Bounds.Height + 1e-6 >= contentHeight + padding,
@@ -254,7 +258,7 @@ public class LayoutCorrectnessRegressionTests
         Fill(row3.Cells[0], "A3");
         Fill(row3.Cells[1], "B3");
 
-        var layout = TableLayout.Layout(table, 200, fonts);
+        var layout = TableLayout.LayoutIsolated(table, 200, fonts);
         var fragments = TablePaginator.Paginate(layout, table, 2.4 * lh);
 
         int FragmentOf(int sourceRow)
@@ -289,7 +293,7 @@ public class LayoutCorrectnessRegressionTests
         Fill(row.Cells[1], "b");
         Fill(row.Cells[2], "c");
 
-        var layout = TableLayout.Layout(table, 400, fonts);
+        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
 
         Assert.All(layout.ColumnWidths, w => Assert.True(w >= 0, $"column width {w:F2} is negative"));
     }

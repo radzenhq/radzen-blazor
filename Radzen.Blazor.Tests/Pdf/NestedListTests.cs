@@ -9,14 +9,16 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class NestedListTests
 {
-    private static List<(double X, string Text)> TextDraws(DocumentBuilder builder)
+    private static List<(double X, string Text)> TextDraws(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
 
@@ -33,19 +35,19 @@ public class NestedListTests
         return result;
     }
 
-    private static Section AddSection(DocumentBuilder builder)
+    private static Section AddSection(Document document)
     {
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
         return section;
     }
 
     [Fact]
     public void NestedBulletList_IndentsInnerItems_WithOwnMarkers()
     {
-        var builder = new DocumentBuilder();
-        var section = AddSection(builder);
+        var document = new Document();
+        var section = AddSection(document);
 
         var list = section.Blocks.AddList(ListStyle.Bullet);
         list.HangingIndent = Unit.FromPoint(20);
@@ -57,7 +59,7 @@ public class NestedListTests
         nested.AddItem("Inner one");
         nested.AddItem("Inner two");
 
-        var draws = TextDraws(builder);
+        var draws = TextDraws(document);
         var texts = draws.ConvertAll(d => d.Text);
 
         Assert.Equal(
@@ -79,8 +81,8 @@ public class NestedListTests
     [Fact]
     public void NestedOrderedList_NumbersIndependently_AndIndents()
     {
-        var builder = new DocumentBuilder();
-        var section = AddSection(builder);
+        var document = new Document();
+        var section = AddSection(document);
 
         var list = section.Blocks.AddList(ListStyle.Number);
         list.HangingIndent = Unit.FromPoint(24);
@@ -94,7 +96,7 @@ public class NestedListTests
         nested.AddItem("Sub two");
         nested.AddItem("Sub three");
 
-        var draws = TextDraws(builder);
+        var draws = TextDraws(document);
 
         var outerMarkers = draws.FindAll(d => Math.Abs(d.X) < 1e-3 && d.Text is "1." or "2." or "3.");
         Assert.Equal(new[] { "1.", "2.", "3." }, outerMarkers.ConvertAll(m => m.Text));
@@ -109,8 +111,8 @@ public class NestedListTests
     [Fact]
     public void FlatLists_OutputBytes_MatchPreNestingBaseline()
     {
-        var builder = new DocumentBuilder();
-        var section = AddSection(builder);
+        var document = new Document();
+        var section = AddSection(document);
 
         var bullets = section.Blocks.AddList(ListStyle.Bullet);
         bullets.HangingIndent = Unit.FromPoint(20);
@@ -124,7 +126,7 @@ public class NestedListTests
         numbers.AddItem("Three");
 
         using var stream = new MemoryStream();
-        builder.SaveToStream(stream);
+        new DocumentRenderer().SaveToStream(document, stream);
 
         Assert.Equal(
             "52508AF33626BD972F78F37217ED1F2C8CCB38ECCD2FCC74A0D56CEFBB4DD09D",

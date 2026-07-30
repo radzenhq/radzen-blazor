@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -78,14 +80,15 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void LoadedNamedOutline_RemainsNavigableWhenUntouched()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Named destination").Anchor = "destination";
         section.Blocks.Add(paragraph);
-        builder.Outline.Add(new OutlineItem("Named", OutlineTarget.ToAnchor("destination")));
+        var renderer = new DocumentRenderer();
+        renderer.Outline.Add(new OutlineItem("Named", OutlineTarget.ToAnchor("destination")));
 
-        var loaded = Load(builder.ToArray());
+        var loaded = Load(renderer.ToArray(document));
         Assert.Equal("Named", Assert.Single(loaded.Outline).Title);
 
         var reloaded = Load(loaded.ToArray());
@@ -124,14 +127,15 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void LoadedPdfA_XmpPacketIsUnchangedWhenNewApiIsUnused()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
-        paragraph.Inlines.Add("Conforming metadata").Font.Name = BuildTestSupport.Latin;
+        paragraph.Inlines.Add("Conforming metadata").Font.Family = BuildTestSupport.Latin;
         section.Blocks.Add(paragraph);
 
-        var loaded = Load(builder.ToArray());
+        var loaded = Load(renderer.ToArray(document));
         var before = Assert.IsType<byte[]>(loaded.Xmp.GetPacket());
 
         var reloaded = Load(loaded.ToArray());
@@ -141,16 +145,17 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void CallerEditedXmp_WithConformanceThrows()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
-        paragraph.Inlines.Add("Conforming metadata").Font.Name = BuildTestSupport.Latin;
+        paragraph.Inlines.Add("Conforming metadata").Font.Family = BuildTestSupport.Latin;
         section.Blocks.Add(paragraph);
 
-        var document = builder.Build();
-        document.Xmp.SetProperty(CustomNamespace, "status", "custom");
+        var pdf = renderer.Render(document);
+        pdf.Xmp.SetProperty(CustomNamespace, "status", "custom");
 
-        Assert.Throws<InvalidOperationException>(() => document.ToArray());
+        Assert.Throws<InvalidOperationException>(() => pdf.ToArray());
     }
 }

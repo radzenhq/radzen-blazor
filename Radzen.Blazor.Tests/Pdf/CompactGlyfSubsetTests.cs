@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,20 +18,22 @@ public class CompactGlyfSubsetTests
 
     private static DocumentReader BuildReader()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, Sample, BuildTestSupport.Latin);
-        return BuildTestSupport.Read(builder);
+        return BuildTestSupport.Read(document, builderRenderer);
     }
 
-    private static DocumentBuilder Builder()
+    private static Document Builder()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, Sample, BuildTestSupport.Latin);
-        return builder;
+        return document;
     }
 
     private static (DictionaryObject Top, DictionaryObject Descendant, DictionaryObject Descriptor) FontGraph(DocumentReader reader)

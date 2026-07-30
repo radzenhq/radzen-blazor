@@ -5,6 +5,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -212,7 +214,7 @@ public class AnnotationTests
         pdf.Append("trailer\n<< /Size 5 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
 
         var annotation = Assert.IsType<FreeTextAnnotation>(Load(pdf.ToArray()).Pages[0].Annotations[0]);
-        Assert.Equal("Courier", annotation.Font.Name);
+        Assert.Equal("Courier", annotation.Font.Family);
         Assert.Equal(12.0, annotation.Font.Size);
     }
 

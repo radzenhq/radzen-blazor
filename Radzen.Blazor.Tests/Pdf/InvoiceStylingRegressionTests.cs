@@ -11,6 +11,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,15 +20,15 @@ public class InvoiceStylingRegressionTests
 {
     private const double Tol = 0.5;
 
-    private static byte[] PageBytes(DocumentBuilder builder)
-        => ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0);
+    private static byte[] PageBytes(Document document)
+        => ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0);
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(PageBytes(builder));
+    private static List<ContentOperation> Ops(Document document)
+        => ContentStreamTokenizer.Parse(PageBytes(document));
 
-    private static List<(string Text, double X, double Y)> TextRuns(DocumentBuilder builder)
+    private static List<(string Text, double X, double Y)> TextRuns(Document document)
     {
-        var content = Encoding.Latin1.GetString(PageBytes(builder));
+        var content = Encoding.Latin1.GetString(PageBytes(document));
         var runs = new List<(string, double, double)>();
         foreach (Match m in Regex.Matches(content, @"(-?[\d.]+)\s+(-?[\d.]+)\s+Td\s*\((.*?)\)\s*Tj", RegexOptions.Singleline))
         {
@@ -65,10 +67,10 @@ public class InvoiceStylingRegressionTests
         property.SetValue(target, Unit.FromPoint(points));
     }
 
-    private static (DocumentBuilder Builder, Section Section) NewDocument()
+    private static (Document Builder, Section Section) NewDocument()
     {
-        var builder = new DocumentBuilder();
-        return (builder, builder.Sections.Add());
+        var document = new Document();
+        return (document, document.Sections.Add());
     }
 
     private static Table OneCellTable(Section section, string text, double columnWidth = 200)
@@ -83,11 +85,11 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void CellBorderWidthWithoutStyle_RendersSolidBottomRule()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = OneCellTable(section, "X");
         table.Rows[0].Cells[0].Borders.Bottom.Width = 0.5;
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
         var horizontal = Segments(ops).Where(IsHorizontal).ToList();
 
         Assert.True(horizontal.Count > 0, "a border edge with Width > 0 and default Style must stroke a line");
@@ -98,11 +100,11 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void TableBorderWidthWithoutStyle_RendersGrid()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = OneCellTable(section, "X");
         table.Borders.Width = 1;
 
-        var segments = Segments(Ops(builder));
+        var segments = Segments(Ops(document));
 
         Assert.True(segments.Any(IsHorizontal), "table borders with Width > 0 must draw horizontal edges");
         Assert.True(
@@ -115,7 +117,7 @@ public class InvoiceStylingRegressionTests
     {
         static double Gap(bool withSpacer)
         {
-            var (builder, section) = NewDocument();
+            var (document, section) = NewDocument();
             section.Blocks.AddParagraph("First");
             if (withSpacer)
             {
@@ -124,7 +126,7 @@ public class InvoiceStylingRegressionTests
 
             section.Blocks.AddParagraph("Second");
 
-            var runs = TextRuns(builder);
+            var runs = TextRuns(document);
             var first = runs.Single(r => r.Text == "First");
             var second = runs.Single(r => r.Text == "Second");
             return first.Y - second.Y;
@@ -138,11 +140,11 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void Tab_AdvancesToNextDefaultTabStop()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         section.Blocks.AddParagraph("ID:\tAAA");
         section.Blocks.AddParagraph("No:\tBBB");
 
-        var runs = TextRuns(builder);
+        var runs = TextRuns(document);
         var label = runs.SingleOrDefault(r => r.Text == "ID:");
         var a = runs.SingleOrDefault(r => r.Text == "AAA");
         var b = runs.SingleOrDefault(r => r.Text == "BBB");
@@ -163,14 +165,14 @@ public class InvoiceStylingRegressionTests
     {
         static double CellX(double indent)
         {
-            var (builder, section) = NewDocument();
+            var (document, section) = NewDocument();
             var table = OneCellTable(section, "CELL", 150);
             if (indent > 0)
             {
                 SetUnitProperty(table, "LeftIndent", indent);
             }
 
-            return TextRuns(builder).Single(r => r.Text == "CELL").X;
+            return TextRuns(document).Single(r => r.Text == "CELL").X;
         }
 
         var shift = CellX(200) - CellX(0);
@@ -181,7 +183,7 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void RowBorders_BottomRule_SpansAllRowCells()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(100));
@@ -195,7 +197,7 @@ public class InvoiceStylingRegressionTests
         borders.Bottom.Width = 0.5;
         borders.Bottom.Style = BorderStyle.Solid;
 
-        var horizontal = Segments(Ops(builder)).Where(IsHorizontal).ToList();
+        var horizontal = Segments(Ops(document)).Where(IsHorizontal).ToList();
         Assert.True(horizontal.Count > 0, "a row-level bottom border must stroke horizontal rules on its cells");
 
         var bottom = horizontal.MinBy(s => s.Y1);
@@ -209,14 +211,14 @@ public class InvoiceStylingRegressionTests
     {
         static double TextX(double indent)
         {
-            var (builder, section) = NewDocument();
+            var (document, section) = NewDocument();
             var paragraph = section.Blocks.AddParagraph("Bullet");
             if (indent > 0)
             {
                 SetUnitProperty(paragraph, "LeftIndent", indent);
             }
 
-            return TextRuns(builder).Single(r => r.Text == "Bullet").X;
+            return TextRuns(document).Single(r => r.Text == "Bullet").X;
         }
 
         var shift = TextX(50) - TextX(0);
@@ -227,11 +229,11 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void ImageWithoutExplicitSize_FitsContentWidth()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         section.Blocks.AddImage(new MemoryStream(GrayPng(2000, 400)));
 
         var contentWidth = section.PageSize.Width.Point - section.Margins.Left.Point - section.Margins.Right.Point;
-        var (width, height) = ImagePlacement(Ops(builder));
+        var (width, height) = ImagePlacement(Ops(document));
 
         Assert.True(width <= contentWidth + Tol,
             $"an unsized 2000px image must be clamped to the {contentWidth:0.##}pt content width, drew {width:0.##}pt");
@@ -243,12 +245,12 @@ public class InvoiceStylingRegressionTests
     [Fact]
     public void ImageWithExplicitSize_UsesGivenSize()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var image = section.Blocks.AddImage(new MemoryStream(GrayPng(2000, 400)));
         image.Width = Unit.FromPoint(120);
         image.Height = Unit.FromPoint(48);
 
-        var (width, height) = ImagePlacement(Ops(builder));
+        var (width, height) = ImagePlacement(Ops(document));
 
         Assert.Equal(120, width, 1);
         Assert.Equal(48, height, 1);

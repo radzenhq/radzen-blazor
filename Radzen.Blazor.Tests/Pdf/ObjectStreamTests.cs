@@ -1,6 +1,7 @@
 #nullable enable
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

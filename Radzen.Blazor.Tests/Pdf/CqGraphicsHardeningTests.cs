@@ -8,6 +8,8 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class CqGraphicsHardeningTests
@@ -100,14 +102,14 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void Watermark_NonWinAnsiText_ThrowsInsteadOfDropping()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = "机密" };
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Body");
         section.Blocks.Add(paragraph);
 
-        Assert.Throws<NotSupportedException>(() => builder.ToArray());
+        Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().ToArray(document));
     }
 
 
@@ -218,18 +220,18 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void RotatedContainer_RoundedTableWithBorderEdgesAndNoFills_Throws()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Rotation = 30 });
         var table = container.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(150));
         table.Borders.Top.Width = 1;
         table.CornerRadius = Unit.FromPoint(8);
         var run = table.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("NoFill");
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
 
-        Assert.Throws<NotSupportedException>(() => builder.Build());
+        Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
     }
 
     private static EdgeDraw Edge() => new()

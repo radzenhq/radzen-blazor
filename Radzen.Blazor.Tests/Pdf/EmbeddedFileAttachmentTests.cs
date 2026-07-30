@@ -8,13 +8,15 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class EmbeddedFileAttachmentTests
 {
     private const string MissingApi =
-        "DocumentBuilder.Attachments with Add(string name, byte[] data, AttachmentRelationship relationship, string mimeType) is missing - P3 attachments are not implemented";
+        "Document.Attachments with Add(string name, byte[] data, AttachmentRelationship relationship, string mimeType) is missing - P3 attachments are not implemented";
 
     private static readonly byte[] InvoiceXml = Encoding.UTF8.GetBytes(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -24,14 +26,14 @@ public class EmbeddedFileAttachmentTests
         "</rsm:CrossIndustryInvoice>\n");
 
     private static PropertyInfo? AttachmentsProperty()
-        => typeof(DocumentBuilder).GetProperty("Attachments");
+        => typeof(DocumentRenderer).GetProperty("Attachments");
 
-    private static void Attach(DocumentBuilder builder, string name, byte[] data, string relationship, string mimeType)
+    private static void Attach(DocumentRenderer renderer, string name, byte[] data, string relationship, string mimeType)
     {
         var property = AttachmentsProperty();
         Assert.True(property is not null && property.CanRead, MissingApi);
 
-        var attachments = property!.GetValue(builder);
+        var attachments = property!.GetValue(renderer);
         Assert.True(attachments is not null, MissingApi);
 
         var add = attachments!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -51,23 +53,24 @@ public class EmbeddedFileAttachmentTests
         add.Invoke(attachments, [name, data, Enum.Parse(relationshipType, relationship), mimeType]);
     }
 
-    private static DocumentBuilder Author(string? conformance = null)
+    private static (Document Document, DocumentRenderer Renderer) Author(string? conformance = null)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        builder.Info.Title = "Invoice 42";
-        builder.Info.Author = "Radzen Ltd";
+        document.Info.Title = "Invoice 42";
+        document.Info.Author = "Radzen Ltd";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice body", BuildTestSupport.Latin);
 
+        var builderRenderer = new DocumentRenderer();
         if (conformance is not null)
         {
-            builder.Conformance = (PdfAConformance)Enum.Parse(typeof(PdfAConformance), conformance);
+            builderRenderer.Conformance = (PdfAConformance)Enum.Parse(typeof(PdfAConformance), conformance);
         }
 
-        return builder;
+        return (document, builderRenderer);
     }
 
     private static DictionaryObject Catalog(DocumentReader reader)
@@ -154,10 +157,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void Attach_EmbeddedFileBytes_RoundTripByteIdentical()
     {
-        var builder = Author();
-        Attach(builder, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
+        var (document, builderRenderer) = Author();
+        Attach(builderRenderer, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var files = EmbeddedFiles(reader);
         Assert.True(files.ContainsKey("invoice-data.xml"), "/EmbeddedFiles name tree contains the attachment name");
 
@@ -175,10 +178,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void Attach_Filespec_HasNamesAndEmbeddedStream()
     {
-        var builder = Author();
-        Attach(builder, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
+        var (document, builderRenderer) = Author();
+        Attach(builderRenderer, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var filespec = EmbeddedFiles(reader)["invoice-data.xml"];
 
         Assert.Equal("Filespec", BuildTestSupport.Name(reader, filespec, "Type"));
@@ -190,10 +193,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void Attach_CatalogAFArray_ReferencesFilespec()
     {
-        var builder = Author();
-        Attach(builder, "invoice-data.xml", InvoiceXml, "Alternative", "text/xml");
+        var (document, builderRenderer) = Author();
+        Attach(builderRenderer, "invoice-data.xml", InvoiceXml, "Alternative", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var catalog = Catalog(reader);
         Assert.True(catalog.TryGetValue("AF", out var afObject), "catalog has /AF");
         var af = Assert.IsType<ArrayObject>(reader.Resolve(afObject!));
@@ -208,12 +211,12 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void Attach_MultipleFiles_AllPresentAndTreeSorted()
     {
-        var builder = Author();
+        var (document, builderRenderer) = Author();
         var readme = Encoding.UTF8.GetBytes("see invoice-data.xml");
-        Attach(builder, "zz-notes.txt", readme, "Supplement", "text/plain");
-        Attach(builder, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
+        Attach(builderRenderer, "zz-notes.txt", readme, "Supplement", "text/plain");
+        Attach(builderRenderer, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var files = EmbeddedFiles(reader);
 
         Assert.Equal(2, files.Count);
@@ -228,10 +231,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void FacturX_Attachment_UnderPdfA3B_EmitsFxXmpBlock()
     {
-        var builder = Author("PdfA3B");
-        Attach(builder, "factur-x.xml", InvoiceXml, "Data", "text/xml");
+        var (document, builderRenderer) = Author("PdfA3B");
+        Attach(builderRenderer, "factur-x.xml", InvoiceXml, "Data", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var packet = MetadataPacket(reader);
 
         Assert.Contains("urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#", packet, StringComparison.Ordinal);
@@ -246,10 +249,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void FacturX_Attachment_UnderPdfA3B_KeepsConformanceAndEmbedsFile()
     {
-        var builder = Author("PdfA3B");
-        Attach(builder, "factur-x.xml", InvoiceXml, "Data", "text/xml");
+        var (document, builderRenderer) = Author("PdfA3B");
+        Attach(builderRenderer, "factur-x.xml", InvoiceXml, "Data", "text/xml");
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
 
         var packet = MetadataPacket(reader);
         Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
@@ -266,10 +269,10 @@ public class EmbeddedFileAttachmentTests
     [Fact]
     public void NonFacturXAttachment_UnderPdfA3B_HasNoFxBlock()
     {
-        var builder = Author("PdfA3B");
-        Attach(builder, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
+        var (document, builderRenderer) = Author("PdfA3B");
+        Attach(builderRenderer, "invoice-data.xml", InvoiceXml, "Data", "text/xml");
 
-        var packet = MetadataPacket(BuildTestSupport.Read(builder));
+        var packet = MetadataPacket(BuildTestSupport.Read(document, builderRenderer));
         Assert.DoesNotContain("<fx:DocumentFileName>", packet, StringComparison.Ordinal);
     }
 }

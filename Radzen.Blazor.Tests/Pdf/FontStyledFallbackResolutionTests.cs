@@ -3,7 +3,9 @@ using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -28,7 +30,7 @@ public class FontStyledFallbackResolutionTests
         var fonts = new FontCollection();
         fonts.Register("Liberation Sans", new MemoryStream(boldBytes), bold: true, italic: false);
 
-        var regular = new Font { Name = "Liberation Sans", Size = 12 };
+        var regular = new Font { Family = "Liberation Sans", Size = 12 };
         Assert.Equal(SfntWidth(boldBytes, "Hello", 12), fonts.MeasureText("Hello", regular), 10);
     }
 
@@ -39,7 +41,7 @@ public class FontStyledFallbackResolutionTests
         var fonts = new FontCollection();
         fonts.Register("Liberation Sans", new MemoryStream(styledBytes), bold: true, italic: true);
 
-        var regular = new Font { Name = "Liberation Sans", Size = 12 };
+        var regular = new Font { Family = "Liberation Sans", Size = 12 };
         Assert.Equal(SfntWidth(styledBytes, "Hello", 12), fonts.MeasureText("Hello", regular), 10);
     }
 
@@ -52,10 +54,10 @@ public class FontStyledFallbackResolutionTests
         fonts.Register("Liberation Sans", new MemoryStream(regularBytes), bold: false, italic: false);
         fonts.Register("Liberation Sans", new MemoryStream(boldBytes), bold: true, italic: false);
 
-        var regular = new Font { Name = "Liberation Sans", Size = 12 };
+        var regular = new Font { Family = "Liberation Sans", Size = 12 };
         Assert.Equal(SfntWidth(regularBytes, "Hello", 12), fonts.MeasureText("Hello", regular), 10);
 
-        var bold = new Font { Name = "Liberation Sans", Size = 12, Bold = true };
+        var bold = new Font { Family = "Liberation Sans", Size = 12, Bold = true };
         Assert.Equal(SfntWidth(boldBytes, "Hello", 12), fonts.MeasureText("Hello", bold), 10);
     }
 }

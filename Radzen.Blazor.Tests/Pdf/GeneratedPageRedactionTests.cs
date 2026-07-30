@@ -4,6 +4,8 @@ using System;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,21 +13,21 @@ public class GeneratedPageRedactionTests
 {
     private static Document GeneratedImagePage()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
-        section.Margin = Unit.FromPoint(0);
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
+        section.Margins.SetAll(Unit.FromPoint(0));
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(200);
         image.Height = Unit.FromPoint(100);
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static Document GeneratedTextPage(string text)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, "Helvetica", 24);
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static bool Contains(byte[] haystack, byte[] needle)

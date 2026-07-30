@@ -4,26 +4,28 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TaggedMultiPageMcidTests
 {
-    private static DocumentBuilder AuthorManyParagraphs(int count)
+    private static Document AuthorManyParagraphs(int count)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(160));
-        section.Margin = Unit.FromPoint(20);
+        section.Margins.SetAll(Unit.FromPoint(20));
 
         for (var i = 0; i < count; i++)
         {
             BuildTestSupport.AddText(section, $"Paragraph number {i}", BuildTestSupport.Latin);
         }
 
-        return builder;
+        return document;
     }
 
     private static List<int> McidsInOrder(DocumentReader reader, DictionaryObject page)

@@ -4,28 +4,41 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
+
+using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class FontResolutionPolicyTests
 {
-    private static DocumentBuilder Author(PdfAConformance conformance = PdfAConformance.None)
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance = PdfAConformance.None)
     {
-        var builder = new DocumentBuilder { Conformance = conformance };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var renderer = new DocumentRenderer { Conformance = conformance };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
-        return builder;
+        return (document, renderer);
     }
 
     [Fact]
     public void LaidOutText_UnknownFamily_StillFailsAtMeasure()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Arial");
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var renderer = new DocumentRenderer();
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.IsType<InvalidOperationException>(exception);
         Assert.Contains("No font is registered for family 'Arial'", exception!.Message, StringComparison.Ordinal);
@@ -37,29 +50,31 @@ public class FontResolutionPolicyTests
     [InlineData("Courier New")]
     public void GeneratedWatermark_UnknownFamily_ThrowsWithEmbedRemedy(string family)
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var watermark = new Watermark { Text = "DRAFT" };
-        watermark.Font.Name = family;
+        watermark.Font.Family = family;
         section.Watermark = watermark;
         BuildTestSupport.AddText(section, "Body", "Helvetica");
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => new DocumentRenderer().ToArray(document));
 
         Assert.IsType<NotSupportedException>(exception);
         Assert.Contains(family, exception!.Message, StringComparison.Ordinal);
-        Assert.Contains("DocumentBuilder.Fonts", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("Document.Fonts", exception.Message, StringComparison.Ordinal);
+        Assert.DoesNotContain("base-14", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
     public void GeneratedFormField_UnknownFamily_ThrowsWithBase14Remedy()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Helvetica");
-        builder.FormFields.Add(Field(new Font { Name = "Arial", Size = 12 }));
+        var renderer = new DocumentRenderer();
+        renderer.FormFields.Add(Field(new Font { Family = "Arial", Size = 12 }));
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.IsType<NotSupportedException>(exception);
         Assert.Contains("Arial", exception!.Message, StringComparison.Ordinal);
@@ -80,11 +95,12 @@ public class FontResolutionPolicyTests
     [Fact]
     public void Overlay_UnknownFamily_ThrowsWithBase14Remedy()
     {
-        var document = Author().Build();
+        var authored = Author();
+        var document = authored.Renderer.Render(authored.Document);
         document.Pages[0].Content.Add(
             new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650))
             {
-                Font = new Font { Name = "Arial", Size = 12 },
+                Font = new Font { Family = "Arial", Size = 12 },
             });
 
         var exception = Record.Exception(() => document.ToArray());
@@ -97,7 +113,8 @@ public class FontResolutionPolicyTests
     [Fact]
     public void EmptyFamily_KeepsDefaultFont()
     {
-        var document = Author().Build();
+        var authored = Author();
+        var document = authored.Renderer.Render(authored.Document);
         document.Pages[0].Content.Add(new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650)));
 
         Assert.NotEmpty(document.ToArray());
@@ -106,11 +123,12 @@ public class FontResolutionPolicyTests
     [Fact]
     public void Overlay_RegisteredEmbeddedFamily_ThrowsRatherThanSubstituting()
     {
-        var document = Author().Build();
+        var authored = Author();
+        var document = authored.Renderer.Render(authored.Document);
         document.Pages[0].Content.Add(
             new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650))
             {
-                Font = new Font { Name = BuildTestSupport.Latin, Size = 12 },
+                Font = new Font { Family = BuildTestSupport.Latin, Size = 12 },
             });
 
         var exception = Record.Exception(() => document.ToArray());
@@ -122,10 +140,10 @@ public class FontResolutionPolicyTests
     [Fact]
     public void FormField_RegisteredEmbeddedFamily_ThrowsRatherThanSubstituting()
     {
-        var builder = Author();
-        builder.FormFields.Add(Field(new Font { Name = BuildTestSupport.Latin, Size = 12 }));
+        var (document, renderer) = Author();
+        renderer.FormFields.Add(Field(new Font { Family = BuildTestSupport.Latin, Size = 12 }));
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.IsType<NotSupportedException>(exception);
         Assert.Contains(BuildTestSupport.Latin, exception!.Message, StringComparison.Ordinal);
@@ -135,10 +153,10 @@ public class FontResolutionPolicyTests
     [Fact]
     public void PdfA3B_TextFormField_RejectsUnembeddedBase14()
     {
-        var builder = Author(PdfAConformance.PdfA3B);
-        builder.FormFields.Add(Field(new Font { Name = "Helvetica", Size = 12 }));
+        var (document, renderer) = Author(PdfAConformance.PdfA3B);
+        renderer.FormFields.Add(Field(new Font { Family = "Helvetica", Size = 12 }));
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.IsType<InvalidOperationException>(exception);
         Assert.Contains("PDF/A", exception!.Message, StringComparison.Ordinal);
@@ -148,29 +166,29 @@ public class FontResolutionPolicyTests
     [Fact]
     public void PdfA3B_Watermark_RejectsUnembeddedBase14()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = "DRAFT" };
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.IsType<InvalidOperationException>(exception);
         Assert.Contains("PDF/A", exception!.Message, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void PdfUA_Base14_StillFailsAtSaveNotBuild()
+    public void PdfUA_Base14_FailsDuringRenderMaterialization()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        builder.Info.Title = "Title";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var renderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Title";
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Helvetica");
 
-        var document = builder.Build();
-
-        var exception = Record.Exception(() => document.ToArray());
+        var exception = Record.Exception(() => renderer.Render(document));
 
         Assert.IsType<InvalidOperationException>(exception);
         Assert.Contains("PDF/UA", exception!.Message, StringComparison.Ordinal);
@@ -179,7 +197,7 @@ public class FontResolutionPolicyTests
     [Fact]
     public void PdfA3B_CleanDocument_EmitsNoUnembeddedType1()
     {
-        var bytes = Author(PdfAConformance.PdfA3B).ToArray();
+        var bytes = RenderAuthored(Author(PdfAConformance.PdfA3B));
         var text = Encoding.Latin1.GetString(bytes);
 
         Assert.DoesNotContain("/BaseFont /Helvetica", text, StringComparison.Ordinal);

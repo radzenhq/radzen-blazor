@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

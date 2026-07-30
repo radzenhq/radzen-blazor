@@ -4,6 +4,9 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -131,7 +134,7 @@ public class AnnotationFidelityTests
         source.Pages.Add().Annotations.Add(new FreeTextAnnotation(PdfRect.FromSize(40, 250, 120, 30))
         {
             Contents = "free text",
-            Font = new Font { Name = "Courier", Size = 18 },
+            Font = new Font { Family = "Courier", Size = 18 },
             TextColor = Color.Red,
         });
 
@@ -139,7 +142,7 @@ public class AnnotationFidelityTests
         var loaded = Assert.IsType<FreeTextAnnotation>(document.Pages[0].Annotations[0]);
 
         Assert.Equal(18, loaded.Font.Size);
-        Assert.Equal("Courier", loaded.Font.Name);
+        Assert.Equal("Courier", loaded.Font.Family);
         Assert.Equal(Color.Red, loaded.TextColor);
 
         loaded.Contents = "edited";

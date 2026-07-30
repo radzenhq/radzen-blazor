@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class SoftMaskDedupTests

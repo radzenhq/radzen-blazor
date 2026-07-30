@@ -1,6 +1,8 @@
 #nullable enable
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -10,15 +12,15 @@ public class BoxRendererByteNeutralityTests
     {
         var paragraph = cell.Blocks.AddParagraph();
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         run.Font.Size = 10;
     }
 
-    private static DocumentBuilder BuildDecoratedDocument()
+    private static Document BuildDecoratedDocument()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
 
         var panel = section.Blocks.Add(new Container
         {
@@ -30,7 +32,7 @@ public class BoxRendererByteNeutralityTests
         panel.Borders.Width = 1;
         panel.Borders.Color = Color.FromRgb(0, 0, 128);
         var text = panel.Blocks.AddParagraph().Inlines.Add("Rounded translucent panel");
-        text.Font.Name = BuildTestSupport.Latin;
+        text.Font.Family = BuildTestSupport.Latin;
         text.Font.Size = 10;
 
         var table = section.Blocks.AddTable();
@@ -81,14 +83,14 @@ public class BoxRendererByteNeutralityTests
         nestedCell.Background = Color.FromRgb(224, 255, 255);
         Fill(nestedCell, "nested");
 
-        return builder;
+        return document;
     }
 
     [Fact]
     public void DecorationHeavyDocument_BuildsByteIdenticalTwice()
     {
-        var golden = BuildDecoratedDocument().ToArray();
-        var again = BuildDecoratedDocument().ToArray();
+        var golden = new DocumentRenderer().ToArray(BuildDecoratedDocument());
+        var again = new DocumentRenderer().ToArray(BuildDecoratedDocument());
 
         Assert.Equal(golden, again);
     }

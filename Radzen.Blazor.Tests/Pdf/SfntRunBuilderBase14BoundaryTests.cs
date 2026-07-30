@@ -3,6 +3,8 @@ using System;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +14,7 @@ public class SfntRunBuilderBase14BoundaryTests
     public void Shaper_Base14Family_Throws()
     {
         var fonts = new FontCollection();
-        var helvetica = new Font { Name = "Helvetica", Size = 12 };
+        var helvetica = new Font { Family = "Helvetica", Size = 12 };
 
         Assert.True(fonts.MeasureText("Hi", helvetica) > 0);
 

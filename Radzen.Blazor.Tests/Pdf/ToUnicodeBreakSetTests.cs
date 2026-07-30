@@ -2,6 +2,7 @@
 using System.Text;
 using Radzen.Documents.Pdf.Fonts;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

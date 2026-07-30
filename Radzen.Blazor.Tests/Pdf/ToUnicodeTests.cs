@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -22,7 +23,7 @@ public class ToUnicodeTests
         var cmap = Type0EmbedSupport.ParseToUnicode(bytes);
 
         var fontFile = Type0EmbedSupport.Stream(e.Reader, e.Descriptor["FontFile2"]);
-        var subset = Radzen.Documents.Pdf.Fonts.Sfnt.SfntFont.Parse(
+        var subset = Radzen.Documents.Fonts.Sfnt.SfntFont.Parse(
             Type0EmbedSupport.DecodeStream(e.Reader, fontFile));
 
         foreach (var ch in LiberationSample)

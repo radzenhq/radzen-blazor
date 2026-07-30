@@ -4,8 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Xunit;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Fonts.Cff;
+using Radzen.Documents;
+
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

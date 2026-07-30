@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using Radzen.Documents.Crypto;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -132,5 +133,25 @@ public class Sha2Tests
     public void Sha512_BlockBoundaries(int count, string expected)
     {
         Assert.Equal(expected, Hex(Sha2.ComputeHash512(Ascii(new string('a', count)))));
+    }
+
+    [Fact]
+    public void Sha256Hasher_FinishTwice_Throws()
+    {
+        var hasher = new Sha256Hasher();
+        hasher.Append(Ascii("abc"));
+        hasher.Finish();
+
+        Assert.Throws<InvalidOperationException>(() => hasher.Finish());
+    }
+
+    [Fact]
+    public void Sha256Hasher_AppendAfterFinish_Throws()
+    {
+        var hasher = new Sha256Hasher();
+        hasher.Finish();
+
+        Assert.Throws<InvalidOperationException>(() => hasher.Append(Ascii("abc")));
+        Assert.Throws<InvalidOperationException>(() => hasher.Append((byte)0));
     }
 }

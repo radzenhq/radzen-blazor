@@ -1,3 +1,4 @@
+using System.IO;
 #nullable enable
 using System;
 using System.Text;
@@ -5,6 +6,8 @@ using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
+using Radzen.Documents.Pdf;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -84,7 +87,7 @@ public class EncryptionHardeningTests
     [InlineData(64)]
     public void AesExpandKey_RejectsInvalidKeyLengths(int keyLength)
     {
-        Assert.Throws<DocumentParseException>(
+        Assert.Throws<InvalidDataException>(
             () => AesCbc.DecryptCbcNoPadding(new byte[keyLength], ZeroIv, new byte[16]));
     }
 

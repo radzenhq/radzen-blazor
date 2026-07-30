@@ -1,8 +1,12 @@
 #nullable enable
 using System;
+using System.Reflection;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,15 +22,15 @@ public class SectionWatermarkParityTests
     [Fact]
     public void SectionWatermarkImage_HonoursInterpolateOption()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var watermark = new Watermark { Opacity = 1 };
         var image = watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Interpolate = true;
         section.Watermark = watermark;
         section.Blocks.Add(Text("Body"));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var stream = Assert.Single(BuildTestSupport.ImageXObjects(reader));
         Assert.True(stream.Dictionary.TryGetValue("Interpolate", out var interpolate));
         Assert.True(interpolate is BooleanObject { Value: true });
@@ -34,36 +38,36 @@ public class SectionWatermarkParityTests
 
     [Fact]
     public void SectionWatermark_RejectsOutOfRangeOpacity()
-    {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
-        section.Watermark = new Watermark { Text = "DRAFT", Opacity = 2 };
-        section.Blocks.Add(Text("Body"));
-
-        Assert.Throws<ArgumentOutOfRangeException>(() => BuildTestSupport.Read(builder));
-    }
+        => Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Opacity = 2 });
 
     [Fact]
     public void SectionWatermark_RejectsNonFiniteRotation()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
-        section.Watermark = new Watermark { Text = "DRAFT", Rotation = double.NaN };
-        section.Blocks.Add(Text("Body"));
-
-        Assert.Throws<ArgumentOutOfRangeException>(() => BuildTestSupport.Read(builder));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Rotation = double.NaN });
     }
 
     [Fact]
-    public void DecodeImage_ReflectsReplacedImage()
+    public void DecodeWatermark_ReflectsReplacedImage()
     {
+        var images = new ImageStore();
         var watermark = new Watermark();
         var first = watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var decodedFirst = watermark.DecodeImage(first);
+        var decodedFirst = images.DecodeWatermark(first).Image;
 
         var second = watermark.SetImage(PdfTestResources.Open("Images/gray.jpg"));
-        var decodedSecond = watermark.DecodeImage(second);
+        var decodedSecond = images.DecodeWatermark(second).Image;
 
         Assert.NotSame(decodedFirst, decodedSecond);
+    }
+
+    [Fact]
+    public void Watermark_HasNoDecodedImageState()
+    {
+        var watermark = new Watermark();
+        watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        Assert.All(
+            typeof(Watermark).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public),
+            field => Assert.DoesNotContain("Radzen.Documents.Pdf", field.FieldType.FullName ?? string.Empty, StringComparison.Ordinal));
     }
 }

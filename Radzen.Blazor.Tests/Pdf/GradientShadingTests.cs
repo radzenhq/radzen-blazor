@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.7.4.5.2, 8.7.4.5.3, 8.7.4.5.5: axial (type 2) and radial (type 3) shadings and the shading Pattern (PatternType 2).
@@ -123,6 +124,37 @@ public class GradientShadingTests
     }
 
     [Fact]
+    public void BoxGradient_PatternMatrix_MapsBoxRelativeTopOriginCoordinatesOntoTheBox()
+    {
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
+        var container = section.Blocks.Add(new Container
+        {
+            Padding = Unit.FromPoint(10),
+            Width = Unit.FromPoint(120),
+            BackgroundGradient = new LinearGradient(
+                0, 0, 100, 0,
+                new GradientStop(0, Color.Red),
+                new GradientStop(1, Color.Blue)),
+        });
+        container.Blocks.AddParagraph().Inlines.Add("Boxed");
+
+        var reader = BuildTestSupport.Read(document);
+        var page = Assert.Single(BuildTestSupport.PageLeaves(reader));
+        var patterns = reader.GetDictionary(page.Resources!, "Pattern");
+        var pattern = Dict(reader.Resolve(patterns![Assert.Single(patterns.Keys)])!);
+        var matrix = Array(reader.Resolve(pattern["Matrix"]!)!);
+
+        var box = Assert.Single(Radzen.Documents.Layout.Paginator.PaginateIsolated(section, new Radzen.Documents.Fonts.FontCollection())).Body.Boxes[0];
+        Assert.Equal(1, Num(matrix[0]), 3);
+        Assert.Equal(0, Num(matrix[1]), 3);
+        Assert.Equal(0, Num(matrix[2]), 3);
+        Assert.Equal(-1, Num(matrix[3]), 3);
+        Assert.Equal(section.Margins.Left.Point + box.Bounds.X, Num(matrix[4]), 3);
+        Assert.Equal(section.PageSize.Height.Point - section.Margins.Top.Point - box.Bounds.Y, Num(matrix[5]), 3);
+    }
+
+    [Fact]
     public void SingleStop_ProducesConstantFunction()
     {
         var brush = new LinearGradient(0, 0, 10, 0, new GradientStop(0, Color.Red));
@@ -143,9 +175,12 @@ public class GradientShadingTests
         GradientBrush radial = new RadialGradient(5, 6, 7, 8, 9, 10,
             new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
 
-        Assert.Equal(2, linear.ShadingType);
-        Assert.Equal(4, linear.BuildCoords().Count);
-        Assert.Equal(3, radial.ShadingType);
-        Assert.Equal(6, radial.BuildCoords().Count);
+        var linearShading = ShadingBuilder.BuildShading(linear);
+        var radialShading = ShadingBuilder.BuildShading(radial);
+
+        Assert.Equal(2, Num(linearShading["ShadingType"]!));
+        Assert.Equal(4, Array(linearShading["Coords"]!).Count);
+        Assert.Equal(3, Num(radialShading["ShadingType"]!));
+        Assert.Equal(6, Array(radialShading["Coords"]!).Count);
     }
 }

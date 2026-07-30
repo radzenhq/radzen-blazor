@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -37,10 +39,10 @@ public class FieldOverflowGuardCoverageTests
     {
         var paragraph = new Paragraph();
         var text = paragraph.Inlines.Add("ending on page ");
-        text.Font.Name = LineLayoutSupport.Family;
+        text.Font.Family = LineLayoutSupport.Family;
         text.Font.Size = 12;
         var field = paragraph.Inlines.Add(new PageCountField());
-        field.Font.Name = LineLayoutSupport.Family;
+        field.Font.Family = LineLayoutSupport.Family;
         field.Font.Size = 12;
         return paragraph;
     }
@@ -49,19 +51,19 @@ public class FieldOverflowGuardCoverageTests
     {
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = LineLayoutSupport.Family;
+        run.Font.Family = LineLayoutSupport.Family;
         run.Font.Size = 12;
         return paragraph;
     }
 
-    private static DocumentBuilder Author(out Section section)
+    private static Document Author(out Section section)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PlaceholderWidth() + 1 + 80), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(40);
-        return builder;
+        section.Margins.SetAll(Unit.FromPoint(40));
+        return document;
     }
 
     private static void PadToTenPages(Section section)
@@ -75,12 +77,12 @@ public class FieldOverflowGuardCoverageTests
     [Fact]
     public void BodyFieldParagraph_ResolvedValueWrapsBeyondLaidOutLines_Throws()
     {
-        var builder = Author(out var section);
+        var document = Author(out var section);
         section.Blocks.Add(FieldParagraph());
         section.Blocks.Add(Plain("BELOW"));
         PadToTenPages(section);
 
-        var ex = Record.Exception(() => builder.ToArray());
+        var ex = Record.Exception(() => new DocumentRenderer().ToArray(document));
 
         Assert.NotNull(ex);
         Assert.IsType<InvalidOperationException>(ex);
@@ -90,7 +92,7 @@ public class FieldOverflowGuardCoverageTests
     [Fact]
     public void TableCellFieldParagraph_ResolvedValueWrapsBeyondLaidOutLines_Throws()
     {
-        var builder = Author(out var section);
+        var document = Author(out var section);
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
@@ -99,7 +101,7 @@ public class FieldOverflowGuardCoverageTests
         cell.Blocks.Add(Plain("BELOW"));
         PadToTenPages(section);
 
-        var ex = Record.Exception(() => builder.ToArray());
+        var ex = Record.Exception(() => new DocumentRenderer().ToArray(document));
 
         Assert.NotNull(ex);
         Assert.IsType<InvalidOperationException>(ex);
@@ -109,11 +111,11 @@ public class FieldOverflowGuardCoverageTests
     [Fact]
     public void BodyFieldParagraph_ResolvedValueFitsReservedLines_RendersWithoutOverprinting()
     {
-        var builder = Author(out var section);
+        var document = Author(out var section);
         section.Blocks.Add(FieldParagraph());
         section.Blocks.Add(Plain("BELOW"));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var placed = PlacedText(reader, 0);
 
         Assert.Equal(2, placed.Count);

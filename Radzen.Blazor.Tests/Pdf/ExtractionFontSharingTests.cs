@@ -4,6 +4,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,16 +13,16 @@ public class ExtractionFontSharingTests
 {
     private static Document Build(int paragraphs)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         for (var i = 0; i < paragraphs; i++)
         {
             BuildTestSupport.AddText(section, "Page filling text " + i, BuildTestSupport.Latin, 36);
         }
 
-        return builder.Build();
+        return new DocumentRenderer().Render(document);
     }
 
     private static List<ReverseFont> Fonts(Document document)

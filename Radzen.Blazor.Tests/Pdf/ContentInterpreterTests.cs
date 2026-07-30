@@ -2,6 +2,9 @@
 
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -82,7 +85,7 @@ public class ContentInterpreterTests
         var content = BuildAndReload().Pages[0].Content;
 
         var text = Assert.IsType<TextContent>(content[0]);
-        Assert.Equal(14, text.Font.Size, 3);
+        Assert.Equal(14, text.Font.Size!.Value.Point, 3);
     }
 
     [Fact]

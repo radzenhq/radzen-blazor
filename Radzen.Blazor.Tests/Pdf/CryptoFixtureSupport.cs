@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Security.Cryptography;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

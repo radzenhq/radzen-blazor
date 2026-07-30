@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -52,7 +54,7 @@ public class DeterminismManifestTests
         var run = paragraph.Inlines.Add(text);
         if (family is not null)
         {
-            run.Font.Name = family;
+            run.Font.Family = family;
         }
 
         run.Font.Size = size;
@@ -62,37 +64,38 @@ public class DeterminismManifestTests
 
     private static byte[] PlainText()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "Plain text";
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "Plain text";
+        var section = document.Sections.Add();
         section.Blocks.Add(Text("The quick brown fox jumps over the lazy dog."));
         section.Blocks.Add(Text("Second base-14 paragraph, no embedded font."));
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] TrueTypeSubset()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "TrueType subset";
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "TrueType subset";
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.Blocks.Add(Text("Embedded Liberation Sans subset AWAY VoTo.", BuildTestSupport.Latin));
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] Tables()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "Table";
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "Table";
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         table.Columns.Add();
 
         var header = table.Rows.Add();
-        header.IsHeader = true;
+        header.RepeatOnEveryPage = true;
+        header.IsHeaderRow = true;
         TableLayoutSupport.Fill(header.Cells[0], "Item");
         TableLayoutSupport.Fill(header.Cells[1], "Price");
 
@@ -103,25 +106,25 @@ public class DeterminismManifestTests
             TableLayoutSupport.Fill(row.Cells[1], price);
         }
 
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] Image()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "Image";
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "Image";
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(120);
         image.Height = Unit.FromPoint(120);
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] Gradients()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "Gradients";
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "Gradients";
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -141,7 +144,7 @@ public class DeterminismManifestTests
                 new GradientStop(1, Color.Black)),
         });
         radial.Blocks.Add(Text("Boxed over a radial gradient."));
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] Encrypted()
@@ -163,12 +166,12 @@ public class DeterminismManifestTests
 
     private static byte[] SignedBase()
     {
-        var builder = new DocumentBuilder();
-        builder.Info.Title = "Signed";
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        document.Info.Title = "Signed";
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.Blocks.Add(Text("Document body to be signed.", BuildTestSupport.Latin));
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static byte[] Signed()
@@ -205,7 +208,7 @@ public class DeterminismManifestTests
         ["truetype-subset"] = "2e28d4416c5c7925b9d581ebd7e99f20d23a491bd6d75a1cd2155393e481e963",
         ["tables"] = "6a16fe3b40d900cde01f93d12dd072eaddd1c8f3b6fd7f870c80fb1f038b249f",
         ["image"] = "d85431f2632cdccfc4699270f92007c5ce74cb1f9e96c10f0af9c140a6b3ef0f",
-        ["gradients"] = "65e26f92ba5254fcd24616755deb28b02ce764f5d12985b4ff66779a6d3ff8f5",
+        ["gradients"] = "0b7ea915987a44d44a824f9ea34dbb0008c9ed1d87b8518cb9edfc81491e9176",
         ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
         ["signed"] = "ab5875e082b064a4ed84920dc14b9801da372bb9cbbe9036e7cb6a4289ec2fd7",
         ["timestamped"] = "bc6d540a6e43addae1e74627e6c972f3c8c23abb4bd72ef7e43f5c64acd7dd49",

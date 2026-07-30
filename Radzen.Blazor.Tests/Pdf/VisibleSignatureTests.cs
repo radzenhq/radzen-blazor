@@ -1,15 +1,15 @@
 #nullable enable
 using System;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.Pkcs;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,9 +19,9 @@ public class VisibleSignatureTests
 
     private static byte[] BuildPdf(int pages = 1)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Signed document body", BuildTestSupport.Latin);
         for (var i = 1; i < pages; i++)
         {
@@ -29,7 +29,7 @@ public class VisibleSignatureTests
             BuildTestSupport.AddText(section, "Another page " + i, BuildTestSupport.Latin);
         }
 
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     private static SignatureOptions Options(SignatureAppearance? appearance = null) => new()
@@ -41,22 +41,14 @@ public class VisibleSignatureTests
         Appearance = appearance,
     };
 
-    private static X509Certificate2 CreateCertificate()
-    {
-        using var rsa = RSA.Create(2048);
-        var request = new CertificateRequest(
-            "CN=Radzen PDF Signing Tests", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-        return request.CreateSelfSigned(
-            new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero),
-            new DateTimeOffset(2036, 1, 1, 0, 0, 0, TimeSpan.Zero));
-    }
+    private static TestSigningIdentity CreateCertificate() => TestSigningIdentity.Create();
 
-    private sealed class CmsSigner2(X509Certificate2 certificate) : ISigner
+    private sealed class CmsSigner2(TestSigningIdentity certificate) : ISigner
     {
         public byte[] Sign(SignedContent content)
         {
             var cms = new SignedCms(new ContentInfo(content.ToArray()), detached: true);
-            cms.ComputeSignature(new CmsSigner(SubjectIdentifierType.IssuerAndSerialNumber, certificate));
+            cms.ComputeSignature(certificate.CmsSigner());
             return cms.Encode();
         }
     }

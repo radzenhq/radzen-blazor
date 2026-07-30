@@ -5,6 +5,9 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -30,9 +33,9 @@ public class MeasureEmitRegressionTests
         return shows;
     }
 
-    private static List<(double X, double Y, byte[] Bytes)> ShowsSortedTopDown(DocumentBuilder builder)
+    private static List<(double X, double Y, byte[] Bytes)> ShowsSortedTopDown(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var shows = TextShows(ContentTestHelpers.PageContent(reader, 0));
         shows.Sort((a, b) => b.Y.CompareTo(a.Y));
         return shows;
@@ -44,7 +47,7 @@ public class MeasureEmitRegressionTests
         paragraph.Alignment = HorizontalAlignment.Right;
         if (family is not null)
         {
-            paragraph.Inlines[0].Font.Name = family;
+            paragraph.Inlines[0].Font.Family = family;
         }
 
         paragraph.Inlines[0].Font.Size = 12;
@@ -52,34 +55,36 @@ public class MeasureEmitRegressionTests
     }
 
     [Fact]
-    public void Base14NoFallback_RightAligned_SubstituteDrivesPosition()
+    public void Base14NoFallback_RightAligned_SubstituteDoesNotRewriteLayoutMetrics()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
-        RightAligned(section, "ЙЙЙЙЙ", null);
+        var document = new Document();
+        document.Fonts.AllowUnsupportedCharacters = true;
+        var section = document.Sections.Add();
+        RightAligned(section, "ﬁﬁﬁﬁﬁ", null);
         RightAligned(section, "?????", null);
 
-        var shows = ShowsSortedTopDown(builder);
+        var shows = ShowsSortedTopDown(document);
 
         Assert.Equal(2, shows.Count);
         Assert.Equal("?????", Encoding.Latin1.GetString(shows[0].Bytes));
         Assert.Equal("?????", Encoding.Latin1.GetString(shows[1].Bytes));
-        Assert.True(Math.Abs(shows[0].X - shows[1].X) < 0.2,
-            $"right-aligned substitute line at x={shows[0].X} but literal '?????' line at x={shows[1].X}");
+        var font = new Font { Size = 12 };
+        var expected = document.Fonts.MeasureText("?????", font) - document.Fonts.MeasureText("ﬁﬁﬁﬁﬁ", font);
+        Assert.Equal(expected, shows[0].X - shows[1].X, 2);
     }
 
     [Fact]
     public void Base14WithFallback_RightAligned_FallbackWidthsDrivePosition()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Fonts.SetFallback(BuildTestSupport.Latin);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Fonts.SetFallback(BuildTestSupport.Latin);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         RightAligned(section, "лева", null);
         RightAligned(section, "лева", BuildTestSupport.Latin);
 
-        var shows = ShowsSortedTopDown(builder);
+        var shows = ShowsSortedTopDown(document);
 
         Assert.Equal(2, shows.Count);
         Assert.Equal(shows[1].Bytes, shows[0].Bytes);
@@ -90,14 +95,14 @@ public class MeasureEmitRegressionTests
     [Fact]
     public void SfntPrimary_SurrogatePair_RightAligned_MeasuredOnce()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         RightAligned(section, "A\U0001F600B", BuildTestSupport.Latin);
         RightAligned(section, "A中B", BuildTestSupport.Latin);
 
-        var shows = ShowsSortedTopDown(builder);
+        var shows = ShowsSortedTopDown(document);
 
         Assert.Equal(2, shows.Count);
         Assert.Equal(shows[1].Bytes, shows[0].Bytes);
@@ -132,12 +137,12 @@ public class MeasureEmitRegressionTests
     {
         const string word = "Typographic";
 
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, word, BuildTestSupport.Latin);
 
-        var shows = ShowsSortedTopDown(builder);
+        var shows = ShowsSortedTopDown(document);
         Assert.Single(shows);
         var drawn = Cids(shows[0].Bytes);
 

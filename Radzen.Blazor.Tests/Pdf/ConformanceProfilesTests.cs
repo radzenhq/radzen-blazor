@@ -4,30 +4,39 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ConformanceProfilesTests
 {
-    private static DocumentBuilder Author(PdfAConformance conformance = PdfAConformance.None, bool ua = false)
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance conformance = PdfAConformance.None, bool ua = false)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        builder.Info.Title = "Conformance profiles";
-        builder.Info.Author = "Radzen Ltd";
+        document.Info.Title = "Conformance profiles";
+        document.Info.Author = "Radzen Ltd";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello conformance", BuildTestSupport.Latin);
 
-        builder.Conformance = conformance;
-        builder.PdfUA = ua;
+        var renderer = new DocumentRenderer();
+        renderer.Conformance = conformance;
+        renderer.Accessibility = ua ? PdfUaConformance.PdfUa1 : PdfUaConformance.None;
         if (ua)
         {
-            builder.Language = "en-US";
+            document.Language = "en-US";
         }
 
-        return builder;
+        return (document, renderer);
     }
 
     private static DictionaryObject Catalog(DocumentReader reader)
@@ -79,7 +88,7 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4E, 4, "E")]
     public void PdfALevel_Xmp_HasPartAndConformance(PdfAConformance level, int part, string conformance)
     {
-        var reader = BuildTestSupport.Read(Author(level));
+        var reader = ReadAuthored(Author(level));
 
         var packet = MetadataPacket(reader);
         Assert.Contains($"<pdfaid:part>{part}</pdfaid:part>", packet, StringComparison.Ordinal);
@@ -92,7 +101,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA4_Xmp_HasPart4RevAndNoConformanceLetter()
     {
-        var reader = BuildTestSupport.Read(Author(PdfAConformance.PdfA4));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA4));
 
         var packet = MetadataPacket(reader);
         Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
@@ -108,13 +117,13 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4F)]
     public void PdfA4Levels_Catalog_DeclaresVersion20(PdfAConformance level)
     {
-        var builder = Author(level);
+        var (document, renderer) = Author(level);
         if (level == PdfAConformance.PdfA4F)
         {
-            builder.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+            renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
         }
 
-        var catalog = Catalog(BuildTestSupport.Read(builder));
+        var catalog = Catalog(BuildTestSupport.Read(document, renderer));
         Assert.True(catalog.TryGetValue("Version", out var version), "catalog has /Version");
         Assert.Equal("2.0", Assert.IsType<NameObject>(version).Value);
     }
@@ -126,23 +135,23 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA3B, "%PDF-1.7")]
     public void FileHeader_MatchesConformancePart(PdfAConformance level, string expectedHeader)
     {
-        var bytes = Author(level).ToArray();
+        var bytes = RenderAuthored(Author(level));
         Assert.Equal(expectedHeader, Encoding.ASCII.GetString(bytes, 0, expectedHeader.Length));
     }
 
     [Fact]
     public void PdfA2A_OutputIsTagged()
     {
-        AssertTagged(BuildTestSupport.Read(Author(PdfAConformance.PdfA2A)));
+        AssertTagged(ReadAuthored(Author(PdfAConformance.PdfA2A)));
     }
 
     [Fact]
     public void PdfA4F_WithAttachment_HasConformanceF()
     {
-        var builder = Author(PdfAConformance.PdfA4F);
-        builder.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+        var (document, renderer) = Author(PdfAConformance.PdfA4F);
+        renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
 
-        var packet = MetadataPacket(BuildTestSupport.Read(builder));
+        var packet = MetadataPacket(BuildTestSupport.Read(document, renderer));
         Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:rev>2020</pdfaid:rev>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:conformance>F</pdfaid:conformance>", packet, StringComparison.Ordinal);
@@ -151,7 +160,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA4F_WithoutAttachment_Throws()
     {
-        var exception = Record.Exception(() => Author(PdfAConformance.PdfA4F).ToArray());
+        var exception = Record.Exception(() => RenderAuthored(Author(PdfAConformance.PdfA4F)));
 
         Assert.NotNull(exception);
         Assert.Contains("PDF/A-4F", exception!.Message, StringComparison.Ordinal);
@@ -165,10 +174,10 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4E)]
     public void AttachmentRestrictedLevels_WithAttachment_Throw(PdfAConformance level)
     {
-        var builder = Author(level);
-        builder.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+        var (document, renderer) = Author(level);
+        renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.NotNull(exception);
         Assert.Contains(level.ToString(), exception!.Message, StringComparison.Ordinal);
@@ -177,7 +186,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_Xmp_HasPdfuaidPart1()
     {
-        var reader = BuildTestSupport.Read(Author(ua: true));
+        var reader = ReadAuthored(Author(ua: true));
 
         var packet = MetadataPacket(reader);
         Assert.Contains("xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"", packet, StringComparison.Ordinal);
@@ -188,7 +197,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_OutputIsTaggedWithDisplayDocTitle()
     {
-        var reader = BuildTestSupport.Read(Author(ua: true));
+        var reader = ReadAuthored(Author(ua: true));
         AssertTagged(reader);
 
         var catalog = Catalog(reader);
@@ -200,7 +209,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_Catalog_HasLang()
     {
-        var catalog = Catalog(BuildTestSupport.Read(Author(ua: true)));
+        var catalog = Catalog(ReadAuthored(Author(ua: true)));
         var lang = Assert.IsType<StringObject>(catalog["Lang"]);
         Assert.Equal("en-US", lang.Value);
     }
@@ -208,10 +217,10 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_WithoutLanguage_Throws()
     {
-        var builder = Author(ua: true);
-        builder.Language = null;
+        var (document, renderer) = Author(ua: true);
+        document.Language = null;
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.NotNull(exception);
         Assert.Contains("Language", exception!.Message, StringComparison.Ordinal);
@@ -220,7 +229,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_WithPdfA_Xmp_DeclaresPdfuaidExtensionSchema()
     {
-        var packet = MetadataPacket(BuildTestSupport.Read(Author(PdfAConformance.PdfA2A, ua: true)));
+        var packet = MetadataPacket(ReadAuthored(Author(PdfAConformance.PdfA2A, ua: true)));
         Assert.Contains("<pdfaSchema:prefix>pdfuaid</pdfaSchema:prefix>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaSchema:namespaceURI>http://www.aiim.org/pdfua/ns/id/</pdfaSchema:namespaceURI>", packet, StringComparison.Ordinal);
     }
@@ -228,21 +237,21 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA4_Trailer_HasNoInfo()
     {
-        var reader = BuildTestSupport.Read(Author(PdfAConformance.PdfA4));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA4));
         Assert.False(reader.Trailer.ContainsKey("Info"), "PDF/A-4 forbids the trailer /Info key");
     }
 
     [Fact]
     public void PdfUA_Alone_EmitsNoPdfAMachinery()
     {
-        var catalog = Catalog(BuildTestSupport.Read(Author(ua: true)));
+        var catalog = Catalog(ReadAuthored(Author(ua: true)));
         Assert.False(catalog.ContainsKey("OutputIntents"), "PDF/UA alone requires no /OutputIntents");
     }
 
     [Fact]
     public void PdfUA_ComposesWithPdfA2A()
     {
-        var reader = BuildTestSupport.Read(Author(PdfAConformance.PdfA2A, ua: true));
+        var reader = ReadAuthored(Author(PdfAConformance.PdfA2A, ua: true));
 
         var packet = MetadataPacket(reader);
         Assert.Contains("<pdfaid:part>2</pdfaid:part>", packet, StringComparison.Ordinal);
@@ -256,12 +265,12 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_Base14FontByName_ThrowsActionable()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var renderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello", "Helvetica");
-        builder.PdfUA = true;
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => renderer.ToArray(document));
 
         Assert.NotNull(exception);
         Assert.Contains("PDF/UA", exception!.Message, StringComparison.Ordinal);
@@ -273,7 +282,8 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4)]
     public void NewLevels_ContentSurvives_ExtractText(PdfAConformance level)
     {
-        var document = BuildTestSupport.Reload(Author(level));
+        var authored = Author(level);
+        var document = BuildTestSupport.Reload(authored.Document, authored.Renderer);
         Assert.Contains("Hello conformance", document.Pages[0].ExtractText(), StringComparison.Ordinal);
     }
 }

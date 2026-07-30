@@ -2,6 +2,8 @@
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -10,8 +12,8 @@ public class BlendModeTests
     [Fact]
     public void BlendModeBox_EmitsBmInExtGState()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -20,7 +22,7 @@ public class BlendModeTests
         });
         container.Blocks.Add(FeatureEmissionTestHelpers.Text("Blended"));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
         var states = Assert.IsType<DictionaryObject>(reader.Resolve(resources["ExtGState"]!));
 

@@ -2,7 +2,9 @@
 using System;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Hybrid-reference files (ISO 32000-1 7.5.8.4): /XRefStm is consulted before the classic table.

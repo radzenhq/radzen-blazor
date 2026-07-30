@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,13 +24,13 @@ public class FooterRightTabTests
     private const double Margin = 40;
     private const double FontSize = 12;
 
-    private static (DocumentBuilder Builder, Section Section) Author()
+    private static (Document Builder, Section Section) Author()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(PageWidth), Unit.FromPoint(PageHeight));
-        section.Margin = Unit.FromPoint(Margin);
-        return (builder, section);
+        section.Margins.SetAll(Unit.FromPoint(Margin));
+        return (document, section);
     }
 
     private static void EnableRightTab(Paragraph paragraph)
@@ -63,18 +66,18 @@ public class FooterRightTabTests
         return runs;
     }
 
-    private static List<(string Text, double X, double Y)> FirstPageRuns(DocumentBuilder builder)
-        => TextRuns(BuildTestSupport.Read(builder), 0);
+    private static List<(string Text, double X, double Y)> FirstPageRuns(Document document)
+        => TextRuns(BuildTestSupport.Read(document), 0);
 
     [Fact]
     public void RightTabStop_TextAfterTab_IsFlushRight_OnTheSameBaseline()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         Sized(paragraph.Inlines.Add("Left\tRight"));
         EnableRightTab(paragraph);
 
-        var runs = FirstPageRuns(builder);
+        var runs = FirstPageRuns(document);
         var left = Assert.Single(runs, r => r.Text == "Left");
         var right = Assert.Single(runs, r => r.Text == "Right");
 
@@ -91,12 +94,12 @@ public class FooterRightTabTests
     [Fact]
     public void RightTabStop_EarlierTabs_KeepLeftTabBehavior()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         Sized(paragraph.Inlines.Add("ID:\tAAA\tRight"));
         EnableRightTab(paragraph);
 
-        var runs = FirstPageRuns(builder);
+        var runs = FirstPageRuns(document);
         var label = Assert.Single(runs, r => r.Text == "ID:");
         var middle = Assert.Single(runs, r => r.Text == "AAA");
         var right = Assert.Single(runs, r => r.Text == "Right");
@@ -116,11 +119,11 @@ public class FooterRightTabTests
     [Fact]
     public void Paragraph_WithoutOptIn_KeepsLeftTabStops()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         Sized(paragraph.Inlines.Add("Left\tRight"));
 
-        var runs = FirstPageRuns(builder);
+        var runs = FirstPageRuns(document);
         var left = Assert.Single(runs, r => r.Text == "Left");
         var right = Assert.Single(runs, r => r.Text == "Right");
 
@@ -129,9 +132,9 @@ public class FooterRightTabTests
             $"without the opt-in a tab must keep the default left tab stop, advanced {advance:F2}pt");
     }
 
-    private static DocumentBuilder TwoPagesWithRightTabFooter()
+    private static Document TwoPagesWithRightTabFooter()
     {
-        var (builder, section) = Author();
+        var (document, section) = Author();
         var footer = section.Footer.Blocks.AddParagraph();
         Sized(footer.Inlines.Add("Confidential\t"));
         Sized(footer.Inlines.Add("Page "));
@@ -143,7 +146,7 @@ public class FooterRightTabTests
         section.Blocks.AddParagraph("body one");
         section.Blocks.AddPageBreak();
         section.Blocks.AddParagraph("body two");
-        return builder;
+        return document;
     }
 
     private static List<(string Text, double X, double Y)> FooterRuns(DocumentReader reader, int pageIndex)

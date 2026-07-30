@@ -5,6 +5,9 @@ using Radzen.Documents.Pdf;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ForcedLineBreakTests
@@ -80,11 +83,11 @@ public class ForcedLineBreakTests
     [Fact]
     public void Newline_ProducesTwoBaselines_InEmittedContent()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddParagraph("Line one\nLine two");
 
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var content = CascadeTestSupport.FirstPageContent(document);
         var baselines = CascadeTestSupport.TdPositions(content)
             .Select(p => Math.Round(p.Y, 2))
             .Distinct()

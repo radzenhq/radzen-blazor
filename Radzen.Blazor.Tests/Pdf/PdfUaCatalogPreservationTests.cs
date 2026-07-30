@@ -6,6 +6,8 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfUaCatalogPreservationTests
@@ -49,19 +51,20 @@ public class PdfUaCatalogPreservationTests
         document.Structure = new StructureElement { Type = "Document" };
         document.Language = "en-US";
         document.Info.Title = "Accessible Title";
-        document.PdfUA = true;
+        document.Accessibility = PdfUaConformance.PdfUa1;
         return document;
     }
 
     private static Document TaggedPage()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Accessible Title";
-        builder.Language = "en-US";
-        builder.PdfUA = true;
-        BuildTestSupport.AddText(builder.Sections.Add(), "Accessible content", BuildTestSupport.Latin);
-        return builder.Build();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Accessible Title";
+        document.Language = "en-US";
+        var renderer = new DocumentRenderer();
+        renderer.Accessibility = PdfUaConformance.PdfUa1;
+        BuildTestSupport.AddText(document.Sections.Add(), "Accessible content", BuildTestSupport.Latin);
+        return renderer.Render(document);
     }
 
     [Fact]

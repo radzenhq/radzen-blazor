@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -265,17 +267,17 @@ public class IncrementalSaveTests
     [Fact]
     public void AppendedLoadedPageCarriesResourcesIncrementally()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Fonted append", BuildTestSupport.Latin);
-        var other = Load(builder.ToArray());
+        var other = Load(new DocumentRenderer().ToArray(document));
 
         var original = BaseDocument();
-        var document = Load(original);
-        document.Append(other);
+        var pdf = Load(original);
+        pdf.Append(other);
 
-        var updated = SaveIncremental(document);
+        var updated = SaveIncremental(pdf);
         AssertVerbatimPrefix(original, updated);
 
         var reader = DocumentReader.Parse(updated);

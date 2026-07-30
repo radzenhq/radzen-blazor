@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TableCellOverflowClipTests
 {
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static List<ContentOperation> Ops(Document document)
+        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
 
     private static List<(double X, double W)> ClipRects(List<ContentOperation> ops)
     {
@@ -42,10 +44,10 @@ public class TableCellOverflowClipTests
     [Fact]
     public void OversizedQrCode_InNarrowCell_IsClippedToCellBox()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(20);
+        section.Margins.SetAll(Unit.FromPoint(20));
         var table = section.Blocks.AddTable();
         table.Columns.Add().Width = Unit.FromPoint(40);
         table.Columns.Add().Width = Unit.FromPoint(200);
@@ -53,7 +55,7 @@ public class TableCellOverflowClipTests
         row.Cells[0].Blocks.AddQrCode("overflow", Unit.FromPoint(90));
         row.Cells[1].Blocks.AddParagraph("neighbour");
 
-        var ops = Ops(builder);
+        var ops = Ops(document);
         var moduleRight = FillRects(ops).Max(r => r.X + r.W);
 
         var clips = ClipRects(ops);

@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,20 +28,20 @@ public class TableCellNonTextAlignmentTests
         return rects;
     }
 
-    private static (DocumentBuilder Builder, Table Table, Column Column) WideSingleColumn()
+    private static (Document Builder, Table Table, Column Column) WideSingleColumn()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
         var table = section.Blocks.AddTable();
         var column = table.Columns.Add();
-        return (builder, table, column);
+        return (document, table, column);
     }
 
-    private static double QrMinX(DocumentBuilder builder)
+    private static double QrMinX(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         return FilledRects(ContentTestHelpers.PageContent(reader, 0)).Min(r => r.X);
     }
 
@@ -60,9 +62,9 @@ public class TableCellNonTextAlignmentTests
     [Fact]
     public void Image_RightAlignment_ShiftsRightVersusDefaultLeft()
     {
-        static double ImageX(DocumentBuilder builder)
+        static double ImageX(Document document)
         {
-            var reader = BuildTestSupport.Read(builder);
+            var reader = BuildTestSupport.Read(document);
             var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));
             var match = Regex.Match(content, @"50(?:\.0+)?\s+0\S*\s+0\S*\s+\d+(?:\.\d+)?\s+([-\d.]+)\s+[-\d.]+\s+cm");
             Assert.True(match.Success, "image cm not found");
@@ -87,12 +89,12 @@ public class TableCellNonTextAlignmentTests
     [Fact]
     public void ColumnEndAlignment_RightAlignsBothTextAndQr()
     {
-        var (builder, table, column) = WideSingleColumn();
+        var (document, table, column) = WideSingleColumn();
         column.Alignment = HorizontalAlignment.End;
         table.Rows.Add().Cells[0].Blocks.AddParagraph("hi");
         table.Rows.Add().Cells[0].Blocks.AddQrCode("qr", Unit.FromPoint(90));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
 
         var qrRight = FilledRects(content).Max(r => r.X + r.W);

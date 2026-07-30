@@ -4,6 +4,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,10 +14,10 @@ public class InlineImageFieldTests
     [Fact]
     public void FooterParagraph_WithInlineImageAndPageNumber_RendersBoth()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
-        section.Margin = Unit.FromPoint(40);
+        section.Margins.SetAll(Unit.FromPoint(40));
         section.Blocks.AddParagraph("body");
 
         var footer = section.Footer.Blocks.AddParagraph();
@@ -25,7 +27,7 @@ public class InlineImageFieldTests
         var number = footer.Inlines.Add(new PageNumberField());
         number.Font.Size = 12;
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));
 
         Assert.Matches(new Regex(@"40(?:\.0+)?\s+0\S*\s+0\S*\s+30(?:\.0+)?\s+[-\d.]+\s+[-\d.]+\s+cm"), content);

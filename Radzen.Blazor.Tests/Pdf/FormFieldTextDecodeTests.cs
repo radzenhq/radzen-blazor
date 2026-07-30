@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,24 +20,24 @@ public class FormFieldTextDecodeTests
 
     private static string Utf16BeHex(string text)
     {
-        var builder = new StringBuilder("<FEFF");
+        var document = new StringBuilder("<FEFF");
         foreach (var b in Encoding.BigEndianUnicode.GetBytes(text))
         {
-            builder.Append(b.ToString("X2"));
+            document.Append(b.ToString("X2"));
         }
 
-        return builder.Append('>').ToString();
+        return document.Append('>').ToString();
     }
 
     private static string Utf8Hex(string text)
     {
-        var builder = new StringBuilder("<EFBBBF");
+        var document = new StringBuilder("<EFBBBF");
         foreach (var b in Encoding.UTF8.GetBytes(text))
         {
-            builder.Append(b.ToString("X2"));
+            document.Append(b.ToString("X2"));
         }
 
-        return builder.Append('>').ToString();
+        return document.Append('>').ToString();
     }
 
     private static byte[] Wrap(FixturePdf pdf, int count)

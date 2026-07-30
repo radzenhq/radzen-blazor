@@ -7,23 +7,25 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ImageXObjectOptionTests
 {
-    private static Image AddImage(DocumentBuilder builder, string resource)
+    private static Image AddImage(Document document, string resource)
     {
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open(resource));
         image.Width = Unit.FromPoint(48);
         image.Height = Unit.FromPoint(48);
         return image;
     }
 
-    private static DictionaryObject SingleImageDictionary(DocumentBuilder builder)
+    private static DictionaryObject SingleImageDictionary(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var images = BuildTestSupport.ImageXObjects(reader);
         return Assert.Single(images).Dictionary;
     }
@@ -35,8 +37,8 @@ public class ImageXObjectOptionTests
     [InlineData(1.01)]
     public void OpacityRejectsNonFiniteAndOutOfRangeValues(double value)
     {
-        var builder = new DocumentBuilder();
-        var image = AddImage(builder, "Images/gray.png");
+        var document = new Document();
+        var image = AddImage(document, "Images/gray.png");
 
         Assert.Throws<ArgumentOutOfRangeException>(() => image.Opacity = value);
     }
@@ -46,8 +48,8 @@ public class ImageXObjectOptionTests
     [InlineData(1.0)]
     public void OpacityAcceptsDocumentedEndpoints(double value)
     {
-        var builder = new DocumentBuilder();
-        var image = AddImage(builder, "Images/gray.png");
+        var document = new Document();
+        var image = AddImage(document, "Images/gray.png");
 
         image.Opacity = value;
 
@@ -55,44 +57,12 @@ public class ImageXObjectOptionTests
     }
 
     [Fact]
-    public void AppliedImageCacheReusesEntryWhileOptionsAreUnchanged()
-    {
-        var image = Image.FromStream(PdfTestResources.Open("Images/gray.png"));
-        var cache = new AppliedImageCache<int>();
-        var calls = 0;
-
-        var first = cache.Get(image, () => ++calls);
-        var second = cache.Get(image, () => ++calls);
-
-        Assert.Equal(first, second);
-        Assert.Equal(1, calls);
-    }
-
-    [Fact]
-    public void AppliedImageCacheInvalidatesWhenOptionValueOrMaskContentsChange()
-    {
-        var image = Image.FromStream(PdfTestResources.Open("Images/gray.png"));
-        var cache = new AppliedImageCache<int>();
-        var calls = 0;
-        cache.Get(image, () => ++calls);
-
-        image.Interpolate = true;
-        cache.Get(image, () => ++calls);
-        image.ColorKeyMask = [0, 1];
-        cache.Get(image, () => ++calls);
-        image.ColorKeyMask[1] = 2;
-        cache.Get(image, () => ++calls);
-
-        Assert.Equal(4, calls);
-    }
-
-    [Fact]
     public void Interpolate_WhenSet_EmitsInterpolateTrueOnXObject()
     {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/gray.png").Interpolate = true;
+        var document = new Document();
+        AddImage(document, "Images/gray.png").Interpolate = true;
 
-        var dict = SingleImageDictionary(builder);
+        var dict = SingleImageDictionary(document);
 
         Assert.True(dict.ContainsKey("Interpolate"), "image XObject is missing /Interpolate");
         Assert.True(Assert.IsType<BooleanObject>(dict["Interpolate"]).Value);
@@ -102,10 +72,10 @@ public class ImageXObjectOptionTests
     [Fact]
     public void Interpolate_WhenUnset_OmitsInterpolateKey()
     {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/gray.png");
+        var document = new Document();
+        AddImage(document, "Images/gray.png");
 
-        var dict = SingleImageDictionary(builder);
+        var dict = SingleImageDictionary(document);
 
         Assert.False(dict.ContainsKey("Interpolate"), "default image must not carry /Interpolate");
     }
@@ -115,197 +85,11 @@ public class ImageXObjectOptionTests
     {
         static byte[] Build()
         {
-            var builder = new DocumentBuilder();
-            AddImage(builder, "Images/rgb.png");
-            return builder.ToArray();
+            var document = new Document();
+            AddImage(document, "Images/rgb.png");
+            return new DocumentRenderer().ToArray(document);
         }
 
         Assert.Equal(Build(), Build());
-    }
-
-    [Fact]
-    public void ColorKeyMask_WhenSet_EmitsMaskRangeArray()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/rgb.png").ColorKeyMask = [0, 0, 0, 0, 0, 0];
-
-        var dict = SingleImageDictionary(builder);
-
-        var mask = Assert.IsType<ArrayObject>(dict["Mask"]);
-        Assert.Equal(6, mask.Count);
-        foreach (var entry in mask)
-        {
-            Assert.Equal(0, ((NumberObject)entry).IntValue);
-        }
-
-        Assert.Equal("DeviceRGB", ((NameObject)dict["ColorSpace"]).Value);
-    }
-
-    [Fact]
-    public void ColorKeyMask_PreservesRangeValues()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/rgb.png").ColorKeyMask = [10, 20, 30, 40, 50, 60];
-
-        var mask = Assert.IsType<ArrayObject>(SingleImageDictionary(builder)["Mask"]);
-        var values = new int[mask.Count];
-        for (var i = 0; i < mask.Count; i++)
-        {
-            values[i] = ((NumberObject)mask[i]).IntValue;
-        }
-
-        Assert.Equal([10, 20, 30, 40, 50, 60], values);
-    }
-
-    [Fact]
-    public void ColorKeyMask_WhenUnset_OmitsMaskKey()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/rgb.png");
-
-        Assert.False(SingleImageDictionary(builder).ContainsKey("Mask"), "default image must not carry /Mask");
-    }
-
-    [Fact]
-    public void ColorKeyMask_WrongComponentCount_Throws()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/rgb.png").ColorKeyMask = [0, 0];
-
-        Assert.Throws<ArgumentException>(() => builder.ToArray());
-    }
-
-    private static Image AddImage(DocumentBuilder builder, byte[] png)
-    {
-        var section = builder.Sections.Add();
-        using var stream = new MemoryStream(png);
-        var image = section.Blocks.AddImage(stream);
-        image.Width = Unit.FromPoint(48);
-        image.Height = Unit.FromPoint(48);
-        return image;
-    }
-
-    [Fact]
-    public void Stencil_WhenSet_EmitsImageMaskWithoutColorSpace()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, OneBitGrayPng(8, 8)).Stencil = true;
-
-        var reader = BuildTestSupport.Read(builder);
-        var dict = Assert.Single(BuildTestSupport.ImageXObjects(reader)).Dictionary;
-
-        Assert.Equal("XObject", ((NameObject)dict["Type"]).Value);
-        Assert.Equal("Image", ((NameObject)dict["Subtype"]).Value);
-        Assert.True(Assert.IsType<BooleanObject>(dict["ImageMask"]).Value);
-        Assert.False(dict.ContainsKey("ColorSpace"), "an image mask must not carry /ColorSpace");
-        Assert.Equal(1, ((NumberObject)dict["BitsPerComponent"]).IntValue);
-        Assert.Equal(8, ((NumberObject)dict["Width"]).IntValue);
-        Assert.Equal(8, ((NumberObject)dict["Height"]).IntValue);
-
-        var content = Encoding.Latin1.GetString(
-            BuildTestSupport.Content(reader, BuildTestSupport.PageLeaves(reader)[0].Page));
-        Assert.Contains(" Do", content, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void Stencil_WhenUnset_KeepsColorSpaceAndOmitsImageMask()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, OneBitGrayPng(8, 8));
-
-        var dict = SingleImageDictionary(builder);
-
-        Assert.Equal("DeviceGray", ((NameObject)dict["ColorSpace"]).Value);
-        Assert.False(dict.ContainsKey("ImageMask"), "default image must not carry /ImageMask");
-    }
-
-    [Fact]
-    public void Stencil_OnNonOneBitImage_Throws()
-    {
-        var builder = new DocumentBuilder();
-        AddImage(builder, "Images/gray.png").Stencil = true;
-
-        Assert.Throws<InvalidOperationException>(() => builder.ToArray());
-    }
-
-    private static byte[] OneBitGrayPng(int width, int height)
-    {
-        var rowBytes = ((width * 1) + 7) / 8;
-        var raw = new byte[height * (rowBytes + 1)];
-        for (var y = 0; y < height; y++)
-        {
-            var rowStart = y * (rowBytes + 1);
-            raw[rowStart] = 0;
-            for (var b = 0; b < rowBytes; b++)
-            {
-                raw[rowStart + 1 + b] = (byte)((y % 2 == 0) ? 0xAA : 0x55);
-            }
-        }
-
-        using var ms = new MemoryStream();
-        ms.Write([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
-
-        byte[] ihdr =
-        [
-            (byte)(width >> 24), (byte)(width >> 16), (byte)(width >> 8), (byte)width,
-            (byte)(height >> 24), (byte)(height >> 16), (byte)(height >> 8), (byte)height,
-            0x01,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-        ];
-        WriteChunk(ms, "IHDR", ihdr);
-        WriteChunk(ms, "IDAT", Deflate(raw));
-        WriteChunk(ms, "IEND", []);
-        return ms.ToArray();
-    }
-
-    private static void WriteChunk(Stream stream, string type, byte[] data)
-    {
-        var typeBytes = Encoding.ASCII.GetBytes(type);
-        Span<byte> length = stackalloc byte[4];
-        BinaryPrimitives.WriteUInt32BigEndian(length, (uint)data.Length);
-        stream.Write(length);
-        stream.Write(typeBytes);
-        stream.Write(data);
-
-        var crc = Crc32(typeBytes, data);
-        Span<byte> crcBytes = stackalloc byte[4];
-        BinaryPrimitives.WriteUInt32BigEndian(crcBytes, crc);
-        stream.Write(crcBytes);
-    }
-
-    private static byte[] Deflate(byte[] data)
-    {
-        using var output = new MemoryStream();
-        using (var zlib = new ZLibStream(output, CompressionMode.Compress, leaveOpen: true))
-        {
-            zlib.Write(data, 0, data.Length);
-        }
-
-        return output.ToArray();
-    }
-
-    private static uint Crc32(byte[] type, byte[] data)
-    {
-        var crc = 0xFFFFFFFFu;
-        crc = Crc32Update(crc, type);
-        crc = Crc32Update(crc, data);
-        return crc ^ 0xFFFFFFFFu;
-    }
-
-    private static uint Crc32Update(uint crc, byte[] bytes)
-    {
-        foreach (var b in bytes)
-        {
-            crc ^= b;
-            for (var i = 0; i < 8; i++)
-            {
-                crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320 : crc >> 1;
-            }
-        }
-
-        return crc;
     }
 }

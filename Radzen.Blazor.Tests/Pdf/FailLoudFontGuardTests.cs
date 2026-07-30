@@ -1,18 +1,20 @@
 using System;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class FailLoudFontGuardTests
 {
-    private static DocumentBuilder WithText(string text)
+    private static Document WithText(string text)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Latin);
-        return builder;
+        return document;
     }
 
     [Theory]
@@ -31,8 +33,8 @@ public class FailLoudFontGuardTests
     [InlineData("\U0001E900\U0001E921")]
     public void ComplexOrRtlScript_ThrowsInsteadOfRenderingBroken(string text)
     {
-        var builder = WithText(text);
-        var ex = Assert.Throws<NotSupportedException>(() => builder.ToArray());
+        var document = WithText(text);
+        var ex = Assert.Throws<NotSupportedException>(() => new DocumentRenderer().ToArray(document));
         Assert.Contains("script", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -42,7 +44,7 @@ public class FailLoudFontGuardTests
     [InlineData("Γειά")]
     public void NonShapingScript_RendersWithoutThrowing(string text)
     {
-        var bytes = WithText(text).ToArray();
+        var bytes = new DocumentRenderer().ToArray(WithText(text));
         Assert.True(bytes.Length > 0);
     }
 
@@ -51,11 +53,11 @@ public class FailLoudFontGuardTests
     [InlineData("가나")]
     public void CjkAndHangul_RenderWithoutThrowing(string text)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterCjk(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterCjk(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Cjk);
-        var bytes = builder.ToArray();
+        var bytes = new DocumentRenderer().ToArray(document);
         Assert.True(bytes.Length > 0);
     }
 }

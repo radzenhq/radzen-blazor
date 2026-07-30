@@ -7,7 +7,9 @@ using Xunit;
 
 using StreamToken = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using StreamTokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfGrammarTests

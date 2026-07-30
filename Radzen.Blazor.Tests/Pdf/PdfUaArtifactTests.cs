@@ -5,31 +5,40 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfUaArtifactTests
 {
-    private static DocumentBuilder AuthorBanded(bool ua, PdfAConformance conformance = PdfAConformance.None)
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) AuthorBanded(bool ua, PdfAConformance conformance = PdfAConformance.None)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Banded";
-        builder.PdfUA = ua;
-        builder.Conformance = conformance;
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Banded";
+        var builderRenderer = new DocumentRenderer();
+        builderRenderer.Accessibility = ua ? PdfUaConformance.PdfUa1 : PdfUaConformance.None;
+        builderRenderer.Conformance = conformance;
         if (ua)
         {
-            builder.Language = "en-US";
+            document.Language = "en-US";
         }
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
 
         var header = new Paragraph();
-        header.Inlines.Add("HEADER").Font.Name = BuildTestSupport.Latin;
+        header.Inlines.Add("HEADER").Font.Family = BuildTestSupport.Latin;
         section.Header.Blocks.Add(header);
 
         var footer = new Paragraph();
-        footer.Inlines.Add("FOOTER").Font.Name = BuildTestSupport.Latin;
+        footer.Inlines.Add("FOOTER").Font.Family = BuildTestSupport.Latin;
         section.Footer.Blocks.Add(footer);
 
         BuildTestSupport.AddText(section, "Body paragraph", BuildTestSupport.Latin);
@@ -45,12 +54,12 @@ public class PdfUaArtifactTests
         left.Background = Color.FromRgb(220, 220, 220);
         TableLayoutSupport.Fill(row.Cells[1], "Price");
 
-        return builder;
+        return (document, builderRenderer);
     }
 
-    private static string ContentString(DocumentBuilder builder)
+    private static string ContentStringOf((Document Document, DocumentRenderer Renderer) authored)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(authored.Document, authored.Renderer);
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;
         return Encoding.Latin1.GetString(BuildTestSupport.Content(reader, page));
     }
@@ -109,7 +118,7 @@ public class PdfUaArtifactTests
     [Fact]
     public void TaggedDocument_LeavesNoRealContentOutsideMarkedContent()
     {
-        var reader = BuildTestSupport.Read(AuthorBanded(ua: true));
+        var reader = ReadAuthored(AuthorBanded(ua: true));
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;
 
         AssertMarkedContentBalanced(reader, page);
@@ -119,14 +128,14 @@ public class PdfUaArtifactTests
     [Fact]
     public void TaggedDocument_HeaderContentIsInsideArtifact()
     {
-        var content = ContentString(AuthorBanded(ua: true));
+        var content = ContentStringOf(AuthorBanded(ua: true));
         Assert.Contains("/Artifact BMC", content, StringComparison.Ordinal);
     }
 
     [Fact]
     public void LevelA_TaggedDocument_LeavesNoRealContentOutsideMarkedContent()
     {
-        var reader = BuildTestSupport.Read(AuthorBanded(ua: false, conformance: PdfAConformance.PdfA3A));
+        var reader = ReadAuthored(AuthorBanded(ua: false, conformance: PdfAConformance.PdfA3A));
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;
 
         AssertMarkedContentBalanced(reader, page);
@@ -136,23 +145,23 @@ public class PdfUaArtifactTests
     [Fact]
     public void PlainDocument_IsNotWrappedInArtifact()
     {
-        var content = ContentString(AuthorBanded(ua: false));
+        var content = ContentStringOf(AuthorBanded(ua: false));
         Assert.DoesNotContain("/Artifact", content, StringComparison.Ordinal);
     }
 
     [Fact]
     public void PlainDocument_IsByteIdenticalAcrossBuilds()
     {
-        Assert.Equal(AuthorBanded(ua: false).ToArray(), AuthorBanded(ua: false).ToArray());
+        Assert.Equal(RenderAuthored(AuthorBanded(ua: false)), RenderAuthored(AuthorBanded(ua: false)));
     }
 
     [Fact]
     public void PdfUA_WithoutTitle_Throws()
     {
-        var builder = AuthorBanded(ua: true);
-        builder.Info.Title = null;
+        var (document, builderRenderer) = AuthorBanded(ua: true);
+        document.Info.Title = null;
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.NotNull(exception);
         Assert.Contains("title", exception!.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -160,12 +169,13 @@ public class PdfUaArtifactTests
     [Fact]
     public void PdfUA_FigureWithoutAltOrActualText_Throws()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        builder.Info.Title = "Figure";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Figure";
+        var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.NotNull(exception);
         Assert.Contains("Figure", exception!.Message, StringComparison.Ordinal);
     }
@@ -173,27 +183,29 @@ public class PdfUaArtifactTests
     [Fact]
     public void PdfUA_FigureWithActualText_DoesNotThrow()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        builder.Info.Title = "Figure";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        document.Info.Title = "Figure";
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.ActualText = "chart";
 
-        Assert.Null(Record.Exception(() => builder.ToArray()));
+        Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
     }
 
     [Fact]
     public void LevelA_WithUntaggedList_Throws()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3A };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "List";
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3A };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "List";
+        var section = document.Sections.Add();
         var list = section.Blocks.AddList(ListStyle.Bullet);
-        list.Font.Name = BuildTestSupport.Latin;
+        list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
-        var exception = Record.Exception(() => builder.ToArray());
+        var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.NotNull(exception);
         Assert.Contains("list", exception!.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -201,31 +213,51 @@ public class PdfUaArtifactTests
     [Fact]
     public void PdfUA_WithList_DoesNotThrow()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "List";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "List";
+        var section = document.Sections.Add();
         var list = section.Blocks.AddList(ListStyle.Bullet);
-        list.Font.Name = BuildTestSupport.Latin;
+        list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
-        Assert.Null(Record.Exception(() => builder.ToArray()));
+        Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
     }
 
     [Fact]
-    public void PdfUA_WithLinkAnnotation_Throws()
+    public void PdfUA_WithLinkInsideTheBody_IsAccepted()
     {
-        var builder = new DocumentBuilder { PdfUA = true, Language = "en-US" };
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Link";
-        var section = builder.Sections.Add();
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Link";
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Radzen");
-        run.Font.Name = BuildTestSupport.Latin;
+        run.Font.Family = BuildTestSupport.Latin;
         run.Link = "https://www.radzen.com";
         section.Blocks.Add(paragraph);
 
-        var exception = Record.Exception(() => builder.ToArray());
+        Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
+    }
+
+    [Fact]
+    public void PdfUA_WithLinkInThePageHeaderArtifact_Throws()
+    {
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Link";
+        var section = document.Sections.Add();
+        var paragraph = new Paragraph();
+        var run = paragraph.Inlines.Add("Radzen");
+        run.Font.Family = BuildTestSupport.Latin;
+        run.Link = "https://www.radzen.com";
+        section.Header.Blocks.Add(paragraph);
+        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+
+        var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.NotNull(exception);
         Assert.Contains("link", exception!.Message, StringComparison.OrdinalIgnoreCase);
     }

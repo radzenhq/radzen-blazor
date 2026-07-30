@@ -4,7 +4,9 @@ using System.IO;
 using Xunit;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,9 +33,9 @@ public class FontCollectionTests
     public void Base14_ResolvesWithoutRegistration()
     {
         var fonts = new FontCollection();
-        var font = new Font { Name = "Helvetica", Size = 12 };
+        var font = new Font { Family = "Helvetica", Size = 12 };
 
-        var expected = Base14Metrics.Resolve(font)!.MeasureString("Hello", 12);
+        var expected = BuiltInFontMetrics.Resolve(font)!.MeasureString("Hello", 12);
         Assert.Equal(expected, fonts.MeasureText("Hello", font), 10);
     }
 
@@ -50,11 +52,11 @@ public class FontCollectionTests
     public void Base14_TimesBoldSelectsBoldVariant()
     {
         var fonts = new FontCollection();
-        var plain = new Font { Name = "Times", Size = 12 };
-        var bold = new Font { Name = "Times", Size = 12, Bold = true };
+        var plain = new Font { Family = "Times", Size = 12 };
+        var bold = new Font { Family = "Times", Size = 12, Bold = true };
 
-        var expectedPlain = Base14Metrics.Resolve(plain)!.MeasureString("Hello", 12);
-        var expectedBold = Base14Metrics.Resolve(bold)!.MeasureString("Hello", 12);
+        var expectedPlain = BuiltInFontMetrics.Resolve(plain)!.MeasureString("Hello", 12);
+        var expectedBold = BuiltInFontMetrics.Resolve(bold)!.MeasureString("Hello", 12);
 
         Assert.Equal(expectedPlain, fonts.MeasureText("Hello", plain), 10);
         Assert.Equal(expectedBold, fonts.MeasureText("Hello", bold), 10);
@@ -65,7 +67,7 @@ public class FontCollectionTests
     public void UnknownFamily_MeasureThrowsWithNameInMessage()
     {
         var fonts = new FontCollection();
-        var font = new Font { Name = "Nonexistent Font", Size = 12 };
+        var font = new Font { Family = "Nonexistent Font", Size = 12 };
 
         var ex = Assert.Throws<InvalidOperationException>(() => fonts.MeasureText("Hello", font));
         Assert.Contains("Nonexistent Font", ex.Message);
@@ -81,7 +83,7 @@ public class FontCollectionTests
             fonts.Register("Liberation Sans", stream);
         }
 
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
         Assert.Equal(SfntWidth(bytes, "Hello", 12), fonts.MeasureText("Hello", font), 10);
     }
 
@@ -94,7 +96,7 @@ public class FontCollectionTests
         fonts.Register("Liberation Sans", stream);
         stream.Dispose();
 
-        var font = new Font { Name = "Liberation Sans", Size = 12 };
+        var font = new Font { Family = "Liberation Sans", Size = 12 };
         Assert.Equal(SfntWidth(bytes, "Hello", 12), fonts.MeasureText("Hello", font), 10);
     }
 
@@ -107,10 +109,10 @@ public class FontCollectionTests
         fonts.Register("Liberation Sans", new MemoryStream(regular));
         fonts.Register("Liberation Sans Bold", new MemoryStream(boldBytes));
 
-        var boldFont = new Font { Name = "Liberation Sans Bold", Size = 12 };
+        var boldFont = new Font { Family = "Liberation Sans Bold", Size = 12 };
         Assert.Equal(SfntWidth(boldBytes, "Hello", 12), fonts.MeasureText("Hello", boldFont), 10);
 
-        var regularBold = new Font { Name = "Liberation Sans", Size = 12, Bold = true };
+        var regularBold = new Font { Family = "Liberation Sans", Size = 12, Bold = true };
         Assert.Equal(SfntWidth(regular, "Hello", 12), fonts.MeasureText("Hello", regularBold), 10);
         Assert.NotEqual(fonts.MeasureText("Hello", boldFont), fonts.MeasureText("Hello", regularBold));
     }
@@ -124,7 +126,7 @@ public class FontCollectionTests
         fonts.Register("Custom", new MemoryStream(sans));
         fonts.Register("Custom", new MemoryStream(serif));
 
-        var font = new Font { Name = "Custom", Size = 12 };
+        var font = new Font { Family = "Custom", Size = 12 };
         Assert.Equal(SfntWidth(serif, "Hello", 12), fonts.MeasureText("Hello", font), 10);
     }
 
@@ -136,7 +138,7 @@ public class FontCollectionTests
         fonts.Register("Liberation Serif", new MemoryStream(ttc));
 
         var serifFace = SfntFont.Parse(ttc, "Liberation Serif");
-        var font = new Font { Name = "Liberation Serif", Size = 12 };
+        var font = new Font { Family = "Liberation Serif", Size = 12 };
         Assert.Equal(SfntWidth(serifFace, "Hello", 12), fonts.MeasureText("Hello", font), 10);
 
         var sans = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");

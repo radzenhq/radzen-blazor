@@ -3,7 +3,9 @@ using System.Text;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ToUnicodeHardeningTests

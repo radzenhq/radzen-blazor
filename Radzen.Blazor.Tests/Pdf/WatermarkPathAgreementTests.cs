@@ -5,6 +5,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -24,20 +26,20 @@ public class WatermarkPathAgreementTests
 
     private static DocumentReader Generated()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Watermark = Mark();
         section.Blocks.Add(new Paragraph());
-        return BuildTestSupport.Read(builder);
+        return BuildTestSupport.Read(document);
     }
 
     private static DocumentReader Appended()
     {
-        var builder = new DocumentBuilder();
-        builder.Sections.Add().Blocks.Add(new Paragraph());
-        var document = builder.Build();
-        document.AddWatermark(Mark());
-        return DocumentReader.Parse(document.ToArray());
+        var document = new Document();
+        document.Sections.Add().Blocks.Add(new Paragraph());
+        var pdf = new DocumentRenderer().Render(document);
+        pdf.AddWatermark(Mark());
+        return DocumentReader.Parse(pdf.ToArray());
     }
 
     [Fact]

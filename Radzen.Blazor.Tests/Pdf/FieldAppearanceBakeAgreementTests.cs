@@ -2,6 +2,8 @@
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,11 +20,11 @@ public class FieldAppearanceBakeAgreementTests
 
     private static DocumentReader Reload(TextFieldDefinition definition)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.AddText(builder.Sections.Add(), "Body", "Helvetica");
-        var document = builder.Build();
-        document.FormFields.Add(definition);
-        return DocumentReader.Parse(document.ToArray());
+        var document = new Document();
+        BuildTestSupport.AddText(document.Sections.Add(), "Body", "Helvetica");
+        var pdf = new DocumentRenderer().Render(document);
+        pdf.FormFields.Add(definition);
+        return DocumentReader.Parse(pdf.ToArray());
     }
 
     private static bool NeedAppearances(DocumentReader reader)

@@ -4,6 +4,8 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -24,11 +26,11 @@ public class SharedGlyphToUnicodeTests
 
     private static ICollection<string> ToUnicodeValues(string text)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterCjk(builder);
-        BuildTestSupport.AddText(builder.Sections.Add(), text, BuildTestSupport.Cjk);
+        var document = new Document();
+        BuildTestSupport.RegisterCjk(document);
+        BuildTestSupport.AddText(document.Sections.Add(), text, BuildTestSupport.Cjk);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var font = Assert.Single(BuildTestSupport.Type0Fonts(reader));
         var stream = (StreamObject)reader.Resolve(font["ToUnicode"]);
         var cmap = Type0EmbedSupport.ParseToUnicode(Type0EmbedSupport.DecodeStream(reader, stream));

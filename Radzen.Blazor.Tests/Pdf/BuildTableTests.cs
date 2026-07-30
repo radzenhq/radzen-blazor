@@ -2,6 +2,8 @@
 using System;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,16 +15,17 @@ public class BuildTableTests
     [Fact]
     public void SinglePageTable_RoundTripsHeaderAndCellsInOrder()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         table.Columns.Add();
 
         var header = table.Rows.Add();
-        header.IsHeader = true;
+        header.RepeatOnEveryPage = true;
+        header.IsHeaderRow = true;
         TableLayoutSupport.Fill(header.Cells[0], "Item");
         TableLayoutSupport.Fill(header.Cells[1], "Price");
 
@@ -34,7 +37,7 @@ public class BuildTableTests
         TableLayoutSupport.Fill(bread.Cells[0], "Bread");
         TableLayoutSupport.Fill(bread.Cells[1], "222");
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.Equal(1, reloaded.Pages.Count);
 
         var text = reloaded.ExtractText();
@@ -47,21 +50,21 @@ public class BuildTableTests
         Assert.True(Index(text, "Apple") < Index(text, "Bread"), "body rows in source order");
     }
 
-    private static DocumentBuilder AuthorTallTable()
+    private static Document AuthorTallTable()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var lh = PaginationSupport.LineHeight(builder.Fonts, 12);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var lh = PaginationSupport.LineHeight(document.Fonts, 12);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(320), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(300));
 
         var header = table.Rows.Add();
-        header.IsHeader = true;
+        header.RepeatOnEveryPage = true;
         TableLayoutSupport.Fill(header.Cells[0], "H0");
 
         for (var i = 0; i < 12; i++)
@@ -70,7 +73,7 @@ public class BuildTableTests
             TableLayoutSupport.Fill(row.Cells[0], $"R{i}");
         }
 
-        return builder;
+        return document;
     }
 
     [Fact]

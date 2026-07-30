@@ -5,6 +5,9 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -61,7 +64,7 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Name = "Helvetica", Size = 18 } });
+        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Size = 18 } });
 
         var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
         var tf = Find(content, "Tf");
@@ -76,7 +79,7 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Name = "Helvetica" } });
+        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica" } });
 
         var reader = ContentTestHelpers.Reload(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
@@ -96,7 +99,7 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Name = "Helvetica", Bold = true } });
+        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Bold = true } });
 
         var reader = ContentTestHelpers.Reload(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
@@ -111,7 +114,7 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Name = "Times" } });
+        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Times" } });
 
         var reader = ContentTestHelpers.Reload(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
@@ -126,7 +129,7 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Name = "Courier" } });
+        page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Courier" } });
 
         var reader = ContentTestHelpers.Reload(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
@@ -141,8 +144,8 @@ public class TextContentTests
     {
         var document = new Document();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("a", 0, 0) { Font = new Font { Name = "Helvetica" } });
-        page.Content.Add(new TextContent("b", 0, 0) { Font = new Font { Name = "Times" } });
+        page.Content.Add(new TextContent("a", 0, 0) { Font = new Font { Family = "Helvetica" } });
+        page.Content.Add(new TextContent("b", 0, 0) { Font = new Font { Family = "Times" } });
 
         var reader = ContentTestHelpers.Reload(document);
         var resources = Assert.IsType<DictionaryObject>(reader.Resolve(ContentTestHelpers.Kid(reader, 0)["Resources"]));

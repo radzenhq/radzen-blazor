@@ -6,6 +6,9 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -66,16 +69,16 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltCellBackground_SurvivesMaterializeAndResave()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Background = Color.Red;
         row.Cells[0].Text = "Total";
-        row.Cells[0].Font.Name = "Helvetica";
+        row.Cells[0].Font.Family = "Helvetica";
 
-        var loaded = Load(builder.ToArray());
+        var loaded = Load(new DocumentRenderer().ToArray(document));
         DirtyFirstText(loaded.Pages[0]);
 
         var bytes = loaded.ToArray();
@@ -91,13 +94,13 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltImage_SurvivesMaterializeAndResave()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(100);
         BuildTestSupport.AddText(section, "Photo caption", "Helvetica");
 
-        var loaded = Load(builder.ToArray());
+        var loaded = Load(new DocumentRenderer().ToArray(document));
         DirtyFirstText(loaded.Pages[0]);
 
         var reader = DocumentReader.Parse(loaded.ToArray());
@@ -116,11 +119,11 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void MaterializedText_KeepsFontResource()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Serif body", "Times");
 
-        var loaded = Load(builder.ToArray());
+        var loaded = Load(new DocumentRenderer().ToArray(document));
         DirtyFirstText(loaded.Pages[0]);
 
         var bytes = loaded.ToArray();
@@ -139,14 +142,14 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltPage_ContentEdit_IsHonoredOnSave()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Original body", "Helvetica");
 
-        var built = builder.Build();
+        var built = new DocumentRenderer().Render(document);
         built.Pages[0].Content.Add(new TextContent("WATERMARK", Unit.FromPoint(72), Unit.FromPoint(400))
         {
-            Font = new Font { Name = "Helvetica", Size = 24 },
+            Font = new Font { Family = "Helvetica", Size = 24 },
         });
 
         var text = Load(built.ToArray()).ExtractText();
@@ -157,21 +160,21 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltPage_Stamp_KeepsBackgroundsAndImages()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         var row = table.Rows.Add();
         row.Cells[0].Background = Color.Red;
         row.Cells[0].Text = "Amount";
-        row.Cells[0].Font.Name = "Helvetica";
+        row.Cells[0].Font.Family = "Helvetica";
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(80);
 
-        var built = builder.Build();
+        var built = new DocumentRenderer().Render(document);
         built.Pages[0].Content.Add(new TextContent("WATERMARK", Unit.FromPoint(72), Unit.FromPoint(400))
         {
-            Font = new Font { Name = "Helvetica", Size = 24 },
+            Font = new Font { Family = "Helvetica", Size = 24 },
         });
 
         var bytes = built.ToArray();
@@ -191,13 +194,13 @@ public class RoundTripFidelityRegressionTests
     [Fact]
     public void BuiltType0_FreshExtractText_ReturnsRealText()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Latin sample", BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, "Здравей свят", BuildTestSupport.Latin);
 
-        var built = builder.Build();
+        var built = new DocumentRenderer().Render(document);
         var fresh = built.ExtractText();
         Assert.Contains("Latin sample", fresh, StringComparison.Ordinal);
         Assert.Contains("Здравей свят", fresh, StringComparison.Ordinal);

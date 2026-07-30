@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,14 +13,14 @@ public class InfoTextStringDecodeTests
 {
     private static string Utf16BeLiteral(string text)
     {
-        var builder = new StringBuilder();
-        builder.Append('\u00FE').Append('\u00FF');
+        var document = new StringBuilder();
+        document.Append('\u00FE').Append('\u00FF');
         foreach (var b in Encoding.BigEndianUnicode.GetBytes(text))
         {
-            builder.Append((char)b);
+            document.Append((char)b);
         }
 
-        return builder.ToString();
+        return document.ToString();
     }
 
     [Fact]

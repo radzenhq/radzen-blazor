@@ -5,6 +5,9 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -57,7 +60,7 @@ public class LoadedResourceKeyCollisionTests
 
         var existing = page.Content.OfType<TextContent>().First();
         existing.Color = Color.Red;
-        page.Content.Add(new TextContent("New", 72, 680) { Font = new Font { Name = "Helvetica" } });
+        page.Content.Add(new TextContent("New", 72, 680) { Font = new Font { Family = "Helvetica" } });
 
         var saved = document.ToArray();
 

@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,13 +16,14 @@ public class CompactCffSubsetTests
 {
     private const string Sample = "Ab Мир 中产";
 
-    private static DocumentBuilder Builder()
+    private static Document Builder()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        BuildTestSupport.RegisterCjk(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        BuildTestSupport.RegisterCjk(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, Sample, BuildTestSupport.Cjk);
-        return builder;
+        return document;
     }
 
     private static DocumentReader BuildReader() => BuildTestSupport.Read(Builder());

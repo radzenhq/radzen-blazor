@@ -7,6 +7,8 @@ using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Codes;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -48,15 +50,16 @@ public class CodeElementTests
     public void QrCode_EmitsOneFilledSquarePerDarkModule_WithinDeclaredSize()
     {
         const string value = "https://radzen.com";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var qr = section.Blocks.AddQrCode(value, Unit.FromPoint(120));
         Assert.Same(qr, section.Blocks[0]);
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
         var expectedModule = 120.0 / (matrix.GetLength(0) + 8);
 
-        var reader = BuildTestSupport.Read(builder);
+        var builderRenderer = new DocumentRenderer();
+        var reader = BuildTestSupport.Read(document, builderRenderer);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
         Assert.Equal(DarkModules(matrix), rects.Count);
@@ -76,12 +79,12 @@ public class CodeElementTests
     public void QrCode_HigherErrorCorrection_ChangesEmittedModules()
     {
         const string value = "error correction";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddQrCode(value, Unit.FromPoint(100), QrErrorCorrection.High);
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.High);
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
         Assert.Equal(DarkModules(matrix), rects.Count);
@@ -91,8 +94,8 @@ public class CodeElementTests
     public void Barcode_Code128_EmitsBarRects_WithinDeclaredWidth()
     {
         const string value = "RADZEN";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
         Assert.Same(barcode, section.Blocks[0]);
 
@@ -109,7 +112,7 @@ public class CodeElementTests
             isBar = !isBar;
         }
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
         Assert.Equal(expectedBars, rects.Count);
@@ -125,15 +128,15 @@ public class CodeElementTests
         const string value = "RADZEN";
         const double width = 200.0;
         const int quiet = 10;
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(width), Unit.FromPoint(40));
 
         var (_, symbolModules, _) = BarcodeEncoder.EncodeToBars(BarcodeType.Code128, value, 40, 0);
         var total = symbolModules + 2 * quiet;
         var scaleX = width / total;
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
         var barsSpan = rects.Max(r => r.X + r.W) - rects.Min(r => r.X);
@@ -147,11 +150,11 @@ public class CodeElementTests
     public void Barcode_ShowText_RendersValueBelowBars()
     {
         const string value = "RADZEN";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
         var ops = ContentStreamTokenizer.Parse(content);
 
@@ -188,12 +191,12 @@ public class CodeElementTests
     [Fact]
     public void Barcode_ShowText_WrappedCaption_DoesNotOverlapNextBlock()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN CODE ONE TWO", Unit.FromPoint(50), Unit.FromPoint(40), showText: true);
         section.Blocks.AddParagraph("after");
 
-        var shown = ShownText(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+        var shown = ShownText(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
         var after = shown.Single(s => s.Text == "after").Y;
         var caption = shown.Where(s => s.Text != "after").ToList();
 
@@ -204,14 +207,15 @@ public class CodeElementTests
     [Fact]
     public void Barcode_ShowText_WithoutExplicitFont_UsesDocumentDefaultFont_InPdfA()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        builder.Info.Title = "Barcode";
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Styles.Normal.Font.Name = BuildTestSupport.Latin;
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        document.Info.Title = "Barcode";
+        BuildTestSupport.RegisterLatin(document);
+        document.Styles.Normal.Font.Family = BuildTestSupport.Latin;
+        var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
 
         Assert.DoesNotContain(BuildTestSupport.Fonts(reader), f =>
             f.TryGetValue("BaseFont", out var baseFont)
@@ -223,12 +227,12 @@ public class CodeElementTests
     [Fact]
     public void Barcode_ShowText_WithoutExplicitFont_InheritsDefaultFontSize()
     {
-        var builder = new DocumentBuilder();
-        builder.Styles.Normal.Font.Size = 14;
-        var section = builder.Sections.Add();
+        var document = new Document();
+        document.Styles.Normal.Font.Size = 14;
+        var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
 
-        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(builder));
+        var sizes = CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document));
 
         Assert.Contains(14.0, sizes);
         Assert.DoesNotContain(10.0, sizes);
@@ -237,15 +241,15 @@ public class CodeElementTests
     [Fact]
     public void Barcode_ShowText_ExplicitFont_WinsOverDefault()
     {
-        var builder = new DocumentBuilder();
-        builder.Styles.Normal.Font.Size = 14;
-        var section = builder.Sections.Add();
+        var document = new Document();
+        document.Styles.Normal.Font.Size = 14;
+        var section = document.Sections.Add();
         var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
-        barcode.Font.Name = "Courier";
+        barcode.Font.Family = "Courier";
         barcode.Font.Size = 8;
 
-        var reader = BuildTestSupport.Read(builder);
-        var content = CascadeTestSupport.FirstPageContent(builder);
+        var reader = BuildTestSupport.Read(document);
+        var content = CascadeTestSupport.FirstPageContent(document);
 
         Assert.Contains(8.0, CascadeTestSupport.TfSizes(content));
         Assert.Contains(BuildTestSupport.Fonts(reader), f =>
@@ -258,15 +262,15 @@ public class CodeElementTests
     public void QrCode_InTableCell_EmitsModuleRects_AndReservesRowHeight()
     {
         const string value = "cell qr";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         table.Rows.Add().Cells[0].Blocks.AddQrCode(value, Unit.FromPoint(90));
         table.Rows.Add().Cells[0].Text = "below";
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var content = ContentTestHelpers.PageContent(reader, 0);
         var rects = FilledRects(content);
 
@@ -281,8 +285,8 @@ public class CodeElementTests
     public void Barcode_InTableCell_EmitsBarRects()
     {
         const string value = "RADZEN";
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         table.Rows.Add().Cells[0].Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
@@ -300,7 +304,7 @@ public class CodeElementTests
             isBar = !isBar;
         }
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var rects = FilledRects(ContentTestHelpers.PageContent(reader, 0));
 
         Assert.Equal(expectedBars, rects.Count);
@@ -310,13 +314,14 @@ public class CodeElementTests
     [Fact]
     public void Document_WithQrCodeAndBarcode_KeepsPdfA3BConformance()
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        builder.Info.Title = "Codes";
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        document.Info.Title = "Codes";
+        var section = document.Sections.Add();
         section.Blocks.AddQrCode("PDF/A", Unit.FromPoint(80));
         section.Blocks.AddBarcode(BarcodeType.Code128, "PDFA", Unit.FromPoint(160), Unit.FromPoint(30));
 
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document, builderRenderer);
 
         var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
         var metadata = Assert.IsType<StreamObject>(reader.Resolve(root["Metadata"]));

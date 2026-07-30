@@ -7,6 +7,8 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -22,37 +24,44 @@ public class AttachmentSpecConformanceTests
 
     private static readonly DateTimeOffset XmlModified = new(2026, 3, 15, 10, 30, 45, TimeSpan.FromHours(2));
 
-    private static DocumentBuilder Author(PdfAConformance? conformance = null)
+    private static (Document Document, DocumentRenderer Renderer) Author(PdfAConformance? conformance = null)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer();
+        BuildTestSupport.RegisterLatin(document);
 
-        builder.Info.Title = "Invoice 42";
-        builder.Info.Author = "Radzen Ltd";
+        document.Info.Title = "Invoice 42";
+        document.Info.Author = "Radzen Ltd";
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice body", BuildTestSupport.Latin);
 
         if (conformance is not null)
         {
-            builder.Conformance = conformance.Value;
+            builderRenderer.Conformance = conformance.Value;
         }
 
-        return builder;
+        return (document, builderRenderer);
     }
 
-    private static DocumentBuilder AuthorWithBothAttachments(PdfAConformance? conformance = null)
+    private static (Document Document, DocumentRenderer Renderer) AuthorWithBothAttachments(PdfAConformance? conformance = null)
     {
-        var builder = Author(conformance);
+        var (document, builderRenderer) = Author(conformance);
 
-        var xml = builder.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
+        var xml = builderRenderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
         xml.Description = "Factur-X invoice data";
         xml.ModificationDate = XmlModified;
 
-        builder.Attachments.Add("scan.bin", BinaryPayload, AttachmentRelationship.Supplement, "application/octet-stream");
+        builderRenderer.Attachments.Add("scan.bin", BinaryPayload, AttachmentRelationship.Supplement, "application/octet-stream");
 
-        return builder;
+        return (document, builderRenderer);
     }
+
+    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+
+    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
 
     private static DictionaryObject Catalog(DocumentReader reader)
     {
@@ -105,7 +114,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_TwoFiles_NameTreeContainsBoth()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         Assert.Equal(2, files.Count);
@@ -116,7 +125,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_Filespec_HasAllSpecKeys()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         foreach (var (name, relationship) in new[] { ("factur-x.xml", "Alternative"), ("scan.bin", "Supplement") })
@@ -137,7 +146,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_EmbeddedFileDict_HasFAndUfStreamReferences()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var filespec = EmbeddedFiles(reader)["factur-x.xml"];
 
         var f = EmbeddedStream(reader, filespec, "F");
@@ -150,7 +159,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_EmbeddedStream_ParamsSizeAndModDate()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         var xml = EmbeddedStream(reader, files["factur-x.xml"]);
@@ -167,7 +176,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_MimeType_WrittenAsSubtypeName()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         Assert.Equal("text/xml", BuildTestSupport.Name(reader, EmbeddedStream(reader, files["factur-x.xml"]).Dictionary, "Subtype"));
@@ -177,7 +186,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_Description_RoundTrips()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         Assert.Equal("Factur-X invoice data",
@@ -188,7 +197,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_CatalogAf_ListsBothFilespecs()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var catalog = Catalog(reader);
         var af = Assert.IsType<ArrayObject>(reader.Resolve(catalog["AF"]));
 
@@ -208,7 +217,7 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Attach_BinaryPayload_RoundTripsByteIdentical()
     {
-        var reader = BuildTestSupport.Read(AuthorWithBothAttachments());
+        var reader = ReadAuthored(AuthorWithBothAttachments());
         var files = EmbeddedFiles(reader);
 
         Assert.Equal(BinaryPayload, Payload(reader, EmbeddedStream(reader, files["scan.bin"])));
@@ -218,8 +227,8 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Build_SameInputs_ByteIdentical()
     {
-        var first = AuthorWithBothAttachments().ToArray();
-        var second = AuthorWithBothAttachments().ToArray();
+        var first = RenderAuthored(AuthorWithBothAttachments());
+        var second = RenderAuthored(AuthorWithBothAttachments());
 
         Assert.Equal(first, second);
     }
@@ -227,8 +236,8 @@ public class AttachmentSpecConformanceTests
     [Fact]
     public void Build_SameInputs_PdfA3B_ByteIdenticalIgnoringTrailerId()
     {
-        var first = AuthorWithBothAttachments(PdfAConformance.PdfA3B).ToArray();
-        var second = AuthorWithBothAttachments(PdfAConformance.PdfA3B).ToArray();
+        var first = RenderAuthored(AuthorWithBothAttachments(PdfAConformance.PdfA3B));
+        var second = RenderAuthored(AuthorWithBothAttachments(PdfAConformance.PdfA3B));
 
         Assert.Equal(MaskDocumentId(first), MaskDocumentId(second));
     }

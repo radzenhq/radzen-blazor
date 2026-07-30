@@ -2,31 +2,38 @@
 using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContainerTaggingConformanceTests
 {
-    private static DocumentBuilder Author(bool ua, PdfAConformance conformance)
+    private static (Document Document, DocumentRenderer Renderer) Author(bool ua, PdfAConformance conformance)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        builder.Info.Title = "Boxed";
-        builder.PdfUA = ua;
-        builder.Conformance = conformance;
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Boxed";
+        var renderer = new DocumentRenderer();
+        renderer.Accessibility = ua ? PdfUaConformance.PdfUa1 : PdfUaConformance.None;
+        renderer.Conformance = conformance;
         if (ua)
         {
-            builder.Language = "en-US";
+            document.Language = "en-US";
         }
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
-        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Name = BuildTestSupport.Latin;
-        return builder;
+        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+        return (document, renderer);
     }
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static List<ContentOperation> Ops((Document Document, DocumentRenderer Renderer) authored)
+        => ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(
+            BuildTestSupport.Read(authored.Document, authored.Renderer), 0));
+
+    private static byte[] Rendered((Document Document, DocumentRenderer Renderer) authored)
+        => authored.Renderer.ToArray(authored.Document);
 
     private static HashSet<string> TagsWrappingText(List<ContentOperation> ops)
     {
@@ -78,8 +85,8 @@ public class ContainerTaggingConformanceTests
     [Fact]
     public void PlainDocument_ContainerOutputIsByteStable()
     {
-        var a = Author(ua: false, PdfAConformance.None).ToArray();
-        var b = Author(ua: false, PdfAConformance.None).ToArray();
+        var a = Rendered(Author(ua: false, PdfAConformance.None));
+        var b = Rendered(Author(ua: false, PdfAConformance.None));
         Assert.Equal(a, b);
     }
 }

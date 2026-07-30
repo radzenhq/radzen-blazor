@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

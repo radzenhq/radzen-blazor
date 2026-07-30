@@ -2,6 +2,8 @@
 
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -9,12 +11,12 @@ public class PooledBufferReuseTests
 {
     private static byte[] BuildInvoiceLike()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice 12345", BuildTestSupport.Latin, 18);
         BuildTestSupport.AddText(section, "Amount due: 4200.00", BuildTestSupport.Latin);
-        return builder.ToArray();
+        return new DocumentRenderer().ToArray(document);
     }
 
     [Fact]

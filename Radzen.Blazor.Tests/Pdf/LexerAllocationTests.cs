@@ -4,6 +4,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using TokenKind = Radzen.Documents.Pdf.Objects.TokenKind;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

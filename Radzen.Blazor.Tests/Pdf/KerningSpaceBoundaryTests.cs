@@ -4,13 +4,15 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class KerningSpaceBoundaryTests
 {
-    private static string Content(DocumentBuilder builder)
-        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0));
+    private static string Content(Document document)
+        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
 
     private static List<(string Kind, char Glyph)> ShowTokens(string content)
     {
@@ -36,13 +38,13 @@ public class KerningSpaceBoundaryTests
     [Fact]
     public void CoalescedRun_DoesNotKernAcrossSpace()
     {
-        var builder = new DocumentBuilder { Fonts = { EnableKerning = true } };
-        var section = builder.Sections.Add();
+        var document = new Document { Fonts = { EnableKerning = true } };
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("To Wa");
         section.Blocks.Add(paragraph);
 
-        var tokens = ShowTokens(Content(builder));
+        var tokens = ShowTokens(Content(document));
 
         Assert.Contains(tokens, t => t.Kind == "n");
 

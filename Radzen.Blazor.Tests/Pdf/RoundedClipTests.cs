@@ -6,16 +6,18 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class RoundedClipTests
 {
-    private static DocumentBuilder RoundedContainerBuilder(double radius, Action<Container>? configure = null)
+    private static Document RoundedContainerBuilder(double radius, Action<Container>? configure = null)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(10),
@@ -28,15 +30,15 @@ public class RoundedClipTests
         var cell = child.Rows.Add().Cells[0];
         cell.Background = Color.FromRgb(200, 60, 60);
         var run = cell.Blocks.AddParagraph().Inlines.Add("Child");
-        run.Font.Name = BuildTestSupport.Latin;
-        return builder;
+        run.Font.Family = BuildTestSupport.Latin;
+        return document;
     }
 
-    private static DocumentBuilder RoundedTableBuilder(double radius, double? borderWidth = 1)
+    private static Document RoundedTableBuilder(double radius, double? borderWidth = 1)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(150));
         table.Columns.Add(Unit.FromPoint(150));
@@ -58,17 +60,17 @@ public class RoundedClipTests
                 var cell = row.Cells[c];
                 cell.Background = Color.FromRgb(200, 220, 255);
                 var run = cell.Blocks.AddParagraph().Inlines.Add($"R{r}C{c}");
-                run.Font.Name = BuildTestSupport.Latin;
+                run.Font.Family = BuildTestSupport.Latin;
             }
         }
 
-        return builder;
+        return document;
     }
 
-    private static string FirstPageContent(DocumentBuilder builder)
+    private static string FirstPageContent(Document document)
     {
-        var document = builder.Build();
-        var page = Assert.Single(document.Pages);
+        var pdf = new DocumentRenderer().Render(document);
+        var page = Assert.Single(pdf.Pages);
         return Encoding.ASCII.GetString(page.GetContent()!);
     }
 
@@ -136,9 +138,9 @@ public class RoundedClipTests
     [Fact]
     public void RoundedContainer_DoesNotClipItsOwnBorderStroke()
     {
-        var builder = RoundedContainerBuilder(8, container => container.Borders.Width = 1);
+        var document = RoundedContainerBuilder(8, container => container.Borders.Width = 1);
 
-        var content = FirstPageContent(builder);
+        var content = FirstPageContent(document);
 
         var stroke = content.IndexOf("h\nS\n", StringComparison.Ordinal);
         Assert.True(stroke >= 0, "rounded border stroke missing");
@@ -200,9 +202,9 @@ public class RoundedClipTests
     {
         static byte[] Build(bool setZero)
         {
-            var builder = new DocumentBuilder();
-            BuildTestSupport.RegisterLatin(builder);
-            var section = builder.Sections.Add();
+            var document = new Document();
+            BuildTestSupport.RegisterLatin(document);
+            var section = document.Sections.Add();
             var container = section.Blocks.Add(new Container
             {
                 Padding = Unit.FromPoint(10),
@@ -216,14 +218,14 @@ public class RoundedClipTests
             var row = table.Rows.Add();
             row.Cells[0].Background = Color.FromRgb(200, 220, 255);
             var run = row.Cells[0].Blocks.AddParagraph().Inlines.Add("Zero");
-            run.Font.Name = BuildTestSupport.Latin;
+            run.Font.Family = BuildTestSupport.Latin;
             if (setZero)
             {
                 container.CornerRadius = Unit.FromPoint(0);
                 table.CornerRadius = Unit.FromPoint(0);
             }
 
-            return builder.ToArray();
+            return new DocumentRenderer().ToArray(document);
         }
 
         Assert.Equal(Build(setZero: false), Build(setZero: true));

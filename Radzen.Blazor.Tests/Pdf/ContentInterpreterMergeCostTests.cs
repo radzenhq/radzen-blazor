@@ -4,6 +4,7 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,13 +12,13 @@ public class ContentInterpreterMergeCostTests
 {
     private static string ShowChain(int shows)
     {
-        var builder = new StringBuilder("BT /F1 12 Tf 10 700 Td ");
+        var document = new StringBuilder("BT /F1 12 Tf 10 700 Td ");
         for (var i = 0; i < shows; i++)
         {
-            builder.Append("(abcdefghij) Tj ");
+            document.Append("(abcdefghij) Tj ");
         }
 
-        return builder.Append("ET").ToString();
+        return document.Append("ET").ToString();
     }
 
     [Fact]

@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts.Cff;
-using Radzen.Documents.Pdf.Fonts.Sfnt;
+using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,13 +18,14 @@ public class PdfACidSetExactTests
     private const string LatinSample = "Voilà - le café naïve! Мой рай";
     private const string CjkSample = "Ab Мир 中产";
 
-    private static DocumentReader Build(Action<DocumentBuilder> register, string family, string text)
+    private static DocumentReader Build(Action<Document> register, string family, string text)
     {
-        var builder = new DocumentBuilder { Conformance = PdfAConformance.PdfA3B };
-        register(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var builderRenderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
+        register(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, family);
-        return BuildTestSupport.Read(builder);
+        return BuildTestSupport.Read(document, builderRenderer);
     }
 
     private static DictionaryObject Descriptor(DocumentReader reader)

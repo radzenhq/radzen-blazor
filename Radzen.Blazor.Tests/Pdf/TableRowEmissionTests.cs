@@ -5,17 +5,19 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TableRowEmissionTests
 {
-    private static DocumentBuilder Author()
+    private static Document Author()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(300), Unit.FromPoint(400));
-        section.Margin = Unit.FromPoint(20);
+        section.Margins.SetAll(Unit.FromPoint(20));
 
         var table = section.Blocks.AddTable();
         table.Columns.Add();
@@ -27,11 +29,11 @@ public class TableRowEmissionTests
             row.Cells[1].Blocks.AddParagraph($"r{r}c1");
         }
 
-        return builder;
+        return document;
     }
 
-    private static byte[] PageBytes(DocumentBuilder builder)
-        => ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0);
+    private static byte[] PageBytes(Document document)
+        => ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0);
 
     private static List<string> TextOrder(byte[] content)
     {

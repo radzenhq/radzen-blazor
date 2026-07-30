@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf;
+using Radzen.Documents;
+using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,7 +19,7 @@ internal static class LineLayoutSupport
         return fonts;
     }
 
-    public static Font FontAt(double size) => new() { Name = Family, Size = size };
+    public static Font FontAt(double size) => new() { Family = Family, Size = size };
 
     public static Paragraph SingleRun(
         string text,
@@ -27,7 +29,7 @@ internal static class LineLayoutSupport
     {
         var paragraph = new Paragraph { Alignment = alignment, LineSpacing = lineSpacing };
         var run = paragraph.Inlines.Add(text);
-        run.Font.Name = Family;
+        run.Font.Family = Family;
         run.Font.Size = size;
         return paragraph;
     }

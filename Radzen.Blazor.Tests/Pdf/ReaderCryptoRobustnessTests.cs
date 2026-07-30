@@ -1,3 +1,4 @@
+using System.IO;
 #nullable enable
 using System;
 using System.Text;
@@ -5,7 +6,9 @@ using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
+using Radzen.Documents;
 
+using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3).
@@ -24,7 +27,7 @@ public class ReaderCryptoRobustnessTests
         var key = CryptoFixtureSupport.FixedBytes(32, 9);
         var data = CryptoFixtureSupport.FixedBytes(length, 3);
 
-        Assert.Throws<DocumentParseException>(() => AesCbc.Decrypt(key, data));
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(key, data));
     }
 
 

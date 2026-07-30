@@ -1,0 +1,72 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using Radzen.Documents;
+using Radzen.Documents.Pdf.Objects;
+using Xunit;
+using Document = Radzen.Documents.Document;
+
+namespace Radzen.Blazor.Pdf.Tests;
+
+public class LinkAnnotationGeometryTests
+{
+    private const string Url = "https://www.radzen.com/";
+
+    private static List<(double X1, double Y1, double X2, double Y2)> LinkRects(DocumentReader reader, int pageIndex)
+    {
+        var page = ContentTestHelpers.Kid(reader, pageIndex);
+        var rects = new List<(double, double, double, double)>();
+        if (!page.TryGetValue("Annots", out var annotsObject) || reader.Resolve(annotsObject!) is not ArrayObject annots)
+        {
+            return rects;
+        }
+
+        for (var i = 0; i < annots.Count; i++)
+        {
+            if (reader.Resolve(annots[i]) is not DictionaryObject annot
+                || !annot.TryGetValue("Subtype", out var subtype)
+                || reader.Resolve(subtype!) is not NameObject { Value: "Link" }
+                || !annot.TryGetValue("Rect", out var rectObject)
+                || reader.Resolve(rectObject!) is not ArrayObject rect)
+            {
+                continue;
+            }
+
+            var n = new double[4];
+            for (var j = 0; j < 4; j++)
+            {
+                n[j] = Assert.IsType<NumberObject>(reader.Resolve(rect[j])).DoubleValue;
+            }
+
+            rects.Add((Math.Min(n[0], n[2]), Math.Min(n[1], n[3]), Math.Max(n[0], n[2]), Math.Max(n[1], n[3])));
+        }
+
+        return rects;
+    }
+
+    private static Document LinkInContainer(double rotation)
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
+        section.Margins.SetAll(Unit.FromPoint(40));
+        var container = section.Blocks.Add(new Container { Padding = Unit.FromPoint(5), Rotation = rotation });
+        var paragraph = container.Blocks.AddParagraph();
+        paragraph.Inlines.Add("Radzen").Link = Url;
+        return document;
+    }
+
+    [Fact]
+    public void LinkInsideRotatedContainer_AnnotationRectIsTransformed()
+    {
+        var upright = Assert.Single(LinkRects(BuildTestSupport.Read(LinkInContainer(0)), 0));
+        var rotated = Assert.Single(LinkRects(BuildTestSupport.Read(LinkInContainer(90)), 0));
+
+        Assert.True(upright.X2 - upright.X1 > upright.Y2 - upright.Y1, "an upright link rect is wider than it is tall");
+        Assert.True(
+            rotated.Y2 - rotated.Y1 > rotated.X2 - rotated.X1,
+            $"a link inside a 90 degree container must carry a rotated rect, got {rotated}");
+        Assert.Equal(upright.X2 - upright.X1, rotated.Y2 - rotated.Y1, 3);
+        Assert.Equal(upright.Y2 - upright.Y1, rotated.X2 - rotated.X1, 3);
+    }
+}

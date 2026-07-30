@@ -4,6 +4,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class OutputIntentTests

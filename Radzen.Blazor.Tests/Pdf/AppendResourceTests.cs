@@ -4,6 +4,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,14 +13,14 @@ public class AppendResourceTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    private static DocumentBuilder BuildFontAndImage()
+    private static Radzen.Documents.Document BuildFontAndImage()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Radzen.Documents.Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Appended Content", BuildTestSupport.Latin);
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        return builder;
+        return document;
     }
 
     private static Document Reload(Document document)
@@ -42,7 +44,7 @@ public class AppendResourceTests
     {
         var target = new Document();
         target.Pages.Add().SetContent(Ascii("BT ET"));
-        target.Append(BuildFontAndImage().Build());
+        target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var reader = DocumentReader.Parse(target.ToArray());
 
@@ -56,7 +58,7 @@ public class AppendResourceTests
     {
         var target = new Document();
         target.Pages.Add().SetContent(Ascii("BT ET"));
-        target.Append(BuildFontAndImage().Build());
+        target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
         Assert.Contains("Appended Content", Reload(target).ExtractText());
     }
@@ -64,7 +66,7 @@ public class AppendResourceTests
     [Fact]
     public void Append_LoadedSourcePage_CarriesFontAndImageResources()
     {
-        var loaded = Reload(BuildFontAndImage().Build());
+        var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var target = new Document();
         target.Pages.Add().SetContent(Ascii("BT ET"));
@@ -80,7 +82,7 @@ public class AppendResourceTests
     [Fact]
     public void Append_LoadedSourcePage_ExtractsTextAfterReload()
     {
-        var loaded = Reload(BuildFontAndImage().Build());
+        var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var target = new Document();
         target.Pages.Add().SetContent(Ascii("BT ET"));
@@ -92,7 +94,7 @@ public class AppendResourceTests
     [Fact]
     public void Append_LeavesSourceDocumentUsable()
     {
-        var loaded = Reload(BuildFontAndImage().Build());
+        var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var target = new Document();
         target.Append(loaded);

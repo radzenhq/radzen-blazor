@@ -2,6 +2,8 @@
 using System;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,14 +21,14 @@ public class FlowUnificationTests
     [Fact]
     public void ParagraphThenTable_FlowsInlineOnSamePage()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Intro", BuildTestSupport.Latin);
         SmallTable(section, "CellText");
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.Equal(1, reloaded.Pages.Count);
 
         var text = reloaded.Pages[0].ExtractText();
@@ -37,25 +39,25 @@ public class FlowUnificationTests
     [Fact]
     public void TableBearingSection_RendersHeaderAndFooterOnEveryPage()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
 
-        var section = builder.Sections.Add();
-        section.Margin = Unit.FromPoint(72);
+        var section = document.Sections.Add();
+        section.Margins.SetAll(Unit.FromPoint(72));
         section.Header.Blocks.Add(PaginationSupport.Text("HDRBAND"));
         section.Footer.Blocks.Add(PaginationSupport.Text("FTRBAND"));
 
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(200));
         var head = table.Rows.Add();
-        head.IsHeader = true;
+        head.RepeatOnEveryPage = true;
         TableLayoutSupport.Fill(head.Cells[0], "H0");
         for (var i = 0; i < 80; i++)
         {
             TableLayoutSupport.Fill(table.Rows.Add().Cells[0], $"R{i}");
         }
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.True(reloaded.Pages.Count > 1, "tall table spans multiple pages");
 
         for (var i = 0; i < reloaded.Pages.Count; i++)
@@ -69,13 +71,13 @@ public class FlowUnificationTests
     [Fact]
     public void TableAfterParagraphs_FirstFragmentFillsRemainingHeight()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var lh = PaginationSupport.LineHeight(builder.Fonts, 12);
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var lh = PaginationSupport.LineHeight(document.Fonts, 12);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(320), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 8)));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         BuildTestSupport.AddText(section, "Fa", BuildTestSupport.Latin);
         BuildTestSupport.AddText(section, "Fb", BuildTestSupport.Latin);
@@ -83,14 +85,14 @@ public class FlowUnificationTests
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(300));
         var head = table.Rows.Add();
-        head.IsHeader = true;
+        head.RepeatOnEveryPage = true;
         TableLayoutSupport.Fill(head.Cells[0], "H0");
         for (var i = 0; i < 12; i++)
         {
             TableLayoutSupport.Fill(table.Rows.Add().Cells[0], $"R{i}");
         }
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.True(reloaded.Pages.Count > 1, "table overflows the first page");
 
         var first = reloaded.Pages[0].ExtractText();
@@ -102,18 +104,18 @@ public class FlowUnificationTests
         Assert.Contains("H0", reloaded.Pages[1].ExtractText(), StringComparison.Ordinal);
     }
 
-    private static (DocumentBuilder Builder, Paragraph Tail) AuthorSplitSection(int fillerLines)
+    private static (Document Builder, Paragraph Tail) AuthorSplitSection(int fillerLines)
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var fonts = builder.Fonts;
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var fonts = document.Fonts;
         var lh = PaginationSupport.LineHeight(fonts, 12);
 
-        var section = builder.Sections.Add();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(
             Unit.FromPoint(PaginationSupport.WidthForWordsPerLine(fonts, "Keep", 1, 12)),
             Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));
-        section.Margin = Unit.FromPoint(0);
+        section.Margins.SetAll(Unit.FromPoint(0));
 
         for (var i = 0; i < fillerLines; i++)
         {
@@ -122,16 +124,16 @@ public class FlowUnificationTests
 
         var tail = section.Blocks.Add(PaginationSupport.Repeated("Keep", 3));
         SmallTable(section, "T");
-        return (builder, tail);
+        return (document, tail);
     }
 
     [Fact]
     public void KeepTogether_AppliesInTableBearingSection()
     {
-        var (builder, tail) = AuthorSplitSection(fillerLines: 3);
+        var (document, tail) = AuthorSplitSection(fillerLines: 3);
         tail.KeepTogether = true;
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.True(reloaded.Pages.Count > 1, "content overflows to a second page");
 
         var first = reloaded.Pages[0].ExtractText();
@@ -142,9 +144,9 @@ public class FlowUnificationTests
     [Fact]
     public void OrphanControl_AppliesInTableBearingSection()
     {
-        var (builder, _) = AuthorSplitSection(fillerLines: 4);
+        var (document, _) = AuthorSplitSection(fillerLines: 4);
 
-        var reloaded = BuildTestSupport.Reload(builder);
+        var reloaded = BuildTestSupport.Reload(document);
         Assert.True(reloaded.Pages.Count > 1, "content overflows to a second page");
 
         var first = reloaded.Pages[0].ExtractText();

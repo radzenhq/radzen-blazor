@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,15 +16,15 @@ public class TableCellSpacingAlignmentIndentRegressionTests
 {
     private const double Tol = 0.5;
 
-    private static byte[] PageBytes(DocumentBuilder builder)
-        => ContentTestHelpers.PageContent(BuildTestSupport.Read(builder), 0);
+    private static byte[] PageBytes(Document document)
+        => ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0);
 
-    private static List<ContentOperation> Ops(DocumentBuilder builder)
-        => ContentStreamTokenizer.Parse(PageBytes(builder));
+    private static List<ContentOperation> Ops(Document document)
+        => ContentStreamTokenizer.Parse(PageBytes(document));
 
-    private static List<(string Text, double X, double Y)> TextRuns(DocumentBuilder builder)
+    private static List<(string Text, double X, double Y)> TextRuns(Document document)
     {
-        var content = Encoding.Latin1.GetString(PageBytes(builder));
+        var content = Encoding.Latin1.GetString(PageBytes(document));
         var runs = new List<(string, double, double)>();
         foreach (Match m in Regex.Matches(content, @"(-?[\d.]+)\s+(-?[\d.]+)\s+Td\s*\((.*?)\)\s*Tj", RegexOptions.Singleline))
         {
@@ -34,9 +36,9 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         return runs;
     }
 
-    private static (double X, double Y) Run(DocumentBuilder builder, string text)
+    private static (double X, double Y) Run(Document document, string text)
     {
-        var run = TextRuns(builder).Single(r => r.Text == text);
+        var run = TextRuns(document).Single(r => r.Text == text);
         return (run.X, run.Y);
     }
 
@@ -55,31 +57,31 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         return segments;
     }
 
-    private static List<(double X1, double Y1, double X2, double Y2)> VerticalSegments(DocumentBuilder builder)
-        => Segments(Ops(builder))
+    private static List<(double X1, double Y1, double X2, double Y2)> VerticalSegments(Document document)
+        => Segments(Ops(document))
             .Where(s => Math.Abs(s.X1 - s.X2) < 0.001 && Math.Abs(s.Y1 - s.Y2) > 1)
             .ToList();
 
-    private static (DocumentBuilder Builder, Section Section) NewDocument()
+    private static (Document Builder, Section Section) NewDocument()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(600));
-        section.Margin = Unit.FromPoint(50);
-        return (builder, section);
+        section.Margins.SetAll(Unit.FromPoint(50));
+        return (document, section);
     }
 
 
-    private static DocumentBuilder TwoParagraphCell(double spacingBefore)
+    private static Document TwoParagraphCell(double spacingBefore)
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
         cell.Blocks.AddParagraph("P1");
         var second = cell.Blocks.AddParagraph("P2");
         second.SpacingBefore = Unit.FromPoint(spacingBefore);
-        return builder;
+        return document;
     }
 
     [Fact]
@@ -94,15 +96,15 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         Assert.Equal(20, spacedGap - plainGap, Tol);
     }
 
-    private static DocumentBuilder TwoRowTable(double spacingAfter)
+    private static Document TwoRowTable(double spacingAfter)
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(200));
         var first = table.Rows.Add().Cells[0].Blocks.AddParagraph("A");
         first.SpacingAfter = Unit.FromPoint(spacingAfter);
         table.Rows.Add().Cells[0].Blocks.AddParagraph("B");
-        return builder;
+        return document;
     }
 
     [Fact]
@@ -120,11 +122,11 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     [Fact]
     public void SpacingBetweenCellParagraphs_GrowsRowHeight_PushingContentAfterTableDown()
     {
-        static DocumentBuilder Author(double spacingBefore)
+        static Document Author(double spacingBefore)
         {
-            var builder = TwoParagraphCell(spacingBefore);
-            builder.Sections[0].Blocks.AddParagraph("After");
-            return builder;
+            var document = TwoParagraphCell(spacingBefore);
+            document.Sections[0].Blocks.AddParagraph("After");
+            return document;
         }
 
         var plain = Author(0);
@@ -147,7 +149,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     [Fact]
     public void CellAlignment_BeatsColumnAlignment()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = OneCellTable(section, "RightMe");
         table.Columns[0].Alignment = HorizontalAlignment.Left;
         table.Rows[0].Cells[0].Alignment = HorizontalAlignment.Right;
@@ -158,14 +160,14 @@ public class TableCellSpacingAlignmentIndentRegressionTests
 
         var expected = Run(reference, "RightMe").X;
         Assert.True(expected > 55, "reference cell-aligned text must sit right of the left content edge");
-        Assert.Equal(expected, Run(builder, "RightMe").X, Tol);
+        Assert.Equal(expected, Run(document, "RightMe").X, Tol);
     }
 
     [Fact]
     public void NamedStyleAlignment_BeatsAlignmentInheritedFromRow()
     {
-        var (builder, section) = NewDocument();
-        builder.Styles.Add("Numeric").Alignment = HorizontalAlignment.Right;
+        var (document, section) = NewDocument();
+        document.Styles.Add("Numeric").Alignment = HorizontalAlignment.Right;
         var table = OneCellTable(section, "RightMe");
         table.Rows[0].Alignment = HorizontalAlignment.Center;
         ((Paragraph)table.Rows[0].Cells[0].Blocks[0]).StyleName = "Numeric";
@@ -176,14 +178,14 @@ public class TableCellSpacingAlignmentIndentRegressionTests
 
         var expected = Run(reference, "RightMe").X;
         Assert.True(expected > 55, "reference right-aligned text must sit right of the left content edge");
-        Assert.Equal(expected, Run(builder, "RightMe").X, Tol);
+        Assert.Equal(expected, Run(document, "RightMe").X, Tol);
     }
 
     [Fact]
     public void NamedStyleAlignment_BeatsAlignmentInheritedFromColumn()
     {
-        var (builder, section) = NewDocument();
-        builder.Styles.Add("Middle").Alignment = HorizontalAlignment.Center;
+        var (document, section) = NewDocument();
+        document.Styles.Add("Middle").Alignment = HorizontalAlignment.Center;
         var table = OneCellTable(section, "MidMe");
         table.Columns[0].Alignment = HorizontalAlignment.Left;
         ((Paragraph)table.Rows[0].Cells[0].Blocks[0]).StyleName = "Middle";
@@ -194,13 +196,13 @@ public class TableCellSpacingAlignmentIndentRegressionTests
 
         var expected = Run(reference, "MidMe").X;
         Assert.True(expected > 55, "reference centered text must sit right of the left content edge");
-        Assert.Equal(expected, Run(builder, "MidMe").X, Tol);
+        Assert.Equal(expected, Run(document, "MidMe").X, Tol);
     }
 
 
-    private static void AssertIndentedEdges(DocumentBuilder builder)
+    private static void AssertIndentedEdges(Document document)
     {
-        var vertical = VerticalSegments(builder);
+        var vertical = VerticalSegments(document);
         Assert.True(vertical.Count > 0, "table borders with Width > 0 must draw vertical edges");
 
         var minX = vertical.Min(s => s.X1);
@@ -213,19 +215,19 @@ public class TableCellSpacingAlignmentIndentRegressionTests
     [Fact]
     public void IndentedAutoWidthTable_InBody_StaysInsideRightContentEdge()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var table = OneCellTable(section, "X");
         table.Columns[0].Width = null;
         table.LeftIndent = Unit.FromPoint(100);
         table.Borders.Width = 1;
 
-        AssertIndentedEdges(builder);
+        AssertIndentedEdges(document);
     }
 
     [Fact]
     public void IndentedAutoWidthTable_InHeaderBand_StaysInsideRightContentEdge()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         section.Blocks.AddParagraph("Body");
 
         var table = section.Header.Blocks.AddTable();
@@ -234,13 +236,13 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         table.LeftIndent = Unit.FromPoint(100);
         table.Borders.Width = 1;
 
-        AssertIndentedEdges(builder);
+        AssertIndentedEdges(document);
     }
 
     [Fact]
     public void IndentedAutoWidthNestedTable_StaysInsideOuterCell()
     {
-        var (builder, section) = NewDocument();
+        var (document, section) = NewDocument();
         var outer = section.Blocks.AddTable();
         outer.Columns.Add(Unit.FromPoint(200));
         var cell = outer.Rows.Add().Cells[0];
@@ -251,7 +253,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         nested.LeftIndent = Unit.FromPoint(80);
         nested.Borders.Width = 1;
 
-        var vertical = VerticalSegments(builder);
+        var vertical = VerticalSegments(document);
         Assert.True(vertical.Count > 0, "nested table borders must draw vertical edges");
 
         var minX = vertical.Min(s => s.X1);

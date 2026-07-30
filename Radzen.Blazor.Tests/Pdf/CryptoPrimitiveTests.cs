@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents.Crypto;
 using Xunit;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -45,6 +46,54 @@ public class CryptoPrimitiveTests
     public void Md5_EmptyArray()
     {
         Assert.Equal("d41d8cd98f00b204e9800998ecf8427e", Hex(Md5.ComputeHash([])));
+    }
+
+    // RFC 3174 section 7.3 and NIST SHA-1 short message vectors
+    [Theory]
+    [InlineData("", "da39a3ee5e6b4b0d3255bfef95601890afd80709")]
+    [InlineData("a", "86f7e437faa5a7fce15d1ddcb9eaeaea377667b8")]
+    [InlineData("abc", "a9993e364706816aba3e25717850c26c9cd0d89d")]
+    [InlineData("message digest", "c12252ceda8be8994d5fa0290a47231c1d16aae3")]
+    [InlineData(
+        "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+        "84983e441c3bd26ebaae4aa1f95129e5e54670f1")]
+    public void Sha1_KnownStrings(string input, string expected)
+    {
+        Assert.Equal(expected, Hex(Sha1.ComputeHash(Ascii(input))));
+    }
+
+    [Theory]
+    [InlineData(55, "c1c8bbdc22796e28c0e15163d20899b65621d65a")]
+    [InlineData(56, "c2db330f6083854c99d4b5bfb6e8f29f201be699")]
+    [InlineData(64, "0098ba824b5c16427bd7a1122a5a442a25ec644d")]
+    public void Sha1_BlockBoundaries(int count, string expected)
+    {
+        Assert.Equal(expected, Hex(Sha1.ComputeHash(Ascii(new string('a', count)))));
+    }
+
+    [Fact]
+    public void Sha1_LongInput()
+    {
+        var input = Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
+        Assert.Equal(80, input.Length);
+        Assert.Equal("50abf5706a150990a08b2c5ea40fa0e585554732", Hex(Sha1.ComputeHash(input)));
+    }
+
+    // RFC 3174 section 7.3 TEST4
+    [Fact]
+    public void Sha1_MultiBlockRepetition()
+    {
+        var input = Ascii(string.Concat(
+            Enumerable.Repeat("0123456701234567012345670123456701234567012345670123456701234567", 10)));
+
+        Assert.Equal(640, input.Length);
+        Assert.Equal("dea356a2cddd90c7a7ecedc5ebb563934f460452", Hex(Sha1.ComputeHash(input)));
+    }
+
+    [Fact]
+    public void Sha1_EmptyArray()
+    {
+        Assert.Equal("da39a3ee5e6b4b0d3255bfef95601890afd80709", Hex(Sha1.ComputeHash([])));
     }
 
     [Theory]
@@ -96,5 +145,11 @@ public class CryptoPrimitiveTests
             "3ad77bb40d7a3660a89ecaf32466ef974b0673d23da20679744afa8e3d589236");
         var plain = AesCbc.Decrypt(key, ivCipher);
         Assert.Equal("6bc1bee22e409f96e93d7e117393172a", Hex(plain));
+    }
+
+    [Fact]
+    public void Rc4_EmptyKey_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => Rc4.Transform([], Ascii("Attack at dawn")));
     }
 }

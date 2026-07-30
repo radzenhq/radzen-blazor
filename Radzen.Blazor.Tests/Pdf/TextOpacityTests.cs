@@ -4,6 +4,8 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,16 +18,16 @@ public class TextOpacityTests
         return paragraph;
     }
 
-    private static string PageText(DocumentBuilder builder, int index = 0)
+    private static string PageText(Document document, int index = 0)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var (page, _) = BuildTestSupport.PageLeaves(reader)[index];
         return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
     }
 
-    private static DictionaryObject? ExtGStates(DocumentBuilder builder, int index = 0)
+    private static DictionaryObject? ExtGStates(Document document, int index = 0)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var (_, resources) = BuildTestSupport.PageLeaves(reader)[index];
         return resources is not null
             && resources.TryGetValue("ExtGState", out var states)
@@ -40,19 +42,19 @@ public class TextOpacityTests
     [Fact]
     public void RunOpacity_RegistersExtGStateAndWrapsShowInGs()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Solid ");
         paragraph.Inlines.Add("Faded").Opacity = 0.5;
         section.Blocks.Add(paragraph);
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
         Assert.Equal(0.5, Alpha(states!, "GS0", "CA"), 6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("q\n/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         var show = text.IndexOf(" Tj", gs, StringComparison.Ordinal);
@@ -64,32 +66,32 @@ public class TextOpacityTests
     [Fact]
     public void RunOpacity_DedupsAcrossRunsByValue()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("First").Opacity = 0.5;
         paragraph.Inlines.Add(" Second").Opacity = 0.5;
         section.Blocks.Add(paragraph);
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Single(states!.Keys);
-        Assert.Equal(2, BuildTestSupport.CountOccurrences(PageText(builder), "/GS0 gs"));
+        Assert.Equal(2, BuildTestSupport.CountOccurrences(PageText(document), "/GS0 gs"));
     }
 
     [Fact]
     public void ContainerOpacity_AppliesToChildText()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
         container.Blocks.Add(Text("Inside"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" Tj", gs, StringComparison.Ordinal) > gs);
@@ -98,16 +100,16 @@ public class TextOpacityTests
     [Fact]
     public void ContainerOpacity_AppliesToChildImage()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
         container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Equal(0.5, Alpha(states!, "GS0", "ca"), 6);
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" Do", gs, StringComparison.Ordinal) > gs);
@@ -116,12 +118,12 @@ public class TextOpacityTests
     [Fact]
     public void ContainerOpacity_MultipliesWithChildImageOpacity()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
         container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).Opacity = 0.5;
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Alpha(states!, key, "ca") == 0.25);
     }
@@ -129,8 +131,8 @@ public class TextOpacityTests
     [Fact]
     public void ContainerOpacity_AppliesToNestedTableContent()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.5 });
         var table = container.Blocks.Add(new Table());
         table.Columns.Add(Unit.FromPoint(100));
@@ -138,7 +140,7 @@ public class TextOpacityTests
         cell.Background = Color.FromRgb(200, 200, 200);
         cell.Blocks.Add(Text("Nested"));
 
-        var text = PageText(builder);
+        var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
         Assert.True(gs >= 0);
         Assert.True(text.IndexOf(" re f", gs, StringComparison.Ordinal) > gs);
@@ -148,13 +150,13 @@ public class TextOpacityTests
     [Fact]
     public void NestedContainerOpacity_Multiplies()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var outer = section.Blocks.Add(new Container { Opacity = 0.5 });
         var inner = outer.Blocks.Add(new Container { Opacity = 0.5 });
         inner.Blocks.Add(Text("Deep"));
 
-        var states = ExtGStates(builder);
+        var states = ExtGStates(document);
         Assert.NotNull(states);
         Assert.Contains(states!.Keys, key => Alpha(states!, key, "ca") == 0.25);
     }
@@ -164,8 +166,8 @@ public class TextOpacityTests
     {
         static byte[] Content(bool set)
         {
-            var builder = new DocumentBuilder();
-            var section = builder.Sections.Add();
+            var document = new Document();
+            var section = document.Sections.Add();
             var paragraph = new Paragraph();
             var run = paragraph.Inlines.Add("Plain");
             section.Blocks.Add(paragraph);
@@ -178,7 +180,7 @@ public class TextOpacityTests
                 container.Opacity = 1;
             }
 
-            var reader = BuildTestSupport.Read(builder);
+            var reader = BuildTestSupport.Read(document);
             var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
             return BuildTestSupport.Content(reader, page);
         }

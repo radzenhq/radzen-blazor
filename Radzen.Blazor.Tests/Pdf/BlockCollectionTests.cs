@@ -3,12 +3,14 @@ using System;
 using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents;
+using Document = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class BlockCollectionTests
 {
-    private static BlockCollection NewBlocks() => new DocumentBuilder().Sections.Add().Blocks;
+    private static BlockCollection NewBlocks() => new Document().Sections.Add().Blocks;
 
     [Fact]
     public void AddString_CreatesParagraphWithText()
@@ -38,7 +40,7 @@ public class BlockCollectionTests
         var blocks = NewBlocks();
         var p = new Paragraph();
         blocks.Add(p);
-        Assert.Throws<ArgumentException>(() => blocks.Add(p));
+        Assert.Throws<InvalidOperationException>(() => blocks.Add(p));
     }
 
     [Fact]

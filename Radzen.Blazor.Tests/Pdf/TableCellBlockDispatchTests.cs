@@ -9,8 +9,12 @@ using System.Text.RegularExpressions;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
-
 using Radzen.Documents.Pdf.Emit;
+using Document = Radzen.Documents.Document;
+using Radzen.Documents.Layout;
+using Radzen.Documents.Codes;
+using Radzen.Documents.Geometry;
+
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TableCellBlockDispatchTests
@@ -25,8 +29,11 @@ public class TableCellBlockDispatchTests
         return (table, cell);
     }
 
-    private static LaidOutCell LayOut(Table table)
-        => TableLayoutSupport.CellAt(TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()), 0, 0);
+    private static LaidOutCell LayOut(Table table, LayoutCaptureContext? capture = null)
+        => TableLayoutSupport.CellAt(
+            TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts(), capture: capture),
+            0,
+            0);
 
     private static byte[] Png() => PdfTestResources.ReadAllBytes("Images/rgb.png");
 
@@ -57,24 +64,30 @@ public class TableCellBlockDispatchTests
     public void QrCodeInCell_ProducesCodeItem()
     {
         var (table, cell) = CellTable();
-        cell.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
+        var qr = cell.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
+        var capture = new LayoutCaptureContext();
 
-        var laid = LayOut(table);
+        var laid = LayOut(table, capture);
 
-        Assert.Single(laid.Codes);
-        Assert.IsType<QrCode>(laid.Codes[0].Source);
+        Assert.Single(laid.CodeSymbols);
+        Assert.Equal(capture.Source(qr), laid.CodeSymbols[0].Source);
     }
 
     [Fact]
     public void BarcodeInCell_ProducesCodeItem()
     {
         var (table, cell) = CellTable();
-        cell.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(120), Unit.FromPoint(40));
+        var barcode = cell.Blocks.AddBarcode(
+            BarcodeType.Code128,
+            "RADZEN",
+            Unit.FromPoint(120),
+            Unit.FromPoint(40));
+        var capture = new LayoutCaptureContext();
 
-        var laid = LayOut(table);
+        var laid = LayOut(table, capture);
 
-        Assert.Single(laid.Codes);
-        Assert.IsType<Barcode>(laid.Codes[0].Source);
+        Assert.Single(laid.CodeSymbols);
+        Assert.Equal(capture.Source(barcode), laid.CodeSymbols[0].Source);
     }
 
     [Fact]
@@ -95,14 +108,14 @@ public class TableCellBlockDispatchTests
     {
         var (table, cell) = CellTable();
         var list = cell.Blocks.AddList(ListStyle.Number);
-        list.Font.Name = TableLayoutSupport.Family;
+        list.Font.Family = TableLayoutSupport.Family;
         list.AddItem("Alpha");
         list.AddItem("Beta");
         list.AddItem("Gamma");
 
         var laid = LayOut(table);
 
-        Assert.Equal(3, laid.Lines.Count);
+        Assert.Equal(3, laid.Lines.Length);
     }
 
     [Fact]
@@ -111,13 +124,13 @@ public class TableCellBlockDispatchTests
         var (table, cell) = CellTable();
         var fonts = TableLayoutSupport.Fonts();
         var list = cell.Blocks.AddList(ListStyle.Bullet);
-        list.Font.Name = TableLayoutSupport.Family;
+        list.Font.Family = TableLayoutSupport.Family;
         list.Font.Size = 12;
         list.AddItem("Alpha");
         list.AddItem("Beta");
         list.AddItem("Gamma");
 
-        var layout = TableLayout.Layout(table, 400, fonts);
+        var layout = TableLayout.LayoutIsolated(table, 400, fonts);
 
         var lineHeight = TableLayoutSupport.LineHeight(fonts);
         var padding = cell.Padding.Point;
@@ -127,8 +140,8 @@ public class TableCellBlockDispatchTests
     [Fact]
     public void ListInCell_EmitsMarkersAndItemTextWithHangingIndent()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         var table = section.Blocks.AddTable();
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
@@ -137,7 +150,7 @@ public class TableCellBlockDispatchTests
         list.AddItem("Alpha");
         list.AddItem("Beta");
 
-        var draws = TextDraws(builder);
+        var draws = TextDraws(document);
 
         var one = Assert.Single(draws, d => d.Text == "1.");
         var two = Assert.Single(draws, d => d.Text == "2.");
@@ -152,16 +165,16 @@ public class TableCellBlockDispatchTests
     {
         var (table, cell) = CellTable();
         TableLayoutSupport.Fill(cell, "Alpha");
-        var withoutBreakHeight = TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()).RowHeights[0];
+        var withoutBreakHeight = TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0];
 
         cell.Blocks.AddPageBreak();
         var laid = LayOut(table);
 
         Assert.Single(laid.Lines);
         Assert.Empty(laid.Images);
-        Assert.Empty(laid.Codes);
+        Assert.Empty(laid.CodeSymbols);
         Assert.Empty(laid.Tables);
-        Assert.Equal(withoutBreakHeight, TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()).RowHeights[0], 6);
+        Assert.Equal(withoutBreakHeight, TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()).RowHeights[0], 6);
     }
 
     private sealed class UnknownBlock : Block;
@@ -172,19 +185,19 @@ public class TableCellBlockDispatchTests
         var (table, cell) = CellTable();
         cell.Blocks.Add(new UnknownBlock());
 
-        var exception = Assert.Throws<NotSupportedException>(() => TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()));
+        var exception = Assert.Throws<NotSupportedException>(() => TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
         Assert.Contains("UnknownBlock", exception.Message);
     }
 
     [Fact]
     public void UnhandledBlockInSection_Throws()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         section.Blocks.Add(new UnknownBlock());
 
-        var exception = Assert.Throws<NotSupportedException>(() => builder.Build());
+        var exception = Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
         Assert.Contains("UnknownBlock", exception.Message);
     }
 
@@ -206,7 +219,7 @@ public class TableCellBlockDispatchTests
 
             var (table, cell) = CellTable();
             AddSample(cell, type);
-            var exception = Record.Exception(() => TableLayout.Layout(table, 400, TableLayoutSupport.Fonts()));
+            var exception = Record.Exception(() => TableLayout.LayoutIsolated(table, 400, TableLayoutSupport.Fonts()));
             Assert.True(exception is null, $"Block type '{type.Name}' failed to lay out inside a table cell: {exception}");
         }
     }
@@ -228,7 +241,7 @@ public class TableCellBlockDispatchTests
                 break;
             case nameof(List):
                 var list = cell.Blocks.AddList();
-                list.Font.Name = TableLayoutSupport.Family;
+                list.Font.Family = TableLayoutSupport.Family;
                 list.AddItem("Alpha");
                 break;
             case nameof(QrCode):
@@ -244,7 +257,7 @@ public class TableCellBlockDispatchTests
                 var container = cell.Blocks.Add(new Container { Padding = Unit.FromPoint(4) });
                 var boxed = container.Blocks.AddParagraph();
                 var run = boxed.Inlines.Add("Boxed");
-                run.Font.Name = TableLayoutSupport.Family;
+                run.Font.Family = TableLayoutSupport.Family;
                 break;
             default:
                 Assert.Fail($"No cell sample for block type '{type.Name}'. Wire it into TableLayout.LayoutContent (and Paginator) and add a sample here.");
@@ -255,14 +268,14 @@ public class TableCellBlockDispatchTests
     [Fact]
     public void ListInHeaderBand_EmitsMarkersAndItemText()
     {
-        var builder = new DocumentBuilder();
-        var section = builder.Sections.Add();
+        var document = new Document();
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "body", "Helvetica");
         var list = section.Header.Blocks.AddList(ListStyle.Number);
         list.AddItem("Alpha");
         list.AddItem("Beta");
 
-        var draws = TextDraws(builder);
+        var draws = TextDraws(document);
 
         Assert.Contains(draws, d => d.Text == "1.");
         Assert.Contains(draws, d => d.Text == "2.");
@@ -273,19 +286,19 @@ public class TableCellBlockDispatchTests
     [Fact]
     public void UnhandledBlockInBand_Throws()
     {
-        var builder = new DocumentBuilder();
-        BuildTestSupport.RegisterLatin(builder);
-        var section = builder.Sections.Add();
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "body", BuildTestSupport.Latin);
         section.Footer.Blocks.Add(new UnknownBlock());
 
-        var exception = Assert.Throws<NotSupportedException>(() => builder.Build());
+        var exception = Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
         Assert.Contains("UnknownBlock", exception.Message);
     }
 
-    private static List<(double X, string Text)> TextDraws(DocumentBuilder builder)
+    private static List<(double X, string Text)> TextDraws(Document document)
     {
-        var reader = BuildTestSupport.Read(builder);
+        var reader = BuildTestSupport.Read(document);
         var leaves = BuildTestSupport.PageLeaves(reader);
         var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
 
