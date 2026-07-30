@@ -54,7 +54,7 @@ public class Type0CompactGidSingleSourceTests
     {
         using var buffer = new MemoryStream();
         var writer = new DocumentWriter(buffer);
-        var topRef = Type0FontEmbedder.Embed(writer, font, gidToUnicode, compactMap);
+        var topRef = Type0FontEmbedder.Embed(writer, Type0FontPlanner.Plan(font, gidToUnicode, compactMap));
         writer.Close();
 
         var reader = DocumentReader.Parse(buffer.ToArray());

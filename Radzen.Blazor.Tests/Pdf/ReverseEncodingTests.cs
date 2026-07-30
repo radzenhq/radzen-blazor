@@ -68,7 +68,7 @@ public class ReverseEncodingTests
         var content = new List<byte>();
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 600, Type0EmbedSupport.CompactCodes(font, map, bottom)));
         content.AddRange(ExtractionSupport.TextRun("F1", 12, 72, 700, Type0EmbedSupport.CompactCodes(font, map, top)));
-        var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), [.. content]);
+        var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, Type0FontPlanner.Plan(font, map)), [.. content]);
 
         var text = document.Pages[0].ExtractText();
         var topIndex = text.IndexOf(top, StringComparison.Ordinal);
@@ -106,7 +106,7 @@ public class ReverseEncodingTests
         var map = Type0EmbedSupport.BuildMap(font, sample);
         var codes = Type0EmbedSupport.CompactCodes(font, map, sample);
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
-        return ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, font, map), content);
+        return ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, Type0FontPlanner.Plan(font, map)), content);
     }
 
     private static DictionaryObject DifferencesFont() => new()

@@ -1,4 +1,3 @@
-using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf;

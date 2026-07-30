@@ -169,7 +169,7 @@ public static class QrEncoder
 
         var moduleFill = SvgAttributes.Color(foreground, nameof(foreground));
         var imageBackgroundFill = SvgAttributes.Color(imageBackground, nameof(imageBackground));
-        var imageHref = image is null ? null : SvgAttributes.Escape(image);
+        var imageHref = image is null ? null : SvgAttributes.Href(image, nameof(image));
 
         int n = modules.GetLength(0);
         int vb = n + 2 * QuietZoneModules;
@@ -1291,31 +1291,7 @@ public static class QrEncoder
         => color is null ? fallback : SvgAttributes.Color(color, parameterName);
 
     private static (string Color, double Opacity) GetSvgFillParts(string? color, string parameterName)
-    {
-        if (string.IsNullOrWhiteSpace(color))
-        {
-            return ("none", 1);
-        }
+        => SvgAttributes.Fill(color, parameterName);
 
-        if (string.Equals(color, "transparent", StringComparison.OrdinalIgnoreCase))
-        {
-            return ("rgb(0, 0, 0)", 0);
-        }
-
-        if (!SvgAttributes.IsColor(color))
-        {
-            throw new ArgumentException($"'{color}' is not a valid CSS color.", parameterName);
-        }
-
-        if (ColorValue.Parse(color) is not { } rgb)
-        {
-            return (SvgAttributes.Escape(color), 1);
-        }
-
-        var opacity = Math.Clamp(rgb.Alpha, 0, 1);
-        var fill = $"rgb({Format(rgb.Red)}, {Format(rgb.Green)}, {Format(rgb.Blue)})";
-        return (fill, opacity);
-    }
-
-    private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);
+    private static string Format(double v) => SvgAttributes.Number(v);
 }

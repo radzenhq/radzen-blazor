@@ -250,18 +250,39 @@ public class QrEncoderTests
 
         Assert.Throws<ArgumentException>(() => QrEncoder.ToSvg(modules, background: "\"><rect fill=\"red\"/>"));
         Assert.Throws<ArgumentException>(() => QrEncoder.ToSvg(modules, eyeColor: "\" onclick=\"x"));
-        Assert.Throws<ArgumentException>(() => QrEncoder.ToSvg(modules, image: "a.png", imageBackground: "\"/><script/>"));
+        Assert.Throws<ArgumentException>(
+            () => QrEncoder.ToSvg(modules, image: "https://example.com/a.png", imageBackground: "\"/><script/>"));
     }
 
-    [Fact]
-    public void ToSvg_EscapesTheImageHref()
+    [Theory]
+    [InlineData("a.png\"/><script>alert(1)</script><image href=\"b.png")]
+    [InlineData("javascript:alert(1)")]
+    [InlineData("data:text/html,<script>alert(1)</script>")]
+    [InlineData("a.png")]
+    public void ToSvg_RejectsAnImageHrefOutsideTheAllowedSchemes(string image)
     {
         var modules = QrEncoder.EncodeUtf8("AB", QrErrorCorrection.Quartile);
 
-        var svg = QrEncoder.ToSvg(modules, image: "a.png\"/><script>alert(1)</script><image href=\"b.png");
+        Assert.Throws<ArgumentException>(() => QrEncoder.ToSvg(modules, image: image));
+    }
 
-        Assert.DoesNotContain("<script", svg, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("&quot;", svg, StringComparison.Ordinal);
-        Assert.Contains("&lt;script&gt;", svg, StringComparison.Ordinal);
+    [Fact]
+    public void ToSvg_EscapesAnAllowedImageHref()
+    {
+        var modules = QrEncoder.EncodeUtf8("AB", QrErrorCorrection.Quartile);
+
+        var svg = QrEncoder.ToSvg(modules, image: "https://example.com/a.png?x=1&y=2");
+
+        Assert.Contains("href=\"https://example.com/a.png?x=1&amp;y=2\"", svg, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToSvg_AcceptsADataImageHref()
+    {
+        var modules = QrEncoder.EncodeUtf8("AB", QrErrorCorrection.Quartile);
+
+        var svg = QrEncoder.ToSvg(modules, image: "data:image/png;base64,iVBORw0KGgo=");
+
+        Assert.Contains("href=\"data:image/png;base64,iVBORw0KGgo=\"", svg, StringComparison.Ordinal);
     }
 }

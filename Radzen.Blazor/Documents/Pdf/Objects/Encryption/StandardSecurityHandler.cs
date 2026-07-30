@@ -828,8 +828,17 @@ internal sealed class StandardSecurityHandler
 
     private static class ParseAes
     {
+        // ISO 32000-1 7.6.2: AESV2 and AESV3 strings and streams begin with the 16-byte initialization vector.
         public static byte[] Decrypt(byte[] key, byte[] data)
-            => Guard(() => AesCbc.Decrypt(key, data));
+        {
+            ArgumentNullException.ThrowIfNull(data);
+            if (data.Length < 16)
+            {
+                throw new DocumentParseException("AES data is shorter than the required 16-byte IV.");
+            }
+
+            return Guard(() => AesCbc.Decrypt(key, data[..16], data[16..]));
+        }
 
         public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] data)
             => Guard(() => AesCbc.DecryptCbcNoPadding(key, iv, data));

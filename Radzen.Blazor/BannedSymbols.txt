@@ -14,6 +14,9 @@ N:System.Security.Cryptography; Do not use System.Security.Cryptography in the P
 ;      reimplementation could improve on (Documents/Pdf/Objects/Encryption/StandardSecurityHandler.cs).
 ;   2. SHA1.HashData - the BCL SHA-1 backing Documents/Crypto/Sha1.cs. It replaces a hand-rolled
 ;      implementation of the same RFC 3174 digest, which the ban was never meant to require.
+;   3. SHA256/SHA384/SHA512.HashData and IncrementalHash - the BCL SHA-2 backing
+;      Documents/Crypto/Sha2.cs, for the same reason as SHA-1: a FIPS 180-4 digest is
+;      deterministic and available on every shipped target.
 
 ; --- Non-deterministic wall-clock time ---
 P:System.DateTime.Now; Non-deterministic. Do not use wall-clock time in the PDF library.

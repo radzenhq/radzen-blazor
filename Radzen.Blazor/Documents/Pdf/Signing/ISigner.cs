@@ -8,12 +8,11 @@ namespace Radzen.Documents.Pdf.Signing;
 /// Implementations are responsible for hashing the content, signing with a
 /// private key, and assembling the DER-encoded CMS <c>SignedData</c>
 /// structure. This library never sees a private key and performs no
-/// public-key cryptography itself - it is safe to ship to the browser
-/// (Blazor WebAssembly). A production implementation runs the actual signing
-/// server-side (web API, HSM, KMS, ...) and returns only the completed CMS
-/// blob. The library always passes the raw covered bytes; implementations may
-/// hash them by any means - for example with the pure-managed
-/// <c>Radzen.Documents.Crypto.Sha2.ComputeHash256</c> - before forwarding the digest
+/// public-key cryptography itself. A production implementation runs the actual
+/// signing server-side (web API, HSM, KMS, ...) and returns only the completed
+/// CMS blob. The library always passes the raw covered bytes; implementations may
+/// hash them by any means - for example with
+/// <c>System.Security.Cryptography.SHA256</c> - before forwarding the digest
 /// to a remote signing service.
 /// </remarks>
 public interface ISigner

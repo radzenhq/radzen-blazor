@@ -63,9 +63,9 @@ public class BuiltInFontCoverageTests
     }
 
     [Fact]
-    public void MeasureText_AllowUnsupportedCharacters_DoesNotChangeNeutralMetrics()
+    public void MeasureText_MeasuresAnUnsupportedCharacterByItsOwnWidthNotTheSubstitute()
     {
-        var fonts = new FontCollection { AllowUnsupportedCharacters = true };
+        var fonts = new FontCollection();
 
         Assert.NotEqual(fonts.MeasureText("?", new Font()), fonts.MeasureText("ﬁ", new Font()));
     }

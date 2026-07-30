@@ -15,21 +15,15 @@ public class AesCbcHardeningTests
     private static readonly byte[] Iv = Convert.FromHexString("101112131415161718191a1b1c1d1e1f");
 
     [Fact]
-    public void Decrypt_ShorterThanIv_Throws()
+    public void Decrypt_EmptyCiphertext_Throws()
     {
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, new byte[15]));
-    }
-
-    [Fact]
-    public void Decrypt_IvOnlyNoCiphertext_Throws()
-    {
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, new byte[16]));
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, Iv, []));
     }
 
     [Fact]
     public void Decrypt_CiphertextNotBlockAligned_Throws()
     {
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, new byte[36]));
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, Iv, new byte[20]));
     }
 
     [Fact]
@@ -42,8 +36,8 @@ public class AesCbcHardeningTests
     public void Decrypt_PadByteOutOfRange_Throws()
     {
         var plain = new byte[16];
-        var ivCipher = Concat(Iv, AesCbc.EncryptCbcNoPadding(Key, Iv, plain));
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, ivCipher));
+        var cipher = AesCbc.EncryptCbcNoPadding(Key, Iv, plain);
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, Iv, cipher));
     }
 
     [Fact]
@@ -53,8 +47,8 @@ public class AesCbcHardeningTests
         plain[15] = 3;
         plain[14] = 1;
         plain[13] = 2;
-        var ivCipher = Concat(Iv, AesCbc.EncryptCbcNoPadding(Key, Iv, plain));
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, ivCipher));
+        var cipher = AesCbc.EncryptCbcNoPadding(Key, Iv, plain);
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(Key, Iv, cipher));
     }
 
     [Fact]
@@ -67,8 +61,8 @@ public class AesCbcHardeningTests
         }
 
         plain[13] = plain[14] = plain[15] = 3;
-        var ivCipher = Concat(Iv, AesCbc.EncryptCbcNoPadding(Key, Iv, plain));
-        Assert.Equal(plain[..13], AesCbc.Decrypt(Key, ivCipher));
+        var cipher = AesCbc.EncryptCbcNoPadding(Key, Iv, plain);
+        Assert.Equal(plain[..13], AesCbc.Decrypt(Key, Iv, cipher));
     }
 
     [Theory]
