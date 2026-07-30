@@ -13,6 +13,12 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class BodyFieldResolutionTests
 {
+    private static void AddField(Paragraph paragraph, TextInline field)
+    {
+        field.Font.Size = 12;
+        paragraph.Inlines.Add(field);
+    }
+
     private static string[] TextRuns(DocumentReader reader, int page)
     {
         var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, page));
@@ -35,9 +41,9 @@ public class BodyFieldResolutionTests
 
         var paragraph = section.Blocks.AddParagraph();
         paragraph.Inlines.Add("page ").Font.Size = 12;
-        paragraph.Inlines.Add(new PageNumberField()).Font.Size = 12;
+        AddField(paragraph, new PageNumberField());
         paragraph.Inlines.Add(" of ").Font.Size = 12;
-        paragraph.Inlines.Add(new PageCountField()).Font.Size = 12;
+        AddField(paragraph, new PageCountField());
 
         var reader = BuildTestSupport.Read(document);
         var runs = TextRuns(reader, 0);

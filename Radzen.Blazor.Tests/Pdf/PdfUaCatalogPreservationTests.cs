@@ -45,9 +45,9 @@ public class PdfUaCatalogPreservationTests
     {
         var document = PortableDocument.LoadFromStream(new MemoryStream(SourceWithIndirectPrefsAndMetadata()));
         document.Pages.RemoveAt(0);
-        document.Append(TaggedPage());
-
-        document.Structure = new StructureElement { Type = "Document" };
+        var tagged = TaggedPage();
+        document.Append(tagged);
+        document.EmissionPlan = tagged.EmissionPlan;
         document.Language = "en-US";
         document.Info.Title = "Accessible Title";
         document.Accessibility = PdfUaConformance.PdfUa1;

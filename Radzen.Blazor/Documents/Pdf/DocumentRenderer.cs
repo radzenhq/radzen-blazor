@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Write;
 
 namespace Radzen.Documents.Pdf;
 
@@ -83,7 +84,7 @@ public sealed class DocumentRenderer
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
     /// document is written unencrypted.
     /// </summary>
-    public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
+    public EncryptionOptions? Encryption { get; set; }
 
     /// <summary>
     /// Gets or sets whether the saved file packs its objects into compressed
@@ -108,7 +109,11 @@ public sealed class DocumentRenderer
     /// <param name="document">The document model to render.</param>
     /// <returns>The generated document.</returns>
     public PortableDocument Render(Document document)
-        => DocumentGenerator.Generate(document, RenderRequest.From(this));
+    {
+        var output = DocumentGenerator.Generate(document, RenderRequest.From(this));
+        output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
+        return output;
+    }
 
     /// <summary>Renders the model and serializes it to the given stream.</summary>
     /// <param name="document">The document model to render.</param>

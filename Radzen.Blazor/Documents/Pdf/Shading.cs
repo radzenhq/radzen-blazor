@@ -4,34 +4,35 @@ using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Geometry;
 
-namespace Radzen.Documents.Pdf.Write;
+namespace Radzen.Documents.Pdf;
 
 // ISO 32000-1 8.7.4.5.2/8.7.4.5.3: axial/radial /Shading dictionaries.
 internal static class ShadingBuilder
 {
+    // ISO 32000-1 Table 78: /Extend defaults to [false false].
+    private static ArrayObject BothEndsExtended() => [new BooleanObject(true), new BooleanObject(true)];
+
     public static DictionaryObject BuildShading(GradientBrush brush)
     {
-        ArrayObject extend = [new BooleanObject(brush.ExtendStart), new BooleanObject(brush.ExtendEnd)];
         return new DictionaryObject
         {
             ["ShadingType"] = new NumberObject(ShadingType(brush)),
             ["ColorSpace"] = new NameObject("DeviceRGB"),
             ["Coords"] = Coords(brush),
             ["Function"] = BuildFunction(brush.Stops),
-            ["Extend"] = extend,
+            ["Extend"] = BothEndsExtended(),
         };
     }
 
     public static DictionaryObject BuildShading(in GradientPaint brush)
     {
-        ArrayObject extend = [new BooleanObject(brush.ExtendStart), new BooleanObject(brush.ExtendEnd)];
         return new DictionaryObject
         {
             ["ShadingType"] = new NumberObject(ShadingType(brush)),
             ["ColorSpace"] = new NameObject("DeviceRGB"),
             ["Coords"] = Coords(brush),
             ["Function"] = BuildFunction(brush.Stops),
-            ["Extend"] = extend,
+            ["Extend"] = BothEndsExtended(),
         };
     }
 

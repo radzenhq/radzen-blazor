@@ -62,7 +62,7 @@ internal static class LoadedAppearancePainter
         var scaleY = target.Height / bbox.Height;
         page.Content.Add(new XObjectContent(name)
         {
-            Transform = Matrix.FromComponents(
+            Transform = Matrix.FromRawComponents(
                 scaleX, 0, 0, scaleY, target.Left - bbox.Left * scaleX, target.Bottom - bbox.Bottom * scaleY),
             Opacity = opacity < 1 ? opacity : null,
         });

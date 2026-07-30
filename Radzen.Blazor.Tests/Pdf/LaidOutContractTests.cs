@@ -177,7 +177,7 @@ public class LaidOutContractTests
         string postScriptName)
     {
         var document = new Document();
-        var run = Page(document).Blocks.AddParagraph("Text").Inlines[0];
+        var run = (Run)Page(document).Blocks.AddParagraph("Text").Inlines[0];
         run.Font.Family = family;
         run.Font.Bold = bold;
         run.Font.Italic = italic;
@@ -194,7 +194,7 @@ public class LaidOutContractTests
     public void CapturedBuiltInAdjustment_IsInPointsUntilPdfEmission()
     {
         var document = new Document { Fonts = { EnableKerning = true } };
-        var run = Page(document).Blocks.AddParagraph("AV").Inlines[0];
+        var run = (Run)Page(document).Blocks.AddParagraph("AV").Inlines[0];
         run.Font.Family = "Helvetica";
         run.Font.Size = 11.3;
 
@@ -577,8 +577,9 @@ public class LaidOutContractTests
             LateFamily,
             new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
 
+        var generated = DocumentGenerator.Generate(settings, laidOut);
         var capturedError = Assert.Throws<NotSupportedException>(
-            () => DocumentGenerator.Generate(settings, laidOut));
+            () => generated.ToArray());
         Assert.Contains(
             "is not one of the base-14 families",
             capturedError.Message,
@@ -671,8 +672,6 @@ public class LaidOutContractTests
         run.Font.Color = Color.FromRgb(200, 201, 202);
         image.Opacity = 0.1;
         image.Interpolate = false;
-        gradient.ExtendStart = false;
-        gradient.ExtendEnd = false;
         shadow.Color = Color.FromArgb(20, 9, 8, 7);
         shadow.BlurRadius = Unit.FromPoint(20);
         shadow.OffsetX = Unit.FromPoint(12);

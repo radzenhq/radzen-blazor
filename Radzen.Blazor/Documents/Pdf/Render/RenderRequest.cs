@@ -26,7 +26,7 @@ internal sealed class RenderRequest
 
     public RoleMap RoleMap { get; }
 
-    public Objects.Encryption.EncryptionOptions? Encryption { get; }
+    public EncryptionOptions? Encryption { get; }
 
     public bool CompressOutput { get; }
 

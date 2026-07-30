@@ -1,5 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 using System;
 
 namespace Radzen.Documents.Pdf.Write;
@@ -32,7 +32,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
         ValidateInspectable();
 
-        if (document.IsPdfUa && document.Structure is null && !document.HasPreservableStructureGraph)
+        if (document.IsPdfUa && document.EmissionPlan?.Structure is null && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
                 "PDF/UA requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer.");
@@ -78,7 +78,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
             return;
         }
 
-        if (document.Structure is { } structure)
+        if (document.EmissionPlan?.Structure is { } structure)
         {
             ValidateFigureAltText(structure);
         }
@@ -99,7 +99,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
             foreach (var link in generated.Links)
             {
-                if (link.Element is null)
+                if (link.StructureElementId is null)
                 {
                     throw new InvalidOperationException(
                         $"{Label} requires every link annotation to be referenced from the structure tree, but a hyperlink "
@@ -110,7 +110,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
         }
     }
 
-    private void ValidateFigureAltText(StructureElement element)
+    private void ValidateFigureAltText(StructureElementSnapshot element)
     {
         if (element.Type == "Figure" && element.Alt is null && element.ActualText is null)
         {
@@ -137,7 +137,9 @@ internal sealed class ConformanceWriter(PortableDocument document)
                 "PDF/A forbids encryption; clear DocumentRenderer.Encryption or use PdfAConformance.None.");
         }
 
-        if (IsLevelA(document.Conformance) && document.Structure is null && !document.HasPreservableStructureGraph)
+        if (IsLevelA(document.Conformance)
+            && document.EmissionPlan?.Structure is null
+            && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
                 $"{document.Conformance} requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer or use a Level B conformance.");
@@ -169,7 +171,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
             foreach (var image in generated.Images)
             {
-                if (image.Image.Image.Dictionary.TryGetValue("ColorSpace", out var space)
+                if (image.Image.TryGetValue("ColorSpace", out var space)
                     && space is NameObject { Value: "DeviceCMYK" })
                 {
                     throw new InvalidOperationException(

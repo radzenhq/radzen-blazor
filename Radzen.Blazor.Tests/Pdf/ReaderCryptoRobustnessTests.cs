@@ -4,11 +4,10 @@ using System;
 using System.Text;
 using Radzen.Documents.Crypto;
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Objects.Encryption;
+using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 
-using Radzen.Documents.Pdf;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // Revision 6 passwords are UTF-8 (ISO 32000-2 7.6.4.3.3).

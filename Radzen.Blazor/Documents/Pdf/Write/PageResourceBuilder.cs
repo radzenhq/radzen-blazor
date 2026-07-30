@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 namespace Radzen.Documents.Pdf.Write;
 
 internal sealed class ResourceDictionaryBuilder
@@ -29,9 +29,9 @@ internal static class PageResourceBuilder
 {
     public static DictionaryObject? BuildGeneratedResources(
         DocumentWriter writer,
-        GeneratedPage page,
-        Dictionary<GeneratedFont, DocumentObject> fontRefs,
-        Dictionary<GeneratedImage, ReferenceObject> imageRefs,
+        PageEmissionPlan page,
+        Dictionary<EmissionFont, DocumentObject> fontRefs,
+        Dictionary<EmissionImage, ReferenceObject> imageRefs,
         IReadOnlySet<string>? referencedKeys = null)
     {
         var resources = new ResourceDictionaryBuilder();
@@ -87,7 +87,7 @@ internal static class PageResourceBuilder
                 continue;
             }
 
-            resources.Add("Pattern", pattern.Key, writer.Add(pattern.Pattern));
+            resources.Add("Pattern", pattern.Key, writer.Add(pattern.Pattern.CreateDictionary()));
         }
 
         return resources.Build();
@@ -133,7 +133,10 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    private static DocumentObject ResolveFont(DocumentWriter writer, GeneratedFont font, Dictionary<GeneratedFont, DocumentObject> cache)
+    private static DocumentObject ResolveFont(
+        DocumentWriter writer,
+        EmissionFont font,
+        Dictionary<EmissionFont, DocumentObject> cache)
     {
         if (cache.TryGetValue(font, out var existing))
         {
@@ -154,26 +157,25 @@ internal static class PageResourceBuilder
         return reference;
     }
 
-    private static ReferenceObject ResolveImage(DocumentWriter writer, GeneratedImage image, Dictionary<GeneratedImage, ReferenceObject> cache)
+    private static ReferenceObject ResolveImage(
+        DocumentWriter writer,
+        EmissionImage image,
+        Dictionary<EmissionImage, ReferenceObject> cache)
     {
         if (cache.TryGetValue(image, out var existing))
         {
             return existing;
         }
 
-        var reference = WriteImage(writer, image.Image);
-        cache[image] = reference;
-        return reference;
-    }
-
-    private static ReferenceObject WriteImage(IObjectWriter writer, ImageXObject image)
-    {
+        var stream = image.Image.CreateStream();
         if (image.SoftMask is { } mask)
         {
-            image.Image.Dictionary["SMask"] = writer.Add(mask);
+            stream.Dictionary["SMask"] = writer.Add(mask.CreateStream());
         }
 
-        return writer.Add(image.Image);
+        var reference = writer.Add(stream);
+        cache[image] = reference;
+        return reference;
     }
 
     public static DictionaryObject? OverlayResources(DocumentWriter writer, DictionaryObject? resources, ContentResourceManifest manifest)
@@ -205,7 +207,7 @@ internal static class PageResourceBuilder
     public static DictionaryObject? BuildResources(
         IObjectWriter? writer,
         ContentResourceManifest manifest,
-        Dictionary<ImageXObject, ReferenceObject>? sharedImages = null)
+        Dictionary<object, ReferenceObject>? sharedImages = null)
     {
         var resources = new ResourceDictionaryBuilder();
 
@@ -214,7 +216,7 @@ internal static class PageResourceBuilder
             resources.Add("Font", key, Base14FontDictionary(baseFont));
         }
 
-        foreach (var (key, image) in manifest.Images)
+        foreach (var (key, image) in manifest.ImagesForWriting)
         {
             resources.Add("XObject", key, ResolveManifestImage(writer!, image, sharedImages));
         }
@@ -234,16 +236,22 @@ internal static class PageResourceBuilder
 
     private static ReferenceObject ResolveManifestImage(
         IObjectWriter writer,
-        ImageXObject image,
-        Dictionary<ImageXObject, ReferenceObject>? sharedImages)
+        EmissionImageResource image,
+        Dictionary<object, ReferenceObject>? sharedImages)
     {
-        if (sharedImages is not null && sharedImages.TryGetValue(image, out var existing))
+        if (sharedImages is not null && sharedImages.TryGetValue(image.Identity, out var existing))
         {
             return existing;
         }
 
-        var reference = WriteImage(writer, image);
-        sharedImages?.TryAdd(image, reference);
+        var stream = image.Image.CreateStream();
+        if (image.SoftMask is { } mask)
+        {
+            stream.Dictionary["SMask"] = writer.Add(mask.CreateStream());
+        }
+
+        var reference = writer.Add(stream);
+        sharedImages?.TryAdd(image.Identity, reference);
         return reference;
     }
 

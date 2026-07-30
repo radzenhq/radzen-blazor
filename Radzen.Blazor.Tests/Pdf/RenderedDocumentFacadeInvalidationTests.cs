@@ -1,11 +1,14 @@
 #nullable enable
 using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects.Encryption;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Write;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -22,6 +25,39 @@ public class RenderedDocumentFacadeInvalidationTests
 
     private static string Save(PortableDocument document)
         => Encoding.Latin1.GetString(document.ToArray());
+
+    private static PortableDocument LoadedTaggedWithPreservationGraphCached()
+    {
+        var authored = Authored();
+        authored.Info.Title = "Tagged facade invalidation";
+        authored.Language = "en";
+
+        var rendered = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.Render(authored);
+        using var stream = new MemoryStream(rendered.ToArray());
+        var loaded = PortableDocument.LoadFromStream(stream);
+
+        Assert.Null(loaded.EmissionPlan);
+        Assert.True(loaded.HasPreservableStructureGraph);
+        Assert.True(loaded.Loaded!.SourceCatalog!.ContainsKey("MarkInfo"));
+
+        loaded.MaterializedGraph = new DocumentMaterializer(loaded).Materialize();
+        return loaded;
+    }
+
+    private static void AssertMarkInfoPrecedesStructTreeRoot(byte[] bytes)
+    {
+        var reader = DocumentReader.Parse(bytes);
+        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+        var keys = catalog.Keys.ToList();
+        var markInfo = keys.IndexOf("MarkInfo");
+        var structTreeRoot = keys.IndexOf("StructTreeRoot");
+
+        Assert.True(markInfo >= 0, "preserved catalog has /MarkInfo");
+        Assert.True(structTreeRoot >= 0, "preserved catalog has /StructTreeRoot");
+        Assert.True(
+            markInfo < structTreeRoot,
+            $"/MarkInfo must precede /StructTreeRoot in the preserved catalog; actual keys: /{string.Join(" /", catalog.Keys)}");
+    }
 
     [Fact]
     public void EncryptionSetAfterRender_ReachesTheSavedBytes()
@@ -237,6 +273,20 @@ public class RenderedDocumentFacadeInvalidationTests
     }
 
     [Fact]
+    public void UnadoptedEmissionPlan_WithStructuredLink_MaterializesRepeatably()
+    {
+        var model = Authored();
+        var paragraph = new Paragraph();
+        paragraph.Inlines.Add("Structured link").Link = "https://radzen.com/emission-plan";
+        model.Sections[0].Blocks.Add(paragraph);
+        var laidOut = DocumentLayouter.Layout(model);
+        var request = RenderRequest.From(new DocumentRenderer());
+        var generated = DocumentGenerator.Generate(request, laidOut);
+
+        Assert.Equal(generated.ToArray(), generated.ToArray());
+    }
+
+    [Fact]
     public void RenderTwice_ProducesTwoIndependentDocuments()
     {
         var renderer = new DocumentRenderer();
@@ -249,5 +299,61 @@ public class RenderedDocumentFacadeInvalidationTests
         Assert.Equal(1, first.Pages.Count);
         Assert.Equal(1, second.Pages.Count);
         Assert.Equal(first.ToArray(), second.ToArray());
+    }
+
+    [Fact]
+    public void ReadingEveryDocumentFacade_RebuildsByteIdentically_AndLaterMutationStillSaves()
+    {
+        var rendered = new DocumentRenderer().Render(Authored());
+        var first = rendered.ToArray();
+
+        _ = rendered.Info;
+        _ = rendered.Pages;
+        _ = rendered.AcroForm;
+        _ = rendered.FormFields;
+        _ = rendered.Encryption;
+        _ = rendered.CompressOutput;
+        _ = rendered.IncludeDocumentId;
+        _ = rendered.ViewerPreferences;
+        _ = rendered.PageLabels;
+        _ = rendered.Outline;
+        _ = rendered.Attachments;
+        _ = rendered.Xmp;
+
+        Assert.Equal(first, rendered.ToArray());
+
+        rendered.Info.Title = "Facade mutation marker";
+        var mutated = rendered.ToArray();
+        Assert.NotEqual(first, mutated);
+        Assert.Contains("Facade mutation marker", Encoding.Latin1.GetString(mutated), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReadingEveryDocumentFacade_OnLoadedTaggedDocument_RebuildsByteIdentically_AndLaterMutationStillSaves()
+    {
+        var loaded = LoadedTaggedWithPreservationGraphCached();
+        var first = loaded.ToArray();
+
+        _ = loaded.Info;
+        _ = loaded.Pages;
+        _ = loaded.AcroForm;
+        _ = loaded.FormFields;
+        _ = loaded.Encryption;
+        _ = loaded.CompressOutput;
+        _ = loaded.IncludeDocumentId;
+        _ = loaded.ViewerPreferences;
+        _ = loaded.PageLabels;
+        _ = loaded.Outline;
+        _ = loaded.Attachments;
+        _ = loaded.Xmp;
+
+        var rebuilt = loaded.ToArray();
+        Assert.Equal(first, rebuilt);
+        AssertMarkInfoPrecedesStructTreeRoot(rebuilt);
+
+        loaded.Info.Title = "Tagged facade mutation marker";
+        var mutated = loaded.ToArray();
+        Assert.NotEqual(first, mutated);
+        Assert.Contains("Tagged facade mutation marker", Encoding.Latin1.GetString(mutated), StringComparison.Ordinal);
     }
 }

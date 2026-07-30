@@ -38,13 +38,15 @@ public class BoxContentEmitterByteNeutralityTests
         var page = field.Inlines.Add("Page ");
         page.Font.Family = BuildTestSupport.Latin;
         page.Font.Size = 10;
-        var number = field.Inlines.Add(new PageNumberField());
+        var number = new PageNumberField();
+        field.Inlines.Add(number);
         number.Font.Family = BuildTestSupport.Latin;
         number.Font.Size = 10;
         var of = field.Inlines.Add(" of ");
         of.Font.Family = BuildTestSupport.Latin;
         of.Font.Size = 10;
-        var count = field.Inlines.Add(new PageCountField());
+        var count = new PageCountField();
+        field.Inlines.Add(count);
         count.Font.Family = BuildTestSupport.Latin;
         count.Font.Size = 10;
 

@@ -7,9 +7,9 @@ namespace Radzen.Blazor.Documents.Tests;
 public class BorderPublicContractTests
 {
     [Fact]
-    public void StandaloneBorderDefaultsToZeroBlackAndNone()
+    public void UnsetEdgeDefaultsToZeroBlackAndNone()
     {
-        var border = new Border();
+        var border = new Borders().Top;
 
         Assert.Equal(Unit.Parse("0pt"), border.Width);
         Assert.Equal(Color.Black, border.Color);
@@ -19,7 +19,8 @@ public class BorderPublicContractTests
     [Fact]
     public void WidthIsAUnit()
     {
-        var border = new Border { Width = "2.54cm" };
+        var border = new Borders().Top;
+        border.Width = "2.54cm";
 
         Assert.Equal(Unit.Parse("1in"), border.Width);
     }
@@ -95,5 +96,6 @@ public class BorderPublicContractTests
         Assert.Null(typeof(Borders).GetMethod("AcceptChanges"));
         Assert.Null(typeof(Border).GetProperty("IsModified"));
         Assert.Null(typeof(Border).GetMethod("AcceptChanges"));
+        Assert.Empty(typeof(Border).GetConstructors());
     }
 }

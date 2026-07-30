@@ -14,7 +14,7 @@ public class ParagraphTests
         p.Inlines.Add("b");
         p.Text = "only";
         Assert.Single(p.Inlines);
-        Assert.Equal("only", p.Inlines[0].Text);
+        Assert.Equal("only", Assert.IsType<Run>(p.Inlines[0]).Text);
         Assert.Equal("only", p.Text);
     }
 

@@ -159,7 +159,7 @@ internal static class FieldAppearances
 
     private static DictionaryObject? BuildResources(ContentResourceManifest manifest)
     {
-        if (manifest.Images.Count > 0 || manifest.Patterns.Count > 0)
+        if (manifest.ImagesForWriting.Count > 0 || manifest.Patterns.Count > 0)
         {
             throw new NotSupportedException(
                 "A field appearance stream cannot reference an image or shading-pattern resource.");

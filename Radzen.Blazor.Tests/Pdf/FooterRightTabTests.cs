@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
@@ -32,20 +31,15 @@ public class FooterRightTabTests
         return (document, section);
     }
 
-    private static void EnableRightTab(Paragraph paragraph)
-    {
-        var property = typeof(Paragraph).GetProperty("RightTabStop", BindingFlags.Public | BindingFlags.Instance);
-        Assert.True(
-            property is not null,
-            "Paragraph must expose a public RightTabStop property that makes the last '\\t' on a line advance to a right-aligned tab stop at the content-box right edge");
-        Assert.Equal(typeof(bool), property!.PropertyType);
-        property.SetValue(paragraph, true);
-    }
+    private const double ContentWidth = PageWidth - (2 * Margin);
 
-    private static Run Sized(Run run)
+    private static void RightTabAtContentEdge(Paragraph paragraph)
+        => paragraph.TabStops.Add(Unit.FromPoint(ContentWidth), TabAlignment.Right);
+
+    private static Inline Sized(Inline inline)
     {
-        run.Font.Size = FontSize;
-        return run;
+        ((TextInline)inline).Font.Size = FontSize;
+        return inline;
     }
 
     private static double Measure(string text)
@@ -69,12 +63,12 @@ public class FooterRightTabTests
         => TextRuns(BuildTestSupport.Read(document), 0);
 
     [Fact]
-    public void RightTabStop_TextAfterTab_IsFlushRight_OnTheSameBaseline()
+    public void RightTabStopAtTheContentEdge_TextAfterTab_IsFlushRight_OnTheSameBaseline()
     {
         var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         Sized(paragraph.Inlines.Add("Left\tRight"));
-        EnableRightTab(paragraph);
+        RightTabAtContentEdge(paragraph);
 
         var runs = FirstPageRuns(document);
         var left = Assert.Single(runs, r => r.Text == "Left");
@@ -91,12 +85,13 @@ public class FooterRightTabTests
     }
 
     [Fact]
-    public void RightTabStop_EarlierTabs_KeepLeftTabBehavior()
+    public void RightTabStopAtTheContentEdge_EarlierTabs_UseTheirOwnLeftStop()
     {
         var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
         Sized(paragraph.Inlines.Add("ID:\tAAA\tRight"));
-        EnableRightTab(paragraph);
+        paragraph.TabStops.Add(Unit.FromPoint(48), TabAlignment.Left);
+        RightTabAtContentEdge(paragraph);
 
         var runs = FirstPageRuns(document);
         var label = Assert.Single(runs, r => r.Text == "ID:");
@@ -108,7 +103,7 @@ public class FooterRightTabTests
 
         var advance = middle.X - label.X;
         Assert.True(advance >= 30 && advance <= 80,
-            $"a tab before the last one must keep the default left tab stop, advanced {advance:F2}pt");
+            $"a tab before the last one must land on its own left stop, advanced {advance:F2}pt");
 
         var rightEdge = right.X + Measure("Right");
         Assert.True(Math.Abs(rightEdge - (PageWidth - Margin)) <= EdgeTol,
@@ -116,7 +111,7 @@ public class FooterRightTabTests
     }
 
     [Fact]
-    public void Paragraph_WithoutOptIn_KeepsLeftTabStops()
+    public void Paragraph_WithoutTabStops_KeepsTheDefaultLeftTabGrid()
     {
         var (document, section) = Author();
         var paragraph = section.Blocks.AddParagraph();
@@ -128,7 +123,7 @@ public class FooterRightTabTests
 
         var advance = right.X - left.X;
         Assert.True(advance >= 30 && advance <= 80,
-            $"without the opt-in a tab must keep the default left tab stop, advanced {advance:F2}pt");
+            $"without explicit stops a tab must keep the default left tab grid, advanced {advance:F2}pt");
     }
 
     private static Document TwoPagesWithRightTabFooter()
@@ -140,7 +135,7 @@ public class FooterRightTabTests
         Sized(footer.Inlines.Add(new PageNumberField()));
         Sized(footer.Inlines.Add(" of "));
         Sized(footer.Inlines.Add(new PageCountField()));
-        EnableRightTab(footer);
+        RightTabAtContentEdge(footer);
 
         section.Blocks.AddParagraph("body one");
         section.Blocks.AddPageBreak();

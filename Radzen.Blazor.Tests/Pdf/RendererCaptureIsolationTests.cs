@@ -1,7 +1,6 @@
 #nullable enable
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects.Encryption;
 using Xunit;
 using Radzen.Documents;
 
@@ -278,8 +277,9 @@ public class RendererCaptureIsolationTests
             new System.IO.MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf")));
 
         var paragraph = (Paragraph)model.Sections[0].Blocks[0];
-        paragraph.Inlines[0].Text = "Mutated model body";
-        paragraph.Inlines[0].Font.Family = "Helvetica";
+        var first = (Run)paragraph.Inlines[0];
+        first.Text = "Mutated model body";
+        first.Font.Family = "Helvetica";
         model.Sections[0].Blocks.Add(new Paragraph { Text = "Added after render" });
         model.Sections.Add().Blocks.Add(new Paragraph { Text = "Added section after render" });
     }

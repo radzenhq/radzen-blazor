@@ -29,7 +29,7 @@ public class TabStopTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = TwoRuns("Left\tRight");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(100), TabAlignment.Left);
+        paragraph.TabStops.Add(Unit.FromPoint(100), TabAlignment.Left);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
 
@@ -42,7 +42,7 @@ public class TabStopTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = TwoRuns("Left\tRight");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(200), TabAlignment.Right);
+        paragraph.TabStops.Add(Unit.FromPoint(200), TabAlignment.Right);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var right = Fragment(lines, "Right");
@@ -56,7 +56,7 @@ public class TabStopTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = TwoRuns("Left\tRight");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(150), TabAlignment.Center);
+        paragraph.TabStops.Add(Unit.FromPoint(150), TabAlignment.Center);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var right = Fragment(lines, "Right");
@@ -69,7 +69,7 @@ public class TabStopTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = TwoRuns("Item\t12.34");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(120), TabAlignment.Decimal);
+        paragraph.TabStops.Add(Unit.FromPoint(120), TabAlignment.Decimal);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var value = Fragment(lines, "12.34");
@@ -82,8 +82,8 @@ public class TabStopTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = TwoRuns("LongishLabel\tX");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(10), TabAlignment.Left);
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(140), TabAlignment.Left);
+        paragraph.TabStops.Add(Unit.FromPoint(10), TabAlignment.Left);
+        paragraph.TabStops.Add(Unit.FromPoint(140), TabAlignment.Left);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
 

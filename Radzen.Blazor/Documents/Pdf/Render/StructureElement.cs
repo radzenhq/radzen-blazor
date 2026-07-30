@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
@@ -11,15 +10,6 @@ internal readonly struct StructureKid
     public int PageIndex { get; init; }
 
     public int Mcid { get; init; }
-}
-
-internal readonly struct StructureAnnotation
-{
-    public required int PageIndex { get; init; }
-
-    public required DictionaryObject Annotation { get; init; }
-
-    public required ReferenceObject Reference { get; init; }
 }
 
 internal sealed class StructureElement : IStructureTag
@@ -41,8 +31,6 @@ internal sealed class StructureElement : IStructureTag
     public List<(int PageIndex, int Mcid)> Marks { get; } = [];
 
     public List<StructureKid> Kids { get; } = [];
-
-    public List<StructureAnnotation> Annotations { get; } = [];
 
     public int KidCursor { get; set; }
 

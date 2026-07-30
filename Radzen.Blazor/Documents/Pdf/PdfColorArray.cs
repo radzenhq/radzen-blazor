@@ -1,6 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 
-namespace Radzen.Documents.Pdf.Write;
+namespace Radzen.Documents.Pdf;
 
 internal static class PdfColorArray
 {

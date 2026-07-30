@@ -1,23 +1,23 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 
 namespace Radzen.Documents.Pdf.Write;
 
 internal static class TransparencyGroupWriter
 {
-    public static StreamObject BuildForm(DocumentWriter writer, GeneratedTransparencyGroup group)
+    public static StreamObject BuildForm(DocumentWriter writer, EmissionTransparencyGroup group)
     {
-        var stream = FlateFilter.EncodeStream(group.Content);
+        var stream = FlateFilter.EncodeStream(group.Content.Span);
         var dict = stream.Dictionary;
         FormXObjectShell.ApplyHeader(
             dict,
             new ArrayObject
             {
-                new NumberObject(group.BBox[0]),
-                new NumberObject(group.BBox[1]),
-                new NumberObject(group.BBox[2]),
-                new NumberObject(group.BBox[3]),
+                new NumberObject(group.BoundingBox[0]),
+                new NumberObject(group.BoundingBox[1]),
+                new NumberObject(group.BoundingBox[2]),
+                new NumberObject(group.BoundingBox[3]),
             },
             formType: true);
 
@@ -38,12 +38,12 @@ internal static class TransparencyGroupWriter
         }
 
         dict["Group"] = groupDict;
-        if (group.XObjects.Count > 0)
+        if (group.XObjects.Length > 0)
         {
             var xobjects = new DictionaryObject();
             foreach (var (name, xobject) in group.XObjects)
             {
-                xobjects[name] = writer.Add(xobject);
+                xobjects[name] = writer.Add(xobject.CreateStream());
             }
 
             dict["Resources"] = new DictionaryObject { ["XObject"] = xobjects };

@@ -33,7 +33,7 @@ public class TabLeaderTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Left\tRight");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(100), TabAlignment.Left, leader: '.');
+        paragraph.TabStops.Add(Unit.FromPoint(100), TabAlignment.Left, leader: '.');
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();
@@ -52,7 +52,7 @@ public class TabLeaderTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Left\tRight");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(100), TabAlignment.Left);
+        paragraph.TabStops.Add(Unit.FromPoint(100), TabAlignment.Left);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();
@@ -66,7 +66,7 @@ public class TabLeaderTests
     {
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Chapter\t5");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(200), TabAlignment.Right, leader: '.');
+        paragraph.TabStops.Add(Unit.FromPoint(200), TabAlignment.Right, leader: '.');
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();

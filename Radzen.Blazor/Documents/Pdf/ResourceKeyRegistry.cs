@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace Radzen.Documents.Pdf.Write;
+namespace Radzen.Documents.Pdf;
 
 internal sealed class ResourceKeyRegistry<TIdentity, TValue>(
     string prefix,

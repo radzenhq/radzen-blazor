@@ -166,7 +166,7 @@ public class StyleSystemPublicContractTests
         Assert.Equal(default, format.LeftIndent);
         Assert.False(format.KeepTogether);
         Assert.False(format.KeepWithNext);
-        Assert.Equal(0, format.HeadingLevel);
+        Assert.Null(format.HeadingLevel);
     }
 
     [Fact]

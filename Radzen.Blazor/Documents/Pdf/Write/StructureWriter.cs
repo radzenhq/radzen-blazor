@@ -1,5 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 using System.Collections.Generic;
 using Radzen.Documents.Geometry;
 
@@ -9,9 +9,10 @@ internal static class StructureWriter
 {
     public static ReferenceObject WriteStructureTree(
         DocumentWriter writer,
-        StructureElement structure,
+        StructureElementSnapshot structure,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        RoleMap roleMap)
+        IReadOnlyList<KeyValuePair<string, string>> roleMap,
+        IReadOnlyList<AnnotationElementJoin> annotationJoins)
     {
         var root = new DictionaryObject { ["Type"] = new NameObject("StructTreeRoot") };
         var rootRef = writer.Add(root);
@@ -19,7 +20,7 @@ internal static class StructureWriter
         if (roleMap.Count > 0)
         {
             var map = new DictionaryObject();
-            foreach (var (role, structureType) in roleMap.Entries)
+            foreach (var (role, structureType) in roleMap)
             {
                 map[role] = new NameObject(structureType);
             }
@@ -28,8 +29,27 @@ internal static class StructureWriter
         }
 
         var parents = new Dictionary<int, List<DocumentObject>>();
+        var joinsByElement = new Dictionary<int, List<AnnotationElementJoin>>();
+        foreach (var join in annotationJoins)
+        {
+            if (!joinsByElement.TryGetValue(join.StructureElementId, out var joins))
+            {
+                joins = [];
+                joinsByElement.Add(join.StructureElementId, joins);
+            }
+
+            joins.Add(join);
+        }
+
         var annotationKey = pageNodes.Count;
-        root["K"] = WriteStructureElement(writer, structure, rootRef, pageNodes, parents, ref annotationKey);
+        root["K"] = WriteStructureElement(
+            writer,
+            structure,
+            rootRef,
+            pageNodes,
+            parents,
+            joinsByElement,
+            ref annotationKey);
 
         var keys = new List<int>(parents.Keys);
         keys.Sort();
@@ -74,7 +94,7 @@ internal static class StructureWriter
         };
 
     // ISO 32000-1 Table 349: RowSpan and ColSpan default to 1 and are written only when the cell spans further.
-    private static DictionaryObject? TableAttributes(StructureElement element)
+    private static DictionaryObject? TableAttributes(StructureElementSnapshot element)
     {
         var scope = ScopeName(element.HeaderScope);
         if (scope is null && element.RowSpan <= 1 && element.ColumnSpan <= 1)
@@ -103,10 +123,11 @@ internal static class StructureWriter
 
     private static ReferenceObject WriteStructureElement(
         DocumentWriter writer,
-        StructureElement element,
+        StructureElementSnapshot element,
         ReferenceObject parentRef,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
         Dictionary<int, List<DocumentObject>> parents,
+        IReadOnlyDictionary<int, List<AnnotationElementJoin>> joinsByElement,
         ref int annotationKey)
     {
         var dictionary = new DictionaryObject
@@ -134,7 +155,7 @@ internal static class StructureWriter
         var reference = writer.Add(dictionary);
 
         var kids = new ArrayObject();
-        var firstPage = element.Marks.Count > 0 ? element.Marks[0].PageIndex : -1;
+        var firstPage = element.Marks.Length > 0 ? element.Marks[0].PageIndex : -1;
         if (firstPage >= 0)
         {
             dictionary["Pg"] = pageNodes[firstPage].Reference;
@@ -144,7 +165,14 @@ internal static class StructureWriter
         {
             if (kid.Child is { } child)
             {
-                kids.Add(WriteStructureElement(writer, child, reference, pageNodes, parents, ref annotationKey));
+                kids.Add(WriteStructureElement(
+                    writer,
+                    child,
+                    reference,
+                    pageNodes,
+                    parents,
+                    joinsByElement,
+                    ref annotationKey));
                 continue;
             }
 
@@ -178,23 +206,26 @@ internal static class StructureWriter
 
         // ISO 32000-1 14.7.4.3: an annotation joins the structure tree through an object reference (OBJR)
         // kid and points back into the parent tree through its own /StructParent key.
-        foreach (var annotation in element.Annotations)
+        if (joinsByElement.TryGetValue(element.Id, out var annotationJoins))
         {
-            kids.Add(new DictionaryObject
+            foreach (var annotation in annotationJoins)
             {
-                ["Type"] = new NameObject("OBJR"),
-                ["Pg"] = pageNodes[annotation.PageIndex].Reference,
-                ["Obj"] = annotation.Reference,
-            });
+                kids.Add(new DictionaryObject
+                {
+                    ["Type"] = new NameObject("OBJR"),
+                    ["Pg"] = pageNodes[annotation.PageIndex].Reference,
+                    ["Obj"] = annotation.Reference,
+                });
 
-            annotation.Annotation["StructParent"] = new NumberObject(annotationKey);
-            parents[annotationKey] = [reference];
-            annotationKey++;
+                annotation.Annotation["StructParent"] = new NumberObject(annotationKey);
+                parents[annotationKey] = [reference];
+                annotationKey++;
 
-            if (firstPage < 0)
-            {
-                firstPage = annotation.PageIndex;
-                dictionary["Pg"] = pageNodes[annotation.PageIndex].Reference;
+                if (firstPage < 0)
+                {
+                    firstPage = annotation.PageIndex;
+                    dictionary["Pg"] = pageNodes[annotation.PageIndex].Reference;
+                }
             }
         }
 

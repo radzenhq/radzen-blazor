@@ -32,28 +32,51 @@ public class WatermarkFontCapabilityTests
     }
 
     [Fact]
-    public void BuiltDocumentRejectsRegisteredWatermarkFont()
+    public void BuiltDocumentRejectsRegisteredWatermarkFontAtTheCall()
     {
         var document = Builder();
         document.Sections.Add().Blocks.Add(new Paragraph());
         var pdf = new DocumentRenderer().Render(document);
 
-        pdf.AddWatermark(Registered());
+        var error = Assert.Throws<NotSupportedException>(() => pdf.AddWatermark(Registered()));
 
-        var error = Assert.Throws<NotSupportedException>(() => pdf.ToArray());
         Assert.Contains("cannot embed", error.Message, StringComparison.Ordinal);
+        Assert.Null(Record.Exception(() => pdf.ToArray()));
     }
 
     [Fact]
-    public void LoadedDocumentRejectsRegisteredWatermarkFont()
+    public void LoadedDocumentRejectsRegisteredWatermarkFontAtTheCall()
     {
         var document = Builder();
         document.Sections.Add().Blocks.Add(new Paragraph());
         using var stream = new MemoryStream(new DocumentRenderer().Render(document).ToArray());
         var pdf = PortableDocument.LoadFromStream(stream);
 
-        pdf.AddWatermark(Registered());
+        Assert.Throws<NotSupportedException>(() => pdf.AddWatermark(Registered()));
+    }
 
-        Assert.Throws<NotSupportedException>(() => pdf.ToArray());
+    [Fact]
+    public void BuiltDocumentAcceptsABase14WatermarkFont()
+    {
+        var document = Builder();
+        document.Sections.Add().Blocks.Add(new Paragraph());
+        var pdf = new DocumentRenderer().Render(document);
+
+        pdf.AddWatermark(new Watermark { Text = "DRAFT", Font = { Family = "Helvetica", Size = 60 } });
+
+        Assert.Null(Record.Exception(() => pdf.ToArray()));
+    }
+
+    [Fact]
+    public void ImageOnlyWatermarkIsAcceptedWhateverTheFont()
+    {
+        var document = Builder();
+        document.Sections.Add().Blocks.Add(new Paragraph());
+        var pdf = new DocumentRenderer().Render(document);
+
+        var watermark = new Watermark { Font = { Family = "Liberation Sans" } };
+        watermark.SetImage(new MemoryStream(ImageTestHelpers.OneBitGrayPng(4, 4)));
+
+        Assert.Null(Record.Exception(() => pdf.AddWatermark(watermark)));
     }
 }

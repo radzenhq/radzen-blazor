@@ -96,7 +96,7 @@ public class LineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var words = Words;
         var paragraph = LineLayoutSupport.SingleRun(Sentence);
-        var run = paragraph.Inlines[0];
+        var run = (Run)paragraph.Inlines[0];
 
         var widths = words.Select(w => LineLayoutSupport.WordWidth(fonts, w, 12)).ToArray();
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
