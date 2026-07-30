@@ -13,9 +13,9 @@ public class FieldResolverRunPropertiesTests
     public void PageNumberFieldKeepsEveryRunPropertyWhenResolved()
     {
         var paragraph = new Paragraph();
-        var field = paragraph.Inlines.Add(new PageNumberField()) as Run;
-        Assert.NotNull(field);
-        field!.Link = "https://example.test";
+        var field = new PageNumberField();
+        paragraph.Inlines.Add(field);
+        field.Link = "https://example.test";
         field.LinkToAnchor = "target";
         field.Anchor = "source";
         field.LetterSpacing = Unit.FromPoint(1.5);
@@ -50,7 +50,8 @@ public class FieldResolverRunPropertiesTests
     {
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Page ");
-        var field = paragraph.Inlines.Add(new PageNumberField());
+        var field = new PageNumberField();
+        paragraph.Inlines.Add(field);
         field.LetterSpacing = Unit.FromPoint(2);
 
         var resolver = new FieldResolver(

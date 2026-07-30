@@ -10,7 +10,7 @@ public class DocumentChangeTrackingPublicContractTests
     public void DeepFontMutationIsTrackedOnlyAtTheLeaf()
     {
         var document = new Document();
-        var run = document.Sections.Add().Blocks.AddParagraph("text").Inlines[0];
+        var run = (Run)document.Sections.Add().Blocks.AddParagraph("text").Inlines[0];
 
         run.Font.Bold = true;
 

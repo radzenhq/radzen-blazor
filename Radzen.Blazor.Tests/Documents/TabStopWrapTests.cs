@@ -22,7 +22,7 @@ public class TabStopWrapTests
         var max = ContentWidth;
         var paragraph = LineLayoutSupport.SingleRun(
             "Label:\tInternational Business Machines Corporation Global Services Division");
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(455), TabAlignment.Left);
+        paragraph.TabStops.Add(Unit.FromPoint(455), TabAlignment.Left);
 
         var lines = LineBreaker.Break(paragraph, max, fonts);
 

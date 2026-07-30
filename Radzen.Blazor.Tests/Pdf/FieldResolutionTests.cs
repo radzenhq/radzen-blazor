@@ -45,7 +45,7 @@ public class FieldResolutionTests
         return (document, section);
     }
 
-    private static void Sized(Run run) => run.Font.Size = FontSize;
+    private static void Sized(Inline inline) => ((TextInline)inline).Font.Size = FontSize;
 
     [Fact]
     public void FooterTableCell_PageNumberField_RendersActualPageNumberPerPage()

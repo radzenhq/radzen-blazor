@@ -61,18 +61,14 @@ public class MatrixNonFiniteTests
         Assert.Contains(Huge, Encoding.Latin1.GetString(saved));
     }
 
-    [Fact]
-    public void Author_NonFiniteTransform_ThrowsWhenWritten()
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(double.NegativeInfinity)]
+    public void Author_NonFiniteTransform_ThrowsAtTheFactory(double value)
     {
-        var document = new PortableDocument();
-        var page = document.Pages.Add();
-        var path = page.Content.Add(new PathContent { Fill = true, Transform = Matrix.Scale(double.NaN, 1) });
-        path.MoveTo(0, 0);
-        path.LineTo(10, 0);
-        path.Close();
-
-        var error = Assert.Throws<InvalidOperationException>(() => document.ToArray());
-
-        Assert.Equal("A PDF number cannot be NaN or infinite.", error.Message);
+        Assert.Throws<ArgumentOutOfRangeException>(() => Matrix.Scale(value, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Matrix.Translate(value, 1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => Matrix.Rotate(value));
     }
 }

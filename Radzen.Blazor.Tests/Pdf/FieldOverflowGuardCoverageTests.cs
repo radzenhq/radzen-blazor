@@ -40,7 +40,8 @@ public class FieldOverflowGuardCoverageTests
         var text = paragraph.Inlines.Add("ending on page ");
         text.Font.Family = LineLayoutSupport.Family;
         text.Font.Size = 12;
-        var field = paragraph.Inlines.Add(new PageCountField());
+        var field = new PageCountField();
+        paragraph.Inlines.Add(field);
         field.Font.Family = LineLayoutSupport.Family;
         field.Font.Size = 12;
         return paragraph;

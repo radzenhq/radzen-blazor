@@ -93,18 +93,15 @@ public class GradientShadingTests
     }
 
     [Fact]
-    public void Extend_DefaultsToBothTrue_AndHonorsOverrides()
+    public void Extend_IsAlwaysBothEnds()
     {
         var brush = new LinearGradient(0, 0, 10, 0,
             new GradientStop(0, Color.Red),
-            new GradientStop(1, Color.Blue))
-        {
-            ExtendStart = false,
-        };
+            new GradientStop(1, Color.Blue));
 
         var extend = Array(ShadingBuilder.BuildShading(brush)["Extend"]!);
 
-        Assert.False(Assert.IsType<BooleanObject>(extend[0]).Value);
+        Assert.True(Assert.IsType<BooleanObject>(extend[0]).Value);
         Assert.True(Assert.IsType<BooleanObject>(extend[1]).Value);
     }
 

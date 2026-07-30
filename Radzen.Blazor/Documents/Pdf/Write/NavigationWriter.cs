@@ -1,5 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,15 @@ internal sealed class NavigationWriter(PortableDocument document)
         DictionaryObject catalog,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
     {
-        var sorted = new SortedDictionary<string, GeneratedAnchor>(document.Anchors, StringComparer.Ordinal);
+        var sorted = new SortedDictionary<string, EmissionAnchor>(StringComparer.Ordinal);
+        if (document.EmissionPlan is { } plan)
+        {
+            foreach (var anchor in plan.Anchors)
+            {
+                sorted.Add(anchor.Key, anchor.Value);
+            }
+        }
+
         NameTree.AddCategory(writer, catalog, "Dests",
             sorted.Select(entry => (entry.Key,
                 (DocumentObject)DestinationArray(pageNodes[entry.Value.PageIndex].Reference, entry.Value.Top))));
@@ -97,9 +105,9 @@ internal sealed class NavigationWriter(PortableDocument document)
     {
         if (target.Anchor is { } anchor)
         {
-            if (!document.Anchors.ContainsKey(anchor))
+            if (document.EmissionPlan?.Anchors.ContainsKey(anchor) != true)
             {
-                throw new InvalidOperationException($"Outline target anchor '{anchor}' does not exist; set Run.Anchor on the destination run.");
+                throw new InvalidOperationException($"Outline target anchor '{anchor}' does not exist; set Inline.Anchor on the destination inline.");
             }
 
             return new StringObject(anchor);
@@ -124,10 +132,11 @@ internal sealed class NavigationWriter(PortableDocument document)
         new NumberObject(0.0),
     ];
 
-    public static ArrayObject BuildLinkAnnotations(
-        DocumentWriter writer, IReadOnlyList<GeneratedLink> links, int pageIndex)
+    public static LinkAnnotationEmission BuildLinkAnnotations(
+        DocumentWriter writer, IReadOnlyList<EmissionLink> links, int pageIndex)
     {
         var annots = new ArrayObject();
+        var joins = new List<AnnotationElementJoin>();
         foreach (var link in links)
         {
             var annotation = new DictionaryObject
@@ -145,17 +154,25 @@ internal sealed class NavigationWriter(PortableDocument document)
 
             var reference = writer.Add(annotation);
             annots.Add(reference);
-            link.Element?.Annotations.Add(new StructureAnnotation
+            if (link.StructureElementId is { } elementId)
             {
-                PageIndex = pageIndex,
-                Annotation = annotation,
-                Reference = reference,
-            });
+                joins.Add(new AnnotationElementJoin(elementId, pageIndex, annotation, reference));
+            }
         }
 
-        return annots;
+        return new LinkAnnotationEmission(annots, joins);
     }
 }
+
+internal sealed record LinkAnnotationEmission(
+    ArrayObject Annotations,
+    IReadOnlyList<AnnotationElementJoin> StructureJoins);
+
+internal readonly record struct AnnotationElementJoin(
+    int StructureElementId,
+    int PageIndex,
+    DictionaryObject Annotation,
+    ReferenceObject Reference);
 
 internal static class LinkAction
 {

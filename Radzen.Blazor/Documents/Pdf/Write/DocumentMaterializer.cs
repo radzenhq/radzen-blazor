@@ -1,6 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -45,10 +45,11 @@ internal sealed class DocumentMaterializer
         var appendImporters = new Dictionary<DocumentReader, GraphImporter>();
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
-        var fontRefs = new Dictionary<GeneratedFont, DocumentObject>();
-        var imageRefs = new Dictionary<GeneratedImage, ReferenceObject>();
-        var sharedImages = new Dictionary<ImageXObject, ReferenceObject>(ReferenceEqualityComparer.Instance);
-        var emittedContent = new Dictionary<Page, List<byte[]>>();
+        var fontRefs = new Dictionary<EmissionFont, DocumentObject>();
+        var imageRefs = new Dictionary<EmissionImage, ReferenceObject>();
+        var sharedImages = new Dictionary<object, ReferenceObject>(ReferenceEqualityComparer.Instance);
+        var emittedContent = new Dictionary<Page, List<ReadOnlyMemory<byte>>>();
+        var annotationJoins = new List<AnnotationElementJoin>();
 
         var kids = new ArrayObject();
         foreach (var page in doc.Pages)
@@ -71,15 +72,10 @@ internal sealed class DocumentMaterializer
             pageNodes.Add((page, pageNode, pageRef));
         }
 
-        if (doc.Structure is { } annotated)
-        {
-            ClearAnnotations(annotated);
-        }
-
         for (var pageIndex = 0; pageIndex < pageNodes.Count; pageIndex++)
         {
             var (page, pageNode, _) = pageNodes[pageIndex];
-            var contentBytes = new List<byte[]>();
+            var contentBytes = new List<ReadOnlyMemory<byte>>();
             emittedContent[page] = contentBytes;
             if (page.Generated is { } generated)
             {
@@ -87,14 +83,14 @@ internal sealed class DocumentMaterializer
                 Content.ContentEmissionResult? overlay = null;
                 if (page.IsEditingGenerated)
                 {
-                    var editedContent = page.CurrentContent ?? generated.Content;
+                    var editedContent = page.CurrentContent ?? generated.Content.ToArray();
                     referenced = PageResourceBuilder.ReferencedResourceKeys(editedContent);
                     pageNode["Contents"] = writer.Add(new StreamObject(editedContent));
                     contentBytes.Add(editedContent);
                 }
                 else
                 {
-                    var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content));
+                    var generatedRef = writer.Add(FlateFilter.EncodeStream(generated.Content.Span));
                     overlay = page.BuildOverlay();
                     pageNode["Contents"] = overlay is null
                         ? generatedRef
@@ -117,9 +113,11 @@ internal sealed class DocumentMaterializer
                     pageNode["Resources"] = resources;
                 }
 
-                if (generated.Links.Count > 0)
+                if (generated.Links.Length > 0)
                 {
-                    pageNode["Annots"] = NavigationWriter.BuildLinkAnnotations(writer, generated.Links, pageIndex);
+                    var links = NavigationWriter.BuildLinkAnnotations(writer, generated.Links, pageIndex);
+                    pageNode["Annots"] = links.Annotations;
+                    annotationJoins.AddRange(links.StructureJoins);
                 }
 
                 continue;
@@ -182,10 +180,15 @@ internal sealed class DocumentMaterializer
         catalog["Type"] = new NameObject("Catalog");
         catalog["Pages"] = pagesRef;
 
-        if (doc.Structure is { } structure)
+        if (doc.EmissionPlan?.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
-            catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(writer, structure, pageNodes, doc.RoleMap);
+            catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(
+                writer,
+                structure,
+                pageNodes,
+                doc.EmissionPlan.RoleMap,
+                annotationJoins);
         }
 
         var formWriter = new FormWriter(doc);
@@ -233,7 +236,7 @@ internal sealed class DocumentMaterializer
             new AttachmentWriter(doc).WriteAttachments(writer, catalog);
         }
 
-        if (doc.Anchors.Count > 0)
+        if (doc.EmissionPlan?.Anchors.Count > 0)
         {
             new NavigationWriter(doc).WriteDestinations(writer, catalog, pageNodes);
         }
@@ -300,18 +303,18 @@ internal sealed class DocumentMaterializer
         return writer.Graph;
     }
 
-    private static Objects.Encryption.EncryptionOptions? SnapshotEncryption(
-        Objects.Encryption.EncryptionOptions? source,
+    private static EncryptionOptions? SnapshotEncryption(
+        EncryptionOptions? source,
         DocumentObjectGraph graph)
         => source is null
             ? null
-            : new Objects.Encryption.EncryptionOptions
+            : new EncryptionOptions
             {
                 UserPassword = source.UserPassword,
                 OwnerPassword = source.OwnerPassword,
                 Algorithm = source.Algorithm,
                 Material = source.Material is { } material
-                    ? new Objects.Encryption.CapturedEncryptionMaterial(material, EncryptionRequestLimit(graph))
+                    ? new CapturedEncryptionMaterial(material, EncryptionRequestLimit(graph))
                     : null,
                 EncryptMetadata = source.EncryptMetadata,
                 AllowPrinting = source.AllowPrinting,
@@ -454,7 +457,7 @@ internal sealed class DocumentMaterializer
     }
 
     // ISO 32000-1 14.4: both /ID halves equal at creation time.
-    private ArrayObject BuildDocumentId(IReadOnlyDictionary<Page, List<byte[]>> emittedContent)
+    private ArrayObject BuildDocumentId(IReadOnlyDictionary<Page, List<ReadOnlyMemory<byte>>> emittedContent)
     {
         var seed = new Radzen.Documents.Crypto.Sha256Hasher();
 
@@ -487,7 +490,7 @@ internal sealed class DocumentMaterializer
             {
                 foreach (var bytes in contentBytes)
                 {
-                    seed.Append(bytes);
+                    seed.Append(bytes.Span);
                 }
             }
 
@@ -499,12 +502,4 @@ internal sealed class DocumentMaterializer
         return [new StringObject(id), new StringObject(id)];
     }
 
-    private static void ClearAnnotations(StructureElement element)
-    {
-        element.Annotations.Clear();
-        foreach (var child in element.Children)
-        {
-            ClearAnnotations(child);
-        }
-    }
 }

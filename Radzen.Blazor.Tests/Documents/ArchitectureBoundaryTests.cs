@@ -22,6 +22,10 @@ public class ArchitectureBoundaryTests
 
     private const string ComponentNamespace = "Radzen.Blazor";
 
+    private const string PdfRenderNamespace = "Radzen.Documents.Pdf.Render";
+
+    private const string PdfWriteNamespace = "Radzen.Documents.Pdf.Write";
+
     private static readonly string[] NeutralNamespaces =
     [
         "Radzen.Documents",
@@ -437,6 +441,146 @@ public class ArchitectureBoundaryTests
 
         Assert.Empty(unreadable);
         Assert.Empty(violations);
+    }
+
+    [Fact]
+    public void PdfRenderAndWriteNamespaces_ReferenceEachOtherOnlyThroughTheEmissionContract()
+    {
+        AssertNamespaceDoesNotReference(PdfRenderNamespace, PdfWriteNamespace);
+        AssertNamespaceDoesNotReference(PdfWriteNamespace, PdfRenderNamespace);
+    }
+
+    private static void AssertNamespaceDoesNotReference(string sourceNamespace, string forbiddenNamespace)
+    {
+        var violations = new List<string>();
+        var unreadable = new List<string>();
+
+        foreach (var type in TypesWithin(sourceNamespace))
+        {
+            CheckNamespaceType(violations, type, "base type", type.BaseType, forbiddenNamespace);
+            foreach (var contract in type.GetInterfaces())
+            {
+                CheckNamespaceType(violations, type, "interface", contract, forbiddenNamespace);
+            }
+
+            foreach (var field in type.GetFields(AllDeclared))
+            {
+                CheckNamespaceType(violations, type, $"field {field.Name}", field.FieldType, forbiddenNamespace);
+            }
+
+            foreach (var property in type.GetProperties(AllDeclared))
+            {
+                CheckNamespaceType(violations, type, $"property {property.Name}", property.PropertyType, forbiddenNamespace);
+            }
+
+            foreach (var method in Methods(type))
+            {
+                if (method is MethodInfo info)
+                {
+                    CheckNamespaceType(violations, type, $"return of {method.Name}", info.ReturnType, forbiddenNamespace);
+                }
+
+                foreach (var parameter in method.GetParameters())
+                {
+                    CheckNamespaceType(
+                        violations,
+                        type,
+                        $"parameter {parameter.Name} of {Describe(method)}",
+                        parameter.ParameterType,
+                        forbiddenNamespace);
+                }
+
+                MethodBody? body;
+                try
+                {
+                    body = method.GetMethodBody();
+                }
+                catch (Exception)
+                {
+                    continue;
+                }
+
+                if (body is null)
+                {
+                    continue;
+                }
+
+                foreach (var local in body.LocalVariables)
+                {
+                    CheckNamespaceType(
+                        violations,
+                        type,
+                        $"local in {Describe(method)}",
+                        local.LocalType,
+                        forbiddenNamespace);
+                }
+
+                foreach (var clause in body.ExceptionHandlingClauses)
+                {
+                    if (clause.Flags == ExceptionHandlingClauseOptions.Clause)
+                    {
+                        CheckNamespaceType(
+                            violations,
+                            type,
+                            $"catch in {Describe(method)}",
+                            clause.CatchType,
+                            forbiddenNamespace);
+                    }
+                }
+
+                foreach (var referenced in ReferencedMembers(method, body, unreadable))
+                {
+                    CheckNamespaceType(
+                        violations,
+                        type,
+                        $"body of {Describe(method)} references {referenced.Name} on",
+                        referenced.DeclaringType,
+                        forbiddenNamespace);
+
+                    if (referenced is Type referencedType)
+                    {
+                        CheckNamespaceType(
+                            violations,
+                            type,
+                            $"body of {Describe(method)} uses",
+                            referencedType,
+                            forbiddenNamespace);
+                    }
+
+                    if (referenced is MethodInfo { IsGenericMethod: true } generic)
+                    {
+                        foreach (var argument in generic.GetGenericArguments())
+                        {
+                            CheckNamespaceType(
+                                violations,
+                                type,
+                                $"body of {Describe(method)} references {referenced.Name}<> with",
+                                argument,
+                                forbiddenNamespace);
+                        }
+                    }
+                }
+            }
+        }
+
+        Assert.Empty(unreadable);
+        Assert.True(violations.Count == 0, string.Join(Environment.NewLine, violations));
+    }
+
+    private static void CheckNamespaceType(
+        List<string> violations,
+        Type owner,
+        string what,
+        Type? referenced,
+        string forbiddenNamespace)
+    {
+        foreach (var part in Parts(referenced))
+        {
+            if (part.Namespace is { } name && IsWithin(name, forbiddenNamespace))
+            {
+                violations.Add($"{owner.FullName}: {what} references {part.FullName}");
+            }
+        }
     }
 
     private static IEnumerable<Type> DeclaredTypes()

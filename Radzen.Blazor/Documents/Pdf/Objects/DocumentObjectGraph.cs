@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 

@@ -39,7 +39,7 @@ internal static class AnnotationFlattener
                 {
                     page.Content.Add(new FlattenedAnnotationContent(appearance, annotation.Opacity)
                     {
-                        Transform = Matrix.Translate(annotation.Bounds.Left, annotation.Bounds.Bottom),
+                        Transform = Matrix.RawTranslate(annotation.Bounds.Left, annotation.Bounds.Bottom),
                     });
                 }
             }

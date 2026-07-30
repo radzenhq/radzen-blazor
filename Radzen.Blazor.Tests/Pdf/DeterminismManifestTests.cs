@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects.Encryption;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;

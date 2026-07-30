@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Objects.Encryption;
+using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 

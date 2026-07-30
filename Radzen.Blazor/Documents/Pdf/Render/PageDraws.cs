@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Geometry;
-using Radzen.Documents.Pdf.Write;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -457,8 +456,6 @@ internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint
             || left.X1 != right.X1
             || left.Y1 != right.Y1
             || left.R1 != right.R1
-            || left.ExtendStart != right.ExtendStart
-            || left.ExtendEnd != right.ExtendEnd
             || left.Stops.Length != right.Stops.Length
             || !x.Matrix.Equals(y.Matrix))
         {
@@ -488,8 +485,6 @@ internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint
         hash.Add(gradient.X1);
         hash.Add(gradient.Y1);
         hash.Add(gradient.R1);
-        hash.Add(gradient.ExtendStart);
-        hash.Add(gradient.ExtendEnd);
         foreach (var stop in gradient.Stops)
         {
             hash.Add(stop);

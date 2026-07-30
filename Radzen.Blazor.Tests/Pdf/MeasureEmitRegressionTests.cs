@@ -46,10 +46,10 @@ public class MeasureEmitRegressionTests
         paragraph.Alignment = HorizontalAlignment.Right;
         if (family is not null)
         {
-            paragraph.Inlines[0].Font.Family = family;
+            ((Run)paragraph.Inlines[0]).Font.Family = family;
         }
 
-        paragraph.Inlines[0].Font.Size = 12;
+        ((Run)paragraph.Inlines[0]).Font.Size = 12;
         return paragraph;
     }
 

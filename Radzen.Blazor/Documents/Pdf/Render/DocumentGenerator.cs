@@ -5,7 +5,6 @@ using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Geometry;
-using Radzen.Documents.Pdf.Write;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -192,7 +191,6 @@ internal sealed class DocumentGenerator
             plans.Add(GeneratePage(paginated[i]));
         }
 
-        output.Structure = structureTree.DocumentElement;
         foreach (var font in fontResolver.AllFonts)
         {
             if (font.Sfnt is { } sfnt)
@@ -201,34 +199,48 @@ internal sealed class DocumentGenerator
             }
         }
 
+        var generatedPages = new List<GeneratedPage>(plans.Count);
+        var extractionFonts = new List<IReadOnlyDictionary<string, Fonts.ReverseFont>>(plans.Count);
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
             var plan = plans[pageIndex];
             var generated = new PageContentFinalizer(structureTree, markArtifacts).Finalize(plan, pageIndex);
-            var page = new Page(plan.Size.Width, plan.Size.Height)
-            {
-                Generated = generated,
-            };
-            page.SetLoadedContent(generated.Content);
-            page.SetTextFonts(BuildExtractionFonts(generated));
-            output.Pages.Insert(output.Pages.Count, page);
+            generatedPages.Add(generated);
+            extractionFonts.Add(BuildExtractionFonts(generated));
         }
 
+        var anchors = new Dictionary<string, GeneratedAnchor>(System.StringComparer.Ordinal);
         for (var pageIndex = 0; pageIndex < paginated.Length; pageIndex++)
         {
             var pageHeight = paginated[pageIndex].Size.Height.Point;
             foreach (var anchor in paginated[pageIndex].Anchors)
             {
-                if (!output.Anchors.ContainsKey(anchor.Name))
+                if (!anchors.ContainsKey(anchor.Name))
                 {
-                    output.Anchors[anchor.Name] = new GeneratedAnchor(
+                    anchors[anchor.Name] = new GeneratedAnchor(
                         pageIndex,
                         PageSpace.FromTop(pageHeight, anchor.Top));
                 }
             }
         }
 
-        output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
+        var emission = new EmissionPlanBuilder().Build(
+            generatedPages,
+            structureTree.DocumentElement,
+            anchors,
+            request.RoleMap);
+        output.EmissionPlan = emission;
+        for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
+        {
+            var page = new Page(plans[pageIndex].Size.Width, plans[pageIndex].Size.Height)
+            {
+                Generated = emission.Pages[pageIndex],
+            };
+            page.SetLoadedContent(emission.Pages[pageIndex].Content.ToArray());
+            page.SetTextFonts(extractionFonts[pageIndex]);
+            output.Pages.Insert(output.Pages.Count, page);
+        }
+
         return output;
     }
 

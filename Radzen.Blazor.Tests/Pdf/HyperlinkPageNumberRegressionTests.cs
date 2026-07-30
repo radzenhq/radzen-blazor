@@ -27,21 +27,23 @@ public class HyperlinkPageNumberRegressionTests
         return (document, section);
     }
 
-    private static void SetLink(Run run, string url)
+    private static void SetLink(Inline inline, string url)
     {
-        var property = typeof(Run).GetProperty("Link", BindingFlags.Public | BindingFlags.Instance);
-        Assert.True(property is not null, "Run.Link public property is missing");
-        Assert.True(property!.PropertyType == typeof(string), $"Run.Link must be a string, was {property.PropertyType}");
-        property.SetValue(run, url);
+        var property = typeof(Inline).GetProperty("Link", BindingFlags.Public | BindingFlags.Instance);
+        Assert.True(property is not null, "Inline.Link public property is missing");
+        Assert.True(property!.PropertyType == typeof(string), $"Inline.Link must be a string, was {property.PropertyType}");
+        property.SetValue(inline, url);
     }
 
-    private static Run Field(string typeName)
+    private static TextInline Field(string typeName)
     {
-        var type = typeof(Run).Assembly.GetType($"Radzen.Documents.{typeName}");
+        var type = typeof(Inline).Assembly.GetType($"Radzen.Documents.{typeName}");
         Assert.True(type is not null, $"public type Radzen.Documents.{typeName} is missing");
-        Assert.True(typeof(Run).IsAssignableFrom(type), $"{typeName} must derive from Run so it can be added to Paragraph.Inlines");
+        Assert.True(
+            typeof(TextInline).IsAssignableFrom(type),
+            $"{typeName} must derive from TextInline so it can be added to Paragraph.Inlines and carry a font");
         var instance = Activator.CreateInstance(type!);
-        return Assert.IsAssignableFrom<Run>(instance);
+        return Assert.IsAssignableFrom<TextInline>(instance);
     }
 
     private static List<(double X1, double Y1, double X2, double Y2, string Uri)> LinkAnnotations(DocumentReader reader, int pageIndex)

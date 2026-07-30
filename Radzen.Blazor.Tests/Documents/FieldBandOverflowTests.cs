@@ -10,8 +10,9 @@ using Radzen.Blazor.Pdf.Tests;
 
 public class FieldBandOverflowTests
 {
-    private static void Sized(Run run)
+    private static void Sized(Inline inline)
     {
+        var run = (TextInline)inline;
         run.Font.Family = LineLayoutSupport.Family;
         run.Font.Size = 12;
     }

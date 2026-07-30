@@ -23,7 +23,8 @@ public class InlineImageFieldTests
         var image = footer.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(40);
         image.Height = Unit.FromPoint(30);
-        var number = footer.Inlines.Add(new PageNumberField());
+        var number = new PageNumberField();
+        footer.Inlines.Add(number);
         number.Font.Size = 12;
 
         var reader = BuildTestSupport.Read(document);

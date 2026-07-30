@@ -13,7 +13,7 @@ public class ModelCollectionPublicContractTests
     public void TabStopsAddInsertIndexAndEnumerateInOrder()
     {
         var stops = new TabStopCollection();
-        var first = stops.AddTabStop("10pt");
+        var first = stops.Add("10pt");
         var third = stops.Add(new TabStop("30pt", TabAlignment.Right, '.'));
         var second = stops.Insert(1, new TabStop("20pt", TabAlignment.Center));
 
@@ -32,8 +32,8 @@ public class ModelCollectionPublicContractTests
     public void TabStopsRemoveRemoveAtAndClear()
     {
         var stops = new TabStopCollection();
-        var first = stops.AddTabStop("10pt");
-        var second = stops.AddTabStop("20pt");
+        var first = stops.Add("10pt");
+        var second = stops.Add("20pt");
         var absent = new TabStop("30pt");
 
         Assert.True(stops.Remove(first));

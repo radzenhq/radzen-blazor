@@ -13,8 +13,9 @@ public class TextLayoutFindingTests
 {
     private const double Tol = 0.5;
 
-    private static void Sized(Run run)
+    private static void Sized(Inline inline)
     {
+        var run = (TextInline)inline;
         run.Font.Family = LineLayoutSupport.Family;
         run.Font.Size = 12;
     }
@@ -110,7 +111,7 @@ public class TextLayoutFindingTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = new Paragraph();
         Sized(paragraph.Inlines.Add("A\tVeryLongValueTextThatOverflows"));
-        paragraph.TabStops.AddTabStop(Unit.FromPoint(40), TabAlignment.Right);
+        paragraph.TabStops.Add(Unit.FromPoint(40), TabAlignment.Right);
 
         var lines = LineBreaker.Break(paragraph, 400, fonts);
 

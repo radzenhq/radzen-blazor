@@ -24,7 +24,7 @@ public class FontFeatureByteSafetyTests
         section.Blocks.Add(justified);
 
         var tabbed = new Paragraph();
-        tabbed.TabStops.AddTabStop(Unit.FromPoint(200), TabAlignment.Right);
+        tabbed.TabStops.Add(Unit.FromPoint(200), TabAlignment.Right);
         var tabRun = tabbed.Inlines.Add("Label\tValue");
         tabRun.Font.Family = "Liberation Sans";
         tabRun.Font.Size = 12;
