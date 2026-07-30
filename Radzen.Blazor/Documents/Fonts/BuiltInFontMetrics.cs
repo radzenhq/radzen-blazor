@@ -94,21 +94,30 @@ internal sealed class BuiltInFontMetrics
     {
         double sum = 0;
         var index = 0;
+        List<int>? missing = null;
         while (index < text.Length)
         {
             var codepoint = FontCollection.CodePointAt(text, index, out var length);
-            if (TryGetWidth(codepoint, out var width))
+            if (TryGetWidth(codepoint, out var width)
+                || (!MissingGlyphMetrics.IsReportable(codepoint) && TryGetWidth('?', out width)))
             {
                 sum += width;
+            }
+            else if (missing is null || !missing.Contains(codepoint))
+            {
+                (missing ??= []).Add(codepoint);
             }
 
             index += length;
         }
 
+        if (missing is not null)
+        {
+            throw MissingGlyphMetrics.Error(entry.FontName, missing);
+        }
+
         return FontMetric.Scale(sum, size, 1000);
     }
-
-    public bool ContainsGlyph(char c) => TryGetWidth(c, out _);
 
     private static string? ResolvePostScriptName(string name, bool bold, bool italic)
     {

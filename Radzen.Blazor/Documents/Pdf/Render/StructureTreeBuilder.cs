@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Geometry;
@@ -8,6 +9,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 {
     private readonly Dictionary<SourceId, StructureElement> elementsBySource = [];
     private readonly Dictionary<SourceId, StructureElement> markerElementsBySource = [];
+    private readonly Dictionary<SourceId, StructureElement> linkElementsBySource = [];
     private readonly Dictionary<SourceId, SemanticArtifactKind> artifactsBySource = [];
     private StructureElement documentElement = null!;
 
@@ -42,6 +44,12 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 && materialized[markerIndex] is { } marker)
             {
                 markerElementsBySource[association.Source] = marker;
+            }
+
+            if (association.LinkElement is { } linkIndex
+                && materialized[linkIndex] is { } link)
+            {
+                linkElementsBySource[association.Source] = link;
             }
         }
     }
@@ -118,8 +126,9 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             SemanticIntent.Figure => "Figure",
             SemanticIntent.Navigation => "TOC",
             SemanticIntent.NavigationEntry => "TOCI",
+            SemanticIntent.CrossReference => "Reference",
             SemanticIntent.Link => "Link",
-            _ => "Reference",
+            _ => throw new ArgumentOutOfRangeException(nameof(intent), intent, null),
         };
 
     private bool Materializes(SemanticStructureTier tier)
@@ -139,6 +148,10 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
     public StructureElement? MarkerElementOf(SourceId source)
         => markerElementsBySource.TryGetValue(source, out var element) ? element : null;
+
+    // ISO 14289-1 7.18.1: the object reference for a link annotation is a kid of the Link element itself.
+    public StructureElement? LinkElementOf(SourceId source)
+        => linkElementsBySource.TryGetValue(source, out var element) ? element : ElementOf(source);
 
     public SemanticArtifactKind? ArtifactOf(SourceId source)
         => artifactsBySource.TryGetValue(source, out var kind) ? kind : null;

@@ -453,30 +453,28 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
     private static void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)
     {
-        writer.WriteRaw("q\n");
-        if (watermark.ExtGState is { } state)
-        {
-            writer.WriteName(state);
-            writer.WriteRaw(" gs\n");
-        }
-
-        WriteTransform(
+        var transform = WatermarkGeometry.Rotation(
+            watermark.Rotation,
+            watermark.CenterX,
+            watermark.CenterY);
+        ContentEmitter.WriteWatermark(
             writer,
-            WatermarkGeometry.Rotation(
-                watermark.Rotation,
-                watermark.CenterX,
-                watermark.CenterY));
-        if (watermark.Image is { } image)
-        {
-            WriteImageDraw(writer, image);
-        }
-
-        foreach (var text in watermark.Texts)
-        {
-            WriteTextDraw(writer, text);
-        }
-
-        writer.WriteRaw("Q\n");
+            watermark.ExtGState,
+            transform,
+            output =>
+            {
+                if (watermark.Image is { } image)
+                {
+                    WriteImageDraw(output, image);
+                }
+            },
+            output =>
+            {
+                foreach (var text in watermark.Texts)
+                {
+                    WriteTextDraw(output, text);
+                }
+            });
     }
 
     private enum ContentPhase

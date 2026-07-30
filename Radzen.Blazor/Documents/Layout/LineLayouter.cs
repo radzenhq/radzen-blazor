@@ -7,19 +7,43 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Layout;
 
+internal sealed class LineLayoutContext
+{
+    public required Paragraph Paragraph { get; init; }
+
+    public required FontCollection Fonts { get; init; }
+
+    public required double MaxWidth { get; init; }
+
+    public required double Indent { get; init; }
+
+    public HorizontalAlignment? InheritedAlignment { get; init; }
+
+    public LoweringContext? Resolution { get; init; }
+
+    public List<TabStop>? SortedTabStops { get; init; }
+
+    public required LayoutCaptureContext Capture { get; init; }
+}
+
+internal readonly record struct LineBuildRequest(
+    int First,
+    int Last,
+    bool IsLast,
+    bool IncludeMarker);
+
 internal static class LineLayouter
 {
     private const double DefaultTabStopWidth = 36.0;
 
     internal static double AdvanceToTabStop(double position)
-        => (Math.Floor((position + 1e-6) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
+        => (Math.Floor((position + LayoutTolerance.Epsilon) / DefaultTabStopWidth) + 1) * DefaultTabStopWidth;
 
     internal static LineBox MarkerLine(
         ListMarkerLayout marker,
         FontCollection fonts,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
     {
-        capture ??= new LayoutCaptureContext();
         var run = new Run(marker.Text);
         var paint = GeometryCapture.Fragment(run, marker.Font, capture);
         var fragment = new LineFragment
@@ -55,11 +79,10 @@ internal static class LineLayouter
         Paragraph paragraph,
         double maxWidthPoints,
         FontCollection fonts,
+        LayoutCaptureContext capture,
         HorizontalAlignment? inheritedAlignment = null,
-        LoweringContext? resolution = null,
-        LayoutCaptureContext? capture = null)
+        LoweringContext? resolution = null)
     {
-        capture ??= new LayoutCaptureContext();
         var boxes = new List<LineBox>();
         var indent = LoweringContext.FormatOf(resolution, paragraph).LeftIndent.Point
             + (resolution?.BlockIndent(paragraph) ?? 0);
@@ -385,6 +408,7 @@ internal static class LineLayouter
             Start = piece.Start + startInText,
             Length = endInText - startInText,
             Advance = advance,
+            GlyphRun = CapturedGlyphRun.Empty(piece.Text[startInText..endInText]),
         };
 
     private static LineBox FinishOversizedLine(
@@ -462,6 +486,7 @@ internal static class LineLayouter
                     Start = piece.Start,
                     Length = piece.Length,
                     Advance = piece.Advance,
+                    GlyphRun = CapturedGlyphRun.Empty(piece.Text),
                 });
                 advances += piece.Advance;
             }
@@ -595,6 +620,7 @@ internal static class LineLayouter
                 XOffset = marker.Indent,
                 Advance = fonts.MeasureText(markerText, markerFont),
                 IsMarker = true,
+                GlyphRun = CapturedGlyphRun.Empty(markerText),
             });
         }
 
@@ -613,6 +639,7 @@ internal static class LineLayouter
                 Length = 1,
                 XOffset = hyphen.XOffset,
                 Advance = hyphen.Width,
+                GlyphRun = CapturedGlyphRun.Empty("-"),
             });
         }
 
@@ -776,7 +803,7 @@ internal static class LineLayouter
                 start = gapStart;
             }
 
-            if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + 1e-6)
+            if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + LayoutTolerance.Epsilon)
             {
                 var leaderFont = fi < span.Length
                     ? span[fi].Paint.Font
@@ -852,6 +879,7 @@ internal static class LineLayouter
                 Start = 0,
                 Length = 0,
                 Advance = 0,
+                GlyphRun = CapturedGlyphRun.Empty(string.Empty),
             };
         }
 
@@ -867,6 +895,7 @@ internal static class LineLayouter
             Length = count,
             XOffset = indent + gapEnd - advance,
             Advance = advance,
+            GlyphRun = CapturedGlyphRun.Empty(fill),
         };
     }
 
@@ -909,7 +938,7 @@ internal static class LineLayouter
     {
         for (var i = 0; i < stops.Count; i++)
         {
-            if (stops[i].Position.Point > cursor + 1e-6)
+            if (stops[i].Position.Point > cursor + LayoutTolerance.Epsilon)
             {
                 position = stops[i].Position.Point;
                 alignment = stops[i].Alignment;

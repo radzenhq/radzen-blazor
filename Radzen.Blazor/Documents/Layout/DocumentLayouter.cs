@@ -135,9 +135,9 @@ internal static class DocumentLayouter
                 section,
                 fonts,
                 lowering,
+                capture,
                 measureImage,
                 tocPages,
-                capture,
                 pages.Count))
             {
                 pages.Add(page);

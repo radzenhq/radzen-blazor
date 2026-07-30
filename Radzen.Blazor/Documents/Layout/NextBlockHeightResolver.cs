@@ -16,6 +16,8 @@ internal sealed class BlockLayoutCache(
     private readonly LaidOutTable?[] tables = new LaidOutTable?[count];
     private readonly BoxContentLayout.Measured?[] boxes = new BoxContentLayout.Measured?[count];
 
+    internal LayoutCaptureContext Capture => capture;
+
     internal LaidOutTable Table(int index, Table table)
         => tables[index] ??= LoweredBlockDispatch.LayoutTable(
             table,
@@ -69,20 +71,20 @@ internal static class NextBlockHeightResolver
             return false;
         }
 
-        var visitor = new NextHeightVisitor(
+        var handler = new NextHeightHandler(
             broken,
             layouts,
             contentWidth,
             fonts,
             measureImage,
             resolution);
-        var result = LoweredBlockDispatch.Dispatch(blocks[next], visitor, next);
+        var result = LoweredBlockDispatch.Dispatch(blocks[next], handler, next);
         spacingBefore = result.SpacingBefore;
         height = result.Height;
         return result.Found;
     }
 
-    private sealed class NextHeightVisitor(
+    private sealed class NextHeightHandler(
         IReadOnlyList<LineBox>?[] broken,
         BlockLayoutCache layouts,
         double contentWidth,
@@ -114,13 +116,21 @@ internal static class NextBlockHeightResolver
         {
             var availableWidth = Math.Max(0, contentWidth - resolution.BlockIndent(image));
             var (_, imageHeight) = measureImage is null
-                ? Paginator.MeasureImage(image, availableWidth)
+                ? ImageProbe.Measure(image, availableWidth)
                 : measureImage(image, availableWidth);
             return new NextBlockHeight { Found = true, Height = imageHeight };
         }
 
         public NextBlockHeight CodeSymbol(Block block, int next)
-            => new() { Found = true, Height = Paginator.MeasureCodeSymbol(block, fonts, resolution).Height };
+            => new()
+            {
+                Found = true,
+                Height = CodeSymbolDispatch.Measure(
+                    block,
+                    layouts.Capture,
+                    fonts,
+                    resolution).Height,
+            };
 
         public NextBlockHeight PageBreak(PageBreak pageBreak, int next) => default;
     }

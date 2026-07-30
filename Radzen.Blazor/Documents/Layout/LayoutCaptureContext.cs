@@ -8,6 +8,7 @@ internal sealed class LayoutCaptureContext
     private readonly Dictionary<object, SourceId> sources = new(ReferenceEqualityComparer.Instance);
     private readonly List<object> sourceValues = [];
     private readonly Dictionary<byte[], SceneImageData> images = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<object, LaidOutNodeId> paints = new(ReferenceEqualityComparer.Instance);
     private int nextNodeId;
 
     public LaidOutNodeId Node() => new(nextNodeId++);
@@ -36,5 +37,16 @@ internal sealed class LayoutCaptureContext
         }
 
         return captured;
+    }
+
+    public LaidOutNodeId Paint(object source)
+    {
+        if (!paints.TryGetValue(source, out var id))
+        {
+            id = Node();
+            paints.Add(source, id);
+        }
+
+        return id;
     }
 }

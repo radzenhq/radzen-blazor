@@ -193,11 +193,12 @@ internal sealed class SemanticSnapshotBuilder
         return child;
     }
 
-    private void Associate(object source, Node element)
+    private void Associate(object source, Node element, Node? link = null)
         => associations.Add(new SemanticStructureAssociation
         {
             Source = identities.Source(source),
             Element = element.Index,
+            LinkElement = link?.Index,
         });
 
     private void AssociateArtifact(object source, SemanticArtifactKind kind)
@@ -335,18 +336,19 @@ internal sealed class SemanticSnapshotBuilder
                 var linked = IsLink(inline);
                 if (inline is InlineImage image)
                 {
-                    var figureParent = linked
+                    var link = linked
                         ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
-                        : element;
+                        : null;
                     var decorative = string.IsNullOrEmpty(image.AlternateText);
                     capture.Associate(
                         image,
                         capture.AddChild(
-                            figureParent,
+                            link ?? element,
                             SemanticIntent.Figure,
                             inlineTier,
                             alternateText: decorative ? null : image.AlternateText,
-                            decorative: decorative));
+                            decorative: decorative),
+                        link);
                     continue;
                 }
 

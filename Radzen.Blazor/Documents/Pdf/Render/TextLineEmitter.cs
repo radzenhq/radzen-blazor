@@ -103,11 +103,6 @@ internal sealed class TextLineEmitter(
             }
 
             var glyphRun = fragment.CoalescedGlyphRun ?? fragment.GlyphRun;
-            if (glyphRun.Spans.IsDefaultOrEmpty)
-            {
-                continue;
-            }
-
             var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
             EmitGlyphRun(
                 plan,

@@ -16,10 +16,9 @@ internal static class OverlayBoxPlacer
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
-        double xOffset = 0,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture,
+        double xOffset = 0)
     {
-        capture ??= new LayoutCaptureContext();
         var (padding, boxWidth, indent, innerWidth) = Geometry(container, availableWidth, xOffset);
 
         var lines = new List<LaidOutLine>();
@@ -99,7 +98,7 @@ internal static class OverlayBoxPlacer
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
     {
         var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
         return BoxContentLayout.Measure(
@@ -133,7 +132,7 @@ internal static class OverlayBoxPlacer
             Source = measured.Capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, y, boxWidth, boxHeight),
-            Style = GeometryCapture.Box(container, boxWidth, boxHeight),
+            Style = GeometryCapture.Box(container, boxWidth, boxHeight, measured.Capture),
             Padding = padding,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,

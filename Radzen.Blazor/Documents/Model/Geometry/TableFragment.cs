@@ -23,5 +23,7 @@ internal sealed record LaidOutTableSlice
 
     public required int HeaderRowCount { get; init; }
 
+    public required bool ContainsRepeatedHeaders { get; init; }
+
     public required double Height { get; init; }
 }

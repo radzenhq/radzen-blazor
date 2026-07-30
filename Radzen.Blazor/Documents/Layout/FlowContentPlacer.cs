@@ -9,7 +9,7 @@ internal static class FlowContentPlacer
         Image image,
         double width,
         Func<Image, double, (double Width, double Height)>? measureImage)
-        => measureImage is null ? Paginator.MeasureImage(image, width) : measureImage(image, width);
+        => measureImage is null ? ImageProbe.Measure(image, width) : measureImage(image, width);
 
     public static LaidOutImage Image(
         Image image,
@@ -47,7 +47,7 @@ internal static class FlowContentPlacer
             Width = codeSymbolWidth,
             Height = codeSymbolHeight,
             X = xOffset + HorizontalAlignmentOffset.Of(Paginator.CodeSymbolAlignment(block), width, codeSymbolWidth),
-            Caption = CodeSymbolDispatch.Caption(block, fonts, resolution),
+            Caption = CodeSymbolDispatch.Caption(block, fonts, resolution, capture),
         };
 
     public static LaidOutTableFragment Table(

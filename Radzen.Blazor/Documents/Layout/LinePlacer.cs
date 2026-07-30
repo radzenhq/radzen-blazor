@@ -50,7 +50,7 @@ internal static class LinePlacer
         {
             placeCount = nrem;
             if (first && r.KeepWithNext && hasPageContent && r.HasNextBlock &&
-                r.AfterCursor + r.NextBlockLeadingHeight > r.ContentHeight + PaginationContext.Eps)
+                r.AfterCursor + r.NextBlockLeadingHeight > r.ContentHeight + LayoutTolerance.Epsilon)
             {
                 moveWhole = true;
             }

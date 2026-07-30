@@ -21,6 +21,9 @@ internal interface ILoweredBlockHandler<in TContext, out TResult>
 
 internal static class LoweredBlockDispatch
 {
+    internal static void Place(Block block, FlowPlacementEngine engine, int index)
+        => Dispatch(block, engine, index);
+
     internal static TResult Dispatch<TContext, TResult>(
         Block block,
         ILoweredBlockHandler<TContext, TResult> handler,
@@ -56,7 +59,7 @@ internal static class LoweredBlockDispatch
             fonts,
             measureImage,
             lowering,
-            indent,
-            capture);
+            capture,
+            indent);
     }
 }

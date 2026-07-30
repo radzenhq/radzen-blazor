@@ -187,7 +187,7 @@ internal readonly struct LineFragment
 
     public bool IsMarker { get; init; }
 
-    public CapturedGlyphRun GlyphRun { get; init; }
+    public required CapturedGlyphRun GlyphRun { get; init; }
 
     public CapturedGlyphRun? CoalescedGlyphRun { get; init; }
 

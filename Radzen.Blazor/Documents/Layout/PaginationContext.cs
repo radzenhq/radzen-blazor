@@ -7,37 +7,34 @@ namespace Radzen.Documents.Layout;
 
 internal sealed class PaginationContext
 {
-    internal const double Eps = 1e-6;
     private readonly List<LaidOutPage> pages;
     private readonly FontCollection fonts;
     private readonly Func<Image, double, (double Width, double Height)>? measureImage;
     private readonly LoweringContext resolution;
     private readonly LayoutCaptureContext capture;
-    private readonly LaidOutWatermark? watermark;
-    private readonly PageSize size;
-    private readonly LaidOutLayer header;
-    private readonly LaidOutLayer footer;
-    private readonly double headerTop;
-    private readonly double footerTop;
-    private readonly double left;
-    private readonly double pageHeight;
-    private readonly double contentTop;
-    private readonly double contentWidth;
-    private readonly double contentHeight;
-    private readonly BlockLayoutCache blockLayouts;
+    private LaidOutWatermark? watermark;
+    private PageSize size;
+    private LaidOutLayer header = null!;
+    private LaidOutLayer footer = null!;
+    private double headerTop;
+    private double footerTop;
+    private double left;
+    private double pageHeight;
+    private double contentTop;
+    private double contentWidth;
+    private double contentHeight;
+    private BlockLayoutCache blockLayouts = null!;
     private readonly int pageNumberOffset;
     private BlockHeightHandler? blockHeightHandler;
     private int order;
     private PageLayerBuilder current;
 
     public PaginationContext(
-        Section section,
         FontCollection fonts,
         List<LaidOutPage> pages,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture,
-        IReadOnlyDictionary<string, int>? tocPages,
         int pageNumberOffset)
     {
         this.pages = pages;
@@ -47,8 +44,13 @@ internal sealed class PaginationContext
         this.capture = capture;
         this.pageNumberOffset = pageNumberOffset;
         current = new PageLayerBuilder(capture);
+        StartPageCount = pages.Count;
+    }
 
-
+    public void Initialize(
+        Section section,
+        IReadOnlyDictionary<string, int>? tocPages)
+    {
         var (pageWidth, effectivePageHeight) = BandLayouter.EffectiveSize(section);
         pageHeight = effectivePageHeight;
         left = section.Margins.Left.Point;
@@ -99,19 +101,27 @@ internal sealed class PaginationContext
         {
             Broken[i] = Blocks[i].Accept(breaker, default);
         }
-
-        StartPageCount = pages.Count;
     }
 
-    public ExpandedBlocks Blocks { get; }
+    public ExpandedBlocks Blocks { get; private set; } = null!;
 
-    public IReadOnlyList<LineBox>?[] Broken { get; }
+    public IReadOnlyList<LineBox>?[] Broken { get; private set; } = null!;
 
-    public Rect ContentBox { get; }
+    public Rect ContentBox { get; private set; }
 
     public int StartPageCount { get; }
 
     public double Cursor { get; private set; }
+
+    internal double AvailableHeight => contentHeight;
+
+    internal FontCollection Fonts => fonts;
+
+    internal Func<Image, double, (double Width, double Height)>? MeasureImage => measureImage;
+
+    internal LoweringContext Resolution => resolution;
+
+    internal LayoutCaptureContext Capture => capture;
 
     public bool HasPageContent => current.HasContent;
 
@@ -149,7 +159,7 @@ internal sealed class PaginationContext
 
     private void EnsureFits(double height)
     {
-        if (HasPageContent && Cursor + height > contentHeight + Eps)
+        if (HasPageContent && Cursor + height > contentHeight + LayoutTolerance.Epsilon)
         {
             Flush();
             Cursor = 0;
@@ -171,7 +181,7 @@ internal sealed class PaginationContext
                 height += BlockHeight(blockIndex);
             }
 
-            if (height <= contentHeight + Eps)
+            if (height <= contentHeight + LayoutTolerance.Epsilon)
             {
                 EnsureFits(height);
             }
@@ -283,8 +293,8 @@ internal sealed class PaginationContext
             fonts,
             measureImage,
             resolution,
-            listIndent,
-            capture);
+            capture,
+            listIndent);
 
         EnsureFits(boxHeight);
         PlaceMarker(container);
@@ -297,7 +307,7 @@ internal sealed class PaginationContext
             Source = capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, Cursor, boxWidth, boxHeight),
-            Style = GeometryCapture.Box(container, boxWidth, boxHeight),
+            Style = GeometryCapture.Box(container, boxWidth, boxHeight, capture),
             Padding = container.Padding.Point,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,
@@ -329,7 +339,11 @@ internal sealed class PaginationContext
     {
         var indent = resolution.BlockIndent(block);
         var availableWidth = AvailableWidth(block);
-        var (codeSymbolWidth, codeSymbolHeight) = Paginator.MeasureCodeSymbol(block, fonts, resolution);
+        var (codeSymbolWidth, codeSymbolHeight) = CodeSymbolDispatch.Measure(
+            block,
+            capture,
+            fonts,
+            resolution);
         EnsureFits(codeSymbolHeight);
         PlaceMarker(block);
 
@@ -381,7 +395,7 @@ internal sealed class PaginationContext
 
             var fit = 0;
             var y = blockTop;
-            while (offset + fit < lines.Count && y + lines[offset + fit].Height <= contentHeight + Eps)
+            while (offset + fit < lines.Count && y + lines[offset + fit].Height <= contentHeight + LayoutTolerance.Epsilon)
             {
                 y += lines[offset + fit].Height;
                 fit++;
@@ -469,13 +483,13 @@ internal sealed class PaginationContext
         protected override IReadOnlyList<LineBox>? Default(Block block, Nothing context) => null;
 
         public override IReadOnlyList<LineBox>? Visit(Paragraph paragraph, Nothing context)
-            => LineBreaker.Break(
+            => LineLayouter.Layout(
                 paragraph,
                 contentWidth,
                 fonts,
+                capture,
                 resolution.Alignment(paragraph),
-                resolution,
-                capture);
+                resolution);
     }
 
     private sealed class BlockHeightHandler(PaginationContext owner)
@@ -515,7 +529,11 @@ internal sealed class PaginationContext
                 owner.measureImage).Height;
 
         public double CodeSymbol(Block block, int index)
-            => Paginator.MeasureCodeSymbol(block, owner.fonts, owner.resolution).Height;
+            => CodeSymbolDispatch.Measure(
+                block,
+                owner.capture,
+                owner.fonts,
+                owner.resolution).Height;
 
         public double PageBreak(PageBreak pageBreak, int index) => double.PositiveInfinity;
     }
