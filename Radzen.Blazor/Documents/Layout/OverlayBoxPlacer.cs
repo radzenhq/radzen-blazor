@@ -42,10 +42,7 @@ internal static class OverlayBoxPlacer
             innerHeight = Math.Max(innerHeight, measured.Height);
             var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
             var positioned = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
-            lines.AddRange(positioned.Lines);
-            images.AddRange(positioned.Images);
-            codeSymbols.AddRange(positioned.CodeSymbols);
-            order = MergeNested(positioned, tables, boxes, order);
+            order = Compose(positioned, lines, images, codeSymbols, tables, boxes, order);
         }
 
         var content = new LaidOutBoxContent
@@ -60,26 +57,42 @@ internal static class OverlayBoxPlacer
         return (content, indent, boxWidth, innerHeight + (2 * padding));
     }
 
-    private static int MergeNested(
+    private static int Compose(
         LaidOutBoxContent child,
+        List<LaidOutLine> lines,
+        List<LaidOutImage> images,
+        List<LaidOutCodeSymbol> codeSymbols,
         List<LaidOutTablePlacement> tables,
         List<LaidOutBox> boxes,
         int order)
     {
-        var cursor = OrderedMerge.ByOrder(child.Tables, static t => t.Order, child.Boxes, static b => b.Order);
-        while (cursor.MoveNext())
+        foreach (var line in child.Lines)
         {
-            if (cursor.IsTable)
-            {
-                tables.Add(child.Tables[cursor.TableIndex] with { Order = order++ });
-            }
-            else
-            {
-                boxes.Add(child.Boxes[cursor.BoxIndex] with { Order = order++ });
-            }
+            lines.Add(line with { ZOrder = order + line.ZOrder });
         }
 
-        return order;
+        foreach (var image in child.Images)
+        {
+            images.Add(image with { ZOrder = order + image.ZOrder });
+        }
+
+        foreach (var codeSymbol in child.CodeSymbols)
+        {
+            codeSymbols.Add(codeSymbol with { ZOrder = order + codeSymbol.ZOrder });
+        }
+
+        foreach (var table in child.Tables)
+        {
+            tables.Add(table with { ZOrder = order + table.ZOrder });
+        }
+
+        foreach (var box in child.Boxes)
+        {
+            boxes.Add(box with { ZOrder = order + box.ZOrder });
+        }
+
+        return order + child.Lines.Length + child.Images.Length + child.CodeSymbols.Length
+            + child.Tables.Length + child.Boxes.Length;
     }
 
     private static (double Padding, double BoxWidth, double Indent, double InnerWidth) Geometry(
@@ -136,7 +149,7 @@ internal static class OverlayBoxPlacer
             Padding = padding,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,
-            Order = order,
+            ZOrder = order,
         };
     }
 }

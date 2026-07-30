@@ -56,7 +56,7 @@ internal static class TableFragmentJoin
             Bounds = bottom > top
                 ? new Rect(layout.Decoration.LeftIndent, y + top, layout.Width, bottom - top)
                 : new Rect(layout.Decoration.LeftIndent, y, 0, 0),
-            Order = order,
+            ZOrder = order,
         };
     }
 
@@ -67,7 +67,7 @@ internal static class TableFragmentJoin
             layout,
             positioned.Fragment,
             positioned.Bounds.Y,
-            positioned.Order);
+            positioned.ZOrder);
 
     private static List<LaidOutCell>[] RowIndex(LaidOutTable layout)
     {

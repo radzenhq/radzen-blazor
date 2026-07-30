@@ -18,6 +18,7 @@ internal static class FlowContentPlacer
         double imageWidth,
         double imageHeight,
         LayoutCaptureContext capture,
+        int zOrder,
         double xOffset = 0)
         => new()
         {
@@ -27,6 +28,7 @@ internal static class FlowContentPlacer
             Width = imageWidth,
             Height = imageHeight,
             X = xOffset + HorizontalAlignmentOffset.Of(image.Alignment, width, imageWidth),
+            ZOrder = zOrder,
         };
 
     public static LaidOutCodeSymbol CodeSymbol(
@@ -38,6 +40,7 @@ internal static class FlowContentPlacer
         Fonts.FontCollection fonts,
         LoweringContext? resolution,
         LayoutCaptureContext capture,
+        int zOrder,
         double xOffset = 0)
         => new()
         {
@@ -48,6 +51,7 @@ internal static class FlowContentPlacer
             Height = codeSymbolHeight,
             X = xOffset + HorizontalAlignmentOffset.Of(Paginator.CodeSymbolAlignment(block), width, codeSymbolWidth),
             Caption = CodeSymbolDispatch.Caption(block, fonts, resolution, capture),
+            ZOrder = zOrder,
         };
 
     public static LaidOutTableFragment Table(

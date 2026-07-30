@@ -25,7 +25,7 @@ internal readonly struct LaidOutTableFragment
 
     public required Rect Bounds { get; init; }
 
-    public int Order { get; init; }
+    public int ZOrder { get; init; }
 }
 
 internal readonly struct LaidOutCaptionLine

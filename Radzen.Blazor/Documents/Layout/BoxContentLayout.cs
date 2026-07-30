@@ -111,6 +111,7 @@ internal static class BoxContentLayout
                     Source = capture.Source(markerSource),
                     X = contentBox.Left,
                     Y = cursorY,
+                    ZOrder = order++,
                 });
             }
 
@@ -122,6 +123,7 @@ internal static class BoxContentLayout
                     Source = capture.Source(source),
                     X = contentBox.Left,
                     Y = cursorY,
+                    ZOrder = order++,
                 });
             }
             else if (item.Image is { } image)
@@ -136,6 +138,7 @@ internal static class BoxContentLayout
                     Y = cursorY,
                     Width = item.Width,
                     Height = item.Height,
+                    ZOrder = order++,
                 });
             }
             else if (item.CodeSymbol is { } codeSymbol)
@@ -151,6 +154,7 @@ internal static class BoxContentLayout
                     X = contentBox.Left + item.Indent
                         + HorizontalAlignmentOffset.Of(Effective(BlockAlignment(codeSymbol), align), availableWidth, item.Width),
                     Y = cursorY,
+                    ZOrder = order++,
                 });
             }
             else if (item.Table is { } nested)
@@ -160,7 +164,7 @@ internal static class BoxContentLayout
                     Layout = nested,
                     X = contentBox.Left,
                     Y = cursorY,
-                    Order = order++,
+                    ZOrder = order++,
                 });
             }
             else if (item.Box is { } box && item.BoxContent is { } boxContent)
@@ -178,7 +182,7 @@ internal static class BoxContentLayout
                     Style = GeometryCapture.Box(box, item.Width, item.Height, capture),
                     Padding = padding,
                     Opacity = item.BoxOpacity,
-                    Order = order++,
+                    ZOrder = order++,
                 });
             }
 

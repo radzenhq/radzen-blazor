@@ -66,6 +66,7 @@ internal static class LineLayouter
         return new LineBox
         {
             Fragments = fragments,
+            ShapedRuns = ShapeRuns([fragment], fonts, capture),
             Width = 0,
             Height = height,
             Baseline = baseline,
@@ -656,23 +657,25 @@ internal static class LineLayouter
             };
         }
 
-        CaptureCoalescedGlyphRuns(fragments, fonts, context.Capture);
+        var shapedRuns = ShapeRuns(fragments, fonts, context.Capture);
         var immutableFragments = fragments.ToImmutableArray();
         var (height, baseline) = Measure(immutableFragments, paragraph.LineSpacing, fonts);
         return new LineBox
         {
             Fragments = immutableFragments,
+            ShapedRuns = shapedRuns,
             Width = width,
             Height = height,
             Baseline = baseline,
         };
     }
 
-    private static void CaptureCoalescedGlyphRuns(
+    private static ImmutableArray<ShapedTextRun> ShapeRuns(
         List<LineFragment> fragments,
         FontCollection fonts,
         LayoutCaptureContext capture)
     {
+        var runs = ImmutableArray.CreateBuilder<ShapedTextRun>(fragments.Count);
         var i = 0;
         while (i < fragments.Count)
         {
@@ -717,24 +720,35 @@ internal static class LineLayouter
                 j++;
             }
 
-            if (j > i + 1)
+            var glyphRun = j > i + 1
+                ? GeometryCapture.PositionSpans(
+                    fonts.CaptureGlyphRun(text[current.Start..end], paint.Font),
+                    paint)
+                : current.GlyphRun;
+
+            if (paint.InlineImage is null)
             {
-                fragments[i] = current with
+                var sources = ImmutableArray.CreateBuilder<ShapedRunSource>(j - i);
+                for (var k = i; k < j; k++)
                 {
-                    CoalescedGlyphRun = GeometryCapture.PositionSpans(
-                        fonts.CaptureGlyphRun(
-                            text[current.Start..end],
-                            paint.Font),
-                        paint),
-                };
-                for (var merged = i + 1; merged < j; merged++)
-                {
-                    fragments[merged] = fragments[merged] with { SuppressTextEmission = true };
+                    sources.Add(new ShapedRunSource(fragments[k].Source, fragments[k].Start, fragments[k].Length));
                 }
+
+                runs.Add(new ShapedTextRun
+                {
+                    FirstFragment = i,
+                    Paint = paint,
+                    XOffset = current.XOffset,
+                    IsMarker = current.IsMarker,
+                    GlyphRun = glyphRun,
+                    Sources = sources.MoveToImmutable(),
+                });
             }
 
             i = j;
         }
+
+        return runs.ToImmutable();
     }
 
     private static LinePlacement ExplicitTabPlacement(

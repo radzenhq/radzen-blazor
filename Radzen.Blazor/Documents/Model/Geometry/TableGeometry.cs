@@ -11,6 +11,8 @@ internal readonly struct LaidOutLine
     public required double X { get; init; }
 
     public required double Y { get; init; }
+
+    public int ZOrder { get; init; }
 }
 
 internal readonly struct LaidOutImage
@@ -26,6 +28,8 @@ internal readonly struct LaidOutImage
     public required double Width { get; init; }
 
     public required double Height { get; init; }
+
+    public int ZOrder { get; init; }
 }
 
 internal readonly struct LaidOutCodeSymbol
@@ -43,6 +47,8 @@ internal readonly struct LaidOutCodeSymbol
     public required double Height { get; init; }
 
     public ImmutableArray<LaidOutCaptionLine>? Caption { get; init; }
+
+    public int ZOrder { get; init; }
 }
 
 internal readonly struct LaidOutTablePlacement
@@ -53,7 +59,7 @@ internal readonly struct LaidOutTablePlacement
 
     public required double Y { get; init; }
 
-    public int Order { get; init; }
+    public int ZOrder { get; init; }
 }
 
 internal sealed record LaidOutBox
@@ -74,7 +80,7 @@ internal sealed record LaidOutBox
 
     public Matrix? Transform { get; init; }
 
-    public int Order { get; init; }
+    public int ZOrder { get; init; }
 }
 
 internal sealed record LaidOutCell

@@ -438,45 +438,6 @@ public class LaidOutContractTests
         Assert.True(anchor.Top >= page.ContentBox.Y);
     }
 
-    [Fact]
-    public void PdfPaintOrder_MatchesTheLaidOutPaintOrderContract()
-        => Assert.Equal(LaidOutPaintOrder.Phases, PageContentFinalizer.PaintOrder());
-
-    [Fact]
-    public void LaidOutPaintOrder_PutsBodyBeforeBands()
-        => Assert.Equal(
-            new[] { PageLayerKind.Body, PageLayerKind.Header, PageLayerKind.Footer },
-            LaidOutPaintOrder.Layers.ToArray());
-
-    [Fact]
-    public void LaidOutPaintOrder_PaintsBodyLinesThenTablesAndBoxesThenImagesAndCodeSymbols()
-        => Assert.Equal(
-            new[] { PaintContent.Lines, PaintContent.TablesAndBoxesByOrder, PaintContent.ImagesAndCodeSymbols },
-            LaidOutPaintOrder.BodyContent.ToArray());
-
-    [Fact]
-    public void LaidOutPaintOrder_PaintsBandLinesThenImagesAndCodeSymbolsThenTablesAndBoxes()
-        => Assert.Equal(
-            new[] { PaintContent.Lines, PaintContent.ImagesAndCodeSymbols, PaintContent.TablesAndBoxesByOrder },
-            LaidOutPaintOrder.BandContent.ToArray());
-
-    [Fact]
-    public void LaidOutPaintOrder_BandsSwapTablesAndBoxesWithImagesAndCodeSymbolsComparedToBody()
-    {
-        Assert.Equal(LaidOutPaintOrder.BodyContent[0], LaidOutPaintOrder.BandContent[0]);
-        Assert.Equal(
-            LaidOutPaintOrder.BodyContent.Skip(1).Reverse().ToArray(),
-            LaidOutPaintOrder.BandContent.Skip(1).ToArray());
-    }
-
-    [Fact]
-    public void LaidOutPaintOrder_ContentOfEachLayer_IsTheBodyOrBandContent()
-    {
-        Assert.Equal(LaidOutPaintOrder.BodyContent, LaidOutPaintOrder.ContentOf(PageLayerKind.Body));
-        Assert.Equal(LaidOutPaintOrder.BandContent, LaidOutPaintOrder.ContentOf(PageLayerKind.Header));
-        Assert.Equal(LaidOutPaintOrder.BandContent, LaidOutPaintOrder.ContentOf(PageLayerKind.Footer));
-    }
-
     private static IEnumerable<PropertyInfo> SettableProperties(System.Type type)
         => type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(property => property.SetMethod is { ReturnParameter: var returned }

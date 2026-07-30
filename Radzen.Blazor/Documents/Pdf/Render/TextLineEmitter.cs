@@ -73,6 +73,8 @@ internal sealed class TextLineEmitter(
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
+        var runs = line.ShapedRuns;
+        var runIndex = 0;
         for (var fi = 0; fi < line.Fragments.Length; fi++)
         {
             var fragment = line.Fragments[fi];
@@ -97,18 +99,18 @@ internal sealed class TextLineEmitter(
 
             fragElement = captured ?? fragElement;
 
-            if (fragment.SuppressTextEmission)
+            if (runIndex >= runs.Length || runs[runIndex].FirstFragment != fi)
             {
                 continue;
             }
 
-            var glyphRun = fragment.CoalescedGlyphRun ?? fragment.GlyphRun;
+            var run = runs[runIndex++];
             var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
             EmitGlyphRun(
                 plan,
-                fragment,
-                glyphRun,
-                originX + fragment.XOffset,
+                run.Paint,
+                run.GlyphRun,
+                originX + run.XOffset,
                 y,
                 fragElement,
                 capturedArtifact ?? artifact,
@@ -246,7 +248,7 @@ internal sealed class TextLineEmitter(
 
     private void EmitGlyphRun(
         PagePlan plan,
-        in LineFragment fragment,
+        in FragmentPaint paint,
         in CapturedGlyphRun glyphRun,
         double startX,
         double y,
@@ -254,7 +256,6 @@ internal sealed class TextLineEmitter(
         SemanticArtifactKind? artifact,
         string? extGState)
     {
-        var paint = fragment.Paint;
         var font = paint.Font;
         var size = font.Size * paint.ScriptScale;
         foreach (var span in glyphRun.Spans)

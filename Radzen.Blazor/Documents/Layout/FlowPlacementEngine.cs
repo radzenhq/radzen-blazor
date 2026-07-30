@@ -157,6 +157,7 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             Source = capture.Source(block),
             X = 0,
             Y = Cursor,
+            ZOrder = order++,
         });
     }
 
@@ -198,8 +199,8 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             return default;
         }
 
-        var tableOrder = order++;
         AddBandMarker(table);
+        var tableOrder = order++;
         foreach (var fragment in TablePaginator.Paginate(
             layout,
             table,
@@ -272,6 +273,7 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             measureImage,
             resolution,
             capture);
+        AddBandMarker(container);
         var box = OverlayBoxPlacer.BuildBox(
             container,
             measured,
@@ -281,7 +283,6 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             transform: null,
             resolution,
             indent);
-        AddBandMarker(container);
         band!.Content.Boxes.Add(box);
         Cursor += box.Bounds.Height;
         return default;
@@ -324,6 +325,7 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             imageWidth,
             imageHeight,
             capture,
+            order++,
             indent));
         Cursor += imageHeight;
         return default;
@@ -370,6 +372,7 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
             fonts,
             resolution,
             capture,
+            order++,
             indent));
         Cursor += codeSymbolHeight;
         return default;
@@ -430,6 +433,7 @@ internal sealed class FlowPlacementEngine : ILoweredBlockHandler<int, Nothing>
                 Source = capture.Source(paragraph),
                 X = 0,
                 Y = y,
+                ZOrder = order++,
             });
             y += line.Height;
         }

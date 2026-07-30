@@ -56,13 +56,13 @@ internal static class LayoutGeometry
         foreach (var table in layer.Tables)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} table y={N(table.Bounds.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} order={table.Order} rows={table.Fragment.Rows.Length} headers={table.Fragment.HeaderRowCount} source={Source(table.Source)}");
+                $"  {name} table y={N(table.Bounds.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} zorder={table.ZOrder} rows={table.Fragment.Rows.Length} headers={table.Fragment.HeaderRowCount} source={Source(table.Source)}");
         }
 
         foreach (var box in layer.Boxes)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} box y={N(box.Bounds.Y)} bounds={N(box.Bounds.X)},{N(box.Bounds.Y)},{N(box.Bounds.Width)},{N(box.Bounds.Height)} order={box.Order} opacity={N(box.Opacity)} lines={box.Content.Lines.Length} source={Source(box.Source)}");
+                $"  {name} box y={N(box.Bounds.Y)} bounds={N(box.Bounds.X)},{N(box.Bounds.Y)},{N(box.Bounds.Width)},{N(box.Bounds.Height)} zorder={box.ZOrder} opacity={N(box.Opacity)} lines={box.Content.Lines.Length} source={Source(box.Source)}");
         }
     }
 
@@ -384,9 +384,9 @@ public class DocumentLayoutGeometryTests
     private const string TableGeometry =
         """
         page 1 size 400.00x240.00 content 20.00,20.00,360.00,200.00
-          body table y=0.00 w=300.00 h=193.18 order=0 rows=14 headers=1 source=114
+          body table y=0.00 w=300.00 h=193.18 zorder=0 rows=14 headers=1 source=114
         page 2 size 400.00x240.00 content 20.00,20.00,360.00,200.00
-          body table y=0.00 w=300.00 h=82.79 order=0 rows=6 headers=1 source=114
+          body table y=0.00 w=300.00 h=82.79 zorder=0 rows=6 headers=1 source=114
         """;
 
     private const string GraphicsGeometry =
@@ -394,7 +394,7 @@ public class DocumentLayoutGeometryTests
         page 1 size 400.00x500.00 content 25.00,25.00,350.00,450.00
           body line y=109.40 w=134.75 h=13.80 baseline=10.86 fragments=4 source=3
           body image y=61.40 x=0.00 w=48.00 h=48.00 source=2
-          body box y=0.00 bounds=0.00,0.00,350.00,61.40 order=0 opacity=0.80 lines=3 source=7
+          body box y=0.00 bounds=0.00,0.00,350.00,61.40 zorder=0 opacity=0.80 lines=3 source=7
         """;
 
     private const string TableOfContentsGeometry =
