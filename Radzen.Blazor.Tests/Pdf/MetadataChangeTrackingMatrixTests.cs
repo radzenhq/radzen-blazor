@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Xunit.Sdk;
 using Radzen.Documents;
@@ -78,6 +79,20 @@ public class MetadataChangeTrackingMatrixTests
         Assert.False(document.OutlineChanged);
         Assert.False(document.PageLabelsChanged);
         Assert.False(document.Attachments.IsModified);
+    }
+
+    [Fact]
+    public void AssigningACollectionItemToItselfLeavesTrackingAndTheMaterializedGraphUntouched()
+    {
+        var document = Loaded();
+        var outline = document.Outline;
+        var graph = new DocumentObjectGraph();
+        document.MaterializedGraph = graph;
+
+        outline[0] = outline[0];
+
+        Assert.False(document.OutlineChanged);
+        Assert.Same(graph, document.MaterializedGraph);
     }
 
     [Fact]

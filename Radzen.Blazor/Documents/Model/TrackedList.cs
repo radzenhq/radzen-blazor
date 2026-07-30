@@ -14,6 +14,11 @@ internal sealed class TrackedList<T>(Action? changed = null) : IList<T>, IReadOn
         get => items[index];
         set
         {
+            if (ReferenceEquals(items[index], value) || EqualityComparer<T>.Default.Equals(items[index], value))
+            {
+                return;
+            }
+
             items[index] = value;
             Changed();
         }
