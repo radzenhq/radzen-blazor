@@ -13,12 +13,12 @@ internal sealed class DocumentGenerator
     private readonly StructureTreeBuilder structureTree;
     private readonly GeneratorFontResolver fontResolver;
     private readonly ImageStore imageStore;
-    private readonly TextLineEmitter textEmitter;
-    private readonly TableEmitter tableEmitter;
-    private readonly BoxEmitter boxEmitter;
-    private readonly ImageEmitter imageEmitter;
-    private readonly CodeSymbolEmitter codeSymbolEmitter;
-    private readonly WatermarkEmitter watermarkEmitter;
+    private readonly TextLinePlanner textPlanner;
+    private readonly TablePlanner tablePlanner;
+    private readonly BoxPlanner boxPlanner;
+    private readonly ImagePlanner imagePlanner;
+    private readonly CodeSymbolPlanner codeSymbolPlanner;
+    private readonly WatermarkDrawPlanner watermarkPlanner;
 
     private readonly bool markArtifacts;
 
@@ -33,17 +33,17 @@ internal sealed class DocumentGenerator
         structureTree.Build();
 
         fontResolver = new(request.Conformance);
-        imageStore = new();
-        textEmitter = new(
+        imageStore = new(request.Decoders);
+        textPlanner = new(
             fontResolver,
             imageStore,
             structureTree,
             laidOut.Fonts.AllowUnsupportedCharacters);
-        codeSymbolEmitter = new(structureTree);
-        imageEmitter = new(imageStore, structureTree);
-        tableEmitter = new(imageStore, structureTree);
-        boxEmitter = new(tableEmitter);
-        watermarkEmitter = new(
+        codeSymbolPlanner = new(structureTree);
+        imagePlanner = new(imageStore, structureTree);
+        tablePlanner = new(imageStore, structureTree);
+        boxPlanner = new(tablePlanner);
+        watermarkPlanner = new(
             fontResolver,
             imageStore,
             laidOut.Fonts.AllowUnsupportedCharacters);
@@ -63,6 +63,7 @@ internal sealed class DocumentGenerator
             CompressOutput = request.CompressOutput,
             IncludeDocumentId = request.IncludeDocumentId,
             ViewerPreferences = request.ViewerPreferences,
+            ImageDecoders = request.Decoders,
         };
 
         output.Info.Producer = request.Producer;
@@ -133,7 +134,8 @@ internal sealed class DocumentGenerator
             emissionPages,
             StructureTreeBuilder.Capture(structureTree.DocumentElement, emissionPages),
             anchors.ToImmutable(),
-            [.. request.RoleMap.Entries]);
+            [.. request.RoleMap.Entries],
+            structureTree.UnmappedRoles);
 
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
@@ -157,8 +159,8 @@ internal sealed class DocumentGenerator
         var context = new EmitContext
         {
             Plan = plan,
-            Text = textEmitter,
-            CodeSymbols = codeSymbolEmitter,
+            Text = textPlanner,
+            CodeSymbols = codeSymbolPlanner,
         };
         var left = page.ContentBox.X;
         var contentTop = PageSpace.FromTop(height, page.ContentBox.Y);
@@ -189,7 +191,7 @@ internal sealed class DocumentGenerator
 
         if (page.Watermark is not null)
         {
-            watermarkEmitter.Plan(plan, page.Watermark);
+            watermarkPlanner.Plan(plan, page.Watermark);
         }
 
         return plan;
@@ -203,14 +205,14 @@ internal sealed class DocumentGenerator
             switch (content)
             {
                 case PaintContent.Lines when body:
-                    textEmitter.EmitLines(
+                    textPlanner.EmitLines(
                         context, layer.Lines,
                         left, top, delta: 0,
                         opacity: 1, inherited: null, resolveStructure: true,
                         overflowThreshold: double.PositiveInfinity);
                     break;
                 case PaintContent.Lines:
-                    textEmitter.EmitBandLines(context, layer.Lines, left, top);
+                    textPlanner.EmitBandLines(context, layer.Lines, left, top);
                     break;
                 case PaintContent.TablesAndBoxesByOrder:
                     EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
@@ -226,12 +228,12 @@ internal sealed class DocumentGenerator
     {
         foreach (var positioned in layer.Images)
         {
-            imageEmitter.EmitImage(context, positioned, left, top);
+            imagePlanner.EmitImage(context, positioned, left, top);
         }
 
         foreach (var positioned in layer.CodeSymbols)
         {
-            codeSymbolEmitter.EmitCodeSymbol(context, positioned, left, top);
+            codeSymbolPlanner.EmitCodeSymbol(context, positioned, left, top);
         }
     }
 
@@ -247,8 +249,8 @@ internal sealed class DocumentGenerator
             static table => table.ZOrder,
             boxes,
             static box => box.ZOrder,
-            table => tableEmitter.EmitFragment(context, table, left, top),
-            box => boxEmitter.EmitBox(context, box, left, top));
+            table => tablePlanner.EmitFragment(context, table, left, top),
+            box => boxPlanner.EmitBox(context, box, left, top));
     }
 
 }

@@ -222,92 +222,12 @@ internal static class DocumentLayouter
         var anchors = new Dictionary<string, int>(StringComparer.Ordinal);
         for (var i = 0; i < pages.Length; i++)
         {
-            var page = pages[i];
-            CollectLayer(anchors, page.Body, i + 1);
-            CollectLayer(anchors, page.HeaderLayer, i + 1);
-            CollectLayer(anchors, page.FooterLayer, i + 1);
+            foreach (var anchor in PageNavigationCollector.Anchors(pages[i]))
+            {
+                anchors.TryAdd(anchor.Name, i + 1);
+            }
         }
 
         return anchors;
-    }
-
-    private static void CollectLayer(Dictionary<string, int> anchors, LaidOutLayer layer, int page)
-    {
-        foreach (var line in layer.Lines)
-        {
-            CollectLine(anchors, line.Line, page);
-        }
-
-        foreach (var table in layer.Tables)
-        {
-            CollectFragment(anchors, table, page);
-        }
-
-        foreach (var box in layer.Boxes)
-        {
-            CollectBoxContent(anchors, box.Content, page);
-        }
-    }
-
-    private static void CollectFragment(Dictionary<string, int> anchors, in LaidOutTableFragment positioned, int page)
-    {
-        foreach (var row in positioned.Rows)
-        {
-            foreach (var placed in row.Cells)
-            {
-                CollectCell(anchors, placed.Cell, page);
-            }
-        }
-    }
-
-    private static void CollectCell(Dictionary<string, int> anchors, LaidOutCell cell, int page)
-    {
-        foreach (var line in cell.Lines)
-        {
-            CollectLine(anchors, line.Line, page);
-        }
-
-        CollectNested(anchors, cell.Tables, cell.Boxes, page);
-    }
-
-    private static void CollectBoxContent(Dictionary<string, int> anchors, in LaidOutBoxContent content, int page)
-    {
-        foreach (var line in content.Lines)
-        {
-            CollectLine(anchors, line.Line, page);
-        }
-
-        CollectNested(anchors, content.Tables, content.Boxes, page);
-    }
-
-    private static void CollectNested(
-        Dictionary<string, int> anchors,
-        ImmutableArray<LaidOutTablePlacement> tables,
-        ImmutableArray<LaidOutBox> boxes,
-        int page)
-    {
-        foreach (var nested in tables)
-        {
-            foreach (var cell in nested.Layout.Cells)
-            {
-                CollectCell(anchors, cell, page);
-            }
-        }
-
-        foreach (var nested in boxes)
-        {
-            CollectBoxContent(anchors, nested.Content, page);
-        }
-    }
-
-    private static void CollectLine(Dictionary<string, int> anchors, LineBox line, int page)
-    {
-        foreach (var fragment in line.Fragments)
-        {
-            if (fragment.Paint.Anchor is { Length: > 0 } anchor)
-            {
-                anchors.TryAdd(anchor, page);
-            }
-        }
     }
 }

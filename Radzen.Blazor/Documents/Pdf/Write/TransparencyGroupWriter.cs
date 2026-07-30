@@ -43,7 +43,7 @@ internal static class TransparencyGroupWriter
             var xobjects = new DictionaryObject();
             foreach (var (name, xobject) in group.XObjects)
             {
-                xobjects[name] = writer.Add(xobject.CreateStream());
+                xobjects[name] = writer.Add(ImageXObjectBuilder.Build(xobject));
             }
 
             dict["Resources"] = new DictionaryObject { ["XObject"] = xobjects };

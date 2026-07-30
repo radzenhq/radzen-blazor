@@ -1,10 +1,9 @@
 using System;
-using System.Runtime.InteropServices;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
+internal sealed class TablePlanner(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
     internal SemanticArtifactKind? ArtifactOf(SourceId source) => structureTree.ArtifactOf(source);
 
@@ -34,7 +33,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         foreach (var row in positioned.Rows)
         {
-            var repeated = row.IsHeader && positioned.Fragment.ContainsRepeatedHeaders;
+            var rowArtifact = row.Artifact ?? tableArtifact;
             PaintRowBackground(
                 plan,
                 row.Background,
@@ -42,9 +41,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 PageSpace.FromTop(contentTop, row.Y + row.Height),
                 layout.Width,
                 row.Height,
-                repeated
-                    ? SemanticArtifactKind.RepeatedContent
-                    : tableArtifact ?? SemanticArtifactKind.LayoutDecoration);
+                SemanticArtifacts.ForDecoration(rowArtifact));
 
             foreach (var placed in row.Cells)
             {
@@ -55,7 +52,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                     contentTop,
                     placed.Delta,
                     null,
-                    repeated ? SemanticArtifactKind.RepeatedContent : tableArtifact);
+                    rowArtifact);
             }
         }
 
@@ -67,7 +64,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 tableBounds,
                 tableRadius,
                 tableMark,
-                tableArtifact ?? SemanticArtifactKind.LayoutDecoration);
+                SemanticArtifacts.ForDecoration(tableArtifact));
         }
     }
 
@@ -134,14 +131,13 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         artifact ??= structureTree.ArtifactOf(cell.Source);
         var element = artifact is null ? structureTree.ElementOf(cell.Source) ?? inherited : null;
         var opacity = cell.Opacity;
-        var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
         var bounds = PageSpace.Bounds(left, contentTop, cell.Bounds, delta);
-        BoxRenderer.Paint(
+        BoxDecorationPlanner.Paint(
             plan,
             bounds,
+            opacity,
             cell.Decoration,
-            extGState,
-            artifact ?? SemanticArtifactKind.LayoutDecoration);
+            SemanticArtifacts.ForDecoration(artifact));
 
         EmitBoxContent(
             context,
@@ -193,10 +189,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var cellClip = clip;
         if (overflows)
         {
-            var texts = CollectionsMarshal.AsSpan(plan.Texts);
-            for (var t = firstText; t < texts.Length; t++)
+            for (var t = firstText; t < plan.Texts.Count; t++)
             {
-                texts[t].Clip = cellClip;
+                plan.Texts[t] = plan.Texts[t] with { Clip = cellClip };
             }
         }
 
@@ -239,22 +234,19 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         if (contentOverflows)
         {
-            var imageDraws = CollectionsMarshal.AsSpan(plan.Images);
-            for (var im = firstImage; im < imageDraws.Length; im++)
+            for (var im = firstImage; im < plan.Images.Count; im++)
             {
-                imageDraws[im].Clip = cellClip;
+                plan.Images[im] = plan.Images[im] with { Clip = cellClip };
             }
 
-            var fills = CollectionsMarshal.AsSpan(plan.Fills);
-            for (var f = firstFill; f < fills.Length; f++)
+            for (var f = firstFill; f < plan.Fills.Count; f++)
             {
-                fills[f].Clip = cellClip;
+                plan.Fills[f] = plan.Fills[f] with { Clip = cellClip };
             }
 
-            var codeSymbolTexts = CollectionsMarshal.AsSpan(plan.Texts);
-            for (var t = firstCodeSymbolText; t < codeSymbolTexts.Length; t++)
+            for (var t = firstCodeSymbolText; t < plan.Texts.Count; t++)
             {
-                codeSymbolTexts[t].Clip = cellClip;
+                plan.Texts[t] = plan.Texts[t] with { Clip = cellClip };
             }
         }
 
@@ -310,7 +302,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                     rowTop + rowHeights[r]),
                 nested.Layout.Width,
                 rowHeights[r],
-                artifact ?? SemanticArtifactKind.LayoutDecoration);
+                SemanticArtifacts.ForDecoration(artifact));
             rowTop += rowHeights[r];
         }
 
@@ -327,7 +319,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 nestedBounds,
                 nestedRadius,
                 nestedMark,
-                artifact ?? SemanticArtifactKind.LayoutDecoration);
+                SemanticArtifacts.ForDecoration(artifact));
         }
     }
 
@@ -344,14 +336,14 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var bounds = PageSpace.Bounds(left, contentTop, box.Bounds, delta);
         var opacity = box.Opacity;
         var artifact = inheritedArtifact ?? structureTree.ArtifactOf(box.Source);
-        ContainerDecoration.Paint(
+        BoxDecorationPlanner.Paint(
             plan,
             bounds,
             opacity,
             box.Style,
-            artifact ?? SemanticArtifactKind.LayoutDecoration);
+            SemanticArtifacts.ForDecoration(artifact));
 
-        var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Padding));
+        var innerWidth = Math.Max(0, box.Bounds.Width - box.Padding.Horizontal);
         EmitBoxContent(
             context,
             box.Content,

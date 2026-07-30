@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Radzen.Documents.Fonts;
@@ -8,184 +9,201 @@ namespace Radzen.Documents.Layout;
 
 internal static class CodeSymbolDispatch
 {
-    private static readonly SizeVisitor size = new();
-    private static readonly AlignmentVisitor alignment = new();
+    private static readonly CodeSymbolShapeVisitor shapes = new();
 
     public static (double Width, double Height) Measure(
         Block block,
         LayoutCaptureContext capture,
         FontCollection? fonts = null,
         LoweringContext? resolution = null)
-        => block.Accept(size, (fonts, resolution, capture));
+        => Shape(block)?.Size(fonts, resolution, capture) ?? (0, 0);
 
-    public static HorizontalAlignment Alignment(Block block) => block.Accept(alignment, default);
+    public static HorizontalAlignment Alignment(Block block)
+        => Shape(block)?.Alignment ?? HorizontalAlignment.Left;
 
-    private static readonly ModuleVisitor modules = new();
-
-    public static ImmutableArray<CodeSymbolModule> Modules(Block block) => block.Accept(modules, default);
-
-    public static IReadOnlyList<LineBox> CaptionLines(
-        Barcode barcode,
-        Font font,
-        FontCollection fonts,
-        LayoutCaptureContext capture)
-    {
-        var run = new Run(barcode.Value);
-        run.Font.InheritFrom(font);
-        var paragraph = new Paragraph { Alignment = HorizontalAlignment.Center };
-        paragraph.Font.InheritFrom(font);
-        paragraph.Inlines.Add(run);
-
-        return LineLayouter.Layout(paragraph, barcode.Width.Point, fonts, capture);
-    }
+    public static ImmutableArray<CodeSymbolModule> Modules(Block block)
+        => Shape(block)?.Modules ?? [];
 
     public static ImmutableArray<LaidOutCaptionLine>? Caption(
         Block block,
         FontCollection fonts,
         LoweringContext? resolution,
         LayoutCaptureContext capture)
+        => Shape(block)?.Caption(fonts, resolution, capture);
+
+    private static CodeSymbolShape? Shape(Block block) => block.Accept(shapes, default);
+
+    private sealed class CodeSymbolShapeVisitor : BlockVisitor<Nothing, CodeSymbolShape?>
     {
-        if (block is not Barcode barcode || !barcode.ShowText)
-        {
-            return null;
-        }
+        protected override CodeSymbolShape? Default(Block block, Nothing context) => null;
 
-        var lines = CaptionLines(
-            barcode,
-            resolution?.BarcodeFont(barcode) ?? barcode.Font,
-            fonts,
-            capture);
-        var positioned = ImmutableArray.CreateBuilder<LaidOutCaptionLine>(lines.Count);
-        var y = barcode.Height.Point;
-        foreach (var line in lines)
-        {
-            positioned.Add(new LaidOutCaptionLine { Line = line, Y = y });
-            y += line.Height;
-        }
+        public override CodeSymbolShape? Visit(QrCode block, Nothing context) => new QrCodeShape(block);
 
-        return positioned.MoveToImmutable();
+        public override CodeSymbolShape? Visit(Barcode block, Nothing context) => new BarcodeShape(block);
     }
 
-    private static double TextBandHeight(
-        Barcode barcode,
-        FontCollection? fonts,
-        LoweringContext? resolution,
-        LayoutCaptureContext capture)
+    private abstract class CodeSymbolShape
     {
-        if (!barcode.ShowText || fonts is null)
-        {
-            return 0;
-        }
+        public abstract HorizontalAlignment Alignment { get; }
 
-        var height = 0.0;
+        public abstract ImmutableArray<CodeSymbolModule> Modules { get; }
 
-        foreach (var line in CaptionLines(
-            barcode,
-            resolution?.BarcodeFont(barcode) ?? barcode.Font,
-            fonts,
-            capture))
-        {
-            height += line.Height;
-        }
+        public abstract (double Width, double Height) Size(
+            FontCollection? fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture);
 
-        return height;
+        public abstract ImmutableArray<LaidOutCaptionLine>? Caption(
+            FontCollection fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture);
     }
 
-    private sealed class SizeVisitor
-        : BlockVisitor<
-            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture),
-            (double Width, double Height)>
+    private sealed class QrCodeShape(QrCode qr) : CodeSymbolShape
     {
-        protected override (double Width, double Height) Default(
-            Block block,
-            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
-            => (0, 0);
+        public override HorizontalAlignment Alignment => qr.Alignment;
 
-        public override (double Width, double Height) Visit(
-            QrCode qr,
-            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
+        public override (double Width, double Height) Size(
+            FontCollection? fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
             => (qr.Size.Point, qr.Size.Point);
 
-        public override (double Width, double Height) Visit(
-            Barcode barcode,
-            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
-            => (
-                barcode.Width.Point,
-                barcode.Height.Point + TextBandHeight(
-                    barcode,
-                    context.Fonts,
-                    context.Resolution,
-                    context.Capture));
-    }
+        public override ImmutableArray<LaidOutCaptionLine>? Caption(
+            FontCollection fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
+            => null;
 
-    private static int QuietZoneModules(BarcodeType type) => type switch
-    {
-        BarcodeType.Ean13 or BarcodeType.Ean8 or BarcodeType.Isbn or BarcodeType.Issn => 11,
-        BarcodeType.UpcA => 9,
-        _ => 10,
-    };
-
-    private sealed class ModuleVisitor : BlockVisitor<Nothing, ImmutableArray<CodeSymbolModule>>
-    {
-        protected override ImmutableArray<CodeSymbolModule> Default(Block block, Nothing context) => [];
-
-        public override ImmutableArray<CodeSymbolModule> Visit(QrCode qr, Nothing context)
+        public override ImmutableArray<CodeSymbolModule> Modules
         {
-            var matrix = QrEncoder.EncodeUtf8(qr.Value, qr.ErrorCorrection);
-            var count = matrix.GetLength(0);
-            var quiet = System.Math.Max(0, qr.QuietZoneModules);
-            var module = qr.Size.Point / (count + (2 * quiet));
-
-            var result = ImmutableArray.CreateBuilder<CodeSymbolModule>();
-            for (var row = 0; row < count; row++)
+            get
             {
-                for (var column = 0; column < count; column++)
+                var matrix = QrEncoder.EncodeUtf8(qr.Value, qr.ErrorCorrection);
+                var count = matrix.GetLength(0);
+                var quiet = Math.Max(0, qr.QuietZoneModules);
+                var module = qr.Size.Point / (count + (2 * quiet));
+
+                var result = ImmutableArray.CreateBuilder<CodeSymbolModule>();
+                for (var row = 0; row < count; row++)
                 {
-                    if (matrix[row, column])
+                    for (var column = 0; column < count; column++)
                     {
-                        result.Add(new CodeSymbolModule
+                        if (matrix[row, column])
                         {
-                            X = (quiet + column) * module,
-                            Y = (quiet + row) * module,
-                            Width = module,
-                            Height = module,
-                        });
+                            result.Add(new CodeSymbolModule
+                            {
+                                X = (quiet + column) * module,
+                                Y = (quiet + row) * module,
+                                Width = module,
+                                Height = module,
+                            });
+                        }
                     }
                 }
+
+                return result.ToImmutable();
             }
-
-            return result.ToImmutable();
-        }
-
-        public override ImmutableArray<CodeSymbolModule> Visit(Barcode barcode, Nothing context)
-        {
-            var quiet = QuietZoneModules(barcode.Type);
-            var (bars, moduleCount, _) = BarcodeEncoder.EncodeToBars(
-                barcode.Type, barcode.Value, barcode.Height.Point, quiet);
-            var scaleX = barcode.Width.Point / moduleCount;
-
-            var result = ImmutableArray.CreateBuilder<CodeSymbolModule>(bars.Count);
-            foreach (var bar in bars)
-            {
-                result.Add(new CodeSymbolModule
-                {
-                    X = bar.X * scaleX,
-                    Y = bar.Y,
-                    Width = bar.Width * scaleX,
-                    Height = bar.Height,
-                });
-            }
-
-            return result.MoveToImmutable();
         }
     }
 
-    private sealed class AlignmentVisitor : BlockVisitor<Nothing, HorizontalAlignment>
+    private sealed class BarcodeShape(Barcode barcode) : CodeSymbolShape
     {
-        protected override HorizontalAlignment Default(Block block, Nothing context) => HorizontalAlignment.Left;
+        public override HorizontalAlignment Alignment => barcode.Alignment;
 
-        public override HorizontalAlignment Visit(QrCode qr, Nothing context) => qr.Alignment;
+        public override (double Width, double Height) Size(
+            FontCollection? fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
+            => (barcode.Width.Point, barcode.Height.Point + TextBandHeight(fonts, resolution, capture));
 
-        public override HorizontalAlignment Visit(Barcode barcode, Nothing context) => barcode.Alignment;
+        public override ImmutableArray<LaidOutCaptionLine>? Caption(
+            FontCollection fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
+        {
+            if (!barcode.ShowText)
+            {
+                return null;
+            }
+
+            var lines = Lines(fonts, resolution, capture);
+            var positioned = ImmutableArray.CreateBuilder<LaidOutCaptionLine>(lines.Count);
+            var y = barcode.Height.Point;
+            foreach (var line in lines)
+            {
+                positioned.Add(new LaidOutCaptionLine { Line = line, Y = y });
+                y += line.Height;
+            }
+
+            return positioned.MoveToImmutable();
+        }
+
+        public override ImmutableArray<CodeSymbolModule> Modules
+        {
+            get
+            {
+                var quiet = QuietZoneModules(barcode.Type);
+                var (bars, moduleCount, _) = BarcodeEncoder.EncodeToBars(
+                    barcode.Type, barcode.Value, barcode.Height.Point, quiet);
+                var scaleX = barcode.Width.Point / moduleCount;
+
+                var result = ImmutableArray.CreateBuilder<CodeSymbolModule>(bars.Count);
+                foreach (var bar in bars)
+                {
+                    result.Add(new CodeSymbolModule
+                    {
+                        X = bar.X * scaleX,
+                        Y = bar.Y,
+                        Width = bar.Width * scaleX,
+                        Height = bar.Height,
+                    });
+                }
+
+                return result.MoveToImmutable();
+            }
+        }
+
+        private double TextBandHeight(
+            FontCollection? fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
+        {
+            if (!barcode.ShowText || fonts is null)
+            {
+                return 0;
+            }
+
+            var height = 0.0;
+
+            foreach (var line in Lines(fonts, resolution, capture))
+            {
+                height += line.Height;
+            }
+
+            return height;
+        }
+
+        private IReadOnlyList<LineBox> Lines(
+            FontCollection fonts,
+            LoweringContext? resolution,
+            LayoutCaptureContext capture)
+        {
+            var font = resolution?.BarcodeFont(barcode) ?? barcode.Font;
+            var run = new Run(barcode.Value);
+            run.Font.InheritFrom(font);
+            var paragraph = new Paragraph { Alignment = HorizontalAlignment.Center };
+            paragraph.Font.InheritFrom(font);
+            paragraph.Inlines.Add(run);
+
+            return LineLayouter.Layout(paragraph, barcode.Width.Point, fonts, capture);
+        }
+
+        private static int QuietZoneModules(BarcodeType type) => type switch
+        {
+            BarcodeType.Ean13 or BarcodeType.Ean8 or BarcodeType.Isbn or BarcodeType.Issn => 11,
+            BarcodeType.UpcA => 9,
+            _ => 10,
+        };
     }
 }

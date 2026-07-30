@@ -3,7 +3,7 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class CodeSymbolEmitter(StructureTreeBuilder structureTree)
+internal sealed class CodeSymbolPlanner(StructureTreeBuilder structureTree)
 {
     private static readonly Color ModuleBlack = Color.FromRgb(0, 0, 0);
 

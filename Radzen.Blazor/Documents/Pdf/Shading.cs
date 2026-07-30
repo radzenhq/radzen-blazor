@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Geometry;
 
@@ -9,109 +8,92 @@ namespace Radzen.Documents.Pdf;
 // ISO 32000-1 8.7.4.5.2/8.7.4.5.3: axial/radial /Shading dictionaries.
 internal static class ShadingBuilder
 {
+    private readonly record struct ShadingDescriptor(int Type, ArrayObject Coords, IReadOnlyList<GradientStopPaint> Stops);
+
     // ISO 32000-1 Table 78: /Extend defaults to [false false].
     private static ArrayObject BothEndsExtended() => [new BooleanObject(true), new BooleanObject(true)];
 
-    public static DictionaryObject BuildShading(GradientBrush brush)
-    {
-        return new DictionaryObject
-        {
-            ["ShadingType"] = new NumberObject(ShadingType(brush)),
-            ["ColorSpace"] = new NameObject("DeviceRGB"),
-            ["Coords"] = Coords(brush),
-            ["Function"] = BuildFunction(brush.Stops),
-            ["Extend"] = BothEndsExtended(),
-        };
-    }
+    public static DictionaryObject BuildShading(GradientBrush brush) => BuildShading(Describe(brush));
 
-    public static DictionaryObject BuildShading(in GradientPaint brush)
-    {
-        return new DictionaryObject
-        {
-            ["ShadingType"] = new NumberObject(ShadingType(brush)),
-            ["ColorSpace"] = new NameObject("DeviceRGB"),
-            ["Coords"] = Coords(brush),
-            ["Function"] = BuildFunction(brush.Stops),
-            ["Extend"] = BothEndsExtended(),
-        };
-    }
+    public static DictionaryObject BuildShading(in GradientPaint brush) => BuildShading(Describe(brush));
 
-    private static int ShadingType(in GradientPaint brush) => brush.Kind switch
+    private static DictionaryObject BuildShading(ShadingDescriptor shading) => new()
     {
-        GradientPaintKind.Linear => 2,
-        GradientPaintKind.Radial => 3,
+        ["ShadingType"] = new NumberObject(shading.Type),
+        ["ColorSpace"] = new NameObject("DeviceRGB"),
+        ["Coords"] = shading.Coords,
+        ["Function"] = BuildFunction(shading.Stops),
+        ["Extend"] = BothEndsExtended(),
+    };
+
+    private static ShadingDescriptor Describe(in GradientPaint brush) => brush.Kind switch
+    {
+        GradientPaintKind.Linear => new ShadingDescriptor(
+            2,
+            [
+                new NumberObject(brush.X0), new NumberObject(brush.Y0),
+                new NumberObject(brush.X1), new NumberObject(brush.Y1),
+            ],
+            brush.Stops),
+        GradientPaintKind.Radial => new ShadingDescriptor(
+            3,
+            [
+                new NumberObject(brush.X0), new NumberObject(brush.Y0), new NumberObject(brush.R0),
+                new NumberObject(brush.X1), new NumberObject(brush.Y1), new NumberObject(brush.R1),
+            ],
+            brush.Stops),
         _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.Kind}'."),
     };
 
-    private static int ShadingType(GradientBrush brush) => brush switch
+    private static ShadingDescriptor Describe(GradientBrush brush) => brush switch
     {
-        LinearGradient => 2,
-        RadialGradient => 3,
+        LinearGradient linear => new ShadingDescriptor(
+            2,
+            [
+                new NumberObject(linear.X0.Point), new NumberObject(linear.Y0.Point),
+                new NumberObject(linear.X1.Point), new NumberObject(linear.Y1.Point),
+            ],
+            Stops(brush)),
+        RadialGradient radial => new ShadingDescriptor(
+            3,
+            [
+                new NumberObject(radial.X0.Point), new NumberObject(radial.Y0.Point), new NumberObject(radial.R0.Point),
+                new NumberObject(radial.X1.Point), new NumberObject(radial.Y1.Point), new NumberObject(radial.R1.Point),
+            ],
+            Stops(brush)),
         _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.GetType()}'."),
     };
 
-    private static ArrayObject Coords(in GradientPaint brush) => brush.Kind switch
+    private static GradientStopPaint[] Stops(GradientBrush brush)
     {
-        GradientPaintKind.Linear =>
-        [
-            new NumberObject(brush.X0), new NumberObject(brush.Y0),
-            new NumberObject(brush.X1), new NumberObject(brush.Y1),
-        ],
-        GradientPaintKind.Radial =>
-        [
-            new NumberObject(brush.X0), new NumberObject(brush.Y0), new NumberObject(brush.R0),
-            new NumberObject(brush.X1), new NumberObject(brush.Y1), new NumberObject(brush.R1),
-        ],
-        _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.Kind}'."),
-    };
+        var stops = new GradientStopPaint[brush.Stops.Count];
+        for (var i = 0; i < stops.Length; i++)
+        {
+            stops[i] = new GradientStopPaint(brush.Stops[i].Offset, brush.Stops[i].Color);
+        }
 
-    private static ArrayObject Coords(GradientBrush brush) => brush switch
-    {
-        LinearGradient linear =>
-        [
-            new NumberObject(linear.X0.Point), new NumberObject(linear.Y0.Point),
-            new NumberObject(linear.X1.Point), new NumberObject(linear.Y1.Point),
-        ],
-        RadialGradient radial =>
-        [
-            new NumberObject(radial.X0.Point), new NumberObject(radial.Y0.Point), new NumberObject(radial.R0.Point),
-            new NumberObject(radial.X1.Point), new NumberObject(radial.Y1.Point), new NumberObject(radial.R1.Point),
-        ],
-        _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.GetType()}'."),
-    };
+        return stops;
+    }
 
-    public static DictionaryObject BuildPattern(GradientBrush brush) => new()
+    public static DictionaryObject BuildPattern(GradientBrush brush) => BuildPattern(Describe(brush));
+
+    public static DictionaryObject BuildPattern(in GradientPaint brush) => BuildPattern(Describe(brush));
+
+    private static DictionaryObject BuildPattern(ShadingDescriptor shading) => new()
     {
         ["Type"] = new NameObject("Pattern"),
         ["PatternType"] = new NumberObject(2),
-        ["Shading"] = BuildShading(brush),
-    };
-
-    public static DictionaryObject BuildPattern(in GradientPaint brush) => new()
-    {
-        ["Type"] = new NameObject("Pattern"),
-        ["PatternType"] = new NumberObject(2),
-        ["Shading"] = BuildShading(brush),
+        ["Shading"] = BuildShading(shading),
     };
 
     public static DictionaryObject BuildPattern(GradientBrush brush, Matrix matrix)
-    {
-        var pattern = BuildPattern(brush);
-        pattern["Matrix"] = new ArrayObject
-        {
-            new NumberObject(matrix.A),
-            new NumberObject(matrix.B),
-            new NumberObject(matrix.C),
-            new NumberObject(matrix.D),
-            new NumberObject(matrix.E),
-            new NumberObject(matrix.F),
-        };
-        return pattern;
-    }
+        => WithMatrix(BuildPattern(brush), matrix);
 
     public static DictionaryObject BuildPattern(in GradientPaint brush, Matrix matrix)
+        => WithMatrix(BuildPattern(brush), matrix);
+
+    private static DictionaryObject WithMatrix(DictionaryObject pattern, Matrix matrix)
     {
-        var pattern = BuildPattern(brush);
         pattern["Matrix"] = new ArrayObject
         {
             new NumberObject(matrix.A),
@@ -124,7 +106,7 @@ internal static class ShadingBuilder
         return pattern;
     }
 
-    public static DictionaryObject BuildFunction(IReadOnlyList<GradientStop> stops)
+    private static DictionaryObject BuildFunction(IReadOnlyList<GradientStopPaint> stops)
     {
         if (stops.Count == 1)
         {
@@ -176,58 +158,6 @@ internal static class ShadingBuilder
         };
     }
 
-    private static DictionaryObject BuildFunction(ImmutableArray<GradientStopPaint> stops)
-    {
-        if (stops.Length == 1)
-        {
-            return Exponential(stops[0].Color, stops[0].Color);
-        }
-
-        var leading = stops[0].Offset > 0;
-        var trailing = stops[^1].Offset < 1;
-        if (stops.Length == 2 && !leading && !trailing)
-        {
-            return Exponential(stops[0].Color, stops[^1].Color);
-        }
-
-        ArrayObject functions = [];
-        var bounds = new List<double>();
-        ArrayObject encode = [];
-
-        if (leading)
-        {
-            functions.Add(Exponential(stops[0].Color, stops[0].Color));
-            AddUnitEncode(encode);
-            bounds.Add(stops[0].Offset);
-        }
-
-        for (var i = 0; i < stops.Length - 1; i++)
-        {
-            functions.Add(Exponential(stops[i].Color, stops[i + 1].Color));
-            AddUnitEncode(encode);
-            if (i < stops.Length - 2)
-            {
-                bounds.Add(stops[i + 1].Offset);
-            }
-        }
-
-        if (trailing)
-        {
-            bounds.Add(stops[^1].Offset);
-            functions.Add(Exponential(stops[^1].Color, stops[^1].Color));
-            AddUnitEncode(encode);
-        }
-
-        return new DictionaryObject
-        {
-            ["FunctionType"] = new NumberObject(3),
-            ["Domain"] = Domain(),
-            ["Functions"] = functions,
-            ["Bounds"] = BoundsWithinDomain(bounds),
-            ["Encode"] = encode,
-        };
-    }
-
     // ISO 32000-1 7.10.4: Type 3 /Bounds must lie strictly inside the domain.
     private static ArrayObject BoundsWithinDomain(List<double> bounds)
     {
@@ -266,8 +196,8 @@ internal static class ShadingBuilder
     {
         ["FunctionType"] = new NumberObject(2),
         ["Domain"] = Domain(),
-        ["C0"] = PdfColorArray.Rgb(from),
-        ["C1"] = PdfColorArray.Rgb(to),
+        ["C0"] = PdfColor.Rgb(from),
+        ["C1"] = PdfColor.Rgb(to),
         ["N"] = new NumberObject(1),
     };
 

@@ -252,15 +252,7 @@ internal sealed class IncrementalDocumentSaver
             var updated = page.CropBoxSet && page.CropBox is null
                 ? sourceNode.Copy("CropBox")
                 : sourceNode.Copy();
-            if (page.MediaBoxSet)
-            {
-                updated["MediaBox"] = PageResourceBuilder.NumberBox(page.MediaBox);
-            }
-
-            if (page.CropBoxSet && page.CropBox is { } cropBox)
-            {
-                updated["CropBox"] = PageResourceBuilder.NumberBox(cropBox);
-            }
+            PageBoxWriter.WriteExplicitBoxes(updated, page);
 
             pageOverrides[number] = updated;
             changed = true;
@@ -348,7 +340,7 @@ internal sealed class IncrementalDocumentSaver
             ["Parent"] = parent,
         };
 
-        PageResourceBuilder.EmitPageGeometry(doc, page, node);
+        PageBoxWriter.EmitPageGeometry(doc, page, node);
 
         if (emission.Bytes is not null)
         {
@@ -392,7 +384,7 @@ internal sealed class IncrementalDocumentSaver
                 continue;
             }
 
-            var annotations = AnnotationEmitter.BuildIncremental(
+            var annotations = AnnotationWriter.BuildIncremental(
                 writer, page.Annotations, pages, i, doc.Loaded!.Source!, appendImporters);
             if (doc.Loaded!.SourcePages.ContainsKey(page))
             {

@@ -13,6 +13,19 @@ internal sealed class PageNavigationCollector
 
     public static LaidOutPage Collect(LaidOutPage page)
     {
+        var collector = Walk(page);
+
+        return page with
+        {
+            Links = [.. collector.links],
+            Anchors = [.. collector.anchors],
+        };
+    }
+
+    public static ImmutableArray<LaidOutAnchor> Anchors(LaidOutPage page) => [.. Walk(page).anchors];
+
+    private static PageNavigationCollector Walk(LaidOutPage page)
+    {
         var collector = new PageNavigationCollector();
         var left = page.ContentBox.X;
 
@@ -20,11 +33,7 @@ internal sealed class PageNavigationCollector
         collector.Layer(page.HeaderLayer, left, page.HeaderTop);
         collector.Layer(page.FooterLayer, left, page.FooterTop);
 
-        return page with
-        {
-            Links = [.. collector.links],
-            Anchors = [.. collector.anchors],
-        };
+        return collector;
     }
 
     private void Layer(LaidOutLayer layer, double left, double top)

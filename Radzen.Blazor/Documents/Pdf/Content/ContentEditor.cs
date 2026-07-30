@@ -8,7 +8,8 @@ internal static class ContentEditor
     internal sealed record SourceElement(ContentElement Element, int Start, int End, Matrix Ambient, bool InsideTextObject);
 
     public static ContentEmissionResult Reemit(byte[] source, ContentCollection current, IReadOnlyList<SourceElement> original,
-        Fonts.FontScope scope, ContentResourcePrefixes prefixes, System.Collections.Generic.IEnumerable<string>? reserved)
+        Fonts.FontScope scope, ContentResourcePrefixes prefixes, System.Collections.Generic.IEnumerable<string>? reserved,
+        ImageDecoders? decoders = null)
     {
         var byElement = new Dictionary<ContentElement, SourceElement>();
         foreach (var item in original)
@@ -41,7 +42,7 @@ internal static class ContentEditor
         }
 
         tail.AddRange(pending);
-        using var writer = new ContentWriter(scope, prefixes, reserved);
+        using var writer = new ContentWriter(scope, prefixes, reserved, decoders);
         var cursor = 0;
         foreach (var item in original)
         {

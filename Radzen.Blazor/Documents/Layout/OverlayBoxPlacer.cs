@@ -40,7 +40,7 @@ internal static class OverlayBoxPlacer
                 resolution,
                 capture);
             innerHeight = Math.Max(innerHeight, measured.Height);
-            var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
+            var contentBox = new Rect(indent + padding.Left, padding.Top, innerWidth, measured.Height);
             var positioned = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
             order = Compose(positioned, lines, images, codeSymbols, tables, boxes, order);
         }
@@ -54,7 +54,7 @@ internal static class OverlayBoxPlacer
             Tables = [.. tables],
             Boxes = [.. boxes],
         };
-        return (content, indent, boxWidth, innerHeight + (2 * padding));
+        return (content, indent, boxWidth, innerHeight + padding.Vertical);
     }
 
     private static int Compose(
@@ -95,13 +95,13 @@ internal static class OverlayBoxPlacer
             + child.Tables.Length + child.Boxes.Length;
     }
 
-    private static (double Padding, double BoxWidth, double Indent, double InnerWidth) Geometry(
+    private static (BoxPadding Padding, double BoxWidth, double Indent, double InnerWidth) Geometry(
         Container container, double availableWidth, double xOffset = 0)
     {
-        var padding = container.Padding.Point;
+        var padding = container.EffectivePadding;
         var boxWidth = container.Width?.Point ?? availableWidth;
         var indent = xOffset + Math.Max(0, HorizontalAlignmentOffset.Of(container.Alignment, availableWidth, boxWidth));
-        var innerWidth = Math.Max(0, boxWidth - (2 * padding));
+        var innerWidth = Math.Max(0, boxWidth - padding.Horizontal);
         return (padding, boxWidth, indent, innerWidth);
     }
 
@@ -113,7 +113,7 @@ internal static class OverlayBoxPlacer
         LoweringContext resolution,
         LayoutCaptureContext capture)
     {
-        var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - (2 * container.Padding.Point));
+        var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - container.EffectivePadding.Horizontal);
         return BoxContentLayout.Measure(
             container.Blocks,
             innerWidth,
@@ -135,8 +135,8 @@ internal static class OverlayBoxPlacer
         double xOffset = 0)
     {
         var (padding, boxWidth, indent, innerWidth) = Geometry(container, availableWidth, xOffset);
-        var boxHeight = measured.Height + (2 * padding);
-        var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
+        var boxHeight = measured.Height + padding.Vertical;
+        var contentBox = new Rect(indent + padding.Left, padding.Top, innerWidth, measured.Height);
         var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
 
         return new LaidOutBox

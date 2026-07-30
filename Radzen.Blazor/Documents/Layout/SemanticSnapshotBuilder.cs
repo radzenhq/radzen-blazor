@@ -138,6 +138,18 @@ internal sealed class SemanticSnapshotBuilder
             });
         }
 
+        foreach (var association in capturedAssociations)
+        {
+            if (nodes[association.Element].IsDecorative)
+            {
+                capturedArtifacts.Add(new SemanticArtifactAssociation
+                {
+                    Source = association.Source,
+                    Kind = SemanticArtifactKind.Decorative,
+                });
+            }
+        }
+
         return new DocumentSemantics
         {
             Language = language,
@@ -149,7 +161,7 @@ internal sealed class SemanticSnapshotBuilder
             {
                 Nodes = capturedNodes.MoveToImmutable(),
                 Associations = capturedAssociations.MoveToImmutable(),
-                Artifacts = capturedArtifacts.MoveToImmutable(),
+                Artifacts = capturedArtifacts.ToImmutable(),
             },
         };
     }
@@ -251,12 +263,14 @@ internal sealed class SemanticSnapshotBuilder
     private (int Index, SemanticIntent Intent) CaptureParagraphStyle(Paragraph paragraph)
     {
         var level = resolution.HeadingLevel(paragraph);
+        var declaredRole = resolution.Role(paragraph);
         var intent = level == 0 ? SemanticIntent.Paragraph : SemanticIntent.Heading;
         paragraphStyles.Add(new ResolvedParagraphStyle
         {
             Intent = intent,
             HeadingLevel = level,
-            CustomRole = level == 0 ? paragraph.StyleName : null,
+            CustomRole = declaredRole ?? (level == 0 ? paragraph.StyleName : null),
+            RoleIsDeclared = declaredRole is not null,
         });
         return (paragraphStyles.Count - 1, intent);
     }
@@ -276,11 +290,6 @@ internal sealed class SemanticSnapshotBuilder
             }
         }
     }
-
-    private static SemanticStructureTier RequireStructural(SemanticStructureTier tier)
-        => tier == SemanticStructureTier.Assistive
-            ? SemanticStructureTier.Assistive
-            : SemanticStructureTier.Structural;
 
     private readonly record struct MappingContext(Node Parent, SemanticStructureTier Tier);
 
@@ -330,7 +339,7 @@ internal sealed class SemanticSnapshotBuilder
             var (style, intent) = capture.CaptureParagraphStyle(paragraph);
             var element = capture.AddChild(context.Parent, intent, context.Tier, paragraphStyle: style);
             capture.Associate(paragraph, element);
-            var inlineTier = RequireStructural(context.Tier);
+            var inlineTier = SemanticStructureTier.Structural;
             foreach (var inline in paragraph.Inlines)
             {
                 var linked = IsLink(inline);
@@ -399,7 +408,7 @@ internal sealed class SemanticSnapshotBuilder
                     capture.Associate(cell, td);
                     foreach (var child in cell.Blocks)
                     {
-                        capture.MapBlock(child, td, RequireStructural(context.Tier));
+                        capture.MapBlock(child, td, SemanticStructureTier.Structural);
                     }
                 }
             }
@@ -429,7 +438,7 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Container block, MappingContext context)
         {
-            var tier = RequireStructural(context.Tier);
+            var tier = SemanticStructureTier.Structural;
             var group = capture.AddChild(context.Parent, SemanticIntent.Group, tier);
             foreach (var child in block.Blocks)
             {
@@ -447,7 +456,7 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(TableOfContents block, MappingContext context)
         {
-            var tier = RequireStructural(context.Tier);
+            var tier = SemanticStructureTier.Structural;
             var navigation = capture.AddChild(context.Parent, SemanticIntent.Navigation, tier);
             foreach (var entry in block.Entries)
             {
@@ -470,7 +479,7 @@ internal sealed class SemanticSnapshotBuilder
                 capture.AddChild(
                     context.Parent,
                     SemanticIntent.Figure,
-                    RequireStructural(context.Tier),
+                    SemanticStructureTier.Structural,
                     alternateText: decorative ? null : alternateText,
                     decorative: decorative));
             return default;

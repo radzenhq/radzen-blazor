@@ -7,7 +7,6 @@ internal enum SemanticStructureTier
 {
     Always,
     Structural,
-    Assistive,
 }
 
 internal enum SemanticArtifactKind
@@ -17,6 +16,12 @@ internal enum SemanticArtifactKind
     Decorative,
     RepeatedContent,
     Watermark,
+}
+
+internal static class SemanticArtifacts
+{
+    public static SemanticArtifactKind ForDecoration(SemanticArtifactKind? classification)
+        => classification ?? SemanticArtifactKind.LayoutDecoration;
 }
 
 internal enum SemanticIntent
@@ -71,6 +76,8 @@ internal readonly record struct ResolvedParagraphStyle
     public int HeadingLevel { get; init; }
 
     public string? CustomRole { get; init; }
+
+    public bool RoleIsDeclared { get; init; }
 }
 
 internal sealed record ResolvedStyleEnvironment

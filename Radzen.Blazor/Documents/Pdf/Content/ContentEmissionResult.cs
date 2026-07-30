@@ -8,7 +8,7 @@ internal sealed class ContentResourceManifest
 {
     public ContentResourceManifest(
         IReadOnlyList<KeyValuePair<string, string>> fonts,
-        IReadOnlyList<KeyValuePair<string, ImageXObject>> images,
+        IReadOnlyList<KeyValuePair<string, DecodedImage>> images,
         IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns,
         IReadOnlyList<KeyValuePair<string, double>> extGStates)
     {
@@ -23,8 +23,8 @@ internal sealed class ContentResourceManifest
             imageResources.Add(new EmissionImage(
                 image.Value,
                 image.Key,
-                EmissionStreamPayload.Capture(image.Value.Image),
-                image.Value.SoftMask is { } mask ? EmissionStreamPayload.Capture(mask) : null));
+                EmissionImagePayload.Capture(image.Value),
+                image.Value.Alpha is { } alpha ? EmissionImagePayload.Capture(alpha) : null));
         }
 
         ImagesForWriting = imageResources;
@@ -34,7 +34,7 @@ internal sealed class ContentResourceManifest
 
     public IReadOnlyList<KeyValuePair<string, string>> Fonts { get; }
 
-    public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images { get; }
+    public IReadOnlyList<KeyValuePair<string, DecodedImage>> Images { get; }
 
     internal IReadOnlyList<EmissionImage> ImagesForWriting { get; }
 

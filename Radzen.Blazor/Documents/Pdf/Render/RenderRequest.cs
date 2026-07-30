@@ -18,6 +18,7 @@ internal sealed class RenderRequest
         Outline = [.. renderer.Outline];
         PageLabels = [.. renderer.PageLabels];
         FormFields = [.. renderer.FormFields];
+        Decoders = renderer.ImageDecoders;
     }
 
     public PdfAConformance Conformance { get; }
@@ -43,6 +44,8 @@ internal sealed class RenderRequest
     public ImmutableArray<PageLabel> PageLabels { get; }
 
     public ImmutableArray<FormFieldDefinition> FormFields { get; }
+
+    public ImageDecoders Decoders { get; }
 
     public static RenderRequest From(DocumentRenderer renderer) => new(renderer);
 }

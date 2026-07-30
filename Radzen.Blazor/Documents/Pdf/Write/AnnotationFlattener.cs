@@ -71,9 +71,9 @@ internal static class AnnotationFlattener
             throw new InvalidOperationException("A loaded annotation appearance has no loaded document state.");
         }
 
-        return LoadedAppearancePainter.TryPaint(
+        return LoadedAppearancePainter.PaintOrThrow(
             reader, loaded, page, owned, normal!, stream, annotation.Bounds, "AFlatten",
-            strict: true, subject: $"/{annotation.Subtype} annotation", opacity: annotation.Opacity);
+            subject: $"/{annotation.Subtype} annotation", opacity: annotation.Opacity);
     }
 
     private sealed class FlattenedAnnotationContent(IReadOnlyList<ContentElement> elements, double opacity) : ContentElement

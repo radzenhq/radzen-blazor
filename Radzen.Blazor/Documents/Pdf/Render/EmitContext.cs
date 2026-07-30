@@ -3,6 +3,6 @@ namespace Radzen.Documents.Pdf.Render;
 internal sealed class EmitContext
 {
     public required PagePlan Plan { get; init; }
-    public required TextLineEmitter Text { get; init; }
-    public required CodeSymbolEmitter CodeSymbols { get; init; }
+    public required TextLinePlanner Text { get; init; }
+    public required CodeSymbolPlanner CodeSymbols { get; init; }
 }

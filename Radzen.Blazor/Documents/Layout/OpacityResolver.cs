@@ -6,7 +6,7 @@ internal sealed class OpacityResolver
 {
     public static readonly OpacityResolver None = new();
 
-    private readonly Dictionary<Block, double> byBlock = [];
+    private readonly Dictionary<Block, double> faded = [];
     private readonly Walker walker;
 
     private OpacityResolver() => walker = new Walker(this);
@@ -23,13 +23,15 @@ internal sealed class OpacityResolver
     }
 
     public double ContainerOpacity(Container container)
-        => (byBlock.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
+        => (faded.TryGetValue(container, out var inherited) ? inherited : 1) * container.Opacity;
 
-    public double CellOpacity(Cell cell)
+    public double CellOpacity(Cell cell) => OpacityOfFirstFadedBlock(cell.Blocks);
+
+    private double OpacityOfFirstFadedBlock(BlockCollection blocks)
     {
-        foreach (var block in cell.Blocks)
+        foreach (var block in blocks)
         {
-            if (byBlock.TryGetValue(block, out var opacity))
+            if (faded.TryGetValue(block, out var opacity))
             {
                 return opacity;
             }
@@ -44,7 +46,7 @@ internal sealed class OpacityResolver
         {
             if (opacity < 1)
             {
-                byBlock[block] = opacity;
+                faded[block] = opacity;
             }
 
             block.Accept(walker, opacity);

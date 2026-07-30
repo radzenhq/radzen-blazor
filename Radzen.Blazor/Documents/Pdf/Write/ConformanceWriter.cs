@@ -114,7 +114,24 @@ internal sealed class ConformanceWriter(PortableDocument document)
             ValidateFigureAltText(structure);
         }
 
+        ValidateRoleMap();
         ValidateLinkStructure();
+    }
+
+    // ISO 14289-1:2014 7.1: non-standard structure types shall be mapped, in the structure tree root's role
+    // map, to the nearest functionally equivalent standard type defined in ISO 32000-1:2008 14.8.4.
+    private void ValidateRoleMap()
+    {
+        if (document.EmissionPlan?.UnmappedRoles is not { Length: > 0 } roles)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(
+            $"{Label} requires every non-standard structure type to be role mapped to a standard ISO 32000-1 "
+            + $"structure type, but Style.Role declares '{string.Join("', '", roles)}' with no matching "
+            + "DocumentRenderer.RoleMap entry, so a reader cannot interpret the tag. Call "
+            + "DocumentRenderer.RoleMap.Add(role, standardType) for each role, or clear Style.Role.");
     }
 
     // ISO 32000-1 14.8.4.4.2 and ISO 14289-1 7.18: a link annotation belongs to a Link structure element,
@@ -192,8 +209,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
         {
             foreach (var image in generated.Images)
             {
-                if (image.Image.TryGetValue("ColorSpace", out var space)
-                    && space is NameObject { Value: "DeviceCMYK" })
+                if (image.Image.ColorSpace == ImageColorSpace.DeviceCmyk)
                 {
                     throw new InvalidOperationException(
                         "PDF/A pairs a DeviceCMYK image with an sRGB output intent, which ISO 19005 forbids; convert the image to RGB or grayscale, or use PdfAConformance.None.");

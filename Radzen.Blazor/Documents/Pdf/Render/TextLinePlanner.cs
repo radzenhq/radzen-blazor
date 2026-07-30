@@ -5,13 +5,13 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class TextLineEmitter(
+internal sealed class TextLinePlanner(
     GeneratorFontResolver fontResolver,
     ImageStore imageStore,
     StructureTreeBuilder structureTree,
     bool allowUnsupportedCharacters)
 {
-    private readonly GlyphSpanEmitter spans = new(fontResolver, allowUnsupportedCharacters);
+    private readonly GlyphSpanPlanner spans = new(fontResolver, allowUnsupportedCharacters);
 
     public void EmitBandLines(
         EmitContext context,
@@ -117,7 +117,7 @@ internal sealed class TextLineEmitter(
                 extGState);
         }
 
-        var decorationArtifact = artifact ?? SemanticArtifactKind.LayoutDecoration;
+        var decorationArtifact = SemanticArtifacts.ForDecoration(artifact);
         EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: true);
         EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: false);
     }

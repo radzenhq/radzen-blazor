@@ -22,6 +22,25 @@ internal sealed class ResourceDictionaryBuilder
         entries[key] = value;
     }
 
+    public void AddAll<T>(
+        string category,
+        IEnumerable<T> items,
+        Func<T, string> key,
+        Func<T, DocumentObject> value,
+        IReadOnlySet<string>? referencedKeys = null)
+    {
+        foreach (var item in items)
+        {
+            var name = key(item);
+            if (referencedKeys is not null && !referencedKeys.Contains(name))
+            {
+                continue;
+            }
+
+            Add(category, name, value(item));
+        }
+    }
+
     public DictionaryObject? Build() => resources;
 }
 
@@ -36,61 +55,45 @@ internal static class PageResourceBuilder
     {
         var resources = new ResourceDictionaryBuilder();
 
-        foreach (var font in page.Fonts)
-        {
-            if (referencedKeys is not null && !referencedKeys.Contains(font.Key))
-            {
-                continue;
-            }
+        resources.AddAll(
+            "Font",
+            page.Fonts,
+            font => font.Key,
+            font => ResolveFont(writer, font, fontRefs),
+            referencedKeys);
 
-            resources.Add("Font", font.Key, ResolveFont(writer, font, fontRefs));
-        }
+        resources.AddAll(
+            "XObject",
+            page.Images,
+            image => image.Key,
+            image => ResolveImage(writer, image, image, imageRefs),
+            referencedKeys);
 
-        foreach (var image in page.Images)
-        {
-            if (referencedKeys is not null && !referencedKeys.Contains(image.Key))
-            {
-                continue;
-            }
+        resources.AddAll(
+            "ExtGState",
+            page.ExtGStates,
+            state => state.Key,
+            state => ExtGStateDictionary(state.FillAlpha, state.StrokeAlpha, state.Blend, SoftMaskOf(writer, state)),
+            referencedKeys);
 
-            resources.Add("XObject", image.Key, ResolveImage(writer, image, imageRefs));
-        }
-
-        foreach (var state in page.ExtGStates)
-        {
-            if (referencedKeys is not null && !referencedKeys.Contains(state.Key))
-            {
-                continue;
-            }
-
-            DocumentObject? softMask = null;
-            if (state.SoftMask is { } mask)
-            {
-                softMask = SoftMaskWriter.BuildDictionary(writer, mask);
-            }
-            else if (state.ClearSoftMask)
-            {
-                softMask = new NameObject("None");
-            }
-
-            resources.Add("ExtGState", state.Key, ExtGStateDictionary(
-                state.FillAlpha,
-                state.StrokeAlpha,
-                state.Blend,
-                softMask));
-        }
-
-        foreach (var pattern in page.Patterns)
-        {
-            if (referencedKeys is not null && !referencedKeys.Contains(pattern.Key))
-            {
-                continue;
-            }
-
-            resources.Add("Pattern", pattern.Key, writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient, pattern.Matrix)));
-        }
+        resources.AddAll(
+            "Pattern",
+            page.Patterns,
+            pattern => pattern.Key,
+            pattern => writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient, pattern.Matrix)),
+            referencedKeys);
 
         return resources.Build();
+    }
+
+    private static DocumentObject? SoftMaskOf(DocumentWriter writer, EmissionExtGState state)
+    {
+        if (state.SoftMask is { } mask)
+        {
+            return SoftMaskWriter.BuildDictionary(writer, mask);
+        }
+
+        return state.ClearSoftMask ? new NameObject("None") : null;
     }
 
     public static IReadOnlySet<string> ReferencedResourceKeys(byte[] content)
@@ -151,24 +154,26 @@ internal static class PageResourceBuilder
         return reference;
     }
 
-    private static ReferenceObject ResolveImage(
-        DocumentWriter writer,
+    private static ReferenceObject ResolveImage<TKey>(
+        IObjectWriter writer,
         EmissionImage image,
-        Dictionary<EmissionImage, ReferenceObject> cache)
+        TKey key,
+        Dictionary<TKey, ReferenceObject>? cache)
+        where TKey : notnull
     {
-        if (cache.TryGetValue(image, out var existing))
+        if (cache is not null && cache.TryGetValue(key, out var existing))
         {
             return existing;
         }
 
-        var stream = image.Image.CreateStream();
+        var stream = ImageXObjectBuilder.Build(image.Image);
         if (image.SoftMask is { } mask)
         {
-            stream.Dictionary["SMask"] = writer.Add(mask.CreateStream());
+            stream.Dictionary["SMask"] = writer.Add(ImageXObjectBuilder.Build(mask));
         }
 
         var reference = writer.Add(stream);
-        cache[image] = reference;
+        cache?.TryAdd(key, reference);
         return reference;
     }
 
@@ -205,48 +210,31 @@ internal static class PageResourceBuilder
     {
         var resources = new ResourceDictionaryBuilder();
 
-        foreach (var (baseFont, key) in manifest.Fonts)
-        {
-            resources.Add("Font", key, Base14FontDictionary(baseFont));
-        }
+        resources.AddAll(
+            "Font",
+            manifest.Fonts,
+            font => font.Value,
+            font => Base14FontDictionary(font.Key));
 
-        foreach (var image in manifest.ImagesForWriting)
-        {
-            resources.Add("XObject", image.Key, ResolveManifestImage(writer!, image, sharedImages));
-        }
+        resources.AddAll(
+            "XObject",
+            manifest.ImagesForWriting,
+            image => image.Key,
+            image => ResolveImage(writer!, image, image.Identity, sharedImages));
 
-        foreach (var (key, pattern) in manifest.Patterns)
-        {
-            resources.Add("Pattern", key, writer!.Add(pattern));
-        }
+        resources.AddAll(
+            "Pattern",
+            manifest.Patterns,
+            pattern => pattern.Key,
+            pattern => writer!.Add(pattern.Value));
 
-        foreach (var (key, opacity) in manifest.ExtGStates)
-        {
-            resources.Add("ExtGState", key, ExtGStateDictionary(opacity, opacity));
-        }
+        resources.AddAll(
+            "ExtGState",
+            manifest.ExtGStates,
+            state => state.Key,
+            state => ExtGStateDictionary(state.Value, state.Value));
 
         return resources.Build();
-    }
-
-    private static ReferenceObject ResolveManifestImage(
-        IObjectWriter writer,
-        EmissionImage image,
-        Dictionary<object, ReferenceObject>? sharedImages)
-    {
-        if (sharedImages is not null && sharedImages.TryGetValue(image.Identity, out var existing))
-        {
-            return existing;
-        }
-
-        var stream = image.Image.CreateStream();
-        if (image.SoftMask is { } mask)
-        {
-            stream.Dictionary["SMask"] = writer.Add(mask.CreateStream());
-        }
-
-        var reference = writer.Add(stream);
-        sharedImages?.TryAdd(image.Identity, reference);
-        return reference;
     }
 
     public static DictionaryObject MergeResources(
@@ -322,84 +310,4 @@ internal static class PageResourceBuilder
             }
         }
     }
-
-    public static void EmitPageGeometry(PortableDocument document, Page page, DictionaryObject node)
-    {
-        node["MediaBox"] = MediaBox(document, page);
-
-        var loaded = document.Loaded;
-        if (page.CropBoxSet && page.CropBox is { } explicitCropBox)
-        {
-            node["CropBox"] = NumberBox(explicitCropBox);
-        }
-        else if (!page.CropBoxSet && loaded is not null && loaded.SourceCropBoxes.TryGetValue(page, out var cropBox))
-        {
-            node["CropBox"] = NumberBox(cropBox);
-        }
-
-        EmitAuxiliaryBox(document, node, page, "BleedBox", page.BleedBox);
-        EmitAuxiliaryBox(document, node, page, "TrimBox", page.TrimBox);
-        EmitAuxiliaryBox(document, node, page, "ArtBox", page.ArtBox);
-
-        if (page.Rotate != 0)
-        {
-            node["Rotate"] = new NumberObject(page.Rotate);
-        }
-        else if (loaded is not null && loaded.SourceRotations.TryGetValue(page, out var rotation))
-        {
-            node["Rotate"] = new NumberObject(rotation);
-        }
-    }
-
-    private static void EmitAuxiliaryBox(PortableDocument document, DictionaryObject node, Page page, string key, PdfRect? value)
-    {
-        if (value is not null)
-        {
-            PageBoxEmitter.WriteIfPresent(node, key, value);
-            return;
-        }
-
-        if (document.Loaded?.Source is { } source && document.Loaded.SourcePages.TryGetValue(page, out var sourceNode)
-            && source.GetArray(sourceNode, key) is { } box && box.Count >= 4)
-        {
-            node[key] = NumberBox(box);
-        }
-    }
-
-    public static ArrayObject MediaBox(PortableDocument document, Page page)
-    {
-        if (page.MediaBoxSet)
-        {
-            return NumberBox(page.MediaBox);
-        }
-
-        if (document.Loaded is { } loaded && loaded.SourceBoxes.TryGetValue(page, out var box))
-        {
-            return NumberBox(box);
-        }
-
-        return
-        [
-            new NumberObject(0.0),
-            new NumberObject(0.0),
-            new NumberObject(page.Width.Point),
-            new NumberObject(page.Height.Point),
-        ];
-    }
-
-    public static ArrayObject NumberBox(ArrayObject box) =>
-    [
-        new NumberObject(DocumentLoader.Number(box[0])),
-        new NumberObject(DocumentLoader.Number(box[1])),
-        new NumberObject(DocumentLoader.Number(box[2])),
-        new NumberObject(DocumentLoader.Number(box[3])),
-    ];
-
-    public static ArrayObject NumberBox(PdfRect box) =>
-    [
-        new NumberObject(box.Left),
-        new NumberObject(box.Bottom),
-        new NumberObject(box.Right),
-        new NumberObject(box.Top),
-    ];
 }

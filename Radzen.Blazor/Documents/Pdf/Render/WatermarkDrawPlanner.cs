@@ -2,12 +2,12 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class WatermarkEmitter(
+internal sealed class WatermarkDrawPlanner(
     GeneratorFontResolver fontResolver,
     ImageStore imageStore,
     bool allowUnsupportedCharacters)
 {
-    private readonly GlyphSpanEmitter spans = new(fontResolver, allowUnsupportedCharacters);
+    private readonly GlyphSpanPlanner spans = new(fontResolver, allowUnsupportedCharacters);
 
     public void Plan(PagePlan plan, LaidOutWatermark watermark)
     {
@@ -16,6 +16,7 @@ internal sealed class WatermarkEmitter(
             CenterX = watermark.CenterX,
             CenterY = PageSpace.FromTop(plan.Size.Height.Point, watermark.CenterY),
             Rotation = watermark.Rotation,
+            Artifact = watermark.Artifact,
             ExtGState = watermark.Opacity < 1
                 ? plan.RegisterExtGState(watermark.Opacity, watermark.Opacity)
                 : null,

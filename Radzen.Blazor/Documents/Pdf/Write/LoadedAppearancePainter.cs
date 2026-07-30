@@ -6,6 +6,36 @@ namespace Radzen.Documents.Pdf.Write;
 
 internal static class LoadedAppearancePainter
 {
+    private enum AppearanceRejection
+    {
+        None,
+        NonIdentityMatrix,
+        MissingBBox,
+        BBoxIsNotFourNumbers,
+        BBoxCoordinateIsNotNumeric,
+        BBoxIsDegenerate,
+    }
+
+    public static bool PaintOrThrow(
+        DocumentReader reader,
+        LoadedState loaded,
+        Page page,
+        HashSet<Page> owned,
+        DocumentObject appearanceReference,
+        StreamObject appearance,
+        PdfRect target,
+        string namePrefix,
+        string subject,
+        double opacity = 1)
+    {
+        if (Paint(reader, loaded, page, owned, appearanceReference, appearance, target, namePrefix, opacity, out var rejection))
+        {
+            return true;
+        }
+
+        throw Rejected(rejection, subject);
+    }
+
     public static bool TryPaint(
         DocumentReader reader,
         LoadedState loaded,
@@ -15,43 +45,70 @@ internal static class LoadedAppearancePainter
         StreamObject appearance,
         PdfRect target,
         string namePrefix,
-        bool strict,
-        string subject,
         double opacity = 1)
-    {
-        if (!MatrixIsIdentity(reader, appearance, strict, subject))
+        => Paint(reader, loaded, page, owned, appearanceReference, appearance, target, namePrefix, opacity, out _);
+
+    private static Exception Rejected(AppearanceRejection rejection, string subject)
+        => rejection switch
         {
+            AppearanceRejection.NonIdentityMatrix => new NotSupportedException(
+                $"Cannot flatten a {subject} whose appearance has a non-identity matrix."),
+            AppearanceRejection.MissingBBox => new NotSupportedException(
+                $"Cannot flatten a {subject} appearance without a /BBox."),
+            AppearanceRejection.BBoxIsNotFourNumbers => new DocumentParseException(
+                "An annotation appearance /BBox must contain four numbers.", -1),
+            AppearanceRejection.BBoxCoordinateIsNotNumeric => new DocumentParseException(
+                "An annotation appearance coordinate is not numeric.", -1),
+            AppearanceRejection.BBoxIsDegenerate => new DocumentParseException(
+                "An annotation appearance /BBox must have nonzero dimensions.", -1),
+            _ => new InvalidOperationException($"A {subject} appearance was painted without a rejection."),
+        };
+
+    private static bool Paint(
+        DocumentReader reader,
+        LoadedState loaded,
+        Page page,
+        HashSet<Page> owned,
+        DocumentObject appearanceReference,
+        StreamObject appearance,
+        PdfRect target,
+        string namePrefix,
+        double opacity,
+        out AppearanceRejection rejection)
+    {
+        rejection = AppearanceRejection.None;
+        if (!MatrixIsIdentity(reader, appearance))
+        {
+            rejection = AppearanceRejection.NonIdentityMatrix;
             return false;
         }
 
         if (reader.GetArray(appearance.Dictionary, "BBox") is not { } box)
         {
-            return strict
-                ? throw new NotSupportedException($"Cannot flatten a {subject} appearance without a /BBox.")
-                : false;
+            rejection = AppearanceRejection.MissingBBox;
+            return false;
         }
 
         if (box.Count != 4)
         {
-            return strict
-                ? throw new DocumentParseException("An annotation appearance /BBox must contain four numbers.", -1)
-                : false;
+            rejection = AppearanceRejection.BBoxIsNotFourNumbers;
+            return false;
         }
 
-        if (!TryNumber(reader, box[0], strict, out var x0)
-            || !TryNumber(reader, box[1], strict, out var y0)
-            || !TryNumber(reader, box[2], strict, out var right)
-            || !TryNumber(reader, box[3], strict, out var top))
+        if (!TryNumber(reader, box[0], out var x0)
+            || !TryNumber(reader, box[1], out var y0)
+            || !TryNumber(reader, box[2], out var right)
+            || !TryNumber(reader, box[3], out var top))
         {
+            rejection = AppearanceRejection.BBoxCoordinateIsNotNumeric;
             return false;
         }
 
         var bbox = PdfRect.Normalize([x0, y0, right, top]);
         if (bbox.Width == 0 || bbox.Height == 0)
         {
-            return strict
-                ? throw new DocumentParseException("An annotation appearance /BBox must have nonzero dimensions.", -1)
-                : false;
+            rejection = AppearanceRejection.BBoxIsDegenerate;
+            return false;
         }
 
         var xobjects = PrivateXObjects(reader, loaded, page, owned);
@@ -69,27 +126,20 @@ internal static class LoadedAppearancePainter
         return true;
     }
 
-    private static bool MatrixIsIdentity(DocumentReader reader, StreamObject appearance, bool strict, string subject)
+    private static bool MatrixIsIdentity(DocumentReader reader, StreamObject appearance)
     {
         if (!appearance.Dictionary.TryGetValue("Matrix", out var value))
         {
             return true;
         }
 
-        if (reader.AsArray(value!) is { Count: 6 } matrix
+        return reader.AsArray(value!) is { Count: 6 } matrix
             && reader.AsNumber(matrix[0]) == 1 && reader.AsNumber(matrix[1]) == 0
             && reader.AsNumber(matrix[2]) == 0 && reader.AsNumber(matrix[3]) == 1
-            && reader.AsNumber(matrix[4]) == 0 && reader.AsNumber(matrix[5]) == 0)
-        {
-            return true;
-        }
-
-        return strict
-            ? throw new NotSupportedException($"Cannot flatten a {subject} whose appearance has a non-identity matrix.")
-            : false;
+            && reader.AsNumber(matrix[4]) == 0 && reader.AsNumber(matrix[5]) == 0;
     }
 
-    private static bool TryNumber(DocumentReader reader, DocumentObject value, bool strict, out double number)
+    private static bool TryNumber(DocumentReader reader, DocumentObject value, out double number)
     {
         if (reader.AsNumber(value) is { } resolved)
         {
@@ -98,9 +148,7 @@ internal static class LoadedAppearancePainter
         }
 
         number = 0;
-        return strict
-            ? throw new DocumentParseException("An annotation appearance coordinate is not numeric.", -1)
-            : false;
+        return false;
     }
 
     private static DictionaryObject PrivateXObjects(DocumentReader reader, LoadedState loaded, Page page, HashSet<Page> owned)

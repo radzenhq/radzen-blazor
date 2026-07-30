@@ -27,40 +27,49 @@ public sealed class ContentWriter : IDisposable
 {
     private readonly PooledByteAccumulator accumulator = new(1024);
     private readonly ResourceNameAllocator<string, KeyValuePair<string, string>> fonts;
-    private readonly ResourceNameAllocator<ImageXObject, KeyValuePair<string, ImageXObject>> images;
+    private readonly ResourceNameAllocator<DecodedImage, KeyValuePair<string, DecodedImage>> images;
     private readonly ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
 
-    private readonly ResourceNameAllocator<double, KeyValuePair<string, double>> extGStates;
+    private readonly ResourceNameAllocator<string, KeyValuePair<string, double>> extGStates;
 
     private readonly FontScope scope;
+
+    private readonly ImageDecoders decoders;
 
     internal ContentWriter(
         FontScope scope = default,
         ContentResourcePrefixes? prefixes = null,
-        IEnumerable<string>? reserved = null)
+        IEnumerable<string>? reserved = null,
+        ImageDecoders? decoders = null)
     {
         this.scope = scope;
+        this.decoders = decoders ?? ImageDecoders.Default;
         var names = prefixes ?? ContentResourcePrefixes.Page;
         fonts = new ResourceNameAllocator<string, KeyValuePair<string, string>>(names.Font, reserved, StringComparer.Ordinal);
-        images = new ResourceNameAllocator<ImageXObject, KeyValuePair<string, ImageXObject>>(names.Image, reserved);
+        images = new ResourceNameAllocator<DecodedImage, KeyValuePair<string, DecodedImage>>(names.Image, reserved);
         patterns = new ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>>(names.Pattern, reserved, ReferenceKeyComparer<GradientBrush>.Instance);
-        extGStates = new ResourceNameAllocator<double, KeyValuePair<string, double>>(names.ExtGState, reserved, AlphaComparer.Instance);
+        extGStates = new ResourceNameAllocator<string, KeyValuePair<string, double>>(names.ExtGState, reserved, StringComparer.Ordinal);
     }
 
     internal IEnumerable<KeyValuePair<string, string>> Fonts => fonts.Values;
 
-    internal IReadOnlyList<KeyValuePair<string, ImageXObject>> Images => images.Values;
+    internal IReadOnlyList<KeyValuePair<string, DecodedImage>> Images => images.Values;
 
     internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns.Values;
 
     internal string RegisterOpacity(double opacity)
     {
         var value = Math.Clamp(opacity, 0, 1);
-        return extGStates.GetOrAdd(value, key => new KeyValuePair<string, double>(key, value));
+        return ExtGStateRegistration.RegisterAlpha(
+            extGStates,
+            value,
+            value,
+            blend: null,
+            key => new KeyValuePair<string, double>(key, value));
     }
 
-    internal string RegisterImage(ImageXObject image)
-        => images.Add(key => new KeyValuePair<string, ImageXObject>(key, image));
+    internal string RegisterImage(DecodedImage image)
+        => images.Add(key => new KeyValuePair<string, DecodedImage>(key, image));
 
     /// <summary>
     /// Registers a shading pattern for <paramref name="gradient"/> and returns its <c>/Pattern</c>
@@ -108,7 +117,8 @@ public sealed class ContentWriter : IDisposable
     /// <returns>The resource name the image is painted by.</returns>
     public string RegisterImage(byte[] encodedImage)
     {
-        return RegisterImage(ImageDecoder.Decode(encodedImage));
+        ArgumentNullException.ThrowIfNull(encodedImage);
+        return RegisterImage(decoders.Decode(encodedImage, ReaderLimits.Default));
     }
 
     /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>
@@ -207,11 +217,11 @@ public sealed class ContentWriter : IDisposable
     /// <param name="operatorName">The color operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
     public void WriteColor(Color color, string operatorName)
     {
-        WriteNumber(color.R / 255.0);
+        WriteNumber(PdfColor.Component(color.R));
         WriteRaw(" ");
-        WriteNumber(color.G / 255.0);
+        WriteNumber(PdfColor.Component(color.G));
         WriteRaw(" ");
-        WriteNumber(color.B / 255.0);
+        WriteNumber(PdfColor.Component(color.B));
         WriteRaw(" ");
         WriteRaw(operatorName);
         WriteRaw("\n");
