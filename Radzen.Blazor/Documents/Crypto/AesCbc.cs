@@ -1,14 +1,9 @@
 using System;
-using Radzen.Documents.Pdf.Objects;
+using System.IO;
 
 namespace Radzen.Documents.Crypto;
 
-/// <summary>
-/// Hand-rolled AES in CBC mode (FIPS-197). Supports 128- and 256-bit keys.
-/// Both a forward and an inverse cipher are provided; the implementation is
-/// pure-managed so it runs under Blazor WebAssembly.
-/// </summary>
-public static class AesCbc
+internal static class AesCbc
 {
     private static readonly byte[] SBox =
     [
@@ -34,48 +29,35 @@ public static class AesCbc
 
     private static readonly byte[] Rcon = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
 
-    /// <summary>
-    /// Decrypts <paramref name="data"/> laid out as a 16-byte IV followed by the
-    /// ciphertext, returning the plaintext with its PKCS#7 padding removed.
-    /// </summary>
-    /// <param name="key">The AES key (16 or 32 bytes).</param>
-    /// <param name="data">The IV (16 bytes) followed by the ciphertext.</param>
-    /// <returns>The decrypted plaintext with padding stripped.</returns>
     public static byte[] Decrypt(byte[] key, byte[] data)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(data);
         if (data.Length < 16)
         {
-            throw new DocumentParseException("AES data is shorter than the required 16-byte IV.");
+            throw new InvalidDataException("AES data is shorter than the required 16-byte IV.");
         }
 
         var iv = data[..16];
         var cipher = data[16..];
         if (cipher.Length == 0)
         {
-            throw new DocumentParseException("AES ciphertext after the IV is empty.");
+            throw new InvalidDataException("AES ciphertext after the IV is empty.");
         }
 
         var plain = DecryptCbcNoPadding(key, iv, cipher);
         return StripPadding(plain);
     }
 
-    /// <summary>
-    /// Decrypts <paramref name="cipher"/> in CBC mode without removing any padding.
-    /// </summary>
-    /// <param name="key">The AES key (16, 24, or 32 bytes).</param>
-    /// <param name="iv">The 16-byte initialization vector.</param>
-    /// <param name="cipher">The ciphertext (whole 16-byte blocks).</param>
-    /// <returns>The decrypted bytes.</returns>
     public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] cipher)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(iv);
         ArgumentNullException.ThrowIfNull(cipher);
+        RequireIv(iv);
         if (cipher.Length % 16 != 0)
         {
-            throw new DocumentParseException("AES ciphertext length must be a whole number of 16-byte blocks.");
+            throw new InvalidDataException("AES ciphertext length must be a whole number of 16-byte blocks.");
         }
 
         var roundKeys = ExpandKey(key, out var rounds);
@@ -98,18 +80,17 @@ public static class AesCbc
         return result;
     }
 
-    /// <summary>
-    /// Encrypts <paramref name="plain"/> in CBC mode without adding any padding.
-    /// </summary>
-    /// <param name="key">The AES key (16, 24, or 32 bytes).</param>
-    /// <param name="iv">The 16-byte initialization vector.</param>
-    /// <param name="plain">The plaintext (whole 16-byte blocks).</param>
-    /// <returns>The encrypted bytes.</returns>
     public static byte[] EncryptCbcNoPadding(byte[] key, byte[] iv, byte[] plain)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(iv);
         ArgumentNullException.ThrowIfNull(plain);
+        RequireIv(iv);
+        if (plain.Length % 16 != 0)
+        {
+            throw new ArgumentException("AES plaintext length must be a whole number of 16-byte blocks.", nameof(plain));
+        }
+
         var roundKeys = ExpandKey(key, out var rounds);
         var result = new byte[plain.Length];
         var previous = (byte[])iv.Clone();
@@ -129,24 +110,32 @@ public static class AesCbc
         return result;
     }
 
+    private static void RequireIv(byte[] iv)
+    {
+        if (iv.Length != 16)
+        {
+            throw new ArgumentException("AES initialization vector must be exactly 16 bytes.", nameof(iv));
+        }
+    }
+
     private static byte[] StripPadding(byte[] plain)
     {
         if (plain.Length == 0)
         {
-            throw new DocumentParseException("AES plaintext is empty.");
+            throw new InvalidDataException("AES plaintext is empty.");
         }
 
         var pad = plain[^1];
         if (pad < 1 || pad > 16 || pad > plain.Length)
         {
-            throw new DocumentParseException("Invalid PKCS#7 padding.");
+            throw new InvalidDataException("Invalid PKCS#7 padding.");
         }
 
         for (var i = plain.Length - pad; i < plain.Length; i++)
         {
             if (plain[i] != pad)
             {
-                throw new DocumentParseException("Invalid PKCS#7 padding.");
+                throw new InvalidDataException("Invalid PKCS#7 padding.");
             }
         }
 
@@ -305,7 +294,7 @@ public static class AesCbc
         // FIPS-197 5.2: AES keys are 128/192/256-bit.
         if (key.Length is not (16 or 24 or 32))
         {
-            throw new DocumentParseException("AES key length must be 16, 24, or 32 bytes.");
+            throw new InvalidDataException("AES key length must be 16, 24, or 32 bytes.");
         }
 
         var nk = key.Length / 4;

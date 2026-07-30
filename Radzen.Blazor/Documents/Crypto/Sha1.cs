@@ -2,19 +2,8 @@ using System;
 
 namespace Radzen.Documents.Crypto;
 
-/// <summary>
-/// Hand-rolled SHA-1 (FIPS 180-4). The BCL implementation is unavailable under
-/// Blazor WebAssembly, so this managed variant is used instead. In this library
-/// SHA-1 serves only as the PAdES <c>/VRI</c> index key (a lookup digest, matching
-/// the Adobe/ETSI convention), never as a security primitive.
-/// </summary>
-public static class Sha1
+internal static class Sha1
 {
-    /// <summary>
-    /// Computes the 20-byte SHA-1 digest of <paramref name="data"/>.
-    /// </summary>
-    /// <param name="data">The bytes to hash.</param>
-    /// <returns>The 20-byte digest.</returns>
     public static byte[] ComputeHash(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -87,12 +76,6 @@ public static class Sha1
         return result;
     }
 
-    /// <summary>
-    /// Computes the SHA-1 digest of <paramref name="data"/> and returns it as an
-    /// uppercase base-16 string (the form PAdES uses for <c>/VRI</c> keys).
-    /// </summary>
-    /// <param name="data">The bytes to hash.</param>
-    /// <returns>The 40-character uppercase hexadecimal digest.</returns>
     public static string ComputeHashHex(byte[] data)
         => HexCodec.EncodeToString(ComputeHash(data), HexCase.Upper);
 
