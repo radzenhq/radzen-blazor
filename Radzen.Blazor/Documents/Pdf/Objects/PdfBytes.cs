@@ -1,5 +1,4 @@
 using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -90,20 +89,6 @@ internal static class PdfBytes
         return width;
     }
 
-    internal static ushort ReadUInt16BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
-    {
-        Require(data, offset, 2, errorMessage);
-        return BinaryPrimitives.ReadUInt16BigEndian(data[offset..]);
-    }
-
-    internal static short ReadInt16BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
-        => unchecked((short)ReadUInt16BigEndian(data, offset, errorMessage));
-
-    internal static uint ReadUInt32BigEndian(ReadOnlySpan<byte> data, int offset, string errorMessage)
-    {
-        Require(data, offset, 4, errorMessage);
-        return BinaryPrimitives.ReadUInt32BigEndian(data[offset..]);
-    }
 
     internal static long ReadBigEndian(ReadOnlySpan<byte> data, ref int position, int width, string errorMessage)
     {

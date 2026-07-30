@@ -70,6 +70,7 @@ public sealed class PageLabel(int startPage) : ITracksChanges
     internal void AcceptChanges() => tracker.AcceptChanges();
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
+
 }
 
 internal static class PageLabelsWriter

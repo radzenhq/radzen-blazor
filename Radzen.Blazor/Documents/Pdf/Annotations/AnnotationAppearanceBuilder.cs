@@ -1,3 +1,4 @@
+using Radzen.Documents.Fonts;
 using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
@@ -90,7 +91,7 @@ internal static class AnnotationAppearanceBuilder
 
         return
         [
-            new TextContent(annotation.Contents, Unit.FromPoint(2), Unit.FromPoint(Math.Max(2, annotation.Bounds.Height - annotation.Font.Size - 2)))
+            new TextContent(annotation.Contents, Unit.FromPoint(2), Unit.FromPoint(Math.Max(2, annotation.Bounds.Height - annotation.Font.EffectiveSize.Point - 2)))
             {
                 Color = annotation.TextColor,
                 Font = annotation.Font,

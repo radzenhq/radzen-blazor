@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// An entry in the document outline (bookmark) tree shown in the viewer's
 /// navigation panel. Add or edit root entries through <see cref="Document.Outline"/>
-/// or <see cref="DocumentBuilder.Outline"/>.
+/// or <see cref="DocumentRenderer.Outline"/>.
 /// </summary>
 /// <param name="title">The title shown in the bookmark panel.</param>
 /// <param name="target">The location the entry navigates to, or <c>null</c> for a non-navigating entry.</param>
@@ -86,6 +86,7 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
     }
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
+
 }
 
 internal enum OutlineFit

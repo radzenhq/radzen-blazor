@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Radzen.Documents.Crypto;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
@@ -93,4 +94,42 @@ internal sealed class MaterialSequence(IEncryptionMaterial material)
     private int index;
 
     public byte[] Next(int count) => material.GetBytes(index++, count);
+}
+
+internal sealed class CapturedEncryptionMaterial : IEncryptionMaterial
+{
+    private static readonly int[] RequestSizes = [4, 8, 16, 32];
+    private readonly Dictionary<(int Index, int Count), byte[]> values = [];
+
+    public CapturedEncryptionMaterial(IEncryptionMaterial source, int requestLimit)
+    {
+        for (var index = 0; index < requestLimit; index++)
+        {
+            foreach (var count in RequestSizes)
+            {
+                var value = source.GetBytes(index, count);
+                if (value.Length != count)
+                {
+                    throw new InvalidOperationException(
+                        $"Encryption material returned {value.Length} bytes for a request of {count} bytes.");
+                }
+
+                var captured = new byte[count];
+                Array.Copy(value, captured, count);
+                values[(index, count)] = captured;
+            }
+        }
+    }
+
+    public byte[] GetBytes(int index, int count)
+    {
+        if (!values.TryGetValue((index, count), out var captured))
+        {
+            throw new InvalidOperationException("The rendered document did not materialize enough encryption data.");
+        }
+
+        var result = new byte[captured.Length];
+        Array.Copy(captured, result, captured.Length);
+        return result;
+    }
 }

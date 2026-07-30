@@ -15,12 +15,12 @@ internal static class DocumentLoader
         ArgumentNullException.ThrowIfNull(limits);
         limits = limits.Snapshot();
 
-        var bytes = DocumentReader.ReadFully(stream, limits.MaxFileBytes);
+        var bytes = PdfSourceBytes.ReadFully(stream, limits.MaxFileBytes);
         var reader = DocumentReader.Parse(bytes, options?.Password, limits);
 
         var state = new LoadedState(reader, bytes);
         var document = Document.CreateLoaded(state);
-        state.SourceInfo = ReadInfo(reader, document.Info);
+        state.SourceInfo = reader.GetDictionary(reader.Trailer, "Info");
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
         if (catalog is null || !catalog.TryGetValue("Pages", out var candidatePages)
@@ -50,16 +50,10 @@ internal static class DocumentLoader
         if (reader.GetDictionary(catalog, "AcroForm") is { } form)
         {
             state.SourceAcroForm = form;
-            document.AcroForm = new AcroForm(reader, form, document);
+            _ = new AcroForm(reader, form, document);
         }
 
-        ReadAttachments(reader, catalog, document, limits);
-        ReadOutline(reader, catalog, document, state, namedDestinations, limits);
-        ReadPageLabels(reader, catalog, document, state, limits);
-        ReadXmp(reader, catalog, document);
-
-        document.AcceptMetadataChanges();
-
+        ReadAttachments(reader, catalog, new Document(), limits);
         return document;
     }
 
@@ -96,8 +90,8 @@ internal static class DocumentLoader
         var cropBox = inherited.CropBox;
         var rotate = inherited.Rotate;
 
-        var mediaCorners = PdfRect.ResolveCorners(reader, box, RectPolicy.Rejecting);
-        var cropCorners = PdfRect.ResolveCorners(reader, cropBox, RectPolicy.Rejecting);
+        var mediaCorners = RectReader.ResolveCorners(reader, box, RectPolicy.Rejecting);
+        var cropCorners = RectReader.ResolveCorners(reader, cropBox, RectPolicy.Rejecting);
         var mediaBox = NormalizedBox(mediaCorners);
         var cropRect = NormalizedBox(cropCorners);
         var (width, height) = Dimensions(mediaBox);
@@ -207,7 +201,7 @@ internal static class DocumentLoader
     ];
 
     private static PdfRect? ReadBox(DocumentReader reader, DictionaryObject page, string key)
-        => NormalizedBox(PdfRect.ResolveCorners(reader, reader.GetArray(page, key), RectPolicy.Rejecting));
+        => NormalizedBox(RectReader.ResolveCorners(reader, reader.GetArray(page, key), RectPolicy.Rejecting));
 
     public static double Number(DocumentObject value) => value is NumberObject number ? number.DoubleValue : 0.0;
 
@@ -263,7 +257,7 @@ internal static class DocumentLoader
         return null;
     }
 
-    private static DictionaryObject? ReadInfo(DocumentReader reader, DocumentInfo target)
+    internal static DictionaryObject? ReadInfo(DocumentReader reader, DocumentInfo target)
     {
         if (reader.GetDictionary(reader.Trailer, "Info") is not { } info)
         {
@@ -318,7 +312,7 @@ internal static class DocumentLoader
         }
     }
 
-    private static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
+    internal static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
     {
         var seen = new HashSet<DictionaryObject>();
 
@@ -442,14 +436,15 @@ internal static class DocumentLoader
             ? FormField.DecodeTextString(text)
             : null;
 
-    private static void ReadOutline(
+    internal static void ReadOutline(
         DocumentReader reader,
         DictionaryObject catalog,
         Document document,
         LoadedState state,
-        Lazy<Dictionary<string, DocumentObject>> namedDestinations,
         ReaderLimits limits)
     {
+        var namedDestinations = new Lazy<Dictionary<string, DocumentObject>>(
+            () => ReadNamedDestinations(reader, catalog, limits));
         if (reader.GetDictionary(catalog, "Outlines") is { } root
             && root.TryGetValue("First", out var first))
         {
@@ -586,7 +581,7 @@ internal static class DocumentLoader
         return result;
     }
 
-    private static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, Document document, LoadedState state, ReaderLimits limits)
+    internal static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
     {
         if (reader.GetDictionary(catalog, "PageLabels") is { } tree)
         {
@@ -617,11 +612,51 @@ internal static class DocumentLoader
         _ => throw new DocumentParseException($"Page-label style /{style} is not supported.", -1),
     };
 
-    private static void ReadXmp(DocumentReader reader, DictionaryObject catalog, Document document)
+    internal static void ReadXmp(DocumentReader reader, DictionaryObject catalog, DocumentXmpMetadata target)
     {
         if (reader.GetStream(catalog, "Metadata") is { } metadata)
         {
-            document.Xmp.LoadPacket(reader.DecodeStream(metadata));
+            target.LoadPacket(reader.DecodeStream(metadata));
         }
+    }
+
+    internal static ViewerPreferences? ReadViewerPreferences(DocumentReader? reader, DictionaryObject? catalog)
+    {
+        if (reader is null || catalog is null)
+        {
+            return null;
+        }
+
+        var result = new ViewerPreferences
+        {
+            PageLayout = Enum.TryParse<PdfPageLayout>(reader.GetName(catalog, "PageLayout"), out var layout) ? layout : null,
+            PageMode = Enum.TryParse<PdfPageMode>(reader.GetName(catalog, "PageMode"), out var mode) ? mode : null,
+        };
+
+        if (reader.GetDictionary(catalog, "ViewerPreferences") is { } preferences)
+        {
+            result.HideToolbar = reader.GetBool(preferences, "HideToolbar") == true;
+            result.HideMenubar = reader.GetBool(preferences, "HideMenubar") == true;
+            result.FitWindow = reader.GetBool(preferences, "FitWindow") == true;
+            result.CenterWindow = reader.GetBool(preferences, "CenterWindow") == true;
+            result.DisplayDocTitle = reader.GetBool(preferences, "DisplayDocTitle") == true;
+            result.Direction = reader.GetName(preferences, "Direction") switch
+            {
+                "L2R" => PdfReadingDirection.LeftToRight,
+                "R2L" => PdfReadingDirection.RightToLeft,
+                _ => null,
+            };
+        }
+
+        return result.PageLayout is null
+            && result.PageMode is null
+            && !result.HideToolbar
+            && !result.HideMenubar
+            && !result.FitWindow
+            && !result.CenterWindow
+            && !result.DisplayDocTitle
+            && result.Direction is null
+                ? null
+                : result;
     }
 }

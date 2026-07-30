@@ -2,26 +2,17 @@ using System.Collections.Generic;
 using System.IO;
 
 using Radzen.Documents.Pdf.Emit;
+
 namespace Radzen.Documents.Pdf;
 
-
 /// <summary>
-/// The root of the document authoring model. Holds metadata, named styles and the ordered sections.
+/// Renders a <see cref="Radzen.Documents.Document"/> into a physical PDF
+/// <see cref="Document"/>. Carries the PDF-only settings of the output: conformance,
+/// accessibility, encryption, viewer preferences, attachments, outline, page labels
+/// and interactive form fields.
 /// </summary>
-public class DocumentBuilder
+public sealed class DocumentRenderer
 {
-    /// <summary>Gets the document metadata.</summary>
-    public DocumentInfo Info { get; } = new();
-
-    /// <summary>Gets the named style definitions.</summary>
-    public StyleCollection Styles { get; } = [];
-
-    /// <summary>Gets the ordered sections of the document.</summary>
-    public SectionCollection Sections { get; } = new();
-
-    /// <summary>Gets the font collection used to register and resolve fonts.</summary>
-    public FontCollection Fonts { get; } = new();
-
     /// <summary>Gets the files to embed into the produced PDF (e.g. the Factur-X invoice XML).</summary>
     public AttachmentCollection Attachments { get; } = [];
 
@@ -52,6 +43,14 @@ public class DocumentBuilder
     public IList<FormFieldDefinition> FormFields { get; } = [];
 
     /// <summary>
+    /// Gets or sets the name of the application that produced the PDF, written to the
+    /// <c>/Info /Producer</c> entry and the XMP <c>pdf:Producer</c> property. When
+    /// <see langword="null"/> (the default) the library's own producer name is used and
+    /// no producer is added to the <c>/Info</c> dictionary.
+    /// </summary>
+    public string? Producer { get; set; }
+
+    /// <summary>
     /// Gets or sets the PDF/A conformance level of the output. When not
     /// <see cref="PdfAConformance.None"/> the saved file carries an XMP
     /// metadata stream with the PDF/A identification, an sRGB output intent
@@ -61,21 +60,14 @@ public class DocumentBuilder
     public PdfAConformance Conformance { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the output identifies as PDF/UA-1 (ISO 14289-1,
-    /// accessibility). The saved file carries pdfuaid:part 1 in its XMP metadata,
-    /// is marked as Tagged PDF (/MarkInfo /Marked true with a /StructTreeRoot)
-    /// and sets the DisplayDocTitle viewer preference; every font must be an
-    /// embedded subset. Composable with <see cref="Conformance"/>.
+    /// Gets or sets the PDF/UA accessibility conformance level of the output. When
+    /// <see cref="PdfUaConformance.PdfUa1"/> the saved file carries pdfuaid:part 1 in
+    /// its XMP metadata, is marked as Tagged PDF (/MarkInfo /Marked true with a
+    /// /StructTreeRoot) and sets the DisplayDocTitle viewer preference; every font must
+    /// be an embedded subset. Composable with <see cref="Conformance"/>. Requires
+    /// <see cref="Radzen.Documents.Document.Language"/> to be set.
     /// </summary>
-    public bool PdfUA { get; set; }
-
-    /// <summary>
-    /// Gets or sets the natural language of the document as an RFC 3066 /
-    /// BCP 47 tag (e.g. <c>en-US</c>), written as the catalog <c>/Lang</c>.
-    /// Required when <see cref="PdfUA"/> is set, since PDF/UA demands that
-    /// the document language be determinable.
-    /// </summary>
-    public string? Language { get; set; }
+    public PdfUaConformance Accessibility { get; set; }
 
     /// <summary>
     /// Gets the map of non-standard structure roles to standard ISO 32000-1
@@ -108,23 +100,27 @@ public class DocumentBuilder
     public bool IncludeDocumentId { get; set; }
 
     /// <summary>
-    /// Runs the layout engine over the sections and produces a physical <see cref="Document"/>.
-    /// Paragraphs flow across pages, tables lay out and paginate (repeating header rows),
-    /// images decode and scale to their box, registered fonts embed as Type0/CID and base-14
-    /// families embed by name.
+    /// Runs the layout engine over the model's sections and produces a physical
+    /// <see cref="Document"/>. Paragraphs flow across pages, tables lay out and paginate
+    /// (repeating header rows), images decode and scale to their box, registered fonts
+    /// embed as Type0/CID and base-14 families embed by name.
     /// </summary>
+    /// <param name="document">The document model to render.</param>
     /// <returns>The generated document.</returns>
-    public Document Build()
+    public Document Render(Radzen.Documents.Document document)
     {
-        var settings = CapturedBuilderSettings.Capture(this);
-        return DocumentGenerator.Generate(this, settings);
+        var settings = CapturedRendererSettings.Capture(this);
+        return DocumentGenerator.Generate(document, settings);
     }
 
-    /// <summary>Builds the document and serializes it to the given stream.</summary>
+    /// <summary>Renders the model and serializes it to the given stream.</summary>
+    /// <param name="document">The document model to render.</param>
     /// <param name="stream">The destination stream.</param>
-    public void SaveToStream(Stream stream) => Build().SaveToStream(stream);
+    public void SaveToStream(Radzen.Documents.Document document, Stream stream)
+        => Render(document).SaveToStream(stream);
 
-    /// <summary>Builds the document and serializes it to a byte array.</summary>
+    /// <summary>Renders the model and serializes it to a byte array.</summary>
+    /// <param name="document">The document model to render.</param>
     /// <returns>The complete PDF file bytes.</returns>
-    public byte[] ToArray() => Build().ToArray();
+    public byte[] ToArray(Radzen.Documents.Document document) => Render(document).ToArray();
 }

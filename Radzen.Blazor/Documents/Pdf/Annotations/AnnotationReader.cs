@@ -259,7 +259,7 @@ internal static class AnnotationReader
     }
 
     private static PdfRect Bounds(DocumentReader reader, ArrayObject? value)
-        => PdfRect.Read(reader, value, RectPolicy.Strict(
+        => RectReader.Read(reader, value, RectPolicy.Strict(
             "A modeled annotation requires a four-number /Rect array.",
             "An annotation coordinate is not numeric."));
 

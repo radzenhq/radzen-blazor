@@ -84,4 +84,5 @@ public sealed class ViewerPreferences
 
     /// <summary>Gets or sets the predominant reading direction (<c>/Direction</c>). When <see langword="null"/> no direction is written.</summary>
     public PdfReadingDirection? Direction { get; set; }
+
 }

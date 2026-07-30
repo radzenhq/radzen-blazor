@@ -66,8 +66,13 @@ public sealed class PathContent : ContentElement
 
     /// <summary>
     /// Gets or sets a gradient the path is filled with, realized as a PDF shading pattern
-    /// (<c>/Pattern cs</c> + <c>scn</c>). When set it overrides <see cref="FillColor"/> and
-    /// <see cref="FillPaint"/> for the fill. Defaults to <see langword="null"/> (solid fill).
+    /// (<c>/Pattern cs</c> + <c>scn</c>) with no pattern matrix, so its coordinates are read
+    /// in the page's default space rather than the box-relative space
+    /// <see cref="GradientBrush"/> describes for modelled content. That space has no reference
+    /// box, so the gradient's coordinates must be absolute lengths; a relative one throws when
+    /// the page is emitted. When set it overrides
+    /// <see cref="FillColor"/> and <see cref="FillPaint"/> for the fill. Defaults to
+    /// <see langword="null"/> (solid fill).
     /// </summary>
     public GradientBrush? FillGradient
     {
@@ -494,21 +499,4 @@ public enum PathClipMode
 
     /// <summary>Clip using the even-odd rule (the <c>W*</c> operator).</summary>
     EvenOdd,
-}
-
-internal enum DeviceColorKind
-{
-    Cmyk,
-    Named,
-    Gray,
-}
-
-internal readonly record struct DeviceColor(DeviceColorKind Kind, string? ColorSpace, double[] Operands, string? PatternName = null)
-{
-    public static DeviceColor Gray(double gray)
-        => new(DeviceColorKind.Gray, null, [UnitInterval.Clamp(gray)]);
-
-    public static DeviceColor Cmyk(double cyan, double magenta, double yellow, double black)
-        => new(DeviceColorKind.Cmyk, null,
-            [UnitInterval.Clamp(cyan), UnitInterval.Clamp(magenta), UnitInterval.Clamp(yellow), UnitInterval.Clamp(black)]);
 }

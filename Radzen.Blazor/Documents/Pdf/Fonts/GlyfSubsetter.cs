@@ -3,8 +3,9 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Fonts.Sfnt;
 
-namespace Radzen.Documents.Pdf.Fonts.Sfnt;
+namespace Radzen.Documents.Pdf.Fonts;
 
 internal static class GlyfSubsetter
 {
@@ -462,11 +463,11 @@ internal static class GlyfSubsetter
 
     private const string Truncated = "Font glyf/loca table is truncated.";
 
-    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadUInt16BigEndian(d, o, Truncated);
+    private static ushort ReadUInt16(ReadOnlySpan<byte> d, int o) => BigEndian.ReadUInt16BigEndian(d, o, Truncated);
 
-    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadInt16BigEndian(d, o, Truncated);
+    private static short ReadInt16(ReadOnlySpan<byte> d, int o) => BigEndian.ReadInt16BigEndian(d, o, Truncated);
 
-    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o) => PdfBytes.ReadUInt32BigEndian(d, o, Truncated);
+    private static uint ReadUInt32(ReadOnlySpan<byte> d, int o) => BigEndian.ReadUInt32BigEndian(d, o, Truncated);
 
     private static void WriteUInt16(byte[] d, int o, ushort v) => PdfBytes.WriteBigEndian(d.AsSpan(o, 2), v);
 

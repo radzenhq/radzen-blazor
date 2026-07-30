@@ -378,8 +378,8 @@ internal static class AnnotationEmitter
 
     private static string DefaultAppearance(FreeTextAnnotation annotation)
         => DefaultAppearanceGrammar.Write(
-            annotation.Font.Name,
-            annotation.Font.Size,
+            annotation.Font.EffectiveFamily,
+            annotation.Font.EffectiveSize.Point,
             string.Create(CultureInfo.InvariantCulture, $"{annotation.TextColor.R / 255.0:0.###} {annotation.TextColor.G / 255.0:0.###} {annotation.TextColor.B / 255.0:0.###} rg"));
 }
 

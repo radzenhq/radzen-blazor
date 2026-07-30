@@ -48,4 +48,5 @@ public sealed class RoleMap
     public bool Contains(string role) => map.ContainsKey(role);
 
     internal IEnumerable<KeyValuePair<string, string>> Entries => map;
+
 }

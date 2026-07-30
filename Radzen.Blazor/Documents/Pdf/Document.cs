@@ -1,4 +1,3 @@
-using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +5,9 @@ using System.Linq;
 using System.Text;
 
 using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
+using Radzen.Documents.Fonts;
 namespace Radzen.Documents.Pdf;
 
 
@@ -16,18 +17,104 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class Document
 {
-    private readonly TrackedList<OutlineItem> outline = [];
-    private readonly TrackedList<PageLabel> pageLabels = [];
+    private readonly TrackedList<OutlineItem> outline;
+    private readonly TrackedList<PageLabel> pageLabels;
+    private readonly TrackedList<FormFieldDefinition> formFields;
+    private DocumentInfo info = new();
+    private readonly AttachmentCollection attachments = [];
+    private DocumentXmpMetadata xmp = new();
+    private ViewerPreferences? viewerPreferences;
+    private AcroForm? acroForm;
+    private readonly object facadeLock = new();
+    private bool infoLoaded = true;
+    private bool attachmentsLoaded = true;
+    private bool outlineLoaded = true;
+    private bool pageLabelsLoaded = true;
+    private bool xmpLoaded = true;
+    private bool viewerPreferencesLoaded = true;
+    private bool acroFormLoaded = true;
 
     /// <summary>Initializes an empty PDF document.</summary>
     public Document()
     {
         Pages = new PageCollection(this);
+        outline = new TrackedList<OutlineItem>(InvalidateMaterializedGraph);
+        pageLabels = new TrackedList<PageLabel>(InvalidateMaterializedGraph);
+        formFields = new TrackedList<FormFieldDefinition>(InvalidateMaterializedGraph);
     }
 
     internal LoadedState? Loaded { get; private set; }
 
-    internal static Document CreateLoaded(LoadedState state) => new() { Loaded = state };
+    internal DocumentObjectGraph? MaterializedGraph { get; set; }
+
+    internal void InvalidateMaterializedGraph() => MaterializedGraph = null;
+
+    internal void AdoptMaterializedGraph(DocumentObjectGraph graph)
+    {
+        var reader = new DocumentReader(graph);
+        var state = new LoadedState(reader)
+        {
+            SourceCatalog = graph.Catalog,
+        };
+
+        for (var i = 0; i < Pages.Count; i++)
+        {
+            var page = Pages[i];
+            var pageNode = graph.Pages[i];
+            state.SourcePages[page] = pageNode;
+            state.LoadedPages.Add(page);
+            state.LoadedPageSettings[page] = (page.BleedBox, page.TrimBox, page.ArtBox, page.Rotate);
+            if (reader.GetDictionary(pageNode, "Resources") is { } resources)
+            {
+                state.SourceResources[page] = resources;
+                page.SetTextFonts(DocumentLoader.BuildTextFonts(reader, resources));
+                page.SetReservedResourceNames(PageResourceBuilder.ResourceNames(reader, resources));
+            }
+
+        }
+
+        if (graph.Catalog is { } catalog && reader.GetDictionary(catalog, "AcroForm") is { } form)
+        {
+            state.SourceAcroForm = form;
+        }
+
+        if (reader.GetDictionary(reader.Trailer, "Info") is { } info)
+        {
+            state.SourceInfo = info;
+        }
+
+        Loaded = state;
+        ResetGraphFacades();
+        MaterializedGraph = graph;
+        Structure = null;
+        Anchors.Clear();
+    }
+
+    internal static Document CreateLoaded(LoadedState state)
+    {
+        var document = new Document { Loaded = state };
+        document.ResetGraphFacades();
+        return document;
+    }
+
+    private void ResetGraphFacades()
+    {
+        info = new DocumentInfo();
+        attachments.Clear();
+        outline.Clear();
+        pageLabels.Clear();
+        formFields.Clear();
+        xmp = new DocumentXmpMetadata();
+        viewerPreferences = null;
+        acroForm = null;
+        infoLoaded = false;
+        attachmentsLoaded = false;
+        outlineLoaded = false;
+        pageLabelsLoaded = false;
+        xmpLoaded = false;
+        viewerPreferencesLoaded = false;
+        acroFormLoaded = false;
+    }
 
     internal LoadedState EnsureLoaded() => Loaded ??= new LoadedState();
 
@@ -40,7 +127,28 @@ public sealed class Document
     }
 
     /// <summary>Gets the document metadata.</summary>
-    public DocumentInfo Info { get; } = new();
+    public DocumentInfo Info
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            EnsureInfoLoaded();
+            return info;
+        }
+    }
+
+    private void EnsureInfoLoaded()
+    {
+        lock (facadeLock)
+        {
+            if (!infoLoaded && Loaded?.Source is { } reader)
+            {
+                infoLoaded = true;
+                Loaded.SourceInfo = DocumentLoader.ReadInfo(reader, info);
+                info.AcceptChanges();
+            }
+        }
+    }
 
     /// <summary>Gets the ordered collection of pages.</summary>
     public PageCollection Pages { get; }
@@ -49,14 +157,41 @@ public sealed class Document
     /// Gets the interactive form of a loaded document, or <c>null</c> when the
     /// document has no AcroForm.
     /// </summary>
-    public AcroForm? AcroForm { get; internal set; }
+    public AcroForm? AcroForm
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            lock (facadeLock)
+            {
+                if (!acroFormLoaded)
+                {
+                    acroFormLoaded = true;
+                    if (Loaded?.Source is { } reader && Loaded.SourceAcroForm is { } form)
+                    {
+                        acroForm = new AcroForm(reader, form, this);
+                    }
+                }
+            }
+
+            return acroForm;
+        }
+        internal set
+        {
+            acroFormLoaded = true;
+            acroForm = value;
+        }
+    }
 
     /// <summary>
     /// Gets the form fields to create on this document. Each definition is
     /// saved as a widget annotation on its page and listed in the catalog
     /// <c>/AcroForm /Fields</c> with a generated appearance stream.
     /// </summary>
-    public IList<FormFieldDefinition> FormFields { get; } = [];
+    public IList<FormFieldDefinition> FormFields
+    {
+        get => formFields;
+    }
 
     /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
@@ -87,7 +222,29 @@ public sealed class Document
     /// <c>null</c> no viewer-preference keys are written and the output is
     /// unchanged.
     /// </summary>
-    public ViewerPreferences? ViewerPreferences { get; set; }
+    public ViewerPreferences? ViewerPreferences
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            lock (facadeLock)
+            {
+                if (!viewerPreferencesLoaded)
+                {
+                    viewerPreferencesLoaded = true;
+                    viewerPreferences = DocumentLoader.ReadViewerPreferences(Loaded?.Source, Loaded?.SourceCatalog);
+                }
+            }
+
+            return viewerPreferences;
+        }
+        set
+        {
+            InvalidateMaterializedGraph();
+            viewerPreferencesLoaded = true;
+            viewerPreferences = value;
+        }
+    }
 
     /// <summary>
     /// Gets the page-label ranges written to the catalog <c>/PageLabels</c> number
@@ -95,19 +252,102 @@ public sealed class Document
     /// with the given style, prefix and start ordinal. When empty no <c>/PageLabels</c>
     /// entry is written.
     /// </summary>
-    public IList<PageLabel> PageLabels => pageLabels;
+    public IList<PageLabel> PageLabels
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            EnsurePageLabelsLoaded();
+            return pageLabels;
+        }
+    }
 
     /// <summary>Gets the root entries of the document outline (bookmark) tree.</summary>
-    public IList<OutlineItem> Outline => outline;
+    public IList<OutlineItem> Outline
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            EnsureOutlineLoaded();
+            return outline;
+        }
+    }
 
     /// <summary>Gets the files embedded in the document.</summary>
-    public AttachmentCollection Attachments { get; } = [];
+    public AttachmentCollection Attachments
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            EnsureAttachmentsLoaded();
+            return attachments;
+        }
+    }
 
     /// <summary>
     /// Gets the document XMP metadata. Caller-set XMP takes precedence over automatic
     /// non-conformance metadata. Editing XMP on PDF/A or PDF/UA output is rejected.
     /// </summary>
-    public DocumentXmpMetadata Xmp { get; } = new();
+    public DocumentXmpMetadata Xmp
+    {
+        get
+        {
+            InvalidateMaterializedGraph();
+            EnsureXmpLoaded();
+            return xmp;
+        }
+    }
+
+    private void EnsureAttachmentsLoaded()
+    {
+        lock (facadeLock)
+        {
+            if (!attachmentsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
+            {
+                attachmentsLoaded = true;
+                DocumentLoader.ReadAttachments(reader, catalog, this, reader.Limits);
+                attachments.AcceptChanges();
+            }
+        }
+    }
+
+    private void EnsureOutlineLoaded()
+    {
+        lock (facadeLock)
+        {
+            if (!outlineLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
+            {
+                outlineLoaded = true;
+                DocumentLoader.ReadOutline(reader, catalog, this, Loaded, reader.Limits);
+                TrackedChanges.Accept(outline);
+            }
+        }
+    }
+
+    private void EnsurePageLabelsLoaded()
+    {
+        lock (facadeLock)
+        {
+            if (!pageLabelsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
+            {
+                pageLabelsLoaded = true;
+                DocumentLoader.ReadPageLabels(reader, catalog, this, reader.Limits);
+                TrackedChanges.Accept(pageLabels);
+            }
+        }
+    }
+
+    private void EnsureXmpLoaded()
+    {
+        lock (facadeLock)
+        {
+            if (!xmpLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
+            {
+                xmpLoaded = true;
+                DocumentLoader.ReadXmp(reader, catalog, xmp);
+            }
+        }
+    }
 
     internal StructureElement? Structure { get; set; }
 
@@ -117,12 +357,17 @@ public sealed class Document
 
     internal FontCollection? Fonts { get; set; }
 
+    internal FontCollectionSnapshot? FontSnapshot { get; set; }
+
     internal Fonts.FontScope FontScope => new(
         Fonts,
-        Conformance != PdfAConformance.None ? "PDF/A" : PdfUA ? "PDF/UA" : null,
+        FontSnapshot,
+        Conformance != PdfAConformance.None ? "PDF/A" : IsPdfUa ? "PDF/UA" : null,
         CanEmbed: false);
 
-    internal bool PdfUA { get; set; }
+    internal PdfUaConformance Accessibility { get; set; }
+
+    internal bool IsPdfUa => Accessibility != PdfUaConformance.None;
 
     internal string? Language { get; set; }
 
@@ -132,17 +377,38 @@ public sealed class Document
 
     internal bool OutlineChanged => Loaded?.Source is null
         || Loaded.OutlineRequiresRewrite
-        || TrackedChanges.AnyModified(outline);
+        || (outlineLoaded && TrackedChanges.AnyModified(outline));
 
     internal bool PageLabelsChanged => Loaded?.Source is null
-        || TrackedChanges.AnyModified(pageLabels);
+        || (pageLabelsLoaded && TrackedChanges.AnyModified(pageLabels));
+
+    internal bool HasPreservableStructureGraph
+        => Loaded is { Source: { } reader, SourceCatalog: { } catalog } loaded
+            && reader.GetDictionary(catalog, "StructTreeRoot") is not null
+            && Pages.Count == loaded.SourcePages.Count
+            && Pages.All(loaded.SourcePages.ContainsKey);
 
     internal void AcceptMetadataChanges()
     {
-        Info.AcceptChanges();
-        Attachments.AcceptChanges();
-        TrackedChanges.Accept(outline);
-        TrackedChanges.Accept(pageLabels);
+        if (infoLoaded)
+        {
+            info.AcceptChanges();
+        }
+
+        if (attachmentsLoaded)
+        {
+            attachments.AcceptChanges();
+        }
+
+        if (outlineLoaded)
+        {
+            TrackedChanges.Accept(outline);
+        }
+
+        if (pageLabelsLoaded)
+        {
+            TrackedChanges.Accept(pageLabels);
+        }
     }
 
     /// <summary>
@@ -310,6 +576,11 @@ public sealed class Document
     {
         ArgumentNullException.ThrowIfNull(source);
         var (offset, length) = range.GetOffsetAndLength(source.Pages.Count);
+        if (source.MaterializedGraph is not null)
+        {
+            return PageOperations.Import(this, source, offset, length);
+        }
+
         if (PageOperations.CanImportDirectly(this, source, offset, length))
         {
             return PageOperations.ImportIsolated(this, source, offset, length);
@@ -339,11 +610,11 @@ public sealed class Document
     public void AddWatermark(Watermark watermark)
     {
         ArgumentNullException.ThrowIfNull(watermark);
-        watermark.Validate();
 
+        var images = new ImageStore();
         foreach (var page in Pages)
         {
-            page.AppendContent(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox));
+            page.AppendContent(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox, images));
         }
     }
 

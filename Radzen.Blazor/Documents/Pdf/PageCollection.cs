@@ -68,6 +68,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     public void Insert(int index, Page page)
     {
         ArgumentNullException.ThrowIfNull(page);
+        owner?.InvalidateMaterializedGraph();
         pages.Insert(index, page);
         Adopt(page);
     }
@@ -93,13 +94,18 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// Removes the page at the specified index.
     /// </summary>
     /// <param name="index">The zero-based index of the page to remove.</param>
-    public void RemoveAt(int index) => pages.RemoveAt(index);
+    public void RemoveAt(int index)
+    {
+        owner?.InvalidateMaterializedGraph();
+        pages.RemoveAt(index);
+    }
 
     /// <summary>Moves a page from one index to another.</summary>
     /// <param name="from">The zero-based source index.</param>
     /// <param name="to">The zero-based destination index in the resulting collection.</param>
     public void Move(int from, int to)
     {
+        owner?.InvalidateMaterializedGraph();
         var page = pages[from];
         pages.RemoveAt(from);
         try
@@ -116,7 +122,11 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <summary>Removes a contiguous range of pages.</summary>
     /// <param name="index">The zero-based index of the first page to remove.</param>
     /// <param name="count">The number of pages to remove.</param>
-    public void RemoveRange(int index, int count) => pages.RemoveRange(index, count);
+    public void RemoveRange(int index, int count)
+    {
+        owner?.InvalidateMaterializedGraph();
+        pages.RemoveRange(index, count);
+    }
 
     /// <summary>Creates a new document containing deep copies of the selected pages.</summary>
     /// <param name="range">The page range to extract.</param>

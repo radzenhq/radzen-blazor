@@ -3,7 +3,7 @@ namespace Radzen.Documents.Pdf;
 /// <summary>
 /// Resource limits applied while reading a PDF, to bound work on malformed or hostile input.
 /// A general-purpose reader is fed untrusted files; these caps turn attacker-controlled
-/// sizes/depths into a recoverable <see cref="Objects.DocumentParseException"/> instead of a hang,
+/// sizes/depths into a recoverable <see cref="DocumentParseException"/> instead of a hang,
 /// out-of-memory, or process-killing stack overflow. All defaults are generous for real
 /// documents and configurable via the reading entry points.
 /// </summary>

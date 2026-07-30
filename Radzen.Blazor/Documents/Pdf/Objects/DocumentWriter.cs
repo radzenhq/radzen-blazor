@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf.Objects.Encryption;
@@ -16,11 +15,7 @@ namespace Radzen.Documents.Pdf.Objects;
 /// returns its indirect reference; the object may be mutated afterwards.
 /// Object bodies are serialized only when <see cref="Close"/> is called.
 /// </remarks>
-/// <remarks>
-/// Initializes a new instance of the <see cref="DocumentWriter"/> class.
-/// </remarks>
-/// <param name="stream">The destination stream.</param>
-public sealed class DocumentWriter(Stream stream) : IObjectWriter
+public sealed class DocumentWriter : IObjectWriter
 {
     private static readonly byte[] HeaderSuffix =
     [
@@ -31,7 +26,11 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
     /// Gets or sets the PDF version written in the file header (e.g. "1.7" or
     /// "2.0"). PDF/A-4 requires "2.0".
     /// </summary>
-    public string Version { get; set; } = "1.7";
+    public string Version
+    {
+        get => graph.Version;
+        set => graph.Version = value;
+    }
 
     private byte[] BuildHeader()
     {
@@ -49,14 +48,31 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         return header;
     }
 
-    private readonly Stream stream = stream ?? throw new ArgumentNullException(nameof(stream));
-    private readonly List<DocumentObject> objects = [];
+    private readonly Stream stream;
+    private readonly DocumentObjectGraph graph;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentWriter"/> class.
+    /// </summary>
+    /// <param name="stream">The destination stream.</param>
+    public DocumentWriter(Stream stream)
+        : this(stream, new DocumentObjectGraph())
+    {
+    }
+
+    internal DocumentWriter(Stream stream, DocumentObjectGraph graph)
+    {
+        this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        this.graph = graph ?? throw new ArgumentNullException(nameof(graph));
+    }
+
+    internal DocumentObjectGraph Graph => graph;
 
     /// <summary>
     /// Gets the trailer dictionary. Entries such as <c>/Root</c> are written
     /// verbatim; <c>/Size</c> is set automatically by <see cref="Close"/>.
     /// </summary>
-    public DictionaryObject Trailer { get; } = new();
+    public DictionaryObject Trailer => graph.Trailer;
 
     /// <summary>
     /// Gets or sets standard PDF encryption options. When non-null, <see cref="Close"/>
@@ -81,18 +97,10 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
     /// <param name="value">The object to register.</param>
     /// <returns>An indirect reference to the registered object.</returns>
     public ReferenceObject Add(DocumentObject value)
-        => IndirectObjectRegistration.Add(value, AppendObject);
-
-    private int AppendObject(DocumentObject value)
-    {
-        objects.Add(value);
-        return objects.Count;
-    }
+        => graph.Add(value);
 
     internal DocumentObject? Resolve(ReferenceObject reference)
-        => reference.ObjectNumber >= 1 && reference.ObjectNumber <= objects.Count
-            ? objects[reference.ObjectNumber - 1]
-            : null;
+        => graph.Resolve(reference);
 
     /// <summary>
     /// Serializes all registered objects, the cross-reference table, and the
@@ -113,14 +121,14 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
             return;
         }
 
-        var offsets = new long[objects.Count];
-        for (var i = 0; i < objects.Count; i++)
+        var offsets = new long[graph.Objects.Count];
+        for (var i = 0; i < graph.Objects.Count; i++)
         {
-            offsets[i] = WriteIndirectObject(buffer, i + 1, objects[i], encryption, encryptNumber);
+            offsets[i] = WriteIndirectObject(buffer, i + 1, graph.Objects[i], encryption, encryptNumber);
         }
 
         var xrefOffset = buffer.Position;
-        var size = objects.Count + 1;
+        var size = graph.Objects.Count + 1;
         PdfBytes.WriteAscii(buffer, "xref\n0 ");
         PdfBytes.WriteInteger(buffer, size);
         PdfBytes.WriteAscii(buffer, "\n0000000000 65535 f \n");
@@ -150,15 +158,15 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
     private void CloseCompressed(CountingBufferedStream buffer, EncryptionWriter? encryption, int encryptNumber)
     {
         var builder = new ObjectStreamBuilder();
-        var count = objects.Count;
+        var count = graph.Objects.Count;
         var offsets = new long[count];
         var packedIndex = new int[count];
 
         // Object stream contents are not individually encrypted (ISO 32000-1 7.6.1).
         for (var i = 0; i < count; i++)
         {
-            packedIndex[i] = objects[i] is not StreamObject && i + 1 != encryptNumber
-                ? builder.Add(i + 1, objects[i])
+            packedIndex[i] = graph.Objects[i] is not StreamObject && i + 1 != encryptNumber
+                ? builder.Add(i + 1, graph.Objects[i])
                 : -1;
         }
 
@@ -169,7 +177,7 @@ public sealed class DocumentWriter(Stream stream) : IObjectWriter
         {
             if (packedIndex[i] < 0)
             {
-                offsets[i] = WriteIndirectObject(buffer, i + 1, objects[i], encryption, encryptNumber);
+                offsets[i] = WriteIndirectObject(buffer, i + 1, graph.Objects[i], encryption, encryptNumber);
             }
         }
 

@@ -67,6 +67,7 @@ public sealed class FacturXProfile : ITracksChanges
     internal void AcceptChanges() => tracker.AcceptChanges();
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
+
 }
 
 /// <summary>

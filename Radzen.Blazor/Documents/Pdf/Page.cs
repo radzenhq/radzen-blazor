@@ -59,6 +59,7 @@ public sealed class Page
         set
         {
             ValidateBox(value, nameof(value));
+            Owner?.InvalidateMaterializedGraph();
             SetMediaBox(value, true);
         }
     }
@@ -78,6 +79,7 @@ public sealed class Page
                 ValidateBox(box, nameof(value));
             }
 
+            Owner?.InvalidateMaterializedGraph();
             cropBox = value;
             CropBoxSet = true;
         }
@@ -115,7 +117,11 @@ public sealed class Page
     public PdfRect? BleedBox
     {
         get => bleedBox;
-        set => bleedBox = ValidateAuxiliaryBox(value, nameof(value));
+        set
+        {
+            Owner?.InvalidateMaterializedGraph();
+            bleedBox = ValidateAuxiliaryBox(value, nameof(value));
+        }
     }
 
     /// <summary>
@@ -126,7 +132,11 @@ public sealed class Page
     public PdfRect? TrimBox
     {
         get => trimBox;
-        set => trimBox = ValidateAuxiliaryBox(value, nameof(value));
+        set
+        {
+            Owner?.InvalidateMaterializedGraph();
+            trimBox = ValidateAuxiliaryBox(value, nameof(value));
+        }
     }
 
     /// <summary>
@@ -137,7 +147,11 @@ public sealed class Page
     public PdfRect? ArtBox
     {
         get => artBox;
-        set => artBox = ValidateAuxiliaryBox(value, nameof(value));
+        set
+        {
+            Owner?.InvalidateMaterializedGraph();
+            artBox = ValidateAuxiliaryBox(value, nameof(value));
+        }
     }
 
     private PdfRect? bleedBox;
@@ -171,6 +185,7 @@ public sealed class Page
                 throw new ArgumentOutOfRangeException(nameof(value), value, "Page rotation must be 0, 90, 180 or 270 degrees.");
             }
 
+            Owner?.InvalidateMaterializedGraph();
             rotate = value;
 
             Owner?.Loaded?.SourceRotations.Remove(this);
@@ -189,6 +204,7 @@ public sealed class Page
     {
         get
         {
+            Owner?.InvalidateMaterializedGraph();
             EnsureMaterialized();
             return elements;
         }
@@ -207,6 +223,7 @@ public sealed class Page
     public void SetContent(byte[] value)
     {
         ArgumentNullException.ThrowIfNull(value);
+        Owner?.InvalidateMaterializedGraph();
         SetContentCore((byte[])value.Clone());
 
         ContentReplaced = true;
