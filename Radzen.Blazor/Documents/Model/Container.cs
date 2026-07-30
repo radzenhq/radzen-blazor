@@ -28,6 +28,7 @@ public enum ContainerLayout
 public sealed class Container : Block
 {
     private double opacity = 1;
+    private double rotation;
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
@@ -111,5 +112,10 @@ public sealed class Container : Block
     /// Overlay and rotated containers are only supported as direct section content, not
     /// inside table cells or other containers.
     /// </summary>
-    public double Rotation { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is not finite.</exception>
+    public double Rotation
+    {
+        get => rotation;
+        set => rotation = AuthoredNumber.Finite(value, "Container.Rotation");
+    }
 }

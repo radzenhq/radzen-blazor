@@ -65,7 +65,7 @@ internal static class ImageProbe
 
         if (image.FitBox is { } box)
         {
-            var scale = Math.Min(box.Width.Point / baseWidth, box.Height.Point / baseHeight);
+            var scale = Math.Min(box.MaxWidth.Point / baseWidth, box.MaxHeight.Point / baseHeight);
             return (baseWidth * scale, baseHeight * scale);
         }
 

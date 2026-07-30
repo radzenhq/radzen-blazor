@@ -7,7 +7,7 @@ internal static class RunTextAdvance
 {
     internal static double Measure(
         FontCollection fonts,
-        Run run,
+        TextInline run,
         Font font,
         string text,
         bool leadingCharacterSpacing = false,
@@ -127,7 +127,7 @@ internal static class RunTextAdvance
         double glyphAdvance,
         int glyphCount,
         int wordSpaceCount,
-        Run run,
+        TextInline run,
         bool leadingCharacterSpacing = false,
         bool trailingCharacterSpacing = false)
         => CalculateCore(

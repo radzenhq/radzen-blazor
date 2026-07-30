@@ -169,12 +169,14 @@ internal sealed class PageNavigationCollector
                 j++;
             }
 
-            var size = first.Paint.Font.Size;
+            var (above, below) = first.Paint.InlineImage is { } image
+                ? (image.Height, 0.0)
+                : (first.Paint.Font.Size * 0.9, first.Paint.Font.Size * 0.3);
             links.Add(Link(
                 originX + start,
-                y - (size * 0.9),
+                y - above,
                 originX + end,
-                y + (size * 0.3),
+                y + below,
                 first.Paint,
                 first.Source,
                 transform,
@@ -220,5 +222,5 @@ internal sealed class PageNavigationCollector
 
     private static bool IsLink(in LineFragment fragment)
         => (fragment.Paint.LinkTarget is not null || fragment.Paint.AnchorTarget is not null)
-            && fragment.Text.Length > 0;
+            && (fragment.Text.Length > 0 || fragment.Paint.InlineImage is not null);
 }

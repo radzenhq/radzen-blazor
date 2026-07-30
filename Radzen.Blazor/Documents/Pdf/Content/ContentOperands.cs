@@ -9,7 +9,7 @@ internal static class ContentOperands
     public static Matrix Components(List<Token> operands)
     {
         var n = Numbers(operands, 6);
-        return Matrix.FromComponents(n[0], n[1], n[2], n[3], n[4], n[5]);
+        return Matrix.FromRawComponents(n[0], n[1], n[2], n[3], n[4], n[5]);
     }
 
     public static double[] Numbers(List<Token> operands, int count)

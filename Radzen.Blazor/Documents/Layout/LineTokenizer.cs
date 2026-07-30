@@ -5,7 +5,7 @@ namespace Radzen.Documents.Layout;
 
 internal readonly struct LinePiece
 {
-    public required Run Run { get; init; }
+    public required Inline Run { get; init; }
     public required Font Font { get; init; }
     public required int Start { get; init; }
     public required int Length { get; init; }
@@ -35,7 +35,7 @@ internal readonly record struct LineTokenization(List<List<LineWord>> Segments, 
 
 internal static class LineTokenizer
 {
-    private static Font ResolvedFont(LoweringContext? resolution, Run run)
+    private static Font ResolvedFont(LoweringContext? resolution, TextInline run)
         => resolution?.RunFont(run) ?? run.Font;
 
     private const char SoftHyphen = '\u00AD';
@@ -56,11 +56,13 @@ internal static class LineTokenizer
         var current = default(LineWord);
         var hasCurrent = false;
 
-        foreach (var run in paragraph.Inlines)
+        var paragraphFont = resolution?.ParagraphFont(paragraph) ?? paragraph.Font;
+
+        foreach (var inline in paragraph.Inlines)
         {
-            var runFont = ResolvedFont(resolution, run);
-            if (run is InlineImage inlineImage)
+            if (inline is not TextInline run)
             {
+                var inlineImage = (InlineImage)inline;
                 if (hasCurrent)
                 {
                     if (current.GapAfter == 0 && current.TabsAfter == 0)
@@ -83,7 +85,7 @@ internal static class LineTokenizer
                 pieces.Add(new LinePiece
                 {
                     Run = inlineImage,
-                    Font = runFont,
+                    Font = paragraphFont,
                     Start = 0,
                     Length = 0,
                     Text = string.Empty,
@@ -92,7 +94,8 @@ internal static class LineTokenizer
                 continue;
             }
 
-            var text = run.Text;
+            var runFont = ResolvedFont(resolution, run);
+            var text = run.LayoutText;
             var i = 0;
             while (i < text.Length)
             {

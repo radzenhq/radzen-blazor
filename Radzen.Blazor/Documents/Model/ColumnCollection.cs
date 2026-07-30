@@ -8,7 +8,8 @@ namespace Radzen.Documents;
 /// <summary>
 /// An ordered collection of the columns in a table. The columns and each row's cells are kept in
 /// step: every mutation here adds, inserts, moves or removes the cell at the same position in
-/// every existing row.
+/// every existing row. A column belongs to exactly one table: adding a column that already has a
+/// parent throws, while one removed from this table may be added back.
 /// </summary>
 public sealed class ColumnCollection : IReadOnlyList<Column>
 {
@@ -89,7 +90,9 @@ public sealed class ColumnCollection : IReadOnlyList<Column>
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, items.Count);
 
+        var column = items[index];
         items.RemoveAt(index);
+        ContentTree.Detach(column);
         foreach (var row in table.Rows)
         {
             row.Cells.RemoveCellAt(index);
@@ -117,6 +120,11 @@ public sealed class ColumnCollection : IReadOnlyList<Column>
     /// </summary>
     public void Clear()
     {
+        foreach (var column in items)
+        {
+            ContentTree.Detach(column);
+        }
+
         items.Clear();
         foreach (var row in table.Rows)
         {
@@ -124,8 +132,17 @@ public sealed class ColumnCollection : IReadOnlyList<Column>
         }
     }
 
-    private Column Add(Column column)
+    /// <summary>
+    /// Appends an existing column, typically one previously removed from this table, adding a cell
+    /// to the end of every existing row.
+    /// </summary>
+    /// <param name="column">The column to append.</param>
+    /// <returns>The same <paramref name="column"/> instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="column"/> is <see langword="null"/>.</exception>
+    /// <exception cref="InvalidOperationException"><paramref name="column"/> already belongs to another table.</exception>
+    public Column Add(Column column)
     {
+        ContentTree.Attach(column, this);
         items.Add(column);
         foreach (var row in table.Rows)
         {
@@ -135,10 +152,21 @@ public sealed class ColumnCollection : IReadOnlyList<Column>
         return column;
     }
 
-    private Column Insert(int index, Column column)
+    /// <summary>
+    /// Inserts an existing column at the specified position, inserting a cell at the same position
+    /// in every existing row.
+    /// </summary>
+    /// <param name="index">The zero-based position to insert at, from 0 to <see cref="Count"/>.</param>
+    /// <param name="column">The column to insert.</param>
+    /// <returns>The same <paramref name="column"/> instance.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="column"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is out of range.</exception>
+    /// <exception cref="InvalidOperationException"><paramref name="column"/> already belongs to another table.</exception>
+    public Column Insert(int index, Column column)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(index);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(index, items.Count);
+        ContentTree.Attach(column, this);
 
         items.Insert(index, column);
         foreach (var row in table.Rows)

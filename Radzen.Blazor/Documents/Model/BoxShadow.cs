@@ -1,10 +1,10 @@
 namespace Radzen.Documents;
 
 /// <summary>
-/// A blurred drop shadow painted underneath a <see cref="Container"/> box. The shadow is
-/// rendered purely in managed code: a rounded-rectangle coverage buffer is rasterized,
-/// blurred with a separable Gaussian, and used as a soft mask over a rectangle filled with
-/// <see cref="Color"/>, offset from and drawn below the box. Leaving
+/// A blurred drop shadow painted underneath a <see cref="Container"/> box: the shape of the box,
+/// grown by <see cref="Spread"/>, filled with <see cref="Color"/>, offset by
+/// <see cref="OffsetX"/> and <see cref="OffsetY"/> and softened by <see cref="BlurRadius"/>.
+/// It follows the box's rounded corners and never affects layout. Leaving
 /// <see cref="Container.Shadow"/> unset paints no shadow.
 /// </summary>
 public sealed class BoxShadow

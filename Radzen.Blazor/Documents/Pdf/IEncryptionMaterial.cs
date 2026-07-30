@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Radzen.Documents.Crypto;
 
-namespace Radzen.Documents.Pdf.Objects.Encryption;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// Supplies the unpredictable bytes standard PDF encryption needs - the document

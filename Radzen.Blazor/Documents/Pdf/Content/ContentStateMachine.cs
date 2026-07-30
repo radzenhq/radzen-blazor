@@ -131,7 +131,7 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
                 goto case "Td";
 
             case "Td":
-                LineMatrix = Matrix.Translate(Number(operands, 0), Number(operands, 1)) * LineMatrix;
+                LineMatrix = Matrix.RawTranslate(Number(operands, 0), Number(operands, 1)) * LineMatrix;
                 TextMatrix = LineMatrix;
                 return true;
 
@@ -149,11 +149,11 @@ internal sealed class ContentStateMachine(IReadOnlyDictionary<string, ReverseFon
         }
     }
 
-    public void Advance(double amount) => TextMatrix = Matrix.Translate(amount, 0) * TextMatrix;
+    public void Advance(double amount) => TextMatrix = Matrix.RawTranslate(amount, 0) * TextMatrix;
 
     private void NextLine()
     {
-        LineMatrix = Matrix.Translate(0, -state.Text.Leading) * LineMatrix;
+        LineMatrix = Matrix.RawTranslate(0, -state.Text.Leading) * LineMatrix;
         TextMatrix = LineMatrix;
     }
 }

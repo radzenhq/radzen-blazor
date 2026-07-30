@@ -1,4 +1,4 @@
-namespace Radzen.Documents.Pdf.Objects.Encryption;
+namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// Selects the standard security handler algorithm used when writing an
@@ -17,8 +17,8 @@ public enum EncryptionAlgorithm
 }
 
 /// <summary>
-/// Configures standard PDF encryption for a <see cref="DocumentWriter"/>. When
-/// assigned to <see cref="DocumentWriter.Encryption"/> every string and stream is
+/// Configures standard PDF encryption for a <see cref="Objects.DocumentWriter"/>. When
+/// assigned to <see cref="Objects.DocumentWriter.Encryption"/> every string and stream is
 /// encrypted, an <c>/Encrypt</c> dictionary is written, and a document <c>/ID</c>
 /// is generated.
 /// </summary>

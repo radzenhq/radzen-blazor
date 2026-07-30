@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Write;
 namespace Radzen.Documents.Pdf;
 
@@ -38,7 +38,7 @@ public sealed class Page
         annotations.OwnedBy(() => Owner?.InvalidateMaterializedGraph());
     }
 
-    internal GeneratedPage? Generated { get; set; }
+    internal PageEmissionPlan? Generated { get; set; }
 
     internal PortableDocument? Owner { get; set; }
 

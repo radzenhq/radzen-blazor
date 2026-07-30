@@ -6,12 +6,12 @@ namespace Radzen.Documents;
 /// </summary>
 public enum LineJoin
 {
-    /// <summary>The outer edges extend to meet at a sharp point (value 0).</summary>
+    /// <summary>The outer edges extend to meet at a sharp point.</summary>
     Miter = 0,
 
-    /// <summary>A circular arc rounds the corner (value 1).</summary>
+    /// <summary>A circular arc rounds the corner.</summary>
     Round = 1,
 
-    /// <summary>The corner is squared off between the segment ends (value 2).</summary>
+    /// <summary>The corner is squared off between the segment ends.</summary>
     Bevel = 2,
 }

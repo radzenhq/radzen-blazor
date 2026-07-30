@@ -1,24 +1,48 @@
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Content;
 
-internal sealed class ContentResourceManifest(
-    IReadOnlyList<KeyValuePair<string, string>> fonts,
-    IReadOnlyList<KeyValuePair<string, ImageXObject>> images,
-    IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns,
-    IReadOnlyList<KeyValuePair<string, double>> extGStates)
+internal sealed class ContentResourceManifest
 {
+    public ContentResourceManifest(
+        IReadOnlyList<KeyValuePair<string, string>> fonts,
+        IReadOnlyList<KeyValuePair<string, ImageXObject>> images,
+        IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns,
+        IReadOnlyList<KeyValuePair<string, double>> extGStates)
+    {
+        Fonts = fonts;
+        Images = images;
+        Patterns = patterns;
+        ExtGStates = extGStates;
+
+        var imageResources = new List<KeyValuePair<string, EmissionImageResource>>(images.Count);
+        foreach (var image in images)
+        {
+            imageResources.Add(new KeyValuePair<string, EmissionImageResource>(
+                image.Key,
+                new EmissionImageResource(
+                    image.Value,
+                    EmissionStreamSnapshot.Capture(image.Value.Image),
+                    image.Value.SoftMask is { } mask ? EmissionStreamSnapshot.Capture(mask) : null)));
+        }
+
+        ImagesForWriting = imageResources;
+    }
+
     public static ContentResourceManifest Empty { get; } = new([], [], [], []);
 
-    public IReadOnlyList<KeyValuePair<string, string>> Fonts { get; } = fonts;
+    public IReadOnlyList<KeyValuePair<string, string>> Fonts { get; }
 
-    public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images { get; } = images;
+    public IReadOnlyList<KeyValuePair<string, ImageXObject>> Images { get; }
 
-    public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns { get; } = patterns;
+    internal IReadOnlyList<KeyValuePair<string, EmissionImageResource>> ImagesForWriting { get; }
 
-    public IReadOnlyList<KeyValuePair<string, double>> ExtGStates { get; } = extGStates;
+    public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns { get; }
+
+    public IReadOnlyList<KeyValuePair<string, double>> ExtGStates { get; }
 
     public bool IsEmpty => Fonts.Count == 0 && Images.Count == 0 && Patterns.Count == 0 && ExtGStates.Count == 0;
 

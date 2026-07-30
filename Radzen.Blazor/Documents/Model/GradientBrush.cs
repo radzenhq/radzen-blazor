@@ -20,7 +20,7 @@ public sealed class GradientStop(double offset, Color color)
 }
 
 /// <summary>
-/// A gradient fill defined by two or more color stops. Coordinates are box-relative and
+/// A gradient fill defined by one or more color stops. Coordinates are box-relative and
 /// top-origin: they are measured within the painted box of the element the brush fills,
 /// with (0, 0) at the box's top-left corner, x increasing to the right and y increasing
 /// downwards. An absolute <see cref="Unit"/> is an offset from that origin along the axis
@@ -29,14 +29,12 @@ public sealed class GradientStop(double offset, Color color)
 /// relative to the box width. Renderers map this space onto the page themselves, so the
 /// same brush paints identically wherever the box lands. Stop alpha expresses the intended
 /// per-stop transparency; renderers approximate it within their capabilities, and one that
-/// cannot vary transparency across a gradient paints every stop fully opaque.
+/// cannot vary transparency across a gradient paints every stop fully opaque. The first stop's
+/// color fills the area before the gradient start and the last stop's color fills the area beyond
+/// its end.
 /// </summary>
-public abstract class GradientBrush : ITracksChanges
+public abstract class GradientBrush
 {
-    private bool extendStart = true;
-    private bool extendEnd = true;
-    private ChangeTracker tracker;
-
     /// <summary>Initializes the shared gradient state from <paramref name="stops"/>.</summary>
     /// <param name="stops">The color stops, in non-decreasing offset order within [0, 1].</param>
     private protected GradientBrush(GradientStop[] stops)
@@ -67,34 +65,6 @@ public abstract class GradientBrush : ITracksChanges
 
     /// <summary>Gets the ordered color stops of this gradient.</summary>
     public ReadOnlyCollection<GradientStop> Stops { get; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the gradient extends beyond its start
-    /// point. Defaults to true.
-    /// </summary>
-    public bool ExtendStart
-    {
-        get => extendStart;
-        set => tracker.Set(ref extendStart, value);
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the gradient extends beyond its end
-    /// point. Defaults to true.
-    /// </summary>
-    public bool ExtendEnd
-    {
-        get => extendEnd;
-        set => tracker.Set(ref extendEnd, value);
-    }
-
-    internal bool IsModified => tracker.IsModified;
-
-    internal void AcceptChanges() => tracker.AcceptChanges();
-
-    bool ITracksChanges.IsModified => IsModified;
-
-    void ITracksChanges.AcceptChanges() => AcceptChanges();
 }
 
 /// <summary>

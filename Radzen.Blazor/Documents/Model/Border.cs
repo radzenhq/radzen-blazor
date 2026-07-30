@@ -7,17 +7,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Border
 {
-    private readonly Borders? owner;
+    private readonly Borders owner;
     private Unit? width;
     private Color? color;
     private BorderStyle? style;
-
-    /// <summary>
-    /// Initializes a standalone border edge with no owning box.
-    /// </summary>
-    public Border()
-    {
-    }
 
     internal Border(Borders owner) => this.owner = owner;
 
@@ -26,7 +19,7 @@ public sealed class Border
     /// </summary>
     public Unit Width
     {
-        get => width ?? owner?.Width ?? Unit.FromPoint(0);
+        get => width ?? owner.Width;
         set => width = value;
     }
 
@@ -35,7 +28,7 @@ public sealed class Border
     /// </summary>
     public Color Color
     {
-        get => color ?? owner?.Color ?? Color.Black;
+        get => color ?? owner.Color;
         set => color = value;
     }
 
@@ -44,9 +37,9 @@ public sealed class Border
     /// </summary>
     public BorderStyle Style
     {
-        get => style ?? owner?.Style ?? BorderStyle.None;
+        get => style ?? owner.Style;
         set => style = value;
     }
 
-    internal bool IsSet => width is not null || color is not null || style is not null || owner?.IsSet == true;
+    internal bool IsSet => width is not null || color is not null || style is not null || owner.IsSet;
 }

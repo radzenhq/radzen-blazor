@@ -16,7 +16,7 @@ public sealed class TocEntry
     /// Initializes a new <see cref="TocEntry"/>.
     /// </summary>
     /// <param name="text">The entry text shown on the line.</param>
-    /// <param name="anchor">The anchor name the entry links to (see <see cref="Run.Anchor"/>).</param>
+    /// <param name="anchor">The anchor name the entry links to (see <see cref="Inline.Anchor"/>).</param>
     /// <param name="level">The zero-based indentation level. Defaults to 0.</param>
     /// <exception cref="ArgumentNullException"><paramref name="text"/> or <paramref name="anchor"/> is <see langword="null"/>.</exception>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="level"/> is negative.</exception>
@@ -153,17 +153,13 @@ public sealed class TocEntryCollection : IReadOnlyList<TocEntry>
 
 /// <summary>
 /// A table of contents rendered as one line per entry: the entry text, a leader of
-/// <see cref="Leader"/> characters and the resolved page number, right-aligned in a fixed
-/// page-number column. Every entry line is a clickable region that navigates to its anchor.
-/// Page numbers are resolved with a second layout pass; the page-number column footprint
-/// is independent of the digits (sized for up to four), so both passes paginate identically.
+/// <see cref="Leader"/> characters and the page the entry's anchor lands on, right-aligned in a
+/// page-number column of fixed width. Every entry line is a clickable region that navigates to
+/// its anchor. The page numbers are the ones the finished document paginates to, and the column
+/// keeps the same width whatever the numbers turn out to be, so adding the table of contents does
+/// not shift where the entries point. A table of contents is only supported as direct section
+/// content.
 /// </summary>
-/// <remarks>
-/// The block lowers to one <see cref="Paragraph"/> per entry rather than to a two-column table:
-/// each paragraph carries a right-aligned tab stop for the page number and the leader fills that
-/// tab's gap, which a table lowering cannot express. A table of contents is only supported as
-/// direct section content.
-/// </remarks>
 public sealed class TableOfContents : Block
 {
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
@@ -189,7 +185,7 @@ public sealed class TableOfContents : Block
     /// Adds an entry.
     /// </summary>
     /// <param name="text">The entry text shown on the line.</param>
-    /// <param name="anchor">The anchor name the entry links to (see <see cref="Run.Anchor"/>).</param>
+    /// <param name="anchor">The anchor name the entry links to (see <see cref="Inline.Anchor"/>).</param>
     /// <param name="level">The zero-based indentation level. Defaults to 0.</param>
     /// <returns>The newly created entry.</returns>
     public TocEntry AddEntry(string text, string anchor, int level = 0)

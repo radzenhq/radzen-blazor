@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Write;
 using Radzen.Documents.Pdf.Objects;
@@ -26,7 +27,7 @@ public sealed class PortableDocument
     private DocumentXmpMetadata xmp = new();
     private ViewerPreferences? viewerPreferences;
     private AcroForm? acroForm;
-    private Objects.Encryption.EncryptionOptions? encryption;
+    private EncryptionOptions? encryption;
     private bool compressOutput;
     private bool includeDocumentId;
     private readonly object facadeLock = new();
@@ -91,8 +92,6 @@ public sealed class PortableDocument
         ResetGraphFacades();
         encryption = graph.Encryption;
         MaterializedGraph = graph;
-        Structure = null;
-        Anchors.Clear();
     }
 
     internal static PortableDocument CreateLoaded(LoadedState state)
@@ -203,7 +202,7 @@ public sealed class PortableDocument
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
     /// document is written unencrypted.
     /// </summary>
-    public Objects.Encryption.EncryptionOptions? Encryption
+    public EncryptionOptions? Encryption
     {
         get => encryption;
         set
@@ -379,7 +378,7 @@ public sealed class PortableDocument
         }
     }
 
-    internal StructureElement? Structure { get; set; }
+    internal DocumentEmissionPlan? EmissionPlan { get; set; }
 
     internal RoleMap RoleMap { get; set; } = new();
 
@@ -400,9 +399,6 @@ public sealed class PortableDocument
     internal bool IsPdfUa => Accessibility != PdfUaConformance.None;
 
     internal string? Language { get; set; }
-
-
-    internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
 
     internal bool OutlineChanged => Loaded?.Source is null
         || Loaded.OutlineRequiresRewrite
@@ -636,9 +632,21 @@ public sealed class PortableDocument
 
     /// <summary>Adds a centered watermark overlay to every current page.</summary>
     /// <param name="watermark">The watermark options.</param>
+    /// <exception cref="NotSupportedException">
+    /// <paramref name="watermark"/> has text in a font this document cannot draw it with: pages of
+    /// a loaded or already-built document reach only the base-14 faces by name and cannot embed a
+    /// font file.
+    /// </exception>
     public void AddWatermark(Watermark watermark)
     {
         ArgumentNullException.ThrowIfNull(watermark);
+
+        if (!string.IsNullOrEmpty(watermark.Text))
+        {
+            Radzen.Documents.Pdf.Fonts.FontResolution.ResolveBase14Name(
+                watermark.Font,
+                FontScope with { Base14ForbiddenBy = null });
+        }
 
         var images = new ImageStore();
         foreach (var page in Pages)

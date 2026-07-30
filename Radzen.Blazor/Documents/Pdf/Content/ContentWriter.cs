@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Text;
 
 using Radzen.Documents.Pdf.Render;
-using Radzen.Documents.Pdf.Write;
 using Radzen.Documents.Fonts;
 namespace Radzen.Documents.Pdf.Content;
 
