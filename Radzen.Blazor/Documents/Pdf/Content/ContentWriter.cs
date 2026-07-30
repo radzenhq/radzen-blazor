@@ -191,8 +191,8 @@ public sealed class ContentWriter : IDisposable
     }
 
     /// <summary>Writes <paramref name="color"/> as an RGB triple followed by <paramref name="operatorName"/> and a newline.</summary>
-    /// <param name="color">The colour to write, emitted as three 0..1 components.</param>
-    /// <param name="operatorName">The colour operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
+    /// <param name="color">The color to write, emitted as three 0..1 components.</param>
+    /// <param name="operatorName">The color operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
     public void WriteColor(Color color, string operatorName)
     {
         WriteNumber(color.R / 255.0);

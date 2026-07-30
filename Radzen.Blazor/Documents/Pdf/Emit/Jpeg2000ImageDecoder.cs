@@ -30,7 +30,7 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         => PdfBytes.Matches(data, Jp2Signature)
             || PdfBytes.Matches(data, [0xFF, 0x4F, 0xFF, 0x51]);
 
-    // JPXDecode embeds verbatim with no /ColorSpace, so the JPX stream's own colour space applies (ISO 32000-1 7.4.9).
+    // JPXDecode embeds verbatim with no /ColorSpace, so the JPX stream's own color space applies (ISO 32000-1 7.4.9).
     private static ImageXObject DecodeJpeg2000(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
         var (width, height, components) = PdfBytes.Matches(data.Span, Jp2Signature)

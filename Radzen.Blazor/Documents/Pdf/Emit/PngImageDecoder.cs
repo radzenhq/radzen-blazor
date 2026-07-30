@@ -126,7 +126,7 @@ internal sealed class PngImageDecoder : IImageDecoder
             3 => 1,
             4 => 2,
             6 => 4,
-            _ => throw new NotSupportedException($"Unsupported PNG colour type {colorType}."),
+            _ => throw new NotSupportedException($"Unsupported PNG color type {colorType}."),
         };
 
         ValidatePngBitDepth(colorType, bitDepth);
@@ -154,11 +154,11 @@ internal sealed class PngImageDecoder : IImageDecoder
             3 => BuildPalettedPng(width, height, bitDepth, samples, palette, transparency),
             4 => BuildAlphaPng(width, height, new NameObject("DeviceGray"), samples, 1, bitDepth),
             6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3, bitDepth),
-            _ => throw new NotSupportedException($"Unsupported PNG colour type {colorType}."),
+            _ => throw new NotSupportedException($"Unsupported PNG color type {colorType}."),
         };
     }
 
-    // ISO/IEC 15948 Table 11.1: allowed bit depths per colour type.
+    // ISO/IEC 15948 Table 11.1: allowed bit depths per color type.
     private static void ValidatePngBitDepth(int colorType, int bitDepth)
     {
         var valid = colorType switch
@@ -173,11 +173,11 @@ internal sealed class PngImageDecoder : IImageDecoder
 
         if (!valid)
         {
-            throw new InvalidDataException($"PNG bit depth {bitDepth} is not allowed for colour type {colorType}.");
+            throw new InvalidDataException($"PNG bit depth {bitDepth} is not allowed for color type {colorType}.");
         }
     }
 
-    // ISO 32000-1 8.9.6.4: a tRNS colour key on grayscale/truecolor maps to /Mask.
+    // ISO 32000-1 8.9.6.4: a tRNS color key on grayscale/truecolor maps to /Mask.
     private static ImageXObject BuildColorKeyedPng(
         int width, int height, int bitDepth, NameObject colorSpace, byte[] samples, byte[]? transparency, int components)
     {
@@ -187,7 +187,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         {
             if (transparency.Length < 2 * components)
             {
-                throw new InvalidDataException("PNG tRNS chunk is truncated for the colour type.");
+                throw new InvalidDataException("PNG tRNS chunk is truncated for the color type.");
             }
 
             var mask = new ArrayObject();

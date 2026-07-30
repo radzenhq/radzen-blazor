@@ -67,7 +67,7 @@ public static class BarcodeEncoder
 {
     // Code 128 patterns (0..106). Each entry is 6 digits (bar/space/bar/space/bar/space) module widths.
     // Stop code (106) is 7 digits in the spec (includes a final bar). We keep it as 7 digits and handle it.
-    static readonly string[] Code128Patterns = new[]
+    private static readonly string[] Code128Patterns = new[]
     {
         "212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
         "221312","231212","112232","122132","122231","113222","123122","123221","223211","221132",
@@ -152,7 +152,7 @@ public static class BarcodeEncoder
         return modules;
     }
 
-    static readonly Dictionary<char, string> Code39Map = new Dictionary<char, string>()
+    private static readonly Dictionary<char, string> Code39Map = new Dictionary<char, string>()
     {
         // Each pattern is 9 elements (bar/space alternating, starting with bar).
         // 'n' = narrow (1), 'w' = wide (2). We expand to digits.
@@ -394,24 +394,24 @@ public static class BarcodeEncoder
         return widths;
     }
 
-    static readonly string[] EanL = new[]
+    private static readonly string[] EanL = new[]
     {
         "0001101","0011001","0010011","0111101","0100011","0110001","0101111","0111011","0110111","0001011"
     };
-    static readonly string[] EanG = new[]
+    private static readonly string[] EanG = new[]
     {
         "0100111","0110011","0011011","0100001","0011101","0111001","0000101","0010001","0001001","0010111"
     };
-    static readonly string[] EanR = new[]
+    private static readonly string[] EanR = new[]
     {
         "1110010","1100110","1101100","1000010","1011100","1001110","1010000","1000100","1001000","1110100"
     };
-    static readonly string[] Ean13Parity = new[]
+    private static readonly string[] Ean13Parity = new[]
     {
         "LLLLLL","LLGLGG","LLGGLG","LLGGGL","LGLLGG","LGGLLG","LGGGLL","LGLGLG","LGLGGL","LGGLGL"
     };
 
-    static int ComputeEanCheckDigit(string digitsWithoutCheck)
+    private static int ComputeEanCheckDigit(string digitsWithoutCheck)
     {
         // digitsWithoutCheck is 7/11/12 digits depending on symbology.
         int sum = 0;
@@ -684,7 +684,7 @@ public static class BarcodeEncoder
     }
 
     // POSTNET digit encoding from Wikipedia (weights 7,4,2,1,0). 1=full bar, 0=half bar.
-    static readonly Dictionary<char, string> PostnetDigitBits = new Dictionary<char, string>()
+    private static readonly Dictionary<char, string> PostnetDigitBits = new Dictionary<char, string>()
     {
         ['0'] = "11000",
         ['1'] = "00011",
@@ -762,10 +762,10 @@ public static class BarcodeEncoder
     // RM4SCC patterns and symbol matrix from Wikipedia:
     // Top patterns (values 1..6) and Bottom patterns (values 1..6) are:
     // 1=0011, 2=0101, 3=0110, 4=1001, 5=1010, 6=1100
-    static readonly string[] Rm4Patterns = new[] { "0011", "0101", "0110", "1001", "1010", "1100" };
+    private static readonly string[] Rm4Patterns = new[] { "0011", "0101", "0110", "1001", "1010", "1100" };
 
     // Matrix indexed by [topValue-1, bottomValue-1]
-    static readonly char[,] Rm4Matrix = new char[6, 6]
+    private static readonly char[,] Rm4Matrix = new char[6, 6]
     {
         { '0', '1', '2', '3', '4', '5' },
         { '6', '7', '8', '9', 'A', 'B' },
@@ -775,9 +775,9 @@ public static class BarcodeEncoder
         { 'U', 'V', 'W', 'X', 'Y', 'Z' }
     };
 
-    static readonly Dictionary<char, (string top, string bottom)> Rm4CharToBits = BuildRm4CharToBits();
+    private static readonly Dictionary<char, (string top, string bottom)> Rm4CharToBits = BuildRm4CharToBits();
 
-    static Dictionary<char, (string top, string bottom)> BuildRm4CharToBits()
+    private static Dictionary<char, (string top, string bottom)> BuildRm4CharToBits()
     {
         var dict = new Dictionary<char, (string top, string bottom)>();
         for (int r = 0; r < 6; r++)
@@ -943,7 +943,7 @@ public static class BarcodeEncoder
         return sb.ToString();
     }
 
-    static int ComputeLuhnCheckDigit(string digits)
+    private static int ComputeLuhnCheckDigit(string digits)
     {
         int sum = 0;
         bool dbl = true;
@@ -1226,7 +1226,7 @@ public static class BarcodeEncoder
         }
     }
 
-    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromWidths(IReadOnlyList<int> widths, double barHeight, int quietZoneModules)
+    private static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromWidths(IReadOnlyList<int> widths, double barHeight, int quietZoneModules)
     {
         ArgumentNullException.ThrowIfNull(widths);
 
@@ -1253,7 +1253,7 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromBits(string bits, double barHeight, int quietZoneModules)
+    private static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromBits(string bits, double barHeight, int quietZoneModules)
     {
         ArgumentNullException.ThrowIfNull(bits);
 
@@ -1291,7 +1291,7 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromRects((IReadOnlyList<Rect> bars, double vbWidth) geometry)
+    private static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromRects((IReadOnlyList<Rect> bars, double vbWidth) geometry)
     {
         var vbWidth = geometry.vbWidth;
         if (vbWidth <= 0)
@@ -1302,7 +1302,7 @@ public static class BarcodeEncoder
         return (geometry.bars, vbWidth);
     }
 
-    static double ComputeBarsHeight(IReadOnlyList<Rect> bars, double fallbackHeight)
+    private static double ComputeBarsHeight(IReadOnlyList<Rect> bars, double fallbackHeight)
     {
         if (bars.Count == 0)
         {
@@ -1318,7 +1318,7 @@ public static class BarcodeEncoder
         return Math.Max(0, max);
     }
 
-    static int CountBits(int v)
+    private static int CountBits(int v)
     {
         int c = 0;
         while (v != 0)
@@ -1329,5 +1329,5 @@ public static class BarcodeEncoder
         return c;
     }
 
-    static string F(double v) => v.ToString(CultureInfo.InvariantCulture);
+    private static string F(double v) => v.ToString(CultureInfo.InvariantCulture);
 }

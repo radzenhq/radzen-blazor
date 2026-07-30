@@ -270,7 +270,7 @@ internal static class AnnotationReader
             return null;
         }
 
-        // ISO 32000-1 Table 164: 0 numbers means no colour, 1 grayscale, 3 RGB, 4 CMYK.
+        // ISO 32000-1 Table 164: 0 numbers means no color, 1 grayscale, 3 RGB, 4 CMYK.
         switch (value.Count)
         {
             case 0:
@@ -286,7 +286,7 @@ internal static class AnnotationReader
 
                 return DeviceColorConverter.FromComponents(components);
             default:
-                throw new DocumentParseException("An annotation colour array must contain zero, one, three or four numbers.", -1);
+                throw new DocumentParseException("An annotation color array must contain zero, one, three or four numbers.", -1);
         }
     }
 

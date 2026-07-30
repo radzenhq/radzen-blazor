@@ -597,8 +597,8 @@ public static class QrEncoder
         return new List<byte>(r);
     }
 
-    const int GF_POLY = 0x11D;
-    static byte GfMul(byte x, byte y)
+    private const int GF_POLY = 0x11D;
+    private static byte GfMul(byte x, byte y)
     {
         int r = 0;
         while (y > 0)
@@ -958,7 +958,7 @@ public static class QrEncoder
 
     // Error correction parameters for each version & ECC:
     // Returns (totalDataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw)
-    static (int totalDataCw, int ecPerBlock, int grp1Blocks, int grp1DataCw, int grp2Blocks, int grp2DataCw)
+    private static (int totalDataCw, int ecPerBlock, int grp1Blocks, int grp1DataCw, int grp2Blocks, int grp2DataCw)
         EcParams(int ver, QrErrorCorrection ecc)
     {
         if (ver < 1 || ver > 40)

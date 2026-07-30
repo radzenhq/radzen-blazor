@@ -2,8 +2,8 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// A colour blend mode: how the colour being painted is combined with the backdrop already
-/// on the page. The first twelve are separable blend modes, applied to each colour component
+/// A color blend mode: how the color being painted is combined with the backdrop already
+/// on the page. The first twelve are separable blend modes, applied to each color component
 /// independently; the last four are non-separable.
 /// </summary>
 public enum BlendMode
@@ -11,7 +11,7 @@ public enum BlendMode
     /// <summary>Paints the source over the backdrop (the default).</summary>
     Normal,
 
-    /// <summary>Multiplies the backdrop and source colours.</summary>
+    /// <summary>Multiplies the backdrop and source colors.</summary>
     Multiply,
 
     /// <summary>Multiplies the complements, then complements the result.</summary>
@@ -38,7 +38,7 @@ public enum BlendMode
     /// <summary>Darkens or lightens depending on the source.</summary>
     SoftLight,
 
-    /// <summary>Subtracts the darker of the two colours from the lighter.</summary>
+    /// <summary>Subtracts the darker of the two colors from the lighter.</summary>
     Difference,
 
     /// <summary>Like <see cref="Difference"/> but lower in contrast.</summary>

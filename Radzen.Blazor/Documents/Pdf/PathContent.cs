@@ -174,7 +174,7 @@ public sealed class PathContent : ContentElement
     }
 
     /// <summary>
-    /// Gets or sets the colour rendering intent (the <c>ri</c> operator). When null
+    /// Gets or sets the color rendering intent (the <c>ri</c> operator). When null
     /// (the default), no rendering-intent operator is emitted.
     /// </summary>
     public RenderingIntent? Intent
