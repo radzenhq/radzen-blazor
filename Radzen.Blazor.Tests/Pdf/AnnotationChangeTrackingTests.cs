@@ -112,14 +112,14 @@ public class AnnotationChangeTrackingTests
     }
 
     [Fact]
-    public void AssigningAPropertyToItsOwnValueMarksTheAnnotationModified()
+    public void AssigningAPropertyToItsOwnValueLeavesTheAnnotationUnmodified()
     {
         var loaded = Loaded(new SquareAnnotation(PdfRect.FromSize(20, 30, 100, 40)));
         var annotation = loaded.Pages[0].Annotations[0];
 
         annotation.Color = annotation.Color;
 
-        Assert.True(annotation.IsModified);
+        Assert.False(annotation.IsModified);
     }
 
     [Fact]

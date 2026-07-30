@@ -81,14 +81,11 @@ public sealed class DocumentInfo : ITracksChanges
         set => tracker.Set(ref modificationDate, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether a modeled metadata field has been assigned since the
-    /// document was loaded. A loaded document overrides its existing metadata only when this
-    /// is true.
-    /// </summary>
-    public bool IsModified => tracker.IsModified;
+    internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 }

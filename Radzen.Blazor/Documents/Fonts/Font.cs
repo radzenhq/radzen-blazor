@@ -100,14 +100,11 @@ public sealed class Font : ITracksChanges
         Color = EffectiveColor,
     };
 
-    /// <summary>
-    /// Gets a value indicating whether this font has been assigned to since it was
-    /// materialized. A content element that owns a font folds the font's state into
-    /// its own modification flag.
-    /// </summary>
-    public bool IsModified => tracker.IsModified;
+    internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 

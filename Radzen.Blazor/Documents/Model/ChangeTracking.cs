@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Radzen.Documents;
 
@@ -50,6 +51,11 @@ internal struct ChangeTracker
 
     public void Set<T>(ref T field, T value)
     {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+        {
+            return;
+        }
+
         field = value;
         touched = true;
     }

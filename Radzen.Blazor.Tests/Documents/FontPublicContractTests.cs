@@ -125,11 +125,24 @@ public class FontPublicContractTests
     [Fact]
     public void ResettingAValueIsTrackedAsAModification()
     {
-        var font = new Font();
+        var font = new Font { Bold = true };
+        font.AcceptChanges();
+
         font.Bold = null;
 
         Assert.True(font.IsModified);
         Assert.Null(font.Bold);
+    }
+
+    [Fact]
+    public void AssigningAValueEqualToTheCurrentOneLeavesTheFontUnmodified()
+    {
+        var font = new Font { Bold = true };
+        font.AcceptChanges();
+
+        font.Bold = true;
+
+        Assert.False(font.IsModified);
     }
 
     [Fact]
