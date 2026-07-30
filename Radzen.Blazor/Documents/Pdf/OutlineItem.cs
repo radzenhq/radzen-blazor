@@ -40,8 +40,8 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
     public IList<OutlineItem> Children => children;
 
     /// <summary>
-    /// Gets or sets the colour of the entry's title text (the <c>/C</c> entry). When
-    /// <see langword="null"/> the viewer's default colour is used and no <c>/C</c> is written.
+    /// Gets or sets the color of the entry's title text (the <c>/C</c> entry). When
+    /// <see langword="null"/> the viewer's default color is used and no <c>/C</c> is written.
     /// </summary>
     public Color? Color
     {

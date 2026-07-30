@@ -7,7 +7,7 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-// ISO 32000-1 11.6.5.2: soft-mask subtype (/Luminosity from group colour, /Alpha from shape alpha).
+// ISO 32000-1 11.6.5.2: soft-mask subtype (/Luminosity from group color, /Alpha from shape alpha).
 internal enum SoftMaskType
 {
     Alpha,

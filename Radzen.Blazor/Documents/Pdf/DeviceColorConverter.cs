@@ -13,7 +13,7 @@ internal static class DeviceColorConverter
             Channel((1 - values[0]) * (1 - values[3])),
             Channel((1 - values[1]) * (1 - values[3])),
             Channel((1 - values[2]) * (1 - values[3]))),
-        _ => throw new ArgumentException("A device colour requires one, three or four components.", nameof(values)),
+        _ => throw new ArgumentException("A device color requires one, three or four components.", nameof(values)),
     };
 
     private static byte Channel(double value) => ColorComponent.ToChannel(value);

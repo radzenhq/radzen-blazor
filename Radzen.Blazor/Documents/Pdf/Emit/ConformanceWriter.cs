@@ -63,7 +63,7 @@ internal sealed class ConformanceWriter(Document document)
             {
                 throw new InvalidOperationException(
                     $"{Label} cannot be claimed for a page that did not come from DocumentRenderer: its fonts, images and "
-                    + "colour spaces cannot be inspected, and this library will not identify a document as conformant on "
+                    + "color spaces cannot be inspected, and this library will not identify a document as conformant on "
                     + "content it has not verified. Rebuild the page with DocumentRenderer, or save without conformance "
                     + "(PdfAConformance.None and PdfUaConformance.None).");
             }

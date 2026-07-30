@@ -10,7 +10,7 @@ namespace Radzen.Documents;
 public sealed class BoxShadow
 {
     /// <summary>
-    /// Gets or sets the shadow colour. Its alpha channel scales the shadow opacity.
+    /// Gets or sets the shadow color. Its alpha channel scales the shadow opacity.
     /// Defaults to 62%-opaque black.
     /// </summary>
     public Color Color { get; set; } = Color.FromArgb(160, 0, 0, 0);
