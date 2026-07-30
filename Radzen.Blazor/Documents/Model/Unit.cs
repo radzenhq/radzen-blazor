@@ -91,8 +91,14 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
 
     /// <summary>
     /// Converts a <see cref="double"/> value, interpreted as points, to a <see cref="Unit"/>.
+    /// The conversion throws rather than producing a measurement that cannot be laid out, so a
+    /// value that may not be finite must be checked before it is assigned.
     /// </summary>
     /// <exception cref="ArgumentException"><paramref name="value"/> is not finite.</exception>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Design",
+        "CA2225:Operator overloads have named alternates",
+        Justification = "FromPoint is the named alternate; the operand is a point value, not an unqualified double.")]
     public static implicit operator Unit(double value) => new(Finite(value, nameof(value)), false);
 
     /// <summary>
@@ -149,20 +155,29 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     }
 
     /// <summary>
-    /// Converts a measurement string (see <see cref="Parse"/>) to a <see cref="Unit"/>.
+    /// Tries to parse a measurement such as "9cm", "5mm", "1in", "12pt", "50%" or a bare number
+    /// (interpreted as points). Parsing is culture-invariant.
     /// </summary>
-    public static implicit operator Unit(string value) => Parse(value);
+    /// <param name="value">The measurement text.</param>
+    /// <param name="result">The parsed measurement, or the default when parsing fails.</param>
+    /// <returns><see langword="true"/> when <paramref name="value"/> is a valid measurement.</returns>
+    public static bool TryParse(string? value, out Unit result)
+    {
+        if (value is not null)
+        {
+            try
+            {
+                result = Parse(value);
+                return true;
+            }
+            catch (FormatException)
+            {
+            }
+        }
 
-    /// <summary>
-    /// Creates a <see cref="Unit"/> from a measurement string (see <see cref="Parse"/>).
-    /// </summary>
-    public static Unit FromString(string value) => Parse(value);
-
-    /// <summary>
-    /// Converts a <see cref="double"/> value, interpreted as points, to a <see cref="Unit"/>.
-    /// </summary>
-    /// <exception cref="ArgumentException"><paramref name="value"/> is not finite.</exception>
-    public static Unit FromDouble(double value) => new(Finite(value, nameof(value)), false);
+        result = default;
+        return false;
+    }
 
     /// <summary>
     /// Adds two measurements. Both must be absolute, or both relative.

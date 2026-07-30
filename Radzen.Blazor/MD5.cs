@@ -7,17 +7,6 @@ namespace Radzen;
 public class MD5
 {
     /// <summary>
-    /// Performs left rotation of bits.
-    /// </summary>
-    /// <param name="x">The value.</param>
-    /// <param name="c">The rotation count.</param>
-    /// <returns>The rotated value.</returns>
-    public static uint leftRotate(uint x, int c)
-    {
-        return (x << c) | (x >> (32 - c));
-    }
-
-    /// <summary>
     /// Calculates the MD5 hash.
     /// </summary>
     /// <param name="input">The input bytes.</param>

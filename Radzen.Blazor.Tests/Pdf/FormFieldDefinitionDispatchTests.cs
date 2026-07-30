@@ -64,7 +64,7 @@ public class FormFieldDefinitionDispatchTests
         var fields = new List<DocumentObject>();
         var created = new List<(int, ReferenceObject)>();
 
-        FormFieldEmitter.Emit(
+        FormFieldWriter.Emit(
             definition,
             new FormEmitContext(writer, page, fields, created, new FormAppearanceService(new PortableDocument())));
 

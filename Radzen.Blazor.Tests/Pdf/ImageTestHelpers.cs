@@ -4,13 +4,23 @@ using System.Buffers.Binary;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
+internal sealed record ImageXObjectView(StreamObject Image, StreamObject? SoftMask);
+
 internal static class ImageTestHelpers
 {
+    public static ImageXObjectView Xobject(DecodedImage image)
+        => new(Stream(image), image.Alpha is { } alpha ? Stream(alpha) : null);
+
+    public static StreamObject Stream(DecodedImage image)
+        => ImageXObjectBuilder.Build(EmissionImagePayload.Capture(image));
+
     public static string Name(DictionaryObject dict, string key) => ((NameObject)dict[key]).Value;
 
     public static int Int(DictionaryObject dict, string key) => ((NumberObject)dict[key]).IntValue;

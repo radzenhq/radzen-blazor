@@ -31,7 +31,7 @@ public class MeasurementUnitSurfaceTests
     [Fact]
     public void FontSize_FromMeasurementString_IsPoints()
     {
-        var font = new Font { Size = "12pt" };
+        var font = new Font { Size = Unit.Parse("12pt") };
 
         Assert.Equal(12, font.Size!.Value.Point);
         Assert.Equal(new Font { Size = 12 }.Size, font.Size);
@@ -57,7 +57,7 @@ public class MeasurementUnitSurfaceTests
     [Fact]
     public void BorderWidth_FromMeasurementString_IsPoints()
     {
-        var borders = new Borders { Width = "1.5pt" };
+        var borders = new Borders { Width = Unit.Parse("1.5pt") };
 
         Assert.Equal(1.5, borders.Width.Point);
         Assert.Equal(1.5, borders.Top.Width.Point);
@@ -67,7 +67,7 @@ public class MeasurementUnitSurfaceTests
     public void BorderWidth_EdgeOverrideAcceptsMillimeters()
     {
         var borders = new Borders { Width = 1 };
-        borders.Left.Width = "1mm";
+        borders.Left.Width = Unit.Parse("1mm");
 
         Assert.Equal(Unit.FromMillimeter(1).Point, borders.Left.Width.Point);
         Assert.Equal(1, borders.Right.Width.Point);
@@ -105,7 +105,7 @@ public class MeasurementUnitSurfaceTests
     [Fact]
     public void LinearGradient_MixesRelativeAndAbsoluteCoordinates()
     {
-        var brush = new LinearGradient(Unit.FromPercent(50), 4, "1in", Unit.FromPercent(25), Stops());
+        var brush = new LinearGradient(Unit.FromPercent(50), 4, Unit.Parse("1in"), Unit.FromPercent(25), Stops());
 
         var paint = Resolve(brush, 200, 80);
 

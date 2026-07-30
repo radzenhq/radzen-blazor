@@ -69,6 +69,27 @@ public class WatermarkPublicContractTests
     public void NonFiniteRotationIsRejectedWhenAssigned(double rotation)
         => Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Rotation = rotation });
 
+    [Fact]
+    public void TextAndImageBothRenderWithTheImageBeneathTheText()
+    {
+        var watermark = new Watermark { Text = "DRAFT" };
+        using (var stream = new MemoryStream(Convert.FromBase64String(Pixel)))
+        {
+            watermark.SetImage(stream);
+        }
+
+        var rendered = new DocumentRenderer().Render(DocumentWith(watermark));
+        var content = System.Text.Encoding.ASCII.GetString(
+            rendered.EmissionPlan!.Pages[0].ContentArray);
+
+        var image = content.LastIndexOf("Do\n", StringComparison.Ordinal);
+        var text = content.LastIndexOf("Tj\n", StringComparison.Ordinal);
+
+        Assert.True(image >= 0);
+        Assert.True(text >= 0);
+        Assert.True(image < text);
+    }
+
     private static Document DocumentWith(Watermark watermark)
     {
         var document = new Document();

@@ -72,6 +72,8 @@ public sealed class RoleMap
     /// <returns><see langword="true"/> when the role is declared.</returns>
     public bool Contains(string role) => map.ContainsKey(role);
 
+    internal static bool IsStandardType(string type) => StandardTypes.Contains(type);
+
     internal IEnumerable<KeyValuePair<string, string>> Entries => map;
 
 }

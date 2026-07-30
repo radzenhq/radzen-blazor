@@ -498,19 +498,10 @@ public sealed class FontCollection
         }
     }
 
-    internal CapturedGlyphRun CaptureGlyphRun(
-        string text,
-        Font font,
-        bool enableBuiltInKerning = true)
-    {
-        var captured = FontPaintCapture.Capture(font);
-        return CaptureGlyphRun(text, captured, enableBuiltInKerning);
-    }
+    internal CapturedGlyphRun CaptureGlyphRun(string text, Font font)
+        => CaptureGlyphRun(text, FontPaintCapture.Capture(font));
 
-    internal CapturedGlyphRun CaptureGlyphRun(
-        string text,
-        in FontPaint font,
-        bool enableBuiltInKerning = true)
+    internal CapturedGlyphRun CaptureGlyphRun(string text, in FontPaint font)
     {
         if (text.Length == 0)
         {
@@ -520,7 +511,7 @@ public sealed class FontCollection
         var configuration = Freeze();
         return configuration.Snapshot.TryResolvePrimary(font.Family, font.Bold, font.Italic, out _)
             ? CaptureSfntGlyphRun(configuration, text, font)
-            : CaptureBuiltInGlyphRun(configuration.Snapshot, text, font, enableBuiltInKerning);
+            : CaptureBuiltInGlyphRun(configuration.Snapshot, text, font);
     }
 
     private static CapturedGlyphRun CaptureSfntGlyphRun(
@@ -580,8 +571,7 @@ public sealed class FontCollection
     private static CapturedGlyphRun CaptureBuiltInGlyphRun(
         in FontCollectionSnapshot snapshot,
         string text,
-        in FontPaint font,
-        bool enableKerning)
+        in FontPaint font)
     {
         SimpleShaper.EnsureNoComplexScript(text);
         var metrics = BuiltInFontMetrics.Resolve(font)
@@ -650,7 +640,7 @@ public sealed class FontCollection
                 }
 
                 fallbackFace = face;
-                if (enableKerning && snapshot.EnableKerning && sfntGlyphs.Count > 0)
+                if (snapshot.EnableKerning && sfntGlyphs.Count > 0)
                 {
                     var previous = sfntGlyphs[^1];
                     var kern = SimpleShaper.PairKerning(
@@ -676,7 +666,7 @@ public sealed class FontCollection
             else if (kind == BuiltInGlyphKind.BuiltIn)
             {
                 FlushSfnt();
-                if (enableKerning && snapshot.EnableKerning && builtInGlyphs.Count > 0)
+                if (snapshot.EnableKerning && builtInGlyphs.Count > 0)
                 {
                     var previous = builtInGlyphs[^1];
                     var kern = metrics.GetRunKerning(

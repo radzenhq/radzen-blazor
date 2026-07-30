@@ -13,9 +13,9 @@ public class ModelCollectionPublicContractTests
     public void TabStopsAddInsertIndexAndEnumerateInOrder()
     {
         var stops = new TabStopCollection();
-        var first = stops.Add("10pt");
-        var third = stops.Add(new TabStop("30pt", TabAlignment.Right, '.'));
-        var second = stops.Insert(1, new TabStop("20pt", TabAlignment.Center));
+        var first = stops.Add(Unit.Parse("10pt"));
+        var third = stops.Add(new TabStop(Unit.Parse("30pt"), TabAlignment.Right, '.'));
+        var second = stops.Insert(1, new TabStop(Unit.Parse("20pt"), TabAlignment.Center));
 
         Assert.Same(first, stops[0]);
         Assert.Same(second, stops[1]);
@@ -32,9 +32,9 @@ public class ModelCollectionPublicContractTests
     public void TabStopsRemoveRemoveAtAndClear()
     {
         var stops = new TabStopCollection();
-        var first = stops.Add("10pt");
-        var second = stops.Add("20pt");
-        var absent = new TabStop("30pt");
+        var first = stops.Add(Unit.Parse("10pt"));
+        var second = stops.Add(Unit.Parse("20pt"));
+        var absent = new TabStop(Unit.Parse("30pt"));
 
         Assert.True(stops.Remove(first));
         Assert.False(stops.Remove(absent));
@@ -61,7 +61,7 @@ public class ModelCollectionPublicContractTests
     [InlineData(1)]
     public void TabStopsInsertRejectsOutOfRangeIndexes(int index)
         => Assert.Throws<ArgumentOutOfRangeException>(
-            () => new TabStopCollection().Insert(index, new TabStop("10pt")));
+            () => new TabStopCollection().Insert(index, new TabStop(Unit.Parse("10pt"))));
 
     [Fact]
     public void TocEntriesAddInsertMoveIndexAndEnumerateInOrder()

@@ -232,6 +232,8 @@ public class RendererCaptureIsolationTests
             renderer.ViewerPreferences.DisplayDocTitle = true;
             renderer.ViewerPreferences.Direction = PdfReadingDirection.RightToLeft;
         }),
+        (nameof(DocumentRenderer.ImageDecoders), static (renderer, _) =>
+            renderer.ImageDecoders = ImageDecoders.BuiltIn),
         (nameof(DocumentRenderer.RoleMap), static (renderer, _) => renderer.RoleMap.Add("Caption", "Span")),
         (nameof(DocumentRenderer.Outline), static (renderer, _) =>
         {
@@ -358,7 +360,6 @@ public class RendererCaptureIsolationTests
 
         var first = renderer.Render(model);
         var immediate = first.ToArray();
-        Assert.Null(first.Fonts);
         Assert.NotSame(renderer.RoleMap, first.RoleMap);
         if (!tagged)
         {

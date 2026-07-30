@@ -22,7 +22,7 @@ public class PngPalettedTrnsBitDepthTests
         byte[] trns = [0x00, 0xFF];
         var png = BuildPng(3, 2, 4, palette, trns, scanlines);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF, 0xFF, 0xFF, 0x00, 0xFF }, alpha);
@@ -36,7 +36,7 @@ public class PngPalettedTrnsBitDepthTests
         byte[] trns = [0x00];
         var png = BuildPng(4, 2, 1, palette, trns, scanlines);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0x00, 0x00 }, alpha);
@@ -50,7 +50,7 @@ public class PngPalettedTrnsBitDepthTests
         byte[] trns = [0x00, 0xFF];
         var png = BuildPng(2, 1, 8, palette, trns, scanlines);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         var alpha = FlateFilter.Decode(xobj.SoftMask!.Data.ToArray());
         Assert.Equal(new byte[] { 0x00, 0xFF }, alpha);
@@ -63,7 +63,7 @@ public class PngPalettedTrnsBitDepthTests
         byte[] palette = [10, 10, 10, 20, 20, 20, 30, 30, 30, 40, 40, 40];
         var png = BuildPng(3, 2, 4, palette, null, scanlines);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         Assert.Null(xobj.SoftMask);
     }

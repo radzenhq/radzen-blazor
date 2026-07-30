@@ -60,7 +60,7 @@ public class ImageDecoderValidationTests
         byte[] trns = [0x00, 0x10, 0x00, 0x20, 0x00, 0x30];
         var png = FullPng(1, 1, 8, colorType: 2, palette: null, trns, scanline);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         Assert.Null(xobj.SoftMask);
         var mask = Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Mask"]);
@@ -79,7 +79,7 @@ public class ImageDecoderValidationTests
         byte[] trns = [0x00, 0x80];
         var png = FullPng(1, 1, 8, colorType: 0, palette: null, trns, scanline);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         var mask = Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Mask"]);
         Assert.Equal(2, mask.Count);
@@ -102,7 +102,7 @@ public class ImageDecoderValidationTests
         byte[] scanline = [0x00, 0x80];
         var png = FullPng(1, 1, 8, colorType: 0, palette: null, trns: null, scanline);
 
-        var xobj = ImageDecoder.Decode(png);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
 
         Assert.False(xobj.Image.Dictionary.TryGetValue("Mask", out _));
     }
@@ -128,7 +128,7 @@ public class ImageDecoderValidationTests
     public void NonAdobeCmyk_HasNoInvertedDecode()
     {
         var jpeg = Jpeg(0xC0, 8, 8, components: 4, adobe: false);
-        var xobj = ImageDecoder.Decode(jpeg);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg));
         Assert.Equal("DeviceCMYK", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.False(xobj.Image.Dictionary.TryGetValue("Decode", out _));
     }
@@ -137,7 +137,7 @@ public class ImageDecoderValidationTests
     public void AdobeCmyk_HasInvertedDecode()
     {
         var jpeg = Jpeg(0xC0, 8, 8, components: 4, adobe: true);
-        var xobj = ImageDecoder.Decode(jpeg);
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg));
         Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Decode"]);
     }
 
@@ -168,7 +168,7 @@ public class ImageDecoderValidationTests
     public void EightBitJpeg_EmitsLegalBitsPerComponent(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false);
-        var dict = ImageDecoder.Decode(jpeg).Image.Dictionary;
+        var dict = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg)).Image.Dictionary;
         Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
     }
 

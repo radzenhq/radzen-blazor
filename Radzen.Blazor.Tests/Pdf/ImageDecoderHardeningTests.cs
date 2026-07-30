@@ -61,7 +61,7 @@ public class ImageDecoderHardeningTests
     [InlineData("Images/alpha.png")]
     public void ValidPng_StillDecodes(string resource)
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes(resource));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes(resource)));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Height"));
     }
@@ -69,7 +69,7 @@ public class ImageDecoderHardeningTests
     [Fact]
     public void ValidJpeg_StillDecodes()
     {
-        var xobj = ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/rgb.jpg"));
+        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/rgb.jpg")));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal("DCTDecode", ImageTestHelpers.Name(xobj.Image.Dictionary, "Filter"));
     }

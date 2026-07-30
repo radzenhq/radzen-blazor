@@ -10,7 +10,8 @@ internal sealed class DocumentEmissionPlan(
     ImmutableArray<PageEmissionPlan> pages,
     StructureElementSnapshot? structure,
     ImmutableDictionary<string, EmissionAnchor> anchors,
-    ImmutableArray<KeyValuePair<string, string>> roleMap)
+    ImmutableArray<KeyValuePair<string, string>> roleMap,
+    ImmutableArray<string> unmappedRoles)
 {
     public ImmutableArray<PageEmissionPlan> Pages { get; } = pages;
 
@@ -19,6 +20,8 @@ internal sealed class DocumentEmissionPlan(
     public ImmutableDictionary<string, EmissionAnchor> Anchors { get; } = anchors;
 
     public ImmutableArray<KeyValuePair<string, string>> RoleMap { get; } = roleMap;
+
+    public ImmutableArray<string> UnmappedRoles { get; } = unmappedRoles;
 }
 
 internal sealed class PageEmissionPlan(
@@ -113,16 +116,16 @@ internal sealed class EmissionFont(
 internal sealed class EmissionImage(
     object identity,
     string key,
-    EmissionStreamPayload image,
-    EmissionStreamPayload? softMask)
+    EmissionImagePayload image,
+    EmissionImagePayload? softMask)
 {
     public object Identity { get; } = identity;
 
     public string Key { get; } = key;
 
-    public EmissionStreamPayload Image { get; } = image;
+    public EmissionImagePayload Image { get; } = image;
 
-    public EmissionStreamPayload? SoftMask { get; } = softMask;
+    public EmissionImagePayload? SoftMask { get; } = softMask;
 }
 
 internal readonly record struct EmissionLink(
@@ -190,7 +193,7 @@ internal sealed class EmissionTransparencyGroup(
     string? colorSpace,
     bool? isolated,
     bool? knockout,
-    ImmutableArray<KeyValuePair<string, EmissionStreamPayload>> xObjects)
+    ImmutableArray<KeyValuePair<string, EmissionImagePayload>> xObjects)
 {
     public ReadOnlyMemory<byte> Content { get; } = content;
 
@@ -202,7 +205,7 @@ internal sealed class EmissionTransparencyGroup(
 
     public bool? Knockout { get; } = knockout;
 
-    public ImmutableArray<KeyValuePair<string, EmissionStreamPayload>> XObjects { get; } = xObjects;
+    public ImmutableArray<KeyValuePair<string, EmissionImagePayload>> XObjects { get; } = xObjects;
 }
 
 internal readonly record struct StructureKidSnapshot(

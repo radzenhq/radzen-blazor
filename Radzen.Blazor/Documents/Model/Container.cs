@@ -1,3 +1,5 @@
+using Radzen.Documents.Geometry;
+
 namespace Radzen.Documents;
 
 
@@ -38,6 +40,36 @@ public sealed class Container : Block
 
     /// <summary>Gets or sets the padding applied on every edge between the box and its content.</summary>
     public Unit Padding { get; set; }
+
+    /// <summary>
+    /// Gets or sets the padding on the left edge, or <see langword="null"/> when the container sets none
+    /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
+    /// </summary>
+    public Unit? PaddingLeft { get; set; }
+
+    /// <summary>
+    /// Gets or sets the padding on the right edge, or <see langword="null"/> when the container sets none
+    /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
+    /// </summary>
+    public Unit? PaddingRight { get; set; }
+
+    /// <summary>
+    /// Gets or sets the padding on the top edge, or <see langword="null"/> when the container sets none
+    /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
+    /// </summary>
+    public Unit? PaddingTop { get; set; }
+
+    /// <summary>
+    /// Gets or sets the padding on the bottom edge, or <see langword="null"/> when the container sets none
+    /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
+    /// </summary>
+    public Unit? PaddingBottom { get; set; }
+
+    internal BoxPadding EffectivePadding => new(
+        (PaddingLeft ?? Padding).Point,
+        (PaddingRight ?? Padding).Point,
+        (PaddingTop ?? Padding).Point,
+        (PaddingBottom ?? Padding).Point);
 
     /// <summary>Gets the container borders, drawn on the box edges.</summary>
     public Borders Borders { get; } = new();

@@ -31,12 +31,6 @@ internal struct SfntReader(byte[] data, int position = 0)
         }
     }
 
-    public byte ReadByte()
-    {
-        Require(1);
-        return data[Position++];
-    }
-
     public ushort ReadUInt16()
     {
         var value = BigEndian.ReadUInt16BigEndian(

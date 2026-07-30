@@ -470,12 +470,19 @@ public sealed class PortableDocument
         }
     }
 
-    internal FontCollection? Fonts { get; set; }
+    /// <summary>
+    /// Gets or sets the image decoders this document decodes <see cref="ImageContent"/> and
+    /// watermark images with. Seeded from <see cref="ImageDecoders.Default"/>, so a decoder
+    /// registered with <see cref="ImageDecoder.Register(IImageDecoder)"/> before this document was
+    /// created is already in the set. Assign <c>ImageDecoders.BuiltIn.Add(...)</c> to reach a
+    /// custom format from this document alone.
+    /// </summary>
+    public ImageDecoders ImageDecoders { get; set; } = ImageDecoders.Default;
 
     internal FontCollectionSnapshot? FontSnapshot { get; set; }
 
     internal Fonts.FontScope FontScope => new(
-        Fonts,
+        null,
         FontSnapshot,
         Conformance != PdfAConformance.None ? "PDF/A" : IsPdfUa ? "PDF/UA" : null,
         CanEmbed: false);
@@ -748,7 +755,7 @@ public sealed class PortableDocument
                 FontScope with { Base14ForbiddenBy = null });
         }
 
-        var images = new ImageStore();
+        var images = new ImageStore(ImageDecoders);
         SourceId? imageSource = null;
         SceneImageData? imageData = null;
         if (watermark.Image is { } image)

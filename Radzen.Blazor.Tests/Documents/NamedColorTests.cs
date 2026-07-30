@@ -1,4 +1,6 @@
 #nullable enable
+using System;
+using System.Linq;
 using Xunit;
 using Radzen.Documents;
 
@@ -38,4 +40,36 @@ public class NamedColorTests
 
     [Fact]
     public void DarkBlue() => AssertRgb(Color.DarkBlue, 0, 0, 139);
+
+    [Fact]
+    public void RebeccaPurple() => AssertRgb(Color.RebeccaPurple, 102, 51, 153);
+
+    [Fact]
+    public void GreyAliasesMatchTheirGraySpelling()
+    {
+        Assert.Equal(Color.Gray, Color.Grey);
+        Assert.Equal(Color.DarkGray, Color.DarkGrey);
+        Assert.Equal(Color.LightSlateGray, Color.LightSlateGrey);
+    }
+
+    [Fact]
+    public void EveryCssKeywordHasAMatchingStaticProperty()
+    {
+        var properties = typeof(Color)
+            .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Where(property => property.PropertyType == typeof(Color) && property.Name != "Transparent")
+            .ToList();
+
+        Assert.Equal(148, properties.Count);
+        Assert.All(properties, property => Assert.Equal((Color)property.GetValue(null)!, Color.FromName(property.Name)));
+    }
+
+    [Fact]
+    public void FromNameIsCaseInsensitiveAndRejectsUnknownKeywords()
+    {
+        Assert.Equal(Color.RebeccaPurple, Color.FromName("rebeccapurple"));
+        Assert.Equal(Color.DarkSlateGray, Color.FromName("DARKSLATEGRAY"));
+        Assert.Throws<FormatException>(() => Color.FromName("burntsienna"));
+        Assert.Throws<ArgumentNullException>(() => Color.FromName(null!));
+    }
 }

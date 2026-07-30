@@ -294,8 +294,8 @@ public static class PdfSigner
 
     private static ArrayObject SignatureRect(SignatureAppearance? appearance)
         => appearance is null
-            ? PageResourceBuilder.NumberBox(PdfRect.FromSize(0, 0, 0, 0))
-            : PageResourceBuilder.NumberBox(PdfRect.FromSize(appearance.X, appearance.Y, appearance.Width, appearance.Height));
+            ? PageBoxWriter.NumberBox(PdfRect.FromSize(0, 0, 0, 0))
+            : PageBoxWriter.NumberBox(PdfRect.FromSize(appearance.X, appearance.Y, appearance.Width, appearance.Height));
 
     private static StreamObject BuildAppearanceStream(SignatureOptions options)
     {

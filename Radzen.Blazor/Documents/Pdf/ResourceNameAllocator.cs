@@ -120,12 +120,3 @@ internal sealed class ReferenceKeyComparer<T> : IEqualityComparer<T>
 
     public int GetHashCode(T value) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value);
 }
-
-internal sealed class AlphaComparer : IEqualityComparer<double>
-{
-    public static AlphaComparer Instance { get; } = new();
-
-    public bool Equals(double x, double y) => x == y;
-
-    public int GetHashCode(double value) => value.GetHashCode();
-}

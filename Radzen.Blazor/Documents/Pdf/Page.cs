@@ -48,6 +48,8 @@ public sealed class Page
 
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
+    internal ImageDecoders Decoders => Owner?.ImageDecoders ?? ImageDecoders.Default;
+
     /// <summary>Gets the page width in points.</summary>
     public Unit Width => width;
 
@@ -471,7 +473,7 @@ public sealed class Page
                 ContentResourceManifest.Combine(editedResources, emission.Resources), isEmitted: true);
         }
 
-        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Page, reservedNames);
+        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Page, reservedNames, Decoders);
         foreach (var element in elements)
         {
             element.Emit(writer);
@@ -505,11 +507,11 @@ public sealed class Page
 
     private ContentEmissionResult Reemit(IEnumerable<string>? reservedNames)
         => ContentEditor.Reemit(
-            content!, elements, sourceElements!, FontScope, ContentResourcePrefixes.Page, reservedNames);
+            content!, elements, sourceElements!, FontScope, ContentResourcePrefixes.Page, reservedNames, Decoders);
 
     private ContentEmissionResult EmitOverlay(IEnumerable<ContentElement> items, IEnumerable<string>? reservedNames)
     {
-        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Overlay, reservedNames);
+        using var writer = new ContentWriter(FontScope, ContentResourcePrefixes.Overlay, reservedNames, Decoders);
         foreach (var element in items)
         {
             element.Emit(writer);

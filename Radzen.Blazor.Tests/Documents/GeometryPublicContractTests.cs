@@ -13,7 +13,7 @@ public class GeometryPublicContractTests
     {
         var margins = new Margins();
 
-        margins.SetAll("18pt");
+        margins.SetAll(Unit.Parse("18pt"));
 
         Assert.Equal(Unit.Parse("18pt"), margins.Top);
         Assert.Equal(Unit.Parse("18pt"), margins.Right);
@@ -26,10 +26,10 @@ public class GeometryPublicContractTests
     {
         var margins = new Margins
         {
-            Top = "1pt",
-            Right = "2pt",
-            Bottom = "3pt",
-            Left = "4pt",
+            Top = Unit.Parse("1pt"),
+            Right = Unit.Parse("2pt"),
+            Bottom = Unit.Parse("3pt"),
+            Left = Unit.Parse("4pt"),
         };
 
         Assert.Equal(Unit.Parse("1pt"), margins.Top);
@@ -48,9 +48,9 @@ public class GeometryPublicContractTests
     [Fact]
     public void PageSizeEqualityUsesWidthAndHeight()
     {
-        var first = new PageSize("300pt", "500pt");
+        var first = new PageSize(Unit.Parse("300pt"), Unit.Parse("500pt"));
         var equal = new PageSize(Unit.FromPoint(300), Unit.FromPoint(500));
-        var different = new PageSize("500pt", "300pt");
+        var different = new PageSize(Unit.Parse("500pt"), Unit.Parse("300pt"));
 
         Assert.True(first == equal);
         Assert.False(first != equal);
@@ -133,7 +133,7 @@ public class GeometryPublicContractTests
     {
         var document = new Document();
         var section = document.Sections.Add();
-        section.PageSize = new PageSize("300pt", "500pt");
+        section.PageSize = new PageSize(Unit.Parse("300pt"), Unit.Parse("500pt"));
         section.Orientation = orientation;
         section.Blocks.AddParagraph("page");
         return document;

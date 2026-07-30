@@ -467,4 +467,62 @@ public class SemanticIntentCaptureTests
             row => Assert.False(row.IsHeader)));
         Assert.Contains("TH", Types(BuildTestSupport.Read(document, Accessible())));
     }
+
+    [Fact]
+    public void StructureTiers_AreAlwaysAndStructuralOnly()
+        => Assert.Equal(
+            [nameof(SemanticStructureTier.Always), nameof(SemanticStructureTier.Structural)],
+            System.Enum.GetNames<SemanticStructureTier>());
+
+    [Fact]
+    public void DecorativeInlineImage_IsClassifiedByTheSnapshotNotTheRenderer()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        var artifacts = DocumentLayouter.Layout(document).Semantics.Structure.Artifacts;
+
+        Assert.Equal(SemanticArtifactKind.Decorative, Assert.Single(artifacts).Kind);
+    }
+
+    [Fact]
+    public void InlineImageWithAlternateText_IsNotClassifiedAsAnArtifact()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A picture";
+
+        Assert.Empty(DocumentLayouter.Layout(document).Semantics.Structure.Artifacts);
+    }
+
+    [Fact]
+    public void WatermarkGeometry_CarriesItsArtifactClassification()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        section.Watermark = new Watermark { Text = "DRAFT" };
+        section.Watermark.Font.Family = BuildTestSupport.Latin;
+        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+
+        var page = DocumentLayouter.Layout(document).Pages[0];
+
+        Assert.Equal(SemanticArtifactKind.Watermark, page.Watermark!.Artifact);
+    }
+
+    [Fact]
+    public void RepeatedTableHeaderRows_CarryTheirArtifactClassification()
+    {
+        var pages = DocumentLayouter.Layout(SpanningDocument(repeat: true, header: true)).Pages;
+
+        Assert.True(pages.Length > 1);
+        var continued = Assert.Single(pages[1].Body.Tables);
+        Assert.Equal(SemanticArtifactKind.RepeatedContent, continued.Rows[0].Artifact);
+        Assert.Null(continued.Rows[1].Artifact);
+    }
 }

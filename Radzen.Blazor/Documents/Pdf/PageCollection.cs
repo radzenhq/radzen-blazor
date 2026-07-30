@@ -12,12 +12,7 @@ namespace Radzen.Documents.Pdf;
 public sealed class PageCollection : IReadOnlyList<Page>
 {
     private readonly List<Page> pages = [];
-    private readonly PortableDocument? owner;
-
-    /// <summary>Initializes an independent page collection.</summary>
-    public PageCollection()
-    {
-    }
+    private readonly PortableDocument owner;
 
     internal PageCollection(PortableDocument owner) => this.owner = owner;
 
@@ -59,6 +54,26 @@ public sealed class PageCollection : IReadOnlyList<Page>
     }
 
     /// <summary>
+    /// Adds an existing page to the end of the collection. Adding a page that belongs to
+    /// another document moves it: the page keeps its source content and resources and this
+    /// document becomes its owner, so the receiving document's conformance and font settings
+    /// govern it from then on. The other document must have released the page first
+    /// (<see cref="RemoveAt"/> or <see cref="RemoveRange"/>); a page cannot belong to two
+    /// documents at once. Use <see cref="PortableDocument.ImportPage"/> to copy a page instead
+    /// of moving it.
+    /// </summary>
+    /// <param name="page">The page to add.</param>
+    /// <returns>The added page.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// <paramref name="page"/> is still listed in another document's pages.
+    /// </exception>
+    public Page Add(Page page)
+    {
+        Insert(pages.Count, page);
+        return page;
+    }
+
+    /// <summary>
     /// Inserts an existing page at the specified index. Inserting a page that
     /// belongs to another document moves it: the page keeps its source content and
     /// resources and this document becomes its owner, so the receiving document's
@@ -76,7 +91,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     {
         ArgumentNullException.ThrowIfNull(page);
         RequireReleasedByDonor(page);
-        owner?.InvalidateMaterializedGraph();
+        owner.InvalidateMaterializedGraph();
         pages.Insert(index, page);
         Adopt(page);
     }
@@ -85,7 +100,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
 
     private void RequireReleasedByDonor(Page page)
     {
-        if (owner is null || page.Owner is not { } donor || ReferenceEquals(donor, owner) || !donor.Pages.Holds(page))
+        if (page.Owner is not { } donor || ReferenceEquals(donor, owner) || !donor.Pages.Holds(page))
         {
             return;
         }
@@ -99,7 +114,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
 
     private void Adopt(Page page)
     {
-        if (owner is null || ReferenceEquals(page.Owner, owner))
+        if (ReferenceEquals(page.Owner, owner))
         {
             return;
         }
@@ -118,7 +133,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <param name="index">The zero-based index of the page to remove.</param>
     public void RemoveAt(int index)
     {
-        owner?.InvalidateMaterializedGraph();
+        owner.InvalidateMaterializedGraph();
         pages.RemoveAt(index);
     }
 
@@ -127,7 +142,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <param name="to">The zero-based destination index in the resulting collection.</param>
     public void Move(int from, int to)
     {
-        owner?.InvalidateMaterializedGraph();
+        owner.InvalidateMaterializedGraph();
         var page = pages[from];
         pages.RemoveAt(from);
         try
@@ -146,7 +161,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <param name="count">The number of pages to remove.</param>
     public void RemoveRange(int index, int count)
     {
-        owner?.InvalidateMaterializedGraph();
+        owner.InvalidateMaterializedGraph();
         pages.RemoveRange(index, count);
     }
 
@@ -155,11 +170,6 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <returns>A new document containing the selected pages.</returns>
     public PortableDocument ExtractPages(Range range)
     {
-        if (owner is null)
-        {
-            throw new InvalidOperationException("Pages can be extracted only from a collection owned by a PortableDocument.");
-        }
-
         var result = new PortableDocument();
         result.ImportPages(owner, range);
         return result;
@@ -174,11 +184,6 @@ public sealed class PageCollection : IReadOnlyList<Page>
     public IReadOnlyList<PortableDocument> Split(params int[] boundaries)
     {
         ArgumentNullException.ThrowIfNull(boundaries);
-        if (owner is null)
-        {
-            throw new InvalidOperationException("Pages can be split only from a collection owned by a PortableDocument.");
-        }
-
         var previous = 0;
         foreach (var boundary in boundaries)
         {

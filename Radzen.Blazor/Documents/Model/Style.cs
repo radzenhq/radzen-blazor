@@ -90,4 +90,31 @@ public sealed class Style
     /// chain. Setting <see langword="null"/> resets it.
     /// </summary>
     public bool? KeepWithNext { get; set; }
+
+    private string? role;
+
+    /// <summary>
+    /// Gets or sets the structure role a paragraph in this style carries in Tagged PDF, or
+    /// <see langword="null"/> when it sets none and the value is inherited from its base style chain.
+    /// A style without a role falls back to its <see cref="Name"/>. A role that is not one of the
+    /// standard ISO 32000-1 structure types must be declared in
+    /// <c>DocumentRenderer.RoleMap</c>; saving with PDF/UA or PDF/A Level A fails when it is not.
+    /// <see cref="HeadingLevel"/> takes precedence over the role when both are set.
+    /// </summary>
+    /// <exception cref="ArgumentException">The value is empty.</exception>
+    public string? Role
+    {
+        get => role;
+        set
+        {
+            if (value is not null && value.Length == 0)
+            {
+                throw new ArgumentException(
+                    "Style.Role must be non-empty, or null for a style that declares no structure role.",
+                    nameof(value));
+            }
+
+            role = value;
+        }
+    }
 }
