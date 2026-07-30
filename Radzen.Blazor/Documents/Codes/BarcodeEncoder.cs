@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Codes;
 
 /// <summary>
 /// Barcode type.
@@ -58,29 +58,6 @@ public enum BarcodeType
 
     /// <summary>Telepen.</summary>
     Telepen
-}
-
-/// <summary>
-/// Represents a rectangle used for barcode rendering, with position and size.
-/// </summary>
-public readonly struct BarcodeRect(double x, double y, double width, double height)
-{
-    /// <summary>
-    /// The X position of the rectangle.
-    /// </summary>
-    public readonly double X = x;
-    /// <summary>
-    /// The Y position of the rectangle.
-    /// </summary>
-    public readonly double Y = y;
-    /// <summary>
-    /// The width of the rectangle.
-    /// </summary>
-    public readonly double Width = width;
-    /// <summary>
-    /// The height of the rectangle.
-    /// </summary>
-    public readonly double Height = height;
 }
 
 /// <summary>
@@ -149,14 +126,11 @@ public static class BarcodeEncoder
         }
         checksumValue %= 103;
 
-        // expose checksum (0..102)
         checksum = checksumValue;
 
         codes.Add(checksumValue);
         codes.Add(stop);
 
-        // Convert codes to module pattern widths, alternating bar/space.
-        // Most codes are 6 digits; stop is 7 digits.
         var modules = new List<int>(codes.Count * 6);
         foreach (var code in codes)
         {
@@ -342,7 +316,6 @@ public static class BarcodeEncoder
     public static IReadOnlyList<int> EncodeCodabar(string value)
     {
         // Wikipedia table mapping (bars: 1=wide, spaces: 0=wide) for the standard symbol set.
-        // Ensure start/stop are present; default to A ... B if missing.
         var raw = (value ?? string.Empty).Trim().ToUpperInvariant();
         if (raw.Length == 0)
         {
@@ -662,7 +635,7 @@ public static class BarcodeEncoder
     /// <param name="barHeight">The bar height in SVG units.</param>
     /// <param name="quietZone">The quiet zone in modules.</param>
     /// <returns>The bar rectangles and viewBox width.</returns>
-    public static (IReadOnlyList<BarcodeRect> bars, double vbWidth) EncodePharmacode(string value, double barHeight, int quietZone)
+    public static (IReadOnlyList<Rect> bars, double vbWidth) EncodePharmacode(string value, double barHeight, int quietZone)
     {
         ArgumentNullException.ThrowIfNull(value);
 
@@ -694,10 +667,10 @@ public static class BarcodeEncoder
         bars.Reverse();
 
         double x = Math.Max(0, quietZone);
-        var rects = new List<BarcodeRect>(bars.Count);
+        var rects = new List<Rect>(bars.Count);
         foreach (var b in bars)
         {
-            rects.Add(new BarcodeRect(x, 0, b.width, barHeight));
+            rects.Add(new Rect(x, 0, b.width, barHeight));
             x += b.width + 1; // 1 module gap
         }
 
@@ -733,7 +706,7 @@ public static class BarcodeEncoder
     /// <param name="quietZone">The quiet zone in modules.</param>
     /// <param name="checksumText">The calculated checksum digit.</param>
     /// <returns>The bar rectangles and viewBox width.</returns>
-    public static (IReadOnlyList<BarcodeRect> bars, double vbWidth) EncodePostnet(string value, double barHeight, int quietZone, out string checksumText)
+    public static (IReadOnlyList<Rect> bars, double vbWidth) EncodePostnet(string value, double barHeight, int quietZone, out string checksumText)
     {
         ArgumentNullException.ThrowIfNull(value);
 
@@ -754,10 +727,10 @@ public static class BarcodeEncoder
         double halfY = fullH - halfH;
 
         double x = Math.Max(0, quietZone);
-        var rects = new List<BarcodeRect>();
+        var rects = new List<Rect>();
 
         // Start frame bar (full)
-        rects.Add(new BarcodeRect(x, 0, 1, fullH));
+        rects.Add(new Rect(x, 0, 1, fullH));
         x += 2; // bar(1) + space(1)
 
         foreach (var ch in payload)
@@ -767,14 +740,14 @@ public static class BarcodeEncoder
             {
                 bool full = bits[i] == '1';
                 rects.Add(full
-                    ? new BarcodeRect(x, 0, 1, fullH)
-                    : new BarcodeRect(x, halfY, 1, halfH));
+                    ? new Rect(x, 0, 1, fullH)
+                    : new Rect(x, halfY, 1, halfH));
                 x += 2;
             }
         }
 
         // Stop frame bar (full)
-        rects.Add(new BarcodeRect(x, 0, 1, fullH));
+        rects.Add(new Rect(x, 0, 1, fullH));
         x += 1;
 
         var vbWidth = x + Math.Max(0, quietZone);
@@ -825,7 +798,7 @@ public static class BarcodeEncoder
     /// <param name="quietZone">The quiet zone in modules.</param>
     /// <param name="checksumText">The calculated checksum character.</param>
     /// <returns>The bar rectangles and viewBox width.</returns>
-    public static (IReadOnlyList<BarcodeRect> bars, double vbWidth) EncodeRm4scc(string value, double barHeight, int quietZone, out string checksumText)
+    public static (IReadOnlyList<Rect> bars, double vbWidth) EncodeRm4scc(string value, double barHeight, int quietZone, out string checksumText)
     {
         ArgumentNullException.ThrowIfNull(value);
 
@@ -868,26 +841,25 @@ public static class BarcodeEncoder
 
         checksumText = checkChar.ToString();
 
-        // Encode start + data + checksum + stop.
         // Start/stop are single bars; we use ascender for start and descender for stop.
         double h = barHeight;
         double third = h / 3.0;
         double trackerY = third;
         double trackerH = third;
 
-        BarcodeRect BarRect(double x, bool top, bool bottom)
+        Rect BarRect(double x, bool top, bool bottom)
         {
             return (top, bottom) switch
             {
-                (false, false) => new BarcodeRect(x, trackerY, 1, trackerH), // tracker
-                (true, false) => new BarcodeRect(x, 0, 1, trackerY + trackerH), // ascender (top + tracker)
-                (false, true) => new BarcodeRect(x, trackerY, 1, h - trackerY), // descender (tracker + bottom)
-                (true, true) => new BarcodeRect(x, 0, 1, h), // full
+                (false, false) => new Rect(x, trackerY, 1, trackerH), // tracker
+                (true, false) => new Rect(x, 0, 1, trackerY + trackerH), // ascender (top + tracker)
+                (false, true) => new Rect(x, trackerY, 1, h - trackerY), // descender (tracker + bottom)
+                (true, true) => new Rect(x, 0, 1, h), // full
             };
         }
 
         double xPos = Math.Max(0, quietZone);
-        var rects = new List<BarcodeRect>();
+        var rects = new List<Rect>();
 
         // Start bar (ascender)
         rects.Add(BarRect(xPos, top: true, bottom: false));
@@ -1017,13 +989,11 @@ public static class BarcodeEncoder
         int check = (127 - sum) % 127;
         checksumText = check.ToString(CultureInfo.InvariantCulture);
 
-        // Build payload: start '_' + data + checksum byte + stop 'z'
         var payload = new List<byte>(bytes.Length + 3) { (byte)'_' };
         payload.AddRange(bytes);
         payload.Add((byte)check);
         payload.Add((byte)'z');
 
-        // Build bit stream LSB-first with even parity bit as MSB.
         var bitStream = new List<int>(payload.Count * 8);
         foreach (var b0 in payload)
         {
@@ -1038,8 +1008,6 @@ public static class BarcodeEncoder
             }
         }
 
-        // Encode bit stream into bar/space widths (narrow=1, wide=3).
-        // We produce alternating bar/space widths list, starting with bar.
         const int narrow = 1;
         const int wide = 3;
         var widths = new List<int>();
@@ -1129,11 +1097,15 @@ public static class BarcodeEncoder
     /// <param name="foreground">The bar color.</param>
     /// <param name="background">The background color.</param>
     /// <returns>An SVG string representing the barcode.</returns>
+    /// <exception cref="ArgumentException"><paramref name="foreground"/> or <paramref name="background"/> is not a valid CSS color.</exception>
     public static string ToSvg(BarcodeType type, string value, double barHeight = 50, int quietZoneModules = 10, string foreground = "#000000", string background = "#FFFFFF")
     {
         ArgumentNullException.ThrowIfNull(value);
         ArgumentNullException.ThrowIfNull(foreground);
         ArgumentNullException.ThrowIfNull(background);
+
+        var barFill = SvgAttributes.Color(foreground, nameof(foreground));
+        var backgroundFill = SvgAttributes.Color(background, nameof(background));
 
         var (bars, viewBoxWidth, viewBoxHeight) = EncodeToBars(type, value, barHeight, quietZoneModules);
 
@@ -1149,19 +1121,19 @@ public static class BarcodeEncoder
 
         var sb = new StringBuilder(bars.Count * 64 + 256);
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" viewBox=\"0 0 {F(viewBoxWidth)} {F(viewBoxHeight)}\" shape-rendering=\"crispEdges\">");
-        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" fill=\"{background}\"/>");
+        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" fill=\"{backgroundFill}\"/>");
 
         for (int i = 0; i < bars.Count; i++)
         {
             var bar = bars[i];
-            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{F(bar.X)}\" y=\"{F(bar.Y)}\" width=\"{F(bar.Width)}\" height=\"{F(bar.Height)}\" fill=\"{foreground}\"/>");
+            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{F(bar.X)}\" y=\"{F(bar.Y)}\" width=\"{F(bar.Width)}\" height=\"{F(bar.Height)}\" fill=\"{barFill}\"/>");
         }
 
         sb.Append("</svg>");
         return sb.ToString();
     }
 
-    internal static (IReadOnlyList<BarcodeRect> bars, double vbWidth, double vbHeight) EncodeToBars(BarcodeType type, string value, double barHeight, int quietZoneModules)
+    internal static (IReadOnlyList<Rect> bars, double vbWidth, double vbHeight) EncodeToBars(BarcodeType type, string value, double barHeight, int quietZoneModules)
     {
         switch (type)
         {
@@ -1254,11 +1226,11 @@ public static class BarcodeEncoder
         }
     }
 
-    static (IReadOnlyList<BarcodeRect> bars, double vbWidth) CreateFromWidths(IReadOnlyList<int> widths, double barHeight, int quietZoneModules)
+    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromWidths(IReadOnlyList<int> widths, double barHeight, int quietZoneModules)
     {
         ArgumentNullException.ThrowIfNull(widths);
 
-        var rects = new List<BarcodeRect>();
+        var rects = new List<Rect>();
         double x = Math.Max(0, quietZoneModules);
         bool isBar = true;
         for (int i = 0; i < widths.Count; i++)
@@ -1266,7 +1238,7 @@ public static class BarcodeEncoder
             var w = widths[i];
             if (isBar && w > 0)
             {
-                rects.Add(new BarcodeRect(x, 0, w, barHeight));
+                rects.Add(new Rect(x, 0, w, barHeight));
             }
             x += w;
             isBar = !isBar;
@@ -1281,16 +1253,16 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    static (IReadOnlyList<BarcodeRect> bars, double vbWidth) CreateFromBits(string bits, double barHeight, int quietZoneModules)
+    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromBits(string bits, double barHeight, int quietZoneModules)
     {
         ArgumentNullException.ThrowIfNull(bits);
 
         if (bits.Length == 0)
         {
-            return (Array.Empty<BarcodeRect>(), 1);
+            return (Array.Empty<Rect>(), 1);
         }
 
-        var rects = new List<BarcodeRect>();
+        var rects = new List<Rect>();
         var quiet = Math.Max(0, quietZoneModules);
         for (int i = 0; i < bits.Length;)
         {
@@ -1306,7 +1278,7 @@ public static class BarcodeEncoder
                 j++;
             }
 
-            rects.Add(new BarcodeRect(quiet + i, 0, j - i, barHeight));
+            rects.Add(new Rect(quiet + i, 0, j - i, barHeight));
             i = j;
         }
 
@@ -1319,7 +1291,7 @@ public static class BarcodeEncoder
         return (rects, vbWidth);
     }
 
-    static (IReadOnlyList<BarcodeRect> bars, double vbWidth) CreateFromRects((IReadOnlyList<BarcodeRect> bars, double vbWidth) geometry)
+    static (IReadOnlyList<Rect> bars, double vbWidth) CreateFromRects((IReadOnlyList<Rect> bars, double vbWidth) geometry)
     {
         var vbWidth = geometry.vbWidth;
         if (vbWidth <= 0)
@@ -1330,7 +1302,7 @@ public static class BarcodeEncoder
         return (geometry.bars, vbWidth);
     }
 
-    static double ComputeBarsHeight(IReadOnlyList<BarcodeRect> bars, double fallbackHeight)
+    static double ComputeBarsHeight(IReadOnlyList<Rect> bars, double fallbackHeight)
     {
         if (bars.Count == 0)
         {

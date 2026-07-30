@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Radzen.Documents.Codes;
 
 namespace Radzen.Blazor
 {
@@ -18,50 +19,50 @@ namespace Radzen.Blazor
         /// <summary>
         /// Code 128 (subset B). Encodes ASCII text and is widely supported.
         /// </summary>
-        Code128 = (int)Radzen.Documents.BarcodeType.Code128,
+        Code128 = (int)Radzen.Documents.Codes.BarcodeType.Code128,
 
         /// <summary>
         /// Code 39. Supports uppercase letters, digits, and a limited set of symbols.
         /// </summary>
-        Code39 = (int)Radzen.Documents.BarcodeType.Code39,
+        Code39 = (int)Radzen.Documents.Codes.BarcodeType.Code39,
 
         /// <summary>EAN-13 (GTIN-13).</summary>
-        Ean13 = (int)Radzen.Documents.BarcodeType.Ean13,
+        Ean13 = (int)Radzen.Documents.Codes.BarcodeType.Ean13,
 
         /// <summary>EAN-8 (GTIN-8).</summary>
-        Ean8 = (int)Radzen.Documents.BarcodeType.Ean8,
+        Ean8 = (int)Radzen.Documents.Codes.BarcodeType.Ean8,
 
         /// <summary>UPC-A.</summary>
-        UpcA = (int)Radzen.Documents.BarcodeType.UpcA,
+        UpcA = (int)Radzen.Documents.Codes.BarcodeType.UpcA,
 
         /// <summary>ITF (Interleaved 2 of 5).</summary>
-        Itf = (int)Radzen.Documents.BarcodeType.Itf,
+        Itf = (int)Radzen.Documents.Codes.BarcodeType.Itf,
 
         /// <summary>POSTNET (USPS). 4/5-state style using short/long bars.</summary>
-        Postnet = (int)Radzen.Documents.BarcodeType.Postnet,
+        Postnet = (int)Radzen.Documents.Codes.BarcodeType.Postnet,
 
         /// <summary>RM4SCC (Royal Mail 4-state customer code).</summary>
-        Rm4scc = (int)Radzen.Documents.BarcodeType.Rm4scc,
+        Rm4scc = (int)Radzen.Documents.Codes.BarcodeType.Rm4scc,
 
         /// <summary>Codabar.</summary>
-        Codabar = (int)Radzen.Documents.BarcodeType.Codabar,
+        Codabar = (int)Radzen.Documents.Codes.BarcodeType.Codabar,
 
         /// <summary>Pharmacode (one-track).</summary>
-        Pharmacode = (int)Radzen.Documents.BarcodeType.Pharmacode,
+        Pharmacode = (int)Radzen.Documents.Codes.BarcodeType.Pharmacode,
 
         /// <summary>ISBN (encodes as EAN-13 with 978/979 prefix).</summary>
-        Isbn = (int)Radzen.Documents.BarcodeType.Isbn,
+        Isbn = (int)Radzen.Documents.Codes.BarcodeType.Isbn,
 
         /// <summary>ISSN (encodes as EAN-13 with 977 prefix).</summary>
-        Issn = (int)Radzen.Documents.BarcodeType.Issn,
+        Issn = (int)Radzen.Documents.Codes.BarcodeType.Issn,
 
         /// <summary>
         /// MSI (Modified Plessey). Numeric-only barcode, commonly used for inventory.
         /// </summary>
-        Msi = (int)Radzen.Documents.BarcodeType.Msi,
+        Msi = (int)Radzen.Documents.Codes.BarcodeType.Msi,
 
         /// <summary>Telepen.</summary>
-        Telepen = (int)Radzen.Documents.BarcodeType.Telepen
+        Telepen = (int)Radzen.Documents.Codes.BarcodeType.Telepen
     }
 
     /// <summary>

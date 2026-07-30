@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents;
+using Radzen.Documents.Codes;
 
 namespace Radzen.Blazor;
 
@@ -27,29 +28,29 @@ public readonly struct BarcodeRect(double x, double y, double width, double heig
     public readonly double Height = height;
 
     /// <summary>
-    /// Converts this rectangle to a <see cref="Radzen.Documents.BarcodeRect"/>.
+    /// Converts this rectangle to a <see cref="Radzen.Documents.Rect"/>.
     /// </summary>
     /// <param name="rect">The rectangle to convert.</param>
-    public static implicit operator Radzen.Documents.BarcodeRect(BarcodeRect rect)
+    public static implicit operator Radzen.Documents.Rect(BarcodeRect rect)
         => new(rect.X, rect.Y, rect.Width, rect.Height);
 
     /// <summary>
-    /// Converts a <see cref="Radzen.Documents.BarcodeRect"/> to this rectangle type.
+    /// Converts a <see cref="Radzen.Documents.Rect"/> to this rectangle type.
     /// </summary>
     /// <param name="rect">The rectangle to convert.</param>
-    public static implicit operator BarcodeRect(Radzen.Documents.BarcodeRect rect)
+    public static implicit operator BarcodeRect(Radzen.Documents.Rect rect)
         => new(rect.X, rect.Y, rect.Width, rect.Height);
 
     /// <summary>
-    /// Converts this rectangle to a <see cref="Radzen.Documents.BarcodeRect"/>.
+    /// Converts this rectangle to a <see cref="Radzen.Documents.Rect"/>.
     /// </summary>
-    public Radzen.Documents.BarcodeRect ToBarcodeRect() => new(X, Y, Width, Height);
+    public Radzen.Documents.Rect ToRect() => new(X, Y, Width, Height);
 
     /// <summary>
-    /// Converts a <see cref="Radzen.Documents.BarcodeRect"/> to this rectangle type.
+    /// Converts a <see cref="Radzen.Documents.Rect"/> to this rectangle type.
     /// </summary>
     /// <param name="rect">The rectangle to convert.</param>
-    public static BarcodeRect FromBarcodeRect(Radzen.Documents.BarcodeRect rect)
+    public static BarcodeRect FromRect(Radzen.Documents.Rect rect)
         => new(rect.X, rect.Y, rect.Width, rect.Height);
 }
 
@@ -212,6 +213,6 @@ public static class RadzenBarcodeEncoder
     public static string ToSvg(RadzenBarcodeType type, string value, double barHeight = 50, int quietZoneModules = 10, string foreground = "#000000", string background = "#FFFFFF")
         => BarcodeEncoder.ToSvg((BarcodeType)(int)type, value, barHeight, quietZoneModules, foreground, background);
 
-    private static IReadOnlyList<BarcodeRect> ToLegacy(IReadOnlyList<Radzen.Documents.BarcodeRect> bars)
+    private static IReadOnlyList<BarcodeRect> ToLegacy(IReadOnlyList<Radzen.Documents.Rect> bars)
         => bars.Select(x => (BarcodeRect)x).ToList();
 }

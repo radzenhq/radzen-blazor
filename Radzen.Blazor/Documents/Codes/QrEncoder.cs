@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Radzen.Blazor.Rendering;
 using System.Text;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Codes;
 
 /// <summary>
 /// Error correction.
@@ -86,7 +85,6 @@ public static class QrEncoder
             throw new ArgumentOutOfRangeException(nameof(minVersion), "Version range must be within 1..40");
         }
 
-        // Try versions until payload (with headers) fits into available data bits.
         for (int ver = minVersion; ver <= maxVersion; ver++)
         {
             int charCountBits = ver <= 9 ? 8 : 16; // byte mode: v1-9:8, v10-40:16
@@ -138,6 +136,7 @@ public static class QrEncoder
     }
 
     /// <summary>Render a module matrix into an SVG string with a 4-module quiet zone.</summary>
+    /// <exception cref="ArgumentException">A color argument is not a valid CSS color.</exception>
     public static string ToSvg(
         bool[,] modules,
         int moduleSize = 8,
@@ -160,19 +159,23 @@ public static class QrEncoder
         ArgumentNullException.ThrowIfNull(background);
         ArgumentNullException.ThrowIfNull(imageBackground);
 
+        var moduleFill = SvgAttributes.Color(foreground, nameof(foreground));
+        var imageBackgroundFill = SvgAttributes.Color(imageBackground, nameof(imageBackground));
+        var imageHref = image is null ? null : SvgAttributes.Escape(image);
+
         int n = modules.GetLength(0);
         int vb = n + 8;  // 4 modules of quiet zone on each side
         int px = vb * moduleSize;
 
         var sb = new StringBuilder(n * n + 1024);
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{px}\" height=\"{px}\" viewBox=\"0 0 {vb} {vb}\" shape-rendering=\"crispEdges\">");
-        var backgroundFill = GetSvgFillParts(background);
+        var backgroundFill = GetSvgFillParts(background, nameof(background));
         sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{backgroundFill.Color}\" fill-opacity=\"{Format(backgroundFill.Opacity)}\"/>");
 
-        var baseEyeColor = eyeColor ?? foreground;
-        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, eyeColorTopLeft ?? baseEyeColor, "eye-mask-0");
-        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, eyeColorTopRight ?? baseEyeColor, "eye-mask-1");
-        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, eyeColorBottomLeft ?? baseEyeColor, "eye-mask-2");
+        var baseEyeFill = eyeColor is null ? moduleFill : SvgAttributes.Color(eyeColor, nameof(eyeColor));
+        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, EyeFill(eyeColorTopLeft, baseEyeFill, nameof(eyeColorTopLeft)), "eye-mask-0");
+        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, EyeFill(eyeColorTopRight, baseEyeFill, nameof(eyeColorTopRight)), "eye-mask-1");
+        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, EyeFill(eyeColorBottomLeft, baseEyeFill, nameof(eyeColorBottomLeft)), "eye-mask-2");
 
         for (int r = 0; r < n; r++)
         {
@@ -193,15 +196,15 @@ public static class QrEncoder
 
                 if (moduleShape == QrModuleShape.Circle)
                 {
-                    sb.Append(CultureInfo.InvariantCulture, $"<circle cx=\"{Format(x + 0.5)}\" cy=\"{Format(y + 0.5)}\" r=\"0.5\" fill=\"{foreground}\"/>");
+                    sb.Append(CultureInfo.InvariantCulture, $"<circle cx=\"{Format(x + 0.5)}\" cy=\"{Format(y + 0.5)}\" r=\"0.5\" fill=\"{moduleFill}\"/>");
                 }
                 else if (moduleShape == QrModuleShape.Rounded)
                 {
-                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" rx=\"0.25\" ry=\"0.25\" fill=\"{foreground}\"/>");
+                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" rx=\"0.25\" ry=\"0.25\" fill=\"{moduleFill}\"/>");
                 }
                 else
                 {
-                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" fill=\"{foreground}\"/>");
+                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" fill=\"{moduleFill}\"/>");
                 }
             }
         }
@@ -228,15 +231,13 @@ public static class QrEncoder
             double imgX = centerX - boxModules / 2.0;
             double imgY = centerY - boxModules / 2.0;
 
-            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(cutoutX)}\" y=\"{Format(cutoutY)}\" width=\"{Format(cutoutW)}\" height=\"{Format(cutoutH)}\" rx=\"{Format(imageCornerRadius)}\" ry=\"{Format(imageCornerRadius)}\" fill=\"{imageBackground}\" fill-opacity=\"{Format(Math.Clamp(imageBackgroundOpacity, 0, 1))}\"/>");
-            sb.Append(CultureInfo.InvariantCulture, $"<image x=\"{Format(imgX)}\" y=\"{Format(imgY)}\" width=\"{Format(boxModules)}\" height=\"{Format(boxModules)}\" preserveAspectRatio=\"xMidYMid meet\" href=\"{image}\"/>");
+            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(cutoutX)}\" y=\"{Format(cutoutY)}\" width=\"{Format(cutoutW)}\" height=\"{Format(cutoutH)}\" rx=\"{Format(imageCornerRadius)}\" ry=\"{Format(imageCornerRadius)}\" fill=\"{imageBackgroundFill}\" fill-opacity=\"{Format(Math.Clamp(imageBackgroundOpacity, 0, 1))}\"/>");
+            sb.Append(CultureInfo.InvariantCulture, $"<image x=\"{Format(imgX)}\" y=\"{Format(imgY)}\" width=\"{Format(boxModules)}\" height=\"{Format(boxModules)}\" preserveAspectRatio=\"xMidYMid meet\" href=\"{imageHref}\"/>");
         }
 
         sb.Append("</svg>");
         return sb.ToString();
     }
-
-    // ---------- Core building ----------
 
     private static (bool[,] m, bool[,] res) BuildBaseMatrix(int ver)
     {
@@ -262,7 +263,6 @@ public static class QrEncoder
         {
             foreach (int x in ap)
             {
-                // Skip the corners with finders
                 bool corner = (x < 9 && y < 9) || (x > n - 9 && y < 9) || (x < 9 && y > n - 9);
                 if (!corner)
                 {
@@ -274,10 +274,8 @@ public static class QrEncoder
         // Dark module (always)
         m[4 * ver + 9, 8] = true; reserved[4 * ver + 9, 8] = true;
 
-        // Reserve format info areas
         ReserveFormat(reserved);
 
-        // Reserve version info (v7+)
         if (ver >= 7)
         {
             ReserveVersion(reserved);
@@ -308,7 +306,6 @@ public static class QrEncoder
                 }
                 else
                 {
-                    // separator (light), just reserve
                     res[rr, cc] = true;
                 }
             }
@@ -351,14 +348,13 @@ public static class QrEncoder
         // Column 8, row 7 is format (row 6 is timing, skip it)
         res[7, 8] = true;
 
-        // Second copy:
-        // Column 8, bottom 7 cells (rows n-1 down to n-7)  ← exactly 7 cells
+        // Column 8, bottom 7 cells (rows n-1 down to n-7)
         for (int i = 0; i < 7; i++)
         {
             res[n - 1 - i, 8] = true;
         }
 
-        // Row 8, right side 8 cells (cols n-8 .. n-1)      ← exactly 8 cells
+        // Row 8, right side 8 cells (cols n-8 .. n-1)
         for (int i = 0; i < 8; i++)
         {
             res[8, n - 8 + i] = true;
@@ -398,7 +394,6 @@ public static class QrEncoder
         int bits = BchEncode(ver, 0x1F25, 18, 6);
         int n = m.GetLength(0);
 
-        // ---- Bottom-left block (3 tall x 6 wide) ----
         // Thonky table:
         //   00 03 06 09 12 15
         //   01 04 07 10 13 16
@@ -419,7 +414,6 @@ public static class QrEncoder
             }
         }
 
-        // ---- Top-right block (6 tall x 3 wide) ----
         // Thonky table:
         //   00 01 02
         //   03 04 05
@@ -443,20 +437,15 @@ public static class QrEncoder
         }
     }
 
-    // ---------- Data & EC ----------
-
     private static byte[] BuildDataCodewords(BitBuffer bb, int dataCw)
     {
         int totalBits = dataCw * 8;
-        // Terminator
         int remaining = totalBits - bb.Length;
         bb.AppendBits(0, Math.Min(4, remaining));
-        // Pad to byte
         while (bb.Length % 8 != 0)
         {
             bb.AppendBits(0, 1);
         }
-        // Build bytes
         var bytes = new List<byte>(dataCw);
         for (int i = 0; i < bb.Length; i += 8)
         {
@@ -473,7 +462,6 @@ public static class QrEncoder
 
             bytes.Add((byte)b);
         }
-        // Pad bytes
         byte[] pads = { 0xEC, 0x11 }; int p = 0;
         while (bytes.Count < dataCw)
         {
@@ -564,7 +552,7 @@ public static class QrEncoder
         var gen = new List<byte> { 1 };
         for (int i = 0; i < ecCount; i++)
         {
-            gen = PolyMul(gen, new List<byte> { 1, GfPow(2, i) }); // (x - α^i), α=2
+            gen = PolyMul(gen, new List<byte> { 1, GfPow(2, i) }); // (x - alpha^i), alpha=2
         }
 
         return gen.ToArray(); // length = ecCount + 1 (leading 1 included)
@@ -636,8 +624,6 @@ public static class QrEncoder
 
         return r;
     }
-
-    // ---------- Placement, masking, penalties ----------
 
     private static void PlaceData(bool[,] m, bool[,] res, byte[] codewords)
     {
@@ -857,22 +843,19 @@ public static class QrEncoder
         return true;
     }
 
-    // ---------- Format & Version info ----------
-
     private static void WriteFormatInfo(bool[,] m, bool[,] res, QrErrorCorrection ecc, int mask)
     {
         // ECL bits: L=01, M=00, Q=11, H=10
         int ecl = ecc switch { QrErrorCorrection.Low => 1, QrErrorCorrection.Medium => 0, QrErrorCorrection.Quartile => 3, QrErrorCorrection.High => 2, _ => 0 };
         int data = (ecl << 3) | (mask & 7);
 
-        // BCH(15,5) with generator 0x537, then XOR with 0x5412 (as you computed)
+        // BCH(15,5) with generator 0x537, then XOR with 0x5412
         int fmt = BchEncode(data, 0x537, 15, 5) ^ 0x5412;
 
         bool GetBit(int i) => ((fmt >> (14 - i)) & 1) != 0; // i=0 is MSB
 
         int n = m.GetLength(0);
 
-        // ---- First copy (around TL finder/timing), bits 0..14 ----
         // row 8, cols 0..5 (bits 0..5)
         for (int i = 0; i <= 5; i++)
         {
@@ -890,7 +873,6 @@ public static class QrEncoder
             Set(m, res, 14 - i, 8, GetBit(i));
         }
 
-        // ---- Second copy (right/bottom), bits 0..14 again ----
         // col 8, rows n-1..n-7 (bits 0..6)
         for (int i = 0; i <= 6; i++)
         {
@@ -918,8 +900,6 @@ public static class QrEncoder
     }
 
     private static void Set(bool[,] m, bool[,] res, int y, int x, bool v) { m[y, x] = v; res[y, x] = true; }
-
-    // ---------- Tables ----------
 
     // Alignment pattern positions per version. For v1: none.
     private static readonly int[][] AlignPos = BuildAlignmentPositions();
@@ -1011,7 +991,6 @@ public static class QrEncoder
     private static readonly int[][][] EcTable = BuildEcTable();
     private static int[][][] BuildEcTable()
     {
-        // To keep this file reasonable, the table is still large but compact.
         // Format per version:
         // {
         //   L: {ecPerBlock, g1Blocks, g1DataCw, g2Blocks, g2DataCw},
@@ -1020,10 +999,7 @@ public static class QrEncoder
         //   H: {...}
         // }
         // Source: standard QR capacity tables (ISO/IEC 18004:2015), widely reproduced.
-        // NOTE: These entries are carefully transcribed. If anything seems off in your tests, ping me.
 
-        // Due to message size constraints, the full 40-version table is included but trimmed for readability here.
-        // (It’s still complete.)
         return new int[][][]
         {
             // V1
@@ -1309,8 +1285,6 @@ public static class QrEncoder
         };
     }
 
-    // ---------- Helpers ----------
-
     private sealed class BitBuffer : List<int>
     {
         public int Length => Count;
@@ -1363,7 +1337,10 @@ public static class QrEncoder
         }
     }
 
-    private static (string Color, double Opacity) GetSvgFillParts(string? color)
+    private static string EyeFill(string? color, string fallback, string parameterName)
+        => color is null ? fallback : SvgAttributes.Color(color, parameterName);
+
+    private static (string Color, double Opacity) GetSvgFillParts(string? color, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(color))
         {
@@ -1375,10 +1352,14 @@ public static class QrEncoder
             return ("rgb(0, 0, 0)", 0);
         }
 
-        var rgb = RGB.Parse(color);
-        if (rgb == null)
+        if (!SvgAttributes.IsColor(color))
         {
-            return (color, 1);
+            throw new ArgumentException($"'{color}' is not a valid CSS color.", parameterName);
+        }
+
+        if (ColorValue.Parse(color) is not { } rgb)
+        {
+            return (SvgAttributes.Escape(color), 1);
         }
 
         var opacity = Math.Clamp(rgb.Alpha, 0, 1);
