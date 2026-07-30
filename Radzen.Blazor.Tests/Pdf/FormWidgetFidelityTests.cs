@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -46,7 +45,7 @@ public class FormWidgetFidelityTests
     // ISO 32000-1 12.7.3.1: /FT is inheritable, so a terminal kid reports its parent's field type.
     public void FieldTypeReadsTheInheritedFieldType()
     {
-        var document = Document.LoadFromStream(new MemoryStream(InheritedTypeForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(InheritedTypeForm()));
 
         Assert.All(document.AcroForm!.Fields, field => Assert.Equal(FormFieldType.Button, field.Type));
     }
@@ -54,7 +53,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void InheritedTypeAgreesWithTheMutatorGuard()
     {
-        var document = Document.LoadFromStream(new MemoryStream(InheritedTypeForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(InheritedTypeForm()));
         var field = document.AcroForm!.Fields[0];
 
         Assert.Equal(FormFieldType.Button, field.Type);
@@ -84,7 +83,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void FillFieldRefreshesEveryWidgetOfAField()
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiWidgetForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiWidgetForm()));
         document.AcroForm!.FillField("name", "Sofia");
 
         var reader = FormTestSupport.Reload(document);
@@ -101,7 +100,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void EachWidgetBakesItsOwnAppearanceBox()
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiWidgetForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiWidgetForm()));
         document.AcroForm!.FillField("name", "Sofia");
 
         var reader = FormTestSupport.Reload(document);
@@ -130,7 +129,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void CheckFieldTurnsOnEveryWidgetOfAField()
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiWidgetCheckBoxForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiWidgetCheckBoxForm()));
         document.AcroForm!.CheckField("agree");
 
         var reader = FormTestSupport.Reload(document);
@@ -164,7 +163,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void FlattenRefusesVisiblePushButtonAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(PushButtonForm(withAppearance: true)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(PushButtonForm(withAppearance: true)));
 
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
@@ -172,7 +171,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void FlattenDropsPushButtonWithoutAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(PushButtonForm(withAppearance: false)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(PushButtonForm(withAppearance: false)));
         document.Flatten();
 
         var reader = FormTestSupport.Reload(document);
@@ -198,7 +197,7 @@ public class FormWidgetFidelityTests
     [Fact]
     public void FlattenRefusesPushButtonWithVisibleStateDictionaryAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(PushButtonFormWithStateAppearance()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(PushButtonFormWithStateAppearance()));
 
         Assert.Throws<NotSupportedException>(document.Flatten);
     }

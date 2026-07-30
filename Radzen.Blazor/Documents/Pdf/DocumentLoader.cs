@@ -9,7 +9,7 @@ namespace Radzen.Documents.Pdf;
 
 internal static class DocumentLoader
 {
-    public static Document Load(Stream stream, ReaderLimits limits, LoadOptions? options)
+    public static PortableDocument Load(Stream stream, ReaderLimits limits, LoadOptions? options)
     {
         ArgumentNullException.ThrowIfNull(stream);
         ArgumentNullException.ThrowIfNull(limits);
@@ -19,7 +19,7 @@ internal static class DocumentLoader
         var reader = DocumentReader.Parse(bytes, options?.Password, limits);
 
         var state = new LoadedState(reader, bytes);
-        var document = Document.CreateLoaded(state);
+        var document = PortableDocument.CreateLoaded(state);
         state.SourceInfo = reader.GetDictionary(reader.Trailer, "Info");
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
@@ -53,7 +53,7 @@ internal static class DocumentLoader
             _ = new AcroForm(reader, form, document);
         }
 
-        ReadAttachments(reader, catalog, new Document(), limits);
+        ReadAttachments(reader, catalog, new PortableDocument(), limits);
         return document;
     }
 
@@ -69,7 +69,7 @@ internal static class DocumentLoader
         public int? Rotate { get; init; }
     }
 
-    private static void CollectPage(DocumentReader reader, PageTreeWalker.Leaf leaf, Document document, LoadedState state)
+    private static void CollectPage(DocumentReader reader, PageTreeWalker.Leaf leaf, PortableDocument document, LoadedState state)
     {
         var inherited = new InheritedAttributes();
         foreach (var pathNode in leaf.Path)
@@ -312,7 +312,7 @@ internal static class DocumentLoader
         }
     }
 
-    internal static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
+    internal static void ReadAttachments(DocumentReader reader, DictionaryObject catalog, PortableDocument document, ReaderLimits limits)
     {
         var seen = new HashSet<DictionaryObject>();
 
@@ -386,7 +386,7 @@ internal static class DocumentLoader
         }
     }
 
-    private static void AddAttachment(DocumentReader reader, DictionaryObject filespec, Document document, HashSet<DictionaryObject> seen)
+    private static void AddAttachment(DocumentReader reader, DictionaryObject filespec, PortableDocument document, HashSet<DictionaryObject> seen)
     {
         if (!seen.Add(filespec) || reader.GetDictionary(filespec, "EF") is not { } ef)
         {
@@ -439,7 +439,7 @@ internal static class DocumentLoader
     internal static void ReadOutline(
         DocumentReader reader,
         DictionaryObject catalog,
-        Document document,
+        PortableDocument document,
         LoadedState state,
         ReaderLimits limits)
     {
@@ -581,7 +581,7 @@ internal static class DocumentLoader
         return result;
     }
 
-    internal static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, Document document, ReaderLimits limits)
+    internal static void ReadPageLabels(DocumentReader reader, DictionaryObject catalog, PortableDocument document, ReaderLimits limits)
     {
         if (reader.GetDictionary(catalog, "PageLabels") is { } tree)
         {

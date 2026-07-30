@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -62,7 +61,7 @@ public class XrefChainEntryBudgetTests
         var data = ChainedXrefStreamFile(fillerSections: 5, perSection: 4);
 
         Assert.Throws<DocumentParseException>(
-            () => Document.LoadFromStream(new MemoryStream(data), new ReaderLimits { MaxXrefEntries = 4 }));
+            () => PortableDocument.LoadFromStream(new MemoryStream(data), new ReaderLimits { MaxXrefEntries = 4 }));
     }
 
     [Fact]

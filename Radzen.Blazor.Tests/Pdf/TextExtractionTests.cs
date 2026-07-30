@@ -4,23 +4,22 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TextExtractionTests
 {
-    private static Document Reload(Document document)
+    private static PortableDocument Reload(PortableDocument document)
     {
         using var buffer = new MemoryStream(document.ToArray());
-        return Document.LoadFromStream(buffer);
+        return PortableDocument.LoadFromStream(buffer);
     }
 
     [Fact]
     public void SimpleBase14_RoundTripsAuthoredString()
     {
         var text = "Hello World";
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent(text, 72, 700));
 
@@ -32,7 +31,7 @@ public class TextExtractionTests
     public void SimpleBase14_PreservesLatin1Characters()
     {
         var text = "Café £5 costs €10";
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent(text, 72, 700));
 
@@ -43,7 +42,7 @@ public class TextExtractionTests
     [Fact]
     public void EmptyPage_ExtractsEmptyString()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
 
         var reloaded = Reload(document);
@@ -53,7 +52,7 @@ public class TextExtractionTests
     [Fact]
     public void ReadingOrder_SortsTopToBottomThenLeftToRight()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
 
         page.Content.Add(new TextContent("Right", 300, 500));
@@ -81,7 +80,7 @@ public class TextExtractionTests
     public void DocumentExtractText_SinglePageEqualsPageText()
     {
         var text = "Single page body";
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent(text, 72, 700));
 
@@ -92,7 +91,7 @@ public class TextExtractionTests
     [Fact]
     public void DocumentExtractText_ConcatenatesPagesInOrder()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent("PageOneBody", 72, 700));
         document.Pages.Add().Content.Add(new TextContent("PageTwoBody", 72, 700));
 

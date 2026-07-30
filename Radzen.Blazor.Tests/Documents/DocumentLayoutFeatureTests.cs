@@ -6,7 +6,6 @@ using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Xunit;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Geometry;
 

@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal static class AnnotationFlattener
 {
-    public static void Flatten(Document document)
+    public static void Flatten(PortableDocument document)
     {
         var owned = new HashSet<Page>();
         foreach (var page in document.Pages)
@@ -49,7 +49,7 @@ internal static class AnnotationFlattener
     }
 
     private static bool TryFlattenLoadedAppearance(
-        Document document,
+        PortableDocument document,
         Page page,
         AnnotationCollection.Entry entry,
         Annotation annotation,

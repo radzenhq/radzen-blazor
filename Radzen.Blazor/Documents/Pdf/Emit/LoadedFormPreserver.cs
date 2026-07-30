@@ -19,7 +19,7 @@ internal sealed class PreserveFormRequest
     public required DocumentWriter Writer { get; init; }
 }
 
-internal sealed class LoadedFormPreserver(Document document, FormAppearanceService appearances)
+internal sealed class LoadedFormPreserver(PortableDocument document, FormAppearanceService appearances)
 {
     private LoadedState? Loaded => document.Loaded;
 

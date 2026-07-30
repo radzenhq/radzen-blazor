@@ -7,7 +7,6 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,7 +15,7 @@ public class BuildEndToEndTests
     [Fact]
     public void PageCount_MatchesPaginator()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var lh = PaginationSupport.LineHeight(document.Fonts, 12);
 
@@ -42,7 +41,7 @@ public class BuildEndToEndTests
     [Fact]
     public void FirstAndLastPageBodyTextSurvivesRoundTrip()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var lh = PaginationSupport.LineHeight(document.Fonts, 12);
 
@@ -65,7 +64,7 @@ public class BuildEndToEndTests
     [Fact]
     public void ImageBlock_DecodesToScaledXObject()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(200);
@@ -91,7 +90,7 @@ public class BuildEndToEndTests
     [Fact]
     public void ImageBlock_IsPaintedAtRequestedSize()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Width = Unit.FromPoint(200);
@@ -112,7 +111,7 @@ public class BuildEndToEndTests
     [Fact]
     public void SaveToStream_MatchesBuildThenSave()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Convenience", BuildTestSupport.Latin);
@@ -128,7 +127,7 @@ public class BuildEndToEndTests
         Assert.Equal(expected.ToArray().Length, viaSave.Length);
 
         using var buffer = new MemoryStream(viaSave);
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
         Assert.Contains("Convenience", reloaded.ExtractText(), StringComparison.Ordinal);
     }
 
@@ -136,7 +135,7 @@ public class BuildEndToEndTests
     public void Base14ZeroConfig_RoundTripsHelvetica()
     {
         const string text = "Helvetica Sample";
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, "Helvetica");
 
@@ -148,7 +147,7 @@ public class BuildEndToEndTests
     [Fact]
     public void Base14ZeroConfig_EmitsNamedType1Font()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Helvetica Sample", "Helvetica");
 

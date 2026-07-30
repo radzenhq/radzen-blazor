@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -71,7 +70,7 @@ public class PageOperationEditingTests
         source.Pages[0].Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { TargetPageIndex = 0 });
 
         var bytes = source.Pages.ExtractPages(0..1).ToArray();
-        var extracted = Document.LoadFromStream(new MemoryStream(bytes));
+        var extracted = PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
         var link = Assert.IsType<LinkAnnotation>(Assert.Single(extracted.Pages[0].Annotations));
         Assert.Equal(0, link.TargetPageIndex);
@@ -83,7 +82,7 @@ public class PageOperationEditingTests
     [Fact]
     public void ExtractPages_ResolvedNamedDestinationSurvivesWhenTargetIsRetainedAndDropsWhenExcluded()
     {
-        var source = Document.LoadFromStream(new MemoryStream(NamedDestinationPreservationTests.Source()));
+        var source = PortableDocument.LoadFromStream(new MemoryStream(NamedDestinationPreservationTests.Source()));
 
         var retained = Reload(source.Pages.ExtractPages(..));
         var excluded = Reload(source.Pages.ExtractPages(0..1));
@@ -113,15 +112,15 @@ public class PageOperationEditingTests
     [Fact]
     public void ImportPages_RebasesLinksForEmptyAndNonEmptyTargets()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var sourcePage = source.Pages.Add();
         sourcePage.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
         sourcePage.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { Uri = new Uri("https://example.com/") });
         source.Pages.Add();
 
-        var empty = new Document();
+        var empty = new PortableDocument();
         empty.ImportPages(source, ..);
-        var nonEmpty = new Document();
+        var nonEmpty = new PortableDocument();
         nonEmpty.Pages.Add();
         nonEmpty.Pages.Add();
         nonEmpty.ImportPages(source, ..);
@@ -151,7 +150,7 @@ public class PageOperationEditingTests
         var first = Reload(Create("ONE", "TWO"));
         var second = Create("THREE");
 
-        var merged = Document.Merge(first, second);
+        var merged = PortableDocument.Merge(first, second);
 
         Assert.Equal(["ONE", "TWO", "THREE"], PageTexts(Reload(merged)));
     }
@@ -167,9 +166,9 @@ public class PageOperationEditingTests
         Assert.All(reloaded.Pages, page => Assert.Contains("DRAFT", page.ExtractText()));
     }
 
-    private static Document Create(params string[] texts)
+    private static PortableDocument Create(params string[] texts)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         foreach (var text in texts)
         {
             var page = document.Pages.Add();
@@ -179,9 +178,9 @@ public class PageOperationEditingTests
         return document;
     }
 
-    private static Document Reload(Document document)
-        => Document.LoadFromStream(new MemoryStream(document.ToArray()));
+    private static PortableDocument Reload(PortableDocument document)
+        => PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
 
-    private static string[] PageTexts(Document document)
+    private static string[] PageTexts(PortableDocument document)
         => document.Pages.Select(page => page.ExtractText()).ToArray();
 }

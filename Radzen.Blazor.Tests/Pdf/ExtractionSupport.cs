@@ -6,13 +6,12 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class ExtractionSupport
 {
-    public static Document BuildSinglePage(Func<DocumentWriter, DocumentObject> font, byte[] content, string fontKey = "F1", double width = 612, double height = 792)
+    public static PortableDocument BuildSinglePage(Func<DocumentWriter, DocumentObject> font, byte[] content, string fontKey = "F1", double width = 612, double height = 792)
     {
         using var buffer = new MemoryStream();
         var writer = new DocumentWriter(buffer);
@@ -52,7 +51,7 @@ internal static class ExtractionSupport
         writer.Close();
 
         using var reload = new MemoryStream(buffer.ToArray());
-        return Document.LoadFromStream(reload);
+        return PortableDocument.LoadFromStream(reload);
     }
 
     public static byte[] TextRun(string fontKey, double size, double x, double y, byte[] codes)

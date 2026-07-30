@@ -7,23 +7,22 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class LoadedContentChangeDetectionTests
 {
-    private static Document Loaded()
+    private static PortableDocument Loaded()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Alpha", 72, 700) { Font = new Font { Size = 12 } });
         page.Content.Add(new TextContent("Beta", 72, 680) { Font = new Font { Size = 12 } });
         return InterpreterTestSupport.Load(document.ToArray());
     }
 
-    private static byte[] SavedContent(Document document)
+    private static byte[] SavedContent(PortableDocument document)
         => InterpreterTestSupport.PageContentBytes(document.ToArray(), 0);
 
     private static bool Contains(byte[] haystack, string needle)
@@ -139,7 +138,7 @@ public class LoadedContentChangeDetectionTests
         "QueuedAppend",
     };
 
-    private static void Apply(Document document, string edit)
+    private static void Apply(PortableDocument document, string edit)
     {
         var page = document.Pages[0];
         switch (edit)

@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,9 +12,9 @@ public class AppendResourceTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    private static Radzen.Documents.Document BuildFontAndImage()
+    private static Document BuildFontAndImage()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Appended Content", BuildTestSupport.Latin);
@@ -23,10 +22,10 @@ public class AppendResourceTests
         return document;
     }
 
-    private static Document Reload(Document document)
+    private static PortableDocument Reload(PortableDocument document)
     {
         using var stream = new MemoryStream(document.ToArray());
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     private static (bool HasFont, bool HasXObject) ResourceKinds(DocumentReader reader, int leafIndex)
@@ -42,7 +41,7 @@ public class AppendResourceTests
     [Fact]
     public void Append_BuiltSourcePage_CarriesFontAndImageResources()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Ascii("BT ET"));
         target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
@@ -56,7 +55,7 @@ public class AppendResourceTests
     [Fact]
     public void Append_BuiltSourcePage_ExtractsTextAfterReload()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Ascii("BT ET"));
         target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
@@ -68,7 +67,7 @@ public class AppendResourceTests
     {
         var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Ascii("BT ET"));
         target.Append(loaded);
 
@@ -84,7 +83,7 @@ public class AppendResourceTests
     {
         var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Ascii("BT ET"));
         target.Append(loaded);
 
@@ -96,7 +95,7 @@ public class AppendResourceTests
     {
         var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(loaded);
         target.ToArray();
 

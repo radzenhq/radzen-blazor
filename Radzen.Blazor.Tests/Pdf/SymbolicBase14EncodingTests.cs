@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -13,7 +12,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 // ISO 32000-1 9.6.6.4: Symbol and ZapfDingbats have a built-in encoding, no /Encoding /WinAnsiEncoding.
 public class SymbolicBase14EncodingTests
 {
-    private static DictionaryObject FontWithBaseFont(Document document, string baseFont)
+    private static DictionaryObject FontWithBaseFont(PortableDocument document, string baseFont)
     {
         var reader = ContentTestHelpers.Reload(document);
         var page = ContentTestHelpers.Kid(reader, 0);
@@ -38,7 +37,7 @@ public class SymbolicBase14EncodingTests
     [InlineData("ZapfDingbats")]
     public void SymbolicBase14Font_OmitsEncoding(string family)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Family = family } });
 
@@ -50,7 +49,7 @@ public class SymbolicBase14EncodingTests
     [Fact]
     public void NonSymbolicBase14Font_KeepsWinAnsiEncoding()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("abc", 72, 700) { Font = new Font { Family = "Helvetica" } });
 

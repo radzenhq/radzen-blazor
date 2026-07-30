@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,7 +16,7 @@ public class IncrementalUpdateWriterTests
 
     private static byte[] BuildClassicDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Incremental";
         document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page zero) Tj ET"));
         document.Pages.Add(PageSizes.Letter).SetContent(Ascii("BT (page one) Tj ET"));

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class DocumentSaver(Document document)
+internal sealed class DocumentSaver(PortableDocument document)
 {
     internal void Save(Stream stream)
     {

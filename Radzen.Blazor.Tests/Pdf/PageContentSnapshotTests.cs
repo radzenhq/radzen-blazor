@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -15,7 +14,7 @@ public class PageContentSnapshotTests
     public void GetContent_MutatingReturnedArray_DoesNotChangeStoredBytes()
     {
         var raw = Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm");
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(raw);
 
@@ -32,7 +31,7 @@ public class PageContentSnapshotTests
     public void SetContent_MutatingSourceArray_DoesNotChangeStoredBytes()
     {
         var raw = Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm");
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(raw);
 
@@ -47,7 +46,7 @@ public class PageContentSnapshotTests
     [Fact]
     public void GetContent_MutatingReturnedArray_DoesNotLeakIntoSavedDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("1 0 0 1 5 5 cm"));
 
@@ -58,7 +57,7 @@ public class PageContentSnapshotTests
         }
 
         using var buffer = new MemoryStream(document.ToArray());
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
         var content = reloaded.Pages[0].GetContent()!;
 
         Assert.Contains("cm", Encoding.ASCII.GetString(content));

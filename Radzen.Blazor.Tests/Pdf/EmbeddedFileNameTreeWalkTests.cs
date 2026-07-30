@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,7 +20,7 @@ public class EmbeddedFileNameTreeWalkTests
             (6, "<< /Kids [7 0 R 7 0 R] >>"),
             (7, "<< /Names [(a.txt) 4 0 R] >>"));
 
-        Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
+        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
     }
 
     [Fact]
@@ -30,7 +29,7 @@ public class EmbeddedFileNameTreeWalkTests
         var bytes = NameTreeFile(
             (6, "<< /Names [(a.txt) 4 0 R (b.txt)] >>"));
 
-        Assert.Throws<DocumentParseException>(() => Document.LoadFromStream(new MemoryStream(bytes)));
+        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
     }
 
     [Fact]
@@ -42,7 +41,7 @@ public class EmbeddedFileNameTreeWalkTests
             (8, "<< /Names [(b.txt) 9 0 R] >>"),
             (9, "<< /Type /Filespec /F (b.txt) /UF (b.txt) /EF << /F 5 0 R >> >>"));
 
-        var document = Document.LoadFromStream(new MemoryStream(bytes));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
         Assert.Equal(new[] { "a.txt", "b.txt" }, document.Attachments.Select(a => a.Name).Order().ToArray());
     }
@@ -55,7 +54,7 @@ public class EmbeddedFileNameTreeWalkTests
             (7, "<< /Names [(a.txt) 4 0 R] >>"),
             (8, "<< /Names [(b.txt) 4 0 R] >>"));
 
-        var document = Document.LoadFromStream(new MemoryStream(bytes));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
         Assert.Equal("a.txt", Assert.Single(document.Attachments).Name);
     }

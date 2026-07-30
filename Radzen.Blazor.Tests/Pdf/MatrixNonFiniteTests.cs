@@ -6,7 +6,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,10 +31,10 @@ public class MatrixNonFiniteTests
         return pdf.ToArray();
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     // ISO 32000-1 7.3.3 reals carry no exponent, so the lexer drops "1.0e400" as malformed.
@@ -65,7 +64,7 @@ public class MatrixNonFiniteTests
     [Fact]
     public void Author_NonFiniteTransform_ThrowsWhenWritten()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = page.Content.Add(new PathContent { Fill = true, Transform = Matrix.Scale(double.NaN, 1) });
         path.MoveTo(0, 0);

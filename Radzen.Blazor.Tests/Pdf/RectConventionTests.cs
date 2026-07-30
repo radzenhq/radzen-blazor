@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -57,7 +56,7 @@ public class RectConventionTests
     [Fact]
     public void AnnotationRect_EmitsLowerLeftThenUpperRight()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.Letter);
         page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(10, 20, 100, 50)));
 
@@ -67,7 +66,7 @@ public class RectConventionTests
     [Fact]
     public void MarkupQuadPoints_PutTheTopEdgeFirst()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.Letter);
         page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
 
@@ -77,7 +76,7 @@ public class RectConventionTests
     [Fact]
     public void PageBoxes_EmitLowerLeftThenUpperRight()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.Letter);
         page.SetContent(Encoding.ASCII.GetBytes("BT (b) Tj ET"));
         page.MediaBox = PdfRect.FromSize(0, 0, 612, PageHeight);
@@ -87,7 +86,7 @@ public class RectConventionTests
         Assert.Equal([20, 30, 575, 730], SavedNumbers(document, "TrimBox"));
     }
 
-    private static double[] SavedNumbers(Document document, string key)
+    private static double[] SavedNumbers(PortableDocument document, string key)
     {
         var reader = DocumentReader.Parse(document.ToArray());
         var node = ContentTestHelpers.Kid(reader, 0);

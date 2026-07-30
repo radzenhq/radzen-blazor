@@ -11,7 +11,7 @@ internal sealed class OpacityResolver
 
     private OpacityResolver() => walker = new Walker(this);
 
-    public OpacityResolver(Radzen.Documents.Document builder)
+    public OpacityResolver(Document builder)
     {
         walker = new Walker(this);
         foreach (var section in builder.Sections)

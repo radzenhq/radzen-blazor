@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -52,9 +51,9 @@ public class AppendAuxiliaryBoxTests
     [Fact]
     public void Append_LoadedPage_KeepsBleedTrimAndArtBoxes()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
-        target.Append(Document.LoadFromStream(new MemoryStream(
+        target.Append(PortableDocument.LoadFromStream(new MemoryStream(
             LoadedBytes("/BleedBox [1 2 3 4] /TrimBox [5 6 7 8] /ArtBox [9 10 11 12]"))));
 
         var reader = DocumentReader.Parse(target.ToArray());
@@ -67,13 +66,13 @@ public class AppendAuxiliaryBoxTests
     [Fact]
     public void Append_GeneratedPage_KeepsRotateAndPrintBoxes()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var page = source.Pages.Add();
         page.Rotate = 90;
         page.TrimBox = new PdfRect(5, 6, 7, 8);
         page.BleedBox = new PdfRect(1, 2, 3, 4);
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(source);
 

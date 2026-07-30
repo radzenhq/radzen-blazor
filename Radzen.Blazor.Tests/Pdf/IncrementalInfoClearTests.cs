@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class IncrementalInfoClearTests
 {
     private static byte[] BaseDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Original title";
         document.Info.Author = "Original author";
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT ET"));
@@ -39,9 +38,9 @@ public class IncrementalInfoClearTests
         return pdf.Append("trailer\n<< /Size 5 /Root 1 0 R /Info 4 0 R >>\nstartxref\n" + xref + "\n%%EOF\n").ToArray();
     }
 
-    private static Document Load(byte[] pdf) => Document.LoadFromStream(new MemoryStream(pdf));
+    private static PortableDocument Load(byte[] pdf) => PortableDocument.LoadFromStream(new MemoryStream(pdf));
 
-    private static byte[] SaveIncremental(Document document)
+    private static byte[] SaveIncremental(PortableDocument document)
     {
         using var stream = new MemoryStream();
         document.SaveIncremental(stream);
@@ -93,7 +92,7 @@ public class IncrementalInfoClearTests
     [Fact]
     public void IncrementalAndFullSaveAgreeOnEveryModeledField()
     {
-        static void Edit(Document document)
+        static void Edit(PortableDocument document)
         {
             document.Info.Title = "T";
             document.Info.Author = "A";

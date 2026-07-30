@@ -3,7 +3,6 @@ using System.Linq;
 using Xunit;
 
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 

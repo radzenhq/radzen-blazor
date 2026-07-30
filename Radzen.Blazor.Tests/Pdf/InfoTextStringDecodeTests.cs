@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,11 +25,11 @@ public class InfoTextStringDecodeTests
     [Fact]
     public void Utf16BeTitleDecodesToText()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         document.Info.Title = Utf16BeLiteral("Hello");
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
 
         Assert.Equal("Hello", reloaded.Info.Title);
     }
@@ -39,11 +38,11 @@ public class InfoTextStringDecodeTests
     public void Utf16BeNonAsciiTitleDecodes()
     {
         var expected = "H\u00E9llo W\u00F6rld";
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         document.Info.Title = Utf16BeLiteral(expected);
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
 
         Assert.Equal(expected, reloaded.Info.Title);
     }
@@ -51,11 +50,11 @@ public class InfoTextStringDecodeTests
     [Fact]
     public void PlainAsciiTitleRoundTrips()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
         document.Info.Title = "Quarterly Report 2026";
 
-        var reloaded = Document.LoadFromStream(new MemoryStream(document.ToArray()));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(document.ToArray()));
 
         Assert.Equal("Quarterly Report 2026", reloaded.Info.Title);
     }

@@ -3,21 +3,20 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AnnotationChangeTrackingTests
 {
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    private static Document Loaded(Annotation annotation)
+    private static PortableDocument Loaded(Annotation annotation)
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(annotation);
         return Load(source.ToArray());
     }

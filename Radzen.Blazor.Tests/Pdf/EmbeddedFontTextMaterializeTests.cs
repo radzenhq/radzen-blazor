@@ -5,7 +5,6 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -48,10 +47,10 @@ public class EmbeddedFontTextMaterializeTests
         return pdf.ToArray();
     }
 
-    private static Document Load()
+    private static PortableDocument Load()
     {
         using var stream = new MemoryStream(Fixture());
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     [Fact]
@@ -72,7 +71,7 @@ public class EmbeddedFontTextMaterializeTests
         text.Color = Color.Red;
 
         using var stream = new MemoryStream(document.ToArray());
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
 
         Assert.Contains("ABC", reloaded.Pages[0].ExtractText());
     }

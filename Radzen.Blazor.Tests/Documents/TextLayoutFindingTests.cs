@@ -86,7 +86,7 @@ public class TextLayoutFindingTests
     [Fact]
     public void ListMarker_TextStartsWithBreak_AttachesToFirstContentLine()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         document.Fonts.Register(
             LineLayoutSupport.Family,
             PdfTestResources.Open("Fonts/LiberationSans-Regular.ttf"));

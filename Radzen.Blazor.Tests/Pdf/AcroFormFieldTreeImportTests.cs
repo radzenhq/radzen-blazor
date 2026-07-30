@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -197,7 +196,7 @@ public class AcroFormFieldTreeImportTests
     [Fact]
     public void QualifiedNamesResolveAndNoFieldIsDropped()
     {
-        var document = Document.LoadFromStream(
+        var document = PortableDocument.LoadFromStream(
             new MemoryStream(Merge(destinationHasNameField: false, destinationHasDa: true)));
 
         Assert.NotNull(document.AcroForm);
@@ -247,7 +246,7 @@ public class AcroFormFieldTreeImportTests
             .ToArray();
         Assert.Equal(["Name", "address", "Name_2"], titles);
 
-        var document = Document.LoadFromStream(new MemoryStream(bytes));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
         Assert.Contains("Name", document.AcroForm!.FieldNames);
         Assert.Contains("Name_2", document.AcroForm.FieldNames);
         Assert.Equal(4, document.AcroForm.FieldNames.Count);

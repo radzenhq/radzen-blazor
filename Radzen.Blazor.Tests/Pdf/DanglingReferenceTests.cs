@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -70,7 +69,7 @@ public class DanglingReferenceTests
     public void LoadSaveRoundTrip_WithDanglingAnnot_Succeeds()
     {
         using var input = new MemoryStream(FileWithDanglingAnnot());
-        var document = Document.LoadFromStream(input);
+        var document = PortableDocument.LoadFromStream(input);
         Assert.Equal(1, document.Pages.Count);
 
         var saved = document.ToArray();

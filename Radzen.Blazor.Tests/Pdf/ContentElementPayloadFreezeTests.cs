@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,7 +15,7 @@ public class ContentElementPayloadFreezeTests
 
     private static Page LoadedTextPage()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii(TextSource));
 
@@ -26,7 +25,7 @@ public class ContentElementPayloadFreezeTests
     [Fact]
     public void SetContent_DiscardsElementsMaterializedFromThePreviousBytes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii(TextSource));
 

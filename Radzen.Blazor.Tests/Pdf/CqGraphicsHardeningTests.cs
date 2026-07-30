@@ -9,7 +9,6 @@ using Xunit;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class CqGraphicsHardeningTests
@@ -22,7 +21,7 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void XObjectName_AboveLatin1_ThrowsOnSave()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new XObjectContent("Ł1"));
 
@@ -32,7 +31,7 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void XObjectName_HighLatin1_StillEncodesAsEscape()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new XObjectContent("©x"));
 
@@ -102,7 +101,7 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void Watermark_NonWinAnsiText_ThrowsInsteadOfDropping()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = "机密" };
         var paragraph = new Paragraph();
@@ -220,7 +219,7 @@ public class CqGraphicsHardeningTests
     [Fact]
     public void RotatedContainer_RoundedTableWithBorderEdgesAndNoFills_Throws()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Rotation = 30 });

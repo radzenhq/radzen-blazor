@@ -10,7 +10,6 @@ using Radzen.Documents.Pdf;
 using Xunit;
 using Xunit.Sdk;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -50,12 +49,12 @@ public class AnnotationChangeTrackingMatrixTests
         return annotation;
     }
 
-    private static Document Loaded(Type type)
+    private static PortableDocument Loaded(Type type)
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(New(type));
         using var stream = new MemoryStream(source.ToArray());
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     [Fact]

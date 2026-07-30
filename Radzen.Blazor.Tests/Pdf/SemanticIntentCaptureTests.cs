@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Geometry;
 

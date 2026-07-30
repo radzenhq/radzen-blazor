@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -25,7 +24,7 @@ public class AnnotationTests
     [Fact]
     public void MalformedUriAnnotationIsRetainedAsUnmodeled()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20))
         {
             Uri = new Uri("http://a.co/"),
@@ -46,7 +45,7 @@ public class AnnotationTests
     [Fact]
     public void MalformedRectAnnotationDoesNotHideValidSibling()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var page = source.Pages.Add();
         page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { Uri = new Uri("https://bad.example/") });
         page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(40, 10, 20, 20)) { Contents = "valid" });
@@ -67,7 +66,7 @@ public class AnnotationTests
     [Fact]
     public void CreatedAnnotationKinds_SaveAndReloadTheirDeclarativeState()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         document.Pages.Add();
         page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 20, 24, 24)) { Contents = "note", Title = "author" });
@@ -104,7 +103,7 @@ public class AnnotationTests
     [Fact]
     public void LoadedAnnotations_CanEditAndRemove_WhileUnknownAnnotationIsPreserved()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var page = source.Pages.Add();
         page.Annotations.Add(new TextAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { Contents = "old" });
         page.Annotations.Add(new SquareAnnotation(PdfRect.FromSize(40, 10, 20, 20)));
@@ -129,7 +128,7 @@ public class AnnotationTests
     [Fact]
     public void Flatten_BurnsAnnotationAppearanceAndRemovesInteractivity()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
@@ -144,7 +143,7 @@ public class AnnotationTests
     [Fact]
     public void Flatten_LoadedAnnotationBurnsItsNormalAppearance()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(new SquareAnnotation(PdfRect.FromSize(20, 30, 100, 40))
         {
             Color = Color.Red,
@@ -179,7 +178,7 @@ public class AnnotationTests
     public void Flatten_DoesNotChangeWhatAnotherDocumentHoldingTheSamePagesSaves()
     {
         var first = Load(SharedResourcesWithAppearances());
-        var second = new Document();
+        var second = new PortableDocument();
         second.Append(first);
         var expected = second.ToArray();
 
@@ -258,11 +257,11 @@ public class AnnotationTests
     [Fact]
     public void EmptyAnnotationCollection_DoesNotChangeOutput()
     {
-        var first = new Document();
+        var first = new PortableDocument();
         first.Pages.Add().SetContent(Encoding.ASCII.GetBytes("plain"));
         var expected = first.ToArray();
 
-        var second = new Document();
+        var second = new PortableDocument();
         var page = second.Pages.Add();
         page.SetContent(Encoding.ASCII.GetBytes("plain"));
         _ = page.Annotations.Count;
@@ -273,7 +272,7 @@ public class AnnotationTests
     [Fact]
     public void TextMarkup_EmitsUpperQuadPointsBeforeLowerQuadPoints()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
 
         var reader = DocumentReader.Parse(document.ToArray());
@@ -286,7 +285,7 @@ public class AnnotationTests
     [Fact]
     public void InkAppearance_BoundsEncloseStrokePointsOutsideAnnotationBounds()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var ink = document.Pages.Add().Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(20, 180), new AnnotationPoint(160, 260) });
 
@@ -302,7 +301,7 @@ public class AnnotationTests
     [Fact]
     public void MarkupAreaOutsideBounds_ThrowsInsteadOfClipping()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var markup = document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
         markup.Areas.Add(PdfRect.FromSize(30, 50, 20, 12));
 
@@ -314,7 +313,7 @@ public class AnnotationTests
     [Fact]
     public void EditedLink_PreservesNamedDestinationObjectType()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 20, 100, 12)) { Destination = "chapter-one" });
         var bytes = ChangeLinkDestinationToName(source.ToArray());
         var document = Load(bytes);
@@ -327,10 +326,10 @@ public class AnnotationTests
         Assert.Equal("chapter-one", Assert.IsType<NameObject>(action["D"]).Value);
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     private static ArrayObject PageAnnotations(DocumentReader reader)

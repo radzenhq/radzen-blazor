@@ -4,7 +4,7 @@ using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class FormAppearanceService(Document document)
+internal sealed class FormAppearanceService(PortableDocument document)
 {
     private readonly List<(GraphImporter Importer, DictionaryObject Form)> appendedFormDefaults = [];
 

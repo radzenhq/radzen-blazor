@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class ReaderXrefFailureClassificationTests
 {
     private static byte[] ValidDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (body) Tj ET"));
         return document.ToArray();
     }

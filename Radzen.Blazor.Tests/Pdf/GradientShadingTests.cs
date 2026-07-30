@@ -126,7 +126,7 @@ public class GradientShadingTests
     [Fact]
     public void BoxGradient_PatternMatrix_MapsBoxRelativeTopOriginCoordinatesOntoTheBox()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {

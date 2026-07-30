@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -72,7 +71,7 @@ public class ImageStampOverlayRegressionTests
     [Fact]
     public void ImageStampOnAuthoredPage_EmitsVisibleImageXObject()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
@@ -93,7 +92,7 @@ public class ImageStampOverlayRegressionTests
     [Fact]
     public void ImageStampOnBuiltPage_RegistersXObjectInResources()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Helvetica");
 
@@ -107,7 +106,7 @@ public class ImageStampOverlayRegressionTests
     [Fact]
     public void ImageStampScalesAndPositionsFromRect()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
@@ -185,7 +184,7 @@ public class ImageStampOverlayRegressionTests
         document.Pages[0].Content.Add(new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650)));
 
         using var buffer = new MemoryStream(document.ToArray());
-        var reloaded = Document.LoadFromStream(buffer);
+        var reloaded = PortableDocument.LoadFromStream(buffer);
         var text = reloaded.Pages[0].ExtractText();
 
         Assert.Contains("Hello", text, StringComparison.Ordinal);

@@ -4,7 +4,6 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,7 +11,7 @@ public class DocumentLoaderAllocationTests
 {
     private static byte[] BuildLargeDocument(int padding)
     {
-        var document = new Document();
+        var document = new PortableDocument();
 
         var payload = new byte[padding];
         new Random(11).NextBytes(payload);
@@ -27,10 +26,10 @@ public class DocumentLoaderAllocationTests
         var bytes = BuildLargeDocument((256 * 1024) + 517);
 
         using var stream = new NonSeekableStream(bytes, 7000);
-        var chunked = Document.LoadFromStream(stream).ToArray();
+        var chunked = PortableDocument.LoadFromStream(stream).ToArray();
 
         using var seekable = new MemoryStream(bytes);
-        Assert.Equal(Document.LoadFromStream(seekable).ToArray(), chunked);
+        Assert.Equal(PortableDocument.LoadFromStream(seekable).ToArray(), chunked);
     }
 
     private sealed class NonSeekableStream(byte[] data, int maxRead = int.MaxValue) : Stream

@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,15 +13,15 @@ public class ByteIdentityTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    private static Document BuildThreePages()
+    private static PortableDocument BuildThreePages()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Identity";
         document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page zero) Tj ET"));
         document.Pages.Add(PageSizes.Letter).SetContent(Ascii("BT (page one) Tj ET"));

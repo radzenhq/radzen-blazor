@@ -5,16 +5,15 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AppendRemovePreservationTests
 {
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var input = new MemoryStream(bytes);
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     private static string Latin1(byte[] bytes) => Encoding.Latin1.GetString(bytes);
@@ -54,7 +53,7 @@ public class AppendRemovePreservationTests
     [Fact]
     public void Append_PageWithUriLink_KeepsUrl()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("cover"));
         target.Append(Load(LinkAnnotSource()));
 

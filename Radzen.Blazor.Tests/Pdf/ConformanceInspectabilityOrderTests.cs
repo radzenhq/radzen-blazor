@@ -4,7 +4,6 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,15 +30,15 @@ public class ConformanceInspectabilityOrderTests
         return pdf.ToArray();
     }
 
-    private static Document LoadedFontlessDocument()
+    private static PortableDocument LoadedFontlessDocument()
     {
         using var stream = new MemoryStream(LoadableFileWithFontlessText());
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
-    private static (Radzen.Documents.Document Document, DocumentRenderer Renderer) ConformingBuilder()
+    private static (Document Document, DocumentRenderer Renderer) ConformingBuilder()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         document.Info.Title = "Conformance";
         var section = document.Sections.Add();

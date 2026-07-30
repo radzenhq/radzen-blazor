@@ -2,7 +2,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal static class DocumentMerger
 {
-    internal static void Append(Document target, Document other)
+    internal static void Append(PortableDocument target, PortableDocument other)
     {
         var pageOffset = target.Pages.Count;
         foreach (var source in other.Pages)
@@ -12,8 +12,8 @@ internal static class DocumentMerger
     }
 
     internal static Page AppendPage(
-        Document target,
-        Document other,
+        PortableDocument target,
+        PortableDocument other,
         Page source,
         int sourcePageOffset,
         int sourcePageCount,

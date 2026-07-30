@@ -3,7 +3,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,9 +12,9 @@ public class TextFieldFlagsTests
     private const int PasswordFlag = 1 << 13;
     private const int CombFlag = 1 << 24;
 
-    private static Document BuildDocument()
+    private static PortableDocument BuildDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Form", "Helvetica");
         return new DocumentRenderer().Render(document);
@@ -24,7 +23,7 @@ public class TextFieldFlagsTests
     private static TextFieldDefinition PlainField()
         => new("Plain") { X = 100, Y = 700, Width = 250, Height = 20, Value = "hello" };
 
-    private static DocumentReader Reload(Document document)
+    private static DocumentReader Reload(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
 
     private static int FlagsOf(DocumentReader reader, DictionaryObject field)

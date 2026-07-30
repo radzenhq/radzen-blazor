@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -45,7 +44,7 @@ public class ChoiceValueAgreementTests
     [InlineData("(Red)", "Red")]
     public void ValueReportsTheSelectionAsADisplayString(string stored, string expected)
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
 
         Assert.Equal(expected, document.AcroForm!.Fields.Single().Value);
     }
@@ -55,7 +54,7 @@ public class ChoiceValueAgreementTests
     [InlineData("[(Red)]")]
     public void FlattenRefusesToPaintAMultiSelectionAsThatString(string stored)
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiSelectListForm(stored)));
 
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
@@ -63,7 +62,7 @@ public class ChoiceValueAgreementTests
     [Fact]
     public void FlattenPaintsASingleSelection()
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm("(Red)")));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiSelectListForm("(Red)")));
         document.Flatten();
 
         var content = FormTestSupport.PageContentText(FormTestSupport.Reload(document));

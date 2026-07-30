@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Radzen.Documents.Pdf.Emit;
 
-internal sealed class AttachmentWriter(Document document)
+internal sealed class AttachmentWriter(PortableDocument document)
 {
     public void WriteAttachments(DocumentWriter writer, DictionaryObject catalog)
     {

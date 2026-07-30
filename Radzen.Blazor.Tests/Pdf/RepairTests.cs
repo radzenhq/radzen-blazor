@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -110,7 +109,7 @@ public class RepairTests
             + "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] >>\nendobj\n"
             + "5 0 obj\n<< /Type /Catalog >>\nendobj\n");
 
-        var document = Document.LoadFromStream(new MemoryStream(data));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(data));
         var reader = document.Loaded!.Source!;
         var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
 

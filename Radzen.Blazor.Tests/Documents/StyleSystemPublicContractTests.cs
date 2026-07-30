@@ -7,16 +7,15 @@ using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
-using ModelDocument = Radzen.Documents.Document;
 
 namespace Radzen.Blazor.Documents.Tests;
 
 public class StyleSystemPublicContractTests
 {
-    private static TextContent RenderedText(ModelDocument document, string text)
+    private static TextContent RenderedText(Document document, string text)
     {
         using var stream = new MemoryStream(new DocumentRenderer().ToArray(document));
-        return Radzen.Documents.Pdf.Document
+        return PortableDocument
             .LoadFromStream(stream)
             .Pages
             .SelectMany(page => page.Content)
@@ -24,7 +23,7 @@ public class StyleSystemPublicContractTests
             .Single(content => content.Text == text);
     }
 
-    private static string TaggedPdf(ModelDocument document)
+    private static string TaggedPdf(Document document)
     {
         document.Language = "en-US";
         document.Info.Title = "Style contracts";
@@ -41,7 +40,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void RenderedFontUsesLocalThenNearestStyleThenDefaultPrecedence()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var root = document.Styles.Add("Root");
         root.Font.Size = 16;
         root.Font.Color = Color.Red;
@@ -71,7 +70,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void HeadingLevelUsesTheNearestStyleInTheBaseChain()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var root = document.Styles.Add("Root");
         root.HeadingLevel = 2;
         var middle = document.Styles.Add("Middle", "Root");
@@ -88,7 +87,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void BuiltInHeadingStyleSuppliesItsHeadingLevel()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         document.Sections.Add().Blocks.AddParagraph("Heading").StyleName = "Heading3";
 
         Assert.Contains("/S /H3", TaggedPdf(document), StringComparison.Ordinal);
@@ -156,7 +155,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void UnsetParagraphValuesResolveToTheBuiltInDefaults()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var paragraph = document.Sections.Add().Blocks.AddParagraph("Default");
 
         var format = document.Resolve(paragraph);
@@ -173,7 +172,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void ParagraphValuesResolveThroughTheNamedStyleChain()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var root = document.Styles.Add("Root");
         root.LeftIndent = "30pt";
         root.KeepWithNext = true;
@@ -195,7 +194,7 @@ public class StyleSystemPublicContractTests
 
     [Fact]
     public void ResolveRejectsAParagraphOutsideTheDocument()
-        => Assert.Throws<ArgumentException>(() => new ModelDocument().Resolve(new Paragraph { Text = "Detached" }));
+        => Assert.Throws<ArgumentException>(() => new Document().Resolve(new Paragraph { Text = "Detached" }));
 
     [Theory]
     [InlineData(0)]
@@ -258,7 +257,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void MissingBaseStyleReferenceFailsWhenRenderedWithTheFullChain()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         document.Styles.Add("Leaf").BaseStyle = "Absent";
         document.Sections.Add().Blocks.AddParagraph("Text").StyleName = "Leaf";
 
@@ -270,7 +269,7 @@ public class StyleSystemPublicContractTests
     [Fact]
     public void BaseStyleCycleIsRejectedWhenRenderedWithTheFullChain()
     {
-        var document = new ModelDocument();
+        var document = new Document();
         var first = document.Styles.Add("First");
         document.Styles.Add("Second", "First");
         first.BaseStyle = "Second";

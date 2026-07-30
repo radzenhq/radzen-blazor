@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -15,7 +14,7 @@ public class ContentEditorNestedTextObjectTests
     [Fact]
     public void ModifiedTextInsideTextObject_DoesNotNestTextObjects()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -30,7 +29,7 @@ public class ContentEditorNestedTextObjectTests
     [Fact]
     public void ModifiedTextInsideTextObject_KeepsFollowingRunsPosition()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);
@@ -49,7 +48,7 @@ public class ContentEditorNestedTextObjectTests
     [Fact]
     public void ModifiedTextInsideTextObject_DoesNotLeakStateOntoFollowingRuns()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Ascii("BT /F1 12 Tf 10 10 Td (Hi) Tj 5 0 Td (There) Tj ET"));
 
         var loaded = InterpreterTestSupport.SaveAndLoad(document);

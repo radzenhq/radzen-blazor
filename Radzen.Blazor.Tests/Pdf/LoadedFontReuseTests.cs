@@ -3,7 +3,6 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -42,10 +41,10 @@ public class LoadedFontReuseTests
         return pdf.ToArray();
     }
 
-    private static Document Load(byte[] bytes)
+    private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
-        return Document.LoadFromStream(stream);
+        return PortableDocument.LoadFromStream(stream);
     }
 
     [Fact]
@@ -71,7 +70,7 @@ public class LoadedFontReuseTests
     public void AppendedPage_ReusesTheDonorReversedFont()
     {
         var source = Load(SharedFontDocument(2));
-        var target = new Document();
+        var target = new PortableDocument();
         target.Append(source);
 
         Assert.Same(source.Pages[0].TextFonts!["F1"], target.Pages[0].TextFonts!["F1"]);

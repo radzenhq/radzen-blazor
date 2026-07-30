@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -34,7 +33,7 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void LoadedLinkWithUnsupportedAction_FlattensWithoutThrowing()
     {
-        var document = Document.LoadFromStream(new MemoryStream(LoadedLaunchLinkPdf()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(LoadedLaunchLinkPdf()));
 
         document.Flatten();
 
@@ -63,14 +62,14 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void LoadedModifiedInvalidAnnotation_IsRejectedOnFlattenLikeOnSave()
     {
-        var document = Document.LoadFromStream(new MemoryStream(LoadedHighlightPdf()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(LoadedHighlightPdf()));
         var markup = Assert.IsType<HighlightAnnotation>(document.Pages[0].Annotations[0]);
         markup.Areas.Clear();
 
         Assert.Throws<InvalidOperationException>(document.Flatten);
     }
 
-    private static string FlattenedContent(Document document)
+    private static string FlattenedContent(PortableDocument document)
     {
         document.Flatten();
         var reader = DocumentReader.Parse(document.ToArray());
@@ -80,9 +79,9 @@ public class AnnotationFlattenValidationTests
             : string.Empty;
     }
 
-    private static Document InvalidMarkup()
+    private static PortableDocument InvalidMarkup()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var markup = document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
         markup.Areas.Add(PdfRect.FromSize(30, 50, 20, 12));
         return document;
@@ -91,7 +90,7 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void VisibleAnnotation_IsPainted()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
@@ -101,11 +100,11 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void TranslucentAnnotation_FlattensWithItsOpacity()
     {
-        var opaque = new Document();
+        var opaque = new PortableDocument();
         opaque.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
-        var translucent = new Document();
+        var translucent = new PortableDocument();
         translucent.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow, Opacity = 0.4 });
 
@@ -116,7 +115,7 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void HiddenAnnotation_IsClearedButNotPainted()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15))
         {
@@ -143,7 +142,7 @@ public class AnnotationFlattenValidationTests
     [Fact]
     public void EmptyStampName_IsRejectedOnFlattenLikeOnSave()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(new StampAnnotation(PdfRect.FromSize(40, 160, 80, 30)) { Name = "  " });
 
         var exception = Assert.Throws<InvalidOperationException>(document.Flatten);

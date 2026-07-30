@@ -7,7 +7,6 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfUaCatalogPreservationTests
@@ -42,9 +41,9 @@ public class PdfUaCatalogPreservationTests
         return pdf.ToArray();
     }
 
-    private static Document LoadAsPdfUa()
+    private static PortableDocument LoadAsPdfUa()
     {
-        var document = Document.LoadFromStream(new MemoryStream(SourceWithIndirectPrefsAndMetadata()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(SourceWithIndirectPrefsAndMetadata()));
         document.Pages.RemoveAt(0);
         document.Append(TaggedPage());
 
@@ -55,9 +54,9 @@ public class PdfUaCatalogPreservationTests
         return document;
     }
 
-    private static Document TaggedPage()
+    private static PortableDocument TaggedPage()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         document.Info.Title = "Accessible Title";
         document.Language = "en-US";

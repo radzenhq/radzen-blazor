@@ -320,7 +320,7 @@ internal static class PageResourceBuilder
         }
     }
 
-    public static void EmitPageGeometry(Document document, Page page, DictionaryObject node)
+    public static void EmitPageGeometry(PortableDocument document, Page page, DictionaryObject node)
     {
         node["MediaBox"] = MediaBox(document, page);
 
@@ -348,7 +348,7 @@ internal static class PageResourceBuilder
         }
     }
 
-    private static void EmitAuxiliaryBox(Document document, DictionaryObject node, Page page, string key, PdfRect? value)
+    private static void EmitAuxiliaryBox(PortableDocument document, DictionaryObject node, Page page, string key, PdfRect? value)
     {
         if (value is not null)
         {
@@ -363,7 +363,7 @@ internal static class PageResourceBuilder
         }
     }
 
-    public static ArrayObject MediaBox(Document document, Page page)
+    public static ArrayObject MediaBox(PortableDocument document, Page page)
     {
         if (page.MediaBoxSet)
         {

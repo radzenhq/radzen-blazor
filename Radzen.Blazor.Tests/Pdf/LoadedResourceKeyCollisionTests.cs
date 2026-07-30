@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -55,7 +54,7 @@ public class LoadedResourceKeyCollisionTests
     public void FullReencode_AddingBase14Text_DoesNotClobberLoadedFont()
     {
         using var stream = new MemoryStream(Fixture());
-        var document = Document.LoadFromStream(stream);
+        var document = PortableDocument.LoadFromStream(stream);
         var page = document.Pages[0];
 
         var existing = page.Content.OfType<TextContent>().First();

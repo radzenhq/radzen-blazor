@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,9 +16,9 @@ public class DocumentDateProducerTests
     private static readonly DateTimeOffset Modified =
         new(2024, 3, 20, 8, 15, 45, TimeSpan.FromHours(-5));
 
-    private static Document Document(bool withMetadata)
+    private static PortableDocument Document(bool withMetadata)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Report";
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (hi) Tj ET"));
         if (withMetadata)

@@ -9,7 +9,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -103,7 +102,7 @@ public class ConcurrentDocumentReadTests
     [Fact]
     public void SequentialFieldValueReadsReturnEachFieldsOwnValue()
     {
-        var document = Document.LoadFromStream(new MemoryStream(FormSource()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(FormSource()));
         var fields = document.AcroForm!.Fields;
 
         Assert.Equal(FieldCount, fields.Count);
@@ -121,7 +120,7 @@ public class ConcurrentDocumentReadTests
 
         for (var round = 0; round < Rounds; round++)
         {
-            var document = Document.LoadFromStream(new MemoryStream(source));
+            var document = PortableDocument.LoadFromStream(new MemoryStream(source));
             var fields = document.AcroForm!.Fields;
             var current = round;
 
@@ -166,7 +165,7 @@ public class ConcurrentDocumentReadTests
             {
                 var exception = Record.Exception(() =>
                 {
-                    var document = Document.LoadFromStream(new MemoryStream(source));
+                    var document = PortableDocument.LoadFromStream(new MemoryStream(source));
                     var content = document.Pages[0].GetContent();
                     if (content is not null && !content.AsSpan().SequenceEqual("(hello)"u8))
                     {

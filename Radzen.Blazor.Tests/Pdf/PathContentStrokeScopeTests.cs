@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,7 +12,7 @@ public class PathContentStrokeScopeTests
 {
     private static IReadOnlyList<string> Operators(params PathContent[] paths)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         foreach (var path in paths)
         {

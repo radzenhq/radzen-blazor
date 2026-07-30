@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,14 +17,14 @@ public class ColorAlphaTests
         return paragraph;
     }
 
-    private static string PageText(Radzen.Documents.Document document)
+    private static string PageText(Document document)
     {
         var reader = BuildTestSupport.Read(document);
         var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
         return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
     }
 
-    private static DictionaryObject? ExtGStates(Radzen.Documents.Document document)
+    private static DictionaryObject? ExtGStates(Document document)
     {
         var reader = BuildTestSupport.Read(document);
         var (_, resources) = BuildTestSupport.PageLeaves(reader)[0];
@@ -39,9 +38,9 @@ public class ColorAlphaTests
     private static double Alpha(DictionaryObject states, string key, string entry)
         => ((NumberObject)((DictionaryObject)states[key]!)[entry]!).DoubleValue;
 
-    private static Radzen.Documents.Document TextColor(Color color)
+    private static Document TextColor(Color color)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Faded").Font.Color = color;
@@ -84,7 +83,7 @@ public class ColorAlphaTests
     [Fact]
     public void FontColorAlpha_MultipliesWithRunOpacity()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Faded");
@@ -100,7 +99,7 @@ public class ColorAlphaTests
     [Fact]
     public void TranslucentBackground_FillPaintsThroughExtGState()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
@@ -121,7 +120,7 @@ public class ColorAlphaTests
     [Fact]
     public void TranslucentBorderColor_StrokePaintsThroughExtGState()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container());
         container.Borders.Width = 2;
@@ -136,7 +135,7 @@ public class ColorAlphaTests
     [Fact]
     public void ShadowColorAlpha_IsNotAppliedTwice()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
@@ -161,7 +160,7 @@ public class ColorAlphaTests
     {
         static byte[] Content(bool explicitAlpha)
         {
-            var document = new Radzen.Documents.Document();
+            var document = new Document();
             var section = document.Sections.Add();
             var paragraph = new Paragraph();
             paragraph.Inlines.Add("Plain").Font.Color =
@@ -187,7 +186,7 @@ public class ColorAlphaTests
 
     private static string DirectContent(ContentElement element)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(element);
         return Encoding.ASCII.GetString(

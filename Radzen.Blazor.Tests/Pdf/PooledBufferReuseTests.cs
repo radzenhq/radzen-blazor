@@ -3,7 +3,6 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -11,7 +10,7 @@ public class PooledBufferReuseTests
 {
     private static byte[] BuildInvoiceLike()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice 12345", BuildTestSupport.Latin, 18);
@@ -32,7 +31,7 @@ public class PooledBufferReuseTests
     [Fact]
     public void RepeatedLoadMaterializeReencode_ProduceByteIdenticalContent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii("10 10 100 50 re f\nBT (hello) Tj ET"));
         var original = document.ToArray();

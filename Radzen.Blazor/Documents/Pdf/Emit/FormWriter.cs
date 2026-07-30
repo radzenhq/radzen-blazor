@@ -11,7 +11,7 @@ internal sealed class FormWriter
     private readonly AppendedFormImporter appendedFormImporter;
     private readonly LoadedFormPreserver loadedFormPreserver;
 
-    public FormWriter(Document document)
+    public FormWriter(PortableDocument document)
     {
         flattener = new FormFlattener(document);
         appearances = new FormAppearanceService(document);

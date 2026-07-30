@@ -5,7 +5,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -13,9 +12,9 @@ public class DocumentMetadataEditingTests
 {
     private const string CustomNamespace = "urn:radzen:test:metadata";
 
-    private static Document SourceDocument()
+    private static PortableDocument SourceDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (one) Tj ET"));
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (two) Tj ET"));
 
@@ -30,8 +29,8 @@ public class DocumentMetadataEditingTests
         return document;
     }
 
-    private static Document Load(byte[] bytes)
-        => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes)
+        => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     [Fact]
     public void LoadedOutlineAttachmentsAndPageLabels_CanBeReadEditedAndReloaded()
@@ -80,7 +79,7 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void LoadedNamedOutline_RemainsNavigableWhenUntouched()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Named destination").Anchor = "destination";
@@ -119,7 +118,7 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void XmpPacket_InvalidXmlThrows()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         Assert.Throws<InvalidDataException>(() => document.Xmp.SetPacket(Encoding.UTF8.GetBytes("<not-closed>")));
         Assert.Throws<InvalidDataException>(() => document.Xmp.SetPacket(Encoding.UTF8.GetBytes("<xml />")));
     }
@@ -127,7 +126,7 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void LoadedPdfA_XmpPacketIsUnchangedWhenNewApiIsUnused()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
@@ -145,7 +144,7 @@ public class DocumentMetadataEditingTests
     [Fact]
     public void CallerEditedXmp_WithConformanceThrows()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var renderer = new DocumentRenderer { Conformance = PdfAConformance.PdfA3B };
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();

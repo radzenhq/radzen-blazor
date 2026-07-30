@@ -3,7 +3,6 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -38,7 +37,7 @@ public class InheritedDefaultAppearanceTests
         return Wrap(pdf, 8);
     }
 
-    private static Document Load() => Document.LoadFromStream(new MemoryStream(ParentDefaultAppearanceForm()));
+    private static PortableDocument Load() => PortableDocument.LoadFromStream(new MemoryStream(ParentDefaultAppearanceForm()));
 
     [Fact]
     public void FillFieldBakesFontSizeFromNonTerminalParentDefaultAppearance()

@@ -4,7 +4,6 @@ using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -31,8 +30,8 @@ public class DocumentOutputConfigTests
         Direction = PdfReadingDirection.RightToLeft,
     };
 
-    private static Radzen.Documents.Pdf.Document Load(byte[] bytes)
-        => Radzen.Documents.Pdf.Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes)
+        => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     [Fact]
     public void ViewerPreferences_ThroughBuilder_EqualsOldMutatePath()

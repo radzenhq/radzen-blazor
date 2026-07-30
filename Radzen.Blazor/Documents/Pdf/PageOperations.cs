@@ -6,14 +6,14 @@ namespace Radzen.Documents.Pdf;
 
 internal static class PageOperations
 {
-    internal static Document Snapshot(Document source)
+    internal static PortableDocument Snapshot(PortableDocument source)
     {
         var bytes = source.ToArray();
         var limits = source.Loaded?.Source?.Limits ?? ReaderLimits.Default;
-        return Document.LoadFromStream(new MemoryStream(bytes, writable: false), limits);
+        return PortableDocument.LoadFromStream(new MemoryStream(bytes, writable: false), limits);
     }
 
-    internal static bool CanImportDirectly(Document target, Document source, int offset, int length)
+    internal static bool CanImportDirectly(PortableDocument target, PortableDocument source, int offset, int length)
     {
         if (ReferenceEquals(target, source) || source.FormFields.Count > 0
             || source.Loaded is not { Source: not null } state)
@@ -35,21 +35,21 @@ internal static class PageOperations
         return true;
     }
 
-    internal static IReadOnlyList<Page> ImportIsolated(Document target, Document source, int offset, int length)
+    internal static IReadOnlyList<Page> ImportIsolated(PortableDocument target, PortableDocument source, int offset, int length)
     {
-        var staging = new Document();
+        var staging = new PortableDocument();
         Import(staging, source, offset, length);
         return Import(target, Snapshot(staging), 0, length);
     }
 
-    internal static Document Extract(Document snapshot, int offset, int length)
+    internal static PortableDocument Extract(PortableDocument snapshot, int offset, int length)
     {
-        var result = new Document();
+        var result = new PortableDocument();
         Import(result, snapshot, offset, length);
         return result;
     }
 
-    internal static IReadOnlyList<Page> Import(Document target, Document snapshot, int offset, int length)
+    internal static IReadOnlyList<Page> Import(PortableDocument target, PortableDocument snapshot, int offset, int length)
     {
         var imported = new List<Page>(length);
         var targetPageOffset = target.Pages.Count;

@@ -6,16 +6,15 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ForeignPageInsertTests
 {
-    private static Document LoadedWithText(string text)
+    private static PortableDocument LoadedWithText(string text)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent(text, 72, 700) { Font = new Font { Size = 12 } });
         return InterpreterTestSupport.Load(document.ToArray());
     }
@@ -37,7 +36,7 @@ public class ForeignPageInsertTests
     public void Insert_ForeignLoadedPage_EmitsResourcesForRetainedContent()
     {
         var source = LoadedWithText("Hello foreign page");
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Pages.Insert(0, source.Pages[0]);
 
@@ -50,7 +49,7 @@ public class ForeignPageInsertTests
     public void Insert_ForeignLoadedPage_ResourcesNameMatchesContentStream()
     {
         var source = LoadedWithText("Hello foreign page");
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Pages.Insert(0, source.Pages[0]);
 
@@ -84,7 +83,7 @@ public class ForeignPageInsertTests
     public void Insert_ForeignLoadedPage_LeavesDonorSaveIntact()
     {
         var source = LoadedWithText("Hello foreign page");
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Pages.Insert(0, source.Pages[0]);
 
@@ -96,9 +95,9 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ForeignBuiltPage_EmitsResources()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Content.Add(new TextContent("Built page", 72, 700) { Font = new Font { Size = 12 } });
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Pages.Insert(0, source.Pages[0]);
 
@@ -110,7 +109,7 @@ public class ForeignPageInsertTests
     public void Insert_InvalidIndex_DoesNotAdoptPage()
     {
         var source = LoadedWithText("Hello foreign page");
-        var target = new Document();
+        var target = new PortableDocument();
 
         Assert.Throws<ArgumentOutOfRangeException>(() => target.Pages.Insert(3, source.Pages[0]));
         Assert.Empty(target.Pages);
@@ -122,10 +121,10 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ForeignLoadedPage_MatchesImportPageResources()
     {
-        var inserted = new Document();
+        var inserted = new PortableDocument();
         inserted.Pages.Insert(0, LoadedWithText("Hello foreign page").Pages[0]);
 
-        var imported = new Document();
+        var imported = new PortableDocument();
         imported.ImportPage(LoadedWithText("Hello foreign page"), 0);
 
         var insertedReader = DocumentReader.Parse(inserted.ToArray());
@@ -139,12 +138,12 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ForeignLoadedPage_PreservesUnmodifiedAnnotations()
     {
-        var sourceDocument = new Document();
+        var sourceDocument = new PortableDocument();
         sourceDocument.Pages.Add().Annotations.Add(
             new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "note" });
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Insert(0, source.Pages[0]);
 
         var reader = DocumentReader.Parse(target.ToArray());
@@ -156,13 +155,13 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ForeignLoadedPage_DropsCrossPageLinkAndDoesNotLeakTargetPage()
     {
-        var sourceDocument = new Document();
+        var sourceDocument = new PortableDocument();
         sourceDocument.Pages.Add().Annotations.Add(
             new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
         sourceDocument.Pages.Add();
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Insert(0, source.Pages[0]);
 
         var bytes = target.ToArray();
@@ -176,13 +175,13 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ForeignLink_RetargetedToCurrentDocument_IsEmitted()
     {
-        var sourceDocument = new Document();
+        var sourceDocument = new PortableDocument();
         sourceDocument.Pages.Add().Annotations.Add(
             new LinkAnnotation(PdfRect.FromSize(10, 10, 20, 20)) { TargetPageIndex = 1 });
         sourceDocument.Pages.Add();
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add();
         target.Pages.Insert(1, source.Pages[0]);
         Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[0]).TargetPageIndex = 0;
@@ -196,7 +195,7 @@ public class ForeignPageInsertTests
     [Fact]
     public void Insert_ModifiedForeignAnnotationImportsUnmanagedValuesFromEntryReader()
     {
-        var sourceDocument = new Document();
+        var sourceDocument = new PortableDocument();
         sourceDocument.Info.Title = "foreign-info";
         sourceDocument.Pages.Add().Annotations.Add(
             new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "before" });
@@ -206,7 +205,7 @@ public class ForeignPageInsertTests
         var sourceAnnotation = sourceReader.AsDictionary(Assert.Single(sourceReader.GetArray(sourcePage, "Annots")!))!;
         sourceAnnotation["ForeignInfo"] = sourceReader.Trailer["Info"];
 
-        var targetDocument = new Document();
+        var targetDocument = new PortableDocument();
         targetDocument.Info.Title = "target-info";
         targetDocument.Pages.Add();
         var target = InterpreterTestSupport.Load(targetDocument.ToArray());

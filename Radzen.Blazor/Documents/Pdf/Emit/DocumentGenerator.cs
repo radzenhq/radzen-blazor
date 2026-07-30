@@ -132,13 +132,13 @@ internal sealed class DocumentGenerator
             laidOut.Fonts.AllowUnsupportedCharacters);
     }
 
-    public static Document Generate(Radzen.Documents.Document document, CapturedRendererSettings settings)
+    public static PortableDocument Generate(Document document, CapturedRendererSettings settings)
         => new DocumentGenerator(settings, DocumentLayouter.Layout(document)).Run();
 
-    internal static Document Generate(CapturedRendererSettings settings, LaidOutDocument laidOut)
+    internal static PortableDocument Generate(CapturedRendererSettings settings, LaidOutDocument laidOut)
         => new DocumentGenerator(settings, laidOut).Run();
 
-    private Document Run()
+    private PortableDocument Run()
     {
         var output = settings.Document;
         output.FontSnapshot = laidOut.Fonts;

@@ -42,7 +42,7 @@ public class MeasurementUnitSurfaceTests
     {
         Assert.Null(new Font().Size);
 
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var paragraph = document.Sections.Add().Blocks.Add(new Paragraph { Text = "x" });
 
         Assert.Equal(10, document.Resolve(paragraph).Font.Size.Point);
@@ -136,7 +136,7 @@ public class MeasurementUnitSurfaceTests
     [Fact]
     public void RelativeGradient_ResolvesAgainstTheContainerBox()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {

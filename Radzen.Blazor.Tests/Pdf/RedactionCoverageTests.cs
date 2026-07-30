@@ -6,7 +6,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class RedactionCoverageTests
 {
     private const string InlineImage = "BI /W 1 /H 1 /BPC 8 /CS /G ID * EI";
 
-    private static Document LoadedDocument(string streamData)
+    private static PortableDocument LoadedDocument(string streamData)
     {
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
         var pdf = new FixturePdf()
@@ -35,13 +34,13 @@ public class RedactionCoverageTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
-    private static string SavedContent(Document document)
+    private static string SavedContent(PortableDocument document)
         => Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 
-    private static Document LoadedInlineImageDocument()
+    private static PortableDocument LoadedInlineImageDocument()
         => LoadedDocument($"q 100 0 0 100 10 10 cm {InlineImage} Q 450 450 10 10 re f");
 
     [Fact]

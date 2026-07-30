@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// The base definition of an interactive form field to create on a
-/// <see cref="Document"/>. Add definitions to <see cref="Document.FormFields"/>.
+/// <see cref="PortableDocument"/>. Add definitions to <see cref="PortableDocument.FormFields"/>.
 /// </summary>
 public abstract class FormFieldDefinition
 {

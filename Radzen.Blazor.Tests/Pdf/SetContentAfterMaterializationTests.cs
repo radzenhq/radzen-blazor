@@ -4,7 +4,6 @@ using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -14,14 +13,14 @@ public class SetContentAfterMaterializationTests
     private const string Original = "10 10 100 100 re f\n";
     private const string Replacement = "1 1 2 2 re f\n";
 
-    private static Document LoadedPathDocument()
+    private static PortableDocument LoadedPathDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes(Original));
         return InterpreterTestSupport.Load(document.ToArray());
     }
 
-    private static string SavedPageContent(Document document)
+    private static string SavedPageContent(PortableDocument document)
         => Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
 
     [Fact]
@@ -71,7 +70,7 @@ public class SetContentAfterMaterializationTests
     [Fact]
     public void SetContent_AfterMaterialization_ReplacedTextIsGone()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().Content.Add(new TextContent("Before", 72, 700) { Font = new Font { Size = 12 } });
         var loaded = InterpreterTestSupport.Load(document.ToArray());
         var page = loaded.Pages[0];

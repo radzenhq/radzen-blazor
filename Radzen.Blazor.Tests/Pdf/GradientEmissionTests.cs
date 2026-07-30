@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ public class GradientEmissionTests
     [Fact]
     public void GradientBoxBackground_EmitsPatternFill_AndShadingResource()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container
         {
@@ -42,7 +41,7 @@ public class GradientEmissionTests
     [Fact]
     public void PathGradientFill_EmitsPatternFill_AndShadingResource()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = new PathContent
         {

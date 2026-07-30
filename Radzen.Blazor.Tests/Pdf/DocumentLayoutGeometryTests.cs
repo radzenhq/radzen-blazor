@@ -9,7 +9,6 @@ using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Emit;
 using Xunit;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Geometry;
@@ -100,9 +99,9 @@ public class DocumentLayoutGeometryTests
         return paragraph;
     }
 
-    internal static Radzen.Documents.Document FlowDocument()
+    internal static Document FlowDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(220));
@@ -120,9 +119,9 @@ public class DocumentLayoutGeometryTests
         return document;
     }
 
-    internal static Radzen.Documents.Document TableDocument()
+    internal static Document TableDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(240));
@@ -146,9 +145,9 @@ public class DocumentLayoutGeometryTests
         return document;
     }
 
-    internal static Radzen.Documents.Document GraphicsDocument()
+    internal static Document GraphicsDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(500));
@@ -177,9 +176,9 @@ public class DocumentLayoutGeometryTests
         return document;
     }
 
-    internal static Radzen.Documents.Document CodeDocument()
+    internal static Document CodeDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
@@ -190,9 +189,9 @@ public class DocumentLayoutGeometryTests
         return document;
     }
 
-    internal static Radzen.Documents.Document TableOfContentsDocument()
+    internal static Document TableOfContentsDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         var front = document.Sections.Add();
         front.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(220));
@@ -255,7 +254,7 @@ public class DocumentLayoutGeometryTests
     [Fact]
     public void Layout_NumbersPagesContinuouslyAcrossSections()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.Add(Text("First"));
         document.Sections.Add().Blocks.Add(Text("Second"));
@@ -329,7 +328,7 @@ public class DocumentLayoutGeometryTests
         Assert.Equal("%PDF", Encoding.ASCII.GetString(bytes, 0, 4));
     }
 
-    private static Radzen.Documents.Document Document(string kind) => kind switch
+    private static Document Document(string kind) => kind switch
     {
         "flow" => FlowDocument(),
         "table" => TableDocument(),

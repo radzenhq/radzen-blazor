@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,8 +32,8 @@ public class AppendRotateCropTests
         return pdf.ToArray();
     }
 
-    private static Document Load(string pageExtra)
-        => Document.LoadFromStream(new MemoryStream(Build(pageExtra)));
+    private static PortableDocument Load(string pageExtra)
+        => PortableDocument.LoadFromStream(new MemoryStream(Build(pageExtra)));
 
     private static DictionaryObject Kid(DocumentReader reader, int index)
     {
@@ -47,7 +46,7 @@ public class AppendRotateCropTests
     [Fact]
     public void AppendedLoadedPage_KeepsRotateAndCropBox()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(Load("/Rotate 90 /CropBox [10 20 200 400]"));
 
@@ -68,10 +67,10 @@ public class AppendRotateCropTests
     {
         var b = Load("/Rotate 270 /CropBox [5 5 100 100]");
 
-        var c = new Document();
+        var c = new PortableDocument();
         c.Append(b);
 
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         a.Append(c);
 
@@ -86,7 +85,7 @@ public class AppendRotateCropTests
     [Fact]
     public void AppendedPlainLoadedPage_HasNoRotateOrCropBox()
     {
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(Load(""));
 

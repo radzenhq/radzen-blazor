@@ -5,15 +5,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PageBoxTests
 {
-    private static Document WithBoxes()
+    private static PortableDocument WithBoxes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.A4);
         page.SetContent(Encoding.ASCII.GetBytes("BT (b) Tj ET"));
         page.BleedBox = PdfRect.FromSize(10, 10, 575, 821);
@@ -51,7 +50,7 @@ public class PageBoxTests
         var save1 = WithBoxes().ToArray();
 
         using var stream = new MemoryStream(save1);
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
         var save2 = reloaded.ToArray();
 
         var reader = DocumentReader.Parse(save2);
@@ -65,7 +64,7 @@ public class PageBoxTests
     public void UserBox_OverridesPreservedSourceBox()
     {
         using var stream = new MemoryStream(WithBoxes().ToArray());
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
         reloaded.Pages[0].TrimBox = PdfRect.FromSize(0, 0, 595, 842);
         var reader = DocumentReader.Parse(reloaded.ToArray());
         Assert.Equal(new[] { 0.0, 0, 595, 842 }, Box(reader, ContentTestHelpers.Kid(reader, 0), "TrimBox"));
@@ -74,9 +73,9 @@ public class PageBoxTests
     [Fact]
     public void NoBoxes_EmitsNothing_AndByteIdentical()
     {
-        Document Plain()
+        PortableDocument Plain()
         {
-            var document = new Document();
+            var document = new PortableDocument();
             document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (b) Tj ET"));
             return document;
         }
@@ -92,7 +91,7 @@ public class PageBoxTests
     [Fact]
     public void NonFiniteAuxiliaryBox_IsRejectedAtAssignment()
     {
-        var page = new Document().Pages.Add(PageSizes.A4);
+        var page = new PortableDocument().Pages.Add(PageSizes.A4);
 
         Assert.Throws<System.ArgumentOutOfRangeException>(() => page.BleedBox = new PdfRect(0, 0, double.NaN, 100));
         Assert.Throws<System.ArgumentOutOfRangeException>(() => page.TrimBox = new PdfRect(0, 0, 100, double.PositiveInfinity));

@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -15,17 +14,17 @@ public class AppendMergeTests
 {
     private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
 
-    private static Document BuildA()
+    private static PortableDocument BuildA()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().SetContent(Ascii("A0-content"));
         a.Pages.Add().SetContent(Ascii("shared-bytes"));
         return a;
     }
 
-    private static Document BuildB()
+    private static PortableDocument BuildB()
     {
-        var b = new Document();
+        var b = new PortableDocument();
         b.Pages.Add().SetContent(Ascii("B0-content"));
         b.Pages.Add().SetContent(Ascii("shared-bytes"));
         b.Pages.Add().SetContent(Ascii("B2-content"));
@@ -128,12 +127,12 @@ public class AppendMergeTests
     [Fact]
     public void Append_DeepCopiesModeledAnnotationScalarAndAppearanceState()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var annotation = source.Pages.Add().Annotations.Add(
             new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "original" });
         annotation.Appearance = new AnnotationAppearance();
         annotation.Appearance.Content.Add(new TextContent("appearance", Unit.FromPoint(1), Unit.FromPoint(2)));
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Append(source);
         annotation.Contents = "mutated";
@@ -152,11 +151,11 @@ public class AppendMergeTests
     [Fact]
     public void Append_RebasesModeledLinkTargetsAfterExistingPages()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(
             new LinkAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { TargetPageIndex = 1 });
         source.Pages.Add();
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add();
 
         target.Append(source);
@@ -169,13 +168,13 @@ public class AppendMergeTests
     [Fact]
     public void Append_NonIntactFallbackRebasesModeledLinkAndKeepsUriLink()
     {
-        var source = new Document();
+        var source = new PortableDocument();
         var page = source.Pages.Add();
         page.SetContent(Ascii("edited source content"));
         page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { TargetPageIndex = 1 });
         page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(50, 20, 30, 40)) { Uri = new System.Uri("https://example.com/") });
         source.Pages.Add();
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add();
 
         target.Append(source);
@@ -189,15 +188,15 @@ public class AppendMergeTests
     [Fact]
     public void Append_ResolvedNamedDestinationBecomesRebasedPageLinkAndKeepsUriLink()
     {
-        var source = Document.LoadFromStream(new MemoryStream(NamedDestinationPreservationTests.Source()));
+        var source = PortableDocument.LoadFromStream(new MemoryStream(NamedDestinationPreservationTests.Source()));
         source.Pages[0].Annotations.Add(
             new LinkAnnotation(PdfRect.FromSize(120, 10, 100, 20)) { Uri = new System.Uri("https://example.com/") });
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add();
 
         target.Append(source);
         var bytes = target.ToArray();
-        var reloaded = Document.LoadFromStream(new MemoryStream(bytes));
+        var reloaded = PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
         var pageLink = Assert.IsType<LinkAnnotation>(reloaded.Pages[1].Annotations[0]);
         Assert.Null(pageLink.Destination);
@@ -220,7 +219,7 @@ public class AppendMergeTests
     [Fact]
     public void Append_PreservesUnmanagedKeysOfUnmodifiedLoadedAnnotation()
     {
-        var sourceDocument = new Document();
+        var sourceDocument = new PortableDocument();
         sourceDocument.Pages.Add().Annotations.Add(
             new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "note" });
         var source = InterpreterTestSupport.Load(sourceDocument.ToArray());
@@ -230,7 +229,7 @@ public class AppendMergeTests
             Assert.Single(sourceReader.GetArray(sourcePage, "Annots")!))!;
         sourceAnnotation["Custom"] = new StringObject("keep-me");
 
-        var target = new Document();
+        var target = new PortableDocument();
         target.Pages.Add();
         target.Append(source);
 
@@ -308,7 +307,7 @@ public class AppendMergeTests
     [Fact]
     public void ExtractPage_WithUnmodeledCrossPageLink_DoesNotLeakExcludedPage()
     {
-        var source = Document.LoadFromStream(new MemoryStream(UnmodeledCrossPageLinkPdf()));
+        var source = PortableDocument.LoadFromStream(new MemoryStream(UnmodeledCrossPageLinkPdf()));
 
         var bytes = source.Pages.ExtractPages(0..1).ToArray();
 
@@ -319,8 +318,8 @@ public class AppendMergeTests
     [Fact]
     public void Append_ForeignUriLinkPreservesUnmanagedKeys()
     {
-        var source = Document.LoadFromStream(new MemoryStream(UriLinkWithUnmanagedKeyPdf()));
-        var target = new Document();
+        var source = PortableDocument.LoadFromStream(new MemoryStream(UriLinkWithUnmanagedKeyPdf()));
+        var target = new PortableDocument();
         target.Pages.Add();
 
         target.Append(source);
@@ -334,14 +333,14 @@ public class AppendMergeTests
     [Fact]
     public void Append_OfAppendedContentPage_CarriesResources()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().Content.Add(new TextContent("hello", 72, 700) { Font = new Font { Size = 12 } });
         var loadedA = InterpreterTestSupport.Load(a.ToArray());
 
-        var b = new Document();
+        var b = new PortableDocument();
         b.Append(loadedA);
 
-        var c = new Document();
+        var c = new PortableDocument();
         c.Append(b);
 
         var reader = DocumentReader.Parse(c.ToArray());
@@ -354,8 +353,8 @@ public class AppendMergeTests
     [Fact]
     public void Append_ForeignUnsupportedActionAndDegenerateAnnotations_SurviveWithoutThrowing()
     {
-        var source = Document.LoadFromStream(new MemoryStream(UnrebuildableAnnotationsPdf()));
-        var target = new Document();
+        var source = PortableDocument.LoadFromStream(new MemoryStream(UnrebuildableAnnotationsPdf()));
+        var target = new PortableDocument();
         target.Pages.Add();
 
         target.Append(source);
@@ -370,16 +369,16 @@ public class AppendMergeTests
     [Fact]
     public void Append_OfAppendedDocument_PreservesAnnotationWithoutLeakingSourcePages()
     {
-        var a = new Document();
+        var a = new PortableDocument();
         a.Pages.Add().Annotations.Add(
             new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { Contents = "note" });
         a.Pages.Add();
         var loadedA = InterpreterTestSupport.Load(a.ToArray());
 
-        var b = new Document();
+        var b = new PortableDocument();
         b.Append(loadedA);
 
-        var c = new Document();
+        var c = new PortableDocument();
         c.Pages.Add();
         c.Append(b);
 
@@ -407,9 +406,9 @@ public class AppendMergeTests
             Appearance = new AnnotationAppearance(),
         };
         annotation.Appearance.Content.Add(path);
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(annotation);
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Append(source);
         path.LineTo(Unit.FromPoint(100), Unit.FromPoint(200));
@@ -432,9 +431,9 @@ public class AppendMergeTests
             Appearance = new AnnotationAppearance(),
         };
         annotation.Appearance.Content.Add(image);
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(annotation);
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Append(source);
         image.EncodedXObject[0] = 9;
@@ -454,9 +453,9 @@ public class AppendMergeTests
             Appearance = new AnnotationAppearance(),
         };
         annotation.Appearance.Content.Add(xObject);
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(annotation);
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Append(source);
         xObject.Transform = Matrix.Translate(9, 10);
@@ -481,9 +480,9 @@ public class AppendMergeTests
         annotation.Font.Family = "Times-Roman";
         annotation.Font.Size = 12;
         annotation.Appearance.Content.Add(text);
-        var source = new Document();
+        var source = new PortableDocument();
         source.Pages.Add().Annotations.Add(annotation);
-        var target = new Document();
+        var target = new PortableDocument();
 
         target.Append(source);
         annotation.Font.Family = "Helvetica";

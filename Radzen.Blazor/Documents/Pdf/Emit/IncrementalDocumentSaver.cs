@@ -7,10 +7,10 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class IncrementalDocumentSaver
 {
-    private readonly Document doc;
+    private readonly PortableDocument doc;
     private readonly Dictionary<DocumentReader, GraphImporter> appendImporters = [];
 
-    internal IncrementalDocumentSaver(Document document) => doc = document;
+    internal IncrementalDocumentSaver(PortableDocument document) => doc = document;
 
     internal void Save(Stream stream)
     {
@@ -20,8 +20,8 @@ internal sealed class IncrementalDocumentSaver
         if (doc.FormFields.Count > 0)
         {
             throw new NotSupportedException(
-                "Creating new form fields (Document.FormFields) incrementally is not supported. "
-                + "Fill existing fields through Document.AcroForm, or use SaveToStream.");
+                "Creating new form fields (PortableDocument.FormFields) incrementally is not supported. "
+                + "Fill existing fields through PortableDocument.AcroForm, or use SaveToStream.");
         }
 
         var writer = new IncrementalUpdateWriter(loaded.SourceBytes!, reader);

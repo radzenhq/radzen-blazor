@@ -3,15 +3,14 @@
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PathGraphicsByteSafetyTests
 {
-    private static Document BuildDocument()
+    private static PortableDocument BuildDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = new PathContent { Stroke = true, Fill = true, Thickness = 2, StrokeColor = Color.Blue, FillColor = Color.Red };
         path.MoveTo(10, 10);

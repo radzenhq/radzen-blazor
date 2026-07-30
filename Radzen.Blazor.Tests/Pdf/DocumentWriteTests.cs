@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -14,7 +13,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class DocumentWriteTests
 {
-    private static DocumentReader Reload(Document document) => DocumentReader.Parse(document.ToArray());
+    private static DocumentReader Reload(PortableDocument document) => DocumentReader.Parse(document.ToArray());
 
     private static DictionaryObject Catalog(DocumentReader reader)
         => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
@@ -44,7 +43,7 @@ public class DocumentWriteTests
     [Fact]
     public void Output_StartsWithPdf17Header()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
 
         var bytes = document.ToArray();
@@ -55,7 +54,7 @@ public class DocumentWriteTests
     [Fact]
     public void EmptyDocument_SavesValidCatalogAndEmptyPagesTree()
     {
-        var reader = Reload(new Document());
+        var reader = Reload(new PortableDocument());
 
         var catalog = Catalog(reader);
         Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
@@ -69,7 +68,7 @@ public class DocumentWriteTests
     [Fact]
     public void OnePageA4_BuildsSinglePageKidWithMediaBoxAndParent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
 
         var reader = Reload(document);
@@ -88,7 +87,7 @@ public class DocumentWriteTests
     [Fact]
     public void ThreePages_PreserveOrderAndMediaBoxes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4);
         document.Pages.Add(PageSizes.Letter);
         document.Pages.Add(PageSizes.A4, PageOrientation.Landscape);
@@ -106,7 +105,7 @@ public class DocumentWriteTests
     [Fact]
     public void EveryKid_ParentPointsBackToPagesNode()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4);
         document.Pages.Add(PageSizes.Letter);
         document.Pages.Add(PageSizes.A5, PageOrientation.Landscape);
@@ -125,7 +124,7 @@ public class DocumentWriteTests
     [Fact]
     public void Info_AllFieldsSet_WrittenAsStrings()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "The Title";
         document.Info.Author = "The Author";
         document.Info.Subject = "The Subject";
@@ -146,7 +145,7 @@ public class DocumentWriteTests
     [Fact]
     public void Info_UnsetFields_AbsentFromDictionary()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Only Title";
 
         var reader = Reload(document);
@@ -162,7 +161,7 @@ public class DocumentWriteTests
     [Fact]
     public void Info_NoFieldsSet_NoInfoInTrailer()
     {
-        var reader = Reload(new Document());
+        var reader = Reload(new PortableDocument());
 
         Assert.False(reader.Trailer.ContainsKey("Info"));
     }
@@ -171,7 +170,7 @@ public class DocumentWriteTests
     public void Page_WithContent_ContentsStreamRoundTripsByteIdentical()
     {
         var content = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (Hi) Tj ET");
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(content);
 
@@ -184,7 +183,7 @@ public class DocumentWriteTests
     [Fact]
     public void Page_WithoutContent_HasNoContentsEntry()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
 
         var reader = Reload(document);
@@ -194,7 +193,7 @@ public class DocumentWriteTests
     [Fact]
     public void ObjectCount_MatchesCatalogPagesPagesContentsInfo()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Counted";
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("a"));
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("b"));
@@ -206,7 +205,7 @@ public class DocumentWriteTests
     [Fact]
     public void AllReferences_InCatalogAndPageChain_Resolve()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Refs";
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("one"));
         document.Pages.Add(PageSizes.Letter);
@@ -257,7 +256,7 @@ public class DocumentWriteTests
     [Fact]
     public void ToArray_IsDeterministic()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Stable";
         document.Pages.Add();
         document.Pages.Add(PageSizes.Letter);
@@ -268,7 +267,7 @@ public class DocumentWriteTests
     [Fact]
     public void Save_ToStream_MatchesToArray()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add();
 
         using var stream = new MemoryStream();
@@ -280,7 +279,7 @@ public class DocumentWriteTests
     [Fact]
     public void RemoveAt_DecrementsCountAndKeepsRemainingContent()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("first"));
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("second"));
 
@@ -295,7 +294,7 @@ public class DocumentWriteTests
     [Fact]
     public void Insert_ReordersKidsInReparsedTree()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var first = document.Pages.Add();
         first.SetContent(Encoding.ASCII.GetBytes("A"));
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("B"));

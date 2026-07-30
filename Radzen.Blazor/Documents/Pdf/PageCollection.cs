@@ -7,19 +7,19 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// The ordered collection of <see cref="Page"/> instances in a
-/// <see cref="Document"/>.
+/// <see cref="PortableDocument"/>.
 /// </summary>
 public sealed class PageCollection : IReadOnlyList<Page>
 {
     private readonly List<Page> pages = [];
-    private readonly Document? owner;
+    private readonly PortableDocument? owner;
 
     /// <summary>Initializes an independent page collection.</summary>
     public PageCollection()
     {
     }
 
-    internal PageCollection(Document owner) => this.owner = owner;
+    internal PageCollection(PortableDocument owner) => this.owner = owner;
 
     /// <summary>Gets the number of pages in the collection.</summary>
     public int Count => pages.Count;
@@ -131,14 +131,14 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// <summary>Creates a new document containing deep copies of the selected pages.</summary>
     /// <param name="range">The page range to extract.</param>
     /// <returns>A new document containing the selected pages.</returns>
-    public Document ExtractPages(Range range)
+    public PortableDocument ExtractPages(Range range)
     {
         if (owner is null)
         {
-            throw new InvalidOperationException("Pages can be extracted only from a collection owned by a Document.");
+            throw new InvalidOperationException("Pages can be extracted only from a collection owned by a PortableDocument.");
         }
 
-        var result = new Document();
+        var result = new PortableDocument();
         result.ImportPages(owner, range);
         return result;
     }
@@ -149,12 +149,12 @@ public sealed class PageCollection : IReadOnlyList<Page>
     /// </summary>
     /// <param name="boundaries">The page indexes at which new documents start.</param>
     /// <returns>The documents in original page order.</returns>
-    public IReadOnlyList<Document> Split(params int[] boundaries)
+    public IReadOnlyList<PortableDocument> Split(params int[] boundaries)
     {
         ArgumentNullException.ThrowIfNull(boundaries);
         if (owner is null)
         {
-            throw new InvalidOperationException("Pages can be split only from a collection owned by a Document.");
+            throw new InvalidOperationException("Pages can be split only from a collection owned by a PortableDocument.");
         }
 
         var previous = 0;
@@ -169,7 +169,7 @@ public sealed class PageCollection : IReadOnlyList<Page>
         }
 
         var snapshot = PageOperations.Snapshot(owner);
-        var result = new List<Document>(boundaries.Length + 1);
+        var result = new List<PortableDocument>(boundaries.Length + 1);
         previous = 0;
         foreach (var boundary in boundaries)
         {

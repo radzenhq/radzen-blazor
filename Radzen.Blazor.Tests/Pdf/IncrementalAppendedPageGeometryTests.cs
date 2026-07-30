@@ -4,7 +4,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,13 +31,13 @@ public class IncrementalAppendedPageGeometryTests
 
     private static byte[] BaseDocument()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Info.Title = "Base";
         document.Pages.Add(PageSizes.A4).SetContent(System.Text.Encoding.ASCII.GetBytes("BT (base) Tj ET"));
         return document.ToArray();
     }
 
-    private static Document Load(byte[] bytes) => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     private static double N(ArrayObject box, int i) => Assert.IsType<NumberObject>(box[i]).DoubleValue;
 

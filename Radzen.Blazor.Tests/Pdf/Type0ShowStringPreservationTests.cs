@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Fonts;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -27,7 +26,7 @@ public class Type0ShowStringPreservationTests
     [Fact]
     public void MutatingUnrelatedElement_PreservesType0ShowStringBytes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.SetContent(InterpreterTestSupport.Ascii(Type0Stream));
 
@@ -45,7 +44,7 @@ public class Type0ShowStringPreservationTests
     [Fact]
     public void GeneratedText_StillEmitsWinAnsiEncodedBytes()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 72, 700));
 

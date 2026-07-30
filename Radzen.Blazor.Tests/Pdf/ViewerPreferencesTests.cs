@@ -4,15 +4,14 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ViewerPreferencesTests
 {
-    private static Document Document()
+    private static PortableDocument Document()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (v) Tj ET"));
         return document;
     }

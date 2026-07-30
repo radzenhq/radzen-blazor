@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -85,7 +84,7 @@ public class DocumentMetadataRegressionTests
     [Fact]
     public void NewlyCreatedXmpPacket_HasStandardFramingAndPadding()
     {
-        var document = new Document();
+        var document = new PortableDocument();
 
         document.Xmp.SetProperty(CustomNamespace, "status", "draft");
 
@@ -103,7 +102,7 @@ public class DocumentMetadataRegressionTests
         const string packet = "<?xpacket begin=\"x\" id=\"custom\"?>\n"
             + "<x:xmpmeta xmlns:x=\"adobe:ns:meta/\"><rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"><rdf:Description rdf:about=\"\" /></rdf:RDF></x:xmpmeta>\n"
             + "   \n<?xpacket end=\"r\"?>";
-        var document = new Document();
+        var document = new PortableDocument();
         document.Xmp.SetPacket(Encoding.UTF8.GetBytes(packet));
 
         document.Xmp.SetProperty(CustomNamespace, "status", "edited");
@@ -114,8 +113,8 @@ public class DocumentMetadataRegressionTests
         Assert.Contains("\n   \n<?xpacket", edited, StringComparison.Ordinal);
     }
 
-    private static Document Load(byte[] bytes)
-        => Document.LoadFromStream(new MemoryStream(bytes));
+    private static PortableDocument Load(byte[] bytes)
+        => PortableDocument.LoadFromStream(new MemoryStream(bytes));
 
     private static byte[] BuildPdf(string catalogExtra, string? outlineTarget)
     {

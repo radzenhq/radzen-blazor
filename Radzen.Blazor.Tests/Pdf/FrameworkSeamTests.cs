@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf.Emit;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,7 +31,7 @@ public class FrameworkSeamTests
     [Fact]
     public void ContentElement_ExternalSubclass_EmitBodyIsDispatched()
     {
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new RectangleElement());
 
@@ -127,7 +126,7 @@ public class FrameworkSeamTests
     {
         ImageDecoder.Register(new RzimImageDecoder());
 
-        var document = new Document();
+        var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent([.. RzimImageDecoder.Magic, 0x2A]) { Bounds = PdfRect.FromSize(0, 0, 10, 10) });
 

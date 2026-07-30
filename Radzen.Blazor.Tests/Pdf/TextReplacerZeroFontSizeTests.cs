@@ -4,13 +4,12 @@ using System.IO;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TextReplacerZeroFontSizeTests
 {
-    private static Document LoadedZeroFontSizeDocument()
+    private static PortableDocument LoadedZeroFontSizeDocument()
     {
         const string streamData = "BT /F0 0 Tf 5 Tc 72 700 Td (A) Tj ET";
         var contentObject = $"4 0 obj\n<< /Length {streamData.Length} >>\nstream\n{streamData}\nendstream\nendobj\n";
@@ -33,7 +32,7 @@ public class TextReplacerZeroFontSizeTests
 
         pdf.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n");
         using var input = new MemoryStream(pdf.ToArray());
-        return Document.LoadFromStream(input);
+        return PortableDocument.LoadFromStream(input);
     }
 
     [Fact]

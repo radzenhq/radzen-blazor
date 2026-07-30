@@ -8,7 +8,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,9 +16,9 @@ public class RadioAndChoiceFieldTests
     private const int RadioFlag = 1 << 15;
     private const int ComboFlag = 1 << 17;
 
-    private static Document BuildDocument()
+    private static PortableDocument BuildDocument()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Survey", "Helvetica");
         return new DocumentRenderer().Render(document);
@@ -67,7 +66,7 @@ public class RadioAndChoiceFieldTests
         return list;
     }
 
-    private static Document WithFields()
+    private static PortableDocument WithFields()
     {
         var document = BuildDocument();
         document.FormFields.Add(RadioGroup());
@@ -76,7 +75,7 @@ public class RadioAndChoiceFieldTests
         return document;
     }
 
-    private static DocumentReader Reload(Document document)
+    private static DocumentReader Reload(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
 
     private static int FlagsOf(DocumentReader reader, DictionaryObject field)
@@ -290,7 +289,7 @@ public class RadioAndChoiceFieldTests
     public void FlattenAfterReloadDrawsSelectionAndDropsForm()
     {
         using var stream = new MemoryStream(WithFields().ToArray());
-        var reloaded = Document.LoadFromStream(stream);
+        var reloaded = PortableDocument.LoadFromStream(stream);
         reloaded.Flatten();
 
         Assert.Null(reloaded.AcroForm);

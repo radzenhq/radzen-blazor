@@ -6,7 +6,6 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -27,9 +26,9 @@ public class FormFieldHardeningTests
         return pdf.ToArray();
     }
 
-    private static Document BuildTextForm(Action<TextFieldDefinition> configure)
+    private static PortableDocument BuildTextForm(Action<TextFieldDefinition> configure)
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Form", "Helvetica");
         var renderer = new DocumentRenderer();
@@ -39,7 +38,7 @@ public class FormFieldHardeningTests
         configure(field);
         pdf.FormFields.Add(field);
 
-        return Document.LoadFromStream(new MemoryStream(pdf.ToArray()));
+        return PortableDocument.LoadFromStream(new MemoryStream(pdf.ToArray()));
     }
 
     private static string? OptionalAppearanceText(DocumentReader reader, DictionaryObject field)
@@ -170,7 +169,7 @@ public class FormFieldHardeningTests
     [Fact]
     public void FillFieldResolvesIndirectRectForAppearanceBox()
     {
-        var document = Document.LoadFromStream(new MemoryStream(IndirectRectForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(IndirectRectForm()));
         document.AcroForm!.FillField("amount", "42");
 
         var reader = FormTestSupport.Reload(document);
@@ -200,7 +199,7 @@ public class FormFieldHardeningTests
     [Fact]
     public void DuplicateRootNamesAreBothReachable()
     {
-        var document = Document.LoadFromStream(new MemoryStream(DuplicateNameForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(DuplicateNameForm()));
         var form = document.AcroForm!;
 
         Assert.Equal(2, form.Fields.Count);
@@ -233,7 +232,7 @@ public class FormFieldHardeningTests
     // ISO 32000-1 12.7.4.4: a multi-select list box (/V array) renders as stacked highlighted /Opt entries, so flatten refuses to join it into one line.
     public void FlattenRefusesMultiSelectListBoxSelections()
     {
-        var document = Document.LoadFromStream(new MemoryStream(MultiSelectListForm()));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(MultiSelectListForm()));
         document.AcroForm!.Fields.Single();
 
         Assert.Throws<NotSupportedException>(document.Flatten);
@@ -263,14 +262,14 @@ public class FormFieldHardeningTests
     [Fact]
     public void FlattenRefusesVisibleSignatureAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(SignatureForm(withAppearance: true)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(SignatureForm(withAppearance: true)));
         Assert.Throws<NotSupportedException>(document.Flatten);
     }
 
     [Fact]
     public void FlattenDropsUnsignedSignatureFieldWithoutAppearance()
     {
-        var document = Document.LoadFromStream(new MemoryStream(SignatureForm(withAppearance: false)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(SignatureForm(withAppearance: false)));
         document.Flatten();
 
         var reader = FormTestSupport.Reload(document);
@@ -283,7 +282,7 @@ public class FormFieldHardeningTests
     [Fact]
     public void DuplicateAttachmentNamesThrowOnSave()
     {
-        var document = new Radzen.Documents.Document();
+        var document = new Document();
         BuildTestSupport.AddText(document.Sections.Add(), "Body", "Helvetica");
         var renderer = new DocumentRenderer();
         renderer.Attachments.Add("data.xml", [1, 2, 3], AttachmentRelationship.Data, "text/xml");

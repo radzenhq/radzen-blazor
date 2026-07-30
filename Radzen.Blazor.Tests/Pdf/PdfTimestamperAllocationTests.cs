@@ -7,7 +7,6 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
-using Document = Radzen.Documents.Pdf.Document;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,7 +25,7 @@ public class PdfTimestamperAllocationTests
 
     private static byte[] BuildLargeDocument(int padding)
     {
-        var document = new Document();
+        var document = new PortableDocument();
         document.Pages.Add(PageSizes.A4).SetContent(Encoding.ASCII.GetBytes("BT (page zero) Tj ET"));
 
         var payload = new byte[padding];
