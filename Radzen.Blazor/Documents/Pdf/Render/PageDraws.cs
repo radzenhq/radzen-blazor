@@ -448,7 +448,7 @@ internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint
     {
         var left = x.Gradient;
         var right = y.Gradient;
-        if (!ReferenceEquals(left.Identity, right.Identity)
+        if (left.Identity != right.Identity
             || left.Kind != right.Kind
             || left.X0 != right.X0
             || left.Y0 != right.Y0
@@ -477,7 +477,7 @@ internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint
     {
         var gradient = value.Gradient;
         var hash = new HashCode();
-        hash.Add(System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(gradient.Identity));
+        hash.Add(gradient.Identity);
         hash.Add(gradient.Kind);
         hash.Add(gradient.X0);
         hash.Add(gradient.Y0);

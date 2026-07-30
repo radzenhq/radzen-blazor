@@ -252,8 +252,6 @@ internal sealed class DocumentGenerator
         {
             Plan = plan,
             Text = textEmitter,
-            Tables = tableEmitter,
-            Images = imageEmitter,
             CodeSymbols = codeSymbolEmitter,
         };
         var left = page.ContentBox.X;
@@ -281,7 +279,7 @@ internal sealed class DocumentGenerator
                 Y2 = PageSpace.FromTop(height, link.Top),
                 Uri = link.Uri,
                 Destination = link.Anchor,
-                Element = structureTree.ElementOf(link.Source),
+                Element = structureTree.LinkElementOf(link.Source),
             });
         }
 

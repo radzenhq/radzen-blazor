@@ -43,7 +43,7 @@ internal static class BoxContentLayout
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
         => Position(
             Measure(blocks, contentBox.Width, align, fonts, measureImage, resolution, capture),
             contentBox,
@@ -57,161 +57,26 @@ internal static class BoxContentLayout
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
     {
-        capture ??= new LayoutCaptureContext();
-        var visitor = new MeasureVisitor(contentWidth, align, fonts, measureImage, resolution, capture);
+        var engine = FlowPlacementEngine.ForBox(
+            contentWidth,
+            align,
+            fonts,
+            measureImage,
+            resolution,
+            capture);
         foreach (var block in BlockExpander.ExpandBlocks(blocks, contentWidth, resolution))
         {
-            LoweredBlockDispatch.Dispatch(block, visitor, default(Nothing));
+            engine.Place(block, 0);
         }
 
         return new Measured
         {
-            Items = visitor.Items,
-            Height = visitor.Height,
+            Items = engine.Items,
+            Height = engine.Cursor,
             Capture = capture,
         };
-    }
-
-    private sealed class MeasureVisitor(
-        double contentWidth,
-        HorizontalAlignment? align,
-        FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
-        LayoutCaptureContext capture)
-        : ILoweredBlockHandler<Nothing, Nothing>
-    {
-        public List<CellItem> Items { get; } = [];
-
-        public double Height { get; private set; }
-
-        private LineBox? Marker(Block block)
-            => resolution.ListMarker(block) is { } marker
-                ? LineLayouter.MarkerLine(marker, fonts, capture)
-                : null;
-
-        public Nothing Paragraph(Paragraph paragraph, Nothing context)
-        {
-            var format = resolution.Format(paragraph);
-            var spacingBefore = format.SpacingBefore.Point;
-            if (spacingBefore > 0)
-            {
-                Items.Add(new CellItem { Height = spacingBefore });
-                Height += spacingBefore;
-            }
-
-            foreach (var line in LineBreaker.Break(
-                paragraph,
-                contentWidth,
-                fonts,
-                resolution.Alignment(paragraph) ?? align,
-                resolution,
-                capture))
-            {
-                Items.Add(new CellItem { Line = line, Source = paragraph, Height = line.Height });
-                Height += line.Height;
-            }
-
-            var spacingAfter = format.SpacingAfter.Point;
-            if (spacingAfter > 0)
-            {
-                Items.Add(new CellItem { Height = spacingAfter });
-                Height += spacingAfter;
-            }
-
-            return default;
-        }
-
-        public Nothing Image(Image image, Nothing context)
-        {
-            var indent = resolution.BlockIndent(image);
-            var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(
-                image,
-                Math.Max(0, contentWidth - indent),
-                measureImage);
-            Items.Add(new CellItem
-            {
-                MarkerLine = Marker(image),
-                MarkerSource = image,
-                Image = image,
-                Indent = indent,
-                Width = imageWidth,
-                Height = imageHeight,
-            });
-            Height += imageHeight;
-            return default;
-        }
-
-        public Nothing CodeSymbol(Block block, Nothing context)
-        {
-            var (codeSymbolWidth, codeSymbolHeight) = Paginator.MeasureCodeSymbol(block, fonts, resolution);
-            Items.Add(new CellItem
-            {
-                CodeSymbol = block,
-                MarkerLine = Marker(block),
-                MarkerSource = block,
-                Caption = CodeSymbolDispatch.Caption(block, fonts, resolution),
-                Indent = resolution.BlockIndent(block),
-                Width = codeSymbolWidth,
-                Height = codeSymbolHeight,
-            });
-            Height += codeSymbolHeight;
-            return default;
-        }
-
-        public Nothing Table(Table nested, Nothing context)
-        {
-            var layout = LoweredBlockDispatch.LayoutTable(
-                nested,
-                contentWidth,
-                fonts,
-                measureImage,
-                resolution,
-                capture);
-            Items.Add(new CellItem
-            {
-                MarkerLine = Marker(nested),
-                MarkerSource = nested,
-                Table = layout,
-                Height = layout.Height,
-            });
-            Height += layout.Height;
-            return default;
-        }
-
-        public Nothing Container(Container container, Nothing context)
-        {
-            var indent = resolution.BlockIndent(container);
-            var availableWidth = Math.Max(0, contentWidth - indent);
-            var padding = container.Padding.Point;
-            var boxWidth = container.Width?.Point ?? availableWidth;
-            var inner = Measure(
-                container.Blocks,
-                Math.Max(0, boxWidth - (2 * padding)),
-                null,
-                fonts,
-                measureImage,
-                resolution,
-                capture);
-            var boxHeight = inner.Height + (2 * padding);
-            Items.Add(new CellItem
-            {
-                Box = container,
-                MarkerLine = Marker(container),
-                MarkerSource = container,
-                BoxContent = inner,
-                BoxOpacity = resolution.Opacities.ContainerOpacity(container),
-                Indent = indent,
-                Width = boxWidth,
-                Height = boxHeight,
-            });
-            Height += boxHeight;
-            return default;
-        }
-
-        public Nothing PageBreak(PageBreak block, Nothing context) => default;
     }
 
     public static LaidOutBoxContent Position(
@@ -310,7 +175,7 @@ internal static class BoxContentLayout
                     Source = capture.Source(box),
                     Content = Position(boxContent, innerBox, HorizontalAlignment.Left, VerticalAlignment.Top),
                     Bounds = new Rect(contentBox.Left + indent, cursorY, item.Width, item.Height),
-                    Style = GeometryCapture.Box(box, item.Width, item.Height),
+                    Style = GeometryCapture.Box(box, item.Width, item.Height, capture),
                     Padding = padding,
                     Opacity = item.BoxOpacity,
                     Order = order++,

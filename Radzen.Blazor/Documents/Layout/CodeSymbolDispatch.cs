@@ -11,8 +11,12 @@ internal static class CodeSymbolDispatch
     private static readonly SizeVisitor size = new();
     private static readonly AlignmentVisitor alignment = new();
 
-    public static (double Width, double Height) Measure(Block block, FontCollection? fonts = null, LoweringContext? resolution = null)
-        => block.Accept(size, (fonts, resolution));
+    public static (double Width, double Height) Measure(
+        Block block,
+        LayoutCaptureContext capture,
+        FontCollection? fonts = null,
+        LoweringContext? resolution = null)
+        => block.Accept(size, (fonts, resolution, capture));
 
     public static HorizontalAlignment Alignment(Block block) => block.Accept(alignment, default);
 
@@ -20,7 +24,11 @@ internal static class CodeSymbolDispatch
 
     public static ImmutableArray<CodeSymbolModule> Modules(Block block) => block.Accept(modules, default);
 
-    public static IReadOnlyList<LineBox> CaptionLines(Barcode barcode, Font font, FontCollection fonts)
+    public static IReadOnlyList<LineBox> CaptionLines(
+        Barcode barcode,
+        Font font,
+        FontCollection fonts,
+        LayoutCaptureContext capture)
     {
         var run = new Run(barcode.Value);
         run.Font.InheritFrom(font);
@@ -28,17 +36,25 @@ internal static class CodeSymbolDispatch
         paragraph.Font.InheritFrom(font);
         paragraph.Inlines.Add(run);
 
-        return LineBreaker.Break(paragraph, barcode.Width.Point, fonts);
+        return LineLayouter.Layout(paragraph, barcode.Width.Point, fonts, capture);
     }
 
-    public static ImmutableArray<LaidOutCaptionLine>? Caption(Block block, FontCollection fonts, LoweringContext? resolution)
+    public static ImmutableArray<LaidOutCaptionLine>? Caption(
+        Block block,
+        FontCollection fonts,
+        LoweringContext? resolution,
+        LayoutCaptureContext capture)
     {
         if (block is not Barcode barcode || !barcode.ShowText)
         {
             return null;
         }
 
-        var lines = CaptionLines(barcode, resolution?.BarcodeFont(barcode) ?? barcode.Font, fonts);
+        var lines = CaptionLines(
+            barcode,
+            resolution?.BarcodeFont(barcode) ?? barcode.Font,
+            fonts,
+            capture);
         var positioned = ImmutableArray.CreateBuilder<LaidOutCaptionLine>(lines.Count);
         var y = barcode.Height.Point;
         foreach (var line in lines)
@@ -50,7 +66,11 @@ internal static class CodeSymbolDispatch
         return positioned.MoveToImmutable();
     }
 
-    private static double TextBandHeight(Barcode barcode, FontCollection? fonts, LoweringContext? resolution)
+    private static double TextBandHeight(
+        Barcode barcode,
+        FontCollection? fonts,
+        LoweringContext? resolution,
+        LayoutCaptureContext capture)
     {
         if (!barcode.ShowText || fonts is null)
         {
@@ -59,7 +79,11 @@ internal static class CodeSymbolDispatch
 
         var height = 0.0;
 
-        foreach (var line in CaptionLines(barcode, resolution?.BarcodeFont(barcode) ?? barcode.Font, fonts))
+        foreach (var line in CaptionLines(
+            barcode,
+            resolution?.BarcodeFont(barcode) ?? barcode.Font,
+            fonts,
+            capture))
         {
             height += line.Height;
         }
@@ -67,14 +91,31 @@ internal static class CodeSymbolDispatch
         return height;
     }
 
-    private sealed class SizeVisitor : BlockVisitor<(FontCollection? Fonts, LoweringContext? Resolution), (double Width, double Height)>
+    private sealed class SizeVisitor
+        : BlockVisitor<
+            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture),
+            (double Width, double Height)>
     {
-        protected override (double Width, double Height) Default(Block block, (FontCollection? Fonts, LoweringContext? Resolution) context) => (0, 0);
+        protected override (double Width, double Height) Default(
+            Block block,
+            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
+            => (0, 0);
 
-        public override (double Width, double Height) Visit(QrCode qr, (FontCollection? Fonts, LoweringContext? Resolution) context) => (qr.Size.Point, qr.Size.Point);
+        public override (double Width, double Height) Visit(
+            QrCode qr,
+            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
+            => (qr.Size.Point, qr.Size.Point);
 
-        public override (double Width, double Height) Visit(Barcode barcode, (FontCollection? Fonts, LoweringContext? Resolution) context)
-            => (barcode.Width.Point, barcode.Height.Point + TextBandHeight(barcode, context.Fonts, context.Resolution));
+        public override (double Width, double Height) Visit(
+            Barcode barcode,
+            (FontCollection? Fonts, LoweringContext? Resolution, LayoutCaptureContext Capture) context)
+            => (
+                barcode.Width.Point,
+                barcode.Height.Point + TextBandHeight(
+                    barcode,
+                    context.Fonts,
+                    context.Resolution,
+                    context.Capture));
     }
 
     private static int QuietZoneModules(BarcodeType type) => type switch

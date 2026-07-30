@@ -8,14 +8,7 @@ namespace Radzen.Documents.Layout;
 internal static class GeometryCapture
 {
     public static FontPaint Font(Font font)
-        => new(
-            font.EffectiveFamily,
-            font.EffectiveSize.Point,
-            font.EffectiveBold,
-            font.EffectiveItalic,
-            font.EffectiveUnderline,
-            font.EffectiveStrikethrough,
-            font.EffectiveColor);
+        => FontPaintCapture.Capture(font);
 
     public static FragmentPaint Fragment(Inline inline, Font font, LayoutCaptureContext capture)
         => Fragment(inline, Font(font), capture);
@@ -95,7 +88,10 @@ internal static class GeometryCapture
         };
     }
 
-    public static GradientPaint? Gradient(GradientBrush? brush, GradientReference reference)
+    public static GradientPaint? Gradient(
+        GradientBrush? brush,
+        GradientReference reference,
+        LayoutCaptureContext capture)
     {
         if (brush is null)
         {
@@ -108,7 +104,7 @@ internal static class GeometryCapture
             stops.Add(new GradientStopPaint(stop.Offset, stop.Color));
         }
 
-        var identity = GradientPaintIdentity.Of(brush);
+        var identity = capture.Paint(brush);
         return brush switch
         {
             LinearGradient linear => new GradientPaint(
@@ -137,10 +133,17 @@ internal static class GeometryCapture
                 shadow.OffsetY.Point,
                 shadow.Spread.Point);
 
-    public static BoxStyle Box(Container container, double width, double height) => new()
+    public static BoxStyle Box(
+        Container container,
+        double width,
+        double height,
+        LayoutCaptureContext capture) => new()
     {
         Background = container.Background,
-        BackgroundGradient = Gradient(container.BackgroundGradient, GradientReference.Box(width, height)),
+        BackgroundGradient = Gradient(
+            container.BackgroundGradient,
+            GradientReference.Box(width, height),
+            capture),
         Top = Edge(container.Borders.Top),
         Right = Edge(container.Borders.Right),
         Bottom = Edge(container.Borders.Bottom),
@@ -152,6 +155,8 @@ internal static class GeometryCapture
 
     public static ResolvedEdge? Edge(Border edge)
     {
+        // Capture policy: setting a width opts an otherwise unstyled edge into a solid border,
+        // while selecting a style with zero width uses the historical hairline width.
         var style = edge.Style;
         if (style == BorderStyle.None && edge.Width.Point > 0)
         {

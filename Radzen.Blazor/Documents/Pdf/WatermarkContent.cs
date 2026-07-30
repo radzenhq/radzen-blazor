@@ -5,37 +5,46 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf;
 
-internal sealed class WatermarkContent(Watermark watermark, PdfRect box, ImageStore images) : ContentElement
+internal sealed class WatermarkContent(
+    Watermark watermark,
+    PdfRect box,
+    ImageStore images,
+    SourceId? imageSource,
+    SceneImageData? imageData) : ContentElement
 {
     protected override void EmitBody(ContentWriter writer)
     {
-        writer.WriteRaw("q\n");
-        if (watermark.Opacity < 1)
-        {
-            writer.WriteName(writer.RegisterOpacity(watermark.Opacity));
-            writer.WriteRaw(" gs\n");
-        }
-
-        ContentEmitter.WriteTransform(
+        var extGState = watermark.Opacity < 1
+            ? writer.RegisterOpacity(watermark.Opacity)
+            : null;
+        var transform = WatermarkGeometry.Rotation(
+            watermark.Rotation,
+            box.Left + box.Width / 2,
+            box.Bottom + box.Height / 2);
+        ContentEmitter.WriteWatermark(
             writer,
-            WatermarkGeometry.Rotation(
-                watermark.Rotation,
-                box.Left + box.Width / 2,
-                box.Bottom + box.Height / 2));
-
-        WriteImage(writer);
-        WriteText(writer);
-        writer.WriteRaw("Q\n");
+            extGState,
+            transform,
+            WriteImage,
+            WriteText);
     }
 
     private void WriteImage(ContentWriter writer)
     {
-        if (watermark.Image is not { } image)
+        if (watermark.Image is not { } image
+            || imageSource is not { } source
+            || imageData is not { } data)
         {
             return;
         }
 
-        var decoded = images.DecodeWatermark(image).Image;
+        var paint = new ImagePaint
+        {
+            Data = data,
+            Opacity = image.Opacity,
+            Interpolate = image.Interpolate,
+        };
+        var decoded = images.DecodeWatermark(source, paint).Image;
         var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
         var state = plan.Alpha < 1

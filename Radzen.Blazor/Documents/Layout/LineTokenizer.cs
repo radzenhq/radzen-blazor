@@ -162,6 +162,24 @@ internal static class LineTokenizer
                     var sub = start;
                     while (sub <= i)
                     {
+                        while (sub < i && IsConditionalBreak(text[sub]))
+                        {
+                            if (hasCurrent)
+                            {
+                                current.OptionalBreakAfter = true;
+                                current.SoftHyphenAfter = text[sub] == SoftHyphen;
+                                if (current.SoftHyphenAfter)
+                                {
+                                    current.HyphenWidth = fonts.MeasureText("-", runFont);
+                                }
+
+                                words.Add(current);
+                                hasCurrent = false;
+                            }
+
+                            sub++;
+                        }
+
                         var q = sub;
                         while (q < i && !(IsConditionalBreak(text[q]) && q > sub))
                         {

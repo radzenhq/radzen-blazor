@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Collections.Immutable;
 
 namespace Radzen.Documents.Geometry;
@@ -41,7 +40,7 @@ internal readonly struct GradientReference
 }
 
 internal readonly record struct GradientPaint(
-    object Identity,
+    LaidOutNodeId Identity,
     GradientPaintKind Kind,
     double X0,
     double Y0,
@@ -50,14 +49,6 @@ internal readonly record struct GradientPaint(
     double Y1,
     double R1,
     ImmutableArray<GradientStopPaint> Stops);
-
-internal static class GradientPaintIdentity
-{
-    private static readonly ConditionalWeakTable<object, object> Identities = new();
-
-    public static object Of(object source)
-        => Identities.GetValue(source, static _ => new object());
-}
 
 internal readonly record struct BoxShadowPaint(
     Color Color,

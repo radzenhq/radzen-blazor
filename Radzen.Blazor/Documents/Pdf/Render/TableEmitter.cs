@@ -34,7 +34,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         foreach (var row in positioned.Rows)
         {
-            var repeated = row.IsHeader && positioned.Fragment.Number > 1;
+            var repeated = row.IsHeader && positioned.Fragment.ContainsRepeatedHeaders;
             PaintRowBackground(
                 plan,
                 row.Background,

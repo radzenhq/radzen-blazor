@@ -11,7 +11,7 @@ internal static class TablePaginator
         LaidOutTable layout,
         Table source,
         double availableHeight,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
         => Paginate(layout, source, availableHeight, availableHeight, capture);
 
     public static IReadOnlyList<LaidOutTableSlice> Paginate(
@@ -19,9 +19,8 @@ internal static class TablePaginator
         Table source,
         double firstAvailable,
         double subsequentAvailable,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture)
     {
-        capture ??= new LayoutCaptureContext();
         var (headers, bodies, headerHeight) = SplitRows(layout, source);
 
         var reach = BuildReach(layout, source.Rows.Count);
@@ -40,10 +39,10 @@ internal static class TablePaginator
             {
                 var (last, groupHeight) = NextGroup(layout, bodies, reach, body);
 
-                var fits = running + groupHeight <= available + 1e-6;
+                var fits = running + groupHeight <= available + LayoutTolerance.Epsilon;
 
-                if (placed.Count == 0 && !fits && onFirst && available + 1e-6 < subsequentAvailable
-                    && headerHeight + groupHeight <= subsequentAvailable + 1e-6
+                if (placed.Count == 0 && !fits && onFirst && available + LayoutTolerance.Epsilon < subsequentAvailable
+                    && headerHeight + groupHeight <= subsequentAvailable + LayoutTolerance.Epsilon
                     && GroupKeepTogether(source, bodies, body, last))
                 {
                     deferred = true;
@@ -210,6 +209,7 @@ internal static class TablePaginator
             Number = number,
             Rows = [.. rows],
             HeaderRowCount = headers.Count,
+            ContainsRepeatedHeaders = number > 1 && headers.Count > 0,
             Height = y,
         };
     }

@@ -156,13 +156,13 @@ internal sealed class FieldResolver(
             resolved.Inlines.Add(newRun);
         }
 
-        var lines = LineBreaker.Break(
+        var lines = LineLayouter.Layout(
             resolved,
             width,
             fonts,
+            capture,
             inheritedAlignment,
-            resolution,
-            capture);
+            resolution);
 
         if (lines.Count > reservedLines)
         {

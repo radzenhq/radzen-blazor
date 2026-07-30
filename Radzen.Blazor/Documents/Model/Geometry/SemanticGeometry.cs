@@ -108,6 +108,8 @@ internal readonly record struct SemanticStructureAssociation
     public required int Element { get; init; }
 
     public int? MarkerElement { get; init; }
+
+    public int? LinkElement { get; init; }
 }
 
 internal readonly record struct SemanticArtifactAssociation

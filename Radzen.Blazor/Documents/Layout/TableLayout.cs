@@ -27,10 +27,9 @@ internal static class TableLayout
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
-        double additionalLeftIndent = 0,
-        LayoutCaptureContext? capture = null)
+        LayoutCaptureContext capture,
+        double additionalLeftIndent = 0)
     {
-        capture ??= new LayoutCaptureContext();
         var columnWidths = ResolveColumnWidths(table, availableWidth);
         var columnX = Prefix(columnWidths);
 
@@ -51,7 +50,13 @@ internal static class TableLayout
 
                 if (c >= nCols)
                 {
-                    break;
+                    if (IsStructuralPlaceholder(cell))
+                    {
+                        continue;
+                    }
+
+                    throw new InvalidOperationException(
+                        $"Table row {r} has more cells than the {nCols}-column grid can place.");
                 }
 
                 var span = Math.Min(cell.ColumnSpan, nCols - c);
@@ -213,6 +218,25 @@ internal static class TableLayout
             Cells = [.. cells],
         };
     }
+
+    private static bool IsStructuralPlaceholder(Cell cell)
+        => cell.Blocks.Count == 0
+            && cell.ColumnSpan == 1
+            && cell.RowSpan == 1
+            && !cell.Font.IsModified
+            && cell.Alignment is null
+            && cell.VerticalAlignment == VerticalAlignment.Top
+            && cell.Padding == default
+            && cell.PaddingLeft is null
+            && cell.PaddingRight is null
+            && cell.PaddingTop is null
+            && cell.PaddingBottom is null
+            && cell.StyleName is null
+            && cell.Background is null
+            && !cell.Borders.Top.IsSet
+            && !cell.Borders.Right.IsSet
+            && !cell.Borders.Bottom.IsSet
+            && !cell.Borders.Left.IsSet;
 
     private static BoxStyle CellDecoration(Table table, Cell cell, int row)
     {

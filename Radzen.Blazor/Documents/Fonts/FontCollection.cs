@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Fonts;
@@ -63,8 +64,9 @@ public sealed class FontCollection
 
     private readonly List<string> fallback = [];
 
-    private SimpleShaper? shaper;
-    private bool shaperKerning;
+    private ShaperCache? shaper;
+
+    private sealed record ShaperCache(bool Kerning, SimpleShaper Value);
 
     /// <summary>
     /// Gets or sets whether pair kerning is applied when measuring and drawing text.
@@ -333,7 +335,7 @@ public sealed class FontCollection
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(font);
-        var captured = Capture(font);
+        var captured = FontPaintCapture.Capture(font);
         return MeasureText(text, captured);
     }
 
@@ -351,25 +353,25 @@ public sealed class FontCollection
         return MeasureBuiltIn(text, font, builtIn);
     }
 
-    private static FontPaint Capture(Font font)
-        => new(
-            font.EffectiveFamily,
-            font.EffectiveSize.Point,
-            font.EffectiveBold,
-            font.EffectiveItalic,
-            font.EffectiveUnderline,
-            font.EffectiveStrikethrough,
-            font.EffectiveColor);
-
     internal SimpleShaper Shaper()
     {
-        if (shaper is null || shaperKerning != EnableKerning)
+        while (true)
         {
-            shaper = new SimpleShaper(this, EnableKerning);
-            shaperKerning = EnableKerning;
-        }
+            var kerning = EnableKerning;
+            var current = Volatile.Read(ref shaper);
+            if (current is not null && current.Kerning == kerning)
+            {
+                return current.Value;
+            }
 
-        return shaper;
+            var created = new ShaperCache(kerning, new SimpleShaper(this, kerning));
+            if (ReferenceEquals(
+                Interlocked.CompareExchange(ref shaper, created, current),
+                current))
+            {
+                return created.Value;
+            }
+        }
     }
 
     internal CapturedGlyphRun CaptureGlyphRun(
@@ -377,7 +379,7 @@ public sealed class FontCollection
         Font font,
         bool enableBuiltInKerning = true)
     {
-        var captured = Capture(font);
+        var captured = FontPaintCapture.Capture(font);
         return CaptureGlyphRun(text, captured, enableBuiltInKerning);
     }
 
@@ -644,36 +646,28 @@ public sealed class FontCollection
         in FontPaint font,
         BuiltInFontMetrics metrics)
     {
-        const int MaxReported = 8;
-        var offenders = new List<string>();
+        var offenders = new List<int>();
         var seen = new HashSet<int>();
         var i = 0;
-        while (i < text.Length && offenders.Count < MaxReported)
+        while (i < text.Length)
         {
             var codepoint = CodePointAt(text, i, out var length);
             if (IsReportable(codepoint)
                 && ClassifyBuiltInGlyph(metrics, codepoint, out _, out _, out _) == BuiltInGlyphKind.Missing
                 && seen.Add(codepoint))
             {
-                offenders.Add(Describe(codepoint));
+                offenders.Add(codepoint);
             }
 
             i += length;
         }
 
-        return new InvalidOperationException(
-            $"The built-in metrics font '{font.Family}' has no glyph metrics for {string.Join(", ", offenders)}. "
-            + $"Register a font that covers these characters with {nameof(FontCollection)}.{nameof(Register)}, "
-            + $"or add such a font to the {nameof(SetFallback)} chain.");
+        return MissingGlyphMetrics.Error(font.Family, offenders);
     }
 
-    private static bool IsReportable(int codepoint)
-        => codepoint > 0xFFFF || !char.IsControl((char)codepoint);
+    private static bool IsReportable(int codepoint) => MissingGlyphMetrics.IsReportable(codepoint);
 
-    private static int MetricsCodepoint(int codepoint) => IsReportable(codepoint) ? codepoint : '?';
-
-    private static string Describe(int codepoint)
-        => $"'{char.ConvertFromUtf32(codepoint)}' (U+{codepoint:X4})";
+    private static int MetricsCodepoint(int codepoint) => MissingGlyphMetrics.Substituted(codepoint);
 
     internal BuiltInGlyphKind ClassifyBuiltInGlyph(
         BuiltInFontMetrics metrics,
