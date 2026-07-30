@@ -5,8 +5,6 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Render;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 
@@ -52,11 +50,13 @@ public class ImageDecoderRegistryTests
 
     [Fact]
     public void Decode_UnrecognizedFormat_Throws()
-        => Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode([0x00, 0x01, 0x02, 0x03]));
+        => Assert.Throws<NotSupportedException>(
+            () => ImageDecoders.BuiltIn.Decode(new byte[] { 0x00, 0x01, 0x02, 0x03 }, ReaderLimits.Default));
 
     [Fact]
     public void ConcurrentRegistrationsAreAllRetained()
     {
+        using var scope = ImageDecoder.Scope();
         const int Threads = 8;
         using var start = new Barrier(Threads);
         var magics = new byte[Threads][];
@@ -77,35 +77,43 @@ public class ImageDecoderRegistryTests
 
         foreach (var magic in magics)
         {
-            Assert.NotNull(ImageDecoder.Decode(magic));
+            Assert.NotNull(ImageDecoders.Default.Decode(magic, ReaderLimits.Default));
         }
     }
 
     [Fact]
-    public void RegisteringSameDecoderAgainDoesNotAddAnotherProbe()
+    public void AddingTheSameDecoderAgainDoesNotAddAnotherProbe()
     {
         var decoder = new CountingDecoder();
-        ImageDecoder.Register(decoder);
-        ImageDecoder.Register(decoder);
+        var decoders = ImageDecoders.BuiltIn.Add(decoder).Add(decoder);
 
-        Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode([0xEF, 0xFE, 0xFD]));
+        Assert.Throws<NotSupportedException>(
+            () => decoders.Decode(new byte[] { 0xEF, 0xFE, 0xFD }, ReaderLimits.Default));
         Assert.Equal(1, decoder.Probes);
+        Assert.Equal(1, decoders.Probes.Count);
+    }
+
+    [Fact]
+    public void AddedDecodersDoNotReachTheProcessDefault()
+    {
+        var payload = new byte[] { 0x5A, 0x5A, 0xEE, 0x00 };
+        var decoders = ImageDecoders.BuiltIn.Add(new StubDecoder([0x5A, 0x5A, 0xEE]));
+
+        Assert.NotNull(decoders.Decode(payload, ReaderLimits.Default));
+        Assert.Throws<NotSupportedException>(() => ImageDecoders.Default.Decode(payload, ReaderLimits.Default));
     }
 
     private sealed class StubDecoder(byte[] magic) : IImageDecoder
     {
-        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
         {
             if (!data.Span.StartsWith(magic))
             {
-                xobject = null;
+                image = null;
                 return false;
             }
 
-            var stream = new StreamObject(Array.Empty<byte>());
-            stream.Dictionary["Width"] = new NumberObject(1);
-            stream.Dictionary["Height"] = new NumberObject(1);
-            xobject = new ImageXObject(stream, null);
+            image = new DecodedImage(Array.Empty<byte>(), 1, 1, 8, ImageColorSpace.DeviceGray);
             return true;
         }
     }
@@ -114,10 +122,10 @@ public class ImageDecoderRegistryTests
     {
         public int Probes;
 
-        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
         {
             Interlocked.Increment(ref Probes);
-            xobject = null;
+            image = null;
             return false;
         }
     }

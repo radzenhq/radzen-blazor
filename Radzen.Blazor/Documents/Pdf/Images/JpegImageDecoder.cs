@@ -1,28 +1,44 @@
-using Radzen.Documents.Pdf.Objects;
 using System;
-using System.Buffers.Binary;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
 namespace Radzen.Documents.Pdf;
 
 internal sealed class JpegImageDecoder : IImageDecoder
 {
-    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+    // ISO 32000-1 8.9.5.2: /Decode maps each component onto the given range, low then high.
+    private static readonly ImmutableArray<double> InvertedCmyk = [1, 0, 1, 0, 1, 0, 1, 0];
+
+    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
     {
-        if (data.Length < 2 || data.Span[0] != 0xFF || data.Span[1] != 0xD8)
+        if (!ImageHeaders.IsJpeg(data.Span))
         {
-            xobject = null;
+            image = null;
             return false;
         }
 
-        xobject = DecodeJpeg(data, limits);
+        image = DecodeJpeg(data, limits);
         return true;
     }
 
-    private static ImageXObject DecodeJpeg(ReadOnlyMemory<byte> data, ReaderLimits limits)
+    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, out int width, out int height)
     {
-        var (width, height, precision, components, adobe) = ReadJpegFrame(data.Span);
+        if (!ImageHeaders.IsJpeg(data.Span))
+        {
+            width = 0;
+            height = 0;
+            return false;
+        }
+
+        var frame = ReadFrame(data.Span);
+        width = frame.Width;
+        height = frame.Height;
+        return true;
+    }
+
+    private static DecodedImage DecodeJpeg(ReadOnlyMemory<byte> data, ReaderLimits limits)
+    {
+        var (width, height, precision, components, adobe) = ReadFrame(data.Span);
 
         ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG");
 
@@ -35,112 +51,29 @@ internal sealed class JpegImageDecoder : IImageDecoder
 
         var colorSpace = components switch
         {
-            1 => "DeviceGray",
-            3 => "DeviceRGB",
-            4 => "DeviceCMYK",
+            1 => ImageColorSpace.DeviceGray,
+            3 => ImageColorSpace.DeviceRgb,
+            4 => ImageColorSpace.DeviceCmyk,
             _ => throw new NotSupportedException($"Unsupported JPEG component count {components}."),
         };
 
-        var stream = new StreamObject(data);
-        var dict = stream.Dictionary;
-        ImageXObjectShell.Apply(
-            dict,
-            new NumberObject(width),
-            new NumberObject(height),
-            new NameObject(colorSpace),
-            new NumberObject(precision),
-            new NameObject("DCTDecode"));
-
-        if (components == 4 && adobe)
+        return new DecodedImage(data, width, height, precision, colorSpace)
         {
-            dict["Decode"] = new ArrayObject
-            {
-                new NumberObject(1), new NumberObject(0),
-                new NumberObject(1), new NumberObject(0),
-                new NumberObject(1), new NumberObject(0),
-                new NumberObject(1), new NumberObject(0),
-            };
-        }
-
-        return new ImageXObject(stream, null);
+            Compression = ImageCompression.Jpeg,
+            Decode = components == 4 && adobe ? InvertedCmyk : [],
+        };
     }
 
-    private static (int Width, int Height, int Precision, int Components, bool Adobe) ReadJpegFrame(ReadOnlySpan<byte> data)
+    private static (int Width, int Height, int Precision, int Components, bool Adobe) ReadFrame(ReadOnlySpan<byte> data)
     {
-        var adobe = false;
-        var pos = 2;
-        while (pos + 1 < data.Length)
+        var position = ImageHeaders.FindJpegFrame(data, out var marker, out var adobe);
+        if (marker is not (0xC0 or 0xC1 or 0xC2))
         {
-            if (data[pos] != 0xFF)
-            {
-                pos++;
-                continue;
-            }
-
-            var marker = data[pos + 1];
-            pos += 2;
-
-            if (marker is 0x01 or (>= 0xD0 and <= 0xD9))
-            {
-                continue;
-            }
-
-            if (pos + 1 >= data.Length)
-            {
-                break;
-            }
-
-            var segmentLength = BinaryPrimitives.ReadUInt16BigEndian(data[pos..]);
-            if (segmentLength < 2 || pos + segmentLength > data.Length)
-            {
-                throw new InvalidDataException("JPEG segment length is invalid.");
-            }
-
-            if (marker == 0xEE && IsAdobeApp14(data, pos, segmentLength))
-            {
-                adobe = true;
-            }
-
-            if (IsStartOfFrame(marker))
-            {
-                if (marker is not (0xC0 or 0xC1 or 0xC2))
-                {
-                    throw new NotSupportedException(
-                        $"JPEG start-of-frame marker 0xFF{marker:X2} is not supported by DCTDecode.");
-                }
-
-                if (pos + 8 > data.Length)
-                {
-                    throw new InvalidDataException("JPEG start-of-frame segment is truncated.");
-                }
-
-                var precision = data[pos + 2];
-                var height = BinaryPrimitives.ReadUInt16BigEndian(data[(pos + 3)..]);
-                var width = BinaryPrimitives.ReadUInt16BigEndian(data[(pos + 5)..]);
-                var components = data[pos + 7];
-                return (width, height, precision, components, adobe);
-            }
-
-            pos += segmentLength;
+            throw new NotSupportedException(
+                $"JPEG start-of-frame marker 0xFF{marker:X2} is not supported by DCTDecode.");
         }
 
-        throw new InvalidDataException("No JPEG start-of-frame marker was found.");
+        var frame = ImageHeaders.ReadJpegFrame(data, position);
+        return (frame.Width, frame.Height, frame.Precision, frame.Components, adobe);
     }
-
-    private static bool IsAdobeApp14(ReadOnlySpan<byte> data, int pos, int segmentLength)
-        => segmentLength >= 8
-            && data[pos + 2] == (byte)'A'
-            && data[pos + 3] == (byte)'d'
-            && data[pos + 4] == (byte)'o'
-            && data[pos + 5] == (byte)'b'
-            && data[pos + 6] == (byte)'e';
-
-    private static bool IsStartOfFrame(byte marker) => marker switch
-    {
-        >= 0xC0 and <= 0xC3 => true,
-        >= 0xC5 and <= 0xC7 => true,
-        >= 0xC9 and <= 0xCB => true,
-        >= 0xCD and <= 0xCF => true,
-        _ => false,
-    };
 }

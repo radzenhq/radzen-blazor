@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -133,6 +134,15 @@ public sealed class DocumentRenderer
     public bool AllowUnsupportedCharacters { get; set; }
 
     /// <summary>
+    /// Gets or sets the image decoders this renderer decodes and measures images with. Seeded from
+    /// <see cref="ImageDecoders.Default"/>, so a decoder registered with
+    /// <see cref="ImageDecoder.Register(IImageDecoder)"/> before this renderer was created is
+    /// already in the set. Assign <c>ImageDecoders.BuiltIn.Add(...)</c> to reach a custom format
+    /// from this renderer alone. Captured into the produced document at <see cref="Render(Document)"/>.
+    /// </summary>
+    public ImageDecoders ImageDecoders { get; set; } = ImageDecoders.Default;
+
+    /// <summary>
     /// Runs the layout engine over the model's sections and produces a physical
     /// <see cref="PortableDocument"/>. Paragraphs flow across pages, tables lay out and paginate
     /// (repeating header rows), images decode and scale to their box, registered fonts
@@ -142,9 +152,11 @@ public sealed class DocumentRenderer
     /// <returns>The generated document.</returns>
     public PortableDocument Render(Document document)
     {
+        ArgumentNullException.ThrowIfNull(document);
+
         var output = DocumentGenerator.Generate(
             RenderRequest.From(this),
-            Layout.DocumentLayouter.Layout(document, AllowUnsupportedCharacters));
+            Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes, AllowUnsupportedCharacters));
         output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
         return output;
     }

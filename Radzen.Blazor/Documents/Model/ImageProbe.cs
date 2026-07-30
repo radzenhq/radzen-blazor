@@ -42,6 +42,15 @@ internal static class ImageProbe
         }
     }
 
+    public static void Restore(ImageProbes probes)
+    {
+        ArgumentNullException.ThrowIfNull(probes);
+        lock (SizeProbeGate)
+        {
+            registered = probes;
+        }
+    }
+
     public static ImageInfo Inspect(byte[] data) => registered.Inspect(data);
 
     public static ImageFormat Format(byte[] data) => registered.Format(data);

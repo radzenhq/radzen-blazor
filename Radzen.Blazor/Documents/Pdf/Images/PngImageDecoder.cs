@@ -3,30 +3,40 @@ using Radzen.Documents.Pdf.Objects.Filters;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 namespace Radzen.Documents.Pdf;
 
 internal sealed class PngImageDecoder : IImageDecoder
 {
-    private static readonly byte[] PngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
-
-    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out ImageXObject? xobject)
+    public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
     {
-        if (!IsPng(data.Span))
+        if (!ImageHeaders.IsPng(data.Span))
         {
-            xobject = null;
+            image = null;
             return false;
         }
 
-        xobject = DecodePng(data, limits);
+        image = DecodePng(data, limits);
         return true;
     }
 
-    private static bool IsPng(ReadOnlySpan<byte> data)
-        => PdfBytes.Matches(data, PngSignature);
+    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, out int width, out int height)
+    {
+        if (!ImageHeaders.IsPng(data.Span))
+        {
+            width = 0;
+            height = 0;
+            return false;
+        }
+
+        var header = ImageHeaders.ReadPngHeader(data.Span);
+        width = header.Width;
+        height = header.Height;
+        return true;
+    }
 
     private static ReadOnlyMemory<byte> JoinIdat(ReadOnlyMemory<byte> data, List<Range>? chunks)
     {
@@ -58,7 +68,7 @@ internal sealed class PngImageDecoder : IImageDecoder
         return joined;
     }
 
-    private static ImageXObject DecodePng(ReadOnlyMemory<byte> data, ReaderLimits limits)
+    private static DecodedImage DecodePng(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
         var width = 0;
         var height = 0;
@@ -68,33 +78,21 @@ internal sealed class PngImageDecoder : IImageDecoder
         byte[]? transparency = null;
         List<Range>? idat = null;
 
-        long pos = PngSignature.Length;
-        while (pos + 8 <= data.Length)
+        var chunks = new PngChunkReader(data.Span);
+        while (chunks.MoveNext())
         {
-            uint length = BinaryPrimitives.ReadUInt32BigEndian(data.Span[(int)pos..]);
-            long body = pos + 8;
-            if (length > data.Length - body)
-            {
-                throw new InvalidDataException("PNG chunk length exceeds the available data.");
-            }
+            var start = chunks.Start;
+            var count = chunks.Count;
 
-            var type = Encoding.ASCII.GetString(data.Span.Slice((int)pos + 4, 4));
-            var start = (int)body;
-            var count = (int)length;
-
-            switch (type)
+            switch (chunks.Type)
             {
                 case "IHDR":
-                    if (count < 13)
-                    {
-                        throw new InvalidDataException("PNG IHDR chunk is truncated.");
-                    }
-
-                    width = (int)BinaryPrimitives.ReadUInt32BigEndian(data.Span[start..]);
-                    height = (int)BinaryPrimitives.ReadUInt32BigEndian(data.Span[(start + 4)..]);
-                    bitDepth = data.Span[start + 8];
-                    colorType = data.Span[start + 9];
-                    if (data.Span[start + 12] != 0)
+                    var header = ImageHeaders.ReadIhdr(data.Span, start, count);
+                    width = header.Width;
+                    height = header.Height;
+                    bitDepth = header.BitDepth;
+                    colorType = header.ColorType;
+                    if (header.Interlace != 0)
                     {
                         throw new NotSupportedException("Adam7 interlaced PNG images are not supported.");
                     }
@@ -109,12 +107,7 @@ internal sealed class PngImageDecoder : IImageDecoder
                 case "IDAT":
                     (idat ??= []).Add(new Range(start, start + count));
                     break;
-                case "IEND":
-                    pos = data.Length;
-                    continue;
             }
-
-            pos = body + count + 4;
         }
 
         ImageDecoder.ValidateImageDimensions(width, height, limits, "PNG");
@@ -149,11 +142,11 @@ internal sealed class PngImageDecoder : IImageDecoder
 
         return colorType switch
         {
-            0 => BuildColorKeyedPng(width, height, bitDepth, new NameObject("DeviceGray"), samples, transparency, 1),
-            2 => BuildColorKeyedPng(width, height, bitDepth, new NameObject("DeviceRGB"), samples, transparency, 3),
+            0 => BuildColorKeyedPng(width, height, bitDepth, ImageColorSpace.DeviceGray, samples, transparency, 1),
+            2 => BuildColorKeyedPng(width, height, bitDepth, ImageColorSpace.DeviceRgb, samples, transparency, 3),
             3 => BuildPalettedPng(width, height, bitDepth, samples, palette, transparency),
-            4 => BuildAlphaPng(width, height, new NameObject("DeviceGray"), samples, 1, bitDepth),
-            6 => BuildAlphaPng(width, height, new NameObject("DeviceRGB"), samples, 3, bitDepth),
+            4 => BuildAlphaPng(width, height, ImageColorSpace.DeviceGray, samples, 1, bitDepth),
+            6 => BuildAlphaPng(width, height, ImageColorSpace.DeviceRgb, samples, 3, bitDepth),
             _ => throw new NotSupportedException($"Unsupported PNG color type {colorType}."),
         };
     }
@@ -178,11 +171,10 @@ internal sealed class PngImageDecoder : IImageDecoder
     }
 
     // ISO 32000-1 8.9.6.4: a tRNS color key on grayscale/truecolor maps to /Mask.
-    private static ImageXObject BuildColorKeyedPng(
-        int width, int height, int bitDepth, NameObject colorSpace, byte[] samples, byte[]? transparency, int components)
+    private static DecodedImage BuildColorKeyedPng(
+        int width, int height, int bitDepth, ImageColorSpace colorSpace, byte[] samples, byte[]? transparency, int components)
     {
-        var image = BuildImage(width, height, bitDepth, colorSpace, samples);
-
+        var colorKey = ImmutableArray<int>.Empty;
         if (transparency is not null)
         {
             if (transparency.Length < 2 * components)
@@ -190,21 +182,21 @@ internal sealed class PngImageDecoder : IImageDecoder
                 throw new InvalidDataException("PNG tRNS chunk is truncated for the color type.");
             }
 
-            var mask = new ArrayObject();
+            var builder = ImmutableArray.CreateBuilder<int>(2 * components);
             for (var c = 0; c < components; c++)
             {
                 var value = BinaryPrimitives.ReadUInt16BigEndian(transparency.AsSpan(c * 2));
-                mask.Add(new NumberObject(value));
-                mask.Add(new NumberObject(value));
+                builder.Add(value);
+                builder.Add(value);
             }
 
-            image.Dictionary["Mask"] = mask;
+            colorKey = builder.MoveToImmutable();
         }
 
-        return new ImageXObject(image, null);
+        return new DecodedImage(samples, width, height, bitDepth, colorSpace) { ColorKeyMask = colorKey };
     }
 
-    private static ImageXObject BuildPalettedPng(
+    private static DecodedImage BuildPalettedPng(
         int width,
         int height,
         int bitDepth,
@@ -222,20 +214,9 @@ internal sealed class PngImageDecoder : IImageDecoder
             throw new InvalidDataException("PNG PLTE chunk must hold 1 to 256 RGB triples.");
         }
 
-        var hival = (palette.Length / 3) - 1;
-        var colorSpace = new ArrayObject
-        {
-            new NameObject("Indexed"),
-            new NameObject("DeviceRGB"),
-            new NumberObject(hival),
-            new StringObject(Encoding.Latin1.GetString(palette)),
-        };
-
-        var image = BuildImage(width, height, bitDepth, colorSpace, indices);
-
         if (transparency is null)
         {
-            return new ImageXObject(image, null);
+            return new DecodedImage(indices, width, height, bitDepth, ImageColorSpace.Indexed) { Palette = palette };
         }
 
         var pixels = UnpackIndices(indices, width, height, bitDepth);
@@ -246,8 +227,11 @@ internal sealed class PngImageDecoder : IImageDecoder
             alpha[i] = index < transparency.Length ? transparency[index] : (byte)0xFF;
         }
 
-        var mask = BuildImage(width, height, 8, new NameObject("DeviceGray"), alpha);
-        return new ImageXObject(image, mask);
+        return new DecodedImage(indices, width, height, bitDepth, ImageColorSpace.Indexed)
+        {
+            Palette = palette,
+            Alpha = Gray(width, height, alpha),
+        };
     }
 
     private static byte[] UnpackIndices(byte[] indices, int width, int height, int bitDepth)
@@ -274,7 +258,8 @@ internal sealed class PngImageDecoder : IImageDecoder
         return pixels;
     }
 
-    private static ImageXObject BuildAlphaPng(int width, int height, NameObject colorSpace, byte[] samples, int colorChannels, int bitDepth)
+    private static DecodedImage BuildAlphaPng(
+        int width, int height, ImageColorSpace colorSpace, byte[] samples, int colorChannels, int bitDepth)
     {
         var pixelCount = width * height;
         var bytesPerSample = bitDepth / 8;
@@ -292,12 +277,9 @@ internal sealed class PngImageDecoder : IImageDecoder
             alpha[i] = samples[(i * stride) + (colorChannels * bytesPerSample)];
         }
 
-        var image = BuildImage(width, height, 8, colorSpace, color);
-        var mask = BuildImage(width, height, 8, new NameObject("DeviceGray"), alpha);
-        return new ImageXObject(image, mask);
+        return new DecodedImage(color, width, height, 8, colorSpace) { Alpha = Gray(width, height, alpha) };
     }
 
-    private static StreamObject BuildImage(int width, int height, int bitsPerComponent, DocumentObject colorSpace, byte[] samples)
-        => ImageXObjectShell.FlateImage(samples, width, height, bitsPerComponent, colorSpace);
-
+    private static DecodedImage Gray(int width, int height, byte[] samples)
+        => new(samples, width, height, 8, ImageColorSpace.DeviceGray);
 }
