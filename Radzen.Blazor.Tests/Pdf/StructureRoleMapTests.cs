@@ -193,6 +193,33 @@ public class StructureRoleMapTests
     }
 
     [Fact]
+    public void MultiHopRoleChainTerminatingAtAStandardType_Renders()
+    {
+        var authored = AuthorWithStyleRole("Body", "Callout", mapsTo: null);
+        authored.Renderer.RoleMap.Add("Callout", "Aside");
+        authored.Renderer.RoleMap.Add("Aside", "Sidebar");
+        authored.Renderer.RoleMap.Add("Sidebar", "Div");
+
+        var reader = ReadAuthored(authored);
+        var structRoot = StructTreeRoot(reader);
+
+        Assert.Equal("Callout", FirstStructureRole(reader, structRoot));
+        Assert.True(structRoot.ContainsKey("RoleMap"), "the chain is written to /RoleMap");
+    }
+
+    [Fact]
+    public void DanglingRoleChain_FailsAtSaveUnderPdfUa()
+    {
+        var authored = AuthorWithStyleRole("Body", "Callout", mapsTo: null);
+        authored.Renderer.RoleMap.Add("Callout", "Aside");
+
+        var error = Assert.Throws<System.InvalidOperationException>(() => RenderAuthored(authored));
+
+        Assert.Contains("Aside", error.Message, System.StringComparison.Ordinal);
+        Assert.Contains("neither a standard type nor itself role mapped", error.Message, System.StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void DeclaredRole_ProducesByteIdenticalOutputAcrossBuilds()
     {
         var first = RenderAuthored(AuthorTagged(declareRole: true));

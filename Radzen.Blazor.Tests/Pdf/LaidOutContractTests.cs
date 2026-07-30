@@ -1,19 +1,19 @@
 #nullable enable
-using System;
-using System.Collections;
-using System.Collections.Immutable;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Radzen.Documents;
-using Radzen.Documents.Fonts;
-using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Render;
-using Xunit;
+using System;
 using Radzen.Documents.Codes;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.LaidOut;
+using Radzen.Documents.Layout;
+using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf;
+using Radzen.Documents;
+using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -310,6 +310,26 @@ public class LaidOutContractTests
         body.Cells[0].Borders.Left.Color = Color.FromRgb(3, 3, 3);
         body.Cells[0].Blocks.AddParagraph("body");
         return table;
+    }
+
+    [Fact]
+    public void EmptyCellInAFadedContainer_InheritsTheContainerOpacity()
+    {
+        var document = new Document();
+        var section = Page(document);
+        var container = section.Blocks.Add(new Container { Opacity = 0.4 });
+        var table = container.Blocks.Add(new Table());
+        table.Columns.Add(Unit.FromPoint(80));
+        table.Columns.Add(Unit.FromPoint(80));
+        var row = table.Rows.Add();
+        row.Cells[0].Blocks.AddParagraph("filled");
+        row.Cells[1].Background = Color.FromRgb(9, 9, 9);
+
+        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
+        var layout = page.Body.Boxes[0].Content.Tables[0].Layout;
+
+        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 0).Opacity);
+        Assert.Equal(0.4, layout.Cells.Single(cell => cell.Column == 1).Opacity);
     }
 
     [Fact]

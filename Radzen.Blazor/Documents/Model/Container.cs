@@ -1,4 +1,4 @@
-using Radzen.Documents.Geometry;
+using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents;
 
@@ -96,7 +96,11 @@ public sealed class Container : Block
 
     /// <summary>
     /// Gets or sets the opacity the box background and borders are painted with, from 0
-    /// (fully transparent) to 1 (fully opaque). Defaults to 1.
+    /// (fully transparent) to 1 (fully opaque). Defaults to 1. The opacity is inherited by
+    /// the decoration of every nested box, list item and table cell, multiplying with each
+    /// nested <see cref="Opacity"/>. A table cell's shading and borders take the whole
+    /// inherited opacity regardless of what the cell holds, so cells with several blocks and
+    /// empty cells are painted alike.
     /// </summary>
     /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is not between 0 and 1.</exception>
     public double Opacity
