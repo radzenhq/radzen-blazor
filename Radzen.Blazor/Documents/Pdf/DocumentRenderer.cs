@@ -125,6 +125,14 @@ public sealed class DocumentRenderer
     public bool IncludeDocumentId { get; set; }
 
     /// <summary>
+    /// Gets or sets whether a glyph captured from a built-in metrics font that the PDF text
+    /// encoding cannot represent is drawn as '?'. Defaults to <see langword="false"/>, so
+    /// rendering throws and names the offending characters. Captured into the laid-out scene at
+    /// <see cref="Render(Document)"/>.
+    /// </summary>
+    public bool AllowUnsupportedCharacters { get; set; }
+
+    /// <summary>
     /// Runs the layout engine over the model's sections and produces a physical
     /// <see cref="PortableDocument"/>. Paragraphs flow across pages, tables lay out and paginate
     /// (repeating header rows), images decode and scale to their box, registered fonts
@@ -134,7 +142,9 @@ public sealed class DocumentRenderer
     /// <returns>The generated document.</returns>
     public PortableDocument Render(Document document)
     {
-        var output = DocumentGenerator.Generate(document, RenderRequest.From(this));
+        var output = DocumentGenerator.Generate(
+            RenderRequest.From(this),
+            Layout.DocumentLayouter.Layout(document, AllowUnsupportedCharacters));
         output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
         return output;
     }

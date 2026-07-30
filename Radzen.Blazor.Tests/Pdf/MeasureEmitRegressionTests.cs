@@ -32,9 +32,11 @@ public class MeasureEmitRegressionTests
         return shows;
     }
 
-    private static List<(double X, double Y, byte[] Bytes)> ShowsSortedTopDown(Document document)
+    private static List<(double X, double Y, byte[] Bytes)> ShowsSortedTopDown(
+        Document document,
+        DocumentRenderer? renderer = null)
     {
-        var reader = BuildTestSupport.Read(document);
+        var reader = BuildTestSupport.Read(document, renderer);
         var shows = TextShows(ContentTestHelpers.PageContent(reader, 0));
         shows.Sort((a, b) => b.Y.CompareTo(a.Y));
         return shows;
@@ -57,12 +59,13 @@ public class MeasureEmitRegressionTests
     public void Base14NoFallback_RightAligned_SubstituteDoesNotRewriteLayoutMetrics()
     {
         var document = new Document();
-        document.Fonts.AllowUnsupportedCharacters = true;
         var section = document.Sections.Add();
         RightAligned(section, "ﬁﬁﬁﬁﬁ", null);
         RightAligned(section, "?????", null);
 
-        var shows = ShowsSortedTopDown(document);
+        var shows = ShowsSortedTopDown(
+            document,
+            new DocumentRenderer { AllowUnsupportedCharacters = true });
 
         Assert.Equal(2, shows.Count);
         Assert.Equal("?????", Encoding.Latin1.GetString(shows[0].Bytes));

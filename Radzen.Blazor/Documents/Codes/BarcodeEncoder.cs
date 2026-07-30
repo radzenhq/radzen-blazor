@@ -1083,8 +1083,8 @@ public static class BarcodeEncoder
         ArgumentNullException.ThrowIfNull(foreground);
         ArgumentNullException.ThrowIfNull(background);
 
-        var barFill = SvgAttributes.Color(foreground, nameof(foreground));
-        var backgroundFill = SvgAttributes.Color(background, nameof(background));
+        var barFill = FillAttributes(SvgAttributes.TranslucentFill(foreground, nameof(foreground)));
+        var backgroundFill = FillAttributes(SvgAttributes.TranslucentFill(background, nameof(background)));
 
         var (bars, viewBoxWidth, viewBoxHeight) = EncodeToBars(type, value, barHeight, quietZoneModules);
 
@@ -1100,12 +1100,12 @@ public static class BarcodeEncoder
 
         var sb = new StringBuilder(bars.Count * 64 + 256);
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" viewBox=\"0 0 {F(viewBoxWidth)} {F(viewBoxHeight)}\" shape-rendering=\"crispEdges\">");
-        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" fill=\"{backgroundFill}\"/>");
+        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{F(viewBoxWidth)}\" height=\"{F(viewBoxHeight)}\" {backgroundFill}/>");
 
         for (int i = 0; i < bars.Count; i++)
         {
             var bar = bars[i];
-            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{F(bar.X)}\" y=\"{F(bar.Y)}\" width=\"{F(bar.Width)}\" height=\"{F(bar.Height)}\" fill=\"{barFill}\"/>");
+            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{F(bar.X)}\" y=\"{F(bar.Y)}\" width=\"{F(bar.Width)}\" height=\"{F(bar.Height)}\" {barFill}/>");
         }
 
         sb.Append("</svg>");
@@ -1308,5 +1308,10 @@ public static class BarcodeEncoder
         return c;
     }
 
-    private static string F(double v) => v.ToString(CultureInfo.InvariantCulture);
+    private static string FillAttributes((string Color, double Opacity) fill)
+        => fill.Opacity >= 1
+            ? $"fill=\"{fill.Color}\""
+            : $"fill=\"{fill.Color}\" fill-opacity=\"{F(fill.Opacity)}\"";
+
+    private static string F(double v) => SvgAttributes.Number(v);
 }

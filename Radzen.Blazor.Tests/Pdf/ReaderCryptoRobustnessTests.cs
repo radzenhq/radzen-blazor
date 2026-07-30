@@ -24,9 +24,10 @@ public class ReaderCryptoRobustnessTests
     public void AesCbcDecrypt_OddLengthCiphertext_Throws(int length)
     {
         var key = CryptoFixtureSupport.FixedBytes(32, 9);
+        var iv = CryptoFixtureSupport.FixedBytes(16, 7);
         var data = CryptoFixtureSupport.FixedBytes(length, 3);
 
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(key, data));
+        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(key, iv, data));
     }
 
 

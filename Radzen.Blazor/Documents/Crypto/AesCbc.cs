@@ -32,24 +32,15 @@ internal static class AesCbc
 
     private static readonly byte[] Rcon = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
 
-    public static byte[] Decrypt(byte[] key, byte[] data)
+    public static byte[] Decrypt(byte[] key, byte[] iv, byte[] cipher)
     {
-        ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(data);
-        if (data.Length < 16)
-        {
-            throw new InvalidDataException("AES data is shorter than the required 16-byte IV.");
-        }
-
-        var iv = data[..16];
-        var cipher = data[16..];
+        ArgumentNullException.ThrowIfNull(cipher);
         if (cipher.Length == 0)
         {
-            throw new InvalidDataException("AES ciphertext after the IV is empty.");
+            throw new InvalidDataException("AES ciphertext is empty.");
         }
 
-        var plain = DecryptCbcNoPadding(key, iv, cipher);
-        return StripPadding(plain);
+        return StripPadding(DecryptCbcNoPadding(key, iv, cipher));
     }
 
     public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] cipher)

@@ -4,7 +4,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Text;
 using Radzen.Documents;
-using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf;
 using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;

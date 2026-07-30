@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -52,6 +53,63 @@ internal static class SvgAttributes
             || value.StartsWith("rgb", StringComparison.OrdinalIgnoreCase)
             || IsKeyword(value)
             || ColorValue.Parse(value) is not null;
+    }
+
+    internal static string Href(string value, string parameterName)
+        => IsAllowedHref(value)
+            ? Escape(value)
+            : throw new ArgumentException(
+                $"'{value}' is not an allowed image reference; use an http, https or data:image URL.",
+                parameterName);
+
+    private static bool IsAllowedHref(string value)
+        => value.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase);
+
+    // https://www.w3.org/TR/SVG11/types.html#DataTypeNumber - an SVG number is decimal or
+    // exponent notation with an 'e', never the 'E' that .NET round-tripping emits.
+    internal static string Number(double value)
+        => value.ToString("0.################", CultureInfo.InvariantCulture);
+
+    internal static (string Color, double Opacity) TranslucentFill(string value, string parameterName)
+    {
+        var escaped = Color(value, parameterName);
+        if (ColorValue.Parse(value) is { } rgb && rgb.Alpha < 1)
+        {
+            return (
+                $"rgb({Number(rgb.Red)}, {Number(rgb.Green)}, {Number(rgb.Blue)})",
+                Math.Clamp(rgb.Alpha, 0, 1));
+        }
+
+        return (escaped, 1);
+    }
+
+    internal static (string Color, double Opacity) Fill(string? color, string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(color))
+        {
+            return ("none", 1);
+        }
+
+        if (string.Equals(color, "transparent", StringComparison.OrdinalIgnoreCase))
+        {
+            return ("rgb(0, 0, 0)", 0);
+        }
+
+        if (!IsColor(color))
+        {
+            throw new ArgumentException($"'{color}' is not a valid CSS color.", parameterName);
+        }
+
+        if (ColorValue.Parse(color) is not { } rgb)
+        {
+            return (Escape(color), 1);
+        }
+
+        return (
+            $"rgb({Number(rgb.Red)}, {Number(rgb.Green)}, {Number(rgb.Blue)})",
+            Math.Clamp(rgb.Alpha, 0, 1));
     }
 
     internal static bool IsKeyword(string value)

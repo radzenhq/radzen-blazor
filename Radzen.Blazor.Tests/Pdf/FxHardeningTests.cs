@@ -105,6 +105,15 @@ public class FxHardeningTests
     }
 
     [Fact]
+    public void SfntWithoutHorizontalMetrics_Throws()
+    {
+        var error = Assert.Throws<InvalidDataException>(
+            () => SfntFont.Parse(MinimalSfnt(bogusTableLength: 4, numberOfHMetrics: 0)));
+
+        Assert.Contains("no horizontal metrics", error.Message, System.StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void SfntTableRecordPastEnd_MemoryVariant_Throws()
     {
         var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 0xFFFF_FFF0u));
@@ -121,13 +130,15 @@ public class FxHardeningTests
         Assert.Throws<InvalidDataException>(() => CffDict.Parse(dict));
     }
 
-    private static byte[] MinimalSfnt(uint bogusTableLength)
+    private static byte[] MinimalSfnt(uint bogusTableLength, int numberOfHMetrics = 1)
     {
         const int numTables = 5;
         var dirLen = 12 + (numTables * 16);
         var head = new byte[54];
         var maxp = new byte[6];
         var hhea = new byte[36];
+        hhea[34] = (byte)(numberOfHMetrics >> 8);
+        hhea[35] = (byte)numberOfHMetrics;
         var hmtx = new byte[4];
         var test = new byte[] { 1, 2, 3, 4 };
 

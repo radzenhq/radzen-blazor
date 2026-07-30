@@ -56,7 +56,7 @@ internal sealed class PooledByteAccumulator(int initialCapacity)
     {
         if (buffer is not null)
         {
-            ArrayPool<byte>.Shared.Return(buffer);
+            ArrayPool<byte>.Shared.Return(buffer, clearArray: true);
             buffer = null;
         }
     }
@@ -64,10 +64,22 @@ internal sealed class PooledByteAccumulator(int initialCapacity)
     private byte[] Grow(int extra)
     {
         var data = Buffer;
-        var replacement = ArrayPool<byte>.Shared.Rent(Math.Max(data.Length * 2, length + extra));
+        var replacement = ArrayPool<byte>.Shared.Rent(Capacity(data.Length, extra));
         data.AsSpan(0, length).CopyTo(replacement);
-        ArrayPool<byte>.Shared.Return(data);
+        ArrayPool<byte>.Shared.Return(data, clearArray: true);
         buffer = replacement;
         return replacement;
+    }
+
+    private int Capacity(int current, int extra)
+    {
+        var required = (long)length + extra;
+        if (required > Array.MaxLength)
+        {
+            throw new InvalidOperationException(
+                $"A pooled byte accumulator cannot grow to {required} bytes; the maximum is {Array.MaxLength}.");
+        }
+
+        return (int)Math.Min(Math.Max((long)current * 2, required), Array.MaxLength);
     }
 }

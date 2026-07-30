@@ -207,5 +207,14 @@ public class BarcodeEncoderTests
 
         Assert.Contains("fill=\"rgb(1, 2, 3)\"", svg, StringComparison.Ordinal);
         Assert.Contains("fill=\"papayawhip\"", svg, StringComparison.Ordinal);
+        Assert.DoesNotContain("fill-opacity", svg, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToSvg_HonoursTheAlphaChannelOfAnRgbaColor()
+    {
+        var svg = BarcodeEncoder.ToSvg(BarcodeType.Code128, "ABC", foreground: "rgba(1, 2, 3, 0.25)");
+
+        Assert.Contains("fill=\"rgb(1, 2, 3)\" fill-opacity=\"0.25\"", svg, StringComparison.Ordinal);
     }
 }

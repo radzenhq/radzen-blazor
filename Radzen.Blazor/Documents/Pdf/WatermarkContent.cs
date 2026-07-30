@@ -44,7 +44,7 @@ internal sealed class WatermarkContent(
             Opacity = image.Opacity,
             Interpolate = image.Interpolate,
         };
-        var decoded = images.DecodeWatermark(source, paint).Image;
+        var decoded = ImageStore.SourceOf(images.DecodeWatermark(source, paint));
         var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
         var state = plan.Alpha < 1

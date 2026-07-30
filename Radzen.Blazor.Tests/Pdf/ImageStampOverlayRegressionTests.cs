@@ -178,7 +178,7 @@ public class ImageStampOverlayRegressionTests
         var codes = Type0EmbedSupport.CompactCodes(sfnt, map, "Hello");
         var content = ExtractionSupport.TextRun("F1", 12, 72, 700, codes);
 
-        var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, sfnt, map), content);
+        var document = ExtractionSupport.BuildSinglePage(w => Type0FontEmbedder.Embed(w, Type0FontPlanner.Plan(sfnt, map)), content);
         Assert.Equal("Hello", document.Pages[0].ExtractText());
 
         document.Pages[0].Content.Add(new TextContent("STAMP", Unit.FromPoint(72), Unit.FromPoint(650)));

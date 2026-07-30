@@ -2,9 +2,13 @@ namespace Radzen.Documents;
 
 internal sealed class ResourceLimits
 {
-    public long MaxFileBytes { get; init; } = 2L * 1024 * 1024 * 1024;
+    internal const long DefaultMaxFileBytes = int.MaxValue;
 
-    public long MaxImagePixels { get; init; } = 64L * 1024 * 1024;
+    internal const long DefaultMaxImagePixels = 64L * 1024 * 1024;
 
-    public static ResourceLimits Default => new();
+    public long MaxFileBytes { get; init; } = DefaultMaxFileBytes;
+
+    public long MaxImagePixels { get; init; } = DefaultMaxImagePixels;
+
+    public static ResourceLimits Default { get; } = new();
 }

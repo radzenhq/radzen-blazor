@@ -54,7 +54,7 @@ internal static class Type0EmbedSupport
     {
         using var buffer = new MemoryStream();
         var writer = new DocumentWriter(buffer);
-        var topRef = Type0FontEmbedder.Embed(writer, font, gidToUnicode);
+        var topRef = Type0FontEmbedder.Embed(writer, Type0FontPlanner.Plan(font, gidToUnicode));
         writer.Close();
 
         var reader = DocumentReader.Parse(buffer.ToArray());

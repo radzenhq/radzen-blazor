@@ -28,11 +28,11 @@ public class WinAnsiFallbackTests
     public void NonWinAnsiCharacters_NoFallback_AreNotSilentlyDeleted()
     {
         var document = new Document();
-        document.Fonts.AllowUnsupportedCharacters = true;
         var section = document.Sections.Add();
         section.Blocks.AddParagraph("AﬁB");
 
-        var text = BuildTestSupport.Reload(document).ExtractText().Trim();
+        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        var text = BuildTestSupport.Reload(document, renderer).ExtractText().Trim();
 
         Assert.NotEqual("AB", text);
         Assert.True(text.Length >= 3, $"expected a visible substitute, extracted '{text}'");
@@ -42,11 +42,11 @@ public class WinAnsiFallbackTests
     public void OnlyNonWinAnsiText_NoFallback_StillEmitsVisibleContent()
     {
         var document = new Document();
-        document.Fonts.AllowUnsupportedCharacters = true;
         var section = document.Sections.Add();
         section.Blocks.AddParagraph("ﬁﬁﬁﬁ");
 
-        var text = BuildTestSupport.Reload(document).ExtractText();
+        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        var text = BuildTestSupport.Reload(document, renderer).ExtractText();
 
         Assert.False(string.IsNullOrWhiteSpace(text), "non-cp1252 text must not vanish from the page");
     }

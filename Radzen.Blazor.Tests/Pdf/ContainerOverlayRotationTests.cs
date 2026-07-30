@@ -196,7 +196,7 @@ public class ContainerOverlayRotationTests
         var text = Text(72, 700) with { Transform = transform };
 
         using var writer = new ContentWriter();
-        ContentEmitter.WriteTextDraw(writer, text);
+        DrawEmitter.WriteTextDraw(writer, text);
         var content = Encoding.ASCII.GetString(writer.ToArray());
 
         var lines = content.Split('\n');
@@ -427,7 +427,7 @@ public class ContainerOverlayRotationTests
         Baseline = baseline,
         Size = 12,
         Color = Color.Black,
-        Font = new GeneratedFont { Key = "F0", Base14 = "Helvetica" },
+        Font = new EmittedFont { Key = "F0", Base14 = "Helvetica" },
         Bytes = Encoding.ASCII.GetBytes("Hi"),
     };
 }

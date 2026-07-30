@@ -73,10 +73,13 @@ public sealed class ReaderLimits
     public int MaxCharstringOperations { get; init; } = 1_000_000;
 
     /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
-    public long MaxImagePixels { get; init; } = 64L * 1024 * 1024;
+    public long MaxImagePixels { get; init; } = ResourceLimits.DefaultMaxImagePixels;
 
-    /// <summary>Maximum size in bytes of a source file buffered while loading. Default 2 GiB.</summary>
-    public long MaxFileBytes { get; init; } = 2L * 1024 * 1024 * 1024;
+    /// <summary>
+    /// Maximum size in bytes of a source file buffered while loading. Default 2 GiB minus one byte,
+    /// the largest buffer that can be addressed as a single array.
+    /// </summary>
+    public long MaxFileBytes { get; init; } = ResourceLimits.DefaultMaxFileBytes;
 
     /// <summary>The default limits used when a caller does not supply their own.</summary>
     public static ReaderLimits Default => new();
