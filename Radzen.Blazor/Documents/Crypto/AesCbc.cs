@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Radzen.Documents.Crypto;
 
+// FIPS 197 table-driven AES: the SBox/InvSBox lookups below are data-dependent and therefore
+// not constant-time, so this implementation leaks key material to a cache-timing attacker. That
+// is outside the threat model - it only decrypts PDF content the attacker already possesses.
 internal static class AesCbc
 {
     private static readonly byte[] SBox =

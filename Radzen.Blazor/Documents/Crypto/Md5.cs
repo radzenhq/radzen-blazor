@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 
 namespace Radzen.Documents.Crypto;
 
@@ -54,15 +55,17 @@ internal static class Md5
         Array.Copy(input, processedInput, input.Length);
         processedInput[input.Length] = 0x80;
 
-        byte[] length = BitConverter.GetBytes((ulong)input.Length * 8);
-        Array.Copy(length, 0, processedInput, processedInput.Length - 8, 8);
+        BinaryPrimitives.WriteUInt64LittleEndian(
+            processedInput.AsSpan(processedInput.Length - 8, 8),
+            (ulong)input.Length * 8);
 
         for (int i = 0; i < processedInput.Length / 64; ++i)
         {
             uint[] M = new uint[16];
             for (int j = 0; j < 16; ++j)
             {
-                M[j] = BitConverter.ToUInt32(processedInput, (i * 64) + (j * 4));
+                M[j] = BinaryPrimitives.ReadUInt32LittleEndian(
+                    processedInput.AsSpan((i * 64) + (j * 4), 4));
             }
 
             uint A = a0, B = b0, C = c0, D = d0, F = 0, g = 0;
@@ -104,10 +107,10 @@ internal static class Md5
         }
 
         var digest = new byte[16];
-        Array.Copy(BitConverter.GetBytes(a0), 0, digest, 0, 4);
-        Array.Copy(BitConverter.GetBytes(b0), 0, digest, 4, 4);
-        Array.Copy(BitConverter.GetBytes(c0), 0, digest, 8, 4);
-        Array.Copy(BitConverter.GetBytes(d0), 0, digest, 12, 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(digest.AsSpan(0, 4), a0);
+        BinaryPrimitives.WriteUInt32LittleEndian(digest.AsSpan(4, 4), b0);
+        BinaryPrimitives.WriteUInt32LittleEndian(digest.AsSpan(8, 4), c0);
+        BinaryPrimitives.WriteUInt32LittleEndian(digest.AsSpan(12, 4), d0);
         return digest;
     }
 }
