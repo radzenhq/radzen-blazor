@@ -160,9 +160,10 @@ public class PdfUaArtifactTests
         var (document, builderRenderer) = AuthorBanded(ua: true);
         document.Info.Title = null;
 
-        var exception = Record.Exception(() => builderRenderer.ToArray(document));
-        Assert.NotNull(exception);
-        Assert.Contains("title", exception!.Message, StringComparison.OrdinalIgnoreCase);
+        var error = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
+
+        Assert.Contains("PDF/UA", error.Message, StringComparison.Ordinal);
+        Assert.Contains("Document.Info.Title", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -174,9 +175,10 @@ public class PdfUaArtifactTests
         var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
-        var exception = Record.Exception(() => builderRenderer.ToArray(document));
-        Assert.NotNull(exception);
-        Assert.Contains("Figure", exception!.Message, StringComparison.Ordinal);
+        var error = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
+
+        Assert.Contains("PDF/UA", error.Message, StringComparison.Ordinal);
+        Assert.Contains("Figure", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -261,8 +263,8 @@ public class PdfUaArtifactTests
         section.Header.Blocks.Add(paragraph);
         section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
 
-        var exception = Record.Exception(() => builderRenderer.ToArray(document));
-        Assert.NotNull(exception);
-        Assert.Contains("link", exception!.Message, StringComparison.OrdinalIgnoreCase);
+        var error = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
+
+        Assert.Contains("PDF/UA", error.Message, StringComparison.Ordinal);
     }
 }

@@ -31,6 +31,21 @@ public class LaidOutContractTests
         => page.Body.Lines[0].Line.Fragments[0];
 
     [Fact]
+    public void BorderCapture_PreservesWidthAndStylePromotionPolicy()
+    {
+        var borders = new Borders();
+        borders.Top.Width = 2;
+        borders.Bottom.Style = BorderStyle.Dashed;
+
+        Assert.Equal(
+            new ResolvedEdge(Color.Black, 2, BorderStyle.Solid),
+            GeometryCapture.Edge(borders.Top));
+        Assert.Equal(
+            new ResolvedEdge(Color.Black, 0.5, BorderStyle.Dashed),
+            GeometryCapture.Edge(borders.Bottom));
+    }
+
+    [Fact]
     public void LaidOutFragment_CarriesResolvedRunPaint()
     {
         var document = new Document();
@@ -342,12 +357,13 @@ public class LaidOutContractTests
         var pages = DocumentLayouter.Layout(document).Pages;
         Assert.True(pages.Length > 1);
 
-        foreach (var page in pages)
+        for (var pageIndex = 0; pageIndex < pages.Length; pageIndex++)
         {
-            var fragment = Assert.Single(page.Body.Tables);
+            var fragment = Assert.Single(pages[pageIndex].Body.Tables);
             var first = fragment.Rows[0];
 
             Assert.True(first.IsHeader);
+            Assert.Equal(pageIndex > 0, fragment.Fragment.ContainsRepeatedHeaders);
             Assert.Equal(0, first.SourceRow);
             var placed = Assert.Single(first.Cells);
             Assert.Equal(first.Y, placed.Cell.Bounds.Y + placed.Delta, 6);
@@ -783,6 +799,75 @@ public class LaidOutContractTests
     private static bool IsImmutableArray(System.Type type)
         => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ImmutableArray<>);
 
+    private static readonly System.Type[] MutableModelRoots =
+    [
+        typeof(Block),
+        typeof(Inline),
+        typeof(Cell),
+        typeof(Row),
+        typeof(Column),
+        typeof(Section),
+        typeof(Watermark),
+        typeof(Document),
+        typeof(DocumentInfo),
+        typeof(FontCollection),
+        typeof(Font),
+        typeof(Style),
+        typeof(ListItem),
+        typeof(Margins),
+        typeof(Border),
+        typeof(Borders),
+        typeof(BoxShadow),
+    ];
+
+    private static readonly string[] MutableModelNamespaces =
+    [
+        typeof(Document).Namespace!,
+        typeof(FontCollection).Namespace!,
+    ];
+
+    private static bool IsMutable(System.Type type)
+        => SettableProperties(type).Any()
+            || type.GetFields(BindingFlags.Public | BindingFlags.Instance)
+                .Any(field => !field.IsInitOnly && !field.IsLiteral);
+
+    [Fact]
+    public void MutableModelRoots_CoverEveryMutablePublicTypeInTheModelNamespaces()
+    {
+        var uncovered =
+            from type in typeof(Document).Assembly.GetTypes()
+            where type.IsClass
+                && type.IsPublic
+                && !type.IsAbstract
+                && type.Namespace is { } declared
+                && MutableModelNamespaces.Contains(declared)
+                && IsMutable(type)
+                && !MutableModelRoots.Any(root => root.IsAssignableFrom(type))
+            select type.FullName;
+
+        Assert.Empty(uncovered);
+    }
+
+    [Fact]
+    public void LaidOutTypes_CoverEveryTypeInTheGeometryNamespace()
+    {
+        var reached = LaidOutTypes().ToHashSet();
+        var unreached =
+            from type in GeometryNamespaceTypes()
+            where !reached.Contains(type)
+            select type.FullName;
+
+        Assert.Empty(unreached);
+    }
+
+    private static IEnumerable<System.Type> GeometryNamespaceTypes()
+        => typeof(LaidOutDocument).Assembly.GetTypes()
+            .Where(type => type.Namespace == typeof(LaidOutDocument).Namespace
+                && !type.IsEnum
+                && !type.IsInterface
+                && !type.IsNested
+                && !type.IsGenericTypeDefinition);
+
     private static IReadOnlyList<string> ReachableGraphOffenders(object root)
     {
         var offenders = new List<string>();
@@ -825,14 +910,7 @@ public class LaidOutContractTests
                 return;
             }
 
-            if (value is Block
-                || value is Run
-                || value is Cell
-                || value is Row
-                || value is Section
-                || value is Watermark
-                || value is Document
-                || value is FontCollection)
+            if (MutableModelRoots.Any(root => root.IsInstanceOfType(value)))
             {
                 offenders.Add($"{path} reaches mutable model type {type.FullName}");
                 return;
@@ -878,8 +956,9 @@ public class LaidOutContractTests
 
     private static IEnumerable<System.Type> LaidOutTypes()
     {
-        var pending = new Queue<System.Type>([typeof(LaidOutDocument)]);
-        var seen = new HashSet<System.Type> { typeof(LaidOutDocument) };
+        var seeds = GeometryNamespaceTypes().Prepend(typeof(LaidOutDocument)).ToArray();
+        var pending = new Queue<System.Type>(seeds);
+        var seen = new HashSet<System.Type>(seeds);
         while (pending.Count > 0)
         {
             var type = pending.Dequeue();

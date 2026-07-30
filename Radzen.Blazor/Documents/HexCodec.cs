@@ -17,9 +17,6 @@ internal enum HexCase
 /// <summary>
 /// Byte to base-16 encoding.
 /// </summary>
-// Case is a caller concern, not a formatting preference: a PAdES /VRI key is an uppercase
-// digest string that readers match literally, and every other caller's case is byte-visible
-// in the file it writes.
 internal static class HexCodec
 {
     const string UpperDigits = "0123456789ABCDEF";

@@ -37,7 +37,7 @@ public class KeepWithNextTableLayoutCacheTests
             return (60, 40);
         }
 
-        _ = Paginator.PaginateIsolated(section, fonts, Measure);
+        _ = IsolatedPaginator.PaginateIsolated(section, fonts, Measure);
 
         Assert.Equal(1, measures);
     }

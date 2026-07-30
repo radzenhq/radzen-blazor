@@ -20,7 +20,7 @@ public class ColumnSizingTests
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
         TableLayoutSupport.Fill(table.Rows.Add().Cells[1], "y");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 1000, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 1000, fonts);
 
         Assert.Equal(60, laid.ColumnWidths[0], 6);
         Assert.Equal(90, laid.ColumnWidths[1], 6);
@@ -38,7 +38,7 @@ public class ColumnSizingTests
         table.Columns.Add();
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 400, fonts);
 
         Assert.Equal(100, laid.ColumnWidths[0], 6);
         Assert.Equal(150, laid.ColumnWidths[1], 6);
@@ -56,7 +56,7 @@ public class ColumnSizingTests
         autoCol.Width = null;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 300, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 300, fonts);
 
         Assert.NotNull(fixedCol.Width);
         Assert.Null(autoCol.Width);
@@ -74,7 +74,7 @@ public class ColumnSizingTests
         table.Columns.Add();
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 100, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 100, fonts);
 
         var each = 100.0 / 3.0;
         Assert.Equal(each, laid.ColumnWidths[0], 6);
@@ -92,7 +92,7 @@ public class ColumnSizingTests
         table.Columns.Add();
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "x");
 
-        var laid = TableLayout.LayoutIsolated(table, availableWidth: 250, fonts);
+        var laid = IsolatedTableLayout.LayoutIsolated(table, availableWidth: 250, fonts);
 
         Assert.Equal(100, laid.ColumnWidths[0], 6);
         Assert.Equal(400, laid.ColumnWidths[1], 6);

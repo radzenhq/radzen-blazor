@@ -232,7 +232,19 @@ public class DeterminismManifestTests
         var actual = Sha256Hex(build());
         Assert.True(
             ExpectedSha256.TryGetValue(name, out var expected),
-            $"no pinned SHA-256 for corpus document '{name}'");
-        Assert.Equal(expected, actual);
+            $"Corpus document '{name}' has no pinned SHA-256. {RePinInstructions(name, actual)}");
+        Assert.True(
+            expected == actual,
+            $"Corpus document '{name}' no longer renders to its pinned SHA-256.{Environment.NewLine}"
+                + $"pinned:   {expected}{Environment.NewLine}"
+                + $"produced: {actual}{Environment.NewLine}"
+                + RePinInstructions(name, actual));
     }
+
+    private static string RePinInstructions(string name, string actual)
+        => "Pinned hashes are not auto-generated: edit the ExpectedSha256 dictionary in "
+            + $"{nameof(DeterminismManifestTests)} by hand, setting [\"{name}\"] = \"{actual}\". "
+            + "Do that only for a reviewed, intended change to PDF output; a hash that moves "
+            + "without such a change is a determinism regression and must be fixed at the source "
+            + "instead of re-pinned.";
 }

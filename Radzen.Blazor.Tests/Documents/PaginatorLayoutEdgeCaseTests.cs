@@ -20,7 +20,7 @@ public class PaginatorLayoutEdgeCaseTests
         para.SpacingBefore = Unit.FromPoint(1000);
         section.Blocks.Add(para);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         var page = Assert.Single(pages);
         var line = Assert.Single(page.Body.Lines);
@@ -41,7 +41,7 @@ public class PaginatorLayoutEdgeCaseTests
         para.Widows = 2;
         section.Blocks.Add(para);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.NotEmpty(pages[0].Body.Lines);
         Assert.Equal(2, pages.Sum(p => p.Body.Lines.Length));

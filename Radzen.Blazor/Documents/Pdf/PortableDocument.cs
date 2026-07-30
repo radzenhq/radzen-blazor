@@ -10,6 +10,7 @@ using Radzen.Documents.Pdf.Write;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Geometry;
 namespace Radzen.Documents.Pdf;
 
 
@@ -649,9 +650,22 @@ public sealed class PortableDocument
         }
 
         var images = new ImageStore();
+        SourceId? imageSource = null;
+        SceneImageData? imageData = null;
+        if (watermark.Image is { } image)
+        {
+            imageSource = new SourceId(0);
+            imageData = new SceneImageData(image.Data);
+        }
+
         foreach (var page in Pages)
         {
-            page.AppendContent(new WatermarkContent(watermark, page.CropBox ?? page.MediaBox, images));
+            page.AppendContent(new WatermarkContent(
+                watermark,
+                page.CropBox ?? page.MediaBox,
+                images,
+                imageSource,
+                imageData));
         }
     }
 

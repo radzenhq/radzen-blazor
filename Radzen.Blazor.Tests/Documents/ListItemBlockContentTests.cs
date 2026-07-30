@@ -143,7 +143,7 @@ public class ListItemBlockContentTests
             .Select(i => item.Blocks.Add(PaginationSupport.Text($"i{i}")))
             .ToArray();
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(blocks[0].Text, Text(pages[0].Body.Lines[^1]));
@@ -166,7 +166,7 @@ public class ListItemBlockContentTests
         var item = section.Blocks.AddList().AddItem();
         var paragraph = item.Blocks.Add(PaginationSupport.Repeated("Ha", 4));
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
         Assert.DoesNotContain(pages[0].Body.Lines.SelectMany(line => line.Line.Fragments), fragment => fragment.IsMarker);

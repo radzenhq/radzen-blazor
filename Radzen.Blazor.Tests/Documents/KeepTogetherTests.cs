@@ -32,7 +32,7 @@ public class KeepTogetherTests
         var fonts = PaginationSupport.Fonts();
         var (section, _) = BuildBoundary(fonts, keepTogether: false);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(4, pages[0].Body.Lines.Length);
@@ -46,7 +46,7 @@ public class KeepTogetherTests
         var (section, para) = BuildBoundary(fonts, keepTogether: true);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(2, pages[0].Body.Lines.Length);
@@ -61,7 +61,7 @@ public class KeepTogetherTests
         var lineH = PaginationSupport.LineHeight(fonts);
         var (section, _) = BuildBoundary(fonts, keepTogether: true);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(0.0, pages[1].Body.Lines[0].Y, Tol);
         Assert.Equal(lineH, pages[1].Body.Lines[1].Y, Tol);
@@ -79,7 +79,7 @@ public class KeepTogetherTests
         section.Blocks.Add(para);
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Single(pages);
         Assert.Equal(5, pages[0].Body.Lines.Length);
@@ -100,7 +100,7 @@ public class KeepTogetherTests
         var body = section.Blocks.Add(PaginationSupport.Text("body"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(2, pages[0].Body.Lines.Length);
@@ -121,7 +121,7 @@ public class KeepTogetherTests
         var body = section.Blocks.Add(PaginationSupport.Text("body"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
         Assert.Equal(3, pages[0].Body.Lines.Length);

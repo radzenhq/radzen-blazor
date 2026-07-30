@@ -24,7 +24,7 @@ public class ContinuationWidowTests
         var para = PaginationSupport.Repeated("Ha", 22);
         section.Blocks.Add(para);
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.True(pages.Length >= 3, $"expected the paragraph to span 3+ pages, got {pages.Length}");
         Assert.True(

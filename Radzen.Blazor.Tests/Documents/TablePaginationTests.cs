@@ -16,7 +16,7 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
         Assert.Equal(11, layout.RowHeights.Length);
         Assert.All(layout.RowHeights, h => Assert.Equal(lh, h, 6));
@@ -28,9 +28,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.Equal(3, fragments.Count);
         Assert.Equal([1, 2, 3], fragments.Select(f => f.Number).ToArray());
@@ -45,9 +45,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         foreach (var fragment in fragments)
         {
@@ -64,9 +64,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         foreach (var fragment in fragments)
         {
@@ -84,9 +84,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         var body = fragments.SelectMany(TablePaginationSupport.BodyRows).ToArray();
         Assert.Equal(Enumerable.Range(1, 10).ToArray(), body);
@@ -98,9 +98,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         foreach (var fragment in fragments)
         {
@@ -122,10 +122,10 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
         var available = TablePaginationSupport.Capacity(lh, 5);
 
-        var fragments = TablePaginator.Paginate(layout, table, available);
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, available);
 
         Assert.Equal(5 * lh, fragments[0].Height, 6);
         Assert.Equal(5 * lh, fragments[1].Height, 6);
@@ -140,9 +140,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 100);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.Equal(25, fragments.Count);
         Assert.All(fragments, f => Assert.True(f.Rows[0].IsHeader));
@@ -159,9 +159,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 0, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
 
         Assert.Equal(3, fragments.Count);
         Assert.All(fragments, f => Assert.Equal(0, f.HeaderRowCount));
@@ -177,9 +177,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 3);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
 
         Assert.Single(fragments);
         Assert.Equal(1, fragments[0].HeaderRowCount);
@@ -204,11 +204,11 @@ public class TablePaginationTests
         tall.KeepTogether = true;
         TableLayoutSupport.Fill(table.Rows.Add().Cells[0], "R1");
 
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
         Assert.Equal(6 * lh, layout.RowHeights[2], 6);
 
         var available = TablePaginationSupport.Capacity(lh, 5);
-        var fragments = TablePaginator.Paginate(layout, table, available);
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, available);
 
         Assert.Equal(3, fragments.Count);
         Assert.Equal([1], TablePaginationSupport.BodyRows(fragments[0]).ToArray());
@@ -228,9 +228,9 @@ public class TablePaginationTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 5);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
 
         Assert.Equal(2, fragments.Count);
         Assert.Equal([1, 2, 3], TablePaginationSupport.BodyRows(fragments[0]).ToArray());

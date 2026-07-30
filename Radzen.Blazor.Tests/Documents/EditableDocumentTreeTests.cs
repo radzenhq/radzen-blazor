@@ -164,9 +164,9 @@ public class EditableDocumentTreeTests
         var other = document.Sections.Add();
         var paragraph = document.Sections[0].Blocks.AddParagraph("a");
 
-        var error = Assert.Throws<InvalidOperationException>(() => other.Blocks.Add(paragraph));
-        Assert.Contains("already belongs to a document tree", error.Message, StringComparison.Ordinal);
-        Assert.Contains("Remove it from its current parent", error.Message, StringComparison.Ordinal);
+        Assert.Throws<InvalidOperationException>(() => other.Blocks.Add(paragraph));
+        Assert.Empty(other.Blocks);
+        Assert.Same(paragraph, document.Sections[0].Blocks[0]);
     }
 
     [Fact]

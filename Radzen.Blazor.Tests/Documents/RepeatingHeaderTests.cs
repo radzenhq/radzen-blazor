@@ -14,9 +14,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 12);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.True(fragments.Count >= 3);
         foreach (var fragment in fragments)
@@ -31,9 +31,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 2, bodies: 8);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.True(fragments.Count >= 3);
         foreach (var fragment in fragments)
@@ -58,11 +58,11 @@ public class RepeatingHeaderTests
 
         var oneHeader = TablePaginationSupport.Build(headers: 1, bodies: 20);
         var twoHeader = TablePaginationSupport.Build(headers: 2, bodies: 20);
-        var oneLayout = TableLayout.LayoutIsolated(oneHeader, 300, fonts);
-        var twoLayout = TableLayout.LayoutIsolated(twoHeader, 300, fonts);
+        var oneLayout = IsolatedTableLayout.LayoutIsolated(oneHeader, 300, fonts);
+        var twoLayout = IsolatedTableLayout.LayoutIsolated(twoHeader, 300, fonts);
 
-        var oneFragments = TablePaginator.Paginate(oneLayout, oneHeader, available);
-        var twoFragments = TablePaginator.Paginate(twoLayout, twoHeader, available);
+        var oneFragments = IsolatedTablePaginator.Paginate(oneLayout, oneHeader, available);
+        var twoFragments = IsolatedTablePaginator.Paginate(twoLayout, twoHeader, available);
 
         Assert.Equal(5, oneFragments.Count);
         Assert.Equal(7, twoFragments.Count);
@@ -75,9 +75,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 2, bodies: 8);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         foreach (var fragment in fragments)
         {
@@ -92,9 +92,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         for (var i = 0; i < fragments.Count; i++)
         {
@@ -118,9 +118,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 2, bodies: 15);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 6));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 6));
 
         var expected = new[] { 0, 1 };
         foreach (var fragment in fragments)
@@ -138,9 +138,9 @@ public class RepeatingHeaderTests
         var fonts = TablePaginationSupport.Fonts();
         var lh = TablePaginationSupport.LineHeight(fonts);
         var table = TablePaginationSupport.Build(headers: 2, bodies: 2);
-        var layout = TableLayout.LayoutIsolated(table, 300, fonts);
+        var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
-        var fragments = TablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
+        var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
 
         Assert.Single(fragments);
         Assert.Equal(2, fragments[0].HeaderRowCount);

@@ -35,7 +35,7 @@ public class TabLeaderTests
         var paragraph = LineLayoutSupport.SingleRun("Left\tRight");
         paragraph.TabStops.Add(Unit.FromPoint(100), TabAlignment.Left, leader: '.');
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();
 
         var leader = fragments.Single(f => f.Text.Length > 0 && f.Text.All(c => c == '.'));
@@ -54,7 +54,7 @@ public class TabLeaderTests
         var paragraph = LineLayoutSupport.SingleRun("Left\tRight");
         paragraph.TabStops.Add(Unit.FromPoint(100), TabAlignment.Left);
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();
 
         Assert.DoesNotContain(fragments, f => f.Text.Length > 0 && f.Text.All(c => c == '.'));
@@ -68,7 +68,7 @@ public class TabLeaderTests
         var paragraph = LineLayoutSupport.SingleRun("Chapter\t5");
         paragraph.TabStops.Add(Unit.FromPoint(200), TabAlignment.Right, leader: '.');
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
         var fragments = lines.SelectMany(l => l.Fragments).ToList();
 
         var number = fragments.Single(f => f.Text == "5");

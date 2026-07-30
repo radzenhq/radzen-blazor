@@ -113,20 +113,63 @@ public class SharedSfntFontConcurrencyTests
         "Radzen.Documents.Fonts.Sfnt.Cmap.memo",
     };
 
+    private static readonly HashSet<string> ParseTimeAssignedProperties = new(StringComparer.Ordinal)
+    {
+        "Radzen.Documents.Fonts.Sfnt.NameTable.FamilyName",
+        "Radzen.Documents.Fonts.Sfnt.NameTable.PostScriptName",
+        "Radzen.Documents.Fonts.Sfnt.NameTable.SubfamilyName",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.Ascent",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.Bold",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.CapHeight",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.Descent",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.FsType",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.Italic",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.ItalicAngle",
+        "Radzen.Documents.Fonts.Sfnt.SfntFont.LineGap",
+    };
+
     [Fact]
-    public void SfntFontFields_AreReadOnlyApartFromTheNamedLazyCaches()
+    public void SfntFontFields_AreReadOnlyApartFromTheNamedLazyCachesAndParseTimeProperties()
         => AssertNamedLazyCacheInvariant();
 
     internal static void AssertNamedLazyCacheInvariant()
     {
+        var allowed = LazyMemoizationFields.Concat(ParseTimeAssignedProperties).ToArray();
+
         var mutable = ReachableFrom(typeof(SfntFont))
             .SelectMany(type => type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            .Where(field => !field.IsInitOnly && !field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false))
-            .Select(field => $"{field.DeclaringType!.FullName}.{field.Name}")
+            .Where(field => !field.IsInitOnly)
+            .Select(Describe)
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(LazyMemoizationFields.OrderBy(name => name, StringComparer.Ordinal), mutable);
+        var unlisted = mutable.Except(allowed, StringComparer.Ordinal).ToArray();
+        var stale = allowed.Except(mutable, StringComparer.Ordinal).ToArray();
+
+        Assert.True(
+            unlisted.Length == 0,
+            $"Mutable members missing from the allow lists: {string.Join(", ", unlisted)}");
+
+        Assert.True(
+            stale.Length == 0,
+            $"Allow-listed members that are no longer mutable: {string.Join(", ", stale)}");
+    }
+
+    private static string Describe(FieldInfo field)
+        => $"{field.DeclaringType!.FullName}.{BackedProperty(field)?.Name ?? field.Name}";
+
+    private static PropertyInfo? BackedProperty(FieldInfo field)
+    {
+        if (!field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false)
+            || !field.Name.StartsWith('<')
+            || !field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal))
+        {
+            return null;
+        }
+
+        return field.DeclaringType!.GetProperty(
+            field.Name[1..field.Name.IndexOf('>')],
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
     }
 
     [Fact]

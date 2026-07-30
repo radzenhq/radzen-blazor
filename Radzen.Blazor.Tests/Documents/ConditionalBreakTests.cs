@@ -27,12 +27,26 @@ public class ConditionalBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("aaa\u00ADbbb");
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
 
         Assert.Single(lines);
         Assert.Equal("aaabbb", AllText(lines));
         Assert.DoesNotContain('-', AllText(lines));
         Assert.Equal(Width(fonts, "aaabbb"), lines[0].Width, Tol);
+    }
+
+    [Fact]
+    public void LeadingSoftHyphen_IsNotRendered()
+    {
+        var fonts = LineLayoutSupport.Fonts();
+        var lines = IsolatedLineBreaker.Break(
+            LineLayoutSupport.SingleRun("\u00ADvisible"),
+            400,
+            fonts);
+
+        Assert.Single(lines);
+        Assert.Equal("visible", AllText(lines));
+        Assert.Equal(Width(fonts, "visible"), lines[0].Width, Tol);
     }
 
     [Fact]
@@ -43,7 +57,7 @@ public class ConditionalBreakTests
         var full = Width(fonts, "aaaaaabbbbbb");
         var left = Width(fonts, "aaaaaa");
 
-        var lines = LineBreaker.Break(paragraph, full - 1, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, full - 1, fonts);
 
         Assert.Equal(2, lines.Count);
         Assert.True(left <= full - 1, "the left half must fit on its own line");
@@ -61,7 +75,7 @@ public class ConditionalBreakTests
         var paragraph = LineLayoutSupport.SingleRun(left + "\u200B" + right);
         var full = Width(fonts, left + right);
 
-        var lines = LineBreaker.Break(paragraph, full - 1, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, full - 1, fonts);
 
         Assert.Equal(2, lines.Count);
         Assert.DoesNotContain(lines.SelectMany(l => l.Fragments), f => f.Text == "-");
@@ -74,7 +88,7 @@ public class ConditionalBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("aaa\u200Bbbb");
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
 
         Assert.Single(lines);
         Assert.Equal("aaabbb", AllText(lines));
@@ -87,7 +101,7 @@ public class ConditionalBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("table-heavy body");
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
 
         Assert.Single(lines);
         Assert.Contains(lines[0].Fragments, f => f.Text == "table-heavy");
@@ -100,7 +114,7 @@ public class ConditionalBreakTests
         var paragraph = LineLayoutSupport.SingleRun("hyphenated-compound-token");
         var max = Width(fonts, "hyphenated-compound-token") - Width(fonts, "token");
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count > 1);
         foreach (var line in lines)

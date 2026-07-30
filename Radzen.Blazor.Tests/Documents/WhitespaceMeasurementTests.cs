@@ -18,7 +18,7 @@ public class WhitespaceMeasurementTests
         var a = LineLayoutSupport.WordWidth(fonts, "a", 12);
         var b = LineLayoutSupport.WordWidth(fonts, "b", 12);
 
-        var lines = LineBreaker.Break(paragraph, 1000.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 1000.0, fonts);
 
         var line = Assert.Single(lines);
         Assert.Equal(a + (8 * space) + b, line.Width, 6);
@@ -28,8 +28,8 @@ public class WhitespaceMeasurementTests
     public void GapWidth_ScalesLinearlyWithSpaceCount()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var one = LineBreaker.Break(LineLayoutSupport.SingleRun("a b"), 1000.0, fonts);
-        var five = LineBreaker.Break(LineLayoutSupport.SingleRun("a     b"), 1000.0, fonts);
+        var one = IsolatedLineBreaker.Break(LineLayoutSupport.SingleRun("a b"), 1000.0, fonts);
+        var five = IsolatedLineBreaker.Break(LineLayoutSupport.SingleRun("a     b"), 1000.0, fonts);
         var space = LineLayoutSupport.SpaceWidth(fonts, 12);
 
         Assert.Equal(one[0].Width + (4 * space), five[0].Width, 6);

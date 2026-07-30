@@ -33,6 +33,26 @@ internal readonly struct TextShowOp
 
 internal static class ContentEmitter
 {
+    public static void WriteWatermark(
+        ContentWriter writer,
+        string? extGState,
+        in Matrix transform,
+        Action<ContentWriter> writeImage,
+        Action<ContentWriter> writeText)
+    {
+        writer.WriteRaw("q\n");
+        if (extGState is { } state)
+        {
+            writer.WriteName(state);
+            writer.WriteRaw(" gs\n");
+        }
+
+        WriteTransform(writer, transform);
+        writeImage(writer);
+        writeText(writer);
+        writer.WriteRaw("Q\n");
+    }
+
     public static void WriteClipRect(ContentWriter writer, in PdfRect clip)
     {
         WriteRectangle(writer, clip.Left, clip.Bottom, clip.Width, clip.Height);

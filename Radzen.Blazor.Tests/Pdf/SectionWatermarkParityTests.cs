@@ -4,6 +4,7 @@ using System.Reflection;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Geometry;
 using Xunit;
 using Radzen.Documents;
 
@@ -51,13 +52,24 @@ public class SectionWatermarkParityTests
         var images = new ImageStore();
         var watermark = new Watermark();
         var first = watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var decodedFirst = images.DecodeWatermark(first).Image;
+        var decodedFirst = images.DecodeWatermark(
+            new SourceId(0),
+            Paint(first)).Image;
 
         var second = watermark.SetImage(PdfTestResources.Open("Images/gray.jpg"));
-        var decodedSecond = images.DecodeWatermark(second).Image;
+        var decodedSecond = images.DecodeWatermark(
+            new SourceId(1),
+            Paint(second)).Image;
 
         Assert.NotSame(decodedFirst, decodedSecond);
     }
+
+    private static ImagePaint Paint(Image image) => new()
+    {
+        Data = new SceneImageData(image.Data),
+        Opacity = image.Opacity,
+        Interpolate = image.Interpolate,
+    };
 
     [Fact]
     public void Watermark_HasNoDecodedImageState()

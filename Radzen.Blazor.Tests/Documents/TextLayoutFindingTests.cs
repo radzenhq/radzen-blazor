@@ -40,7 +40,7 @@ public class TextLayoutFindingTests
         var moreWidth = Width(fonts, "more");
         var max = valueWidth + 20 + unitWidth + space + moreWidth + 2;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.True(lines.Count >= 2, "the paragraph must wrap so the image line is justified");
         var imageLine = lines.First(l => l.Fragments.Any(f => f.Paint.InlineImage is not null));
@@ -76,7 +76,7 @@ public class TextLayoutFindingTests
         var full = Width(fonts, "aaaaaabbbbbb");
         var max = full - 1;
 
-        var lines = LineBreaker.Break(paragraph, max, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, max, fonts);
 
         Assert.Equal(2, lines.Count);
         Assert.Contains(lines[0].Fragments, f => f.Text == "-");
@@ -113,7 +113,7 @@ public class TextLayoutFindingTests
         Sized(paragraph.Inlines.Add("A\tVeryLongValueTextThatOverflows"));
         paragraph.TabStops.Add(Unit.FromPoint(40), TabAlignment.Right);
 
-        var lines = LineBreaker.Break(paragraph, 400, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 400, fonts);
 
         var fragments = lines[0].Fragments;
         var label = fragments.First(f => f.Text == "A");

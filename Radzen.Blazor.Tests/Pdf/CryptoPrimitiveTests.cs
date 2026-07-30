@@ -48,6 +48,131 @@ public class CryptoPrimitiveTests
         Assert.Equal("d41d8cd98f00b204e9800998ecf8427e", Hex(Md5.ComputeHash([])));
     }
 
+    [Fact]
+    public void Md5_MatchesShiftOnlyReferenceAcrossLengthsAndBlockBoundaries()
+    {
+        for (var length = 0; length <= 200; length++)
+        {
+            var input = new byte[length];
+            for (var i = 0; i < length; i++)
+            {
+                input[i] = (byte)((i * 37) + 11);
+            }
+
+            Assert.Equal(Hex(ShiftOnlyMd5.ComputeHash(input)), Hex(Md5.ComputeHash(input)));
+        }
+    }
+
+    private static class ShiftOnlyMd5
+    {
+        private static readonly int[] Shifts =
+        [
+            7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,  7, 12, 17, 22,
+            5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,  5,  9, 14, 20,
+            4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,  4, 11, 16, 23,
+            6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,  6, 10, 15, 21,
+        ];
+
+        public static byte[] ComputeHash(byte[] input)
+        {
+            uint a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+
+            var padZeros = (56 - ((input.Length + 1) % 64) + 64) % 64;
+            var message = new byte[input.Length + 1 + padZeros + 8];
+            Array.Copy(input, message, input.Length);
+            message[input.Length] = 0x80;
+
+            var bitLength = (ulong)input.Length * 8;
+            for (var i = 0; i < 8; i++)
+            {
+                message[message.Length - 8 + i] = (byte)(bitLength >> (8 * i));
+            }
+
+            for (var block = 0; block < message.Length / 64; block++)
+            {
+                var m = new uint[16];
+                for (var j = 0; j < 16; j++)
+                {
+                    var at = (block * 64) + (j * 4);
+                    m[j] = message[at]
+                        | ((uint)message[at + 1] << 8)
+                        | ((uint)message[at + 2] << 16)
+                        | ((uint)message[at + 3] << 24);
+                }
+
+                uint a = a0, b = b0, c = c0, d = d0;
+                for (var i = 0; i < 64; i++)
+                {
+                    uint f;
+                    int g;
+                    if (i < 16)
+                    {
+                        f = (b & c) | (~b & d);
+                        g = i;
+                    }
+                    else if (i < 32)
+                    {
+                        f = (d & b) | (~d & c);
+                        g = ((5 * i) + 1) % 16;
+                    }
+                    else if (i < 48)
+                    {
+                        f = b ^ c ^ d;
+                        g = ((3 * i) + 5) % 16;
+                    }
+                    else
+                    {
+                        f = c ^ (b | ~d);
+                        g = (7 * i) % 16;
+                    }
+
+                    var rotated = unchecked(a + f + Constants[i] + m[g]);
+                    var previousD = d;
+                    d = c;
+                    c = b;
+                    b = unchecked(b + ((rotated << Shifts[i]) | (rotated >> (32 - Shifts[i]))));
+                    a = previousD;
+                }
+
+                unchecked
+                {
+                    a0 += a;
+                    b0 += b;
+                    c0 += c;
+                    d0 += d;
+                }
+            }
+
+            var digest = new byte[16];
+            WriteLittleEndian(digest, 0, a0);
+            WriteLittleEndian(digest, 4, b0);
+            WriteLittleEndian(digest, 8, c0);
+            WriteLittleEndian(digest, 12, d0);
+            return digest;
+        }
+
+        private static void WriteLittleEndian(byte[] target, int offset, uint value)
+        {
+            target[offset] = (byte)value;
+            target[offset + 1] = (byte)(value >> 8);
+            target[offset + 2] = (byte)(value >> 16);
+            target[offset + 3] = (byte)(value >> 24);
+        }
+
+        private static readonly uint[] Constants = BuildConstants();
+
+        private static uint[] BuildConstants()
+        {
+            var constants = new uint[64];
+            for (var i = 0; i < 64; i++)
+            {
+                constants[i] = (uint)(Math.Abs(Math.Sin(i + 1)) * 4294967296d);
+            }
+
+            return constants;
+        }
+    }
+
     // RFC 3174 section 7.3 and NIST SHA-1 short message vectors
     [Theory]
     [InlineData("", "da39a3ee5e6b4b0d3255bfef95601890afd80709")]
