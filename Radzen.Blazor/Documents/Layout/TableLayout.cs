@@ -1,0 +1,343 @@
+using System;
+using System.Collections.Generic;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Geometry;
+
+namespace Radzen.Documents.Layout;
+
+
+internal static class TableLayout
+{
+    private sealed class Placed
+    {
+        public required Cell Cell { get; init; }
+        public required int Row { get; init; }
+        public required int Column { get; init; }
+        public required int ColumnSpan { get; init; }
+        public required int RowSpan { get; init; }
+        public required double ContentWidth { get; init; }
+        public required HorizontalAlignment? Align { get; init; }
+        public required BoxContentLayout.Measured Content { get; init; }
+        public double ContentHeight => Content.Height;
+    }
+
+    public static LaidOutTable Layout(
+        Table table,
+        double availableWidth,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage,
+        LoweringContext resolution,
+        double additionalLeftIndent = 0,
+        LayoutCaptureContext? capture = null)
+    {
+        capture ??= new LayoutCaptureContext();
+        var columnWidths = ResolveColumnWidths(table, availableWidth);
+        var columnX = Prefix(columnWidths);
+
+        var nRows = table.Rows.Count;
+        var nCols = columnWidths.Length;
+        var occupied = new bool[nRows, nCols];
+        var placed = new List<Placed>();
+
+        for (var r = 0; r < nRows; r++)
+        {
+            var c = 0;
+            foreach (var cell in table.Rows[r].Cells)
+            {
+                while (c < nCols && occupied[r, c])
+                {
+                    c++;
+                }
+
+                if (c >= nCols)
+                {
+                    break;
+                }
+
+                var span = Math.Min(cell.ColumnSpan, nCols - c);
+                var rowSpan = Math.Min(cell.RowSpan, nRows - r);
+                var lastRow = r + rowSpan;
+                for (var rr = r; rr < lastRow; rr++)
+                {
+                    for (var cc = c; cc < c + span; cc++)
+                    {
+                        occupied[rr, cc] = true;
+                    }
+                }
+
+                double cellWidth = 0;
+                for (var cc = c; cc < c + span; cc++)
+                {
+                    cellWidth += columnWidths[cc];
+                }
+
+                var contentWidth = cellWidth - cell.EffectivePaddingLeft.Point - cell.EffectivePaddingRight.Point;
+                var align = cell.Alignment
+                    ?? resolution.CellAlignment(cell)
+                    ?? ColumnAlignment(table, c)
+                    ?? table.Rows[r].Alignment;
+                var content = BoxContentLayout.Measure(
+                    cell.Blocks,
+                    contentWidth,
+                    align,
+                    fonts,
+                    measureImage,
+                    resolution,
+                    capture);
+
+                placed.Add(new Placed
+                {
+                    Cell = cell,
+                    Row = r,
+                    Column = c,
+                    ColumnSpan = span,
+                    RowSpan = rowSpan,
+                    ContentWidth = contentWidth,
+                    Align = align,
+                    Content = content,
+                });
+
+                c += span;
+            }
+        }
+
+        var rowHeights = new double[nRows];
+        foreach (var p in placed)
+        {
+            if (p.RowSpan != 1)
+            {
+                continue;
+            }
+
+            var h = p.ContentHeight + p.Cell.EffectivePaddingTop.Point + p.Cell.EffectivePaddingBottom.Point;
+            if (h > rowHeights[p.Row])
+            {
+                rowHeights[p.Row] = h;
+            }
+        }
+
+        foreach (var p in placed)
+        {
+            if (p.RowSpan <= 1)
+            {
+                continue;
+            }
+
+            var needed = p.ContentHeight + p.Cell.EffectivePaddingTop.Point + p.Cell.EffectivePaddingBottom.Point;
+            double covered = 0;
+            var end = p.Row + p.RowSpan - 1;
+            for (var rr = p.Row; rr <= end; rr++)
+            {
+                covered += rowHeights[rr];
+            }
+
+            if (needed > covered)
+            {
+                rowHeights[end] += needed - covered;
+            }
+        }
+
+        var rowY = Prefix(rowHeights);
+
+        var cells = new List<LaidOutCell>(placed.Count);
+        foreach (var p in placed)
+        {
+            double width = 0;
+            for (var cc = p.Column; cc < p.Column + p.ColumnSpan; cc++)
+            {
+                width += columnWidths[cc];
+            }
+
+            double height = 0;
+            var lastRow = Math.Min(nRows, p.Row + p.RowSpan);
+            for (var rr = p.Row; rr < lastRow; rr++)
+            {
+                height += rowHeights[rr];
+            }
+
+            var x = columnX[p.Column];
+            var y = rowY[p.Row];
+            var padLeft = p.Cell.EffectivePaddingLeft.Point;
+            var padTop = p.Cell.EffectivePaddingTop.Point;
+            var bounds = new Rect(x, y, width, height);
+            var contentBox = new Rect(
+                x + padLeft,
+                y + padTop,
+                width - padLeft - p.Cell.EffectivePaddingRight.Point,
+                height - padTop - p.Cell.EffectivePaddingBottom.Point);
+
+            var cellAlignment = p.Align ?? HorizontalAlignment.Left;
+            var content = BoxContentLayout.Position(p.Content, contentBox, cellAlignment, p.Cell.VerticalAlignment);
+
+            cells.Add(new LaidOutCell
+            {
+                Source = capture.Source(p.Cell),
+                Decoration = CellDecoration(table, p.Cell, p.Row),
+                Opacity = resolution.Opacities.CellOpacity(p.Cell),
+                Row = p.Row,
+                Column = p.Column,
+                ColumnSpan = p.ColumnSpan,
+                RowSpan = p.RowSpan,
+                Bounds = bounds,
+                ContentBox = contentBox,
+                Lines = content.Lines,
+                Images = content.Images,
+                CodeSymbols = content.CodeSymbols,
+                Tables = content.Tables,
+                Boxes = content.Boxes,
+            });
+        }
+
+        double totalWidth = 0;
+        foreach (var w in columnWidths)
+        {
+            totalWidth += w;
+        }
+
+        double totalHeight = 0;
+        foreach (var h in rowHeights)
+        {
+            totalHeight += h;
+        }
+
+        return new LaidOutTable
+        {
+            Source = capture.Source(table),
+            Decoration = GeometryCapture.Table(table, additionalLeftIndent),
+            ColumnWidths = [.. columnWidths],
+            RowHeights = [.. rowHeights],
+            Width = totalWidth,
+            Height = totalHeight,
+            Cells = [.. cells],
+        };
+    }
+
+    internal static LaidOutTable LayoutIsolated(
+        Table table,
+        double availableWidth,
+        FontCollection fonts,
+        Func<Image, double, (double Width, double Height)>? measureImage = null,
+        LayoutCaptureContext? capture = null)
+        => Layout(
+            table,
+            availableWidth,
+            fonts,
+            measureImage,
+            LoweringContext.CreateIsolated(StyleResolution.Empty),
+            capture: capture);
+
+    private static BoxStyle CellDecoration(Table table, Cell cell, int row)
+    {
+        var cellBorders = cell.Borders;
+        var rowBorders = row < table.Rows.Count ? table.Rows[row].Borders : null;
+        var tableBorders = table.Borders;
+
+        return new BoxStyle
+        {
+            Background = cell.Background,
+            Top = GeometryCapture.Edge(CascadeEdge(cellBorders.Top, rowBorders?.Top, tableBorders.Top)),
+            Right = GeometryCapture.Edge(CascadeEdge(cellBorders.Right, rowBorders?.Right, tableBorders.Right)),
+            Bottom = GeometryCapture.Edge(CascadeEdge(cellBorders.Bottom, rowBorders?.Bottom, tableBorders.Bottom)),
+            Left = GeometryCapture.Edge(CascadeEdge(cellBorders.Left, rowBorders?.Left, tableBorders.Left)),
+        };
+    }
+
+    private static Border CascadeEdge(Border cellEdge, Border? rowEdge, Border? tableEdge)
+    {
+        if (!cellEdge.IsSet)
+        {
+            if (rowEdge?.IsSet == true)
+            {
+                return rowEdge;
+            }
+
+            if (tableEdge is not null)
+            {
+                return tableEdge;
+            }
+        }
+
+        return cellEdge;
+    }
+
+    private static HorizontalAlignment? ColumnAlignment(Table table, int column)
+        => column < table.Columns.Count ? table.Columns[column].Alignment : null;
+
+    private static double[] ResolveColumnWidths(Table table, double availableWidth)
+    {
+        var count = table.Columns.Count;
+        if (count == 0)
+        {
+            foreach (var row in table.Rows)
+            {
+                var cells = 0;
+                foreach (var cell in row.Cells)
+                {
+                    cells += Math.Max(1, cell.ColumnSpan);
+                }
+
+                count = Math.Max(count, cells);
+            }
+
+            if (count == 0)
+            {
+                return [];
+            }
+
+            var total = table.Width?.Point ?? availableWidth;
+            var derived = new double[count];
+            var share = Math.Max(0, total / count);
+            for (var i = 0; i < count; i++)
+            {
+                derived[i] = share;
+            }
+
+            return derived;
+        }
+
+        var widths = new double[count];
+        double fixedSum = 0;
+        double weightSum = 0;
+        for (var i = 0; i < count; i++)
+        {
+            if (table.Columns[i].Width is { } w)
+            {
+                widths[i] = w.Point;
+                fixedSum += w.Point;
+            }
+            else
+            {
+                weightSum += table.Columns[i].RelativeWidth ?? 1.0;
+            }
+        }
+
+        if (weightSum == 0)
+        {
+            return widths;
+        }
+
+        var remaining = Math.Max(0, (table.Width?.Point ?? availableWidth) - fixedSum);
+        for (var i = 0; i < count; i++)
+        {
+            if (table.Columns[i].Width is null)
+            {
+                widths[i] = remaining * (table.Columns[i].RelativeWidth ?? 1.0) / weightSum;
+            }
+        }
+
+        return widths;
+    }
+
+    private static double[] Prefix(double[] values)
+    {
+        var result = new double[values.Length];
+        double sum = 0;
+        for (var i = 0; i < values.Length; i++)
+        {
+            result[i] = sum;
+            sum += values[i];
+        }
+
+        return result;
+    }
+}
