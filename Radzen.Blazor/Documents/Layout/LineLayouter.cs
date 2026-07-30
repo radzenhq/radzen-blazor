@@ -112,7 +112,8 @@ internal static class LineLayouter
     private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts, LoweringContext? resolution)
     {
         var font = ResolvedFont(resolution, paragraph);
-        var (height, ascent) = FontExtent(font, fonts);
+        var captured = GeometryCapture.Font(font);
+        var (height, ascent) = FontExtent(captured, fonts);
         return new LineBox
         {
             Fragments = [],
@@ -587,7 +588,7 @@ internal static class LineLayouter
                 Source = context.Capture.Source(hyphenRun),
                 Paint = GeometryCapture.Fragment(
                     hyphenRun,
-                    GeometryCapture.Materialize(hyphen.Font),
+                    hyphen.Font,
                     context.Capture),
                 Text = "-",
                 Start = 0,
@@ -600,7 +601,7 @@ internal static class LineLayouter
         for (var i = 0; i < fragments.Count; i++)
         {
             var fragment = fragments[i];
-            var font = GeometryCapture.Materialize(fragment.Paint.Font);
+            var font = fragment.Paint.Font;
             fragments[i] = fragment with
             {
                 Face = fonts.ResolveFace(font),
@@ -610,7 +611,7 @@ internal static class LineLayouter
             };
         }
 
-        CaptureCoalescedGlyphRuns(fragments, fonts);
+        CaptureCoalescedGlyphRuns(fragments, fonts, context.Capture);
         var immutableFragments = fragments.ToImmutableArray();
         var (height, baseline) = Measure(immutableFragments, paragraph.LineSpacing, fonts);
         return new LineBox
@@ -622,7 +623,10 @@ internal static class LineLayouter
         };
     }
 
-    private static void CaptureCoalescedGlyphRuns(List<LineFragment> fragments, FontCollection fonts)
+    private static void CaptureCoalescedGlyphRuns(
+        List<LineFragment> fragments,
+        FontCollection fonts,
+        LayoutCaptureContext capture)
     {
         var i = 0;
         while (i < fragments.Count)
@@ -630,7 +634,7 @@ internal static class LineLayouter
             var current = fragments[i];
             var run = current.Source;
             var paint = current.Paint;
-            var text = paint.RunText;
+            var text = capture.Resolve<Run>(run).Text;
             var end = current.Start + current.Length;
             var right = current.XOffset + current.Advance;
             var j = i + 1;
@@ -656,7 +660,7 @@ internal static class LineLayouter
                 var gapWidth = next.Start == end
                     ? 0
                     : RunTextAdvance.Measure(
-                        fonts, paint, GeometryCapture.Materialize(paint.Font), text[end..next.Start],
+                        fonts, paint, text[end..next.Start],
                         leadingCharacterSpacing: true, trailingCharacterSpacing: true);
                 if (!allSpaces || Math.Abs(next.XOffset - right - gapWidth) > 0.001)
                 {
@@ -675,7 +679,7 @@ internal static class LineLayouter
                     CoalescedGlyphRun = GeometryCapture.PositionSpans(
                         fonts.CaptureGlyphRun(
                             text[current.Start..end],
-                            GeometryCapture.Materialize(paint.Font)),
+                            paint.Font),
                         paint),
                 };
                 for (var merged = i + 1; merged < j; merged++)
@@ -757,8 +761,8 @@ internal static class LineLayouter
             if (tabsBefore > 0 && leaderChar != '\0' && start > gapStart + 1e-6)
             {
                 var leaderFont = fi < span.Length
-                    ? GeometryCapture.Materialize(span[fi].Paint.Font)
-                    : ResolvedFont(resolution, paragraph);
+                    ? span[fi].Paint.Font
+                    : GeometryCapture.Font(ResolvedFont(resolution, paragraph));
                 (leaders ??= []).Add(BuildLeader(
                     leaderChar,
                     gapStart,
@@ -812,7 +816,7 @@ internal static class LineLayouter
         double gapStart,
         double gapEnd,
         double indent,
-        Font font,
+        in FontPaint font,
         FontCollection fonts,
         LayoutCaptureContext capture)
     {
@@ -866,7 +870,7 @@ internal static class LineLayouter
                     {
                         decimalOffset = width + fonts.MeasureText(
                             fragment.Text[..dot],
-                            GeometryCapture.Materialize(fragment.Paint.Font));
+                            fragment.Paint.Font);
                     }
                 }
 
@@ -912,7 +916,7 @@ internal static class LineLayouter
             var paint = fragments[i].Paint;
             var (h, asc) = paint.InlineImage is { } image
                 ? (image.Height, image.Height)
-                : FontExtent(GeometryCapture.Materialize(paint.Font), fonts);
+                : FontExtent(paint.Font, fonts);
             if (paint.IsScript)
             {
                 (h, asc) = ScriptExtent(paint, h, asc);
@@ -934,9 +938,11 @@ internal static class LineLayouter
         return (ascent + descent + Math.Max(-rise, 0), ascent);
     }
 
-    private static (double Height, double Ascent) FontExtent(Font font, FontCollection fonts)
+    private static (double Height, double Ascent) FontExtent(
+        in FontPaint font,
+        FontCollection fonts)
     {
-        var size = font.EffectiveSize.Point;
+        var size = font.Size;
         if (fonts.TryResolvePrimary(font, out var face))
         {
             var upm = face.UnitsPerEm;

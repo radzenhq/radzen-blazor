@@ -17,14 +17,14 @@ internal readonly struct TableDecoration
 
 }
 
-internal readonly struct PlacedCell
+internal readonly struct LaidOutCellPlacement
 {
     public required LaidOutCell Cell { get; init; }
 
     public required double Delta { get; init; }
 }
 
-internal readonly struct PlacedRow
+internal readonly struct LaidOutRow
 {
     public required int SourceRow { get; init; }
 
@@ -36,5 +36,5 @@ internal readonly struct PlacedRow
 
     public Color? Background { get; init; }
 
-    public required ImmutableArray<PlacedCell> Cells { get; init; }
+    public required ImmutableArray<LaidOutCellPlacement> Cells { get; init; }
 }

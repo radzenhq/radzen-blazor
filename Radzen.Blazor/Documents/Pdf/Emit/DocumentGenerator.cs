@@ -183,7 +183,9 @@ internal sealed class DocumentGenerator
             {
                 if (!output.Anchors.ContainsKey(anchor.Name))
                 {
-                    output.Anchors[anchor.Name] = new GeneratedAnchor(pageIndex, pageHeight - anchor.Top);
+                    output.Anchors[anchor.Name] = new GeneratedAnchor(
+                        pageIndex,
+                        PageSpace.FromTop(pageHeight, anchor.Top));
                 }
             }
         }
@@ -192,7 +194,7 @@ internal sealed class DocumentGenerator
         return output;
     }
 
-    private PagePlan GeneratePage(PaginatedPage page)
+    private PagePlan GeneratePage(LaidOutPage page)
     {
         var height = page.Size.Height.Point;
         var plan = new PagePlan { Size = page.Size };
@@ -205,15 +207,15 @@ internal sealed class DocumentGenerator
             CodeSymbols = codeSymbolEmitter,
         };
         var left = page.ContentBox.X;
-        var contentTop = height - page.ContentBox.Y;
+        var contentTop = PageSpace.FromTop(height, page.ContentBox.Y);
 
         foreach (var kind in LaidOutPaintOrder.Layers)
         {
             var (layer, top) = kind switch
             {
                 PageLayerKind.Body => (page.Body, contentTop),
-                PageLayerKind.Header => (page.HeaderLayer, height - page.HeaderTop),
-                _ => (page.FooterLayer, height - page.FooterTop),
+                PageLayerKind.Header => (page.HeaderLayer, PageSpace.FromTop(height, page.HeaderTop)),
+                _ => (page.FooterLayer, PageSpace.FromTop(height, page.FooterTop)),
             };
 
             EmitLayer(context, kind, layer, left, top);
@@ -224,9 +226,9 @@ internal sealed class DocumentGenerator
             plan.Links.Add(new GeneratedLink
             {
                 X1 = link.Left,
-                Y1 = height - link.Bottom,
+                Y1 = PageSpace.FromTop(height, link.Bottom),
                 X2 = link.Right,
-                Y2 = height - link.Top,
+                Y2 = PageSpace.FromTop(height, link.Top),
                 Uri = link.Uri,
                 Destination = link.Anchor,
                 Element = structureTree.ElementOf(link.Source),
@@ -241,7 +243,7 @@ internal sealed class DocumentGenerator
         return plan;
     }
 
-    private void EmitLayer(EmitContext context, PageLayerKind kind, PageLayer layer, double left, double top)
+    private void EmitLayer(EmitContext context, PageLayerKind kind, LaidOutLayer layer, double left, double top)
     {
         var body = kind == PageLayerKind.Body;
         foreach (var content in LaidOutPaintOrder.ContentOf(kind))
@@ -251,7 +253,6 @@ internal sealed class DocumentGenerator
                 case PaintContent.Lines when body:
                     textEmitter.EmitLines(
                         context, layer.Lines,
-                        static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
                         left, top, delta: 0,
                         opacity: 1, inherited: null, resolveStructure: true,
                         overflowThreshold: double.PositiveInfinity);
@@ -269,7 +270,7 @@ internal sealed class DocumentGenerator
         }
     }
 
-    private void EmitImagesAndCodeSymbols(EmitContext context, PageLayer layer, double left, double top)
+    private void EmitImagesAndCodeSymbols(EmitContext context, LaidOutLayer layer, double left, double top)
     {
         foreach (var positioned in layer.Images)
         {
@@ -284,23 +285,18 @@ internal sealed class DocumentGenerator
 
     private void EmitTablesAndBoxes(
         EmitContext context,
-        ImmutableArray<PositionedTableFragment> tables,
-        ImmutableArray<PositionedBox> boxes,
+        ImmutableArray<LaidOutTableFragment> tables,
+        ImmutableArray<LaidOutBox> boxes,
         double left,
         double top)
     {
-        var cursor = OrderedMerge.ByOrder(tables, static t => t.Order, boxes, static b => b.Order);
-        while (cursor.MoveNext())
-        {
-            if (cursor.IsTable)
-            {
-                tableEmitter.EmitFragment(context, tables[cursor.TableIndex], left, top);
-            }
-            else
-            {
-                boxEmitter.EmitBox(context, boxes[cursor.BoxIndex], left, top);
-            }
-        }
+        OrderedMerge.VisitByOrder(
+            tables,
+            static table => table.Order,
+            boxes,
+            static box => box.Order,
+            table => tableEmitter.EmitFragment(context, table, left, top),
+            box => boxEmitter.EmitBox(context, box, left, top));
     }
 
 }

@@ -60,7 +60,7 @@ public class DocumentLayoutFeatureTests
         return document;
     }
 
-    private static string LineText(PositionedLine line)
+    private static string LineText(LaidOutLine line)
         => string.Concat(line.Line.Fragments.Select(fragment => fragment.Text));
 
     [Fact]

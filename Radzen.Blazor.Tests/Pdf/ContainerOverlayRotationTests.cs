@@ -39,7 +39,7 @@ public class ContainerOverlayRotationTests
         var box = Assert.Single(page.Body.Boxes);
         Assert.Equal(capture.Source(container), box.Source);
         Assert.Null(box.Transform);
-        Assert.Equal(0, box.Y, 6);
+        Assert.Equal(0, box.Bounds.Y, 6);
         Assert.Equal(0, box.Bounds.X, 6);
         Assert.Equal(400, box.Bounds.Width, 6);
 

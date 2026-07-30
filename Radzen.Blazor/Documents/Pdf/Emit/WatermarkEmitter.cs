@@ -7,15 +7,14 @@ internal sealed class WatermarkEmitter(
     ImageStore imageStore,
     bool allowUnsupportedCharacters)
 {
-    private readonly SfntRunBuilder runBuilder = new(fontResolver);
-    private readonly Base14GlyphEncoder base14Encoder = new(allowUnsupportedCharacters);
+    private readonly GlyphSpanEmitter spans = new(fontResolver, allowUnsupportedCharacters);
 
-    public void Plan(PagePlan plan, PositionedWatermark watermark)
+    public void Plan(PagePlan plan, LaidOutWatermark watermark)
     {
         var draw = new WatermarkDraw
         {
             CenterX = watermark.CenterX,
-            CenterY = plan.Size.Height.Point - watermark.CenterY,
+            CenterY = PageSpace.FromTop(plan.Size.Height.Point, watermark.CenterY),
             Rotation = watermark.Rotation,
             ExtGState = watermark.Opacity < 1
                 ? plan.RegisterExtGState(watermark.Opacity, watermark.Opacity)
@@ -48,9 +47,8 @@ internal sealed class WatermarkEmitter(
         plan.Watermark = draw;
     }
 
-    private void PlanText(PagePlan plan, WatermarkDraw draw, in PositionedWatermarkText text)
+    private void PlanText(PagePlan plan, WatermarkDraw draw, in LaidOutWatermarkText text)
     {
-        var font = PdfModelAdapter.Materialize(text.Font);
         var size = text.Size;
         var baseline = -text.Baseline;
         var extGState = text.AlphaOverride is { } alpha
@@ -59,57 +57,19 @@ internal sealed class WatermarkEmitter(
         foreach (var span in text.GlyphRun.Spans)
         {
             var x = text.X + span.XOffset;
-            switch (span.Face.Kind)
+            var emitted = spans.Emit(span, text.Font.Size);
+            plan.UsedFonts.Add(emitted.Font);
+            draw.Texts.Add(new TextDraw
             {
-                case CapturedFontFaceKind.Sfnt:
-                {
-                    var glyphRun = runBuilder.Build(span, font.EffectiveSize.Point);
-                    plan.UsedFonts.Add(glyphRun.Font);
-                    draw.Texts.Add(new TextDraw
-                    {
-                        X = x,
-                        Baseline = baseline,
-                        Size = size,
-                        Color = text.Color,
-                        Font = glyphRun.Font,
-                        Bytes = glyphRun.Bytes,
-                        Kerns = glyphRun.Kerns,
-                        ExtGState = extGState,
-                    });
-                    break;
-                }
-                case CapturedFontFaceKind.BuiltIn:
-                {
-                    var face = span.Face.BuiltIn;
-                    var glyphs = span.BuiltInGlyphs;
-                    var bytes = base14Encoder.Encode(glyphs, face);
-                    var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
-                    for (var i = 0; i < glyphs.Length; i++)
-                    {
-                        if (i < kerns.Length)
-                        {
-                            kerns[i] = SfntRunBuilder.PdfTextAdjustment(
-                                glyphs[i].TextAdjustmentPoints,
-                                font.EffectiveSize.Point);
-                        }
-                    }
-
-                    var generated = fontResolver.ResolveBase14(face);
-                    plan.UsedFonts.Add(generated);
-                    draw.Texts.Add(new TextDraw
-                    {
-                        X = x,
-                        Baseline = baseline,
-                        Size = size,
-                        Color = text.Color,
-                        Font = generated,
-                        Bytes = bytes,
-                        Kerns = SfntRunBuilder.HasNonZero(kerns) ? kerns : null,
-                        ExtGState = extGState,
-                    });
-                    break;
-                }
-            }
+                X = x,
+                Baseline = baseline,
+                Size = size,
+                Color = text.Color,
+                Font = emitted.Font,
+                Bytes = emitted.Bytes,
+                Kerns = emitted.Kerns,
+                ExtGState = extGState,
+            });
         }
     }
 }

@@ -62,8 +62,6 @@ internal readonly record struct ResolvedParagraphStyle
     public int HeadingLevel { get; init; }
 
     public string? CustomRole { get; init; }
-
-    public required ResolvedParagraphFormat Format { get; init; }
 }
 
 internal sealed record ResolvedStyleEnvironment
@@ -117,7 +115,7 @@ internal sealed record SemanticStructureTree
     public required ImmutableArray<SemanticListOccurrence> Lists { get; init; }
 }
 
-internal readonly record struct CapturedDocumentInfo
+internal readonly record struct LaidOutDocumentInfo
 {
     public string? Title { get; init; }
 

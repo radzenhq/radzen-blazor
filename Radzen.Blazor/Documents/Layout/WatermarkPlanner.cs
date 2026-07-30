@@ -6,7 +6,7 @@ namespace Radzen.Documents.Layout;
 
 internal static class WatermarkPlanner
 {
-    public static PositionedWatermark? Plan(
+    public static LaidOutWatermark? Plan(
         Watermark? watermark,
         PageSize size,
         FontCollection fonts,
@@ -19,8 +19,9 @@ internal static class WatermarkPlanner
 
 
         var width = size.Width.Point;
-        return new PositionedWatermark
+        return new LaidOutWatermark
         {
+            Id = capture.Node(),
             CenterX = width / 2,
             CenterY = size.Height.Point / 2,
             Rotation = watermark.Rotation,
@@ -30,13 +31,13 @@ internal static class WatermarkPlanner
         };
     }
 
-    private static PositionedWatermarkImage PlanImage(
+    private static LaidOutWatermarkImage PlanImage(
         Image image,
         double availableWidth,
         LayoutCaptureContext capture)
     {
         var (width, height) = ImageProbe.Measure(image, availableWidth);
-        return new PositionedWatermarkImage
+        return new LaidOutWatermarkImage
         {
             Source = capture.Source(image),
             Paint = GeometryCapture.Image(image, capture),
@@ -48,7 +49,7 @@ internal static class WatermarkPlanner
         };
     }
 
-    private static PositionedWatermarkText PlanText(Watermark watermark, string text, FontCollection fonts)
+    private static LaidOutWatermarkText PlanText(Watermark watermark, string text, FontCollection fonts)
     {
         var font = watermark.Font;
         var isSfnt = fonts.TryResolvePrimary(font, out _);
@@ -63,7 +64,7 @@ internal static class WatermarkPlanner
 
         var glyphRun = fonts.CaptureGlyphRun(text, font, enableBuiltInKerning: isSfnt);
 
-        return new PositionedWatermarkText
+        return new LaidOutWatermarkText
         {
             Text = text,
             Font = GeometryCapture.Font(font),

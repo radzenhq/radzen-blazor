@@ -2,7 +2,7 @@ using Radzen.Documents.Fonts.Sfnt;
 
 namespace Radzen.Documents.Fonts;
 
-internal readonly struct PositionedGlyph(ushort glyphId, double advance, int cluster, SfntFont face)
+internal readonly struct ShapedGlyph(ushort glyphId, double advance, int cluster, SfntFont face)
 {
     public ushort GlyphId { get; } = glyphId;
 

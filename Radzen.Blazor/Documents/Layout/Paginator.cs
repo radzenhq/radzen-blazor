@@ -9,7 +9,7 @@ namespace Radzen.Documents.Layout;
 
 internal static class Paginator
 {
-    public static ImmutableArray<PaginatedPage> Paginate(
+    public static ImmutableArray<LaidOutPage> Paginate(
         Section section,
         FontCollection fonts,
         LoweringContext resolution,
@@ -19,7 +19,7 @@ internal static class Paginator
         int pageNumberOffset = 0)
     {
         capture ??= new LayoutCaptureContext();
-        var pages = new List<PaginatedPage>();
+        var pages = new List<LaidOutPage>();
         PaginateSection(
             section,
             fonts,
@@ -32,22 +32,10 @@ internal static class Paginator
         return [.. pages];
     }
 
-    internal static ImmutableArray<PaginatedPage> PaginateIsolated(
-        Section section,
-        FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage = null,
-        LayoutCaptureContext? capture = null)
-        => Paginate(
-            section,
-            fonts,
-            LoweringContext.CreateIsolated(StyleResolution.Empty),
-            measureImage,
-            capture: capture);
-
     private static void PaginateSection(
         Section section,
         FontCollection fonts,
-        List<PaginatedPage> pages,
+        List<LaidOutPage> pages,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture,
@@ -67,18 +55,15 @@ internal static class Paginator
         for (var i = 0; i < context.Blocks.Count; i++)
         {
             context.PrepareBlock(i);
-            BlockLayoutDispatch.Dispatch(context.Blocks[i], placer, i);
+            LoweredBlockDispatch.Dispatch(context.Blocks[i], placer, i);
         }
 
         context.Finish();
     }
 
     private sealed class SectionPlacer(PaginationContext context)
-        : IBlockLayoutHandler<int, Nothing>
+        : ILoweredBlockHandler<int, Nothing>
     {
-        public Nothing Unsupported(Block block, int index)
-            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in section content.");
-
         public Nothing PageBreak(PageBreak block, int index)
         {
             context.PlaceBreak();

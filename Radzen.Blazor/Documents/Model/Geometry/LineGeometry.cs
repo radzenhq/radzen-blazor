@@ -160,8 +160,6 @@ internal readonly record struct FragmentPaint
 
     public string? Anchor { get; init; }
 
-    public required string RunText { get; init; }
-
     public string? LinkTarget => Link is { Length: > 0 } link ? link : null;
 
     public string? AnchorTarget
@@ -169,7 +167,7 @@ internal readonly record struct FragmentPaint
 
 }
 
-internal struct LineFragment
+internal readonly struct LineFragment
 {
     public required SourceId Source { get; init; }
 

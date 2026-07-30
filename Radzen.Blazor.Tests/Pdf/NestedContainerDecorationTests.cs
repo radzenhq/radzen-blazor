@@ -95,4 +95,44 @@ public class NestedContainerDecorationTests
         Assert.True(HasOperator(ops, "scn"),
             "nested container gradient background selects a shading pattern via scn");
     }
+
+    [Fact]
+    public void NestedContainer_PaintsShadow()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(300));
+        var nested = table.Rows.Add().Cells[0].Blocks.Add(new Container
+        {
+            Width = Unit.FromPoint(200),
+            Shadow = new BoxShadow
+            {
+                Color = Color.FromArgb(160, 0, 0, 0),
+                BlurRadius = Unit.FromPoint(8),
+                OffsetX = Unit.FromPoint(2),
+                OffsetY = Unit.FromPoint(3),
+            },
+        });
+        nested.Blocks.AddParagraph("Nested");
+
+        Assert.True(HasOperator(Ops(document), "gs"),
+            "nested container shadow emits its transparency graphics state");
+    }
+
+    [Fact]
+    public void RotatedContainerInsideTableCell_IsRejectedBeforeEmission()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(300));
+        var nested = table.Rows.Add().Cells[0].Blocks.Add(new Container { Rotation = 15 });
+        nested.Blocks.AddParagraph("Nested");
+
+        var exception = Assert.Throws<System.NotSupportedException>(
+            () => new DocumentRenderer().Render(document));
+
+        Assert.Contains("only supported as direct section content", exception.Message);
+    }
 }

@@ -8,6 +8,9 @@ internal sealed class LayoutCaptureContext
     private readonly Dictionary<object, SourceId> sources = new(ReferenceEqualityComparer.Instance);
     private readonly List<object> sourceValues = [];
     private readonly Dictionary<byte[], SceneImageData> images = new(ReferenceEqualityComparer.Instance);
+    private int nextNodeId;
+
+    public LaidOutNodeId Node() => new(nextNodeId++);
 
     public SourceId Source(object source)
     {

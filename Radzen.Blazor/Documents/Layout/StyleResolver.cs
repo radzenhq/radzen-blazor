@@ -107,8 +107,6 @@ internal sealed class LoweringContext
 
     internal static LoweringContext CreateForDocument(StyleResolution styles) => new(styles);
 
-    internal static LoweringContext CreateIsolated(StyleResolution styles) => new(styles);
-
     public HorizontalAlignment? Alignment(Paragraph paragraph)
         => Styles.Alignment(paragraph);
 

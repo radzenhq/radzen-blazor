@@ -5,11 +5,13 @@ namespace Radzen.Documents.Geometry;
 
 internal sealed class LaidOutDocument
 {
+    public required LaidOutNodeId Id { get; init; }
+
     public required FontCollectionSnapshot Fonts { get; init; }
 
-    public required ImmutableArray<PaginatedPage> Pages { get; init; }
+    public required ImmutableArray<LaidOutPage> Pages { get; init; }
 
     public required DocumentSemantics Semantics { get; init; }
 
-    public required CapturedDocumentInfo Info { get; init; }
+    public required LaidOutDocumentInfo Info { get; init; }
 }

@@ -66,20 +66,6 @@ internal static class BlockExpander
         return new ExpandedBlocks(expanded, ranges);
     }
 
-    internal static ExpandedBlocks ExpandBlocksIsolated(
-        BlockCollection blocks,
-        double availableWidth,
-        bool keepSpecialContainers = false,
-        IReadOnlyDictionary<string, int>? tocPages = null,
-        FontCollection? fonts = null)
-        => ExpandBlocks(
-            blocks,
-            availableWidth,
-            LoweringContext.CreateIsolated(StyleResolution.Empty),
-            keepSpecialContainers,
-            tocPages,
-            fonts);
-
     private sealed class ExpandVisitor(
         List<Block> expanded,
         List<ListItemBlockRange> ranges,

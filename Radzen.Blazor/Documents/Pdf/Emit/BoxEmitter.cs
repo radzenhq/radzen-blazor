@@ -5,15 +5,11 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class BoxEmitter(TableEmitter tables)
 {
-    public void EmitBox(EmitContext context, in PositionedBox box, double left, double contentTop)
+    public void EmitBox(EmitContext context, in LaidOutBox box, double left, double contentTop)
     {
         var plan = context.Plan;
         var mark = plan.Mark();
-        var bounds = PdfRect.FromSize(
-            left + box.Bounds.X,
-            contentTop - box.Bounds.Y - box.Bounds.Height,
-            box.Bounds.Width,
-            box.Bounds.Height);
+        var bounds = PageSpace.Bounds(left, contentTop, box.Bounds);
 
         if (box.Transform is not null && box.Style.Shadow is not null)
         {
@@ -32,7 +28,7 @@ internal sealed class BoxEmitter(TableEmitter tables)
             box.Content,
             innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
             bounds, radius, opacity, null,
-            left, contentTop, box.Y);
+            left, contentTop, box.Bounds.Y);
 
         if (box.Transform is { } transform)
         {

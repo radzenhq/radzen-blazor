@@ -52,7 +52,7 @@ public class LayoutCorrectnessRegressionTests
             task.Wait(TimeSpan.FromSeconds(5)),
             "Paginator did not terminate for a continuation line taller than the page.");
 
-        if (task.Result is System.Collections.Immutable.ImmutableArray<PaginatedPage> pages)
+        if (task.Result is System.Collections.Immutable.ImmutableArray<LaidOutPage> pages)
         {
             Assert.InRange(pages.Length, 1, 3);
             Assert.Equal(2, pages.Sum(p => p.Body.Lines.Length));
@@ -60,7 +60,9 @@ public class LayoutCorrectnessRegressionTests
         }
         else
         {
-            Assert.IsAssignableFrom<Exception>(task.Result);
+            Assert.True(
+                task.Result is InvalidOperationException or NotSupportedException,
+                $"Layout must terminate with a layout diagnostic, but threw {task.Result.GetType().FullName}.");
         }
     }
 
@@ -104,7 +106,9 @@ public class LayoutCorrectnessRegressionTests
         }
         else
         {
-            Assert.IsAssignableFrom<Exception>(task.Result);
+            Assert.True(
+                task.Result is InvalidOperationException or NotSupportedException,
+                $"Layout must terminate with a layout diagnostic, but threw {task.Result.GetType().FullName}.");
         }
     }
 

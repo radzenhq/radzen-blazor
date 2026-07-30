@@ -17,33 +17,26 @@ internal static class GeometryCapture
             font.EffectiveStrikethrough,
             font.EffectiveColor);
 
-    public static Font Materialize(in FontPaint paint)
-        => new()
-        {
-            Family = paint.Family,
-            Size = paint.Size,
-            Bold = paint.Bold,
-            Italic = paint.Italic,
-            Underline = paint.Underline,
-            Strikethrough = paint.Strikethrough,
-            Color = paint.Color,
-        };
+    public static FragmentPaint Fragment(Run run, Font font, LayoutCaptureContext capture)
+        => Fragment(run, Font(font), capture);
 
-    public static FragmentPaint Fragment(Run run, Font font, LayoutCaptureContext capture) => new()
+    public static FragmentPaint Fragment(
+        Run run,
+        in FontPaint font,
+        LayoutCaptureContext capture) => new()
     {
-        Font = Font(font),
+        Font = font,
         Opacity = run.Opacity,
         LetterSpacing = run.LetterSpacing.Point,
         WordSpacing = run.WordSpacing.Point,
         HorizontalScale = run.HorizontalScale,
         ScriptScale = run.ScriptScale,
-        Rise = run.ScriptRise(font.EffectiveSize.Point),
+        Rise = run.ScriptRise(font.Size),
         IsScript = run.VerticalAlignment != RunVerticalAlignment.None,
         Invisible = run.Invisible,
         Link = run.Link,
         LinkToAnchor = run.LinkToAnchor,
         Anchor = run.Anchor,
-        RunText = run.Text,
         InlineImage = InlineImage(run, capture),
     };
 
@@ -152,7 +145,7 @@ internal static class GeometryCapture
         return new ResolvedEdge(edge.Color, width > 0 ? width : 0.5, style);
     }
 
-    public static CapturedDocumentInfo DocumentInfo(DocumentInfo info) => new()
+    public static LaidOutDocumentInfo DocumentInfo(DocumentInfo info) => new()
     {
         Title = info.Title,
         Author = info.Author,

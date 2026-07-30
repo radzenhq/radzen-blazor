@@ -125,7 +125,7 @@ public class ListItemBlockContentTests
         var positionedImage = Assert.Single(body.Images);
         var marker = Assert.Single(body.Lines);
 
-        Assert.Equal(18, positionedImage.XOffset, Tol);
+        Assert.Equal(18, positionedImage.X, Tol);
         Assert.Equal(positionedImage.Y, marker.Y, Tol);
         Assert.Contains(marker.Line.Fragments, fragment => fragment.IsMarker);
     }
@@ -146,13 +146,10 @@ public class ListItemBlockContentTests
         var pages = Paginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
-        Assert.Contains(
-            pages[0].Body.Lines[^1].Line.Fragments,
-            fragment => fragment.Paint.RunText == blocks[0].Text);
+        Assert.Equal(blocks[0].Text, Text(pages[0].Body.Lines[^1]));
         Assert.Equal(
             3,
-            pages[1].Body.Lines.Count(line => line.Line.Fragments.Any(
-                fragment => blocks.Any(block => block.Text == fragment.Paint.RunText))));
+            pages[1].Body.Lines.Count(line => blocks.Any(block => block.Text == Text(line))));
         Assert.Single(pages.SelectMany(page => page.Body.Lines)
             .SelectMany(line => line.Line.Fragments)
             .Where(fragment => fragment.IsMarker));
@@ -174,7 +171,7 @@ public class ListItemBlockContentTests
         Assert.Equal(2, pages.Length);
         Assert.DoesNotContain(pages[0].Body.Lines.SelectMany(line => line.Line.Fragments), fragment => fragment.IsMarker);
         var firstLine = pages[1].Body.Lines.First(line => line.Line.Fragments.Any(
-            fragment => fragment.Paint.RunText == paragraph.Text));
+            fragment => !fragment.IsMarker));
         Assert.Contains(firstLine.Line.Fragments, fragment => fragment.IsMarker);
         Assert.Equal(0, firstLine.Y, Tol);
     }
@@ -206,13 +203,12 @@ public class ListItemBlockContentTests
 
         Assert.Equal(2, pages.Length);
         Assert.DoesNotContain(
-            pages[0].Body.Lines.SelectMany(line => line.Line.Fragments),
-            fragment => fragment.Paint.RunText == first.Text);
+            pages[0].Body.Lines,
+            line => Text(line) == first.Text);
         Assert.Equal(
             new[] { first.Text, second.Text },
-            pages[1].Body.Lines.SelectMany(line => line.Line.Fragments)
-                .Where(fragment => !fragment.IsMarker)
-                .Select(fragment => fragment.Paint.RunText)
+            pages[1].Body.Lines
+                .Select(Text)
                 .ToArray());
     }
 
@@ -235,9 +231,9 @@ public class ListItemBlockContentTests
             children);
     }
 
-    private static string Text(PositionedLine line)
+    private static string Text(LaidOutLine line)
         => string.Concat(line.Line.Fragments.Where(fragment => !fragment.IsMarker).Select(fragment => fragment.Text));
 
-    private static double ContentX(PositionedLine line)
+    private static double ContentX(LaidOutLine line)
         => line.Line.Fragments.First(fragment => !fragment.IsMarker).XOffset;
 }

@@ -8,15 +8,15 @@ namespace Radzen.Documents.Layout;
 internal sealed class PaginationContext
 {
     internal const double Eps = 1e-6;
-    private readonly List<PaginatedPage> pages;
+    private readonly List<LaidOutPage> pages;
     private readonly FontCollection fonts;
     private readonly Func<Image, double, (double Width, double Height)>? measureImage;
     private readonly LoweringContext resolution;
     private readonly LayoutCaptureContext capture;
-    private readonly PositionedWatermark? watermark;
+    private readonly LaidOutWatermark? watermark;
     private readonly PageSize size;
-    private readonly PageLayer header;
-    private readonly PageLayer footer;
+    private readonly LaidOutLayer header;
+    private readonly LaidOutLayer footer;
     private readonly double headerTop;
     private readonly double footerTop;
     private readonly double left;
@@ -28,12 +28,12 @@ internal sealed class PaginationContext
     private readonly int pageNumberOffset;
     private BlockHeightHandler? blockHeightHandler;
     private int order;
-    private PageLayerBuilder current = new();
+    private PageLayerBuilder current;
 
     public PaginationContext(
         Section section,
         FontCollection fonts,
-        List<PaginatedPage> pages,
+        List<LaidOutPage> pages,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture,
@@ -46,6 +46,7 @@ internal sealed class PaginationContext
         this.resolution = resolution;
         this.capture = capture;
         this.pageNumberOffset = pageNumberOffset;
+        current = new PageLayerBuilder(capture);
 
 
         var (pageWidth, effectivePageHeight) = BandLayouter.EffectiveSize(section);
@@ -116,8 +117,9 @@ internal sealed class PaginationContext
 
     public void Flush()
     {
-        pages.Add(new PaginatedPage
+        pages.Add(new LaidOutPage
         {
+            Id = capture.Node(),
             Size = size,
             ContentBox = ContentBox,
             Number = pageNumberOffset + pages.Count + 1,
@@ -128,7 +130,7 @@ internal sealed class PaginationContext
             FooterTop = footerTop,
             Watermark = watermark,
         });
-        current = new PageLayerBuilder();
+        current = new PageLayerBuilder(capture);
     }
 
     public void Finish()
@@ -177,7 +179,7 @@ internal sealed class PaginationContext
     }
 
     private double BlockHeight(int index)
-        => BlockLayoutDispatch.Dispatch(
+        => LoweredBlockDispatch.Dispatch(
             Blocks[index],
             blockHeightHandler ??= new BlockHeightHandler(this),
             index);
@@ -192,10 +194,11 @@ internal sealed class PaginationContext
     {
         if (block is not Paragraph && resolution.ListMarker(block) is { } marker)
         {
-            current.Lines.Add(new PositionedLine
+            current.Lines.Add(new LaidOutLine
             {
                 Line = LineLayouter.MarkerLine(marker, fonts, capture),
                 Source = capture.Source(block),
+                X = 0,
                 Y = Cursor,
             });
         }
@@ -209,7 +212,8 @@ internal sealed class PaginationContext
         PlaceMarker(table);
 
         var tableOrder = order++;
-        var fragments = TablePaginator.Paginate(layout, table, contentHeight - Cursor, contentHeight);
+        var fragments = TablePaginator.Paginate(
+            layout, table, contentHeight - Cursor, contentHeight, capture);
         for (var f = 0; f < fragments.Count; f++)
         {
             if (f > 0)
@@ -287,13 +291,13 @@ internal sealed class PaginationContext
 
         var transform = RotationAboutCenter(container, indent, boxWidth, boxHeight);
 
-        current.Boxes.Add(new PositionedBox
+        current.Boxes.Add(new LaidOutBox
         {
+            Id = capture.Node(),
             Source = capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, Cursor, boxWidth, boxHeight),
             Style = GeometryCapture.Box(container, boxWidth, boxHeight),
-            Y = Cursor,
             Padding = container.Padding.Point,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,
@@ -432,10 +436,11 @@ internal sealed class PaginationContext
             for (var lineIndex = 0; lineIndex < decision.PlaceCount; lineIndex++)
             {
                 var box = lines[offset + lineIndex];
-                current.Lines.Add(new PositionedLine
+                current.Lines.Add(new LaidOutLine
                 {
                     Line = box,
                     Source = capture.Source(paragraph),
+                    X = 0,
                     Y = lineY,
                 });
                 lineY += box.Height;
@@ -474,7 +479,7 @@ internal sealed class PaginationContext
     }
 
     private sealed class BlockHeightHandler(PaginationContext owner)
-        : IBlockLayoutHandler<int, double>
+        : ILoweredBlockHandler<int, double>
     {
         public double Paragraph(Paragraph paragraph, int index)
         {
@@ -513,7 +518,5 @@ internal sealed class PaginationContext
             => Paginator.MeasureCodeSymbol(block, owner.fonts, owner.resolution).Height;
 
         public double PageBreak(PageBreak pageBreak, int index) => double.PositiveInfinity;
-
-        public double Unsupported(Block block, int index) => 0;
     }
 }

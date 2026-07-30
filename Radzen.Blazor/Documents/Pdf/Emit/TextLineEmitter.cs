@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Radzen.Documents.Fonts;
 using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Emit;
@@ -12,28 +11,22 @@ internal sealed class TextLineEmitter(
     StructureTreeBuilder structureTree,
     bool allowUnsupportedCharacters)
 {
-    private readonly SfntRunBuilder runBuilder = new(fontResolver);
-    private readonly Base14GlyphEncoder base14Encoder = new(allowUnsupportedCharacters);
+    private readonly GlyphSpanEmitter spans = new(fontResolver, allowUnsupportedCharacters);
 
     public void EmitBandLines(
         EmitContext context,
-        ImmutableArray<PositionedLine> lines,
+        ImmutableArray<LaidOutLine> lines,
         double left,
         double top)
         => EmitLines(
             context, lines,
-            static l => l.Line, static l => l.Source, static _ => 0, static l => l.Y,
             left, top, delta: 0,
             opacity: 1, inherited: null, resolveStructure: false,
             overflowThreshold: double.PositiveInfinity);
 
-    public bool EmitLines<TLine>(
+    public bool EmitLines(
         EmitContext context,
-        ImmutableArray<TLine> lines,
-        Func<TLine, LineBox> lineOf,
-        Func<TLine, SourceId> sourceOf,
-        Func<TLine, double> xOf,
-        Func<TLine, double> yOf,
+        ImmutableArray<LaidOutLine> lines,
         double left,
         double baseTop,
         double delta,
@@ -45,12 +38,17 @@ internal sealed class TextLineEmitter(
         var overflows = false;
         foreach (var current in lines)
         {
-            var source = sourceOf(current);
-            var element = resolveStructure ? structureTree.ElementOf(source) ?? inherited : null;
-            var marker = resolveStructure ? structureTree.MarkerElementOf(source) : null;
-            var box = lineOf(current);
+            var element = resolveStructure ? structureTree.ElementOf(current.Source) ?? inherited : null;
+            var marker = resolveStructure ? structureTree.MarkerElementOf(current.Source) : null;
+            var box = current.Line;
             EmitLine(
-                context, box, left + xOf(current), baseTop - (yOf(current) + delta), element, opacity, marker,
+                context,
+                box,
+                left + current.X,
+                PageSpace.FromTop(baseTop, current.Y + delta),
+                element,
+                opacity,
+                marker,
                 resolveFragments: resolveStructure);
             overflows |= box.Width > overflowThreshold + 0.01;
         }
@@ -232,81 +230,27 @@ internal sealed class TextLineEmitter(
         string? extGState)
     {
         var paint = fragment.Paint;
-        var font = PdfModelAdapter.Materialize(paint.Font);
-        var size = font.EffectiveSize.Point * paint.ScriptScale;
+        var font = paint.Font;
+        var size = font.Size * paint.ScriptScale;
         foreach (var span in glyphRun.Spans)
         {
             var x = startX + span.XOffset;
-            switch (span.Face.Kind)
-            {
-                case CapturedFontFaceKind.Sfnt:
-                    EmitSfntSpan(plan, paint, font, span, x, y, size, element, extGState);
-                    break;
-                case CapturedFontFaceKind.BuiltIn:
-                    EmitBase14Span(plan, paint, span, x, y, size, element, extGState);
-                    break;
-            }
+            var emitted = spans.Emit(span, font.Size);
+            plan.UsedFonts.Add(emitted.Font);
+            plan.Texts.Add(BuildTextDraw(
+                paint,
+                x,
+                y,
+                size,
+                emitted.Font,
+                emitted.Bytes,
+                element,
+                extGState,
+                emitted.Kerns,
+                plan.NextSequence(),
+                emitted.Face is { } face && font.Bold && !face.Bold ? size * 0.03 : 0,
+                emitted.Face is { } italicFace && font.Italic && !italicFace.Italic ? 0.21 : 0));
         }
-    }
-
-    private void EmitSfntSpan(
-        PagePlan plan,
-        in FragmentPaint paint,
-        Font font,
-        in CapturedGlyphSpan span,
-        double x,
-        double y,
-        double size,
-        StructureElement? element,
-        string? extGState)
-    {
-        var glyphRun = runBuilder.Build(span, font.EffectiveSize.Point);
-        var face = glyphRun.Face;
-        plan.UsedFonts.Add(glyphRun.Font);
-        plan.Texts.Add(BuildTextDraw(
-            paint, x, y, size, glyphRun.Font, glyphRun.Bytes, element, extGState, glyphRun.Kerns,
-            plan.NextSequence(),
-            font.EffectiveBold && !face.Bold ? size * 0.03 : 0,
-            font.EffectiveItalic && !face.Italic ? 0.21 : 0));
-    }
-
-    private void EmitBase14Span(
-        PagePlan plan,
-        in FragmentPaint paint,
-        in CapturedGlyphSpan span,
-        double x,
-        double y,
-        double size,
-        StructureElement? element,
-        string? extGState)
-    {
-        var face = span.Face.BuiltIn;
-        var glyphs = span.BuiltInGlyphs;
-        var bytes = base14Encoder.Encode(glyphs, face);
-        var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
-        for (var i = 0; i < glyphs.Length; i++)
-        {
-            if (i < kerns.Length)
-            {
-                kerns[i] = SfntRunBuilder.PdfTextAdjustment(
-                    glyphs[i].TextAdjustmentPoints,
-                    paint.Font.Size);
-            }
-        }
-
-        var generated = fontResolver.ResolveBase14(face);
-        plan.UsedFonts.Add(generated);
-        plan.Texts.Add(BuildTextDraw(
-            paint,
-            x,
-            y,
-            size,
-            generated,
-            bytes,
-            element,
-            extGState,
-            SfntRunBuilder.HasNonZero(kerns) ? kerns : null,
-            plan.NextSequence()));
     }
 
     private void EmitInlineImage(PagePlan plan, in InlineImagePaint image, double x, double baseline, StructureElement? element, double alpha)

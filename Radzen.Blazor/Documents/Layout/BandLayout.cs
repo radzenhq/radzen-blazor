@@ -4,9 +4,9 @@ using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Layout;
 
-internal sealed class BandLayout
+internal sealed class BandLayout(LayoutCaptureContext capture)
 {
-    public PageLayerBuilder Content { get; } = new();
+    public PageLayerBuilder Content { get; } = new(capture);
 
     public double Height { get; set; }
 }
@@ -21,11 +21,11 @@ internal static class BandLayouter
         LoweringContext resolution,
         LayoutCaptureContext capture)
     {
-        var result = new BandLayout();
+        var result = new BandLayout(capture);
         var visitor = new BandVisitor(result, width, fonts, measureImage, resolution, capture);
         foreach (var block in BlockExpander.ExpandBlocks(band.Blocks, width, resolution))
         {
-            BlockLayoutDispatch.Dispatch(block, visitor, default(Nothing));
+            LoweredBlockDispatch.Dispatch(block, visitor, default(Nothing));
         }
 
         result.Height = visitor.Cursor;
@@ -39,23 +39,21 @@ internal static class BandLayouter
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture)
-        : IBlockLayoutHandler<Nothing, Nothing>
+        : ILoweredBlockHandler<Nothing, Nothing>
     {
         private int order;
 
         public double Cursor { get; private set; }
 
-        public Nothing Unsupported(Block block, Nothing context)
-            => throw new NotSupportedException($"Block type '{block.GetType().Name}' is not supported in a header/footer band.");
-
         private void PlaceMarker(Block block)
         {
             if (resolution.ListMarker(block) is { } marker)
             {
-                result.Content.Lines.Add(new PositionedLine
+                result.Content.Lines.Add(new LaidOutLine
                 {
                     Line = LineLayouter.MarkerLine(marker, fonts, capture),
                     Source = capture.Source(block),
+                    X = 0,
                     Y = Cursor,
                 });
             }
@@ -89,7 +87,7 @@ internal static class BandLayouter
 
         public Nothing Table(Table table, Nothing context)
         {
-            var layout = BlockLayoutDispatch.LayoutTable(
+            var layout = LoweredBlockDispatch.LayoutTable(
                 table,
                 width,
                 fonts,
@@ -98,7 +96,8 @@ internal static class BandLayouter
                 capture);
             var tableOrder = order++;
             PlaceMarker(table);
-            foreach (var fragment in TablePaginator.Paginate(layout, table, double.PositiveInfinity))
+            foreach (var fragment in TablePaginator.Paginate(
+                layout, table, double.PositiveInfinity, capture))
             {
                 result.Content.Tables.Add(FlowContentPlacer.Table(
                     table,
@@ -166,10 +165,11 @@ internal static class BandLayouter
             var y = Cursor + format.SpacingBefore.Point;
             foreach (var box in lines)
             {
-                result.Content.Lines.Add(new PositionedLine
+                result.Content.Lines.Add(new LaidOutLine
                 {
                     Line = box,
                     Source = capture.Source(paragraph),
+                    X = 0,
                     Y = y,
                 });
                 y += box.Height;

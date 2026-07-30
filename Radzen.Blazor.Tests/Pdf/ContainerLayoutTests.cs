@@ -73,12 +73,12 @@ public class ContainerLayoutTests
         var page = Assert.Single(pages);
 
         var box = Assert.Single(page.HeaderLayer.Boxes);
-        Assert.Equal(0, box.Y, 6);
+        Assert.Equal(0, box.Bounds.Y, 6);
         Assert.Equal(box.Content.Height + 12, box.Bounds.Height, 6);
         Assert.Null(box.Transform);
 
         var fragment = Assert.Single(page.HeaderLayer.Tables);
-        Assert.Equal(box.Bounds.Height, fragment.Y, 6);
+        Assert.Equal(box.Bounds.Height, fragment.Bounds.Y, 6);
         Assert.True(box.Order < fragment.Order, "band box precedes the band table");
     }
 
@@ -250,7 +250,7 @@ public class ContainerLayoutTests
         var box = Assert.Single(laidCell.Boxes);
         Assert.Equal(capture.Source(container), box.Source);
         Assert.Equal(300, box.Bounds.Width, 6);
-        Assert.Equal(4, box.Radius, 6);
+        Assert.Equal(4, box.Style.CornerRadius, 6);
         Assert.Equal(container.Background, box.Style.Background);
         var line = Assert.Single(box.Content.Lines);
         Assert.Equal(8, line.X, 6);

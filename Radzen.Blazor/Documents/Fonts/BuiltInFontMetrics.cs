@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Fonts;
 
@@ -47,7 +48,18 @@ internal sealed class BuiltInFontMetrics
 
     public static BuiltInFontMetrics? Resolve(Font font)
     {
-        var psName = ResolvePostScriptName(font);
+        var psName = ResolvePostScriptName(
+            font.EffectiveFamily,
+            font.EffectiveBold,
+            font.EffectiveItalic);
+        return Resolve(psName);
+    }
+
+    public static BuiltInFontMetrics? Resolve(in FontPaint font)
+        => Resolve(ResolvePostScriptName(font.Family, font.Bold, font.Italic));
+
+    private static BuiltInFontMetrics? Resolve(string? psName)
+    {
         if (psName == null || !EntryByName.TryGetValue(psName, out var entry))
         {
             return null;
@@ -98,9 +110,8 @@ internal sealed class BuiltInFontMetrics
 
     public bool ContainsGlyph(char c) => TryGetWidth(c, out _);
 
-    private static string? ResolvePostScriptName(Font font)
+    private static string? ResolvePostScriptName(string name, bool bold, bool italic)
     {
-        var name = font.EffectiveFamily;
         if (string.IsNullOrEmpty(name))
         {
             return null;
@@ -108,11 +119,11 @@ internal sealed class BuiltInFontMetrics
 
         return name.ToLowerInvariant() switch
         {
-            "helvetica" => StyleSuffix(font, "Helvetica", "-Bold", "-Oblique", "-BoldOblique"),
-            "courier" => StyleSuffix(font, "Courier", "-Bold", "-Oblique", "-BoldOblique"),
-            "times" or "times-roman" => font.EffectiveBold && font.EffectiveItalic ? "Times-BoldItalic"
-                                : font.EffectiveBold ? "Times-Bold"
-                                : font.EffectiveItalic ? "Times-Italic"
+            "helvetica" => StyleSuffix(bold, italic, "Helvetica", "-Bold", "-Oblique", "-BoldOblique"),
+            "courier" => StyleSuffix(bold, italic, "Courier", "-Bold", "-Oblique", "-BoldOblique"),
+            "times" or "times-roman" => bold && italic ? "Times-BoldItalic"
+                                : bold ? "Times-Bold"
+                                : italic ? "Times-Italic"
                                 : "Times-Roman",
             "symbol" => "Symbol",
             "zapfdingbats" => "ZapfDingbats",
@@ -120,10 +131,16 @@ internal sealed class BuiltInFontMetrics
         };
     }
 
-    private static string StyleSuffix(Font font, string family, string bold, string italic, string boldItalic)
-        => font.EffectiveBold && font.EffectiveItalic ? family + boldItalic
-            : font.EffectiveBold ? family + bold
-            : font.EffectiveItalic ? family + italic
+    private static string StyleSuffix(
+        bool isBold,
+        bool isItalic,
+        string family,
+        string bold,
+        string italic,
+        string boldItalic)
+        => isBold && isItalic ? family + boldItalic
+            : isBold ? family + bold
+            : isItalic ? family + italic
             : family;
 
     private static Dictionary<string, int> ParseWidths(string widths)

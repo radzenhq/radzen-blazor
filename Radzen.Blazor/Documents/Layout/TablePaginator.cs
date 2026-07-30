@@ -7,17 +7,26 @@ namespace Radzen.Documents.Layout;
 
 internal static class TablePaginator
 {
-    public static IReadOnlyList<TableFragment> Paginate(LaidOutTable layout, Table source, double availableHeight)
-        => Paginate(layout, source, availableHeight, availableHeight);
+    public static IReadOnlyList<LaidOutTableSlice> Paginate(
+        LaidOutTable layout,
+        Table source,
+        double availableHeight,
+        LayoutCaptureContext? capture = null)
+        => Paginate(layout, source, availableHeight, availableHeight, capture);
 
-    public static IReadOnlyList<TableFragment> Paginate(
-        LaidOutTable layout, Table source, double firstAvailable, double subsequentAvailable)
+    public static IReadOnlyList<LaidOutTableSlice> Paginate(
+        LaidOutTable layout,
+        Table source,
+        double firstAvailable,
+        double subsequentAvailable,
+        LayoutCaptureContext? capture = null)
     {
+        capture ??= new LayoutCaptureContext();
         var (headers, bodies, headerHeight) = SplitRows(layout, source);
 
         var reach = BuildReach(layout, source.Rows.Count);
 
-        List<TableFragment> fragments = [];
+        List<LaidOutTableSlice> fragments = [];
         var body = 0;
 
         var onFirst = true;
@@ -67,13 +76,13 @@ internal static class TablePaginator
 
                 if (fragments.Count == 0)
                 {
-                    fragments.Add(BuildFragment(1, layout, headers, placed));
+                    fragments.Add(BuildFragment(1, layout, headers, placed, capture));
                 }
 
                 break;
             }
 
-            fragments.Add(BuildFragment(fragments.Count + 1, layout, headers, placed));
+            fragments.Add(BuildFragment(fragments.Count + 1, layout, headers, placed, capture));
             onFirst = false;
 
             if (body >= bodies.Count)
@@ -172,26 +181,32 @@ internal static class TablePaginator
         return false;
     }
 
-    private static TableFragment BuildFragment(int number, LaidOutTable layout, List<int> headers, List<int> bodyRows)
+    private static LaidOutTableSlice BuildFragment(
+        int number,
+        LaidOutTable layout,
+        List<int> headers,
+        List<int> bodyRows,
+        LayoutCaptureContext capture)
     {
-        List<FragmentRow> rows = [];
+        List<LaidOutFragmentRow> rows = [];
         double y = 0;
         foreach (var h in headers)
         {
             var height = layout.RowHeights[h];
-            rows.Add(new FragmentRow { SourceRow = h, IsHeader = true, Y = y, Height = height });
+            rows.Add(new LaidOutFragmentRow { SourceRow = h, IsHeader = true, Y = y, Height = height });
             y += height;
         }
 
         foreach (var b in bodyRows)
         {
             var height = layout.RowHeights[b];
-            rows.Add(new FragmentRow { SourceRow = b, IsHeader = false, Y = y, Height = height });
+            rows.Add(new LaidOutFragmentRow { SourceRow = b, IsHeader = false, Y = y, Height = height });
             y += height;
         }
 
-        return new TableFragment
+        return new LaidOutTableSlice
         {
+            Id = capture.Node(),
             Number = number,
             Rows = [.. rows],
             HeaderRowCount = headers.Count,

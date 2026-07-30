@@ -25,8 +25,8 @@ internal static class OverlayBoxPlacer
         var lines = new List<LaidOutLine>();
         var images = new List<LaidOutImage>();
         var codeSymbols = new List<LaidOutCodeSymbol>();
-        var tables = new List<LaidOutNestedTable>();
-        var boxes = new List<LaidOutNestedBox>();
+        var tables = new List<LaidOutTablePlacement>();
+        var boxes = new List<LaidOutBox>();
         var order = 0;
         var innerHeight = 0.0;
         foreach (var child in container.Blocks)
@@ -63,8 +63,8 @@ internal static class OverlayBoxPlacer
 
     private static int MergeNested(
         LaidOutBoxContent child,
-        List<LaidOutNestedTable> tables,
-        List<LaidOutNestedBox> boxes,
+        List<LaidOutTablePlacement> tables,
+        List<LaidOutBox> boxes,
         int order)
     {
         var cursor = OrderedMerge.ByOrder(child.Tables, static t => t.Order, child.Boxes, static b => b.Order);
@@ -112,7 +112,7 @@ internal static class OverlayBoxPlacer
             capture);
     }
 
-    internal static PositionedBox BuildBox(
+    internal static LaidOutBox BuildBox(
         Container container,
         BoxContentLayout.Measured measured,
         double availableWidth,
@@ -127,13 +127,13 @@ internal static class OverlayBoxPlacer
         var contentBox = new Rect(indent + padding, padding, innerWidth, measured.Height);
         var content = BoxContentLayout.Position(measured, contentBox, HorizontalAlignment.Left, VerticalAlignment.Top);
 
-        return new PositionedBox
+        return new LaidOutBox
         {
+            Id = measured.Capture.Node(),
             Source = measured.Capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, y, boxWidth, boxHeight),
             Style = GeometryCapture.Box(container, boxWidth, boxHeight),
-            Y = y,
             Padding = padding,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,

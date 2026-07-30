@@ -55,9 +55,9 @@ internal static class TablePaginationSupport
 
     public static double Capacity(double lh, int rows) => (rows + 0.4) * lh;
 
-    public static IReadOnlyList<int> BodyRows(TableFragment fragment)
+    public static IReadOnlyList<int> BodyRows(LaidOutTableSlice fragment)
         => [.. fragment.Rows.Where(r => !r.IsHeader).Select(r => r.SourceRow)];
 
-    public static IReadOnlyList<int> HeaderRows(TableFragment fragment)
+    public static IReadOnlyList<int> HeaderRows(LaidOutTableSlice fragment)
         => [.. fragment.Rows.Where(r => r.IsHeader).Select(r => r.SourceRow)];
 }

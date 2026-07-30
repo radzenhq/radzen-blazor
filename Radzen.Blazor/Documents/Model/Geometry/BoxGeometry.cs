@@ -12,7 +12,7 @@ internal readonly struct LaidOutBoxContent
 
     public required ImmutableArray<LaidOutCodeSymbol> CodeSymbols { get; init; }
 
-    public required ImmutableArray<LaidOutNestedTable> Tables { get; init; }
+    public required ImmutableArray<LaidOutTablePlacement> Tables { get; init; }
 
-    public required ImmutableArray<LaidOutNestedBox> Boxes { get; init; }
+    public required ImmutableArray<LaidOutBox> Boxes { get; init; }
 }

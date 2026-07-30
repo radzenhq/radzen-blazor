@@ -17,7 +17,7 @@ internal sealed class BlockLayoutCache(
     private readonly BoxContentLayout.Measured?[] boxes = new BoxContentLayout.Measured?[count];
 
     internal LaidOutTable Table(int index, Table table)
-        => tables[index] ??= BlockLayoutDispatch.LayoutTable(
+        => tables[index] ??= LoweredBlockDispatch.LayoutTable(
             table,
             contentWidth,
             fonts,
@@ -76,7 +76,7 @@ internal static class NextBlockHeightResolver
             fonts,
             measureImage,
             resolution);
-        var result = BlockLayoutDispatch.Dispatch(blocks[next], visitor, next);
+        var result = LoweredBlockDispatch.Dispatch(blocks[next], visitor, next);
         spacingBefore = result.SpacingBefore;
         height = result.Height;
         return result.Found;
@@ -89,10 +89,8 @@ internal static class NextBlockHeightResolver
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution)
-        : IBlockLayoutHandler<int, NextBlockHeight>
+        : ILoweredBlockHandler<int, NextBlockHeight>
     {
-        public NextBlockHeight Unsupported(Block block, int next) => default;
-
         public NextBlockHeight Paragraph(Paragraph paragraph, int next)
             => broken[next] is { Count: > 0 } lines
                 ? new NextBlockHeight { Found = true, SpacingBefore = resolution.Format(paragraph).SpacingBefore.Point, Height = lines[0].Height }

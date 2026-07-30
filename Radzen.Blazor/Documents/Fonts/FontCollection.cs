@@ -333,7 +333,13 @@ public sealed class FontCollection
     {
         ArgumentNullException.ThrowIfNull(text);
         ArgumentNullException.ThrowIfNull(font);
+        var captured = Capture(font);
+        return MeasureText(text, captured);
+    }
 
+    internal double MeasureText(string text, in FontPaint font)
+    {
+        ArgumentNullException.ThrowIfNull(text);
         if (TryResolvePrimary(font, out _))
         {
             return Shaper().MeasureAdvance(text, font);
@@ -341,9 +347,19 @@ public sealed class FontCollection
 
         SimpleShaper.EnsureNoComplexScript(text);
         var builtIn = BuiltInFontMetrics.Resolve(font)
-            ?? throw new InvalidOperationException($"No font is registered for family '{font.EffectiveFamily}'.");
+            ?? throw new InvalidOperationException($"No font is registered for family '{font.Family}'.");
         return MeasureBuiltIn(text, font, builtIn);
     }
+
+    private static FontPaint Capture(Font font)
+        => new(
+            font.EffectiveFamily,
+            font.EffectiveSize.Point,
+            font.EffectiveBold,
+            font.EffectiveItalic,
+            font.EffectiveUnderline,
+            font.EffectiveStrikethrough,
+            font.EffectiveColor);
 
     internal SimpleShaper Shaper()
     {
@@ -361,6 +377,15 @@ public sealed class FontCollection
         Font font,
         bool enableBuiltInKerning = true)
     {
+        var captured = Capture(font);
+        return CaptureGlyphRun(text, captured, enableBuiltInKerning);
+    }
+
+    internal CapturedGlyphRun CaptureGlyphRun(
+        string text,
+        in FontPaint font,
+        bool enableBuiltInKerning = true)
+    {
         if (text.Length == 0)
         {
             return CapturedGlyphRun.Empty(text);
@@ -371,7 +396,7 @@ public sealed class FontCollection
             : CaptureBuiltInGlyphRun(text, font, enableBuiltInKerning);
     }
 
-    private CapturedGlyphRun CaptureSfntGlyphRun(string text, Font font)
+    private CapturedGlyphRun CaptureSfntGlyphRun(string text, in FontPaint font)
     {
         var positioned = Shaper().Shape(text, font, out var totalAdvance);
         var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
@@ -397,7 +422,7 @@ public sealed class FontCollection
             face = positionedGlyph.Face;
             var codepoint = CodePointAt(text, positionedGlyph.Cluster);
             var trailing = SimpleShaper.TrailingKerning(
-                face, positionedGlyph.GlyphId, positionedGlyph.Advance, font.EffectiveSize.Point);
+                face, positionedGlyph.GlyphId, positionedGlyph.Advance, font.Size);
             glyphs.Add(new CapturedSfntGlyph(
                 positionedGlyph.GlyphId,
                 positionedGlyph.Advance,
@@ -422,11 +447,14 @@ public sealed class FontCollection
         return new CapturedGlyphRun(text, spans.ToImmutable(), totalAdvance);
     }
 
-    private CapturedGlyphRun CaptureBuiltInGlyphRun(string text, Font font, bool enableKerning)
+    private CapturedGlyphRun CaptureBuiltInGlyphRun(
+        string text,
+        in FontPaint font,
+        bool enableKerning)
     {
         SimpleShaper.EnsureNoComplexScript(text);
         var metrics = BuiltInFontMetrics.Resolve(font)
-            ?? throw new InvalidOperationException($"No font is registered for family '{font.EffectiveFamily}'.");
+            ?? throw new InvalidOperationException($"No font is registered for family '{font.Family}'.");
 
         var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
         var builtInGlyphs = new List<CapturedBuiltInGlyph>();
@@ -436,6 +464,7 @@ public sealed class FontCollection
         var builtInKernAdvance = 0.0;
         var sfntAdvance = 0.0;
         var totalAdvance = 0.0;
+        var fontSize = font.Size;
 
         void FlushBuiltIn()
         {
@@ -444,7 +473,7 @@ public sealed class FontCollection
                 return;
             }
 
-            var advance = FontMetric.Scale(builtInDesignAdvance, font.EffectiveSize.Point, 1000) + builtInKernAdvance;
+            var advance = FontMetric.Scale(builtInDesignAdvance, fontSize, 1000) + builtInKernAdvance;
             spans.Add(new CapturedGlyphSpan(
                 CapturedFontFace.FromBuiltIn(metrics.PostScriptName),
                 [],
@@ -494,7 +523,7 @@ public sealed class FontCollection
                 {
                     var previous = sfntGlyphs[^1];
                     var kern = SimpleShaper.PairKerning(
-                        face!, previous.GlyphId, glyph, previous.Codepoint, codepoint, font.EffectiveSize.Point);
+                        face!, previous.GlyphId, glyph, previous.Codepoint, codepoint, font.Size);
                     sfntAdvance += kern;
                     sfntGlyphs[^1] = previous with
                     {
@@ -505,13 +534,13 @@ public sealed class FontCollection
 
                 sfntGlyphs.Add(new CapturedSfntGlyph(
                     glyph,
-                    face!.AdvanceInUserSpace(glyph, font.EffectiveSize.Point),
+                    face!.AdvanceInUserSpace(glyph, font.Size),
                     0,
                     0,
                     0,
                     i,
                     codepoint));
-                sfntAdvance += face.AdvanceInUserSpace(glyph, font.EffectiveSize.Point);
+                sfntAdvance += face.AdvanceInUserSpace(glyph, font.Size);
             }
             else if (kind == BuiltInGlyphKind.BuiltIn)
             {
@@ -522,16 +551,16 @@ public sealed class FontCollection
                     var kern = metrics.GetRunKerning(
                         (char)MetricsCodepoint(previous.Codepoint),
                         (char)MetricsCodepoint(codepoint));
-                    builtInKernAdvance += kern * font.EffectiveSize.Point / 1000.0;
+                    builtInKernAdvance += kern * font.Size / 1000.0;
                     builtInGlyphs[^1] = previous with
                     {
-                        Advance = previous.Advance + FontMetric.Scale(kern, font.EffectiveSize.Point, 1000),
-                        TextAdjustmentPoints = -FontMetric.Scale(kern, font.EffectiveSize.Point, 1000),
+                        Advance = previous.Advance + FontMetric.Scale(kern, font.Size, 1000),
+                        TextAdjustmentPoints = -FontMetric.Scale(kern, font.Size, 1000),
                     };
                 }
 
                 builtInGlyphs.Add(new CapturedBuiltInGlyph(
-                    FontMetric.Scale(width, font.EffectiveSize.Point, 1000),
+                    FontMetric.Scale(width, font.Size, 1000),
                     0,
                     i,
                     codepoint));
@@ -561,7 +590,7 @@ public sealed class FontCollection
         return advance;
     }
 
-    private double MeasureBuiltIn(string text, Font font, BuiltInFontMetrics metrics)
+    private double MeasureBuiltIn(string text, in FontPaint font, BuiltInFontMetrics metrics)
     {
         double sum = 0;
         var i = 0;
@@ -579,11 +608,11 @@ public sealed class FontCollection
                     {
                         sum += FontMetric.Scale(
                             metrics.GetRunKerning(previous, (char)MetricsCodepoint(codepoint)),
-                            font.EffectiveSize.Point,
+                            font.Size,
                             1000);
                     }
 
-                    sum += FontMetric.Scale(width, font.EffectiveSize.Point, 1000);
+                    sum += FontMetric.Scale(width, font.Size, 1000);
                     previousBuiltIn = (char)MetricsCodepoint(codepoint);
                     prevFallbackFace = null;
                     break;
@@ -591,10 +620,10 @@ public sealed class FontCollection
                     if (EnableKerning && ReferenceEquals(prevFallbackFace, face))
                     {
                         sum += SimpleShaper.PairKerning(
-                            face!, prevFallbackGlyph, glyph, prevFallbackCodepoint, codepoint, font.EffectiveSize.Point);
+                            face!, prevFallbackGlyph, glyph, prevFallbackCodepoint, codepoint, font.Size);
                     }
 
-                    sum += face!.AdvanceInUserSpace(glyph, font.EffectiveSize.Point);
+                    sum += face!.AdvanceInUserSpace(glyph, font.Size);
                     previousBuiltIn = null;
                     prevFallbackFace = face;
                     prevFallbackGlyph = glyph;
@@ -610,7 +639,10 @@ public sealed class FontCollection
         return sum;
     }
 
-    private InvalidOperationException MissingMetrics(string text, Font font, BuiltInFontMetrics metrics)
+    private InvalidOperationException MissingMetrics(
+        string text,
+        in FontPaint font,
+        BuiltInFontMetrics metrics)
     {
         const int MaxReported = 8;
         var offenders = new List<string>();
@@ -630,7 +662,7 @@ public sealed class FontCollection
         }
 
         return new InvalidOperationException(
-            $"The built-in metrics font '{font.EffectiveFamily}' has no glyph metrics for {string.Join(", ", offenders)}. "
+            $"The built-in metrics font '{font.Family}' has no glyph metrics for {string.Join(", ", offenders)}. "
             + $"Register a font that covers these characters with {nameof(FontCollection)}.{nameof(Register)}, "
             + $"or add such a font to the {nameof(SetFallback)} chain.");
     }
@@ -740,20 +772,42 @@ public sealed class FontCollection
 
     internal SfntFont? ResolveFace(Font font) => TryResolvePrimary(font, out var face) ? face : null;
 
+    internal SfntFont? ResolveFace(in FontPaint font)
+        => TryResolvePrimary(font, out var face) ? face : null;
+
     internal bool TryResolvePrimary(Font font, out SfntFont primary)
+        => TryResolvePrimary(
+            font.EffectiveFamily,
+            font.EffectiveBold,
+            font.EffectiveItalic,
+            out primary);
+
+    internal bool TryResolvePrimary(in FontPaint font, out SfntFont primary)
+        => TryResolvePrimary(font.Family, font.Bold, font.Italic, out primary);
+
+    private bool TryResolvePrimary(
+        string family,
+        bool bold,
+        bool italic,
+        out SfntFont primary)
     {
-        if (registered.TryGetValue((font.EffectiveFamily, font.EffectiveBold, font.EffectiveItalic), out primary!))
+        if (registered.TryGetValue((family, bold, italic), out primary!))
         {
             return true;
         }
 
-        return TryResolveFamily(font.EffectiveFamily, out primary);
+        return TryResolveFamily(family, out primary);
     }
 
     internal SfntFont ResolvePrimarySfnt(Font font)
         => TryResolvePrimary(font, out var primary)
             ? primary
             : throw new InvalidOperationException($"No font is registered for family '{font.EffectiveFamily}'.");
+
+    internal SfntFont ResolvePrimarySfnt(string family, bool bold, bool italic)
+        => TryResolvePrimary(family, bold, italic, out var primary)
+            ? primary
+            : throw new InvalidOperationException($"No font is registered for family '{family}'.");
 
     internal (SfntFont Face, ushort GlyphId) ResolveGlyph(SfntFont primary, int c)
     {

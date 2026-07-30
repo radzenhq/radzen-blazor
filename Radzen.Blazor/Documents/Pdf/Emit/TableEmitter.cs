@@ -6,7 +6,7 @@ namespace Radzen.Documents.Pdf.Emit;
 
 internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
-    public void EmitFragment(EmitContext context, PositionedTableFragment positioned, double left, double contentTop)
+    public void EmitFragment(EmitContext context, LaidOutTableFragment positioned, double left, double contentTop)
     {
         var plan = context.Plan;
         var layout = positioned.Layout;
@@ -19,7 +19,11 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             var bounds = positioned.Bounds;
             tableBounds = bounds.Width > 0 || bounds.Height > 0
-                ? PdfRect.FromSize(x, contentTop - bounds.Y - bounds.Height, bounds.Width, bounds.Height)
+                ? PdfRect.FromSize(
+                    x,
+                    PageSpace.Bottom(contentTop, bounds.Y, bounds.Height),
+                    bounds.Width,
+                    bounds.Height)
                 : default;
             tableRadius = BoxStyle.ClampRadius(decoration.CornerRadius, tableBounds.Width, tableBounds.Height);
             tableMark = plan.Mark();
@@ -27,7 +31,13 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         foreach (var row in positioned.Rows)
         {
-            PaintRowBackground(plan, row.Background, x, contentTop - (row.Y + row.Height), layout.Width, row.Height);
+            PaintRowBackground(
+                plan,
+                row.Background,
+                x,
+                PageSpace.FromTop(contentTop, row.Y + row.Height),
+                layout.Width,
+                row.Height);
 
             var repeated = row.IsHeader && positioned.Fragment.Number > 1;
             foreach (var placed in row.Cells)
@@ -90,11 +100,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var element = artifact ? null : structureTree.ElementOf(cell.Source) ?? inherited;
         var opacity = cell.Opacity;
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
-        var bounds = PdfRect.FromSize(
-            left + cell.Bounds.X,
-            contentTop - (cell.Bounds.Y + delta) - cell.Bounds.Height,
-            cell.Bounds.Width,
-            cell.Bounds.Height);
+        var bounds = PageSpace.Bounds(left, contentTop, cell.Bounds, delta);
         BoxRenderer.Paint(plan, bounds, cell.Decoration, extGState);
 
         EmitBoxContent(
@@ -139,7 +145,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var firstText = plan.Texts.Count;
         var overflows = context.Text.EmitLines(
             context, content.Lines,
-            static l => l.Line, static l => l.Source, static l => l.X, static l => l.Y,
             left, contentTop, delta,
             opacity, element, resolveStructure: !artifact,
             overflowThreshold: contentWidth);
@@ -167,7 +172,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             plan.Images.Add(new ImageDraw
             {
                 X = left + image.X,
-                Y = contentTop - (image.Y + delta) - image.Height,
+                Y = PageSpace.Bottom(contentTop, image.Y + delta, image.Height),
                 Width = image.Width,
                 Height = image.Height,
                 Image = xobject,
@@ -183,7 +188,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             contentOverflows |= codeSymbol.X < boundsLeft - 0.01 || codeSymbol.X + codeSymbol.Width > boundsRight + 0.01;
             context.CodeSymbols.EmitCodeSymbolModules(
                 context, codeSymbol.Source, codeSymbol.Modules,
-                left + codeSymbol.X, contentTop - (codeSymbol.Y + delta), codeSymbol.Caption);
+                left + codeSymbol.X,
+                PageSpace.FromTop(contentTop, codeSymbol.Y + delta),
+                codeSymbol.Caption);
         }
 
         if (contentOverflows)
@@ -207,18 +214,13 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             }
         }
 
-        var cursor = OrderedMerge.ByOrder(tables, static t => t.Order, boxes, static b => b.Order);
-        while (cursor.MoveNext())
-        {
-            if (cursor.IsTable)
-            {
-                EmitNestedTable(context, tables[cursor.TableIndex], element, left, contentTop, delta);
-            }
-            else
-            {
-                EmitNestedBox(context, boxes[cursor.BoxIndex], element, left, contentTop, delta);
-            }
-        }
+        OrderedMerge.VisitByOrder(
+            tables,
+            static table => table.Order,
+            boxes,
+            static box => box.Order,
+            table => EmitNestedTable(context, table, element, left, contentTop, delta),
+            box => EmitNestedBox(context, box, element, left, contentTop, delta));
 
         if (radius > 0)
         {
@@ -226,7 +228,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    private void EmitNestedTable(EmitContext context, in LaidOutNestedTable nested, StructureElement? element, double left, double contentTop, double delta)
+    private void EmitNestedTable(EmitContext context, in LaidOutTablePlacement nested, StructureElement? element, double left, double contentTop, double delta)
     {
         var plan = context.Plan;
         var nestedDecoration = nested.Layout.Decoration;
@@ -238,7 +240,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             nestedBounds = PdfRect.FromSize(
                 nestedLeft,
-                contentTop - (delta + nested.Y) - nested.Layout.Height,
+                PageSpace.Bottom(contentTop, delta + nested.Y, nested.Layout.Height),
                 nested.Layout.Width,
                 nested.Layout.Height);
             nestedRadius = BoxStyle.ClampRadius(nestedDecoration.CornerRadius, nestedBounds.Width, nestedBounds.Height);
@@ -251,7 +253,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         {
             PaintRowBackground(
                 plan, nestedDecoration.RowBackgrounds[r], nestedLeft,
-                contentTop - (delta + nested.Y) - (rowTop + rowHeights[r]),
+                PageSpace.FromTop(
+                    PageSpace.FromTop(contentTop, delta + nested.Y),
+                    rowTop + rowHeights[r]),
                 nested.Layout.Width, rowHeights[r]);
             rowTop += rowHeights[r];
         }
@@ -267,14 +271,10 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    private void EmitNestedBox(EmitContext context, LaidOutNestedBox box, StructureElement? element, double left, double contentTop, double delta)
+    private void EmitNestedBox(EmitContext context, LaidOutBox box, StructureElement? element, double left, double contentTop, double delta)
     {
         var plan = context.Plan;
-        var bounds = PdfRect.FromSize(
-            left + box.Bounds.X,
-            contentTop - (box.Bounds.Y + delta) - box.Bounds.Height,
-            box.Bounds.Width,
-            box.Bounds.Height);
+        var bounds = PageSpace.Bounds(left, contentTop, box.Bounds, delta);
         var opacity = box.Opacity;
         ContainerDecoration.Paint(plan, bounds, opacity, box.Style);
 
@@ -283,7 +283,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             context,
             box.Content,
             innerWidth, 0, box.Bounds.Width,
-            bounds, box.Radius, opacity, element,
+            bounds, BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height), opacity, element,
             left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
     }
 }

@@ -28,7 +28,7 @@ public class FieldResolverRunPropertiesTests
 
         var resolver = new FieldResolver(
             new FontCollection(),
-            LoweringContext.CreateIsolated(StyleResolution.Empty),
+            LoweringContext.CreateForDocument(StyleResolution.Empty),
             new LayoutCaptureContext());
         var line = Assert.Single(resolver.ResolveFields(paragraph, 500, 7, 10, null, 1));
         var resolved = Assert.Single(line.Fragments).Paint;
@@ -55,7 +55,7 @@ public class FieldResolverRunPropertiesTests
 
         var resolver = new FieldResolver(
             new FontCollection(),
-            LoweringContext.CreateIsolated(StyleResolution.Empty),
+            LoweringContext.CreateForDocument(StyleResolution.Empty),
             new LayoutCaptureContext());
         var line = Assert.Single(resolver.ResolveFields(paragraph, 500, 7, 10, null, 1));
 

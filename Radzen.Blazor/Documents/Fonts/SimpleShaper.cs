@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Fonts;
 
@@ -24,12 +25,12 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
 
     private struct CollectSink : IGlyphSink
     {
-        public List<PositionedGlyph> Glyphs;
+        public List<ShapedGlyph> Glyphs;
         public double Total;
 
         public void Add(ushort glyph, double advance, int cluster, SfntFont face)
         {
-            Glyphs.Add(new PositionedGlyph(glyph, advance, cluster, face));
+            Glyphs.Add(new ShapedGlyph(glyph, advance, cluster, face));
             Total += advance;
         }
 
@@ -37,17 +38,23 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         {
             var last = Glyphs.Count - 1;
             var previous = Glyphs[last];
-            Glyphs[last] = new PositionedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster, previous.Face);
+            Glyphs[last] = new ShapedGlyph(previous.GlyphId, previous.Advance + kern, previous.Cluster, previous.Face);
             Total += kern;
         }
     }
 
-    private void ShapeCore<TSink>(ReadOnlySpan<char> text, Font font, ref TSink sink)
+    private void ShapeCore<TSink>(
+        ReadOnlySpan<char> text,
+        string family,
+        bool bold,
+        bool italic,
+        double size,
+        ref TSink sink)
         where TSink : struct, IGlyphSink
     {
         EnsureNoComplexScript(text);
 
-        var primary = fonts.ResolvePrimarySfnt(font);
+        var primary = fonts.ResolvePrimarySfnt(family, bold, italic);
 
         SfntFont? previousFace = null;
         ushort previousGlyph = 0;
@@ -58,11 +65,11 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         {
             var codepoint = FontCollection.CodePointAt(text, i, out var codePointLength);
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
-            var advance = face.AdvanceInUserSpace(glyph, font.EffectiveSize.Point);
+            var advance = face.AdvanceInUserSpace(glyph, size);
 
             if (enableKerning && ReferenceEquals(previousFace, face) && count > 0)
             {
-                var kern = PairKerning(previousFace!, previousGlyph, glyph, previousCodepoint, codepoint, font.EffectiveSize.Point);
+                var kern = PairKerning(previousFace!, previousGlyph, glyph, previousCodepoint, codepoint, size);
                 if (kern != 0)
                 {
                     sink.Kern(kern);
@@ -78,10 +85,27 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
         }
     }
 
-    public List<PositionedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
+    public List<ShapedGlyph> Shape(ReadOnlySpan<char> text, Font font, out double totalAdvance)
     {
-        var sink = new CollectSink { Glyphs = new List<PositionedGlyph>(text.Length) };
-        ShapeCore(text, font, ref sink);
+        var sink = new CollectSink { Glyphs = new List<ShapedGlyph>(text.Length) };
+        ShapeCore(
+            text,
+            font.EffectiveFamily,
+            font.EffectiveBold,
+            font.EffectiveItalic,
+            font.EffectiveSize.Point,
+            ref sink);
+        totalAdvance = sink.Total;
+        return sink.Glyphs;
+    }
+
+    public List<ShapedGlyph> Shape(
+        ReadOnlySpan<char> text,
+        in FontPaint font,
+        out double totalAdvance)
+    {
+        var sink = new CollectSink { Glyphs = new List<ShapedGlyph>(text.Length) };
+        ShapeCore(text, font.Family, font.Bold, font.Italic, font.Size, ref sink);
         totalAdvance = sink.Total;
         return sink.Glyphs;
     }
@@ -89,7 +113,20 @@ internal sealed class SimpleShaper(FontCollection fonts, bool enableKerning = fa
     public double MeasureAdvance(ReadOnlySpan<char> text, Font font)
     {
         var sink = new MeasureSink();
-        ShapeCore(text, font, ref sink);
+        ShapeCore(
+            text,
+            font.EffectiveFamily,
+            font.EffectiveBold,
+            font.EffectiveItalic,
+            font.EffectiveSize.Point,
+            ref sink);
+        return sink.Total;
+    }
+
+    public double MeasureAdvance(ReadOnlySpan<char> text, in FontPaint font)
+    {
+        var sink = new MeasureSink();
+        ShapeCore(text, font.Family, font.Bold, font.Italic, font.Size, ref sink);
         return sink.Total;
     }
 
