@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Linq;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
@@ -33,6 +34,33 @@ public class OverlayContainerTaggingConformanceTests
 
     private static byte[] Rendered((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
+
+    private static (Document Document, DocumentRenderer Renderer) Layered(bool tagged)
+    {
+        var document = new Document { Language = "en-US" };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Layered";
+        var section = document.Sections.Add();
+        var container = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
+        container.Blocks.AddParagraph().Inlines.Add("ABOVE IMAGE").Font.Family = BuildTestSupport.Latin;
+        var image = container.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        image.Width = Unit.FromPoint(80);
+        image.Height = Unit.FromPoint(30);
+        image.AlternateText = "Meaningful image";
+
+        return (
+            document,
+            new DocumentRenderer
+            {
+                Accessibility = tagged ? PdfUaConformance.PdfUa1 : PdfUaConformance.None,
+            });
+    }
+
+    private static List<string> DrawOperators((Document Document, DocumentRenderer Renderer) authored)
+        => Ops(authored)
+            .Where(operation => operation.Operator is not ("BDC" or "BMC" or "EMC" or "DP" or "MP"))
+            .Select(operation => operation.Operator)
+            .ToList();
 
     private static HashSet<string> TagsWrappingText(List<ContentOperation> ops)
     {
@@ -95,5 +123,16 @@ public class OverlayContainerTaggingConformanceTests
         var a = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
         var b = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
         Assert.Equal(a, b);
+    }
+
+    [Fact]
+    public void Tagging_DoesNotChangeTheOperatorSequenceOutsideMarkedContent()
+    {
+        var plain = DrawOperators(Layered(tagged: false));
+        var tagged = DrawOperators(Layered(tagged: true));
+
+        Assert.Contains("Do", plain);
+        Assert.Contains(plain, operation => operation is "Tj" or "TJ");
+        Assert.Equal(plain, tagged);
     }
 }

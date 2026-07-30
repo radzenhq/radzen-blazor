@@ -70,7 +70,7 @@ public class SemanticIntentCaptureTests
         var scene = DocumentLayouter.Layout(document);
         var tree = new StructureTreeBuilder(
             scene.Semantics,
-            CapturedRendererSettings.Capture(renderer));
+            RenderRequest.From(renderer));
         tree.Build();
         var types = new List<string>();
         CollectTypes(tree.DocumentElement, types);
@@ -102,6 +102,35 @@ public class SemanticIntentCaptureTests
                 .Select(association => association.Element)
                 .Distinct()
                 .Count());
+    }
+
+    [Fact]
+    public void HeaderAndFooterContent_CapturesPaginationArtifactIntent()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        section.Header.Blocks.AddParagraph().Inlines.Add("Header").Font.Family = BuildTestSupport.Latin;
+        section.Footer.Blocks.AddParagraph().Inlines.Add("Footer").Font.Family = BuildTestSupport.Latin;
+        section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
+
+        var artifacts = DocumentLayouter.Layout(document).Semantics.Structure.Artifacts;
+
+        Assert.NotEmpty(artifacts);
+        Assert.All(artifacts, artifact => Assert.Equal(SemanticArtifactKind.Pagination, artifact.Kind));
+    }
+
+    [Fact]
+    public void List_CapturesItsTierOnTheStructuralNode()
+    {
+        var document = new Document();
+        var list = document.Sections.Add().Blocks.AddList(ListStyle.Bullet);
+        list.AddItem("Item");
+
+        var nodes = DocumentLayouter.Layout(document).Semantics.Structure.Nodes;
+        var captured = Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.List));
+
+        Assert.Equal(SemanticStructureTier.Structural, captured.Tier);
     }
 
     [Fact]

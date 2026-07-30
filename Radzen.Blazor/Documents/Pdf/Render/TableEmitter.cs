@@ -6,6 +6,8 @@ namespace Radzen.Documents.Pdf.Render;
 
 internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder structureTree)
 {
+    internal SemanticArtifactKind? ArtifactOf(SourceId source) => structureTree.ArtifactOf(source);
+
     public void EmitFragment(EmitContext context, LaidOutTableFragment positioned, double left, double contentTop)
     {
         var plan = context.Plan;
@@ -15,6 +17,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var tableRadius = 0.0;
         var tableBounds = default(PdfRect);
         var tableMark = default(PlanMarks);
+        var tableArtifact = structureTree.ArtifactOf(positioned.Source);
         if (decoration.CornerRadius > 0)
         {
             var bounds = positioned.Bounds;
@@ -31,28 +34,50 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
 
         foreach (var row in positioned.Rows)
         {
+            var repeated = row.IsHeader && positioned.Fragment.Number > 1;
             PaintRowBackground(
                 plan,
                 row.Background,
                 x,
                 PageSpace.FromTop(contentTop, row.Y + row.Height),
                 layout.Width,
-                row.Height);
+                row.Height,
+                repeated
+                    ? SemanticArtifactKind.RepeatedContent
+                    : tableArtifact ?? SemanticArtifactKind.LayoutDecoration);
 
-            var repeated = row.IsHeader && positioned.Fragment.Number > 1;
             foreach (var placed in row.Cells)
             {
-                EmitCell(context, placed.Cell, x, contentTop, placed.Delta, null, repeated);
+                EmitCell(
+                    context,
+                    placed.Cell,
+                    x,
+                    contentTop,
+                    placed.Delta,
+                    null,
+                    repeated ? SemanticArtifactKind.RepeatedContent : tableArtifact);
             }
         }
 
         if (tableRadius > 0)
         {
-            EmitTableFrame(plan, decoration.Frame, tableBounds, tableRadius, tableMark);
+            EmitTableFrame(
+                plan,
+                decoration.Frame,
+                tableBounds,
+                tableRadius,
+                tableMark,
+                tableArtifact ?? SemanticArtifactKind.LayoutDecoration);
         }
     }
 
-    private static void EmitTableFrame(PagePlan plan, in BoxStyle style, in PdfRect bounds, double radius, PlanMarks mark)
+    private static void EmitTableFrame(
+        PagePlan plan,
+        in BoxStyle style,
+        in PdfRect bounds,
+        double radius,
+        PlanMarks mark,
+        SemanticArtifactKind artifact)
     {
         plan.ApplyRoundedClip(bounds, radius, mark);
 
@@ -68,11 +93,19 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 LineWidth = edge.Width,
                 Color = edge.Color,
                 Style = edge.Style,
+                Artifact = artifact,
             });
         }
     }
 
-    private static void PaintRowBackground(PagePlan plan, Color? rowBackground, double x, double bottom, double width, double height)
+    private static void PaintRowBackground(
+        PagePlan plan,
+        Color? rowBackground,
+        double x,
+        double bottom,
+        double width,
+        double height,
+        SemanticArtifactKind artifact)
     {
         if (rowBackground is { } background)
         {
@@ -83,6 +116,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Width = width,
                 Height = height,
                 Color = background,
+                Artifact = artifact,
             });
         }
     }
@@ -94,14 +128,20 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double contentTop,
         double delta,
         StructureElement? inherited,
-        bool artifact = false)
+        SemanticArtifactKind? artifact = null)
     {
         var plan = context.Plan;
-        var element = artifact ? null : structureTree.ElementOf(cell.Source) ?? inherited;
+        artifact ??= structureTree.ArtifactOf(cell.Source);
+        var element = artifact is null ? structureTree.ElementOf(cell.Source) ?? inherited : null;
         var opacity = cell.Opacity;
         var extGState = opacity < 1 ? plan.RegisterExtGState(opacity, opacity) : null;
         var bounds = PageSpace.Bounds(left, contentTop, cell.Bounds, delta);
-        BoxRenderer.Paint(plan, bounds, cell.Decoration, extGState);
+        BoxRenderer.Paint(
+            plan,
+            bounds,
+            cell.Decoration,
+            extGState,
+            artifact ?? SemanticArtifactKind.LayoutDecoration);
 
         EmitBoxContent(
             context,
@@ -132,7 +172,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         double left,
         double contentTop,
         double delta,
-        bool artifact = false)
+        SemanticArtifactKind? artifact = null)
     {
         var images = content.Images;
         var codeSymbols = content.CodeSymbols;
@@ -146,8 +186,9 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         var overflows = context.Text.EmitLines(
             context, content.Lines,
             left, contentTop, delta,
-            opacity, element, resolveStructure: !artifact,
-            overflowThreshold: contentWidth);
+            opacity, element, resolveStructure: artifact is null,
+            overflowThreshold: contentWidth,
+            artifact: artifact);
 
         var cellClip = clip;
         if (overflows)
@@ -169,6 +210,7 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             contentOverflows |= image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
             var xobject = imageStore.DecodeApplied(image.Source, image.Paint);
             var alpha = image.Paint.Opacity * opacity;
+            var imageElement = artifact is null ? structureTree.ElementOf(image.Source) ?? element : null;
             plan.Images.Add(new ImageDraw
             {
                 X = left + image.X,
@@ -177,7 +219,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 Height = image.Height,
                 Image = xobject,
                 Sequence = plan.NextSequence(),
-                Element = artifact ? null : structureTree.ElementOf(image.Source) ?? element,
+                Element = imageElement,
+                Artifact = imageElement is null ? artifact ?? structureTree.ArtifactOf(image.Source) : null,
                 ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
             });
             plan.UsedImages.Add(xobject);
@@ -190,7 +233,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 context, codeSymbol.Source, codeSymbol.Modules,
                 left + codeSymbol.X,
                 PageSpace.FromTop(contentTop, codeSymbol.Y + delta),
-                codeSymbol.Caption);
+                codeSymbol.Caption,
+                artifact);
         }
 
         if (contentOverflows)
@@ -219,8 +263,8 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             static table => table.Order,
             boxes,
             static box => box.Order,
-            table => EmitNestedTable(context, table, element, left, contentTop, delta),
-            box => EmitNestedBox(context, box, element, left, contentTop, delta));
+            table => EmitNestedTable(context, table, element, left, contentTop, delta, artifact),
+            box => EmitNestedBox(context, box, element, left, contentTop, delta, artifact));
 
         if (radius > 0)
         {
@@ -228,10 +272,18 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
         }
     }
 
-    private void EmitNestedTable(EmitContext context, in LaidOutTablePlacement nested, StructureElement? element, double left, double contentTop, double delta)
+    private void EmitNestedTable(
+        EmitContext context,
+        in LaidOutTablePlacement nested,
+        StructureElement? element,
+        double left,
+        double contentTop,
+        double delta,
+        SemanticArtifactKind? inheritedArtifact)
     {
         var plan = context.Plan;
         var nestedDecoration = nested.Layout.Decoration;
+        var artifact = inheritedArtifact ?? structureTree.ArtifactOf(nested.Layout.Source);
         var nestedLeft = left + nested.X + nestedDecoration.LeftIndent;
         var nestedRadius = 0.0;
         var nestedBounds = default(PdfRect);
@@ -256,27 +308,48 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
                 PageSpace.FromTop(
                     PageSpace.FromTop(contentTop, delta + nested.Y),
                     rowTop + rowHeights[r]),
-                nested.Layout.Width, rowHeights[r]);
+                nested.Layout.Width,
+                rowHeights[r],
+                artifact ?? SemanticArtifactKind.LayoutDecoration);
             rowTop += rowHeights[r];
         }
 
         foreach (var nestedCell in nested.Layout.Cells)
         {
-            EmitCell(context, nestedCell, nestedLeft, contentTop, delta + nested.Y, element);
+            EmitCell(context, nestedCell, nestedLeft, contentTop, delta + nested.Y, element, artifact);
         }
 
         if (nestedRadius > 0)
         {
-            EmitTableFrame(plan, nestedDecoration.Frame, nestedBounds, nestedRadius, nestedMark);
+            EmitTableFrame(
+                plan,
+                nestedDecoration.Frame,
+                nestedBounds,
+                nestedRadius,
+                nestedMark,
+                artifact ?? SemanticArtifactKind.LayoutDecoration);
         }
     }
 
-    private void EmitNestedBox(EmitContext context, LaidOutBox box, StructureElement? element, double left, double contentTop, double delta)
+    private void EmitNestedBox(
+        EmitContext context,
+        LaidOutBox box,
+        StructureElement? element,
+        double left,
+        double contentTop,
+        double delta,
+        SemanticArtifactKind? inheritedArtifact)
     {
         var plan = context.Plan;
         var bounds = PageSpace.Bounds(left, contentTop, box.Bounds, delta);
         var opacity = box.Opacity;
-        ContainerDecoration.Paint(plan, bounds, opacity, box.Style);
+        var artifact = inheritedArtifact ?? structureTree.ArtifactOf(box.Source);
+        ContainerDecoration.Paint(
+            plan,
+            bounds,
+            opacity,
+            box.Style,
+            artifact ?? SemanticArtifactKind.LayoutDecoration);
 
         var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Padding));
         EmitBoxContent(
@@ -284,6 +357,6 @@ internal sealed class TableEmitter(ImageStore imageStore, StructureTreeBuilder s
             box.Content,
             innerWidth, 0, box.Bounds.Width,
             bounds, BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height), opacity, element,
-            left + box.Bounds.X, contentTop, delta + box.Bounds.Y);
+            left + box.Bounds.X, contentTop, delta + box.Bounds.Y, artifact);
     }
 }

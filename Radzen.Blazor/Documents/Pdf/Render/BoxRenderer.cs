@@ -4,13 +4,18 @@ namespace Radzen.Documents.Pdf.Render;
 
 internal static class BoxRenderer
 {
-    public static void Paint(PagePlan plan, PdfRect bounds, in BoxStyle style, string? extGState)
+    public static void Paint(
+        PagePlan plan,
+        PdfRect bounds,
+        in BoxStyle style,
+        string? extGState,
+        SemanticArtifactKind artifact)
     {
         var radius = BoxStyle.ClampRadius(style.CornerRadius, bounds.Width, bounds.Height);
 
         if (style.Shadow is { } shadow)
         {
-            SoftMask.EmitBoxShadow(plan, bounds, radius, shadow);
+            SoftMask.EmitBoxShadow(plan, bounds, radius, shadow, artifact);
         }
 
         if (style.BackgroundGradient is { } gradient)
@@ -25,6 +30,7 @@ internal static class BoxRenderer
                 Radius = radius,
                 ExtGState = extGState,
                 Gradient = gradient,
+                Artifact = artifact,
             });
         }
         else if (style.Background is { } background)
@@ -38,6 +44,7 @@ internal static class BoxRenderer
                 Color = background,
                 Radius = radius,
                 ExtGState = extGState,
+                Artifact = artifact,
             });
         }
 
@@ -58,18 +65,27 @@ internal static class BoxRenderer
                 LineWidth = uniform.Width,
                 Color = uniform.Color,
                 Style = uniform.Style,
+                Artifact = artifact,
                 ExtGState = extGState,
             });
             return;
         }
 
-        EmitEdge(plan, style.Top, x, top, right, top, extGState);
-        EmitEdge(plan, style.Right, right, bottom, right, top, extGState);
-        EmitEdge(plan, style.Bottom, x, bottom, right, bottom, extGState);
-        EmitEdge(plan, style.Left, x, bottom, x, top, extGState);
+        EmitEdge(plan, style.Top, x, top, right, top, extGState, artifact);
+        EmitEdge(plan, style.Right, right, bottom, right, top, extGState, artifact);
+        EmitEdge(plan, style.Bottom, x, bottom, right, bottom, extGState, artifact);
+        EmitEdge(plan, style.Left, x, bottom, x, top, extGState, artifact);
     }
 
-    private static void EmitEdge(PagePlan plan, ResolvedEdge? border, double x1, double y1, double x2, double y2, string? extGState)
+    private static void EmitEdge(
+        PagePlan plan,
+        ResolvedEdge? border,
+        double x1,
+        double y1,
+        double x2,
+        double y2,
+        string? extGState,
+        SemanticArtifactKind artifact)
     {
         if (border is not { } edge)
         {
@@ -85,6 +101,7 @@ internal static class BoxRenderer
             LineWidth = edge.Width,
             Color = edge.Color,
             Style = edge.Style,
+            Artifact = artifact,
             ExtGState = extGState,
         });
     }

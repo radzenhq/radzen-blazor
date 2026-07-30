@@ -10,6 +10,7 @@ internal sealed class BoxEmitter(TableEmitter tables)
         var plan = context.Plan;
         var mark = plan.Mark();
         var bounds = PageSpace.Bounds(left, contentTop, box.Bounds);
+        var artifact = tables.ArtifactOf(box.Source);
 
         if (box.Transform is not null && box.Style.Shadow is not null)
         {
@@ -18,7 +19,12 @@ internal sealed class BoxEmitter(TableEmitter tables)
         }
 
         var opacity = box.Opacity;
-        ContainerDecoration.Paint(plan, bounds, opacity, box.Style);
+        ContainerDecoration.Paint(
+            plan,
+            bounds,
+            opacity,
+            box.Style,
+            artifact ?? SemanticArtifactKind.LayoutDecoration);
 
         var radius = BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height);
         var innerWidth = Math.Max(0, box.Bounds.Width - (2 * box.Padding));
@@ -28,7 +34,7 @@ internal sealed class BoxEmitter(TableEmitter tables)
             box.Content,
             innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
             bounds, radius, opacity, null,
-            left, contentTop, box.Bounds.Y);
+            left, contentTop, box.Bounds.Y, artifact);
 
         if (box.Transform is { } transform)
         {

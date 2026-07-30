@@ -339,7 +339,7 @@ public class TaggedPdfStructureTests
     }
 
     [Fact]
-    public void Build_ContentMcidsMatchStructureTreeInReadingOrder()
+    public void Build_ContentMcidsAndStructureReadingOrderReferenceTheSameMarks()
     {
         var reader = BuildTestSupport.Read(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
@@ -354,7 +354,9 @@ public class TaggedPdfStructureTests
         var treeOrder = new List<int>();
         CollectMcidsInStructureOrder(document, treeOrder);
 
-        Assert.Equal(treeOrder, marked.Select(m => m.Mcid).ToList());
+        var streamOrder = marked.Select(m => m.Mcid).ToList();
+        Assert.Equal(streamOrder.Order().ToList(), treeOrder.Order().ToList());
+        Assert.NotEqual(treeOrder, streamOrder);
     }
 
     [Fact]

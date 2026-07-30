@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
 using static Radzen.Documents.Pdf.Content.ContentEmitter;
@@ -9,14 +10,11 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 {
     private static readonly ContentPhase[] OrderedPhases =
     [
-        ContentPhase.BeginArtifacts,
         ContentPhase.Fills,
         ContentPhase.StraightStrokes,
         ContentPhase.RoundedStrokes,
         ContentPhase.Images,
         ContentPhase.Text,
-        ContentPhase.EndArtifacts,
-        ContentPhase.TaggedContent,
         ContentPhase.Watermark,
         ContentPhase.Resources,
     ];
@@ -46,10 +44,10 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     }
 
     private readonly List<TaggedDraw> tagged = [];
+    private Dictionary<int, TaggedMark> taggedMarks = [];
     private ContentWriter writer = null!;
     private PagePlan plan = null!;
     private int pageIndex;
-    private bool wrapArtifacts;
     private GeneratedPage? generatedPage;
 
     public GeneratedPage Finalize(PagePlan pagePlan, int index)
@@ -58,10 +56,11 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         writer = contentWriter;
         plan = pagePlan;
         pageIndex = index;
-        wrapArtifacts = markArtifacts && HasArtifactContent(plan);
         tagged.Clear();
+        taggedMarks.Clear();
         generatedPage = null;
         ApplyColorAlpha();
+        PlanMarkedContent();
 
         foreach (var phase in OrderedPhases)
         {
@@ -125,9 +124,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         switch (phase)
         {
-            case ContentPhase.BeginArtifacts:
-                BeginArtifacts();
-                break;
             case ContentPhase.Fills:
                 EmitFills();
                 break;
@@ -143,12 +139,6 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             case ContentPhase.Text:
                 EmitText();
                 break;
-            case ContentPhase.EndArtifacts:
-                EndArtifacts();
-                break;
-            case ContentPhase.TaggedContent:
-                WriteTaggedContent();
-                break;
             case ContentPhase.Watermark:
                 EmitWatermark();
                 break;
@@ -158,26 +148,42 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         }
     }
 
-    private void BeginArtifacts()
+    private void PlanMarkedContent()
     {
-        if (wrapArtifacts)
+        foreach (var fill in plan.Fills)
         {
-            writer.WriteName("Artifact");
-            writer.WriteRaw(" BMC\n");
+            if (fill.Element is { } element)
+            {
+                tagged.Add(new TaggedDraw { Sequence = fill.Sequence, Element = element });
+            }
         }
+
+        foreach (var image in plan.Images)
+        {
+            if (image.Element is { } element)
+            {
+                tagged.Add(new TaggedDraw { Sequence = image.Sequence, Element = element });
+            }
+        }
+
+        foreach (var text in plan.Texts)
+        {
+            if (text.Element is { } element)
+            {
+                tagged.Add(new TaggedDraw { Sequence = text.Sequence, Element = element });
+            }
+        }
+
+        taggedMarks = structureTree.PlanTaggedContent(pageIndex, tagged);
     }
 
     private void EmitFills()
     {
         foreach (var fill in plan.Fills)
         {
-            if (fill.Element is { } element)
-            {
-                tagged.Add(new TaggedDraw { Sequence = fill.Sequence, Element = element, Fill = fill });
-                continue;
-            }
-
+            BeginMarkedDraw(fill.Element, fill.Artifact, fill.Sequence);
             WriteFill(fill);
+            EndMarkedDraw(fill.Element, fill.Artifact);
         }
     }
 
@@ -234,6 +240,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var edge in plan.Edges)
         {
+            BeginArtifactDraw(edge.Artifact);
             writer.WriteRaw("q\n");
             if (edge.ExtGState is { } edgeState)
             {
@@ -255,6 +262,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             writer.WriteRaw(" ");
             writer.WriteNumber(edge.Y2);
             writer.WriteRaw(" l\nS\nQ\n");
+            EndArtifact();
         }
     }
 
@@ -262,6 +270,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var rounded in plan.RoundedStrokes)
         {
+            BeginArtifactDraw(rounded.Artifact);
             writer.WriteRaw("q\n");
             if (rounded.ExtGState is { } roundedState)
             {
@@ -272,6 +281,7 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
             WriteStrokeState(writer, rounded.Color, rounded.LineWidth, rounded.Style);
             WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
             writer.WriteRaw("S\nQ\n");
+            EndArtifact();
         }
     }
 
@@ -279,14 +289,9 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var image in plan.Images)
         {
-            if (image.Element is { } element)
-            {
-                tagged.Add(new TaggedDraw { Sequence = image.Sequence, Element = element, Image = image });
-            }
-            else
-            {
-                WriteImageDraw(writer, image);
-            }
+            BeginMarkedDraw(image.Element, image.Artifact, image.Sequence);
+            WriteImageDraw(writer, image);
+            EndMarkedDraw(image.Element, image.Artifact);
         }
     }
 
@@ -294,49 +299,95 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     {
         foreach (var text in plan.Texts)
         {
-            if (text.Element is { } element)
-            {
-                tagged.Add(new TaggedDraw { Sequence = text.Sequence, Element = element, Text = text });
-            }
-            else
-            {
-                WriteTextDraw(writer, text);
-            }
+            BeginMarkedDraw(text.Element, text.Artifact, text.Sequence);
+            WriteTextDraw(writer, text);
+            EndMarkedDraw(text.Element, text.Artifact);
         }
     }
 
-    private void WriteTaggedContent()
+    private void BeginMarkedDraw(
+        StructureElement? element,
+        SemanticArtifactKind? artifact,
+        int sequence)
     {
-        foreach (var segment in structureTree.PlanTaggedContent(pageIndex, tagged))
+        if (element is { } taggedElement)
         {
-            writer.WriteName(segment.Element.Type);
-            writer.WriteRaw(" <</MCID ");
-            writer.WriteRaw(segment.Mcid.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            writer.WriteRaw(">> BDC\n");
-
-            foreach (var draw in segment.Content)
+            if (artifact is not null)
             {
-                if (draw.Fill is { } fill)
-                {
-                    WriteFill(fill);
-                }
-                else if (draw.Image is { } image)
-                {
-                    WriteImageDraw(writer, image);
-                }
-                else if (draw.Text is { } text)
-                {
-                    WriteTextDraw(writer, text);
-                }
+                throw new InvalidOperationException(
+                    "A page draw cannot be both structure content and an artifact.");
             }
 
+            if (!taggedMarks.TryGetValue(sequence, out var mark)
+                || !ReferenceEquals(mark.Element, taggedElement))
+            {
+                throw new InvalidOperationException(
+                    "A structured page draw has no planned marked-content reference.");
+            }
+
+            writer.WriteName(taggedElement.Type);
+            writer.WriteRaw(" <</MCID ");
+            writer.WriteRaw(mark.Mcid.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            writer.WriteRaw(">> BDC\n");
+            return;
+        }
+
+        if (artifact is { } artifactKind)
+        {
+            BeginArtifact(artifactKind);
+            return;
+        }
+
+        if (markArtifacts)
+        {
+            throw new InvalidOperationException(
+                "Tagged page content must resolve to a structure element or an explicit artifact classification.");
+        }
+    }
+
+    private void EndMarkedDraw(StructureElement? element, SemanticArtifactKind? artifact)
+    {
+        if (element is not null || (artifact is not null && markArtifacts))
+        {
             writer.WriteRaw("EMC\n");
         }
     }
 
-    private void EndArtifacts()
+    private void BeginArtifact(SemanticArtifactKind artifact)
     {
-        if (wrapArtifacts)
+        if (!markArtifacts)
+        {
+            return;
+        }
+
+        writer.WriteName("Artifact");
+        if (artifact == SemanticArtifactKind.Pagination)
+        {
+            // ISO 32000-1 14.8.2.2: headers and footers are pagination artifacts.
+            writer.WriteRaw(" <</Type /Pagination>> BDC\n");
+        }
+        else
+        {
+            writer.WriteRaw(" BMC\n");
+        }
+    }
+
+    private void BeginArtifactDraw(SemanticArtifactKind? artifact)
+    {
+        if (artifact is { } kind)
+        {
+            BeginArtifact(kind);
+        }
+        else if (markArtifacts)
+        {
+            throw new InvalidOperationException(
+                "Tagged page content must resolve to a structure element or an explicit artifact classification.");
+        }
+    }
+
+    private void EndArtifact()
+    {
+        if (markArtifacts)
         {
             writer.WriteRaw("EMC\n");
         }
@@ -351,15 +402,14 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
         if (markArtifacts)
         {
-            writer.WriteName("Artifact");
-            writer.WriteRaw(" BMC\n");
+            BeginArtifact(SemanticArtifactKind.Watermark);
         }
 
         WriteWatermark(writer, watermark);
 
         if (markArtifacts)
         {
-            writer.WriteRaw("EMC\n");
+            EndArtifact();
         }
     }
 
@@ -429,50 +479,13 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
         writer.WriteRaw("Q\n");
     }
 
-    private static bool HasArtifactContent(PagePlan plan)
-    {
-        if (plan.Edges.Count > 0 || plan.RoundedStrokes.Count > 0)
-        {
-            return true;
-        }
-
-        foreach (var fill in plan.Fills)
-        {
-            if (fill.Element is null)
-            {
-                return true;
-            }
-        }
-
-        foreach (var image in plan.Images)
-        {
-            if (image.Element is null)
-            {
-                return true;
-            }
-        }
-
-        foreach (var text in plan.Texts)
-        {
-            if (text.Element is null)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private enum ContentPhase
     {
-        BeginArtifacts,
         Fills,
         StraightStrokes,
         RoundedStrokes,
         Images,
         Text,
-        EndArtifacts,
-        TaggedContent,
         Watermark,
         Resources,
     }

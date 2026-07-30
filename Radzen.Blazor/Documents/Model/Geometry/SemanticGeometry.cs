@@ -10,6 +10,15 @@ internal enum SemanticStructureTier
     Assistive,
 }
 
+internal enum SemanticArtifactKind
+{
+    LayoutDecoration,
+    Pagination,
+    Decorative,
+    RepeatedContent,
+    Watermark,
+}
+
 internal enum SemanticIntent
 {
     Document,
@@ -101,9 +110,11 @@ internal readonly record struct SemanticStructureAssociation
     public int? MarkerElement { get; init; }
 }
 
-internal readonly record struct SemanticListOccurrence
+internal readonly record struct SemanticArtifactAssociation
 {
-    public required SemanticStructureTier Tier { get; init; }
+    public required SourceId Source { get; init; }
+
+    public required SemanticArtifactKind Kind { get; init; }
 }
 
 internal sealed record SemanticStructureTree
@@ -112,7 +123,7 @@ internal sealed record SemanticStructureTree
 
     public required ImmutableArray<SemanticStructureAssociation> Associations { get; init; }
 
-    public required ImmutableArray<SemanticListOccurrence> Lists { get; init; }
+    public required ImmutableArray<SemanticArtifactAssociation> Artifacts { get; init; }
 }
 
 internal readonly record struct LaidOutDocumentInfo
