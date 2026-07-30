@@ -105,13 +105,13 @@ public sealed class DocumentXmpMetadata
         XNamespace x = "adobe:ns:meta/";
         XNamespace rdf = RdfNamespace;
         return new XDocument(
-            new XProcessingInstruction("xpacket", Emit.XmpPacketFraming.BeginInstruction),
+            new XProcessingInstruction("xpacket", Write.XmpPacketFraming.BeginInstruction),
             new XText("\n"),
             new XElement(x + "xmpmeta",
                 new XElement(rdf + "RDF",
                     new XElement(rdf + "Description", new XAttribute(rdf + "about", "")))),
-            new XText("\n" + Emit.XmpPacketFraming.Padding),
-            new XProcessingInstruction("xpacket", Emit.XmpPacketFraming.EndInstruction));
+            new XText("\n" + Write.XmpPacketFraming.Padding),
+            new XProcessingInstruction("xpacket", Write.XmpPacketFraming.EndInstruction));
     }
 
     private static XDocument Parse(byte[] value)
