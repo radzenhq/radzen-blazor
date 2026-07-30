@@ -188,15 +188,32 @@ internal readonly struct LineFragment
     public bool IsMarker { get; init; }
 
     public required CapturedGlyphRun GlyphRun { get; init; }
+}
 
-    public CapturedGlyphRun? CoalescedGlyphRun { get; init; }
+internal readonly record struct ShapedRunSource(SourceId Source, int Start, int Length);
 
-    public bool SuppressTextEmission { get; init; }
+internal readonly struct ShapedTextRun
+{
+    public required int FirstFragment { get; init; }
+
+    public required FragmentPaint Paint { get; init; }
+
+    public required double XOffset { get; init; }
+
+    public required bool IsMarker { get; init; }
+
+    public required CapturedGlyphRun GlyphRun { get; init; }
+
+    public required ImmutableArray<ShapedRunSource> Sources { get; init; }
+
+    public SourceId Source => Sources[0].Source;
 }
 
 internal sealed record LineBox
 {
     public required ImmutableArray<LineFragment> Fragments { get; init; }
+
+    public ImmutableArray<ShapedTextRun> ShapedRuns { get; init; } = [];
 
     public double Width { get; init; }
 

@@ -210,6 +210,7 @@ internal sealed class PaginationContext
                 Source = capture.Source(block),
                 X = 0,
                 Y = Cursor,
+                ZOrder = order++,
             });
         }
     }
@@ -311,7 +312,7 @@ internal sealed class PaginationContext
             Padding = container.Padding.Point,
             Opacity = (resolution?.Opacities ?? OpacityResolver.None).ContainerOpacity(container),
             Transform = transform,
-            Order = order++,
+            ZOrder = order++,
         });
         Cursor += boxHeight;
     }
@@ -331,6 +332,7 @@ internal sealed class PaginationContext
             imageWidth,
             imageHeight,
             capture,
+            order++,
             indent));
         Cursor += imageHeight;
     }
@@ -356,6 +358,7 @@ internal sealed class PaginationContext
             fonts,
             resolution,
             capture,
+            order++,
             indent));
         Cursor += codeSymbolHeight;
     }
@@ -456,6 +459,7 @@ internal sealed class PaginationContext
                     Source = capture.Source(paragraph),
                     X = 0,
                     Y = lineY,
+                    ZOrder = order++,
                 });
                 lineY += box.Height;
             }

@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.Pdf.Render;
 
 internal enum PaintPhase
 {
@@ -25,7 +25,7 @@ internal enum PaintContent
     ImagesAndCodeSymbols,
 }
 
-internal static class LaidOutPaintOrder
+internal static class PdfPaintOrder
 {
     public static ImmutableArray<PaintPhase> Phases { get; } =
     [

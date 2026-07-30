@@ -232,6 +232,7 @@ internal static class LayoutFinalizer
                     Source = current.Source,
                     X = current.X,
                     Y = y,
+                    ZOrder = current.ZOrder,
                 });
 
         private ImmutableArray<T>? LinesCore<T>(

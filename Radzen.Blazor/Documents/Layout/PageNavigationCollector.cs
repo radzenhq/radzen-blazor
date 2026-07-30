@@ -34,7 +34,7 @@ internal sealed class PageNavigationCollector
             Line(line.Line, left, top + line.Y, transform: null, clip: null);
         }
 
-        var cursor = OrderedMerge.ByOrder(layer.Tables, static t => t.Order, layer.Boxes, static b => b.Order);
+        var cursor = OrderedMerge.ByOrder(layer.Tables, static t => t.ZOrder, layer.Boxes, static b => b.ZOrder);
         while (cursor.MoveNext())
         {
             if (cursor.IsTable)
@@ -93,7 +93,7 @@ internal sealed class PageNavigationCollector
             Line(line.Line, left + line.X, top + line.Y + delta, transform, clip);
         }
 
-        var cursor = OrderedMerge.ByOrder(content.Tables, static t => t.Order, content.Boxes, static b => b.Order);
+        var cursor = OrderedMerge.ByOrder(content.Tables, static t => t.ZOrder, content.Boxes, static b => b.ZOrder);
         while (cursor.MoveNext())
         {
             if (cursor.IsTable)

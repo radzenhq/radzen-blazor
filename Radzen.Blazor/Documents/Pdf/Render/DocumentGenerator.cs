@@ -257,7 +257,7 @@ internal sealed class DocumentGenerator
         var left = page.ContentBox.X;
         var contentTop = PageSpace.FromTop(height, page.ContentBox.Y);
 
-        foreach (var kind in LaidOutPaintOrder.Layers)
+        foreach (var kind in PdfPaintOrder.Layers)
         {
             var (layer, top) = kind switch
             {
@@ -294,7 +294,7 @@ internal sealed class DocumentGenerator
     private void EmitLayer(EmitContext context, PageLayerKind kind, LaidOutLayer layer, double left, double top)
     {
         var body = kind == PageLayerKind.Body;
-        foreach (var content in LaidOutPaintOrder.ContentOf(kind))
+        foreach (var content in PdfPaintOrder.ContentOf(kind))
         {
             switch (content)
             {
@@ -340,9 +340,9 @@ internal sealed class DocumentGenerator
     {
         OrderedMerge.VisitByOrder(
             tables,
-            static table => table.Order,
+            static table => table.ZOrder,
             boxes,
-            static box => box.Order,
+            static box => box.ZOrder,
             table => tableEmitter.EmitFragment(context, table, left, top),
             box => boxEmitter.EmitBox(context, box, left, top));
     }
