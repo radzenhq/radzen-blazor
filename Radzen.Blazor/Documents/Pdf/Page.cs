@@ -35,6 +35,7 @@ public sealed class Page
         this.width = width;
         this.height = height;
         mediaBox = PdfRect.FromSize(0, 0, width.Point, height.Point);
+        annotations.OwnedBy(() => Owner?.InvalidateMaterializedGraph());
     }
 
     internal GeneratedPage? Generated { get; set; }

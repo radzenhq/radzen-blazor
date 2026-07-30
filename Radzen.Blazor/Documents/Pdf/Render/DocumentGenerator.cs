@@ -91,7 +91,7 @@ internal sealed class GeneratedPage
 
 internal sealed class DocumentGenerator
 {
-    private readonly CapturedRendererSettings settings;
+    private readonly RenderRequest request;
     private readonly LaidOutDocument laidOut;
 
     private readonly StructureTreeBuilder structureTree;
@@ -106,17 +106,17 @@ internal sealed class DocumentGenerator
 
     private readonly bool markArtifacts;
 
-    private DocumentGenerator(CapturedRendererSettings settings, LaidOutDocument laidOut)
+    private DocumentGenerator(RenderRequest request, LaidOutDocument laidOut)
     {
-        this.settings = settings;
+        this.request = request;
         this.laidOut = laidOut;
-        markArtifacts = settings.Accessibility != PdfUaConformance.None
-            || settings.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
+        markArtifacts = request.Accessibility != PdfUaConformance.None
+            || request.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
 
-        structureTree = new(laidOut.Semantics, settings);
+        structureTree = new(laidOut.Semantics, request);
         structureTree.Build();
 
-        fontResolver = new(settings.Conformance);
+        fontResolver = new(request.Conformance);
         imageStore = new();
         textEmitter = new(
             fontResolver,
@@ -133,15 +133,53 @@ internal sealed class DocumentGenerator
             laidOut.Fonts.AllowUnsupportedCharacters);
     }
 
-    public static PortableDocument Generate(Document document, CapturedRendererSettings settings)
-        => new DocumentGenerator(settings, DocumentLayouter.Layout(document)).Run();
+    public static PortableDocument Generate(Document document, RenderRequest request)
+        => new DocumentGenerator(request, DocumentLayouter.Layout(document)).Run();
 
-    internal static PortableDocument Generate(CapturedRendererSettings settings, LaidOutDocument laidOut)
-        => new DocumentGenerator(settings, laidOut).Run();
+    internal static PortableDocument Generate(RenderRequest request, LaidOutDocument laidOut)
+        => new DocumentGenerator(request, laidOut).Run();
+
+    private PortableDocument CreateOutput()
+    {
+        var output = new PortableDocument
+        {
+            Conformance = request.Conformance,
+            Accessibility = request.Accessibility,
+            RoleMap = request.RoleMap,
+            Encryption = request.Encryption,
+            CompressOutput = request.CompressOutput,
+            IncludeDocumentId = request.IncludeDocumentId,
+            ViewerPreferences = request.ViewerPreferences,
+        };
+
+        output.Info.Producer = request.Producer;
+
+        foreach (var attachment in request.Attachments)
+        {
+            output.Attachments.Add(attachment);
+        }
+
+        foreach (var item in request.Outline)
+        {
+            output.Outline.Add(item);
+        }
+
+        foreach (var label in request.PageLabels)
+        {
+            output.PageLabels.Add(label);
+        }
+
+        foreach (var field in request.FormFields)
+        {
+            output.FormFields.Add(field);
+        }
+
+        return output;
+    }
 
     private PortableDocument Run()
     {
-        var output = settings.Document;
+        var output = CreateOutput();
         output.FontSnapshot = laidOut.Fonts;
         output.Language = laidOut.Semantics.Language;
         PdfModelAdapter.Apply(laidOut.Info, output.Info);
@@ -155,7 +193,6 @@ internal sealed class DocumentGenerator
         }
 
         output.Structure = structureTree.DocumentElement;
-        output.HasUntaggedListContent = structureTree.HasUntaggedList;
         foreach (var font in fontResolver.AllFonts)
         {
             if (font.Sfnt is { } sfnt)

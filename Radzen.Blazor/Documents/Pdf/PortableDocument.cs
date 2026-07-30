@@ -26,6 +26,9 @@ public sealed class PortableDocument
     private DocumentXmpMetadata xmp = new();
     private ViewerPreferences? viewerPreferences;
     private AcroForm? acroForm;
+    private Objects.Encryption.EncryptionOptions? encryption;
+    private bool compressOutput;
+    private bool includeDocumentId;
     private readonly object facadeLock = new();
     private bool infoLoaded = true;
     private bool attachmentsLoaded = true;
@@ -86,7 +89,7 @@ public sealed class PortableDocument
 
         Loaded = state;
         ResetGraphFacades();
-        Encryption = graph.Encryption;
+        encryption = graph.Encryption;
         MaterializedGraph = graph;
         Structure = null;
         Anchors.Clear();
@@ -200,7 +203,15 @@ public sealed class PortableDocument
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
     /// document is written unencrypted.
     /// </summary>
-    public Objects.Encryption.EncryptionOptions? Encryption { get; set; }
+    public Objects.Encryption.EncryptionOptions? Encryption
+    {
+        get => encryption;
+        set
+        {
+            InvalidateMaterializedGraph();
+            encryption = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets whether to pack indirect objects into compressed object
@@ -208,7 +219,15 @@ public sealed class PortableDocument
     /// which typically shrinks the output. Not compatible with PDF/A-1;
     /// leave <c>false</c> for maximum reader compatibility.
     /// </summary>
-    public bool CompressOutput { get; set; }
+    public bool CompressOutput
+    {
+        get => compressOutput;
+        set
+        {
+            InvalidateMaterializedGraph();
+            compressOutput = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets whether a deterministic trailer <c>/ID</c> (ISO 32000-1 7.5.5)
@@ -217,7 +236,15 @@ public sealed class PortableDocument
     /// Defaults to <c>false</c> so a document that does not opt in stays byte
     /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless.
     /// </summary>
-    public bool IncludeDocumentId { get; set; }
+    public bool IncludeDocumentId
+    {
+        get => includeDocumentId;
+        set
+        {
+            InvalidateMaterializedGraph();
+            includeDocumentId = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the viewer preferences written to the document catalog
@@ -374,7 +401,6 @@ public sealed class PortableDocument
 
     internal string? Language { get; set; }
 
-    internal bool HasUntaggedListContent { get; set; }
 
     internal Dictionary<string, GeneratedAnchor> Anchors { get; } = new(StringComparer.Ordinal);
 
