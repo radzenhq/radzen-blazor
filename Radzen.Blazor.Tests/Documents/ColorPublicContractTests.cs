@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Linq;
+using System.Reflection;
 using Radzen.Documents;
 using Xunit;
 
@@ -61,6 +63,7 @@ public class ColorPublicContractTests
         Assert.Equal(Color.FromHex("#D3D3D3"), Color.LightGray);
         Assert.Equal(Color.FromHex("#A9A9A9"), Color.DarkGray);
         Assert.Equal(Color.FromHex("#00008B"), Color.DarkBlue);
+        Assert.Equal(Color.FromHex("#663399"), Color.RebeccaPurple);
         Assert.Equal(Color.FromArgb(0, 0, 0, 0), Color.Transparent);
     }
 
@@ -68,6 +71,8 @@ public class ColorPublicContractTests
     [InlineData("")]
     [InlineData("#")]
     [InlineData("12")]
+    [InlineData("#12")]
+    [InlineData("#GGGGGG")]
     [InlineData("12345")]
     [InlineData("1234567")]
     [InlineData("123456789")]
@@ -81,6 +86,35 @@ public class ColorPublicContractTests
     [Fact]
     public void FromHex_NullThrowsArgumentNullException()
         => Assert.Throws<ArgumentNullException>(() => Color.FromHex(null!));
+
+    [Fact]
+    public void GreyAliasesMatchTheirGraySpelling()
+    {
+        Assert.Equal(Color.Gray, Color.Grey);
+        Assert.Equal(Color.DarkGray, Color.DarkGrey);
+        Assert.Equal(Color.LightSlateGray, Color.LightSlateGrey);
+    }
+
+    [Fact]
+    public void EveryCssKeywordHasAMatchingStaticProperty()
+    {
+        var properties = typeof(Color)
+            .GetProperties(BindingFlags.Public | BindingFlags.Static)
+            .Where(property => property.PropertyType == typeof(Color) && property.Name != "Transparent")
+            .ToList();
+
+        Assert.Equal(148, properties.Count);
+        Assert.All(properties, property => Assert.Equal((Color)property.GetValue(null)!, Color.FromName(property.Name)));
+    }
+
+    [Fact]
+    public void FromNameIsCaseInsensitiveAndRejectsUnknownKeywords()
+    {
+        Assert.Equal(Color.RebeccaPurple, Color.FromName("rebeccapurple"));
+        Assert.Equal(Color.DarkSlateGray, Color.FromName("DARKSLATEGRAY"));
+        Assert.Throws<FormatException>(() => Color.FromName("burntsienna"));
+        Assert.Throws<ArgumentNullException>(() => Color.FromName(null!));
+    }
 
     [Fact]
     public void EqualityAndHashCodeUseAllFourChannels()

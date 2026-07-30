@@ -8,6 +8,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class TextLayoutFindingTests
 {

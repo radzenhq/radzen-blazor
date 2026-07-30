@@ -20,7 +20,7 @@ public class FlattenBakeFidelityTests
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] /DA (/Helv 0 Tf 0 g) >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (secret) /P 3 0 R "
                 + "/Rect [100 640 280 700] " + extra + " /V (" + value + ") >>\nendobj\n");
-        return Wrap(pdf, 6);
+        return FixturePdf.Wrap(pdf, 6);
     }
 
     private static byte[] ChoiceForm(string extra, string values)
@@ -33,22 +33,7 @@ public class FlattenBakeFidelityTests
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] /DA (/Helv 0 Tf 0 g) >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Ch /T (colors) /P 3 0 R "
                 + "/Rect [100 640 280 700] " + extra + " /Opt [(Red) (Green) (Blue)] /V " + values + " >>\nendobj\n");
-        return Wrap(pdf, 6);
-    }
-
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
+        return FixturePdf.Wrap(pdf, 6);
     }
 
     private static PortableDocument Load(byte[] bytes) => PortableDocument.LoadFromStream(new MemoryStream(bytes));

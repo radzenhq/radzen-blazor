@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class PaginationTests
 {
@@ -16,7 +17,7 @@ public class PaginationTests
     public void TwelveSingleLineParagraphs_FivePerPage_ProduceThreePages()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
 
         var paras = new Paragraph[12];
@@ -37,7 +38,7 @@ public class PaginationTests
     public void PageNumbers_AreOneBasedAndSequential()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
         for (var i = 0; i < 12; i++)
         {
@@ -53,7 +54,7 @@ public class PaginationTests
     public void EachBodyLine_AdvancesByLineHeightFromContentTop()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
         for (var i = 0; i < 12; i++)
         {
@@ -76,7 +77,7 @@ public class PaginationTests
     public void FirstLineOfEveryPage_StartsAtContentTop()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
         for (var i = 0; i < 12; i++)
         {
@@ -92,7 +93,7 @@ public class PaginationTests
     public void SourceReferences_MapLinesBackToTheirParagraphs()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
         var paras = new Paragraph[12];
         for (var i = 0; i < paras.Length; i++)
@@ -114,7 +115,7 @@ public class PaginationTests
     public void ContentBox_EqualsPageMinusMargins()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var h = PaginationSupport.HeightForLines(lineH, 5);
         var section = PaginationSupport.Section(500, h, marginPt: 0);
         section.Margins.Left = Unit.FromPoint(20);
@@ -180,7 +181,7 @@ public class PaginationTests
     public void SpacingAfter_PushesTheFollowingParagraphDown()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(500, 400);
         var first = PaginationSupport.Text("first");
         first.SpacingAfter = Unit.FromPoint(9);

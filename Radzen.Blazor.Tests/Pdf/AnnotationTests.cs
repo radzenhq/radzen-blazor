@@ -394,4 +394,38 @@ public class AnnotationTests
         });
         return document.ToArray();
     }
+
+    [Theory]
+    [InlineData(AnnotationFlags.Invisible, 1)]
+    [InlineData(AnnotationFlags.NoZoom, 8)]
+    [InlineData(AnnotationFlags.NoRotate, 16)]
+    [InlineData(AnnotationFlags.NoView, 32)]
+    [InlineData(AnnotationFlags.ReadOnly, 64)]
+    [InlineData(AnnotationFlags.Locked, 128)]
+    [InlineData(AnnotationFlags.ToggleNoView, 256)]
+    [InlineData(AnnotationFlags.LockedContents, 512)]
+    [InlineData(AnnotationFlags.NoZoom | AnnotationFlags.Locked, 136)]
+    public void AnnotationFlags_RoundTripThroughTheSpecifiedFBitValue(AnnotationFlags flags, int bits)
+    {
+        var document = new PortableDocument();
+        document.Pages.Add().Annotations.Add(
+            new SquareAnnotation(PdfRect.FromSize(10, 10, 40, 40)) { Flags = flags });
+
+        var bytes = document.ToArray();
+        var reader = DocumentReader.Parse(bytes);
+        var page = PdfPageContentTestHelper.PageLeaves(reader, assertStructure: true)[0].Page;
+        var annotation = (DictionaryObject)reader.Resolve(
+            ((ArrayObject)reader.Resolve(page["Annots"]))[0]);
+
+        Assert.Equal(bits, ((NumberObject)reader.Resolve(annotation["F"])).IntValue);
+        Assert.Equal(flags, Assert.Single(Load(bytes).Pages[0].Annotations).Flags);
+    }
+
+    [Fact]
+    public void AnnotationFlags_DefaultToPrint()
+    {
+        var annotation = new SquareAnnotation(PdfRect.FromSize(10, 10, 40, 40));
+
+        Assert.Equal(AnnotationFlags.Print, annotation.Flags);
+    }
 }

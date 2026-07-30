@@ -81,7 +81,7 @@ public class ReaderRepairRobustnessTests
     }
 
     [Fact]
-    public void CyclicStreamLength_DoesNotOverflowStack()
+    public void CyclicStreamLength_RecoversTheContentInsteadOfRecursing()
     {
         var pdf = new FixturePdf();
         pdf.Append("%PDF-1.4\n");
@@ -100,17 +100,8 @@ public class ReaderRepairRobustnessTests
         pdf.Append("trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n"
             + xrefOffset.ToString(CultureInfo.InvariantCulture) + "\n%%EOF\n");
 
-        var exception = Record.Exception(() =>
-        {
-            var document = Load(pdf.ToArray());
-            var content = document.Pages[0].GetContent();
-            if (content is not null)
-            {
-                Assert.Equal(Encoding.ASCII.GetBytes("(hello)"), content);
-            }
-        });
+        var document = Load(pdf.ToArray());
 
-        Assert.True(exception is null or DocumentParseException,
-            $"Cyclic /Length must be rejected as a parse error, but threw {exception}");
+        Assert.Equal(Encoding.ASCII.GetBytes("(hello)"), document.Pages[0].GetContent());
     }
 }

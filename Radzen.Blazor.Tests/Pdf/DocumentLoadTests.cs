@@ -18,8 +18,6 @@ public class DocumentLoadTests
         return PortableDocument.LoadFromStream(stream, options);
     }
 
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     [Fact]
     public void RoundTrip_ThreePages_PreservesCountSizesInfoAndContent()
     {
@@ -30,9 +28,9 @@ public class DocumentLoadTests
         source.Info.Keywords = "alpha beta gamma";
         source.Info.Creator = "Radzen";
 
-        var c0 = Ascii("BT /F1 12 Tf 72 700 Td (Page one) Tj ET");
-        var c1 = Ascii("BT /F1 10 Tf 40 500 Td (Second page here) Tj ET");
-        var c2 = Ascii("0 0 1 rg 10 10 200 200 re f");
+        var c0 = TestBytes.Ascii("BT /F1 12 Tf 72 700 Td (Page one) Tj ET");
+        var c1 = TestBytes.Ascii("BT /F1 10 Tf 40 500 Td (Second page here) Tj ET");
+        var c2 = TestBytes.Ascii("0 0 1 rg 10 10 200 200 re f");
         source.Pages.Add(PageSizes.A4).SetContent(c0);
         source.Pages.Add(PageSizes.Letter).SetContent(c1);
         source.Pages.Add(PageSizes.A4, PageOrientation.Landscape).SetContent(c2);
@@ -63,8 +61,8 @@ public class DocumentLoadTests
     public void RoundTrip_ReSaveReparsed_KidContentMatchesOriginals()
     {
         var source = new PortableDocument();
-        var a = Ascii("first");
-        var b = Ascii("second");
+        var a = TestBytes.Ascii("first");
+        var b = TestBytes.Ascii("second");
         source.Pages.Add().SetContent(a);
         source.Pages.Add().SetContent(b);
 
@@ -102,26 +100,26 @@ public class DocumentLoadTests
     public void Split_RemoveFirstPage_DropsItAndKeepsOrder()
     {
         var source = new PortableDocument();
-        source.Pages.Add().SetContent(Ascii("one"));
-        source.Pages.Add().SetContent(Ascii("two"));
-        source.Pages.Add().SetContent(Ascii("three"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("one"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("two"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("three"));
 
         var loaded = Load(source.ToArray());
         loaded.Pages.RemoveAt(0);
 
         var reader = DocumentReader.Parse(loaded.ToArray());
         Assert.Equal(2, PageCount(reader));
-        Assert.Equal(Ascii("two"), KidContent(reader, 0));
-        Assert.Equal(Ascii("three"), KidContent(reader, 1));
+        Assert.Equal(TestBytes.Ascii("two"), KidContent(reader, 0));
+        Assert.Equal(TestBytes.Ascii("three"), KidContent(reader, 1));
     }
 
     [Fact]
     public void Reorder_InsertMovesPage()
     {
         var source = new PortableDocument();
-        source.Pages.Add().SetContent(Ascii("A"));
-        source.Pages.Add().SetContent(Ascii("B"));
-        source.Pages.Add().SetContent(Ascii("C"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("A"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("B"));
+        source.Pages.Add().SetContent(TestBytes.Ascii("C"));
 
         var loaded = Load(source.ToArray());
         var moved = loaded.Pages[0];
@@ -130,9 +128,9 @@ public class DocumentLoadTests
 
         var reader = DocumentReader.Parse(loaded.ToArray());
         Assert.Equal(3, PageCount(reader));
-        Assert.Equal(Ascii("B"), KidContent(reader, 0));
-        Assert.Equal(Ascii("C"), KidContent(reader, 1));
-        Assert.Equal(Ascii("A"), KidContent(reader, 2));
+        Assert.Equal(TestBytes.Ascii("B"), KidContent(reader, 0));
+        Assert.Equal(TestBytes.Ascii("C"), KidContent(reader, 1));
+        Assert.Equal(TestBytes.Ascii("A"), KidContent(reader, 2));
     }
 
     private static string Readable(byte[] content)

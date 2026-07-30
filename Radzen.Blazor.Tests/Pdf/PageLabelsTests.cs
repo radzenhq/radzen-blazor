@@ -123,4 +123,20 @@ public class PageLabelsTests
         Assert.DoesNotContain("/PageLabels", Encoding.Latin1.GetString(bytes));
         Assert.False(ContentTestHelpers.Catalog(DocumentReader.Parse(bytes)).ContainsKey("PageLabels"));
     }
+
+    [Theory]
+    [InlineData(PageLabelStyle.Decimal, "D")]
+    [InlineData(PageLabelStyle.UppercaseRoman, "R")]
+    [InlineData(PageLabelStyle.LowercaseRoman, "r")]
+    [InlineData(PageLabelStyle.UppercaseLetters, "A")]
+    [InlineData(PageLabelStyle.LowercaseLetters, "a")]
+    public void EveryPageLabelStyle_WritesItsSpecifiedNumberingStyleName(PageLabelStyle style, string name)
+    {
+        var document = Document(2);
+        document.PageLabels.Add(new PageLabel(0) { Style = style });
+
+        var reader = DocumentReader.Parse(document.ToArray());
+
+        Assert.Equal(name, Assert.IsType<NameObject>(reader.Resolve(Labels(reader)[0]["S"])).Value);
+    }
 }

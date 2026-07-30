@@ -8,6 +8,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class ContinuationWidowTests
 {
@@ -18,7 +19,7 @@ public class ContinuationWidowTests
     public void ParagraphAcrossThreePages_KeepsWidowsLinesOnFinalPage()
     {
         var fonts = PaginationSupport.Fonts();
-        var lh = PaginationSupport.LineHeight(fonts);
+        var lh = PaginationSupport.LineHeight();
 
         var section = PaginationSupport.Section(Width(fonts), PaginationSupport.HeightForLines(lh, 5));
         var para = PaginationSupport.Repeated("Ha", 22);

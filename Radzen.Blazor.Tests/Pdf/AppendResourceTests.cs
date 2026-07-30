@@ -10,8 +10,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AppendResourceTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static Document BuildFontAndImage()
     {
         var document = new Document();
@@ -42,7 +40,7 @@ public class AppendResourceTests
     public void Append_BuiltSourcePage_CarriesFontAndImageResources()
     {
         var target = new PortableDocument();
-        target.Pages.Add().SetContent(Ascii("BT ET"));
+        target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var reader = DocumentReader.Parse(target.ToArray());
@@ -56,7 +54,7 @@ public class AppendResourceTests
     public void Append_BuiltSourcePage_ExtractsTextAfterReload()
     {
         var target = new PortableDocument();
-        target.Pages.Add().SetContent(Ascii("BT ET"));
+        target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
         Assert.Contains("Appended Content", Reload(target).ExtractText());
@@ -68,7 +66,7 @@ public class AppendResourceTests
         var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var target = new PortableDocument();
-        target.Pages.Add().SetContent(Ascii("BT ET"));
+        target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(loaded);
 
         var reader = DocumentReader.Parse(target.ToArray());
@@ -84,7 +82,7 @@ public class AppendResourceTests
         var loaded = Reload(new DocumentRenderer().Render(BuildFontAndImage()));
 
         var target = new PortableDocument();
-        target.Pages.Add().SetContent(Ascii("BT ET"));
+        target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(loaded);
 
         Assert.Contains("Appended Content", Reload(target).ExtractText());

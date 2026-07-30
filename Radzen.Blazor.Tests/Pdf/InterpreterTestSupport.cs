@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class InterpreterTestSupport
 {
-    public static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
+    public static byte[] Ascii(string text) => TestBytes.Ascii(text);
 
     public static PortableDocument Load(byte[] bytes)
     {

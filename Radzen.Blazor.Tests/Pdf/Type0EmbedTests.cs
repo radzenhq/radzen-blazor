@@ -92,7 +92,7 @@ public class Type0EmbedTests
         {
             var newGid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
             Assert.True(widths.ContainsKey(newGid), $"W missing compact CID {newGid} for U+{cp:X4}");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[newGid]);
+            Assert.Equal(Type0EmbedSupport.LiberationSansWidth((char)cp), widths[newGid]);
         }
 
         Assert.Equal(722, widths[Type0EmbedSupport.NewGid(toUnicode, 'R')]);
@@ -169,7 +169,7 @@ public class Type0EmbedTests
         {
             var newCid = Type0EmbedSupport.NewGid(toUnicode, (char)cp);
             Assert.True(widths.ContainsKey(newCid), $"W missing compact CID {newCid}");
-            Assert.Equal(Type0EmbedSupport.ScaleWidth(font, gid), widths[newCid]);
+            Assert.Equal(Type0EmbedSupport.NotoSansScWidth((char)cp), widths[newCid]);
         }
 
         Assert.Equal(1000, widths[Type0EmbedSupport.NewGid(toUnicode, '中')]);

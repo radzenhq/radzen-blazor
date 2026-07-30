@@ -17,7 +17,7 @@ public class BuildEndToEndTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var lh = PaginationSupport.LineHeight(document.Fonts, 12);
+        var lh = PaginationSupport.LineHeight(12);
 
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));
@@ -43,7 +43,7 @@ public class BuildEndToEndTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var lh = PaginationSupport.LineHeight(document.Fonts, 12);
+        var lh = PaginationSupport.LineHeight(12);
 
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));

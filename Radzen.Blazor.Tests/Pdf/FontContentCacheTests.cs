@@ -13,9 +13,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class FontContentCacheTests
 {
     private const string Family = "Liberation Sans";
-    private const string ArialUnicodePath =
-        "/private/tmp/claude-501/-Users-korchev-github-radzen/8ba9b99c-919c-46f4-bcc4-22dcb43d51ea/scratchpad/ArialUnicode.ttf";
-
     private static byte[] SansBytes() => PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf");
 
     private static byte[] SerifBytes() => PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf");
@@ -104,16 +101,21 @@ public class FontContentCacheTests
     }
 
     [Fact]
-    public void LargeRealFontParsesOnceAcrossIdiomaticRegistrations()
+    public void CffBackedFontParsesOnceAcrossIdiomaticRegistrations()
     {
-        if (!File.Exists(ArialUnicodePath))
-        {
-            return;
-        }
+        var bytes = PdfTestResources.ReadAllBytes("Fonts/NotoSansSC-Subset.otf");
+        var first = RegisterIdiomatic("Noto Sans SC", bytes);
+        var second = RegisterIdiomatic("Noto Sans SC", (byte[])bytes.Clone());
 
-        var bytes = File.ReadAllBytes(ArialUnicodePath);
-        var first = RegisterIdiomatic("Arial Unicode MS", bytes);
-        var second = RegisterIdiomatic("Arial Unicode MS", (byte[])bytes.Clone());
+        Assert.Same(first, second);
+    }
+
+    [Fact]
+    public void CollectionBackedFontParsesOnceAcrossIdiomaticRegistrations()
+    {
+        var bytes = PdfTestResources.ReadAllBytes("Fonts/LiberationSans-RegBold.ttc");
+        var first = RegisterIdiomatic(Family, bytes);
+        var second = RegisterIdiomatic(Family, (byte[])bytes.Clone());
 
         Assert.Same(first, second);
     }

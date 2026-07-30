@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class WidowOrphanTests
 {
@@ -17,7 +18,7 @@ public class WidowOrphanTests
 
     private static (Section, Paragraph) WidowScenario(FontCollection fonts, int widows)
     {
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(Width(fonts), PaginationSupport.HeightForLines(lineH, 5));
         section.Blocks.Add(PaginationSupport.Text("f0"));
         section.Blocks.Add(PaginationSupport.Text("f1"));
@@ -44,7 +45,7 @@ public class WidowOrphanTests
     public void DefaultWidows_SplitLinesLandAtTheExpectedOffsets()
     {
         var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var (section, para) = WidowScenario(fonts, widows: 2);
 
         var capture = new LayoutCaptureContext();
@@ -74,7 +75,7 @@ public class WidowOrphanTests
 
     private static (Section, Paragraph) OrphanScenario(FontCollection fonts, int orphans)
     {
-        var lineH = PaginationSupport.LineHeight(fonts);
+        var lineH = PaginationSupport.LineHeight();
         var section = PaginationSupport.Section(Width(fonts), PaginationSupport.HeightForLines(lineH, 5));
         for (var i = 0; i < 4; i++)
         {

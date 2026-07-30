@@ -10,21 +10,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class FormWidgetFidelityTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
 
     private static byte[] InheritedTypeForm()
     {
@@ -38,7 +23,7 @@ public class FormWidgetFidelityTests
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /T (first) /Parent 5 0 R /P 3 0 R /Rect [100 700 120 720] /AP << /N << /Yes 8 0 R /Off 8 0 R >> >> /AS /Off >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Widget /T (second) /Parent 5 0 R /P 3 0 R /Rect [100 660 120 680] >>\nendobj\n")
             .Object(8, "8 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 20 20] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
-        return Wrap(pdf, 9);
+        return FixturePdf.Wrap(pdf, 9);
     }
 
     [Fact]
@@ -74,7 +59,7 @@ public class FormWidgetFidelityTests
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /Parent 5 0 R /P 3 0 R /Rect [100 700 350 720] /AP << /N 8 0 R >> >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Widget /Parent 5 0 R /P 3 0 R /Rect [100 600 350 620] /AP << /N 8 0 R >> >>\nendobj\n")
             .Object(8, "8 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 250 20] /Length " + stale.Length + " >>\nstream\n" + stale + "\nendstream\nendobj\n");
-        return Wrap(pdf, 9);
+        return FixturePdf.Wrap(pdf, 9);
     }
 
     private static DictionaryObject Kid(DocumentReader reader, DictionaryObject field, int index)
@@ -123,7 +108,7 @@ public class FormWidgetFidelityTests
             .Object(6, "6 0 obj\n<< /Type /Annot /Subtype /Widget /Parent 5 0 R /P 3 0 R /Rect [100 700 120 720] /AP << /N << /Yes 8 0 R /Off 8 0 R >> >> /AS /Off >>\nendobj\n")
             .Object(7, "7 0 obj\n<< /Type /Annot /Subtype /Widget /Parent 5 0 R /P 3 0 R /Rect [100 660 120 680] /AP << /N << /Yes 8 0 R /Off 8 0 R >> >> /AS /Off >>\nendobj\n")
             .Object(8, "8 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 20 20] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
-        return Wrap(pdf, 9);
+        return FixturePdf.Wrap(pdf, 9);
     }
 
     [Fact]
@@ -153,11 +138,11 @@ public class FormWidgetFidelityTests
         {
             pdf.Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Btn /Ff 65536 /T (submit) /P 3 0 R /Rect [100 700 200 730] /AP << /N 6 0 R >> >>\nendobj\n")
                 .Object(6, "6 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 100 30] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
-            return Wrap(pdf, 7);
+            return FixturePdf.Wrap(pdf, 7);
         }
 
         pdf.Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Btn /Ff 65536 /T (submit) /P 3 0 R /Rect [100 700 200 730] >>\nendobj\n");
-        return Wrap(pdf, 6);
+        return FixturePdf.Wrap(pdf, 6);
     }
 
     [Fact]
@@ -191,7 +176,7 @@ public class FormWidgetFidelityTests
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Btn /Ff 65536 /T (submit) /P 3 0 R /Rect [100 700 200 730] /AP << /N << /Off 6 0 R >> >> >>\nendobj\n")
             .Object(6, "6 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 100 30] /Length 4 >>\nstream\nq\nQ\nendstream\nendobj\n");
-        return Wrap(pdf, 7);
+        return FixturePdf.Wrap(pdf, 7);
     }
 
     [Fact]

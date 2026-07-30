@@ -12,8 +12,6 @@ public class CryptoPrimitiveTests
 {
     private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     // RFC 1321 MD5 test vectors
     [Theory]
     [InlineData("", "d41d8cd98f00b204e9800998ecf8427e")]
@@ -22,7 +20,7 @@ public class CryptoPrimitiveTests
     [InlineData("message digest", "f96b697d7cb7938d525a2f31aaf161d0")]
     public void Md5_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Md5.ComputeHash(Ascii(input))));
+        Assert.Equal(expected, Hex(Md5.ComputeHash(TestBytes.Ascii(input))));
     }
 
     [Theory]
@@ -31,13 +29,13 @@ public class CryptoPrimitiveTests
     [InlineData(64, "014842d480b571495a4a0363793f7367")]
     public void Md5_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Md5.ComputeHash(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Md5.ComputeHash(TestBytes.Ascii(new string('a', count)))));
     }
 
     [Fact]
     public void Md5_LongInput()
     {
-        var input = Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
+        var input = TestBytes.Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
         Assert.Equal(80, input.Length);
         Assert.Equal("57edf4a22be3c955ac49da2e2107b67a", Hex(Md5.ComputeHash(input)));
     }
@@ -184,7 +182,7 @@ public class CryptoPrimitiveTests
         "84983e441c3bd26ebaae4aa1f95129e5e54670f1")]
     public void Sha1_KnownStrings(string input, string expected)
     {
-        Assert.Equal(expected, Hex(Sha1.ComputeHash(Ascii(input))));
+        Assert.Equal(expected, Hex(Sha1.ComputeHash(TestBytes.Ascii(input))));
     }
 
     [Theory]
@@ -193,13 +191,13 @@ public class CryptoPrimitiveTests
     [InlineData(64, "0098ba824b5c16427bd7a1122a5a442a25ec644d")]
     public void Sha1_BlockBoundaries(int count, string expected)
     {
-        Assert.Equal(expected, Hex(Sha1.ComputeHash(Ascii(new string('a', count)))));
+        Assert.Equal(expected, Hex(Sha1.ComputeHash(TestBytes.Ascii(new string('a', count)))));
     }
 
     [Fact]
     public void Sha1_LongInput()
     {
-        var input = Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
+        var input = TestBytes.Ascii(string.Concat(Enumerable.Repeat("1234567890", 8)));
         Assert.Equal(80, input.Length);
         Assert.Equal("50abf5706a150990a08b2c5ea40fa0e585554732", Hex(Sha1.ComputeHash(input)));
     }
@@ -208,7 +206,7 @@ public class CryptoPrimitiveTests
     [Fact]
     public void Sha1_MultiBlockRepetition()
     {
-        var input = Ascii(string.Concat(
+        var input = TestBytes.Ascii(string.Concat(
             Enumerable.Repeat("0123456701234567012345670123456701234567012345670123456701234567", 10)));
 
         Assert.Equal(640, input.Length);
@@ -227,14 +225,14 @@ public class CryptoPrimitiveTests
     [InlineData("Secret", "Attack at dawn", "45a01f645fc35b383552544b9bf5")]
     public void Rc4_EncryptVectors(string key, string plaintext, string expected)
     {
-        Assert.Equal(expected, Hex(Rc4.Transform(Ascii(key), Ascii(plaintext))));
+        Assert.Equal(expected, Hex(Rc4.Transform(TestBytes.Ascii(key), TestBytes.Ascii(plaintext))));
     }
 
     [Fact]
     public void Rc4_RoundTrip()
     {
-        var key = Ascii("Secret");
-        var cipher = Rc4.Transform(key, Ascii("Attack at dawn"));
+        var key = TestBytes.Ascii("Secret");
+        var cipher = Rc4.Transform(key, TestBytes.Ascii("Attack at dawn"));
         Assert.Equal("Attack at dawn", Encoding.ASCII.GetString(Rc4.Transform(key, cipher)));
     }
 
@@ -274,6 +272,6 @@ public class CryptoPrimitiveTests
     [Fact]
     public void Rc4_EmptyKey_Throws()
     {
-        Assert.Throws<ArgumentException>(() => Rc4.Transform([], Ascii("Attack at dawn")));
+        Assert.Throws<ArgumentException>(() => Rc4.Transform([], TestBytes.Ascii("Attack at dawn")));
     }
 }

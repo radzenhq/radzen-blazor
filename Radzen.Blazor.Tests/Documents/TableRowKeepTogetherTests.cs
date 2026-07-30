@@ -4,6 +4,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Blazor.Tests.Isolated;
 
 namespace Radzen.Blazor.Documents.Tests;
 

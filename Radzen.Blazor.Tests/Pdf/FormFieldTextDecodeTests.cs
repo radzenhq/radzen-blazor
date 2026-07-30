@@ -39,21 +39,6 @@ public class FormFieldTextDecodeTests
         return document.Append('>').ToString();
     }
 
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] Form()
     {
         var pdf = new FixturePdf()
@@ -69,7 +54,7 @@ public class FormFieldTextDecodeTests
             .Object(9, "9 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Ch /T (multi) /V [" + Utf16BeHex(A) + " " + Utf16BeHex(Be) + "] /P 3 0 R /Rect [100 580 350 600] >>\nendobj\n")
             .Object(10, "10 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T (utf8) /V " + Utf8Hex(Faktura) + " /P 3 0 R /Rect [100 540 350 560] >>\nendobj\n")
             .Object(11, "11 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T " + Utf8Hex(Imya) + " /V (x) /P 3 0 R /Rect [100 500 350 520] >>\nendobj\n");
-        return Wrap(pdf, 12);
+        return FixturePdf.Wrap(pdf, 12);
     }
 
     private static PortableDocument Load()
@@ -112,7 +97,7 @@ public class FormFieldTextDecodeTests
             .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Annots [5 0 R] >>\nendobj\n")
             .Object(4, "4 0 obj\n<< /Fields [5 0 R] >>\nendobj\n")
             .Object(5, "5 0 obj\n<< /Type /Annot /Subtype /Widget /FT /Tx /T " + Utf16BeHex(Imya) + " /V (x) /P 3 0 R /Rect [100 700 350 720] >>\nendobj\n");
-        var document = PortableDocument.LoadFromStream(new MemoryStream(Wrap(pdf, 6)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(FixturePdf.Wrap(pdf, 6)));
 
         Assert.Equal(Imya, document.AcroForm!.Fields.Single().Name);
     }

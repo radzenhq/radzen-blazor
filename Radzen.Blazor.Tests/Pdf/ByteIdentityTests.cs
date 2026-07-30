@@ -11,8 +11,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ByteIdentityTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static PortableDocument Load(byte[] bytes)
     {
         using var stream = new MemoryStream(bytes);
@@ -23,9 +21,9 @@ public class ByteIdentityTests
     {
         var document = new PortableDocument();
         document.Info.Title = "Identity";
-        document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page zero) Tj ET"));
-        document.Pages.Add(PageSizes.Letter).SetContent(Ascii("BT (page one) Tj ET"));
-        document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page two) Tj ET"));
+        document.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (page zero) Tj ET"));
+        document.Pages.Add(PageSizes.Letter).SetContent(TestBytes.Ascii("BT (page one) Tj ET"));
+        document.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (page two) Tj ET"));
         return document;
     }
 
@@ -69,7 +67,7 @@ public class ByteIdentityTests
         var save1 = BuildThreePages().ToArray();
 
         var loaded = Load(save1);
-        loaded.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (added page) Tj ET"));
+        loaded.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (added page) Tj ET"));
         var save2 = loaded.ToArray();
 
         var r1 = DocumentReader.Parse(save1);

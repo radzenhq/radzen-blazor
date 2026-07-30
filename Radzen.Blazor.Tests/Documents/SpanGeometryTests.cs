@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class SpanGeometryTests
 {
@@ -56,7 +57,7 @@ public class SpanGeometryTests
     public void RowSpan_SumsRowHeights_AndShiftsFollowingRow()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var space = TableLayoutSupport.Measure(fonts, " ", 12);
         var wHello = TableLayoutSupport.Measure(fonts, "Hello", 12);
         var narrow = wHello + (0.5 * space);

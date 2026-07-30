@@ -8,21 +8,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class GraphImportTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static DocumentReader SourceWithIndirectScalars()
     {
         var pdf = new FixturePdf()
@@ -33,7 +18,7 @@ public class GraphImportTests
             .Object(4, "4 0 obj\n42\nendobj\n")
             .Object(5, "5 0 obj\n/Helv\nendobj\n")
             .Object(6, "6 0 obj\ntrue\nendobj\n");
-        return DocumentReader.Parse(Wrap(pdf, 7));
+        return DocumentReader.Parse(FixturePdf.Wrap(pdf, 7));
     }
 
     private static DocumentReader ImportAndReparse(DocumentReader reader, DocumentObject root)

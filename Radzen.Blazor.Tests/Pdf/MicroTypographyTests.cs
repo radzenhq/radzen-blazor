@@ -10,6 +10,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class MicroTypographyTests
@@ -70,7 +71,7 @@ public class MicroTypographyTests
         run.Font.Size = Size;
         run.LetterSpacing = Unit.FromPoint(2);
 
-        var lines = LineBreaker.Break(paragraph, 500, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, 500, fonts);
 
         var plain = fonts.MeasureText("Styled", LineLayoutSupport.FontAt(Size));
         var fragment = Assert.Single(Assert.Single(lines).Fragments);
@@ -106,14 +107,14 @@ public class MicroTypographyTests
     public void Superscript_MeasuresAtReducedSizeAndRaisesAscent()
     {
         var fonts = LineLayoutSupport.Fonts();
-        var plainLine = Assert.Single(LineBreaker.Break(LineLayoutSupport.SingleRun("Styled", Size), 500, fonts));
+        var plainLine = Assert.Single(IsolatedLineBreaker.Break(LineLayoutSupport.SingleRun("Styled", Size), 500, fonts));
 
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Styled");
         run.Font.Family = Family;
         run.Font.Size = Size;
         run.VerticalAlignment = RunVerticalAlignment.Superscript;
-        var line = Assert.Single(LineBreaker.Break(paragraph, 500, fonts));
+        var line = Assert.Single(IsolatedLineBreaker.Break(paragraph, 500, fonts));
 
         var fragment = Assert.Single(line.Fragments);
         Assert.Equal(0.583 * Assert.Single(plainLine.Fragments).Advance, fragment.Advance, 6);

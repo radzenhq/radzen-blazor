@@ -17,22 +17,7 @@ public class StyledFaceRegistrationTests
     private static void RegisterFace(FontCollection fonts, string resource, bool bold, bool italic)
     {
         using var stream = new MemoryStream(PdfTestResources.ReadAllBytes(resource));
-        var styled = typeof(FontCollection).GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == "Register"
-                && m.GetParameters() is { Length: 4 } p
-                && p[0].ParameterType == typeof(string)
-                && p[1].ParameterType == typeof(Stream)
-                && p[2].ParameterType == typeof(bool)
-                && p[3].ParameterType == typeof(bool));
-
-        if (styled != null)
-        {
-            styled.Invoke(fonts, [Family, stream, bold, italic]);
-        }
-        else
-        {
-            fonts.Register(Family, stream);
-        }
+        fonts.Register(Family, stream, bold, italic);
     }
 
     private static void RegisterBoth(FontCollection fonts)

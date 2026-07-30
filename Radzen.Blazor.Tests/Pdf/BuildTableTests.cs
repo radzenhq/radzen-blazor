@@ -53,7 +53,7 @@ public class BuildTableTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
-        var lh = PaginationSupport.LineHeight(document.Fonts, 12);
+        var lh = PaginationSupport.LineHeight(12);
 
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(320), Unit.FromPoint(PaginationSupport.HeightForLines(lh, 5)));

@@ -4,6 +4,7 @@ using Xunit;
 
 using Radzen.Documents;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Documents.Tests;
 
 public class RepeatingHeaderTests
@@ -12,7 +13,7 @@ public class RepeatingHeaderTests
     public void SingleHeader_RepeatsOnEveryFragment()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 12);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -29,7 +30,7 @@ public class RepeatingHeaderTests
     public void MultipleHeaderRows_AllRepeatInOrder()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 2, bodies: 8);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -53,7 +54,7 @@ public class RepeatingHeaderTests
     public void MoreHeaderRows_ReduceBodyCapacity()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var available = TablePaginationSupport.Capacity(lh, 5);
 
         var oneHeader = TablePaginationSupport.Build(headers: 1, bodies: 20);
@@ -73,7 +74,7 @@ public class RepeatingHeaderTests
     public void HeaderHeight_CountedInEveryFragmentHeight()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 2, bodies: 8);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -90,7 +91,7 @@ public class RepeatingHeaderTests
     public void BorderResolution_BottomAtFragmentEnd_HeaderRedrawnAtNextTop()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -116,7 +117,7 @@ public class RepeatingHeaderTests
     public void HeaderRows_IdenticalSourceAcrossAllFragments()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 2, bodies: 15);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -136,7 +137,7 @@ public class RepeatingHeaderTests
     public void SingleFragment_HeaderPresentButNotRepeated()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 2, bodies: 2);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 

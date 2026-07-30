@@ -7,6 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ForcedLineBreakTests
@@ -19,7 +20,7 @@ public class ForcedLineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Alpha\nBeta");
 
-        var lines = LineBreaker.Break(paragraph, Wide, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, Wide, fonts);
 
         Assert.Equal(2, lines.Count);
         Assert.Equal("Alpha", string.Concat(lines[0].Fragments.Select(f => f.Text)));
@@ -32,7 +33,7 @@ public class ForcedLineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Alpha\r\nBeta");
 
-        var lines = LineBreaker.Break(paragraph, Wide, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, Wide, fonts);
 
         Assert.Equal(2, lines.Count);
         foreach (var fragment in lines.SelectMany(l => l.Fragments))
@@ -48,7 +49,7 @@ public class ForcedLineBreakTests
         var fonts = LineLayoutSupport.Fonts();
         var paragraph = LineLayoutSupport.SingleRun("Alpha\tBeta");
 
-        var lines = LineBreaker.Break(paragraph, Wide, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, Wide, fonts);
 
         Assert.Single(lines);
         var texts = lines[0].Fragments.Select(f => f.Text).ToList();
@@ -62,7 +63,7 @@ public class ForcedLineBreakTests
         var paragraph = LineLayoutSupport.SingleRun("Alpha\tBeta", size: 12);
         var alpha = LineLayoutSupport.WordWidth(fonts, "Alpha", 12);
 
-        var lines = LineBreaker.Break(paragraph, alpha + 1.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, alpha + 1.0, fonts);
 
         Assert.Equal(2, lines.Count);
     }
@@ -74,7 +75,7 @@ public class ForcedLineBreakTests
         var paragraph = LineLayoutSupport.SingleRun("Alpha\u00A0Beta", size: 12);
         var alpha = LineLayoutSupport.WordWidth(fonts, "Alpha", 12);
 
-        var lines = LineBreaker.Break(paragraph, alpha + 1.0, fonts);
+        var lines = IsolatedLineBreaker.Break(paragraph, alpha + 1.0, fonts);
 
         Assert.Single(lines);
     }

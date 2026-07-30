@@ -239,4 +239,52 @@ public class TableOfContentsTests
         var exception = Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().Render(document));
         Assert.Contains("'nowhere'", exception.Message, StringComparison.Ordinal);
     }
+
+    private static Document WideEntryDocument(int pagesBeforeTheAnchor)
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(120), Unit.FromPoint(60));
+        section.Margins.SetAll(Unit.FromPoint(5));
+        section.Blocks.AddTableOfContents().AddEntry(new string('W', 24), "target");
+
+        for (var page = 0; page < pagesBeforeTheAnchor; page++)
+        {
+            section.Blocks.AddPageBreak();
+        }
+
+        var heading = new Paragraph();
+        heading.Inlines.Add("H").Anchor = "target";
+        section.Blocks.Add(heading);
+
+        return document;
+    }
+
+    [Theory]
+    [InlineData(8)]
+    [InlineData(98)]
+    [InlineData(998)]
+    [InlineData(9998)]
+    public void TocEntryLineCount_IsIndependentOfTheResolvedPageNumberWidth(int pagesBeforeTheAnchor)
+    {
+        var baseline = Radzen.Documents.Layout.DocumentLayouter.Layout(WideEntryDocument(8));
+        var wide = Radzen.Documents.Layout.DocumentLayouter.Layout(WideEntryDocument(pagesBeforeTheAnchor));
+
+        Assert.Equal(baseline.Pages[0].Body.Lines.Length, wide.Pages[0].Body.Lines.Length);
+    }
+
+    [Theory]
+    [InlineData(8)]
+    [InlineData(998)]
+    [InlineData(10998)]
+    public void TocPageNumbers_SettleWithinThreePassesAtEveryDigitWidth(int pagesBeforeTheAnchor)
+    {
+        var laidOut = Radzen.Documents.Layout.DocumentLayouter.Layout(WideEntryDocument(pagesBeforeTheAnchor));
+        var number = (pagesBeforeTheAnchor + 1).ToString(CultureInfo.InvariantCulture);
+
+        Assert.Equal(pagesBeforeTheAnchor + 1, laidOut.Pages.Length);
+        Assert.Contains(
+            laidOut.Pages[0].Body.Lines,
+            line => string.Concat(line.Line.Fragments.Select(fragment => fragment.Text)).EndsWith(number, StringComparison.Ordinal));
+    }
 }

@@ -12,15 +12,13 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class InlineImageEiBoundaryTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     [Fact]
     public void Tokenize_EiWithoutPrecedingWhitespace_ResumesAtFollowingOperator()
     {
         var bytes = new List<byte>();
-        bytes.AddRange(Ascii("q BI /W 1 /H 1 /CS /G /BPC 8 ID "));
+        bytes.AddRange(TestBytes.Ascii("q BI /W 1 /H 1 /CS /G /BPC 8 ID "));
         bytes.AddRange([0x2A, (byte)'E', (byte)'I']);
-        bytes.AddRange(Ascii("\nQ\n"));
+        bytes.AddRange(TestBytes.Ascii("\nQ\n"));
 
         var operators = ContentTokenizer.Tokenize([.. bytes])
             .Where(t => t.Kind == ContentTokenizer.TokenKind.Operator)

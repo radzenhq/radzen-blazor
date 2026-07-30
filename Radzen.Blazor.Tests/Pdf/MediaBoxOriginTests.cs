@@ -9,21 +9,6 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class MediaBoxOriginTests
 {
-    private static byte[] Wrap(FixturePdf pdf, int count)
-    {
-        var xref = pdf.Position;
-        pdf.Append("xref\n0 " + count + "\n");
-        pdf.Append(FixturePdf.Entry20(0, 65535, 'f'));
-        for (var number = 1; number < count; number++)
-        {
-            pdf.Append(FixturePdf.Entry20(pdf.OffsetOf(number)));
-        }
-
-        pdf.Append("trailer\n<< /Size " + count + " /Root 1 0 R >>\n");
-        pdf.Append("startxref\n" + xref + "\n%%EOF\n");
-        return pdf.ToArray();
-    }
-
     private static byte[] OnePageWithBox(string box)
     {
         var pdf = new FixturePdf()
@@ -32,7 +17,7 @@ public class MediaBoxOriginTests
             .Object(2, "2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n")
             .Object(3, "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox " + box + " /Contents 4 0 R >>\nendobj\n")
             .Object(4, "4 0 obj\n<< /Length 12 >>\nstream\n0 0 10 10 re\nendstream\nendobj\n");
-        return Wrap(pdf, 5);
+        return FixturePdf.Wrap(pdf, 5);
     }
 
     private static PortableDocument Load(byte[] bytes)
@@ -68,7 +53,7 @@ public class MediaBoxOriginTests
             .Object(4, "4 0 obj\n<< /Length 12 >>\nstream\n0 0 10 10 re\nendstream\nendobj\n")
             .Object(5, "5 0 obj\n612\nendobj\n")
             .Object(6, "6 0 obj\n792\nendobj\n");
-        var loaded = Load(Wrap(pdf, 7));
+        var loaded = Load(FixturePdf.Wrap(pdf, 7));
 
         Assert.Equal(612, loaded.Pages[0].Width.Point, 0.01);
         Assert.Equal(792, loaded.Pages[0].Height.Point, 0.01);

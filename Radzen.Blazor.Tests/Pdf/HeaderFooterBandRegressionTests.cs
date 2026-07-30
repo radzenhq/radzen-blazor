@@ -11,6 +11,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class HeaderFooterBandRegressionTests
@@ -27,7 +28,7 @@ public class HeaderFooterBandRegressionTests
         var paragraph = new Paragraph();
         var run = paragraph.Inlines.Add("Xg");
         run.Font.Size = size;
-        var box = LineBreaker.Break(paragraph, 100000, new FontCollection())[0];
+        var box = IsolatedLineBreaker.Break(paragraph, 100000, new FontCollection())[0];
         return (box.Height, box.Baseline);
     }
 

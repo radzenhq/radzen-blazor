@@ -11,6 +11,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
+using Radzen.Blazor.Tests.Isolated;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContainerOverlayRotationTests
@@ -31,7 +32,7 @@ public class ContainerOverlayRotationTests
         var tallText = container.Blocks.Add(PaginationSupport.Text("Tall child that wraps onto multiple lines because the box is only four hundred points wide and this text is long"));
 
         var capture = new LayoutCaptureContext();
-        var pages = Paginator.PaginateIsolated(section, fonts, capture: capture);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
         var page = Assert.Single(pages);
 
         Assert.Empty(page.Body.Tables);
@@ -103,7 +104,7 @@ public class ContainerOverlayRotationTests
         var inner = outer.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
         inner.Blocks.Add(PaginationSupport.Text("Nested"));
 
-        Assert.Throws<NotSupportedException>(() => Paginator.PaginateIsolated(section, fonts));
+        Assert.Throws<NotSupportedException>(() => IsolatedPaginator.PaginateIsolated(section, fonts));
     }
 
 
@@ -119,7 +120,7 @@ public class ContainerOverlayRotationTests
         });
         container.Blocks.Add(PaginationSupport.Text("Tilted"));
 
-        var pages = Paginator.PaginateIsolated(section, fonts);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
         var page = Assert.Single(pages);
 
         Assert.Empty(page.Body.Tables);

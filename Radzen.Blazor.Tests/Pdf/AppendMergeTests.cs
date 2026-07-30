@@ -12,22 +12,20 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class AppendMergeTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static PortableDocument BuildA()
     {
         var a = new PortableDocument();
-        a.Pages.Add().SetContent(Ascii("A0-content"));
-        a.Pages.Add().SetContent(Ascii("shared-bytes"));
+        a.Pages.Add().SetContent(TestBytes.Ascii("A0-content"));
+        a.Pages.Add().SetContent(TestBytes.Ascii("shared-bytes"));
         return a;
     }
 
     private static PortableDocument BuildB()
     {
         var b = new PortableDocument();
-        b.Pages.Add().SetContent(Ascii("B0-content"));
-        b.Pages.Add().SetContent(Ascii("shared-bytes"));
-        b.Pages.Add().SetContent(Ascii("B2-content"));
+        b.Pages.Add().SetContent(TestBytes.Ascii("B0-content"));
+        b.Pages.Add().SetContent(TestBytes.Ascii("shared-bytes"));
+        b.Pages.Add().SetContent(TestBytes.Ascii("B2-content"));
         return b;
     }
 
@@ -43,11 +41,11 @@ public class AppendMergeTests
         Assert.Equal(5, DocumentLoadTests.PageCount(reader));
         Assert.Equal(5, DocumentLoadTests.Kids(reader).Count);
 
-        Assert.Equal(Ascii("A0-content"), DocumentLoadTests.KidContent(reader, 0));
-        Assert.Equal(Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 1));
-        Assert.Equal(Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
-        Assert.Equal(Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 3));
-        Assert.Equal(Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 4));
+        Assert.Equal(TestBytes.Ascii("A0-content"), DocumentLoadTests.KidContent(reader, 0));
+        Assert.Equal(TestBytes.Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 1));
+        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
+        Assert.Equal(TestBytes.Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 3));
+        Assert.Equal(TestBytes.Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 4));
     }
 
     [Fact]
@@ -107,8 +105,8 @@ public class AppendMergeTests
 
         var reader = DocumentReader.Parse(b.ToArray());
         Assert.Equal(3, DocumentLoadTests.PageCount(reader));
-        Assert.Equal(Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 0));
-        Assert.Equal(Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 2));
+        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 0));
+        Assert.Equal(TestBytes.Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 2));
     }
 
     [Fact]
@@ -118,10 +116,10 @@ public class AppendMergeTests
         var b = BuildB();
         a.Append(b);
 
-        b.Pages[0].SetContent(Ascii("mutated-after-append"));
+        b.Pages[0].SetContent(TestBytes.Ascii("mutated-after-append"));
 
         var reader = DocumentReader.Parse(a.ToArray());
-        Assert.Equal(Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
+        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
     }
 
     [Fact]
@@ -170,7 +168,7 @@ public class AppendMergeTests
     {
         var source = new PortableDocument();
         var page = source.Pages.Add();
-        page.SetContent(Ascii("edited source content"));
+        page.SetContent(TestBytes.Ascii("edited source content"));
         page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(10, 20, 30, 40)) { TargetPageIndex = 1 });
         page.Annotations.Add(new LinkAnnotation(PdfRect.FromSize(50, 20, 30, 40)) { Uri = new System.Uri("https://example.com/") });
         source.Pages.Add();
@@ -242,7 +240,7 @@ public class AppendMergeTests
 
     private static byte[] UnrebuildableAnnotationsPdf()
     {
-        var body = Ascii("BT /F1 12 Tf 72 700 Td (hi) Tj ET");
+        var body = TestBytes.Ascii("BT /F1 12 Tf 72 700 Td (hi) Tj ET");
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
         pdf.Object(2, "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj\n");

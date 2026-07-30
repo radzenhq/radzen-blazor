@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class TablePaginationTests
 {
@@ -14,7 +15,7 @@ public class TablePaginationTests
     public void UniformRows_AllHaveLineHeight()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -26,7 +27,7 @@ public class TablePaginationTests
     public void TallerThanPage_SplitsIntoThreeFragments()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -43,7 +44,7 @@ public class TablePaginationTests
     public void EveryFragmentStartsWithTheHeaderRow()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -62,7 +63,7 @@ public class TablePaginationTests
     public void NoRowIsSplitMidRow()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -82,7 +83,7 @@ public class TablePaginationTests
     public void BodyRows_CoveredExactlyOnceInOrder()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -96,7 +97,7 @@ public class TablePaginationTests
     public void FragmentGeometry_IsContiguousFromZero()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -120,7 +121,7 @@ public class TablePaginationTests
     public void FirstTwoFragments_FillToCapacity()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
         var available = TablePaginationSupport.Capacity(lh, 5);
@@ -138,7 +139,7 @@ public class TablePaginationTests
     public void LargeTable_ForcesManyFragments()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 100);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -157,7 +158,7 @@ public class TablePaginationTests
     public void NoHeader_PlainRowSplit()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 0, bodies: 10);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -175,7 +176,7 @@ public class TablePaginationTests
     public void SmallTable_FitsInSingleFragment()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 3);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 
@@ -192,7 +193,7 @@ public class TablePaginationTests
     public void OversizedRow_MovesWhole_ToOwnFragment()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
 
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(300));
@@ -226,7 +227,7 @@ public class TablePaginationTests
     public void RowThatDoesNotFit_StartsNextFragment_NeverSplits()
     {
         var fonts = TablePaginationSupport.Fonts();
-        var lh = TablePaginationSupport.LineHeight(fonts);
+        var lh = TablePaginationSupport.LineHeight();
         var table = TablePaginationSupport.Build(headers: 1, bodies: 5);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts);
 

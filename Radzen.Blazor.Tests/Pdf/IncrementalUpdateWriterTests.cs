@@ -12,14 +12,12 @@ namespace Radzen.Blazor.Pdf.Tests;
 // ISO 32000-1 7.5.6: the original bytes stay a byte-for-byte prefix; appended objects chain a new xref section via /Prev.
 public class IncrementalUpdateWriterTests
 {
-    private static byte[] Ascii(string text) => Encoding.ASCII.GetBytes(text);
-
     private static byte[] BuildClassicDocument()
     {
         var document = new PortableDocument();
         document.Info.Title = "Incremental";
-        document.Pages.Add(PageSizes.A4).SetContent(Ascii("BT (page zero) Tj ET"));
-        document.Pages.Add(PageSizes.Letter).SetContent(Ascii("BT (page one) Tj ET"));
+        document.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (page zero) Tj ET"));
+        document.Pages.Add(PageSizes.Letter).SetContent(TestBytes.Ascii("BT (page one) Tj ET"));
         return document.ToArray();
     }
 
@@ -30,7 +28,7 @@ public class IncrementalUpdateWriterTests
 
         var catalog = new DictionaryObject { ["Type"] = new NameObject("Catalog") };
         var pages = new DictionaryObject { ["Type"] = new NameObject("Pages"), ["Count"] = new NumberObject(1) };
-        var content = new StreamObject(Ascii("BT (compressed page) Tj ET"));
+        var content = new StreamObject(TestBytes.Ascii("BT (compressed page) Tj ET"));
 
         var catalogRef = writer.Add(catalog);
         var pagesRef = writer.Add(pages);

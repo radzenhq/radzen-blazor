@@ -10,6 +10,7 @@ using Xunit;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class TableLayoutTests
 {
@@ -43,7 +44,7 @@ public class TableLayoutTests
     public void Grid2x2_FixedColumns_CellRectangles()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(100));
         table.Columns.Add(Unit.FromPoint(150));
@@ -73,7 +74,7 @@ public class TableLayoutTests
     public void Padding_InsetsContentBox_AndShiftsContent()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
@@ -93,7 +94,7 @@ public class TableLayoutTests
     public void RowHeight_IsMaxCellContentHeightPlusPadding()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         const double Pad = 4;
         var space = TableLayoutSupport.Measure(fonts, " ", 12);
         var wHello = TableLayoutSupport.Measure(fonts, "Hello", 12);
@@ -145,7 +146,7 @@ public class TableLayoutTests
     public void VerticalAlignment_OffsetsContentWithinRow(VerticalAlignment valign, double factor)
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var space = TableLayoutSupport.Measure(fonts, " ", 12);
         var widest = new[] { "Hello", "World", "Again" }
             .Select(w => TableLayoutSupport.Measure(fonts, w, 12)).Max();
@@ -239,7 +240,7 @@ public class TableLayoutTests
     public void PerEdgePadding_InsetsContentBoxByEachEdge()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];
@@ -262,7 +263,7 @@ public class TableLayoutTests
     public void PerEdgePadding_UnsetEdgeFallsBackToUniformPadding()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(200));
         var cell = table.Rows.Add().Cells[0];

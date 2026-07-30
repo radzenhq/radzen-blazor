@@ -7,6 +7,7 @@ using Radzen.Documents.Layout;
 namespace Radzen.Blazor.Documents.Tests;
 
 using Radzen.Blazor.Pdf.Tests;
+using Radzen.Blazor.Tests.Isolated;
 
 public class FirstTableFragmentRowspanTests
 {
@@ -41,7 +42,7 @@ public class FirstTableFragmentRowspanTests
     public void FirstTableFragment_FlushesWhenRowspanGroupExceedsRemainingSpace()
     {
         var fonts = TableLayoutSupport.Fonts();
-        var lh = TableLayoutSupport.LineHeight(fonts);
+        var lh = TableLayoutSupport.LineHeight();
 
         var section = PaginationSupport.Section(400, PaginationSupport.HeightForLines(lh, 6));
         for (var i = 0; i < 4; i++)

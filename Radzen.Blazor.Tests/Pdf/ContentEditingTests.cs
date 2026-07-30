@@ -426,4 +426,48 @@ public class ContentEditingTests
         Assert.DoesNotContain("B", text);
         Assert.Equal("AAA", text.Replace(" ", string.Empty, StringComparison.Ordinal));
     }
+
+    [Fact]
+    public void ReplaceText_FailIfWider_ThrowsWhenTheReplacementIsWider()
+    {
+        var loaded = LoadedSimpleWidthDocument();
+        var options = new ReplaceTextOptions { Layout = TextReplacementLayout.FailIfWider };
+
+        var error = Assert.Throws<InvalidOperationException>(() => loaded.ReplaceText("A", "B", options));
+
+        Assert.Contains("wider", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReplaceText_FailIfWider_AcceptsANarrowerReplacement()
+    {
+        var loaded = LoadedSimpleWidthDocument();
+        var options = new ReplaceTextOptions { Layout = TextReplacementLayout.FailIfWider };
+
+        var count = loaded.ReplaceText("B", "A", options);
+        var reloaded = InterpreterTestSupport.Load(loaded.ToArray());
+
+        Assert.Equal(1, count);
+        Assert.Contains("AA", reloaded.ExtractText(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ReplaceText_AllowAdvance_MovesTheFollowingRunInsteadOfCompensating()
+    {
+        var loaded = LoadedSimpleWidthDocument();
+        var before = loaded.Pages[0].ExtractPositionedText().Single(run => run.Text == "Z").Bounds.Left;
+        var options = new ReplaceTextOptions { Layout = TextReplacementLayout.AllowAdvance };
+
+        var count = loaded.ReplaceText("A", "B", options);
+        var saved = loaded.ToArray();
+        var reloaded = InterpreterTestSupport.Load(saved);
+        var after = reloaded.Pages[0].ExtractPositionedText().Single(run => run.Text == "Z").Bounds.Left;
+
+        Assert.Equal(1, count);
+        Assert.True(after > before, "AllowAdvance lets the wider replacement push the following run to the right");
+        Assert.DoesNotContain(
+            "TJ",
+            Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(saved, 0)),
+            StringComparison.Ordinal);
+    }
 }
