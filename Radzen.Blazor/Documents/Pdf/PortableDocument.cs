@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Radzen.Documents.Pdf.Emission;
-using Radzen.Documents.Pdf.Render;
-using Radzen.Documents.Pdf.Write;
-using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.Internal;
+using Radzen.Documents.LaidOut;
+using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Signing;
+using Radzen.Documents.Pdf.Write;
 namespace Radzen.Documents.Pdf;
 
 

@@ -1,6 +1,6 @@
 using System;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 

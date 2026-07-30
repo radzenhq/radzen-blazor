@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal abstract class WriteOnlyStream : Stream
 {

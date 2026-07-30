@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal static class Fnv1a64
 {

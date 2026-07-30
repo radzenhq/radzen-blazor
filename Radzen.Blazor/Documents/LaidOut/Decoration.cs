@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal readonly struct TableDecoration
 {

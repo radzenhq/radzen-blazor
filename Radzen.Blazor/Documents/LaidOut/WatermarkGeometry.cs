@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal static class WatermarkGeometry
 {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Xunit;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
-using Radzen.Documents.Fonts;
-using Radzen.Documents.Geometry;
+using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

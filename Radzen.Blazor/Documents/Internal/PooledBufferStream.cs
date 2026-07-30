@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal sealed class PooledBufferStream(int initialCapacity = 4 * 1024) : WriteOnlyStream
 {

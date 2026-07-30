@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using Radzen.Documents.Fonts.Sfnt;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal readonly record struct FontPaint(
     string Family,

@@ -1,10 +1,10 @@
-using System;
 using System.Collections.Generic;
+using System;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Fonts;
-using Radzen.Documents.Fonts.Sfnt;
-using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 

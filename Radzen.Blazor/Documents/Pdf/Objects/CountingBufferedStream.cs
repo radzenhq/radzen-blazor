@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf.Objects;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Xunit;
 

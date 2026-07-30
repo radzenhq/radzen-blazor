@@ -1,3 +1,4 @@
+using Radzen.Documents.Internal;
 namespace Radzen.Documents.Pdf;
 
 /// <summary>

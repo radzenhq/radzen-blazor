@@ -1,6 +1,6 @@
 using Radzen.Documents.Fonts;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal readonly struct LaidOutWatermarkText
 {

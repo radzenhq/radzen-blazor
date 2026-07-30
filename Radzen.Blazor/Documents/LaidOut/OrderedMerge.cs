@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.LaidOut;
 
 internal static class OrderedMerge
 {

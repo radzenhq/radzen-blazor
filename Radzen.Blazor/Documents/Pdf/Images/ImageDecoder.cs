@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf;
 

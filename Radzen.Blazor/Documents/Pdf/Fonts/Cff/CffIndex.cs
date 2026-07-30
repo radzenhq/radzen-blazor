@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Radzen.Documents.Internal;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Fonts.Cff;

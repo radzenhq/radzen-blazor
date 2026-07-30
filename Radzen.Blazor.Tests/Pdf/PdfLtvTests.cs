@@ -3,11 +3,12 @@ using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Radzen.Documents.Pdf;
+using Radzen.Documents.Internal;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
-using Xunit;
+using Radzen.Documents.Pdf;
 using Radzen.Documents;
+using Xunit;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

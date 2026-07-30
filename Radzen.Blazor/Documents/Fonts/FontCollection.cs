@@ -1,11 +1,12 @@
-using Radzen.Documents.Fonts.Sfnt;
-using System;
-using System.Collections.Immutable;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Radzen.Documents.Geometry;
+using System;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Internal;
+using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Fonts;
 

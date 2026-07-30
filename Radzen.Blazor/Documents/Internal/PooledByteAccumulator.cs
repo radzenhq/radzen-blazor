@@ -1,7 +1,7 @@
 using System;
 using System.Buffers;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal sealed class PooledByteAccumulator(int initialCapacity)
 {

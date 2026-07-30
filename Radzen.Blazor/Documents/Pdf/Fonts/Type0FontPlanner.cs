@@ -1,5 +1,6 @@
-using Radzen.Documents.Fonts;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Internal;
 using Radzen.Documents.Pdf.Emission;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Objects;

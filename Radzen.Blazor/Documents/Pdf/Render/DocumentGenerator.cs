@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Emission;
-using Radzen.Documents.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 

@@ -2,7 +2,7 @@ using System;
 using System.Buffers.Binary;
 using System.IO;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Internal;
 
 internal static class BigEndian
 {
