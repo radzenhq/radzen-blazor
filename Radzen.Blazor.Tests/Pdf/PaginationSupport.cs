@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;

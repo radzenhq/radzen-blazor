@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Geometry;

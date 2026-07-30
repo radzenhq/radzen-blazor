@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;

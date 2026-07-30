@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Immutable;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 namespace Radzen.Documents.Pdf.Content;
 
 internal readonly struct TextShowOp

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 namespace Radzen.Blazor.Pdf.Tests;
 

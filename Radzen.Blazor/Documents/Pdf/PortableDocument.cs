@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Write;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Fonts;

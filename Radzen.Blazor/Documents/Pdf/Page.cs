@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Pdf.Write;
 namespace Radzen.Documents.Pdf;
 
 

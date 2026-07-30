@@ -10,7 +10,7 @@ using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Xunit;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Geometry;

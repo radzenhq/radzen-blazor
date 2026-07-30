@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Emit;
+using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 
