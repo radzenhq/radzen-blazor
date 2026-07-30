@@ -35,4 +35,11 @@ public sealed class Column
 
     /// <summary>Gets or sets the horizontal content alignment, or <see langword="null"/> to inherit.</summary>
     public HorizontalAlignment? Alignment { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the column's cells are header cells describing the
+    /// rows beside them, announced as such by assistive technology. A cell that is in both a header
+    /// column and a header row - see <see cref="Row.IsHeaderRow"/> - heads both its row and its column.
+    /// </summary>
+    public bool IsHeaderColumn { get; set; }
 }

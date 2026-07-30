@@ -72,6 +72,34 @@ internal static class StructureWriter
             _ => null,
         };
 
+    // ISO 32000-1 Table 349: RowSpan and ColSpan default to 1 and are written only when the cell spans further.
+    private static DictionaryObject? TableAttributes(StructureElement element)
+    {
+        var scope = ScopeName(element.HeaderScope);
+        if (scope is null && element.RowSpan <= 1 && element.ColumnSpan <= 1)
+        {
+            return null;
+        }
+
+        var attributes = new DictionaryObject { ["O"] = new NameObject("Table") };
+        if (scope is { } name)
+        {
+            attributes["Scope"] = new NameObject(name);
+        }
+
+        if (element.RowSpan > 1)
+        {
+            attributes["RowSpan"] = new NumberObject(element.RowSpan);
+        }
+
+        if (element.ColumnSpan > 1)
+        {
+            attributes["ColSpan"] = new NumberObject(element.ColumnSpan);
+        }
+
+        return attributes;
+    }
+
     private static ReferenceObject WriteStructureElement(
         DocumentWriter writer,
         StructureElement element,
@@ -97,13 +125,9 @@ internal static class StructureWriter
             dictionary["ActualText"] = StringObject.FromText(actualText);
         }
 
-        if (ScopeName(element.HeaderScope) is { } scope)
+        if (TableAttributes(element) is { } attributes)
         {
-            dictionary["A"] = new DictionaryObject
-            {
-                ["O"] = new NameObject("Table"),
-                ["Scope"] = new NameObject(scope),
-            };
+            dictionary["A"] = attributes;
         }
 
         var reference = writer.Add(dictionary);

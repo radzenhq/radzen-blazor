@@ -87,7 +87,7 @@ public class SemanticIntentCaptureTests
         var nodes = structure.Nodes;
         var navigation = Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.Navigation));
 
-        Assert.Equal(SemanticStructureVisibility.WhenTagged, navigation.Visibility);
+        Assert.Equal(SemanticStructureTier.Structural, navigation.Tier);
         Assert.Equal(toc.Entries.Count, navigation.Children.Length);
         Assert.All(navigation.Children, child =>
         {
@@ -181,6 +181,101 @@ public class SemanticIntentCaptureTests
         Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
     }
 
+    private static SemanticStructureNode SingleFigure(Document document)
+    {
+        var nodes = DocumentLayouter.Layout(document).Semantics.Structure.Nodes;
+        return Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.Figure));
+    }
+
+    [Fact]
+    public void QrCodeWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Code";
+        BuildTestSupport.RegisterLatin(document);
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+
+        var figure = SingleFigure(document);
+
+        Assert.True(figure.IsDecorative);
+        Assert.Null(figure.AlternateText);
+    }
+
+    [Fact]
+    public void QrCodeWithAlternateText_IsCapturedAsAMeaningfulFigure()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Code";
+        BuildTestSupport.RegisterLatin(document);
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "Scan for details";
+
+        var figure = SingleFigure(document);
+
+        Assert.False(figure.IsDecorative);
+        Assert.Equal("Scan for details", figure.AlternateText);
+    }
+
+    [Fact]
+    public void BarcodeWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Code";
+        BuildTestSupport.RegisterLatin(document);
+        document.Sections.Add().Blocks.AddBarcode(
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+
+        Assert.True(SingleFigure(document).IsDecorative);
+    }
+
+    [Fact]
+    public void InlineImageWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Inline";
+        BuildTestSupport.RegisterLatin(document);
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        Assert.True(SingleFigure(document).IsDecorative);
+    }
+
+    [Fact]
+    public void DecorativeQrCode_IsDrawnAsArtifactContent()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Code";
+        BuildTestSupport.RegisterLatin(document);
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+
+        var reader = BuildTestSupport.Read(document, Accessible());
+
+        Assert.All(FillTags(reader), tag => Assert.Equal("Artifact", tag));
+    }
+
+    private static List<string> FillTags(DocumentReader reader)
+    {
+        var stack = new List<string>();
+        var tags = new List<string>();
+        foreach (var operation in ContentStreamTokenizer.Parse(ContentTestHelpers.PageContent(reader, 0)))
+        {
+            switch (operation.Operator)
+            {
+                case "BDC" or "BMC":
+                    stack.Add(operation.Operands.Count > 0 ? operation.Operands[0].Text : "");
+                    break;
+                case "EMC":
+                    stack.RemoveAt(stack.Count - 1);
+                    break;
+                case "f":
+                    tags.Add(stack.Count > 0 ? stack[^1] : "");
+                    break;
+            }
+        }
+
+        return tags;
+    }
+
     [Fact]
     public void BarcodeWithAlternateText_IsAMeaningfulFigure()
     {
@@ -236,6 +331,33 @@ public class SemanticIntentCaptureTests
         paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
         Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
+    }
+
+    [Fact]
+    public void Container_GroupsItsBlocksUnderADivWhenTagged()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Boxed";
+        BuildTestSupport.RegisterLatin(document);
+        var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
+        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+
+        var root = TaggedStructureProbe.Root(BuildTestSupport.Read(document, Accessible()));
+        var div = TaggedStructureProbe.Single(root, "Div");
+
+        Assert.Equal("P", Assert.Single(div.Children).Type);
+    }
+
+    [Fact]
+    public void Container_AddsNoGroupingToUntaggedOutput()
+    {
+        var document = new Document();
+        document.Info.Title = "Boxed";
+        BuildTestSupport.RegisterLatin(document);
+        var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
+        container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
+
+        Assert.DoesNotContain("Div", Types(BuildTestSupport.Read(document, new DocumentRenderer())));
     }
 
     private static Table SpanningTable(Document document, bool repeat, bool header)
