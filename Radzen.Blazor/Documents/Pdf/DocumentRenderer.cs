@@ -134,6 +134,23 @@ public sealed class DocumentRenderer
     public bool AllowUnsupportedCharacters { get; set; }
 
     /// <summary>
+    /// Gets or sets whether a registered font whose OS/2 fsType marks it as Restricted License
+    /// Embedding may still be embedded. Defaults to <see langword="false"/>, so rendering a
+    /// document that registers such a font throws unless the caller explicitly opts in.
+    /// Captured into the produced document at <see cref="Render(Document)"/>.
+    /// </summary>
+    public bool AllowRestrictedEmbedding { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a registered font that would render degraded - a variable font
+    /// (embedded only at its default instance) or a color font (COLR/sbix/SVG, rendered
+    /// monochrome) - may still be embedded. Defaults to <see langword="false"/>, so rendering
+    /// fails loudly rather than silently producing wrong output. Captured into the produced
+    /// document at <see cref="Render(Document)"/>.
+    /// </summary>
+    public bool AllowDegradedFonts { get; set; }
+
+    /// <summary>
     /// Gets or sets the image decoders this renderer decodes and measures images with. Seeded from
     /// <see cref="ImageDecoders.Default"/>, so a decoder registered with
     /// <see cref="ImageDecoder.Register(IImageDecoder)"/> before this renderer was created is
@@ -156,7 +173,7 @@ public sealed class DocumentRenderer
 
         var output = DocumentGenerator.Generate(
             RenderRequest.From(this),
-            Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes, AllowUnsupportedCharacters));
+            Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes));
         output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
         return output;
     }

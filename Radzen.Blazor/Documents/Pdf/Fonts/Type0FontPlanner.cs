@@ -1,7 +1,7 @@
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Internal;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Radzen.Documents.Pdf.Objects;
 using System;
@@ -15,7 +15,7 @@ namespace Radzen.Documents.Pdf.Fonts;
 // Type0/CID font subset and descriptor metrics per ISO 32000-1 9.7.
 internal static class Type0FontPlanner
 {
-    public static EmissionFontProgram Plan(
+    public static OutputFontProgram Plan(
         SfntFont font,
         IReadOnlyDictionary<ushort, int> gidToUnicode,
         IReadOnlyDictionary<ushort, ushort>? compactGidMap = null)
@@ -31,7 +31,7 @@ internal static class Type0FontPlanner
         IReadOnlyDictionary<ushort, ushort> gidMap = compactGidMap ?? CompactGidMap.Build(font, usedGids);
         var (kind, file) = font.IsCff ? SubsetCff(font, usedGids) : SubsetGlyf(font, gidMap);
 
-        return new EmissionFontProgram(
+        return new OutputFontProgram(
             kind,
             file,
             BuildFullCidSet(gidMap.Count),
@@ -46,14 +46,14 @@ internal static class Type0FontPlanner
             CapHeight(font, scale));
     }
 
-    private static (EmissionFontFileKind Kind, byte[] File) SubsetGlyf(
+    private static (OutputFontFileKind Kind, byte[] File) SubsetGlyf(
         SfntFont font,
         IReadOnlyDictionary<ushort, ushort> gidMap)
     {
         var subset = GlyfSubsetter.SubsetPooled(font, gidMap, out var subsetLength);
         try
         {
-            return (EmissionFontFileKind.Glyf, subset.AsSpan(0, subsetLength).ToArray());
+            return (OutputFontFileKind.Glyf, subset.AsSpan(0, subsetLength).ToArray());
         }
         finally
         {
@@ -61,7 +61,7 @@ internal static class Type0FontPlanner
         }
     }
 
-    private static (EmissionFontFileKind Kind, byte[] File) SubsetCff(SfntFont font, SortedSet<ushort> usedGids)
+    private static (OutputFontFileKind Kind, byte[] File) SubsetCff(SfntFont font, SortedSet<ushort> usedGids)
     {
         if (!font.TryGetTable("CFF ", out var cffData))
         {
@@ -74,15 +74,15 @@ internal static class Type0FontPlanner
             gids.Add(gid);
         }
 
-        return (EmissionFontFileKind.Cff, CffSubsetter.Subset(CffFont.Parse(cffData), gids));
+        return (OutputFontFileKind.Cff, CffSubsetter.Subset(CffFont.Parse(cffData), gids));
     }
 
-    private static ImmutableArray<EmissionWidthRun> BuildWidths(
+    private static ImmutableArray<OutputWidthRun> BuildWidths(
         SfntFont font,
         SortedSet<ushort> usedGids,
         IReadOnlyDictionary<ushort, ushort> gidMap)
     {
-        var runs = ImmutableArray.CreateBuilder<EmissionWidthRun>();
+        var runs = ImmutableArray.CreateBuilder<OutputWidthRun>();
         List<int>? current = null;
         var cidOfRun = 0;
         var prev = -1;
@@ -100,7 +100,7 @@ internal static class Type0FontPlanner
             {
                 if (current is not null)
                 {
-                    runs.Add(new EmissionWidthRun(cidOfRun, [.. current]));
+                    runs.Add(new OutputWidthRun(cidOfRun, [.. current]));
                 }
 
                 current = [width];
@@ -112,7 +112,7 @@ internal static class Type0FontPlanner
 
         if (current is not null)
         {
-            runs.Add(new EmissionWidthRun(cidOfRun, [.. current]));
+            runs.Add(new OutputWidthRun(cidOfRun, [.. current]));
         }
 
         return runs.ToImmutable();

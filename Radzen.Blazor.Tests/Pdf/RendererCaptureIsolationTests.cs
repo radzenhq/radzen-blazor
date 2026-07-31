@@ -187,6 +187,8 @@ public class RendererCaptureIsolationTests
         (nameof(DocumentRenderer.CompressOutput), static (renderer, _) => renderer.CompressOutput = false),
         (nameof(DocumentRenderer.IncludeDocumentId), static (renderer, _) => renderer.IncludeDocumentId = false),
         (nameof(DocumentRenderer.AllowUnsupportedCharacters), static (renderer, _) => renderer.AllowUnsupportedCharacters = true),
+        (nameof(DocumentRenderer.AllowRestrictedEmbedding), static (renderer, _) => renderer.AllowRestrictedEmbedding = true),
+        (nameof(DocumentRenderer.AllowDegradedFonts), static (renderer, _) => renderer.AllowDegradedFonts = true),
         (nameof(DocumentRenderer.Accessibility), static (renderer, tagged) =>
         {
             if (tagged)
@@ -336,8 +338,6 @@ public class RendererCaptureIsolationTests
         model.Info.Author = "Mutated model author";
         model.Language = "fr";
         model.Fonts.EnableKerning = true;
-        model.Fonts.AllowRestrictedEmbedding = true;
-        model.Fonts.AllowDegradedFonts = true;
         model.Fonts.SetFallback(BuildTestSupport.Latin);
         model.Fonts.Register(
             BuildTestSupport.Latin,

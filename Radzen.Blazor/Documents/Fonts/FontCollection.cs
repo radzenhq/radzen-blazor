@@ -6,7 +6,6 @@ using System.Threading;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Internal;
-using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Fonts;
 
@@ -33,10 +32,7 @@ internal sealed class FontSourceData(byte[] bytes)
 internal readonly record struct FontCollectionSnapshot(
     ImmutableArray<RegisteredFace> Faces,
     ImmutableArray<string> Fallback,
-    bool EnableKerning,
-    bool AllowRestrictedEmbedding,
-    bool AllowDegradedFonts,
-    bool AllowUnsupportedCharacters)
+    bool EnableKerning)
 {
     internal bool HasFamily(string family)
     {
@@ -156,10 +152,6 @@ public sealed class FontCollection
 
     private bool enableKerning;
 
-    private bool allowRestrictedEmbedding;
-
-    private bool allowDegradedFonts;
-
     private sealed class FrozenConfiguration(FontCollectionSnapshot snapshot)
     {
         public FontCollectionSnapshot Snapshot { get; } = snapshot;
@@ -177,30 +169,6 @@ public sealed class FontCollection
     {
         get => enableKerning;
         set => Configure(ref enableKerning, value);
-    }
-
-    /// <summary>
-    /// Gets or sets whether a font whose OS/2 fsType marks it as Restricted License
-    /// Embedding may still be embedded. Defaults to <see langword="false"/>, so
-    /// registering such a font throws unless the caller explicitly opts in.
-    /// </summary>
-    public bool AllowRestrictedEmbedding
-    {
-        get => allowRestrictedEmbedding;
-        set => Configure(ref allowRestrictedEmbedding, value);
-    }
-
-    /// <summary>
-    /// Gets or sets whether a font that would render degraded - a variable font
-    /// (embedded only at its default instance) or a color font (COLR/sbix/SVG,
-    /// rendered monochrome) - may still be registered. Defaults to
-    /// <see langword="false"/>, so registering such a font fails loudly rather
-    /// than silently producing wrong output.
-    /// </summary>
-    public bool AllowDegradedFonts
-    {
-        get => allowDegradedFonts;
-        set => Configure(ref allowDegradedFonts, value);
     }
 
     private void Configure(ref bool field, bool value)
@@ -257,10 +225,6 @@ public sealed class FontCollection
 
         lock (gate)
         {
-            // ISO/IEC 14496-22 OS/2 fsType: Restricted License Embedding forbids embedding the font
-            // without a licence from its foundry.
-            face.EnsureEmbeddable(allowRestrictedEmbedding);
-            face.EnsureRenderable(allowDegradedFonts);
             var key = (family, bold, italic);
             if (!registered.ContainsKey(key))
             {
@@ -895,10 +859,7 @@ public sealed class FontCollection
         return new FontCollectionSnapshot(
             faces.MoveToImmutable(),
             ImmutableArray.CreateRange(fallback),
-            enableKerning,
-            allowRestrictedEmbedding,
-            allowDegradedFonts,
-            AllowUnsupportedCharacters: false);
+            enableKerning);
     }
 
     internal SfntFont? ResolveFace(Font font) => TryResolvePrimary(font, out var face) ? face : null;
