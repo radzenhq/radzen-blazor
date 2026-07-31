@@ -756,7 +756,7 @@ public sealed class PortableDocument
                 FontScope with { Base14ForbiddenBy = null });
         }
 
-        var images = new ImageStore(ImageDecoders);
+        var images = new ImageRegistry(ImageDecoders);
         SourceId? imageSource = null;
         SceneImageData? imageData = null;
         if (watermark.Image is { } image)
@@ -797,7 +797,7 @@ public sealed class PortableDocument
             page.Annotations.RemoveLoadedSubtype("Widget");
         }
 
-        AnnotationFlattener.Flatten(this);
+        AnnotationFlatteningWriter.Flatten(this);
     }
 
     /// <summary>
@@ -819,7 +819,13 @@ public sealed class PortableDocument
     {
         ArgumentNullException.ThrowIfNull(stream);
 
-        new DocumentSaver(this).Save(stream);
+        var graph = (MaterializedGraph ?? new DocumentGraphBuilder(this).Build()).CopyForSerialization();
+        var writer = new DocumentWriter(stream, graph)
+        {
+            Encryption = graph.Encryption,
+            UseCompressedStreams = graph.UseCompressedStreams,
+        };
+        writer.Close();
     }
 
     /// <summary>
@@ -850,7 +856,7 @@ public sealed class PortableDocument
                 + "Use SaveToStream to write a newly built document.");
         }
 
-        new IncrementalDocumentSaver(this).Save(stream);
+        new IncrementalDocumentWriter(this).Save(stream);
     }
 
     /// <summary>

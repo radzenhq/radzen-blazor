@@ -140,8 +140,7 @@ internal sealed class OutputExtGState(
     double fillAlpha,
     double strokeAlpha,
     BlendMode? blend,
-    OutputSoftMask? softMask,
-    bool clearSoftMask)
+    OutputSoftMask? softMask)
 {
     public string Key { get; } = key;
 
@@ -153,7 +152,6 @@ internal sealed class OutputExtGState(
 
     public OutputSoftMask? SoftMask { get; } = softMask;
 
-    public bool ClearSoftMask { get; } = clearSoftMask;
 }
 
 internal sealed class OutputPattern(string key, GradientPaint gradient, Matrix matrix)
@@ -165,30 +163,16 @@ internal sealed class OutputPattern(string key, GradientPaint gradient, Matrix m
     public Matrix Matrix { get; } = matrix;
 }
 
-internal enum OutputSoftMaskType
-{
-    Alpha,
-    Luminosity,
-}
-
 internal sealed class OutputSoftMask(
-    OutputSoftMaskType type,
-    OutputTransparencyGroup group,
-    ImmutableArray<double>? backdrop)
+    OutputTransparencyGroup group)
 {
-    public OutputSoftMaskType Type { get; } = type;
-
     public OutputTransparencyGroup Group { get; } = group;
-
-    public ImmutableArray<double>? Backdrop { get; } = backdrop;
 }
 
 internal sealed class OutputTransparencyGroup(
     byte[] content,
     ImmutableArray<double> boundingBox,
     string? colorSpace,
-    bool? isolated,
-    bool? knockout,
     ImmutableArray<KeyValuePair<string, OutputImagePayload>> xObjects)
 {
     public ReadOnlyMemory<byte> Content { get; } = content;
@@ -196,10 +180,6 @@ internal sealed class OutputTransparencyGroup(
     public ImmutableArray<double> BoundingBox { get; } = boundingBox;
 
     public string? ColorSpace { get; } = colorSpace;
-
-    public bool? Isolated { get; } = isolated;
-
-    public bool? Knockout { get; } = knockout;
 
     public ImmutableArray<KeyValuePair<string, OutputImagePayload>> XObjects { get; } = xObjects;
 }
@@ -217,8 +197,6 @@ internal sealed class StructureElementSnapshot(
     SemanticHeaderScope headerScope,
     int rowSpan,
     int columnSpan,
-    ImmutableArray<StructureElementSnapshot> children,
-    ImmutableArray<(PageOutput Page, int Mcid)> marks,
     ImmutableArray<StructureKidSnapshot> kids)
 {
     public int Id { get; } = id;
@@ -234,10 +212,6 @@ internal sealed class StructureElementSnapshot(
     public int RowSpan { get; } = rowSpan;
 
     public int ColumnSpan { get; } = columnSpan;
-
-    public ImmutableArray<StructureElementSnapshot> Children { get; } = children;
-
-    public ImmutableArray<(PageOutput Page, int Mcid)> Marks { get; } = marks;
 
     public ImmutableArray<StructureKidSnapshot> Kids { get; } = kids;
 }

@@ -49,7 +49,7 @@ internal static class FlowContentPlacer
             Y = y,
             Width = codeSymbolWidth,
             Height = codeSymbolHeight,
-            X = xOffset + HorizontalAlignmentOffset.Of(Paginator.CodeSymbolAlignment(block), width, codeSymbolWidth),
+            X = xOffset + HorizontalAlignmentOffset.Of(CodeSymbolDispatch.Alignment(block), width, codeSymbolWidth),
             Caption = CodeSymbolDispatch.Caption(block, fonts, resolution, capture),
             ZOrder = zOrder,
         };

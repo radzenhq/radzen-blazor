@@ -5,7 +5,7 @@ namespace Radzen.Documents.Pdf.Write;
 
 internal static class FormFieldWriter
 {
-    public static void Emit(FormFieldDefinition definition, FormEmitContext context)
+    public static void Emit(FormFieldDefinition definition, FormWriteContext context)
     {
         if (definition is RadioGroupFieldDefinition radio)
         {
@@ -42,7 +42,7 @@ internal static class FormFieldWriter
     private static void PopulateWidget(
         FormFieldDefinition definition,
         DictionaryObject widget,
-        FormEmitContext context,
+        FormWriteContext context,
         double width,
         double height)
     {
@@ -51,7 +51,7 @@ internal static class FormFieldWriter
             case TextFieldDefinition text:
                 widget["FT"] = new NameObject("Tx");
                 widget["V"] = StringObject.FromText(text.Value);
-                widget["DA"] = new StringObject(context.Appearances.DefaultAppearanceOf(text.Font));
+                widget["DA"] = new StringObject(context.Forms.DefaultAppearanceOf(text.Font));
                 var flags = TextFieldFlags(text);
                 if (flags != 0)
                 {
@@ -67,7 +67,7 @@ internal static class FormFieldWriter
                 {
                     widget["AP"] = new DictionaryObject
                     {
-                        ["N"] = context.Writer.Add(context.Appearances.BuildText(text.Value, width, height, text.Font)),
+                        ["N"] = context.Writer.Add(context.Forms.BuildText(text.Value, width, height, text.Font)),
                     };
                 }
 
@@ -81,8 +81,8 @@ internal static class FormFieldWriter
                 {
                     ["N"] = new DictionaryObject
                     {
-                        ["Yes"] = context.Writer.Add(context.Appearances.BuildCheck(width, height)),
-                        ["Off"] = context.Writer.Add(context.Appearances.BuildOff(width, height)),
+                        ["Yes"] = context.Writer.Add(context.Forms.BuildCheck(width, height)),
+                        ["Off"] = context.Writer.Add(context.Forms.BuildOff(width, height)),
                     },
                 };
                 break;
@@ -101,12 +101,12 @@ internal static class FormFieldWriter
                 }
 
                 widget["V"] = StringObject.FromText(choice.Value);
-                widget["DA"] = new StringObject(context.Appearances.DefaultAppearanceOf(choice.Font));
+                widget["DA"] = new StringObject(context.Forms.DefaultAppearanceOf(choice.Font));
                 if (FieldAppearances.CanBakeSingleLine(choice))
                 {
                     widget["AP"] = new DictionaryObject
                     {
-                        ["N"] = context.Writer.Add(context.Appearances.BuildText(choice.Value, width, height, choice.Font)),
+                        ["N"] = context.Writer.Add(context.Forms.BuildText(choice.Value, width, height, choice.Font)),
                     };
                 }
 
@@ -116,7 +116,7 @@ internal static class FormFieldWriter
         }
     }
 
-    private static void EmitRadioGroup(RadioGroupFieldDefinition radio, FormEmitContext context)
+    private static void EmitRadioGroup(RadioGroupFieldDefinition radio, FormWriteContext context)
     {
         RadioGroupValidation.Validate(radio);
 
@@ -152,8 +152,8 @@ internal static class FormFieldWriter
                 {
                     ["N"] = new DictionaryObject
                     {
-                        [option.Value] = context.Writer.Add(context.Appearances.BuildRadio(width, height, selected: true)),
-                        ["Off"] = context.Writer.Add(context.Appearances.BuildRadio(width, height, selected: false)),
+                        [option.Value] = context.Writer.Add(context.Forms.BuildRadio(width, height, selected: true)),
+                        ["Off"] = context.Writer.Add(context.Forms.BuildRadio(width, height, selected: false)),
                     },
                 },
             };

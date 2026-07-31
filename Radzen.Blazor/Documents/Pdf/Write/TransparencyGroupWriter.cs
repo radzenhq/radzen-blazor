@@ -10,7 +10,7 @@ internal static class TransparencyGroupWriter
     {
         var stream = FlateFilter.EncodeStream(group.Content.Span);
         var dict = stream.Dictionary;
-        FormXObjectShell.ApplyHeader(
+        FormXObjectBuilder.ApplyHeader(
             dict,
             new ArrayObject
             {
@@ -25,16 +25,6 @@ internal static class TransparencyGroupWriter
         if (group.ColorSpace is { } cs)
         {
             groupDict["CS"] = new NameObject(cs);
-        }
-
-        if (group.Isolated is { } isolated)
-        {
-            groupDict["I"] = new BooleanObject(isolated);
-        }
-
-        if (group.Knockout is { } knockout)
-        {
-            groupDict["K"] = new BooleanObject(knockout);
         }
 
         dict["Group"] = groupDict;

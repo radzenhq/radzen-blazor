@@ -11,8 +11,8 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class PdfPaintOrderTests
 {
     [Fact]
-    public void PageContentFinalizer_MatchesThePdfPaintOrderContract()
-        => Assert.Equal(PdfPaintOrder.Phases, PageContentFinalizer.PaintOrder());
+    public void PageWriter_MatchesThePdfPaintOrderContract()
+        => Assert.Equal(PdfPaintOrder.Phases, PageWriter.PaintOrder());
 
     [Fact]
     public void RenderedPage_PaintsFillThenStrokeThenImageThenTextThenWatermark()

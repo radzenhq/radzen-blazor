@@ -27,7 +27,7 @@ internal sealed class AttachmentWriter(PortableDocument document)
             file.Dictionary["Params"] = new DictionaryObject
             {
                 ["Size"] = new NumberObject(attachment.Data.Length),
-                ["ModDate"] = new StringObject(DocumentSaver.PdfDate(attachment.ModificationDate.ToUniversalTime())),
+                ["ModDate"] = new StringObject(DocumentGraphBuilder.PdfDate(attachment.ModificationDate.ToUniversalTime())),
             };
 
             var fileReference = writer.Add(file);

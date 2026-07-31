@@ -46,7 +46,7 @@ public class ConcurrentRenderByteIdentityTests
     }
 
     private static byte[] Render(LaidOutDocument laidOut)
-        => DocumentGenerator.Generate(RenderRequest.From(Renderer()), laidOut).ToArray();
+        => DocumentRenderEngine.Generate(RenderRequest.From(Renderer()), laidOut).ToArray();
 
     [Fact]
     public void RenderingOneLaidOutDocumentOnManyThreads_ProducesBytesIdenticalToASingleThreadedRender()

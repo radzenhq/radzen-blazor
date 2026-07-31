@@ -63,6 +63,4 @@ internal static class Paginator
         context.Finish();
     }
 
-    internal static HorizontalAlignment CodeSymbolAlignment(Block block) => CodeSymbolDispatch.Alignment(block);
-
 }

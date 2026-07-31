@@ -23,9 +23,7 @@ public class ResourceKeyRegistryTests
             Capture)!.Value;
 
     private static OutputSoftMask Mask() => new(
-        OutputSoftMaskType.Luminosity,
-        new OutputTransparencyGroup([], [0, 0, 1, 1], null, null, null, []),
-        null);
+        new OutputTransparencyGroup([], [0, 0, 1, 1], null, []));
 
     [Fact]
     public void PlainAndSoftMaskStates_ShareOneGsCounter()

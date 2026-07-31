@@ -40,7 +40,7 @@ public class RenderedDocumentFacadeInvalidationTests
         Assert.True(loaded.HasPreservableStructureGraph);
         Assert.True(loaded.Loaded!.SourceCatalog!.ContainsKey("MarkInfo"));
 
-        loaded.MaterializedGraph = new DocumentMaterializer(loaded).Materialize();
+        loaded.MaterializedGraph = new DocumentGraphBuilder(loaded).Build();
         return loaded;
     }
 
@@ -263,8 +263,8 @@ public class RenderedDocumentFacadeInvalidationTests
         var laidOut = DocumentLayouter.Layout(model);
         var request = RenderRequest.From(new DocumentRenderer());
 
-        var first = DocumentGenerator.Generate(request, laidOut);
-        var second = DocumentGenerator.Generate(request, laidOut);
+        var first = DocumentRenderEngine.Generate(request, laidOut);
+        var second = DocumentRenderEngine.Generate(request, laidOut);
 
         Assert.NotSame(first, second);
         Assert.Equal(laidOut.Pages.Length, first.Pages.Count);
@@ -281,7 +281,7 @@ public class RenderedDocumentFacadeInvalidationTests
         model.Sections[0].Blocks.Add(paragraph);
         var laidOut = DocumentLayouter.Layout(model);
         var request = RenderRequest.From(new DocumentRenderer());
-        var generated = DocumentGenerator.Generate(request, laidOut);
+        var generated = DocumentRenderEngine.Generate(request, laidOut);
 
         Assert.Equal(generated.ToArray(), generated.ToArray());
     }

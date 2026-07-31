@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Write;
 
-internal sealed class AppendedFormImporter(PortableDocument document, FormAppearanceService appearances)
+internal sealed class AppendedFormImporter(PortableDocument document, FormWriter forms)
 {
     private readonly HashSet<string> usedFieldNames = new(StringComparer.Ordinal);
 
@@ -47,7 +47,7 @@ internal sealed class AppendedFormImporter(PortableDocument document, FormAppear
                 continue;
             }
 
-            appearances.RegisterAppendedDefaults(importer, sourceForm);
+            forms.RegisterAppendedDefaults(importer, sourceForm);
 
             for (var i = 0; i < annots.Count; i++)
             {

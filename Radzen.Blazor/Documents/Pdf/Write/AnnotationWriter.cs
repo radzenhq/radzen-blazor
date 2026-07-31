@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Write;
 
-internal sealed class AnnotationEmitContext
+internal sealed class AnnotationWriteContext
 {
     public required IObjectWriter Writer { get; init; }
 
@@ -41,7 +41,7 @@ internal static class AnnotationWriter
                 continue;
             }
 
-            var context = new AnnotationEmitContext
+            var context = new AnnotationWriteContext
             {
                 Writer = writer,
                 ImportValue = (reader, value) => ImportValue(
@@ -77,7 +77,7 @@ internal static class AnnotationWriter
         DocumentReader source,
         Dictionary<DocumentReader, GraphImporter> appendImporters)
     {
-        var context = new AnnotationEmitContext
+        var context = new AnnotationWriteContext
         {
             Writer = writer,
             ImportValue = (reader, value) => ImportIncrementalValue(
@@ -92,12 +92,12 @@ internal static class AnnotationWriter
                 : writer.Add(dictionary));
     }
 
-    private static ArrayObject Build(AnnotationCollection annotations, AnnotationEmitContext context)
+    private static ArrayObject Build(AnnotationCollection annotations, AnnotationWriteContext context)
         => BuildEntries(annotations, context, (dictionary, _) => context.Writer.Add(dictionary));
 
     private static ArrayObject BuildEntries(
         AnnotationCollection annotations,
-        AnnotationEmitContext context,
+        AnnotationWriteContext context,
         Func<DictionaryObject, AnnotationCollection.Entry, DocumentObject> writeModeled)
     {
         var result = new ArrayObject();
@@ -120,12 +120,12 @@ internal static class AnnotationWriter
         return result;
     }
 
-    private static bool IsForeignPageTargetedLink(AnnotationCollection.Entry entry, AnnotationEmitContext context)
+    private static bool IsForeignPageTargetedLink(AnnotationCollection.Entry entry, AnnotationWriteContext context)
         => entry is { Original: not null, Annotation: LinkAnnotation { Uri: null, IsModified: false } link }
             && (link.Destination is not null || link.TargetPageIndex is not null)
             && !ReferenceEquals(entry.Reader, context.Source);
 
-    private static DocumentObject Import(AnnotationCollection.Entry entry, AnnotationEmitContext context)
+    private static DocumentObject Import(AnnotationCollection.Entry entry, AnnotationWriteContext context)
     {
         if (entry.Original is null)
         {
@@ -138,7 +138,7 @@ internal static class AnnotationWriter
     private static DictionaryObject BuildDictionary(
         Annotation annotation,
         AnnotationCollection.Entry entry,
-        AnnotationEmitContext context)
+        AnnotationWriteContext context)
     {
         AnnotationValidator.Validate(annotation);
         var dictionary = new DictionaryObject();
@@ -218,7 +218,7 @@ internal static class AnnotationWriter
             : GraphImporter.GetOrCreate(appendImporters, reader, writer).ImportValue(value);
     }
 
-    private static void Populate(Annotation annotation, DictionaryObject dictionary, AnnotationEmitContext context)
+    private static void Populate(Annotation annotation, DictionaryObject dictionary, AnnotationWriteContext context)
     {
         switch (annotation)
         {
@@ -280,7 +280,7 @@ internal static class AnnotationWriter
         }
     }
 
-    private static void PopulateLink(LinkAnnotation link, DictionaryObject dictionary, AnnotationEmitContext context)
+    private static void PopulateLink(LinkAnnotation link, DictionaryObject dictionary, AnnotationWriteContext context)
     {
         if (link.Uri is { } uri)
         {

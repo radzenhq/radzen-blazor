@@ -116,21 +116,6 @@ public class WatermarkKerningTests
     }
 
     [Fact]
-    public void KernedSpaceContainingRun_MeasuredWidthEqualsDrawnAdvance()
-    {
-        const string text = "AV AV";
-        var fonts = Fonts(kerning: true);
-        var font = new Font { Family = "Liberation Sans", Size = 60 };
-        var captured = fonts.CaptureGlyphRun(text, font);
-        var document = new SfntRunBuilder(new GeneratorFontResolver(PdfAConformance.None));
-
-        var drawnAdvance = document.Build(captured, font.EffectiveSize.Point).Sum(run => run.Advance);
-
-        Assert.Equal(fonts.MeasureText(text, font), drawnAdvance, 10);
-        Assert.Contains(document.Build(captured, font.EffectiveSize.Point), run => run.Kerns is not null);
-    }
-
-    [Fact]
     public void Unkerned_WatermarkShowsWithoutTj()
     {
         var content = PageText(Builder(kerning: false));

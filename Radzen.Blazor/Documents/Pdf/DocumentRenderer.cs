@@ -171,10 +171,10 @@ public sealed class DocumentRenderer
     {
         ArgumentNullException.ThrowIfNull(document);
 
-        var output = DocumentGenerator.Generate(
+        var output = DocumentRenderEngine.Generate(
             RenderRequest.From(this),
             Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes));
-        output.AdoptMaterializedGraph(new DocumentMaterializer(output).Materialize());
+        output.AdoptMaterializedGraph(new DocumentGraphBuilder(output).Build());
         return output;
     }
 

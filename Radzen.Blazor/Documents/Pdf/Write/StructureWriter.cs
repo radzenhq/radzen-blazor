@@ -160,7 +160,15 @@ internal static class StructureWriter
         var reference = writer.Add(dictionary);
 
         var kids = new ArrayObject();
-        var firstPage = element.Marks.Length > 0 ? pageMap.IndexOf(element.Marks[0].Page, Feature) : -1;
+        var firstPage = -1;
+        foreach (var kid in element.Kids)
+        {
+            if (kid.Page is { } markedPage)
+            {
+                firstPage = pageMap.IndexOf(markedPage, Feature);
+                break;
+            }
+        }
         if (firstPage >= 0)
         {
             dictionary["Pg"] = pageNodes[firstPage].Reference;

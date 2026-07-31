@@ -155,7 +155,7 @@ public class CqGraphicsHardeningTests
             Radius = 8,
         });
 
-        Assert.Throws<NotSupportedException>(() => plan.ApplyTransform(Matrix.Rotate(30), mark));
+        Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class CqGraphicsHardeningTests
             Style = BorderStyle.Solid,
         });
 
-        Assert.Throws<NotSupportedException>(() => plan.ApplyTransform(Matrix.Rotate(30), mark));
+        Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
     }
 
     [Fact]
@@ -184,9 +184,9 @@ public class CqGraphicsHardeningTests
         var plan = new PagePlan { Size = PageSizes.A4 };
         var mark = plan.Mark();
         plan.Edges.Add(Edge());
-        plan.ApplyRoundedClip(new PdfRect(10, 20, 100, 40), 6, mark);
+        PageDrawTransformer.ApplyRoundedClip(plan, new PdfRect(10, 20, 100, 40), 6, mark);
 
-        var error = Assert.Throws<NotSupportedException>(() => plan.ApplyTransform(Matrix.Rotate(30), mark));
+        var error = Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
         Assert.Contains("edge", error.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -197,7 +197,7 @@ public class CqGraphicsHardeningTests
         var mark = plan.Mark();
         plan.Edges.Add(Edge());
 
-        plan.ApplyTransform(Matrix.Rotate(90), mark);
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(90), mark);
 
         var edge = Assert.Single(plan.Edges);
         Assert.Equal(-20, edge.X1, 6);
@@ -211,9 +211,9 @@ public class CqGraphicsHardeningTests
         var plan = new PagePlan { Size = PageSizes.A4 };
         var mark = plan.Mark();
         plan.Edges.Add(Edge());
-        plan.ApplyRoundedClip(new PdfRect(10, 20, 100, 40), 0, mark);
+        PageDrawTransformer.ApplyRoundedClip(plan, new PdfRect(10, 20, 100, 40), 0, mark);
 
-        plan.ApplyTransform(Matrix.Rotate(30), mark);
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark);
         Assert.Single(plan.Edges);
     }
 
@@ -259,7 +259,7 @@ public class CqGraphicsHardeningTests
             Color = Color.FromRgb(200, 200, 200),
         });
 
-        plan.ApplyTransform(Matrix.Rotate(30), mark);
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark);
         Assert.Single(plan.Edges);
     }
 }

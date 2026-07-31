@@ -22,27 +22,13 @@ internal sealed class ResourceDictionaryBuilder
         entries[key] = value;
     }
 
-    public void AddAll<T>(
-        string category,
-        IEnumerable<T> items,
-        Func<T, string> key,
-        Func<T, DocumentObject> value,
-        IReadOnlySet<string>? referencedKeys = null)
-    {
-        foreach (var item in items)
-        {
-            var name = key(item);
-            if (referencedKeys is not null && !referencedKeys.Contains(name))
-            {
-                continue;
-            }
-
-            Add(category, name, value(item));
-        }
-    }
-
     public DictionaryObject? Build() => resources;
 }
+
+internal readonly record struct ResourceEntry(
+    string Category,
+    string Key,
+    Func<DocumentObject> Value);
 
 internal static class PageResourceBuilder
 {
@@ -53,37 +39,40 @@ internal static class PageResourceBuilder
         Dictionary<OutputImage, ReferenceObject> imageRefs,
         IReadOnlySet<string>? referencedKeys = null)
     {
-        var resources = new ResourceDictionaryBuilder();
+        return BuildResourceDictionary(GeneratedEntries(writer, page, fontRefs, imageRefs), referencedKeys);
+    }
 
-        resources.AddAll(
-            "Font",
-            page.Fonts,
-            font => font.Key,
-            font => ResolveFont(writer, font, fontRefs),
-            referencedKeys);
+    private static IEnumerable<ResourceEntry> GeneratedEntries(
+        DocumentWriter writer,
+        PageOutput page,
+        Dictionary<OutputFont, DocumentObject> fontRefs,
+        Dictionary<OutputImage, ReferenceObject> imageRefs)
+    {
+        foreach (var font in page.Fonts)
+        {
+            yield return new ResourceEntry("Font", font.Key, () => ResolveFont(writer, font, fontRefs));
+        }
 
-        resources.AddAll(
-            "XObject",
-            page.Images,
-            image => image.Key,
-            image => ResolveImage(writer, image, image, imageRefs),
-            referencedKeys);
+        foreach (var image in page.Images)
+        {
+            yield return new ResourceEntry("XObject", image.Key, () => ResolveImage(writer, image, image, imageRefs));
+        }
 
-        resources.AddAll(
-            "ExtGState",
-            page.ExtGStates,
-            state => state.Key,
-            state => ExtGStateDictionary(state.FillAlpha, state.StrokeAlpha, state.Blend, SoftMaskOf(writer, state)),
-            referencedKeys);
+        foreach (var state in page.ExtGStates)
+        {
+            yield return new ResourceEntry(
+                "ExtGState",
+                state.Key,
+                () => ExtGStateDictionary(state.FillAlpha, state.StrokeAlpha, state.Blend, SoftMaskOf(writer, state)));
+        }
 
-        resources.AddAll(
-            "Pattern",
-            page.Patterns,
-            pattern => pattern.Key,
-            pattern => writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient, pattern.Matrix)),
-            referencedKeys);
-
-        return resources.Build();
+        foreach (var pattern in page.Patterns)
+        {
+            yield return new ResourceEntry(
+                "Pattern",
+                pattern.Key,
+                () => writer.Add(ShadingBuilder.BuildPattern(pattern.Gradient, pattern.Matrix)));
+        }
     }
 
     private static DocumentObject? SoftMaskOf(DocumentWriter writer, OutputExtGState state)
@@ -93,7 +82,7 @@ internal static class PageResourceBuilder
             return SoftMaskWriter.BuildDictionary(writer, mask);
         }
 
-        return state.ClearSoftMask ? new NameObject("None") : null;
+        return null;
     }
 
     public static IReadOnlySet<string> ReferencedResourceKeys(byte[] content)
@@ -208,31 +197,53 @@ internal static class PageResourceBuilder
         ContentResourceManifest manifest,
         Dictionary<object, ReferenceObject>? sharedImages = null)
     {
+        return BuildResourceDictionary(ContentEntries(writer, manifest, sharedImages));
+    }
+
+    private static IEnumerable<ResourceEntry> ContentEntries(
+        IObjectWriter? writer,
+        ContentResourceManifest manifest,
+        Dictionary<object, ReferenceObject>? sharedImages)
+    {
+        foreach (var font in manifest.Fonts)
+        {
+            yield return new ResourceEntry("Font", font.Value, () => Base14FontDictionary(font.Key));
+        }
+
+        foreach (var image in manifest.ImagesForWriting)
+        {
+            yield return new ResourceEntry(
+                "XObject",
+                image.Key,
+                () => ResolveImage(writer!, image, image.Identity, sharedImages));
+        }
+
+        foreach (var pattern in manifest.Patterns)
+        {
+            yield return new ResourceEntry("Pattern", pattern.Key, () => writer!.Add(pattern.Value));
+        }
+
+        foreach (var state in manifest.ExtGStates)
+        {
+            yield return new ResourceEntry(
+                "ExtGState",
+                state.Key,
+                () => ExtGStateDictionary(state.Value, state.Value));
+        }
+    }
+
+    private static DictionaryObject? BuildResourceDictionary(
+        IEnumerable<ResourceEntry> entries,
+        IReadOnlySet<string>? referencedKeys = null)
+    {
         var resources = new ResourceDictionaryBuilder();
-
-        resources.AddAll(
-            "Font",
-            manifest.Fonts,
-            font => font.Value,
-            font => Base14FontDictionary(font.Key));
-
-        resources.AddAll(
-            "XObject",
-            manifest.ImagesForWriting,
-            image => image.Key,
-            image => ResolveImage(writer!, image, image.Identity, sharedImages));
-
-        resources.AddAll(
-            "Pattern",
-            manifest.Patterns,
-            pattern => pattern.Key,
-            pattern => writer!.Add(pattern.Value));
-
-        resources.AddAll(
-            "ExtGState",
-            manifest.ExtGStates,
-            state => state.Key,
-            state => ExtGStateDictionary(state.Value, state.Value));
+        foreach (var entry in entries)
+        {
+            if (referencedKeys is null || referencedKeys.Contains(entry.Key))
+            {
+                resources.Add(entry.Category, entry.Key, entry.Value());
+            }
+        }
 
         return resources.Build();
     }

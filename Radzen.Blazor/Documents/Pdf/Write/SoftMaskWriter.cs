@@ -10,20 +10,9 @@ internal static class SoftMaskWriter
         var dictionary = new DictionaryObject
         {
             ["Type"] = new NameObject("Mask"),
-            ["S"] = new NameObject(mask.Type == OutputSoftMaskType.Luminosity ? "Luminosity" : "Alpha"),
+            ["S"] = new NameObject("Luminosity"),
             ["G"] = writer.Add(TransparencyGroupWriter.BuildForm(writer, mask.Group)),
         };
-
-        if (mask.Backdrop is { } backdrop)
-        {
-            var bc = new ArrayObject();
-            foreach (var component in backdrop)
-            {
-                bc.Add(new NumberObject(component));
-            }
-
-            dictionary["BC"] = bc;
-        }
 
         return dictionary;
     }

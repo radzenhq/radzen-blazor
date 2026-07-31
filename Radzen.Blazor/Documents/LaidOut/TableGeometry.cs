@@ -83,7 +83,7 @@ internal sealed record LaidOutBox
     public int ZOrder { get; init; }
 }
 
-internal sealed record LaidOutCell
+internal sealed record LaidOutCell : ILaidOutContent<LaidOutTablePlacement>
 {
     public required LaidOutNodeId Id { get; init; }
 

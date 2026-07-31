@@ -39,7 +39,7 @@ internal static class AppearanceStreamBuilder
         var emitted = content.DetachResult();
         validateResources?.Invoke(emitted.Resources);
         var stream = new StreamObject(emitted.Bytes!);
-        FormXObjectShell.ApplyHeader(stream.Dictionary, boundingBox, formType);
+        FormXObjectBuilder.ApplyHeader(stream.Dictionary, boundingBox, formType);
 
         var resources = PageResourceBuilder.BuildResources(writer, emitted.Resources) ?? new DictionaryObject();
         augmentResources?.Invoke(resources);

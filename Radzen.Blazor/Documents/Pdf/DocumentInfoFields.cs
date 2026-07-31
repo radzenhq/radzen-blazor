@@ -19,9 +19,9 @@ internal static class DocumentInfoFields
         new("Keywords", info => info.Keywords, (reader, source, info) => info.Keywords = DocumentLoader.Text(reader, source, "Keywords")),
         new("Creator", info => info.Creator, (reader, source, info) => info.Creator = DocumentLoader.Text(reader, source, "Creator")),
         new("Producer", info => info.Producer, (reader, source, info) => info.Producer = DocumentLoader.Text(reader, source, "Producer")),
-        new("CreationDate", info => info.CreationDate is { } value ? DocumentSaver.PdfDate(value) : null,
+        new("CreationDate", info => info.CreationDate is { } value ? DocumentGraphBuilder.PdfDate(value) : null,
             (reader, source, info) => info.CreationDate = DocumentLoader.Date(reader, source, "CreationDate")),
-        new("ModDate", info => info.ModificationDate is { } value ? DocumentSaver.PdfDate(value) : null,
+        new("ModDate", info => info.ModificationDate is { } value ? DocumentGraphBuilder.PdfDate(value) : null,
             (reader, source, info) => info.ModificationDate = DocumentLoader.Date(reader, source, "ModDate")),
     ];
 

@@ -9,6 +9,7 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Blazor.Tests.Isolated;
@@ -165,7 +166,7 @@ public class ContainerOverlayRotationTests
         plan.Texts.Add(Text(15, 30));
 
         var rotate90 = Matrix.Rotate(90);
-        plan.ApplyTransform(rotate90, mark);
+        PageDrawTransformer.ApplyTransform(plan, rotate90, mark);
 
         var fill = Assert.Single(plan.Fills);
         Assert.Equal(10, fill.Width, 6);
@@ -197,7 +198,10 @@ public class ContainerOverlayRotationTests
         var text = Text(72, 700) with { Transform = transform };
 
         using var writer = new ContentWriter();
-        DrawEmitter.WriteTextDraw(writer, text);
+        DrawWriter.WriteTextDraw(
+            writer,
+            text,
+            new PlannedFont(new OutputFont(text.Font.Key, text.Font.Base14, null), null));
         var content = Encoding.ASCII.GetString(writer.ToArray());
 
         var lines = content.Split('\n');

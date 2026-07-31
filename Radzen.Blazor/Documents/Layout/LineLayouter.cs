@@ -32,7 +32,7 @@ internal readonly record struct LineBuildRequest(
     bool IsLast,
     bool IncludeMarker);
 
-internal static class LineLayouter
+internal static partial class LineLayouter
 {
     private const double DefaultTabStopWidth = 36.0;
 
@@ -145,128 +145,6 @@ internal static class LineLayouter
             Height = height * paragraph.LineSpacing,
             Baseline = ascent,
         };
-    }
-
-    private static double NextStart(double position, LineWord word, List<TabStop>? stops = null)
-    {
-        var p = position + word.GapAfter;
-        for (var t = 0; t < word.TabsAfter; t++)
-        {
-            p = stops is not null && TryNextStop(stops, p, out var stopPos, out _, out _)
-                ? stopPos
-                : AdvanceToTabStop(p);
-        }
-
-        return p;
-    }
-
-    private static List<TabStop>? SortedTabStops(Paragraph paragraph)
-    {
-        if (paragraph.TabStops.Count == 0)
-        {
-            return null;
-        }
-
-        var stops = new List<TabStop>(paragraph.TabStops.Count);
-        for (var s = 0; s < paragraph.TabStops.Count; s++)
-        {
-            stops.Add(paragraph.TabStops[s]);
-        }
-
-        stops.Sort((a, b) => a.Position.Point.CompareTo(b.Position.Point));
-        return stops;
-    }
-
-    private static List<(int First, int Last)> Wrap(List<LineWord> words, double max, List<TabStop>? stops)
-    {
-        var lines = new List<(int, int)>();
-        var i = 0;
-        while (i < words.Count)
-        {
-            var j = i;
-            var end = words[i].Width;
-            while (j + 1 < words.Count)
-            {
-                var (nextEnd, through) = NextSegment(words, j, end, stops);
-                if (nextEnd <= max)
-                {
-                    end = nextEnd;
-                    j = through;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            while (j > i && words[j].SoftHyphenAfter && j < words.Count - 1
-                && LineNaturalWidth(words, i, j, stops) + words[j].HyphenWidth > max)
-            {
-                j--;
-            }
-
-            lines.Add((i, j));
-            i = j + 1;
-        }
-
-        return lines;
-    }
-
-    private static (double End, int Through) NextSegment(
-        List<LineWord> words, int from, double end, List<TabStop>? stops)
-    {
-        var gapStart = end + words[from].GapAfter;
-        var stopPosition = gapStart;
-        var alignment = TabAlignment.Left;
-        for (var t = 0; t < words[from].TabsAfter; t++)
-        {
-            if (stops is not null && TryNextStop(stopPosition, stops, out var next, out var nextAlignment))
-            {
-                stopPosition = next;
-                alignment = nextAlignment;
-            }
-            else
-            {
-                stopPosition = AdvanceToTabStop(stopPosition);
-                alignment = TabAlignment.Left;
-            }
-        }
-
-        if (alignment is not (TabAlignment.Right or TabAlignment.Center))
-        {
-            return (stopPosition + words[from + 1].Width, from + 1);
-        }
-
-        var through = from + 1;
-        var width = words[through].Width;
-        while (through < words.Count - 1 && words[through].TabsAfter == 0)
-        {
-            width += words[through].GapAfter + words[through + 1].Width;
-            through++;
-        }
-
-        var aligned = alignment == TabAlignment.Right
-            ? stopPosition
-            : stopPosition + (width / 2.0);
-        return (Math.Max(aligned, gapStart + width), through);
-    }
-
-    private static bool TryNextStop(
-        double cursor, List<TabStop> stops, out double position, out TabAlignment alignment)
-    {
-        var found = TryNextStop(stops, cursor, out position, out alignment, out _);
-        return found;
-    }
-
-    private static double LineNaturalWidth(List<LineWord> words, int i, int j, List<TabStop>? stops)
-    {
-        var end = words[i].Width;
-        for (var w = i; w < j; w++)
-        {
-            end = NextStart(end, words[w], stops) + words[w + 1].Width;
-        }
-
-        return end;
     }
 
     private static bool IsHyphenBreak(char c) => c is '-' or '\u2013' or '\u2014';
@@ -784,7 +662,7 @@ internal static class LineLayouter
             var stopPos = cursor;
             for (var t = 0; t < tabsBefore; t++)
             {
-                if (TryNextStop(stops, cursor, out var nextPos, out var nextAlign, out var nextLeader))
+                if (FindNextTabStop(stops, cursor, out var nextPos, out var nextAlign, out var nextLeader))
                 {
                     stopPos = nextPos;
                     alignment = nextAlign;
@@ -913,107 +791,4 @@ internal static class LineLayouter
         };
     }
 
-    private static (double Width, double DecimalOffset) MeasureSegment(
-        Span<LineFragment> span, List<LineWord> words, int wStart, int wEnd, int fiStart, FontCollection fonts)
-    {
-        double width = 0;
-        double decimalOffset = -1;
-        var f = fiStart;
-        for (var ww = wStart; ww <= wEnd; ww++)
-        {
-            for (var p = 0; p < words[ww].PieceCount; p++)
-            {
-                var fragment = span[f];
-                if (decimalOffset < 0)
-                {
-                    var dot = fragment.Text.IndexOf('.', StringComparison.Ordinal);
-                    if (dot >= 0)
-                    {
-                        decimalOffset = width + fonts.MeasureText(
-                            fragment.Text[..dot],
-                            fragment.Paint.Font);
-                    }
-                }
-
-                width += fragment.Advance;
-                f++;
-            }
-
-            if (ww < wEnd)
-            {
-                width += words[ww].GapAfter;
-            }
-        }
-
-        return (width, decimalOffset < 0 ? width : decimalOffset);
-    }
-
-    private static bool TryNextStop(List<TabStop> stops, double cursor, out double position, out TabAlignment alignment, out char leader)
-    {
-        for (var i = 0; i < stops.Count; i++)
-        {
-            if (stops[i].Position.Point > cursor + LayoutTolerance.Epsilon)
-            {
-                position = stops[i].Position.Point;
-                alignment = stops[i].Alignment;
-                leader = stops[i].Leader;
-                return true;
-            }
-        }
-
-        position = 0;
-        alignment = TabAlignment.Left;
-        leader = '\0';
-        return false;
-    }
-
-    private static (double Height, double Baseline) Measure(
-        ImmutableArray<LineFragment> fragments, double lineSpacing, FontCollection fonts)
-    {
-        double natural = 0;
-        double baseline = 0;
-        for (var i = 0; i < fragments.Length; i++)
-        {
-            var paint = fragments[i].Paint;
-            var (h, asc) = paint.InlineImage is { } image
-                ? (image.Height, image.Height)
-                : FontExtent(paint.Font, fonts);
-            if (paint.IsScript)
-            {
-                (h, asc) = ScriptExtent(paint, h, asc);
-            }
-
-            natural = Math.Max(natural, h);
-            baseline = Math.Max(baseline, asc);
-        }
-
-        return (natural * lineSpacing, baseline);
-    }
-
-    private static (double Height, double Ascent) ScriptExtent(in FragmentPaint paint, double height, double ascent)
-    {
-        var scale = paint.ScriptScale;
-        var rise = paint.Rise;
-        var descent = (height - ascent) * scale;
-        ascent = (ascent * scale) + Math.Max(rise, 0);
-        return (ascent + descent + Math.Max(-rise, 0), ascent);
-    }
-
-    private static (double Height, double Ascent) FontExtent(
-        in FontPaint font,
-        FontCollection fonts)
-    {
-        var size = font.Size;
-        if (fonts.TryResolvePrimary(font, out var face))
-        {
-            var upm = face.UnitsPerEm;
-            return ((face.Ascent - face.Descent + face.LineGap) * size / upm, face.Ascent * size / upm);
-        }
-
-        return (size * 1.2, size * 0.9);
-    }
-
-    private readonly record struct LinePlacement(double Width, HyphenPlacement Hyphen);
-
-    private readonly record struct HyphenPlacement(bool Include, double XOffset, FontPaint Font, double Width);
 }

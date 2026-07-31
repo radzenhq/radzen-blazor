@@ -41,7 +41,7 @@ internal static class RadioGroupValidation
     }
 }
 
-internal sealed class CreatedFieldWriter(PortableDocument document, FormAppearanceService appearances)
+internal sealed class CreatedFieldWriter(PortableDocument document, FormWriter forms)
 {
     public List<(int PageIndex, ReferenceObject Reference)> Write(
         DocumentWriter writer,
@@ -53,12 +53,12 @@ internal sealed class CreatedFieldWriter(PortableDocument document, FormAppearan
         {
             FieldPageValidation.Validate(definition, pageNodes.Count);
 
-            var context = new FormEmitContext(
+            var context = new FormWriteContext(
                 writer,
                 pageNodes[definition.PageIndex].Reference,
                 fields,
                 created,
-                appearances);
+                forms);
             FormFieldWriter.Emit(definition, context);
         }
 

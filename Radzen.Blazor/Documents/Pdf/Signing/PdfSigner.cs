@@ -156,7 +156,7 @@ public static class PdfSigner
 
         if (options.SigningTime is { } time)
         {
-            signature["M"] = new StringObject(DocumentSaver.PdfDate(time.ToUniversalTime()));
+            signature["M"] = new StringObject(DocumentGraphBuilder.PdfDate(time.ToUniversalTime()));
         }
 
         if (options.Reason is not null)
