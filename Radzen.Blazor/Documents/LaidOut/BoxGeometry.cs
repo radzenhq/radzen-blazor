@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace Radzen.Documents.LaidOut;
 
-internal readonly struct LaidOutBoxContent
+internal readonly struct LaidOutBoxContent : ILaidOutContent<LaidOutTablePlacement>
 {
     public required double Height { get; init; }
 

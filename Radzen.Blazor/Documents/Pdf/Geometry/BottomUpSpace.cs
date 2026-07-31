@@ -6,6 +6,8 @@ internal static class BottomUpSpace
 
     public static double Bottom(double top, double y, double height) => FromTop(top, y) - height;
 
+    public static double BottomFromTop(double top, double height) => FromTop(top, height);
+
     public static PageBox Box(double left, double top, in Rect bounds, double delta)
         => new(
             left + bounds.X,
@@ -27,4 +29,7 @@ internal static class BottomUpSpace
             transform.D,
             transform.E + (height * transform.C),
             height - transform.F - (height * transform.D));
+
+    public static Matrix TopDownAt(double left, double bottom, double height)
+        => Matrix.FromComponents(1, 0, 0, -1, left, bottom + height);
 }

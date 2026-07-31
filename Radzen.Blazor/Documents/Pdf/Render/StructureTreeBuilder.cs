@@ -14,6 +14,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private readonly Dictionary<SourceId, StructureElement> linkElementsBySource = [];
     private readonly Dictionary<SourceId, SemanticArtifactKind> artifactsBySource = [];
     private readonly SortedSet<string> unmappedRoles = new(StringComparer.Ordinal);
+    private readonly Dictionary<StructureElement, List<PlannedStructureKid>> orderedKids = [];
+    private readonly Dictionary<StructureElement, int> kidCursors = [];
     private StructureElement documentElement = null!;
     private int nextElementId;
 
@@ -21,12 +23,12 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
     public ImmutableArray<string> UnmappedRoles => [.. unmappedRoles];
 
-    public static StructureElementSnapshot Capture(
-        StructureElement root,
-        ImmutableArray<PageOutput> pages)
-        => new StructureCapture(pages).Capture(root);
+    public StructureElementSnapshot Capture(ImmutableArray<PageOutput> pages)
+        => new StructureCapture(pages, orderedKids).Capture(documentElement);
 
-    private sealed class StructureCapture(ImmutableArray<PageOutput> pages)
+    private sealed class StructureCapture(
+        ImmutableArray<PageOutput> pages,
+        Dictionary<StructureElement, List<PlannedStructureKid>> orderedKids)
     {
         private readonly Dictionary<StructureElement, StructureElementSnapshot> captured = [];
 
@@ -37,25 +39,14 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 return existing;
             }
 
-            var children = ImmutableArray.CreateBuilder<StructureElementSnapshot>(element.Children.Count);
-            foreach (var child in element.Children)
-            {
-                children.Add(Capture(child));
-            }
-
-            var kids = ImmutableArray.CreateBuilder<StructureKidSnapshot>(element.Kids.Count);
-            foreach (var kid in element.Kids)
+            var sourceKids = orderedKids[element];
+            var kids = ImmutableArray.CreateBuilder<StructureKidSnapshot>(sourceKids.Count);
+            foreach (var kid in sourceKids)
             {
                 kids.Add(new StructureKidSnapshot(
                     kid.Child is { } child ? Capture(child) : null,
                     kid.Child is null ? pages[kid.PageIndex] : null,
                     kid.Mcid));
-            }
-
-            var marks = ImmutableArray.CreateBuilder<(PageOutput Page, int Mcid)>(element.Marks.Count);
-            foreach (var (pageIndex, mcid) in element.Marks)
-            {
-                marks.Add((pages[pageIndex], mcid));
             }
 
             var snapshot = new StructureElementSnapshot(
@@ -66,8 +57,6 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 element.HeaderScope,
                 element.RowSpan,
                 element.ColumnSpan,
-                children.MoveToImmutable(),
-                marks.MoveToImmutable(),
                 kids.MoveToImmutable());
             captured.Add(element, snapshot);
             return snapshot;
@@ -133,13 +122,15 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             RowSpan = captured.RowSpan,
             ColumnSpan = captured.ColumnSpan,
         };
+        orderedKids[element] = [];
+        kidCursors[element] = 0;
         materialized[index] = element;
         foreach (var childIndex in captured.Children)
         {
             if (Materialize(childIndex, snapshot, materialized) is { } child)
             {
                 element.Children.Add(child);
-                element.Kids.Add(new StructureKid { Child = child });
+                orderedKids[element].Add(new PlannedStructureKid { Child = child });
             }
         }
 
@@ -283,7 +274,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
         return start;
     }
 
-    private static void Walk(
+    private void Walk(
         StructureElement element,
         Dictionary<StructureElement, List<TaggedDraw>> own,
         Dictionary<StructureElement, int> subtreeStart,
@@ -311,7 +302,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             }
 
             Walk(child, own, subtreeStart, pageIndex, marks);
-            element.AdvancePast(child);
+            AdvancePast(element, child);
         }
 
         if (draws is not null && next < draws.Count)
@@ -320,7 +311,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
         }
     }
 
-    private static void AddMarks(
+    private void AddMarks(
         StructureElement element,
         List<TaggedDraw> draws,
         int start,
@@ -330,10 +321,42 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     {
         for (var i = start; i < end; i++)
         {
-            element.AddMark(pageIndex, marks[draws[i].Sequence].Mcid);
+            AddMark(element, pageIndex, marks[draws[i].Sequence].Mcid);
         }
     }
 
+    private void AddMark(StructureElement element, int pageIndex, int mcid)
+    {
+        var kids = orderedKids[element];
+        var cursor = kidCursors[element];
+        kids.Insert(cursor, new PlannedStructureKid { PageIndex = pageIndex, Mcid = mcid });
+        kidCursors[element] = cursor + 1;
+    }
+
+    private void AdvancePast(StructureElement element, StructureElement child)
+    {
+        var kids = orderedKids[element];
+        for (var i = 0; i < kids.Count; i++)
+        {
+            if (ReferenceEquals(kids[i].Child, child))
+            {
+                kidCursors[element] = i + 1;
+                return;
+            }
+        }
+
+        throw new InvalidOperationException("A structure child is missing from its parent's ordered kids.");
+    }
+
+}
+
+internal readonly struct PlannedStructureKid
+{
+    public StructureElement? Child { get; init; }
+
+    public int PageIndex { get; init; }
+
+    public int Mcid { get; init; }
 }
 
 internal readonly struct TaggedDraw

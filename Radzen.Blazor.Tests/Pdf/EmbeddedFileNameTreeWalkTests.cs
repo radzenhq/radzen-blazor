@@ -14,22 +14,26 @@ namespace Radzen.Blazor.Pdf.Tests;
 public class EmbeddedFileNameTreeWalkTests
 {
     [Fact]
-    public void EmbeddedFileTree_SharedKid_Throws()
+    public void EmbeddedFileTree_SharedKid_ThrowsWhenAttachmentsAreAccessed()
     {
         var bytes = NameTreeFile(
             (6, "<< /Kids [7 0 R 7 0 R] >>"),
             (7, "<< /Names [(a.txt) 4 0 R] >>"));
 
-        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
+
+        Assert.Throws<DocumentParseException>(() => document.Attachments.Count);
     }
 
     [Fact]
-    public void EmbeddedFileTree_OddLengthNamesArray_Throws()
+    public void EmbeddedFileTree_OddLengthNamesArray_ThrowsWhenAttachmentsAreAccessed()
     {
         var bytes = NameTreeFile(
             (6, "<< /Names [(a.txt) 4 0 R (b.txt)] >>"));
 
-        Assert.Throws<DocumentParseException>(() => PortableDocument.LoadFromStream(new MemoryStream(bytes)));
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
+
+        Assert.Throws<DocumentParseException>(() => document.Attachments.Count);
     }
 
     [Fact]

@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Output;
+using Radzen.Documents.Pdf.Content;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -149,10 +150,10 @@ internal sealed class PagePlan
 
     public int NextSequence() => sequence++;
     private readonly ResourceNameAllocator<string, OutputExtGState> extGStates =
-        new("GS", reserved: null, StringComparer.Ordinal);
+        new(ContentResourcePrefixes.Page.ExtGState, reserved: null, StringComparer.Ordinal);
 
     private readonly ResourceNameAllocator<(GradientPaint Gradient, Matrix Matrix), OutputPattern> patterns =
-        new("P", reserved: null, GradientPatternComparer.Instance);
+        new(ContentResourcePrefixes.Page.Pattern, reserved: null, GradientPatternComparer.Instance);
 
     private readonly Dictionary<string, OutputExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
@@ -189,8 +190,7 @@ internal sealed class PagePlan
             fillAlpha,
             strokeAlpha,
             blend,
-            softMask: null,
-            clearSoftMask: false)));
+            softMask: null)));
     }
 
     private OutputExtGState Track(OutputExtGState state)
@@ -214,7 +214,7 @@ internal sealed class PagePlan
             return RegisterExtGState(alpha, alpha);
         }
 
-        if (FindExtGState(extGState) is not { SoftMask: null, ClearSoftMask: false } state)
+        if (FindExtGState(extGState) is not { SoftMask: null } state)
         {
             return extGState;
         }
@@ -236,8 +236,7 @@ internal sealed class PagePlan
             Math.Clamp(fillAlpha, 0, 1),
             Math.Clamp(strokeAlpha, 0, 1),
             blend: null,
-            softMask,
-            clearSoftMask: false));
+            softMask));
 
         return contentKey is { } dedup
             ? extGStates.GetOrAdd("m|" + dedup, Create)
@@ -248,164 +247,6 @@ internal sealed class PagePlan
         => patterns.GetOrAdd((gradient, matrix), key => new OutputPattern(key, gradient, matrix));
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
-
-    public void ApplyRoundedClip(PdfRect bounds, double radius, PlanMarks mark)
-    {
-        ApplyClip(Fills, mark.Fills, fill => fill.Clip is null
-            ? fill with { Clip = bounds, ClipRadius = radius }
-            : fill);
-        ApplyClip(Edges, mark.Edges, edge => edge.Clip is null
-            ? edge with { Clip = bounds, ClipRadius = radius }
-            : edge);
-        ApplyClip(Images, mark.Images, image => image.Clip is null
-            ? image with { Clip = bounds, ClipRadius = radius }
-            : image);
-        ApplyClip(Texts, mark.Texts, text => text.Clip is null
-            ? text with { Clip = bounds, ClipRadius = radius }
-            : text);
-    }
-
-    private static void ApplyClip<T>(List<T> items, int start, Func<T, T> clip)
-    {
-        for (var i = start; i < items.Count; i++)
-        {
-            items[i] = clip(items[i]);
-        }
-    }
-
-    public void ApplyTransform(Matrix transform, PlanMarks mark)
-    {
-        for (var i = mark.Fills; i < Fills.Count; i++)
-        {
-            var fill = Fills[i];
-            if (fill.Radius > 0 || (fill.Clip is not null && fill.ClipRadius > 0))
-            {
-                throw new NotSupportedException(
-                    "A rotated box cannot preserve rounded corners or a rounded clip; remove the corner radius or the rotation.");
-            }
-
-            if (fill.Gradient is not null)
-            {
-                throw new NotSupportedException(
-                    "A rotated box cannot preserve a gradient background; remove the gradient or the rotation.");
-            }
-        }
-
-        for (var i = mark.Rounded; i < RoundedStrokes.Count; i++)
-        {
-            if (RoundedStrokes[i].Radius > 0)
-            {
-                throw new NotSupportedException(
-                    "A rotated box cannot preserve a rounded border; remove the corner radius or the rotation.");
-            }
-        }
-
-        for (var i = mark.Edges; i < Edges.Count; i++)
-        {
-            if (Edges[i].Clip is not null && Edges[i].ClipRadius > 0)
-            {
-                throw new NotSupportedException(
-                    "A rotated box cannot preserve a rounded clip on a border edge; remove the corner radius or the rotation.");
-            }
-        }
-
-        for (var i = mark.Edges; i < Edges.Count; i++)
-        {
-            var edge = Edges[i];
-            var (x1, y1) = transform.Transform(edge.X1, edge.Y1);
-            var (x2, y2) = transform.Transform(edge.X2, edge.Y2);
-            Edges[i] = new EdgeDraw
-            {
-                X1 = x1,
-                Y1 = y1,
-                X2 = x2,
-                Y2 = y2,
-                LineWidth = edge.LineWidth,
-                Color = edge.Color,
-                Style = edge.Style,
-                Artifact = edge.Artifact,
-                ExtGState = edge.ExtGState,
-            };
-        }
-
-        if (Fills.Count > mark.Fills)
-        {
-            var converted = new List<EdgeDraw>(Fills.Count - mark.Fills);
-            for (var i = mark.Fills; i < Fills.Count; i++)
-            {
-                var fill = Fills[i];
-                if (fill.Width <= 0 || fill.Height <= 0)
-                {
-                    continue;
-                }
-
-                var midY = fill.Y + fill.Height / 2;
-                var (x1, y1) = transform.Transform(fill.X, midY);
-                var (x2, y2) = transform.Transform(fill.X + fill.Width, midY);
-                converted.Add(new EdgeDraw
-                {
-                    X1 = x1,
-                    Y1 = y1,
-                    X2 = x2,
-                    Y2 = y2,
-                    LineWidth = fill.Height,
-                    Color = fill.Color,
-                    Style = BorderStyle.Solid,
-                    Artifact = SemanticArtifacts.ForDecoration(fill.Artifact),
-                    ExtGState = fill.ExtGState,
-                });
-            }
-
-            Fills.RemoveRange(mark.Fills, Fills.Count - mark.Fills);
-            Edges.InsertRange(mark.Edges, converted);
-        }
-
-        if (RoundedStrokes.Count > mark.Rounded)
-        {
-            for (var i = mark.Rounded; i < RoundedStrokes.Count; i++)
-            {
-                var rounded = RoundedStrokes[i];
-                var left = rounded.X;
-                var bottom = rounded.Y;
-                var right = rounded.X + rounded.Width;
-                var top = rounded.Y + rounded.Height;
-                AddTransformedEdge(transform, left, top, right, top, rounded);
-                AddTransformedEdge(transform, right, bottom, right, top, rounded);
-                AddTransformedEdge(transform, left, bottom, right, bottom, rounded);
-                AddTransformedEdge(transform, left, bottom, left, top, rounded);
-            }
-
-            RoundedStrokes.RemoveRange(mark.Rounded, RoundedStrokes.Count - mark.Rounded);
-        }
-
-        for (var i = mark.Images; i < Images.Count; i++)
-        {
-            Images[i] = Images[i] with { Transform = transform };
-        }
-
-        for (var i = mark.Texts; i < Texts.Count; i++)
-        {
-            Texts[i] = Texts[i] with { Transform = transform };
-        }
-    }
-
-    private void AddTransformedEdge(Matrix transform, double x1, double y1, double x2, double y2, RoundedStrokeDraw rounded)
-    {
-        var (tx1, ty1) = transform.Transform(x1, y1);
-        var (tx2, ty2) = transform.Transform(x2, y2);
-        Edges.Add(new EdgeDraw
-        {
-            X1 = tx1,
-            Y1 = ty1,
-            X2 = tx2,
-            Y2 = ty2,
-            LineWidth = rounded.LineWidth,
-            Color = rounded.Color,
-            Style = rounded.Style,
-            Artifact = rounded.Artifact,
-            ExtGState = rounded.ExtGState,
-        });
-    }
 }
 
 internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint Gradient, Matrix Matrix)>

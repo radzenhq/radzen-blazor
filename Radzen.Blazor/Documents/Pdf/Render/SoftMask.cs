@@ -53,12 +53,10 @@ internal static class SoftMask
             content.ToArray(),
             [left, bottom, left + rectWidth, bottom + rectHeight],
             "DeviceGray",
-            isolated: null,
-            knockout: null,
             [new KeyValuePair<string, OutputImagePayload>("Sm", OutputImagePayload.Capture(image))]);
 
         var alpha = shadow.Color.A / 255.0;
-        var softMask = new OutputSoftMask(OutputSoftMaskType.Luminosity, group, backdrop: null);
+        var softMask = new OutputSoftMask(group);
         var extGState = plan.RegisterSoftMaskExtGState(
             alpha,
             alpha,
@@ -76,19 +74,6 @@ internal static class SoftMask
             Artifact = artifact,
         });
     }
-
-    public static void EmitBoxShadow(PagePlan plan, PdfRect bounds, double cornerRadius, BoxShadow shadow)
-        => EmitBoxShadow(
-            plan,
-            bounds,
-            cornerRadius,
-            new BoxShadowPaint(
-                shadow.Color,
-                shadow.BlurRadius.Point,
-                shadow.OffsetX.Point,
-                shadow.OffsetY.Point,
-                shadow.Spread.Point),
-            SemanticArtifactKind.LayoutDecoration);
 
     private static string ShadowKey(ShadowMask mask, double left, double bottom, double rectWidth, double rectHeight, double alpha)
     {

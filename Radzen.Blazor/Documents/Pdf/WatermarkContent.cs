@@ -7,7 +7,7 @@ namespace Radzen.Documents.Pdf;
 internal sealed class WatermarkContent(
     Watermark watermark,
     PdfRect box,
-    ImageStore images,
+    ImageRegistry images,
     SourceId? imageSource,
     SceneImageData? imageData) : ContentElement
 {
@@ -43,7 +43,7 @@ internal sealed class WatermarkContent(
             Opacity = image.Opacity,
             Interpolate = image.Interpolate,
         };
-        var decoded = ImageStore.SourceOf(images.DecodeWatermark(source, paint));
+        var decoded = ImageRegistry.SourceOf(images.DecodeWatermark(source, paint));
         var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
         var key = writer.RegisterImage(decoded);
         var state = plan.Alpha < 1

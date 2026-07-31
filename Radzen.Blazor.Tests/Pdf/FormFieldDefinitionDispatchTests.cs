@@ -66,7 +66,7 @@ public class FormFieldDefinitionDispatchTests
 
         FormFieldWriter.Emit(
             definition,
-            new FormEmitContext(writer, page, fields, created, new FormAppearanceService(new PortableDocument())));
+            new FormWriteContext(writer, page, fields, created, new FormWriter(new PortableDocument())));
 
         var reference = Assert.IsType<ReferenceObject>(Assert.Single(fields));
         return Assert.IsType<DictionaryObject>(writer.Resolve(reference));
@@ -77,7 +77,7 @@ public class FormFieldDefinitionDispatchTests
         var document = new PortableDocument();
         var page = document.Pages.Add(PageSizes.A4);
         document.FormFields.Add(definition);
-        new FormFlattener(document).Flatten();
+        new FormFlatteningWriter(document).Flatten();
         return page;
     }
 }

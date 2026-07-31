@@ -70,7 +70,7 @@ internal readonly record struct LaidOutAnchor
     public required double Top { get; init; }
 }
 
-internal sealed record LaidOutLayer
+internal sealed record LaidOutLayer : ILaidOutContent<LaidOutTableFragment>
 {
     public required LaidOutNodeId Id { get; init; }
 
@@ -84,7 +84,6 @@ internal sealed record LaidOutLayer
 
     public ImmutableArray<LaidOutBox> Boxes { get; init; } = [];
 
-    public bool HasContent => Lines.Length > 0 || Images.Length > 0 || CodeSymbols.Length > 0 || Tables.Length > 0 || Boxes.Length > 0;
 }
 
 internal sealed record LaidOutPage

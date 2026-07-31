@@ -224,7 +224,7 @@ public class LaidOutContractTests
         Assert.Equal(expectedPoints, glyph.TextAdjustmentPoints, 9);
         Assert.Equal(
             -kern,
-            SfntRunBuilder.PdfTextAdjustment(
+            SfntGlyphEncoder.PdfTextAdjustment(
                 glyph.TextAdjustmentPoints,
                 run.Font.EffectiveSize.Point),
             9);
@@ -647,7 +647,7 @@ public class LaidOutContractTests
             LateFamily,
             new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
 
-        var generated = DocumentGenerator.Generate(settings, laidOut);
+        var generated = DocumentRenderEngine.Generate(settings, laidOut);
         var capturedError = Assert.Throws<NotSupportedException>(
             () => generated.ToArray());
         Assert.Contains(
@@ -838,7 +838,7 @@ public class LaidOutContractTests
         DocumentRenderer? renderer = null)
     {
         var settings = RenderRequest.From(renderer ?? new DocumentRenderer());
-        return DocumentGenerator.Generate(settings, laidOut).ToArray();
+        return DocumentRenderEngine.Generate(settings, laidOut).ToArray();
     }
 
     private static bool Opaque(PropertyInfo property)

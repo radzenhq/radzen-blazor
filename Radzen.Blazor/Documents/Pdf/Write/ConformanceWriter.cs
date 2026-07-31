@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Radzen.Documents.Pdf.Write;
 
-internal sealed class ConformanceWriter(PortableDocument document)
+internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap pageMap)
 {
     private static (int Part, string Conformance) Identification(PdfAConformance level) => level switch
     {
@@ -24,7 +24,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
     private string Label => document.Conformance != PdfAConformance.None ? "PDF/A" : "PDF/UA";
 
-    private IReadOnlyList<PageOutput> PlannedPages() => PageOutputMap.Build(document.Pages).Planned;
+    private IReadOnlyList<PageOutput> PlannedPages() => pageMap.Planned;
 
     public void ValidateConformance()
     {
@@ -70,7 +70,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
             if (LoadedResources(page) is { } loaded)
             {
-                new LoadedPageInspector(loaded.Reader, Label).Inspect(loaded.Resources);
+                new LoadedPageValidator(loaded.Reader, Label).Inspect(loaded.Resources);
                 continue;
             }
 
@@ -208,9 +208,12 @@ internal sealed class ConformanceWriter(PortableDocument document)
                 $"{Label} requires every Figure to carry an alternate description; set Image.AlternateText or Image.ActualText.");
         }
 
-        foreach (var child in element.Children)
+        foreach (var kid in element.Kids)
         {
-            ValidateFigureAltText(child);
+            if (kid.Child is { } child)
+            {
+                ValidateFigureAltText(child);
+            }
         }
     }
 
@@ -295,7 +298,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
     public void WriteConformance(DocumentWriter writer, DictionaryObject catalog)
     {
-        var xmp = DocumentSaver.BaseXmp(document.Info);
+        var xmp = DocumentGraphBuilder.BaseXmp(document.Info);
 
         var part = 0;
         if (document.Conformance != PdfAConformance.None)

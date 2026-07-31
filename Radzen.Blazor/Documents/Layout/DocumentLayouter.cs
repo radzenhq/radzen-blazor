@@ -14,19 +14,9 @@ internal static class DocumentLayouter
     public static LaidOutDocument Layout(Document document, ImageProbes probes)
     {
         ArgumentNullException.ThrowIfNull(probes);
-        return Layout(
-            document,
-            document.Fonts,
-            StyleResolver.Resolve(document),
-            probes.Measure);
-    }
-
-    public static LaidOutDocument Layout(
-        Document document,
-        FontCollection fonts,
-        StyleResolution resolution,
-        Func<Image, double, (double Width, double Height)>? measureImage)
-    {
+        var fonts = document.Fonts;
+        var resolution = StyleResolver.Resolve(document);
+        var measureImage = probes.Measure;
         var first = LayoutPass(document, fonts, resolution, measureImage, null);
 
         if (!HasTableOfContents(document))

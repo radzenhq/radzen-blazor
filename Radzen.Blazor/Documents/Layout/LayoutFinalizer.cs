@@ -59,19 +59,16 @@ internal static class LayoutFinalizer
     {
         public LaidOutLayer? Layer(LaidOutLayer layer, double width)
         {
-            var lines = Lines(layer.Lines, width);
-            var boxes = Boxes(layer.Boxes);
-            var tables = Tables(layer.Tables);
-            if (lines is null && boxes is null && tables is null)
+            if (ResolveContent(layer, width, Tables) is not { } resolved)
             {
                 return null;
             }
 
             return layer with
             {
-                Lines = lines ?? layer.Lines,
-                Tables = tables ?? layer.Tables,
-                Boxes = boxes ?? layer.Boxes,
+                Lines = resolved.Lines ?? layer.Lines,
+                Tables = resolved.Tables ?? layer.Tables,
+                Boxes = resolved.Boxes ?? layer.Boxes,
             };
         }
 
@@ -143,28 +140,22 @@ internal static class LayoutFinalizer
 
         private LaidOutCell? Cell(LaidOutCell cell)
         {
-            var lines = Lines(cell.Lines, cell.ContentBox.Width);
-            var tables = NestedTables(cell.Tables);
-            var boxes = Boxes(cell.Boxes);
-            if (lines is null && tables is null && boxes is null)
+            if (ResolveContent(cell, cell.ContentBox.Width, NestedTables) is not { } resolved)
             {
                 return null;
             }
 
             return cell with
             {
-                Lines = lines ?? cell.Lines,
-                Tables = tables ?? cell.Tables,
-                Boxes = boxes ?? cell.Boxes,
+                Lines = resolved.Lines ?? cell.Lines,
+                Tables = resolved.Tables ?? cell.Tables,
+                Boxes = resolved.Boxes ?? cell.Boxes,
             };
         }
 
         private LaidOutBoxContent? Content(in LaidOutBoxContent content, double width)
         {
-            var lines = Lines(content.Lines, width);
-            var tables = NestedTables(content.Tables);
-            var boxes = Boxes(content.Boxes);
-            if (lines is null && tables is null && boxes is null)
+            if (ResolveContent(content, width, NestedTables) is not { } resolved)
             {
                 return null;
             }
@@ -172,13 +163,31 @@ internal static class LayoutFinalizer
             return new LaidOutBoxContent
             {
                 Height = content.Height,
-                Lines = lines ?? content.Lines,
+                Lines = resolved.Lines ?? content.Lines,
                 Images = content.Images,
                 CodeSymbols = content.CodeSymbols,
-                Tables = tables ?? content.Tables,
-                Boxes = boxes ?? content.Boxes,
+                Tables = resolved.Tables ?? content.Tables,
+                Boxes = resolved.Boxes ?? content.Boxes,
             };
         }
+
+        private ContentResolution<TTable>? ResolveContent<TTable>(
+            ILaidOutContent<TTable> content,
+            double width,
+            Func<ImmutableArray<TTable>, ImmutableArray<TTable>?> resolveTables)
+        {
+            var lines = Lines(content.Lines, width);
+            var tables = resolveTables(content.Tables);
+            var boxes = Boxes(content.Boxes);
+            return lines is null && tables is null && boxes is null
+                ? null
+                : new ContentResolution<TTable>(lines, tables, boxes);
+        }
+
+        private readonly record struct ContentResolution<TTable>(
+            ImmutableArray<LaidOutLine>? Lines,
+            ImmutableArray<TTable>? Tables,
+            ImmutableArray<LaidOutBox>? Boxes);
 
         private ImmutableArray<LaidOutTablePlacement>? NestedTables(ImmutableArray<LaidOutTablePlacement> tables)
         {

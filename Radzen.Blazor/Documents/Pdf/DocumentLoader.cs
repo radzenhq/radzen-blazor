@@ -53,7 +53,6 @@ internal static class DocumentLoader
             _ = new AcroForm(reader, form, document);
         }
 
-        ReadAttachments(reader, catalog, new PortableDocument(), limits);
         return document;
     }
 
