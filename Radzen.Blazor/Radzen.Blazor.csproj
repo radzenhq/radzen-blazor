@@ -65,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- WASM-safety/determinism guard for the PDF library. Scoped to Documents/Pdf, Documents/Crypto,
+    <!-- WASM-safety/determinism guard for the PDF library. Scoped to Documents/Pdf,
          Documents/Codes and Documents/Markdown via .editorconfig (RS0030/RS0031, plus CA1305). -->
     <AdditionalFiles Include="BannedSymbols.txt" />
     <GlobalAnalyzerConfigFiles Include="BannedApi.globalconfig" />

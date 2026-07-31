@@ -1,5 +1,5 @@
 using System;
-using Radzen.Documents.Crypto;
+using Radzen.Documents.Pdf.Crypto;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Signing;

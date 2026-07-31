@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Radzen.Documents.Crypto;
+namespace Radzen.Documents.Pdf.Crypto;
 
 // FIPS 197 table-driven AES: the SBox/InvSBox lookups below are data-dependent and therefore
 // not constant-time, so this implementation leaks key material to a cache-timing attacker. That

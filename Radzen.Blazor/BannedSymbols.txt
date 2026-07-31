@@ -1,5 +1,5 @@
 ; WASM-safety / determinism guard for Radzen.Documents.Pdf.
-; Enforced only under Documents/Pdf, Documents/Crypto, Documents/Codes and Documents/Markdown
+; Enforced only under Documents/Pdf, Documents/Codes and Documents/Markdown
 ; (RS0030/RS0031 scoped to error in those trees via .editorconfig).
 ; The PDF library must reimplement crypto in pure managed code and stay deterministic:
 ; no System.Security.Cryptography algorithms/RNG, no wall-clock time, no Guid/Random entropy.
@@ -12,10 +12,10 @@ N:System.Security.Cryptography; Do not use System.Security.Cryptography in the P
 ; is the only way to express this.
 ;   1. CryptographicOperations.FixedTimeEquals - a constant-time comparison that no
 ;      reimplementation could improve on (Documents/Pdf/Objects/Encryption/StandardSecurityHandler.cs).
-;   2. SHA1.HashData - the BCL SHA-1 backing Documents/Crypto/Sha1.cs. It replaces a hand-rolled
+;   2. SHA1.HashData - the BCL SHA-1 backing Documents/Pdf/Crypto/Sha1.cs. It replaces a hand-rolled
 ;      implementation of the same RFC 3174 digest, which the ban was never meant to require.
 ;   3. SHA256/SHA384/SHA512.HashData and IncrementalHash - the BCL SHA-2 backing
-;      Documents/Crypto/Sha2.cs, for the same reason as SHA-1: a FIPS 180-4 digest is
+;      Documents/Pdf/Crypto/Sha2.cs, for the same reason as SHA-1: a FIPS 180-4 digest is
 ;      deterministic and available on every shipped target.
 
 ; --- Non-deterministic wall-clock time ---

@@ -1,4 +1,4 @@
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.Pdf.Geometry;
 
 internal static class BottomUpSpace
 {
@@ -12,6 +12,12 @@ internal static class BottomUpSpace
             Bottom(top, bounds.Y + delta, bounds.Height),
             bounds.Width,
             bounds.Height);
+
+    public static PdfRect Bounds(double left, double top, in Rect bounds, double delta = 0)
+    {
+        var box = Box(left, top, bounds, delta);
+        return PdfRect.FromSize(box.Left, box.Bottom, box.Width, box.Height);
+    }
 
     public static Matrix FlipVertical(in Matrix transform, double height)
         => Matrix.FromComponents(

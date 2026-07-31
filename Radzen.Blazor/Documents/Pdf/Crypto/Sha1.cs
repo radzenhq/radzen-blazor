@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Radzen.Documents.Crypto;
+namespace Radzen.Documents.Pdf.Crypto;
 
 internal static class Sha1
 {
