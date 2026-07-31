@@ -35,7 +35,8 @@ public sealed class Image : Block
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the image, carried on the
     /// image in accessible output for assistive technology to announce in place of the
-    /// picture. When <see langword="null"/> (the default) no description is written.
+    /// picture. When <see langword="null"/> or empty (the default) and <see cref="ActualText"/>
+    /// is also unset, the image is decorative and carries no description.
     /// </summary>
     public string? AlternateText { get; set; }
 

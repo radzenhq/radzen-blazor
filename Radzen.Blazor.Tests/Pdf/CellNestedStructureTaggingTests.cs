@@ -96,11 +96,9 @@ public class CellNestedStructureTaggingTests
     }
 
     [Fact]
-    public void PdfUA_CellImageWithoutAltText_IsRejected()
+    public void PdfUA_CellImageWithoutAltText_IsNotTaggedAsFigure()
     {
-        var (document, builderRenderer) = AuthorTableWithCellImage(alternateText: false);
-        var ex = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
-        Assert.Contains("Figure", ex.Message);
+        Assert.DoesNotContain("Figure", TagsWrappingImages(Ops(AuthorTableWithCellImage(alternateText: false))));
     }
 
     [Fact]
