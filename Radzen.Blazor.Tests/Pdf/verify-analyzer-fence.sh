@@ -25,7 +25,7 @@ if [ ! -f "$CSPROJ" ]; then
 fi
 
 # One probe per fenced tree; each uses a banned symbol that must trip RS0030.
-TREES=("Documents/Pdf" "Documents/Crypto" "Documents/Codes" "Documents/Markdown")
+TREES=("Documents/Pdf" "Documents/Codes" "Documents/Markdown")
 PROBES=()
 
 cleanup() {

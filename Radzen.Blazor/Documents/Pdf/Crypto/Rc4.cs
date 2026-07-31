@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents.Crypto;
+namespace Radzen.Documents.Pdf.Crypto;
 
 internal static class Rc4
 {

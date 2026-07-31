@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Text;
-using Radzen.Documents.Crypto;
+using Radzen.Documents.Pdf.Crypto;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;

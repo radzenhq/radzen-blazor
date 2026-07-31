@@ -301,11 +301,6 @@ dotnet_diagnostic.RS0030.severity = error
 dotnet_diagnostic.RS0031.severity = error
 dotnet_diagnostic.CA1305.severity = error
 
-[Documents/Crypto/**.cs]
-dotnet_diagnostic.RS0030.severity = error
-dotnet_diagnostic.RS0031.severity = error
-dotnet_diagnostic.CA1305.severity = error
-
 [Documents/Codes/**.cs]
 dotnet_diagnostic.RS0030.severity = error
 dotnet_diagnostic.RS0031.severity = error

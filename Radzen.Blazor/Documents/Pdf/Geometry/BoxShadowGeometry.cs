@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents.Geometry;
+namespace Radzen.Documents.Pdf.Geometry;
 
 internal readonly record struct BoxShadowShape(double Width, double Height, double Radius, double Blur);
 

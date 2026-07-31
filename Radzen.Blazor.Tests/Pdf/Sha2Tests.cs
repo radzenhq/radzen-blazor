@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Text;
-using Radzen.Documents.Crypto;
+using Radzen.Documents.Pdf.Crypto;
 using Xunit;
 using Radzen.Documents;
 

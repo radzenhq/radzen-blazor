@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using Radzen.Documents;
-using Radzen.Documents.Crypto;
+using Radzen.Documents.Pdf.Crypto;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 

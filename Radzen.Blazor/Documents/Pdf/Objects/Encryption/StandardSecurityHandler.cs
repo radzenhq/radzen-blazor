@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Radzen.Documents.Crypto;
+using Radzen.Documents.Pdf.Crypto;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
 
