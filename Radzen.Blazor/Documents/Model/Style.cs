@@ -94,11 +94,11 @@ public sealed class Style
     private string? role;
 
     /// <summary>
-    /// Gets or sets the structure role a paragraph in this style carries in Tagged PDF, or
-    /// <see langword="null"/> when it sets none and the value is inherited from its base style chain.
-    /// A style without a role falls back to its <see cref="Name"/>. A role that is not one of the
-    /// standard ISO 32000-1 structure types must be declared in
-    /// <c>DocumentRenderer.RoleMap</c>; saving with PDF/UA or PDF/A Level A fails when it is not.
+    /// Gets or sets the semantic role a paragraph in this style carries for assistive technology and
+    /// structured output, or <see langword="null"/> when it sets none and the value is inherited from
+    /// its base style chain. A style without a role falls back to its <see cref="Name"/>. A renderer
+    /// decides how to express the role and which role names it accepts - the PDF renderer, for one,
+    /// maps it onto a structure type and rejects an unknown name that its role map does not declare.
     /// <see cref="HeadingLevel"/> takes precedence over the role when both are set.
     /// </summary>
     /// <exception cref="ArgumentException">The value is empty.</exception>

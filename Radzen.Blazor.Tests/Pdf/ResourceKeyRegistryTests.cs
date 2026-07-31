@@ -2,7 +2,7 @@
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
@@ -22,9 +22,9 @@ public class ResourceKeyRegistryTests
             GradientReference.Box(100, 100),
             Capture)!.Value;
 
-    private static EmissionSoftMask Mask() => new(
-        EmissionSoftMaskType.Luminosity,
-        new EmissionTransparencyGroup([], [0, 0, 1, 1], null, null, null, []),
+    private static OutputSoftMask Mask() => new(
+        OutputSoftMaskType.Luminosity,
+        new OutputTransparencyGroup([], [0, 0, 1, 1], null, null, null, []),
         null);
 
     [Fact]

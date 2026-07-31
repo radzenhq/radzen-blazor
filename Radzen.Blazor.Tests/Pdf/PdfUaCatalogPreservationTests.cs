@@ -47,7 +47,7 @@ public class PdfUaCatalogPreservationTests
         document.Pages.RemoveAt(0);
         var tagged = TaggedPage();
         document.Append(tagged);
-        document.EmissionPlan = tagged.EmissionPlan;
+        document.Output = tagged.Output;
         document.Language = "en-US";
         document.Info.Title = "Accessible Title";
         document.Accessibility = PdfUaConformance.PdfUa1;

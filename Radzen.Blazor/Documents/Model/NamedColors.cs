@@ -158,5 +158,7 @@ internal static class NamedColors
         ["YellowGreen"] = 0x9ACD32,
     };
 
+    internal static int Count => Values.Count;
+
     public static bool TryGet(string name, out uint rgb) => Values.TryGetValue(name, out rgb);
 }

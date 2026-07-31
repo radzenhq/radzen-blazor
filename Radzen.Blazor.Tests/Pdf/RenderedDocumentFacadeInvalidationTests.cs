@@ -36,7 +36,7 @@ public class RenderedDocumentFacadeInvalidationTests
         using var stream = new MemoryStream(rendered.ToArray());
         var loaded = PortableDocument.LoadFromStream(stream);
 
-        Assert.Null(loaded.EmissionPlan);
+        Assert.Null(loaded.Output);
         Assert.True(loaded.HasPreservableStructureGraph);
         Assert.True(loaded.Loaded!.SourceCatalog!.ContainsKey("MarkInfo"));
 
@@ -273,7 +273,7 @@ public class RenderedDocumentFacadeInvalidationTests
     }
 
     [Fact]
-    public void UnadoptedEmissionPlan_WithStructuredLink_MaterializesRepeatably()
+    public void UnadoptedOutput_WithStructuredLink_MaterializesRepeatably()
     {
         var model = Authored();
         var paragraph = new Paragraph();

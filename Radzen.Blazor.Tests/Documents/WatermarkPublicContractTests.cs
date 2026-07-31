@@ -80,7 +80,7 @@ public class WatermarkPublicContractTests
 
         var rendered = new DocumentRenderer().Render(DocumentWith(watermark));
         var content = System.Text.Encoding.ASCII.GetString(
-            rendered.EmissionPlan!.Pages[0].ContentArray);
+            rendered.Output!.Pages[0].ContentArray);
 
         var image = content.LastIndexOf("Do\n", StringComparison.Ordinal);
         var text = content.LastIndexOf("Tj\n", StringComparison.Ordinal);

@@ -82,8 +82,12 @@ public static class QrEncoder
     private static int ByteModeCharacterCountBits(int version) => version <= 9 ? 8 : 16;
 
     /// <summary>Encode a UTF-8 string into a QR module matrix.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
     public static bool[,] EncodeUtf8(string value, QrErrorCorrection ecc, int minVersion = 1, int maxVersion = 40)
-        => EncodeBytes(Encoding.UTF8.GetBytes(value ?? string.Empty), ecc, minVersion, maxVersion);
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return EncodeBytes(Encoding.UTF8.GetBytes(value), ecc, minVersion, maxVersion);
+    }
 
     /// <summary>Encode raw bytes into a QR module matrix.</summary>
     public static bool[,] EncodeBytes(byte[] data, QrErrorCorrection ecc = QrErrorCorrection.Medium, int minVersion = 1, int maxVersion = 40)
