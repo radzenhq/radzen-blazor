@@ -1,6 +1,6 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -45,13 +45,13 @@ internal sealed class DocumentMaterializer
         var appendImporters = new Dictionary<DocumentReader, GraphImporter>();
         var pageNodes = new List<(Page Page, DictionaryObject Node, ReferenceObject Reference)>();
 
-        var fontRefs = new Dictionary<EmissionFont, DocumentObject>();
-        var imageRefs = new Dictionary<EmissionImage, ReferenceObject>();
+        var fontRefs = new Dictionary<OutputFont, DocumentObject>();
+        var imageRefs = new Dictionary<OutputImage, ReferenceObject>();
         var sharedImages = new Dictionary<object, ReferenceObject>(ReferenceEqualityComparer.Instance);
         var emittedContent = new Dictionary<Page, List<ReadOnlyMemory<byte>>>();
         var annotationJoins = new List<AnnotationElementJoin>();
 
-        var pageMap = EmissionPageMap.Build(doc.Pages);
+        var pageMap = PageOutputMap.Build(doc.Pages);
         var kids = new ArrayObject();
         foreach (var page in doc.Pages)
         {
@@ -181,7 +181,7 @@ internal sealed class DocumentMaterializer
         catalog["Type"] = new NameObject("Catalog");
         catalog["Pages"] = pagesRef;
 
-        if (doc.EmissionPlan?.Structure is { } structure)
+        if (doc.Output?.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
             catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(
@@ -189,7 +189,7 @@ internal sealed class DocumentMaterializer
                 structure,
                 pageNodes,
                 pageMap,
-                doc.EmissionPlan.RoleMap,
+                doc.Output.RoleMap,
                 annotationJoins);
         }
 
@@ -238,7 +238,7 @@ internal sealed class DocumentMaterializer
             new AttachmentWriter(doc).WriteAttachments(writer, catalog);
         }
 
-        if (doc.EmissionPlan?.Anchors.Count > 0)
+        if (doc.Output?.Anchors.Count > 0)
         {
             new NavigationWriter(doc).WriteDestinations(writer, catalog, pageNodes, pageMap);
         }
@@ -461,7 +461,7 @@ internal sealed class DocumentMaterializer
     // ISO 32000-1 14.4: both /ID halves equal at creation time.
     private ArrayObject BuildDocumentId(IReadOnlyDictionary<Page, List<ReadOnlyMemory<byte>>> emittedContent)
     {
-        var seed = new Radzen.Documents.Crypto.Sha256Hasher();
+        var seed = new Radzen.Documents.Pdf.Crypto.Sha256Hasher();
 
         void Text(string? value)
         {

@@ -1,26 +1,27 @@
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Pdf.Output;
 
-namespace Radzen.Documents.Pdf.Emission;
+namespace Radzen.Documents.Pdf.Write;
 
-internal sealed class EmissionPageMap
+internal sealed class PageOutputMap
 {
-    private readonly Dictionary<PageEmissionPlan, int> indexes = [];
-    private readonly List<PageEmissionPlan?> byPageIndex = [];
-    private readonly List<PageEmissionPlan> planned = [];
+    private readonly Dictionary<PageOutput, int> indexes = [];
+    private readonly List<PageOutput?> byPageIndex = [];
+    private readonly List<PageOutput> planned = [];
 
-    private EmissionPageMap()
+    private PageOutputMap()
     {
     }
 
-    public IReadOnlyList<PageEmissionPlan> Planned => planned;
+    public IReadOnlyList<PageOutput> Planned => planned;
 
-    public static EmissionPageMap Build(IReadOnlyList<Page> pages)
+    public static PageOutputMap Build(IReadOnlyList<Page> pages)
     {
-        var map = new EmissionPageMap();
+        var map = new PageOutputMap();
         for (var index = 0; index < pages.Count; index++)
         {
-            var plan = pages[index].EmissionIdentity;
+            var plan = pages[index].OutputIdentity;
             map.byPageIndex.Add(plan);
             if (plan is not null)
             {
@@ -32,9 +33,9 @@ internal sealed class EmissionPageMap
         return map;
     }
 
-    public PageEmissionPlan? PlanAt(int pageIndex) => byPageIndex[pageIndex];
+    public PageOutput? PlanAt(int pageIndex) => byPageIndex[pageIndex];
 
-    public int IndexOf(PageEmissionPlan page, string feature)
+    public int IndexOf(PageOutput page, string feature)
         => indexes.TryGetValue(page, out var index)
             ? index
             : throw new InvalidOperationException(

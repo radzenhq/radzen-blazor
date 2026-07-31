@@ -19,6 +19,9 @@ internal sealed class RenderRequest
         PageLabels = [.. renderer.PageLabels];
         FormFields = [.. renderer.FormFields];
         Decoders = renderer.ImageDecoders;
+        AllowUnsupportedCharacters = renderer.AllowUnsupportedCharacters;
+        AllowRestrictedEmbedding = renderer.AllowRestrictedEmbedding;
+        AllowDegradedFonts = renderer.AllowDegradedFonts;
     }
 
     public PdfAConformance Conformance { get; }
@@ -46,6 +49,12 @@ internal sealed class RenderRequest
     public ImmutableArray<FormFieldDefinition> FormFields { get; }
 
     public ImageDecoders Decoders { get; }
+
+    public bool AllowUnsupportedCharacters { get; }
+
+    public bool AllowRestrictedEmbedding { get; }
+
+    public bool AllowDegradedFonts { get; }
 
     public static RenderRequest From(DocumentRenderer renderer) => new(renderer);
 }

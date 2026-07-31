@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Write;
@@ -13,7 +13,7 @@ internal static class StructureWriter
         DocumentWriter writer,
         StructureElementSnapshot structure,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        EmissionPageMap pageMap,
+        PageOutputMap pageMap,
         IReadOnlyList<KeyValuePair<string, string>> roleMap,
         IReadOnlyList<AnnotationElementJoin> annotationJoins)
     {
@@ -130,7 +130,7 @@ internal static class StructureWriter
         StructureElementSnapshot element,
         ReferenceObject parentRef,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        EmissionPageMap pageMap,
+        PageOutputMap pageMap,
         Dictionary<int, List<DocumentObject>> parents,
         IReadOnlyDictionary<int, List<AnnotationElementJoin>> joinsByElement,
         ref int annotationKey)

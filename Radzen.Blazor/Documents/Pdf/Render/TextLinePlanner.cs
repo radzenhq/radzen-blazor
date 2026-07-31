@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System;
+using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -48,7 +50,7 @@ internal sealed class TextLinePlanner(
                 context,
                 box,
                 left + current.X,
-                PageSpace.FromTop(baseTop, current.Y + delta),
+                BottomUpSpace.FromTop(baseTop, current.Y + delta),
                 element,
                 opacity,
                 marker,

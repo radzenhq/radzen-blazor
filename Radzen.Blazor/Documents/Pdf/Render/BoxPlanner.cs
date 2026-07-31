@@ -1,16 +1,31 @@
 using System;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class BoxPlanner(TablePlanner tables)
+internal enum BoxContentOrigin
 {
-    public void EmitBox(EmitContext context, in LaidOutBox box, double left, double contentTop)
+    Parent,
+    Box,
+}
+
+internal sealed class BoxPlanner(StructureTreeBuilder structureTree)
+{
+    public void EmitBox(
+        EmitContext context,
+        LaidOutBox box,
+        BoxContentOrigin origin,
+        StructureElement? element,
+        double left,
+        double contentTop,
+        double delta,
+        SemanticArtifactKind? inheritedArtifact)
     {
         var plan = context.Plan;
         var mark = plan.Mark();
-        var bounds = PageSpace.Bounds(left, contentTop, box.Bounds);
-        var artifact = tables.ArtifactOf(box.Source);
+        var bounds = BottomUpSpace.Bounds(left, contentTop, box.Bounds, delta);
+        var artifact = inheritedArtifact ?? structureTree.ArtifactOf(box.Source);
 
         if (box.Transform is not null && box.Style.Shadow is not null)
         {
@@ -28,17 +43,21 @@ internal sealed class BoxPlanner(TablePlanner tables)
 
         var radius = BoxStyle.ClampRadius(box.Style.CornerRadius, bounds.Width, bounds.Height);
         var innerWidth = Math.Max(0, box.Bounds.Width - box.Padding.Horizontal);
+        var parentOrigin = origin == BoxContentOrigin.Parent;
 
-        tables.EmitBoxContent(
+        BoxContentPlanner.EmitBoxContent(
             context,
             box.Content,
-            innerWidth, box.Bounds.X, box.Bounds.X + box.Bounds.Width,
-            bounds, radius, opacity, null,
-            left, contentTop, box.Bounds.Y, artifact);
+            innerWidth,
+            parentOrigin ? box.Bounds.X : 0,
+            parentOrigin ? box.Bounds.X + box.Bounds.Width : box.Bounds.Width,
+            bounds, radius, opacity, element,
+            parentOrigin ? left : left + box.Bounds.X,
+            contentTop, delta + box.Bounds.Y, artifact);
 
         if (box.Transform is { } transform)
         {
-            plan.ApplyTransform(PageSpace.Flip(transform, plan.Size.Height.Point), mark);
+            plan.ApplyTransform(BottomUpSpace.FlipVertical(transform, plan.Size.Height.Point), mark);
         }
     }
 }

@@ -2,64 +2,63 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Fonts;
 
-namespace Radzen.Documents.Pdf.Emission;
+namespace Radzen.Documents.Pdf.Output;
 
-internal sealed class DocumentEmissionPlan(
-    ImmutableArray<PageEmissionPlan> pages,
+internal sealed class DocumentOutput(
+    ImmutableArray<PageOutput> pages,
     StructureElementSnapshot? structure,
-    ImmutableDictionary<string, EmissionAnchor> anchors,
+    ImmutableDictionary<string, OutputAnchor> anchors,
     ImmutableArray<KeyValuePair<string, string>> roleMap,
     ImmutableArray<string> unmappedRoles)
 {
-    public ImmutableArray<PageEmissionPlan> Pages { get; } = pages;
+    public ImmutableArray<PageOutput> Pages { get; } = pages;
 
     public StructureElementSnapshot? Structure { get; } = structure;
 
-    public ImmutableDictionary<string, EmissionAnchor> Anchors { get; } = anchors;
+    public ImmutableDictionary<string, OutputAnchor> Anchors { get; } = anchors;
 
     public ImmutableArray<KeyValuePair<string, string>> RoleMap { get; } = roleMap;
 
     public ImmutableArray<string> UnmappedRoles { get; } = unmappedRoles;
 }
 
-internal sealed class PageEmissionPlan(
+internal sealed class PageOutput(
     byte[] content,
-    ImmutableArray<EmissionFont> fonts,
-    ImmutableArray<EmissionImage> images,
-    ImmutableArray<EmissionLink> links,
-    ImmutableArray<EmissionExtGState> extGStates,
-    ImmutableArray<EmissionPattern> patterns)
+    ImmutableArray<OutputFont> fonts,
+    ImmutableArray<OutputImage> images,
+    ImmutableArray<OutputLink> links,
+    ImmutableArray<OutputExtGState> extGStates,
+    ImmutableArray<OutputPattern> patterns)
 {
     public ReadOnlyMemory<byte> Content => ContentArray;
 
     public byte[] ContentArray { get; } = content;
 
-    public ImmutableArray<EmissionFont> Fonts { get; } = fonts;
+    public ImmutableArray<OutputFont> Fonts { get; } = fonts;
 
-    public ImmutableArray<EmissionImage> Images { get; } = images;
+    public ImmutableArray<OutputImage> Images { get; } = images;
 
-    public ImmutableArray<EmissionLink> Links { get; } = links;
+    public ImmutableArray<OutputLink> Links { get; } = links;
 
-    public ImmutableArray<EmissionExtGState> ExtGStates { get; } = extGStates;
+    public ImmutableArray<OutputExtGState> ExtGStates { get; } = extGStates;
 
-    public ImmutableArray<EmissionPattern> Patterns { get; } = patterns;
+    public ImmutableArray<OutputPattern> Patterns { get; } = patterns;
 }
 
-internal enum EmissionFontFileKind
+internal enum OutputFontFileKind
 {
     Glyf,
     Cff,
 }
 
-internal readonly record struct EmissionWidthRun(int Cid, ImmutableArray<int> Widths);
+internal readonly record struct OutputWidthRun(int Cid, ImmutableArray<int> Widths);
 
-internal sealed class EmissionFontProgram(
-    EmissionFontFileKind kind,
+internal sealed class OutputFontProgram(
+    OutputFontFileKind kind,
     byte[] file,
     byte[] cidSet,
-    ImmutableArray<EmissionWidthRun> widths,
+    ImmutableArray<OutputWidthRun> widths,
     byte[] toUnicode,
     string baseName,
     int flags,
@@ -69,13 +68,13 @@ internal sealed class EmissionFontProgram(
     int descent,
     int capHeight)
 {
-    public EmissionFontFileKind Kind { get; } = kind;
+    public OutputFontFileKind Kind { get; } = kind;
 
     public ReadOnlyMemory<byte> File { get; } = file;
 
     public ReadOnlyMemory<byte> CidSet { get; } = cidSet;
 
-    public ImmutableArray<EmissionWidthRun> Widths { get; } = widths;
+    public ImmutableArray<OutputWidthRun> Widths { get; } = widths;
 
     public ReadOnlyMemory<byte> ToUnicode { get; } = toUnicode;
 
@@ -94,11 +93,10 @@ internal sealed class EmissionFontProgram(
     public int CapHeight { get; } = capHeight;
 }
 
-internal sealed class EmissionFont(
+internal sealed class OutputFont(
     string key,
     string? base14,
-    EmissionFontProgram? program,
-    ReverseFont extraction)
+    OutputFontProgram? program)
 {
     public string Key { get; } = key;
 
@@ -106,29 +104,27 @@ internal sealed class EmissionFont(
 
     public string Base14Name => Base14 ?? "Helvetica";
 
-    public EmissionFontProgram? Program { get; } = program;
+    public OutputFontProgram? Program { get; } = program;
 
     public bool IsEmbedded => Program is not null;
-
-    public ReverseFont Extraction { get; } = extraction;
 }
 
-internal sealed class EmissionImage(
-    object identity,
+internal sealed class OutputImage(
+    DecodedImage identity,
     string key,
-    EmissionImagePayload image,
-    EmissionImagePayload? softMask)
+    OutputImagePayload image,
+    OutputImagePayload? softMask)
 {
-    public object Identity { get; } = identity;
+    public DecodedImage Identity { get; } = identity;
 
     public string Key { get; } = key;
 
-    public EmissionImagePayload Image { get; } = image;
+    public OutputImagePayload Image { get; } = image;
 
-    public EmissionImagePayload? SoftMask { get; } = softMask;
+    public OutputImagePayload? SoftMask { get; } = softMask;
 }
 
-internal readonly record struct EmissionLink(
+internal readonly record struct OutputLink(
     double X1,
     double Y1,
     double X2,
@@ -137,14 +133,14 @@ internal readonly record struct EmissionLink(
     string? Destination,
     int? StructureElementId);
 
-internal readonly record struct EmissionAnchor(PageEmissionPlan Page, double Top);
+internal readonly record struct OutputAnchor(PageOutput Page, double Top);
 
-internal sealed class EmissionExtGState(
+internal sealed class OutputExtGState(
     string key,
     double fillAlpha,
     double strokeAlpha,
     BlendMode? blend,
-    EmissionSoftMask? softMask,
+    OutputSoftMask? softMask,
     bool clearSoftMask)
 {
     public string Key { get; } = key;
@@ -155,12 +151,12 @@ internal sealed class EmissionExtGState(
 
     public BlendMode? Blend { get; } = blend;
 
-    public EmissionSoftMask? SoftMask { get; } = softMask;
+    public OutputSoftMask? SoftMask { get; } = softMask;
 
     public bool ClearSoftMask { get; } = clearSoftMask;
 }
 
-internal sealed class EmissionPattern(string key, GradientPaint gradient, Matrix matrix)
+internal sealed class OutputPattern(string key, GradientPaint gradient, Matrix matrix)
 {
     public string Key { get; } = key;
 
@@ -169,31 +165,31 @@ internal sealed class EmissionPattern(string key, GradientPaint gradient, Matrix
     public Matrix Matrix { get; } = matrix;
 }
 
-internal enum EmissionSoftMaskType
+internal enum OutputSoftMaskType
 {
     Alpha,
     Luminosity,
 }
 
-internal sealed class EmissionSoftMask(
-    EmissionSoftMaskType type,
-    EmissionTransparencyGroup group,
+internal sealed class OutputSoftMask(
+    OutputSoftMaskType type,
+    OutputTransparencyGroup group,
     ImmutableArray<double>? backdrop)
 {
-    public EmissionSoftMaskType Type { get; } = type;
+    public OutputSoftMaskType Type { get; } = type;
 
-    public EmissionTransparencyGroup Group { get; } = group;
+    public OutputTransparencyGroup Group { get; } = group;
 
     public ImmutableArray<double>? Backdrop { get; } = backdrop;
 }
 
-internal sealed class EmissionTransparencyGroup(
+internal sealed class OutputTransparencyGroup(
     byte[] content,
     ImmutableArray<double> boundingBox,
     string? colorSpace,
     bool? isolated,
     bool? knockout,
-    ImmutableArray<KeyValuePair<string, EmissionImagePayload>> xObjects)
+    ImmutableArray<KeyValuePair<string, OutputImagePayload>> xObjects)
 {
     public ReadOnlyMemory<byte> Content { get; } = content;
 
@@ -205,12 +201,12 @@ internal sealed class EmissionTransparencyGroup(
 
     public bool? Knockout { get; } = knockout;
 
-    public ImmutableArray<KeyValuePair<string, EmissionImagePayload>> XObjects { get; } = xObjects;
+    public ImmutableArray<KeyValuePair<string, OutputImagePayload>> XObjects { get; } = xObjects;
 }
 
 internal readonly record struct StructureKidSnapshot(
     StructureElementSnapshot? Child,
-    PageEmissionPlan? Page,
+    PageOutput? Page,
     int Mcid);
 
 internal sealed class StructureElementSnapshot(
@@ -222,7 +218,7 @@ internal sealed class StructureElementSnapshot(
     int rowSpan,
     int columnSpan,
     ImmutableArray<StructureElementSnapshot> children,
-    ImmutableArray<(PageEmissionPlan Page, int Mcid)> marks,
+    ImmutableArray<(PageOutput Page, int Mcid)> marks,
     ImmutableArray<StructureKidSnapshot> kids)
 {
     public int Id { get; } = id;
@@ -241,7 +237,7 @@ internal sealed class StructureElementSnapshot(
 
     public ImmutableArray<StructureElementSnapshot> Children { get; } = children;
 
-    public ImmutableArray<(PageEmissionPlan Page, int Mcid)> Marks { get; } = marks;
+    public ImmutableArray<(PageOutput Page, int Mcid)> Marks { get; } = marks;
 
     public ImmutableArray<StructureKidSnapshot> Kids { get; } = kids;
 }

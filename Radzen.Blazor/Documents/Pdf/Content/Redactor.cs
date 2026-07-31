@@ -54,7 +54,7 @@ internal static class Redactor
         page.BeginGeneratedEdit();
 
         Func<string, bool> isRemovableXObject = static _ => false;
-        if (page.EmissionIdentity is { } generated)
+        if (page.OutputIdentity is { } generated)
         {
             var imageNames = new HashSet<string>(StringComparer.Ordinal);
             foreach (var image in generated.Images)

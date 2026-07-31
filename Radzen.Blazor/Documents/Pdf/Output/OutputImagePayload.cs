@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Radzen.Documents.Pdf.Emission;
+namespace Radzen.Documents.Pdf.Output;
 
-internal sealed class EmissionImagePayload
+internal sealed class OutputImagePayload
 {
     private readonly byte[] samples;
 
     private readonly byte[] palette;
 
-    private EmissionImagePayload(DecodedImage image)
+    private OutputImagePayload(DecodedImage image)
     {
         samples = image.Samples.ToArray();
         palette = image.Palette.ToArray();
@@ -23,7 +23,7 @@ internal sealed class EmissionImagePayload
         Interpolate = image.Interpolate;
     }
 
-    public static EmissionImagePayload Capture(DecodedImage image) => new(image);
+    public static OutputImagePayload Capture(DecodedImage image) => new(image);
 
     public ReadOnlySpan<byte> Samples => samples;
 

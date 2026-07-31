@@ -1,5 +1,5 @@
 using System.Text;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 
@@ -8,7 +8,7 @@ namespace Radzen.Documents.Pdf;
 internal static class ImageXObjectBuilder
 {
     // ISO 32000-1 8.9.5: an image XObject names its size, color space, sample depth and filter.
-    public static StreamObject Build(EmissionImagePayload image)
+    public static StreamObject Build(OutputImagePayload image)
     {
         var stream = new StreamObject(Encode(image));
         var dict = stream.Dictionary;
@@ -54,7 +54,7 @@ internal static class ImageXObjectBuilder
         return stream;
     }
 
-    private static byte[] Encode(EmissionImagePayload image)
+    private static byte[] Encode(OutputImagePayload image)
         => image.Compression == ImageCompression.None
             ? FlateFilter.Encode(image.Samples)
             : image.Samples.ToArray();
@@ -67,7 +67,7 @@ internal static class ImageXObjectBuilder
     };
 
     // ISO 32000-1 8.6.6.3: an indexed color space is [/Indexed base hival lookup].
-    private static DocumentObject? ColorSpace(EmissionImagePayload image) => image.ColorSpace switch
+    private static DocumentObject? ColorSpace(OutputImagePayload image) => image.ColorSpace switch
     {
         ImageColorSpace.DeviceGray => new NameObject("DeviceGray"),
         ImageColorSpace.DeviceRgb => new NameObject("DeviceRGB"),

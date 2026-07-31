@@ -80,7 +80,7 @@ internal sealed class CatalogPreserver(PortableDocument document)
             catalog[key] = importer.ImportValue(sourceCatalog[key]);
         }
 
-        if (document.EmissionPlan?.Structure is null && document.HasPreservableStructureGraph)
+        if (document.Output?.Structure is null && document.HasPreservableStructureGraph)
         {
             if (sourceCatalog.TryGetValue("MarkInfo", out var markInfo))
             {

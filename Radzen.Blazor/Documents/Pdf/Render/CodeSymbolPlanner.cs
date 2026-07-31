@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -10,7 +11,7 @@ internal sealed class CodeSymbolPlanner(StructureTreeBuilder structureTree)
     public void EmitCodeSymbol(EmitContext context, LaidOutCodeSymbol positioned, double left, double top)
         => EmitCodeSymbolModules(
             context, positioned.Source, positioned.Modules,
-            left + positioned.X, PageSpace.FromTop(top, positioned.Y), positioned.Caption);
+            left + positioned.X, BottomUpSpace.FromTop(top, positioned.Y), positioned.Caption);
 
     public void EmitCodeSymbolModules(
         EmitContext context,

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Content;
@@ -17,14 +17,14 @@ internal sealed class ContentResourceManifest
         Patterns = patterns;
         ExtGStates = extGStates;
 
-        var imageResources = new List<EmissionImage>(images.Count);
+        var imageResources = new List<OutputImage>(images.Count);
         foreach (var image in images)
         {
-            imageResources.Add(new EmissionImage(
+            imageResources.Add(new OutputImage(
                 image.Value,
                 image.Key,
-                EmissionImagePayload.Capture(image.Value),
-                image.Value.Alpha is { } alpha ? EmissionImagePayload.Capture(alpha) : null));
+                OutputImagePayload.Capture(image.Value),
+                image.Value.Alpha is { } alpha ? OutputImagePayload.Capture(alpha) : null));
         }
 
         ImagesForWriting = imageResources;
@@ -36,7 +36,7 @@ internal sealed class ContentResourceManifest
 
     public IReadOnlyList<KeyValuePair<string, DecodedImage>> Images { get; }
 
-    internal IReadOnlyList<EmissionImage> ImagesForWriting { get; }
+    internal IReadOnlyList<OutputImage> ImagesForWriting { get; }
 
     public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns { get; }
 

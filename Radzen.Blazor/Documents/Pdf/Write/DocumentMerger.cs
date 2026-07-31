@@ -77,9 +77,9 @@ internal static class DocumentMerger
             }
         }
 
-        if (source.EmissionIdentity is { } generated)
+        if (source.OutputIdentity is { } generated)
         {
-            page.EmissionIdentity = generated;
+            page.OutputIdentity = generated;
             if (source.TextFonts is { } generatedFonts)
             {
                 page.SetTextFonts(generatedFonts);

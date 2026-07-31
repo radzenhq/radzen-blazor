@@ -7,7 +7,7 @@ using System.Text;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Internal;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Signing;
@@ -411,7 +411,7 @@ public sealed class PortableDocument
         }
     });
 
-    internal DocumentEmissionPlan? EmissionPlan { get; set; }
+    internal DocumentOutput? Output { get; set; }
 
     /// <summary>
     /// Gets the map of non-standard structure roles to standard ISO 32000-1 structure types
@@ -456,7 +456,7 @@ public sealed class PortableDocument
         {
             if (Pages.Count > 0
                 && value is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A
-                && EmissionPlan?.Structure is null
+                && Output?.Structure is null
                 && !HasPreservableStructureGraph)
             {
                 throw new InvalidOperationException(

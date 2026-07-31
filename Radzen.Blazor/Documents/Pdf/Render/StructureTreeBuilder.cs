@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -23,10 +23,10 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
     public static StructureElementSnapshot Capture(
         StructureElement root,
-        ImmutableArray<PageEmissionPlan> pages)
+        ImmutableArray<PageOutput> pages)
         => new StructureCapture(pages).Capture(root);
 
-    private sealed class StructureCapture(ImmutableArray<PageEmissionPlan> pages)
+    private sealed class StructureCapture(ImmutableArray<PageOutput> pages)
     {
         private readonly Dictionary<StructureElement, StructureElementSnapshot> captured = [];
 
@@ -52,7 +52,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                     kid.Mcid));
             }
 
-            var marks = ImmutableArray.CreateBuilder<(PageEmissionPlan Page, int Mcid)>(element.Marks.Count);
+            var marks = ImmutableArray.CreateBuilder<(PageOutput Page, int Mcid)>(element.Marks.Count);
             foreach (var (pageIndex, mcid) in element.Marks)
             {
                 marks.Add((pages[pageIndex], mcid));

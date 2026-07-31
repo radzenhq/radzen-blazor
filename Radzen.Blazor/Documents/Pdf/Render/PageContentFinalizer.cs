@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using static Radzen.Documents.Pdf.Content.ContentEmitter;
 using static Radzen.Documents.Pdf.Render.DrawEmitter;
 
@@ -51,13 +51,13 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
     private ContentWriter writer = null!;
     private PagePlan plan = null!;
     private int pageIndex;
-    private IReadOnlyDictionary<EmittedFont, EmissionFont> fontPlans = null!;
-    private PageEmissionPlan? emissionPage;
+    private IReadOnlyDictionary<EmittedFont, OutputFont> fontPlans = null!;
+    private PageOutput? emissionPage;
 
-    public PageEmissionPlan Finalize(
+    public PageOutput Finalize(
         PagePlan pagePlan,
         int index,
-        IReadOnlyDictionary<EmittedFont, EmissionFont> fonts)
+        IReadOnlyDictionary<EmittedFont, OutputFont> fonts)
     {
         using var contentWriter = new ContentWriter();
         writer = contentWriter;
@@ -431,13 +431,13 @@ internal sealed class PageContentFinalizer(StructureTreeBuilder structureTree, b
 
     private void PackageResources()
     {
-        var fonts = ImmutableArray.CreateBuilder<EmissionFont>(plan.UsedFonts.Count);
+        var fonts = ImmutableArray.CreateBuilder<OutputFont>(plan.UsedFonts.Count);
         foreach (var font in plan.UsedFonts)
         {
             fonts.Add(fontPlans[font]);
         }
 
-        emissionPage = new PageEmissionPlan(
+        emissionPage = new PageOutput(
             writer.ToArray(),
             fonts.MoveToImmutable(),
             [.. plan.UsedImages],
