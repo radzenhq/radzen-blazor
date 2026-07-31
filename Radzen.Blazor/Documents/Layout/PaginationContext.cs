@@ -398,9 +398,13 @@ internal sealed class PaginationContext
         var spacingAfter = format.SpacingAfter.Point;
         var offset = 0;
         var first = true;
+        var progress = new LayoutProgressGuard(
+            FormattableString.Invariant($"Paragraph pagination over {lines.Count} lines"));
 
         while (true)
         {
+            progress.Reached(offset);
+
             var remaining = lines.Count - offset;
             var blockTop = Cursor + (first ? spacingBefore : 0);
             if (first && !HasPageContent)
