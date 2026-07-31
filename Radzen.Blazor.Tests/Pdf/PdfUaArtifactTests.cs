@@ -167,13 +167,32 @@ public class PdfUaArtifactTests
     }
 
     [Fact]
-    public void PdfUA_FigureWithoutAltOrActualText_Throws()
+    public void PdfUA_ImageWithoutAltOrActualText_IsNotTagged()
     {
         var document = new Document { Language = "en-US" };
         var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
         document.Info.Title = "Figure";
         var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var types = new List<string>();
+        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
+
+        Assert.DoesNotContain("Figure", types);
+    }
+
+    [Fact]
+    public void PdfUA_ParagraphStyledAsFigureWithoutAlternateText_Throws()
+    {
+        var document = new Document { Language = "en-US" };
+        var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+        BuildTestSupport.RegisterLatin(document);
+        document.Info.Title = "Figure";
+        document.Styles.Add("Fig").Role = "Figure";
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.StyleName = "Fig";
+        paragraph.Inlines.Add("Stands in for a picture.").Font.Family = BuildTestSupport.Latin;
 
         var error = Assert.Throws<InvalidOperationException>(() => builderRenderer.ToArray(document));
 

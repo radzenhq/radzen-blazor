@@ -205,7 +205,7 @@ public class DeterminismManifestTests
         ["plain-text"] = "17509576c3839f8833478414a2d21189753951372311492c094100caf2010b34",
         ["truetype-subset"] = "2e28d4416c5c7925b9d581ebd7e99f20d23a491bd6d75a1cd2155393e481e963",
         ["tables"] = "6a16fe3b40d900cde01f93d12dd072eaddd1c8f3b6fd7f870c80fb1f038b249f",
-        ["image"] = "d85431f2632cdccfc4699270f92007c5ce74cb1f9e96c10f0af9c140a6b3ef0f",
+        ["image"] = "0438f720084fc8b23c1600fbd41f626e606a7a8278fa95858e9fe3d398f6bcd6",
         ["gradients"] = "0b7ea915987a44d44a824f9ea34dbb0008c9ed1d87b8518cb9edfc81491e9176",
         ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
         ["signed"] = "ab5875e082b064a4ed84920dc14b9801da372bb9cbbe9036e7cb6a4289ec2fd7",
