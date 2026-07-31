@@ -100,7 +100,8 @@ internal sealed class SfntFont
         {
             throw new InvalidOperationException(
                 $"The font '{PostScriptName}' has OS/2 fsType 0x{FsType:X4} (Restricted License Embedding) and must not be embedded. "
-                + "Pass the embedding opt-in override to embed it anyway if you hold a license that permits it.");
+                + "Set DocumentRenderer.AllowRestrictedEmbedding to true to embed it anyway if you hold a license "
+                + "that permits it.");
         }
     }
 
@@ -119,14 +120,14 @@ internal sealed class SfntFont
         {
             throw new NotSupportedException(
                 $"The font '{PostScriptName}' is a variable font; axis selection is not supported, so only its default instance "
-                + "would be embedded. Set AllowDegradedFonts to embed the default instance anyway.");
+                + "would be embedded. Set DocumentRenderer.AllowDegradedFonts to true to embed the default instance anyway.");
         }
 
         if (IsColorFont)
         {
             throw new NotSupportedException(
                 $"The font '{PostScriptName}' is a color font (COLR/sbix/SVG); color glyphs are not supported and would render as "
-                + "monochrome outlines or missing. Set AllowDegradedFonts to embed it anyway.");
+                + "monochrome outlines or missing. Set DocumentRenderer.AllowDegradedFonts to true to embed it anyway.");
         }
     }
 

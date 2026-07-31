@@ -71,6 +71,35 @@ public class FontEmbedPermissionTests
         face.EnsureEmbeddable(allowRestricted: true);
     }
 
+    private static Document DocumentWith(byte[] font)
+    {
+        var document = new Document();
+        document.Fonts.Register("Restricted", new System.IO.MemoryStream(font));
+        var section = document.Sections.Add();
+        section.Blocks.AddParagraph("Body").Font.Family = "Restricted";
+        return document;
+    }
+
+    [Fact]
+    public void RestrictedFont_RegistersButIsRejectedAtRender()
+    {
+        var document = DocumentWith(WithFsType(Liberation(), 0x0002));
+
+        var error = Assert.Throws<InvalidOperationException>(
+            () => new Radzen.Documents.Pdf.DocumentRenderer().Render(document));
+
+        Assert.Contains("Restricted License Embedding", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RestrictedFont_IsEmbeddedWhenTheRendererAllowsIt()
+    {
+        var document = DocumentWith(WithFsType(Liberation(), 0x0002));
+        var renderer = new Radzen.Documents.Pdf.DocumentRenderer { AllowRestrictedEmbedding = true };
+
+        Assert.NotEmpty(renderer.ToArray(document));
+    }
+
     [Fact]
     public void PreviewPrintAndEditableBits_AreNotRestricted()
     {

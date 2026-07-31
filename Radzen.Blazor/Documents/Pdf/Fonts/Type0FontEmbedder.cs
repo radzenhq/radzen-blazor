@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 
@@ -12,12 +12,12 @@ internal static class Type0FontEmbedder
     private const int StemV = 80;
     private const int DefaultWidth = 1000;
 
-    public static ReferenceObject Embed(DocumentWriter writer, EmissionFontProgram program)
+    public static ReferenceObject Embed(DocumentWriter writer, OutputFontProgram program)
     {
         ArgumentNullException.ThrowIfNull(writer);
         ArgumentNullException.ThrowIfNull(program);
 
-        var isCff = program.Kind == EmissionFontFileKind.Cff;
+        var isCff = program.Kind == OutputFontFileKind.Cff;
         var descriptor = new DictionaryObject
         {
             ["Type"] = new NameObject("FontDescriptor"),
@@ -72,7 +72,7 @@ internal static class Type0FontEmbedder
         return writer.Add(top);
     }
 
-    private static StreamObject FontFile(EmissionFontProgram program, bool isCff)
+    private static StreamObject FontFile(OutputFontProgram program, bool isCff)
     {
         var stream = FlateFilter.EncodeStream(program.File.Span);
         if (isCff)
@@ -98,7 +98,7 @@ internal static class Type0FontEmbedder
         return array;
     }
 
-    private static ArrayObject Widths(System.Collections.Immutable.ImmutableArray<EmissionWidthRun> runs)
+    private static ArrayObject Widths(System.Collections.Immutable.ImmutableArray<OutputWidthRun> runs)
     {
         var w = new ArrayObject();
         foreach (var run in runs)

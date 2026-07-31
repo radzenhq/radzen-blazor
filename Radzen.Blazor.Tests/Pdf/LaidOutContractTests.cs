@@ -231,7 +231,7 @@ public class LaidOutContractTests
     }
 
     [Fact]
-    public void AllowUnsupportedCharacters_IsCapturedAtLayout()
+    public void AllowUnsupportedCharacters_IsReadFromTheRenderRequest()
     {
         var document = new Document();
         var section = Page(document);
@@ -252,10 +252,7 @@ public class LaidOutContractTests
             error.Message);
 
         var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
-        Assert.Throws<InvalidOperationException>(() => Render(laidOut, document, renderer));
-
-        var recaptured = DocumentLayouter.Layout(document, allowUnsupportedCharacters: true);
-        var rendered = Render(recaptured, document, renderer);
+        var rendered = Render(laidOut, document, renderer);
 
         using var buffer = new MemoryStream(rendered);
         var reloaded = PortableDocument.LoadFromStream(buffer);
