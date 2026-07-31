@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Radzen.Documents.Geometry;
+using Radzen.Documents.Pdf.Geometry;
 using Radzen.Documents.Internal;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -49,16 +49,16 @@ internal static class SoftMask
         ContentEmitter.WriteImagePlacement(content, "Sm", left, bottom, rectWidth, rectHeight);
 
         // ISO 32000-1 11.6.5.2: soft-mask subtype (/Luminosity from group color, /Alpha from shape alpha).
-        var group = new EmissionTransparencyGroup(
+        var group = new OutputTransparencyGroup(
             content.ToArray(),
             [left, bottom, left + rectWidth, bottom + rectHeight],
             "DeviceGray",
             isolated: null,
             knockout: null,
-            [new KeyValuePair<string, EmissionImagePayload>("Sm", EmissionImagePayload.Capture(image))]);
+            [new KeyValuePair<string, OutputImagePayload>("Sm", OutputImagePayload.Capture(image))]);
 
         var alpha = shadow.Color.A / 255.0;
-        var softMask = new EmissionSoftMask(EmissionSoftMaskType.Luminosity, group, backdrop: null);
+        var softMask = new OutputSoftMask(OutputSoftMaskType.Luminosity, group, backdrop: null);
         var extGState = plan.RegisterSoftMaskExtGState(
             alpha,
             alpha,

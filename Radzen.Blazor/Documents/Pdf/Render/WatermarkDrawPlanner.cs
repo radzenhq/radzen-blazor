@@ -1,4 +1,5 @@
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -14,7 +15,7 @@ internal sealed class WatermarkDrawPlanner(
         var draw = new WatermarkDraw
         {
             CenterX = watermark.CenterX,
-            CenterY = PageSpace.FromTop(plan.Size.Height.Point, watermark.CenterY),
+            CenterY = BottomUpSpace.FromTop(plan.Size.Height.Point, watermark.CenterY),
             Rotation = watermark.Rotation,
             Artifact = watermark.Artifact,
             ExtGState = watermark.Opacity < 1

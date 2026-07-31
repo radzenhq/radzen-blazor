@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf.Render;

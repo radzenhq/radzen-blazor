@@ -1,5 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using System;
 using System.Collections.Generic;
 
@@ -24,7 +24,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
     private string Label => document.Conformance != PdfAConformance.None ? "PDF/A" : "PDF/UA";
 
-    private IReadOnlyList<PageEmissionPlan> PlannedPages() => EmissionPageMap.Build(document.Pages).Planned;
+    private IReadOnlyList<PageOutput> PlannedPages() => PageOutputMap.Build(document.Pages).Planned;
 
     public void ValidateConformance()
     {
@@ -35,7 +35,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
 
         ValidateInspectable();
 
-        if (document.IsPdfUa && document.EmissionPlan?.Structure is null && !document.HasPreservableStructureGraph)
+        if (document.IsPdfUa && document.Output?.Structure is null && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
                 "PDF/UA requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer.");
@@ -109,7 +109,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
             return;
         }
 
-        if (document.EmissionPlan?.Structure is { } structure)
+        if (document.Output?.Structure is { } structure)
         {
             ValidateFigureAltText(structure);
         }
@@ -124,7 +124,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
     {
         ValidateRoleMapChains();
 
-        if (document.EmissionPlan?.UnmappedRoles is not { Length: > 0 } roles)
+        if (document.Output?.UnmappedRoles is not { Length: > 0 } roles)
         {
             return;
         }
@@ -140,7 +140,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
     // at a standard ISO 32000-1 structure type (02-002) and shall not be circular (02-003).
     private void ValidateRoleMapChains()
     {
-        if (document.EmissionPlan?.RoleMap is not { Length: > 0 } entries)
+        if (document.Output?.RoleMap is not { Length: > 0 } entries)
         {
             return;
         }
@@ -228,7 +228,7 @@ internal sealed class ConformanceWriter(PortableDocument document)
         }
 
         if (IsLevelA(document.Conformance)
-            && document.EmissionPlan?.Structure is null
+            && document.Output?.Structure is null
             && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(

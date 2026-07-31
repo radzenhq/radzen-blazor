@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -64,7 +64,7 @@ internal readonly struct ImageDraw
     public required double Y { get; init; }
     public required double Width { get; init; }
     public required double Height { get; init; }
-    public required EmissionImage Image { get; init; }
+    public required OutputImage Image { get; init; }
     public StructureElement? Element { get; init; }
     public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
@@ -144,21 +144,21 @@ internal sealed class PagePlan
     public List<RoundedStrokeDraw> RoundedStrokes { get; } = [];
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
-    public List<EmissionLink> Links { get; } = [];
+    public List<OutputLink> Links { get; } = [];
     private int sequence;
 
     public int NextSequence() => sequence++;
-    private readonly ResourceNameAllocator<string, EmissionExtGState> extGStates =
+    private readonly ResourceNameAllocator<string, OutputExtGState> extGStates =
         new("GS", reserved: null, StringComparer.Ordinal);
 
-    private readonly ResourceNameAllocator<(GradientPaint Gradient, Matrix Matrix), EmissionPattern> patterns =
+    private readonly ResourceNameAllocator<(GradientPaint Gradient, Matrix Matrix), OutputPattern> patterns =
         new("P", reserved: null, GradientPatternComparer.Instance);
 
-    private readonly Dictionary<string, EmissionExtGState> extGStatesByKey = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, OutputExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
-    public IReadOnlyList<EmissionExtGState> ExtGStates => extGStates.Values;
+    public IReadOnlyList<OutputExtGState> ExtGStates => extGStates.Values;
 
-    public IReadOnlyList<EmissionPattern> Patterns => patterns.Values;
+    public IReadOnlyList<OutputPattern> Patterns => patterns.Values;
 
     private readonly Dictionary<(double Width, double Height, double Radius, double Blur), ShadowMask> shadowMasks = [];
 
@@ -175,7 +175,7 @@ internal sealed class PagePlan
     }
     public WatermarkDraw? Watermark { get; set; }
     public OrderedSet<EmittedFont> UsedFonts { get; } = [];
-    public OrderedSet<EmissionImage> UsedImages { get; } = [];
+    public OrderedSet<OutputImage> UsedImages { get; } = [];
 
     public string RegisterExtGState(double fillAlpha, double strokeAlpha)
         => RegisterExtGState(fillAlpha, strokeAlpha, null);
@@ -184,7 +184,7 @@ internal sealed class PagePlan
     {
         fillAlpha = Math.Clamp(fillAlpha, 0, 1);
         strokeAlpha = Math.Clamp(strokeAlpha, 0, 1);
-        return ExtGStateRegistration.RegisterAlpha(extGStates, fillAlpha, strokeAlpha, blend, key => Track(new EmissionExtGState(
+        return ExtGStateRegistration.RegisterAlpha(extGStates, fillAlpha, strokeAlpha, blend, key => Track(new OutputExtGState(
             key,
             fillAlpha,
             strokeAlpha,
@@ -193,13 +193,13 @@ internal sealed class PagePlan
             clearSoftMask: false)));
     }
 
-    private EmissionExtGState Track(EmissionExtGState state)
+    private OutputExtGState Track(OutputExtGState state)
     {
         extGStatesByKey[state.Key] = state;
         return state;
     }
 
-    public EmissionExtGState? FindExtGState(string key)
+    public OutputExtGState? FindExtGState(string key)
         => extGStatesByKey.TryGetValue(key, out var state) ? state : null;
 
     public string? ApplyAlpha(string? extGState, double alpha)
@@ -228,10 +228,10 @@ internal sealed class PagePlan
     public string RegisterSoftMaskExtGState(
         double fillAlpha,
         double strokeAlpha,
-        EmissionSoftMask softMask,
+        OutputSoftMask softMask,
         string? contentKey)
     {
-        EmissionExtGState Create(string key) => Track(new EmissionExtGState(
+        OutputExtGState Create(string key) => Track(new OutputExtGState(
             key,
             Math.Clamp(fillAlpha, 0, 1),
             Math.Clamp(strokeAlpha, 0, 1),
@@ -245,7 +245,7 @@ internal sealed class PagePlan
     }
 
     public string RegisterPattern(GradientPaint gradient, Matrix matrix)
-        => patterns.GetOrAdd((gradient, matrix), key => new EmissionPattern(key, gradient, matrix));
+        => patterns.GetOrAdd((gradient, matrix), key => new OutputPattern(key, gradient, matrix));
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
 

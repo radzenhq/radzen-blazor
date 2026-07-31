@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 namespace Radzen.Documents.Pdf;
 
 
@@ -38,9 +38,9 @@ public sealed class Page
         elements.OwnedBy(Invalidate);
     }
 
-    internal PageEmissionPlan? EmissionIdentity { get; set; }
+    internal PageOutput? OutputIdentity { get; set; }
 
-    internal bool IsGenerated => EmissionIdentity is not null;
+    internal bool IsGenerated => OutputIdentity is not null;
 
     internal PortableDocument? Owner { get; set; }
 

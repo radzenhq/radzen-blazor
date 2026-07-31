@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Radzen.Documents.LaidOut;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
+using Radzen.Documents.Pdf.Fonts;
+using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -38,15 +40,15 @@ internal sealed class DocumentGenerator
             fontResolver,
             imageStore,
             structureTree,
-            laidOut.Fonts.AllowUnsupportedCharacters);
+            request.AllowUnsupportedCharacters);
         codeSymbolPlanner = new(structureTree);
         imagePlanner = new(imageStore, structureTree);
-        tablePlanner = new(imageStore, structureTree);
-        boxPlanner = new(tablePlanner);
+        tablePlanner = new(structureTree);
+        boxPlanner = new(structureTree);
         watermarkPlanner = new(
             fontResolver,
             imageStore,
-            laidOut.Fonts.AllowUnsupportedCharacters);
+            request.AllowUnsupportedCharacters);
     }
 
     internal static PortableDocument Generate(RenderRequest request, LaidOutDocument laidOut)
@@ -93,10 +95,12 @@ internal sealed class DocumentGenerator
 
     private PortableDocument Run()
     {
-        var output = CreateOutput();
-        output.FontSnapshot = laidOut.Fonts;
-        output.Language = laidOut.Semantics.Language;
-        PdfModelAdapter.Apply(laidOut.Info, output.Info);
+        FontEmbedding.Ensure(laidOut.Fonts, request.AllowRestrictedEmbedding, request.AllowDegradedFonts);
+
+        var portable = CreateOutput();
+        portable.FontSnapshot = laidOut.Fonts;
+        portable.Language = laidOut.Semantics.Language;
+        PdfModelAdapter.Apply(laidOut.Info, portable.Info);
 
         var paginated = laidOut.Pages;
 
@@ -107,15 +111,15 @@ internal sealed class DocumentGenerator
         }
 
         var fontPlans = fontResolver.Plan();
-        var pages = ImmutableArray.CreateBuilder<PageEmissionPlan>(plans.Count);
+        var pages = ImmutableArray.CreateBuilder<PageOutput>(plans.Count);
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
             pages.Add(new PageContentFinalizer(structureTree, markArtifacts)
                 .Finalize(plans[pageIndex], pageIndex, fontPlans));
         }
 
-        var emissionPages = pages.MoveToImmutable();
-        var anchors = ImmutableDictionary.CreateBuilder<string, EmissionAnchor>(System.StringComparer.Ordinal);
+        var pageOutputs = pages.MoveToImmutable();
+        var anchors = ImmutableDictionary.CreateBuilder<string, OutputAnchor>(System.StringComparer.Ordinal);
         for (var pageIndex = 0; pageIndex < paginated.Length; pageIndex++)
         {
             var pageHeight = paginated[pageIndex].Size.Height.Point;
@@ -125,31 +129,31 @@ internal sealed class DocumentGenerator
                 {
                     anchors.Add(
                         anchor.Name,
-                        new EmissionAnchor(emissionPages[pageIndex], PageSpace.FromTop(pageHeight, anchor.Top)));
+                        new OutputAnchor(pageOutputs[pageIndex], BottomUpSpace.FromTop(pageHeight, anchor.Top)));
                 }
             }
         }
 
-        output.EmissionPlan = new DocumentEmissionPlan(
-            emissionPages,
-            StructureTreeBuilder.Capture(structureTree.DocumentElement, emissionPages),
+        portable.Output = new DocumentOutput(
+            pageOutputs,
+            StructureTreeBuilder.Capture(structureTree.DocumentElement, pageOutputs),
             anchors.ToImmutable(),
             [.. request.RoleMap.Entries],
             structureTree.UnmappedRoles);
 
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
         {
-            var emissionPage = emissionPages[pageIndex];
+            var pageOutput = pageOutputs[pageIndex];
             var page = new Page(plans[pageIndex].Size.Width, plans[pageIndex].Size.Height)
             {
-                EmissionIdentity = emissionPage,
+                OutputIdentity = pageOutput,
             };
-            page.SetLoadedContent(emissionPage.ContentArray);
-            page.SetTextFonts(GeneratorFontResolver.ExtractionFonts(emissionPage));
-            output.Pages.Insert(output.Pages.Count, page);
+            page.SetLoadedContent(pageOutput.ContentArray);
+            page.SetTextFonts(fontResolver.ExtractionFonts(pageOutput));
+            portable.Pages.Insert(portable.Pages.Count, page);
         }
 
-        return output;
+        return portable;
     }
 
     private PagePlan GeneratePage(LaidOutPage page)
@@ -161,17 +165,20 @@ internal sealed class DocumentGenerator
             Plan = plan,
             Text = textPlanner,
             CodeSymbols = codeSymbolPlanner,
+            Images = imagePlanner,
+            Tables = tablePlanner,
+            Boxes = boxPlanner,
         };
         var left = page.ContentBox.X;
-        var contentTop = PageSpace.FromTop(height, page.ContentBox.Y);
+        var contentTop = BottomUpSpace.FromTop(height, page.ContentBox.Y);
 
         foreach (var kind in PdfPaintOrder.Layers)
         {
             var (layer, top) = kind switch
             {
                 PageLayerKind.Body => (page.Body, contentTop),
-                PageLayerKind.Header => (page.HeaderLayer, PageSpace.FromTop(height, page.HeaderTop)),
-                _ => (page.FooterLayer, PageSpace.FromTop(height, page.FooterTop)),
+                PageLayerKind.Header => (page.HeaderLayer, BottomUpSpace.FromTop(height, page.HeaderTop)),
+                _ => (page.FooterLayer, BottomUpSpace.FromTop(height, page.FooterTop)),
             };
 
             EmitLayer(context, kind, layer, left, top);
@@ -179,11 +186,11 @@ internal sealed class DocumentGenerator
 
         foreach (var link in page.Links)
         {
-            plan.Links.Add(new EmissionLink(
+            plan.Links.Add(new OutputLink(
                 link.Left,
-                PageSpace.FromTop(height, link.Bottom),
+                BottomUpSpace.FromTop(height, link.Bottom),
                 link.Right,
-                PageSpace.FromTop(height, link.Top),
+                BottomUpSpace.FromTop(height, link.Top),
                 link.Uri,
                 link.Anchor,
                 structureTree.LinkElementOf(link.Source)?.Id));
@@ -228,7 +235,9 @@ internal sealed class DocumentGenerator
     {
         foreach (var positioned in layer.Images)
         {
-            imagePlanner.EmitImage(context, positioned, left, top);
+            imagePlanner.EmitImage(
+                context, positioned, left, top,
+                delta: 0, opacity: 1, inherited: null, inheritedArtifact: null);
         }
 
         foreach (var positioned in layer.CodeSymbols)
@@ -250,7 +259,9 @@ internal sealed class DocumentGenerator
             boxes,
             static box => box.ZOrder,
             table => tablePlanner.EmitFragment(context, table, left, top),
-            box => boxPlanner.EmitBox(context, box, left, top));
+            box => boxPlanner.EmitBox(
+                context, box, BoxContentOrigin.Parent, element: null, left, top,
+                delta: 0, inheritedArtifact: null));
     }
 
 }

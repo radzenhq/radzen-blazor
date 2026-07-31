@@ -1,5 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +12,10 @@ internal sealed class NavigationWriter(PortableDocument document)
         DocumentWriter writer,
         DictionaryObject catalog,
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
-        EmissionPageMap pageMap)
+        PageOutputMap pageMap)
     {
-        var sorted = new SortedDictionary<string, EmissionAnchor>(StringComparer.Ordinal);
-        if (document.EmissionPlan is { } plan)
+        var sorted = new SortedDictionary<string, OutputAnchor>(StringComparer.Ordinal);
+        if (document.Output is { } plan)
         {
             foreach (var anchor in plan.Anchors)
             {
@@ -108,7 +108,7 @@ internal sealed class NavigationWriter(PortableDocument document)
     {
         if (target.Anchor is { } anchor)
         {
-            if (document.EmissionPlan?.Anchors.ContainsKey(anchor) != true)
+            if (document.Output?.Anchors.ContainsKey(anchor) != true)
             {
                 throw new InvalidOperationException($"Outline target anchor '{anchor}' does not exist; set Inline.Anchor on the destination inline.");
             }
@@ -136,7 +136,7 @@ internal sealed class NavigationWriter(PortableDocument document)
     ];
 
     public static LinkAnnotationEmission BuildLinkAnnotations(
-        DocumentWriter writer, IReadOnlyList<EmissionLink> links, int pageIndex)
+        DocumentWriter writer, IReadOnlyList<OutputLink> links, int pageIndex)
     {
         var annots = new ArrayObject();
         var joins = new List<AnnotationElementJoin>();

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 namespace Radzen.Documents.Pdf.Write;
 
 internal sealed class ResourceDictionaryBuilder
@@ -48,9 +48,9 @@ internal static class PageResourceBuilder
 {
     public static DictionaryObject? BuildGeneratedResources(
         DocumentWriter writer,
-        PageEmissionPlan page,
-        Dictionary<EmissionFont, DocumentObject> fontRefs,
-        Dictionary<EmissionImage, ReferenceObject> imageRefs,
+        PageOutput page,
+        Dictionary<OutputFont, DocumentObject> fontRefs,
+        Dictionary<OutputImage, ReferenceObject> imageRefs,
         IReadOnlySet<string>? referencedKeys = null)
     {
         var resources = new ResourceDictionaryBuilder();
@@ -86,7 +86,7 @@ internal static class PageResourceBuilder
         return resources.Build();
     }
 
-    private static DocumentObject? SoftMaskOf(DocumentWriter writer, EmissionExtGState state)
+    private static DocumentObject? SoftMaskOf(DocumentWriter writer, OutputExtGState state)
     {
         if (state.SoftMask is { } mask)
         {
@@ -138,8 +138,8 @@ internal static class PageResourceBuilder
 
     private static DocumentObject ResolveFont(
         DocumentWriter writer,
-        EmissionFont font,
-        Dictionary<EmissionFont, DocumentObject> cache)
+        OutputFont font,
+        Dictionary<OutputFont, DocumentObject> cache)
     {
         if (cache.TryGetValue(font, out var existing))
         {
@@ -156,7 +156,7 @@ internal static class PageResourceBuilder
 
     private static ReferenceObject ResolveImage<TKey>(
         IObjectWriter writer,
-        EmissionImage image,
+        OutputImage image,
         TKey key,
         Dictionary<TKey, ReferenceObject>? cache)
         where TKey : notnull

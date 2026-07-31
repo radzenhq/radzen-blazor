@@ -1,12 +1,12 @@
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 
 namespace Radzen.Documents.Pdf.Write;
 
 internal static class TransparencyGroupWriter
 {
-    public static StreamObject BuildForm(DocumentWriter writer, EmissionTransparencyGroup group)
+    public static StreamObject BuildForm(DocumentWriter writer, OutputTransparencyGroup group)
     {
         var stream = FlateFilter.EncodeStream(group.Content.Span);
         var dict = stream.Dictionary;
