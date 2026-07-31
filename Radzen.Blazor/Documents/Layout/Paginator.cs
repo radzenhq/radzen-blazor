@@ -16,7 +16,8 @@ internal static class Paginator
         LayoutCaptureContext capture,
         Func<Image, double, (double Width, double Height)>? measureImage = null,
         IReadOnlyDictionary<string, int>? tocPages = null,
-        int pageNumberOffset = 0)
+        int pageNumberOffset = 0,
+        int sectionIndex = 0)
     {
         var pages = new List<LaidOutPage>();
         PaginateSection(
@@ -27,7 +28,8 @@ internal static class Paginator
             resolution,
             capture,
             tocPages,
-            pageNumberOffset);
+            pageNumberOffset,
+            sectionIndex);
         return [.. pages];
     }
 
@@ -38,8 +40,9 @@ internal static class Paginator
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture,
-        IReadOnlyDictionary<string, int>? tocPages = null,
-        int pageNumberOffset = 0)
+        IReadOnlyDictionary<string, int>? tocPages,
+        int pageNumberOffset,
+        int sectionIndex)
     {
         var context = new PaginationContext(
             fonts,
@@ -47,7 +50,8 @@ internal static class Paginator
             measureImage,
             resolution,
             capture,
-            pageNumberOffset);
+            pageNumberOffset,
+            sectionIndex);
         context.Initialize(section, tocPages);
         var engine = FlowPlacementEngine.ForPages(context);
         for (var i = 0; i < context.Blocks.Count; i++)
