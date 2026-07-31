@@ -34,6 +34,18 @@ public class BlockCollectionTests
     }
 
     [Fact]
+    public void AddContainer_CreatesOwnedContainer()
+    {
+        var blocks = NewBlocks();
+
+        var container = blocks.AddContainer();
+
+        Assert.Same(container, Assert.Single(blocks));
+        Assert.True(blocks.StructureChanged);
+        Assert.Throws<InvalidOperationException>(() => NewBlocks().Add(container));
+    }
+
+    [Fact]
     public void Add_SameInstanceTwice_Throws()
     {
         var blocks = NewBlocks();

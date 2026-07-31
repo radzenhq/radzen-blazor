@@ -139,8 +139,8 @@ public class RenderedPageIdentityTests
     public void RemovingAnAnchoredPage_ThrowsNamingTheDestination()
     {
         var rendered = new DocumentRenderer().Render(ThreePages(anchors: true));
-        var plan = rendered.EmissionPlan!;
-        rendered.EmissionPlan = new Radzen.Documents.Pdf.Emission.DocumentEmissionPlan(
+        var plan = rendered.Output!;
+        rendered.Output = new Radzen.Documents.Pdf.Output.DocumentOutput(
             plan.Pages, null, plan.Anchors, plan.RoleMap, plan.UnmappedRoles);
         rendered.Pages.RemoveAt(1);
 

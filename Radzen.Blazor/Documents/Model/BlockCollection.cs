@@ -160,6 +160,12 @@ public sealed class BlockCollection : IReadOnlyList<Block>
     }
 
     /// <summary>
+    /// Appends an empty container.
+    /// </summary>
+    /// <returns>The newly created container.</returns>
+    public Container AddContainer() => Add(new Container());
+
+    /// <summary>
     /// Appends an empty table.
     /// </summary>
     /// <returns>The newly created table.</returns>

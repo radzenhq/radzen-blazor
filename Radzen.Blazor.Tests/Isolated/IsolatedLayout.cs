@@ -19,7 +19,7 @@ internal static class IsolatedPaginator
         => Radzen.Documents.Layout.Paginator.Paginate(
             section,
             fonts,
-            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
             capture ?? new LayoutCaptureContext(),
             measureImage,
             tocPages: null);
@@ -38,7 +38,7 @@ internal static class IsolatedTableLayout
             availableWidth,
             fonts,
             measureImage,
-            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
             capture ?? new LayoutCaptureContext());
 }
 
@@ -76,7 +76,7 @@ internal static class IsolatedLineBreaker
         double maxWidthPoints,
         FontCollection fonts,
         HorizontalAlignment? inheritedAlignment = null,
-        LoweringContext? resolution = null,
+        LoweringResult? resolution = null,
         LayoutCaptureContext? capture = null)
         => LineLayouter.Layout(
             paragraph,
@@ -98,7 +98,7 @@ internal static class IsolatedBlockExpander
         => Radzen.Documents.Layout.BlockExpander.ExpandBlocks(
             blocks,
             availableWidth,
-            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
             keepSpecialContainers,
             tocPages,
             fonts);

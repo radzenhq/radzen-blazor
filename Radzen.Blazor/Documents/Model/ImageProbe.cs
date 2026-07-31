@@ -28,11 +28,6 @@ internal static class ImageProbe
         lock (SizeProbeGate)
         {
             var snapshot = registered;
-            if (snapshot.Contains(probe))
-            {
-                return;
-            }
-
             if (snapshot.Count >= SizeProbeLimit)
             {
                 throw new InvalidOperationException($"No more than {SizeProbeLimit} custom image size probes can be registered.");

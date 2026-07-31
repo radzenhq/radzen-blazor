@@ -160,6 +160,12 @@ public class QrEncoderTests
     }
 
     [Fact]
+    public void EncodeUtf8_NullValue_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => QrEncoder.EncodeUtf8(null!, QrErrorCorrection.Medium));
+    }
+
+    [Fact]
     public void EncodeBytes_InvalidVersionRange_Throws()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => QrEncoder.EncodeBytes(new byte[] { 1 }, QrErrorCorrection.Medium, 5, 3));

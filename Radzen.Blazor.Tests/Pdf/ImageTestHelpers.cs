@@ -5,7 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Emission;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
 
@@ -19,7 +19,7 @@ internal static class ImageTestHelpers
         => new(Stream(image), image.Alpha is { } alpha ? Stream(alpha) : null);
 
     public static StreamObject Stream(DecodedImage image)
-        => ImageXObjectBuilder.Build(EmissionImagePayload.Capture(image));
+        => ImageXObjectBuilder.Build(OutputImagePayload.Capture(image));
 
     public static string Name(DictionaryObject dict, string key) => ((NameObject)dict[key]).Value;
 

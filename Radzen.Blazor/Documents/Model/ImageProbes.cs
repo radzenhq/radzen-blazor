@@ -25,19 +25,6 @@ internal sealed class ImageProbes
         return new ImageProbes(probes.Add(probe));
     }
 
-    public bool Contains(Func<ReadOnlyMemory<byte>, (double Width, double Height)?> probe)
-    {
-        foreach (var existing in probes)
-        {
-            if (existing.Equals(probe))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public ImageInfo Inspect(byte[] data)
     {
         ArgumentNullException.ThrowIfNull(data);

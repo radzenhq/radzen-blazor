@@ -96,15 +96,22 @@ public class ColorPublicContractTests
     }
 
     [Fact]
-    public void EveryCssKeywordHasAMatchingStaticProperty()
+    public void EveryCssKeywordHasAMatchingStaticPropertyAndTableEntry()
     {
         var properties = typeof(Color)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
             .Where(property => property.PropertyType == typeof(Color) && property.Name != "Transparent")
             .ToList();
 
+        Assert.Equal(148, NamedColors.Count);
         Assert.Equal(148, properties.Count);
-        Assert.All(properties, property => Assert.Equal((Color)property.GetValue(null)!, Color.FromName(property.Name)));
+        Assert.All(properties, property =>
+        {
+            Assert.True(NamedColors.TryGet(property.Name, out var rgb));
+            Assert.Equal(
+                Color.FromRgb((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb),
+                (Color)property.GetValue(null)!);
+        });
     }
 
     [Fact]

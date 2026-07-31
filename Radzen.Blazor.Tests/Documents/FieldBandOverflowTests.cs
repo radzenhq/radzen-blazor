@@ -32,7 +32,7 @@ public class FieldBandOverflowTests
         var fonts = LineLayoutSupport.Fonts();
         var resolver = new FieldResolver(
             fonts,
-            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
             new LayoutCaptureContext());
 
         var width = fonts.MeasureText("ending on page 0", LineLayoutSupport.FontAt(12)) + 1;
@@ -50,7 +50,7 @@ public class FieldBandOverflowTests
         var fonts = LineLayoutSupport.Fonts();
         var resolver = new FieldResolver(
             fonts,
-            LoweringContext.CreateForDocument(StyleResolution.Empty),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
             new LayoutCaptureContext());
         var width = fonts.MeasureText("ending on page 0", LineLayoutSupport.FontAt(12)) + 1;
         var reserved = IsolatedLineBreaker.Break(FieldParagraph(), width, fonts).Count;
