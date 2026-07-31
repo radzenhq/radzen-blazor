@@ -25,6 +25,7 @@ internal sealed class PaginationContext
     private double contentHeight;
     private BlockLayoutCache blockLayouts = null!;
     private readonly int pageNumberOffset;
+    private readonly int sectionIndex;
     private BlockHeightHandler? blockHeightHandler;
     private int order;
     private PageLayerBuilder current;
@@ -35,7 +36,8 @@ internal sealed class PaginationContext
         Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringContext resolution,
         LayoutCaptureContext capture,
-        int pageNumberOffset)
+        int pageNumberOffset,
+        int sectionIndex)
     {
         this.pages = pages;
         this.fonts = fonts;
@@ -43,6 +45,7 @@ internal sealed class PaginationContext
         this.resolution = resolution;
         this.capture = capture;
         this.pageNumberOffset = pageNumberOffset;
+        this.sectionIndex = sectionIndex;
         current = new PageLayerBuilder(capture);
         StartPageCount = pages.Count;
     }
@@ -58,6 +61,7 @@ internal sealed class PaginationContext
         var right = section.Margins.Right.Point;
         var bottom = section.Margins.Bottom.Point;
         contentWidth = pageWidth - left - right;
+        RequirePositiveContentBox(contentWidth, pageHeight - top - bottom);
         size = new PageSize(Unit.FromPoint(pageWidth), Unit.FromPoint(pageHeight));
         watermark = WatermarkPlanner.Plan(section.Watermark, size, fonts, capture);
 
@@ -83,6 +87,7 @@ internal sealed class PaginationContext
         contentTop = Math.Max(top, headerLayout.Height > 0 ? headerDistance + headerLayout.Height : 0);
         var contentBottom = Math.Max(bottom, footerLayout.Height > 0 ? footerDistance + footerLayout.Height : 0);
         ContentBox = new Rect(left, contentTop, contentWidth, pageHeight - contentTop - contentBottom);
+        RequirePositiveContentBox(ContentBox.Width, ContentBox.Height);
         contentHeight = ContentBox.Height;
         headerTop = headerDistance;
         footerTop = pageHeight - footerDistance - footerLayout.Height;
@@ -101,6 +106,17 @@ internal sealed class PaginationContext
         {
             Broken[i] = Blocks[i].Accept(breaker, default);
         }
+    }
+
+    private void RequirePositiveContentBox(double width, double height)
+    {
+        if (width > 0 && height > 0)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(FormattableString.Invariant(
+            $"Section {sectionIndex} has an impossible content box of {width:0.###} x {height:0.###} points; its margins, header distance and footer distance must leave a positive content width and height."));
     }
 
     public ExpandedBlocks Blocks { get; private set; } = null!;

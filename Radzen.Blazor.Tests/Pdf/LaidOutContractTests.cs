@@ -924,15 +924,13 @@ public class LaidOutContractTests
     public void LaidOutTypes_ReachEveryDataTypeInTheGeometryNamespace()
     {
         var reached = LaidOutTypes().ToHashSet();
-        var unreached =
-            from type in GeometryNamespaceTypes()
-            where !type.IsAbstract || !type.IsSealed
-            where !reached.Contains(type)
-            select type.Name;
+        var data =
+            (from type in GeometryNamespaceTypes()
+             where !type.IsAbstract || !type.IsSealed
+             select type).ToArray();
 
-        Assert.Equal(
-            NonSceneGeometryNamespaceTypes,
-            unreached.OrderBy(name => name, StringComparer.Ordinal).ToArray());
+        Assert.NotEmpty(data);
+        Assert.Empty(data.Where(type => !reached.Contains(type)).Select(type => type.Name));
     }
 
     [Fact]
@@ -947,12 +945,6 @@ public class LaidOutContractTests
 
         Assert.Empty(offenders);
     }
-
-    private static readonly string[] NonSceneGeometryNamespaceTypes =
-    [
-        nameof(GradientReference),
-        nameof(ResolvedParagraphFormat),
-    ];
 
     private static IEnumerable<System.Type> GeometryNamespaceTypes()
         => typeof(LaidOutDocument).Assembly.GetTypes()

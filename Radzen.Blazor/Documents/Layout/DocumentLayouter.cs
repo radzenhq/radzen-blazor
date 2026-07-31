@@ -150,8 +150,9 @@ internal static class DocumentLayouter
         var semanticCapture = SemanticSnapshotBuilder.Capture(document, resolution, capture);
         var lowering = semanticCapture.Lowering;
         var pages = new List<LaidOutPage>();
-        foreach (var section in document.Sections)
+        for (var index = 0; index < document.Sections.Count; index++)
         {
+            var section = document.Sections[index];
             if (section.Direction != FlowDirection.LeftToRight || section.WritingMode != WritingMode.HorizontalTopToBottom)
             {
                 throw new NotSupportedException("Right-to-left flow direction and vertical writing modes are not yet supported.");
@@ -164,7 +165,8 @@ internal static class DocumentLayouter
                 capture,
                 measureImage,
                 tocPages,
-                pages.Count))
+                pages.Count,
+                index))
             {
                 pages.Add(page);
             }

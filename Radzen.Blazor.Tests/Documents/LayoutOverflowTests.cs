@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Linq;
 using Radzen.Documents.Layout;
 using Radzen.Documents;
@@ -71,30 +72,101 @@ public class LayoutOverflowTests
     }
 
     [Fact]
-    public void MarginsExceedingThePageHeight_ProduceANegativeContentBoxAndStillLayOutTheFirstLine()
+    public void MarginsExceedingThePageHeight_ThrowNamingTheSectionAndTheComputedBox()
     {
         var document = new Document();
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
+        section.Margins.SetAll(Unit.FromPoint(10));
         section.Margins.Top = Unit.FromPoint(80);
         section.Margins.Bottom = Unit.FromPoint(80);
         section.Blocks.AddParagraph("Body");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
 
-        Assert.Equal(-60, page.ContentBox.Height, 6);
-        Assert.Equal(80, page.ContentBox.Y, 6);
-        Assert.Equal(0, Assert.Single(page.Body.Lines).Y, 6);
+        Assert.Contains("Section 0", error.Message);
+        Assert.Contains("180 x -60 points", error.Message);
     }
 
     [Fact]
-    public void MarginsExceedingThePageHeight_TerminateInsteadOfPaginatingForever()
+    public void MarginsExceedingThePageWidth_ThrowNamingTheSectionAndTheComputedBox()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(100), Unit.FromPoint(200));
+        section.Margins.SetAll(Unit.FromPoint(10));
+        section.Margins.Left = Unit.FromPoint(80);
+        section.Margins.Right = Unit.FromPoint(80);
+        section.Blocks.AddParagraph("Body");
+
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
+
+        Assert.Contains("Section 0", error.Message);
+        Assert.Contains("-60 x 180 points", error.Message);
+    }
+
+    [Fact]
+    public void HeaderAndFooterDistancesSwallowingTheContentBox_ThrowNamingTheSectionAndTheComputedBox()
     {
         var document = new Document();
         var section = document.Sections.Add();
         section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
-        section.Margins.Top = Unit.FromPoint(80);
-        section.Margins.Bottom = Unit.FromPoint(80);
+        section.Margins.SetAll(Unit.FromPoint(10));
+        section.HeaderDistance = Unit.FromPoint(60);
+        section.FooterDistance = Unit.FromPoint(60);
+        section.Header.Blocks.AddParagraph("Header");
+        section.Footer.Blocks.AddParagraph("Footer");
+        section.Blocks.AddParagraph("Body");
+
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
+
+        Assert.Contains("Section 0", error.Message);
+        Assert.Contains("header distance and footer distance", error.Message);
+    }
+
+    [Fact]
+    public void MarginsThatExactlyConsumeThePageHeight_Throw()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
+        section.Margins.SetAll(Unit.FromPoint(10));
+        section.Margins.Top = Unit.FromPoint(50);
+        section.Margins.Bottom = Unit.FromPoint(50);
+        section.Blocks.AddParagraph("Body");
+
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
+
+        Assert.Contains("180 x 0 points", error.Message);
+    }
+
+    [Fact]
+    public void ImpossibleMarginsInALaterSection_NameThatSection()
+    {
+        var document = new Document();
+        var first = Page(document, 200, 100);
+        first.Blocks.AddParagraph("Body");
+
+        var second = document.Sections.Add();
+        second.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
+        second.Margins.SetAll(Unit.FromPoint(10));
+        second.Margins.Top = Unit.FromPoint(80);
+        second.Margins.Bottom = Unit.FromPoint(80);
+
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
+
+        Assert.Contains("Section 1", error.Message);
+    }
+
+    [Fact]
+    public void MarginsLeavingAThinContentBox_TerminateInsteadOfPaginatingForever()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(100));
+        section.Margins.SetAll(Unit.FromPoint(10));
+        section.Margins.Top = Unit.FromPoint(49);
+        section.Margins.Bottom = Unit.FromPoint(50);
 
         for (var line = 0; line < 10; line++)
         {
@@ -103,6 +175,7 @@ public class LayoutOverflowTests
 
         var pages = DocumentLayouter.Layout(document).Pages;
 
+        Assert.Equal(1, pages[0].ContentBox.Height, 6);
         Assert.Equal(10, pages.Sum(page => page.Body.Lines.Length));
         Assert.InRange(pages.Length, 1, 10);
     }
