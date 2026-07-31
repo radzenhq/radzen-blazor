@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
@@ -36,23 +35,7 @@ public class LayoutCorrectnessRegressionTests
         huge.Font.Size = 600;
         section.Blocks.Add(paragraph);
 
-        var task = Task.Run(() =>
-        {
-            try
-            {
-                return (object)IsolatedPaginator.PaginateIsolated(section, fonts);
-            }
-            catch (Exception exception)
-            {
-                return exception;
-            }
-        });
-
-        Assert.True(
-            task.Wait(TimeSpan.FromSeconds(5)),
-            "Paginator did not terminate for a continuation line taller than the page.");
-
-        var pages = Assert.IsType<System.Collections.Immutable.ImmutableArray<LaidOutPage>>(task.Result);
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
         Assert.Equal(2, pages.Length);
         Assert.All(pages, page => Assert.Equal(1, page.Body.Lines.Length));
@@ -76,23 +59,7 @@ public class LayoutCorrectnessRegressionTests
         huge.Font.Size = 600;
         section.Blocks.Add(paragraph);
 
-        var task = Task.Run(() =>
-        {
-            try
-            {
-                return (object)new DocumentRenderer().ToArray(document);
-            }
-            catch (Exception exception)
-            {
-                return exception;
-            }
-        });
-
-        Assert.True(
-            task.Wait(TimeSpan.FromSeconds(10)),
-            "Build() did not terminate for a continuation line taller than the page.");
-
-        Assert.NotEmpty(Assert.IsType<byte[]>(task.Result));
+        Assert.NotEmpty(new DocumentRenderer().ToArray(document));
     }
 
     [Fact]

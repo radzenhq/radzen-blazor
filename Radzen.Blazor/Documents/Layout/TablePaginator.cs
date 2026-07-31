@@ -29,8 +29,12 @@ internal static class TablePaginator
         var body = 0;
 
         var onFirst = true;
+        var progress = new LayoutProgressGuard(
+            FormattableString.Invariant($"Table pagination over {bodies.Count} body rows"));
         while (true)
         {
+            progress.Reached(body);
+
             var available = onFirst ? firstAvailable : subsequentAvailable;
             var running = headerHeight;
             List<int> placed = [];
