@@ -9,26 +9,16 @@ namespace Radzen.Documents.Layout;
 internal static class DocumentLayouter
 {
     public static LaidOutDocument Layout(Document document)
-        => Layout(document, allowUnsupportedCharacters: false);
-
-    public static LaidOutDocument Layout(Document document, bool allowUnsupportedCharacters)
-        => Layout(document, ImageProbe.Registered, allowUnsupportedCharacters);
+        => Layout(document, ImageProbe.Registered);
 
     public static LaidOutDocument Layout(Document document, ImageProbes probes)
-        => Layout(document, probes, allowUnsupportedCharacters: false);
-
-    public static LaidOutDocument Layout(
-        Document document,
-        ImageProbes probes,
-        bool allowUnsupportedCharacters)
     {
         ArgumentNullException.ThrowIfNull(probes);
         return Layout(
             document,
             document.Fonts,
             StyleResolver.Resolve(document),
-            probes.Measure,
-            allowUnsupportedCharacters);
+            probes.Measure);
     }
 
     public static LaidOutDocument Layout(
@@ -36,20 +26,12 @@ internal static class DocumentLayouter
         FontCollection fonts,
         StyleResolution resolution,
         Func<Image, double, (double Width, double Height)>? measureImage)
-        => Layout(document, fonts, resolution, measureImage, allowUnsupportedCharacters: false);
-
-    public static LaidOutDocument Layout(
-        Document document,
-        FontCollection fonts,
-        StyleResolution resolution,
-        Func<Image, double, (double Width, double Height)>? measureImage,
-        bool allowUnsupportedCharacters)
     {
         var first = LayoutPass(document, fonts, resolution, measureImage, null);
 
         if (!HasTableOfContents(document))
         {
-            return Resolve(first, document, fonts, allowUnsupportedCharacters);
+            return Resolve(first, document, fonts);
         }
 
         var tocPages = AnchorPages(first.Pages);
@@ -60,7 +42,7 @@ internal static class DocumentLayouter
         var settled = AnchorPages(second.Pages);
         if (AnchorsStable(tocPages, settled, entries))
         {
-            return Resolve(second, document, fonts, allowUnsupportedCharacters);
+            return Resolve(second, document, fonts);
         }
 
         var third = LayoutPass(document, fonts, resolution, measureImage, settled);
@@ -71,19 +53,18 @@ internal static class DocumentLayouter
                 "an entry keeps moving across a page boundary as the resolved numbers change its width.");
         }
 
-        return Resolve(third, document, fonts, allowUnsupportedCharacters);
+        return Resolve(third, document, fonts);
     }
 
     private static LaidOutDocument Resolve(
         in LayoutPassResult pass,
         Document document,
-        FontCollection fonts,
-        bool allowUnsupportedCharacters)
+        FontCollection fonts)
         => LayoutFinalizer.Resolve(
             new LaidOutDocument
             {
                 Id = pass.Id,
-                Fonts = fonts.Snapshot() with { AllowUnsupportedCharacters = allowUnsupportedCharacters },
+                Fonts = fonts.Snapshot(),
                 Pages = pass.Pages,
                 Semantics = pass.Semantics.Snapshot(),
                 Info = GeometryCapture.DocumentInfo(document.Info),
@@ -136,7 +117,7 @@ internal static class DocumentLayouter
         ImmutableArray<LaidOutPage> Pages,
         LaidOutNodeId Id,
         SemanticSnapshotBuilder Semantics,
-        LoweringContext Lowering,
+        LoweringResult Lowering,
         LayoutCaptureContext Capture);
 
     private static LayoutPassResult LayoutPass(

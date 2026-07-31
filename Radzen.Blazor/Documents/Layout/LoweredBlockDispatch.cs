@@ -42,7 +42,7 @@ internal static class LoweredBlockDispatch
         double contentWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext lowering,
+        LoweringResult lowering,
         LayoutCaptureContext capture)
     {
         var indent = lowering.BlockIndent(table);

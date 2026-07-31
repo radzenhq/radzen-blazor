@@ -11,7 +11,7 @@ internal static class LayoutFinalizer
     public static LaidOutDocument Resolve(
         LaidOutDocument document,
         FontCollection fonts,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
     {
         var resolver = new FieldResolver(fonts, resolution, capture);
@@ -52,7 +52,7 @@ internal static class LayoutFinalizer
 
     private sealed class PageState(
         FieldResolver resolver,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         int pageNumber,
         int pageCount)

@@ -7,23 +7,23 @@ namespace Radzen.Documents.Layout;
 
 internal readonly record struct SemanticCapture(
     SemanticSnapshotBuilder Builder,
-    LoweringContext Lowering);
+    LoweringResult Lowering);
 
 internal sealed class SemanticSnapshotBuilder
 {
     private readonly string? language;
-    private readonly LoweringContext resolution;
+    private readonly LoweringResult resolution;
     private readonly LayoutCaptureContext identities;
-    private readonly List<Node> nodes = [];
+    private readonly List<SemanticNode> nodes = [];
     private readonly List<ResolvedParagraphStyle> paragraphStyles = [];
     private readonly List<SemanticStructureAssociation> associations = [];
     private readonly List<(object Source, SemanticArtifactKind Kind)> artifactSources = [];
     private readonly Mapper mapper;
-    private readonly Node document;
+    private readonly SemanticNode document;
 
     private SemanticSnapshotBuilder(
         Document source,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext identities)
     {
         language = source.Language;
@@ -50,15 +50,15 @@ internal sealed class SemanticSnapshotBuilder
         StyleResolution styles,
         LayoutCaptureContext identities)
     {
-        var lowering = LoweringContext.CreateForDocument(styles);
+        var lowering = LoweringResult.CreateForDocument(styles);
         return new SemanticCapture(new SemanticSnapshotBuilder(source, lowering, identities), lowering);
     }
 
     public DocumentSemantics Snapshot()
     {
-        var listBlockElements = resolution.ListBlockElements();
-        var tocParagraphElements = resolution.TocParagraphElements();
-        var runLinkElements = resolution.RunLinkElements();
+        var listBlockElements = resolution.Semantics.ListBlockElements();
+        var tocParagraphElements = resolution.Semantics.TocParagraphElements();
+        var runLinkElements = resolution.Semantics.RunLinkElements();
         var capturedAssociations = ImmutableArray.CreateBuilder<SemanticStructureAssociation>(
             associations.Count + listBlockElements.Length + tocParagraphElements.Length + runLinkElements.Length);
         capturedAssociations.AddRange(associations);
@@ -70,44 +70,35 @@ internal sealed class SemanticSnapshotBuilder
 
         foreach (var (block, label, body) in listBlockElements)
         {
-            if (label is Node labelNode && body is Node bodyNode)
-            {
-                var source = identities.Source(block);
-                var element = lastElementBySource.TryGetValue(source, out var associated)
-                    ? associated
-                    : bodyNode.Index;
+            var source = identities.Source(block);
+            var element = lastElementBySource.TryGetValue(source, out var associated)
+                ? associated
+                : body.Index;
 
-                capturedAssociations.Add(new SemanticStructureAssociation
-                {
-                    Source = source,
-                    Element = element,
-                    MarkerElement = labelNode.Index,
-                });
-            }
+            capturedAssociations.Add(new SemanticStructureAssociation
+            {
+                Source = source,
+                Element = element,
+                MarkerElement = label.Index,
+            });
         }
 
         foreach (var (paragraph, reference) in tocParagraphElements)
         {
-            if (reference is Node referenceNode)
+            capturedAssociations.Add(new SemanticStructureAssociation
             {
-                capturedAssociations.Add(new SemanticStructureAssociation
-                {
-                    Source = identities.Source(paragraph),
-                    Element = referenceNode.Index,
-                });
-            }
+                Source = identities.Source(paragraph),
+                Element = reference.Index,
+            });
         }
 
         foreach (var (run, link) in runLinkElements)
         {
-            if (link is Node linkNode)
+            capturedAssociations.Add(new SemanticStructureAssociation
             {
-                capturedAssociations.Add(new SemanticStructureAssociation
-                {
-                    Source = identities.Source(run),
-                    Element = linkNode.Index,
-                });
-            }
+                Source = identities.Source(run),
+                Element = link.Index,
+            });
         }
 
         var capturedNodes = ImmutableArray.CreateBuilder<SemanticStructureNode>(nodes.Count);
@@ -166,10 +157,10 @@ internal sealed class SemanticSnapshotBuilder
         };
     }
 
-    private void MapBlock(Block block, Node parent, SemanticStructureTier tier)
+    private void MapBlock(Block block, SemanticNode parent, SemanticStructureTier tier)
         => block.Accept(mapper, new MappingContext(parent, tier));
 
-    private Node AddNode(
+    private SemanticNode AddNode(
         SemanticIntent intent,
         SemanticStructureTier tier,
         int paragraphStyle = -1,
@@ -180,15 +171,15 @@ internal sealed class SemanticSnapshotBuilder
         int columnSpan = 1,
         bool decorative = false)
     {
-        var node = new Node(
+        var node = new SemanticNode(
             nodes.Count, intent, tier, paragraphStyle, alternateText, actualText,
             headerScope, rowSpan, columnSpan, decorative);
         nodes.Add(node);
         return node;
     }
 
-    private Node AddChild(
-        Node parent,
+    private SemanticNode AddChild(
+        SemanticNode parent,
         SemanticIntent intent,
         SemanticStructureTier tier,
         int paragraphStyle = -1,
@@ -205,7 +196,7 @@ internal sealed class SemanticSnapshotBuilder
         return child;
     }
 
-    private void Associate(object source, Node element, Node? link = null)
+    private void Associate(object source, SemanticNode element, SemanticNode? link = null)
         => associations.Add(new SemanticStructureAssociation
         {
             Source = identities.Source(source),
@@ -275,7 +266,7 @@ internal sealed class SemanticSnapshotBuilder
         return (paragraphStyles.Count - 1, intent);
     }
 
-    private void MapList(List list, Node parent)
+    private void MapList(List list, SemanticNode parent)
     {
         var l = AddChild(parent, SemanticIntent.List, SemanticStructureTier.Structural);
         foreach (var item in list.Items)
@@ -283,7 +274,7 @@ internal sealed class SemanticSnapshotBuilder
             var li = AddChild(l, SemanticIntent.ListItem, SemanticStructureTier.Structural);
             var label = AddChild(li, SemanticIntent.ListLabel, SemanticStructureTier.Structural);
             var body = AddChild(li, SemanticIntent.ListBody, SemanticStructureTier.Structural);
-            resolution.SetListItemElements(item, label, body);
+            resolution.Semantics.SetListItemElements(item, label, body);
             foreach (var block in item.Blocks)
             {
                 MapBlock(block, body, SemanticStructureTier.Structural);
@@ -291,42 +282,7 @@ internal sealed class SemanticSnapshotBuilder
         }
     }
 
-    private readonly record struct MappingContext(Node Parent, SemanticStructureTier Tier);
-
-    private sealed class Node(
-        int index,
-        SemanticIntent intent,
-        SemanticStructureTier tier,
-        int paragraphStyle,
-        string? alternateText,
-        string? actualText,
-        SemanticHeaderScope headerScope,
-        int rowSpan,
-        int columnSpan,
-        bool decorative) : IStructureTag
-    {
-        public int Index { get; } = index;
-
-        public SemanticHeaderScope HeaderScope { get; } = headerScope;
-
-        public int RowSpan { get; } = rowSpan;
-
-        public int ColumnSpan { get; } = columnSpan;
-
-        public bool IsDecorative { get; } = decorative;
-
-        public SemanticIntent Intent { get; } = intent;
-
-        public SemanticStructureTier Tier { get; } = tier;
-
-        public int ParagraphStyle { get; } = paragraphStyle;
-
-        public string? AlternateText { get; } = alternateText;
-
-        public string? ActualText { get; } = actualText;
-
-        public List<int> Children { get; } = [];
-    }
+    private readonly record struct MappingContext(SemanticNode Parent, SemanticStructureTier Tier);
 
     private sealed class Mapper(SemanticSnapshotBuilder capture)
         : BlockVisitor<MappingContext, Nothing>
@@ -418,12 +374,14 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Image image, MappingContext context)
         {
+            var decorative = string.IsNullOrEmpty(image.AlternateText) && string.IsNullOrEmpty(image.ActualText);
             var figure = capture.AddChild(
                 context.Parent,
                 SemanticIntent.Figure,
                 context.Tier,
-                alternateText: image.AlternateText,
-                actualText: image.ActualText);
+                alternateText: decorative ? null : image.AlternateText,
+                actualText: decorative ? null : image.ActualText,
+                decorative: decorative);
             capture.Associate(image, figure);
             return default;
         }
@@ -462,8 +420,8 @@ internal sealed class SemanticSnapshotBuilder
             {
                 var item = capture.AddChild(navigation, SemanticIntent.NavigationEntry, tier);
                 var reference = capture.AddChild(item, SemanticIntent.CrossReference, tier);
-                capture.resolution.SetTocEntryElement(entry, reference);
-                capture.resolution.SetTocLinkElement(
+                capture.resolution.Semantics.SetTocEntryElement(entry, reference);
+                capture.resolution.Semantics.SetTocLinkElement(
                     entry,
                     capture.AddChild(reference, SemanticIntent.Link, tier));
             }

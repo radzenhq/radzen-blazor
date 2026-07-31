@@ -227,7 +227,7 @@ internal static class BoxContentLayout
         VerticalAlignment vAlign,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
         => Position(
             Measure(blocks, contentBox.Width, align, fonts, measureImage, resolution, capture),
@@ -241,7 +241,7 @@ internal static class BoxContentLayout
         HorizontalAlignment? align,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
     {
         var engine = FlowPlacementEngine.ForBox(

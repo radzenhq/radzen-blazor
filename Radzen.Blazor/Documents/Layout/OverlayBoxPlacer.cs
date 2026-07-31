@@ -15,7 +15,7 @@ internal static class OverlayBoxPlacer
         double availableWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         double xOffset = 0)
     {
@@ -110,7 +110,7 @@ internal static class OverlayBoxPlacer
         double contentWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
     {
         var innerWidth = Math.Max(0, (container.Width?.Point ?? contentWidth) - container.EffectivePadding.Horizontal);
@@ -131,7 +131,7 @@ internal static class OverlayBoxPlacer
         double y,
         int order,
         Matrix? transform,
-        LoweringContext? resolution = null,
+        LoweringResult? resolution = null,
         double xOffset = 0)
     {
         var (padding, boxWidth, indent, innerWidth) = Geometry(container, availableWidth, xOffset);
