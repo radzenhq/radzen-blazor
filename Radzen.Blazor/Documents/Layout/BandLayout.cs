@@ -17,7 +17,7 @@ internal static class BandLayouter
         double width,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
     {
         var result = new BandLayout(capture);

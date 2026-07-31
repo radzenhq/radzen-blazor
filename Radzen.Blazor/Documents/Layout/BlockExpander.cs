@@ -28,7 +28,7 @@ internal static class BlockExpander
     internal static ExpandedBlocks ExpandBlocks(
         BlockCollection blocks,
         double availableWidth,
-        LoweringContext resolution,
+        LoweringResult resolution,
         bool keepSpecialContainers = false,
         IReadOnlyDictionary<string, int>? tocPages = null,
         FontCollection? fonts = null)
@@ -73,7 +73,7 @@ internal static class BlockExpander
         bool keepSpecialContainers,
         IReadOnlyDictionary<string, int>? tocPages,
         FontCollection? fonts,
-        LoweringContext resolution)
+        LoweringResult resolution)
         : BlockVisitor<Nothing, Nothing>
     {
         protected override Nothing Default(Block block, Nothing context)
@@ -123,7 +123,7 @@ internal static class BlockExpander
         double availableWidth,
         IReadOnlyDictionary<string, int>? tocPages,
         FontCollection? fonts,
-        LoweringContext resolution)
+        LoweringResult resolution)
     {
         if (fonts is null)
         {
@@ -144,7 +144,7 @@ internal static class BlockExpander
         double availableWidth,
         IReadOnlyDictionary<string, int>? tocPages,
         FontCollection fonts,
-        LoweringContext resolution)
+        LoweringResult resolution)
     {
         var indent = toc.LevelIndent.Point * entry.Level;
         var max = availableWidth - indent;
@@ -170,15 +170,15 @@ internal static class BlockExpander
         numberRun.LinkToAnchor = entry.Anchor;
         resolution.SetRunFont(numberRun, font);
 
-        if (resolution.TocEntryElement(entry) is { } reference)
+        if (resolution.Semantics.TocEntryElement(entry) is { } reference)
         {
-            resolution.SetTocParagraphElement(paragraph, reference);
+            resolution.Semantics.SetTocParagraphElement(paragraph, reference);
         }
 
-        if (resolution.TocLinkElement(entry) is { } link)
+        if (resolution.Semantics.TocLinkElement(entry) is { } link)
         {
-            resolution.SetRunLinkElement(textRun, link);
-            resolution.SetRunLinkElement(numberRun, link);
+            resolution.Semantics.SetRunLinkElement(textRun, link);
+            resolution.Semantics.SetRunLinkElement(numberRun, link);
         }
 
         return paragraph;
@@ -209,7 +209,7 @@ internal static class BlockExpander
         List<ListItemBlockRange> ranges,
         double indent,
         Font? inherited,
-        LoweringContext resolution)
+        LoweringResult resolution)
     {
         for (var i = 0; i < list.Items.Count; i++)
         {
@@ -262,9 +262,9 @@ internal static class BlockExpander
                         indent + list.LeftIndent.Point,
                         itemFont));
 
-                if (resolution.ListItemElements(item) is { } elements)
+                if (resolution.Semantics.ListItemElements(item) is { } elements)
                 {
-                    resolution.SetListBlockElements(first, elements.Label, elements.Body);
+                    resolution.Semantics.SetListBlockElements(first, elements.Label, elements.Body);
                 }
             }
 

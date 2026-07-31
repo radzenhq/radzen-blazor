@@ -9,7 +9,7 @@ namespace Radzen.Documents.Layout;
 
 internal sealed class FieldResolver(
     FontCollection fonts,
-    LoweringContext resolution,
+    LoweringResult resolution,
     LayoutCaptureContext capture)
 {
     private static readonly FieldParagraphVisitor fieldParagraphs = new();

@@ -35,7 +35,7 @@ internal readonly record struct LineTokenization(List<List<LineWord>> Segments, 
 
 internal static class LineTokenizer
 {
-    private static Font ResolvedFont(LoweringContext? resolution, TextInline run)
+    private static Font ResolvedFont(LoweringResult? resolution, TextInline run)
         => resolution?.RunFont(run) ?? run.Font;
 
     private const char SoftHyphen = '\u00AD';
@@ -47,7 +47,7 @@ internal static class LineTokenizer
 
     private static bool IsConditionalBreak(char c) => c == SoftHyphen || c == ZeroWidthSpace;
 
-    public static LineTokenization Tokenize(Paragraph paragraph, FontCollection fonts, LoweringContext? resolution)
+    public static LineTokenization Tokenize(Paragraph paragraph, FontCollection fonts, LoweringResult? resolution)
     {
         var segments = new List<List<LineWord>>();
         var words = new List<LineWord>();

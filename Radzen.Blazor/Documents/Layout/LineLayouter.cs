@@ -19,7 +19,7 @@ internal sealed class LineLayoutContext
 
     public HorizontalAlignment? InheritedAlignment { get; init; }
 
-    public LoweringContext? Resolution { get; init; }
+    public LoweringResult? Resolution { get; init; }
 
     public List<TabStop>? SortedTabStops { get; init; }
 
@@ -73,7 +73,7 @@ internal static class LineLayouter
         };
     }
 
-    private static Font ResolvedFont(LoweringContext? resolution, Paragraph paragraph)
+    private static Font ResolvedFont(LoweringResult? resolution, Paragraph paragraph)
         => resolution?.ParagraphFont(paragraph) ?? paragraph.Font;
 
     public static IReadOnlyList<LineBox> Layout(
@@ -82,10 +82,10 @@ internal static class LineLayouter
         FontCollection fonts,
         LayoutCaptureContext capture,
         HorizontalAlignment? inheritedAlignment = null,
-        LoweringContext? resolution = null)
+        LoweringResult? resolution = null)
     {
         var boxes = new List<LineBox>();
-        var indent = LoweringContext.FormatOf(resolution, paragraph).LeftIndent.Point
+        var indent = LoweringResult.FormatOf(resolution, paragraph).LeftIndent.Point
             + (resolution?.BlockIndent(paragraph) ?? 0);
         var max = maxWidthPoints - indent;
         var wrapStops = SortedTabStops(paragraph);
@@ -133,7 +133,7 @@ internal static class LineLayouter
         return boxes;
     }
 
-    private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts, LoweringContext? resolution)
+    private static LineBox EmptyLine(Paragraph paragraph, FontCollection fonts, LoweringResult? resolution)
     {
         var font = ResolvedFont(resolution, paragraph);
         var captured = GeometryCapture.Font(font);

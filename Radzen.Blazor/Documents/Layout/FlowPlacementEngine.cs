@@ -35,7 +35,7 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         double width,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
         => new(
             new FlowPlacementPolicy(
@@ -55,7 +55,7 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         HorizontalAlignment? align,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
         => new(
             new FlowPlacementPolicy(
@@ -142,13 +142,13 @@ internal abstract class ContentFlowPlacementEngine(
     HorizontalAlignment? align,
     FontCollection fonts,
     Func<Image, double, (double Width, double Height)>? measureImage,
-    LoweringContext resolution,
+    LoweringResult resolution,
     LayoutCaptureContext capture)
     : FlowPlacementEngine(policy)
 {
     protected FontCollection Fonts => fonts;
 
-    protected LoweringContext Resolution => resolution;
+    protected LoweringResult Resolution => resolution;
 
     protected LayoutCaptureContext Capture => capture;
 
@@ -256,7 +256,7 @@ internal sealed class BandFlowPlacementEngine(
     double width,
     FontCollection fonts,
     Func<Image, double, (double Width, double Height)>? measureImage,
-    LoweringContext resolution,
+    LoweringResult resolution,
     LayoutCaptureContext capture)
     : ContentFlowPlacementEngine(policy, width, align: null, fonts, measureImage, resolution, capture)
 {
@@ -394,7 +394,7 @@ internal sealed class BoxFlowPlacementEngine(
     HorizontalAlignment? align,
     FontCollection fonts,
     Func<Image, double, (double Width, double Height)>? measureImage,
-    LoweringContext resolution,
+    LoweringResult resolution,
     LayoutCaptureContext capture)
     : ContentFlowPlacementEngine(policy, width, align, fonts, measureImage, resolution, capture)
 {

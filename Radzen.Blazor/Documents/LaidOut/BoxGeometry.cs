@@ -2,13 +2,6 @@ using System.Collections.Immutable;
 
 namespace Radzen.Documents.LaidOut;
 
-internal readonly record struct BoxPadding(double Left, double Right, double Top, double Bottom)
-{
-    public double Horizontal => Left + Right;
-
-    public double Vertical => Top + Bottom;
-}
-
 internal readonly struct LaidOutBoxContent
 {
     public required double Height { get; init; }

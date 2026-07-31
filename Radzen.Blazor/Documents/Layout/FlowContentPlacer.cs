@@ -38,7 +38,7 @@ internal static class FlowContentPlacer
         double codeSymbolWidth,
         double codeSymbolHeight,
         Fonts.FontCollection fonts,
-        LoweringContext? resolution,
+        LoweringResult? resolution,
         LayoutCaptureContext capture,
         int zOrder,
         double xOffset = 0)

@@ -10,7 +10,7 @@ internal sealed class BlockLayoutCache(
     double contentWidth,
     FontCollection fonts,
     Func<Image, double, (double Width, double Height)>? measureImage,
-    LoweringContext lowering,
+    LoweringResult lowering,
     LayoutCaptureContext capture)
 {
     private readonly LaidOutTable?[] tables = new LaidOutTable?[count];
@@ -59,7 +59,7 @@ internal static class NextBlockHeightResolver
         double contentWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         out double spacingBefore,
         out double height)
     {
@@ -90,7 +90,7 @@ internal static class NextBlockHeightResolver
         double contentWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution)
+        LoweringResult resolution)
         : ILoweredBlockHandler<int, NextBlockHeight>
     {
         public NextBlockHeight Paragraph(Paragraph paragraph, int next)

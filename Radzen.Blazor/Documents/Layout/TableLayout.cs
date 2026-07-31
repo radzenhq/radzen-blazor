@@ -26,7 +26,7 @@ internal static class TableLayout
         double availableWidth,
         FontCollection fonts,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         double additionalLeftIndent = 0)
     {

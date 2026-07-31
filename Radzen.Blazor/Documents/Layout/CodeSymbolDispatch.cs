@@ -15,7 +15,7 @@ internal static class CodeSymbolDispatch
         Block block,
         LayoutCaptureContext capture,
         FontCollection? fonts = null,
-        LoweringContext? resolution = null)
+        LoweringResult? resolution = null)
         => Shape(block)?.Size(fonts, resolution, capture) ?? (0, 0);
 
     public static HorizontalAlignment Alignment(Block block)
@@ -27,7 +27,7 @@ internal static class CodeSymbolDispatch
     public static ImmutableArray<LaidOutCaptionLine>? Caption(
         Block block,
         FontCollection fonts,
-        LoweringContext? resolution,
+        LoweringResult? resolution,
         LayoutCaptureContext capture)
         => Shape(block)?.Caption(fonts, resolution, capture);
 
@@ -50,12 +50,12 @@ internal static class CodeSymbolDispatch
 
         public abstract (double Width, double Height) Size(
             FontCollection? fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture);
 
         public abstract ImmutableArray<LaidOutCaptionLine>? Caption(
             FontCollection fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture);
     }
 
@@ -65,13 +65,13 @@ internal static class CodeSymbolDispatch
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
             => (qr.Size.Point, qr.Size.Point);
 
         public override ImmutableArray<LaidOutCaptionLine>? Caption(
             FontCollection fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
             => null;
 
@@ -113,13 +113,13 @@ internal static class CodeSymbolDispatch
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
             => (barcode.Width.Point, barcode.Height.Point + TextBandHeight(fonts, resolution, capture));
 
         public override ImmutableArray<LaidOutCaptionLine>? Caption(
             FontCollection fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
         {
             if (!barcode.ShowText)
@@ -166,7 +166,7 @@ internal static class CodeSymbolDispatch
 
         private double TextBandHeight(
             FontCollection? fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
         {
             if (!barcode.ShowText || fonts is null)
@@ -186,7 +186,7 @@ internal static class CodeSymbolDispatch
 
         private IReadOnlyList<LineBox> Lines(
             FontCollection fonts,
-            LoweringContext? resolution,
+            LoweringResult? resolution,
             LayoutCaptureContext capture)
         {
             var font = resolution?.BarcodeFont(barcode) ?? barcode.Font;

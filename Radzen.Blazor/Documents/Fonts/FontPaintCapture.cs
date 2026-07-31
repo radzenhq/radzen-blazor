@@ -1,6 +1,13 @@
-using Radzen.Documents.LaidOut;
-
 namespace Radzen.Documents.Fonts;
+
+internal readonly record struct FontPaint(
+    string Family,
+    double Size,
+    bool Bold,
+    bool Italic,
+    bool Underline,
+    bool Strikethrough,
+    Color Color);
 
 internal static class FontPaintCapture
 {

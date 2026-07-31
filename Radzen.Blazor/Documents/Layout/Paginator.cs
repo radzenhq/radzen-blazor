@@ -12,7 +12,7 @@ internal static class Paginator
     public static ImmutableArray<LaidOutPage> Paginate(
         Section section,
         FontCollection fonts,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         Func<Image, double, (double Width, double Height)>? measureImage = null,
         IReadOnlyDictionary<string, int>? tocPages = null,
@@ -38,7 +38,7 @@ internal static class Paginator
         FontCollection fonts,
         List<LaidOutPage> pages,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages,
         int pageNumberOffset,

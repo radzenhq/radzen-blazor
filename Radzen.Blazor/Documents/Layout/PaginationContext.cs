@@ -10,7 +10,7 @@ internal sealed class PaginationContext
     private readonly List<LaidOutPage> pages;
     private readonly FontCollection fonts;
     private readonly Func<Image, double, (double Width, double Height)>? measureImage;
-    private readonly LoweringContext resolution;
+    private readonly LoweringResult resolution;
     private readonly LayoutCaptureContext capture;
     private LaidOutWatermark? watermark;
     private PageSize size;
@@ -34,7 +34,7 @@ internal sealed class PaginationContext
         FontCollection fonts,
         List<LaidOutPage> pages,
         Func<Image, double, (double Width, double Height)>? measureImage,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture,
         int pageNumberOffset,
         int sectionIndex)
@@ -135,7 +135,7 @@ internal sealed class PaginationContext
 
     internal Func<Image, double, (double Width, double Height)>? MeasureImage => measureImage;
 
-    internal LoweringContext Resolution => resolution;
+    internal LoweringResult Resolution => resolution;
 
     internal LayoutCaptureContext Capture => capture;
 
@@ -496,7 +496,7 @@ internal sealed class PaginationContext
     private sealed class LineBreakVisitor(
         double contentWidth,
         FontCollection fonts,
-        LoweringContext resolution,
+        LoweringResult resolution,
         LayoutCaptureContext capture)
         : BlockVisitor<Nothing, IReadOnlyList<LineBox>?>
     {
