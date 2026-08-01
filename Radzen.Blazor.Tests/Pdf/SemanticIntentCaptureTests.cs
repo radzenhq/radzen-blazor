@@ -199,12 +199,12 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void QrCodeWithoutAlternateText_StaysDecorative()
+    public void DecorativeQrCode_StaysDecorative()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
 
         Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
     }
@@ -216,12 +216,12 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void QrCodeWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    public void DecorativeQrCode_IsCapturedAsADecorativeFigure()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
 
         var figure = SingleFigure(document);
 
@@ -244,26 +244,26 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void BarcodeWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    public void DecorativeBarcode_IsCapturedAsADecorativeFigure()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)).AlternateText = "";
 
         Assert.True(SingleFigure(document).IsDecorative);
     }
 
     [Fact]
-    public void InlineImageWithoutAlternateText_IsStillCapturedAsADecorativeFigure()
+    public void DecorativeInlineImage_IsCapturedAsADecorativeFigure()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Inline";
         BuildTestSupport.RegisterLatin(document);
         var paragraph = document.Sections.Add().Blocks.AddParagraph();
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
         Assert.True(SingleFigure(document).IsDecorative);
     }
@@ -274,7 +274,7 @@ public class SemanticIntentCaptureTests
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+        document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
 
         var reader = BuildTestSupport.Read(document, Accessible());
 
@@ -321,13 +321,13 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void BarcodeWithoutAlternateText_StaysDecorative()
+    public void DecorativeBarcode_StaysDecorative()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Code";
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)).AlternateText = "";
 
         Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
     }
@@ -349,14 +349,14 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void InlineImageWithoutAlternateText_StaysDecorative()
+    public void DecorativeInlineImage_StaysDecorative()
     {
         var document = new Document { Language = "en-US" };
         document.Info.Title = "Inline";
         BuildTestSupport.RegisterLatin(document);
         var paragraph = document.Sections.Add().Blocks.AddParagraph();
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
         Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
     }
@@ -481,11 +481,40 @@ public class SemanticIntentCaptureTests
         BuildTestSupport.RegisterLatin(document);
         var paragraph = document.Sections.Add().Blocks.AddParagraph();
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
         var artifacts = DocumentLayouter.Layout(document).Semantics.Structure.Artifacts;
 
         Assert.Equal(SemanticArtifactKind.Decorative, Assert.Single(artifacts).Kind);
+    }
+
+    [Fact]
+    public void InlineImageActualText_IsCapturedAsReplacementText()
+    {
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).ActualText = "Radzen";
+
+        var figure = SingleFigure(document);
+
+        Assert.False(figure.IsDecorative);
+        Assert.Null(figure.AlternateText);
+        Assert.Equal("Radzen", figure.ActualText);
+        Assert.Empty(DocumentLayouter.Layout(document).Semantics.Structure.Artifacts);
+    }
+
+    [Fact]
+    public void MissingInlineImageText_IsNotSilentlyClassifiedAsDecorative()
+    {
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        var laidOut = DocumentLayouter.Layout(document);
+        var figure = Assert.Single(laidOut.Semantics.Structure.Nodes.Where(node => node.Intent == SemanticIntent.Figure));
+
+        Assert.False(figure.IsDecorative);
+        Assert.Empty(laidOut.Semantics.Structure.Artifacts);
     }
 
     [Fact]

@@ -96,9 +96,14 @@ public class CellNestedStructureTaggingTests
     }
 
     [Fact]
-    public void PdfUA_CellImageWithoutAltText_IsNotTaggedAsFigure()
+    public void PdfUA_CellImageThatDescribesNothing_Throws()
     {
-        Assert.DoesNotContain("Figure", TagsWrappingImages(Ops(AuthorTableWithCellImage(alternateText: false))));
+        var error = Assert.Throws<InvalidOperationException>(
+            () => Ops(AuthorTableWithCellImage(alternateText: false)));
+
+        Assert.Contains("PDF/UA", error.Message, StringComparison.Ordinal);
+        Assert.Contains("AlternateText", error.Message, StringComparison.Ordinal);
+        Assert.Contains("decorative", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

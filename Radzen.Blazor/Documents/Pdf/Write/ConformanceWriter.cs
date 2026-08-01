@@ -202,10 +202,14 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
 
     private void ValidateFigureAltText(StructureElementSnapshot element)
     {
-        if (element.Type == "Figure" && element.Alt is null && element.ActualText is null)
+        if (element.Type == "Figure"
+            && string.IsNullOrEmpty(element.Alt)
+            && string.IsNullOrEmpty(element.ActualText))
         {
             throw new InvalidOperationException(
-                $"{Label} requires every Figure to carry an alternate description; set Image.AlternateText or Image.ActualText.");
+                $"{Label} requires every non-decorative Figure to carry alternate or replacement text; "
+                + "set AlternateText or ActualText, or set AlternateText to the empty string when the content is "
+                + "purely decorative.");
         }
 
         foreach (var kid in element.Kids)
