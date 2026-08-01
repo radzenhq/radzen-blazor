@@ -11,6 +11,7 @@ internal sealed class LoweringResult
     private readonly Dictionary<Paragraph, Font> paragraphFonts = [];
     private readonly Dictionary<Block, double> blockIndents = [];
     private readonly Dictionary<Block, ListMarkerLayout> listMarkers = [];
+    private readonly Dictionary<Table, TablePlacement> tablePlacements = [];
 
     private LoweringResult(StyleResolution styles)
     {
@@ -72,6 +73,17 @@ internal sealed class LoweringResult
 
     internal void SetListMarker(Block block, ListMarkerLayout marker)
         => listMarkers[block] = marker;
+
+    public TablePlacement TablePlacement(Table table)
+    {
+        if (!tablePlacements.TryGetValue(table, out var placement))
+        {
+            placement = global::Radzen.Documents.Layout.TablePlacement.Create(table);
+            tablePlacements[table] = placement;
+        }
+
+        return placement;
+    }
 
     public int HeadingLevel(Paragraph paragraph)
         => Styles.HeadingLevel(paragraph);

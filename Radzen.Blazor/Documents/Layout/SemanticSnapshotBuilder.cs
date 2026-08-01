@@ -228,13 +228,10 @@ internal sealed class SemanticSnapshotBuilder
 
                 break;
             case Table table:
-                foreach (var row in table.Rows)
+                foreach (var placed in resolution.TablePlacement(table).Cells)
                 {
-                    foreach (var cell in row.Cells)
-                    {
-                        AssociateArtifact(cell, kind);
-                        CaptureArtifacts(cell.Blocks, kind);
-                    }
+                    AssociateArtifact(placed.Cell, kind);
+                    CaptureArtifacts(placed.Cell.Blocks, kind);
                 }
 
                 break;
@@ -304,14 +301,15 @@ internal sealed class SemanticSnapshotBuilder
                     var link = linked
                         ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
                         : null;
-                    var decorative = string.IsNullOrEmpty(image.AlternateText);
+                    var decorative = IsDecorative(image.AlternateText);
                     capture.Associate(
                         image,
                         capture.AddChild(
                             link ?? element,
                             SemanticIntent.Figure,
                             inlineTier,
-                            alternateText: decorative ? null : image.AlternateText,
+                            alternateText: decorative || string.IsNullOrEmpty(image.AlternateText) ? null : image.AlternateText,
+                            actualText: decorative || string.IsNullOrEmpty(image.ActualText) ? null : image.ActualText,
                             decorative: decorative),
                         link);
                     continue;
@@ -343,15 +341,20 @@ internal sealed class SemanticSnapshotBuilder
         public override Nothing Visit(Table table, MappingContext context)
         {
             var element = capture.AddChild(context.Parent, SemanticIntent.Table, context.Tier);
-            foreach (var row in table.Rows)
+            var placement = capture.resolution.TablePlacement(table);
+            for (var row = 0; row < table.Rows.Count; row++)
             {
                 var tr = capture.AddChild(element, SemanticIntent.TableRow, context.Tier);
-                for (var column = 0; column < row.Cells.Count; column++)
+                foreach (var placed in placement.Cells)
                 {
-                    var cell = row.Cells[column];
+                    if (placed.Row != row)
+                    {
+                        continue;
+                    }
+
                     var scope = HeaderScope(
-                        row.IsHeaderRow,
-                        column < table.Columns.Count && table.Columns[column].IsHeaderColumn);
+                        table.Rows[row].IsHeaderRow,
+                        placed.Column < table.Columns.Count && table.Columns[placed.Column].IsHeaderColumn);
                     var td = capture.AddChild(
                         tr,
                         scope == SemanticHeaderScope.None
@@ -359,10 +362,10 @@ internal sealed class SemanticSnapshotBuilder
                             : SemanticIntent.TableHeaderCell,
                         context.Tier,
                         headerScope: scope,
-                        rowSpan: cell.RowSpan,
-                        columnSpan: cell.ColumnSpan);
-                    capture.Associate(cell, td);
-                    foreach (var child in cell.Blocks)
+                        rowSpan: placed.RowSpan,
+                        columnSpan: placed.ColumnSpan);
+                    capture.Associate(placed.Cell, td);
+                    foreach (var child in placed.Cell.Blocks)
                     {
                         capture.MapBlock(child, td, SemanticStructureTier.Structural);
                     }
@@ -374,13 +377,13 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Image image, MappingContext context)
         {
-            var decorative = string.IsNullOrEmpty(image.AlternateText) && string.IsNullOrEmpty(image.ActualText);
+            var decorative = IsDecorative(image.AlternateText);
             var figure = capture.AddChild(
                 context.Parent,
                 SemanticIntent.Figure,
                 context.Tier,
-                alternateText: decorative ? null : image.AlternateText,
-                actualText: decorative ? null : image.ActualText,
+                alternateText: decorative || string.IsNullOrEmpty(image.AlternateText) ? null : image.AlternateText,
+                actualText: decorative || string.IsNullOrEmpty(image.ActualText) ? null : image.ActualText,
                 decorative: decorative);
             capture.Associate(image, figure);
             return default;
@@ -429,16 +432,18 @@ internal sealed class SemanticSnapshotBuilder
             return default;
         }
 
+        private static bool IsDecorative(string? alternateText) => alternateText is { Length: 0 };
+
         private Nothing MapCode(Block block, string? alternateText, MappingContext context)
         {
-            var decorative = string.IsNullOrEmpty(alternateText);
+            var decorative = IsDecorative(alternateText);
             capture.Associate(
                 block,
                 capture.AddChild(
                     context.Parent,
                     SemanticIntent.Figure,
                     SemanticStructureTier.Structural,
-                    alternateText: decorative ? null : alternateText,
+                    alternateText: decorative || string.IsNullOrEmpty(alternateText) ? null : alternateText,
                     decorative: decorative));
             return default;
         }
