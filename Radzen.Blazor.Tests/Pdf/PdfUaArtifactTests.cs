@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Radzen.Documents.Codes;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -167,15 +168,73 @@ public class PdfUaArtifactTests
     }
 
     [Fact]
-    public void PdfUA_ImageWithoutAltOrActualText_IsNotTagged()
+    public void PdfUA_DecorativeImage_IsNotTagged()
     {
         var document = new Document { Language = "en-US" };
         var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
         document.Info.Title = "Figure";
         var section = document.Sections.Add();
-        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
         var reader = BuildTestSupport.Read(document, builderRenderer);
+        var types = new List<string>();
+        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
+
+        Assert.DoesNotContain("Figure", types);
+    }
+
+    [Theory]
+    [InlineData("Image", false)]
+    [InlineData("InlineImage", false)]
+    [InlineData("Barcode", false)]
+    [InlineData("QrCode", false)]
+    [InlineData("Image", true)]
+    [InlineData("InlineImage", true)]
+    [InlineData("Barcode", true)]
+    [InlineData("QrCode", true)]
+    public void AccessibleFigureThatDescribesNothing_Throws(string kind, bool levelA)
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Figure";
+        var blocks = document.Sections.Add().Blocks;
+        switch (kind)
+        {
+            case "Image":
+                blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+                break;
+            case "InlineImage":
+                blocks.AddParagraph().Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+                break;
+            case "Barcode":
+                blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
+                break;
+            case "QrCode":
+                blocks.AddQrCode("RADZEN", Unit.FromPoint(80));
+                break;
+        }
+
+        var renderer = levelA
+            ? new DocumentRenderer { Conformance = PdfAConformance.PdfA3A }
+            : new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
+
+        var error = Assert.Throws<InvalidOperationException>(() => renderer.ToArray(document));
+
+        Assert.Contains(levelA ? "PDF/A" : "PDF/UA", error.Message, StringComparison.Ordinal);
+        Assert.Contains("AlternateText", error.Message, StringComparison.Ordinal);
+        Assert.Contains("decorative", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void PdfUA_EmptyAlternateText_DeclaresTheImageDecorativeAndIsNotTagged()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Figure";
+        var image = document.Sections.Add().Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
+        image.AlternateText = "";
+
+        var reader = BuildTestSupport.Read(
+            document,
+            new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
         var types = new List<string>();
         StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
 

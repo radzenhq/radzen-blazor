@@ -202,6 +202,25 @@ public class InlineImageLinkTests
     }
 
     [Fact]
+    public void InlineImageActualText_IsWrittenOnTheTaggedFigure()
+    {
+        var (document, _) = Authored(picture => picture.ActualText = "Radzen");
+        document.Language = "en";
+        document.Info.Title = "Doc";
+
+        var reader = BuildTestSupport.Read(
+            document,
+            new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        var figure = Descendants(reader, TaggedStructureProbe.Root(reader))
+            .Single(element => element.Type == "Figure");
+
+        Assert.False(figure.Dict.ContainsKey("Alt"));
+        Assert.Equal(
+            "Radzen",
+            Assert.IsType<StringObject>(reader.Resolve(figure.Dict["ActualText"])).Value);
+    }
+
+    [Fact]
     public void LinkedInlineImage_KeepsTheOutputByteIdenticalAcrossBuilds()
     {
         var first = Authored(image => image.Link = "https://www.radzen.com/");
@@ -258,7 +277,8 @@ public class InlineImageLinkTests
         Assert.Equal(
             new HashSet<string>(StringComparer.Ordinal)
             {
-                "Width", "Height", "AlternateText", "Link", "LinkToAnchor", "Anchor", "Opacity",
+                "Width", "Height", "AlternateText", "ActualText",
+                "Link", "LinkToAnchor", "Anchor", "Opacity",
             },
             members);
     }

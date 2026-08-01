@@ -45,8 +45,11 @@ public sealed class Barcode : Block
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the barcode, carried on the
     /// barcode in accessible output for assistive technology to announce in place of the bars.
-    /// When <see langword="null"/> or empty (the default) the barcode is decorative and carries
-    /// no description.
+    /// Follows the HTML <c>alt</c> convention:
+    /// <see langword="null"/> (the default) states nothing about the barcode - it stays a figure
+    /// without a description, which accessible output rejects; the empty string declares the
+    /// barcode purely decorative, so it is written as an artifact instead of a figure; a
+    /// non-empty value is the description itself.
     /// </summary>
     public string? AlternateText { get; set; }
 }

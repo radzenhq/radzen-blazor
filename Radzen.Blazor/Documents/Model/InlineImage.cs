@@ -11,15 +11,11 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class InlineImage : Inline
 {
-    private (double Width, double Height)? pixels;
-
     internal InlineImage(byte[] data) => Data = data;
 
     internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, ResourceLimits.Default.MaxFileBytes));
 
     internal byte[] Data { get; }
-
-    internal ImageInfo Info => ImageProbe.Inspect(Data);
 
     /// <summary>
     /// Gets or sets the drawn width, or <see langword="null"/> (the default) for the natural width.
@@ -35,15 +31,19 @@ public sealed class InlineImage : Inline
 
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the image, carried on the
-    /// image in accessible output for assistive technology to announce in place of the
-    /// picture. When <see langword="null"/> or empty (the default) the image is decorative and
-    /// carries no description.
+    /// image in accessible output for assistive technology to announce in place of the picture.
+    /// Follows the HTML <c>alt</c> convention:
+    /// <see langword="null"/> (the default) states nothing about the image - it stays a figure
+    /// without a description, which accessible output rejects unless <see cref="ActualText"/> is set;
+    /// the empty string declares the image purely decorative, so it is written as an artifact
+    /// instead of a figure; a non-empty value is the description itself.
     /// </summary>
     public string? AlternateText { get; set; }
 
-    internal (double Width, double Height) EffectiveSize()
-    {
-        var (pixelWidth, pixelHeight) = pixels ??= ImageProbe.PixelSize(Data);
-        return ImageProbe.DeriveSize(Width, Height, pixelWidth, pixelHeight);
-    }
+    /// <summary>
+    /// Gets or sets the replacement text of the image: the exact text the picture stands in
+    /// for, carried on the image in accessible output so that extraction and reading substitute
+    /// it for the picture. When <see langword="null"/> or empty (the default) no replacement text is written.
+    /// </summary>
+    public string? ActualText { get; set; }
 }

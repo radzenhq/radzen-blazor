@@ -125,7 +125,7 @@ public class TaggedFigureContentTests
     [Fact]
     public void DecorativeInlineImage_IsArtifactContentAndNotParagraphTagged()
     {
-        var reader = BuildTestSupport.Read(InlineImage(null, midSentence: true), Accessible());
+        var reader = BuildTestSupport.Read(InlineImage("", midSentence: true), Accessible());
 
         Assert.Empty(TaggedStructureProbe.All(TaggedStructureProbe.Root(reader), "Figure"));
 
@@ -173,7 +173,7 @@ public class TaggedFigureContentTests
     [Fact]
     public void DecorativeBarcode_StaysArtifactContent()
     {
-        var reader = BuildTestSupport.Read(Code(null), Accessible());
+        var reader = BuildTestSupport.Read(Code(""), Accessible());
 
         Assert.Empty(TaggedStructureProbe.All(TaggedStructureProbe.Root(reader), "Figure"));
         Assert.All(
