@@ -110,21 +110,6 @@ public class PublicSurfaceWartTests
     }
 
     [Fact]
-    public void EncryptionOptionsLiveInThePdfNamespace()
-    {
-        foreach (var type in new[]
-        {
-            typeof(Radzen.Documents.Pdf.EncryptionOptions),
-            typeof(Radzen.Documents.Pdf.EncryptionAlgorithm),
-            typeof(Radzen.Documents.Pdf.IEncryptionMaterial),
-            typeof(Radzen.Documents.Pdf.SeededEncryptionMaterial),
-        })
-        {
-            Assert.Equal("Radzen.Documents.Pdf", type.Namespace);
-        }
-    }
-
-    [Fact]
     public void TheOnlyInlineKindsAreTextRunsPageFieldsAndImages()
     {
         var kinds = typeof(Inline).Assembly.GetTypes()

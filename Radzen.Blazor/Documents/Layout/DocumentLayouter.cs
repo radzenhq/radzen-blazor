@@ -141,6 +141,8 @@ internal static class DocumentLayouter
             }
         }
 
+        lowering.Semantics.Seal();
+
         return new LayoutPassResult(
             [.. pages],
             capture.Node(),

@@ -56,6 +56,14 @@ internal sealed class SemanticSnapshotBuilder
 
     public DocumentSemantics Snapshot()
     {
+        if (!resolution.Semantics.IsSealed)
+        {
+            throw new InvalidOperationException(
+                "The semantic snapshot was requested before lowering sealed its structure handles; " +
+                "list markers and table-of-contents links are only registered while blocks are expanded, " +
+                "so the tree would be incomplete. Seal the handles once every section has been paginated.");
+        }
+
         var listBlockElements = resolution.Semantics.ListBlockElements();
         var tocParagraphElements = resolution.Semantics.TocParagraphElements();
         var runLinkElements = resolution.Semantics.RunLinkElements();

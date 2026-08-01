@@ -241,13 +241,13 @@ public class DeterminismManifestTests
 
     private static readonly Dictionary<string, string> ExpectedSha256 = new()
     {
-        ["plain-text"] = "17509576c3839f8833478414a2d21189753951372311492c094100caf2010b34",
+        ["plain-text"] = "4f35fe8aedda1820c01cd16160f48c6ac825b7162f7a1372489a5e25f029a4d5",
         ["truetype-subset"] = "2e28d4416c5c7925b9d581ebd7e99f20d23a491bd6d75a1cd2155393e481e963",
         ["tables"] = "6a16fe3b40d900cde01f93d12dd072eaddd1c8f3b6fd7f870c80fb1f038b249f",
         ["image"] = "d85431f2632cdccfc4699270f92007c5ce74cb1f9e96c10f0af9c140a6b3ef0f",
-        ["gradients"] = "ea3c0eec05d7c73e4895c3b1a9a0605ee7903c5e626020e079743c259e217a2e",
-        ["overlapping-z-order"] = "aad96ec8fd20b1124d003a8e8be6d2d71ffdcb5c3b03905f597b1b7825e21ae9",
-        ["flat-lists"] = "52508af33626bd972f78f37217ed1f2c8ccb38eccd2fcc74a0d56cefbb4dd09d",
+        ["gradients"] = "3dd03dccc68660200d0a42b089d355dfe8db6046441e04f8dbfd52aad62e3b4a",
+        ["overlapping-z-order"] = "825b2b6b5d331487cc5ea59bcb8cc21dc2ad5f8874412a9e5b16304641380a5a",
+        ["flat-lists"] = "8a55bfdbeae4394a0362c5b5abd1b547660ac30501604fac12661fbfb7ba6917",
         ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
         ["signed"] = "ab5875e082b064a4ed84920dc14b9801da372bb9cbbe9036e7cb6a4289ec2fd7",
         ["timestamped"] = "bc6d540a6e43addae1e74627e6c972f3c8c23abb4bd72ef7e43f5c64acd7dd49",

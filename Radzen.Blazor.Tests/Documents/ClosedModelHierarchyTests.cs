@@ -22,6 +22,7 @@ public class ClosedModelHierarchyTests
         typeof(Radzen.Documents.Pdf.Annotation),
         typeof(Radzen.Documents.Pdf.ShapeAnnotation),
         typeof(Radzen.Documents.Pdf.MarkupAnnotation),
+        typeof(Radzen.Documents.Core.ResourceLimits),
     };
 
     [Theory]
