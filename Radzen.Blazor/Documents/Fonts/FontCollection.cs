@@ -561,7 +561,7 @@ public sealed class FontCollection
 
             var advance = FontMetric.ScaleAfm(builtInDesignAdvance, fontSize) + builtInKernAdvance;
             spans.Add(new CapturedGlyphSpan(
-                CapturedFontFace.FromBuiltIn(metrics.PostScriptName),
+                CapturedFontFace.FromBuiltIn(metrics.Face()),
                 [],
                 ImmutableArray.CreateRange(builtInGlyphs),
                 advance,

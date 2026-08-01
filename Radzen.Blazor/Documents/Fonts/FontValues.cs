@@ -6,7 +6,8 @@ namespace Radzen.Documents.Fonts;
 /// </summary>
 public readonly record struct FontValues
 {
-    /// <summary>Gets the effective font family name.</summary>
+    /// <summary>Gets the effective font family name. The default, <c>"Helvetica"</c>, names the built-in
+    /// metric-compatible sans family shipped with the library rather than the Adobe typeface.</summary>
     public required string Family { get; init; }
 
     /// <summary>Gets the effective font size.</summary>

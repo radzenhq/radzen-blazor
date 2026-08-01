@@ -7,6 +7,7 @@ using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 
+using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -200,5 +201,45 @@ public class FontResolutionPolicyTests
         var text = Encoding.Latin1.GetString(bytes);
 
         Assert.DoesNotContain("/BaseFont /Helvetica", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StandardFonts_DeriveThePostScriptNameFromTheNeutralFace()
+    {
+        (BuiltInFontFamily Family, bool Bold, bool Italic, string Expected)[] cases =
+        [
+            (BuiltInFontFamily.Sans, false, false, "Helvetica"),
+            (BuiltInFontFamily.Sans, true, false, "Helvetica-Bold"),
+            (BuiltInFontFamily.Sans, false, true, "Helvetica-Oblique"),
+            (BuiltInFontFamily.Sans, true, true, "Helvetica-BoldOblique"),
+            (BuiltInFontFamily.Monospace, false, false, "Courier"),
+            (BuiltInFontFamily.Monospace, true, false, "Courier-Bold"),
+            (BuiltInFontFamily.Monospace, false, true, "Courier-Oblique"),
+            (BuiltInFontFamily.Monospace, true, true, "Courier-BoldOblique"),
+            (BuiltInFontFamily.Serif, false, false, "Times-Roman"),
+            (BuiltInFontFamily.Serif, true, false, "Times-Bold"),
+            (BuiltInFontFamily.Serif, false, true, "Times-Italic"),
+            (BuiltInFontFamily.Serif, true, true, "Times-BoldItalic"),
+            (BuiltInFontFamily.Symbol, false, false, "Symbol"),
+            (BuiltInFontFamily.ZapfDingbats, false, false, "ZapfDingbats"),
+        ];
+
+        foreach (var (family, bold, italic, expected) in cases)
+        {
+            Assert.Equal(
+                expected,
+                StandardFonts.PostScriptName(new CapturedBuiltInFace(family, bold, italic, default)));
+        }
+    }
+
+    [Fact]
+    public void EveryBuiltInFace_RoundTripsThroughTheNeutralFace()
+    {
+        foreach (var entry in BuiltInFontData.Fonts)
+        {
+            var metrics = BuiltInFontMetrics.Resolve(new Font { Family = entry.FontName })!;
+
+            Assert.Equal(entry.FontName, StandardFonts.PostScriptName(metrics.Face()));
+        }
     }
 }

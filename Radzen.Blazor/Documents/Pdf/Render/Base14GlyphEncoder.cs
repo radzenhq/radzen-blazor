@@ -58,7 +58,7 @@ internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
         }
 
         return new InvalidOperationException(
-            $"The built-in font '{face.PostScriptName}' cannot draw {string.Join(", ", offenders)}: a base-14 font is limited "
+            $"The built-in font '{StandardFonts.PostScriptName(face)}' cannot draw {string.Join(", ", offenders)}: a base-14 font is limited "
             + "to the WinAnsi character set. Register a font that covers these characters with "
             + $"{nameof(FontCollection)}.{nameof(FontCollection.Register)}, add such a font to the "
             + $"{nameof(FontCollection.SetFallback)} chain, or set "

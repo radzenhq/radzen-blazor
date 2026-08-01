@@ -170,7 +170,7 @@ public class LaidOutContractTests
         var span = Assert.Single(fragment.GlyphRun.Spans);
 
         Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
-        Assert.Equal("Helvetica", span.Face.BuiltIn.PostScriptName);
+        Assert.Equal(BuiltInFontFamily.Sans, span.Face.BuiltIn.Family);
         Assert.Empty(span.SfntGlyphs);
         Assert.Equal(new[] { 'A', 0x20AC, 0xFB01 }, span.BuiltInGlyphs.Select(glyph => glyph.Codepoint));
         Assert.Equal(new[] { 0, 1, 2 }, span.BuiltInGlyphs.Select(glyph => glyph.Cluster));
@@ -180,29 +180,77 @@ public class LaidOutContractTests
             property => property.PropertyType == typeof(byte));
     }
 
-    [Theory]
-    [InlineData("Helvetica", false, false, "Helvetica")]
-    [InlineData("Helvetica", true, true, "Helvetica-BoldOblique")]
-    [InlineData("Times", false, true, "Times-Italic")]
-    [InlineData("Courier", true, false, "Courier-Bold")]
-    public void LaidOutBuiltInFragment_CapturesResolvedFace(
-        string family,
-        bool bold,
-        bool italic,
-        string postScriptName)
+    [Fact]
+    public void LaidOutBuiltInFragment_CapturesResolvedFamilyAndStyle()
+    {
+        (string Family, bool Bold, bool Italic, BuiltInFontFamily Resolved, bool ResolvedBold, bool ResolvedItalic)[] cases =
+        [
+            ("Helvetica", false, false, BuiltInFontFamily.Sans, false, false),
+            ("Helvetica", true, true, BuiltInFontFamily.Sans, true, true),
+            ("Helvetica-BoldOblique", false, false, BuiltInFontFamily.Sans, true, true),
+            ("Times", false, true, BuiltInFontFamily.Serif, false, true),
+            ("Courier", true, false, BuiltInFontFamily.Monospace, true, false),
+            ("Symbol", false, false, BuiltInFontFamily.Symbol, false, false),
+        ];
+
+        foreach (var (family, bold, italic, resolved, resolvedBold, resolvedItalic) in cases)
+        {
+            var document = new Document();
+            var run = (Run)Page(document).Blocks.AddParagraph("A").Inlines[0];
+            run.Font.Family = family;
+            run.Font.Bold = bold;
+            run.Font.Italic = italic;
+
+            var span = Assert.Single(
+                FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
+                    .GlyphRun.Spans);
+
+            Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
+            Assert.Equal(resolved, span.Face.BuiltIn.Family);
+            Assert.Equal(resolvedBold, span.Face.BuiltIn.Bold);
+            Assert.Equal(resolvedItalic, span.Face.BuiltIn.Italic);
+        }
+    }
+
+    [Fact]
+    public void LaidOutBuiltInFace_CarriesTheMetricsLayoutMeasuredWith()
     {
         var document = new Document();
-        var run = (Run)Page(document).Blocks.AddParagraph("Text").Inlines[0];
-        run.Font.Family = family;
-        run.Font.Bold = bold;
-        run.Font.Italic = italic;
+        Page(document).Blocks.AddParagraph("A");
 
-        var span = Assert.Single(
+        var face = Assert.Single(
             FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
-                .GlyphRun.Spans);
+                .GlyphRun.Spans)
+            .Face.BuiltIn;
+        var metrics = BuiltInFontMetrics.Resolve(new Font())!;
 
-        Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
-        Assert.Equal(postScriptName, span.Face.BuiltIn.PostScriptName);
+        Assert.Equal(FontMetric.AfmDesignUnitsPerEm, face.Metrics.DesignUnitsPerEm);
+        Assert.Equal(metrics.Ascender, face.Metrics.Ascender);
+        Assert.Equal(metrics.Descender, face.Metrics.Descender);
+        Assert.Equal(metrics.CapHeight, face.Metrics.CapHeight);
+        Assert.Equal(metrics.XHeight, face.Metrics.XHeight);
+        Assert.Equal(metrics.ItalicAngle, face.Metrics.ItalicAngle);
+        Assert.Equal(metrics.IsFixedPitch, face.Metrics.IsFixedPitch);
+        Assert.Equal(
+            new[] { metrics.BBoxLeft, metrics.BBoxBottom, metrics.BBoxRight, metrics.BBoxTop },
+            new[]
+            {
+                face.Metrics.BBoxLeft,
+                face.Metrics.BBoxBottom,
+                face.Metrics.BBoxRight,
+                face.Metrics.BBoxTop,
+            });
+    }
+
+    [Fact]
+    public void LaidOutBuiltInFace_CarriesNoRendererSpecificFontIdentity()
+    {
+        Assert.DoesNotContain(
+            typeof(CapturedBuiltInFace).GetProperties(),
+            property => property.PropertyType == typeof(string));
+        Assert.DoesNotContain(
+            typeof(BuiltInFaceMetrics).GetProperties(),
+            property => property.PropertyType == typeof(string));
     }
 
     [Fact]

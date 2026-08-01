@@ -25,7 +25,11 @@ internal enum CapturedFontFaceKind
     BuiltIn,
 }
 
-internal readonly record struct CapturedBuiltInFace(string PostScriptName);
+internal readonly record struct CapturedBuiltInFace(
+    BuiltInFontFamily Family,
+    bool Bold,
+    bool Italic,
+    BuiltInFaceMetrics Metrics);
 
 internal readonly record struct CapturedFontFace
 {
@@ -57,8 +61,8 @@ internal readonly record struct CapturedFontFace
     public static CapturedFontFace FromSfnt(SfntFont face)
         => new(CapturedFontFaceKind.Sfnt, face, default);
 
-    public static CapturedFontFace FromBuiltIn(string postScriptName)
-        => new(CapturedFontFaceKind.BuiltIn, null, new CapturedBuiltInFace(postScriptName));
+    public static CapturedFontFace FromBuiltIn(CapturedBuiltInFace face)
+        => new(CapturedFontFaceKind.BuiltIn, null, face);
 }
 
 internal readonly record struct CapturedGlyphSpan(

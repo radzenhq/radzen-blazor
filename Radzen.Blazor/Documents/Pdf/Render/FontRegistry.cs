@@ -34,7 +34,7 @@ internal sealed class FontRegistry
 
     public EmittedFont ResolveBase14(CapturedBuiltInFace face)
     {
-        var name = face.PostScriptName;
+        var name = StandardFonts.PostScriptName(face);
         return fonts.GetOrAddValue(name, key => new EmittedFont { Key = key, Base14 = name });
     }
 
