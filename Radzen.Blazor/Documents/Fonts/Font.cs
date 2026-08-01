@@ -16,7 +16,12 @@ public sealed class Font : ITracksChanges
     private ChangeTracker tracker;
 
     /// <summary>Gets or sets the font family name set directly on this font, or <see langword="null"/> when
-    /// none is set and the family is inherited. Setting <see langword="null"/> resets it and is tracked as a change.</summary>
+    /// none is set and the family is inherited. Setting <see langword="null"/> resets it and is tracked as a change.
+    /// When no family is set anywhere in the inheritance chain the document falls back to <c>"Helvetica"</c>, which
+    /// names the built-in metric-compatible sans family shipped with the library rather than the Adobe typeface; the
+    /// built-in families are the sans (<c>"Helvetica"</c>), serif (<c>"Times"</c>), monospace (<c>"Courier"</c>),
+    /// <c>"Symbol"</c> and <c>"ZapfDingbats"</c> faces, for which the library ships metrics but no font files.
+    /// Register a font file with <see cref="FontCollection.Register(string, System.IO.Stream)"/> to use any other family.</summary>
     public string? Family
     {
         get => family;

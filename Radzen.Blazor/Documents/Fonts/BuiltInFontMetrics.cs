@@ -21,9 +21,56 @@ internal sealed class BuiltInFontMetrics
         this.entry = entry;
         widthByName = ParseWidths(entry.Widths);
         kernByPair = ParseKerning(entry.FontName);
+        (Family, Bold, Italic) = ClassifyEntry(entry.FontName);
     }
 
     public string PostScriptName => entry.FontName;
+
+    public BuiltInFontFamily Family { get; }
+
+    public bool Bold { get; }
+
+    public bool Italic { get; }
+
+    public CapturedBuiltInFace Face()
+        => new(
+            Family,
+            Bold,
+            Italic,
+            new BuiltInFaceMetrics(
+                FontMetric.AfmDesignUnitsPerEm,
+                entry.Ascender,
+                entry.Descender,
+                entry.CapHeight,
+                entry.XHeight,
+                entry.ItalicAngle,
+                entry.UnderlinePosition,
+                entry.UnderlineThickness,
+                entry.IsFixedPitch,
+                entry.BBoxLeft,
+                entry.BBoxBottom,
+                entry.BBoxRight,
+                entry.BBoxTop));
+
+    private static (BuiltInFontFamily Family, bool Bold, bool Italic) ClassifyEntry(string fontName)
+        => fontName switch
+        {
+            "Helvetica" => (BuiltInFontFamily.Sans, false, false),
+            "Helvetica-Bold" => (BuiltInFontFamily.Sans, true, false),
+            "Helvetica-Oblique" => (BuiltInFontFamily.Sans, false, true),
+            "Helvetica-BoldOblique" => (BuiltInFontFamily.Sans, true, true),
+            "Courier" => (BuiltInFontFamily.Monospace, false, false),
+            "Courier-Bold" => (BuiltInFontFamily.Monospace, true, false),
+            "Courier-Oblique" => (BuiltInFontFamily.Monospace, false, true),
+            "Courier-BoldOblique" => (BuiltInFontFamily.Monospace, true, true),
+            "Times-Roman" => (BuiltInFontFamily.Serif, false, false),
+            "Times-Bold" => (BuiltInFontFamily.Serif, true, false),
+            "Times-Italic" => (BuiltInFontFamily.Serif, false, true),
+            "Times-BoldItalic" => (BuiltInFontFamily.Serif, true, true),
+            "Symbol" => (BuiltInFontFamily.Symbol, false, false),
+            "ZapfDingbats" => (BuiltInFontFamily.ZapfDingbats, false, false),
+            _ => throw new InvalidOperationException($"'{fontName}' is not a built-in face."),
+        };
 
     public double CapHeight => entry.CapHeight;
 
