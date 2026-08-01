@@ -6,7 +6,7 @@ internal static class WatermarkGeometry
 {
     private const double BaselineFactor = 0.35;
 
-    public static double Baseline(double size) => size * BaselineFactor;
+    public static double BaselineBelowCenter(double size) => size * BaselineFactor;
 
     public static double Centered(double extent) => -extent / 2;
 

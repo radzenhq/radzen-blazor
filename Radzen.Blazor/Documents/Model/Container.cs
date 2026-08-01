@@ -11,12 +11,9 @@ public enum ContainerLayout
 
     /// <summary>
     /// Children share the container box: each child is laid out from the box top-left
-    /// (inset by the padding) and children are stacked in declaration order, so later
-    /// children are recorded above earlier ones. The box height is the tallest child's height.
-    /// The declaration order is recorded on every laid-out draw, and a renderer is free to
-    /// honour it. The PDF renderer does not: it flattens a page into fixed global phases
-    /// (backgrounds, then borders, then images, then text, then watermarks), so in a PDF a
-    /// text child always paints above an image child regardless of declaration order.
+    /// (inset by the padding) and children are painted in declaration order, so later
+    /// children appear above earlier ones regardless of content kind. The box height is the
+    /// tallest child's height.
     /// </summary>
     Overlay,
 }

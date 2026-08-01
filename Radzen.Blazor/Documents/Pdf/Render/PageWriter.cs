@@ -17,40 +17,6 @@ internal sealed class PageWriter(
     int pageIndex,
     IReadOnlyDictionary<EmittedFont, PlannedFont> fontPlans) : IDisposable
 {
-    private static readonly ContentPhase[] OrderedPhases =
-    [
-        ContentPhase.Fills,
-        ContentPhase.StraightStrokes,
-        ContentPhase.RoundedStrokes,
-        ContentPhase.Images,
-        ContentPhase.Text,
-        ContentPhase.Watermark,
-    ];
-
-    internal static IReadOnlyList<PaintPhase> PaintOrder()
-    {
-        var phases = new List<PaintPhase>();
-        foreach (var phase in OrderedPhases)
-        {
-            var scene = phase switch
-            {
-                ContentPhase.Fills => PaintPhase.Fill,
-                ContentPhase.StraightStrokes or ContentPhase.RoundedStrokes => PaintPhase.Stroke,
-                ContentPhase.Images => PaintPhase.Image,
-                ContentPhase.Text => PaintPhase.Text,
-                ContentPhase.Watermark => PaintPhase.Watermark,
-                _ => (PaintPhase?)null,
-            };
-
-            if (scene is { } value && (phases.Count == 0 || phases[^1] != value))
-            {
-                phases.Add(value);
-            }
-        }
-
-        return phases;
-    }
-
     private readonly List<TaggedDraw> tagged = [];
     private Dictionary<int, TaggedMark> taggedMarks = [];
     private readonly ContentWriter writer = new();
@@ -61,9 +27,9 @@ internal sealed class PageWriter(
         PageDrawTransformer.ApplyColorAlpha(plan);
         PlanMarkedContent();
 
-        foreach (var phase in OrderedPhases)
+        foreach (var draw in OrderedDraws())
         {
-            Emit(phase);
+            Emit(draw);
         }
 
         return PackageResources();
@@ -72,26 +38,26 @@ internal sealed class PageWriter(
     private static Matrix GradientMatrix(in FillDraw fill)
         => BottomUpSpace.TopDownAt(fill.X, fill.Y, fill.Height);
 
-    private void Emit(ContentPhase phase)
+    private void Emit(in PageDrawReference draw)
     {
-        switch (phase)
+        switch (draw.Phase)
         {
-            case ContentPhase.Fills:
-                EmitFills();
+            case PaintPhase.Fills:
+                EmitFill(plan.Fills[draw.Index]);
                 break;
-            case ContentPhase.StraightStrokes:
-                EmitStraightStrokes();
+            case PaintPhase.StraightStrokes:
+                EmitStraightStroke(plan.Edges[draw.Index]);
                 break;
-            case ContentPhase.RoundedStrokes:
-                EmitRoundedStrokes();
+            case PaintPhase.RoundedStrokes:
+                EmitRoundedStroke(plan.RoundedStrokes[draw.Index]);
                 break;
-            case ContentPhase.Images:
-                EmitImages();
+            case PaintPhase.Images:
+                EmitImage(plan.Images[draw.Index]);
                 break;
-            case ContentPhase.Text:
-                EmitText();
+            case PaintPhase.Text:
+                EmitText(plan.Texts[draw.Index]);
                 break;
-            case ContentPhase.Watermark:
+            case PaintPhase.Watermark:
                 EmitWatermark();
                 break;
         }
@@ -134,14 +100,11 @@ internal sealed class PageWriter(
         taggedMarks = structureTree.PlanTaggedContent(pageIndex, tagged);
     }
 
-    private void EmitFills()
+    private void EmitFill(in FillDraw fill)
     {
-        foreach (var fill in plan.Fills)
-        {
-            BeginMarkedDraw(fill.Element, fill.Artifact, fill.Sequence);
-            WriteFill(fill);
-            EndMarkedDraw(fill.Element, fill.Artifact);
-        }
+        BeginMarkedDraw(fill.Element, fill.Artifact, fill.Sequence);
+        WriteFill(fill);
+        EndMarkedDraw(fill.Element, fill.Artifact);
     }
 
     private void WriteFill(in FillDraw fill)
@@ -193,73 +156,61 @@ internal sealed class PageWriter(
         }
     }
 
-    private void EmitStraightStrokes()
+    private void EmitStraightStroke(in EdgeDraw edge)
     {
-        foreach (var edge in plan.Edges)
+        BeginArtifactDraw(edge.Artifact);
+        writer.WriteRaw("q\n");
+        if (edge.ExtGState is { } edgeState)
         {
-            BeginArtifactDraw(edge.Artifact);
-            writer.WriteRaw("q\n");
-            if (edge.ExtGState is { } edgeState)
-            {
-                writer.WriteName(edgeState);
-                writer.WriteRaw(" gs\n");
-            }
-
-            if (edge.Clip is { } edgeClip)
-            {
-                WriteClip(writer, edgeClip, edge.ClipRadius);
-            }
-
-            WriteStrokeState(writer, edge.Color, edge.LineWidth, edge.Style);
-            writer.WriteNumber(edge.X1);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(edge.Y1);
-            writer.WriteRaw(" m\n");
-            writer.WriteNumber(edge.X2);
-            writer.WriteRaw(" ");
-            writer.WriteNumber(edge.Y2);
-            writer.WriteRaw(" l\nS\nQ\n");
-            EndArtifact();
+            writer.WriteName(edgeState);
+            writer.WriteRaw(" gs\n");
         }
+
+        if (edge.Clip is { } edgeClip)
+        {
+            WriteClip(writer, edgeClip, edge.ClipRadius);
+        }
+
+        WriteStrokeState(writer, edge.Color, edge.LineWidth, edge.Style);
+        writer.WriteNumber(edge.X1);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(edge.Y1);
+        writer.WriteRaw(" m\n");
+        writer.WriteNumber(edge.X2);
+        writer.WriteRaw(" ");
+        writer.WriteNumber(edge.Y2);
+        writer.WriteRaw(" l\nS\nQ\n");
+        EndArtifact();
     }
 
-    private void EmitRoundedStrokes()
+    private void EmitRoundedStroke(in RoundedStrokeDraw rounded)
     {
-        foreach (var rounded in plan.RoundedStrokes)
+        BeginMarkedDraw(rounded.Element, rounded.Artifact, rounded.Sequence);
+        writer.WriteRaw("q\n");
+        if (rounded.ExtGState is { } roundedState)
         {
-            BeginMarkedDraw(rounded.Element, rounded.Artifact, rounded.Sequence);
-            writer.WriteRaw("q\n");
-            if (rounded.ExtGState is { } roundedState)
-            {
-                writer.WriteName(roundedState);
-                writer.WriteRaw(" gs\n");
-            }
-
-            WriteStrokeState(writer, rounded.Color, rounded.LineWidth, rounded.Style);
-            WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
-            writer.WriteRaw("S\nQ\n");
-            EndMarkedDraw(rounded.Element, rounded.Artifact);
+            writer.WriteName(roundedState);
+            writer.WriteRaw(" gs\n");
         }
+
+        WriteStrokeState(writer, rounded.Color, rounded.LineWidth, rounded.Style);
+        WriteRoundedRect(writer, rounded.X, rounded.Y, rounded.Width, rounded.Height, rounded.Radius);
+        writer.WriteRaw("S\nQ\n");
+        EndMarkedDraw(rounded.Element, rounded.Artifact);
     }
 
-    private void EmitImages()
+    private void EmitImage(in ImageDraw image)
     {
-        foreach (var image in plan.Images)
-        {
-            BeginMarkedDraw(image.Element, image.Artifact, image.Sequence);
-            WriteImageDraw(writer, image);
-            EndMarkedDraw(image.Element, image.Artifact);
-        }
+        BeginMarkedDraw(image.Element, image.Artifact, image.Sequence);
+        WriteImageDraw(writer, image);
+        EndMarkedDraw(image.Element, image.Artifact);
     }
 
-    private void EmitText()
+    private void EmitText(in TextDraw text)
     {
-        foreach (var text in plan.Texts)
-        {
-            BeginMarkedDraw(text.Element, text.Artifact, text.Sequence);
-            WriteTextDraw(writer, text, plannedFonts[text.Font]);
-            EndMarkedDraw(text.Element, text.Artifact);
-        }
+        BeginMarkedDraw(text.Element, text.Artifact, text.Sequence);
+        WriteTextDraw(writer, text, plannedFonts[text.Font]);
+        EndMarkedDraw(text.Element, text.Artifact);
     }
 
     private void BeginMarkedDraw(
@@ -413,14 +364,160 @@ internal sealed class PageWriter(
             });
     }
 
-    private enum ContentPhase
+    private List<PageDrawReference> OrderedDraws()
     {
-        Fills,
-        StraightStrokes,
-        RoundedStrokes,
-        Images,
-        Text,
-        Watermark,
+        var draws = PhaseOrderedDraws();
+        var groups = StackGroups(draws);
+        AddStackPrecedence(groups);
+
+        var ready = new SortedSet<int>();
+        for (var i = 0; i < draws.Count; i++)
+        {
+            if (draws[i].Stack is null || groups[draws[i].Stack!.Value].Blockers == 0)
+            {
+                ready.Add(i);
+            }
+        }
+
+        var ordered = new List<PageDrawReference>(draws.Count);
+        while (ready.Count > 0)
+        {
+            var index = ready.Min;
+            ready.Remove(index);
+            var draw = draws[index];
+            ordered.Add(draw);
+
+            if (draw.Stack is not { } stack)
+            {
+                continue;
+            }
+
+            var group = groups[stack];
+            group.Remaining--;
+            if (group.Remaining != 0)
+            {
+                continue;
+            }
+
+            foreach (var successor in group.Successors)
+            {
+                var next = groups[successor];
+                next.Blockers--;
+                if (next.Blockers == 0)
+                {
+                    foreach (var node in next.Nodes)
+                    {
+                        ready.Add(node);
+                    }
+                }
+            }
+        }
+
+        if (ordered.Count != draws.Count)
+        {
+            throw new InvalidOperationException("The page stacking constraints contain a cycle.");
+        }
+
+        return ordered;
+    }
+
+    private List<PageDrawReference> PhaseOrderedDraws()
+    {
+        var draws = new List<PageDrawReference>(
+            plan.Fills.Count + plan.Edges.Count + plan.RoundedStrokes.Count
+            + plan.Images.Count + plan.Texts.Count + (plan.Watermark is null ? 0 : 1));
+        foreach (var phase in PdfPaintOrder.Phases)
+        {
+            var count = phase switch
+            {
+                PaintPhase.Fills => plan.Fills.Count,
+                PaintPhase.StraightStrokes => plan.Edges.Count,
+                PaintPhase.RoundedStrokes => plan.RoundedStrokes.Count,
+                PaintPhase.Images => plan.Images.Count,
+                PaintPhase.Text => plan.Texts.Count,
+                PaintPhase.Watermark => plan.Watermark is null ? 0 : 1,
+                _ => 0,
+            };
+            for (var index = 0; index < count; index++)
+            {
+                draws.Add(new PageDrawReference(phase, index, StackOf(phase, index)));
+            }
+        }
+
+        return draws;
+    }
+
+    private PaintStack? StackOf(PaintPhase phase, int index)
+        => phase switch
+        {
+            PaintPhase.Fills => plan.Fills[index].Stack,
+            PaintPhase.StraightStrokes => plan.Edges[index].Stack,
+            PaintPhase.RoundedStrokes => plan.RoundedStrokes[index].Stack,
+            PaintPhase.Images => plan.Images[index].Stack,
+            PaintPhase.Text => plan.Texts[index].Stack,
+            _ => null,
+        };
+
+    private static Dictionary<PaintStack, StackGroup> StackGroups(List<PageDrawReference> draws)
+    {
+        var groups = new Dictionary<PaintStack, StackGroup>();
+        for (var i = 0; i < draws.Count; i++)
+        {
+            if (draws[i].Stack is not { } stack)
+            {
+                continue;
+            }
+
+            if (!groups.TryGetValue(stack, out var group))
+            {
+                group = new StackGroup();
+                groups.Add(stack, group);
+            }
+
+            group.Nodes.Add(i);
+            group.Remaining++;
+        }
+
+        return groups;
+    }
+
+    private static void AddStackPrecedence(Dictionary<PaintStack, StackGroup> groups)
+    {
+        var stacks = new List<PaintStack>(groups.Keys);
+        stacks.Sort(static (left, right) => left.Order.CompareTo(right.Order));
+        for (var earlierIndex = 0; earlierIndex < stacks.Count; earlierIndex++)
+        {
+            var earlier = stacks[earlierIndex];
+            var earlierGroup = groups[earlier];
+            for (var laterIndex = earlierIndex + 1; laterIndex < stacks.Count; laterIndex++)
+            {
+                var later = stacks[laterIndex];
+                var laterGroup = groups[later];
+                if (earlier.Layer != later.Layer
+                    || !Overlaps(earlier.Bounds, later.Bounds)
+                    || earlierGroup.Nodes[^1] < laterGroup.Nodes[0])
+                {
+                    continue;
+                }
+
+                earlierGroup.Successors.Add(later);
+                laterGroup.Blockers++;
+            }
+        }
+    }
+
+    private static bool Overlaps(in PdfRect left, in PdfRect right)
+        => left.Left < right.Right && right.Left < left.Right
+            && left.Bottom < right.Top && right.Bottom < left.Top;
+
+    private readonly record struct PageDrawReference(PaintPhase Phase, int Index, PaintStack? Stack);
+
+    private sealed class StackGroup
+    {
+        public List<int> Nodes { get; } = [];
+        public List<PaintStack> Successors { get; } = [];
+        public int Remaining { get; set; }
+        public int Blockers { get; set; }
     }
 
     public void Dispose() => writer.Dispose();

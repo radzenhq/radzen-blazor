@@ -171,6 +171,7 @@ internal static class PageDrawTransformer
                 Style = BorderStyle.Solid,
                 Artifact = SemanticArtifacts.ForDecoration(fill.Artifact),
                 ExtGState = fill.ExtGState,
+                Stack = fill.Stack,
             });
         }
 
@@ -223,6 +224,7 @@ internal static class PageDrawTransformer
             Style = rounded.Style,
             Artifact = rounded.Artifact,
             ExtGState = rounded.ExtGState,
+            Stack = rounded.Stack,
         });
     }
 }

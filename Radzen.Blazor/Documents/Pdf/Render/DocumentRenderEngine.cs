@@ -210,61 +210,133 @@ internal sealed class DocumentRenderEngine
     private void EmitLayer(PageRenderContext context, PageLayerKind kind, LaidOutLayer layer, double left, double top)
     {
         var body = kind == PageLayerKind.Body;
-        foreach (var content in PdfPaintOrder.ContentOf(kind))
+        context.Layer = (int)kind;
+        foreach (var line in layer.Lines)
         {
-            switch (content)
-            {
-                case PaintContent.Lines when body:
-                    textRecorder.EmitLines(
-                        context, layer.Lines,
-                        left, top, delta: 0,
-                        opacity: 1, inherited: null, resolveStructure: true,
-                        overflowThreshold: double.PositiveInfinity);
-                    break;
-                case PaintContent.Lines:
-                    textRecorder.EmitBandLines(context, layer.Lines, left, top);
-                    break;
-                case PaintContent.TablesAndBoxesByOrder:
-                    EmitTablesAndBoxes(context, layer.Tables, layer.Boxes, left, top);
-                    break;
-                case PaintContent.ImagesAndCodeSymbols:
-                    EmitImagesAndCodeSymbols(context, layer, left, top);
-                    break;
-            }
+            EmitLine(context, line, body, left, top);
         }
+
+        if (body)
+        {
+            EmitTablesAndBoxes(context, layer, left, top);
+            EmitImagesAndCodeSymbols(context, layer, left, top);
+        }
+        else
+        {
+            EmitImagesAndCodeSymbols(context, layer, left, top);
+            EmitTablesAndBoxes(context, layer, left, top);
+        }
+    }
+
+    private void EmitTablesAndBoxes(PageRenderContext context, LaidOutLayer layer, double left, double top)
+    {
+        OrderedMerge.VisitByOrder(
+            layer.Tables,
+            static table => table.ZOrder,
+            layer.Boxes,
+            static box => box.ZOrder,
+            table => EmitTable(context, table, left, top),
+            box => EmitBox(context, box, left, top));
     }
 
     private void EmitImagesAndCodeSymbols(PageRenderContext context, LaidOutLayer layer, double left, double top)
     {
-        foreach (var positioned in layer.Images)
+        foreach (var image in layer.Images)
         {
-            imageRecorder.EmitImage(
-                context, positioned, left, top,
-                delta: 0, opacity: 1, inherited: null, inheritedArtifact: null);
+            EmitImage(context, image, left, top);
         }
 
-        foreach (var positioned in layer.CodeSymbols)
+        foreach (var codeSymbol in layer.CodeSymbols)
         {
-            codeSymbolRecorder.EmitCodeSymbol(context, positioned, left, top);
+            EmitCodeSymbol(context, codeSymbol, left, top);
         }
     }
 
-    private void EmitTablesAndBoxes(
+    private void EmitLine(
         PageRenderContext context,
-        ImmutableArray<LaidOutTableFragment> tables,
-        ImmutableArray<LaidOutBox> boxes,
+        in LaidOutLine line,
+        bool body,
         double left,
         double top)
     {
-        OrderedMerge.VisitByOrder(
-            tables,
-            static table => table.ZOrder,
-            boxes,
-            static box => box.ZOrder,
-            table => tableRecorder.EmitFragment(context, table, left, top),
-            box => boxRecorder.EmitBox(
-                context, box, BoxContentOrigin.Parent, element: null, left, top,
-                delta: 0, inheritedArtifact: null));
+        var mark = context.BeginStack(
+            line.ZOrder,
+            PdfRect.FromSize(
+                left + line.X,
+                BottomUpSpace.Bottom(top, line.Y, line.Line.Height),
+                line.Line.Width,
+                line.Line.Height));
+        if (body)
+        {
+            textRecorder.EmitLines(
+                context, [line],
+                left, top, delta: 0,
+                opacity: 1, inherited: null, resolveStructure: true,
+                overflowThreshold: double.PositiveInfinity);
+        }
+        else
+        {
+            textRecorder.EmitBandLines(context, [line], left, top);
+        }
+
+        context.EndStack(mark);
+    }
+
+    private void EmitImage(PageRenderContext context, in LaidOutImage image, double left, double top)
+    {
+        var mark = context.BeginStack(
+            image.ZOrder,
+            PdfRect.FromSize(
+                left + image.X,
+                BottomUpSpace.Bottom(top, image.Y, image.Height),
+                image.Width,
+                image.Height));
+        imageRecorder.EmitImage(
+            context, image, left, top,
+            delta: 0, opacity: 1, inherited: null, inheritedArtifact: null);
+        context.EndStack(mark);
+    }
+
+    private void EmitCodeSymbol(
+        PageRenderContext context,
+        in LaidOutCodeSymbol codeSymbol,
+        double left,
+        double top)
+    {
+        var mark = context.BeginStack(
+            codeSymbol.ZOrder,
+            PdfRect.FromSize(
+                left + codeSymbol.X,
+                BottomUpSpace.Bottom(top, codeSymbol.Y, codeSymbol.Height),
+                codeSymbol.Width,
+                codeSymbol.Height));
+        codeSymbolRecorder.EmitCodeSymbol(context, codeSymbol, left, top);
+        context.EndStack(mark);
+    }
+
+    private void EmitTable(
+        PageRenderContext context,
+        in LaidOutTableFragment table,
+        double left,
+        double top)
+    {
+        var mark = context.BeginStack(
+            table.ZOrder,
+            BottomUpSpace.Bounds(left, top, table.Bounds, delta: 0));
+        tableRecorder.EmitFragment(context, table, left, top);
+        context.EndStack(mark);
+    }
+
+    private void EmitBox(PageRenderContext context, LaidOutBox box, double left, double top)
+    {
+        var mark = context.BeginStack(
+            box.ZOrder,
+            BottomUpSpace.Bounds(left, top, box.Bounds, delta: 0),
+            box.Transform);
+        boxRecorder.EmitBox(
+            context, box, BoxContentOrigin.Parent, element: null, left, top,
+            delta: 0, inheritedArtifact: null);
+        context.EndStack(mark);
     }
 
 }

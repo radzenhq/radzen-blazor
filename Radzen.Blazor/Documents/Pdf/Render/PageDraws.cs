@@ -57,6 +57,8 @@ internal readonly struct TextDraw
     public string? ExtGState { get; init; }
 
     public Matrix? Transform { get; init; }
+
+    public PaintStack? Stack { get; init; }
 }
 
 internal readonly struct ImageDraw
@@ -73,6 +75,8 @@ internal readonly struct ImageDraw
     public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
     public Matrix? Transform { get; init; }
+
+    public PaintStack? Stack { get; init; }
 }
 
 internal readonly struct FillDraw
@@ -93,6 +97,8 @@ internal readonly struct FillDraw
     public string? ExtGState { get; init; }
 
     public GradientPaint? Gradient { get; init; }
+
+    public PaintStack? Stack { get; init; }
 }
 
 internal readonly struct RoundedStrokeDraw
@@ -109,6 +115,8 @@ internal readonly struct RoundedStrokeDraw
     public SemanticArtifactKind? Artifact { get; init; }
     public int Sequence { get; init; }
     public string? ExtGState { get; init; }
+
+    public PaintStack? Stack { get; init; }
 }
 
 internal readonly struct EdgeDraw
@@ -124,6 +132,37 @@ internal readonly struct EdgeDraw
     public PdfRect? Clip { get; init; }
     public double ClipRadius { get; init; }
     public string? ExtGState { get; init; }
+
+    public PaintStack? Stack { get; init; }
+}
+
+internal readonly record struct PaintStack(int Layer, PaintStackOrder Order, PdfRect Bounds);
+
+internal sealed class PaintStackOrder(PaintStackOrder? parent, int zOrder) : IComparable<PaintStackOrder>
+{
+    private readonly int[] path = parent is null ? [zOrder] : [.. parent.path, zOrder];
+
+    public PaintStackOrder? Parent { get; } = parent;
+
+    public int CompareTo(PaintStackOrder? other)
+    {
+        if (other is null)
+        {
+            return 1;
+        }
+
+        var count = Math.Min(path.Length, other.path.Length);
+        for (var i = 0; i < count; i++)
+        {
+            var comparison = path[i].CompareTo(other.path[i]);
+            if (comparison != 0)
+            {
+                return comparison;
+            }
+        }
+
+        return path.Length.CompareTo(other.path.Length);
+    }
 }
 
 internal sealed class WatermarkDraw
@@ -149,6 +188,52 @@ internal sealed class PagePlan
     private int sequence;
 
     public int NextSequence() => sequence++;
+
+    public StackMark BeginStack(int layer, PaintStackOrder order, in PdfRect bounds)
+        => new(new PaintStack(layer, order, bounds), Mark());
+
+    public void EndStack(in StackMark mark)
+    {
+        for (var i = mark.Marks.Fills; i < Fills.Count; i++)
+        {
+            if (Fills[i].Stack is null)
+            {
+                Fills[i] = Fills[i] with { Stack = mark.Stack };
+            }
+        }
+
+        for (var i = mark.Marks.Edges; i < Edges.Count; i++)
+        {
+            if (Edges[i].Stack is null)
+            {
+                Edges[i] = Edges[i] with { Stack = mark.Stack };
+            }
+        }
+
+        for (var i = mark.Marks.Images; i < Images.Count; i++)
+        {
+            if (Images[i].Stack is null)
+            {
+                Images[i] = Images[i] with { Stack = mark.Stack };
+            }
+        }
+
+        for (var i = mark.Marks.Texts; i < Texts.Count; i++)
+        {
+            if (Texts[i].Stack is null)
+            {
+                Texts[i] = Texts[i] with { Stack = mark.Stack };
+            }
+        }
+
+        for (var i = mark.Marks.Rounded; i < RoundedStrokes.Count; i++)
+        {
+            if (RoundedStrokes[i].Stack is null)
+            {
+                RoundedStrokes[i] = RoundedStrokes[i] with { Stack = mark.Stack };
+            }
+        }
+    }
     private readonly ResourceNameAllocator<string, OutputExtGState> extGStates =
         new(ContentResourcePrefixes.Page.ExtGState, reserved: null, StringComparer.Ordinal);
 
@@ -307,3 +392,5 @@ internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint
 }
 
 internal readonly record struct PlanMarks(int Fills, int Edges, int Images, int Texts, int Rounded);
+
+internal readonly record struct StackMark(PaintStack Stack, PlanMarks Marks);

@@ -1,8 +1,6 @@
 #nullable enable
-using System.Collections.Generic;
 using System.Linq;
 
-using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Xunit;
 
@@ -10,28 +8,67 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfPaintOrderTests
 {
-    [Fact]
-    public void PageWriter_MatchesThePdfPaintOrderContract()
-        => Assert.Equal(PdfPaintOrder.Phases, PageWriter.PaintOrder());
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void RenderedPage_PaintsOverlappingTextAndImageInDeclarationOrder(bool imageFirst)
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(200), Unit.FromPoint(200));
+        section.Margins.SetAll(Unit.FromPoint(20));
+        var overlay = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
+        var paragraph = new Paragraph();
+        paragraph.Inlines.Add("TEXT");
+        var image = new Image(PdfTestResources.ReadAllBytes("Images/rgb.jpg"))
+        {
+            Width = Unit.FromPoint(80),
+            Height = Unit.FromPoint(40),
+        };
+        if (imageFirst)
+        {
+            overlay.Blocks.Add(image);
+            overlay.Blocks.Add(paragraph);
+        }
+        else
+        {
+            overlay.Blocks.Add(paragraph);
+            overlay.Blocks.Add(image);
+        }
 
-    [Fact]
-    public void RenderedPage_PaintsFillThenStrokeThenImageThenTextThenWatermark()
-        => Assert.Equal(
-            new[] { PaintPhase.Fill, PaintPhase.Stroke, PaintPhase.Image, PaintPhase.Text, PaintPhase.Watermark },
-            ObservedPhases(OverlappingPage()));
+        var operations = Parsed(document);
+        var text = operations.FindIndex(operation =>
+            operation.Operator == "Tj"
+            && System.Text.Encoding.Latin1.GetString(operation.Operands[0].Bytes) == "TEXT");
+        var imageDraw = operations.FindIndex(operation => operation.Operator == "Do");
 
-    [Fact]
-    public void RenderedPage_PaintsEveryPhaseDeclaredByThePaintOrderContract()
-        => Assert.Equal(PdfPaintOrder.Phases, ObservedPhases(OverlappingPage()));
+        Assert.True(text >= 0);
+        Assert.True(imageDraw >= 0);
+        Assert.Equal(imageFirst, imageDraw < text);
+    }
 
     [Fact]
     public void RenderedPage_PaintsTheWatermarkAfterEveryBodyOperator()
     {
-        var operators = Operators(OverlappingPage());
-        var watermark = Assert.Single(operators.Select((op, index) => (op, index)).Where(entry => entry.op == "gs")).index;
+        var operations = Parsed(OverlappingPage());
+        var watermarkText = operations.FindIndex(operation =>
+            operation.Operator == "Tj"
+            && System.Text.Encoding.Latin1.GetString(operation.Operands[0].Bytes) == "DRAFT");
+        Assert.True(watermarkText >= 0);
+        var watermarkTransform = operations.FindLastIndex(
+            watermarkText,
+            operation => operation.Operator == "cm"
+                && operation.Num(4) == 200
+                && operation.Num(5) == 200);
 
-        Assert.DoesNotContain(operators.Skip(watermark), op => op is "f" or "S" or "re" or "Do");
-        Assert.Contains(operators.Skip(watermark), op => op is "Tj" or "TJ");
+        Assert.True(watermarkTransform >= 0);
+        Assert.DoesNotContain(
+            operations.Skip(watermarkTransform + 1).Take(watermarkText - watermarkTransform - 1),
+            operation => operation.Operator is "f" or "S" or "re" or "Do");
+        Assert.All(
+            operations.Select((operation, index) => (operation, index))
+                .Where(entry => entry.operation.Operator is "f" or "S" or "re" or "Do"),
+            entry => Assert.True(entry.index < watermarkTransform));
     }
 
     [Fact]
@@ -71,13 +108,15 @@ public class PdfPaintOrderTests
             Text = "DRAFT",
             Opacity = 0.3,
             Rotation = 45,
-            Font = { Family = BuildTestSupport.Latin, Size = 48 },
+            Font = { Family = "Helvetica", Size = 48 },
         };
 
         var container = section.Blocks.Add(new Container
         {
             Padding = Unit.FromPoint(8),
             Background = Color.FromRgb(200, 220, 240),
+            Opacity = 0.8,
+            BlendMode = BlendMode.Multiply,
         });
         container.Borders.Width = 3;
         container.Borders.Color = Color.FromRgb(10, 20, 30);
@@ -91,53 +130,8 @@ public class PdfPaintOrderTests
         return document;
     }
 
-    private static PaintPhase[] ObservedPhases(Document document)
-    {
-        var phases = new List<PaintPhase>();
-        foreach (var phase in PhaseStream(document))
-        {
-            if (phases.Count == 0 || phases[^1] != phase)
-            {
-                phases.Add(phase);
-            }
-        }
-
-        return phases.ToArray();
-    }
-
-    private static IEnumerable<PaintPhase> PhaseStream(Document document)
-    {
-        var watermark = false;
-        foreach (var op in Operators(document))
-        {
-            if (op == "gs")
-            {
-                watermark = true;
-            }
-
-            if (watermark)
-            {
-                yield return PaintPhase.Watermark;
-                continue;
-            }
-
-            var phase = op switch
-            {
-                "f" or "f*" or "B" => PaintPhase.Fill,
-                "S" or "s" => PaintPhase.Stroke,
-                "Do" => PaintPhase.Image,
-                "Tj" or "TJ" => PaintPhase.Text,
-                _ => (PaintPhase?)null,
-            };
-
-            if (phase is { } value)
-            {
-                yield return value;
-            }
-        }
-    }
-
-    private static List<string> Operators(Document document)
-        => ContentStreamTokenizer.Operators(
+    private static System.Collections.Generic.List<ContentOperation> Parsed(Document document)
+        => ContentStreamTokenizer.Parse(
             ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
+
 }
