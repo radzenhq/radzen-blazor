@@ -101,7 +101,7 @@ public class PaginationTests
             paras[i] = section.Blocks.Add(PaginationSupport.Text($"P{i}"));
         }
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(capture.Source(paras[0]), pages[0].Body.Lines[0].Source);
@@ -154,7 +154,7 @@ public class PaginationTests
         section.Blocks.AddPageBreak();
         var b = section.Blocks.Add(PaginationSupport.Text("after"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
@@ -188,7 +188,7 @@ public class PaginationTests
         section.Blocks.Add(first);
         var second = section.Blocks.Add(PaginationSupport.Text("second"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var page = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture)[0];
 
         var secondLine = page.Body.Lines.Single(l => l.Source == capture.Source(second));

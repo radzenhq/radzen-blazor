@@ -1,4 +1,3 @@
-using System;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Layout;
@@ -16,7 +15,6 @@ internal static class BandLayouter
         HeaderFooter band,
         double width,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
     {
@@ -25,7 +23,6 @@ internal static class BandLayouter
             result,
             width,
             fonts,
-            measureImage,
             resolution,
             capture);
         foreach (var block in BlockExpander.ExpandBlocks(band.Blocks, width, resolution))

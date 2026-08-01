@@ -47,7 +47,11 @@ internal static class LineTokenizer
 
     private static bool IsConditionalBreak(char c) => c == SoftHyphen || c == ZeroWidthSpace;
 
-    public static LineTokenization Tokenize(Paragraph paragraph, FontCollection fonts, LoweringResult? resolution)
+    public static LineTokenization Tokenize(
+        Paragraph paragraph,
+        FontCollection fonts,
+        LoweringResult? resolution,
+        LayoutCaptureContext capture)
     {
         var segments = new List<List<LineWord>>();
         var words = new List<LineWord>();
@@ -74,7 +78,7 @@ internal static class LineTokenizer
                     hasCurrent = false;
                 }
 
-                var advance = inlineImage.EffectiveSize().Width;
+                var advance = capture.Probes.Measure(inlineImage).Width;
                 words.Add(new LineWord
                 {
                     PieceStart = pieces.Count,

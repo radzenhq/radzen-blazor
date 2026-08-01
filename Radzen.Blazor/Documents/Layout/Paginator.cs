@@ -14,7 +14,6 @@ internal static class Paginator
         FontCollection fonts,
         LoweringResult resolution,
         LayoutCaptureContext capture,
-        Func<Image, double, (double Width, double Height)>? measureImage = null,
         IReadOnlyDictionary<string, int>? tocPages = null,
         int pageNumberOffset = 0,
         int sectionIndex = 0)
@@ -24,7 +23,6 @@ internal static class Paginator
             section,
             fonts,
             pages,
-            measureImage,
             resolution,
             capture,
             tocPages,
@@ -37,7 +35,6 @@ internal static class Paginator
         Section section,
         FontCollection fonts,
         List<LaidOutPage> pages,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages,
@@ -47,7 +44,6 @@ internal static class Paginator
         var context = new PaginationContext(
             fonts,
             pages,
-            measureImage,
             resolution,
             capture,
             pageNumberOffset,

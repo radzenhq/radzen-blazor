@@ -101,7 +101,7 @@ internal static partial class LineLayouter
             Capture = capture,
         };
         var markerPending = true;
-        var tokenization = LineTokenizer.Tokenize(paragraph, fonts, resolution);
+        var tokenization = LineTokenizer.Tokenize(paragraph, fonts, resolution, capture);
         var pieces = tokenization.Pieces;
         foreach (var words in tokenization.Segments)
         {

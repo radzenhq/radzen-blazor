@@ -12,46 +12,8 @@ internal enum ImageFormat
 
 internal sealed record ImageInfo(ImageFormat Format, double Width, double Height);
 
-internal static class ImageProbe
+internal static class ImageMetrics
 {
-    private const int SizeProbeLimit = 64;
-
-    private static readonly object SizeProbeGate = new();
-
-    private static volatile ImageProbes registered = ImageProbes.None;
-
-    public static ImageProbes Registered => registered;
-
-    public static void RegisterSizeProbe(Func<ReadOnlyMemory<byte>, (double Width, double Height)?> probe)
-    {
-        ArgumentNullException.ThrowIfNull(probe);
-        lock (SizeProbeGate)
-        {
-            var snapshot = registered;
-            if (snapshot.Count >= SizeProbeLimit)
-            {
-                throw new InvalidOperationException($"No more than {SizeProbeLimit} custom image size probes can be registered.");
-            }
-
-            registered = snapshot.Add(probe);
-        }
-    }
-
-    public static void Restore(ImageProbes probes)
-    {
-        ArgumentNullException.ThrowIfNull(probes);
-        lock (SizeProbeGate)
-        {
-            registered = probes;
-        }
-    }
-
-    public static ImageInfo Inspect(byte[] data) => registered.Inspect(data);
-
-    public static ImageFormat Format(byte[] data) => registered.Format(data);
-
-    public static (double Width, double Height) PixelSize(byte[] data) => registered.PixelSize(data);
-
     public static string? MediaType(ImageFormat format) => format switch
     {
         ImageFormat.Png => "image/png",
@@ -59,9 +21,6 @@ internal static class ImageProbe
         ImageFormat.Jpeg2000 => "image/jp2",
         _ => null,
     };
-
-    public static (double Width, double Height) Measure(Image image, double availableWidth)
-        => registered.Measure(image, availableWidth);
 
     public static (double Width, double Height) Measure(Image image, double pixelWidth, double pixelHeight, double availableWidth)
     {

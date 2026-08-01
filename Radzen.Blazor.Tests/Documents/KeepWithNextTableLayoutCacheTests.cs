@@ -1,4 +1,5 @@
 #nullable enable
+using System.Linq;
 using Xunit;
 
 using Radzen.Documents;
@@ -10,8 +11,17 @@ using Radzen.Blazor.Tests.Isolated;
 
 public class KeepWithNextTableLayoutCacheTests
 {
+    private static Table TableWithImageCell()
+    {
+        var table = new Table();
+        table.Columns.Add(Unit.FromPoint(200));
+        var row = table.Rows.Add();
+        row.Cells[0].Blocks.Add(new Image(PdfTestResources.ReadAllBytes("Images/rgb.png")));
+        return table;
+    }
+
     [Fact]
-    public void KeepWithNextBeforeTable_LaysOutTheTableOnce()
+    public void KeepWithNextBeforeTable_PlacesTheTableOnce()
     {
         var fonts = PaginationSupport.Fonts();
         var lh = PaginationSupport.LineHeight();
@@ -25,21 +35,24 @@ public class KeepWithNextTableLayoutCacheTests
         var heading = PaginationSupport.Text("Heading");
         heading.KeepWithNext = true;
         section.Blocks.Add(heading);
+        section.Blocks.Add(TableWithImageCell());
 
-        var table = section.Blocks.AddTable();
-        table.Columns.Add(Unit.FromPoint(200));
-        var row = table.Rows.Add();
-        row.Cells[0].Blocks.Add(new Image([1, 2, 3]));
+        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
 
-        var measures = 0;
-        (double, double) Measure(Image image, double available)
-        {
-            measures++;
-            return (60, 40);
-        }
+        Assert.Equal(1, pages.Sum(page => page.Body.Tables.Length));
+    }
 
-        _ = IsolatedPaginator.PaginateIsolated(section, fonts, Measure);
+    [Fact]
+    public void BlockLayoutCache_ReusesTheLayoutOfABlock()
+    {
+        var table = TableWithImageCell();
+        var cache = new BlockLayoutCache(
+            1,
+            400,
+            PaginationSupport.Fonts(),
+            LoweringResult.CreateForDocument(StyleResolution.Empty),
+            new LayoutCaptureContext(ImageProbes.None));
 
-        Assert.Equal(1, measures);
+        Assert.Same(cache.Table(0, table), cache.Table(0, table));
     }
 }

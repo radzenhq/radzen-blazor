@@ -4,9 +4,11 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents;
+using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Render;
@@ -145,34 +147,140 @@ public class ImageMeasurementParityTests
         AssertPaginationAgrees(ImageFlow(BridgeDecoder.Payload(), 6, null), renderer);
     }
 
-    [Fact]
-    public void Layout_MeasuresWithTheSuppliedProbeSet_NotTheGlobalRegistry()
+    private const double IsolatedPointWidth = IsolatedDecoder.PixelWidth * 72.0 / 96.0;
+
+    private const double IsolatedPointHeight = IsolatedDecoder.PixelHeight * 72.0 / 96.0;
+
+    private static DocumentRenderer IsolatedRenderer()
     {
-        var document = ImageFlow(IsolatedFormat.Payload(), 1, null);
+        Assert.Throws<NotSupportedException>(
+            () => ImageDecoders.Default.Probes.PixelSize(IsolatedDecoder.Payload()));
 
-        Assert.Throws<NotSupportedException>(() => DocumentLayouter.Layout(document));
-
-        var probes = ImageProbes.None.Add(
-            data => data.Span.StartsWith(IsolatedFormat.Magic) ? (IsolatedFormat.PixelWidth, IsolatedFormat.PixelHeight) : null);
-        var image = DocumentLayouter.Layout(document, probes).Pages[0].Body.Images[0];
-
-        Assert.Equal(IsolatedFormat.PixelWidth * 72.0 / 96.0, image.Width, 3);
-        Assert.Equal(IsolatedFormat.PixelHeight * 72.0 / 96.0, image.Height, 3);
+        return new DocumentRenderer { ImageDecoders = ImageDecoders.BuiltIn.Add(new IsolatedDecoder()) };
     }
 
-    private static class IsolatedFormat
+    private static LaidOutPage LaidOutWithRendererProbes(Document document, DocumentRenderer renderer, int page = 0)
     {
-        public const double PixelWidth = 120;
+        Assert.Throws<NotSupportedException>(() => DocumentLayouter.Layout(document));
 
-        public const double PixelHeight = 60;
+        return DocumentLayouter.Layout(document, renderer.ImageDecoders.Probes).Pages[page];
+    }
 
-        public static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x53];
+    private static Paragraph PlainText(string text)
+    {
+        var paragraph = new Paragraph();
+        paragraph.Inlines.Add(text);
+        return paragraph;
+    }
+
+    private static Section IsolatedSection(Document document, double width, double height)
+    {
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(width), Unit.FromPoint(height));
+        section.Margins.SetAll(Unit.FromPoint(0));
+        section.HeaderDistance = Unit.FromPoint(0);
+        section.FooterDistance = Unit.FromPoint(0);
+        return section;
+    }
+
+    [Fact]
+    public void Layout_MeasuresBlockImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
+    {
+        var renderer = IsolatedRenderer();
+        var document = ImageFlow(IsolatedDecoder.Payload(), 1, null);
+
+        var image = LaidOutWithRendererProbes(document, renderer).Body.Images[0];
+
+        Assert.Equal(IsolatedPointWidth, image.Width, 3);
+        Assert.Equal(IsolatedPointHeight, image.Height, 3);
+    }
+
+    [Fact]
+    public void Layout_MeasuresWatermarkImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
+    {
+        var renderer = IsolatedRenderer();
+        var document = new Document();
+        var section = IsolatedSection(document, 300, 300);
+        section.Blocks.Add(PlainText("body"));
+        section.Watermark = new Watermark { Image = new Image(IsolatedDecoder.Payload()) };
+
+        var watermark = LaidOutWithRendererProbes(document, renderer).Watermark;
+
+        Assert.NotNull(watermark);
+        var image = Assert.NotNull(watermark!.Image);
+        Assert.Equal(IsolatedPointWidth, image.Width, 3);
+        Assert.Equal(IsolatedPointHeight, image.Height, 3);
+        Assert.NotEmpty(renderer.ToArray(document));
+    }
+
+    [Fact]
+    public void Layout_MeasuresInlineImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
+    {
+        var renderer = IsolatedRenderer();
+        var document = new Document();
+        var section = IsolatedSection(document, 300, 300);
+        var paragraph = new Paragraph();
+        paragraph.Inlines.AddImage(new MemoryStream(IsolatedDecoder.Payload()));
+        section.Blocks.Add(paragraph);
+
+        var line = Assert.Single(LaidOutWithRendererProbes(document, renderer).Body.Lines);
+        var fragment = Assert.Single(line.Line.Fragments);
+        var inline = Assert.NotNull(fragment.Paint.InlineImage);
+
+        Assert.Equal(IsolatedPointWidth, inline.Width, 3);
+        Assert.Equal(IsolatedPointHeight, inline.Height, 3);
+        Assert.Equal(IsolatedPointWidth, fragment.Advance, 3);
+        Assert.NotEmpty(renderer.ToArray(document));
+    }
+
+    [Fact]
+    public void Layout_MeasuresTheKeepWithNextLookaheadWithTheRendererProbeSet_NotTheGlobalRegistry()
+    {
+        var renderer = IsolatedRenderer();
+        var lineHeight = PaginationSupport.BuiltInLineHeight();
+        var document = new Document();
+        var section = IsolatedSection(document, 300, lineHeight + IsolatedPointHeight + 1);
+        section.Blocks.Add(PlainText("filler"));
+        var heading = PlainText("heading");
+        heading.KeepWithNext = true;
+        section.Blocks.Add(heading);
+        section.Blocks.Add(new Image(IsolatedDecoder.Payload()));
+
+        Assert.Throws<NotSupportedException>(() => DocumentLayouter.Layout(document));
+        var pages = DocumentLayouter.Layout(document, renderer.ImageDecoders.Probes).Pages;
+
+        Assert.Equal(2, pages.Length);
+        Assert.Empty(pages[0].Body.Images);
+        Assert.Single(pages[1].Body.Lines);
+        Assert.Single(pages[1].Body.Images);
+    }
+
+    private sealed class IsolatedDecoder : IImageDecoder
+    {
+        public const int PixelWidth = 120;
+
+        public const int PixelHeight = 60;
+
+        private static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x53];
 
         public static byte[] Payload()
         {
             var data = new byte[Magic.Length + 1];
             Magic.CopyTo(data, 0);
             return data;
+        }
+
+        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
+        {
+            if (!data.Span.StartsWith(Magic))
+            {
+                image = null;
+                return false;
+            }
+
+            image = new DecodedImage(
+                new byte[PixelWidth * PixelHeight], PixelWidth, PixelHeight, 8, ImageColorSpace.DeviceGray);
+            return true;
         }
     }
 
@@ -190,10 +298,10 @@ public class ImageMeasurementParityTests
 
         foreach (var (resource, format, mediaType) in expected)
         {
-            var image = new Image(PdfTestResources.ReadAllBytes(resource));
+            var info = ImageProbes.None.Inspect(PdfTestResources.ReadAllBytes(resource));
 
-            Assert.Equal(format, image.Info.Format);
-            Assert.Equal(mediaType, ImageProbe.MediaType(image.Info.Format));
+            Assert.Equal(format, info.Format);
+            Assert.Equal(mediaType, ImageMetrics.MediaType(info.Format));
         }
     }
 
@@ -202,9 +310,9 @@ public class ImageMeasurementParityTests
     {
         var data = Jpeg2000Codestream(8, 4);
 
-        Assert.Equal(ImageFormat.Jpeg2000, ImageProbe.Format(data));
-        Assert.Equal("image/jp2", ImageProbe.MediaType(ImageProbe.Format(data)));
-        Assert.Equal((8d, 4d), ImageProbe.PixelSize(data));
+        Assert.Equal(ImageFormat.Jpeg2000, ImageProbes.None.Format(data));
+        Assert.Equal("image/jp2", ImageMetrics.MediaType(ImageProbes.None.Format(data)));
+        Assert.Equal((8d, 4d), ImageProbes.None.PixelSize(data));
     }
 
     // ISO/IEC 15444-1 A.5.1: SOC followed by the SIZ marker segment carrying the image area.

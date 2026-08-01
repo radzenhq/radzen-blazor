@@ -1,16 +1,9 @@
-using System;
 using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
 internal static class FlowContentPlacer
 {
-    public static (double Width, double Height) MeasureImage(
-        Image image,
-        double width,
-        Func<Image, double, (double Width, double Height)>? measureImage)
-        => measureImage is null ? ImageProbe.Measure(image, width) : measureImage(image, width);
-
     public static LaidOutImage Image(
         Image image,
         double width,

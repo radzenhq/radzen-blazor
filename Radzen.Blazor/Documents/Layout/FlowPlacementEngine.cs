@@ -34,7 +34,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         BandLayout band,
         double width,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
         => new(
@@ -46,7 +45,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
             band,
             width,
             fonts,
-            measureImage,
             resolution,
             capture);
 
@@ -54,7 +52,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
         => new(
@@ -66,7 +63,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
             contentWidth,
             align,
             fonts,
-            measureImage,
             resolution,
             capture);
 
@@ -141,7 +137,6 @@ internal abstract class ContentFlowPlacementEngine(
     double width,
     HorizontalAlignment? align,
     FontCollection fonts,
-    Func<Image, double, (double Width, double Height)>? measureImage,
     LoweringResult resolution,
     LayoutCaptureContext capture)
     : FlowPlacementEngine(policy)
@@ -151,8 +146,6 @@ internal abstract class ContentFlowPlacementEngine(
     protected LoweringResult Resolution => resolution;
 
     protected LayoutCaptureContext Capture => capture;
-
-    protected Func<Image, double, (double Width, double Height)>? ImageMeasure => measureImage;
 
     internal double Cursor { get; private protected set; }
 
@@ -174,7 +167,6 @@ internal abstract class ContentFlowPlacementEngine(
             table,
             width,
             fonts,
-            measureImage,
             resolution,
             capture);
         PlaceTable(table, layout);
@@ -192,10 +184,7 @@ internal abstract class ContentFlowPlacementEngine(
     {
         var indent = resolution.BlockIndent(image);
         var availableWidth = Math.Max(0, width - indent);
-        var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(
-            image,
-            availableWidth,
-            measureImage);
+        var (imageWidth, imageHeight) = capture.Probes.Measure(image, availableWidth);
         PlaceImage(image, indent, availableWidth, imageWidth, imageHeight);
         return default;
     }
@@ -255,10 +244,9 @@ internal sealed class BandFlowPlacementEngine(
     BandLayout band,
     double width,
     FontCollection fonts,
-    Func<Image, double, (double Width, double Height)>? measureImage,
     LoweringResult resolution,
     LayoutCaptureContext capture)
-    : ContentFlowPlacementEngine(policy, width, align: null, fonts, measureImage, resolution, capture)
+    : ContentFlowPlacementEngine(policy, width, align: null, fonts, resolution, capture)
 {
     private int order;
 
@@ -289,7 +277,6 @@ internal sealed class BandFlowPlacementEngine(
             container,
             availableWidth,
             Fonts,
-            ImageMeasure,
             Resolution,
             Capture);
         AddMarker(container);
@@ -393,10 +380,9 @@ internal sealed class BoxFlowPlacementEngine(
     double width,
     HorizontalAlignment? align,
     FontCollection fonts,
-    Func<Image, double, (double Width, double Height)>? measureImage,
     LoweringResult resolution,
     LayoutCaptureContext capture)
-    : ContentFlowPlacementEngine(policy, width, align, fonts, measureImage, resolution, capture)
+    : ContentFlowPlacementEngine(policy, width, align, fonts, resolution, capture)
 {
     internal List<CellItem> Items { get; } = [];
 
@@ -421,7 +407,6 @@ internal sealed class BoxFlowPlacementEngine(
             Math.Max(0, boxWidth - padding.Horizontal),
             null,
             Fonts,
-            ImageMeasure,
             Resolution,
             Capture);
         var boxHeight = inner.Height + padding.Vertical;

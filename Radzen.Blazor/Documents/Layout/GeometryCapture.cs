@@ -208,7 +208,7 @@ internal static class GeometryCapture
 
     private static InlineImagePaint ImagePaint(InlineImage image, LayoutCaptureContext capture)
     {
-        var (width, height) = image.EffectiveSize();
+        var (width, height) = capture.Probes.Measure(image);
         return new InlineImagePaint
         {
             Key = capture.Source(image),

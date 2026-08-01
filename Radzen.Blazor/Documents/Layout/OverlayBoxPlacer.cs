@@ -14,7 +14,6 @@ internal static class OverlayBoxPlacer
         Container container,
         double availableWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture,
         double xOffset = 0)
@@ -36,7 +35,6 @@ internal static class OverlayBoxPlacer
                 innerWidth,
                 null,
                 fonts,
-                measureImage,
                 resolution,
                 capture);
             innerHeight = Math.Max(innerHeight, measured.Height);
@@ -109,7 +107,6 @@ internal static class OverlayBoxPlacer
         Container container,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
     {
@@ -119,7 +116,6 @@ internal static class OverlayBoxPlacer
             innerWidth,
             null,
             fonts,
-            measureImage,
             resolution,
             capture);
     }
