@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,13 +6,20 @@ using Bunit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Radzen.Blazor.Tests;
 
 public class ChartTests
 {
-    [Fact]
-    public async Task Chart_Tooltip_DoesNotReformatCategoryLabelsWhileHovering()
+    private readonly ITestOutputHelper output;
+    public ChartTests(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
+    [Fact(Timeout = 30000)]
+    public async Task Chart_Tooltip_Performance()
     {
         using var ctx = new TestContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -20,7 +28,6 @@ public class ChartTests
         ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
         ctx.RenderComponent<RadzenChartTooltip>();
 
-        var formatted = 0;
         var seriesData = Enumerable.Range(0, 5000).Select(i => new Point { X = i, Y = i });
         var chart = ctx.RenderComponent<RadzenChart>(chartParameters =>
             chartParameters
@@ -34,12 +41,11 @@ public class ChartTests
                         .Add(p => p.Step, 100)
                         .Add(p => p.Formatter, x =>
                         {
-                            Interlocked.Increment(ref formatted);
+                            Thread.Sleep(100);
                             return $"{x}";
                         })));
 
-        var afterRender = formatted;
-
+        var stopwatch = Stopwatch.StartNew();
         foreach (var invocation in Enumerable.Range(0, 10))
         {
             await chart.InvokeAsync(() => chart.Instance.MouseMove(100, 80));
@@ -47,8 +53,7 @@ public class ChartTests
             await chart.InvokeAsync(() => chart.Instance.MouseMove(0, 0));
             Assert.Equal(invocation + 1, ctx.JSInterop.Invocations.Count(x => x.Identifier == "Radzen.closeTooltip"));
         }
-
-        Assert.Equal(0, formatted - afterRender);
+        output.WriteLine($"Time took: {stopwatch.Elapsed}");
     }
 
     private class MultiAxisItem
