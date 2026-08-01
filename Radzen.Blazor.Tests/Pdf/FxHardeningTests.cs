@@ -205,6 +205,25 @@ public class FxHardeningTests
         Assert.NotNull(ImageDecoder.Decode(png));
     }
 
+    [Fact]
+    public void TightenedMaxImagePixels_ReachesMeasurementAndDecodingAlike()
+    {
+        var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
+        var tight = new ReaderLimits { MaxImagePixels = 100 };
+        var decoders = ImageDecoders.Default.WithLimits(tight);
+
+        var measured = Assert.Throws<InvalidDataException>(() => decoders.Probes.PixelSize(png));
+        var decoded = Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png, tight));
+        Assert.Equal(decoded.Message, measured.Message);
+
+        var document = new Document();
+        document.Sections.Add().Blocks.AddImage(new MemoryStream(png));
+
+        Assert.Throws<InvalidDataException>(
+            () => new DocumentRenderer { ImageDecoders = decoders }.Render(document));
+        Assert.NotNull(new DocumentRenderer().Render(document));
+    }
+
     private static byte[] Ihdr(int width, int height, byte bitDepth, byte colorType)
     {
         var body = new byte[13];

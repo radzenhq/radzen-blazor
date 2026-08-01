@@ -257,10 +257,10 @@ public sealed class FontCollection
             }
         }
 
-        return FromBytes(BufferStream(font, ResourceLimits.Default), sharedWithCaller: false);
+        return FromBytes(BufferStream(font, Pdf.ReaderLimits.Default), sharedWithCaller: false);
     }
 
-    internal static byte[] BufferStream(Stream font, ResourceLimits limits)
+    internal static byte[] BufferStream(Stream font, Pdf.ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(limits);
         return StreamBytes.ReadFully(font, limits.MaxFileBytes);

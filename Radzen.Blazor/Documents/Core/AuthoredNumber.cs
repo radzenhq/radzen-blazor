@@ -25,6 +25,16 @@ internal static class AuthoredNumber
     internal static Unit? Absolute(Unit? value, string subject)
         => value is { } measurement ? Absolute(measurement, subject) : null;
 
+    internal static Unit AbsolutePositive(Unit value, string subject)
+    {
+        var absolute = Absolute(value, subject);
+        Positive(absolute.Point, subject);
+        return absolute;
+    }
+
+    internal static Unit? AbsolutePositive(Unit? value, string subject)
+        => value is { } measurement ? AbsolutePositive(measurement, subject) : null;
+
     internal static int NonNegative(int value, string subject)
         => value >= 0
             ? value

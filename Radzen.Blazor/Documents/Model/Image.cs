@@ -15,29 +15,30 @@ public sealed class Image : Block
     private double opacity = 1;
     private Unit? width;
     private Unit? height;
+    private (Unit MaxWidth, Unit MaxHeight)? fitBox;
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     internal Image(byte[] data) => Data = data;
 
-    internal static Image FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, ResourceLimits.Default.MaxFileBytes));
+    internal static Image FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, Pdf.ReaderLimits.Default.MaxFileBytes));
 
     internal byte[] Data { get; }
 
     /// <summary>Gets or sets the rendered width. When <see langword="null"/> the natural width is used.</summary>
-    /// <exception cref="ArgumentOutOfRangeException">The value is relative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The value is relative or is not greater than zero.</exception>
     public Unit? Width
     {
         get => width;
-        set => width = AuthoredNumber.Absolute(value, "Image.Width");
+        set => width = AuthoredNumber.AbsolutePositive(value, "Image.Width");
     }
 
     /// <summary>Gets or sets the rendered height. When <see langword="null"/> the natural height is used.</summary>
-    /// <exception cref="ArgumentOutOfRangeException">The value is relative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The value is relative or is not greater than zero.</exception>
     public Unit? Height
     {
         get => height;
-        set => height = AuthoredNumber.Absolute(value, "Image.Height");
+        set => height = AuthoredNumber.AbsolutePositive(value, "Image.Height");
     }
 
     /// <summary>Gets or sets the horizontal alignment of the image within its container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
@@ -83,7 +84,15 @@ public sealed class Image : Block
     /// Gets or sets the box the image is scaled down to fit, or <see langword="null"/> (the default)
     /// for none. Setting <see langword="null"/> clears it. See <see cref="FitInBox"/>.
     /// </summary>
-    public (Unit MaxWidth, Unit MaxHeight)? FitBox { get; set; }
+    /// <exception cref="ArgumentOutOfRangeException">A bound is relative or is not greater than zero.</exception>
+    public (Unit MaxWidth, Unit MaxHeight)? FitBox
+    {
+        get => fitBox;
+        set => fitBox = value is { } box
+            ? (AuthoredNumber.AbsolutePositive(box.MaxWidth, "Image.FitBox.MaxWidth"),
+                AuthoredNumber.AbsolutePositive(box.MaxHeight, "Image.FitBox.MaxHeight"))
+            : null;
+    }
 
     /// <summary>
     /// Scales the image to fit within a <paramref name="maxWidth"/> x <paramref name="maxHeight"/> box

@@ -44,13 +44,13 @@ public static class ImageDecoder
         return StreamBytes.ReadFully(stream, limits.MaxFileBytes);
     }
 
-    internal static DecodedImage Decode(byte[] imageBytes) => Decode((ReadOnlyMemory<byte>)imageBytes, ReaderLimits.Default);
+    internal static DecodedImage Decode(byte[] imageBytes) => Decode((ReadOnlyMemory<byte>)imageBytes);
 
     internal static DecodedImage Decode(byte[] imageBytes, ReaderLimits limits)
         => Decode((ReadOnlyMemory<byte>)imageBytes, limits);
 
     internal static DecodedImage Decode(ReadOnlyMemory<byte> imageBytes)
-        => Decode(imageBytes, ReaderLimits.Default);
+        => registered.Decode(imageBytes);
 
     internal static DecodedImage Decode(ReadOnlyMemory<byte> imageBytes, ReaderLimits limits)
         => registered.Decode(imageBytes, limits);

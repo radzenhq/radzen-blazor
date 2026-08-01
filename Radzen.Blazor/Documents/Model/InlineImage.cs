@@ -17,7 +17,7 @@ public sealed class InlineImage : Inline
 
     internal InlineImage(byte[] data) => Data = data;
 
-    internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, ResourceLimits.Default.MaxFileBytes));
+    internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, Pdf.ReaderLimits.Default.MaxFileBytes));
 
     internal byte[] Data { get; }
 
@@ -25,22 +25,22 @@ public sealed class InlineImage : Inline
     /// Gets or sets the drawn width, or <see langword="null"/> (the default) for the natural width.
     /// When only <see cref="Height"/> is set the width follows from it and the image's aspect ratio.
     /// </summary>
-    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative or is not greater than zero.</exception>
     public Unit? Width
     {
         get => width;
-        set => width = AuthoredNumber.Absolute(value, "InlineImage.Width");
+        set => width = AuthoredNumber.AbsolutePositive(value, "InlineImage.Width");
     }
 
     /// <summary>
     /// Gets or sets the drawn height, or <see langword="null"/> (the default) for the natural height.
     /// When only <see cref="Width"/> is set the height follows from it and the image's aspect ratio.
     /// </summary>
-    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative or is not greater than zero.</exception>
     public Unit? Height
     {
         get => height;
-        set => height = AuthoredNumber.Absolute(value, "InlineImage.Height");
+        set => height = AuthoredNumber.AbsolutePositive(value, "InlineImage.Height");
     }
 
     /// <summary>

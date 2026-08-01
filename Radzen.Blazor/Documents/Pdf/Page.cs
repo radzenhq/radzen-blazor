@@ -32,9 +32,9 @@ public sealed class Page
 
     internal Page(Unit width, Unit height)
     {
-        this.width = width;
-        this.height = height;
-        mediaBox = PdfRect.FromSize(0, 0, width.Point, height.Point);
+        this.width = AuthoredNumber.AbsolutePositive(width, "Page.Width");
+        this.height = AuthoredNumber.AbsolutePositive(height, "Page.Height");
+        mediaBox = PdfRect.FromSize(0, 0, this.width.Point, this.height.Point);
         annotations.OwnedBy(Invalidate);
         elements.OwnedBy(Invalidate);
     }
