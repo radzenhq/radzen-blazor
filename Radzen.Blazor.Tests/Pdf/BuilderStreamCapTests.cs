@@ -2,7 +2,6 @@
 
 using System.IO;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.Internal;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
@@ -22,8 +21,6 @@ public class BuilderStreamCapTests
 
     private static ReaderLimits Bounded => new() { MaxFileBytes = Cap };
 
-    private static ResourceLimits BoundedResources => new() { MaxFileBytes = Cap };
-
     [Fact]
     public void ImageReadFully_RejectsUnseekableStreamPastCap()
     {
@@ -35,7 +32,7 @@ public class BuilderStreamCapTests
     public void FontBufferStream_RejectsUnseekableStreamPastCap()
     {
         var stream = new UnseekableStream(new byte[Cap * 4]);
-        Assert.Throws<InvalidDataException>(() => FontCollection.BufferStream(stream, BoundedResources));
+        Assert.Throws<InvalidDataException>(() => FontCollection.BufferStream(stream, Bounded));
     }
 
     [Fact]

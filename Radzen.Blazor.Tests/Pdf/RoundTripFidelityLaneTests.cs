@@ -155,11 +155,13 @@ public class RoundTripFidelityLaneTests
         run!.Color = Color.Red;
 
         var bytes = document.ToArray();
-        var content = Encoding.Latin1.GetString(
-            ContentTestHelpers.PageContent(DocumentReader.Parse(bytes), 0));
+        var content = ContentTestHelpers.PageContent(DocumentReader.Parse(bytes), 0);
 
-        Assert.Contains("] TJ", content, StringComparison.Ordinal);
-        Assert.Contains("-120", content, StringComparison.Ordinal);
+        Assert.Contains(
+            ContentStreamTokenizer.Parse(content),
+            operation => operation.Operator == "TJ"
+                && operation.Operands.Exists(operand =>
+                    operand.Kind == ContentTokenKind.Number && operand.Number == -120));
         Assert.Contains("Hello", Load(bytes).ExtractText(), StringComparison.Ordinal);
     }
 }

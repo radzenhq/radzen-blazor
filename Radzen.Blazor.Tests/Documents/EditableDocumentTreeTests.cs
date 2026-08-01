@@ -240,7 +240,7 @@ public class EditableDocumentTreeTests
     [Fact]
     public void ListAddedToAnItemOfItself_Throws()
     {
-        var list = new List();
+        var list = new ListBlock();
         var item = list.Items.Add("a");
 
         Assert.Throws<InvalidOperationException>(() => item.NestedList = list);
@@ -249,7 +249,7 @@ public class EditableDocumentTreeTests
     [Fact]
     public void NestedListAssignedTwice_Throws()
     {
-        var list = new List();
+        var list = new ListBlock();
         var first = list.Items.Add("a");
         var second = list.Items.Add("b");
         var nested = first.AddList();
@@ -260,7 +260,7 @@ public class EditableDocumentTreeTests
     [Fact]
     public void NestedListDetached_MayBeReassigned()
     {
-        var list = new List();
+        var list = new ListBlock();
         var first = list.Items.Add("a");
         var second = list.Items.Add("b");
         var nested = first.AddList();
@@ -371,7 +371,7 @@ public class EditableDocumentTreeTests
     [Fact]
     public void ListItemInsertRemoveAndMove_ReorderTheItems()
     {
-        var list = new List();
+        var list = new ListBlock();
         list.Items.Add("a");
         list.Items.Add("c");
         list.Items.Insert(1, "b");
@@ -390,10 +390,10 @@ public class EditableDocumentTreeTests
     [Fact]
     public void ListItemAddedToASecondList_Throws()
     {
-        var first = new List();
+        var first = new ListBlock();
         var item = first.Items.Add("a");
 
-        Assert.Throws<InvalidOperationException>(() => new List().Items.Add(item));
+        Assert.Throws<InvalidOperationException>(() => new ListBlock().Items.Add(item));
     }
 
     [Fact]

@@ -60,7 +60,8 @@ public class PageContentSnapshotTests
         var reloaded = PortableDocument.LoadFromStream(buffer);
         var content = reloaded.Pages[0].GetContent()!;
 
-        Assert.Contains("cm", Encoding.ASCII.GetString(content));
-        Assert.DoesNotContain("XXXX", Encoding.ASCII.GetString(content));
+        var operators = ContentOperationTestHelpers.Operators(content);
+        Assert.Contains("cm", operators);
+        Assert.DoesNotContain("XXXX", operators);
     }
 }

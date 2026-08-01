@@ -70,15 +70,16 @@ public class AnnotationFlattenValidationTests
         Assert.Throws<InvalidOperationException>(document.Flatten);
     }
 
-    private static string FlattenedContent(PortableDocument document)
+    private static byte[] FlattenedContentBytes(PortableDocument document)
     {
         document.Flatten();
         var reader = DocumentReader.Parse(document.ToArray());
         var page = DocumentLoadTests.Kid(reader, 0);
-        return page.ContainsKey("Contents")
-            ? Encoding.ASCII.GetString(DocumentLoadTests.KidContent(reader, 0))
-            : string.Empty;
+        return page.ContainsKey("Contents") ? DocumentLoadTests.KidContent(reader, 0) : [];
     }
+
+    private static string FlattenedContent(PortableDocument document)
+        => Encoding.ASCII.GetString(FlattenedContentBytes(document));
 
     private static PortableDocument InvalidMarkup()
     {
@@ -109,8 +110,8 @@ public class AnnotationFlattenValidationTests
         translucent.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow, Opacity = 0.4 });
 
-        Assert.DoesNotContain(" gs", FlattenedContent(opaque), StringComparison.Ordinal);
-        Assert.Contains(" gs", FlattenedContent(translucent), StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(FlattenedContentBytes(opaque)));
+        Assert.Contains("gs", ContentOperationTestHelpers.Operators(FlattenedContentBytes(translucent)));
     }
 
     [Fact]

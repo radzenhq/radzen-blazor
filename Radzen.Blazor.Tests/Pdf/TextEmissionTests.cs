@@ -17,8 +17,8 @@ public class TextEmissionTests
         var section = document.Sections.Add();
         section.Blocks.Add(FeatureEmissionTestHelpers.Text("AWAY To Yo"));
 
-        var content = FeatureEmissionTestHelpers.Content(document);
-        Assert.Contains("] TJ", content, StringComparison.Ordinal);
+        var operators = ContentOperationTestHelpers.Operators(FeatureEmissionTestHelpers.ContentBytes(document));
+        Assert.Contains("TJ", operators);
     }
 
     [Fact]
@@ -33,10 +33,10 @@ public class TextEmissionTests
         }
 
         var first = Build();
-        var content = Encoding.Latin1.GetString(
+        var operators = ContentOperationTestHelpers.Operators(
             ContentTestHelpers.PageContent(DocumentReader.Parse(first), 0));
-        Assert.Contains(" Tj", content, StringComparison.Ordinal);
-        Assert.DoesNotContain("] TJ", content, StringComparison.Ordinal);
+        Assert.Contains("Tj", operators);
+        Assert.DoesNotContain("TJ", operators);
         Assert.Equal(first, Build());
     }
 

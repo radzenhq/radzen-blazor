@@ -522,6 +522,16 @@ public class LaidOutContractTests
     }
 
     [Fact]
+    public void LaidOutTypes_ReachTheCapturedFontAndGlyphTypes()
+    {
+        var reached = LaidOutTypes().ToHashSet();
+
+        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedFontFace), reached);
+        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedGlyphRun), reached);
+        Assert.Contains(typeof(Radzen.Documents.Fonts.CapturedGlyphSpan), reached);
+    }
+
+    [Fact]
     public void LaidOutCollections_AreImmutableArrays()
     {
         var offenders =
@@ -1108,18 +1118,48 @@ public class LaidOutContractTests
                     continue;
                 }
 
-                var declared = Unwrap(property.PropertyType);
-                var candidate = IsImmutableArray(declared) ? declared.GetGenericArguments()[0] : declared;
-                if (IsLaidOutType(candidate) && seen.Add(candidate))
+                foreach (var candidate in Candidates(Unwrap(property.PropertyType)))
                 {
-                    pending.Enqueue(candidate);
+                    if (IsLaidOutType(candidate) && seen.Add(candidate))
+                    {
+                        pending.Enqueue(candidate);
+                    }
                 }
             }
         }
     }
 
+    private static IEnumerable<System.Type> Candidates(System.Type type)
+    {
+        yield return type;
+
+        if (type.IsArray && type.GetElementType() is { } element)
+        {
+            foreach (var nested in Candidates(Unwrap(element)))
+            {
+                yield return nested;
+            }
+        }
+
+        if (!type.IsGenericType)
+        {
+            yield break;
+        }
+
+        foreach (var argument in type.GetGenericArguments())
+        {
+            foreach (var nested in Candidates(Unwrap(argument)))
+            {
+                yield return nested;
+            }
+        }
+    }
+
     private static bool IsLaidOutType(System.Type type)
-        => type.Namespace == typeof(LaidOutDocument).Namespace
-            || type == typeof(FontCollectionSnapshot)
-            || type == typeof(RegisteredFace);
+        => type.Assembly == typeof(LaidOutDocument).Assembly
+            && !type.IsEnum
+            && !type.IsInterface
+            && !type.IsPointer
+            && !type.IsGenericTypeDefinition
+            && Array.IndexOf(ImmutableAfterParseSharedValues, type) < 0;
 }

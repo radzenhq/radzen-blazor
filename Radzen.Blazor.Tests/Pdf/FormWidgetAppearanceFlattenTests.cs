@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
@@ -32,6 +33,25 @@ public class FormWidgetAppearanceFlattenTests
             .Object(10, "10 0 obj\n<< /Type /XObject /Subtype /Form /BBox [0 0 20 20] /Length " + OffAppearance.Length
                 + " >>\nstream\n" + OffAppearance + "\nendstream\nendobj\n");
         return FixturePdf.Wrap(pdf, 11);
+    }
+
+    private static byte[] AllPageContentBytes(DocumentReader reader)
+    {
+        var page = FormTestSupport.FirstPage(reader);
+        var contents = reader.Resolve(page["Contents"]);
+        if (contents is StreamObject single)
+        {
+            return FormTestSupport.DecodeBytes(single);
+        }
+
+        var bytes = new List<byte>();
+        foreach (var entry in Assert.IsType<ArrayObject>(contents))
+        {
+            bytes.AddRange(FormTestSupport.DecodeBytes(Assert.IsType<StreamObject>(reader.Resolve(entry))));
+            bytes.Add((byte)'\n');
+        }
+
+        return [.. bytes];
     }
 
     private static string AllPageContent(DocumentReader reader)
@@ -78,7 +98,7 @@ public class FormWidgetAppearanceFlattenTests
         document.Flatten();
         var reader = FormTestSupport.Reload(document);
 
-        Assert.Contains("Do", AllPageContent(reader));
+        Assert.Contains("Do", ContentOperationTestHelpers.Operators(AllPageContentBytes(reader)));
         Assert.Contains(PaintedAppearances(reader), a => a.Contains(YesAppearance));
     }
 
@@ -90,7 +110,7 @@ public class FormWidgetAppearanceFlattenTests
         document.Flatten();
         var reader = FormTestSupport.Reload(document);
 
-        Assert.Contains("Do", AllPageContent(reader));
+        Assert.Contains("Do", ContentOperationTestHelpers.Operators(AllPageContentBytes(reader)));
         Assert.Contains(PaintedAppearances(reader), a => a.Contains(OffAppearance));
     }
 }

@@ -120,7 +120,6 @@ public class PageLabelsTests
     {
         var bytes = Document(2).ToArray();
         Assert.Equal(bytes, Document(2).ToArray());
-        Assert.DoesNotContain("/PageLabels", Encoding.Latin1.GetString(bytes));
         Assert.False(ContentTestHelpers.Catalog(DocumentReader.Parse(bytes)).ContainsKey("PageLabels"));
     }
 

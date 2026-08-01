@@ -14,8 +14,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class SoftMaskShadowTests
 {
-    private static string Content(Document document)
-        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
+    private static byte[] ContentBytes(Document document)
+        => ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0);
+
+    private static string Content(Document document) => Encoding.Latin1.GetString(ContentBytes(document));
 
     private static Paragraph Text(string text)
     {
@@ -129,9 +131,10 @@ public class SoftMaskShadowTests
     [Fact]
     public void Shadow_PaintsMaskedFill_UnderBoxBackground()
     {
+        var bytes = ContentBytes(ShadowDocument());
         var content = Content(ShadowDocument());
-        Assert.Contains(" gs", content, StringComparison.Ordinal);
-        Assert.Contains(" re f", content, StringComparison.Ordinal);
+        Assert.Contains("gs", ContentOperationTestHelpers.Operators(bytes));
+        Assert.True(ContentOperationTestHelpers.HasSequence(bytes, "re", "f"));
 
         var firstFill = content.IndexOf(" re f", StringComparison.Ordinal);
         var background = content.IndexOf("1 1 1 rg", StringComparison.Ordinal);

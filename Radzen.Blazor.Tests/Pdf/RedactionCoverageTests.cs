@@ -95,7 +95,7 @@ public class RedactionCoverageTests
 
         loaded.Pages[0].Redact(new[] { PdfRect.FromSize(400, 400, 100, 100) });
 
-        Assert.Contains("sh", SavedContent(loaded), StringComparison.Ordinal);
+        Assert.Contains("sh", ContentOperationTestHelpers.Operators(InterpreterTestSupport.PageContentBytes(loaded.ToArray(), 0)));
     }
 
     [Fact]

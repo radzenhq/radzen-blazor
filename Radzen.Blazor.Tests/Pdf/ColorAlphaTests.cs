@@ -181,17 +181,16 @@ public class ColorAlphaTests
         }
 
         Assert.Equal(Content(explicitAlpha: false), Content(explicitAlpha: true));
-        Assert.DoesNotContain(" gs\n", Encoding.ASCII.GetString(Content(explicitAlpha: true)), StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(Content(explicitAlpha: true)));
     }
 
 
-    private static string DirectContent(ContentElement element)
+    private static byte[] DirectContent(ContentElement element)
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(element);
-        return Encoding.ASCII.GetString(
-            ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));
+        return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
     }
 
     [Fact]
@@ -202,11 +201,13 @@ public class ColorAlphaTests
             Color = Color.FromArgb(128, 255, 0, 0),
         });
 
-        var gs = content.IndexOf("q\n/GS0 gs", StringComparison.Ordinal);
+        var operators = ContentOperationTestHelpers.Operators(content);
+        var gs = ContentOperationTestHelpers.IndexOfSequence(operators, "q", "gs");
         Assert.True(gs >= 0);
-        var show = content.IndexOf(" Tj", gs, StringComparison.Ordinal);
+        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(content, "gs"));
+        var show = operators.IndexOf("Tj", gs);
         Assert.True(show > gs);
-        Assert.True(content.IndexOf("Q\n", show, StringComparison.Ordinal) > show);
+        Assert.True(operators.IndexOf("Q", show) > show);
     }
 
     [Fact]
@@ -217,7 +218,7 @@ public class ColorAlphaTests
             Color = Color.FromRgb(255, 0, 0),
         });
 
-        Assert.DoesNotContain(" gs", content, StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(content));
     }
 
     [Fact]
@@ -230,9 +231,11 @@ public class ColorAlphaTests
         path.Close();
 
         var content = DirectContent(path);
-        var gs = content.IndexOf("q\n/GS0 gs", StringComparison.Ordinal);
+        var operators = ContentOperationTestHelpers.Operators(content);
+        var gs = ContentOperationTestHelpers.IndexOfSequence(operators, "q", "gs");
         Assert.True(gs >= 0);
-        Assert.True(content.IndexOf("Q\n", gs, StringComparison.Ordinal) > gs);
+        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(content, "gs"));
+        Assert.True(operators.IndexOf("Q", gs) > gs);
     }
 
     [Fact]
@@ -266,6 +269,6 @@ public class ColorAlphaTests
         path.LineTo(10, 0);
         path.Close();
 
-        Assert.Contains("/GS0 gs", DirectContent(path), StringComparison.Ordinal);
+        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(DirectContent(path), "gs"));
     }
 }

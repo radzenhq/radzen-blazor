@@ -31,15 +31,15 @@ public class ResourceKeyRegistryTests
     {
         var plan = Plan();
 
-        Assert.Equal("GS0", plan.RegisterExtGState(0.5, 0.5));
-        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask(), "a"));
-        Assert.Equal("GS2", plan.RegisterExtGState(0.25, 0.25));
+        Assert.Equal("GS0", plan.Resources.RegisterExtGState(0.5, 0.5));
+        Assert.Equal("GS1", plan.Resources.RegisterSoftMaskExtGState(1, 1, Mask(), "a"));
+        Assert.Equal("GS2", plan.Resources.RegisterExtGState(0.25, 0.25));
 
-        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask(), "a"));
-        Assert.Equal("GS0", plan.RegisterExtGState(0.5, 0.5));
+        Assert.Equal("GS1", plan.Resources.RegisterSoftMaskExtGState(1, 1, Mask(), "a"));
+        Assert.Equal("GS0", plan.Resources.RegisterExtGState(0.5, 0.5));
 
-        Assert.Equal("GS3", plan.RegisterSoftMaskExtGState(1, 1, Mask(), "b"));
-        Assert.Equal(4, plan.ExtGStates.Count);
+        Assert.Equal("GS3", plan.Resources.RegisterSoftMaskExtGState(1, 1, Mask(), "b"));
+        Assert.Equal(4, plan.Resources.ExtGStates.Count);
     }
 
     [Fact]
@@ -47,18 +47,18 @@ public class ResourceKeyRegistryTests
     {
         var plan = Plan();
 
-        Assert.Equal("GS0", plan.RegisterSoftMaskExtGState(1, 1, Mask(), null));
-        Assert.Equal("GS1", plan.RegisterSoftMaskExtGState(1, 1, Mask(), null));
-        Assert.Equal(2, plan.ExtGStates.Count);
+        Assert.Equal("GS0", plan.Resources.RegisterSoftMaskExtGState(1, 1, Mask(), null));
+        Assert.Equal("GS1", plan.Resources.RegisterSoftMaskExtGState(1, 1, Mask(), null));
+        Assert.Equal(2, plan.Resources.ExtGStates.Count);
     }
 
     [Fact]
     public void PlainState_NeverReusesASoftMaskStateWithEqualAlpha()
     {
         var plan = Plan();
-        var mask = plan.RegisterSoftMaskExtGState(0.5, 0.5, Mask(), "a");
+        var mask = plan.Resources.RegisterSoftMaskExtGState(0.5, 0.5, Mask(), "a");
 
-        Assert.NotEqual(mask, plan.RegisterExtGState(0.5, 0.5));
+        Assert.NotEqual(mask, plan.Resources.RegisterExtGState(0.5, 0.5));
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class ResourceKeyRegistryTests
         var first = Paint(new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)));
         var second = Paint(new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)));
 
-        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
-        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
-        Assert.Equal("P1", plan.RegisterPattern(second, Matrix.Identity));
+        Assert.Equal("P0", plan.Resources.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P0", plan.Resources.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P1", plan.Resources.RegisterPattern(second, Matrix.Identity));
     }
 
     [Fact]
@@ -82,8 +82,8 @@ public class ResourceKeyRegistryTests
 
         Assert.Equal(first, second);
         Assert.Equal(first.GetHashCode(), second.GetHashCode());
-        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
-        Assert.Equal("P0", plan.RegisterPattern(second, Matrix.Identity));
+        Assert.Equal("P0", plan.Resources.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P0", plan.Resources.RegisterPattern(second, Matrix.Identity));
     }
 
     [Fact]

@@ -51,7 +51,7 @@ public class EmitFailLoudTests
         });
         container.Blocks.Add(FeatureEmissionTestHelpers.Text("Upright"));
 
-        Assert.Contains("/Pattern cs", FeatureEmissionTestHelpers.Content(document), StringComparison.Ordinal);
+        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(FeatureEmissionTestHelpers.ContentBytes(document), "cs"));
     }
 
     [Fact]

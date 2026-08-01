@@ -65,6 +65,6 @@ public class ContentInterpreterSpanTests
         using var buffer = new MemoryStream(document.ToArray());
         var reloaded = PortableDocument.LoadFromStream(buffer);
 
-        Assert.Contains("Do", Encoding.ASCII.GetString(reloaded.Pages[0].GetContent()!));
+        Assert.Contains("Do", ContentOperationTestHelpers.Operators(reloaded.Pages[0].GetContent()!));
     }
 }

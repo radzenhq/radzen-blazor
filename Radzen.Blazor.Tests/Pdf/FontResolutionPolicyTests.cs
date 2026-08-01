@@ -198,10 +198,11 @@ public class FontResolutionPolicyTests
     [Fact]
     public void PdfA3B_CleanDocument_EmitsNoUnembeddedType1()
     {
-        var bytes = RenderAuthored(Author(PdfAConformance.PdfA3B));
-        var text = Encoding.Latin1.GetString(bytes);
+        var reader = DocumentReader.Parse(RenderAuthored(Author(PdfAConformance.PdfA3B)));
 
-        Assert.DoesNotContain("/BaseFont /Helvetica", text, StringComparison.Ordinal);
+        Assert.All(
+            BuildTestSupport.Fonts(reader),
+            font => Assert.NotEqual("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont")));
     }
 
     [Fact]

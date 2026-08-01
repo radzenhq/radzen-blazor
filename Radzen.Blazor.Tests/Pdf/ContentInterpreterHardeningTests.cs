@@ -17,12 +17,14 @@ public class ContentInterpreterHardeningTests
         return target;
     }
 
-    private static string Emit(ContentElement element)
+    private static byte[] EmitBytes(ContentElement element)
     {
         using var writer = new ContentWriter();
         element.Emit(writer);
-        return Encoding.Latin1.GetString(writer.ToArray());
+        return writer.ToArray();
     }
+
+    private static string Emit(ContentElement element) => Encoding.Latin1.GetString(EmitBytes(element));
 
     [Fact]
     public void UnterminatedArray_DoesNotThrow()
@@ -58,10 +60,10 @@ public class ContentInterpreterHardeningTests
         var content = Materialize("/Pattern cs /P0 scn 0 0 10 10 re f");
         ((PathContent)content[0]).EvenOdd = true;
 
-        var body = Emit(content[0]);
+        var body = EmitBytes(content[0]);
 
-        Assert.Contains("/Pattern cs", body);
-        Assert.Contains("/P0 scn", body);
+        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(body, "cs"));
+        Assert.Contains("P0", ContentOperationTestHelpers.ResourceNames(body, "scn"));
     }
 
     [Fact]
@@ -69,10 +71,10 @@ public class ContentInterpreterHardeningTests
     {
         var content = Materialize("/Pattern CS /P0 SCN 1 w 0 0 m 10 10 l S");
 
-        var body = Emit(content[0]);
+        var body = EmitBytes(content[0]);
 
-        Assert.Contains("/Pattern CS", body);
-        Assert.Contains("/P0 SCN", body);
+        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(body, "CS"));
+        Assert.Contains("P0", ContentOperationTestHelpers.ResourceNames(body, "SCN"));
     }
 
     [Fact]

@@ -20,12 +20,15 @@ public class OpacityWatermarkTests
         return paragraph;
     }
 
-    private static string PageText(Document document, int index = 0)
+    private static byte[] PageBytes(Document document, int index = 0)
     {
         var reader = BuildTestSupport.Read(document);
         var (page, _) = BuildTestSupport.PageLeaves(reader)[index];
-        return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
+        return BuildTestSupport.Content(reader, page);
     }
+
+    private static string PageText(Document document, int index = 0)
+        => Encoding.ASCII.GetString(PageBytes(document, index));
 
     private static DictionaryObject? ExtGStates(Document document, int index = 0)
     {
@@ -129,7 +132,7 @@ public class OpacityWatermarkTests
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
 
         Assert.Null(ExtGStates(document));
-        Assert.DoesNotContain(" gs\n", PageText(document), StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(PageBytes(document)));
     }
 
     [Fact]
@@ -153,7 +156,7 @@ public class OpacityWatermarkTests
             var text = PageText(document, i);
             Assert.Contains("0.707 0.707 -0.707 0.707 200 100 cm", text, StringComparison.Ordinal);
             Assert.Contains("(DRAFT) Tj", text, StringComparison.Ordinal);
-            Assert.Contains("/GS0 gs", text, StringComparison.Ordinal);
+            Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(PageBytes(document, i), "gs"));
 
             var states = ExtGStates(document, i);
             Assert.NotNull(states);
@@ -179,7 +182,7 @@ public class OpacityWatermarkTests
             -width / 2,
             -section.Watermark.Font.Size!.Value.Point * 0.35);
         Assert.Contains(expected, text, StringComparison.Ordinal);
-        Assert.DoesNotContain(" gs\n", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(PageBytes(document)));
     }
 
     [Fact]

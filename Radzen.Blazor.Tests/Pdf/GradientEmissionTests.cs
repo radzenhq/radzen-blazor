@@ -26,9 +26,9 @@ public class GradientEmissionTests
         });
         container.Blocks.Add(FeatureEmissionTestHelpers.Text("Boxed"));
 
-        var content = FeatureEmissionTestHelpers.Content(document);
-        Assert.Contains("/Pattern cs", content, StringComparison.Ordinal);
-        Assert.Contains("scn", content, StringComparison.Ordinal);
+        var content = FeatureEmissionTestHelpers.ContentBytes(document);
+        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(content, "cs"));
+        Assert.Contains("scn", ContentOperationTestHelpers.Operators(content));
 
         var reader = BuildTestSupport.Read(document);
         var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
@@ -59,9 +59,9 @@ public class GradientEmissionTests
         page.Content.Add(path);
 
         var reader = ContentTestHelpers.Reload(document);
-        var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));
-        Assert.Contains("/Pattern cs", content, StringComparison.Ordinal);
-        Assert.Contains("scn", content, StringComparison.Ordinal);
+        var content = ContentTestHelpers.PageContent(reader, 0);
+        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(content, "cs"));
+        Assert.Contains("scn", ContentOperationTestHelpers.Operators(content));
 
         var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
         var patterns = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Pattern"]!));

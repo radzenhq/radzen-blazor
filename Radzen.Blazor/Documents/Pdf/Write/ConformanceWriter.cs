@@ -43,10 +43,13 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
 
         ValidateFonts();
 
-        if (document.IsPdfUa && string.IsNullOrEmpty(document.Language))
+        // ISO 14289-1:2014 7.2: the natural language of the document shall be determinable, and
+        // ISO 32000-1 14.9.2 requires /Lang to be a language tag as defined by RFC 3066 / BCP 47.
+        if (document.IsPdfUa && !Core.LanguageTag.IsWellFormed(document.Language))
         {
             throw new InvalidOperationException(
-                "PDF/UA requires the document's natural language to be determinable; set Document.Language (e.g. \"en-US\").");
+                "PDF/UA requires the document's natural language to be determinable; set Document.Language to a "
+                + "well-formed BCP 47 language tag (e.g. \"en-US\").");
         }
 
         if (document.IsPdfUa && string.IsNullOrEmpty(document.Info.Title))

@@ -1,6 +1,5 @@
 #nullable enable
 using System.Linq;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -188,9 +187,8 @@ public class ContainerLayoutTests
 
         var page = Assert.Single(pdf.Pages);
         Assert.Contains("Inside the box", page.ExtractText());
-        var content = Encoding.ASCII.GetString(page.GetContent()!);
-        Assert.Contains("re f", content);
-        Assert.Contains("RG", content);
+        Assert.True(ContentOperationTestHelpers.HasSequence(page.GetContent()!, "re", "f"));
+        Assert.Contains("RG", ContentOperationTestHelpers.Operators(page.GetContent()!));
     }
 
     [Fact]
@@ -259,9 +257,9 @@ public class ContainerLayoutTests
         var extracted = pdfPage.ExtractText();
         Assert.Contains("First paragraph", extracted);
         Assert.Contains("nested cell", extracted);
-        var content = Encoding.ASCII.GetString(pdfPage.GetContent()!);
-        Assert.Contains(" rg", content);
-        Assert.Contains(" RG", content);
+        var operators = ContentOperationTestHelpers.Operators(pdfPage.GetContent()!);
+        Assert.Contains("rg", operators);
+        Assert.Contains("RG", operators);
     }
 
     [Fact]
@@ -329,9 +327,9 @@ public class ContainerLayoutTests
         var extracted = page.ExtractText();
         Assert.Contains("inside box", extracted);
         Assert.Contains("deep cell", extracted);
-        var content = Encoding.ASCII.GetString(page.GetContent()!);
-        Assert.Contains(" rg", content);
-        Assert.Contains(" RG", content);
+        var operators = ContentOperationTestHelpers.Operators(page.GetContent()!);
+        Assert.Contains("rg", operators);
+        Assert.Contains("RG", operators);
     }
 
     [Fact]

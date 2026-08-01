@@ -151,9 +151,9 @@ public class ContentEditingTests
         text.Text = "after";
 
         var saved = loaded.ToArray();
-        var content = Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(saved, 0));
+        var content = InterpreterTestSupport.PageContentBytes(saved, 0);
 
-        Assert.Contains("/GS1 gs", content, StringComparison.Ordinal);
+        Assert.Contains("GS1", ContentOperationTestHelpers.ResourceNames(content, "gs"));
         Assert.Contains("after", InterpreterTestSupport.Load(saved).ExtractText(), StringComparison.Ordinal);
     }
 

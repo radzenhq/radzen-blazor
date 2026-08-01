@@ -48,11 +48,12 @@ public class OpaqueOperatorPassthroughTests
         var path = page.Content.OfType<PathContent>().First();
         path.Thickness = 3;
 
-        var content = Encoding.Latin1.GetString(InterpreterTestSupport.PageContentBytes(document.ToArray(), 0));
+        var content = InterpreterTestSupport.PageContentBytes(document.ToArray(), 0);
+        var operations = ContentStreamTokenizer.Parse(content);
 
-        Assert.Contains("/GS0 gs", content);
-        Assert.Contains("1 J", content);
-        Assert.Contains("1 j", content);
-        Assert.Contains("4 M", content);
+        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(content, "gs"));
+        Assert.Contains(operations, op => op.Operator == "J" && op.Num(0) == 1);
+        Assert.Contains(operations, op => op.Operator == "j" && op.Num(0) == 1);
+        Assert.Contains(operations, op => op.Operator == "M" && op.Num(0) == 4);
     }
 }
