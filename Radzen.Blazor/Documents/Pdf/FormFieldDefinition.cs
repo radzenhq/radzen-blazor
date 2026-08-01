@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
@@ -11,7 +12,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class FormFieldDefinition
 {
-    internal FormFieldDefinition(string name)
+    private protected FormFieldDefinition(string name)
     {
         ArgumentException.ThrowIfNullOrEmpty(name);
         Name = name;
@@ -29,21 +30,46 @@ public abstract class FormFieldDefinition
 /// <summary>Defines a form field represented by one rectangular widget.</summary>
 public abstract class PositionedFieldDefinition : FormFieldDefinition
 {
-    internal PositionedFieldDefinition(string name) : base(name)
+    private protected PositionedFieldDefinition(string name) : base(name)
     {
     }
 
+    private Unit x;
+    private Unit y;
+    private Unit width;
+    private Unit height;
+
     /// <summary>Gets or sets the left edge of the field rectangle, in PDF user space.</summary>
-    public Unit X { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit X
+    {
+        get => x;
+        set => x = AuthoredNumber.Absolute(value, "PositionedFieldDefinition.X");
+    }
 
     /// <summary>Gets or sets the bottom edge of the field rectangle, in PDF user space.</summary>
-    public Unit Y { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Y
+    {
+        get => y;
+        set => y = AuthoredNumber.Absolute(value, "PositionedFieldDefinition.Y");
+    }
 
     /// <summary>Gets or sets the width of the field rectangle.</summary>
-    public Unit Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "PositionedFieldDefinition.Width");
+    }
 
     /// <summary>Gets or sets the height of the field rectangle.</summary>
-    public Unit Height { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Height
+    {
+        get => height;
+        set => height = AuthoredNumber.Absolute(value, "PositionedFieldDefinition.Height");
+    }
 }
 
 
@@ -100,17 +126,42 @@ public sealed class RadioOptionDefinition
     /// <summary>Gets the export value.</summary>
     public string Value { get; }
 
+    private Unit x;
+    private Unit y;
+    private Unit width;
+    private Unit height;
+
     /// <summary>Gets or sets the left edge of the option rectangle, in PDF user space.</summary>
-    public Unit X { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit X
+    {
+        get => x;
+        set => x = AuthoredNumber.Absolute(value, "RadioOptionDefinition.X");
+    }
 
     /// <summary>Gets or sets the bottom edge of the option rectangle, in PDF user space.</summary>
-    public Unit Y { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Y
+    {
+        get => y;
+        set => y = AuthoredNumber.Absolute(value, "RadioOptionDefinition.Y");
+    }
 
     /// <summary>Gets or sets the width of the option rectangle.</summary>
-    public Unit Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "RadioOptionDefinition.Width");
+    }
 
     /// <summary>Gets or sets the height of the option rectangle.</summary>
-    public Unit Height { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Height
+    {
+        get => height;
+        set => height = AuthoredNumber.Absolute(value, "RadioOptionDefinition.Height");
+    }
 
 }
 

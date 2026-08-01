@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Radzen.Documents;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

@@ -1,5 +1,6 @@
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Geometry;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf.Render;
 

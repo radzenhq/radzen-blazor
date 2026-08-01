@@ -4,6 +4,7 @@ using System.Collections;
 using System.Linq;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -131,10 +132,4 @@ public class ModelCollectionPublicContractTests
     public void TocEntryConstructorValidatesArguments(string? text, string? anchor, int level)
         => Assert.ThrowsAny<ArgumentException>(() => new TocEntry(text!, anchor!, level));
 
-    [Fact]
-    public void TocEntryCollectionDoesNotExposePublicChangeTracking()
-    {
-        Assert.Null(typeof(TocEntryCollection).GetProperty("IsModified"));
-        Assert.Null(typeof(TocEntryCollection).GetMethod("AcceptChanges"));
-    }
 }

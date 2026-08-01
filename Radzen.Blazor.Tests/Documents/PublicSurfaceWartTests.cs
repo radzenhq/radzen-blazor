@@ -4,6 +4,7 @@ using System.Linq;
 using Radzen.Blazor.Pdf.Tests;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -63,26 +64,10 @@ public class PublicSurfaceWartTests
 
         var stop = paragraph.TabStops.Add(Unit.FromPoint(120), TabAlignment.Right, '.');
 
-        Assert.Null(typeof(TabStopCollection).GetMethod("AddTabStop"));
         Assert.Same(stop, Assert.Single(paragraph.TabStops));
         Assert.Equal(Unit.FromPoint(120), stop.Position);
         Assert.Equal(TabAlignment.Right, stop.Alignment);
         Assert.Equal('.', stop.Leader);
-    }
-
-    [Fact]
-    public void ParagraphNoLongerExposesARightTabStopFlag()
-        => Assert.Null(typeof(Paragraph).GetProperty("RightTabStop"));
-
-    [Fact]
-    public void BorderCannotBeConstructedStandalone()
-        => Assert.Empty(typeof(Border).GetConstructors());
-
-    [Fact]
-    public void GradientBrushNoLongerExposesExtendFlags()
-    {
-        Assert.Null(typeof(GradientBrush).GetProperty("ExtendStart"));
-        Assert.Null(typeof(GradientBrush).GetProperty("ExtendEnd"));
     }
 
     [Fact]

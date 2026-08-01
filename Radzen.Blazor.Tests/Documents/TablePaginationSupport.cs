@@ -4,6 +4,7 @@ using System.Linq;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 

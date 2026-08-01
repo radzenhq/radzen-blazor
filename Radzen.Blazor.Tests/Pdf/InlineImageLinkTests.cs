@@ -8,6 +8,7 @@ using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -259,11 +260,12 @@ public class InlineImageLinkTests
     }
 
     [Fact]
-    public void InlineImageRelativeWidth_ReadsBackWithoutThrowing()
+    public void InlineImageRelativeWidth_IsRejectedAtTheSetter()
     {
-        var (_, image) = Authored(picture => picture.Width = Unit.FromPercent(50));
+        var error = Assert.Throws<ArgumentOutOfRangeException>(
+            () => Authored(picture => picture.Width = Unit.FromPercent(50)));
 
-        Assert.Equal(Unit.FromPercent(50), image.Width);
+        Assert.Contains("InlineImage.Width", error.Message, StringComparison.Ordinal);
     }
 
     [Fact]

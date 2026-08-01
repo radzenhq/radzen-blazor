@@ -10,6 +10,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
 using Radzen.Blazor.Tests.Isolated;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

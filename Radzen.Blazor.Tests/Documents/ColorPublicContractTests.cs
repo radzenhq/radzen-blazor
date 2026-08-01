@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 

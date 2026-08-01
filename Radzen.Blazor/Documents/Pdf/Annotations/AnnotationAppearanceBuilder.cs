@@ -2,6 +2,7 @@ using Radzen.Documents.Fonts;
 using System;
 using System.Collections.Generic;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

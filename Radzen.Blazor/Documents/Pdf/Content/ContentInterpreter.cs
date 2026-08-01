@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf.Fonts;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
 using Token = Radzen.Documents.Pdf.Content.ContentTokenizer.Token;
 using TokenKind = Radzen.Documents.Pdf.Content.ContentTokenizer.TokenKind;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf.Content;
 

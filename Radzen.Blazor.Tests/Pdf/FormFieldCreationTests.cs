@@ -9,6 +9,7 @@ using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Pdf.Signing;
 using System.Security.Cryptography.Pkcs;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

@@ -8,6 +8,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -102,7 +103,7 @@ public class DocumentLayoutFeatureTests
     }
 
     [Fact]
-    public void LaidOutFragments_CarryTheResolvedFace()
+    public void CapturedGlyphSpans_CarryTheResolvedFace()
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
@@ -113,7 +114,13 @@ public class DocumentLayoutFeatureTests
 
         var line = Assert.Single(Assert.Single(DocumentLayouter.Layout(document).Pages).Body.Lines);
 
-        Assert.All(line.Line.Fragments, fragment => Assert.NotNull(fragment.Face));
+        var resolved = document.Fonts.ResolveFace(run.Font);
+
+        Assert.All(
+            line.Line.Fragments,
+            fragment => Assert.All(
+                fragment.GlyphRun.Spans,
+                span => Assert.Same(resolved, span.Face.Sfnt)));
     }
 
     [Fact]

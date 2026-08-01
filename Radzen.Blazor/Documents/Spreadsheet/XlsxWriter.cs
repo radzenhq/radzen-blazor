@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
+using Radzen.Documents.Core;
 namespace Radzen.Documents.Spreadsheet;
 
 #nullable enable

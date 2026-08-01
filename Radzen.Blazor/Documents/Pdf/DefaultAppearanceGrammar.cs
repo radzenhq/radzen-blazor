@@ -4,6 +4,7 @@ using System.Text;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Objects;
 using static Radzen.Documents.Pdf.Content.ContentOperands;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

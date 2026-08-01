@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 namespace Radzen.Documents.Pdf;
 
 

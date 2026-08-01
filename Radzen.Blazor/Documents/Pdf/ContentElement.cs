@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Core;
 namespace Radzen.Documents.Pdf;
 
 
@@ -8,7 +9,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public abstract class ContentElement : ITracksChanges
 {
-    internal ContentElement()
+    private protected ContentElement()
     {
     }
 

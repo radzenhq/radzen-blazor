@@ -11,6 +11,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Pdf.Write;
+using Radzen.Documents.Core;
 namespace Radzen.Documents.Pdf;
 
 
@@ -56,13 +57,16 @@ public sealed class PortableDocument
 
     internal DocumentObjectGraph? MaterializedGraph { get; set; }
 
-    private int loadingThread;
+    private int facadeLoadDepth;
 
     internal void InvalidateMaterializedGraph()
     {
-        if (loadingThread != Environment.CurrentManagedThreadId)
+        lock (facadeLock)
         {
-            MaterializedGraph = null;
+            if (facadeLoadDepth == 0)
+            {
+                MaterializedGraph = null;
+            }
         }
     }
 
@@ -70,15 +74,14 @@ public sealed class PortableDocument
     {
         lock (facadeLock)
         {
-            var previous = loadingThread;
-            loadingThread = Environment.CurrentManagedThreadId;
+            facadeLoadDepth++;
             try
             {
                 load();
             }
             finally
             {
-                loadingThread = previous;
+                facadeLoadDepth--;
             }
         }
     }

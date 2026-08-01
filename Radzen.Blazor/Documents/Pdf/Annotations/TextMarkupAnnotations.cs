@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
@@ -29,9 +30,7 @@ public sealed class TextAnnotation(PdfRect bounds) : Annotation(bounds)
 /// <summary>Base class for text markup annotations.</summary>
 public abstract class MarkupAnnotation : Annotation
 {
-    /// <summary>Initializes a new instance of the <see cref="MarkupAnnotation"/> class.</summary>
-    /// <param name="bounds">The annotation bounds.</param>
-    protected MarkupAnnotation(PdfRect bounds) : base(bounds)
+    private protected MarkupAnnotation(PdfRect bounds) : base(bounds)
         => Areas = new TrackedList<PdfRect>(Touch) { bounds };
 
     /// <summary>Gets the rectangular text areas covered by the markup.</summary>

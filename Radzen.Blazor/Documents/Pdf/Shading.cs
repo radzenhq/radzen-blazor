@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

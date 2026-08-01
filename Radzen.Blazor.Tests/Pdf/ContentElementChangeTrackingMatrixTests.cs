@@ -13,6 +13,7 @@ using Xunit;
 using Xunit.Sdk;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -142,4 +143,78 @@ public class AuthoredValueValidationTests
     [Fact]
     public void ColorToStringOmitsAnOpaqueAlphaChannel()
         => Assert.Equal("#000000", Color.Black.ToString());
+
+    public static TheoryData<string, Action<Unit>> AbsoluteOnlyMeasurements()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        var table = new Table();
+        var container = new Container();
+        var column = table.Columns.Add();
+        var cell = table.Rows.Add().Cells[0];
+        var paragraph = new Paragraph();
+        var run = new Run("x");
+        var list = new List();
+        var style = document.Styles.Add("guarded");
+        var toc = new TableOfContents();
+        var shadow = new BoxShadow();
+        var borders = new Borders();
+
+        return new()
+        {
+            { "Margins.Top", value => section.Margins.Top = value },
+            { "Margins.Right", value => section.Margins.Right = value },
+            { "Margins.Bottom", value => section.Margins.Bottom = value },
+            { "Margins.Left", value => section.Margins.Left = value },
+            { "Margins.SetAll", section.Margins.SetAll },
+            { "Section.HeaderDistance", value => section.HeaderDistance = value },
+            { "Section.FooterDistance", value => section.FooterDistance = value },
+            { "PageSize.Width", value => _ = new PageSize(value, Unit.FromPoint(10)) },
+            { "PageSize.Height", value => _ = new PageSize(Unit.FromPoint(10), value) },
+            { "Borders.Width", value => borders.Width = value },
+            { "Border.Width", value => borders.Top.Width = value },
+            { "BoxShadow.BlurRadius", value => shadow.BlurRadius = value },
+            { "BoxShadow.OffsetX", value => shadow.OffsetX = value },
+            { "BoxShadow.OffsetY", value => shadow.OffsetY = value },
+            { "BoxShadow.Spread", value => shadow.Spread = value },
+            { "Cell.Padding", value => cell.Padding = value },
+            { "Cell.PaddingLeft", value => cell.PaddingLeft = value },
+            { "Cell.PaddingRight", value => cell.PaddingRight = value },
+            { "Cell.PaddingTop", value => cell.PaddingTop = value },
+            { "Cell.PaddingBottom", value => cell.PaddingBottom = value },
+            { "Column.Width", value => column.Width = value },
+            { "Container.Padding", value => container.Padding = value },
+            { "Container.PaddingLeft", value => container.PaddingLeft = value },
+            { "Container.PaddingRight", value => container.PaddingRight = value },
+            { "Container.PaddingTop", value => container.PaddingTop = value },
+            { "Container.PaddingBottom", value => container.PaddingBottom = value },
+            { "Container.CornerRadius", value => container.CornerRadius = value },
+            { "Container.Width", value => container.Width = value },
+            { "TextInline.LetterSpacing", value => run.LetterSpacing = value },
+            { "TextInline.WordSpacing", value => run.WordSpacing = value },
+            { "List.LeftIndent", value => list.LeftIndent = value },
+            { "List.HangingIndent", value => list.HangingIndent = value },
+            { "Paragraph.LeftIndent", value => paragraph.LeftIndent = value },
+            { "Paragraph.SpacingBefore", value => paragraph.SpacingBefore = value },
+            { "Paragraph.SpacingAfter", value => paragraph.SpacingAfter = value },
+            { "Style.SpacingBefore", value => style.SpacingBefore = value },
+            { "Style.SpacingAfter", value => style.SpacingAfter = value },
+            { "Style.LeftIndent", value => style.LeftIndent = value },
+            { "Table.Width", value => table.Width = value },
+            { "Table.LeftIndent", value => table.LeftIndent = value },
+            { "Table.CornerRadius", value => table.CornerRadius = value },
+            { "TableOfContents.LevelIndent", value => toc.LevelIndent = value },
+            { "TabStop.Position", value => _ = new TabStop(value) },
+            { "Font.Size", value => run.Font.Size = value },
+        };
+    }
+
+    [Theory]
+    [MemberData(nameof(AbsoluteOnlyMeasurements))]
+    public void AbsoluteOnlyMeasurementsRejectPercentages(string subject, Action<Unit> assign)
+    {
+        var error = Assert.Throws<ArgumentOutOfRangeException>(() => assign(Unit.FromPercent(50)));
+
+        Assert.Contains(subject.Replace(".SetAll", ".Top", StringComparison.Ordinal), error.Message, StringComparison.Ordinal);
+    }
 }

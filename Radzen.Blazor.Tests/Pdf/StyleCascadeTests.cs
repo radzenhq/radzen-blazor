@@ -7,6 +7,7 @@ using Radzen.Documents.Codes;
 using System.Linq;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

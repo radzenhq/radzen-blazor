@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

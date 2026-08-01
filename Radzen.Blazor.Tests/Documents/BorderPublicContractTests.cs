@@ -1,6 +1,7 @@
 #nullable enable
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -89,13 +90,4 @@ public class BorderPublicContractTests
         Assert.Equal(BorderStyle.Solid, borders.Right.Style);
     }
 
-    [Fact]
-    public void BordersAndBorderDoNotExposePublicChangeTracking()
-    {
-        Assert.Null(typeof(Borders).GetProperty("IsModified"));
-        Assert.Null(typeof(Borders).GetMethod("AcceptChanges"));
-        Assert.Null(typeof(Border).GetProperty("IsModified"));
-        Assert.Null(typeof(Border).GetMethod("AcceptChanges"));
-        Assert.Empty(typeof(Border).GetConstructors());
-    }
 }

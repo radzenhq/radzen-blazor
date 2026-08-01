@@ -1,0 +1,797 @@
+Radzen.Documents.Barcode.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
+Radzen.Documents.Barcode.AlternateText : System.String { get; set; }
+Radzen.Documents.Barcode.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Barcode.Height : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.Barcode.ShowText : System.Boolean { get; set; }
+Radzen.Documents.Barcode.Type : Radzen.Documents.Codes.BarcodeType { get; }
+Radzen.Documents.Barcode.Value : System.String { get; }
+Radzen.Documents.Barcode.Width : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.BlendMode.Color : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.ColorBurn : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.ColorDodge : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Darken : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Difference : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Exclusion : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.HardLight : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Hue : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Lighten : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Luminosity : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Multiply : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Normal : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Overlay : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Saturation : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.Screen : Radzen.Documents.BlendMode
+Radzen.Documents.BlendMode.SoftLight : Radzen.Documents.BlendMode
+Radzen.Documents.BlockCollection..ctor()
+Radzen.Documents.BlockCollection.Add(System.String) : Radzen.Documents.Paragraph
+Radzen.Documents.BlockCollection.Add(T) : T
+Radzen.Documents.BlockCollection.AddBarcode(Radzen.Documents.Codes.BarcodeType, System.String, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, System.Boolean) : Radzen.Documents.Barcode
+Radzen.Documents.BlockCollection.AddContainer() : Radzen.Documents.Container
+Radzen.Documents.BlockCollection.AddImage(System.IO.Stream) : Radzen.Documents.Image
+Radzen.Documents.BlockCollection.AddList(Radzen.Documents.ListStyle) : Radzen.Documents.List
+Radzen.Documents.BlockCollection.AddPageBreak() : Radzen.Documents.PageBreak
+Radzen.Documents.BlockCollection.AddParagraph() : Radzen.Documents.Paragraph
+Radzen.Documents.BlockCollection.AddParagraph(System.String) : Radzen.Documents.Paragraph
+Radzen.Documents.BlockCollection.AddQrCode(System.String, Radzen.Documents.Core.Unit, Radzen.Documents.Codes.QrErrorCorrection) : Radzen.Documents.QrCode
+Radzen.Documents.BlockCollection.AddTable() : Radzen.Documents.Table
+Radzen.Documents.BlockCollection.AddTableOfContents() : Radzen.Documents.TableOfContents
+Radzen.Documents.BlockCollection.Clear() : System.Void
+Radzen.Documents.BlockCollection.Count : System.Int32 { get; }
+Radzen.Documents.BlockCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Block>
+Radzen.Documents.BlockCollection.Insert(System.Int32, T) : T
+Radzen.Documents.BlockCollection.Item[System.Int32] : Radzen.Documents.Block { get; }
+Radzen.Documents.BlockCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.BlockCollection.Remove(Radzen.Documents.Block) : System.Boolean
+Radzen.Documents.BlockCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.Border.Color : Radzen.Documents.Core.Color { get; set; }
+Radzen.Documents.Border.Style : Radzen.Documents.BorderStyle { get; set; }
+Radzen.Documents.Border.Width : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.BorderStyle.Dashed : Radzen.Documents.BorderStyle
+Radzen.Documents.BorderStyle.Dotted : Radzen.Documents.BorderStyle
+Radzen.Documents.BorderStyle.None : Radzen.Documents.BorderStyle
+Radzen.Documents.BorderStyle.Solid : Radzen.Documents.BorderStyle
+Radzen.Documents.Borders..ctor()
+Radzen.Documents.Borders.Bottom : Radzen.Documents.Border { get; }
+Radzen.Documents.Borders.Color : Radzen.Documents.Core.Color { get; set; }
+Radzen.Documents.Borders.Left : Radzen.Documents.Border { get; }
+Radzen.Documents.Borders.Right : Radzen.Documents.Border { get; }
+Radzen.Documents.Borders.Style : Radzen.Documents.BorderStyle { get; set; }
+Radzen.Documents.Borders.Top : Radzen.Documents.Border { get; }
+Radzen.Documents.Borders.Width : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.BoxShadow..ctor()
+Radzen.Documents.BoxShadow.BlurRadius : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.BoxShadow.Color : Radzen.Documents.Core.Color { get; set; }
+Radzen.Documents.BoxShadow.OffsetX : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.BoxShadow.OffsetY : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.BoxShadow.Spread : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Cell.Alignment : System.Nullable<Radzen.Documents.HorizontalAlignment> { get; set; }
+Radzen.Documents.Cell.Background : System.Nullable<Radzen.Documents.Core.Color> { get; set; }
+Radzen.Documents.Cell.Blocks : Radzen.Documents.BlockCollection { get; }
+Radzen.Documents.Cell.Borders : Radzen.Documents.Borders { get; }
+Radzen.Documents.Cell.ColumnSpan : System.Int32 { get; set; }
+Radzen.Documents.Cell.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Cell.Padding : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Cell.PaddingBottom : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Cell.PaddingLeft : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Cell.PaddingRight : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Cell.PaddingTop : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Cell.RowSpan : System.Int32 { get; set; }
+Radzen.Documents.Cell.StyleName : System.String { get; set; }
+Radzen.Documents.Cell.Text : System.String { get; set; }
+Radzen.Documents.Cell.VerticalAlignment : Radzen.Documents.VerticalAlignment { get; set; }
+Radzen.Documents.CellCollection..ctor()
+Radzen.Documents.CellCollection.Count : System.Int32 { get; }
+Radzen.Documents.CellCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Cell>
+Radzen.Documents.CellCollection.Item[System.Int32] : Radzen.Documents.Cell { get; }
+Radzen.Documents.Codes.BarcodeEncoder.EncodeCodabar(System.String) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeCode128B(System.String) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeCode128B(System.String, ref System.Int32) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeCode39(System.String) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeEan13(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.EncodeEan8(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.EncodeIsbnAsEan13(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.EncodeIssnAsEan13(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.EncodeItf(System.String) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeMsiPlessey(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.EncodePharmacode(System.String, System.Double, System.Int32) : System.ValueTuple<System.Collections.Generic.IReadOnlyList<Radzen.Documents.Core.Rect>, System.Double>
+Radzen.Documents.Codes.BarcodeEncoder.EncodePostnet(System.String, System.Double, System.Int32, ref System.String) : System.ValueTuple<System.Collections.Generic.IReadOnlyList<Radzen.Documents.Core.Rect>, System.Double>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeRm4scc(System.String, System.Double, System.Int32, ref System.String) : System.ValueTuple<System.Collections.Generic.IReadOnlyList<Radzen.Documents.Core.Rect>, System.Double>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeTelepen(System.String, ref System.String) : System.Collections.Generic.IReadOnlyList<System.Int32>
+Radzen.Documents.Codes.BarcodeEncoder.EncodeUpcA(System.String, ref System.String) : System.String
+Radzen.Documents.Codes.BarcodeEncoder.ToSvg(Radzen.Documents.Codes.BarcodeType, System.String, System.Double, System.Int32, System.String, System.String) : System.String
+Radzen.Documents.Codes.BarcodeType.Codabar : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Code128 : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Code39 : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Ean13 : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Ean8 : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Isbn : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Issn : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Itf : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Msi : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Pharmacode : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Postnet : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Rm4scc : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.Telepen : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.BarcodeType.UpcA : Radzen.Documents.Codes.BarcodeType
+Radzen.Documents.Codes.QrEncoder.EncodeBytes(System.Byte[], Radzen.Documents.Codes.QrErrorCorrection, System.Int32, System.Int32) : System.Boolean[]
+Radzen.Documents.Codes.QrEncoder.EncodeUtf8(System.String, Radzen.Documents.Codes.QrErrorCorrection, System.Int32, System.Int32) : System.Boolean[]
+Radzen.Documents.Codes.QrEncoder.ToSvg(System.Boolean[], System.Int32, System.String, System.String, Radzen.Documents.Codes.QrModuleShape, Radzen.Documents.Codes.QrEyeShape, System.Nullable<Radzen.Documents.Codes.QrEyeShape>, System.Nullable<Radzen.Documents.Codes.QrEyeShape>, System.Nullable<Radzen.Documents.Codes.QrEyeShape>, System.String, System.String, System.String, System.String, System.String, System.String) : System.String
+Radzen.Documents.Codes.QrErrorCorrection.High : Radzen.Documents.Codes.QrErrorCorrection
+Radzen.Documents.Codes.QrErrorCorrection.Low : Radzen.Documents.Codes.QrErrorCorrection
+Radzen.Documents.Codes.QrErrorCorrection.Medium : Radzen.Documents.Codes.QrErrorCorrection
+Radzen.Documents.Codes.QrErrorCorrection.Quartile : Radzen.Documents.Codes.QrErrorCorrection
+Radzen.Documents.Codes.QrEyeShape.Framed : Radzen.Documents.Codes.QrEyeShape
+Radzen.Documents.Codes.QrEyeShape.Rounded : Radzen.Documents.Codes.QrEyeShape
+Radzen.Documents.Codes.QrEyeShape.Square : Radzen.Documents.Codes.QrEyeShape
+Radzen.Documents.Codes.QrModuleShape.Circle : Radzen.Documents.Codes.QrModuleShape
+Radzen.Documents.Codes.QrModuleShape.Rounded : Radzen.Documents.Codes.QrModuleShape
+Radzen.Documents.Codes.QrModuleShape.Square : Radzen.Documents.Codes.QrModuleShape
+Radzen.Documents.Column..ctor()
+Radzen.Documents.Column.Alignment : System.Nullable<Radzen.Documents.HorizontalAlignment> { get; set; }
+Radzen.Documents.Column.IsHeaderColumn : System.Boolean { get; set; }
+Radzen.Documents.Column.RelativeWidth : System.Nullable<System.Double> { get; set; }
+Radzen.Documents.Column.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.ColumnCollection.Add() : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Add(Radzen.Documents.Column) : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Add(Radzen.Documents.Core.Unit) : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Clear() : System.Void
+Radzen.Documents.ColumnCollection.Count : System.Int32 { get; }
+Radzen.Documents.ColumnCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Column>
+Radzen.Documents.ColumnCollection.Insert(System.Int32) : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Insert(System.Int32, Radzen.Documents.Column) : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Insert(System.Int32, Radzen.Documents.Core.Unit) : Radzen.Documents.Column
+Radzen.Documents.ColumnCollection.Item[System.Int32] : Radzen.Documents.Column { get; }
+Radzen.Documents.ColumnCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.ColumnCollection.Remove(Radzen.Documents.Column) : System.Boolean
+Radzen.Documents.ColumnCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.Container..ctor()
+Radzen.Documents.Container.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
+Radzen.Documents.Container.Background : System.Nullable<Radzen.Documents.Core.Color> { get; set; }
+Radzen.Documents.Container.BackgroundGradient : Radzen.Documents.GradientBrush { get; set; }
+Radzen.Documents.Container.BlendMode : System.Nullable<Radzen.Documents.BlendMode> { get; set; }
+Radzen.Documents.Container.Blocks : Radzen.Documents.BlockCollection { get; }
+Radzen.Documents.Container.Borders : Radzen.Documents.Borders { get; }
+Radzen.Documents.Container.CornerRadius : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Container.Layout : Radzen.Documents.ContainerLayout { get; set; }
+Radzen.Documents.Container.Opacity : System.Double { get; set; }
+Radzen.Documents.Container.Padding : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Container.PaddingBottom : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Container.PaddingLeft : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Container.PaddingRight : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Container.PaddingTop : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Container.Rotation : System.Double { get; set; }
+Radzen.Documents.Container.Shadow : Radzen.Documents.BoxShadow { get; set; }
+Radzen.Documents.Container.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.ContainerLayout.Overlay : Radzen.Documents.ContainerLayout
+Radzen.Documents.ContainerLayout.Stack : Radzen.Documents.ContainerLayout
+Radzen.Documents.Core.Color.A : System.Byte { get; }
+Radzen.Documents.Core.Color.AliceBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.AntiqueWhite : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Aqua : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Aquamarine : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Azure : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.B : System.Byte { get; }
+Radzen.Documents.Core.Color.Beige : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Bisque : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Black : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.BlanchedAlmond : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Blue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.BlueViolet : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Brown : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.BurlyWood : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.CadetBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Chartreuse : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Chocolate : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Coral : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.CornflowerBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Cornsilk : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Crimson : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Cyan : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkCyan : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkGoldenrod : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkKhaki : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkMagenta : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkOliveGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkOrange : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkOrchid : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkRed : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkSalmon : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkSeaGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkSlateBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkSlateGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkSlateGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkTurquoise : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DarkViolet : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DeepPink : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DeepSkyBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DimGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DimGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.DodgerBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Equals(Radzen.Documents.Core.Color) : System.Boolean
+Radzen.Documents.Core.Color.Equals(System.Object) : System.Boolean
+Radzen.Documents.Core.Color.FireBrick : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.FloralWhite : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.ForestGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.FromArgb(System.Byte, System.Byte, System.Byte, System.Byte) : Radzen.Documents.Core.Color
+Radzen.Documents.Core.Color.FromHex(System.String) : Radzen.Documents.Core.Color
+Radzen.Documents.Core.Color.FromName(System.String) : Radzen.Documents.Core.Color
+Radzen.Documents.Core.Color.FromRgb(System.Byte, System.Byte, System.Byte) : Radzen.Documents.Core.Color
+Radzen.Documents.Core.Color.Fuchsia : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.G : System.Byte { get; }
+Radzen.Documents.Core.Color.Gainsboro : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.GetHashCode() : System.Int32
+Radzen.Documents.Core.Color.GhostWhite : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Gold : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Goldenrod : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Gray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Green : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.GreenYellow : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Grey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Honeydew : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.HotPink : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.IndianRed : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Indigo : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Ivory : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Khaki : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Lavender : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LavenderBlush : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LawnGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LemonChiffon : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightCoral : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightCyan : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightGoldenrodYellow : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightPink : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSalmon : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSeaGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSkyBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSlateGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSlateGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightSteelBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LightYellow : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Lime : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.LimeGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Linen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Magenta : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Maroon : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumAquamarine : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumOrchid : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumPurple : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumSeaGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumSlateBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumSpringGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumTurquoise : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MediumVioletRed : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MidnightBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MintCream : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.MistyRose : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Moccasin : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.NavajoWhite : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Navy : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.OldLace : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Olive : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.OliveDrab : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Orange : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.OrangeRed : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Orchid : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PaleGoldenrod : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PaleGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PaleTurquoise : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PaleVioletRed : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PapayaWhip : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PeachPuff : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Peru : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Pink : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Plum : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.PowderBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Purple : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.R : System.Byte { get; }
+Radzen.Documents.Core.Color.RebeccaPurple : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Red : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.RosyBrown : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.RoyalBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SaddleBrown : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Salmon : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SandyBrown : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SeaGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SeaShell : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Sienna : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Silver : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SkyBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SlateBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SlateGray : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SlateGrey : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Snow : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SpringGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.SteelBlue : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Tan : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Teal : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Thistle : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.ToString() : System.String
+Radzen.Documents.Core.Color.Tomato : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Transparent : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Turquoise : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Violet : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Wheat : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.White : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.WhiteSmoke : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.Yellow : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.YellowGreen : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.Core.Color.op_Equality(Radzen.Documents.Core.Color, Radzen.Documents.Core.Color) : System.Boolean
+Radzen.Documents.Core.Color.op_Inequality(Radzen.Documents.Core.Color, Radzen.Documents.Core.Color) : System.Boolean
+Radzen.Documents.Core.Rect..ctor(System.Double, System.Double, System.Double, System.Double)
+Radzen.Documents.Core.Rect.Bottom : System.Double { get; }
+Radzen.Documents.Core.Rect.Equals(Radzen.Documents.Core.Rect) : System.Boolean
+Radzen.Documents.Core.Rect.Equals(System.Object) : System.Boolean
+Radzen.Documents.Core.Rect.GetHashCode() : System.Int32
+Radzen.Documents.Core.Rect.Height : System.Double { get; }
+Radzen.Documents.Core.Rect.Left : System.Double { get; }
+Radzen.Documents.Core.Rect.Right : System.Double { get; }
+Radzen.Documents.Core.Rect.Top : System.Double { get; }
+Radzen.Documents.Core.Rect.Width : System.Double { get; }
+Radzen.Documents.Core.Rect.X : System.Double { get; }
+Radzen.Documents.Core.Rect.Y : System.Double { get; }
+Radzen.Documents.Core.Rect.op_Equality(Radzen.Documents.Core.Rect, Radzen.Documents.Core.Rect) : System.Boolean
+Radzen.Documents.Core.Rect.op_Inequality(Radzen.Documents.Core.Rect, Radzen.Documents.Core.Rect) : System.Boolean
+Radzen.Documents.Core.Unit.Add(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.CompareTo(Radzen.Documents.Core.Unit) : System.Int32
+Radzen.Documents.Core.Unit.CompareTo(System.Object) : System.Int32
+Radzen.Documents.Core.Unit.Equals(Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.Equals(System.Object) : System.Boolean
+Radzen.Documents.Core.Unit.FromCentimeter(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.FromInch(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.FromMillimeter(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.FromPercent(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.FromPoint(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.GetHashCode() : System.Int32
+Radzen.Documents.Core.Unit.IsRelative : System.Boolean { get; }
+Radzen.Documents.Core.Unit.Parse(System.String) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.Percent : System.Double { get; }
+Radzen.Documents.Core.Unit.Point : System.Double { get; }
+Radzen.Documents.Core.Unit.Resolve(System.Double) : System.Double
+Radzen.Documents.Core.Unit.Subtract(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.ToString() : System.String
+Radzen.Documents.Core.Unit.TryParse(System.String, ref Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_Addition(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.op_Equality(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_GreaterThan(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_GreaterThanOrEqual(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_Implicit(System.Double) : Radzen.Documents.Core.Unit
+Radzen.Documents.Core.Unit.op_Inequality(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_LessThan(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_LessThanOrEqual(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : System.Boolean
+Radzen.Documents.Core.Unit.op_Subtraction(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : Radzen.Documents.Core.Unit
+Radzen.Documents.Document..ctor()
+Radzen.Documents.Document.Fonts : Radzen.Documents.Fonts.FontCollection { get; }
+Radzen.Documents.Document.Info : Radzen.Documents.DocumentInfo { get; }
+Radzen.Documents.Document.Language : System.String { get; set; }
+Radzen.Documents.Document.Resolve(Radzen.Documents.Paragraph) : Radzen.Documents.ParagraphFormat
+Radzen.Documents.Document.Resolve(Radzen.Documents.TextInline) : Radzen.Documents.Fonts.FontValues
+Radzen.Documents.Document.Sections : Radzen.Documents.SectionCollection { get; }
+Radzen.Documents.Document.Styles : Radzen.Documents.StyleCollection { get; }
+Radzen.Documents.DocumentInfo..ctor()
+Radzen.Documents.DocumentInfo.Author : System.String { get; set; }
+Radzen.Documents.DocumentInfo.CreationDate : System.Nullable<System.DateTimeOffset> { get; set; }
+Radzen.Documents.DocumentInfo.Creator : System.String { get; set; }
+Radzen.Documents.DocumentInfo.Keywords : System.String { get; set; }
+Radzen.Documents.DocumentInfo.ModificationDate : System.Nullable<System.DateTimeOffset> { get; set; }
+Radzen.Documents.DocumentInfo.Subject : System.String { get; set; }
+Radzen.Documents.DocumentInfo.Title : System.String { get; set; }
+Radzen.Documents.FlowDirection.LeftToRight : Radzen.Documents.FlowDirection
+Radzen.Documents.FlowDirection.RightToLeft : Radzen.Documents.FlowDirection
+Radzen.Documents.Fonts.Font..ctor()
+Radzen.Documents.Fonts.Font.Bold : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Fonts.Font.Color : System.Nullable<Radzen.Documents.Core.Color> { get; set; }
+Radzen.Documents.Fonts.Font.Family : System.String { get; set; }
+Radzen.Documents.Fonts.Font.Italic : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Fonts.Font.Size : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Fonts.Font.Strikethrough : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Fonts.Font.Underline : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Fonts.FontCollection..ctor()
+Radzen.Documents.Fonts.FontCollection.EnableKerning : System.Boolean { get; set; }
+Radzen.Documents.Fonts.FontCollection.MeasureText(System.String, Radzen.Documents.Fonts.Font) : System.Double
+Radzen.Documents.Fonts.FontCollection.Register(System.String, System.IO.Stream) : System.Void
+Radzen.Documents.Fonts.FontCollection.Register(System.String, System.IO.Stream, System.Boolean, System.Boolean) : System.Void
+Radzen.Documents.Fonts.FontCollection.SetFallback(System.String[]) : System.Void
+Radzen.Documents.Fonts.FontValues.Bold : System.Boolean { get; set; }
+Radzen.Documents.Fonts.FontValues.Color : Radzen.Documents.Core.Color { get; set; }
+Radzen.Documents.Fonts.FontValues.Equals(Radzen.Documents.Fonts.FontValues) : System.Boolean
+Radzen.Documents.Fonts.FontValues.Equals(System.Object) : System.Boolean
+Radzen.Documents.Fonts.FontValues.Family : System.String { get; set; }
+Radzen.Documents.Fonts.FontValues.GetHashCode() : System.Int32
+Radzen.Documents.Fonts.FontValues.Italic : System.Boolean { get; set; }
+Radzen.Documents.Fonts.FontValues.Size : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Fonts.FontValues.Strikethrough : System.Boolean { get; set; }
+Radzen.Documents.Fonts.FontValues.ToString() : System.String
+Radzen.Documents.Fonts.FontValues.Underline : System.Boolean { get; set; }
+Radzen.Documents.Fonts.FontValues.op_Equality(Radzen.Documents.Fonts.FontValues, Radzen.Documents.Fonts.FontValues) : System.Boolean
+Radzen.Documents.Fonts.FontValues.op_Inequality(Radzen.Documents.Fonts.FontValues, Radzen.Documents.Fonts.FontValues) : System.Boolean
+Radzen.Documents.GradientBrush.Stops : System.Collections.ObjectModel.ReadOnlyCollection<Radzen.Documents.GradientStop> { get; }
+Radzen.Documents.GradientStop..ctor(System.Double, Radzen.Documents.Core.Color)
+Radzen.Documents.GradientStop.Color : Radzen.Documents.Core.Color { get; }
+Radzen.Documents.GradientStop.Offset : System.Double { get; }
+Radzen.Documents.HeaderFooter..ctor()
+Radzen.Documents.HeaderFooter.Blocks : Radzen.Documents.BlockCollection { get; }
+Radzen.Documents.HorizontalAlignment.Center : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.HorizontalAlignment.End : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.HorizontalAlignment.Justify : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.HorizontalAlignment.Left : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.HorizontalAlignment.Right : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.HorizontalAlignment.Start : Radzen.Documents.HorizontalAlignment
+Radzen.Documents.Image.ActualText : System.String { get; set; }
+Radzen.Documents.Image.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
+Radzen.Documents.Image.AlternateText : System.String { get; set; }
+Radzen.Documents.Image.FitBox : System.Nullable<System.ValueTuple<Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit>> { get; set; }
+Radzen.Documents.Image.FitInBox(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit) : Radzen.Documents.Image
+Radzen.Documents.Image.Height : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Image.Interpolate : System.Boolean { get; set; }
+Radzen.Documents.Image.Opacity : System.Double { get; set; }
+Radzen.Documents.Image.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Inline.Anchor : System.String { get; set; }
+Radzen.Documents.Inline.Link : System.String { get; set; }
+Radzen.Documents.Inline.LinkToAnchor : System.String { get; set; }
+Radzen.Documents.Inline.Opacity : System.Double { get; set; }
+Radzen.Documents.InlineCollection..ctor()
+Radzen.Documents.InlineCollection.Add(Radzen.Documents.Inline) : Radzen.Documents.Inline
+Radzen.Documents.InlineCollection.Add(System.String) : Radzen.Documents.Run
+Radzen.Documents.InlineCollection.AddImage(System.IO.Stream) : Radzen.Documents.InlineImage
+Radzen.Documents.InlineCollection.Clear() : System.Void
+Radzen.Documents.InlineCollection.Count : System.Int32 { get; }
+Radzen.Documents.InlineCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Inline>
+Radzen.Documents.InlineCollection.Insert(System.Int32, Radzen.Documents.Inline) : Radzen.Documents.Inline
+Radzen.Documents.InlineCollection.Insert(System.Int32, System.String) : Radzen.Documents.Run
+Radzen.Documents.InlineCollection.Item[System.Int32] : Radzen.Documents.Inline { get; }
+Radzen.Documents.InlineCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.InlineCollection.Remove(Radzen.Documents.Inline) : System.Boolean
+Radzen.Documents.InlineCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.InlineImage.ActualText : System.String { get; set; }
+Radzen.Documents.InlineImage.AlternateText : System.String { get; set; }
+Radzen.Documents.InlineImage.Height : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.InlineImage.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.LineCap.Butt : Radzen.Documents.LineCap
+Radzen.Documents.LineCap.Round : Radzen.Documents.LineCap
+Radzen.Documents.LineCap.Square : Radzen.Documents.LineCap
+Radzen.Documents.LineJoin.Bevel : Radzen.Documents.LineJoin
+Radzen.Documents.LineJoin.Miter : Radzen.Documents.LineJoin
+Radzen.Documents.LineJoin.Round : Radzen.Documents.LineJoin
+Radzen.Documents.LinearGradient..ctor(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.GradientStop[])
+Radzen.Documents.LinearGradient.X0 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.LinearGradient.X1 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.LinearGradient.Y0 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.LinearGradient.Y1 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.List..ctor()
+Radzen.Documents.List.AddItem() : Radzen.Documents.ListItem
+Radzen.Documents.List.AddItem(System.String) : Radzen.Documents.ListItem
+Radzen.Documents.List.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.List.HangingIndent : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.List.Items : Radzen.Documents.ListItemCollection { get; }
+Radzen.Documents.List.LeftIndent : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.List.Style : Radzen.Documents.ListStyle { get; set; }
+Radzen.Documents.ListItem..ctor()
+Radzen.Documents.ListItem.AddList(Radzen.Documents.ListStyle) : Radzen.Documents.List
+Radzen.Documents.ListItem.Blocks : Radzen.Documents.BlockCollection { get; }
+Radzen.Documents.ListItem.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.ListItem.Inlines : Radzen.Documents.InlineCollection { get; }
+Radzen.Documents.ListItem.KeepTogether : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.ListItem.NestedList : Radzen.Documents.List { get; set; }
+Radzen.Documents.ListItem.StyleName : System.String { get; set; }
+Radzen.Documents.ListItem.Text : System.String { get; set; }
+Radzen.Documents.ListItemCollection..ctor()
+Radzen.Documents.ListItemCollection.Add() : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Add(Radzen.Documents.ListItem) : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Add(System.String) : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Clear() : System.Void
+Radzen.Documents.ListItemCollection.Count : System.Int32 { get; }
+Radzen.Documents.ListItemCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.ListItem>
+Radzen.Documents.ListItemCollection.Insert(System.Int32) : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Insert(System.Int32, Radzen.Documents.ListItem) : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Insert(System.Int32, System.String) : Radzen.Documents.ListItem
+Radzen.Documents.ListItemCollection.Item[System.Int32] : Radzen.Documents.ListItem { get; }
+Radzen.Documents.ListItemCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.ListItemCollection.Remove(Radzen.Documents.ListItem) : System.Boolean
+Radzen.Documents.ListItemCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.ListStyle.Bullet : Radzen.Documents.ListStyle
+Radzen.Documents.ListStyle.Number : Radzen.Documents.ListStyle
+Radzen.Documents.Margins..ctor()
+Radzen.Documents.Margins.Bottom : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Margins.Left : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Margins.Right : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Margins.SetAll(Radzen.Documents.Core.Unit) : System.Void
+Radzen.Documents.Margins.Top : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Matrix.A : System.Double { get; }
+Radzen.Documents.Matrix.B : System.Double { get; }
+Radzen.Documents.Matrix.C : System.Double { get; }
+Radzen.Documents.Matrix.D : System.Double { get; }
+Radzen.Documents.Matrix.E : System.Double { get; }
+Radzen.Documents.Matrix.Equals(Radzen.Documents.Matrix) : System.Boolean
+Radzen.Documents.Matrix.Equals(System.Object) : System.Boolean
+Radzen.Documents.Matrix.F : System.Double { get; }
+Radzen.Documents.Matrix.GetHashCode() : System.Int32
+Radzen.Documents.Matrix.Identity : Radzen.Documents.Matrix { get; }
+Radzen.Documents.Matrix.Multiply(Radzen.Documents.Matrix, Radzen.Documents.Matrix) : Radzen.Documents.Matrix
+Radzen.Documents.Matrix.Rotate(System.Double) : Radzen.Documents.Matrix
+Radzen.Documents.Matrix.Scale(System.Double, System.Double) : Radzen.Documents.Matrix
+Radzen.Documents.Matrix.Transform(System.Double, System.Double) : System.ValueTuple<System.Double, System.Double>
+Radzen.Documents.Matrix.Translate(System.Double, System.Double) : Radzen.Documents.Matrix
+Radzen.Documents.Matrix.op_Equality(Radzen.Documents.Matrix, Radzen.Documents.Matrix) : System.Boolean
+Radzen.Documents.Matrix.op_Inequality(Radzen.Documents.Matrix, Radzen.Documents.Matrix) : System.Boolean
+Radzen.Documents.Matrix.op_Multiply(Radzen.Documents.Matrix, Radzen.Documents.Matrix) : Radzen.Documents.Matrix
+Radzen.Documents.PageBreak..ctor()
+Radzen.Documents.PageCountField..ctor()
+Radzen.Documents.PageNumberField..ctor()
+Radzen.Documents.PageOrientation.Landscape : Radzen.Documents.PageOrientation
+Radzen.Documents.PageOrientation.Portrait : Radzen.Documents.PageOrientation
+Radzen.Documents.PageSize..ctor(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit)
+Radzen.Documents.PageSize.Equals(Radzen.Documents.PageSize) : System.Boolean
+Radzen.Documents.PageSize.Equals(System.Object) : System.Boolean
+Radzen.Documents.PageSize.GetHashCode() : System.Int32
+Radzen.Documents.PageSize.Height : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.PageSize.Width : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.PageSize.op_Equality(Radzen.Documents.PageSize, Radzen.Documents.PageSize) : System.Boolean
+Radzen.Documents.PageSize.op_Inequality(Radzen.Documents.PageSize, Radzen.Documents.PageSize) : System.Boolean
+Radzen.Documents.PageSizes.A0 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A1 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A2 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A3 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A4 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A5 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.A6 : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.Legal : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.Letter : Radzen.Documents.PageSize { get; }
+Radzen.Documents.PageSizes.Tabloid : Radzen.Documents.PageSize { get; }
+Radzen.Documents.Paragraph..ctor()
+Radzen.Documents.Paragraph.Alignment : System.Nullable<Radzen.Documents.HorizontalAlignment> { get; set; }
+Radzen.Documents.Paragraph.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Paragraph.Inlines : Radzen.Documents.InlineCollection { get; }
+Radzen.Documents.Paragraph.KeepTogether : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Paragraph.KeepWithNext : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Paragraph.LeftIndent : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Paragraph.LineSpacing : System.Double { get; set; }
+Radzen.Documents.Paragraph.Orphans : System.Int32 { get; set; }
+Radzen.Documents.Paragraph.SpacingAfter : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Paragraph.SpacingBefore : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Paragraph.StyleName : System.String { get; set; }
+Radzen.Documents.Paragraph.TabStops : Radzen.Documents.TabStopCollection { get; }
+Radzen.Documents.Paragraph.Text : System.String { get; set; }
+Radzen.Documents.Paragraph.Widows : System.Int32 { get; set; }
+Radzen.Documents.ParagraphFormat.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
+Radzen.Documents.ParagraphFormat.Equals(Radzen.Documents.ParagraphFormat) : System.Boolean
+Radzen.Documents.ParagraphFormat.Equals(System.Object) : System.Boolean
+Radzen.Documents.ParagraphFormat.Font : Radzen.Documents.Fonts.FontValues { get; set; }
+Radzen.Documents.ParagraphFormat.GetHashCode() : System.Int32
+Radzen.Documents.ParagraphFormat.HeadingLevel : System.Nullable<System.Int32> { get; set; }
+Radzen.Documents.ParagraphFormat.KeepTogether : System.Boolean { get; set; }
+Radzen.Documents.ParagraphFormat.KeepWithNext : System.Boolean { get; set; }
+Radzen.Documents.ParagraphFormat.LeftIndent : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.ParagraphFormat.SpacingAfter : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.ParagraphFormat.SpacingBefore : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.ParagraphFormat.ToString() : System.String
+Radzen.Documents.ParagraphFormat.op_Equality(Radzen.Documents.ParagraphFormat, Radzen.Documents.ParagraphFormat) : System.Boolean
+Radzen.Documents.ParagraphFormat.op_Inequality(Radzen.Documents.ParagraphFormat, Radzen.Documents.ParagraphFormat) : System.Boolean
+Radzen.Documents.QrCode.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
+Radzen.Documents.QrCode.AlternateText : System.String { get; set; }
+Radzen.Documents.QrCode.ErrorCorrection : Radzen.Documents.Codes.QrErrorCorrection { get; set; }
+Radzen.Documents.QrCode.QuietZoneModules : System.Int32 { get; set; }
+Radzen.Documents.QrCode.Size : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.QrCode.Value : System.String { get; }
+Radzen.Documents.RadialGradient..ctor(Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit, Radzen.Documents.GradientStop[])
+Radzen.Documents.RadialGradient.R0 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.RadialGradient.R1 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.RadialGradient.X0 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.RadialGradient.X1 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.RadialGradient.Y0 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.RadialGradient.Y1 : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.Row.Alignment : System.Nullable<Radzen.Documents.HorizontalAlignment> { get; set; }
+Radzen.Documents.Row.Background : System.Nullable<Radzen.Documents.Core.Color> { get; set; }
+Radzen.Documents.Row.Borders : Radzen.Documents.Borders { get; }
+Radzen.Documents.Row.Cells : Radzen.Documents.CellCollection { get; }
+Radzen.Documents.Row.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Row.IsHeaderRow : System.Boolean { get; set; }
+Radzen.Documents.Row.KeepTogether : System.Boolean { get; set; }
+Radzen.Documents.Row.RepeatOnEveryPage : System.Boolean { get; set; }
+Radzen.Documents.RowCollection.Add() : Radzen.Documents.Row
+Radzen.Documents.RowCollection.Add(Radzen.Documents.Row) : Radzen.Documents.Row
+Radzen.Documents.RowCollection.Clear() : System.Void
+Radzen.Documents.RowCollection.Count : System.Int32 { get; }
+Radzen.Documents.RowCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Row>
+Radzen.Documents.RowCollection.Insert(System.Int32) : Radzen.Documents.Row
+Radzen.Documents.RowCollection.Insert(System.Int32, Radzen.Documents.Row) : Radzen.Documents.Row
+Radzen.Documents.RowCollection.Item[System.Int32] : Radzen.Documents.Row { get; }
+Radzen.Documents.RowCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.RowCollection.Remove(Radzen.Documents.Row) : System.Boolean
+Radzen.Documents.RowCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.Run.Text : System.String { get; set; }
+Radzen.Documents.RunVerticalAlignment.None : Radzen.Documents.RunVerticalAlignment
+Radzen.Documents.RunVerticalAlignment.Subscript : Radzen.Documents.RunVerticalAlignment
+Radzen.Documents.RunVerticalAlignment.Superscript : Radzen.Documents.RunVerticalAlignment
+Radzen.Documents.Section..ctor()
+Radzen.Documents.Section.Blocks : Radzen.Documents.BlockCollection { get; }
+Radzen.Documents.Section.Direction : Radzen.Documents.FlowDirection { get; set; }
+Radzen.Documents.Section.Footer : Radzen.Documents.HeaderFooter { get; }
+Radzen.Documents.Section.FooterDistance : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Section.Header : Radzen.Documents.HeaderFooter { get; }
+Radzen.Documents.Section.HeaderDistance : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Section.Margins : Radzen.Documents.Margins { get; }
+Radzen.Documents.Section.Orientation : Radzen.Documents.PageOrientation { get; set; }
+Radzen.Documents.Section.PageSize : Radzen.Documents.PageSize { get; set; }
+Radzen.Documents.Section.Watermark : Radzen.Documents.Watermark { get; set; }
+Radzen.Documents.Section.WritingMode : Radzen.Documents.WritingMode { get; set; }
+Radzen.Documents.SectionCollection..ctor()
+Radzen.Documents.SectionCollection.Add() : Radzen.Documents.Section
+Radzen.Documents.SectionCollection.Add(Radzen.Documents.Section) : Radzen.Documents.Section
+Radzen.Documents.SectionCollection.Clear() : System.Void
+Radzen.Documents.SectionCollection.Count : System.Int32 { get; }
+Radzen.Documents.SectionCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Section>
+Radzen.Documents.SectionCollection.Insert(System.Int32) : Radzen.Documents.Section
+Radzen.Documents.SectionCollection.Insert(System.Int32, Radzen.Documents.Section) : Radzen.Documents.Section
+Radzen.Documents.SectionCollection.Item[System.Int32] : Radzen.Documents.Section { get; }
+Radzen.Documents.SectionCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.SectionCollection.Remove(Radzen.Documents.Section) : System.Boolean
+Radzen.Documents.SectionCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.Style.Alignment : System.Nullable<Radzen.Documents.HorizontalAlignment> { get; set; }
+Radzen.Documents.Style.BaseStyle : System.String { get; set; }
+Radzen.Documents.Style.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Style.HeadingLevel : System.Nullable<System.Int32> { get; set; }
+Radzen.Documents.Style.KeepTogether : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Style.KeepWithNext : System.Nullable<System.Boolean> { get; set; }
+Radzen.Documents.Style.LeftIndent : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Style.Name : System.String { get; }
+Radzen.Documents.Style.Role : System.String { get; set; }
+Radzen.Documents.Style.SpacingAfter : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.Style.SpacingBefore : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.StyleCollection..ctor()
+Radzen.Documents.StyleCollection.Add(System.String, System.String) : Radzen.Documents.Style
+Radzen.Documents.StyleCollection.Contains(System.String) : System.Boolean
+Radzen.Documents.StyleCollection.Count : System.Int32 { get; }
+Radzen.Documents.StyleCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Style>
+Radzen.Documents.StyleCollection.Item[System.String] : Radzen.Documents.Style { get; }
+Radzen.Documents.StyleCollection.Normal : Radzen.Documents.Style { get; }
+Radzen.Documents.TabAlignment.Center : Radzen.Documents.TabAlignment
+Radzen.Documents.TabAlignment.Decimal : Radzen.Documents.TabAlignment
+Radzen.Documents.TabAlignment.Left : Radzen.Documents.TabAlignment
+Radzen.Documents.TabAlignment.Right : Radzen.Documents.TabAlignment
+Radzen.Documents.TabStop..ctor(Radzen.Documents.Core.Unit, Radzen.Documents.TabAlignment, System.Char)
+Radzen.Documents.TabStop.Alignment : Radzen.Documents.TabAlignment { get; }
+Radzen.Documents.TabStop.Leader : System.Char { get; }
+Radzen.Documents.TabStop.Position : Radzen.Documents.Core.Unit { get; }
+Radzen.Documents.TabStopCollection..ctor()
+Radzen.Documents.TabStopCollection.Add(Radzen.Documents.Core.Unit, Radzen.Documents.TabAlignment, System.Char) : Radzen.Documents.TabStop
+Radzen.Documents.TabStopCollection.Add(Radzen.Documents.TabStop) : Radzen.Documents.TabStop
+Radzen.Documents.TabStopCollection.Clear() : System.Void
+Radzen.Documents.TabStopCollection.Count : System.Int32 { get; }
+Radzen.Documents.TabStopCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.TabStop>
+Radzen.Documents.TabStopCollection.Insert(System.Int32, Radzen.Documents.TabStop) : Radzen.Documents.TabStop
+Radzen.Documents.TabStopCollection.Item[System.Int32] : Radzen.Documents.TabStop { get; }
+Radzen.Documents.TabStopCollection.Remove(Radzen.Documents.TabStop) : System.Boolean
+Radzen.Documents.TabStopCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.Table..ctor()
+Radzen.Documents.Table.Borders : Radzen.Documents.Borders { get; }
+Radzen.Documents.Table.Columns : Radzen.Documents.ColumnCollection { get; }
+Radzen.Documents.Table.CornerRadius : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Table.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Table.LeftIndent : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.Table.Rows : Radzen.Documents.RowCollection { get; }
+Radzen.Documents.Table.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.TableOfContents..ctor()
+Radzen.Documents.TableOfContents.AddEntry(System.String, System.String, System.Int32) : Radzen.Documents.TocEntry
+Radzen.Documents.TableOfContents.Entries : Radzen.Documents.TocEntryCollection { get; }
+Radzen.Documents.TableOfContents.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.TableOfContents.Leader : System.Char { get; set; }
+Radzen.Documents.TableOfContents.LevelIndent : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.TextInline.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.TextInline.HorizontalScale : System.Double { get; set; }
+Radzen.Documents.TextInline.Invisible : System.Boolean { get; set; }
+Radzen.Documents.TextInline.LetterSpacing : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.TextInline.VerticalAlignment : Radzen.Documents.RunVerticalAlignment { get; set; }
+Radzen.Documents.TextInline.VerticalAlignmentScale : System.Double { get; set; }
+Radzen.Documents.TextInline.WordSpacing : Radzen.Documents.Core.Unit { get; set; }
+Radzen.Documents.TocEntry..ctor(System.String, System.String, System.Int32)
+Radzen.Documents.TocEntry.Anchor : System.String { get; }
+Radzen.Documents.TocEntry.Level : System.Int32 { get; }
+Radzen.Documents.TocEntry.Text : System.String { get; }
+Radzen.Documents.TocEntryCollection..ctor()
+Radzen.Documents.TocEntryCollection.Add(Radzen.Documents.TocEntry) : Radzen.Documents.TocEntry
+Radzen.Documents.TocEntryCollection.Clear() : System.Void
+Radzen.Documents.TocEntryCollection.Count : System.Int32 { get; }
+Radzen.Documents.TocEntryCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.TocEntry>
+Radzen.Documents.TocEntryCollection.Insert(System.Int32, Radzen.Documents.TocEntry) : Radzen.Documents.TocEntry
+Radzen.Documents.TocEntryCollection.Item[System.Int32] : Radzen.Documents.TocEntry { get; }
+Radzen.Documents.TocEntryCollection.Move(System.Int32, System.Int32) : System.Void
+Radzen.Documents.TocEntryCollection.Remove(Radzen.Documents.TocEntry) : System.Boolean
+Radzen.Documents.TocEntryCollection.RemoveAt(System.Int32) : System.Void
+Radzen.Documents.VerticalAlignment.Bottom : Radzen.Documents.VerticalAlignment
+Radzen.Documents.VerticalAlignment.Middle : Radzen.Documents.VerticalAlignment
+Radzen.Documents.VerticalAlignment.Top : Radzen.Documents.VerticalAlignment
+Radzen.Documents.Watermark..ctor()
+Radzen.Documents.Watermark.Font : Radzen.Documents.Fonts.Font { get; }
+Radzen.Documents.Watermark.Image : Radzen.Documents.Image { get; set; }
+Radzen.Documents.Watermark.Opacity : System.Double { get; set; }
+Radzen.Documents.Watermark.Rotation : System.Double { get; set; }
+Radzen.Documents.Watermark.SetImage(System.IO.Stream) : Radzen.Documents.Image
+Radzen.Documents.Watermark.Text : System.String { get; set; }
+Radzen.Documents.WritingMode.HorizontalTopToBottom : Radzen.Documents.WritingMode
+Radzen.Documents.WritingMode.VerticalLeftToRight : Radzen.Documents.WritingMode
+Radzen.Documents.WritingMode.VerticalRightToLeft : Radzen.Documents.WritingMode
+abstract class Radzen.Documents.Block
+abstract class Radzen.Documents.GradientBrush
+abstract class Radzen.Documents.Inline
+abstract class Radzen.Documents.TextInline
+enum Radzen.Documents.BlendMode
+enum Radzen.Documents.BorderStyle
+enum Radzen.Documents.Codes.BarcodeType
+enum Radzen.Documents.Codes.QrErrorCorrection
+enum Radzen.Documents.Codes.QrEyeShape
+enum Radzen.Documents.Codes.QrModuleShape
+enum Radzen.Documents.ContainerLayout
+enum Radzen.Documents.FlowDirection
+enum Radzen.Documents.HorizontalAlignment
+enum Radzen.Documents.LineCap
+enum Radzen.Documents.LineJoin
+enum Radzen.Documents.ListStyle
+enum Radzen.Documents.PageOrientation
+enum Radzen.Documents.RunVerticalAlignment
+enum Radzen.Documents.TabAlignment
+enum Radzen.Documents.VerticalAlignment
+enum Radzen.Documents.WritingMode
+sealed class Radzen.Documents.Barcode
+sealed class Radzen.Documents.BlockCollection
+sealed class Radzen.Documents.Border
+sealed class Radzen.Documents.Borders
+sealed class Radzen.Documents.BoxShadow
+sealed class Radzen.Documents.Cell
+sealed class Radzen.Documents.CellCollection
+sealed class Radzen.Documents.Column
+sealed class Radzen.Documents.ColumnCollection
+sealed class Radzen.Documents.Container
+sealed class Radzen.Documents.Document
+sealed class Radzen.Documents.DocumentInfo
+sealed class Radzen.Documents.Fonts.Font
+sealed class Radzen.Documents.Fonts.FontCollection
+sealed class Radzen.Documents.GradientStop
+sealed class Radzen.Documents.HeaderFooter
+sealed class Radzen.Documents.Image
+sealed class Radzen.Documents.InlineCollection
+sealed class Radzen.Documents.InlineImage
+sealed class Radzen.Documents.LinearGradient
+sealed class Radzen.Documents.List
+sealed class Radzen.Documents.ListItem
+sealed class Radzen.Documents.ListItemCollection
+sealed class Radzen.Documents.Margins
+sealed class Radzen.Documents.PageBreak
+sealed class Radzen.Documents.PageCountField
+sealed class Radzen.Documents.PageNumberField
+sealed class Radzen.Documents.Paragraph
+sealed class Radzen.Documents.QrCode
+sealed class Radzen.Documents.RadialGradient
+sealed class Radzen.Documents.Row
+sealed class Radzen.Documents.RowCollection
+sealed class Radzen.Documents.Run
+sealed class Radzen.Documents.Section
+sealed class Radzen.Documents.SectionCollection
+sealed class Radzen.Documents.Style
+sealed class Radzen.Documents.StyleCollection
+sealed class Radzen.Documents.TabStop
+sealed class Radzen.Documents.TabStopCollection
+sealed class Radzen.Documents.Table
+sealed class Radzen.Documents.TableOfContents
+sealed class Radzen.Documents.TocEntry
+sealed class Radzen.Documents.TocEntryCollection
+sealed class Radzen.Documents.Watermark
+static class Radzen.Documents.Codes.BarcodeEncoder
+static class Radzen.Documents.Codes.QrEncoder
+static class Radzen.Documents.PageSizes
+struct Radzen.Documents.Core.Color
+struct Radzen.Documents.Core.Rect
+struct Radzen.Documents.Core.Unit
+struct Radzen.Documents.Fonts.FontValues
+struct Radzen.Documents.Matrix
+struct Radzen.Documents.PageSize
+struct Radzen.Documents.ParagraphFormat

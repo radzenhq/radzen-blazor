@@ -13,6 +13,7 @@ using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Render;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

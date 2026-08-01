@@ -4,6 +4,7 @@ using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Geometry;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -75,23 +76,20 @@ internal sealed class TextLineRecorder(
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
-        var runs = line.ShapedRuns;
-        var runIndex = 0;
-        for (var fi = 0; fi < line.Fragments.Length; fi++)
+        foreach (var run in line.ShapedRuns)
         {
-            var fragment = line.Fragments[fi];
-            var alpha = opacity * fragment.Paint.Opacity;
-            var fragElement = fragment.IsMarker && markerElement is not null ? markerElement : element;
-            var captured = resolveFragments ? structureTree.ElementOf(fragment.Source) : null;
-            var capturedArtifact = resolveFragments ? structureTree.ArtifactOf(fragment.Source) : null;
-            if (fragment.Paint.InlineImage is { } inlineImage)
+            var alpha = opacity * run.Paint.Opacity;
+            var fragElement = run.IsMarker && markerElement is not null ? markerElement : element;
+            var captured = resolveFragments ? structureTree.ElementOf(run.Source) : null;
+            var capturedArtifact = resolveFragments ? structureTree.ArtifactOf(run.Source) : null;
+            if (run.Paint.InlineImage is { } inlineImage)
             {
                 var imageElement = captured
                     ?? (capturedArtifact is not null && structureTree.TaggingActive ? null : fragElement);
                 EmitInlineImage(
                     plan,
                     inlineImage,
-                    originX + fragment.XOffset,
+                    originX + run.XOffset,
                     y,
                     imageElement,
                     imageElement is null ? capturedArtifact ?? artifact : null,
@@ -101,12 +99,6 @@ internal sealed class TextLineRecorder(
 
             fragElement = captured ?? fragElement;
 
-            if (runIndex >= runs.Length || runs[runIndex].FirstFragment != fi)
-            {
-                continue;
-            }
-
-            var run = runs[runIndex++];
             var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
             EmitGlyphRun(
                 plan,

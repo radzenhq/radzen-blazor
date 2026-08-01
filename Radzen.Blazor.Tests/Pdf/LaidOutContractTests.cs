@@ -14,6 +14,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -113,7 +114,7 @@ public class LaidOutContractTests
 
         Assert.Equal("A\u4E2DB", fragment.GlyphRun.Text);
         Assert.Equal(3, spans.Length);
-        Assert.Same(fragment.Face, spans[0].Face.Sfnt);
+        Assert.Same(document.Fonts.ResolveFace(run.Font), spans[0].Face.Sfnt);
         Assert.NotSame(spans[0].Face.Sfnt, spans[1].Face.Sfnt);
         Assert.Same(spans[0].Face.Sfnt, spans[2].Face.Sfnt);
         Assert.Equal(0, spans[0].XOffset, 9);

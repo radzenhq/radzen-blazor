@@ -30,6 +30,7 @@
     <EmbeddedResource Update="RadzenStrings.en-GB.resx"
                       LogicalName="Radzen.Blazor.RadzenStrings.en-GB.resources" />
     <EmbeddedResource Include="Pdf\Resources\**" />
+    <EmbeddedResource Include="Documents\PublicApiBaseline.txt" />
   </ItemGroup>
 
 </Project>

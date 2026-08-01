@@ -9,6 +9,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Write;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class SoftMaskShadowTests

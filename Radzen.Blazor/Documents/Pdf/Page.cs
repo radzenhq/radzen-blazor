@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Output;
+using Radzen.Documents.Core;
 namespace Radzen.Documents.Pdf;
 
 

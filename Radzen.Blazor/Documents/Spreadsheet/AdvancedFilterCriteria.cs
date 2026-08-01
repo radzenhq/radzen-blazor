@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Spreadsheet;
 

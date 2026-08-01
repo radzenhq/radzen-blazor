@@ -15,10 +15,5 @@ public class DocumentChangeTrackingPublicContractTests
         run.Font.Bold = true;
 
         Assert.True(run.Font.IsModified);
-        Assert.Null(typeof(Document).GetProperty("IsModified"));
     }
-
-    [Fact]
-    public void DocumentDoesNotExposeAPublicAcceptChangesOperation()
-        => Assert.Null(typeof(Document).GetMethod("AcceptChanges"));
 }

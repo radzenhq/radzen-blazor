@@ -1,3 +1,4 @@
+
 namespace Radzen.Documents.Pdf.Write;
 
 internal static class BlendModes
