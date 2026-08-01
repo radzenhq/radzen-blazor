@@ -88,12 +88,14 @@ public sealed class InlineCollection : IReadOnlyList<Inline>
     /// the specified stream.
     /// </summary>
     /// <param name="stream">The source image stream.</param>
+    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="ResourceLimits.Default"/>.</param>
     /// <returns>The newly created inline image.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public InlineImage AddImage(Stream stream)
+    /// <exception cref="System.IO.InvalidDataException">The stream holds more than <see cref="ResourceLimits.MaxFileBytes"/> bytes.</exception>
+    public InlineImage AddImage(Stream stream, ResourceLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        var image = InlineImage.FromStream(stream);
+        var image = InlineImage.FromStream(stream, limits);
         Add(image);
         return image;
     }

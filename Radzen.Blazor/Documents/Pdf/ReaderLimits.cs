@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents.Pdf;
 
 /// <summary>
@@ -5,17 +7,12 @@ namespace Radzen.Documents.Pdf;
 /// A general-purpose reader is fed untrusted files; these caps turn attacker-controlled
 /// sizes/depths into a recoverable <see cref="DocumentParseException"/> instead of a hang,
 /// out-of-memory, or process-killing stack overflow. All defaults are generous for real
-/// documents and configurable via the reading entry points. The limits that also bound authored
-/// input - <see cref="MaxImagePixels"/> and <see cref="MaxFileBytes"/> - additionally govern
-/// image measurement and decoding during rendering, and are configured for that path with
-/// <see cref="ImageDecoders.WithLimits(ReaderLimits)"/>.
+/// documents and configurable via the reading entry points. The inherited
+/// <see cref="ResourceLimits"/> caps bound authored input as well, and are configured for that
+/// path with <see cref="ImageDecoders.WithLimits(ResourceLimits)"/>.
 /// </summary>
-public sealed class ReaderLimits
+public sealed class ReaderLimits : ResourceLimits
 {
-    internal const long DefaultMaxFileBytes = int.MaxValue;
-
-    internal const long DefaultMaxImagePixels = 64L * 1024 * 1024;
-
     /// <summary>
     /// Maximum nesting depth for directly-nested arrays and dictionaries during parsing.
     /// Real documents nest a handful of levels inline; deeper structures use indirect
@@ -79,19 +76,14 @@ public sealed class ReaderLimits
     /// </summary>
     public int MaxCharstringOperations { get; init; } = 1_000_000;
 
-    /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
-    public long MaxImagePixels { get; init; } = DefaultMaxImagePixels;
-
-    /// <summary>
-    /// Maximum size in bytes of a source file buffered while loading. Default 2 GiB minus one byte,
-    /// the largest buffer that can be addressed as a single array.
-    /// </summary>
-    public long MaxFileBytes { get; init; } = DefaultMaxFileBytes;
-
     /// <summary>The default limits used when a caller does not supply their own.</summary>
-    public static ReaderLimits Default => new();
+    public static new ReaderLimits Default => new();
 
-    internal ReaderLimits Snapshot()
+    internal static ReaderLimits From(ResourceLimits limits)
+        => limits as ReaderLimits
+            ?? new ReaderLimits { MaxImagePixels = limits.MaxImagePixels, MaxFileBytes = limits.MaxFileBytes };
+
+    internal override ReaderLimits Snapshot()
     {
         RequirePositive(MaxObjectNestingDepth, nameof(MaxObjectNestingDepth));
         RequirePositive(MaxPageTreeDepth, nameof(MaxPageTreeDepth));
@@ -105,8 +97,7 @@ public sealed class ReaderLimits
         RequirePositive(MaxCMapEntries, nameof(MaxCMapEntries));
         RequirePositive(MaxFontWidthEntries, nameof(MaxFontWidthEntries));
         RequirePositive(MaxCharstringOperations, nameof(MaxCharstringOperations));
-        RequirePositive(MaxImagePixels, nameof(MaxImagePixels));
-        RequirePositive(MaxFileBytes, nameof(MaxFileBytes));
+        Validate();
 
         return new ReaderLimits
         {
@@ -125,13 +116,5 @@ public sealed class ReaderLimits
             MaxImagePixels = MaxImagePixels,
             MaxFileBytes = MaxFileBytes,
         };
-    }
-
-    private static void RequirePositive(long value, string name)
-    {
-        if (value <= 0)
-        {
-            throw new System.ArgumentOutOfRangeException(name, "Reader limits must be positive.");
-        }
     }
 }

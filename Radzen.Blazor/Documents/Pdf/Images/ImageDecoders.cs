@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
@@ -36,7 +37,7 @@ public sealed class ImageDecoders
     /// </summary>
     /// <param name="limits">The resource limits to decode and measure with.</param>
     /// <returns>A set with the given limits.</returns>
-    public ImageDecoders WithLimits(ReaderLimits limits)
+    public ImageDecoders WithLimits(ResourceLimits limits)
     {
         ArgumentNullException.ThrowIfNull(limits);
         return new ImageDecoders(custom, Probes.WithLimits(limits.Snapshot()));
@@ -73,7 +74,7 @@ public sealed class ImageDecoders
 
     internal ImageProbes Probes { get; }
 
-    internal ReaderLimits Limits => Probes.Limits;
+    internal ReaderLimits Limits => ReaderLimits.From(Probes.Limits);
 
     internal bool Contains(IImageDecoder decoder)
     {
@@ -113,8 +114,8 @@ public sealed class ImageDecoders
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
     }
 
-    internal static Func<ReadOnlyMemory<byte>, (double Width, double Height)?> SizeProbe(IImageDecoder decoder)
-        => data => decoder.TryReadPixelSize(data, out var width, out var height)
+    internal static Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?> SizeProbe(IImageDecoder decoder)
+        => (data, limits) => decoder.TryReadPixelSize(data, ReaderLimits.From(limits), out var width, out var height)
             ? ((double)width, (double)height)
             : null;
 }

@@ -161,6 +161,19 @@ public class StructureRoleMapTests
     }
 
     [Fact]
+    public void HeadingLevelWithAnUnmappedRole_RendersUnderPdfUa()
+    {
+        var authored = AuthorWithStyleRole("Subtitle", "Sub", mapsTo: null);
+        authored.Document.Styles["Subtitle"].HeadingLevel = 2;
+
+        var reader = ReadAuthored(authored);
+        var structRoot = StructTreeRoot(reader);
+
+        Assert.Equal("H2", FirstStructureRole(reader, structRoot));
+        Assert.False(structRoot.ContainsKey("RoleMap"), "the discarded role is not role mapped");
+    }
+
+    [Fact]
     public void StandardStructureTypeAsARole_NeedsNoRoleMapEntry()
     {
         var reader = ReadAuthored(AuthorWithStyleRole("Quote", "BlockQuote", mapsTo: null));

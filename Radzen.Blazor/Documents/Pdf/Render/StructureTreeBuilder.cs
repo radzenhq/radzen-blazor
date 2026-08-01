@@ -148,14 +148,14 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             ? semantics.Styles.Paragraphs[styleIndex].HeadingLevel
             : 0;
 
-        if (node.RoleIsDeclared && node.Role is { } declared && !Interpretable(declared))
-        {
-            unmappedRoles.Add(declared);
-        }
-
         if (headingLevel > 0)
         {
             return StandardType(node.Intent, headingLevel);
+        }
+
+        if (node.RoleIsDeclared && node.Role is { } declared && !Interpretable(declared))
+        {
+            unmappedRoles.Add(declared);
         }
 
         return node.Role is { } role

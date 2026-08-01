@@ -31,7 +31,7 @@ public Radzen.Documents.BlockCollection.Add(System.String text) : Radzen.Documen
 public Radzen.Documents.BlockCollection.Add<T>(T block) : T where T : Radzen.Documents.Block
 public Radzen.Documents.BlockCollection.AddBarcode(Radzen.Documents.Codes.BarcodeType type, System.String value, Radzen.Documents.Core.Unit width, Radzen.Documents.Core.Unit height, System.Boolean showText = false) : Radzen.Documents.Barcode
 public Radzen.Documents.BlockCollection.AddContainer() : Radzen.Documents.Container
-public Radzen.Documents.BlockCollection.AddImage(System.IO.Stream stream) : Radzen.Documents.Image
+public Radzen.Documents.BlockCollection.AddImage(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.Image
 public Radzen.Documents.BlockCollection.AddList(Radzen.Documents.ListStyle style = Radzen.Documents.ListStyle.Bullet) : Radzen.Documents.ListBlock
 public Radzen.Documents.BlockCollection.AddPageBreak() : Radzen.Documents.PageBreak
 public Radzen.Documents.BlockCollection.AddParagraph() : Radzen.Documents.Paragraph
@@ -363,6 +363,11 @@ public static Radzen.Documents.Core.Rect.op_Equality(Radzen.Documents.Core.Rect 
 public static Radzen.Documents.Core.Rect.op_Inequality(Radzen.Documents.Core.Rect left, Radzen.Documents.Core.Rect right) : System.Boolean
 public virtual Radzen.Documents.Core.Rect.Equals(System.Object? obj) : System.Boolean
 public virtual Radzen.Documents.Core.Rect.GetHashCode() : System.Int32
+Radzen.Documents.Core.ResourceLimits = public class
+public Radzen.Documents.Core.ResourceLimits..ctor()
+public Radzen.Documents.Core.ResourceLimits.MaxFileBytes : System.Int64 { public get; public init; }
+public Radzen.Documents.Core.ResourceLimits.MaxImagePixels : System.Int64 { public get; public init; }
+public static Radzen.Documents.Core.ResourceLimits.Default : Radzen.Documents.Core.ResourceLimits { public get; }
 Radzen.Documents.Core.Unit = public struct : System.IComparable, System.IComparable<Radzen.Documents.Core.Unit>, System.IEquatable<Radzen.Documents.Core.Unit>
 public Radzen.Documents.Core.Unit.CompareTo(Radzen.Documents.Core.Unit other) : System.Int32
 public Radzen.Documents.Core.Unit.CompareTo(System.Object? obj) : System.Int32
@@ -484,7 +489,7 @@ Radzen.Documents.InlineCollection = public sealed class : System.Collections.Gen
 public Radzen.Documents.InlineCollection..ctor()
 public Radzen.Documents.InlineCollection.Add(Radzen.Documents.Inline inline) : Radzen.Documents.Inline
 public Radzen.Documents.InlineCollection.Add(System.String text) : Radzen.Documents.Run
-public Radzen.Documents.InlineCollection.AddImage(System.IO.Stream stream) : Radzen.Documents.InlineImage
+public Radzen.Documents.InlineCollection.AddImage(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.InlineImage
 public Radzen.Documents.InlineCollection.Clear() : System.Void
 public Radzen.Documents.InlineCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.InlineCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Inline>
@@ -1044,7 +1049,7 @@ public Radzen.Documents.Pdf.HighlightAnnotation..ctor(Radzen.Documents.Pdf.PdfRe
 Radzen.Documents.Pdf.IEncryptionMaterial = public interface
 public abstract Radzen.Documents.Pdf.IEncryptionMaterial.GetBytes(System.Int32 index, System.Int32 count) : System.Byte[]
 Radzen.Documents.Pdf.IImageDecoder = public interface
-public Radzen.Documents.Pdf.IImageDecoder.TryReadPixelSize(System.ReadOnlyMemory<System.Byte> data, out System.Int32 width, out System.Int32 height) : System.Boolean
+public Radzen.Documents.Pdf.IImageDecoder.TryReadPixelSize(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out System.Int32 width, out System.Int32 height) : System.Boolean
 public abstract Radzen.Documents.Pdf.IImageDecoder.TryDecode(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out Radzen.Documents.Pdf.DecodedImage? image) : System.Boolean
 Radzen.Documents.Pdf.ImageColorSpace = public enum : System.Int32
 public const Radzen.Documents.Pdf.ImageColorSpace.DeviceCmyk : Radzen.Documents.Pdf.ImageColorSpace
@@ -1064,7 +1069,7 @@ Radzen.Documents.Pdf.ImageDecoder = public static class
 public static Radzen.Documents.Pdf.ImageDecoder.Register(Radzen.Documents.Pdf.IImageDecoder decoder) : System.Void
 Radzen.Documents.Pdf.ImageDecoders = public sealed class
 public Radzen.Documents.Pdf.ImageDecoders.Add(Radzen.Documents.Pdf.IImageDecoder decoder) : Radzen.Documents.Pdf.ImageDecoders
-public Radzen.Documents.Pdf.ImageDecoders.WithLimits(Radzen.Documents.Pdf.ReaderLimits limits) : Radzen.Documents.Pdf.ImageDecoders
+public Radzen.Documents.Pdf.ImageDecoders.WithLimits(Radzen.Documents.Core.ResourceLimits limits) : Radzen.Documents.Pdf.ImageDecoders
 public static Radzen.Documents.Pdf.ImageDecoders.BuiltIn : Radzen.Documents.Pdf.ImageDecoders { public get; }
 public static Radzen.Documents.Pdf.ImageDecoders.Default : Radzen.Documents.Pdf.ImageDecoders { public get; }
 Radzen.Documents.Pdf.InkAnnotation = public sealed class : Radzen.Documents.Pdf.Annotation
@@ -1373,7 +1378,7 @@ public Radzen.Documents.Pdf.RadioOptionDefinition.Value : System.String { public
 public Radzen.Documents.Pdf.RadioOptionDefinition.Width : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.Pdf.RadioOptionDefinition.X : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.Pdf.RadioOptionDefinition.Y : Radzen.Documents.Core.Unit { public get; public set; }
-Radzen.Documents.Pdf.ReaderLimits = public sealed class
+Radzen.Documents.Pdf.ReaderLimits = public sealed class : Radzen.Documents.Core.ResourceLimits
 public Radzen.Documents.Pdf.ReaderLimits..ctor()
 public Radzen.Documents.Pdf.ReaderLimits.ExpansionRatioFloorBytes : System.Int64 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxAggregateDecodedBytes : System.Int64 { public get; public init; }
@@ -1381,10 +1386,8 @@ public Radzen.Documents.Pdf.ReaderLimits.MaxCMapEntries : System.Int32 { public 
 public Radzen.Documents.Pdf.ReaderLimits.MaxCharstringOperations : System.Int32 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxDecodeExpansionRatio : System.Int32 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxDecodedStreamBytes : System.Int64 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxFileBytes : System.Int64 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxFilterChainLength : System.Int32 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxFontWidthEntries : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxImagePixels : System.Int64 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxObjectNestingDepth : System.Int32 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxObjectStreamCount : System.Int32 { public get; public init; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxPageTreeDepth : System.Int32 { public get; public init; }
@@ -2509,7 +2512,7 @@ public Radzen.Documents.Watermark.Font : Radzen.Documents.Fonts.Font { public ge
 public Radzen.Documents.Watermark.Image : Radzen.Documents.Image? { public get; public set; }
 public Radzen.Documents.Watermark.Opacity : System.Double { public get; public set; }
 public Radzen.Documents.Watermark.Rotation : System.Double { public get; public set; }
-public Radzen.Documents.Watermark.SetImage(System.IO.Stream image) : Radzen.Documents.Image
+public Radzen.Documents.Watermark.SetImage(System.IO.Stream image, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.Image
 public Radzen.Documents.Watermark.Text : System.String? { public get; public set; }
 Radzen.Documents.WritingMode = public enum : System.Int32
 public const Radzen.Documents.WritingMode.HorizontalTopToBottom : Radzen.Documents.WritingMode

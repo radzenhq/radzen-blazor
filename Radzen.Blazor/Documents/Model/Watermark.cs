@@ -61,11 +61,12 @@ public sealed class Watermark
     /// The stream is buffered fully so it may be closed immediately after.
     /// </summary>
     /// <param name="image">A stream containing the image data.</param>
+    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="Core.ResourceLimits.Default"/>.</param>
     /// <returns>The buffered <see cref="Image"/>; its sizing members control the drawn size.</returns>
-    public Image SetImage(Stream image)
+    public Image SetImage(Stream image, Core.ResourceLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(image);
-        var buffered = Radzen.Documents.Image.FromStream(image);
+        var buffered = Radzen.Documents.Image.FromStream(image, limits);
         Image = buffered;
         return buffered;
     }

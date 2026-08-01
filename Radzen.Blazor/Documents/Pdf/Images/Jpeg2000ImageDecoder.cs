@@ -18,7 +18,7 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         return true;
     }
 
-    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, out int width, out int height)
+    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, ReaderLimits limits, out int width, out int height)
     {
         if (!ImageHeaders.IsJpeg2000(data.Span))
         {

@@ -17,7 +17,8 @@ public sealed class InlineImage : Inline
 
     internal InlineImage(byte[] data) => Data = data;
 
-    internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, Pdf.ReaderLimits.Default.MaxFileBytes));
+    internal static InlineImage FromStream(Stream stream, ResourceLimits? limits = null)
+        => new(StreamBytes.ReadFully(stream, (limits ?? ResourceLimits.Default).MaxFileBytes));
 
     internal byte[] Data { get; }
 

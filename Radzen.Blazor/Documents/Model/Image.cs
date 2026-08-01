@@ -21,7 +21,8 @@ public sealed class Image : Block
 
     internal Image(byte[] data) => Data = data;
 
-    internal static Image FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, Pdf.ReaderLimits.Default.MaxFileBytes));
+    internal static Image FromStream(Stream stream, ResourceLimits? limits = null)
+        => new(StreamBytes.ReadFully(stream, (limits ?? ResourceLimits.Default).MaxFileBytes));
 
     internal byte[] Data { get; }
 
