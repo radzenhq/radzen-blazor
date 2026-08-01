@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Spreadsheet;
 

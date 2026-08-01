@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents.Pdf;
 
 internal enum DeviceColorKind

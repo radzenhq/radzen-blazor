@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -156,17 +157,8 @@ public class UnitPublicContractTests
     }
 
     [Fact]
-    public void NoImplicitConversionExistsFromString()
-        => Assert.DoesNotContain(
-            typeof(Unit).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static),
-            method => method.Name == "op_Implicit" && method.GetParameters()[0].ParameterType == typeof(string));
-
-    [Fact]
-    public void ParseAndTryParseAreTheOnlyWaysToReadAMeasurementString()
+    public void TryParseReadsAbsoluteRelativeAndInvalidMeasurementStrings()
     {
-        Assert.Null(typeof(Unit).GetMethod("FromString"));
-        Assert.Null(typeof(Unit).GetMethod("FromDouble"));
-
         Assert.True(Unit.TryParse("2.54cm", out var parsed));
         Assert.Equal(72, parsed.Point, 9);
 

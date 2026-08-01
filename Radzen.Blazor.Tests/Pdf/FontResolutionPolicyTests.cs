@@ -9,6 +9,7 @@ using Radzen.Documents.Fonts;
 
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

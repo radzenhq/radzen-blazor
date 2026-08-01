@@ -1,22 +1,22 @@
 using System.Collections.Immutable;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Geometry;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf.Render;
 
 internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
 {
-    private static readonly Color ModuleBlack = Color.FromRgb(0, 0, 0);
-
     public void EmitCodeSymbol(PageRenderContext context, LaidOutCodeSymbol positioned, double left, double top)
         => EmitCodeSymbolModules(
-            context, positioned.Source, positioned.Modules,
+            context, positioned.Source, positioned.Modules, positioned.Foreground,
             left + positioned.X, BottomUpSpace.FromTop(top, positioned.Y), positioned.Caption);
 
     public void EmitCodeSymbolModules(
         PageRenderContext context,
         SourceId source,
         ImmutableArray<CodeSymbolModule> modules,
+        Color foreground,
         double x,
         double topY,
         ImmutableArray<LaidOutCaptionLine>? caption,
@@ -36,7 +36,7 @@ internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
                 Y = BottomUpSpace.Bottom(topY, module.Y, module.Height),
                 Width = module.Width,
                 Height = module.Height,
-                Color = ModuleBlack,
+                Color = foreground,
             });
         }
 

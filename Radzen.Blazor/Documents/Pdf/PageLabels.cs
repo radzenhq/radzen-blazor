@@ -1,6 +1,7 @@
 using Radzen.Documents.Pdf.Objects;
 using System;
 using System.Collections.Generic;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

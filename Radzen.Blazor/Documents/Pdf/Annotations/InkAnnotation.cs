@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

@@ -4,6 +4,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -42,19 +43,17 @@ public class ShapedTextRunTests
 
         var run = Assert.Single(line.ShapedRuns);
         Assert.Equal("body one", run.GlyphRun.Text);
-        Assert.Equal(0, run.FirstFragment);
+        Assert.Equal(new[] { "body", "one" }, run.Fragments.Select(fragment => fragment.Text).ToArray());
     }
 
     [Fact]
-    public void AShapedRunAttributesEveryFragmentItCovers()
+    public void AShapedRunOwnsEveryFragmentItCovers()
     {
         var line = FirstLine(Paragraph("body one"));
 
         var run = Assert.Single(line.ShapedRuns);
 
-        Assert.Equal(
-            line.Fragments.Select(fragment => new ShapedRunSource(fragment.Source, fragment.Start, fragment.Length)),
-            run.Sources);
+        Assert.Equal(line.Fragments, run.Fragments);
     }
 
     [Fact]
@@ -63,12 +62,22 @@ public class ShapedTextRunTests
         var line = FirstLine(Paragraph("body one"));
 
         var run = Assert.Single(line.ShapedRuns);
-        var first = run.Sources[0];
-        var last = run.Sources[^1];
+        var first = run.Fragments[0];
+        var last = run.Fragments[^1];
 
         Assert.Equal(0, first.Start);
         Assert.Equal("body one".Length, last.Start + last.Length);
         Assert.Equal(last.Start + last.Length - first.Start, run.GlyphRun.Text.Length);
+    }
+
+    [Fact]
+    public void ShapedRunsPartitionTheLineFragmentsInOrder()
+    {
+        var line = FirstLine(Paragraph("one two three four five"));
+
+        Assert.Equal(
+            line.Fragments,
+            line.ShapedRuns.SelectMany(run => run.Fragments).ToArray());
     }
 
     [Fact]
@@ -85,20 +94,9 @@ public class ShapedTextRunTests
         var line = FirstLine(document);
 
         Assert.Equal(2, line.ShapedRuns.Length);
-        Assert.All(line.ShapedRuns, run => Assert.Single(run.Sources));
+        Assert.All(line.ShapedRuns, run => Assert.Single(run.Fragments));
         Assert.Equal(
             line.ShapedRuns.Select(run => run.GlyphRun.Text).ToArray(),
             new[] { "body", "one" });
-    }
-
-    [Fact]
-    public void EveryShapedRunStartsAtADistinctFragmentInOrder()
-    {
-        var line = FirstLine(Paragraph("one two three four five"));
-
-        var starts = line.ShapedRuns.Select(run => run.FirstFragment).ToArray();
-
-        Assert.Equal(starts.OrderBy(start => start).Distinct().ToArray(), starts);
-        Assert.All(starts, start => Assert.InRange(start, 0, line.Fragments.Length - 1));
     }
 }

@@ -14,6 +14,7 @@ using Radzen.Documents.Pdf.Output;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Blazor.Tests.Isolated;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContainerOverlayRotationTests

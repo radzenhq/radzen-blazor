@@ -19,7 +19,7 @@ public class LayoutProgressGuardTests
     }
 
     [Fact]
-    public void OneStalledStepPerPosition_IsAllowed()
+    public void OneNonAdvancingStep_IsAllowedBecauseThatStepMovedToAFreshPage()
     {
         var guard = new LayoutProgressGuard("Work");
 
@@ -51,14 +51,13 @@ public class LayoutProgressGuardTests
         var guard = new LayoutProgressGuard("Work");
         guard.Reached(0);
         guard.Reached(0);
-        guard.Reached(1);
-        guard.Reached(1);
-        guard.Reached(2);
 
-        Assert.Throws<InvalidOperationException>(() =>
+        Assert.Null(Record.Exception(() =>
         {
+            guard.Reached(1);
+            guard.Reached(1);
             guard.Reached(2);
             guard.Reached(2);
-        });
+        }));
     }
 }

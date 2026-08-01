@@ -1,11 +1,17 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents.Pdf;
 
-/// <summary>Describes an interactive annotation placed on a PDF page.</summary>
-/// <param name="bounds">The annotation bounds in PDF page coordinates.</param>
-public abstract class Annotation(PdfRect bounds) : ITracksChanges
+/// <summary>
+/// Describes an interactive annotation placed on a PDF page. The hierarchy is closed: the set of
+/// annotation kinds is fixed by this library and cannot be extended from outside it.
+/// </summary>
+public abstract class Annotation : ITracksChanges
 {
+    private protected Annotation(PdfRect bounds) => this.bounds = bounds;
+
     private ChangeTracker tracker;
-    private PdfRect bounds = bounds;
+    private PdfRect bounds;
     private Color color = Color.Yellow;
     private double opacity = 1;
     private AnnotationFlags flags = AnnotationFlags.Print;

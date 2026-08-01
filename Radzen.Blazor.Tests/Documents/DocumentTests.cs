@@ -1,6 +1,7 @@
 #nullable enable
 using Radzen.Documents;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 

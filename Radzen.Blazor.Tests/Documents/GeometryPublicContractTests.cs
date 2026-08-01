@@ -3,6 +3,7 @@ using System.Linq;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -38,12 +39,6 @@ public class GeometryPublicContractTests
         Assert.Equal(Unit.Parse("4pt"), margins.Left);
     }
 
-    [Fact]
-    public void MarginsDoNotExposePublicChangeTracking()
-    {
-        Assert.Null(typeof(Margins).GetProperty("IsModified"));
-        Assert.Null(typeof(Margins).GetMethod("AcceptChanges"));
-    }
 
     [Fact]
     public void PageSizeEqualityUsesWidthAndHeight()

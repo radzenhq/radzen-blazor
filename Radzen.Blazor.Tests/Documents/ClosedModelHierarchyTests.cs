@@ -18,6 +18,10 @@ public class ClosedModelHierarchyTests
         typeof(Radzen.Documents.Pdf.ContentElement),
         typeof(Radzen.Documents.Pdf.FormFieldDefinition),
         typeof(Radzen.Documents.Pdf.PositionedFieldDefinition),
+        typeof(Radzen.Documents.Pdf.Objects.DocumentObject),
+        typeof(Radzen.Documents.Pdf.Annotation),
+        typeof(Radzen.Documents.Pdf.ShapeAnnotation),
+        typeof(Radzen.Documents.Pdf.MarkupAnnotation),
     };
 
     [Theory]

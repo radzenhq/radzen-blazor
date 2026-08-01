@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

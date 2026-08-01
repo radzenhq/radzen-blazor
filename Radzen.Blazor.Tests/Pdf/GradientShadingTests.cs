@@ -7,6 +7,7 @@ using Xunit;
 using Radzen.Documents.Pdf.Write;
 using Radzen.Documents;
 using Radzen.Blazor.Tests.Isolated;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.7.4.5.2, 8.7.4.5.3, 8.7.4.5.5: axial (type 2) and radial (type 3) shadings and the shading Pattern (PatternType 2).

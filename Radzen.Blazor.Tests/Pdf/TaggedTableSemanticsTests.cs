@@ -7,6 +7,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
 using Xunit;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

@@ -8,6 +8,7 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ImageLayoutTests

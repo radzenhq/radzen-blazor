@@ -8,6 +8,7 @@ using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

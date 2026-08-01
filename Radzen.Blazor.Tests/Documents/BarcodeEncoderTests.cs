@@ -165,7 +165,7 @@ public class BarcodeEncoderTests
 
         for (int i = 0; i < neutralBars.Count; i++)
         {
-            Radzen.Documents.Rect converted = legacyBars[i];
+            Radzen.Documents.Core.Rect converted = legacyBars[i];
             Assert.Equal(neutralBars[i].X, converted.X);
             Assert.Equal(neutralBars[i].Y, converted.Y);
             Assert.Equal(neutralBars[i].Width, converted.Width);

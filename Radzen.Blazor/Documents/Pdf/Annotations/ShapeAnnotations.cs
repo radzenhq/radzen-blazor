@@ -1,4 +1,5 @@
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
@@ -19,9 +20,12 @@ public sealed class StampAnnotation(PdfRect bounds) : Annotation(bounds)
 }
 
 /// <summary>Base class for square and circle annotations.</summary>
-/// <param name="bounds">The annotation bounds.</param>
-public abstract class ShapeAnnotation(PdfRect bounds) : Annotation(bounds)
+public abstract class ShapeAnnotation : Annotation
 {
+    private protected ShapeAnnotation(PdfRect bounds) : base(bounds)
+    {
+    }
+
     private double borderWidth = 1;
     private Color? interiorColor;
 
@@ -71,10 +75,11 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
     }
 
     /// <summary>Gets or sets the font size.</summary>
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
     public Unit FontSize
     {
         get => Font.EffectiveSize;
-        set => Font.Size = value;
+        set => Font.Size = AuthoredNumber.Absolute(value, "FreeTextAnnotation.FontSize");
     }
 
     /// <summary>Gets or sets the text color.</summary>

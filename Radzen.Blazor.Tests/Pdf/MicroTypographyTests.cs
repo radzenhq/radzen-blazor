@@ -11,6 +11,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Blazor.Tests.Isolated;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class MicroTypographyTests

@@ -11,6 +11,7 @@ using Xunit;
 
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Codes;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Pdf.Tests;
 

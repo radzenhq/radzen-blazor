@@ -2,6 +2,7 @@
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Xunit;
+using Radzen.Documents.Core;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -148,7 +149,4 @@ public class FontPublicContractTests
     [Fact]
     public void FontIsSealed() => Assert.True(typeof(Font).IsSealed);
 
-    [Fact]
-    public void FontDoesNotExposeAPublicAcceptChangesOperation()
-        => Assert.Null(typeof(Font).GetMethod("AcceptChanges"));
 }

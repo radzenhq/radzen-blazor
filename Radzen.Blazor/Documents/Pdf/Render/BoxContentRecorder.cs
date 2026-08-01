@@ -143,7 +143,7 @@ internal static class BoxContentRecorder
     {
         var mark = context.BeginStack(codeSymbol.ZOrder);
         context.CodeSymbols.EmitCodeSymbolModules(
-            context, codeSymbol.Source, codeSymbol.Modules,
+            context, codeSymbol.Source, codeSymbol.Modules, codeSymbol.Foreground,
             left + codeSymbol.X,
             BottomUpSpace.FromTop(contentTop, codeSymbol.Y + delta),
             codeSymbol.Caption,

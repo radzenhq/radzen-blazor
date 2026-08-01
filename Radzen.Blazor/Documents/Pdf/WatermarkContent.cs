@@ -4,6 +4,7 @@ using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Render;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 

@@ -13,6 +13,7 @@ using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Radzen.Blazor.Tests.Isolated;
+using Radzen.Documents.Core;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class HeaderFooterDistanceTests
