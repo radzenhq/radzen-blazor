@@ -27,7 +27,7 @@ internal static class SoftMask
             return;
         }
 
-        var mask = plan.RenderShadowMask(shape.Width, shape.Height, shape.Radius, shape.Blur);
+        var mask = plan.Resources.RenderShadowMask(shape.Width, shape.Height, shape.Radius, shape.Blur);
 
         var placement = BoxShadowGeometry.Placement(
             shape,
@@ -57,7 +57,7 @@ internal static class SoftMask
 
         var alpha = shadow.Color.A / 255.0;
         var softMask = new OutputSoftMask(group);
-        var extGState = plan.RegisterSoftMaskExtGState(
+        var extGState = plan.Resources.RegisterSoftMaskExtGState(
             alpha,
             alpha,
             softMask,

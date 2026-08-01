@@ -14,7 +14,7 @@ internal static class PageDrawTransformer
             var fill = plan.Fills[i];
             if (fill.Gradient is null && Translucent(fill.Color, out var alpha))
             {
-                plan.Fills[i] = fill with { ExtGState = plan.ApplyAlpha(fill.ExtGState, alpha) };
+                plan.Fills[i] = fill with { ExtGState = plan.Resources.ApplyAlpha(fill.ExtGState, alpha) };
             }
         }
 
@@ -23,7 +23,7 @@ internal static class PageDrawTransformer
             var edge = plan.Edges[i];
             if (Translucent(edge.Color, out var alpha))
             {
-                plan.Edges[i] = edge with { ExtGState = plan.ApplyAlpha(edge.ExtGState, alpha) };
+                plan.Edges[i] = edge with { ExtGState = plan.Resources.ApplyAlpha(edge.ExtGState, alpha) };
             }
         }
 
@@ -32,7 +32,7 @@ internal static class PageDrawTransformer
             var rounded = plan.RoundedStrokes[i];
             if (Translucent(rounded.Color, out var alpha))
             {
-                plan.RoundedStrokes[i] = rounded with { ExtGState = plan.ApplyAlpha(rounded.ExtGState, alpha) };
+                plan.RoundedStrokes[i] = rounded with { ExtGState = plan.Resources.ApplyAlpha(rounded.ExtGState, alpha) };
             }
         }
 
@@ -41,7 +41,7 @@ internal static class PageDrawTransformer
             var text = plan.Texts[i];
             if (Translucent(text.Color, out var alpha))
             {
-                plan.Texts[i] = text with { ExtGState = plan.ApplyAlpha(text.ExtGState, alpha) };
+                plan.Texts[i] = text with { ExtGState = plan.Resources.ApplyAlpha(text.ExtGState, alpha) };
             }
         }
     }

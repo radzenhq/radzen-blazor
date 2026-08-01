@@ -130,7 +130,7 @@ internal sealed class PageWriter(
             if (fill.Gradient is { } gradient)
             {
                 writer.WriteRaw("/Pattern cs\n");
-                writer.WriteName(plan.RegisterPattern(gradient, GradientMatrix(fill)));
+                writer.WriteName(plan.Resources.RegisterPattern(gradient, GradientMatrix(fill)));
                 writer.WriteRaw(" scn\n");
             }
             else
@@ -323,8 +323,8 @@ internal sealed class PageWriter(
 
     private PageOutput PackageResources()
     {
-        var fonts = ImmutableArray.CreateBuilder<OutputFont>(plan.UsedFonts.Count);
-        foreach (var font in plan.UsedFonts)
+        var fonts = ImmutableArray.CreateBuilder<OutputFont>(plan.Resources.UsedFonts.Count);
+        foreach (var font in plan.Resources.UsedFonts)
         {
             fonts.Add(plannedFonts[font].Output);
         }
@@ -332,10 +332,10 @@ internal sealed class PageWriter(
         return new PageOutput(
             writer.ToArray(),
             fonts.MoveToImmutable(),
-            [.. plan.UsedImages],
+            [.. plan.Resources.UsedImages],
             [.. plan.Links],
-            [.. plan.ExtGStates],
-            [.. plan.Patterns]);
+            [.. plan.Resources.ExtGStates],
+            [.. plan.Resources.Patterns]);
     }
 
     private void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)

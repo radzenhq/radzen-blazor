@@ -37,7 +37,7 @@ internal sealed class ImageRegistry(ImageDecoders decoders)
     }
 
     public OutputImage DecodeBytes(SourceId key, SceneImageData data)
-        => images.GetOrAddValue(key, name => Capture(name, decoders.Decode(data.Memory, ReaderLimits.Default)));
+        => images.GetOrAddValue(key, name => Capture(name, decoders.Decode(data.Memory)));
 
     public static DecodedImage SourceOf(OutputImage image) => image.Identity;
 

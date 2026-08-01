@@ -27,7 +27,22 @@ public sealed class Document
     /// accessible output: accessibility standards require the document language to be
     /// determinable, so renderers targeting them need it set.
     /// </summary>
-    public string? Language { get; set; }
+    /// <exception cref="System.ArgumentException">The value is not a well-formed BCP 47 tag.</exception>
+    public string? Language
+    {
+        get => language;
+        set => language = Core.LanguageTag.Validated(value, "Document.Language");
+    }
+
+    private string? language;
+
+    /// <summary>
+    /// Takes a snapshot of the effective formatting of this document, resolving its named style
+    /// chains once. Resolve many paragraphs or runs through the returned snapshot instead of
+    /// calling the single-element overloads in a loop.
+    /// </summary>
+    /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
+    public DocumentFormatting Resolve() => new(StyleResolver.Resolve(this));
 
     /// <summary>
     /// Resolves the effective formatting of a paragraph in this document. Every value is resolved with the
@@ -38,33 +53,7 @@ public sealed class Document
     /// <exception cref="System.ArgumentNullException"><paramref name="paragraph"/> is <see langword="null"/>.</exception>
     /// <exception cref="System.ArgumentException"><paramref name="paragraph"/> is not part of this document.</exception>
     /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public ParagraphFormat Resolve(Paragraph paragraph)
-    {
-        System.ArgumentNullException.ThrowIfNull(paragraph);
-
-        var styles = StyleResolver.Resolve(this);
-
-        if (!styles.Contains(paragraph))
-        {
-            throw new System.ArgumentException(
-                "The paragraph is not part of this document. Add it to a section, header or footer before resolving it.",
-                nameof(paragraph));
-        }
-
-        var format = styles.Format(paragraph);
-
-        return new ParagraphFormat
-        {
-            Alignment = format.Alignment,
-            SpacingBefore = format.SpacingBefore,
-            SpacingAfter = format.SpacingAfter,
-            LeftIndent = format.LeftIndent,
-            KeepTogether = format.KeepTogether,
-            KeepWithNext = format.KeepWithNext,
-            HeadingLevel = styles.HeadingLevel(paragraph) is var level and > 0 ? level : null,
-            Font = (styles.ParagraphFont(paragraph) ?? paragraph.Font).Effective(),
-        };
-    }
+    public ParagraphFormat Resolve(Paragraph paragraph) => Resolve().Resolve(paragraph);
 
     /// <summary>
     /// Resolves the effective font values of a run in this document, cascading the run's own font over the
@@ -74,15 +63,5 @@ public sealed class Document
     /// <exception cref="System.ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
     /// <exception cref="System.ArgumentException"><paramref name="run"/> is not part of this document.</exception>
     /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public FontValues Resolve(TextInline run)
-    {
-        System.ArgumentNullException.ThrowIfNull(run);
-
-        var font = StyleResolver.Resolve(this).RunFont(run)
-            ?? throw new System.ArgumentException(
-                "The run is not part of this document. Add it to a paragraph in a section, header or footer before resolving it.",
-                nameof(run));
-
-        return font.Effective();
-    }
+    public FontValues Resolve(TextInline run) => Resolve().Resolve(run);
 }

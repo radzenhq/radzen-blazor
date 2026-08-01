@@ -75,7 +75,7 @@ public enum BorderStyle
 }
 
 /// <summary>
-/// The marker style of a <see cref="List"/>.
+/// The marker style of a <see cref="ListBlock"/>.
 /// </summary>
 public enum ListStyle
 {

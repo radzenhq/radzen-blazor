@@ -74,7 +74,7 @@ public abstract class Inline
     /// language of the document applies. An inline that declares a language becomes a span of its
     /// own in structured output, carrying the language change.
     /// </summary>
-    /// <exception cref="System.ArgumentException">The value is empty.</exception>
+    /// <exception cref="System.ArgumentException">The value is empty or is not a well-formed BCP 47 tag.</exception>
     public string? Language
     {
         get => language;
@@ -87,7 +87,7 @@ public abstract class Inline
                     nameof(value));
             }
 
-            language = value;
+            language = Core.LanguageTag.Validated(value, "Inline.Language");
         }
     }
 

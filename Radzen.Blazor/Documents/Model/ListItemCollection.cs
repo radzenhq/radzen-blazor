@@ -7,7 +7,7 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// An ordered collection of the items in a <see cref="List"/> with typed helpers for appending.
+/// An ordered collection of the items in a <see cref="ListBlock"/> with typed helpers for appending.
 /// An item belongs to exactly one list: adding an item that already has a parent throws, as does
 /// adding an item to a list nested inside it.
 /// </summary>

@@ -34,8 +34,8 @@ internal sealed class ImageRecorder(ImageRegistry imageRegistry, StructureTreeBu
             Artifact = element is null
                 ? inheritedArtifact ?? structureTree.ArtifactOf(positioned.Source)
                 : null,
-            ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
+            ExtGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null,
         });
-        plan.UsedImages.Add(xobject);
+        plan.Resources.UsedImages.Add(xobject);
     }
 }
