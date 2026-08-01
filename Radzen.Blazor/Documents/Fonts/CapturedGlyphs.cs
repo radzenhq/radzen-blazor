@@ -76,6 +76,57 @@ internal readonly record struct CapturedGlyphSpan(
 
     public int GlyphCount => IsSfnt ? SfntGlyphs.Length : BuiltInGlyphs.Length;
 
+    public bool Equals(CapturedGlyphSpan other)
+    {
+        if (Face != other.Face
+            || Advance != other.Advance
+            || XOffset != other.XOffset
+            || SfntGlyphs.Length != other.SfntGlyphs.Length
+            || BuiltInGlyphs.Length != other.BuiltInGlyphs.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < SfntGlyphs.Length; i++)
+        {
+            if (SfntGlyphs[i] != other.SfntGlyphs[i])
+            {
+                return false;
+            }
+        }
+
+        for (var i = 0; i < BuiltInGlyphs.Length; i++)
+        {
+            if (BuiltInGlyphs[i] != other.BuiltInGlyphs[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(Face);
+        hash.Add(SfntGlyphs.Length);
+        for (var i = 0; i < SfntGlyphs.Length; i++)
+        {
+            hash.Add(SfntGlyphs[i]);
+        }
+
+        hash.Add(BuiltInGlyphs.Length);
+        for (var i = 0; i < BuiltInGlyphs.Length; i++)
+        {
+            hash.Add(BuiltInGlyphs[i]);
+        }
+
+        hash.Add(Advance);
+        hash.Add(XOffset);
+        return hash.ToHashCode();
+    }
+
     public int WordSpaceCount
     {
         get

@@ -92,44 +92,11 @@ internal sealed class SfntFont
 
     public ushort FsType { get; }
 
-    public bool EmbeddingRestricted => (FsType & 0x0002) != 0;
-
-    public void EnsureEmbeddable(bool allowRestricted)
-    {
-        if (EmbeddingRestricted && !allowRestricted)
-        {
-            throw new InvalidOperationException(
-                $"The font '{PostScriptName}' has OS/2 fsType 0x{FsType:X4} (Restricted License Embedding) and must not be embedded. "
-                + "Set DocumentRenderer.AllowRestrictedEmbedding to true to embed it anyway if you hold a license "
-                + "that permits it.");
-        }
-    }
-
+    // ISO/IEC 14496-22 OS/2 fvar: a font carrying a font variations table is a variable font.
     public bool IsVariable => HasTable("fvar");
 
-    public bool IsColorFont => HasTable("COLR") || HasTable("sbix") || HasTable("SVG ");
-
-    public void EnsureRenderable(bool allowDegraded)
-    {
-        if (allowDegraded)
-        {
-            return;
-        }
-
-        if (IsVariable)
-        {
-            throw new NotSupportedException(
-                $"The font '{PostScriptName}' is a variable font; axis selection is not supported, so only its default instance "
-                + "would be embedded. Set DocumentRenderer.AllowDegradedFonts to true to embed the default instance anyway.");
-        }
-
-        if (IsColorFont)
-        {
-            throw new NotSupportedException(
-                $"The font '{PostScriptName}' is a color font (COLR/sbix/SVG); color glyphs are not supported and would render as "
-                + "monochrome outlines or missing. Set DocumentRenderer.AllowDegradedFonts to true to embed it anyway.");
-        }
-    }
+    // ISO/IEC 14496-22: COLR, sbix and SVG carry colour glyph descriptions.
+    public bool HasColorTables => HasTable("COLR") || HasTable("sbix") || HasTable("SVG ");
 
     public ushort GetGlyphId(int codepoint) => cmap?.GetGlyphId(codepoint) ?? 0;
 
