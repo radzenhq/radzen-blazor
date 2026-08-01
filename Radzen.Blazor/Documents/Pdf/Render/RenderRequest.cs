@@ -8,7 +8,7 @@ internal sealed class RenderRequest
     {
         Conformance = renderer.Conformance;
         Accessibility = renderer.Accessibility;
-        RoleMap = renderer.RoleMap;
+        RoleMap = renderer.RoleMap.Snapshot();
         Encryption = renderer.Encryption;
         CompressOutput = renderer.CompressOutput;
         IncludeDocumentId = renderer.IncludeDocumentId;

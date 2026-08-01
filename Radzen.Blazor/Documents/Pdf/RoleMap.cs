@@ -125,4 +125,15 @@ public sealed class RoleMap
 
     internal IEnumerable<KeyValuePair<string, string>> Entries => map;
 
+    internal RoleMap Snapshot()
+    {
+        var copy = new RoleMap();
+        foreach (var entry in map)
+        {
+            copy.map[entry.Key] = entry.Value;
+        }
+
+        return copy;
+    }
+
 }

@@ -146,7 +146,6 @@ public sealed class PortableDocument
         viewerPreferences?.OwnedBy(null);
         viewerPreferences = null;
         acroForm = null;
-        RoleMap = new RoleMap();
         infoLoaded = false;
         attachmentsLoaded = false;
         outlineLoaded = false;
