@@ -141,7 +141,7 @@ public class LaidOutContractTests
             HorizontalScale = 0.83,
         };
         run.Font.Family = BuildTestSupport.Latin;
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var paint = GeometryCapture.Fragment(run, run.Font, capture);
         var positioned = GeometryCapture.PositionSpans(
             document.Fonts.CaptureGlyphRun(run.Text, run.Font),

@@ -9,7 +9,6 @@ internal sealed class BlockLayoutCache(
     int count,
     double contentWidth,
     FontCollection fonts,
-    Func<Image, double, (double Width, double Height)>? measureImage,
     LoweringResult lowering,
     LayoutCaptureContext capture)
 {
@@ -23,7 +22,6 @@ internal sealed class BlockLayoutCache(
             table,
             contentWidth,
             fonts,
-            measureImage,
             lowering,
             capture);
 
@@ -32,7 +30,6 @@ internal sealed class BlockLayoutCache(
             container,
             Math.Max(0, contentWidth - lowering.BlockIndent(container)),
             fonts,
-            measureImage,
             lowering,
             capture);
 }
@@ -58,7 +55,6 @@ internal static class NextBlockHeightResolver
         int index,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         out double spacingBefore,
         out double height)
@@ -76,7 +72,6 @@ internal static class NextBlockHeightResolver
             layouts,
             contentWidth,
             fonts,
-            measureImage,
             resolution);
         var result = LoweredBlockDispatch.Dispatch(blocks[next], handler, next);
         spacingBefore = result.SpacingBefore;
@@ -89,7 +84,6 @@ internal static class NextBlockHeightResolver
         BlockLayoutCache layouts,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution)
         : ILoweredBlockHandler<int, NextBlockHeight>
     {
@@ -115,9 +109,7 @@ internal static class NextBlockHeightResolver
         public NextBlockHeight Image(Image image, int next)
         {
             var availableWidth = Math.Max(0, contentWidth - resolution.BlockIndent(image));
-            var (_, imageHeight) = measureImage is null
-                ? ImageProbe.Measure(image, availableWidth)
-                : measureImage(image, availableWidth);
+            var (_, imageHeight) = layouts.Capture.Probes.Measure(image, availableWidth);
             return new NextBlockHeight { Found = true, Height = imageHeight };
         }
 

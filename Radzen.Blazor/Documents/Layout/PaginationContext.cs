@@ -9,7 +9,6 @@ internal sealed class PaginationContext
 {
     private readonly List<LaidOutPage> pages;
     private readonly FontCollection fonts;
-    private readonly Func<Image, double, (double Width, double Height)>? measureImage;
     private readonly LoweringResult resolution;
     private readonly LayoutCaptureContext capture;
     private LaidOutWatermark? watermark;
@@ -33,7 +32,6 @@ internal sealed class PaginationContext
     public PaginationContext(
         FontCollection fonts,
         List<LaidOutPage> pages,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture,
         int pageNumberOffset,
@@ -41,7 +39,6 @@ internal sealed class PaginationContext
     {
         this.pages = pages;
         this.fonts = fonts;
-        this.measureImage = measureImage;
         this.resolution = resolution;
         this.capture = capture;
         this.pageNumberOffset = pageNumberOffset;
@@ -69,14 +66,12 @@ internal sealed class PaginationContext
             section.Header,
             contentWidth,
             fonts,
-            measureImage,
             resolution,
             capture);
         var footerLayout = BandLayouter.Layout(
             section.Footer,
             contentWidth,
             fonts,
-            measureImage,
             resolution,
             capture);
         header = headerLayout.Content.Build();
@@ -97,7 +92,6 @@ internal sealed class PaginationContext
             Blocks.Count,
             contentWidth,
             fonts,
-            measureImage,
             resolution,
             capture);
         Broken = new IReadOnlyList<LineBox>?[Blocks.Count];
@@ -132,8 +126,6 @@ internal sealed class PaginationContext
     internal double AvailableHeight => contentHeight;
 
     internal FontCollection Fonts => fonts;
-
-    internal Func<Image, double, (double Width, double Height)>? MeasureImage => measureImage;
 
     internal LoweringResult Resolution => resolution;
 
@@ -308,7 +300,6 @@ internal sealed class PaginationContext
             container,
             AvailableWidth(container),
             fonts,
-            measureImage,
             resolution,
             capture,
             listIndent);
@@ -337,7 +328,7 @@ internal sealed class PaginationContext
     {
         var indent = resolution.BlockIndent(image);
         var availableWidth = AvailableWidth(image);
-        var (imageWidth, imageHeight) = FlowContentPlacer.MeasureImage(image, availableWidth, measureImage);
+        var (imageWidth, imageHeight) = capture.Probes.Measure(image, availableWidth);
         EnsureFits(imageHeight);
         PlaceMarker(image);
 
@@ -435,7 +426,6 @@ internal sealed class PaginationContext
                     index,
                     contentWidth,
                     fonts,
-                    measureImage,
                     resolution,
                     out var nextSpacingBefore,
                     out var nextHeight))
@@ -537,7 +527,6 @@ internal sealed class PaginationContext
                     container,
                     owner.AvailableWidth(container),
                     owner.fonts,
-                    owner.measureImage,
                     owner.resolution,
                     capture: owner.capture).BoxHeight;
             }
@@ -547,10 +536,7 @@ internal sealed class PaginationContext
         }
 
         public double Image(Image image, int index)
-            => FlowContentPlacer.MeasureImage(
-                image,
-                owner.AvailableWidth(image),
-                owner.measureImage).Height;
+            => owner.capture.Probes.Measure(image, owner.AvailableWidth(image)).Height;
 
         public double CodeSymbol(Block block, int index)
             => CodeSymbolDispatch.Measure(

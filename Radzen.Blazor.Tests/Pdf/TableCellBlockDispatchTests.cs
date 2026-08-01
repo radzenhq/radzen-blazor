@@ -65,7 +65,7 @@ public class TableCellBlockDispatchTests
     {
         var (table, cell) = CellTable();
         var qr = cell.Blocks.AddQrCode("RADZEN", Unit.FromPoint(60));
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
 
         var laid = LayOut(table, capture);
 
@@ -82,7 +82,7 @@ public class TableCellBlockDispatchTests
             "RADZEN",
             Unit.FromPoint(120),
             Unit.FromPoint(40));
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
 
         var laid = LayOut(table, capture);
 

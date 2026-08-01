@@ -54,7 +54,7 @@ public class ImageProbeParityTests
         var data = Bytes(resource);
         var expected = ImageDecoder.PixelSize(ImageDecoder.Decode(data));
 
-        Assert.Equal(expected, ImageProbe.PixelSize(data));
+        Assert.Equal(expected, ImageProbes.None.PixelSize(data));
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class ImageProbeParityTests
     {
         var data = Concat([0xFF, 0x4F], Siz(width, height, components));
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbe.PixelSize(data));
+        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Theory]
@@ -75,7 +75,7 @@ public class ImageProbeParityTests
     {
         var data = Jp2File(width, height, components);
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbe.PixelSize(data));
+        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ImageProbeParityTests
     {
         var data = Jp2FileCodestreamOnly(6, 2, components: 1);
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbe.PixelSize(data));
+        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Fact]
@@ -93,11 +93,11 @@ public class ImageProbeParityTests
     [Fact]
     public void TruncatedPng_Throws()
         => Assert.Throws<InvalidDataException>(
-            () => ImageProbe.PixelSize([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]));
+            () => ImageProbes.None.PixelSize([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]));
 
     [Fact]
     public void JpegWithoutStartOfFrame_Throws()
-        => Assert.Throws<InvalidDataException>(() => ImageProbe.PixelSize([0xFF, 0xD8, 0xFF, 0xD9]));
+        => Assert.Throws<InvalidDataException>(() => ImageProbes.None.PixelSize([0xFF, 0xD8, 0xFF, 0xD9]));
 
     private static byte[] Siz(int width, int height, int components)
     {

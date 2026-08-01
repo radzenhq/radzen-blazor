@@ -12,7 +12,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class ResourceKeyRegistryTests
 {
-    private static readonly LayoutCaptureContext Capture = new();
+    private static readonly LayoutCaptureContext Capture = new(ImageProbes.None);
 
     private static PagePlan Plan() => new() { Size = PageSizes.A4 };
 

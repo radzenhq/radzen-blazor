@@ -37,7 +37,7 @@ internal static class WatermarkPlanner
         double availableWidth,
         LayoutCaptureContext capture)
     {
-        var (width, height) = ImageProbe.Measure(image, availableWidth);
+        var (width, height) = capture.Probes.Measure(image, availableWidth);
         return new LaidOutWatermarkImage
         {
             Source = capture.Source(image),

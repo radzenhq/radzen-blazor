@@ -55,7 +55,7 @@ public class HeaderFooterTests
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out var header, out _);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.All(pages, p => Assert.NotEmpty(p.HeaderLayer.Lines));
@@ -68,7 +68,7 @@ public class HeaderFooterTests
         var fonts = PaginationSupport.Fonts();
         var section = BuildMultiPage(fonts, out _, out var footer);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.All(pages, p => Assert.NotEmpty(p.FooterLayer.Lines));

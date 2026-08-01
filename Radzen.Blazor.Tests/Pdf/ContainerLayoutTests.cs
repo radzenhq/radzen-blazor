@@ -110,7 +110,7 @@ public class ContainerLayoutTests
         table.Rows.Add().Cells[0].Blocks.Add(Text("Band table"));
         section.Blocks.Add(Text("Body"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
         var page = Assert.Single(pages);
 
@@ -152,7 +152,7 @@ public class ContainerLayoutTests
         var inner = outer.Blocks.Add(new Container { Padding = Unit.FromPoint(5) });
         inner.Blocks.Add(Text("Deep"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         var box = Assert.Single(Assert.Single(pages).Body.Boxes);
@@ -285,7 +285,7 @@ public class ContainerLayoutTests
         deep.Inlines.Add("deep cell").Font.Family = PaginationSupport.Family;
         cell.Blocks.Add(container);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
 
         var laidCell = Assert.Single(layout.Cells);
@@ -346,7 +346,7 @@ public class ContainerLayoutTests
         outer.Blocks.Add(inner);
         cell.Blocks.Add(outer);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var layout = IsolatedTableLayout.LayoutIsolated(table, 300, fonts, capture: capture);
 
         var outerBox = Assert.Single(Assert.Single(layout.Cells).Boxes);

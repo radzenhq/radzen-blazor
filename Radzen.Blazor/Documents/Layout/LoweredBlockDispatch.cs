@@ -41,7 +41,6 @@ internal static class LoweredBlockDispatch
         Table table,
         double contentWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult lowering,
         LayoutCaptureContext capture)
     {
@@ -50,7 +49,6 @@ internal static class LoweredBlockDispatch
             table,
             Math.Max(0, contentWidth - indent - table.LeftIndent.Point),
             fonts,
-            measureImage,
             lowering,
             capture,
             indent);

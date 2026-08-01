@@ -9,15 +9,14 @@ namespace Radzen.Documents.Layout;
 internal static class DocumentLayouter
 {
     public static LaidOutDocument Layout(Document document)
-        => Layout(document, ImageProbe.Registered);
+        => Layout(document, ImageProbes.None);
 
     public static LaidOutDocument Layout(Document document, ImageProbes probes)
     {
         ArgumentNullException.ThrowIfNull(probes);
         var fonts = document.Fonts;
         var resolution = StyleResolver.Resolve(document);
-        var measureImage = probes.Measure;
-        var first = LayoutPass(document, fonts, resolution, measureImage, null);
+        var first = LayoutPass(document, fonts, resolution, probes, null);
 
         if (!HasTableOfContents(document))
         {
@@ -28,14 +27,14 @@ internal static class DocumentLayouter
         ValidateTocAnchors(document, tocPages);
 
         var entries = TocAnchors(document);
-        var second = LayoutPass(document, fonts, resolution, measureImage, tocPages);
+        var second = LayoutPass(document, fonts, resolution, probes, tocPages);
         var settled = AnchorPages(second.Pages);
         if (AnchorsStable(tocPages, settled, entries))
         {
             return Resolve(second, document, fonts);
         }
 
-        var third = LayoutPass(document, fonts, resolution, measureImage, settled);
+        var third = LayoutPass(document, fonts, resolution, probes, settled);
         if (!AnchorsStable(settled, AnchorPages(third.Pages), entries))
         {
             throw new InvalidOperationException(
@@ -114,10 +113,10 @@ internal static class DocumentLayouter
         Document document,
         FontCollection fonts,
         StyleResolution resolution,
-        Func<Image, double, (double Width, double Height)>? measureImage,
+        ImageProbes probes,
         IReadOnlyDictionary<string, int>? tocPages)
     {
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(probes);
         var semanticCapture = SemanticSnapshotBuilder.Capture(document, resolution, capture);
         var lowering = semanticCapture.Lowering;
         var pages = new List<LaidOutPage>();
@@ -134,7 +133,6 @@ internal static class DocumentLayouter
                 fonts,
                 lowering,
                 capture,
-                measureImage,
                 tocPages,
                 pages.Count,
                 index))

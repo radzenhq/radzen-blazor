@@ -14,14 +14,12 @@ internal static class IsolatedPaginator
     public static ImmutableArray<LaidOutPage> PaginateIsolated(
         Section section,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage = null,
         LayoutCaptureContext? capture = null)
         => Radzen.Documents.Layout.Paginator.Paginate(
             section,
             fonts,
             LoweringResult.CreateForDocument(StyleResolution.Empty),
-            capture ?? new LayoutCaptureContext(),
-            measureImage,
+            capture ?? new LayoutCaptureContext(ImageProbes.None),
             tocPages: null);
 }
 
@@ -31,15 +29,13 @@ internal static class IsolatedTableLayout
         Table table,
         double availableWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage = null,
         LayoutCaptureContext? capture = null)
         => Radzen.Documents.Layout.TableLayout.Layout(
             table,
             availableWidth,
             fonts,
-            measureImage,
             LoweringResult.CreateForDocument(StyleResolution.Empty),
-            capture ?? new LayoutCaptureContext());
+            capture ?? new LayoutCaptureContext(ImageProbes.None));
 }
 
 internal static class IsolatedTablePaginator
@@ -53,7 +49,7 @@ internal static class IsolatedTablePaginator
             layout,
             source,
             availableHeight,
-            capture ?? new LayoutCaptureContext());
+            capture ?? new LayoutCaptureContext(ImageProbes.None));
 
     public static IReadOnlyList<LaidOutTableSlice> Paginate(
         LaidOutTable layout,
@@ -66,7 +62,7 @@ internal static class IsolatedTablePaginator
             source,
             firstAvailable,
             subsequentAvailable,
-            capture ?? new LayoutCaptureContext());
+            capture ?? new LayoutCaptureContext(ImageProbes.None));
 }
 
 internal static class IsolatedLineBreaker
@@ -82,7 +78,7 @@ internal static class IsolatedLineBreaker
             paragraph,
             maxWidthPoints,
             fonts,
-            capture ?? new LayoutCaptureContext(),
+            capture ?? new LayoutCaptureContext(ImageProbes.None),
             inheritedAlignment,
             resolution);
 }

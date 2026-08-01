@@ -29,7 +29,7 @@ public class FieldResolverRunPropertiesTests
         var resolver = new FieldResolver(
             new FontCollection(),
             LoweringResult.CreateForDocument(StyleResolution.Empty),
-            new LayoutCaptureContext());
+            new LayoutCaptureContext(ImageProbes.None));
         var line = Assert.Single(resolver.ResolveFields(paragraph, 500, 7, 10, null, 1));
         var resolved = Assert.Single(line.Fragments).Paint;
 
@@ -57,7 +57,7 @@ public class FieldResolverRunPropertiesTests
         var resolver = new FieldResolver(
             new FontCollection(),
             LoweringResult.CreateForDocument(StyleResolution.Empty),
-            new LayoutCaptureContext());
+            new LayoutCaptureContext(ImageProbes.None));
         var line = Assert.Single(resolver.ResolveFields(paragraph, 500, 7, 10, null, 1));
 
         Assert.Equal(2, line.Fragments.Select(fragment => fragment.Source).Distinct().Count());

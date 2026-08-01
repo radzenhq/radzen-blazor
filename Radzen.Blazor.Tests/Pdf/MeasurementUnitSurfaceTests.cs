@@ -14,7 +14,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class MeasurementUnitSurfaceTests
 {
-    private static readonly LayoutCaptureContext Capture = new();
+    private static readonly LayoutCaptureContext Capture = new(ImageProbes.None);
 
     private static GradientStop[] Stops() =>
     [

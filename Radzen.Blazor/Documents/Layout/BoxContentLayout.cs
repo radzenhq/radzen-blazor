@@ -226,11 +226,10 @@ internal static class BoxContentLayout
         HorizontalAlignment align,
         VerticalAlignment vAlign,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
         => Position(
-            Measure(blocks, contentBox.Width, align, fonts, measureImage, resolution, capture),
+            Measure(blocks, contentBox.Width, align, fonts, resolution, capture),
             contentBox,
             align,
             vAlign);
@@ -240,7 +239,6 @@ internal static class BoxContentLayout
         double contentWidth,
         HorizontalAlignment? align,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture)
     {
@@ -248,7 +246,6 @@ internal static class BoxContentLayout
             contentWidth,
             align,
             fonts,
-            measureImage,
             resolution,
             capture);
         foreach (var block in BlockExpander.ExpandBlocks(blocks, contentWidth, resolution))

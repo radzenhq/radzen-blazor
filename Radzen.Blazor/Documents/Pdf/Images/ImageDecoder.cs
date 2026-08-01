@@ -21,8 +21,8 @@ public static class ImageDecoder
     /// <summary>
     /// Registers a custom <see cref="IImageDecoder"/> so a new image format can be decoded. The
     /// built-in PNG, JPEG and JPEG2000 decoders are tried first; registered decoders are tried after
-    /// them in registration order. Registration also bridges the decoder to the renderer-neutral
-    /// size probe layout measures with, so a custom format paginates the same way in every renderer.
+    /// them in registration order. The decoder's pixel-size probe travels with it, so a custom
+    /// format paginates the same way in every renderer that uses a set seeded from this one.
     /// </summary>
     /// <param name="decoder">The decoder to register.</param>
     public static void Register(IImageDecoder decoder)
@@ -30,12 +30,6 @@ public static class ImageDecoder
         ArgumentNullException.ThrowIfNull(decoder);
         lock (RegisterGate)
         {
-            if (registered.Contains(decoder))
-            {
-                return;
-            }
-
-            ImageProbe.RegisterSizeProbe(ImageDecoders.SizeProbe(decoder));
             registered = registered.Add(decoder);
         }
     }
@@ -64,7 +58,7 @@ public static class ImageDecoder
     internal static (double Width, double Height) PixelSize(DecodedImage image) => (image.Width, image.Height);
 
     internal static (double Width, double Height) Measure(Image image, DecodedImage decoded, double availableWidth)
-        => ImageProbe.Measure(image, decoded.Width, decoded.Height, availableWidth);
+        => ImageMetrics.Measure(image, decoded.Width, decoded.Height, availableWidth);
 
     internal static DecodedImage ApplyOptions(DecodedImage image, bool interpolate)
         => interpolate ? image.Interpolated() : image;
@@ -86,14 +80,11 @@ public static class ImageDecoder
     {
         private readonly ImageDecoders decoders = registered;
 
-        private readonly ImageProbes probes = ImageProbe.Registered;
-
         public void Dispose()
         {
             lock (RegisterGate)
             {
                 registered = decoders;
-                ImageProbe.Restore(probes);
             }
         }
     }

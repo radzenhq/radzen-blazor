@@ -44,7 +44,15 @@ internal sealed class ImageProbes
         ArgumentNullException.ThrowIfNull(image);
 
         var pixels = PixelSize(image.Data);
-        return ImageProbe.Measure(image, pixels.Width, pixels.Height, availableWidth);
+        return ImageMetrics.Measure(image, pixels.Width, pixels.Height, availableWidth);
+    }
+
+    public (double Width, double Height) Measure(InlineImage image)
+    {
+        ArgumentNullException.ThrowIfNull(image);
+
+        var pixels = PixelSize(image.Data);
+        return ImageMetrics.DeriveSize(image.Width, image.Height, pixels.Width, pixels.Height);
     }
 
     private ImageInfo Probe(byte[] data)

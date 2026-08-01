@@ -1,15 +1,18 @@
+using System;
 using System.Collections.Generic;
 using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
-internal sealed class LayoutCaptureContext
+internal sealed class LayoutCaptureContext(ImageProbes probes)
 {
     private readonly Dictionary<object, SourceId> sources = new(ReferenceEqualityComparer.Instance);
     private readonly List<object> sourceValues = [];
     private readonly Dictionary<byte[], SceneImageData> images = new(ReferenceEqualityComparer.Instance);
     private readonly Dictionary<object, LaidOutNodeId> paints = new(ReferenceEqualityComparer.Instance);
     private int nextNodeId;
+
+    public ImageProbes Probes { get; } = probes ?? throw new ArgumentNullException(nameof(probes));
 
     public LaidOutNodeId Node() => new(nextNodeId++);
 

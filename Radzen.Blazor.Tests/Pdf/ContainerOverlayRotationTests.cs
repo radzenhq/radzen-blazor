@@ -32,7 +32,7 @@ public class ContainerOverlayRotationTests
         var shortText = container.Blocks.Add(PaginationSupport.Text("Short"));
         var tallText = container.Blocks.Add(PaginationSupport.Text("Tall child that wraps onto multiple lines because the box is only four hundred points wide and this text is long"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
         var page = Assert.Single(pages);
 

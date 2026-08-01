@@ -46,7 +46,7 @@ public class KeepTogetherTests
         var fonts = PaginationSupport.Fonts();
         var (section, para) = BuildBoundary(fonts, keepTogether: true);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
@@ -79,7 +79,7 @@ public class KeepTogetherTests
         para.KeepTogether = true;
         section.Blocks.Add(para);
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Single(pages);
@@ -100,7 +100,7 @@ public class KeepTogetherTests
         section.Blocks.Add(heading);
         var body = section.Blocks.Add(PaginationSupport.Text("body"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
@@ -121,7 +121,7 @@ public class KeepTogetherTests
         var heading = section.Blocks.Add(PaginationSupport.Text("Heading"));
         var body = section.Blocks.Add(PaginationSupport.Text("body"));
 
-        var capture = new LayoutCaptureContext();
+        var capture = new LayoutCaptureContext(ImageProbes.None);
         var pages = IsolatedPaginator.PaginateIsolated(section, fonts, capture: capture);
 
         Assert.Equal(2, pages.Length);
