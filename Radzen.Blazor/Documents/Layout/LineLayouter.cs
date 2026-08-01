@@ -56,7 +56,6 @@ internal static partial class LineLayouter
             XOffset = marker.Indent,
             Advance = fonts.MeasureText(marker.Text, marker.Font),
             IsMarker = true,
-            Face = fonts.ResolveFace(marker.Font),
             GlyphRun = GeometryCapture.PositionSpans(
                 fonts.CaptureGlyphRun(marker.Text, marker.Font),
                 paint),
@@ -65,7 +64,6 @@ internal static partial class LineLayouter
         var (height, baseline) = Measure(fragments, 1, fonts);
         return new LineBox
         {
-            Fragments = fragments,
             ShapedRuns = ShapeRuns([fragment], fonts, capture),
             Width = 0,
             Height = height,
@@ -140,7 +138,7 @@ internal static partial class LineLayouter
         var (height, ascent) = FontExtent(captured, fonts);
         return new LineBox
         {
-            Fragments = [],
+            ShapedRuns = [],
             Width = 0,
             Height = height * paragraph.LineSpacing,
             Baseline = ascent,
@@ -528,7 +526,6 @@ internal static partial class LineLayouter
             var font = fragment.Paint.Font;
             fragments[i] = fragment with
             {
-                Face = fonts.ResolveFace(font),
                 GlyphRun = GeometryCapture.PositionSpans(
                     fonts.CaptureGlyphRun(fragment.Text, font),
                     fragment.Paint),
@@ -536,11 +533,9 @@ internal static partial class LineLayouter
         }
 
         var shapedRuns = ShapeRuns(fragments, fonts, context.Capture);
-        var immutableFragments = fragments.ToImmutableArray();
-        var (height, baseline) = Measure(immutableFragments, paragraph.LineSpacing, fonts);
+        var (height, baseline) = Measure(fragments.ToImmutableArray(), paragraph.LineSpacing, fonts);
         return new LineBox
         {
-            Fragments = immutableFragments,
             ShapedRuns = shapedRuns,
             Width = width,
             Height = height,
@@ -558,8 +553,22 @@ internal static partial class LineLayouter
         while (i < fragments.Count)
         {
             var current = fragments[i];
-            var run = current.Source;
             var paint = current.Paint;
+            if (paint.InlineImage is not null)
+            {
+                runs.Add(new ShapedTextRun
+                {
+                    Fragments = [current],
+                    Paint = paint,
+                    XOffset = current.XOffset,
+                    IsMarker = current.IsMarker,
+                    GlyphRun = current.GlyphRun,
+                });
+                i++;
+                continue;
+            }
+
+            var run = current.Source;
             var text = capture.Resolve<Inline>(run) is TextInline inline ? inline.LayoutText : string.Empty;
             var end = current.Start + current.Length;
             var right = current.XOffset + current.Advance;
@@ -604,24 +613,20 @@ internal static partial class LineLayouter
                     paint)
                 : current.GlyphRun;
 
-            if (paint.InlineImage is null)
+            var covered = ImmutableArray.CreateBuilder<LineFragment>(j - i);
+            for (var k = i; k < j; k++)
             {
-                var sources = ImmutableArray.CreateBuilder<ShapedRunSource>(j - i);
-                for (var k = i; k < j; k++)
-                {
-                    sources.Add(new ShapedRunSource(fragments[k].Source, fragments[k].Start, fragments[k].Length));
-                }
-
-                runs.Add(new ShapedTextRun
-                {
-                    FirstFragment = i,
-                    Paint = paint,
-                    XOffset = current.XOffset,
-                    IsMarker = current.IsMarker,
-                    GlyphRun = glyphRun,
-                    Sources = sources.MoveToImmutable(),
-                });
+                covered.Add(fragments[k]);
             }
+
+            runs.Add(new ShapedTextRun
+            {
+                Fragments = covered.MoveToImmutable(),
+                Paint = paint,
+                XOffset = current.XOffset,
+                IsMarker = current.IsMarker,
+                GlyphRun = glyphRun,
+            });
 
             i = j;
         }

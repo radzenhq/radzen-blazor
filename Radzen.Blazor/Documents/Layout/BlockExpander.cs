@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Layout;
 

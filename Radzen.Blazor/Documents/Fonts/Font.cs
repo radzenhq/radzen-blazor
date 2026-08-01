@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents.Fonts;
 
 
@@ -30,10 +32,11 @@ public sealed class Font : ITracksChanges
 
     /// <summary>Gets or sets the font size set directly on this font, or <see langword="null"/> when none is
     /// set and the size is inherited. Setting <see langword="null"/> resets it and is tracked as a change.</summary>
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
     public Unit? Size
     {
         get => size;
-        set => tracker.Set(ref size, value);
+        set => tracker.Set(ref size, AuthoredNumber.Absolute(value, "Font.Size"));
     }
 
     /// <summary>Gets or sets the bold flag set directly on this font, or <see langword="null"/> when none is
@@ -92,7 +95,7 @@ public sealed class Font : ITracksChanges
 
     internal bool EffectiveStrikethrough => strikethrough ?? false;
 
-    internal Color EffectiveColor => color ?? Radzen.Documents.Color.Black;
+    internal Color EffectiveColor => color ?? Core.Color.Black;
 
     internal FontValues Effective() => new()
     {

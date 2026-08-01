@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Codes;
 

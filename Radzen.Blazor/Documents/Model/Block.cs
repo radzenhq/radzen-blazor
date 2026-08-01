@@ -8,7 +8,7 @@ namespace Radzen.Documents;
 /// </summary>
 public abstract class Block
 {
-    internal Block()
+    private protected Block()
     {
     }
 

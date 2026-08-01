@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 namespace Radzen.Documents;
 
 
@@ -162,6 +163,8 @@ public sealed class TocEntryCollection : IReadOnlyList<TocEntry>
 /// </summary>
 public sealed class TableOfContents : Block
 {
+    private Unit levelIndent = Unit.FromPoint(12);
+
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     /// <summary>Gets the entries, in the order their lines are rendered.</summary>
@@ -179,7 +182,12 @@ public sealed class TableOfContents : Block
     /// <summary>
     /// Gets or sets the indentation applied per <see cref="TocEntry.Level"/>. Defaults to 12pt.
     /// </summary>
-    public Unit LevelIndent { get; set; } = Unit.FromPoint(12);
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit LevelIndent
+    {
+        get => levelIndent;
+        set => levelIndent = AuthoredNumber.Absolute(value, "TableOfContents.LevelIndent");
+    }
 
     /// <summary>
     /// Adds an entry.

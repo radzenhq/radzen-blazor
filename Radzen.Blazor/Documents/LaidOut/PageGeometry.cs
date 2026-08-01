@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.LaidOut;
 

@@ -1,4 +1,5 @@
 using Radzen.Documents.Codes;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -15,7 +16,7 @@ public sealed class QrCode : Block
     internal QrCode(string value, Unit size)
     {
         Value = value;
-        Size = size;
+        Size = AuthoredNumber.Absolute(size, "QrCode.Size");
     }
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);

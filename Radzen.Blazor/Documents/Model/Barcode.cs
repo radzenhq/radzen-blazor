@@ -1,5 +1,6 @@
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Codes;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -15,8 +16,8 @@ public sealed class Barcode : Block
     {
         Type = type;
         Value = value;
-        Width = width;
-        Height = height;
+        Width = AuthoredNumber.Absolute(width, "Barcode.Width");
+        Height = AuthoredNumber.Absolute(height, "Barcode.Height");
     }
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);

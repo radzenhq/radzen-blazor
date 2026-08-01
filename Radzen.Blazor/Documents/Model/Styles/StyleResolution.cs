@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Radzen.Documents.Fonts;
 
-namespace Radzen.Documents.Layout;
+namespace Radzen.Documents;
 
 internal sealed class StyleResolution
 {

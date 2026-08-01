@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Core;
 
 
 /// <summary>

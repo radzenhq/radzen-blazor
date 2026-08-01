@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents;
 
 
@@ -6,17 +8,42 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Margins
 {
+    private Unit top;
+    private Unit right;
+    private Unit bottom;
+    private Unit left;
+
     /// <summary>Gets or sets the top margin.</summary>
-    public Unit Top { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Top
+    {
+        get => top;
+        set => top = AuthoredNumber.Absolute(value, "Margins.Top");
+    }
 
     /// <summary>Gets or sets the right margin.</summary>
-    public Unit Right { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Right
+    {
+        get => right;
+        set => right = AuthoredNumber.Absolute(value, "Margins.Right");
+    }
 
     /// <summary>Gets or sets the bottom margin.</summary>
-    public Unit Bottom { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Bottom
+    {
+        get => bottom;
+        set => bottom = AuthoredNumber.Absolute(value, "Margins.Bottom");
+    }
 
     /// <summary>Gets or sets the left margin.</summary>
-    public Unit Left { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Left
+    {
+        get => left;
+        set => left = AuthoredNumber.Absolute(value, "Margins.Left");
+    }
 
     /// <summary>
     /// Sets every edge to the same value.

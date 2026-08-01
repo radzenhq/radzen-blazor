@@ -1,4 +1,5 @@
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 namespace Radzen.Documents;
 
 
@@ -12,6 +13,7 @@ public sealed class List : Block
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     private Unit? hangingIndent;
+    private Unit leftIndent;
 
     /// <summary>Gets or sets the marker style. Defaults to <see cref="ListStyle.Bullet"/>.</summary>
     public ListStyle Style { get; set; } = ListStyle.Bullet;
@@ -20,13 +22,18 @@ public sealed class List : Block
     public Font Font { get; } = new();
 
     /// <summary>Gets or sets the indent of the whole list (the marker column) from the content-box left edge.</summary>
-    public Unit LeftIndent { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit LeftIndent
+    {
+        get => leftIndent;
+        set => leftIndent = AuthoredNumber.Absolute(value, "List.LeftIndent");
+    }
 
     /// <summary>Gets or sets the distance from the marker column to the item content. Defaults to 18 points.</summary>
     public Unit HangingIndent
     {
         get => hangingIndent ?? Unit.FromPoint(18);
-        set => hangingIndent = value;
+        set => hangingIndent = AuthoredNumber.Absolute(value, "List.HangingIndent");
     }
 
     /// <summary>Gets the list items.</summary>

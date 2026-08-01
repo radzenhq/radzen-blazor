@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents;
 
 
@@ -7,9 +9,15 @@ namespace Radzen.Documents;
 public sealed class Column
 {
     private double? relativeWidth;
+    private Unit? width;
 
     /// <summary>Gets or sets the fixed column width, or <see langword="null"/> for automatic sizing.</summary>
-    public Unit? Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative. Use <see cref="RelativeWidth"/>.</exception>
+    public Unit? Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "Column.Width");
+    }
 
     /// <summary>
     /// Gets or sets the star (relative) width weight. Columns without a fixed <see cref="Width"/>

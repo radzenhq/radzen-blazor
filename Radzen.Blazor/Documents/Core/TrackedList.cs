@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Core;
 
 internal sealed class TrackedList<T> : IList<T>, IReadOnlyList<T>
 {

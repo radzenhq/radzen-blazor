@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Layout;
 
@@ -122,6 +123,7 @@ internal sealed class CodeSymbolCellItem : BlockCellItem<Block>
         {
             Source = placement.Capture.Source(Block),
             Modules = CodeSymbolDispatch.Modules(Block),
+            Foreground = CodeSymbolDispatch.Foreground(Block),
             Width = Width,
             Height = Height,
             Caption = Caption,

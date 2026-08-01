@@ -4,6 +4,7 @@ using System;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Layout;
 
@@ -23,6 +24,9 @@ internal static class CodeSymbolDispatch
 
     public static ImmutableArray<CodeSymbolModule> Modules(Block block)
         => Shape(block)?.Modules ?? [];
+
+    public static Color Foreground(Block block)
+        => Shape(block)?.Foreground ?? Color.Black;
 
     public static ImmutableArray<LaidOutCaptionLine>? Caption(
         Block block,
@@ -46,6 +50,8 @@ internal static class CodeSymbolDispatch
     {
         public abstract HorizontalAlignment Alignment { get; }
 
+        public abstract Color Foreground { get; }
+
         public abstract ImmutableArray<CodeSymbolModule> Modules { get; }
 
         public abstract (double Width, double Height) Size(
@@ -62,6 +68,8 @@ internal static class CodeSymbolDispatch
     private sealed class QrCodeShape(QrCode qr) : CodeSymbolShape
     {
         public override HorizontalAlignment Alignment => qr.Alignment;
+
+        public override Color Foreground => Color.Black;
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,
@@ -110,6 +118,8 @@ internal static class CodeSymbolDispatch
     private sealed class BarcodeShape(Barcode barcode) : CodeSymbolShape
     {
         public override HorizontalAlignment Alignment => barcode.Alignment;
+
+        public override Color Foreground => Color.Black;
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,

@@ -1,6 +1,6 @@
 using System;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Core;
 
 internal static class ColorComponent
 {

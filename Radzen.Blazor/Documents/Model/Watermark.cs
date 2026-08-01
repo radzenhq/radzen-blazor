@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
