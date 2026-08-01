@@ -31,7 +31,7 @@ internal static class PaginationSupport
 
     public const double LiberationSansLineHeightPerEm = (1854 + 434 + 67) / 2048.0;
 
-    public const double BuiltInLineHeightPerEm = 1.2;
+    public const double BuiltInLineHeightPerEm = (931 - -225) / 1000.0;
 
     public static double LineHeight(double size = 12, double spacing = 1.0)
         => size * LiberationSansLineHeightPerEm * spacing;

@@ -91,8 +91,20 @@ internal static partial class LineLayouter
                 face.Ascent * size / unitsPerEm);
         }
 
+        if (BuiltInFontMetrics.Resolve(BuiltInPaint(font)) is { } builtIn)
+        {
+            var metrics = builtIn.Face().Metrics;
+            var unitsPerEm = metrics.DesignUnitsPerEm;
+            return (
+                (metrics.BBoxTop - metrics.BBoxBottom) * size / unitsPerEm,
+                metrics.BBoxTop * size / unitsPerEm);
+        }
+
         return (size * 1.2, size * 0.9);
     }
+
+    private static FontPaint BuiltInPaint(in FontPaint font)
+        => string.IsNullOrEmpty(font.Family) ? font with { Family = Font.DefaultFamily } : font;
 
     private readonly record struct LinePlacement(double Width, HyphenPlacement Hyphen);
 

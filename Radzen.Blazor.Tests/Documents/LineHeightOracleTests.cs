@@ -15,8 +15,8 @@ public class LineHeightOracleTests
         => Assert.Equal(2355.0 / 2048.0, PaginationSupport.LiberationSansLineHeightPerEm, 12);
 
     [Fact]
-    public void BuiltInLineHeightPerEm_IsTheFlatOnePointTwoFactor()
-        => Assert.Equal(1.2, PaginationSupport.BuiltInLineHeightPerEm, 12);
+    public void BuiltInLineHeightPerEm_IsHelveticaFontBBoxTopMinusBottomOverUnitsPerEm()
+        => Assert.Equal(1156.0 / 1000.0, PaginationSupport.BuiltInLineHeightPerEm, 12);
 
     [Theory]
     [InlineData(8)]

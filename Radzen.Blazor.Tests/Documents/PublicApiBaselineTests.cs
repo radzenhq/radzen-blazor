@@ -38,7 +38,14 @@ public class PublicApiBaselineTests
     [Fact]
     public void EveryDocumentNamespaceWithPublicTypes_IsCoveredByTheBaseline()
     {
-        var covered = typeof(Document).Assembly.GetTypes()
+        var baselined = Baseline()
+            .Where(line => line.StartsWith(NamespaceRoot, StringComparison.Ordinal))
+            .Select(line => line.IndexOf(" = ", StringComparison.Ordinal) is var separator and > 0
+                ? line[..separator]
+                : line)
+            .ToList();
+
+        var discovered = typeof(Document).Assembly.GetTypes()
             .Where(IsVisibleOutside)
             .Select(type => type.Namespace)
             .Where(space => space is { } declared
@@ -47,9 +54,10 @@ public class PublicApiBaselineTests
             .Distinct()
             .ToList();
 
-        Assert.All(covered, space => Assert.Contains(
-            Surface(),
-            line => line.Contains(space + ".", StringComparison.Ordinal)));
+        Assert.NotEmpty(discovered);
+        Assert.All(discovered, space => Assert.Contains(
+            baselined,
+            name => name.StartsWith(space + ".", StringComparison.Ordinal)));
     }
 
     internal static IReadOnlyList<string> Surface()

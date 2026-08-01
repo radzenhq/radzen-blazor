@@ -364,7 +364,6 @@ public static Radzen.Documents.Core.Rect.op_Inequality(Radzen.Documents.Core.Rec
 public virtual Radzen.Documents.Core.Rect.Equals(System.Object? obj) : System.Boolean
 public virtual Radzen.Documents.Core.Rect.GetHashCode() : System.Int32
 Radzen.Documents.Core.ResourceLimits = public class
-public Radzen.Documents.Core.ResourceLimits..ctor()
 public Radzen.Documents.Core.ResourceLimits.MaxFileBytes : System.Int64 { public get; public init; }
 public Radzen.Documents.Core.ResourceLimits.MaxImagePixels : System.Int64 { public get; public init; }
 public static Radzen.Documents.Core.ResourceLimits.Default : Radzen.Documents.Core.ResourceLimits { public get; }

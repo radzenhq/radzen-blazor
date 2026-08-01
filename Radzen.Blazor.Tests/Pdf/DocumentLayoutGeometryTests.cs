@@ -416,6 +416,6 @@ public class DocumentLayoutGeometryTests
         page 1 size 400.00x400.00 content 20.00,20.00,360.00,360.00
           body line y=0.00 w=47.36 h=13.80 baseline=10.86 fragments=2 source=0
           body code y=13.80 x=0.00 w=120.00 h=120.00 source=1
-          body code y=133.80 x=0.00 w=200.00 h=52.00 source=2
+          body code y=133.80 x=0.00 w=200.00 h=51.56 source=2
         """;
 }

@@ -16,6 +16,10 @@ public class ResourceLimits
 
     internal const long DefaultMaxImagePixels = 64L * 1024 * 1024;
 
+    private protected ResourceLimits()
+    {
+    }
+
     /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
     public long MaxImagePixels { get; init; } = DefaultMaxImagePixels;
 

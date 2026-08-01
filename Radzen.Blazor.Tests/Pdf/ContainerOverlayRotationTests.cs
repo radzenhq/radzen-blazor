@@ -291,7 +291,7 @@ public class ContainerOverlayRotationTests
 
 
     private const string PlainContainerDeclarationOrderSha256 =
-        "4e82c628d63f8bb3cf0894604151cfc292ad96bd6cdaea1e792ef403bb86c2d7";
+        "5cb57cc73877efeba6dbb2dbe2d88d062428312a972c42b33d4f2ee962d6f5d5";
 
     [Fact]
     public void PlainVerticalContainer_BuildBytes_MatchDeclarationOrderBaseline()
@@ -315,7 +315,7 @@ public class ContainerOverlayRotationTests
     }
 
     private const string PlainOverlayDeclarationOrderSha256 =
-        "0e24ec2536bef0f1647ea38deb2cbf673946390f39453ef57e53f70ac88d0efc";
+        "6a12437ab1adc8cf03cac5fe53e954ce5d3a47071049c69ea79938ab9c228d24";
 
     [Fact]
     public void PlainOverlayContainer_BuildBytes_MatchDeclarationOrderBaseline()
