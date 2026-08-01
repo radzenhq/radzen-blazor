@@ -85,7 +85,7 @@ public class ContainerOverlayRotationTests
         var page = Assert.Single(pdf.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
-        Assert.Contains("re f", content);
+        Assert.True(ContentOperationTestHelpers.HasSequence(page.GetContent()!, "re", "f"));
         var under = content.IndexOf("(UNDERLAY) Tj", StringComparison.Ordinal);
         var over = content.IndexOf("(OVERLAY) Tj", StringComparison.Ordinal);
         Assert.True(under >= 0, "first child present");
@@ -204,25 +204,24 @@ public class ContainerOverlayRotationTests
             writer,
             text,
             new PlannedFont(new OutputFont(text.Font.Key, text.Font.Base14, null), null));
-        var content = Encoding.ASCII.GetString(writer.ToArray());
+        var drawn = writer.ToArray();
 
-        var lines = content.Split('\n');
-        Assert.Equal(1, lines.Count(line => line == "q"));
-        Assert.Equal(1, lines.Count(line => line == "Q"));
-        Assert.Equal("q", lines[0]);
-        Assert.Equal("Q", lines[^2]);
+        var operators = ContentOperationTestHelpers.Operators(drawn);
+        Assert.Equal(1, operators.Count(op => op == "q"));
+        Assert.Equal(1, operators.Count(op => op == "Q"));
+        Assert.Equal("q", operators[0]);
+        Assert.Equal("Q", operators[^1]);
 
-        var cm = Assert.Single(lines, line => line.EndsWith(" cm", StringComparison.Ordinal));
-        var operands = cm[..^3].Split(' ').Select(v => double.Parse(v, CultureInfo.InvariantCulture)).ToArray();
+        var cm = Assert.Single(ContentStreamTokenizer.Parse(drawn), op => op.Operator == "cm");
         var (cos, sin) = (Math.Cos(Math.PI / 6), Math.Sin(Math.PI / 6));
         double[] expected = [cos, sin, -sin, cos, 100 - (100 * cos) + (200 * sin), 200 - (100 * sin) - (200 * cos)];
-        Assert.Equal(6, operands.Length);
+        Assert.Equal(6, cm.Operands.Count);
         for (var i = 0; i < 6; i++)
         {
-            Assert.True(Math.Abs(expected[i] - operands[i]) < 1e-3, $"cm operand {i}: expected {expected[i]}, got {operands[i]}");
+            Assert.True(Math.Abs(expected[i] - cm.Num(i)) < 1e-3, $"cm operand {i}: expected {expected[i]}, got {cm.Num(i)}");
         }
 
-        Assert.True(content.IndexOf(" cm\n", StringComparison.Ordinal) < content.IndexOf("BT\n", StringComparison.Ordinal));
+        Assert.True(operators.IndexOf("cm") < operators.IndexOf("BT"));
     }
 
     [Fact]
@@ -287,8 +286,7 @@ public class ContainerOverlayRotationTests
 
         var pdf = new DocumentRenderer().Render(document);
         var page = Assert.Single(pdf.Pages);
-        var content = Encoding.ASCII.GetString(page.GetContent()!);
-        Assert.Contains(" gs", content);
+        Assert.Contains("gs", ContentOperationTestHelpers.Operators(page.GetContent()!));
     }
 
 
@@ -363,9 +361,9 @@ public class ContainerOverlayRotationTests
         var page = Assert.Single(pdf.Pages);
         var content = Encoding.ASCII.GetString(page.GetContent()!);
 
-        Assert.Contains("h\nf\n", content);
-        Assert.Contains("h\nS\n", content);
-        Assert.DoesNotContain("re f", content);
+        Assert.True(ContentOperationTestHelpers.HasSequence(page.GetContent()!, "h", "f"));
+        Assert.True(ContentOperationTestHelpers.HasSequence(page.GetContent()!, "h", "S"));
+        Assert.False(ContentOperationTestHelpers.HasSequence(page.GetContent()!, "re", "f"));
         var over = content.IndexOf("(Rounded overlay) Tj", StringComparison.Ordinal);
         Assert.True(over >= 0, "child text present over the rounded decoration");
     }

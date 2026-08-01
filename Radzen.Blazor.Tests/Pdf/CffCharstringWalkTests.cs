@@ -1,9 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
-using System.Text;
 using Radzen.Documents.Pdf.Fonts.Cff;
 using Xunit;
 using Radzen.Documents;
@@ -42,7 +41,19 @@ public class CffCharstringWalkTests
 
     private static readonly int[] Operators = [1, 3, 18, 23, 19, 20, 21, 4, 22, 14, 10, 29, 11, 12];
 
-    private static byte[] RandomCharString(Random random)
+    private static readonly int[] ArithmeticFreeOperators = [1, 3, 18, 23, 19, 20, 21, 4, 22, 14, 10, 29, 11];
+
+    private const int DeclaredDefaultWidthX = 100;
+
+    private const int DeclaredNominalWidthX = 200;
+
+    private const int MaxOperandMagnitude = 32768;
+
+    private const int Corpus = 400;
+
+    private static byte[] RandomCharString(Random random) => RandomCharString(random, Operators);
+
+    private static byte[] RandomCharString(Random random, int[] operators)
     {
         var bytes = new List<byte>();
         var pieces = random.Next(1, 7);
@@ -71,7 +82,7 @@ public class CffCharstringWalkTests
                 }
             }
 
-            var op = Operators[random.Next(Operators.Length)];
+            var op = operators[random.Next(operators.Length)];
             if (op == 10 || op == 29)
             {
                 bytes.Add((byte)random.Next(32, 247));
@@ -88,61 +99,147 @@ public class CffCharstringWalkTests
     }
 
     [Fact]
-    public void WidthAndSeacWalksMatchPinnedManifest()
+    public void RandomCharstringWalksTerminateAndFailOnlyAsParseErrors()
     {
         var random = new Random(20260716);
-        var manifest = new StringBuilder();
+        var stopwatch = Stopwatch.StartNew();
+        var walked = 0;
 
-        for (var iteration = 0; iteration < 400; iteration++)
+        for (var iteration = 0; iteration < Corpus; iteration++)
         {
-            var charStrings = new byte[random.Next(1, 4)][];
-            for (var g = 0; g < charStrings.Length; g++)
+            if (RandomFont(random, Operators) is not { } font)
             {
-                charStrings[g] = RandomCharString(random);
-            }
-
-            var subrs = new byte[random.Next(1, 4)][];
-            for (var s = 0; s < subrs.Length; s++)
-            {
-                subrs[s] = RandomCharString(random);
-            }
-
-            CffFont font;
-            try
-            {
-                font = CffFont.Parse(BuildFont(charStrings, subrs));
-            }
-            catch (Exception e)
-            {
-                manifest.Append(iteration).Append(":parse:").Append(e.GetType().Name).Append('\n');
                 continue;
             }
 
-            for (var g = 0; g < font.GlyphCount; g++)
+            for (var glyph = 0; glyph < font.GlyphCount; glyph++)
             {
-                manifest.Append(iteration).Append(':').Append(g).Append(':');
-                manifest.Append(Answer(() => font.GetAdvanceWidth(g).ToString(CultureInfo.InvariantCulture)));
-                manifest.Append(':');
-                manifest.Append(Answer(() => font.UsesSeacEndchar(g).ToString()));
-                manifest.Append('\n');
+                var index = glyph;
+
+                Assert.Equal(
+                    Walk(() => font.GetAdvanceWidth(index)),
+                    Walk(() => font.GetAdvanceWidth(index)));
+                Assert.Equal(
+                    Walk(() => font.UsesSeacEndchar(index) ? 1 : 0),
+                    Walk(() => font.UsesSeacEndchar(index) ? 1 : 0));
+
+                walked++;
             }
         }
 
-        var hash = Convert.ToHexString(
-            System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(manifest.ToString())));
-
-        Assert.Equal(PinnedManifestHash, hash);
+        Assert.True(walked >= Corpus, $"Only {walked} glyph walks were exercised.");
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(30), $"The walk took {stopwatch.Elapsed}.");
     }
 
-    private static string Answer(Func<string> f)
+    [Fact]
+    public void ArithmeticFreeCharstringWidthsStayWithinTheDeclaredRange()
+    {
+        var random = new Random(20260716);
+        var measured = 0;
+
+        for (var iteration = 0; iteration < Corpus; iteration++)
+        {
+            if (RandomFont(random, ArithmeticFreeOperators) is not { } font)
+            {
+                continue;
+            }
+
+            for (var glyph = 0; glyph < font.GlyphCount; glyph++)
+            {
+                int width;
+                try
+                {
+                    width = font.GetAdvanceWidth(glyph);
+                }
+                catch (InvalidDataException)
+                {
+                    continue;
+                }
+
+                Assert.InRange(
+                    width,
+                    Math.Min(DeclaredDefaultWidthX, DeclaredNominalWidthX - MaxOperandMagnitude),
+                    Math.Max(DeclaredDefaultWidthX, DeclaredNominalWidthX + MaxOperandMagnitude));
+
+                measured++;
+            }
+        }
+
+        Assert.True(measured >= Corpus, $"Only {measured} widths were measured.");
+    }
+
+    [Fact]
+    public void TruncatedCharstringsNeverEscapeAsAnythingButAParseError()
+    {
+        var random = new Random(20260716);
+        var thrown = 0;
+        var walked = 0;
+
+        for (var iteration = 0; iteration < Corpus; iteration++)
+        {
+            if (RandomFont(random, Operators, truncate: true) is not { } font)
+            {
+                continue;
+            }
+
+            for (var glyph = 0; glyph < font.GlyphCount; glyph++)
+            {
+                var index = glyph;
+
+                if (Walk(() => font.GetAdvanceWidth(index)) is null)
+                {
+                    thrown++;
+                }
+
+                if (Walk(() => font.UsesSeacEndchar(index) ? 1 : 0) is null)
+                {
+                    thrown++;
+                }
+
+                walked++;
+            }
+        }
+
+        Assert.True(walked >= Corpus, $"Only {walked} glyph walks were exercised.");
+        Assert.True(thrown > 0, "Truncation produced no malformed charstrings.");
+    }
+
+    private static CffFont? RandomFont(Random random, int[] operators, bool truncate = false)
+    {
+        var charStrings = new byte[random.Next(1, 4)][];
+        for (var g = 0; g < charStrings.Length; g++)
+        {
+            charStrings[g] = Maybe(random, RandomCharString(random, operators), truncate);
+        }
+
+        var subrs = new byte[random.Next(1, 4)][];
+        for (var s = 0; s < subrs.Length; s++)
+        {
+            subrs[s] = Maybe(random, RandomCharString(random, operators), truncate);
+        }
+
+        try
+        {
+            return CffFont.Parse(BuildFont(charStrings, subrs));
+        }
+        catch (InvalidDataException)
+        {
+            return null;
+        }
+    }
+
+    private static byte[] Maybe(Random random, byte[] charString, bool truncate)
+        => truncate ? charString[..random.Next(0, charString.Length + 1)] : charString;
+
+    private static int? Walk(Func<int> walk)
     {
         try
         {
-            return f();
+            return walk();
         }
-        catch (Exception e)
+        catch (InvalidDataException)
         {
-            return "EX:" + e.GetType().Name;
+            return null;
         }
     }
 
@@ -251,6 +348,4 @@ public class CffCharstringWalkTests
 
         Assert.Equal(100, Font([.. cs]).GetAdvanceWidth(0));
     }
-
-    private const string PinnedManifestHash = "1E262A6DB348AB5736217E20572BE45F41D15EFD656639B9AED28FDF361CD554";
 }

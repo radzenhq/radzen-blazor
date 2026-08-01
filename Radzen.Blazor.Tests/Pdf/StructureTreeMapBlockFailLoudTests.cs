@@ -43,7 +43,7 @@ public class StructureTreeMapBlockFailLoudTests
         row.IsHeaderRow = true;
         TableLayoutSupport.Fill(row.Cells[0], "Cell");
 
-        var list = new List();
+        var list = new ListBlock();
         var item = list.AddItem();
         item.Font.Family = BuildTestSupport.Latin;
         item.Inlines.Add("One").Font.Family = BuildTestSupport.Latin;

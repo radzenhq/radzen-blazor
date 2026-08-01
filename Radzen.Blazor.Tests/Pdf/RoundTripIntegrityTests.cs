@@ -129,9 +129,12 @@ public class RoundTripIntegrityTests
         var leaves = BuildTestSupport.PageLeaves(reader);
         Assert.Single(leaves);
 
-        var operators = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
-        Assert.Contains("BT", operators, StringComparison.Ordinal);
-        Assert.Contains("(Hello Flate) Tj", operators, StringComparison.Ordinal);
+        var content = BuildTestSupport.Content(reader, leaves[0].Page);
+        Assert.Contains("BT", ContentOperationTestHelpers.Operators(content));
+        Assert.Contains(
+            ContentStreamTokenizer.Parse(content),
+            operation => operation.Operator == "Tj"
+                && Encoding.Latin1.GetString(operation.Operands[0].Bytes) == "Hello Flate");
     }
 
     [Fact]
@@ -158,7 +161,7 @@ public class RoundTripIntegrityTests
 
         var content = built.Pages[0].GetContent();
         Assert.NotNull(content);
-        Assert.Contains("BT", Encoding.Latin1.GetString(content!), StringComparison.Ordinal);
+        Assert.Contains("BT", ContentOperationTestHelpers.Operators(content!));
     }
 
     [Fact]
@@ -181,9 +184,9 @@ public class RoundTripIntegrityTests
         var leaves = BuildTestSupport.PageLeaves(reader);
         Assert.Single(leaves);
 
-        var operators = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
-        Assert.Contains("BT", operators, StringComparison.Ordinal);
-        Assert.Contains("Tj", operators, StringComparison.Ordinal);
+        var operators = ContentOperationTestHelpers.Operators(BuildTestSupport.Content(reader, leaves[0].Page));
+        Assert.Contains("BT", operators);
+        Assert.Contains("Tj", operators);
     }
 
 

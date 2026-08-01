@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -58,11 +57,11 @@ public class PdfUaArtifactTests
         return (document, builderRenderer);
     }
 
-    private static string ContentStringOf((Document Document, DocumentRenderer Renderer) authored)
+    private static byte[] ContentOf((Document Document, DocumentRenderer Renderer) authored)
     {
         var reader = BuildTestSupport.Read(authored.Document, authored.Renderer);
         var page = BuildTestSupport.PageLeaves(reader)[0].Page;
-        return Encoding.Latin1.GetString(BuildTestSupport.Content(reader, page));
+        return BuildTestSupport.Content(reader, page);
     }
 
     private static readonly HashSet<string> PaintingOps = new(StringComparer.Ordinal)
@@ -129,8 +128,13 @@ public class PdfUaArtifactTests
     [Fact]
     public void TaggedDocument_HeaderContentIsInsideArtifact()
     {
-        var content = ContentStringOf(AuthorBanded(ua: true));
-        Assert.Contains("/Artifact <</Type /Pagination>> BDC", content, StringComparison.Ordinal);
+        var tags = ContentOperationTestHelpers.Tags(ContentOf(AuthorBanded(ua: true)));
+
+        Assert.Contains(
+            tags,
+            tag => tag.Tag == "Artifact"
+                && tag.Properties.TryGetValue("Type", out var type)
+                && type == "Pagination");
     }
 
     [Fact]
@@ -146,8 +150,9 @@ public class PdfUaArtifactTests
     [Fact]
     public void PlainDocument_IsNotWrappedInArtifact()
     {
-        var content = ContentStringOf(AuthorBanded(ua: false));
-        Assert.DoesNotContain("/Artifact", content, StringComparison.Ordinal);
+        var tags = ContentOperationTestHelpers.Tags(ContentOf(AuthorBanded(ua: false)));
+
+        Assert.DoesNotContain(tags, tag => tag.Tag == "Artifact");
     }
 
     [Fact]

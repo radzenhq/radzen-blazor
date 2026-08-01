@@ -82,10 +82,10 @@ public class PageBoxTests
 
         var bytes = Plain().ToArray();
         Assert.Equal(bytes, Plain().ToArray());
-        var text = Encoding.Latin1.GetString(bytes);
-        Assert.DoesNotContain("/BleedBox", text);
-        Assert.DoesNotContain("/TrimBox", text);
-        Assert.DoesNotContain("/ArtBox", text);
+        var page = ContentTestHelpers.Kid(DocumentReader.Parse(bytes), 0);
+        Assert.False(page.ContainsKey("BleedBox"));
+        Assert.False(page.ContainsKey("TrimBox"));
+        Assert.False(page.ContainsKey("ArtBox"));
     }
 
     [Fact]

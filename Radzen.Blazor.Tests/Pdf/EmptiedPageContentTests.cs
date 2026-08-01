@@ -173,7 +173,7 @@ public class EmptiedPageContentTests
         loaded.Pages[0].Content.Clear();
         var resaved = loaded.ToArray();
 
-        Assert.DoesNotContain("re", Encoding.ASCII.GetString(InterpreterTestSupport.PageContentBytes(resaved, 0)));
+        Assert.DoesNotContain("re", ContentOperationTestHelpers.Operators(InterpreterTestSupport.PageContentBytes(resaved, 0)));
         Assert.Equal(
             InterpreterTestSupport.PageContentBytes(original, 1),
             InterpreterTestSupport.PageContentBytes(resaved, 1));

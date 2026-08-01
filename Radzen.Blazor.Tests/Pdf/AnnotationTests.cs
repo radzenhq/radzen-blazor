@@ -138,7 +138,7 @@ public class AnnotationTests
 
         Assert.Empty(page.Annotations);
         Assert.False(DocumentLoadTests.Kid(DocumentReader.Parse(bytes), 0).ContainsKey("Annots"));
-        Assert.Contains(" rg", Encoding.ASCII.GetString(page.GetContent() ?? DocumentLoadTests.KidContent(DocumentReader.Parse(bytes), 0)), StringComparison.Ordinal);
+        Assert.Contains("rg", ContentOperationTestHelpers.Operators(page.GetContent() ?? DocumentLoadTests.KidContent(DocumentReader.Parse(bytes), 0)));
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class AnnotationTests
 
         Assert.Empty(Load(bytes).Pages[0].Annotations);
         Assert.IsType<NullObject>(page["Annots"]);
-        Assert.Contains("Do", Encoding.ASCII.GetString(DocumentLoadTests.KidContent(reader, 0)), StringComparison.Ordinal);
+        Assert.Contains("Do", ContentOperationTestHelpers.Operators(DocumentLoadTests.KidContent(reader, 0)));
         Assert.NotNull(reader.GetDictionary(Assert.IsType<DictionaryObject>(page["Resources"]), "XObject"));
     }
 

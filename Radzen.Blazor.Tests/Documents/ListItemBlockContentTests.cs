@@ -42,7 +42,7 @@ public class ListItemBlockContentTests
     [Fact]
     public void Blocks_RejectAListAttachedToItsOwnItem()
     {
-        var list = new List();
+        var list = new ListBlock();
         var item = list.AddItem("item");
 
         Assert.Throws<InvalidOperationException>(() => item.Blocks.Add(list));
@@ -51,7 +51,7 @@ public class ListItemBlockContentTests
     [Fact]
     public void TextInlinesAndNestedList_RemainTerseCompatibilityPaths()
     {
-        var list = new List();
+        var list = new ListBlock();
         var item = list.AddItem("one");
         item.Inlines.Add(" two");
         var nested = item.AddList(ListStyle.Number);

@@ -52,9 +52,9 @@ public class FlateWritePathTests
         var contents = FirstPageContents(reader);
         var decoded = RequireFlate(reader, contents);
 
-        var text = Encoding.Latin1.GetString(decoded);
-        Assert.Contains("BT", text, StringComparison.Ordinal);
-        Assert.Contains("Tf", text, StringComparison.Ordinal);
+        var operators = ContentOperationTestHelpers.Operators(decoded);
+        Assert.Contains("BT", operators);
+        Assert.Contains("Tf", operators);
     }
 
     [Fact]

@@ -101,12 +101,15 @@ public class BuildEndToEndTests
         var leaves = BuildTestSupport.PageLeaves(reader);
         Assert.Single(leaves);
 
-        var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
+        var content = BuildTestSupport.Content(reader, leaves[0].Page);
+        var placement = Assert.Single(
+            ContentStreamTokenizer.Parse(content),
+            operation => operation.Operator == "cm" && operation.Num(0) == 200);
 
-        Assert.Matches(
-            @"200(?:\.0+)?\s+0(?:\.0+)?\s+0(?:\.0+)?\s+100(?:\.0+)?\s+[-\d.]+\s+[-\d.]+\s+cm",
-            content);
-        Assert.Matches(@"/\w+\s+Do", content);
+        Assert.Equal(0, placement.Num(1));
+        Assert.Equal(0, placement.Num(2));
+        Assert.Equal(100, placement.Num(3));
+        Assert.NotEmpty(ContentOperationTestHelpers.ResourceNames(content, "Do"));
     }
 
     [Fact]
@@ -125,7 +128,7 @@ public class BuildEndToEndTests
         new DocumentRenderer().Render(document).SaveToStream(expected);
 
         Assert.NotEmpty(viaSave);
-        Assert.Equal(expected.ToArray().Length, viaSave.Length);
+        Assert.Equal(expected.ToArray(), viaSave);
 
         using var buffer = new MemoryStream(viaSave);
         var reloaded = PortableDocument.LoadFromStream(buffer);

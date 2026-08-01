@@ -21,7 +21,7 @@ public class SoftMaskDedupTests
         OffsetY: 3,
         Spread: 1);
 
-    private static int SoftMaskStates(PagePlan plan) => plan.ExtGStates.Count(s => s.SoftMask is not null);
+    private static int SoftMaskStates(PagePlan plan) => plan.Resources.ExtGStates.Count(s => s.SoftMask is not null);
 
     [Fact]
     public void IdenticalShadows_ShareOneSoftMaskState()

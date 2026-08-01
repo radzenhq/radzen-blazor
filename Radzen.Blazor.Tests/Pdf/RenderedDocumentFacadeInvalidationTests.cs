@@ -114,7 +114,7 @@ public class RenderedDocumentFacadeInvalidationTests
     {
         var rendered = new DocumentRenderer().Render(Authored());
         var immediate = rendered.ToArray();
-        Assert.DoesNotContain("/ID", Encoding.Latin1.GetString(immediate), StringComparison.Ordinal);
+        Assert.False(DocumentReader.Parse(immediate).Trailer.ContainsKey("ID"));
 
         rendered.IncludeDocumentId = true;
 

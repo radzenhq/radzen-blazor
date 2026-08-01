@@ -120,7 +120,7 @@ public sealed class ContentWriter : IDisposable
     public string RegisterImage(byte[] encodedImage)
     {
         ArgumentNullException.ThrowIfNull(encodedImage);
-        return RegisterImage(decoders.Decode(encodedImage, ReaderLimits.Default));
+        return RegisterImage(decoders.Decode(encodedImage));
     }
 
     /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>

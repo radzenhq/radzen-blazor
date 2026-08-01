@@ -73,9 +73,9 @@ public class ListFontCascadeTests
         Assert.NotEmpty(fonts);
         Assert.All(fonts, font => Assert.Equal("Type0", BuildTestSupport.Name(reader, font, "Subtype")));
 
-        var leaves = BuildTestSupport.PageLeaves(reader);
-        var content = Encoding.Latin1.GetString(BuildTestSupport.Content(reader, leaves[0].Page));
-        Assert.DoesNotContain("Helvetica", content, StringComparison.Ordinal);
+        Assert.All(
+            fonts,
+            font => Assert.NotEqual("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont")));
 
         Assert.Contains("Embedded item", BuildTestSupport.Reload(document, builderRenderer).Pages[0].ExtractText(), StringComparison.Ordinal);
     }

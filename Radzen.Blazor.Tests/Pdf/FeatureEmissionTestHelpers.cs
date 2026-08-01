@@ -7,8 +7,10 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 internal static class FeatureEmissionTestHelpers
 {
-    public static string Content(Document document)
-        => Encoding.Latin1.GetString(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
+    public static byte[] ContentBytes(Document document)
+        => ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0);
+
+    public static string Content(Document document) => Encoding.Latin1.GetString(ContentBytes(document));
 
     public static Paragraph Text(string text)
     {

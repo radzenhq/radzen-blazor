@@ -48,9 +48,11 @@ public class InheritedDefaultAppearanceTests
         document.Flatten();
 
         var reader = FormTestSupport.Reload(document);
-        var content = FormTestSupport.PageContentText(reader);
+        var sizes = ContentStreamTokenizer.Parse(FormTestSupport.PageContentBytes(reader))
+            .FindAll(operation => operation.Operator == "Tf")
+            .ConvertAll(operation => operation.Num(1));
 
-        Assert.Contains("9 Tf", content);
-        Assert.DoesNotContain("12 Tf", content);
+        Assert.Contains(9d, sizes);
+        Assert.DoesNotContain(12d, sizes);
     }
 }

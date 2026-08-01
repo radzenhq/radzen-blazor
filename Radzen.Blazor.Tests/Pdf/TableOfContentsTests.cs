@@ -119,11 +119,13 @@ public class TableOfContentsTests
     [Fact]
     public void Toc_IndentsEntries_ByLevel()
     {
-        var content = Encoding.Latin1.GetString(
-            ContentTestHelpers.PageContent(BuildTestSupport.Read(ChapterDocument()), 0));
+        var content = ContentTestHelpers.PageContent(BuildTestSupport.Read(ChapterDocument()), 0);
+        var starts = ContentStreamTokenizer.Parse(content)
+            .FindAll(operation => operation.Operator == "Td")
+            .ConvertAll(operation => operation.Num(0));
 
-        Assert.Contains("40 ", content, StringComparison.Ordinal);
-        Assert.Contains("52 ", content, StringComparison.Ordinal);
+        Assert.Contains(40d, starts);
+        Assert.Contains(52d, starts);
     }
 
     [Fact]

@@ -96,7 +96,7 @@ internal static class FormTestSupport
         return Decode((StreamObject)normal);
     }
 
-    public static string Decode(StreamObject stream)
+    public static byte[] DecodeBytes(StreamObject stream)
     {
         var data = stream.Data.ToArray();
         if (stream.Dictionary.TryGetValue("Filter", out var filter)
@@ -105,14 +105,19 @@ internal static class FormTestSupport
             data = FlateFilter.Decode(data);
         }
 
-        return Encoding.Latin1.GetString(data);
+        return data;
     }
 
-    public static string PageContentText(DocumentReader reader)
+    public static string Decode(StreamObject stream) => Encoding.Latin1.GetString(DecodeBytes(stream));
+
+    public static byte[] PageContentBytes(DocumentReader reader)
     {
         var page = FirstPage(reader);
         Assert.True(page.TryGetValue("Contents", out var contents), "page has no /Contents");
         var resolved = reader.Resolve(contents!);
-        return resolved is StreamObject stream ? Decode(stream) : string.Empty;
+        return resolved is StreamObject stream ? DecodeBytes(stream) : [];
     }
+
+    public static string PageContentText(DocumentReader reader)
+        => Encoding.Latin1.GetString(PageContentBytes(reader));
 }

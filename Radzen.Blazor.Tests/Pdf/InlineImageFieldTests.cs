@@ -29,9 +29,17 @@ public class InlineImageFieldTests
         number.Font.Size = 12;
 
         var reader = BuildTestSupport.Read(document);
-        var content = Encoding.Latin1.GetString(ContentTestHelpers.PageContent(reader, 0));
+        var content = ContentTestHelpers.PageContent(reader, 0);
+        var operations = ContentStreamTokenizer.Parse(content);
 
-        Assert.Matches(new Regex(@"40(?:\.0+)?\s+0\S*\s+0\S*\s+30(?:\.0+)?\s+[-\d.]+\s+[-\d.]+\s+cm"), content);
-        Assert.Contains("(1) Tj", content);
+        Assert.Contains(
+            operations,
+            operation => operation.Operator == "cm"
+                && operation.Num(0) == 40 && operation.Num(1) == 0
+                && operation.Num(2) == 0 && operation.Num(3) == 30);
+        Assert.Contains(
+            operations,
+            operation => operation.Operator == "Tj"
+                && Encoding.Latin1.GetString(operation.Operands[0].Bytes) == "1");
     }
 }

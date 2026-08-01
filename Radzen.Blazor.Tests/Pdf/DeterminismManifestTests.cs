@@ -161,6 +161,27 @@ public class DeterminismManifestTests
         return new DocumentRenderer().ToArray(document);
     }
 
+    private static byte[] FlatLists()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(400));
+        section.Margins.SetAll(Unit.FromPoint(0));
+
+        var bullets = section.Blocks.AddList(ListStyle.Bullet);
+        bullets.HangingIndent = Unit.FromPoint(20);
+        bullets.AddItem("Alpha");
+        bullets.AddItem("Beta");
+
+        var numbers = section.Blocks.AddList(ListStyle.Number);
+        numbers.LeftIndent = Unit.FromPoint(6);
+        numbers.AddItem("One");
+        numbers.AddItem("Two");
+        numbers.AddItem("Three");
+
+        return new DocumentRenderer().ToArray(document);
+    }
+
     private static byte[] Encrypted()
     {
         var document = new PortableDocument();
@@ -212,6 +233,7 @@ public class DeterminismManifestTests
         yield return new object[] { "image", (Func<byte[]>)Image };
         yield return new object[] { "gradients", (Func<byte[]>)Gradients };
         yield return new object[] { "overlapping-z-order", (Func<byte[]>)OverlappingZOrder };
+        yield return new object[] { "flat-lists", (Func<byte[]>)FlatLists };
         yield return new object[] { "encrypted", (Func<byte[]>)Encrypted };
         yield return new object[] { "signed", (Func<byte[]>)Signed };
         yield return new object[] { "timestamped", (Func<byte[]>)Timestamped };
@@ -225,6 +247,7 @@ public class DeterminismManifestTests
         ["image"] = "d85431f2632cdccfc4699270f92007c5ce74cb1f9e96c10f0af9c140a6b3ef0f",
         ["gradients"] = "ea3c0eec05d7c73e4895c3b1a9a0605ee7903c5e626020e079743c259e217a2e",
         ["overlapping-z-order"] = "aad96ec8fd20b1124d003a8e8be6d2d71ffdcb5c3b03905f597b1b7825e21ae9",
+        ["flat-lists"] = "52508af33626bd972f78f37217ed1f2c8ccb38eccd2fcc74a0d56cefbb4dd09d",
         ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
         ["signed"] = "ab5875e082b064a4ed84920dc14b9801da372bb9cbbe9036e7cb6a4289ec2fd7",
         ["timestamped"] = "bc6d540a6e43addae1e74627e6c972f3c8c23abb4bd72ef7e43f5c64acd7dd49",

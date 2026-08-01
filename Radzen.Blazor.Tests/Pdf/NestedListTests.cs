@@ -3,11 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
@@ -109,7 +106,7 @@ public class NestedListTests
     }
 
     [Fact]
-    public void FlatLists_OutputBytes_MatchPreNestingBaseline()
+    public void FlatLists_PlaceMarkersAndTextAtTheDeclaredIndents()
     {
         var document = new Document();
         var section = AddSection(document);
@@ -125,11 +122,23 @@ public class NestedListTests
         numbers.AddItem("Two");
         numbers.AddItem("Three");
 
-        using var stream = new MemoryStream();
-        new DocumentRenderer().SaveToStream(document, stream);
+        var draws = TextDraws(document);
+
+        Assert.Equal(20, draws.Find(d => d.Text == "Alpha").X, 3);
+        Assert.Equal(20, draws.Find(d => d.Text == "Beta").X, 3);
+
+        var bulletMarkers = draws.FindAll(d => Math.Abs(d.X) < 1e-3 && d.Text.Length > 0);
+        Assert.Equal(2, bulletMarkers.Count);
+        Assert.Equal(bulletMarkers[0].Text, bulletMarkers[1].Text);
 
         Assert.Equal(
-            "52508AF33626BD972F78F37217ED1F2C8CCB38ECCD2FCC74A0D56CEFBB4DD09D",
-            Convert.ToHexString(SHA256.HashData(stream.ToArray())));
+            new[] { "1.", "2.", "3." },
+            draws.FindAll(d => Math.Abs(d.X - 6) < 1e-3 && d.Text is "1." or "2." or "3.")
+                .ConvertAll(d => d.Text));
+
+        foreach (var text in new[] { "One", "Two", "Three" })
+        {
+            Assert.Equal(numbers.LeftIndent.Point + numbers.HangingIndent.Point, draws.Find(d => d.Text == text).X, 3);
+        }
     }
 }

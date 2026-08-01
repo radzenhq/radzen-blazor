@@ -198,14 +198,14 @@ public class NavigationOutlineTests
         var bytes = new DocumentRenderer().ToArray(PlainDocument());
         Assert.Equal(bytes, new DocumentRenderer().ToArray(PlainDocument()));
 
-        var text = Encoding.Latin1.GetString(bytes);
-        Assert.DoesNotContain("/Outlines", text);
-        Assert.DoesNotContain("/Dests", text);
-        Assert.DoesNotContain("/GoTo", text);
-        Assert.DoesNotContain("/Rotate", text);
-
         var reader = DocumentReader.Parse(bytes);
+        var catalog = ContentTestHelpers.Catalog(reader);
+        Assert.False(catalog.ContainsKey("Outlines"));
+        Assert.False(catalog.ContainsKey("Dests"));
+        Assert.False(catalog.ContainsKey("Names"));
+
         var page = ContentTestHelpers.Kid(reader, 0);
         Assert.False(page.ContainsKey("Rotate"));
+        Assert.False(page.ContainsKey("Annots"));
     }
 }

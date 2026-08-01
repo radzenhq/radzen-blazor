@@ -147,10 +147,11 @@ public class ImageStampOverlayRegressionTests
         var first = Assert.IsType<StreamObject>(reader.Resolve(contents[0]));
         Assert.Equal(original, reader.DecodeStream(first));
 
-        var overlay = Encoding.Latin1.GetString(
-            reader.DecodeStream(Assert.IsType<StreamObject>(reader.Resolve(contents[1]))));
-        Assert.Contains("STAMP", overlay, StringComparison.Ordinal);
-        Assert.Contains("Tj", overlay, StringComparison.Ordinal);
+        var overlay = reader.DecodeStream(Assert.IsType<StreamObject>(reader.Resolve(contents[1])));
+        Assert.Contains(
+            ContentStreamTokenizer.Parse(overlay),
+            operation => operation.Operator == "Tj"
+                && Encoding.Latin1.GetString(operation.Operands[0].Bytes).Contains("STAMP", StringComparison.Ordinal));
     }
 
     [Fact]

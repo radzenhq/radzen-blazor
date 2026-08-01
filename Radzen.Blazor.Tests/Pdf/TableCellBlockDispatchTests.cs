@@ -242,7 +242,7 @@ public class TableCellBlockDispatchTests
             case nameof(Image):
                 cell.Blocks.AddImage(new MemoryStream(Png()));
                 break;
-            case nameof(List):
+            case nameof(ListBlock):
                 var list = cell.Blocks.AddList();
                 list.Font.Family = TableLayoutSupport.Family;
                 list.AddItem("Alpha");

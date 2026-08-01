@@ -279,7 +279,10 @@ public class SemanticIntentCaptureTests
 
         var reader = BuildTestSupport.Read(document, Accessible());
 
-        Assert.All(FillTags(reader), tag => Assert.Equal("Artifact", tag));
+        var fills = FillTags(reader);
+
+        Assert.NotEmpty(fills);
+        Assert.All(fills, tag => Assert.Equal("Artifact", tag));
     }
 
     private static List<string> FillTags(DocumentReader reader)

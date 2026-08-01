@@ -72,9 +72,9 @@ public class PathContentStrokeStyleTests
         var path = Line();
         path.SetDash([3, 2], 1);
 
-        var content = Encoding.ASCII.GetString(Render(path));
+        var dash = Find(Render(path), "d");
 
-        Assert.Contains("[3 2] 1 d", content);
+        Assert.Equal([3d, 2d, 1d], dash.Operands.FindAll(o => o.Kind == ContentTokenKind.Number).ConvertAll(o => o.Number));
     }
 
     [Fact]

@@ -186,6 +186,6 @@ public class TextOpacityTests
         }
 
         Assert.Equal(Content(set: false), Content(set: true));
-        Assert.DoesNotContain(" gs\n", Encoding.ASCII.GetString(Content(set: true)), StringComparison.Ordinal);
+        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(Content(set: true)));
     }
 }

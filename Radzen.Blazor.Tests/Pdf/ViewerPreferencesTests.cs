@@ -73,11 +73,9 @@ public class ViewerPreferencesTests
         var bytes = Document().ToArray();
         Assert.Equal(bytes, Document().ToArray());
 
-        var text = Encoding.Latin1.GetString(bytes);
-        Assert.DoesNotContain("/ViewerPreferences", text);
-        Assert.DoesNotContain("/PageLayout", text);
-        Assert.DoesNotContain("/PageMode", text);
-
-        Assert.False(Catalog(bytes).ContainsKey("ViewerPreferences"));
+        var catalog = Catalog(bytes);
+        Assert.False(catalog.ContainsKey("ViewerPreferences"));
+        Assert.False(catalog.ContainsKey("PageLayout"));
+        Assert.False(catalog.ContainsKey("PageMode"));
     }
 }
