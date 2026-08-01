@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.LaidOut;
+using Radzen.Documents.Layout;
 using Xunit;
 using Radzen.Documents;
 
@@ -194,12 +196,96 @@ public class TaggedTableSemanticsTests
         var reader = BuildTestSupport.Read(Merged(rowSpan: 2, columnSpan: 2), Accessible());
         var root = TaggedStructureProbe.Root(reader);
 
-        var merged = TaggedStructureProbe.All(root, "TD")[0];
+        var merged = Assert.Single(TaggedStructureProbe.All(root, "TD"));
         var attributes = Attributes(reader, merged);
 
         Assert.Equal("Table", BuildTestSupport.Name(reader, attributes, "O"));
         Assert.Equal(2, BuildTestSupport.Int(attributes, "RowSpan"));
         Assert.Equal(2, BuildTestSupport.Int(attributes, "ColSpan"));
+    }
+
+    private static Document CombinedSpans()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Combined spans";
+        BuildTestSupport.RegisterLatin(document);
+
+        var table = document.Sections.Add().Blocks.AddTable();
+        table.Columns.Add();
+        table.Columns.Add();
+        table.Columns.Add();
+        table.Columns[2].IsHeaderColumn = true;
+
+        var first = table.Rows.Add();
+        first.IsHeaderRow = true;
+        first.Cells[0].RowSpan = 99;
+        first.Cells[0].ColumnSpan = 2;
+        TableLayoutSupport.Fill(first.Cells[0], "Merged");
+        TableLayoutSupport.Fill(first.Cells[1], "Top right");
+
+        var second = table.Rows.Add();
+        second.Cells[0].RowSpan = 99;
+        second.Cells[0].ColumnSpan = 99;
+        TableLayoutSupport.Fill(second.Cells[0], "Shifted header");
+
+        table.Rows.Add();
+        return document;
+    }
+
+    [Fact]
+    public void CombinedSpans_SemanticCellsExactlyMatchPhysicalPlacement()
+    {
+        var laidOut = DocumentLayouter.Layout(CombinedSpans());
+        var physical = Assert.Single(Assert.Single(laidOut.Pages).Body.Tables).Layout.Cells;
+        var structure = laidOut.Semantics.Structure;
+        var logical = structure.Nodes
+            .Where(node => node.Intent is SemanticIntent.TableCell or SemanticIntent.TableHeaderCell)
+            .ToList();
+        var logicalElements = logical
+            .Select(node => structure.Nodes.IndexOf(node))
+            .ToHashSet();
+        var associations = structure.Associations
+            .Where(association => logicalElements.Contains(association.Element))
+            .ToList();
+
+        Assert.Equal(3, physical.Length);
+        Assert.Equal(3, logical.Count);
+        Assert.Equal(3, associations.Count);
+        Assert.Equal(3, associations.Select(association => association.Source).Distinct().Count());
+        Assert.Equal(
+            physical.Select(cell => cell.Source).ToHashSet(),
+            associations.Select(association => association.Source).ToHashSet());
+
+        Assert.Equal(
+            [SemanticHeaderScope.ColumnHeader, SemanticHeaderScope.ColumnAndRowHeader, SemanticHeaderScope.RowHeader],
+            logical.Select(node => node.HeaderScope).ToArray());
+        Assert.Equal([(3, 2), (1, 1), (2, 1)], logical.Select(node => (node.RowSpan, node.ColumnSpan)).ToArray());
+    }
+
+    [Fact]
+    public void CombinedSpans_TaggedGridHasExactCountsScopesAndEffectiveSpans()
+    {
+        var reader = BuildTestSupport.Read(CombinedSpans(), Accessible());
+        var root = TaggedStructureProbe.Root(reader);
+        var headers = TaggedStructureProbe.All(root, "TH");
+
+        Assert.Equal(3, headers.Count);
+        Assert.Empty(TaggedStructureProbe.All(root, "TD"));
+        Assert.Equal(
+            ["Column", "Both", "Row"],
+            headers.Select(header => BuildTestSupport.Name(reader, Attributes(reader, header), "Scope")).ToArray());
+
+        var merged = Attributes(reader, headers[0]);
+        Assert.Equal(3, BuildTestSupport.Int(merged, "RowSpan"));
+        Assert.Equal(2, BuildTestSupport.Int(merged, "ColSpan"));
+
+        var unspanned = Attributes(reader, headers[1]);
+        Assert.False(unspanned.ContainsKey("RowSpan"));
+        Assert.False(unspanned.ContainsKey("ColSpan"));
+
+        var clamped = Attributes(reader, headers[2]);
+        Assert.Equal(2, BuildTestSupport.Int(clamped, "RowSpan"));
+        Assert.False(clamped.ContainsKey("ColSpan"));
     }
 
     [Fact]

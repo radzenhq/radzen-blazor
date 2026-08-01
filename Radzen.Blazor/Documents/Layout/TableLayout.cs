@@ -25,85 +25,50 @@ internal static class TableLayout
         Table table,
         double availableWidth,
         FontCollection fonts,
-        Func<Image, double, (double Width, double Height)>? measureImage,
         LoweringResult resolution,
         LayoutCaptureContext capture,
         double additionalLeftIndent = 0)
     {
-        var columnWidths = ResolveColumnWidths(table, availableWidth);
+        var placement = resolution.TablePlacement(table);
+        var columnWidths = ResolveColumnWidths(table, placement.ColumnCount, availableWidth);
         var columnX = Prefix(columnWidths);
 
         var nRows = table.Rows.Count;
-        var nCols = columnWidths.Length;
-        var occupied = new bool[nRows, nCols];
-        var placed = new List<MeasuredCell>();
+        var placed = new List<MeasuredCell>(placement.Cells.Count);
 
-        for (var r = 0; r < nRows; r++)
+        foreach (var placedCell in placement.Cells)
         {
-            var c = 0;
-            foreach (var cell in table.Rows[r].Cells)
+            var cell = placedCell.Cell;
+            double cellWidth = 0;
+            for (var column = placedCell.Column; column < placedCell.Column + placedCell.ColumnSpan; column++)
             {
-                while (c < nCols && occupied[r, c])
-                {
-                    c++;
-                }
-
-                if (c >= nCols)
-                {
-                    if (IsStructuralPlaceholder(cell))
-                    {
-                        continue;
-                    }
-
-                    throw new InvalidOperationException(
-                        $"Table row {r} has more cells than the {nCols}-column grid can place.");
-                }
-
-                var span = Math.Min(cell.ColumnSpan, nCols - c);
-                var rowSpan = Math.Min(cell.RowSpan, nRows - r);
-                var lastRow = r + rowSpan;
-                for (var rr = r; rr < lastRow; rr++)
-                {
-                    for (var cc = c; cc < c + span; cc++)
-                    {
-                        occupied[rr, cc] = true;
-                    }
-                }
-
-                double cellWidth = 0;
-                for (var cc = c; cc < c + span; cc++)
-                {
-                    cellWidth += columnWidths[cc];
-                }
-
-                var contentWidth = cellWidth - cell.EffectivePaddingLeft.Point - cell.EffectivePaddingRight.Point;
-                var align = cell.Alignment
-                    ?? resolution.CellAlignment(cell)
-                    ?? ColumnAlignment(table, c)
-                    ?? table.Rows[r].Alignment;
-                var content = BoxContentLayout.Measure(
-                    cell.Blocks,
-                    contentWidth,
-                    align,
-                    fonts,
-                    measureImage,
-                    resolution,
-                    capture);
-
-                placed.Add(new MeasuredCell
-                {
-                    Cell = cell,
-                    Row = r,
-                    Column = c,
-                    ColumnSpan = span,
-                    RowSpan = rowSpan,
-                    ContentWidth = contentWidth,
-                    Align = align,
-                    Content = content,
-                });
-
-                c += span;
+                cellWidth += columnWidths[column];
             }
+
+            var contentWidth = cellWidth - cell.EffectivePaddingLeft.Point - cell.EffectivePaddingRight.Point;
+            var align = cell.Alignment
+                ?? resolution.CellAlignment(cell)
+                ?? ColumnAlignment(table, placedCell.Column)
+                ?? table.Rows[placedCell.Row].Alignment;
+            var content = BoxContentLayout.Measure(
+                cell.Blocks,
+                contentWidth,
+                align,
+                fonts,
+                resolution,
+                capture);
+
+            placed.Add(new MeasuredCell
+            {
+                Cell = cell,
+                Row = placedCell.Row,
+                Column = placedCell.Column,
+                ColumnSpan = placedCell.ColumnSpan,
+                RowSpan = placedCell.RowSpan,
+                ContentWidth = contentWidth,
+                Align = align,
+                Content = content,
+            });
         }
 
         var rowHeights = new double[nRows];
@@ -219,25 +184,6 @@ internal static class TableLayout
         };
     }
 
-    private static bool IsStructuralPlaceholder(Cell cell)
-        => cell.Blocks.Count == 0
-            && cell.ColumnSpan == 1
-            && cell.RowSpan == 1
-            && cell.Font.HasNoDeclaredValues
-            && cell.Alignment is null
-            && cell.VerticalAlignment == VerticalAlignment.Top
-            && cell.Padding == default
-            && cell.PaddingLeft is null
-            && cell.PaddingRight is null
-            && cell.PaddingTop is null
-            && cell.PaddingBottom is null
-            && cell.StyleName is null
-            && cell.Background is null
-            && !cell.Borders.Top.IsSet
-            && !cell.Borders.Right.IsSet
-            && !cell.Borders.Bottom.IsSet
-            && !cell.Borders.Left.IsSet;
-
     private static BoxStyle CellDecoration(Table table, Cell cell, int row)
     {
         var cellBorders = cell.Borders;
@@ -275,22 +221,10 @@ internal static class TableLayout
     private static HorizontalAlignment? ColumnAlignment(Table table, int column)
         => column < table.Columns.Count ? table.Columns[column].Alignment : null;
 
-    private static double[] ResolveColumnWidths(Table table, double availableWidth)
+    private static double[] ResolveColumnWidths(Table table, int count, double availableWidth)
     {
-        var count = table.Columns.Count;
-        if (count == 0)
+        if (table.Columns.Count == 0)
         {
-            foreach (var row in table.Rows)
-            {
-                var cells = 0;
-                foreach (var cell in row.Cells)
-                {
-                    cells += Math.Max(1, cell.ColumnSpan);
-                }
-
-                count = Math.Max(count, cells);
-            }
-
             if (count == 0)
             {
                 return [];
