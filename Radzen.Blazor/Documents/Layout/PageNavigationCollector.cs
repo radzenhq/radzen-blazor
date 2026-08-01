@@ -3,18 +3,23 @@ using System.Collections.Immutable;
 using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Scene;
 using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Layout;
 
-internal sealed class PageNavigationCollector
+internal sealed class PageNavigationCollector : ISceneVisitor
 {
     private readonly List<LaidOutLink> links = [];
     private readonly List<LaidOutAnchor> anchors = [];
     private readonly IDictionary<string, SourceId> seen;
+    private readonly LaidOutPage page;
+    private readonly List<Container> containers = [];
+    private double top;
 
-    private PageNavigationCollector(IDictionary<string, SourceId> seen)
+    private PageNavigationCollector(LaidOutPage page, IDictionary<string, SourceId> seen)
     {
+        this.page = page;
         this.seen = seen;
     }
 
@@ -34,118 +39,43 @@ internal sealed class PageNavigationCollector
 
     private static PageNavigationCollector Walk(LaidOutPage page, IDictionary<string, SourceId> seen)
     {
-        var collector = new PageNavigationCollector(seen);
-        var left = page.ContentBox.X;
-
-        collector.Layer(page.Body, left, page.ContentBox.Y);
-        collector.Layer(page.HeaderLayer, left, page.HeaderTop);
-        collector.Layer(page.FooterLayer, left, page.FooterTop);
-
+        var collector = new PageNavigationCollector(page, seen);
+        SceneWalk.Page(page, collector);
         return collector;
     }
 
-    private void Layer(LaidOutLayer layer, double left, double top)
-    {
-        foreach (var line in layer.Lines)
-        {
-            Line(line.Line, left, top + line.Y, transform: null, clip: null);
-        }
+    void ISceneVisitor.EnterLayer(SceneLayerKind kind) => top = SceneWalk.LayerTop(page, kind);
 
-        var cursor = OrderedMerge.ByOrder(layer.Tables, static t => t.ZOrder, layer.Boxes, static b => b.ZOrder);
-        while (cursor.MoveNext())
-        {
-            if (cursor.IsTable)
-            {
-                Fragment(layer.Tables[cursor.TableIndex], left, top, transform: null);
-            }
-            else
-            {
-                Box(layer.Boxes[cursor.BoxIndex], left, top);
-            }
-        }
+    void ISceneVisitor.Line(in LaidOutLine line, in SceneFrame frame)
+    {
+        var current = Current;
+        Line(line.Line, frame.Left + line.X, top + line.Y + frame.Delta, current.Transform, current.Clip);
     }
 
-    private void Box(in LaidOutBox box, double left, double top)
-        => Content(
-            box.Content,
-            left,
-            top,
-            box.Bounds.Y,
-            box.Transform,
-            Clip(left, top, box.Bounds, 0));
+    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneContentBounds bounds)
+        => containers.Add(new Container(
+            box.Transform ?? Current.Transform,
+            Clip(frame, box.Bounds)));
 
-    private void Fragment(in LaidOutTableFragment positioned, double left, double top, Matrix? transform)
-    {
-        var x = left + positioned.Layout.Decoration.LeftIndent;
-        foreach (var row in positioned.Rows)
-        {
-            foreach (var placed in row.Cells)
-            {
-                Cell(placed.Cell, x, top, placed.Delta, transform);
-            }
-        }
-    }
+    void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame) => Pop();
 
-    private void Cell(LaidOutCell cell, double left, double top, double delta, Matrix? transform)
-        => Content(
-            new LaidOutBoxContent
-            {
-                Height = 0,
-                Lines = cell.Lines,
-                Images = cell.Images,
-                CodeSymbols = cell.CodeSymbols,
-                Tables = cell.Tables,
-                Boxes = cell.Boxes,
-            },
-            left,
-            top,
-            delta,
-            transform,
-            Clip(left, top, cell.Bounds, delta));
+    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneContentBounds bounds)
+        => containers.Add(new Container(Current.Transform, Clip(frame, cell.Bounds)));
 
-    private void Content(in LaidOutBoxContent content, double left, double top, double delta, Matrix? transform, Clipping? clip)
-    {
-        foreach (var line in content.Lines)
-        {
-            Line(line.Line, left + line.X, top + line.Y + delta, transform, clip);
-        }
+    void ISceneVisitor.LeaveCell(LaidOutCell cell, in SceneFrame frame) => Pop();
 
-        var cursor = OrderedMerge.ByOrder(content.Tables, static t => t.ZOrder, content.Boxes, static b => b.ZOrder);
-        while (cursor.MoveNext())
-        {
-            if (cursor.IsTable)
-            {
-                var nested = content.Tables[cursor.TableIndex];
-                foreach (var cell in nested.Layout.Cells)
-                {
-                    Cell(
-                        cell,
-                        left + nested.X + nested.Layout.Decoration.LeftIndent,
-                        top,
-                        delta + nested.Y,
-                        transform);
-                }
-            }
-            else
-            {
-                var nested = content.Boxes[cursor.BoxIndex];
-                Content(
-                    nested.Content,
-                    left + nested.Bounds.X,
-                    top,
-                    delta + nested.Bounds.Y,
-                    transform,
-                    Clip(left, top, nested.Bounds, delta));
-            }
-        }
-    }
+    private Container Current => containers.Count > 0 ? containers[^1] : default;
 
-    private static Clipping Clip(double left, double top, in Rect bounds, double delta)
+    private void Pop() => containers.RemoveAt(containers.Count - 1);
+
+    private Clipping Clip(in SceneFrame frame, in Rect bounds)
         => new(
-            left + bounds.X,
-            top + bounds.Y + delta,
-            left + bounds.X + bounds.Width,
-            top + bounds.Y + delta + bounds.Height);
+            frame.Left + bounds.X,
+            top + bounds.Y + frame.Delta,
+            frame.Left + bounds.X + bounds.Width,
+            top + bounds.Y + frame.Delta + bounds.Height);
+
+    private readonly record struct Container(Matrix? Transform, Clipping? Clip);
 
     private readonly record struct Clipping(double Left, double Top, double Right, double Bottom);
 

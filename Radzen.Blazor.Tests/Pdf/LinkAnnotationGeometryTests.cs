@@ -78,6 +78,44 @@ public class LinkAnnotationGeometryTests
     }
 
     [Fact]
+    public void LinkInsideAContainerInATableCell_CoversTheDrawnText()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        section.PageSize = new PageSize(Unit.FromPoint(400), Unit.FromPoint(300));
+        section.Margins.SetAll(Unit.FromPoint(40));
+
+        var table = section.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(120));
+        table.Columns.Add(Unit.FromPoint(120));
+        var row = table.Rows.Add();
+        row.Cells[0].Blocks.AddParagraph("First");
+        var container = row.Cells[1].Blocks.Add(new Container { Padding = Unit.FromPoint(7) });
+        var paragraph = container.Blocks.AddParagraph();
+        var run = paragraph.Inlines.Add("Radzen");
+        run.Link = Url;
+        run.Font.Family = BuildTestSupport.Latin;
+        run.Font.Size = Unit.FromPoint(14);
+
+        var rect = Assert.Single(LinkRects(BuildTestSupport.Read(document), 0));
+        var hit = Assert.Single(BuildTestSupport.Reload(document).Pages[0].FindText("Radzen"));
+
+        Assert.False(hit.GeometryEstimated);
+        Assert.True(
+            Math.Abs(hit.Bounds.Left - rect.X1) < 0.05,
+            $"the link rect {rect} must start where the drawn text {hit.Bounds} starts");
+        Assert.True(
+            Math.Abs(hit.Bounds.Right - rect.X2) < 0.05,
+            $"the link rect {rect} must end where the drawn text {hit.Bounds} ends");
+        var overlap = Math.Min(rect.Y2, hit.Bounds.Top) - Math.Max(rect.Y1, hit.Bounds.Bottom);
+        Assert.True(
+            overlap > 0.85 * (hit.Bounds.Top - hit.Bounds.Bottom),
+            $"the link rect {rect} must sit on the drawn text at "
+                + $"{hit.Bounds.Left},{hit.Bounds.Bottom},{hit.Bounds.Right},{hit.Bounds.Top}");
+    }
+
+    [Fact]
     public void LinkInsideRotatedContainer_AnnotationRectIsTransformed()
     {
         var upright = Assert.Single(LinkRects(BuildTestSupport.Read(LinkInContainer(0)), 0));

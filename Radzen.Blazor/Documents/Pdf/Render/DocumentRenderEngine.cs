@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Scene;
 using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Geometry;
@@ -16,8 +17,6 @@ internal sealed class DocumentRenderEngine
     private readonly FontRegistry fontRegistry;
     private readonly ImageRegistry imageRegistry;
     private readonly TextLineRecorder textRecorder;
-    private readonly TableRecorder tableRecorder;
-    private readonly BoxRecorder boxRecorder;
     private readonly ImageRecorder imageRecorder;
     private readonly CodeSymbolRecorder codeSymbolRecorder;
     private readonly WatermarkRecorder watermarkRecorder;
@@ -43,8 +42,6 @@ internal sealed class DocumentRenderEngine
             request.AllowUnsupportedCharacters);
         codeSymbolRecorder = new(structureTree);
         imageRecorder = new(imageRegistry, structureTree);
-        tableRecorder = new(structureTree);
-        boxRecorder = new(structureTree);
         watermarkRecorder = new(
             fontRegistry,
             imageRegistry,
@@ -169,23 +166,9 @@ internal sealed class DocumentRenderEngine
             plan,
             textRecorder,
             codeSymbolRecorder,
-            imageRecorder,
-            tableRecorder,
-            boxRecorder);
-        var left = page.ContentBox.X;
-        var contentTop = BottomUpSpace.FromTop(height, page.ContentBox.Y);
+            imageRecorder);
 
-        foreach (var kind in PdfPaintOrder.Layers)
-        {
-            var (layer, top) = kind switch
-            {
-                PageLayerKind.Body => (page.Body, contentTop),
-                PageLayerKind.Header => (page.HeaderLayer, BottomUpSpace.FromTop(height, page.HeaderTop)),
-                _ => (page.FooterLayer, BottomUpSpace.FromTop(height, page.FooterTop)),
-            };
-
-            EmitLayer(context, kind, layer, left, top);
-        }
+        SceneWalk.Page(page, new PageSceneRecorder(context, structureTree, page, height));
 
         foreach (var link in page.Links)
         {
@@ -205,115 +188,6 @@ internal sealed class DocumentRenderEngine
         }
 
         return plan;
-    }
-
-    private void EmitLayer(PageRenderContext context, PageLayerKind kind, LaidOutLayer layer, double left, double top)
-    {
-        var body = kind == PageLayerKind.Body;
-        context.Layer = (int)kind;
-        foreach (var line in layer.Lines)
-        {
-            EmitLine(context, line, body, left, top);
-        }
-
-        if (body)
-        {
-            EmitTablesAndBoxes(context, layer, left, top);
-            EmitImagesAndCodeSymbols(context, layer, left, top);
-        }
-        else
-        {
-            EmitImagesAndCodeSymbols(context, layer, left, top);
-            EmitTablesAndBoxes(context, layer, left, top);
-        }
-    }
-
-    private void EmitTablesAndBoxes(PageRenderContext context, LaidOutLayer layer, double left, double top)
-    {
-        OrderedMerge.VisitByOrder(
-            layer.Tables,
-            static table => table.ZOrder,
-            layer.Boxes,
-            static box => box.ZOrder,
-            table => EmitTable(context, table, left, top),
-            box => EmitBox(context, box, left, top));
-    }
-
-    private void EmitImagesAndCodeSymbols(PageRenderContext context, LaidOutLayer layer, double left, double top)
-    {
-        foreach (var image in layer.Images)
-        {
-            EmitImage(context, image, left, top);
-        }
-
-        foreach (var codeSymbol in layer.CodeSymbols)
-        {
-            EmitCodeSymbol(context, codeSymbol, left, top);
-        }
-    }
-
-    private void EmitLine(
-        PageRenderContext context,
-        in LaidOutLine line,
-        bool body,
-        double left,
-        double top)
-    {
-        var mark = context.BeginStack(line.ZOrder);
-        if (body)
-        {
-            textRecorder.EmitLines(
-                context, [line],
-                left, top, delta: 0,
-                opacity: 1, inherited: null, resolveStructure: true,
-                overflowThreshold: double.PositiveInfinity);
-        }
-        else
-        {
-            textRecorder.EmitBandLines(context, [line], left, top);
-        }
-
-        context.EndStack(mark);
-    }
-
-    private void EmitImage(PageRenderContext context, in LaidOutImage image, double left, double top)
-    {
-        var mark = context.BeginStack(image.ZOrder);
-        imageRecorder.EmitImage(
-            context, image, left, top,
-            delta: 0, opacity: 1, inherited: null, inheritedArtifact: null);
-        context.EndStack(mark);
-    }
-
-    private void EmitCodeSymbol(
-        PageRenderContext context,
-        in LaidOutCodeSymbol codeSymbol,
-        double left,
-        double top)
-    {
-        var mark = context.BeginStack(codeSymbol.ZOrder);
-        codeSymbolRecorder.EmitCodeSymbol(context, codeSymbol, left, top);
-        context.EndStack(mark);
-    }
-
-    private void EmitTable(
-        PageRenderContext context,
-        in LaidOutTableFragment table,
-        double left,
-        double top)
-    {
-        var mark = context.BeginStack(table.ZOrder);
-        tableRecorder.EmitFragment(context, table, left, top);
-        context.EndStack(mark);
-    }
-
-    private void EmitBox(PageRenderContext context, LaidOutBox box, double left, double top)
-    {
-        var mark = context.BeginStack(box.ZOrder);
-        boxRecorder.EmitBox(
-            context, box, BoxContentOrigin.Parent, element: null, left, top,
-            delta: 0, inheritedArtifact: null);
-        context.EndStack(mark);
     }
 
 }
