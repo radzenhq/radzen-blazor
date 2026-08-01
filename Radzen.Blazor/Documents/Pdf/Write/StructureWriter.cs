@@ -152,6 +152,13 @@ internal static class StructureWriter
             dictionary["ActualText"] = StringObject.FromText(actualText);
         }
 
+        // ISO 32000-1 14.9.2: a structure element declares the natural language of its content
+        // with /Lang, overriding the language in force for its ancestors.
+        if (element.Language is { } language)
+        {
+            dictionary["Lang"] = new StringObject(language);
+        }
+
         if (TableAttributes(element) is { } attributes)
         {
             dictionary["A"] = attributes;

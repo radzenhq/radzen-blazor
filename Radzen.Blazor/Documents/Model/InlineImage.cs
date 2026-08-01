@@ -48,7 +48,7 @@ public sealed class InlineImage : Inline
     /// image in accessible output for assistive technology to announce in place of the picture.
     /// Follows the HTML <c>alt</c> convention:
     /// <see langword="null"/> (the default) states nothing about the image - it stays a figure
-    /// without a description, which accessible output rejects unless <see cref="ActualText"/> is set;
+    /// without a description, which accessible output rejects unless <see cref="ReplacementText"/> is set;
     /// the empty string declares the image purely decorative, so it is written as an artifact
     /// instead of a figure; a non-empty value is the description itself.
     /// </summary>
@@ -59,5 +59,5 @@ public sealed class InlineImage : Inline
     /// for, carried on the image in accessible output so that extraction and reading substitute
     /// it for the picture. When <see langword="null"/> or empty (the default) no replacement text is written.
     /// </summary>
-    public string? ActualText { get; set; }
+    public string? ReplacementText { get; set; }
 }

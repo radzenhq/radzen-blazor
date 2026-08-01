@@ -54,6 +54,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 element.Type,
                 element.Alt,
                 element.ActualText,
+                element.Language,
                 element.HeaderScope,
                 element.RowSpan,
                 element.ColumnSpan,
@@ -117,7 +118,9 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             Id = nextElementId++,
             Type = StructureType(captured),
             Alt = captured.AlternateText,
-            ActualText = captured.ActualText,
+            Language = captured.Language,
+            // ISO 32000-1 14.9.4: the authored replacement text is the element's /ActualText.
+            ActualText = captured.ReplacementText,
             HeaderScope = captured.HeaderScope,
             RowSpan = captured.RowSpan,
             ColumnSpan = captured.ColumnSpan,
@@ -139,26 +142,24 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
     private string StructureType(in SemanticStructureNode node)
     {
-        if (node.ParagraphStyle is not { } styleIndex)
-        {
-            return StandardType(node.Intent, 0);
-        }
+        var headingLevel = node.ParagraphStyle is { } styleIndex
+            ? semantics.Styles.Paragraphs[styleIndex].HeadingLevel
+            : 0;
 
-        var style = semantics.Styles.Paragraphs[styleIndex];
-        if (style.RoleIsDeclared && style.CustomRole is { } declared && !Interpretable(declared))
+        if (node.RoleIsDeclared && node.Role is { } declared && !Interpretable(declared))
         {
             unmappedRoles.Add(declared);
         }
 
-        if (style.HeadingLevel > 0)
+        if (headingLevel > 0)
         {
-            return StandardType(style.Intent, style.HeadingLevel);
+            return StandardType(node.Intent, headingLevel);
         }
 
-        return style.CustomRole is { } role
-            && (settings.RoleMap.Contains(role) || (style.RoleIsDeclared && RoleMap.IsStandardType(role)))
+        return node.Role is { } role
+            && (settings.RoleMap.Contains(role) || (node.RoleIsDeclared && RoleMap.IsStandardType(role)))
             ? role
-            : StandardType(style.Intent, style.HeadingLevel);
+            : StandardType(node.Intent, headingLevel);
     }
 
     // ISO 14289-1:2014 7.1: non-standard structure types shall be mapped, in the structure tree root's role
@@ -191,6 +192,10 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             SemanticIntent.NavigationEntry => "TOCI",
             SemanticIntent.CrossReference => "Reference",
             SemanticIntent.Link => "Link",
+            SemanticIntent.Span => "Span",
+            SemanticIntent.Caption => "Caption",
+            SemanticIntent.TableHeaderGroup => "THead",
+            SemanticIntent.TableBodyGroup => "TBody",
             _ => throw new ArgumentOutOfRangeException(nameof(intent), intent, null),
         };
 

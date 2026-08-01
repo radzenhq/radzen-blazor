@@ -108,8 +108,11 @@ internal sealed class SemanticSnapshotBuilder
             {
                 Intent = node.Intent,
                 ParagraphStyle = node.ParagraphStyle >= 0 ? node.ParagraphStyle : null,
+                Role = node.Role,
+                RoleIsDeclared = node.RoleIsDeclared,
+                Language = node.Language,
                 AlternateText = node.AlternateText,
-                ActualText = node.ActualText,
+                ReplacementText = node.ReplacementText,
                 HeaderScope = node.HeaderScope,
                 RowSpan = node.RowSpan,
                 ColumnSpan = node.ColumnSpan,
@@ -164,16 +167,19 @@ internal sealed class SemanticSnapshotBuilder
         SemanticIntent intent,
         SemanticStructureTier tier,
         int paragraphStyle = -1,
+        string? role = null,
+        bool roleIsDeclared = false,
+        string? language = null,
         string? alternateText = null,
-        string? actualText = null,
+        string? replacementText = null,
         SemanticHeaderScope headerScope = SemanticHeaderScope.None,
         int rowSpan = 1,
         int columnSpan = 1,
         bool decorative = false)
     {
         var node = new SemanticNode(
-            nodes.Count, intent, tier, paragraphStyle, alternateText, actualText,
-            headerScope, rowSpan, columnSpan, decorative);
+            nodes.Count, intent, tier, paragraphStyle, role, roleIsDeclared, language,
+            alternateText, replacementText, headerScope, rowSpan, columnSpan, decorative);
         nodes.Add(node);
         return node;
     }
@@ -183,15 +189,19 @@ internal sealed class SemanticSnapshotBuilder
         SemanticIntent intent,
         SemanticStructureTier tier,
         int paragraphStyle = -1,
+        string? role = null,
+        bool roleIsDeclared = false,
+        string? language = null,
         string? alternateText = null,
-        string? actualText = null,
+        string? replacementText = null,
         SemanticHeaderScope headerScope = SemanticHeaderScope.None,
         int rowSpan = 1,
         int columnSpan = 1,
         bool decorative = false)
     {
         var child = AddNode(
-            intent, tier, paragraphStyle, alternateText, actualText, headerScope, rowSpan, columnSpan, decorative);
+            intent, tier, paragraphStyle, role, roleIsDeclared, language,
+            alternateText, replacementText, headerScope, rowSpan, columnSpan, decorative);
         parent.Children.Add(child.Index);
         return child;
     }
@@ -248,7 +258,7 @@ internal sealed class SemanticSnapshotBuilder
         }
     }
 
-    private (int Index, SemanticIntent Intent) CaptureParagraphStyle(Paragraph paragraph)
+    private CapturedParagraphStyle CaptureParagraphStyle(Paragraph paragraph)
     {
         var level = resolution.HeadingLevel(paragraph);
         var declaredRole = resolution.Role(paragraph);
@@ -257,10 +267,12 @@ internal sealed class SemanticSnapshotBuilder
         {
             Intent = intent,
             HeadingLevel = level,
-            CustomRole = declaredRole ?? (level == 0 ? paragraph.StyleName : null),
-            RoleIsDeclared = declaredRole is not null,
         });
-        return (paragraphStyles.Count - 1, intent);
+        return new CapturedParagraphStyle(
+            paragraphStyles.Count - 1,
+            intent,
+            declaredRole ?? (level == 0 ? paragraph.StyleName : null),
+            declaredRole is not null);
     }
 
     private void MapList(List list, SemanticNode parent)
@@ -279,6 +291,12 @@ internal sealed class SemanticSnapshotBuilder
         }
     }
 
+    private readonly record struct CapturedParagraphStyle(
+        int Index,
+        SemanticIntent Intent,
+        string? Role,
+        bool RoleIsDeclared);
+
     private readonly record struct MappingContext(SemanticNode Parent, SemanticStructureTier Tier);
 
     private sealed class Mapper(SemanticSnapshotBuilder capture)
@@ -289,8 +307,14 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Paragraph paragraph, MappingContext context)
         {
-            var (style, intent) = capture.CaptureParagraphStyle(paragraph);
-            var element = capture.AddChild(context.Parent, intent, context.Tier, paragraphStyle: style);
+            var style = capture.CaptureParagraphStyle(paragraph);
+            var element = capture.AddChild(
+                context.Parent,
+                style.Intent,
+                context.Tier,
+                paragraphStyle: style.Index,
+                role: style.Role,
+                roleIsDeclared: style.RoleIsDeclared);
             capture.Associate(paragraph, element);
             var inlineTier = SemanticStructureTier.Structural;
             foreach (var inline in paragraph.Inlines)
@@ -308,18 +332,38 @@ internal sealed class SemanticSnapshotBuilder
                             link ?? element,
                             SemanticIntent.Figure,
                             inlineTier,
+                            role: image.Role,
+                            roleIsDeclared: image.Role is not null,
+                            language: image.Language,
                             alternateText: decorative || string.IsNullOrEmpty(image.AlternateText) ? null : image.AlternateText,
-                            actualText: decorative || string.IsNullOrEmpty(image.ActualText) ? null : image.ActualText,
+                            replacementText: decorative || string.IsNullOrEmpty(image.ReplacementText) ? null : image.ReplacementText,
                             decorative: decorative),
                         link);
                     continue;
                 }
 
-                if (linked)
+                var linkElement = linked
+                    ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
+                    : null;
+
+                if (inline.Role is not null || inline.Language is not null)
                 {
                     capture.Associate(
                         inline,
-                        capture.AddChild(element, SemanticIntent.Link, inlineTier));
+                        capture.AddChild(
+                            linkElement ?? element,
+                            SemanticIntent.Span,
+                            inlineTier,
+                            role: inline.Role,
+                            roleIsDeclared: inline.Role is not null,
+                            language: inline.Language),
+                        linkElement);
+                    continue;
+                }
+
+                if (linkElement is not null)
+                {
+                    capture.Associate(inline, linkElement);
                 }
             }
 
@@ -383,7 +427,7 @@ internal sealed class SemanticSnapshotBuilder
                 SemanticIntent.Figure,
                 context.Tier,
                 alternateText: decorative || string.IsNullOrEmpty(image.AlternateText) ? null : image.AlternateText,
-                actualText: decorative || string.IsNullOrEmpty(image.ActualText) ? null : image.ActualText,
+                replacementText: decorative || string.IsNullOrEmpty(image.ReplacementText) ? null : image.ReplacementText,
                 decorative: decorative);
             capture.Associate(image, figure);
             return default;

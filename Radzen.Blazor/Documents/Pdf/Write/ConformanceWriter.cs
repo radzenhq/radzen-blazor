@@ -208,7 +208,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         {
             throw new InvalidOperationException(
                 $"{Label} requires every non-decorative Figure to carry alternate or replacement text; "
-                + "set AlternateText or ActualText, or set AlternateText to the empty string when the content is "
+                + "set AlternateText or ReplacementText, or set AlternateText to the empty string when the content is "
                 + "purely decorative.");
         }
 
