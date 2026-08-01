@@ -185,7 +185,7 @@ internal static class DocumentLoader
     }
 
     private static (Unit Width, Unit Height) Dimensions(PdfRect? box)
-        => box is { } rect
+        => box is { } rect && rect.IsFiniteAndPositive
             ? (Unit.FromPoint(rect.Width), Unit.FromPoint(rect.Height))
             : (PageSizes.A4.Width, PageSizes.A4.Height);
 

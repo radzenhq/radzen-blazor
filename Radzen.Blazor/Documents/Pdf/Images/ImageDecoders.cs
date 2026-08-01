@@ -29,6 +29,19 @@ public sealed class ImageDecoders
         Probes = probes;
     }
 
+    /// <summary>
+    /// Returns a set holding this set's decoders bounded by <paramref name="limits"/>. The same
+    /// limits govern both paths an image travels: the pixel-size measurement layout paginates
+    /// from, and the decoding the renderer performs.
+    /// </summary>
+    /// <param name="limits">The resource limits to decode and measure with.</param>
+    /// <returns>A set with the given limits.</returns>
+    public ImageDecoders WithLimits(ReaderLimits limits)
+    {
+        ArgumentNullException.ThrowIfNull(limits);
+        return new ImageDecoders(custom, Probes.WithLimits(limits.Snapshot()));
+    }
+
     /// <summary>Gets the set holding only the built-in PNG, JPEG and JPEG2000 decoders.</summary>
     public static ImageDecoders BuiltIn { get; } = new([], ImageProbes.None);
 
@@ -60,6 +73,8 @@ public sealed class ImageDecoders
 
     internal ImageProbes Probes { get; }
 
+    internal ReaderLimits Limits => Probes.Limits;
+
     internal bool Contains(IImageDecoder decoder)
     {
         foreach (var existing in custom)
@@ -72,6 +87,8 @@ public sealed class ImageDecoders
 
         return false;
     }
+
+    internal DecodedImage Decode(ReadOnlyMemory<byte> data) => Decode(data, Limits);
 
     internal DecodedImage Decode(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {

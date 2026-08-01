@@ -1,28 +1,38 @@
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Runtime.CompilerServices;
-using Radzen.Documents.Internal;
+using Radzen.Documents.Pdf;
 
 namespace Radzen.Documents;
 
 internal sealed class ImageProbes
 {
-    public static readonly ImageProbes None = new([]);
+    public static readonly ImageProbes None = new([], ReaderLimits.Default);
 
     private readonly ImmutableArray<Func<ReadOnlyMemory<byte>, (double Width, double Height)?>> probes;
 
     private readonly ConditionalWeakTable<byte[], ImageInfo> cache = new();
 
-    private ImageProbes(ImmutableArray<Func<ReadOnlyMemory<byte>, (double Width, double Height)?>> probes)
-        => this.probes = probes;
+    private ImageProbes(ImmutableArray<Func<ReadOnlyMemory<byte>, (double Width, double Height)?>> probes, ReaderLimits limits)
+    {
+        this.probes = probes;
+        Limits = limits;
+    }
 
     public int Count => probes.Length;
+
+    public ReaderLimits Limits { get; }
 
     public ImageProbes Add(Func<ReadOnlyMemory<byte>, (double Width, double Height)?> probe)
     {
         ArgumentNullException.ThrowIfNull(probe);
-        return new ImageProbes(probes.Add(probe));
+        return new ImageProbes(probes.Add(probe), Limits);
+    }
+
+    public ImageProbes WithLimits(ReaderLimits limits)
+    {
+        ArgumentNullException.ThrowIfNull(limits);
+        return new ImageProbes(probes, limits);
     }
 
     public ImageInfo Inspect(byte[] data)
@@ -85,7 +95,7 @@ internal sealed class ImageProbes
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
     }
 
-    private static ImageInfo ReadJpeg(byte[] data)
+    private ImageInfo ReadJpeg(byte[] data)
     {
         var position = ImageHeaders.FindJpegFrame(data, out var marker, out _);
         if (marker is not (0xC0 or 0xC1 or 0xC2))
@@ -98,20 +108,9 @@ internal sealed class ImageProbes
         return Validate(frame.Width, frame.Height, ImageFormat.Jpeg);
     }
 
-    private static ImageInfo Validate(long width, long height, ImageFormat format)
+    private ImageInfo Validate(long width, long height, ImageFormat format)
     {
-        var limits = ResourceLimits.Default;
-        var name = FormatName(format);
-        if (width <= 0 || height <= 0)
-        {
-            throw new InvalidDataException($"{name} image has invalid dimensions.");
-        }
-
-        if (width * height > limits.MaxImagePixels)
-        {
-            throw new InvalidDataException($"{name} image dimensions exceed the maximum decodable size.");
-        }
-
+        ImageDecoder.ValidateImageDimensions(width, height, Limits, FormatName(format));
         return new ImageInfo(format, width, height);
     }
 

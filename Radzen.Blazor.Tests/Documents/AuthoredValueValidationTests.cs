@@ -154,7 +154,7 @@ public class AuthoredValueValidationTests
         var cell = table.Rows.Add().Cells[0];
         var paragraph = new Paragraph();
         var run = new Run("x");
-        var list = new List();
+        var list = new ListBlock();
         var style = document.Styles.Add("guarded");
         var toc = new TableOfContents();
         var shadow = new BoxShadow();
@@ -192,8 +192,8 @@ public class AuthoredValueValidationTests
             { "Container.Width", value => container.Width = value },
             { "TextInline.LetterSpacing", value => run.LetterSpacing = value },
             { "TextInline.WordSpacing", value => run.WordSpacing = value },
-            { "List.LeftIndent", value => list.LeftIndent = value },
-            { "List.HangingIndent", value => list.HangingIndent = value },
+            { "ListBlock.LeftIndent", value => list.LeftIndent = value },
+            { "ListBlock.HangingIndent", value => list.HangingIndent = value },
             { "Paragraph.LeftIndent", value => paragraph.LeftIndent = value },
             { "Paragraph.SpacingBefore", value => paragraph.SpacingBefore = value },
             { "Paragraph.SpacingAfter", value => paragraph.SpacingAfter = value },
@@ -216,5 +216,99 @@ public class AuthoredValueValidationTests
         var error = Assert.Throws<ArgumentOutOfRangeException>(() => assign(Unit.FromPercent(50)));
 
         Assert.Contains(subject.Replace(".SetAll", ".Top", StringComparison.Ordinal), error.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void PageSizeRejectsNonPositiveDimensions(double value)
+    {
+        var width = Assert.Throws<ArgumentOutOfRangeException>(() => new PageSize(Unit.FromPoint(value), Unit.FromPoint(100)));
+        var height = Assert.Throws<ArgumentOutOfRangeException>(() => new PageSize(Unit.FromPoint(100), Unit.FromPoint(value)));
+
+        Assert.Contains("PageSize.Width", width.Message, StringComparison.Ordinal);
+        Assert.Contains("PageSize.Height", height.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-4)]
+    public void ImageFitBoxRejectsNonPositiveBounds(double value)
+    {
+        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+
+        var width = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPoint(value), Unit.FromPoint(10)));
+        var height = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPoint(10), Unit.FromPoint(value)));
+
+        Assert.Contains("Image.FitBox.MaxWidth", width.Message, StringComparison.Ordinal);
+        Assert.Contains("Image.FitBox.MaxHeight", height.Message, StringComparison.Ordinal);
+        Assert.Null(image.FitBox);
+    }
+
+    [Fact]
+    public void ImageFitBoxRejectsRelativeBounds()
+    {
+        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPercent(50), Unit.FromPoint(10)));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-3)]
+    public void ImageDimensionsRejectNonPositiveValues(double value)
+    {
+        var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => image.Width = Unit.FromPoint(value));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image.Height = Unit.FromPoint(value));
+    }
+
+    [Theory]
+    [InlineData("en")]
+    [InlineData("en-US")]
+    [InlineData("de-CH-1901")]
+    [InlineData("english")]
+    [InlineData("sr-Latn-RS")]
+    [InlineData("zh-cmn-Hans-CN")]
+    [InlineData("es-419")]
+    [InlineData("en-US-u-va-posix")]
+    [InlineData("x-private")]
+    [InlineData("EN-us")]
+    public void DocumentLanguageAcceptsWellFormedTags(string tag)
+        => Assert.Equal(tag, new Document { Language = tag }.Language);
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("en_US")]
+    [InlineData("en-")]
+    [InlineData("-en")]
+    [InlineData("en--US")]
+    [InlineData("en-toolongsubtag")]
+    [InlineData("i-klingon")]
+    [InlineData("e")]
+    [InlineData("en US")]
+    [InlineData("en-US-")]
+    [InlineData("en-a")]
+    public void DocumentLanguageRejectsMalformedTags(string tag)
+    {
+        var error = Assert.Throws<ArgumentException>(() => new Document { Language = tag });
+
+        Assert.Contains("Document.Language", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void DocumentLanguageAcceptsNull()
+        => Assert.Null(new Document { Language = null }.Language);
+
+    [Fact]
+    public void InlineLanguageRejectsMalformedTags()
+    {
+        var paragraph = new Document().Sections.Add().Blocks.AddParagraph();
+        var run = paragraph.Inlines.Add("text");
+
+        Assert.Throws<ArgumentException>(() => run.Language = "not a tag");
+        run.Language = "la";
+        Assert.Equal("la", run.Language);
     }
 }
