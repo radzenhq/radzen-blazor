@@ -102,13 +102,7 @@ internal static class BoxContentRecorder
         double delta,
         SemanticArtifactKind? artifact)
     {
-        var mark = context.BeginStack(
-            line.ZOrder,
-            PdfRect.FromSize(
-                left + line.X,
-                BottomUpSpace.Bottom(contentTop, line.Y + delta, line.Line.Height),
-                line.Line.Width,
-                line.Line.Height));
+        var mark = context.BeginStack(line.ZOrder);
         var overflows = context.Text.EmitLines(
             context, [line],
             left, contentTop, delta,
@@ -131,13 +125,7 @@ internal static class BoxContentRecorder
         double delta,
         SemanticArtifactKind? artifact)
     {
-        var mark = context.BeginStack(
-            image.ZOrder,
-            PdfRect.FromSize(
-                left + image.X,
-                BottomUpSpace.Bottom(contentTop, image.Y + delta, image.Height),
-                image.Width,
-                image.Height));
+        var mark = context.BeginStack(image.ZOrder);
         context.Images.EmitImage(context, image, left, contentTop, delta, opacity, element, artifact);
         context.EndStack(mark);
         return image.X < boundsLeft - 0.01 || image.X + image.Width > boundsRight + 0.01;
@@ -153,13 +141,7 @@ internal static class BoxContentRecorder
         double delta,
         SemanticArtifactKind? artifact)
     {
-        var mark = context.BeginStack(
-            codeSymbol.ZOrder,
-            PdfRect.FromSize(
-                left + codeSymbol.X,
-                BottomUpSpace.Bottom(contentTop, codeSymbol.Y + delta, codeSymbol.Height),
-                codeSymbol.Width,
-                codeSymbol.Height));
+        var mark = context.BeginStack(codeSymbol.ZOrder);
         context.CodeSymbols.EmitCodeSymbolModules(
             context, codeSymbol.Source, codeSymbol.Modules,
             left + codeSymbol.X,
@@ -179,13 +161,7 @@ internal static class BoxContentRecorder
         double delta,
         SemanticArtifactKind? artifact)
     {
-        var mark = context.BeginStack(
-            table.ZOrder,
-            PdfRect.FromSize(
-                left + table.X,
-                BottomUpSpace.Bottom(contentTop, delta + table.Y, table.Layout.Height),
-                table.Layout.Width,
-                table.Layout.Height));
+        var mark = context.BeginStack(table.ZOrder);
         context.Tables.EmitNestedTable(context, table, element, left, contentTop, delta, artifact);
         context.EndStack(mark);
     }
@@ -199,10 +175,7 @@ internal static class BoxContentRecorder
         double delta,
         SemanticArtifactKind? artifact)
     {
-        var mark = context.BeginStack(
-            box.ZOrder,
-            BottomUpSpace.Bounds(left, contentTop, box.Bounds, delta),
-            box.Transform);
+        var mark = context.BeginStack(box.ZOrder);
         context.Boxes.EmitBox(
             context, box, BoxContentOrigin.Box, element, left, contentTop, delta, artifact);
         context.EndStack(mark);

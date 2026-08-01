@@ -136,7 +136,7 @@ internal readonly struct EdgeDraw
     public PaintStack? Stack { get; init; }
 }
 
-internal readonly record struct PaintStack(int Layer, PaintStackOrder Order, PdfRect Bounds);
+internal readonly record struct PaintStack(int Layer, PaintStackOrder Order);
 
 internal sealed class PaintStackOrder(PaintStackOrder? parent, int zOrder) : IComparable<PaintStackOrder>
 {
@@ -189,8 +189,8 @@ internal sealed class PagePlan
 
     public int NextSequence() => sequence++;
 
-    public StackMark BeginStack(int layer, PaintStackOrder order, in PdfRect bounds)
-        => new(new PaintStack(layer, order, bounds), Mark());
+    public StackMark BeginStack(int layer, PaintStackOrder order)
+        => new(new PaintStack(layer, order), Mark());
 
     public void EndStack(in StackMark mark)
     {

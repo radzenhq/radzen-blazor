@@ -259,13 +259,7 @@ internal sealed class DocumentRenderEngine
         double left,
         double top)
     {
-        var mark = context.BeginStack(
-            line.ZOrder,
-            PdfRect.FromSize(
-                left + line.X,
-                BottomUpSpace.Bottom(top, line.Y, line.Line.Height),
-                line.Line.Width,
-                line.Line.Height));
+        var mark = context.BeginStack(line.ZOrder);
         if (body)
         {
             textRecorder.EmitLines(
@@ -284,13 +278,7 @@ internal sealed class DocumentRenderEngine
 
     private void EmitImage(PageRenderContext context, in LaidOutImage image, double left, double top)
     {
-        var mark = context.BeginStack(
-            image.ZOrder,
-            PdfRect.FromSize(
-                left + image.X,
-                BottomUpSpace.Bottom(top, image.Y, image.Height),
-                image.Width,
-                image.Height));
+        var mark = context.BeginStack(image.ZOrder);
         imageRecorder.EmitImage(
             context, image, left, top,
             delta: 0, opacity: 1, inherited: null, inheritedArtifact: null);
@@ -303,13 +291,7 @@ internal sealed class DocumentRenderEngine
         double left,
         double top)
     {
-        var mark = context.BeginStack(
-            codeSymbol.ZOrder,
-            PdfRect.FromSize(
-                left + codeSymbol.X,
-                BottomUpSpace.Bottom(top, codeSymbol.Y, codeSymbol.Height),
-                codeSymbol.Width,
-                codeSymbol.Height));
+        var mark = context.BeginStack(codeSymbol.ZOrder);
         codeSymbolRecorder.EmitCodeSymbol(context, codeSymbol, left, top);
         context.EndStack(mark);
     }
@@ -320,19 +302,14 @@ internal sealed class DocumentRenderEngine
         double left,
         double top)
     {
-        var mark = context.BeginStack(
-            table.ZOrder,
-            BottomUpSpace.Bounds(left, top, table.Bounds, delta: 0));
+        var mark = context.BeginStack(table.ZOrder);
         tableRecorder.EmitFragment(context, table, left, top);
         context.EndStack(mark);
     }
 
     private void EmitBox(PageRenderContext context, LaidOutBox box, double left, double top)
     {
-        var mark = context.BeginStack(
-            box.ZOrder,
-            BottomUpSpace.Bounds(left, top, box.Bounds, delta: 0),
-            box.Transform);
+        var mark = context.BeginStack(box.ZOrder);
         boxRecorder.EmitBox(
             context, box, BoxContentOrigin.Parent, element: null, left, top,
             delta: 0, inheritedArtifact: null);
