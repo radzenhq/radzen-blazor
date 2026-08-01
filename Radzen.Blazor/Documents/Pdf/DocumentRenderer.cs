@@ -128,8 +128,10 @@ public sealed class DocumentRenderer
     /// <summary>
     /// Gets or sets whether a glyph captured from a built-in metrics font that the PDF text
     /// encoding cannot represent is drawn as '?'. Defaults to <see langword="false"/>, so
-    /// rendering throws and names the offending characters. Captured into the laid-out scene at
-    /// <see cref="Render(Document)"/>.
+    /// rendering throws and names the offending characters. Read once by <see cref="Render(Document)"/>,
+    /// which applies it while it draws text and watermarks; it is not carried on the laid-out scene
+    /// or on the produced document, so changing it afterwards has no effect on an already-rendered
+    /// document.
     /// </summary>
     public bool AllowUnsupportedCharacters { get; set; }
 
@@ -137,7 +139,8 @@ public sealed class DocumentRenderer
     /// Gets or sets whether a registered font whose OS/2 fsType marks it as Restricted License
     /// Embedding may still be embedded. Defaults to <see langword="false"/>, so rendering a
     /// document that registers such a font throws unless the caller explicitly opts in.
-    /// Captured into the produced document at <see cref="Render(Document)"/>.
+    /// Checked once by <see cref="Render(Document)"/>, against the fonts that document uses. The
+    /// produced document does not carry the permission, so saving it again does not re-check it.
     /// </summary>
     public bool AllowRestrictedEmbedding { get; set; }
 
@@ -145,8 +148,9 @@ public sealed class DocumentRenderer
     /// Gets or sets whether a registered font that would render degraded - a variable font
     /// (embedded only at its default instance) or a color font (COLR/sbix/SVG, rendered
     /// monochrome) - may still be embedded. Defaults to <see langword="false"/>, so rendering
-    /// fails loudly rather than silently producing wrong output. Captured into the produced
-    /// document at <see cref="Render(Document)"/>.
+    /// fails loudly rather than silently producing wrong output. Checked once by
+    /// <see cref="Render(Document)"/>, against the fonts that document uses. The produced document
+    /// does not carry the permission, so saving it again does not re-check it.
     /// </summary>
     public bool AllowDegradedFonts { get; set; }
 
