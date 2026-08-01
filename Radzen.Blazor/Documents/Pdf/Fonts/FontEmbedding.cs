@@ -1,5 +1,5 @@
 using System;
-using Radzen.Documents.Fonts;
+using System.Collections.Generic;
 using Radzen.Documents.Fonts.Sfnt;
 
 namespace Radzen.Documents.Pdf.Fonts;
@@ -14,14 +14,14 @@ internal static class FontEmbedding
         => (face.FsType & RestrictedLicenseEmbedding) != 0;
 
     public static void Ensure(
-        in FontCollectionSnapshot fonts,
+        IEnumerable<SfntFont> faces,
         bool allowRestrictedEmbedding,
         bool allowDegradedFonts)
     {
-        foreach (var face in fonts.Faces)
+        foreach (var face in faces)
         {
-            EnsureEmbeddable(face.Face, allowRestrictedEmbedding);
-            EnsureRenderable(face.Face, allowDegradedFonts);
+            EnsureEmbeddable(face, allowRestrictedEmbedding);
+            EnsureRenderable(face, allowDegradedFonts);
         }
     }
 

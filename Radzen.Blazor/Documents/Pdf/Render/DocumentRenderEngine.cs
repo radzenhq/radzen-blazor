@@ -95,8 +95,6 @@ internal sealed class DocumentRenderEngine
 
     private PortableDocument Run()
     {
-        FontEmbedding.Ensure(laidOut.Fonts, request.AllowRestrictedEmbedding, request.AllowDegradedFonts);
-
         var portable = CreateOutput();
         portable.FontSnapshot = laidOut.Fonts;
         portable.Language = laidOut.Semantics.Language;
@@ -109,6 +107,11 @@ internal sealed class DocumentRenderEngine
         {
             plans.Add(GeneratePage(paginated[i]));
         }
+
+        FontEmbedding.Ensure(
+            fontRegistry.SfntFaces(),
+            request.AllowRestrictedEmbedding,
+            request.AllowDegradedFonts);
 
         var fontPlans = fontRegistry.Plan();
         var pages = ImmutableArray.CreateBuilder<PageOutput>(plans.Count);

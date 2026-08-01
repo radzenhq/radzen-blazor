@@ -102,6 +102,17 @@ public class FontEmbedPermissionTests
     }
 
     [Fact]
+    public void RegisteredButUnusedRestrictedFont_DoesNotBlockRendering()
+    {
+        var document = new Document();
+        document.Fonts.Register("Restricted", new System.IO.MemoryStream(WithFsType(Liberation(), 0x0002)));
+        var section = document.Sections.Add();
+        section.Blocks.AddParagraph("Body drawn with a base-14 face");
+
+        Assert.NotEmpty(new Radzen.Documents.Pdf.DocumentRenderer().ToArray(document));
+    }
+
+    [Fact]
     public void PreviewPrintAndEditableBits_AreNotRestricted()
     {
         Assert.False(FontEmbedding.EmbeddingRestricted(SfntFont.Parse(WithFsType(Liberation(), 0x0004))));
