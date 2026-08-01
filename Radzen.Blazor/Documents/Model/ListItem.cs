@@ -4,7 +4,7 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// A single item of a <see cref="List"/>, containing block-level content that flows after the item marker.
+/// A single item of a <see cref="ListBlock"/>, containing block-level content that flows after the item marker.
 /// </summary>
 public sealed class ListItem
 {
@@ -30,13 +30,13 @@ public sealed class ListItem
     /// <exception cref="System.InvalidOperationException">
     /// The list already has a parent, or attaching it would make the tree cyclic.
     /// </exception>
-    public List? NestedList
+    public ListBlock? NestedList
     {
         get
         {
             foreach (var block in Blocks)
             {
-                if (block is List list)
+                if (block is ListBlock list)
                 {
                     return list;
                 }
@@ -67,7 +67,7 @@ public sealed class ListItem
     /// <summary>Creates a nested sub-list with the specified marker style and attaches it to this item.</summary>
     /// <param name="style">The marker style of the nested list.</param>
     /// <returns>The newly created nested list.</returns>
-    public List AddList(ListStyle style = ListStyle.Bullet) => NestedList = new List { Style = style };
+    public ListBlock AddList(ListStyle style = ListStyle.Bullet) => NestedList = new ListBlock { Style = style };
 
     /// <summary>
     /// Gets or sets the text of the first paragraph. Getting returns <see langword="null"/> when

@@ -14,7 +14,7 @@ internal abstract class BlockVisitor<TContext, TResult>
 
     public virtual TResult Visit(Image block, TContext context) => Default(block, context);
 
-    public virtual TResult Visit(List block, TContext context) => Default(block, context);
+    public virtual TResult Visit(ListBlock block, TContext context) => Default(block, context);
 
     public virtual TResult Visit(Container block, TContext context) => Default(block, context);
 

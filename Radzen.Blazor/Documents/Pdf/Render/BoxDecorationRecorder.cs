@@ -13,7 +13,7 @@ internal static class BoxDecorationRecorder
         SemanticArtifactKind artifact)
     {
         var extGState = opacity < 1 || style.HasGraphicsStateOptions
-            ? plan.RegisterExtGState(opacity, opacity, style.Blend)
+            ? plan.Resources.RegisterExtGState(opacity, opacity, style.Blend)
             : null;
         var radius = BoxStyle.ClampRadius(style.CornerRadius, bounds.Width, bounds.Height);
 

@@ -245,7 +245,7 @@ internal sealed class SemanticSnapshotBuilder
                 }
 
                 break;
-            case List list:
+            case ListBlock list:
                 foreach (var item in list.Items)
                 {
                     CaptureArtifacts(item.Blocks, kind);
@@ -275,7 +275,7 @@ internal sealed class SemanticSnapshotBuilder
             declaredRole is not null);
     }
 
-    private void MapList(List list, SemanticNode parent)
+    private void MapList(ListBlock list, SemanticNode parent)
     {
         var l = AddChild(parent, SemanticIntent.List, SemanticStructureTier.Structural);
         foreach (var item in list.Items)
@@ -433,7 +433,7 @@ internal sealed class SemanticSnapshotBuilder
             return default;
         }
 
-        public override Nothing Visit(List list, MappingContext context)
+        public override Nothing Visit(ListBlock list, MappingContext context)
         {
             capture.MapList(list, context.Parent);
             return default;

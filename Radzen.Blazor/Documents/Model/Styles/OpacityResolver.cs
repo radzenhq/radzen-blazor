@@ -69,7 +69,7 @@ internal sealed class OpacityResolver
             return default;
         }
 
-        public override Nothing Visit(List list, double opacity)
+        public override Nothing Visit(ListBlock list, double opacity)
         {
             foreach (var item in list.Items)
             {

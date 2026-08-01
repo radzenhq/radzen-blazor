@@ -19,7 +19,7 @@ internal sealed class WatermarkRecorder(
             Rotation = watermark.Rotation,
             Artifact = watermark.Artifact,
             ExtGState = watermark.Opacity < 1
-                ? plan.RegisterExtGState(watermark.Opacity, watermark.Opacity)
+                ? plan.Resources.RegisterExtGState(watermark.Opacity, watermark.Opacity)
                 : null,
         };
 
@@ -35,10 +35,10 @@ internal sealed class WatermarkRecorder(
                 Height = image.Height,
                 Image = generated,
                 ExtGState = image.Alpha < 1
-                    ? plan.RegisterExtGState(watermark.Opacity * image.Alpha, watermark.Opacity * image.Alpha)
+                    ? plan.Resources.RegisterExtGState(watermark.Opacity * image.Alpha, watermark.Opacity * image.Alpha)
                     : null,
             };
-            plan.UsedImages.Add(generated);
+            plan.Resources.UsedImages.Add(generated);
         }
 
         if (watermark.Text is { } text)
@@ -54,13 +54,13 @@ internal sealed class WatermarkRecorder(
         var size = text.Size;
         var baseline = -text.Baseline;
         var extGState = text.AlphaOverride is { } alpha
-            ? plan.RegisterExtGState(alpha, alpha)
+            ? plan.Resources.RegisterExtGState(alpha, alpha)
             : null;
         foreach (var span in text.GlyphRun.Spans)
         {
             var x = text.X + span.XOffset;
             var emitted = spans.Emit(span, text.Font.Size);
-            plan.UsedFonts.Add(emitted.Font);
+            plan.Resources.UsedFonts.Add(emitted.Font);
             draw.Texts.Add(new TextDraw
             {
                 X = x,

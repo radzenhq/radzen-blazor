@@ -16,6 +16,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private readonly SortedSet<string> unmappedRoles = new(StringComparer.Ordinal);
     private readonly Dictionary<StructureElement, List<PlannedStructureKid>> orderedKids = [];
     private readonly Dictionary<StructureElement, int> kidCursors = [];
+    private Dictionary<StructureElement, StructureElement>? parents;
+    private Dictionary<StructureElement, int>? childOrder;
     private StructureElement documentElement = null!;
     private int nextElementId;
 
@@ -249,25 +251,87 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             list.Add(draw);
         }
 
-        var subtreeStart = new Dictionary<StructureElement, int>();
-        ComputeSubtreeStart(documentElement, own, subtreeStart);
+        IndexTree();
+        var touched = TouchedChildren(own.Keys);
 
-        Walk(documentElement, own, subtreeStart, pageIndex, marks);
+        var subtreeStart = new Dictionary<StructureElement, int>();
+        ComputeSubtreeStart(documentElement, own, touched, subtreeStart);
+
+        Walk(documentElement, own, touched, subtreeStart, pageIndex, marks);
         return marks;
+    }
+
+    private void IndexTree()
+    {
+        if (parents is not null)
+        {
+            return;
+        }
+
+        parents = [];
+        childOrder = [];
+
+        var pending = new Stack<StructureElement>();
+        pending.Push(documentElement);
+        while (pending.Count > 0)
+        {
+            var element = pending.Pop();
+            for (var index = 0; index < element.Children.Count; index++)
+            {
+                var child = element.Children[index];
+                parents[child] = element;
+                childOrder[child] = index;
+                pending.Push(child);
+            }
+        }
+    }
+
+    private Dictionary<StructureElement, List<StructureElement>> TouchedChildren(
+        Dictionary<StructureElement, List<TaggedDraw>>.KeyCollection elements)
+    {
+        var touched = new Dictionary<StructureElement, List<StructureElement>>();
+        var seen = new HashSet<StructureElement>();
+
+        foreach (var element in elements)
+        {
+            var current = element;
+            while (seen.Add(current) && parents!.TryGetValue(current, out var parent))
+            {
+                if (!touched.TryGetValue(parent, out var children))
+                {
+                    children = [];
+                    touched[parent] = children;
+                }
+
+                children.Add(current);
+                current = parent;
+            }
+        }
+
+        foreach (var children in touched.Values)
+        {
+            children.Sort((left, right) => childOrder![left].CompareTo(childOrder![right]));
+        }
+
+        return touched;
     }
 
     private static int ComputeSubtreeStart(
         StructureElement element,
         Dictionary<StructureElement, List<TaggedDraw>> own,
+        Dictionary<StructureElement, List<StructureElement>> touched,
         Dictionary<StructureElement, int> subtreeStart)
     {
         var start = own.TryGetValue(element, out var draws) ? draws[0].Sequence : int.MaxValue;
-        foreach (var child in element.Children)
+        if (touched.TryGetValue(element, out var children))
         {
-            var childStart = ComputeSubtreeStart(child, own, subtreeStart);
-            if (childStart < start)
+            foreach (var child in children)
             {
-                start = childStart;
+                var childStart = ComputeSubtreeStart(child, own, touched, subtreeStart);
+                if (childStart < start)
+                {
+                    start = childStart;
+                }
             }
         }
 
@@ -282,13 +346,15 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private void Walk(
         StructureElement element,
         Dictionary<StructureElement, List<TaggedDraw>> own,
+        Dictionary<StructureElement, List<StructureElement>> touched,
         Dictionary<StructureElement, int> subtreeStart,
         int pageIndex,
         Dictionary<int, TaggedMark> marks)
     {
         own.TryGetValue(element, out var draws);
+        touched.TryGetValue(element, out var children);
         var next = 0;
-        foreach (var child in element.Children)
+        foreach (var child in children ?? [])
         {
             if (!subtreeStart.TryGetValue(child, out var childStart))
             {
@@ -306,7 +372,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 AddMarks(element, draws!, start, next, pageIndex, marks);
             }
 
-            Walk(child, own, subtreeStart, pageIndex, marks);
+            Walk(child, own, touched, subtreeStart, pageIndex, marks);
             AdvancePast(element, child);
         }
 
@@ -341,16 +407,28 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private void AdvancePast(StructureElement element, StructureElement child)
     {
         var kids = orderedKids[element];
-        for (var i = 0; i < kids.Count; i++)
+        if (Locate(kids, child, kidCursors[element]) is { } ahead)
+        {
+            kidCursors[element] = ahead + 1;
+            return;
+        }
+
+        kidCursors[element] = Locate(kids, child, 0)
+            ?? throw new InvalidOperationException("A structure child is missing from its parent's ordered kids.");
+        kidCursors[element]++;
+    }
+
+    private static int? Locate(List<PlannedStructureKid> kids, StructureElement child, int from)
+    {
+        for (var i = from; i < kids.Count; i++)
         {
             if (ReferenceEquals(kids[i].Child, child))
             {
-                kidCursors[element] = i + 1;
-                return;
+                return i;
             }
         }
 
-        throw new InvalidOperationException("A structure child is missing from its parent's ordered kids.");
+        return null;
     }
 
 }

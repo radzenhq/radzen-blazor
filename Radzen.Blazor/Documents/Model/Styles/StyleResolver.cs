@@ -59,7 +59,7 @@ internal static class StyleResolver
             return default;
         }
 
-        public override Nothing Visit(List list, List<Font> inherited)
+        public override Nothing Visit(ListBlock list, List<Font> inherited)
         {
             ResolveList(list, styles, inherited, this);
             return default;
@@ -78,7 +78,7 @@ internal static class StyleResolver
         }
     }
 
-    private static void ResolveList(List list, StyleCollection styles, List<Font> inherited, StyleVisitor visitor)
+    private static void ResolveList(ListBlock list, StyleCollection styles, List<Font> inherited, StyleVisitor visitor)
     {
         foreach (var item in list.Items)
         {

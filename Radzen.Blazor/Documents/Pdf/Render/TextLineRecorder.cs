@@ -99,7 +99,7 @@ internal sealed class TextLineRecorder(
 
             fragElement = captured ?? fragElement;
 
-            var extGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null;
+            var extGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null;
             EmitGlyphRun(
                 plan,
                 run.Paint,
@@ -167,7 +167,7 @@ internal sealed class TextLineRecorder(
             Color = color,
             Style = BorderStyle.Solid,
             Artifact = artifact,
-            ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
+            ExtGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null,
         });
     }
 
@@ -256,7 +256,7 @@ internal sealed class TextLineRecorder(
         {
             var x = startX + span.XOffset;
             var emitted = spans.Emit(span, font.Size);
-            plan.UsedFonts.Add(emitted.Font);
+            plan.Resources.UsedFonts.Add(emitted.Font);
             plan.Texts.Add(BuildTextDraw(
                 paint,
                 x,
@@ -294,8 +294,8 @@ internal sealed class TextLineRecorder(
             Image = generated,
             Element = element,
             Artifact = artifact,
-            ExtGState = alpha < 1 ? plan.RegisterExtGState(alpha, alpha) : null,
+            ExtGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null,
         });
-        plan.UsedImages.Add(generated);
+        plan.Resources.UsedImages.Add(generated);
     }
 }

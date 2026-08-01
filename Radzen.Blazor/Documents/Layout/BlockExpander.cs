@@ -37,7 +37,7 @@ internal static class BlockExpander
         var needsExpansion = false;
         foreach (var block in blocks)
         {
-            if (block is List or Container or TableOfContents)
+            if (block is ListBlock or Container or TableOfContents)
             {
                 needsExpansion = true;
                 break;
@@ -83,7 +83,7 @@ internal static class BlockExpander
             return default;
         }
 
-        public override Nothing Visit(List list, Nothing context)
+        public override Nothing Visit(ListBlock list, Nothing context)
         {
             ExpandList(list, expanded, ranges, 0, null, resolution);
             return default;
@@ -205,7 +205,7 @@ internal static class BlockExpander
     }
 
     private static void ExpandList(
-        List list,
+        ListBlock list,
         List<Block> expanded,
         List<ListItemBlockRange> ranges,
         double indent,
@@ -220,7 +220,7 @@ internal static class BlockExpander
             var itemFont = resolution.ItemFont(item) ?? ItemFont(item, list, inherited);
             foreach (var block in item.Blocks)
             {
-                if (block is List nested)
+                if (block is ListBlock nested)
                 {
                     ExpandList(nested, expanded, ranges, contentIndent, itemFont, resolution);
                     continue;
@@ -273,12 +273,12 @@ internal static class BlockExpander
         }
     }
 
-    private static Font ItemFont(ListItem item, List list, Font? inherited)
+    private static Font ItemFont(ListItem item, ListBlock list, Font? inherited)
         => FontCascade.Resolve([item.Font, list.Font, inherited]);
 
     private const string BulletGlyph = "\u2022";
 
-    private static string Marker(List list, int index)
+    private static string Marker(ListBlock list, int index)
         => list.Style == ListStyle.Number
             ? (index + 1).ToString(CultureInfo.InvariantCulture) + "."
             : BulletGlyph;

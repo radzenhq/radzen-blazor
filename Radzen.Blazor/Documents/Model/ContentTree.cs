@@ -108,7 +108,7 @@ internal static class ContentTree
                 return Reaches(container.Blocks, target);
             case Table table:
                 return ReferenceEquals(table.Columns, target) || Reaches(table.Rows, target);
-            case List list:
+            case ListBlock list:
                 return Reaches(list.Items, target);
             case Row row:
                 return Reaches(row.Cells, target);

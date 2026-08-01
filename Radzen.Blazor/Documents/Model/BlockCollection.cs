@@ -189,7 +189,7 @@ public sealed class BlockCollection : IReadOnlyList<Block>
     /// </summary>
     /// <param name="style">The marker style. Defaults to <see cref="ListStyle.Bullet"/>.</param>
     /// <returns>The newly created list.</returns>
-    public List AddList(ListStyle style = ListStyle.Bullet) => Add(new List { Style = style });
+    public ListBlock AddList(ListStyle style = ListStyle.Bullet) => Add(new ListBlock { Style = style });
 
     /// <summary>
     /// Appends an image, buffering the bytes from the specified stream.
