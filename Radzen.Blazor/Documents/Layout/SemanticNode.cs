@@ -8,8 +8,11 @@ internal sealed class SemanticNode(
     SemanticIntent intent,
     SemanticStructureTier tier,
     int paragraphStyle,
+    string? role,
+    bool roleIsDeclared,
+    string? language,
     string? alternateText,
-    string? actualText,
+    string? replacementText,
     SemanticHeaderScope headerScope,
     int rowSpan,
     int columnSpan,
@@ -31,9 +34,15 @@ internal sealed class SemanticNode(
 
     public int ParagraphStyle { get; } = paragraphStyle;
 
+    public string? Role { get; } = role;
+
+    public bool RoleIsDeclared { get; } = roleIsDeclared;
+
+    public string? Language { get; } = language;
+
     public string? AlternateText { get; } = alternateText;
 
-    public string? ActualText { get; } = actualText;
+    public string? ReplacementText { get; } = replacementText;
 
     public List<int> Children { get; } = [];
 }

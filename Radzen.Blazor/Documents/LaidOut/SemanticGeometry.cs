@@ -44,6 +44,10 @@ internal enum SemanticIntent
     NavigationEntry,
     CrossReference,
     Link,
+    Span,
+    Caption,
+    TableHeaderGroup,
+    TableBodyGroup,
 }
 
 internal enum SemanticHeaderScope
@@ -59,10 +63,6 @@ internal readonly record struct ResolvedParagraphStyle
     public required SemanticIntent Intent { get; init; }
 
     public int HeadingLevel { get; init; }
-
-    public string? CustomRole { get; init; }
-
-    public bool RoleIsDeclared { get; init; }
 }
 
 internal sealed record ResolvedStyleEnvironment
@@ -70,15 +70,21 @@ internal sealed record ResolvedStyleEnvironment
     public required ImmutableArray<ResolvedParagraphStyle> Paragraphs { get; init; }
 }
 
-internal readonly record struct SemanticStructureNode
+internal readonly struct SemanticStructureNode
 {
     public required SemanticIntent Intent { get; init; }
 
     public int? ParagraphStyle { get; init; }
 
+    public string? Role { get; init; }
+
+    public bool RoleIsDeclared { get; init; }
+
+    public string? Language { get; init; }
+
     public string? AlternateText { get; init; }
 
-    public string? ActualText { get; init; }
+    public string? ReplacementText { get; init; }
 
     public SemanticHeaderScope HeaderScope { get; init; }
 

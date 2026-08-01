@@ -426,7 +426,6 @@ Radzen.Documents.HorizontalAlignment.Justify : Radzen.Documents.HorizontalAlignm
 Radzen.Documents.HorizontalAlignment.Left : Radzen.Documents.HorizontalAlignment
 Radzen.Documents.HorizontalAlignment.Right : Radzen.Documents.HorizontalAlignment
 Radzen.Documents.HorizontalAlignment.Start : Radzen.Documents.HorizontalAlignment
-Radzen.Documents.Image.ActualText : System.String { get; set; }
 Radzen.Documents.Image.Alignment : Radzen.Documents.HorizontalAlignment { get; set; }
 Radzen.Documents.Image.AlternateText : System.String { get; set; }
 Radzen.Documents.Image.FitBox : System.Nullable<System.ValueTuple<Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit>> { get; set; }
@@ -434,11 +433,14 @@ Radzen.Documents.Image.FitInBox(Radzen.Documents.Core.Unit, Radzen.Documents.Cor
 Radzen.Documents.Image.Height : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
 Radzen.Documents.Image.Interpolate : System.Boolean { get; set; }
 Radzen.Documents.Image.Opacity : System.Double { get; set; }
+Radzen.Documents.Image.ReplacementText : System.String { get; set; }
 Radzen.Documents.Image.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
 Radzen.Documents.Inline.Anchor : System.String { get; set; }
+Radzen.Documents.Inline.Language : System.String { get; set; }
 Radzen.Documents.Inline.Link : System.String { get; set; }
 Radzen.Documents.Inline.LinkToAnchor : System.String { get; set; }
 Radzen.Documents.Inline.Opacity : System.Double { get; set; }
+Radzen.Documents.Inline.Role : System.String { get; set; }
 Radzen.Documents.InlineCollection..ctor()
 Radzen.Documents.InlineCollection.Add(Radzen.Documents.Inline) : Radzen.Documents.Inline
 Radzen.Documents.InlineCollection.Add(System.String) : Radzen.Documents.Run
@@ -452,9 +454,9 @@ Radzen.Documents.InlineCollection.Item[System.Int32] : Radzen.Documents.Inline {
 Radzen.Documents.InlineCollection.Move(System.Int32, System.Int32) : System.Void
 Radzen.Documents.InlineCollection.Remove(Radzen.Documents.Inline) : System.Boolean
 Radzen.Documents.InlineCollection.RemoveAt(System.Int32) : System.Void
-Radzen.Documents.InlineImage.ActualText : System.String { get; set; }
 Radzen.Documents.InlineImage.AlternateText : System.String { get; set; }
 Radzen.Documents.InlineImage.Height : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
+Radzen.Documents.InlineImage.ReplacementText : System.String { get; set; }
 Radzen.Documents.InlineImage.Width : System.Nullable<Radzen.Documents.Core.Unit> { get; set; }
 Radzen.Documents.LineCap.Butt : Radzen.Documents.LineCap
 Radzen.Documents.LineCap.Round : Radzen.Documents.LineCap

@@ -1,3 +1,4 @@
+using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
 
@@ -33,9 +34,62 @@ public abstract class Inline
     /// <summary>
     /// Gets or sets the anchor name marking this inline's position as a named navigation target.
     /// Outline entries targeting an anchor and internal links (<see cref="LinkToAnchor"/>)
-    /// navigate to it.
+    /// navigate to it. A non-empty anchor name must be unique within the document; layout throws
+    /// when the same name occurs more than once.
     /// </summary>
     public string? Anchor { get; set; }
+
+    private string? role;
+
+    private string? language;
+
+    /// <summary>
+    /// Gets or sets the semantic role this inline carries for assistive technology and structured
+    /// output, or <see langword="null"/> (the default) when it carries none and the inline is
+    /// content of its paragraph. An inline that declares a role becomes a span of its own in
+    /// structured output. A renderer decides how to express the role and which role names it
+    /// accepts - the PDF renderer, for one, maps it onto a structure type and rejects an unknown
+    /// name that its role map does not declare.
+    /// </summary>
+    /// <exception cref="System.ArgumentException">The value is empty.</exception>
+    public string? Role
+    {
+        get => role;
+        set
+        {
+            if (value is not null && value.Length == 0)
+            {
+                throw new ArgumentException(
+                    "Inline.Role must be non-empty, or null for an inline that declares no structure role.",
+                    nameof(value));
+            }
+
+            role = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the natural language of this inline as a BCP 47 language tag (for example
+    /// <c>fr-FR</c>), or <see langword="null"/> (the default) when it declares none and the
+    /// language of the document applies. An inline that declares a language becomes a span of its
+    /// own in structured output, carrying the language change.
+    /// </summary>
+    /// <exception cref="System.ArgumentException">The value is empty.</exception>
+    public string? Language
+    {
+        get => language;
+        set
+        {
+            if (value is not null && value.Length == 0)
+            {
+                throw new ArgumentException(
+                    "Inline.Language must be non-empty, or null for an inline that declares no language.",
+                    nameof(value));
+            }
+
+            language = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the opacity this inline is painted with, from 0 (fully transparent)
@@ -133,6 +187,8 @@ public abstract class TextInline : Inline
         target.Link = Link;
         target.LinkToAnchor = LinkToAnchor;
         target.Anchor = Anchor;
+        target.Role = Role;
+        target.Language = Language;
         target.LetterSpacing = LetterSpacing;
         target.VerticalAlignment = VerticalAlignment;
         target.VerticalAlignmentScale = VerticalAlignmentScale;
