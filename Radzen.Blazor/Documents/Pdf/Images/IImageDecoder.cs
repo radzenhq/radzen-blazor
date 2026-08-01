@@ -33,11 +33,12 @@ public interface IImageDecoder
     /// <c>false</c>. The default reads the size off a full decode; override it to read the header only.
     /// </summary>
     /// <param name="data">The encoded image bytes.</param>
+    /// <param name="limits">Resource limits bounding work on malformed or hostile input.</param>
     /// <param name="width">The width in pixels on success; otherwise <c>0</c>.</param>
     /// <param name="height">The height in pixels on success; otherwise <c>0</c>.</param>
-    bool TryReadPixelSize(ReadOnlyMemory<byte> data, out int width, out int height)
+    bool TryReadPixelSize(ReadOnlyMemory<byte> data, ReaderLimits limits, out int width, out int height)
     {
-        if (TryDecode(data, ReaderLimits.Default, out var image))
+        if (TryDecode(data, limits, out var image))
         {
             width = image.Width;
             height = image.Height;

@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
-using Radzen.Documents.Pdf;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
 internal sealed class ImageProbes
 {
-    public static readonly ImageProbes None = new([], ReaderLimits.Default);
+    public static readonly ImageProbes None = new([], ResourceLimits.Default);
 
-    private readonly ImmutableArray<Func<ReadOnlyMemory<byte>, (double Width, double Height)?>> probes;
+    private readonly ImmutableArray<Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?>> probes;
 
     private readonly ConditionalWeakTable<byte[], ImageInfo> cache = new();
 
-    private ImageProbes(ImmutableArray<Func<ReadOnlyMemory<byte>, (double Width, double Height)?>> probes, ReaderLimits limits)
+    private ImageProbes(ImmutableArray<Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?>> probes, ResourceLimits limits)
     {
         this.probes = probes;
         Limits = limits;
@@ -21,15 +21,15 @@ internal sealed class ImageProbes
 
     public int Count => probes.Length;
 
-    public ReaderLimits Limits { get; }
+    public ResourceLimits Limits { get; }
 
-    public ImageProbes Add(Func<ReadOnlyMemory<byte>, (double Width, double Height)?> probe)
+    public ImageProbes Add(Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?> probe)
     {
         ArgumentNullException.ThrowIfNull(probe);
         return new ImageProbes(probes.Add(probe), Limits);
     }
 
-    public ImageProbes WithLimits(ReaderLimits limits)
+    public ImageProbes WithLimits(ResourceLimits limits)
     {
         ArgumentNullException.ThrowIfNull(limits);
         return new ImageProbes(probes, limits);
@@ -86,7 +86,7 @@ internal sealed class ImageProbes
 
         foreach (var probe in probes)
         {
-            if (probe(data) is { } size)
+            if (probe(data, Limits) is { } size)
             {
                 return Validate((long)size.Width, (long)size.Height, ImageFormat.Custom);
             }
@@ -110,7 +110,7 @@ internal sealed class ImageProbes
 
     private ImageInfo Validate(long width, long height, ImageFormat format)
     {
-        ImageDecoder.ValidateImageDimensions(width, height, Limits, FormatName(format));
+        Limits.ValidateImageDimensions(width, height, FormatName(format));
         return new ImageInfo(format, width, height);
     }
 

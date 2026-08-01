@@ -64,17 +64,7 @@ public static class ImageDecoder
         => interpolate ? image.Interpolated() : image;
 
     internal static void ValidateImageDimensions(long width, long height, ReaderLimits limits, string format)
-    {
-        if (width <= 0 || height <= 0)
-        {
-            throw new InvalidDataException($"{format} image has invalid dimensions.");
-        }
-
-        if (width * height > limits.MaxImagePixels)
-        {
-            throw new InvalidDataException($"{format} image dimensions exceed the maximum decodable size.");
-        }
-    }
+        => limits.ValidateImageDimensions(width, height, format);
 
     private sealed class RegistryScope : IDisposable
     {

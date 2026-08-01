@@ -195,12 +195,14 @@ public sealed class BlockCollection : IReadOnlyList<Block>
     /// Appends an image, buffering the bytes from the specified stream.
     /// </summary>
     /// <param name="stream">The source image stream.</param>
+    /// <param name="limits">The resource limits bounding the buffered bytes, or <see langword="null"/> for <see cref="ResourceLimits.Default"/>.</param>
     /// <returns>The newly created image.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
-    public Image AddImage(Stream stream)
+    /// <exception cref="System.IO.InvalidDataException">The stream holds more than <see cref="ResourceLimits.MaxFileBytes"/> bytes.</exception>
+    public Image AddImage(Stream stream, ResourceLimits? limits = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
-        return Add(Image.FromStream(stream));
+        return Add(Image.FromStream(stream, limits));
     }
 
     /// <summary>
