@@ -11,8 +11,8 @@ public enum ContainerLayout
 
     /// <summary>
     /// Children share the container box: each child is laid out from the box top-left
-    /// (inset by the padding) and children are painted in declaration order, so later
-    /// children appear above earlier ones regardless of content kind. The box height is the
+    /// (inset by the padding). Child content is always painted in declaration order across
+    /// all content kinds, so later children appear above earlier ones. The box height is the
     /// tallest child's height.
     /// </summary>
     Overlay,

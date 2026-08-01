@@ -366,62 +366,12 @@ internal sealed class PageWriter(
 
     private List<PageDrawReference> OrderedDraws()
     {
-        var draws = PhaseOrderedDraws();
-        var groups = StackGroups(draws);
-        AddStackPrecedence(groups);
-
-        var ready = new SortedSet<int>();
-        for (var i = 0; i < draws.Count; i++)
-        {
-            if (draws[i].Stack is null || groups[draws[i].Stack!.Value].Blockers == 0)
-            {
-                ready.Add(i);
-            }
-        }
-
-        var ordered = new List<PageDrawReference>(draws.Count);
-        while (ready.Count > 0)
-        {
-            var index = ready.Min;
-            ready.Remove(index);
-            var draw = draws[index];
-            ordered.Add(draw);
-
-            if (draw.Stack is not { } stack)
-            {
-                continue;
-            }
-
-            var group = groups[stack];
-            group.Remaining--;
-            if (group.Remaining != 0)
-            {
-                continue;
-            }
-
-            foreach (var successor in group.Successors)
-            {
-                var next = groups[successor];
-                next.Blockers--;
-                if (next.Blockers == 0)
-                {
-                    foreach (var node in next.Nodes)
-                    {
-                        ready.Add(node);
-                    }
-                }
-            }
-        }
-
-        if (ordered.Count != draws.Count)
-        {
-            throw new InvalidOperationException("The page stacking constraints contain a cycle.");
-        }
-
-        return ordered;
+        var draws = AllDraws();
+        draws.Sort(CompareDraws);
+        return draws;
     }
 
-    private List<PageDrawReference> PhaseOrderedDraws()
+    private List<PageDrawReference> AllDraws()
     {
         var draws = new List<PageDrawReference>(
             plan.Fills.Count + plan.Edges.Count + plan.RoundedStrokes.Count
@@ -447,6 +397,34 @@ internal sealed class PageWriter(
         return draws;
     }
 
+    private static int CompareDraws(PageDrawReference left, PageDrawReference right)
+    {
+        if (left.Stack is not { } leftStack)
+        {
+            return right.Stack is null ? CompareWithinStack(left, right) : 1;
+        }
+
+        if (right.Stack is not { } rightStack)
+        {
+            return -1;
+        }
+
+        var layer = leftStack.Layer.CompareTo(rightStack.Layer);
+        if (layer != 0)
+        {
+            return layer;
+        }
+
+        var order = leftStack.Order.CompareTo(rightStack.Order);
+        return order != 0 ? order : CompareWithinStack(left, right);
+    }
+
+    private static int CompareWithinStack(PageDrawReference left, PageDrawReference right)
+    {
+        var phase = left.Phase.CompareTo(right.Phase);
+        return phase != 0 ? phase : left.Index.CompareTo(right.Index);
+    }
+
     private PaintStack? StackOf(PaintPhase phase, int index)
         => phase switch
         {
@@ -458,67 +436,7 @@ internal sealed class PageWriter(
             _ => null,
         };
 
-    private static Dictionary<PaintStack, StackGroup> StackGroups(List<PageDrawReference> draws)
-    {
-        var groups = new Dictionary<PaintStack, StackGroup>();
-        for (var i = 0; i < draws.Count; i++)
-        {
-            if (draws[i].Stack is not { } stack)
-            {
-                continue;
-            }
-
-            if (!groups.TryGetValue(stack, out var group))
-            {
-                group = new StackGroup();
-                groups.Add(stack, group);
-            }
-
-            group.Nodes.Add(i);
-            group.Remaining++;
-        }
-
-        return groups;
-    }
-
-    private static void AddStackPrecedence(Dictionary<PaintStack, StackGroup> groups)
-    {
-        var stacks = new List<PaintStack>(groups.Keys);
-        stacks.Sort(static (left, right) => left.Order.CompareTo(right.Order));
-        for (var earlierIndex = 0; earlierIndex < stacks.Count; earlierIndex++)
-        {
-            var earlier = stacks[earlierIndex];
-            var earlierGroup = groups[earlier];
-            for (var laterIndex = earlierIndex + 1; laterIndex < stacks.Count; laterIndex++)
-            {
-                var later = stacks[laterIndex];
-                var laterGroup = groups[later];
-                if (earlier.Layer != later.Layer
-                    || !Overlaps(earlier.Bounds, later.Bounds)
-                    || earlierGroup.Nodes[^1] < laterGroup.Nodes[0])
-                {
-                    continue;
-                }
-
-                earlierGroup.Successors.Add(later);
-                laterGroup.Blockers++;
-            }
-        }
-    }
-
-    private static bool Overlaps(in PdfRect left, in PdfRect right)
-        => left.Left < right.Right && right.Left < left.Right
-            && left.Bottom < right.Top && right.Bottom < left.Top;
-
     private readonly record struct PageDrawReference(PaintPhase Phase, int Index, PaintStack? Stack);
-
-    private sealed class StackGroup
-    {
-        public List<int> Nodes { get; } = [];
-        public List<PaintStack> Successors { get; } = [];
-        public int Remaining { get; set; }
-        public int Blockers { get; set; }
-    }
 
     public void Dispose() => writer.Dispose();
 }

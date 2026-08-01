@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
@@ -290,32 +291,11 @@ public class ContainerOverlayRotationTests
     }
 
 
-    private const string PlainContainerBaseline =
-        "JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgL01hcmtJbmZvIDw8IC" +
-        "9NYXJrZWQgdHJ1ZSA+PiAvU3RydWN0VHJlZVJvb3QgNSAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1Bh" +
-        "Z2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudC" +
-        "AyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUuMjc1NTkwNTUxMTgxMiA4NDEuODg5NzYzNzc5NTI3N10gL0NvbnRlbnRz" +
-        "IDQgMCBSIC9SZXNvdXJjZXMgPDwgL0ZvbnQgPDwgL0YwIDw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQm" +
-        "FzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyA+PiA+PiA+PiAvU3RydWN0UGFyZW50" +
-        "cyAwID4+CmVuZG9iago0IDAgb2JqCjw8IC9MZW5ndGggMjE2IC9GaWx0ZXIgL0ZsYXRlRGVjb2RlID4+CnN0cmVhbQ" +
-        "p4nJWOwWrCQBRF9+8r7lI3kzfJJBoIQpPY4kJo63xBm4mNpAmdCvr5RWPHkFpRBt5iuOdwWMTsg3vXrmnCYhpFmMhY" +
-        "sK+gwkCEKoBiWIOSvohxeK9PJLFz67Bbf1LoK6E4dj81rehlSLmRvAsbpPUoeQ81aO4g7xlJ4i2zRQ6ezZDmGaX6JL" +
-        "Jr8h4ZkqFLR0f+kdYFjVJTttZg+2Hw1u7H0Buaa5ovs75V3mSV7KwP5dbYS9J/DNPOoM5di+a7Kv50XceDc8DKvLdN" +
-        "gbpqDKqj6lfxAw1Re+YKZW5kc3RyZWFtCmVuZG9iago1IDAgb2JqCjw8IC9UeXBlIC9TdHJ1Y3RUcmVlUm9vdCAvSy" +
-        "A2IDAgUiAvUGFyZW50VHJlZSAxMSAwIFIgL1BhcmVudFRyZWVOZXh0S2V5IDEgPj4KZW5kb2JqCjYgMCBvYmoKPDwg" +
-        "L1R5cGUgL1N0cnVjdEVsZW0gL1MgL0RvY3VtZW50IC9QIDUgMCBSIC9LIFs3IDAgUl0gPj4KZW5kb2JqCjcgMCBvYm" +
-        "oKPDwgL1R5cGUgL1N0cnVjdEVsZW0gL1MgL1NlY3QgL1AgNiAwIFIgL0sgWzggMCBSIDkgMCBSXSA+PgplbmRvYmoK" +
-        "OCAwIG9iago8PCAvVHlwZSAvU3RydWN0RWxlbSAvUyAvUCAvUCA3IDAgUiAvUGcgMyAwIFIgL0sgWzBdID4+CmVuZG" +
-        "9iago5IDAgb2JqCjw8IC9UeXBlIC9TdHJ1Y3RFbGVtIC9TIC9QIC9QIDcgMCBSIC9QZyAzIDAgUiAvSyBbMV0gPj4K" +
-        "ZW5kb2JqCjEwIDAgb2JqCls4IDAgUiA5IDAgUl0KZW5kb2JqCjExIDAgb2JqCjw8IC9OdW1zIFswIDEwIDAgUl0gPj" +
-        "4KZW5kb2JqCnhyZWYKMCAxMgowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDEx" +
-        "NSAwMDAwMCBuIAowMDAwMDAwMTcyIDAwMDAwIG4gCjAwMDAwMDA0MTkgMDAwMDAgbiAKMDAwMDAwMDcwNyAwMDAwMC" +
-        "BuIAowMDAwMDAwNzk5IDAwMDAwIG4gCjAwMDAwMDA4NzEgMDAwMDAgbiAKMDAwMDAwMDk0NSAwMDAwMCBuIAowMDAw" +
-        "MDAxMDE2IDAwMDAwIG4gCjAwMDAwMDEwODcgMDAwMDAgbiAKMDAwMDAwMTExNyAwMDAwMCBuIAp0cmFpbGVyCjw8IC" +
-        "9Sb290IDEgMCBSIC9TaXplIDEyID4+CnN0YXJ0eHJlZgoxMTU2CiUlRU9GCg==";
+    private const string PlainContainerDeclarationOrderSha256 =
+        "4e82c628d63f8bb3cf0894604151cfc292ad96bd6cdaea1e792ef403bb86c2d7";
 
     [Fact]
-    public void PlainVerticalContainer_BuildBytes_IdenticalToPreChangeBaseline()
+    public void PlainVerticalContainer_BuildBytes_MatchDeclarationOrderBaseline()
     {
         var document = new Document();
         var section = document.Sections.Add();
@@ -332,35 +312,14 @@ public class ContainerOverlayRotationTests
 
         var bytes = new DocumentRenderer().Render(document).ToArray();
 
-        Assert.Equal(Convert.FromBase64String(PlainContainerBaseline), bytes);
+        Assert.Equal(PlainContainerDeclarationOrderSha256, Sha256Hex(bytes));
     }
 
-    private const string PlainOverlayBaseline =
-        "JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgL01hcmtJbmZvIDw8IC" +
-        "9NYXJrZWQgdHJ1ZSA+PiAvU3RydWN0VHJlZVJvb3QgNSAwIFIgPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1Bh" +
-        "Z2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4KZW5kb2JqCjMgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgL1BhcmVudC" +
-        "AyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUuMjc1NTkwNTUxMTgxMiA4NDEuODg5NzYzNzc5NTI3N10gL0NvbnRlbnRz" +
-        "IDQgMCBSIC9SZXNvdXJjZXMgPDwgL0ZvbnQgPDwgL0YwIDw8IC9UeXBlIC9Gb250IC9TdWJ0eXBlIC9UeXBlMSAvQm" +
-        "FzZUZvbnQgL0hlbHZldGljYSAvRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZyA+PiA+PiA+PiAvU3RydWN0UGFyZW50" +
-        "cyAwID4+CmVuZG9iago0IDAgb2JqCjw8IC9MZW5ndGggMjAyIC9GaWx0ZXIgL0ZsYXRlRGVjb2RlID4+CnN0cmVhbQ" +
-        "p4nI2O3QqCQBBG7+cp5rJu1nHdNQUJ0iy6kP62F4jWIippierxo7RVpEAG5mL4zpmPWEgcqbHNHgbEAt/Hgecy4gKF" +
-        "9JgUHvIAjcYcrkD4ntUUXHzYtAw/6TNILpig0F5OsIZlm7Kh6klHrFWtQVWXblSrcwk5C4wiJ0tmY6ThEONxArGqRG" +
-        "YPzoTQJVS5pX3+odUOerHOC6PxdtC4LZ59VEdIFaRZ0rS6nay8to7ymza/pH8MQWkQtWFz2WnzJTtT83sNvQDP4XOI" +
-        "CmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PCAvVHlwZSAvU3RydWN0VHJlZVJvb3QgL0sgNiAwIFIgL1BhcmVudF" +
-        "RyZWUgMTEgMCBSIC9QYXJlbnRUcmVlTmV4dEtleSAxID4+CmVuZG9iago2IDAgb2JqCjw8IC9UeXBlIC9TdHJ1Y3RF" +
-        "bGVtIC9TIC9Eb2N1bWVudCAvUCA1IDAgUiAvSyBbNyAwIFJdID4+CmVuZG9iago3IDAgb2JqCjw8IC9UeXBlIC9TdH" +
-        "J1Y3RFbGVtIC9TIC9TZWN0IC9QIDYgMCBSIC9LIFs4IDAgUiA5IDAgUl0gPj4KZW5kb2JqCjggMCBvYmoKPDwgL1R5" +
-        "cGUgL1N0cnVjdEVsZW0gL1MgL1AgL1AgNyAwIFIgL1BnIDMgMCBSIC9LIFswXSA+PgplbmRvYmoKOSAwIG9iago8PC" +
-        "AvVHlwZSAvU3RydWN0RWxlbSAvUyAvUCAvUCA3IDAgUiAvUGcgMyAwIFIgL0sgWzFdID4+CmVuZG9iagoxMCAwIG9i" +
-        "agpbOCAwIFIgOSAwIFJdCmVuZG9iagoxMSAwIG9iago8PCAvTnVtcyBbMCAxMCAwIFJdID4+CmVuZG9iagp4cmVmCj" +
-        "AgMTIKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAw" +
-        "MDAwMDE3MiAwMDAwMCBuIAowMDAwMDAwNDE5IDAwMDAwIG4gCjAwMDAwMDA2OTMgMDAwMDAgbiAKMDAwMDAwMDc4NS" +
-        "AwMDAwMCBuIAowMDAwMDAwODU3IDAwMDAwIG4gCjAwMDAwMDA5MzEgMDAwMDAgbiAKMDAwMDAwMTAwMiAwMDAwMCBu" +
-        "IAowMDAwMDAxMDczIDAwMDAwIG4gCjAwMDAwMDExMDMgMDAwMDAgbiAKdHJhaWxlcgo8PCAvUm9vdCAxIDAgUiAvU2" +
-        "l6ZSAxMiA+PgpzdGFydHhyZWYKMTE0MgolJUVPRgo=";
+    private const string PlainOverlayDeclarationOrderSha256 =
+        "0e24ec2536bef0f1647ea38deb2cbf673946390f39453ef57e53f70ac88d0efc";
 
     [Fact]
-    public void PlainOverlayContainer_BuildBytes_IdenticalToPreChangeBaseline()
+    public void PlainOverlayContainer_BuildBytes_MatchDeclarationOrderBaseline()
     {
         var document = new Document();
         var section = document.Sections.Add();
@@ -378,8 +337,11 @@ public class ContainerOverlayRotationTests
 
         var bytes = new DocumentRenderer().Render(document).ToArray();
 
-        Assert.Equal(Convert.FromBase64String(PlainOverlayBaseline), bytes);
+        Assert.Equal(PlainOverlayDeclarationOrderSha256, Sha256Hex(bytes));
     }
+
+    private static string Sha256Hex(byte[] bytes)
+        => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
 
     [Fact]
     public void RoundedOverlayContainer_WithBackgroundAndBorder_RendersRoundedDecoration()
