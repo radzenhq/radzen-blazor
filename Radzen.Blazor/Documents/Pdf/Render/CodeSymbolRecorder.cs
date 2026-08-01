@@ -7,11 +7,6 @@ namespace Radzen.Documents.Pdf.Render;
 
 internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
 {
-    public void EmitCodeSymbol(PageRenderContext context, LaidOutCodeSymbol positioned, double left, double top)
-        => EmitCodeSymbolModules(
-            context, positioned.Source, positioned.Modules, positioned.Foreground,
-            left + positioned.X, BottomUpSpace.FromTop(top, positioned.Y), positioned.Caption);
-
     public void EmitCodeSymbolModules(
         PageRenderContext context,
         SourceId source,
