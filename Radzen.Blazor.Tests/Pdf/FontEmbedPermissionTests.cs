@@ -4,6 +4,7 @@ using System.Buffers.Binary;
 using System.Text;
 using Xunit;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
@@ -43,8 +44,8 @@ public class FontEmbedPermissionTests
     {
         var face = SfntFont.Parse(Liberation());
         Assert.Equal(0, face.FsType);
-        Assert.False(face.EmbeddingRestricted);
-        face.EnsureEmbeddable(allowRestricted: false);
+        Assert.False(FontEmbedding.EmbeddingRestricted(face));
+        FontEmbedding.EnsureEmbeddable(face, allowRestricted: false);
     }
 
     [Fact]
@@ -52,14 +53,14 @@ public class FontEmbedPermissionTests
     {
         var face = SfntFont.Parse(WithFsType(Liberation(), 0x0002));
         Assert.Equal(0x0002, face.FsType);
-        Assert.True(face.EmbeddingRestricted);
+        Assert.True(FontEmbedding.EmbeddingRestricted(face));
     }
 
     [Fact]
     public void EnsureEmbeddable_ThrowsByDefaultForRestrictedFont()
     {
         var face = SfntFont.Parse(WithFsType(Liberation(), 0x0002));
-        Assert.Throws<InvalidOperationException>(() => face.EnsureEmbeddable(allowRestricted: false));
+        Assert.Throws<InvalidOperationException>(() => FontEmbedding.EnsureEmbeddable(face, allowRestricted: false));
     }
 
     [Fact]
@@ -67,8 +68,8 @@ public class FontEmbedPermissionTests
     {
         var face = SfntFont.Parse(WithFsType(Liberation(), 0x0002));
 
-        Assert.True(face.EmbeddingRestricted);
-        face.EnsureEmbeddable(allowRestricted: true);
+        Assert.True(FontEmbedding.EmbeddingRestricted(face));
+        FontEmbedding.EnsureEmbeddable(face, allowRestricted: true);
     }
 
     private static Document DocumentWith(byte[] font)
@@ -103,7 +104,7 @@ public class FontEmbedPermissionTests
     [Fact]
     public void PreviewPrintAndEditableBits_AreNotRestricted()
     {
-        Assert.False(SfntFont.Parse(WithFsType(Liberation(), 0x0004)).EmbeddingRestricted);
-        Assert.False(SfntFont.Parse(WithFsType(Liberation(), 0x0008)).EmbeddingRestricted);
+        Assert.False(FontEmbedding.EmbeddingRestricted(SfntFont.Parse(WithFsType(Liberation(), 0x0004))));
+        Assert.False(FontEmbedding.EmbeddingRestricted(SfntFont.Parse(WithFsType(Liberation(), 0x0008))));
     }
 }
