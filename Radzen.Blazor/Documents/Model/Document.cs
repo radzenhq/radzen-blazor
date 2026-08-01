@@ -42,7 +42,7 @@ public sealed class Document
     {
         System.ArgumentNullException.ThrowIfNull(paragraph);
 
-        var styles = Layout.StyleResolver.Resolve(this);
+        var styles = StyleResolver.Resolve(this);
 
         if (!styles.Contains(paragraph))
         {
@@ -78,7 +78,7 @@ public sealed class Document
     {
         System.ArgumentNullException.ThrowIfNull(run);
 
-        var font = Layout.StyleResolver.Resolve(this).RunFont(run)
+        var font = StyleResolver.Resolve(this).RunFont(run)
             ?? throw new System.ArgumentException(
                 "The run is not part of this document. Add it to a paragraph in a section, header or footer before resolving it.",
                 nameof(run));

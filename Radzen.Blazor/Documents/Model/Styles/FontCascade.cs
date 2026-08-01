@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Radzen.Documents.Fonts;
 
-namespace Radzen.Documents.Layout;
+namespace Radzen.Documents;
 
 internal static class FontCascade
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Radzen.Documents.Layout;
+namespace Radzen.Documents;
 
 internal sealed class OpacityResolver
 {

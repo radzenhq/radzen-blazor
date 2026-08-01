@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents;
 
 
@@ -27,6 +29,13 @@ public sealed class Container : Block
 {
     private double opacity = 1;
     private double rotation;
+    private Unit padding;
+    private Unit? paddingLeft;
+    private Unit? paddingRight;
+    private Unit? paddingTop;
+    private Unit? paddingBottom;
+    private Unit cornerRadius;
+    private Unit? width;
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
@@ -34,31 +43,56 @@ public sealed class Container : Block
     public BlockCollection Blocks { get; } = [];
 
     /// <summary>Gets or sets the padding applied on every edge between the box and its content.</summary>
-    public Unit Padding { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit Padding
+    {
+        get => padding;
+        set => padding = AuthoredNumber.Absolute(value, "Container.Padding");
+    }
 
     /// <summary>
     /// Gets or sets the padding on the left edge, or <see langword="null"/> when the container sets none
     /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? PaddingLeft { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? PaddingLeft
+    {
+        get => paddingLeft;
+        set => paddingLeft = AuthoredNumber.Absolute(value, "Container.PaddingLeft");
+    }
 
     /// <summary>
     /// Gets or sets the padding on the right edge, or <see langword="null"/> when the container sets none
     /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? PaddingRight { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? PaddingRight
+    {
+        get => paddingRight;
+        set => paddingRight = AuthoredNumber.Absolute(value, "Container.PaddingRight");
+    }
 
     /// <summary>
     /// Gets or sets the padding on the top edge, or <see langword="null"/> when the container sets none
     /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? PaddingTop { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? PaddingTop
+    {
+        get => paddingTop;
+        set => paddingTop = AuthoredNumber.Absolute(value, "Container.PaddingTop");
+    }
 
     /// <summary>
     /// Gets or sets the padding on the bottom edge, or <see langword="null"/> when the container sets none
     /// and the edge falls back to <see cref="Padding"/>. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? PaddingBottom { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? PaddingBottom
+    {
+        get => paddingBottom;
+        set => paddingBottom = AuthoredNumber.Absolute(value, "Container.PaddingBottom");
+    }
 
     internal BoxPadding EffectivePadding => new(
         (PaddingLeft ?? Padding).Point,
@@ -87,7 +121,12 @@ public sealed class Container : Block
     /// the same width, color and style on all four edges; a non-uniform border keeps the square
     /// four-edge rendering while the background stays rounded. Defaults to 0 (square).
     /// </summary>
-    public Unit CornerRadius { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit CornerRadius
+    {
+        get => cornerRadius;
+        set => cornerRadius = AuthoredNumber.Absolute(value, "Container.CornerRadius");
+    }
 
     /// <summary>
     /// Gets or sets the opacity the box background and borders are painted with, from 0
@@ -115,7 +154,12 @@ public sealed class Container : Block
     /// Gets or sets the fixed box width (padding and borders included), or
     /// <see langword="null"/> to fill the available width.
     /// </summary>
-    public Unit? Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "Container.Width");
+    }
 
     /// <summary>
     /// Gets or sets how the child blocks are arranged inside the box.

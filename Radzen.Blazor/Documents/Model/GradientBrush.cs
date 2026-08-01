@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 

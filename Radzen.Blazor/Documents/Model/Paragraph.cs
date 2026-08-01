@@ -1,6 +1,7 @@
 using System.Linq;
 
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 namespace Radzen.Documents;
 
 
@@ -10,6 +11,9 @@ namespace Radzen.Documents;
 public sealed class Paragraph : Block
 {
     private double lineSpacing = 1.0;
+    private Unit? leftIndent;
+    private Unit? spacingBefore;
+    private Unit? spacingAfter;
     private int widows = 2;
     private int orphans = 2;
 
@@ -60,21 +64,36 @@ public sealed class Paragraph : Block
     /// default. Setting <see langword="null"/> resets it. Use <see cref="Document.Resolve(Paragraph)"/> for
     /// the effective value.
     /// </summary>
-    public Unit? LeftIndent { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? LeftIndent
+    {
+        get => leftIndent;
+        set => leftIndent = AuthoredNumber.Absolute(value, "Paragraph.LeftIndent");
+    }
 
     /// <summary>
     /// Gets or sets the spacing before the paragraph, or <see langword="null"/> when none is set directly
     /// and the effective value comes from the named style chain or the built-in default. Setting
     /// <see langword="null"/> resets it. Use <see cref="Document.Resolve(Paragraph)"/> for the effective value.
     /// </summary>
-    public Unit? SpacingBefore { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? SpacingBefore
+    {
+        get => spacingBefore;
+        set => spacingBefore = AuthoredNumber.Absolute(value, "Paragraph.SpacingBefore");
+    }
 
     /// <summary>
     /// Gets or sets the spacing after the paragraph, or <see langword="null"/> when none is set directly
     /// and the effective value comes from the named style chain or the built-in default. Setting
     /// <see langword="null"/> resets it. Use <see cref="Document.Resolve(Paragraph)"/> for the effective value.
     /// </summary>
-    public Unit? SpacingAfter { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? SpacingAfter
+    {
+        get => spacingAfter;
+        set => spacingAfter = AuthoredNumber.Absolute(value, "Paragraph.SpacingAfter");
+    }
 
     /// <summary>Gets or sets the line spacing multiplier. Defaults to 1.0.</summary>
     /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value"/> is not a finite number greater than zero.</exception>

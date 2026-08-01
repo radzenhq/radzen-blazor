@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Layout;
 

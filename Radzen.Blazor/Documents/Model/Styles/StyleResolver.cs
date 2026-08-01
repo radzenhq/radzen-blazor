@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using Radzen.Documents.Fonts;
 
-namespace Radzen.Documents.Layout;
+namespace Radzen.Documents;
 
 internal static class StyleResolver
 {

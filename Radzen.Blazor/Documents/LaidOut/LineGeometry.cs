@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.Fonts.Sfnt;
 
 namespace Radzen.Documents.LaidOut;
 
@@ -56,8 +56,6 @@ internal readonly struct LineFragment
 
     public required FragmentPaint Paint { get; init; }
 
-    public SfntFont? Face { get; init; }
-
     public required string Text { get; init; }
 
     public required int Start { get; init; }
@@ -73,11 +71,9 @@ internal readonly struct LineFragment
     public required CapturedGlyphRun GlyphRun { get; init; }
 }
 
-internal readonly record struct ShapedRunSource(SourceId Source, int Start, int Length);
-
 internal readonly struct ShapedTextRun
 {
-    public required int FirstFragment { get; init; }
+    public required ImmutableArray<LineFragment> Fragments { get; init; }
 
     public required FragmentPaint Paint { get; init; }
 
@@ -87,16 +83,20 @@ internal readonly struct ShapedTextRun
 
     public required CapturedGlyphRun GlyphRun { get; init; }
 
-    public required ImmutableArray<ShapedRunSource> Sources { get; init; }
-
-    public SourceId Source => Sources[0].Source;
+    public SourceId Source => Fragments[0].Source;
 }
 
 internal sealed record LineBox
 {
-    public required ImmutableArray<LineFragment> Fragments { get; init; }
+    public required ImmutableArray<ShapedTextRun> ShapedRuns { get; init; }
 
-    public ImmutableArray<ShapedTextRun> ShapedRuns { get; init; } = [];
+    public ImmutableArray<LineFragment> Fragments
+        => ShapedRuns.Length switch
+        {
+            0 => [],
+            1 => ShapedRuns[0].Fragments,
+            _ => [.. ShapedRuns.SelectMany(run => run.Fragments)],
+        };
 
     public double Width { get; init; }
 

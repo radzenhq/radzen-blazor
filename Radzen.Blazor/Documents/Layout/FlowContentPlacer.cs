@@ -39,6 +39,7 @@ internal static class FlowContentPlacer
         {
             Source = capture.Source(block),
             Modules = CodeSymbolDispatch.Modules(block),
+            Foreground = CodeSymbolDispatch.Foreground(block),
             Y = y,
             Width = codeSymbolWidth,
             Height = codeSymbolHeight,

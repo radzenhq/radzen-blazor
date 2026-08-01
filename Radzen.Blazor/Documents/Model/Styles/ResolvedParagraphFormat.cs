@@ -1,4 +1,6 @@
-namespace Radzen.Documents.Layout;
+using Radzen.Documents.Core;
+
+namespace Radzen.Documents;
 
 internal readonly record struct ResolvedParagraphFormat
 {

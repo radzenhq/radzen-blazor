@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents;
 
 
@@ -6,6 +8,9 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Section
 {
+    private Unit headerDistance = Unit.FromCentimeter(1.25);
+    private Unit footerDistance = Unit.FromCentimeter(1.25);
+
     internal object? Owner { get; set; }
 
     /// <summary>Gets or sets the page size. Defaults to <see cref="PageSizes.A4"/>.</summary>
@@ -35,13 +40,23 @@ public sealed class Section
     /// Gets or sets the distance between the top page edge and the header band.
     /// Defaults to 1.25 cm.
     /// </summary>
-    public Unit HeaderDistance { get; set; } = Unit.FromCentimeter(1.25);
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit HeaderDistance
+    {
+        get => headerDistance;
+        set => headerDistance = AuthoredNumber.Absolute(value, "Section.HeaderDistance");
+    }
 
     /// <summary>
     /// Gets or sets the distance between the bottom page edge and the footer band.
     /// Defaults to 1.25 cm.
     /// </summary>
-    public Unit FooterDistance { get; set; } = Unit.FromCentimeter(1.25);
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit FooterDistance
+    {
+        get => footerDistance;
+        set => footerDistance = AuthoredNumber.Absolute(value, "Section.FooterDistance");
+    }
 
     /// <summary>Gets the page header.</summary>
     public HeaderFooter Header { get; } = new();

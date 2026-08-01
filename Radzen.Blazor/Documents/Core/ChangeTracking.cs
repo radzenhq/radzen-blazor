@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Core;
 
 internal interface ITracksChanges
 {

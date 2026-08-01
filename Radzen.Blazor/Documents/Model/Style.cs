@@ -1,5 +1,6 @@
 using System;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -42,19 +43,34 @@ public sealed class Style
     /// Gets or sets the spacing before a paragraph this style sets itself, or <see langword="null"/> when it
     /// sets none and the value is inherited from its base style chain. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? SpacingBefore { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? SpacingBefore
+    {
+        get => spacingBefore;
+        set => spacingBefore = AuthoredNumber.Absolute(value, "Style.SpacingBefore");
+    }
 
     /// <summary>
     /// Gets or sets the spacing after a paragraph this style sets itself, or <see langword="null"/> when it
     /// sets none and the value is inherited from its base style chain. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? SpacingAfter { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? SpacingAfter
+    {
+        get => spacingAfter;
+        set => spacingAfter = AuthoredNumber.Absolute(value, "Style.SpacingAfter");
+    }
 
     /// <summary>
     /// Gets or sets the left indent this style sets itself, or <see langword="null"/> when it sets none and
     /// the value is inherited from its base style chain. Setting <see langword="null"/> resets it.
     /// </summary>
-    public Unit? LeftIndent { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? LeftIndent
+    {
+        get => leftIndent;
+        set => leftIndent = AuthoredNumber.Absolute(value, "Style.LeftIndent");
+    }
 
     /// <summary>
     /// Gets or sets the keep-together flag this style sets itself, or <see langword="null"/> when it sets
@@ -63,6 +79,9 @@ public sealed class Style
     public bool? KeepTogether { get; set; }
 
     private int? headingLevel;
+    private Unit? spacingBefore;
+    private Unit? spacingAfter;
+    private Unit? leftIndent;
 
     /// <summary>
     /// Gets or sets the heading level a paragraph in this style carries, from 1 to 6, or

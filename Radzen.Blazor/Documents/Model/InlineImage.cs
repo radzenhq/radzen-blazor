@@ -1,5 +1,6 @@
 using System.IO;
 using Radzen.Documents.Internal;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -11,6 +12,9 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class InlineImage : Inline
 {
+    private Unit? width;
+    private Unit? height;
+
     internal InlineImage(byte[] data) => Data = data;
 
     internal static InlineImage FromStream(Stream stream) => new(StreamBytes.ReadFully(stream, ResourceLimits.Default.MaxFileBytes));
@@ -21,13 +25,23 @@ public sealed class InlineImage : Inline
     /// Gets or sets the drawn width, or <see langword="null"/> (the default) for the natural width.
     /// When only <see cref="Height"/> is set the width follows from it and the image's aspect ratio.
     /// </summary>
-    public Unit? Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "InlineImage.Width");
+    }
 
     /// <summary>
     /// Gets or sets the drawn height, or <see langword="null"/> (the default) for the natural height.
     /// When only <see cref="Width"/> is set the height follows from it and the image's aspect ratio.
     /// </summary>
-    public Unit? Height { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Height
+    {
+        get => height;
+        set => height = AuthoredNumber.Absolute(value, "InlineImage.Height");
+    }
 
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the image, carried on the

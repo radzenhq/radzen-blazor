@@ -1,4 +1,5 @@
 using System;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -9,14 +10,15 @@ namespace Radzen.Documents;
 /// <remarks>
 /// Initializes a new <see cref="PageSize"/>.
 /// </remarks>
+/// <exception cref="ArgumentOutOfRangeException"><paramref name="width"/> or <paramref name="height"/> is relative.</exception>
 public readonly struct PageSize(Unit width, Unit height) : IEquatable<PageSize>
 {
 
     /// <summary>Gets the page width.</summary>
-    public Unit Width { get; } = width;
+    public Unit Width { get; } = AuthoredNumber.Absolute(width, "PageSize.Width");
 
     /// <summary>Gets the page height.</summary>
-    public Unit Height { get; } = height;
+    public Unit Height { get; } = AuthoredNumber.Absolute(height, "PageSize.Height");
 
     internal (Unit Width, Unit Height) Effective(PageOrientation orientation)
         => orientation == PageOrientation.Landscape ? (Height, Width) : (Width, Height);

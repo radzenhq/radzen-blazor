@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.LaidOut;
 
@@ -37,6 +38,8 @@ internal readonly struct LaidOutCodeSymbol
     public required SourceId Source { get; init; }
 
     public required ImmutableArray<CodeSymbolModule> Modules { get; init; }
+
+    public required Color Foreground { get; init; }
 
     public required double Width { get; init; }
 

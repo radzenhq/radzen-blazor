@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Core;
 
 // CSS Color Module Level 4 section 6.1: the named colors and their sRGB values.
 internal static class NamedColors

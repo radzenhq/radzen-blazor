@@ -1,4 +1,5 @@
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -58,6 +59,8 @@ public abstract class TextInline : Inline
 {
     private double verticalAlignmentScale = 0.583;
     private double horizontalScale = 1.0;
+    private Unit letterSpacing;
+    private Unit wordSpacing;
 
     private protected TextInline()
     {
@@ -70,13 +73,23 @@ public abstract class TextInline : Inline
     /// Gets or sets the additional spacing added after each glyph, in points. Included in
     /// measurement as spacing * (glyph count - 1).
     /// </summary>
-    public Unit LetterSpacing { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit LetterSpacing
+    {
+        get => letterSpacing;
+        set => letterSpacing = AuthoredNumber.Absolute(value, "TextInline.LetterSpacing");
+    }
 
     /// <summary>
     /// Gets or sets the additional spacing added at every word-separator space, in points. Which
     /// positions count as word separators is determined by text shaping. Defaults to zero.
     /// </summary>
-    public Unit WordSpacing { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit WordSpacing
+    {
+        get => wordSpacing;
+        set => wordSpacing = AuthoredNumber.Absolute(value, "TextInline.WordSpacing");
+    }
 
     /// <summary>
     /// Gets or sets the vertical alignment of this inline. Superscript and subscript inlines

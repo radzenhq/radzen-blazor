@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Codes;
 

@@ -1,3 +1,5 @@
+using Radzen.Documents.Core;
+
 namespace Radzen.Documents;
 
 
@@ -23,12 +25,13 @@ public sealed class Borders
     private BorderStyle style = BorderStyle.None;
 
     /// <summary>Gets or sets the box-level border width.</summary>
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
     public Unit Width
     {
         get => width;
         set
         {
-            width = value;
+            width = AuthoredNumber.Absolute(value, "Borders.Width");
             IsSet = true;
         }
     }

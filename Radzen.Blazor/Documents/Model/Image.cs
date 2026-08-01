@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Radzen.Documents.Internal;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents;
 
@@ -12,6 +13,8 @@ namespace Radzen.Documents;
 public sealed class Image : Block
 {
     private double opacity = 1;
+    private Unit? width;
+    private Unit? height;
 
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
@@ -22,10 +25,20 @@ public sealed class Image : Block
     internal byte[] Data { get; }
 
     /// <summary>Gets or sets the rendered width. When <see langword="null"/> the natural width is used.</summary>
-    public Unit? Width { get; set; }
+    /// <exception cref="ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "Image.Width");
+    }
 
     /// <summary>Gets or sets the rendered height. When <see langword="null"/> the natural height is used.</summary>
-    public Unit? Height { get; set; }
+    /// <exception cref="ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Height
+    {
+        get => height;
+        set => height = AuthoredNumber.Absolute(value, "Image.Height");
+    }
 
     /// <summary>Gets or sets the horizontal alignment of the image within its container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;

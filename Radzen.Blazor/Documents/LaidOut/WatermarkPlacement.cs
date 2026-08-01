@@ -1,4 +1,5 @@
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 
 namespace Radzen.Documents.LaidOut;
 

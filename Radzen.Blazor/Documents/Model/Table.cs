@@ -1,4 +1,5 @@
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Core;
 namespace Radzen.Documents;
 
 
@@ -7,6 +8,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Table : Block
 {
+    private Unit? width;
+    private Unit leftIndent;
+    private Unit cornerRadius;
+
     internal override TResult Accept<TContext, TResult>(BlockVisitor<TContext, TResult> visitor, TContext context) => visitor.Visit(this, context);
 
     /// <summary>
@@ -31,10 +36,20 @@ public sealed class Table : Block
     public Font Font { get; } = new();
 
     /// <summary>Gets or sets the fixed table width, or <see langword="null"/> for automatic sizing.</summary>
-    public Unit? Width { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit? Width
+    {
+        get => width;
+        set => width = AuthoredNumber.Absolute(value, "Table.Width");
+    }
 
     /// <summary>Gets or sets the horizontal offset of the table from the left content edge.</summary>
-    public Unit LeftIndent { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit LeftIndent
+    {
+        get => leftIndent;
+        set => leftIndent = AuthoredNumber.Absolute(value, "Table.LeftIndent");
+    }
 
     /// <summary>
     /// Gets or sets the corner radius of the table. When positive, the table strokes a single
@@ -43,5 +58,10 @@ public sealed class Table : Block
     /// backgrounds - to the rounded shape. The radius is clamped to half the smaller table
     /// dimension. A table that breaks across pages rounds each per-page fragment independently.
     /// </summary>
-    public Unit CornerRadius { get; set; }
+    /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
+    public Unit CornerRadius
+    {
+        get => cornerRadius;
+        set => cornerRadius = AuthoredNumber.Absolute(value, "Table.CornerRadius");
+    }
 }
