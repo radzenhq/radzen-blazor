@@ -13,6 +13,8 @@ internal sealed class StructureElement
 
     public string? ActualText { get; init; }
 
+    public string? Language { get; init; }
+
     public SemanticHeaderScope HeaderScope { get; init; }
 
     public int RowSpan { get; init; }

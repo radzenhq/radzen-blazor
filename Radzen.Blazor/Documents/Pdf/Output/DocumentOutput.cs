@@ -194,6 +194,7 @@ internal sealed class StructureElementSnapshot(
     string type,
     string? alt,
     string? actualText,
+    string? language,
     SemanticHeaderScope headerScope,
     int rowSpan,
     int columnSpan,
@@ -206,6 +207,8 @@ internal sealed class StructureElementSnapshot(
     public string? Alt { get; } = alt;
 
     public string? ActualText { get; } = actualText;
+
+    public string? Language { get; } = language;
 
     public SemanticHeaderScope HeaderScope { get; } = headerScope;
 

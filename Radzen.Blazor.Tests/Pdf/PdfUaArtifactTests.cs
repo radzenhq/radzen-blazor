@@ -261,14 +261,14 @@ public class PdfUaArtifactTests
     }
 
     [Fact]
-    public void PdfUA_FigureWithActualText_DoesNotThrow()
+    public void PdfUA_FigureWithReplacementText_DoesNotThrow()
     {
         var document = new Document { Language = "en-US" };
         var builderRenderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
         document.Info.Title = "Figure";
         var section = document.Sections.Add();
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        image.ActualText = "chart";
+        image.ReplacementText = "chart";
 
         Assert.Null(Record.Exception(() => builderRenderer.ToArray(document)));
     }

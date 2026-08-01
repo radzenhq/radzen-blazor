@@ -97,7 +97,7 @@ internal sealed class PageWriter(
             }
         }
 
-        taggedMarks = structureTree.PlanTaggedContent(pageIndex, tagged);
+        taggedMarks = structureTree.PlanTaggedContent(pageIndex, [.. tagged]);
     }
 
     private void EmitFill(in FillDraw fill)

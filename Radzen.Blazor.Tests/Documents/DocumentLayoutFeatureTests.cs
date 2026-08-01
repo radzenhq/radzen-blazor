@@ -44,6 +44,20 @@ public class DocumentLayoutFeatureTests
         Assert.Equal("here", Assert.Single(page.Anchors).Name);
     }
 
+    [Fact]
+    public void DuplicateAnchorNames_AcrossPagesFailLayout()
+    {
+        var (document, section) = Author();
+        section.Blocks.AddParagraph().Inlines.Add("first").Anchor = "duplicate";
+        section.Blocks.AddPageBreak();
+        section.Blocks.AddParagraph().Inlines.Add("second").Anchor = "duplicate";
+
+        var error = Assert.Throws<InvalidOperationException>(() => DocumentLayouter.Layout(document));
+
+        Assert.Contains("duplicate", error.Message, StringComparison.Ordinal);
+        Assert.Contains("unique", error.Message, StringComparison.Ordinal);
+    }
+
     private static Document NumberedFooter()
     {
         var (document, section) = Author();

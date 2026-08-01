@@ -99,4 +99,19 @@ public class ShapedTextRunTests
             line.ShapedRuns.Select(run => run.GlyphRun.Text).ToArray(),
             new[] { "body", "one" });
     }
+
+    [Fact]
+    public void FragmentsAreFlattenedOnceForMultipleShapedRuns()
+    {
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Inlines.Add("body");
+        paragraph.Inlines.Add("one").Font.Bold = true;
+        var line = FirstLine(document);
+
+        var first = line.Fragments;
+        var second = line.Fragments;
+
+        Assert.True(first == second);
+    }
 }

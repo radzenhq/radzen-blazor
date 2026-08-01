@@ -845,7 +845,7 @@ public class LaidOutContractTests
         body.StyleName = "Heading1";
         lead.StyleName = "Heading2";
         image.AlternateText = "Mutated alternate text";
-        image.ActualText = "Mutated actual text";
+        image.ReplacementText = "Mutated replacement text";
         document.Language = "fr";
 
         Assert.Equal(immediate, Render(laidOut, document, renderer));

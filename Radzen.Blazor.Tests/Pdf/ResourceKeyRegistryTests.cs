@@ -74,6 +74,19 @@ public class ResourceKeyRegistryTests
     }
 
     [Fact]
+    public void GradientStops_HaveStructuralValueEquality()
+    {
+        var first = Paint(new LinearGradient(0, 0, 1, 1, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue)));
+        var second = first with { Stops = [.. first.Stops] };
+        var plan = Plan();
+
+        Assert.Equal(first, second);
+        Assert.Equal(first.GetHashCode(), second.GetHashCode());
+        Assert.Equal("P0", plan.RegisterPattern(first, Matrix.Identity));
+        Assert.Equal("P0", plan.RegisterPattern(second, Matrix.Identity));
+    }
+
+    [Fact]
     public void NegativeZeroOpacity_SharesTheZeroEntry()
     {
         using var writer = new ContentWriter();

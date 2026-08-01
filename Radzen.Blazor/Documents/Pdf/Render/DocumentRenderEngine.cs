@@ -130,12 +130,9 @@ internal sealed class DocumentRenderEngine
             var pageHeight = paginated[pageIndex].Size.Height.Point;
             foreach (var anchor in paginated[pageIndex].Anchors)
             {
-                if (!anchors.ContainsKey(anchor.Name))
-                {
-                    anchors.Add(
-                        anchor.Name,
-                        new OutputAnchor(pageOutputs[pageIndex], BottomUpSpace.FromTop(pageHeight, anchor.Top)));
-                }
+                anchors.Add(
+                    anchor.Name,
+                    new OutputAnchor(pageOutputs[pageIndex], BottomUpSpace.FromTop(pageHeight, anchor.Top)));
             }
         }
 

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
 using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.LaidOut;
@@ -88,15 +87,39 @@ internal readonly struct ShapedTextRun
 
 internal sealed record LineBox
 {
-    public required ImmutableArray<ShapedTextRun> ShapedRuns { get; init; }
-
-    public ImmutableArray<LineFragment> Fragments
-        => ShapedRuns.Length switch
+    public LineBox(ImmutableArray<ShapedTextRun> shapedRuns)
+    {
+        ShapedRuns = shapedRuns;
+        if (shapedRuns.Length == 0)
         {
-            0 => [],
-            1 => ShapedRuns[0].Fragments,
-            _ => [.. ShapedRuns.SelectMany(run => run.Fragments)],
-        };
+            Fragments = [];
+            return;
+        }
+
+        if (shapedRuns.Length == 1)
+        {
+            Fragments = shapedRuns[0].Fragments;
+            return;
+        }
+
+        var count = 0;
+        foreach (var run in shapedRuns)
+        {
+            count += run.Fragments.Length;
+        }
+
+        var fragments = ImmutableArray.CreateBuilder<LineFragment>(count);
+        foreach (var run in shapedRuns)
+        {
+            fragments.AddRange(run.Fragments);
+        }
+
+        Fragments = fragments.MoveToImmutable();
+    }
+
+    public ImmutableArray<ShapedTextRun> ShapedRuns { get; }
+
+    public ImmutableArray<LineFragment> Fragments { get; }
 
     public double Width { get; init; }
 

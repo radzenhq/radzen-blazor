@@ -10,11 +10,16 @@ internal sealed class PageNavigationCollector
 {
     private readonly List<LaidOutLink> links = [];
     private readonly List<LaidOutAnchor> anchors = [];
-    private readonly HashSet<string> seen = new(StringComparer.Ordinal);
+    private readonly IDictionary<string, SourceId> seen;
 
-    public static LaidOutPage Collect(LaidOutPage page)
+    private PageNavigationCollector(IDictionary<string, SourceId> seen)
     {
-        var collector = Walk(page);
+        this.seen = seen;
+    }
+
+    public static LaidOutPage Collect(LaidOutPage page, IDictionary<string, SourceId> seen)
+    {
+        var collector = Walk(page, seen);
 
         return page with
         {
@@ -23,11 +28,12 @@ internal sealed class PageNavigationCollector
         };
     }
 
-    public static ImmutableArray<LaidOutAnchor> Anchors(LaidOutPage page) => [.. Walk(page).anchors];
+    public static ImmutableArray<LaidOutAnchor> Anchors(LaidOutPage page, IDictionary<string, SourceId> seen)
+        => [.. Walk(page, seen).anchors];
 
-    private static PageNavigationCollector Walk(LaidOutPage page)
+    private static PageNavigationCollector Walk(LaidOutPage page, IDictionary<string, SourceId> seen)
     {
-        var collector = new PageNavigationCollector();
+        var collector = new PageNavigationCollector(seen);
         var left = page.ContentBox.X;
 
         collector.Layer(page.Body, left, page.ContentBox.Y);
@@ -146,16 +152,30 @@ internal sealed class PageNavigationCollector
     {
         foreach (var fragment in line.Fragments)
         {
-            if (fragment.Paint.Anchor is { Length: > 0 } anchor && seen.Add(anchor))
+            if (fragment.Paint.Anchor is not { Length: > 0 } anchor)
             {
-                anchors.Add(new LaidOutAnchor
-                {
-                    Name = anchor,
-                    Top = transform is { } matrix
-                        ? matrix.Transform(originX, lineTop).Y
-                        : lineTop,
-                });
+                continue;
             }
+
+            if (seen.TryGetValue(anchor, out var source))
+            {
+                if (source == fragment.Source)
+                {
+                    continue;
+                }
+
+                throw new InvalidOperationException(
+                    $"Duplicate anchor name '{anchor}'; anchor names must be unique within a document.");
+            }
+
+            seen.Add(anchor, fragment.Source);
+            anchors.Add(new LaidOutAnchor
+            {
+                Name = anchor,
+                Top = transform is { } matrix
+                    ? matrix.Transform(originX, lineTop).Y
+                    : lineTop,
+            });
         }
 
         var y = lineTop + line.Baseline;

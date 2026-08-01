@@ -62,9 +62,8 @@ internal static partial class LineLayouter
         };
         var fragments = ImmutableArray.Create(fragment);
         var (height, baseline) = Measure(fragments, 1, fonts);
-        return new LineBox
+        return new LineBox(ShapeRuns([fragment], fonts, capture))
         {
-            ShapedRuns = ShapeRuns([fragment], fonts, capture),
             Width = 0,
             Height = height,
             Baseline = baseline,
@@ -136,9 +135,8 @@ internal static partial class LineLayouter
         var font = ResolvedFont(resolution, paragraph);
         var captured = GeometryCapture.Font(font);
         var (height, ascent) = FontExtent(captured, fonts);
-        return new LineBox
+        return new LineBox([])
         {
-            ShapedRuns = [],
             Width = 0,
             Height = height * paragraph.LineSpacing,
             Baseline = ascent,
@@ -534,9 +532,8 @@ internal static partial class LineLayouter
 
         var shapedRuns = ShapeRuns(fragments, fonts, context.Capture);
         var (height, baseline) = Measure(fragments.ToImmutableArray(), paragraph.LineSpacing, fonts);
-        return new LineBox
+        return new LineBox(shapedRuns)
         {
-            ShapedRuns = shapedRuns,
             Width = width,
             Height = height,
             Baseline = baseline,
