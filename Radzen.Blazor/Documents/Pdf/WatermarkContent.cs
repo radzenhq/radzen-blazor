@@ -1,5 +1,8 @@
+using Radzen.Documents.Fonts;
+using Radzen.Documents.Layout;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Content;
+using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Render;
 
 namespace Radzen.Documents.Pdf;
@@ -8,71 +11,65 @@ internal sealed class WatermarkContent(
     Watermark watermark,
     PdfRect box,
     ImageRegistry images,
-    SourceId? imageSource,
-    SceneImageData? imageData) : ContentElement
+    FontCollectionSnapshot? knownFonts,
+    ImageProbes probes) : ContentElement
 {
     protected override void EmitBody(ContentWriter writer)
     {
-        var extGState = watermark.Opacity < 1
-            ? writer.RegisterOpacity(watermark.Opacity)
+        var planned = WatermarkPlanner.PlanBase14(
+            watermark,
+            new PageSize(Unit.FromPoint(box.Width), Unit.FromPoint(box.Height)),
+            knownFonts,
+            new LayoutCaptureContext(probes))!;
+        var extGState = planned.Opacity < 1
+            ? writer.RegisterOpacity(planned.Opacity)
             : null;
         var transform = WatermarkGeometry.Rotation(
-            watermark.Rotation,
-            box.Left + box.Width / 2,
-            box.Bottom + box.Height / 2);
+            planned.Rotation,
+            box.Left + planned.CenterX,
+            box.Bottom + planned.CenterY);
         ContentEmitter.WriteWatermark(
             writer,
             extGState,
             transform,
-            WriteImage,
-            WriteText);
+            output => WriteImage(output, planned),
+            output => WriteText(output, planned));
     }
 
-    private void WriteImage(ContentWriter writer)
+    private void WriteImage(ContentWriter writer, LaidOutWatermark planned)
     {
-        if (watermark.Image is not { } image
-            || imageSource is not { } source
-            || imageData is not { } data)
+        if (planned.Image is not { } image)
         {
             return;
         }
 
-        var paint = new ImagePaint
-        {
-            Data = data,
-            Opacity = image.Opacity,
-            Interpolate = image.Interpolate,
-        };
-        var decoded = ImageRegistry.SourceOf(images.DecodeWatermark(source, paint));
-        var plan = WatermarkImagePlan.Create(image, decoded, box.Width);
+        var decoded = ImageRegistry.SourceOf(images.DecodeWatermark(image.Source, image.Paint));
         var key = writer.RegisterImage(decoded);
-        var state = plan.Alpha < 1
-            ? writer.RegisterOpacity(watermark.Opacity * plan.Alpha)
+        var state = image.Alpha < 1
+            ? writer.RegisterOpacity(planned.Opacity * image.Alpha)
             : null;
         ContentEmitter.WriteImagePlacement(
-            writer, key, plan.X, plan.Y, plan.Width, plan.Height, state);
+            writer, key, image.X, image.Y, image.Width, image.Height, state);
     }
 
-    private void WriteText(ContentWriter writer)
+    private void WriteText(ContentWriter writer, LaidOutWatermark planned)
     {
-        if (string.IsNullOrEmpty(watermark.Text))
+        if (planned.Text is not { } text)
         {
             return;
         }
 
         var font = watermark.Font;
         var fontKey = writer.RegisterFont(font);
-        var plan = WatermarkTextPlan.Base14(watermark.Text, font);
-        var alphaOverride = WatermarkGeometry.AlphaOverride(watermark.Opacity, font.EffectiveColor.A);
         ContentEmitter.WriteTextShow(writer, new TextShowOp
         {
             FontKey = fontKey,
-            Size = font.EffectiveSize.Point,
-            X = plan.X,
-            Baseline = plan.Baseline,
-            Color = font.EffectiveColor,
-            Bytes = plan.Bytes,
-            ExtGState = alphaOverride is { } alpha ? writer.RegisterOpacity(alpha) : null,
+            Size = text.Size,
+            X = text.X,
+            Baseline = -text.Baseline,
+            Color = text.Color,
+            Bytes = WinAnsiText.Encode(text.Text, OnUnencodable.Throw, "Watermark text"),
+            ExtGState = text.AlphaOverride is { } alpha ? writer.RegisterOpacity(alpha) : null,
         });
     }
 }

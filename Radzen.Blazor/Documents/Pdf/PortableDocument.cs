@@ -6,7 +6,6 @@ using System.Text;
 
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Internal;
-using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
@@ -757,22 +756,14 @@ public sealed class PortableDocument
         }
 
         var images = new ImageRegistry(ImageDecoders);
-        SourceId? imageSource = null;
-        SceneImageData? imageData = null;
-        if (watermark.Image is { } image)
-        {
-            imageSource = new SourceId(0);
-            imageData = new SceneImageData(image.Data);
-        }
-
         foreach (var page in Pages)
         {
             page.AppendContent(new WatermarkContent(
                 watermark,
                 page.CropBox ?? page.MediaBox,
                 images,
-                imageSource,
-                imageData));
+                FontSnapshot,
+                ImageDecoders.Probes));
         }
     }
 
