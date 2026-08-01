@@ -765,7 +765,11 @@ public sealed class PortableDocument
                 page.CropBox ?? page.MediaBox,
                 images,
                 FontSnapshot,
-                ImageDecoders.Probes));
+                ImageDecoders.Probes)
+            {
+                // ISO 32000-1 14.8.2.2: a watermark is an artifact, not real content.
+                IsArtifact = true,
+            });
         }
     }
 

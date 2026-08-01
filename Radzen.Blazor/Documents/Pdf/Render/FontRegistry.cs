@@ -38,6 +38,17 @@ internal sealed class FontRegistry
         return fonts.GetOrAddValue(name, key => new EmittedFont { Key = key, Base14 = name });
     }
 
+    public IEnumerable<SfntFont> SfntFaces()
+    {
+        foreach (var font in fonts.Values)
+        {
+            if (font.Sfnt is { } sfnt)
+            {
+                yield return sfnt;
+            }
+        }
+    }
+
     public Dictionary<EmittedFont, PlannedFont> Plan()
     {
         var planned = new Dictionary<EmittedFont, PlannedFont>(fonts.Count);

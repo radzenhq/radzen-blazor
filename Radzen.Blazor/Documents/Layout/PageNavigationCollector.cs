@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System;
+using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Core;
 
@@ -199,9 +200,7 @@ internal sealed class PageNavigationCollector
                 j++;
             }
 
-            var (above, below) = first.Paint.InlineImage is { } image
-                ? (image.Height, 0.0)
-                : (first.Paint.Font.Size * 0.9, first.Paint.Font.Size * 0.3);
+            var (above, below) = Extent(first, line);
             links.Add(Link(
                 originX + start,
                 y - above,
@@ -213,6 +212,33 @@ internal sealed class PageNavigationCollector
                 clip));
             i = j;
         }
+    }
+
+    private static (double Above, double Below) Extent(in LineFragment fragment, LineBox line)
+    {
+        if (fragment.Paint.InlineImage is { } image)
+        {
+            return (image.Height, 0.0);
+        }
+
+        var size = fragment.Paint.Font.Size;
+        foreach (var span in fragment.GlyphRun.Spans)
+        {
+            if (span.Face.Kind == CapturedFontFaceKind.Sfnt)
+            {
+                var face = span.Face.Sfnt;
+                return (
+                    face.Ascent * size / face.UnitsPerEm,
+                    -face.Descent * size / face.UnitsPerEm);
+            }
+
+            var metrics = span.Face.BuiltIn.Metrics;
+            return (
+                metrics.Ascender * size / metrics.DesignUnitsPerEm,
+                -metrics.Descender * size / metrics.DesignUnitsPerEm);
+        }
+
+        return (line.Baseline, line.Height - line.Baseline);
     }
 
     private LaidOutLink Link(

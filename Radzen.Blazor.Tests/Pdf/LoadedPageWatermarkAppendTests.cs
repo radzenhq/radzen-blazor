@@ -76,4 +76,22 @@ public class LoadedPageWatermarkAppendTests
 
         Assert.Equal(eagerOutput.ToArray(), lazyOutput.ToArray());
     }
+
+    [Fact]
+    public void AddWatermark_LoadedPage_StampsInsideArtifactMarkedContent()
+    {
+        var document = Load(Source(1, 2));
+        document.AddWatermark("DRAFT");
+
+        var content = Encoding.ASCII.GetString(
+            ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));
+
+        var begin = content.IndexOf("/Artifact BMC", System.StringComparison.Ordinal);
+        Assert.True(begin >= 0, $"the stamped watermark must open an artifact, got:\n{content}");
+        var watermark = content.IndexOf("(DRAFT)", System.StringComparison.Ordinal);
+        Assert.True(watermark > begin, "the watermark text must sit inside the artifact");
+        Assert.True(
+            content.IndexOf("EMC", watermark, System.StringComparison.Ordinal) > watermark,
+            "the artifact must be closed after the watermark text");
+    }
 }

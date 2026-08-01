@@ -57,6 +57,27 @@ public class LinkAnnotationGeometryTests
     }
 
     [Fact]
+    public void LinkRect_MatchesTheFaceAscentAndDescent()
+    {
+        const double size = 24;
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        var paragraph = section.Blocks.AddParagraph();
+        var run = paragraph.Inlines.Add("Radzen");
+        run.Link = Url;
+        run.Font.Family = BuildTestSupport.Latin;
+        run.Font.Size = Unit.FromPoint(size);
+
+        var rect = Assert.Single(LinkRects(BuildTestSupport.Read(document), 0));
+
+        var face = Radzen.Documents.Fonts.Sfnt.SfntFont.Parse(
+            PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"));
+        var expected = (face.Ascent - face.Descent) * size / face.UnitsPerEm;
+        Assert.Equal(expected, rect.Y2 - rect.Y1, 3);
+    }
+
+    [Fact]
     public void LinkInsideRotatedContainer_AnnotationRectIsTransformed()
     {
         var upright = Assert.Single(LinkRects(BuildTestSupport.Read(LinkInContainer(0)), 0));
