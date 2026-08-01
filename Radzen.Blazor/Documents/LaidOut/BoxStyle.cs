@@ -23,7 +23,53 @@ internal readonly record struct GradientPaint(
     double X1,
     double Y1,
     double R1,
-    ImmutableArray<GradientStopPaint> Stops);
+    ImmutableArray<GradientStopPaint> Stops)
+{
+    public bool Equals(GradientPaint other)
+    {
+        if (Identity != other.Identity
+            || Kind != other.Kind
+            || X0 != other.X0
+            || Y0 != other.Y0
+            || R0 != other.R0
+            || X1 != other.X1
+            || Y1 != other.Y1
+            || R1 != other.R1
+            || Stops.Length != other.Stops.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < Stops.Length; i++)
+        {
+            if (Stops[i] != other.Stops[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+        hash.Add(Identity);
+        hash.Add(Kind);
+        hash.Add(X0);
+        hash.Add(Y0);
+        hash.Add(R0);
+        hash.Add(X1);
+        hash.Add(Y1);
+        hash.Add(R1);
+        for (var i = 0; i < Stops.Length; i++)
+        {
+            hash.Add(Stops[i]);
+        }
+
+        return hash.ToHashCode();
+    }
+}
 
 internal readonly record struct BoxShadowPaint(
     Color Color,

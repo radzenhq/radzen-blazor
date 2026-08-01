@@ -17,6 +17,7 @@ internal static class LayoutFinalizer
         var resolver = new FieldResolver(fonts, resolution, capture);
         var count = document.Pages.Length;
         var pages = ImmutableArray.CreateBuilder<LaidOutPage>(count);
+        var anchors = new Dictionary<string, SourceId>(StringComparer.Ordinal);
         for (var index = 0; index < count; index++)
         {
             var page = document.Pages[index];
@@ -37,7 +38,7 @@ internal static class LayoutFinalizer
                 };
             }
 
-            pages.Add(PageNavigationCollector.Collect(page));
+            pages.Add(PageNavigationCollector.Collect(page, anchors));
         }
 
         return new LaidOutDocument

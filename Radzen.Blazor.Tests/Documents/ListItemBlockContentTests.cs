@@ -93,6 +93,54 @@ public class ListItemBlockContentTests
     }
 
     [Fact]
+    public void RepeatedMeasurement_UsesTheMarkerIndentFromTheFinalPlacement()
+    {
+        var fonts = PaginationSupport.Fonts();
+        var resolution = LoweringResult.CreateForDocument(StyleResolution.Empty);
+        var capture = new LayoutCaptureContext(ImageProbes.None);
+
+        var narrow = new Container { Width = Unit.FromPoint(120) };
+        var narrowOuter = narrow.Blocks.AddList();
+        narrowOuter.LeftIndent = Unit.FromPoint(5);
+        narrowOuter.HangingIndent = Unit.FromPoint(10);
+        var narrowItem = narrowOuter.AddItem("narrow");
+        var measuredList = narrowItem.Blocks.AddList();
+        measuredList.LeftIndent = Unit.FromPoint(3);
+        measuredList.HangingIndent = Unit.FromPoint(7);
+        measuredList.AddItem("target").Font.Family = PaginationSupport.Family;
+
+        _ = BoxContentLayout.Measure(
+            BlockCollection.Borrowing(narrow),
+            120,
+            null,
+            fonts,
+            resolution,
+            capture);
+
+        Assert.True(narrowItem.Blocks.Remove(measuredList));
+        var wide = new Container { Width = Unit.FromPoint(240) };
+        var wideOuter = wide.Blocks.AddList();
+        wideOuter.LeftIndent = Unit.FromPoint(40);
+        wideOuter.HangingIndent = Unit.FromPoint(20);
+        var wideItem = wideOuter.AddItem("wide");
+        wideItem.Blocks.Add(measuredList);
+
+        var laidOut = BoxContentLayout.Layout(
+            BlockCollection.Borrowing(wide),
+            new Rect(0, 0, 240, 200),
+            HorizontalAlignment.Left,
+            VerticalAlignment.Top,
+            fonts,
+            resolution,
+            capture);
+        var target = Assert.Single(Assert.Single(laidOut.Boxes).Content.Lines.Where(line => Text(line) == "target"));
+        var marker = target.Line.Fragments.Single(fragment => fragment.IsMarker);
+
+        Assert.Equal(63, marker.XOffset, Tol);
+        Assert.Equal(marker.XOffset + measuredList.HangingIndent.Point, ContentX(target), Tol);
+    }
+
+    [Fact]
     public void TableBlock_UsesTheItemContentEdge()
     {
         var document = new Document();

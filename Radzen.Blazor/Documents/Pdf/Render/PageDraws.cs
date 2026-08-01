@@ -239,7 +239,7 @@ internal sealed class PagePlan
         new(ContentResourcePrefixes.Page.ExtGState, reserved: null, StringComparer.Ordinal);
 
     private readonly ResourceNameAllocator<(GradientPaint Gradient, Matrix Matrix), OutputPattern> patterns =
-        new(ContentResourcePrefixes.Page.Pattern, reserved: null, GradientPatternComparer.Instance);
+        new(ContentResourcePrefixes.Page.Pattern, reserved: null);
 
     private readonly Dictionary<string, OutputExtGState> extGStatesByKey = new(StringComparer.Ordinal);
 
@@ -333,63 +333,6 @@ internal sealed class PagePlan
         => patterns.GetOrAdd((gradient, matrix), key => new OutputPattern(key, gradient, matrix));
 
     public PlanMarks Mark() => new(Fills.Count, Edges.Count, Images.Count, Texts.Count, RoundedStrokes.Count);
-}
-
-internal sealed class GradientPatternComparer : IEqualityComparer<(GradientPaint Gradient, Matrix Matrix)>
-{
-    public static GradientPatternComparer Instance { get; } = new();
-
-    public bool Equals(
-        (GradientPaint Gradient, Matrix Matrix) x,
-        (GradientPaint Gradient, Matrix Matrix) y)
-    {
-        var left = x.Gradient;
-        var right = y.Gradient;
-        if (left.Identity != right.Identity
-            || left.Kind != right.Kind
-            || left.X0 != right.X0
-            || left.Y0 != right.Y0
-            || left.R0 != right.R0
-            || left.X1 != right.X1
-            || left.Y1 != right.Y1
-            || left.R1 != right.R1
-            || left.Stops.Length != right.Stops.Length
-            || !x.Matrix.Equals(y.Matrix))
-        {
-            return false;
-        }
-
-        for (var i = 0; i < left.Stops.Length; i++)
-        {
-            if (left.Stops[i] != right.Stops[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public int GetHashCode((GradientPaint Gradient, Matrix Matrix) value)
-    {
-        var gradient = value.Gradient;
-        var hash = new HashCode();
-        hash.Add(gradient.Identity);
-        hash.Add(gradient.Kind);
-        hash.Add(gradient.X0);
-        hash.Add(gradient.Y0);
-        hash.Add(gradient.R0);
-        hash.Add(gradient.X1);
-        hash.Add(gradient.Y1);
-        hash.Add(gradient.R1);
-        foreach (var stop in gradient.Stops)
-        {
-            hash.Add(stop);
-        }
-
-        hash.Add(value.Matrix);
-        return hash.ToHashCode();
-    }
 }
 
 internal readonly record struct PlanMarks(int Fills, int Edges, int Images, int Texts, int Rounded);

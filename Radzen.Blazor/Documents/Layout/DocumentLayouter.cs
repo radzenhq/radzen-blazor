@@ -191,11 +191,12 @@ internal static class DocumentLayouter
     private static Dictionary<string, int> AnchorPages(ImmutableArray<LaidOutPage> pages)
     {
         var anchors = new Dictionary<string, int>(StringComparer.Ordinal);
+        var seen = new Dictionary<string, SourceId>(StringComparer.Ordinal);
         for (var i = 0; i < pages.Length; i++)
         {
-            foreach (var anchor in PageNavigationCollector.Anchors(pages[i]))
+            foreach (var anchor in PageNavigationCollector.Anchors(pages[i], seen))
             {
-                anchors.TryAdd(anchor.Name, i + 1);
+                anchors.Add(anchor.Name, i + 1);
             }
         }
 

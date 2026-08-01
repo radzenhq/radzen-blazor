@@ -490,17 +490,17 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void InlineImageActualText_IsCapturedAsReplacementText()
+    public void InlineImageReplacementText_IsCaptured()
     {
         var document = new Document();
         var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).ActualText = "Radzen";
+        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).ReplacementText = "Radzen";
 
         var figure = SingleFigure(document);
 
         Assert.False(figure.IsDecorative);
         Assert.Null(figure.AlternateText);
-        Assert.Equal("Radzen", figure.ActualText);
+        Assert.Equal("Radzen", figure.ReplacementText);
         Assert.Empty(DocumentLayouter.Layout(document).Semantics.Structure.Artifacts);
     }
 

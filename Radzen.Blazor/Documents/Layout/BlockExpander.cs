@@ -254,19 +254,16 @@ internal static class BlockExpander
             }
 
             var first = expanded[start];
-            if (resolution.ListMarker(first) is null)
-            {
-                resolution.SetListMarker(
-                    first,
-                    new ListMarkerLayout(
-                        Marker(list, i),
-                        indent + list.LeftIndent.Point,
-                        itemFont));
+            resolution.SetListMarker(
+                first,
+                new ListMarkerLayout(
+                    Marker(list, i),
+                    indent + list.LeftIndent.Point,
+                    itemFont));
 
-                if (resolution.Semantics.ListItemElements(item) is { } elements)
-                {
-                    resolution.Semantics.SetListBlockElements(first, elements.Label, elements.Body);
-                }
+            if (resolution.Semantics.ListItemElements(item) is { } elements)
+            {
+                resolution.Semantics.SetListBlockElements(first, elements.Label, elements.Body);
             }
 
             ranges.Add(new ListItemBlockRange(

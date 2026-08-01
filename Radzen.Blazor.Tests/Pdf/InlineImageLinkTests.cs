@@ -203,9 +203,9 @@ public class InlineImageLinkTests
     }
 
     [Fact]
-    public void InlineImageActualText_IsWrittenOnTheTaggedFigure()
+    public void InlineImageReplacementText_IsWrittenAsActualTextOnTheTaggedFigure()
     {
-        var (document, _) = Authored(picture => picture.ActualText = "Radzen");
+        var (document, _) = Authored(picture => picture.ReplacementText = "Radzen");
         document.Language = "en";
         document.Info.Title = "Doc";
 
@@ -279,8 +279,8 @@ public class InlineImageLinkTests
         Assert.Equal(
             new HashSet<string>(StringComparer.Ordinal)
             {
-                "Width", "Height", "AlternateText", "ActualText",
-                "Link", "LinkToAnchor", "Anchor", "Opacity",
+                "Width", "Height", "AlternateText", "ReplacementText",
+                "Link", "LinkToAnchor", "Anchor", "Opacity", "Role", "Language",
             },
             members);
     }
