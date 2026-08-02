@@ -14,6 +14,8 @@ internal sealed class FormFlatteningWriter(PortableDocument document)
 
     public void Flatten()
     {
+        FlattenAuthoredFields();
+
         foreach (var definition in document.FormFields)
         {
             FieldPageValidation.Validate(definition, document.Pages.Count);
@@ -23,6 +25,60 @@ internal sealed class FormFlatteningWriter(PortableDocument document)
 
         document.FormFields.Clear();
         FlattenLoadedForm();
+    }
+
+    private void FlattenAuthoredFields()
+    {
+        foreach (var (pageIndex, _, widget) in AuthoredFields.Placed(document, PageOutputMap.Build(document.Pages)))
+        {
+            PaintAuthoredField(document.Pages[pageIndex], widget);
+        }
+
+        document.AuthoredFieldsFlattened = true;
+    }
+
+    private static void PaintAuthoredField(Page page, in Output.OutputWidget widget)
+    {
+        var field = widget.Field;
+        switch (field.Kind)
+        {
+            case LaidOut.FormFieldKind.Text or LaidOut.FormFieldKind.DropDown:
+                if (field.Value.Length == 0)
+                {
+                    return;
+                }
+
+                if (!FieldAppearances.CanEncode(field.Value))
+                {
+                    throw new NotSupportedException(
+                        $"Cannot flatten the field '{field.Name}': its value has characters the standard-14 "
+                        + "appearance font cannot encode, so flattening it would paint the wrong content.");
+                }
+
+                page.Content.Add(FieldAppearances.Text(
+                    field.Value,
+                    widget.X,
+                    widget.Bottom,
+                    field.Height,
+                    AuthoredFields.AppearanceFont(widget.Font)));
+                break;
+            case LaidOut.FormFieldKind.CheckBox:
+                if (field.Chosen)
+                {
+                    page.Content.Add(FieldAppearances.CheckMark(
+                        widget.X, widget.Bottom, field.Width, field.Height));
+                }
+
+                break;
+            default:
+                foreach (var path in FieldAppearances.RadioVisual(
+                    widget.X, widget.Bottom, field.Width, field.Height, field.Chosen))
+                {
+                    page.Content.Add(path);
+                }
+
+                break;
+        }
     }
 
     private static void WriteCreatedField(Page page, FormFieldDefinition definition)

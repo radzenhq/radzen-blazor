@@ -84,7 +84,7 @@ internal sealed class FieldResolver(
                 case PageCountField:
                     text = pageCount.ToString(CultureInfo.InvariantCulture);
                     break;
-                case InlineImage:
+                case InlineImage or FormInput:
                     if (pendingTabs > 0)
                     {
                         pieces.Add((run, new StringBuilder(), pendingTabs));

@@ -15,6 +15,7 @@ public class ClosedModelHierarchyTests
         typeof(Block),
         typeof(Inline),
         typeof(TextInline),
+        typeof(FormInput),
         typeof(Radzen.Documents.Pdf.ContentElement),
         typeof(Radzen.Documents.Pdf.FormFieldDefinition),
         typeof(Radzen.Documents.Pdf.PositionedFieldDefinition),

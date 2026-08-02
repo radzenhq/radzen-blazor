@@ -79,6 +79,16 @@ internal readonly struct ImageDraw
     public PaintStack? Stack { get; init; }
 }
 
+internal readonly struct WidgetDraw
+{
+    public required double X { get; init; }
+    public required double Bottom { get; init; }
+    public required FormFieldPaint Field { get; init; }
+    public required Radzen.Documents.Fonts.FontPaint Font { get; init; }
+    public StructureElement? Element { get; init; }
+    public int Sequence { get; init; }
+}
+
 internal readonly struct FillDraw
 {
     public required double X { get; init; }
@@ -185,6 +195,7 @@ internal sealed class PagePlan
     public List<ImageDraw> Images { get; } = [];
     public List<TextDraw> Texts { get; } = [];
     public List<OutputLink> Links { get; } = [];
+    public List<WidgetDraw> Widgets { get; } = [];
     private int sequence;
 
     public int NextSequence() => sequence++;

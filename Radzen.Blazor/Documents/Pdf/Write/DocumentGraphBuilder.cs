@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Radzen.Documents.Pdf.Write;
@@ -84,15 +85,17 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         LoadedState? loaded,
         Dictionary<DocumentReader, GraphImporter> appendImporters)
     {
+        var forms = new FormWriter(doc);
+        var appendedFields = forms.AppendForms(pageNodes, appendImporters, writer);
+        var authored = new AuthoredFieldWriter(doc, forms).Write(writer, pageNodes, pageMap, appendedFields);
+
         if (doc.Output?.Structure is { } structure)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
             catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(
-                writer, structure, pageNodes, pageMap, doc.RoleMap.Entries, annotationJoins);
+                writer, structure, pageNodes, pageMap, doc.RoleMap.Entries, annotationJoins, authored.StructureJoins);
         }
 
-        var forms = new FormWriter(doc);
-        var appendedFields = forms.AppendForms(pageNodes, appendImporters, writer);
         var createdWidgets = doc.FormFields.Count > 0
             ? forms.WriteCreatedFields(writer, pageNodes, appendedFields)
             : [];
@@ -118,7 +121,7 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         }
 
         AnnotationWriter.Write(writer, importer, loaded?.Source, appendImporters, pageNodes);
-        foreach (var (pageIndex, reference) in createdWidgets)
+        foreach (var (pageIndex, reference) in Enumerable.Concat(authored.Widgets, createdWidgets))
         {
             var node = pageNodes[pageIndex].Node;
             if (node.TryGetValue("Annots", out var annots) && annots is ArrayObject array)

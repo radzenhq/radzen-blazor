@@ -26,8 +26,11 @@ internal sealed class PageOutput(
     ImmutableArray<OutputImage> images,
     ImmutableArray<OutputLink> links,
     ImmutableArray<OutputExtGState> extGStates,
-    ImmutableArray<OutputPattern> patterns)
+    ImmutableArray<OutputPattern> patterns,
+    ImmutableArray<OutputWidget> widgets)
 {
+    public ImmutableArray<OutputWidget> Widgets { get; } = widgets;
+
     public ReadOnlyMemory<byte> Content => ContentArray;
 
     public byte[] ContentArray { get; } = content;
@@ -121,6 +124,13 @@ internal sealed class OutputImage(
     public OutputImagePayload? SoftMask { get; } = softMask;
 }
 
+internal readonly record struct OutputWidget(
+    double X,
+    double Bottom,
+    FormFieldPaint Field,
+    Radzen.Documents.Fonts.FontPaint Font,
+    int? StructureElementId);
+
 internal readonly record struct OutputLink(
     double X1,
     double Y1,
@@ -184,7 +194,8 @@ internal sealed class OutputTransparencyGroup(
 internal readonly record struct StructureKidSnapshot(
     StructureElementSnapshot? Child,
     PageOutput? Page,
-    int Mcid);
+    int Mcid,
+    int? Annotation);
 
 internal sealed class StructureElementSnapshot(
     int id,

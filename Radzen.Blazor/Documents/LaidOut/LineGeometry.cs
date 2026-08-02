@@ -14,6 +14,39 @@ internal readonly record struct InlineImagePaint
     public required double Height { get; init; }
 }
 
+internal enum FormFieldKind
+{
+    Text,
+    CheckBox,
+    Radio,
+    DropDown,
+}
+
+internal readonly record struct FormFieldPaint
+{
+    public required SourceId Key { get; init; }
+
+    public required FormFieldKind Kind { get; init; }
+
+    public required string Name { get; init; }
+
+    public required string Value { get; init; }
+
+    public required bool Required { get; init; }
+
+    public required bool Chosen { get; init; }
+
+    public required double Width { get; init; }
+
+    public required double Height { get; init; }
+
+    public required double Ascent { get; init; }
+
+    public string? Label { get; init; }
+
+    public ImmutableArray<string> Options { get; init; }
+}
+
 internal readonly record struct FragmentPaint
 {
     public required FontPaint Font { get; init; }
@@ -35,6 +68,8 @@ internal readonly record struct FragmentPaint
     public required bool Invisible { get; init; }
 
     public InlineImagePaint? InlineImage { get; init; }
+
+    public FormFieldPaint? FormField { get; init; }
 
     public string? Link { get; init; }
 

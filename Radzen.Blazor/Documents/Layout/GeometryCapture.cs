@@ -18,9 +18,12 @@ internal static class GeometryCapture
         Inline inline,
         in FontPaint font,
         LayoutCaptureContext capture)
-        => inline is TextInline text
-            ? TextFragment(text, font)
-            : ImageFragment((InlineImage)inline, font, capture);
+        => inline switch
+        {
+            TextInline text => TextFragment(text, font),
+            FormInput input => FieldFragment(input, font, capture),
+            _ => ImageFragment((InlineImage)inline, font, capture),
+        };
 
     private static FragmentPaint TextFragment(TextInline run, in FontPaint font) => new()
     {
@@ -57,6 +60,60 @@ internal static class GeometryCapture
         Anchor = image.Anchor,
         InlineImage = ImagePaint(image, capture),
     };
+
+    private static FragmentPaint FieldFragment(
+        FormInput input,
+        in FontPaint font,
+        LayoutCaptureContext capture) => new()
+    {
+        Font = font,
+        Opacity = input.Opacity,
+        LetterSpacing = 0,
+        WordSpacing = 0,
+        HorizontalScale = 1,
+        ScriptScale = 1,
+        Rise = 0,
+        IsScript = false,
+        Invisible = false,
+        Anchor = input.Anchor,
+        FormField = FieldPaint(input, font.Size, capture),
+    };
+
+    private static FormFieldPaint FieldPaint(FormInput input, double fontSize, LayoutCaptureContext capture)
+    {
+        var extent = FormInputMetrics.Measure(input, fontSize);
+        return new FormFieldPaint
+        {
+            Key = capture.Source(input),
+            Kind = input switch
+            {
+                TextInput => FormFieldKind.Text,
+                CheckBox => FormFieldKind.CheckBox,
+                RadioButton => FormFieldKind.Radio,
+                _ => FormFieldKind.DropDown,
+            },
+            Name = input.Name,
+            Value = input switch
+            {
+                TextInput text => text.Value,
+                RadioButton radio => radio.Value,
+                DropDown drop => drop.Value,
+                _ => string.Empty,
+            },
+            Required = input.Required,
+            Chosen = input switch
+            {
+                CheckBox box => box.Checked,
+                RadioButton radio => radio.Selected,
+                _ => false,
+            },
+            Label = input.Label,
+            Options = input is DropDown list ? [.. list.Options] : [],
+            Width = extent.Width,
+            Height = extent.Height,
+            Ascent = extent.Ascent,
+        };
+    }
 
     public static ImagePaint Image(Image image, LayoutCaptureContext capture) => new()
     {

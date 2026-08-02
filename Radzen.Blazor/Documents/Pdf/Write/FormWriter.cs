@@ -12,6 +12,8 @@ internal sealed class FormWriter
     private readonly AppendedFormImporter appendedFormImporter;
     private readonly LoadedFormImporter loadedFormImporter;
     private readonly List<(GraphImporter Importer, DictionaryObject Form)> appendedFormDefaults = [];
+    private readonly SortedSet<string> authoredFonts = new(System.StringComparer.Ordinal);
+    private bool regenerateAppearances;
 
     public FormWriter(PortableDocument document)
     {
@@ -63,6 +65,18 @@ internal sealed class FormWriter
     public StreamObject BuildRadio(double width, double height, bool selected)
         => FieldAppearances.BuildRadio(width, height, selected);
 
+    public StreamObject BuildAuthoredText(string value, double width, double height, Font font)
+        => FieldAppearances.BuildText(value, width, height, font, scope: default);
+
+    public string RegisterAuthoredFont(Font font)
+    {
+        var baseFont = Fonts.FontResolution.ResolveBase14Name(font, scope: default);
+        authoredFonts.Add(baseFont);
+        return DefaultAppearanceGrammar.Write(baseFont, font.EffectiveSize.Point, "0 g");
+    }
+
+    public void RequireAppearanceRegeneration() => regenerateAppearances = true;
+
     public bool CanEncode(string value) => FieldAppearances.CanEncode(value);
 
     public string DefaultAppearanceOf(Font font)
@@ -83,9 +97,14 @@ internal sealed class FormWriter
 
     public void ApplyCreatedDefaults(DictionaryObject form)
     {
-        if (document.FormFields.Count == 0)
+        if (document.FormFields.Count == 0 && authoredFonts.Count == 0)
         {
             return;
+        }
+
+        if (regenerateAppearances)
+        {
+            form["NeedAppearances"] = new BooleanObject(true);
         }
 
         if (!form.ContainsKey("DA"))
@@ -96,6 +115,14 @@ internal sealed class FormWriter
         if (!form.ContainsKey("DR"))
         {
             var fonts = new DictionaryObject { ["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica") };
+            foreach (var baseFont in authoredFonts)
+            {
+                if (!fonts.ContainsKey(baseFont))
+                {
+                    fonts[baseFont] = PageResourceBuilder.Base14FontDictionary(baseFont);
+                }
+            }
+
             foreach (var definition in document.FormFields)
             {
                 if (TextAppearance(definition) is (_, { } font))

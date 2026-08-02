@@ -38,6 +38,7 @@ internal enum SemanticIntent
     NavigationEntry,
     CrossReference,
     Link,
+    Form,
     Span,
     Caption,
     TableHeaderGroup,

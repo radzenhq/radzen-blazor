@@ -90,6 +90,9 @@ public Radzen.Documents.CellCollection..ctor()
 public Radzen.Documents.CellCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.CellCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Cell>
 public Radzen.Documents.CellCollection.Item[System.Int32 index] : Radzen.Documents.Cell { public get; }
+Radzen.Documents.CheckBox = public sealed class : Radzen.Documents.FormInput
+public Radzen.Documents.CheckBox..ctor(System.String name)
+public Radzen.Documents.CheckBox.Checked : System.Boolean { public get; public set; }
 Radzen.Documents.Codes.BarcodeEncoder = public static class
 public static Radzen.Documents.Codes.BarcodeEncoder.EncodeCodabar(System.String value) : System.Collections.Generic.IReadOnlyList<System.Int32>
 public static Radzen.Documents.Codes.BarcodeEncoder.EncodeCode128B(System.String value) : System.Collections.Generic.IReadOnlyList<System.Int32>
@@ -411,6 +414,11 @@ public Radzen.Documents.DocumentInfo.Keywords : System.String? { public get; pub
 public Radzen.Documents.DocumentInfo.ModificationDate : System.DateTimeOffset? { public get; public set; }
 public Radzen.Documents.DocumentInfo.Subject : System.String? { public get; public set; }
 public Radzen.Documents.DocumentInfo.Title : System.String? { public get; public set; }
+Radzen.Documents.DropDown = public sealed class : Radzen.Documents.FormInput
+public Radzen.Documents.DropDown..ctor(System.String name)
+public Radzen.Documents.DropDown.Options : System.Collections.Generic.IList<System.String> { public get; }
+public Radzen.Documents.DropDown.Value : System.String { public get; public set; }
+public Radzen.Documents.DropDown.Width : Radzen.Documents.Core.Unit? { public get; public set; }
 Radzen.Documents.FlowDirection = public enum : System.Int32
 public const Radzen.Documents.FlowDirection.LeftToRight : Radzen.Documents.FlowDirection
 public const Radzen.Documents.FlowDirection.RightToLeft : Radzen.Documents.FlowDirection
@@ -444,6 +452,10 @@ public static Radzen.Documents.Fonts.FontValues.op_Inequality(Radzen.Documents.F
 public virtual Radzen.Documents.Fonts.FontValues.Equals(System.Object obj) : System.Boolean
 public virtual Radzen.Documents.Fonts.FontValues.GetHashCode() : System.Int32
 public virtual Radzen.Documents.Fonts.FontValues.ToString() : System.String
+Radzen.Documents.FormInput = public abstract class : Radzen.Documents.Inline
+public Radzen.Documents.FormInput.Label : System.String? { public get; public set; }
+public Radzen.Documents.FormInput.Name : System.String { public get; public set; }
+public Radzen.Documents.FormInput.Required : System.Boolean { public get; public set; }
 Radzen.Documents.GradientBrush = public abstract class
 public Radzen.Documents.GradientBrush.Stops : System.Collections.ObjectModel.ReadOnlyCollection<Radzen.Documents.GradientStop> { public get; }
 Radzen.Documents.GradientStop = public sealed class
@@ -1422,6 +1434,10 @@ public Radzen.Documents.RadialGradient.X0 : Radzen.Documents.Core.Unit { public 
 public Radzen.Documents.RadialGradient.X1 : Radzen.Documents.Core.Unit { public get; }
 public Radzen.Documents.RadialGradient.Y0 : Radzen.Documents.Core.Unit { public get; }
 public Radzen.Documents.RadialGradient.Y1 : Radzen.Documents.Core.Unit { public get; }
+Radzen.Documents.RadioButton = public sealed class : Radzen.Documents.FormInput
+public Radzen.Documents.RadioButton..ctor(System.String name, System.String value)
+public Radzen.Documents.RadioButton.Selected : System.Boolean { public get; public set; }
+public Radzen.Documents.RadioButton.Value : System.String { public get; public set; }
 Radzen.Documents.Row = public sealed class
 public Radzen.Documents.Row.Alignment : Radzen.Documents.HorizontalAlignment? { public get; public set; }
 public Radzen.Documents.Row.Background : Radzen.Documents.Core.Color? { public get; public set; }
@@ -2366,6 +2382,10 @@ public Radzen.Documents.TextInline.LetterSpacing : Radzen.Documents.Core.Unit { 
 public Radzen.Documents.TextInline.VerticalAlignment : Radzen.Documents.RunVerticalAlignment { public get; public set; }
 public Radzen.Documents.TextInline.VerticalAlignmentScale : System.Double { public get; public set; }
 public Radzen.Documents.TextInline.WordSpacing : Radzen.Documents.Core.Unit { public get; public set; }
+Radzen.Documents.TextInput = public sealed class : Radzen.Documents.FormInput
+public Radzen.Documents.TextInput..ctor(System.String name)
+public Radzen.Documents.TextInput.Value : System.String { public get; public set; }
+public Radzen.Documents.TextInput.Width : Radzen.Documents.Core.Unit? { public get; public set; }
 Radzen.Documents.TocEntry = public sealed class
 public Radzen.Documents.TocEntry..ctor(System.String text, System.String anchor, System.Int32 level = 0)
 public Radzen.Documents.TocEntry.Anchor : System.String { public get; }
