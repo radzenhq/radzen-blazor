@@ -142,7 +142,6 @@ internal static class TableLayout
 
             cells.Add(new LaidOutCell
             {
-                Id = capture.Node(),
                 Source = capture.Source(p.Cell),
                 Decoration = CellDecoration(table, p.Cell, p.Row),
                 Opacity = resolution.Opacities.CellOpacity(p.Cell),
@@ -174,7 +173,6 @@ internal static class TableLayout
 
         return new LaidOutTable
         {
-            Id = capture.Node(),
             Source = capture.Source(table),
             Decoration = GeometryCapture.Table(table, additionalLeftIndent),
             ColumnWidths = [.. columnWidths],

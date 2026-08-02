@@ -34,8 +34,6 @@ public static class ImageDecoder
         }
     }
 
-    internal static IDisposable Scope() => new RegistryScope();
-
     internal static byte[] ReadFully(Stream stream) => ReadFully(stream, ReaderLimits.Default);
 
     internal static byte[] ReadFully(Stream stream, ReaderLimits limits)
@@ -65,17 +63,4 @@ public static class ImageDecoder
 
     internal static void ValidateImageDimensions(long width, long height, ReaderLimits limits, string format)
         => limits.ValidateImageDimensions(width, height, format);
-
-    private sealed class RegistryScope : IDisposable
-    {
-        private readonly ImageDecoders decoders = registered;
-
-        public void Dispose()
-        {
-            lock (RegisterGate)
-            {
-                registered = decoders;
-            }
-        }
-    }
 }

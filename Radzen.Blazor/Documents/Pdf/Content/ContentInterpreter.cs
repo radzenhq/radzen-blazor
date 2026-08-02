@@ -648,7 +648,7 @@ internal sealed class RawContent(string op, IReadOnlyList<Token> operands) : Con
 
     public PdfRect? ClipBounds { get; init; }
 
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         foreach (var operand in operands)
         {
@@ -678,7 +678,7 @@ internal sealed class InlineImageContent(byte[] source) : ContentElement
 {
     public byte[] Source => source;
 
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         writer.WriteBytes(source);
         writer.WriteRaw("\n");

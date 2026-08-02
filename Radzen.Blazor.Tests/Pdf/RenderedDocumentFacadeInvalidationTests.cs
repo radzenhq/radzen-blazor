@@ -77,17 +77,14 @@ public class RenderedDocumentFacadeInvalidationTests
     [Fact]
     public void EncryptionMutatedAfterRender_ReachesTheSavedBytes()
     {
-        var renderer = new DocumentRenderer
+        var rendered = new DocumentRenderer().Render(Authored());
+        rendered.Encryption = new EncryptionOptions
         {
-            Encryption = new EncryptionOptions
-            {
-                UserPassword = "user",
-                Algorithm = EncryptionAlgorithm.Aes128,
-                Material = new SeededEncryptionMaterial([1, 2, 3, 4]),
-            },
+            UserPassword = "user",
+            Algorithm = EncryptionAlgorithm.Aes128,
+            Material = new SeededEncryptionMaterial([1, 2, 3, 4]),
         };
 
-        var rendered = renderer.Render(Authored());
         var immediate = rendered.ToArray();
 
         rendered.Encryption!.Algorithm = EncryptionAlgorithm.Aes256;
@@ -142,32 +139,10 @@ public class RenderedDocumentFacadeInvalidationTests
     }
 
     [Fact]
-    public void FormFieldDefinitions_AreConsumedByTheRenderAndEditedThroughTheLiveForm()
-    {
-        var renderer = new DocumentRenderer();
-        renderer.FormFields.Add(new TextFieldDefinition("given")
-        {
-            Value = "Ada",
-            X = 40,
-            Y = 40,
-            Width = 120,
-            Height = 20,
-        });
-
-        var rendered = renderer.Render(Authored());
-        Assert.Contains("Ada", Save(rendered), StringComparison.Ordinal);
-        Assert.Empty(rendered.FormFields);
-
-        rendered.AcroForm!.FillField("given", "Grace");
-
-        Assert.Contains("Grace", Save(rendered), StringComparison.Ordinal);
-    }
-
-    [Fact]
     public void ViewerPreferencesMutatedAfterRender_ReachesTheSavedBytes()
     {
-        var rendered = new DocumentRenderer { ViewerPreferences = new ViewerPreferences { HideToolbar = true } }
-            .Render(Authored());
+        var rendered = new DocumentRenderer().Render(Authored());
+        rendered.ViewerPreferences = new ViewerPreferences { HideToolbar = true };
         _ = rendered.ToArray();
 
         rendered.ViewerPreferences!.HideMenubar = true;
@@ -290,10 +265,11 @@ public class RenderedDocumentFacadeInvalidationTests
     public void RenderTwice_ProducesTwoIndependentDocuments()
     {
         var renderer = new DocumentRenderer();
-        renderer.Outline.Add(new OutlineItem("Chapter", OutlineTarget.ToPage(0)));
 
         var first = renderer.Render(Authored());
         var second = renderer.Render(Authored());
+        first.Outline.Add(new OutlineItem("Chapter", OutlineTarget.ToPage(0)));
+        second.Outline.Add(new OutlineItem("Chapter", OutlineTarget.ToPage(0)));
 
         Assert.NotSame(first, second);
         Assert.Equal(1, first.Pages.Count);
@@ -380,10 +356,8 @@ public class RenderedDocumentFacadeInvalidationTests
     [Fact]
     public void MutatingANestedMemberThroughAPreviouslyReadFacade_ReachesTheSavedBytes()
     {
-        var rendered = new DocumentRenderer
-        {
-            ViewerPreferences = new ViewerPreferences { HideToolbar = true },
-        }.Render(Authored());
+        var rendered = new DocumentRenderer().Render(Authored());
+        rendered.ViewerPreferences = new ViewerPreferences { HideToolbar = true };
 
         var info = rendered.Info;
         var outline = rendered.Outline;

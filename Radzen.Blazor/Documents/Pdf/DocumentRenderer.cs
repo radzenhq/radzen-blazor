@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 using Radzen.Documents.Pdf.Render;
@@ -8,58 +7,14 @@ using Radzen.Documents.Pdf.Write;
 namespace Radzen.Documents.Pdf;
 
 /// <summary>
-/// Renders a <see cref="Document"/> into a physical PDF
-/// <see cref="PortableDocument"/>. Carries the PDF-only settings of the output: conformance,
-/// accessibility, encryption, viewer preferences, attachments, outline, page labels
-/// and interactive form fields.
+/// Renders a <see cref="Document"/> into a physical PDF <see cref="PortableDocument"/>. Carries
+/// the settings that govern what rendering emits: conformance, accessibility, the structure role
+/// map, the font permissions and the image decoders. Everything the saved file carries afterwards
+/// - encryption, attachments, outline, page labels, form fields, viewer preferences and output
+/// compression - is set on the produced <see cref="PortableDocument"/>.
 /// </summary>
 public sealed class DocumentRenderer
 {
-    /// <summary>
-    /// Gets the files to embed into the produced PDF (e.g. the Factur-X invoice XML). Copied into the
-    /// produced document at <see cref="Render(Document)"/>; afterwards
-    /// <see cref="PortableDocument.Attachments"/> on that document governs what is saved, and changing
-    /// this collection has no effect on an already-rendered document.
-    /// </summary>
-    public AttachmentCollection Attachments { get; } = [];
-
-    /// <summary>
-    /// Gets the root entries of the document outline (bookmark) tree. Copied into the produced
-    /// document at <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.Outline"/>
-    /// on that document governs what is saved, and changing this list has no effect on an
-    /// already-rendered document.
-    /// </summary>
-    public IList<OutlineItem> Outline { get; } = [];
-
-    /// <summary>
-    /// Gets or sets the viewer preferences applied to the produced document
-    /// (initial page layout and page mode plus the <c>/ViewerPreferences</c>
-    /// flags). When <c>null</c> no viewer-preference keys are written and the
-    /// output is unchanged. Captured into the produced document at <see cref="Render(Document)"/>;
-    /// afterwards <see cref="PortableDocument.ViewerPreferences"/> on that document governs what is
-    /// saved, and changing it here has no effect on an already-rendered document.
-    /// </summary>
-    public ViewerPreferences? ViewerPreferences { get; set; }
-
-    /// <summary>
-    /// Gets the page-label ranges applied to the produced document, written as
-    /// the catalog <c>/PageLabels</c> number tree. When empty no <c>/PageLabels</c>
-    /// entry is written. Copied into the produced document at <see cref="Render(Document)"/>;
-    /// afterwards <see cref="PortableDocument.PageLabels"/> on that document governs what is saved,
-    /// and changing this list has no effect on an already-rendered document.
-    /// </summary>
-    public IList<PageLabel> PageLabels { get; } = [];
-
-    /// <summary>
-    /// Gets the interactive form fields to create on the produced document. Each
-    /// definition is saved as a widget annotation on its page and listed in the
-    /// catalog <c>/AcroForm /Fields</c>. When empty no form is written. Copied into the produced
-    /// document at <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.FormFields"/>
-    /// on that document governs what is saved, and changing this list has no effect on an
-    /// already-rendered document.
-    /// </summary>
-    public IList<FormFieldDefinition> FormFields { get; } = [];
-
     /// <summary>
     /// Gets or sets the name of the application that produced the PDF, written to the
     /// <c>/Info /Producer</c> entry and the XMP <c>pdf:Producer</c> property. When
@@ -98,34 +53,6 @@ public sealed class DocumentRenderer
     public RoleMap RoleMap { get; } = new();
 
     /// <summary>
-    /// Gets or sets the encryption to apply when saving. When <c>null</c> the
-    /// document is written unencrypted. Captured into the produced document at
-    /// <see cref="Render(Document)"/>; afterwards <see cref="PortableDocument.Encryption"/> on that
-    /// document governs what is saved, and changing it here has no effect on an already-rendered
-    /// document.
-    /// </summary>
-    public EncryptionOptions? Encryption { get; set; }
-
-    /// <summary>
-    /// Gets or sets whether the saved file packs its objects into compressed
-    /// object streams with a cross-reference stream, shrinking the output at
-    /// the cost of PDF/A-1 compatibility. Defaults to <c>false</c>. Captured into the produced
-    /// document at <see cref="Render(Document)"/>; afterwards
-    /// <see cref="PortableDocument.CompressOutput"/> on that document governs what is saved, and
-    /// changing it here has no effect on an already-rendered document.
-    /// </summary>
-    public bool CompressOutput { get; set; }
-
-    /// <summary>
-    /// Gets or sets whether the saved file carries a deterministic trailer
-    /// <c>/ID</c>. Defaults to <c>false</c> so output stays byte identical unless
-    /// opted in. Captured into the produced document at <see cref="Render(Document)"/>; afterwards
-    /// <see cref="PortableDocument.IncludeDocumentId"/> on that document governs what is saved, and
-    /// changing it here has no effect on an already-rendered document.
-    /// </summary>
-    public bool IncludeDocumentId { get; set; }
-
-    /// <summary>
     /// Gets or sets whether a glyph captured from a built-in metrics font that the PDF text
     /// encoding cannot represent is drawn as '?'. Defaults to <see langword="false"/>, so
     /// rendering throws and names the offending characters. Read once by <see cref="Render(Document)"/>,
@@ -159,7 +86,8 @@ public sealed class DocumentRenderer
     /// <see cref="ImageDecoders.Default"/>, so a decoder registered with
     /// <see cref="ImageDecoder.Register(IImageDecoder)"/> before this renderer was created is
     /// already in the set. Assign <c>ImageDecoders.BuiltIn.Add(...)</c> to reach a custom format
-    /// from this renderer alone. Captured into the produced document at <see cref="Render(Document)"/>.
+    /// from this renderer alone. Used to measure and decode the images this render draws, and
+    /// carried onto the produced document so images added to it later decode the same way.
     /// </summary>
     public ImageDecoders ImageDecoders { get; set; } = ImageDecoders.Default;
 

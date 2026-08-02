@@ -5,8 +5,6 @@ namespace Radzen.Documents.LaidOut;
 
 internal sealed class LaidOutDocument
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required FontCollectionSnapshot Fonts { get; init; }
 
     public required ImmutableArray<LaidOutPage> Pages { get; init; }

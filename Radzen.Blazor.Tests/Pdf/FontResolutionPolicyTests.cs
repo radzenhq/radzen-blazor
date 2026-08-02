@@ -72,10 +72,10 @@ public class FontResolutionPolicyTests
         var document = new Document();
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", "Helvetica");
-        var renderer = new DocumentRenderer();
-        renderer.FormFields.Add(Field(new Font { Family = "Arial", Size = 12 }));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.FormFields.Add(Field(new Font { Family = "Arial", Size = 12 }));
 
-        var exception = Record.Exception(() => renderer.ToArray(document));
+        var exception = Record.Exception(rendered.ToArray);
 
         Assert.IsType<NotSupportedException>(exception);
         Assert.Contains("Arial", exception!.Message, StringComparison.Ordinal);
@@ -142,9 +142,10 @@ public class FontResolutionPolicyTests
     public void FormField_RegisteredEmbeddedFamily_ThrowsRatherThanSubstituting()
     {
         var (document, renderer) = Author();
-        renderer.FormFields.Add(Field(new Font { Family = BuildTestSupport.Latin, Size = 12 }));
+        var rendered = renderer.Render(document);
+        rendered.FormFields.Add(Field(new Font { Family = BuildTestSupport.Latin, Size = 12 }));
 
-        var exception = Record.Exception(() => renderer.ToArray(document));
+        var exception = Record.Exception(rendered.ToArray);
 
         Assert.IsType<NotSupportedException>(exception);
         Assert.Contains(BuildTestSupport.Latin, exception!.Message, StringComparison.Ordinal);
@@ -155,9 +156,10 @@ public class FontResolutionPolicyTests
     public void PdfA3B_TextFormField_RejectsUnembeddedBase14()
     {
         var (document, renderer) = Author(PdfAConformance.PdfA3B);
-        renderer.FormFields.Add(Field(new Font { Family = "Helvetica", Size = 12 }));
+        var rendered = renderer.Render(document);
+        rendered.FormFields.Add(Field(new Font { Family = "Helvetica", Size = 12 }));
 
-        var exception = Record.Exception(() => renderer.ToArray(document));
+        var exception = Record.Exception(rendered.ToArray);
 
         Assert.IsType<InvalidOperationException>(exception);
         Assert.Contains("PDF/A", exception!.Message, StringComparison.Ordinal);

@@ -45,14 +45,9 @@ public abstract class ContentElement : ITracksChanges
     /// </summary>
     public virtual bool IsModified => tracker.IsModified;
 
-    /// <summary>Assigns a tracked backing field and marks this element modified.</summary>
-    /// <typeparam name="T">The field type.</typeparam>
-    /// <param name="field">The backing field to assign.</param>
-    /// <param name="value">The value to assign.</param>
-    protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
+    private protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
 
-    /// <summary>Marks this element modified without assigning a tracked field.</summary>
-    protected void Touch() => tracker.Touch();
+    private protected void Touch() => tracker.Touch();
 
     internal virtual void AcceptChanges() => tracker.AcceptChanges();
 
@@ -103,11 +98,5 @@ public abstract class ContentElement : ITracksChanges
         }
     }
 
-    /// <summary>
-    /// Emits this element's content-stream body into <paramref name="writer"/>. The transform
-    /// and artifact/marked-content wrapping are applied by the base class around this call, so an
-    /// override writes only the element's own operators.
-    /// </summary>
-    /// <param name="writer">The content-stream writer to emit into.</param>
-    protected abstract void EmitBody(ContentWriter writer);
+    private protected abstract void EmitBody(ContentWriter writer);
 }

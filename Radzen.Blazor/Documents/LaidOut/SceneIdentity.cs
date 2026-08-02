@@ -4,7 +4,7 @@ namespace Radzen.Documents.LaidOut;
 
 internal readonly record struct SourceId(int Value);
 
-internal readonly record struct LaidOutNodeId(int Value);
+internal readonly record struct PaintId(int Value);
 
 internal sealed class SceneImageData
 {

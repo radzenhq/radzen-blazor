@@ -41,8 +41,6 @@ internal readonly struct LaidOutWatermarkImage
 
 internal sealed record LaidOutWatermark
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required double CenterX { get; init; }
 
     public required double CenterY { get; init; }

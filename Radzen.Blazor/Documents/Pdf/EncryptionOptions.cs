@@ -22,6 +22,12 @@ public enum EncryptionAlgorithm
 /// encrypted, an <c>/Encrypt</c> dictionary is written, and a document <c>/ID</c>
 /// is generated.
 /// </summary>
+/// <remarks>
+/// The salts, encryption key and document identifier are generated with a
+/// cryptographically secure random number generator by default, so setting a password
+/// and the permission flags is enough to produce a securely encrypted document.
+/// Consequently two saves of the same content differ byte for byte.
+/// </remarks>
 public sealed class EncryptionOptions
 {
     /// <summary>
@@ -41,15 +47,7 @@ public sealed class EncryptionOptions
     /// </summary>
     public EncryptionAlgorithm Algorithm { get; set; } = EncryptionAlgorithm.Aes128;
 
-    /// <summary>
-    /// Gets or sets the source of the unpredictable bytes encryption requires - the
-    /// document <c>/ID</c>, the AES-256 file key, per-stream AES initialisation
-    /// vectors and the revision 6 salts. The library generates no randomness of its
-    /// own, so this must be set whenever encryption is used; writing an encrypted
-    /// document without it throws. See <see cref="IEncryptionMaterial"/> and the
-    /// deterministic <see cref="SeededEncryptionMaterial"/>.
-    /// </summary>
-    public IEncryptionMaterial? Material { get; set; }
+    internal IEncryptionMaterial? Material { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the document metadata is encrypted

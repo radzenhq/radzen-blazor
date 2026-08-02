@@ -38,14 +38,15 @@ public class PdfAEncryptionRejectionTests
     public void PdfA_WithEncryption_ThrowsActionable(PdfAConformance conformance)
     {
         var (document, builderRenderer) = Author(conformance);
-        builderRenderer.Encryption = new EncryptionOptions
+        var rendered = builderRenderer.Render(document);
+        rendered.Encryption = new EncryptionOptions
         {
             Material = new SeededEncryptionMaterial([7]),
             Algorithm = EncryptionAlgorithm.Aes128,
             UserPassword = "s3cret",
         };
 
-        var exception = Record.Exception(() => builderRenderer.ToArray(document));
+        var exception = Record.Exception(rendered.ToArray);
 
         Assert.True(exception is not null, "PDF/A output must not be encrypted");
         Assert.Contains("PDF/A forbids encryption", exception!.Message, StringComparison.Ordinal);

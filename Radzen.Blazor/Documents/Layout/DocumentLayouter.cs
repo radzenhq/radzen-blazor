@@ -52,7 +52,6 @@ internal static class DocumentLayouter
         => LayoutFinalizer.Resolve(
             new LaidOutDocument
             {
-                Id = pass.Id,
                 Fonts = fonts.Snapshot(),
                 Pages = pass.Pages,
                 Semantics = pass.Semantics.Snapshot(),
@@ -104,7 +103,6 @@ internal static class DocumentLayouter
 
     private readonly record struct LayoutPassResult(
         ImmutableArray<LaidOutPage> Pages,
-        LaidOutNodeId Id,
         SemanticSnapshotBuilder Semantics,
         LoweringResult Lowering,
         LayoutCaptureContext Capture);
@@ -145,7 +143,6 @@ internal static class DocumentLayouter
 
         return new LayoutPassResult(
             [.. pages],
-            capture.Node(),
             semanticCapture.Builder,
             lowering,
             capture);

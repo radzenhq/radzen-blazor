@@ -58,34 +58,10 @@ internal sealed class DocumentRenderEngine
             Conformance = request.Conformance,
             Accessibility = request.Accessibility,
             RoleMap = request.RoleMap,
-            Encryption = request.Encryption,
-            CompressOutput = request.CompressOutput,
-            IncludeDocumentId = request.IncludeDocumentId,
-            ViewerPreferences = request.ViewerPreferences,
             ImageDecoders = request.Decoders,
         };
 
         output.Info.Producer = request.Producer;
-
-        foreach (var attachment in request.Attachments)
-        {
-            output.Attachments.Add(attachment);
-        }
-
-        foreach (var item in request.Outline)
-        {
-            output.Outline.Add(item);
-        }
-
-        foreach (var label in request.PageLabels)
-        {
-            output.PageLabels.Add(label);
-        }
-
-        foreach (var field in request.FormFields)
-        {
-            output.FormFields.Add(field);
-        }
 
         return output;
     }

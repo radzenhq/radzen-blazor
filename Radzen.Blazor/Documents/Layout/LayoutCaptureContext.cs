@@ -9,12 +9,10 @@ internal sealed class LayoutCaptureContext(ImageProbes probes)
     private readonly Dictionary<object, SourceId> sources = new(ReferenceEqualityComparer.Instance);
     private readonly List<object> sourceValues = [];
     private readonly Dictionary<byte[], SceneImageData> images = new(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<object, LaidOutNodeId> paints = new(ReferenceEqualityComparer.Instance);
-    private int nextNodeId;
+    private readonly Dictionary<object, PaintId> paints = new(ReferenceEqualityComparer.Instance);
+    private int nextPaintId;
 
     public ImageProbes Probes { get; } = probes ?? throw new ArgumentNullException(nameof(probes));
-
-    public LaidOutNodeId Node() => new(nextNodeId++);
 
     public SourceId Source(object source)
     {
@@ -42,11 +40,11 @@ internal sealed class LayoutCaptureContext(ImageProbes probes)
         return captured;
     }
 
-    public LaidOutNodeId Paint(object source)
+    public PaintId Paint(object source)
     {
         if (!paints.TryGetValue(source, out var id))
         {
-            id = Node();
+            id = new PaintId(nextPaintId++);
             paints.Add(source, id);
         }
 

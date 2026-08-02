@@ -158,7 +158,6 @@ internal sealed class BoxCellItem : BlockCellItem<Container>
         var innerBox = new Rect(padding.Left, padding.Top, Math.Max(0, Width - padding.Horizontal), Content.Height);
         placement.Add(new LaidOutBox
         {
-            Id = capture.Node(),
             Source = capture.Source(Block),
             Content = BoxContentLayout.Position(Content, innerBox, HorizontalAlignment.Left, VerticalAlignment.Top),
             Bounds = new Rect(contentBox.Left + indent, placement.CursorY, Width, Height),

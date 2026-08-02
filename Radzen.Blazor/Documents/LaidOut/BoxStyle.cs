@@ -15,7 +15,7 @@ internal enum GradientPaintKind
 internal readonly record struct GradientStopPaint(double Offset, Color Color);
 
 internal readonly record struct GradientPaint(
-    LaidOutNodeId Identity,
+    PaintId Identity,
     GradientPaintKind Kind,
     double X0,
     double Y0,

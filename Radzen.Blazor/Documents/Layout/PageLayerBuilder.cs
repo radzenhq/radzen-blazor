@@ -4,7 +4,7 @@ using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
-internal sealed class PageLayerBuilder(LayoutCaptureContext capture)
+internal sealed class PageLayerBuilder
 {
     public List<LaidOutLine> Lines { get; } = [];
 
@@ -21,7 +21,6 @@ internal sealed class PageLayerBuilder(LayoutCaptureContext capture)
 
     public LaidOutLayer Build() => new()
     {
-        Id = capture.Node(),
         Lines = [.. Lines],
         Images = [.. Images],
         CodeSymbols = [.. CodeSymbols],

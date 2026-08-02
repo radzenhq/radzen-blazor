@@ -253,7 +253,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
                     $"{document.Conformance} only permits embedded files that are themselves PDF/A conformant, which cannot be verified; remove the attachments or use PdfA3B, PdfA3A or PdfA4F.");
             case PdfAConformance.PdfA4F when document.Attachments.Count == 0:
                 throw new InvalidOperationException(
-                    "PDF/A-4F requires at least one embedded file; add one with DocumentRenderer.Attachments or use PdfA4.");
+                    "PDF/A-4F requires at least one embedded file; add one with PortableDocument.Attachments or use PdfA4.");
         }
 
         ValidateImageColorSpaces();

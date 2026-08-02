@@ -78,7 +78,7 @@ internal static class AnnotationFlatteningWriter
 
     private sealed class FlattenedAnnotationContent(IReadOnlyList<ContentElement> elements, double opacity) : ContentElement
     {
-        protected override void EmitBody(ContentWriter writer)
+        private protected override void EmitBody(ContentWriter writer)
         {
             if (opacity < 1)
             {

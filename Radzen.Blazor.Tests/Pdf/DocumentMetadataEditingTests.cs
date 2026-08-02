@@ -84,10 +84,10 @@ public class DocumentMetadataEditingTests
         var paragraph = new Paragraph();
         paragraph.Inlines.Add("Named destination").Anchor = "destination";
         section.Blocks.Add(paragraph);
-        var renderer = new DocumentRenderer();
-        renderer.Outline.Add(new OutlineItem("Named", OutlineTarget.ToAnchor("destination")));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("Named", OutlineTarget.ToAnchor("destination")));
 
-        var loaded = Load(renderer.ToArray(document));
+        var loaded = Load(rendered.ToArray());
         Assert.Equal("Named", Assert.Single(loaded.Outline).Title);
 
         var reloaded = Load(loaded.ToArray());

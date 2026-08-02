@@ -209,7 +209,6 @@ internal static class TablePaginator
 
         return new LaidOutTableSlice
         {
-            Id = capture.Node(),
             Number = number,
             Rows = [.. rows],
             HeaderRowCount = headers.Count,

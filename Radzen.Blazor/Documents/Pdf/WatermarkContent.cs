@@ -15,7 +15,7 @@ internal sealed class WatermarkContent(
     FontCollectionSnapshot? knownFonts,
     ImageProbes probes) : ContentElement
 {
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         var planned = WatermarkPlanner.PlanBase14(
             watermark,

@@ -126,9 +126,10 @@ public class EmbeddedFileAttachmentTests
     public void Attach_EmbeddedFileBytes_RoundTripByteIdentical()
     {
         var (document, builderRenderer) = Author();
-        builderRenderer.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var files = EmbeddedFiles(reader);
         Assert.True(files.ContainsKey("invoice-data.xml"), "/EmbeddedFiles name tree contains the attachment name");
 
@@ -147,9 +148,10 @@ public class EmbeddedFileAttachmentTests
     public void Attach_Filespec_HasNamesAndEmbeddedStream()
     {
         var (document, builderRenderer) = Author();
-        builderRenderer.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var filespec = EmbeddedFiles(reader)["invoice-data.xml"];
 
         Assert.Equal("Filespec", BuildTestSupport.Name(reader, filespec, "Type"));
@@ -162,9 +164,10 @@ public class EmbeddedFileAttachmentTests
     public void Attach_CatalogAFArray_ReferencesFilespec()
     {
         var (document, builderRenderer) = Author();
-        builderRenderer.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var catalog = Catalog(reader);
         Assert.True(catalog.TryGetValue("AF", out var afObject), "catalog has /AF");
         var af = Assert.IsType<ArrayObject>(reader.Resolve(afObject!));
@@ -180,11 +183,12 @@ public class EmbeddedFileAttachmentTests
     public void Attach_MultipleFiles_AllPresentAndTreeSorted()
     {
         var (document, builderRenderer) = Author();
+        var rendered = builderRenderer.Render(document);
         var readme = Encoding.UTF8.GetBytes("see invoice-data.xml");
-        builderRenderer.Attachments.Add("zz-notes.txt", readme, AttachmentRelationship.Supplement, "text/plain");
-        builderRenderer.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        rendered.Attachments.Add("zz-notes.txt", readme, AttachmentRelationship.Supplement, "text/plain");
+        rendered.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var files = EmbeddedFiles(reader);
 
         Assert.Equal(2, files.Count);
@@ -200,9 +204,10 @@ public class EmbeddedFileAttachmentTests
     public void FacturX_Attachment_UnderPdfA3B_EmitsFxXmpBlock()
     {
         var (document, builderRenderer) = Author(PdfAConformance.PdfA3B);
-        builderRenderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var packet = MetadataPacket(reader);
 
         Assert.Contains("urn:factur-x:pdfa:CrossIndustryDocument:invoice:1p0#", packet, StringComparison.Ordinal);
@@ -218,9 +223,10 @@ public class EmbeddedFileAttachmentTests
     public void FacturX_Attachment_UnderPdfA3B_KeepsConformanceAndEmbedsFile()
     {
         var (document, builderRenderer) = Author(PdfAConformance.PdfA3B);
-        builderRenderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
 
         var packet = MetadataPacket(reader);
         Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
@@ -238,9 +244,10 @@ public class EmbeddedFileAttachmentTests
     public void NonFacturXAttachment_UnderPdfA3B_HasNoFxBlock()
     {
         var (document, builderRenderer) = Author(PdfAConformance.PdfA3B);
-        builderRenderer.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = builderRenderer.Render(document);
+        rendered.Attachments.Add("invoice-data.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var packet = MetadataPacket(BuildTestSupport.Read(document, builderRenderer));
+        var packet = MetadataPacket(DocumentReader.Parse(rendered.ToArray()));
         Assert.DoesNotContain("<fx:DocumentFileName>", packet, StringComparison.Ordinal);
     }
 }

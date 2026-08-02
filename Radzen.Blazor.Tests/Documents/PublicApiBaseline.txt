@@ -845,8 +845,6 @@ public Radzen.Documents.Pdf.AcroForm.FillField(System.String name, System.String
 public Radzen.Documents.Pdf.AcroForm.SelectOption(System.String name, System.String value) : System.Void
 public Radzen.Documents.Pdf.AcroForm.SelectRadioOption(System.String name, System.String value) : System.Void
 Radzen.Documents.Pdf.Annotation = public abstract class
-protected Radzen.Documents.Pdf.Annotation.Set<T>(ref T? field, T? value) : System.Void
-protected Radzen.Documents.Pdf.Annotation.Touch() : System.Void
 public Radzen.Documents.Pdf.Annotation.Appearance : Radzen.Documents.Pdf.AnnotationAppearance? { public get; public set; }
 public Radzen.Documents.Pdf.Annotation.Bounds : Radzen.Documents.Pdf.PdfRect { public get; public set; }
 public Radzen.Documents.Pdf.Annotation.Color : Radzen.Documents.Core.Color { public get; public set; }
@@ -925,17 +923,6 @@ public Radzen.Documents.Pdf.ChoiceFieldDefinition.Options : System.Collections.G
 public Radzen.Documents.Pdf.ChoiceFieldDefinition.Value : System.String { public get; public set; }
 Radzen.Documents.Pdf.CircleAnnotation = public sealed class : Radzen.Documents.Pdf.ShapeAnnotation
 public Radzen.Documents.Pdf.CircleAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
-Radzen.Documents.Pdf.Content.ContentWriter = public sealed class : System.IDisposable
-public Radzen.Documents.Pdf.Content.ContentWriter.Dispose() : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.RegisterFont(Radzen.Documents.Fonts.Font font) : System.String
-public Radzen.Documents.Pdf.Content.ContentWriter.RegisterImage(System.Byte[] encodedImage) : System.String
-public Radzen.Documents.Pdf.Content.ContentWriter.RegisterPattern(Radzen.Documents.GradientBrush gradient) : System.String
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteColor(Radzen.Documents.Core.Color color, System.String operatorName) : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteName(System.String name) : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteNumber(System.Double value) : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteRaw(System.ReadOnlySpan<System.Char> text) : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteRaw(System.String text) : System.Void
-public Radzen.Documents.Pdf.Content.ContentWriter.WriteString(System.ReadOnlySpan<System.Byte> bytes) : System.Void
 Radzen.Documents.Pdf.ContentCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.ContentElement>
 public Radzen.Documents.Pdf.ContentCollection..ctor()
 public Radzen.Documents.Pdf.ContentCollection.Add<T>(T element) : T where T : Radzen.Documents.Pdf.ContentElement
@@ -946,9 +933,6 @@ public Radzen.Documents.Pdf.ContentCollection.Item[System.Int32 index] : Radzen.
 public Radzen.Documents.Pdf.ContentCollection.Remove(Radzen.Documents.Pdf.ContentElement element) : System.Boolean
 public Radzen.Documents.Pdf.ContentCollection.RemoveAt(System.Int32 index) : System.Void
 Radzen.Documents.Pdf.ContentElement = public abstract class
-protected Radzen.Documents.Pdf.ContentElement.Set<T>(ref T? field, T? value) : System.Void
-protected Radzen.Documents.Pdf.ContentElement.Touch() : System.Void
-protected abstract Radzen.Documents.Pdf.ContentElement.EmitBody(Radzen.Documents.Pdf.Content.ContentWriter writer) : System.Void
 public Radzen.Documents.Pdf.ContentElement.IsArtifact : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.ContentElement.Transform : Radzen.Documents.Matrix { public get; public set; }
 public virtual Radzen.Documents.Pdf.ContentElement.IsModified : System.Boolean { public get; }
@@ -977,21 +961,13 @@ public Radzen.Documents.Pdf.DocumentRenderer.Accessibility : Radzen.Documents.Pd
 public Radzen.Documents.Pdf.DocumentRenderer.AllowDegradedFonts : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowRestrictedEmbedding : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowUnsupportedCharacters : System.Boolean { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.Attachments : Radzen.Documents.Pdf.AttachmentCollection { public get; }
-public Radzen.Documents.Pdf.DocumentRenderer.CompressOutput : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Conformance : Radzen.Documents.Pdf.PdfAConformance { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.Encryption : Radzen.Documents.Pdf.EncryptionOptions? { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.FormFields : System.Collections.Generic.IList<Radzen.Documents.Pdf.FormFieldDefinition> { public get; }
 public Radzen.Documents.Pdf.DocumentRenderer.ImageDecoders : Radzen.Documents.Pdf.ImageDecoders { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.IncludeDocumentId : System.Boolean { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.Outline : System.Collections.Generic.IList<Radzen.Documents.Pdf.OutlineItem> { public get; }
-public Radzen.Documents.Pdf.DocumentRenderer.PageLabels : System.Collections.Generic.IList<Radzen.Documents.Pdf.PageLabel> { public get; }
 public Radzen.Documents.Pdf.DocumentRenderer.Producer : System.String? { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Render(Radzen.Documents.Document document) : Radzen.Documents.Pdf.PortableDocument
 public Radzen.Documents.Pdf.DocumentRenderer.RoleMap : Radzen.Documents.Pdf.RoleMap { public get; }
 public Radzen.Documents.Pdf.DocumentRenderer.SaveToStream(Radzen.Documents.Document document, System.IO.Stream stream) : System.Void
 public Radzen.Documents.Pdf.DocumentRenderer.ToArray(Radzen.Documents.Document document) : System.Byte[]
-public Radzen.Documents.Pdf.DocumentRenderer.ViewerPreferences : Radzen.Documents.Pdf.ViewerPreferences? { public get; public set; }
 Radzen.Documents.Pdf.DocumentXmpMetadata = public sealed class
 public Radzen.Documents.Pdf.DocumentXmpMetadata..ctor()
 public Radzen.Documents.Pdf.DocumentXmpMetadata.Clear() : System.Void
@@ -1015,7 +991,6 @@ public Radzen.Documents.Pdf.EncryptionOptions.AllowHighResPrinting : System.Bool
 public Radzen.Documents.Pdf.EncryptionOptions.AllowModification : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.AllowPrinting : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.EncryptMetadata : System.Boolean { public get; public set; }
-public Radzen.Documents.Pdf.EncryptionOptions.Material : Radzen.Documents.Pdf.IEncryptionMaterial? { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.OwnerPassword : System.String { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.UserPassword : System.String { public get; public set; }
 Radzen.Documents.Pdf.FacturXProfile = public sealed class
@@ -1045,8 +1020,6 @@ public Radzen.Documents.Pdf.FreeTextAnnotation.TextColor : Radzen.Documents.Core
 public virtual Radzen.Documents.Pdf.FreeTextAnnotation.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.HighlightAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.HighlightAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
-Radzen.Documents.Pdf.IEncryptionMaterial = public interface
-public abstract Radzen.Documents.Pdf.IEncryptionMaterial.GetBytes(System.Int32 index, System.Int32 count) : System.Byte[]
 Radzen.Documents.Pdf.IImageDecoder = public interface
 public Radzen.Documents.Pdf.IImageDecoder.TryReadPixelSize(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out System.Int32 width, out System.Int32 height) : System.Boolean
 public abstract Radzen.Documents.Pdf.IImageDecoder.TryDecode(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out Radzen.Documents.Pdf.DecodedImage? image) : System.Boolean
@@ -1061,7 +1034,6 @@ public const Radzen.Documents.Pdf.ImageCompression.Jpeg : Radzen.Documents.Pdf.I
 public const Radzen.Documents.Pdf.ImageCompression.Jpeg2000 : Radzen.Documents.Pdf.ImageCompression
 public const Radzen.Documents.Pdf.ImageCompression.None : Radzen.Documents.Pdf.ImageCompression
 Radzen.Documents.Pdf.ImageContent = public sealed class : Radzen.Documents.Pdf.ContentElement
-protected virtual Radzen.Documents.Pdf.ImageContent.EmitBody(Radzen.Documents.Pdf.Content.ContentWriter writer) : System.Void
 public Radzen.Documents.Pdf.ImageContent..ctor(System.Byte[] encodedXObject)
 public Radzen.Documents.Pdf.ImageContent.Bounds : Radzen.Documents.Pdf.PdfRect { public get; public set; }
 Radzen.Documents.Pdf.ImageDecoder = public static class
@@ -1250,7 +1222,6 @@ public const Radzen.Documents.Pdf.PathClipMode.EvenOdd : Radzen.Documents.Pdf.Pa
 public const Radzen.Documents.Pdf.PathClipMode.NonZero : Radzen.Documents.Pdf.PathClipMode
 public const Radzen.Documents.Pdf.PathClipMode.None : Radzen.Documents.Pdf.PathClipMode
 Radzen.Documents.Pdf.PathContent = public sealed class : Radzen.Documents.Pdf.ContentElement
-protected virtual Radzen.Documents.Pdf.PathContent.EmitBody(Radzen.Documents.Pdf.Content.ContentWriter writer) : System.Void
 public Radzen.Documents.Pdf.PathContent..ctor()
 public Radzen.Documents.Pdf.PathContent.Cap : Radzen.Documents.LineCap? { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.Clip : Radzen.Documents.Pdf.PathClipMode { public get; public set; }
@@ -1409,9 +1380,6 @@ public Radzen.Documents.Pdf.RoleMap..ctor()
 public Radzen.Documents.Pdf.RoleMap.Add(System.String role, System.String structureType) : System.Void
 public Radzen.Documents.Pdf.RoleMap.Contains(System.String role) : System.Boolean
 public Radzen.Documents.Pdf.RoleMap.Count : System.Int32 { public get; }
-Radzen.Documents.Pdf.SeededEncryptionMaterial = public sealed class : Radzen.Documents.Pdf.IEncryptionMaterial
-public Radzen.Documents.Pdf.SeededEncryptionMaterial..ctor(System.Byte[] seed)
-public Radzen.Documents.Pdf.SeededEncryptionMaterial.GetBytes(System.Int32 index, System.Int32 count) : System.Byte[]
 Radzen.Documents.Pdf.ShapeAnnotation = public abstract class : Radzen.Documents.Pdf.Annotation
 public Radzen.Documents.Pdf.ShapeAnnotation.BorderWidth : System.Double { public get; public set; }
 public Radzen.Documents.Pdf.ShapeAnnotation.InteriorColor : Radzen.Documents.Core.Color? { public get; public set; }
@@ -1464,7 +1432,6 @@ public Radzen.Documents.Pdf.TextAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bo
 public Radzen.Documents.Pdf.TextAnnotation.Icon : System.String { public get; public set; }
 public Radzen.Documents.Pdf.TextAnnotation.Open : System.Boolean { public get; public set; }
 Radzen.Documents.Pdf.TextContent = public sealed class : Radzen.Documents.Pdf.ContentElement
-protected virtual Radzen.Documents.Pdf.TextContent.EmitBody(Radzen.Documents.Pdf.Content.ContentWriter writer) : System.Void
 public Radzen.Documents.Pdf.TextContent..ctor(System.String text, Radzen.Documents.Core.Unit x, Radzen.Documents.Core.Unit y)
 public Radzen.Documents.Pdf.TextContent.Color : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Pdf.TextContent.Font : Radzen.Documents.Fonts.Font { public get; public set; }
@@ -1523,7 +1490,6 @@ public Radzen.Documents.Pdf.ViewerPreferences.HideToolbar : System.Boolean { pub
 public Radzen.Documents.Pdf.ViewerPreferences.PageLayout : Radzen.Documents.Pdf.PdfPageLayout? { public get; public set; }
 public Radzen.Documents.Pdf.ViewerPreferences.PageMode : Radzen.Documents.Pdf.PdfPageMode? { public get; public set; }
 Radzen.Documents.Pdf.XObjectContent = public sealed class : Radzen.Documents.Pdf.ContentElement
-protected virtual Radzen.Documents.Pdf.XObjectContent.EmitBody(Radzen.Documents.Pdf.Content.ContentWriter writer) : System.Void
 public Radzen.Documents.Pdf.XObjectContent..ctor(System.String name)
 public Radzen.Documents.Pdf.XObjectContent.Name : System.String { public get; }
 Radzen.Documents.QrCode = public sealed class : Radzen.Documents.Block

@@ -37,9 +37,10 @@ public class FacturXXmpExtensionSchemaTests
 
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice body", BuildTestSupport.Latin);
-        renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = renderer.Render(document);
+        rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = BuildTestSupport.Read(document, renderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(rootObject!));
         Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
@@ -114,7 +115,8 @@ public class FacturXXmpExtensionSchemaTests
         document.Info.Title = "Invoice 42";
         BuildTestSupport.AddText(document.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
 
-        var attachment = renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = renderer.Render(document);
+        var attachment = rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
         attachment.FacturX = new FacturXProfile
         {
             DocumentType = "INVOICE",
@@ -122,7 +124,7 @@ public class FacturXXmpExtensionSchemaTests
             ConformanceLevel = "EN 16931",
         };
 
-        var reader = BuildTestSupport.Read(document, renderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
         var metadata = Assert.IsType<StreamObject>(reader.Resolve(catalog["Metadata"]));
         var xmp = XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
@@ -142,10 +144,11 @@ public class FacturXXmpExtensionSchemaTests
         document.Info.Title = "Invoice 42";
         BuildTestSupport.AddText(document.Sections.Add(), "Invoice body", BuildTestSupport.Latin);
 
-        var attachment = renderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
+        var rendered = renderer.Render(document);
+        var attachment = rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
         attachment.FacturX = new FacturXProfile { ConformanceLevel = "" };
 
-        Assert.Throws<InvalidOperationException>(() => BuildTestSupport.Read(document, renderer));
+        Assert.Throws<InvalidOperationException>(rendered.ToArray);
     }
 
     [Fact]

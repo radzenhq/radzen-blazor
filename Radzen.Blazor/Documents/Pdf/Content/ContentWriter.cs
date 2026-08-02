@@ -20,12 +20,7 @@ internal sealed record ContentResourcePrefixes(string Font, string Image, string
     public static ContentResourcePrefixes Appearance { get; } = new("AF", "AIm", "GS", "P");
 }
 
-/// <summary>
-/// The write surface for a page content stream, passed to <see cref="ContentElement.EmitBody"/>.
-/// Emits content-stream operators and registers the base-14 fonts, image XObjects and shading
-/// patterns an element references, returning the resource name each is reached by.
-/// </summary>
-public sealed class ContentWriter : IDisposable
+internal sealed class ContentWriter : IDisposable
 {
     private readonly PooledByteAccumulator accumulator = new(1024);
     private readonly ResourceNameAllocator<string, KeyValuePair<string, string>> fonts;
@@ -73,13 +68,7 @@ public sealed class ContentWriter : IDisposable
     internal string RegisterImage(DecodedImage image)
         => images.Add(key => new KeyValuePair<string, DecodedImage>(key, image));
 
-    /// <summary>
-    /// Registers a shading pattern for <paramref name="gradient"/> and returns its <c>/Pattern</c>
-    /// resource name. One brush reused across elements emits a single pattern dictionary.
-    /// </summary>
-    /// <param name="gradient">The gradient brush to register.</param>
-    /// <returns>The resource name the pattern is selected by.</returns>
-    public string RegisterPattern(GradientBrush gradient)
+    internal string RegisterPattern(GradientBrush gradient)
     {
         ArgumentNullException.ThrowIfNull(gradient);
         return patterns.GetOrAdd(
@@ -111,51 +100,29 @@ public sealed class ContentWriter : IDisposable
         new ContentResourceManifest([.. fonts.Values], [.. images.Values], [.. patterns.Values], [.. extGStates.Values]),
         isEmitted: true);
 
-    /// <summary>
-    /// Decodes and registers an image XObject for <paramref name="encodedImage"/> and returns its
-    /// resource name. An undecodable payload throws rather than silently emitting nothing.
-    /// </summary>
-    /// <param name="encodedImage">The encoded image bytes (PNG, JPEG or JPEG2000).</param>
-    /// <returns>The resource name the image is painted by.</returns>
-    public string RegisterImage(byte[] encodedImage)
+    internal string RegisterImage(byte[] encodedImage)
     {
         ArgumentNullException.ThrowIfNull(encodedImage);
         return RegisterImage(decoders.Decode(encodedImage));
     }
 
-    /// <summary>Registers <paramref name="font"/> and returns the resource name its base-14 face is reached by.</summary>
-    /// <param name="font">The font whose base-14 face to register.</param>
-    /// <returns>The resource name the font is selected by.</returns>
-    /// <exception cref="NotSupportedException">
-    /// <paramref name="font"/> names a family this stream cannot reach: one with no base-14 face,
-    /// or one registered as an embeddable font file, which this stream cannot embed.
-    /// </exception>
-    /// <exception cref="InvalidOperationException">
-    /// The document's conformance level forbids referencing a base-14 face by name.
-    /// </exception>
-    public string RegisterFont(Font font)
+    internal string RegisterFont(Font font)
     {
         ArgumentNullException.ThrowIfNull(font);
         var baseFont = FontResolution.ResolveBase14Name(font, scope);
         return fonts.GetOrAdd(baseFont, key => new KeyValuePair<string, string>(baseFont, key));
     }
 
-    /// <summary>Appends <paramref name="text"/> to the content stream verbatim, one byte per character.</summary>
-    /// <param name="text">The raw content-stream text; every character must be within the Latin-1 range.</param>
-    public void WriteRaw(string text) => WriteRaw(text.AsSpan());
+    internal void WriteRaw(string text) => WriteRaw(text.AsSpan());
 
-    /// <summary>Appends <paramref name="text"/> to the content stream verbatim, one byte per character.</summary>
-    /// <param name="text">The raw content-stream text; every character must be within the Latin-1 range.</param>
-    public void WriteRaw(ReadOnlySpan<char> text)
+    internal void WriteRaw(ReadOnlySpan<char> text)
     {
         var destination = accumulator.Reserve(text.Length);
         Latin1ByteEncoder.Encode(text, destination);
         accumulator.Advance(text.Length);
     }
 
-    /// <summary>Writes <paramref name="name"/> as a PDF name object, escaping characters that require it.</summary>
-    /// <param name="name">The name to write, without the leading solidus.</param>
-    public void WriteName(string name)
+    internal void WriteName(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
         if (NameObject.NeedsEscaping(name))
@@ -168,11 +135,8 @@ public sealed class ContentWriter : IDisposable
         WriteRaw(name);
     }
 
-    /// <summary>Writes <paramref name="value"/> as a content-stream number at 1/1000-unit precision.</summary>
-    /// <param name="value">The number to write.</param>
-    /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
-    /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
-    public void WriteNumber(double value)
+    // ISO 32000-1 section 7.3.3: a PDF number has no token for NaN or infinity.
+    internal void WriteNumber(double value)
     {
         if (!double.IsFinite(value))
         {
@@ -214,10 +178,7 @@ public sealed class ContentWriter : IDisposable
         return denominator;
     }
 
-    /// <summary>Writes <paramref name="color"/> as an RGB triple followed by <paramref name="operatorName"/> and a newline.</summary>
-    /// <param name="color">The color to write, emitted as three 0..1 components.</param>
-    /// <param name="operatorName">The color operator to apply (for example <c>rg</c> or <c>RG</c>).</param>
-    public void WriteColor(Color color, string operatorName)
+    internal void WriteColor(Color color, string operatorName)
     {
         WriteNumber(PdfColor.Component(color.R));
         WriteRaw(" ");
@@ -229,9 +190,7 @@ public sealed class ContentWriter : IDisposable
         WriteRaw("\n");
     }
 
-    /// <summary>Writes <paramref name="bytes"/> as a parenthesised PDF literal string, escaping as required.</summary>
-    /// <param name="bytes">The raw string bytes to write.</param>
-    public void WriteString(ReadOnlySpan<byte> bytes)
+    internal void WriteString(ReadOnlySpan<byte> bytes)
     {
         var builder = new StringBuilder(bytes.Length + 2);
         PdfLiteralString.AppendEscaped(builder, bytes, binary: true);
@@ -240,6 +199,5 @@ public sealed class ContentWriter : IDisposable
 
     private void Append(byte value) => accumulator.Append(value);
 
-    /// <summary>Returns the pooled internal buffer. Call only after the emitted bytes have been read out.</summary>
     public void Dispose() => accumulator.Return();
 }
