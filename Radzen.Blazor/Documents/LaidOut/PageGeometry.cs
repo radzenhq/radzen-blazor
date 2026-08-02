@@ -10,6 +10,8 @@ internal readonly record struct ImagePaint
     public required double Opacity { get; init; }
 
     public required bool Interpolate { get; init; }
+
+    public string? MediaType => Data.MediaType;
 }
 
 internal readonly struct LaidOutTableFragment

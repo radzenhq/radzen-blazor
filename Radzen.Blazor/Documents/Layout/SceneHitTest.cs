@@ -63,22 +63,19 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
 
     private readonly List<Item> items = [];
     private readonly List<Container> containers = [];
-    private readonly LaidOutPage page;
     private double top;
-
-    private SceneGeometryCollector(LaidOutPage page) => this.page = page;
 
     public static IReadOnlyList<Item> Collect(LaidOutPage page)
     {
-        var collector = new SceneGeometryCollector(page);
+        var collector = new SceneGeometryCollector();
         SceneWalk.Page(page, collector);
         return collector.items;
     }
 
-    void ISceneVisitor.EnterLayer(SceneLayerKind kind)
+    void ISceneVisitor.EnterLayer(SceneLayerKind kind, double layerTop)
     {
         containers.Clear();
-        top = SceneWalk.LayerTop(page, kind);
+        top = layerTop;
     }
 
     void ISceneVisitor.Line(in LaidOutLine line, in SceneFrame frame)
@@ -111,7 +108,7 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
                 codeSymbol.Width,
                 codeSymbol.Height));
 
-    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
     {
         var rect = Local(frame, box.Bounds);
         Add(box.Source, rect);
@@ -144,7 +141,7 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
 
     void ISceneVisitor.LeaveTable(in LaidOutTablePlacement table, in SceneFrame frame) => Pop();
 
-    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneClip clip)
     {
         var rect = Local(frame, cell.Bounds);
         Add(cell.Source, rect);

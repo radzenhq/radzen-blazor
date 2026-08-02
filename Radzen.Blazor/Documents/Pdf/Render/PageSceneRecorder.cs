@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Scene;
 using Radzen.Documents.Pdf.Geometry;
+using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf.Render;
 
+internal readonly record struct PlannedAnchor(int PageIndex, string Name, double Top);
+
 internal sealed class PageSceneRecorder(
-    PageRenderContext context,
     StructureTreeBuilder structureTree,
-    LaidOutPage page,
-    double height) : ISceneVisitor
+    TextLineRecorder textRecorder,
+    CodeSymbolRecorder codeSymbolRecorder,
+    ImageRecorder imageRecorder,
+    WatermarkRecorder watermarkRecorder) : ISceneVisitor
 {
     private sealed class ContentScope
     {
@@ -29,19 +33,9 @@ internal sealed class PageSceneRecorder(
 
         public required PlanMarks BoxMark { get; init; }
 
-        public required SceneContentBounds Bounds { get; init; }
+        public required PdfRect? LineClip { get; init; }
 
-        public required int FirstText { get; init; }
-
-        public bool TextOverflows { get; set; }
-
-        public int FirstImage { get; set; }
-
-        public int FirstFill { get; set; }
-
-        public int FirstCodeSymbolText { get; set; }
-
-        public bool ContentOverflows { get; set; }
+        public required PdfRect? InlineClip { get; init; }
     }
 
     private sealed class TableScope
@@ -64,8 +58,14 @@ internal sealed class PageSceneRecorder(
     private readonly List<ContentScope> scopes = [];
     private readonly List<TableScope> tables = [];
     private readonly List<StackMark> items = [];
+    private PageRenderContext context = null!;
+    private double height;
     private double top;
     private bool body;
+
+    public List<PagePlan> Plans { get; } = [];
+
+    public List<PlannedAnchor> Anchors { get; } = [];
 
     private ContentScope? Scope => scopes.Count > 0 ? scopes[^1] : null;
 
@@ -73,11 +73,22 @@ internal sealed class PageSceneRecorder(
 
     private PagePlan Plan => context.Plan;
 
-    void ISceneVisitor.EnterLayer(SceneLayerKind kind)
+    void ISceneVisitor.BeginPage(LaidOutPage page, int index)
+    {
+        height = page.Size.Height.Point;
+        var plan = new PagePlan { Size = page.Size };
+        context = new PageRenderContext(plan, textRecorder, codeSymbolRecorder, imageRecorder);
+        Plans.Add(plan);
+        scopes.Clear();
+        tables.Clear();
+        items.Clear();
+    }
+
+    void ISceneVisitor.EnterLayer(SceneLayerKind kind, double layerTop)
     {
         context.Layer = (int)kind;
         body = kind == SceneLayerKind.Body;
-        top = BottomUpSpace.FromTop(height, SceneWalk.LayerTop(page, kind));
+        top = BottomUpSpace.FromTop(height, layerTop);
     }
 
     void ISceneVisitor.BeginItem(int zOrder) => items.Add(context.BeginStack(zOrder));
@@ -93,101 +104,48 @@ internal sealed class PageSceneRecorder(
     {
         if (Scope is not { } scope)
         {
-            context.Text.EmitLines(
+            textRecorder.EmitLines(
                 context, [line],
                 frame.Left, top, frame.Delta,
                 opacity: 1, inherited: null, resolveStructure: body,
-                overflowThreshold: double.PositiveInfinity,
+                clip: null,
                 artifact: body ? null : SemanticArtifactKind.Pagination);
             return;
         }
 
-        scope.TextOverflows |= context.Text.EmitLines(
+        textRecorder.EmitLines(
             context, [line],
             frame.Left, top, frame.Delta,
             scope.Opacity, scope.Element, resolveStructure: scope.Artifact is null,
-            overflowThreshold: scope.Bounds.Width,
+            clip: scope.LineClip,
             artifact: scope.Artifact);
     }
 
     void ISceneVisitor.Image(in LaidOutImage image, in SceneFrame frame)
     {
         var scope = Scope;
-        context.Images.EmitImage(
+        imageRecorder.EmitImage(
             context, image, frame.Left, top, frame.Delta,
-            scope?.Opacity ?? 1, scope?.Element, scope?.Artifact);
-
-        Overflow(scope, image.X, image.Width);
+            scope?.Opacity ?? 1, scope?.Element, scope?.Artifact, scope?.InlineClip);
     }
 
     void ISceneVisitor.CodeSymbol(in LaidOutCodeSymbol codeSymbol, in SceneFrame frame)
     {
         var scope = Scope;
-        context.CodeSymbols.EmitCodeSymbolModules(
+        codeSymbolRecorder.EmitCodeSymbolModules(
             context, codeSymbol.Source, codeSymbol.Modules, codeSymbol.Foreground,
             frame.Left + codeSymbol.X,
             BottomUpSpace.FromTop(top, codeSymbol.Y + frame.Delta),
             codeSymbol.Caption,
-            scope?.Artifact);
-
-        Overflow(scope, codeSymbol.X, codeSymbol.Width);
+            scope?.Artifact,
+            scope?.InlineClip);
     }
 
-    private static void Overflow(ContentScope? scope, double left, double width)
-    {
-        if (scope is null)
-        {
-            return;
-        }
-
-        scope.ContentOverflows |= left < scope.Bounds.Left - 0.01 || left + width > scope.Bounds.Right + 0.01;
-    }
-
-    void ISceneVisitor.AfterLines()
-    {
-        var scope = scopes[^1];
-        if (scope.TextOverflows)
-        {
-            for (var i = scope.FirstText; i < Plan.Texts.Count; i++)
-            {
-                Plan.Texts[i] = Plan.Texts[i] with { Clip = scope.Clip };
-            }
-        }
-
-        scope.FirstImage = Plan.Images.Count;
-        scope.FirstFill = Plan.Fills.Count;
-        scope.FirstCodeSymbolText = Plan.Texts.Count;
-    }
-
-    void ISceneVisitor.AfterInline()
-    {
-        var scope = scopes[^1];
-        if (!scope.ContentOverflows)
-        {
-            return;
-        }
-
-        for (var i = scope.FirstImage; i < Plan.Images.Count; i++)
-        {
-            Plan.Images[i] = Plan.Images[i] with { Clip = scope.Clip };
-        }
-
-        for (var i = scope.FirstFill; i < Plan.Fills.Count; i++)
-        {
-            Plan.Fills[i] = Plan.Fills[i] with { Clip = scope.Clip };
-        }
-
-        for (var i = scope.FirstCodeSymbolText; i < Plan.Texts.Count; i++)
-        {
-            Plan.Texts[i] = Plan.Texts[i] with { Clip = scope.Clip };
-        }
-    }
-
-    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
     {
         var parent = Scope;
         var mark = Plan.Mark();
-        var rect = BottomUpSpace.Bounds(frame.Left, top, box.Bounds, frame.Delta);
+        var rect = ToPdfRect(clip.Bounds);
         var artifact = parent?.Artifact ?? structureTree.ArtifactOf(box.Source);
 
         if (box.Transform is not null && box.Style.Shadow is not null)
@@ -214,8 +172,8 @@ internal sealed class PageSceneRecorder(
             Radius = radius,
             ContentMark = radius > 0 ? Plan.Mark() : default,
             BoxMark = mark,
-            Bounds = bounds,
-            FirstText = Plan.Texts.Count,
+            LineClip = clip.ClipsLines ? rect : null,
+            InlineClip = clip.ClipsInline ? rect : null,
         });
     }
 
@@ -271,14 +229,14 @@ internal sealed class PageSceneRecorder(
         });
     }
 
-    void ISceneVisitor.Row(in LaidOutRow row, in SceneFrame frame)
+    void ISceneVisitor.EnterRow(in LaidOutRow row, in SceneFrame frame)
     {
         var table = Table;
         table.CellArtifact = row.Artifact ?? table.Artifact;
         PaintRowBackground(
             row.Background,
             frame.Left,
-            BottomUpSpace.FromTop(top, row.Y + row.Height),
+            BottomUpSpace.FromTop(BottomUpSpace.FromTop(top, frame.Delta), row.Y + row.Height),
             table.Width,
             row.Height,
             SemanticArtifacts.ForDecoration(table.CellArtifact));
@@ -318,22 +276,6 @@ internal sealed class PageSceneRecorder(
             mark = Plan.Mark();
         }
 
-        var rowTop = 0.0;
-        var rowHeights = placement.Layout.RowHeights;
-        for (var r = 0; r < rowHeights.Length && r < decoration.RowBackgrounds.Length; r++)
-        {
-            PaintRowBackground(
-                decoration.RowBackgrounds[r],
-                frame.Left,
-                BottomUpSpace.BottomFromTop(
-                    BottomUpSpace.FromTop(top, frame.Delta),
-                    rowTop + rowHeights[r]),
-                placement.Layout.Width,
-                rowHeights[r],
-                SemanticArtifacts.ForDecoration(artifact));
-            rowTop += rowHeights[r];
-        }
-
         tables.Add(new TableScope
         {
             Element = parent?.Element,
@@ -361,12 +303,12 @@ internal sealed class PageSceneRecorder(
         }
     }
 
-    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneClip clip)
     {
         var table = Table;
         var artifact = table.CellArtifact ?? structureTree.ArtifactOf(cell.Source);
         var element = artifact is null ? structureTree.ElementOf(cell.Source) ?? table.Element : null;
-        var rect = BottomUpSpace.Bounds(frame.Left, top, cell.Bounds, frame.Delta);
+        var rect = ToPdfRect(clip.Bounds);
 
         BoxDecorationRecorder.Paint(
             Plan,
@@ -384,13 +326,38 @@ internal sealed class PageSceneRecorder(
             Radius = 0,
             ContentMark = default,
             BoxMark = default,
-            Bounds = bounds,
-            FirstText = Plan.Texts.Count,
+            LineClip = clip.ClipsLines ? rect : null,
+            InlineClip = clip.ClipsInline ? rect : null,
         });
     }
 
     void ISceneVisitor.LeaveCell(LaidOutCell cell, in SceneFrame frame)
         => scopes.RemoveAt(scopes.Count - 1);
+
+    void ISceneVisitor.Link(in LaidOutLink link)
+        => Plan.Links.Add(new OutputLink(
+            link.Left,
+            BottomUpSpace.FromTop(height, link.Bottom),
+            link.Right,
+            BottomUpSpace.FromTop(height, link.Top),
+            link.Uri,
+            link.Anchor,
+            structureTree.LinkElementOf(link.Source)?.Id));
+
+    void ISceneVisitor.Anchor(in LaidOutAnchor anchor)
+        => Anchors.Add(new PlannedAnchor(
+            Plans.Count - 1,
+            anchor.Name,
+            BottomUpSpace.FromTop(height, anchor.Top)));
+
+    void ISceneVisitor.Watermark(LaidOutWatermark watermark) => watermarkRecorder.Plan(Plan, watermark);
+
+    private PdfRect ToPdfRect(in Rect bounds)
+        => PdfRect.FromSize(
+            bounds.X,
+            BottomUpSpace.Bottom(top, bounds.Y, bounds.Height),
+            bounds.Width,
+            bounds.Height);
 
     private void PaintRowBackground(
         Color? rowBackground,
