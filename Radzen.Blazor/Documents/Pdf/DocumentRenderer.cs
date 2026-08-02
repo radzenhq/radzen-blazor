@@ -106,7 +106,7 @@ public sealed class DocumentRenderer
         var output = DocumentRenderEngine.Generate(
             RenderRequest.From(this),
             Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes));
-        output.AdoptMaterializedGraph(new DocumentGraphBuilder(output).Build());
+        output.AdoptMaterializedGraph(new DocumentGraphBuilder(output, renderTime: true).Build());
         return output;
     }
 

@@ -26,7 +26,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
 
     private IReadOnlyList<PageOutput> PlannedPages() => pageMap.Planned;
 
-    public void ValidateConformance()
+    public void ValidateRenderTime()
     {
         if (document.Conformance != PdfAConformance.None)
         {
@@ -59,6 +59,51 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         }
 
         ValidateTagging();
+    }
+
+    public void ValidateSaveTime()
+    {
+        if (document.Conformance == PdfAConformance.None && !document.IsPdfUa)
+        {
+            return;
+        }
+
+        if (document.Xmp.IsModified)
+        {
+            throw new InvalidOperationException(
+                "Caller-edited XMP cannot be combined with PDF/A or PDF/UA output because conformance metadata has mandatory values. Clear the XMP edits or disable conformance.");
+        }
+
+        if (document.Conformance == PdfAConformance.None)
+        {
+            return;
+        }
+
+        if (document.Encryption is not null)
+        {
+            throw new InvalidOperationException(
+                "PDF/A forbids encryption; clear PortableDocument.Encryption or use PdfAConformance.None.");
+        }
+
+        switch (document.Conformance)
+        {
+            case PdfAConformance.PdfA2B or PdfAConformance.PdfA2A
+                or PdfAConformance.PdfA4 or PdfAConformance.PdfA4E when document.Attachments.Count > 0:
+                throw new InvalidOperationException(
+                    $"{document.Conformance} only permits embedded files that are themselves PDF/A conformant, which cannot be verified; remove the attachments or use PdfA3B, PdfA3A or PdfA4F.");
+            case PdfAConformance.PdfA4F when document.Attachments.Count == 0:
+                throw new InvalidOperationException(
+                    "PDF/A-4F requires at least one embedded file; add one with PortableDocument.Attachments or use PdfA4.");
+        }
+
+        foreach (var attachment in document.Attachments)
+        {
+            if (attachment.Name == "factur-x.xml")
+            {
+                RequireCompleteFacturXProfile(attachment.FacturX);
+                break;
+            }
+        }
     }
 
     // Font embedding: ISO 19005-2 6.2.11.4.1. DeviceCMYK against sRGB intent: 6.2.4.3.
@@ -143,12 +188,13 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
     // at a standard ISO 32000-1 structure type (02-002) and shall not be circular (02-003).
     private void ValidateRoleMapChains()
     {
-        if (document.Output?.RoleMap is not { Length: > 0 } entries)
+        var entries = document.RoleMap.Entries;
+        if (entries.Count == 0)
         {
             return;
         }
 
-        var chain = new Dictionary<string, string>(entries.Length, StringComparer.Ordinal);
+        var chain = new Dictionary<string, string>(entries.Count, StringComparer.Ordinal);
 
         foreach (var entry in entries)
         {
@@ -231,29 +277,12 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
             throw new InvalidOperationException("PDF/A forbids encryption; the source document is encrypted.");
         }
 
-        if (document.Encryption is not null)
-        {
-            throw new InvalidOperationException(
-                "PDF/A forbids encryption; clear DocumentRenderer.Encryption or use PdfAConformance.None.");
-        }
-
         if (IsLevelA(document.Conformance)
             && document.Output?.Structure is null
             && !document.HasPreservableStructureGraph)
         {
             throw new InvalidOperationException(
                 $"{document.Conformance} requires Tagged PDF logical structure; the document has no structure tree. Render the document with DocumentRenderer or use a Level B conformance.");
-        }
-
-        switch (document.Conformance)
-        {
-            case PdfAConformance.PdfA2B or PdfAConformance.PdfA2A
-                or PdfAConformance.PdfA4 or PdfAConformance.PdfA4E when document.Attachments.Count > 0:
-                throw new InvalidOperationException(
-                    $"{document.Conformance} only permits embedded files that are themselves PDF/A conformant, which cannot be verified; remove the attachments or use PdfA3B, PdfA3A or PdfA4F.");
-            case PdfAConformance.PdfA4F when document.Attachments.Count == 0:
-                throw new InvalidOperationException(
-                    "PDF/A-4F requires at least one embedded file; add one with PortableDocument.Attachments or use PdfA4.");
         }
 
         ValidateImageColorSpaces();
@@ -365,11 +394,11 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         }
     }
 
-    private static FacturXMetadata BuildFacturX(FacturXProfile? profile)
+    private static void RequireCompleteFacturXProfile(FacturXProfile? profile)
     {
         if (profile is null)
         {
-            return new FacturXMetadata();
+            return;
         }
 
         if (string.IsNullOrEmpty(profile.DocumentType)
@@ -378,6 +407,14 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         {
             throw new InvalidOperationException(
                 "Attachment.FacturX requires DocumentType, Version and ConformanceLevel; leave the profile null to use the BASIC 1.0 INVOICE defaults.");
+        }
+    }
+
+    private static FacturXMetadata BuildFacturX(FacturXProfile? profile)
+    {
+        if (profile is null)
+        {
+            return new FacturXMetadata();
         }
 
         return new FacturXMetadata

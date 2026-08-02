@@ -116,12 +116,11 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4F)]
     public void PdfA4Levels_Catalog_DeclaresVersion20(PdfAConformance level)
     {
-        var (document, renderer) = Author(level == PdfAConformance.PdfA4F ? PdfAConformance.PdfA4 : level);
+        var (document, renderer) = Author(level);
         var rendered = renderer.Render(document);
         if (level == PdfAConformance.PdfA4F)
         {
             rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
-            rendered.Conformance = PdfAConformance.PdfA4F;
         }
 
         var catalog = Catalog(DocumentReader.Parse(rendered.ToArray()));
@@ -149,10 +148,9 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA4F_WithAttachment_HasConformanceF()
     {
-        var (document, renderer) = Author(PdfAConformance.PdfA4);
+        var (document, renderer) = Author(PdfAConformance.PdfA4F);
         var rendered = renderer.Render(document);
         rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
-        rendered.Conformance = PdfAConformance.PdfA4F;
 
         var packet = MetadataPacket(DocumentReader.Parse(rendered.ToArray()));
         Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);

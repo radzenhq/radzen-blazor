@@ -116,7 +116,6 @@ internal sealed class DocumentRenderEngine
             pageOutputs,
             structureTree.Capture(pageOutputs),
             anchors.ToImmutable(),
-            [.. request.RoleMap.Entries],
             structureTree.UnmappedRoles);
 
         for (var pageIndex = 0; pageIndex < plans.Count; pageIndex++)
