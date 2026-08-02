@@ -10,6 +10,7 @@ using Radzen.Documents.Codes;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
+using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
@@ -114,18 +115,18 @@ public class LaidOutContractTests
 
         Assert.Equal("A\u4E2DB", fragment.GlyphRun.Text);
         Assert.Equal(3, spans.Length);
-        Assert.Same(document.Fonts.ResolveFace(run.Font), spans[0].Face.Sfnt);
-        Assert.NotSame(spans[0].Face.Sfnt, spans[1].Face.Sfnt);
-        Assert.Same(spans[0].Face.Sfnt, spans[2].Face.Sfnt);
+        Assert.Same(document.Fonts.ResolveFace(run.Font), PdfFontProgram.Of(spans[0].Face));
+        Assert.NotSame(PdfFontProgram.Of(spans[0].Face), PdfFontProgram.Of(spans[1].Face));
+        Assert.Same(PdfFontProgram.Of(spans[0].Face), PdfFontProgram.Of(spans[2].Face));
         Assert.Equal(0, spans[0].XOffset, 9);
         Assert.Equal(spans[0].Advance, spans[1].XOffset, 9);
         Assert.Equal(spans[0].Advance + spans[1].Advance, spans[2].XOffset, 9);
         Assert.All(
-            spans.Where(span => span.IsSfnt),
+            spans.Where(span => span.Face.Kind == CapturedFontFaceKind.Sfnt),
             span => Assert.Contains(
                 laidOut.Fonts.Faces,
-                registered => ReferenceEquals(registered.Face, span.Face.Sfnt)));
-        Assert.Equal(new[] { 0, 1, 2 }, spans.SelectMany(span => span.SfntGlyphs).Select(glyph => glyph.Cluster));
+                registered => ReferenceEquals(registered.Face, PdfFontProgram.Of(span.Face))));
+        Assert.Equal(new[] { 0, 1, 2 }, spans.SelectMany(span => span.Glyphs).Select(glyph => glyph.Cluster));
     }
 
     [Fact]
@@ -172,10 +173,9 @@ public class LaidOutContractTests
 
         Assert.Equal(CapturedFontFaceKind.BuiltIn, span.Face.Kind);
         Assert.Equal(BuiltInFontFamily.Sans, span.Face.BuiltIn.Family);
-        Assert.Empty(span.SfntGlyphs);
-        Assert.Equal(new[] { 'A', 0x20AC, 0xFB01 }, span.BuiltInGlyphs.Select(glyph => glyph.Codepoint));
-        Assert.Equal(new[] { 0, 1, 2 }, span.BuiltInGlyphs.Select(glyph => glyph.Cluster));
-        Assert.All(span.BuiltInGlyphs, glyph => Assert.True(glyph.Advance > 0));
+        Assert.Equal(new[] { 'A', 0x20AC, 0xFB01 }, span.Glyphs.Select(glyph => glyph.Codepoint));
+        Assert.Equal(new[] { 0, 1, 2 }, span.Glyphs.Select(glyph => glyph.Cluster));
+        Assert.All(span.Glyphs, glyph => Assert.True(glyph.Advance > 0));
     }
 
     [Fact]
@@ -251,17 +251,15 @@ public class LaidOutContractTests
         var glyph = Assert.Single(
             FirstFragment(Assert.Single(DocumentLayouter.Layout(document).Pages))
                 .GlyphRun.Spans)
-            .BuiltInGlyphs[0];
+            .Glyphs[0];
         var metrics = BuiltInFontMetrics.Resolve(run.Font)!;
         var kern = metrics.GetRunKerning('A', 'V');
-        var expectedPoints = -FontMetric.Scale(kern, run.Font.EffectiveSize.Point, 1000);
+        var expectedPoints = FontMetric.Scale(kern, run.Font.EffectiveSize.Point, 1000);
 
-        Assert.Equal(expectedPoints, glyph.TextAdjustmentPoints, 9);
+        Assert.Equal(expectedPoints, glyph.Kerning, 9);
         Assert.Equal(
             -kern,
-            SfntGlyphEncoder.PdfTextAdjustment(
-                glyph.TextAdjustmentPoints,
-                run.Font.EffectiveSize.Point),
+            SfntGlyphEncoder.PdfTextAdjustment(glyph.Kerning, run.Font.EffectiveSize.Point),
             9);
     }
 
@@ -275,7 +273,7 @@ public class LaidOutContractTests
         var laidOut = DocumentLayouter.Layout(document);
         var glyph = Assert.Single(
             FirstFragment(Assert.Single(laidOut.Pages)).GlyphRun.Spans)
-            .BuiltInGlyphs[1];
+            .Glyphs[1];
 
         Assert.Equal(0xFB01, glyph.Codepoint);
         var error = Assert.Throws<InvalidOperationException>(() => Render(laidOut, document));
@@ -306,7 +304,7 @@ public class LaidOutContractTests
 
         var laidOut = DocumentLayouter.Layout(document);
         var fragment = FirstFragment(Assert.Single(laidOut.Pages));
-        var capturedFace = Assert.Single(fragment.GlyphRun.Spans).Face.Sfnt;
+        var capturedFace = PdfFontProgram.Of(Assert.Single(fragment.GlyphRun.Spans).Face);
         var registered = Assert.Single(document.Fonts.RegisteredFaces());
         var asset = Assert.Single(laidOut.Fonts.Faces);
         var before = Render(laidOut, document);

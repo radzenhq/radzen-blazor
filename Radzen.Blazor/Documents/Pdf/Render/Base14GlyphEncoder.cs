@@ -9,7 +9,7 @@ namespace Radzen.Documents.Pdf.Render;
 internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
 {
     public byte[] Encode(
-        ImmutableArray<CapturedBuiltInGlyph> glyphs,
+        ImmutableArray<CapturedGlyph> glyphs,
         CapturedBuiltInFace face)
     {
         var bytes = new byte[glyphs.Length];
