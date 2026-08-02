@@ -640,6 +640,7 @@ public sealed class PortableDocument
     public void Redact(IEnumerable<PageRedaction> areas, RedactionOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(areas);
+        var plans = new List<RedactionPlan>();
         foreach (var group in areas.GroupBy(static area => area.PageIndex))
         {
             if (group.Key < 0 || group.Key >= Pages.Count)
@@ -647,7 +648,15 @@ public sealed class PortableDocument
                 throw new ArgumentOutOfRangeException(nameof(areas), group.Key, "A redaction page index is outside the document.");
             }
 
-            Pages[group.Key].Redact(group.Select(static area => area.Area), options);
+            if (Redactor.Plan(Pages[group.Key], group.Select(static area => area.Area), options) is { } plan)
+            {
+                plans.Add(plan);
+            }
+        }
+
+        foreach (var plan in plans)
+        {
+            plan.Commit();
         }
     }
 
@@ -659,9 +668,20 @@ public sealed class PortableDocument
     public int RedactText(string text, TextSearchOptions? searchOptions = null, RedactionOptions? redactionOptions = null)
     {
         var count = 0;
+        var plans = new List<RedactionPlan>();
         foreach (var page in Pages)
         {
-            count += page.RedactText(text, searchOptions, redactionOptions);
+            var plan = Redactor.PlanText(page, text, searchOptions, redactionOptions, out var pageCount);
+            count += pageCount;
+            if (plan is not null)
+            {
+                plans.Add(plan);
+            }
+        }
+
+        foreach (var plan in plans)
+        {
+            plan.Commit();
         }
 
         return count;

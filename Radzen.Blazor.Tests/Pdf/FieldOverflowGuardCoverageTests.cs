@@ -35,6 +35,13 @@ public class FieldOverflowGuardCoverageTests
         return fonts.MeasureText("ending on page 0", LineLayoutSupport.FontAt(12));
     }
 
+    private static void Sized(Inline inline)
+    {
+        var run = (TextInline)inline;
+        run.Font.Family = LineLayoutSupport.Family;
+        run.Font.Size = 12;
+    }
+
     private static Paragraph FieldParagraph()
     {
         var paragraph = new Paragraph();
@@ -76,22 +83,18 @@ public class FieldOverflowGuardCoverageTests
     }
 
     [Fact]
-    public void BodyFieldParagraph_ResolvedValueWrapsBeyondLaidOutLines_Throws()
+    public void BodyFieldParagraph_MultiDigitCount_FitsTheReservedLines()
     {
         var document = Author(out var section);
         section.Blocks.Add(FieldParagraph());
         section.Blocks.Add(Plain("BELOW"));
         PadToTenPages(section);
 
-        var ex = Record.Exception(() => new DocumentRenderer().ToArray(document));
-
-        Assert.NotNull(ex);
-        Assert.IsType<InvalidOperationException>(ex);
-        Assert.Contains("reserved", ex!.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Null(Record.Exception(() => new DocumentRenderer().ToArray(document)));
     }
 
     [Fact]
-    public void TableCellFieldParagraph_ResolvedValueWrapsBeyondLaidOutLines_Throws()
+    public void TableCellFieldParagraph_MultiDigitCount_FitsTheReservedLines()
     {
         var document = Author(out var section);
         var table = section.Blocks.AddTable();
@@ -102,11 +105,32 @@ public class FieldOverflowGuardCoverageTests
         cell.Blocks.Add(Plain("BELOW"));
         PadToTenPages(section);
 
-        var ex = Record.Exception(() => new DocumentRenderer().ToArray(document));
+        Assert.Null(Record.Exception(() => new DocumentRenderer().ToArray(document)));
+    }
 
-        Assert.NotNull(ex);
-        Assert.IsType<InvalidOperationException>(ex);
-        Assert.Contains("reserved", ex!.Message, StringComparison.OrdinalIgnoreCase);
+    [Fact]
+    public void HeaderFieldParagraph_OverAHundredPages_FitsTheReservedLines()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        var fonts = LineLayoutSupport.Fonts();
+        var narrow = fonts.MeasureText("Page 0 of 0", LineLayoutSupport.FontAt(12));
+        section.PageSize = new PageSize(Unit.FromPoint(narrow + 1 + 80), Unit.FromPoint(500));
+        section.Margins.SetAll(Unit.FromPoint(40));
+
+        var header = new Paragraph();
+        Sized(header.Inlines.Add("Page "));
+        Sized(header.Inlines.Add(new PageNumberField()));
+        Sized(header.Inlines.Add(" of "));
+        Sized(header.Inlines.Add(new PageCountField()));
+        section.Header.Blocks.Add(header);
+        for (var i = 0; i < 120; i++)
+        {
+            section.Blocks.AddPageBreak();
+        }
+
+        Assert.Null(Record.Exception(() => new DocumentRenderer().ToArray(document)));
     }
 
     [Fact]

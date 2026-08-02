@@ -12,5 +12,5 @@ public sealed class PageCountField : TextInline
     {
     }
 
-    internal override string LayoutText => "0";
+    internal override string LayoutText => PageFieldPlaceholder.Text;
 }

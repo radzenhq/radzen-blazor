@@ -125,7 +125,7 @@ public class LaidOutContractTests
             spans.Where(span => span.Face.Kind == CapturedFontFaceKind.Sfnt),
             span => Assert.Contains(
                 laidOut.Fonts.Faces,
-                registered => ReferenceEquals(registered.Face, PdfFontProgram.Of(span.Face))));
+                registered => ReferenceEquals(PdfFontProgram.Of(registered), PdfFontProgram.Of(span.Face))));
         Assert.Equal(new[] { 0, 1, 2 }, spans.SelectMany(span => span.Glyphs).Select(glyph => glyph.Cluster));
     }
 
@@ -309,9 +309,9 @@ public class LaidOutContractTests
         var asset = Assert.Single(laidOut.Fonts.Faces);
         var before = Render(laidOut, document);
 
-        Assert.Same(registered.Source, asset.Source);
+        Assert.Same(PdfFontProgram.DataOf(registered), PdfFontProgram.DataOf(asset));
         Assert.Equal(registered.FaceIndex, asset.FaceIndex);
-        Assert.Same(capturedFace, asset.Face);
+        Assert.Same(capturedFace, PdfFontProgram.Of(asset));
 
         document.Fonts.Register(
             BuildTestSupport.Latin,

@@ -90,12 +90,13 @@ public class SharedSfntFontConcurrencyTests
     [Fact]
     public void ParallelKerningLookupsOverASharedFace_AgreeWithASingleThreadedFace()
     {
-        var shared = Assert.Single(Fonts().RegisteredFaces().Where(face => face.Family == Sans)).Face;
+        var shared = Assert.Single(Fonts().RegisteredFaces().Where(face => face.Family == Sans));
+        var sharedProgram = FontProgram.Of(shared);
         var solo = SfntFont.Parse(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf"));
 
         var pairs = Enumerable.Range(32, 96)
             .SelectMany(left => Enumerable.Range(32, 96).Select(right => (Left: left, Right: right)))
-            .Select(pair => (shared.GetGlyphId(pair.Left), shared.GetGlyphId(pair.Right)))
+            .Select(pair => (sharedProgram.GetGlyphId(pair.Left), sharedProgram.GetGlyphId(pair.Right)))
             .ToArray();
 
         var expected = pairs.Select(pair => solo.GetKerning(pair.Item1, pair.Item2)).ToArray();
@@ -103,7 +104,7 @@ public class SharedSfntFontConcurrencyTests
 
         Parallel.For(0, pairs.Length, index =>
         {
-            observed[index] = shared.GetKerning(pairs[index].Item1, pairs[index].Item2);
+            observed[index] = sharedProgram.GetKerning(pairs[index].Item1, pairs[index].Item2);
         });
 
         Assert.Equal(expected, observed);

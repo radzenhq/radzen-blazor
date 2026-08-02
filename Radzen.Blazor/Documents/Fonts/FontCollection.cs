@@ -16,13 +16,49 @@ internal enum BuiltInGlyphKind
     Missing,
 }
 
-internal readonly record struct RegisteredFace(
-    string Family,
-    bool Bold,
-    bool Italic,
-    SfntFont Face,
-    FontSourceData Source,
-    int FaceIndex);
+internal interface IFontProgramSource
+{
+    SfntFont Program { get; }
+}
+
+internal static class FontProgram
+{
+    public static SfntFont Of<TSource>(in TSource source)
+        where TSource : struct, IFontProgramSource
+        => source.Program;
+}
+
+internal readonly record struct RegisteredFace : IFontProgramSource, Pdf.Fonts.IPdfEmbeddedFace
+{
+    private readonly SfntFont program;
+    private readonly FontSourceData source;
+
+    internal RegisteredFace(string family, bool bold, bool italic, SfntFont program, FontSourceData source, int faceIndex)
+    {
+        Family = family;
+        Bold = bold;
+        Italic = italic;
+        FaceIndex = faceIndex;
+        this.program = program;
+        this.source = source;
+    }
+
+    public string Family { get; }
+
+    public bool Bold { get; }
+
+    public bool Italic { get; }
+
+    public int FaceIndex { get; }
+
+    public CapturedFaceMetrics Metrics => new(program.Ascent, program.Descent, program.UnitsPerEm);
+
+    SfntFont IFontProgramSource.Program => program;
+
+    SfntFont Pdf.Fonts.IPdfFontProgramSource.Program => program;
+
+    FontSourceData Pdf.Fonts.IPdfEmbeddedFace.ProgramData => source;
+}
 
 internal sealed class FontSourceData(byte[] bytes)
 {
@@ -54,7 +90,7 @@ internal readonly record struct FontCollectionSnapshot(
             if (face.Bold == bold && face.Italic == italic
                 && string.Equals(face.Family, family, StringComparison.Ordinal))
             {
-                primary = face.Face;
+                primary = FontProgram.Of(face);
                 return true;
             }
         }
@@ -106,7 +142,7 @@ internal readonly record struct FontCollectionSnapshot(
             if (!candidate.Bold && !candidate.Italic
                 && string.Equals(candidate.Family, family, StringComparison.Ordinal))
             {
-                face = candidate.Face;
+                face = FontProgram.Of(candidate);
                 return true;
             }
         }
@@ -115,7 +151,7 @@ internal readonly record struct FontCollectionSnapshot(
         {
             if (string.Equals(candidate.Family, family, StringComparison.Ordinal))
             {
-                face = candidate.Face;
+                face = FontProgram.Of(candidate);
                 return true;
             }
         }
