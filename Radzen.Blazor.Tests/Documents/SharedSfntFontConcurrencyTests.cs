@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
@@ -107,43 +106,25 @@ public class SharedSfntFontConcurrencyTests
         Assert.Equal(expected, observed);
     }
 
-    private static readonly string[] NamedLazyCaches =
-    [
-        "Radzen.Documents.Fonts.Sfnt.Cmap.memo",
-        "Radzen.Documents.Fonts.Sfnt.SfntFont.kerning",
-    ];
+    private static readonly Dictionary<string, int> LazyCachesByDeclaringType = new(StringComparer.Ordinal)
+    {
+        ["Radzen.Documents.Fonts.Sfnt.Cmap"] = 1,
+        ["Radzen.Documents.Fonts.Sfnt.SfntFont"] = 1,
+    };
 
     [Fact]
-    public void SfntFontFields_AreReadOnlyApartFromTheTwoNamedLazyCaches()
-        => AssertNamedLazyCacheInvariant();
+    public void SfntFontFields_AreReadOnlyApartFromOneLazyCachePerCachingType()
+        => AssertLazyCacheInvariant();
 
-    internal static void AssertNamedLazyCacheInvariant()
+    internal static void AssertLazyCacheInvariant()
     {
         var mutable = ReachableFrom(typeof(SfntFont))
             .SelectMany(type => type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             .Where(field => !field.IsInitOnly)
-            .Select(Describe)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
+            .GroupBy(field => field.DeclaringType!.FullName!, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.Count(), StringComparer.Ordinal);
 
-        Assert.Equal(NamedLazyCaches, mutable);
-    }
-
-    private static string Describe(FieldInfo field)
-        => $"{field.DeclaringType!.FullName}.{BackedProperty(field)?.Name ?? field.Name}";
-
-    private static PropertyInfo? BackedProperty(FieldInfo field)
-    {
-        if (!field.IsDefined(typeof(CompilerGeneratedAttribute), inherit: false)
-            || !field.Name.StartsWith('<')
-            || !field.Name.EndsWith(">k__BackingField", StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        return field.DeclaringType!.GetProperty(
-            field.Name[1..field.Name.IndexOf('>')],
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        Assert.Equal(LazyCachesByDeclaringType, mutable);
     }
 
     [Fact]

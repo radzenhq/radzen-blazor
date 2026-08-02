@@ -12,7 +12,7 @@ internal sealed class IndirectObjectStore(
     ReaderLimits limits,
     Dictionary<int, XrefEntry> entries,
     StreamDecoder decoder,
-    DocumentRepairer repairer) : IDocumentRepairStore
+    DocumentRepairer repairer)
 {
     private readonly byte[] data = data;
     private readonly ReaderLimits limits = limits;

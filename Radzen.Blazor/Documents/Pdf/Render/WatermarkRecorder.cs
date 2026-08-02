@@ -17,7 +17,7 @@ internal sealed class WatermarkRecorder(
             CenterX = watermark.CenterX,
             CenterY = BottomUpSpace.FromTop(plan.Size.Height.Point, watermark.CenterY),
             Rotation = watermark.Rotation,
-            Artifact = watermark.Artifact,
+            Artifact = SemanticArtifactKind.Watermark,
             ExtGState = watermark.Opacity < 1
                 ? plan.Resources.RegisterExtGState(watermark.Opacity, watermark.Opacity)
                 : null,

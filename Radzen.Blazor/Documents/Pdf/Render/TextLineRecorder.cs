@@ -13,21 +13,9 @@ internal sealed class TextLineRecorder(
     ImageRegistry imageRegistry,
     StructureTreeBuilder structureTree,
     bool allowUnsupportedCharacters,
-    bool embedFieldAppearances = false)
+    bool embedFieldAppearances)
 {
     private readonly GlyphSpanRecorder spans = new(fontRegistry, allowUnsupportedCharacters);
-
-    public void EmitBandLines(
-        PageRenderContext context,
-        ImmutableArray<LaidOutLine> lines,
-        double left,
-        double top)
-        => EmitLines(
-            context, lines,
-            left, top, delta: 0,
-            opacity: 1, inherited: null, resolveStructure: false,
-            overflowThreshold: double.PositiveInfinity,
-            artifact: SemanticArtifactKind.Pagination);
 
     public bool EmitLines(
         PageRenderContext context,

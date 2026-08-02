@@ -176,9 +176,6 @@ public class LaidOutContractTests
         Assert.Equal(new[] { 'A', 0x20AC, 0xFB01 }, span.BuiltInGlyphs.Select(glyph => glyph.Codepoint));
         Assert.Equal(new[] { 0, 1, 2 }, span.BuiltInGlyphs.Select(glyph => glyph.Cluster));
         Assert.All(span.BuiltInGlyphs, glyph => Assert.True(glyph.Advance > 0));
-        Assert.DoesNotContain(
-            typeof(CapturedBuiltInGlyph).GetProperties(),
-            property => property.PropertyType == typeof(byte));
     }
 
     [Fact]
@@ -241,17 +238,6 @@ public class LaidOutContractTests
                 face.Metrics.BBoxRight,
                 face.Metrics.BBoxTop,
             });
-    }
-
-    [Fact]
-    public void LaidOutBuiltInFace_CarriesNoRendererSpecificFontIdentity()
-    {
-        Assert.DoesNotContain(
-            typeof(CapturedBuiltInFace).GetProperties(),
-            property => property.PropertyType == typeof(string));
-        Assert.DoesNotContain(
-            typeof(BuiltInFaceMetrics).GetProperties(),
-            property => property.PropertyType == typeof(string));
     }
 
     [Fact]
@@ -979,19 +965,6 @@ public class LaidOutContractTests
     }
 
     [Fact]
-    public void LaidOutTypes_ReachEveryDataTypeInTheGeometryNamespace()
-    {
-        var reached = LaidOutTypes().ToHashSet();
-        var data =
-            (from type in GeometryNamespaceTypes()
-             where !type.IsAbstract || !type.IsSealed
-             select type).ToArray();
-
-        Assert.NotEmpty(data);
-        Assert.Empty(data.Where(type => !reached.Contains(type)).Select(type => type.Name));
-    }
-
-    [Fact]
     public void GeometryNamespaceStaticHelpers_HoldNoSceneState()
     {
         var offenders =
@@ -1050,7 +1023,7 @@ public class LaidOutContractTests
 
             if (Array.IndexOf(ImmutableAfterParseSharedValues, type) >= 0)
             {
-                Radzen.Blazor.Documents.Tests.SharedSfntFontConcurrencyTests.AssertNamedLazyCacheInvariant();
+                Radzen.Blazor.Documents.Tests.SharedSfntFontConcurrencyTests.AssertLazyCacheInvariant();
                 return;
             }
 

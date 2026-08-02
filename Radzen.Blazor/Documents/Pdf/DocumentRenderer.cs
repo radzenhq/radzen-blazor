@@ -79,16 +79,6 @@ public sealed class DocumentRenderer
     public bool AllowRestrictedEmbedding { get; set; }
 
     /// <summary>
-    /// Gets or sets whether a registered font that would render degraded - a variable font
-    /// (embedded only at its default instance) or a color font (COLR/sbix/SVG, rendered
-    /// monochrome) - may still be embedded. Defaults to <see langword="false"/>, so rendering
-    /// fails loudly rather than silently producing wrong output. Checked once by
-    /// <see cref="Render(Document)"/>, against the fonts that document uses. The produced document
-    /// does not carry the permission, so saving it again does not re-check it.
-    /// </summary>
-    public bool AllowDegradedFonts { get; set; }
-
-    /// <summary>
     /// Gets or sets the image decoders this renderer decodes and measures images with. Seeded from
     /// <see cref="ImageDecoders.Default"/>, so a decoder registered with
     /// <see cref="ImageDecoder.Register(IImageDecoder)"/> before this renderer was created is

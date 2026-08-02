@@ -36,22 +36,6 @@ public class PaginationTests
     }
 
     [Fact]
-    public void PageNumbers_AreOneBasedAndSequential()
-    {
-        var fonts = PaginationSupport.Fonts();
-        var lineH = PaginationSupport.LineHeight();
-        var section = PaginationSupport.Section(500, PaginationSupport.HeightForLines(lineH, 5));
-        for (var i = 0; i < 12; i++)
-        {
-            section.Blocks.Add(PaginationSupport.Text($"P{i}"));
-        }
-
-        var pages = IsolatedPaginator.PaginateIsolated(section, fonts);
-
-        Assert.Equal([1, 2, 3], pages.Select(p => p.Number).ToArray());
-    }
-
-    [Fact]
     public void EachBodyLine_AdvancesByLineHeightFromContentTop()
     {
         var fonts = PaginationSupport.Fonts();

@@ -144,7 +144,6 @@ internal static class DocumentLayouter
                 lowering,
                 capture,
                 tocPages,
-                pages.Count,
                 index))
             {
                 pages.Add(page);

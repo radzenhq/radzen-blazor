@@ -49,8 +49,6 @@ internal sealed record LaidOutWatermark
 
     public required double Opacity { get; init; }
 
-    public required SemanticArtifactKind Artifact { get; init; }
-
     public LaidOutWatermarkImage? Image { get; init; }
 
     public LaidOutWatermarkText? Text { get; init; }

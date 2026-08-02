@@ -101,23 +101,6 @@ public class CosAccessorsTests
     }
 
     [Fact]
-    public void TryGet_PresentAndTyped_BindsValue()
-    {
-        var reader = Reader();
-        Assert.True(reader.TryGet<NameObject>(Dict(reader), "Name", out var name));
-        Assert.Equal("Helvetica", name!.Value);
-    }
-
-    [Fact]
-    public void TryGet_MissingOrWrongType_ReturnsFalse()
-    {
-        var reader = Reader();
-        Assert.False(reader.TryGet<ArrayObject>(Dict(reader), "Name", out var wrong));
-        Assert.Null(wrong);
-        Assert.False(reader.TryGet<NameObject>(Dict(reader), "Absent", out _));
-    }
-
-    [Fact]
     public void As_ResolvesAndTypeChecksArbitraryValue()
     {
         var reader = Reader();

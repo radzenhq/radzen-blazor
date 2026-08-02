@@ -298,4 +298,28 @@ public class StyleSystemPublicContractTests
 
         Assert.Throws<ArgumentException>(() => style.Role = string.Empty);
     }
+
+    [Fact]
+    public void StyleAddWithAnExplicitBaseStyleRecordsIt()
+    {
+        var styles = new Document().Styles;
+        styles.Add("Caption");
+
+        Assert.Equal("Caption", styles.Add("SubCaption", "Caption").BaseStyle);
+    }
+
+    [Fact]
+    public void StyleBaseChainIsWalkableToTheRoot()
+    {
+        var styles = new Document().Styles;
+        styles.Add("Caption");
+        styles.Add("SubCaption", "Caption");
+
+        var current = styles["SubCaption"];
+        Assert.Equal("Caption", current.BaseStyle);
+        current = styles[current.BaseStyle!];
+        Assert.Equal("Normal", current.BaseStyle);
+        current = styles[current.BaseStyle!];
+        Assert.Null(current.BaseStyle);
+    }
 }

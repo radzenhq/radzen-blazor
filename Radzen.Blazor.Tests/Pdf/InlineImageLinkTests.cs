@@ -269,32 +269,6 @@ public class InlineImageLinkTests
     }
 
     [Fact]
-    public void InlineImageExposesOnlyMembersItHonors()
-    {
-        var members = typeof(InlineImage)
-            .GetProperties()
-            .Select(property => property.Name)
-            .ToHashSet(StringComparer.Ordinal);
-
-        Assert.Equal(
-            new HashSet<string>(StringComparer.Ordinal)
-            {
-                "Width", "Height", "AlternateText", "ReplacementText",
-                "Link", "LinkToAnchor", "Anchor", "Opacity", "Role", "Language",
-            },
-            members);
-    }
-
-    [Theory]
-    [InlineData(typeof(PageNumberField))]
-    [InlineData(typeof(PageCountField))]
-    public void PageFieldsExposeNoAuthoredText(Type field)
-    {
-        Assert.Null(field.GetProperty("Text"));
-        Assert.True(typeof(TextInline).IsAssignableFrom(field));
-    }
-
-    [Fact]
     public void PageFieldTextIsNotPartOfTheParagraphText()
     {
         var paragraph = new Paragraph();

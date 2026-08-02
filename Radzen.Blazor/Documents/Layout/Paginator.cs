@@ -15,7 +15,6 @@ internal static class Paginator
         LoweringResult resolution,
         LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages = null,
-        int pageNumberOffset = 0,
         int sectionIndex = 0)
     {
         var pages = new List<LaidOutPage>();
@@ -26,7 +25,6 @@ internal static class Paginator
             resolution,
             capture,
             tocPages,
-            pageNumberOffset,
             sectionIndex);
         return [.. pages];
     }
@@ -38,7 +36,6 @@ internal static class Paginator
         LoweringResult resolution,
         LayoutCaptureContext capture,
         IReadOnlyDictionary<string, int>? tocPages,
-        int pageNumberOffset,
         int sectionIndex)
     {
         var context = new PaginationContext(
@@ -46,7 +43,6 @@ internal static class Paginator
             pages,
             resolution,
             capture,
-            pageNumberOffset,
             sectionIndex);
         context.Initialize(section, tocPages);
         var engine = FlowPlacementEngine.ForPages(context);

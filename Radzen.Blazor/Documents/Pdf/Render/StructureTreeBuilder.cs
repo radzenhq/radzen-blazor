@@ -206,9 +206,6 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             // ISO 14289-1 7.18.5: a form field shall be contained in a Form structure element.
             SemanticIntent.Form => "Form",
             SemanticIntent.Span => "Span",
-            SemanticIntent.Caption => "Caption",
-            SemanticIntent.TableHeaderGroup => "THead",
-            SemanticIntent.TableBodyGroup => "TBody",
             _ => throw new ArgumentOutOfRangeException(nameof(intent), intent, null),
         };
 

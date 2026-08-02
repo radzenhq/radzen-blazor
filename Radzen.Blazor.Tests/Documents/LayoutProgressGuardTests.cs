@@ -12,10 +12,13 @@ public class LayoutProgressGuardTests
     {
         var guard = new LayoutProgressGuard("Work");
 
-        for (var position = 0; position < 1000; position++)
+        Assert.Null(Record.Exception(() =>
         {
-            guard.Reached(position);
-        }
+            for (var position = 0; position < 1000; position++)
+            {
+                guard.Reached(position);
+            }
+        }));
     }
 
     [Fact]
@@ -23,11 +26,14 @@ public class LayoutProgressGuardTests
     {
         var guard = new LayoutProgressGuard("Work");
 
-        for (var position = 0; position < 1000; position++)
+        Assert.Null(Record.Exception(() =>
         {
-            guard.Reached(position);
-            guard.Reached(position);
-        }
+            for (var position = 0; position < 1000; position++)
+            {
+                guard.Reached(position);
+                guard.Reached(position);
+            }
+        }));
     }
 
     [Fact]

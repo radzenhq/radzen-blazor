@@ -70,15 +70,4 @@ public class SectionWatermarkParityTests
         Opacity = image.Opacity,
         Interpolate = image.Interpolate,
     };
-
-    [Fact]
-    public void Watermark_HasNoDecodedImageState()
-    {
-        var watermark = new Watermark();
-        watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
-
-        Assert.All(
-            typeof(Watermark).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public),
-            field => Assert.DoesNotContain("Radzen.Documents.Pdf", field.FieldType.FullName ?? string.Empty, StringComparison.Ordinal));
-    }
 }

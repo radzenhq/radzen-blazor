@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -51,17 +50,4 @@ internal static class CosAccessors
 
     public static bool? GetBool(this DocumentReader reader, DictionaryObject dict, string key)
         => dict.TryGetValue(key, out var value) ? reader.AsBool(value!) : null;
-
-    public static bool TryGet<T>(this DocumentReader reader, DictionaryObject dict, string key, [NotNullWhen(true)] out T? result)
-        where T : DocumentObject
-    {
-        if (dict.TryGetValue(key, out var value) && reader.Resolve(value!) is T typed)
-        {
-            result = typed;
-            return true;
-        }
-
-        result = null;
-        return false;
-    }
 }

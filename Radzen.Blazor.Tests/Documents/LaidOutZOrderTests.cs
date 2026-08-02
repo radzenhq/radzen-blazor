@@ -21,44 +21,47 @@ public class LaidOutZOrderTests
         return section;
     }
 
-    private static IReadOnlyList<int> ZOrders(LaidOutLayer layer)
-        =>
-        [
-            .. layer.Lines.Select(line => line.ZOrder),
-            .. layer.Images.Select(image => image.ZOrder),
-            .. layer.CodeSymbols.Select(code => code.ZOrder),
-            .. layer.Tables.Select(table => table.ZOrder),
-            .. layer.Boxes.Select(box => box.ZOrder),
-        ];
+    private static List<string> PaintOrder(Document document)
+    {
+        var reader = Radzen.Blazor.Pdf.Tests.BuildTestSupport.Read(document);
+        var content = Radzen.Blazor.Pdf.Tests.ContentTestHelpers.PageContent(reader, 0);
+        var painted = new List<string>();
+        foreach (var operation in Radzen.Blazor.Pdf.Tests.ContentStreamTokenizer.Parse(content))
+        {
+            if (operation.Operator == "Tj")
+            {
+                painted.Add(System.Text.Encoding.ASCII.GetString(operation.Operands[0].Bytes!));
+            }
+            else if (operation.Operator == "f")
+            {
+                painted.Add("fill");
+            }
+        }
 
-    private static IReadOnlyList<int> ZOrders(LaidOutBoxContent content)
-        =>
-        [
-            .. content.Lines.Select(line => line.ZOrder),
-            .. content.Images.Select(image => image.ZOrder),
-            .. content.CodeSymbols.Select(code => code.ZOrder),
-            .. content.Tables.Select(table => table.ZOrder),
-            .. content.Boxes.Select(box => box.ZOrder),
-        ];
+        return painted;
+    }
+
+    private static Container Panel(BlockCollection blocks, string text)
+    {
+        var container = blocks.Add(new Container { Background = Color.FromRgb(200, 200, 200) });
+        container.Blocks.AddParagraph().Inlines.Add(text);
+        return container;
+    }
 
     [Fact]
-    public void EveryBodyDraw_CarriesADistinctZOrder()
+    public void BodyDraws_PaintInDeclarationOrderAcrossLinesAndBoxes()
     {
         var document = new Document();
         var section = Page(document);
         section.Blocks.AddParagraph().Inlines.Add("first");
         section.Blocks.AddParagraph().Inlines.Add("second");
-        var container = section.Blocks.Add(new Container());
-        container.Blocks.AddParagraph().Inlines.Add("inside");
+        Panel(section.Blocks, "inside");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
-        var orders = ZOrders(page.Body);
-
-        Assert.Equal(orders.Count, orders.Distinct().Count());
+        Assert.Equal(["first", "second", "fill", "inside"], PaintOrder(document));
     }
 
     [Fact]
-    public void BodyLines_AreOrderedByDeclarationOrder()
+    public void BodyLines_PaintInDeclarationOrder()
     {
         var document = new Document();
         var section = Page(document);
@@ -66,47 +69,39 @@ public class LaidOutZOrderTests
         section.Blocks.AddParagraph().Inlines.Add("second");
         section.Blocks.AddParagraph().Inlines.Add("third");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
-        var orders = page.Body.Lines.Select(line => line.ZOrder).ToArray();
-
-        Assert.Equal(orders.OrderBy(order => order).ToArray(), orders);
+        Assert.Equal(["first", "second", "third"], PaintOrder(document));
     }
 
     [Fact]
-    public void ADeclaredBoxOutranksThePrecedingParagraph()
+    public void ADeclaredBox_PaintsOverThePrecedingParagraph()
     {
         var document = new Document();
         var section = Page(document);
         section.Blocks.AddParagraph().Inlines.Add("before");
-        var container = section.Blocks.Add(new Container());
-        container.Blocks.AddParagraph().Inlines.Add("inside");
+        Panel(section.Blocks, "inside");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
+        var painted = PaintOrder(document);
 
-        Assert.True(page.Body.Lines[^1].ZOrder < page.Body.Boxes[0].ZOrder);
+        Assert.True(painted.IndexOf("fill") > painted.IndexOf("before"));
     }
 
     [Fact]
-    public void NestedContextsComposeIntoOneStackWithinTheirBox()
+    public void NestedOverlayContexts_PaintOuterContentBeforeTheInnerBox()
     {
         var document = new Document();
         var section = Page(document);
-        var container = section.Blocks.Add(new Container());
-        container.Layout = ContainerLayout.Overlay;
+        var container = section.Blocks.Add(new Container { Layout = ContainerLayout.Overlay });
         container.Blocks.AddParagraph().Inlines.Add("under");
-        var inner = container.Blocks.Add(new Container());
-        inner.Blocks.AddParagraph().Inlines.Add("over");
+        Panel(container.Blocks, "over");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
-        var content = page.Body.Boxes[0].Content;
-        var orders = ZOrders(content);
+        var painted = PaintOrder(document);
 
-        Assert.Equal(orders.Count, orders.Distinct().Count());
-        Assert.True(content.Lines[0].ZOrder < content.Boxes[0].ZOrder);
+        Assert.True(painted.IndexOf("under") < painted.IndexOf("fill"));
+        Assert.True(painted.IndexOf("fill") < painted.IndexOf("over"));
     }
 
     [Fact]
-    public void BandDraws_CarryTheirOwnStack()
+    public void BandDraws_PaintInTheirOwnDeclarationOrder()
     {
         var document = new Document();
         var section = Page(document);
@@ -114,11 +109,10 @@ public class LaidOutZOrderTests
         section.Header.Blocks.AddParagraph().Inlines.Add("header second");
         section.Blocks.AddParagraph().Inlines.Add("body");
 
-        var page = Assert.Single(DocumentLayouter.Layout(document).Pages);
-        var orders = ZOrders(page.HeaderLayer);
+        var painted = PaintOrder(document);
 
-        Assert.Equal(orders.Count, orders.Distinct().Count());
-        Assert.Equal(orders.OrderBy(order => order).ToArray(), orders.ToArray());
+        Assert.Contains("body", painted);
+        Assert.True(painted.IndexOf("header first") < painted.IndexOf("header second"));
     }
 
     private static IReadOnlyList<string> Merge(
@@ -137,37 +131,34 @@ public class LaidOutZOrderTests
         return visited;
     }
 
-    [Fact]
-    public void OrderedMerge_EmitsTheTableFirstWhenTheZOrdersTie()
+    [Theory]
+    [InlineData("t0,t5", "0,5", "b0,b5", "0,5", "t0,b0,t5,b5")]
+    [InlineData("t9", "9", "b1,b2", "1,2", "b1,b2,t9")]
+    [InlineData("", "", "", "", "")]
+    public void OrderedMerge_VisitsBothSidesInZOrderWithTablesFirstOnATie(
+        string tables,
+        string tableOrders,
+        string boxes,
+        string boxOrders,
+        string expected)
     {
+        static ImmutableArray<string> Names(string value)
+            => value.Length == 0 ? [] : [.. value.Split(',')];
+
+        static Func<string, int> Order(string names, string orders)
+        {
+            var map = Names(names)
+                .Zip(Names(orders).Select(int.Parse), (name, order) => (name, order))
+                .ToDictionary(pair => pair.name, pair => pair.order, StringComparer.Ordinal);
+            return name => map[name];
+        }
+
         var visited = Merge(
-            ImmutableArray.Create("t0", "t5"),
-            table => table == "t0" ? 0 : 5,
-            ImmutableArray.Create("b0", "b5"),
-            box => box == "b0" ? 0 : 5);
+            Names(tables),
+            Order(tables, tableOrders),
+            Names(boxes),
+            Order(boxes, boxOrders));
 
-        Assert.Equal(new[] { "t0", "b0", "t5", "b5" }, visited);
-    }
-
-    [Fact]
-    public void OrderedMerge_DrainsTheRemainingSideWhenOneRunsOut()
-    {
-        var visited = Merge(
-            ImmutableArray.Create("t9"),
-            _ => 9,
-            ImmutableArray.Create("b1", "b2"),
-            box => box == "b1" ? 1 : 2);
-
-        Assert.Equal(new[] { "b1", "b2", "t9" }, visited);
-    }
-
-    [Fact]
-    public void OrderedMerge_VisitsNothingWhenBothSidesAreEmpty()
-    {
-        Assert.Empty(Merge(
-            ImmutableArray<string>.Empty,
-            _ => 0,
-            ImmutableArray<string>.Empty,
-            _ => 0));
+        Assert.Equal(Names(expected), visited);
     }
 }

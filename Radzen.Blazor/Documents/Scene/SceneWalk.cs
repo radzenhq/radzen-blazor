@@ -32,10 +32,6 @@ internal interface ISceneVisitor
     {
     }
 
-    void LeaveLayer(SceneLayerKind kind)
-    {
-    }
-
     void BeginItem(int zOrder)
     {
     }
@@ -140,8 +136,6 @@ internal static class SceneWalk
             Inline(layer, frame, visitor);
             Fragments(layer, frame, visitor);
         }
-
-        visitor.LeaveLayer(kind);
     }
 
     private static void Inline(LaidOutLayer layer, in SceneFrame frame, ISceneVisitor visitor)

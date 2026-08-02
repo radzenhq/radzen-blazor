@@ -2,6 +2,7 @@ Radzen.Documents.Barcode = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.Barcode.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.Barcode.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.Barcode.Font : Radzen.Documents.Fonts.Font { public get; }
+public Radzen.Documents.Barcode.Foreground : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Barcode.Height : Radzen.Documents.Core.Unit { public get; }
 public Radzen.Documents.Barcode.ShowText : System.Boolean { public get; public set; }
 public Radzen.Documents.Barcode.Type : Radzen.Documents.Codes.BarcodeType { public get; }
@@ -962,7 +963,6 @@ public Radzen.Documents.Pdf.DocumentParseException.Offset : System.Int64 { publi
 Radzen.Documents.Pdf.DocumentRenderer = public sealed class
 public Radzen.Documents.Pdf.DocumentRenderer..ctor()
 public Radzen.Documents.Pdf.DocumentRenderer.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.AllowDegradedFonts : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowRestrictedEmbedding : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowUnsupportedCharacters : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Conformance : Radzen.Documents.Pdf.PdfAConformance { public get; public set; }
@@ -1423,6 +1423,7 @@ Radzen.Documents.QrCode = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.QrCode.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.QrCode.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.QrCode.ErrorCorrection : Radzen.Documents.Codes.QrErrorCorrection { public get; public set; }
+public Radzen.Documents.QrCode.Foreground : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.QrCode.QuietZoneModules : System.Int32 { public get; public set; }
 public Radzen.Documents.QrCode.Size : Radzen.Documents.Core.Unit { public get; }
 public Radzen.Documents.QrCode.Value : System.String { public get; }

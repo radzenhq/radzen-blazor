@@ -15,13 +15,12 @@ internal static class FontEmbedding
 
     public static void Ensure(
         IEnumerable<SfntFont> faces,
-        bool allowRestrictedEmbedding,
-        bool allowDegradedFonts)
+        bool allowRestrictedEmbedding)
     {
         foreach (var face in faces)
         {
             EnsureEmbeddable(face, allowRestrictedEmbedding);
-            EnsureRenderable(face, allowDegradedFonts);
+            EnsureRenderable(face);
         }
     }
 
@@ -36,25 +35,20 @@ internal static class FontEmbedding
         }
     }
 
-    public static void EnsureRenderable(SfntFont face, bool allowDegraded)
+    public static void EnsureRenderable(SfntFont face)
     {
-        if (allowDegraded)
-        {
-            return;
-        }
-
         if (face.IsVariable)
         {
             throw new NotSupportedException(
                 $"The font '{face.PostScriptName}' is a variable font; axis selection is not supported, so only its default instance "
-                + "would be embedded. Set DocumentRenderer.AllowDegradedFonts to true to embed the default instance anyway.");
+                + "could be embedded.");
         }
 
         if (face.HasColorTables)
         {
             throw new NotSupportedException(
                 $"The font '{face.PostScriptName}' is a color font (COLR/sbix/SVG); color glyphs are not supported and would render as "
-                + "monochrome outlines or missing. Set DocumentRenderer.AllowDegradedFonts to true to embed it anyway.");
+                + "monochrome outlines or missing.");
         }
     }
 }

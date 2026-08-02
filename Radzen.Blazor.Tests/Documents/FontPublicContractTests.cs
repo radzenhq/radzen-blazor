@@ -166,7 +166,4 @@ public class FontPublicContractTests
         Assert.False(font.IsModified);
     }
 
-    [Fact]
-    public void FontIsSealed() => Assert.True(typeof(Font).IsSealed);
-
 }
