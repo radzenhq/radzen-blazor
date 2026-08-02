@@ -6,7 +6,6 @@ namespace Radzen.Documents.Layout;
 internal sealed class SemanticNode(
     int index,
     SemanticIntent intent,
-    SemanticStructureTier tier,
     int paragraphStyle,
     string? role,
     bool roleIsDeclared,
@@ -29,8 +28,6 @@ internal sealed class SemanticNode(
     public bool IsDecorative { get; } = decorative;
 
     public SemanticIntent Intent { get; } = intent;
-
-    public SemanticStructureTier Tier { get; } = tier;
 
     public int ParagraphStyle { get; } = paragraphStyle;
 

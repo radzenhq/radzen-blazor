@@ -30,14 +30,14 @@ internal sealed class SemanticSnapshotBuilder
         this.resolution = resolution;
         this.identities = identities;
         mapper = new Mapper(this);
-        document = AddNode(SemanticIntent.Document, SemanticStructureTier.Always);
+        document = AddNode(SemanticIntent.Document);
 
         foreach (var section in source.Sections)
         {
-            var sect = AddChild(document, SemanticIntent.Section, SemanticStructureTier.Always);
+            var sect = AddChild(document, SemanticIntent.Section);
             foreach (var block in section.Blocks)
             {
-                MapBlock(block, sect, SemanticStructureTier.Always);
+                MapBlock(block, sect);
             }
 
             CaptureArtifacts(section.Header.Blocks, SemanticArtifactKind.Pagination);
@@ -125,7 +125,6 @@ internal sealed class SemanticSnapshotBuilder
                 RowSpan = node.RowSpan,
                 ColumnSpan = node.ColumnSpan,
                 IsDecorative = node.IsDecorative,
-                Tier = node.Tier,
                 Children = [.. node.Children],
             });
         }
@@ -168,12 +167,11 @@ internal sealed class SemanticSnapshotBuilder
         };
     }
 
-    private void MapBlock(Block block, SemanticNode parent, SemanticStructureTier tier)
-        => block.Accept(mapper, new MappingContext(parent, tier));
+    private void MapBlock(Block block, SemanticNode parent)
+        => block.Accept(mapper, new MappingContext(parent));
 
     private SemanticNode AddNode(
         SemanticIntent intent,
-        SemanticStructureTier tier,
         int paragraphStyle = -1,
         string? role = null,
         bool roleIsDeclared = false,
@@ -186,7 +184,7 @@ internal sealed class SemanticSnapshotBuilder
         bool decorative = false)
     {
         var node = new SemanticNode(
-            nodes.Count, intent, tier, paragraphStyle, role, roleIsDeclared, language,
+            nodes.Count, intent, paragraphStyle, role, roleIsDeclared, language,
             alternateText, replacementText, headerScope, rowSpan, columnSpan, decorative);
         nodes.Add(node);
         return node;
@@ -195,7 +193,6 @@ internal sealed class SemanticSnapshotBuilder
     private SemanticNode AddChild(
         SemanticNode parent,
         SemanticIntent intent,
-        SemanticStructureTier tier,
         int paragraphStyle = -1,
         string? role = null,
         bool roleIsDeclared = false,
@@ -208,7 +205,7 @@ internal sealed class SemanticSnapshotBuilder
         bool decorative = false)
     {
         var child = AddNode(
-            intent, tier, paragraphStyle, role, roleIsDeclared, language,
+            intent, paragraphStyle, role, roleIsDeclared, language,
             alternateText, replacementText, headerScope, rowSpan, columnSpan, decorative);
         parent.Children.Add(child.Index);
         return child;
@@ -285,16 +282,16 @@ internal sealed class SemanticSnapshotBuilder
 
     private void MapList(ListBlock list, SemanticNode parent)
     {
-        var l = AddChild(parent, SemanticIntent.List, SemanticStructureTier.Structural);
+        var l = AddChild(parent, SemanticIntent.List);
         foreach (var item in list.Items)
         {
-            var li = AddChild(l, SemanticIntent.ListItem, SemanticStructureTier.Structural);
-            var label = AddChild(li, SemanticIntent.ListLabel, SemanticStructureTier.Structural);
-            var body = AddChild(li, SemanticIntent.ListBody, SemanticStructureTier.Structural);
+            var li = AddChild(l, SemanticIntent.ListItem);
+            var label = AddChild(li, SemanticIntent.ListLabel);
+            var body = AddChild(li, SemanticIntent.ListBody);
             resolution.Semantics.SetListItemElements(item, label, body);
             foreach (var block in item.Blocks)
             {
-                MapBlock(block, body, SemanticStructureTier.Structural);
+                MapBlock(block, body);
             }
         }
     }
@@ -305,7 +302,7 @@ internal sealed class SemanticSnapshotBuilder
         string? Role,
         bool RoleIsDeclared);
 
-    private readonly record struct MappingContext(SemanticNode Parent, SemanticStructureTier Tier);
+    private readonly record struct MappingContext(SemanticNode Parent);
 
     private sealed class Mapper(SemanticSnapshotBuilder capture)
         : BlockVisitor<MappingContext, Nothing>
@@ -319,19 +316,17 @@ internal sealed class SemanticSnapshotBuilder
             var element = capture.AddChild(
                 context.Parent,
                 style.Intent,
-                context.Tier,
                 paragraphStyle: style.Index,
                 role: style.Role,
                 roleIsDeclared: style.RoleIsDeclared);
             capture.Associate(paragraph, element);
-            var inlineTier = SemanticStructureTier.Structural;
             foreach (var inline in paragraph.Inlines)
             {
                 var linked = IsLink(inline);
                 if (inline is InlineImage image)
                 {
                     var link = linked
-                        ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
+                        ? capture.AddChild(element, SemanticIntent.Link)
                         : null;
                     var decorative = IsDecorative(image.AlternateText);
                     capture.Associate(
@@ -339,7 +334,6 @@ internal sealed class SemanticSnapshotBuilder
                         capture.AddChild(
                             link ?? element,
                             SemanticIntent.Figure,
-                            inlineTier,
                             role: image.Role,
                             roleIsDeclared: image.Role is not null,
                             language: image.Language,
@@ -351,7 +345,7 @@ internal sealed class SemanticSnapshotBuilder
                 }
 
                 var linkElement = linked
-                    ? capture.AddChild(element, SemanticIntent.Link, inlineTier)
+                    ? capture.AddChild(element, SemanticIntent.Link)
                     : null;
 
                 if (inline.Role is not null || inline.Language is not null)
@@ -361,7 +355,6 @@ internal sealed class SemanticSnapshotBuilder
                         capture.AddChild(
                             linkElement ?? element,
                             SemanticIntent.Span,
-                            inlineTier,
                             role: inline.Role,
                             roleIsDeclared: inline.Role is not null,
                             language: inline.Language),
@@ -392,11 +385,11 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Table table, MappingContext context)
         {
-            var element = capture.AddChild(context.Parent, SemanticIntent.Table, context.Tier);
+            var element = capture.AddChild(context.Parent, SemanticIntent.Table);
             var placement = capture.resolution.TablePlacement(table);
             for (var row = 0; row < table.Rows.Count; row++)
             {
-                var tr = capture.AddChild(element, SemanticIntent.TableRow, context.Tier);
+                var tr = capture.AddChild(element, SemanticIntent.TableRow);
                 foreach (var placed in placement.Cells)
                 {
                     if (placed.Row != row)
@@ -412,14 +405,13 @@ internal sealed class SemanticSnapshotBuilder
                         scope == SemanticHeaderScope.None
                             ? SemanticIntent.TableCell
                             : SemanticIntent.TableHeaderCell,
-                        context.Tier,
                         headerScope: scope,
                         rowSpan: placed.RowSpan,
                         columnSpan: placed.ColumnSpan);
                     capture.Associate(placed.Cell, td);
                     foreach (var child in placed.Cell.Blocks)
                     {
-                        capture.MapBlock(child, td, SemanticStructureTier.Structural);
+                        capture.MapBlock(child, td);
                     }
                 }
             }
@@ -433,7 +425,6 @@ internal sealed class SemanticSnapshotBuilder
             var figure = capture.AddChild(
                 context.Parent,
                 SemanticIntent.Figure,
-                context.Tier,
                 alternateText: decorative || string.IsNullOrEmpty(image.AlternateText) ? null : image.AlternateText,
                 replacementText: decorative || string.IsNullOrEmpty(image.ReplacementText) ? null : image.ReplacementText,
                 decorative: decorative);
@@ -451,11 +442,10 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(Container block, MappingContext context)
         {
-            var tier = SemanticStructureTier.Structural;
-            var group = capture.AddChild(context.Parent, SemanticIntent.Group, tier);
+            var group = capture.AddChild(context.Parent, SemanticIntent.Group);
             foreach (var child in block.Blocks)
             {
-                capture.MapBlock(child, group, tier);
+                capture.MapBlock(child, group);
             }
 
             return default;
@@ -469,16 +459,15 @@ internal sealed class SemanticSnapshotBuilder
 
         public override Nothing Visit(TableOfContents block, MappingContext context)
         {
-            var tier = SemanticStructureTier.Structural;
-            var navigation = capture.AddChild(context.Parent, SemanticIntent.Navigation, tier);
+            var navigation = capture.AddChild(context.Parent, SemanticIntent.Navigation);
             foreach (var entry in block.Entries)
             {
-                var item = capture.AddChild(navigation, SemanticIntent.NavigationEntry, tier);
-                var reference = capture.AddChild(item, SemanticIntent.CrossReference, tier);
+                var item = capture.AddChild(navigation, SemanticIntent.NavigationEntry);
+                var reference = capture.AddChild(item, SemanticIntent.CrossReference);
                 capture.resolution.Semantics.SetTocEntryElement(entry, reference);
                 capture.resolution.Semantics.SetTocLinkElement(
                     entry,
-                    capture.AddChild(reference, SemanticIntent.Link, tier));
+                    capture.AddChild(reference, SemanticIntent.Link));
             }
 
             return default;
@@ -494,7 +483,6 @@ internal sealed class SemanticSnapshotBuilder
                 capture.AddChild(
                     context.Parent,
                     SemanticIntent.Figure,
-                    SemanticStructureTier.Structural,
                     alternateText: decorative || string.IsNullOrEmpty(alternateText) ? null : alternateText,
                     decorative: decorative));
             return default;

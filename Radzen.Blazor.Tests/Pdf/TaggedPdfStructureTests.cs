@@ -55,6 +55,9 @@ public class TaggedPdfStructureTests
         return document;
     }
 
+    private static DocumentReader ReadTagged(Document document)
+        => BuildTestSupport.Read(document, new DocumentRenderer { Conformance = PdfAConformance.PdfA2A });
+
     private static DictionaryObject Catalog(DocumentReader reader)
     {
         Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
@@ -256,7 +259,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_EmitsMarkInfoAndStructTreeRoot()
     {
-        var reader = BuildTestSupport.Read(AuthorInvoice());
+        var reader = ReadTagged(AuthorInvoice());
         var catalog = Catalog(reader);
 
         Assert.True(catalog.TryGetValue("MarkInfo", out var markInfoObject), "catalog has /MarkInfo");
@@ -270,9 +273,61 @@ public class TaggedPdfStructureTests
     }
 
     [Fact]
-    public void Build_StructureNestingMatchesAuthoringOrder()
+    public void Build_WithoutAccessibilityOrConformance_EmitsNoMarkInfoAndNoStructTreeRoot()
     {
         var reader = BuildTestSupport.Read(AuthorInvoice());
+        var catalog = Catalog(reader);
+
+        Assert.False(catalog.ContainsKey("MarkInfo"), "catalog has no /MarkInfo");
+        Assert.False(catalog.ContainsKey("StructTreeRoot"), "catalog has no /StructTreeRoot");
+    }
+
+    [Fact]
+    public void Build_WithoutAccessibilityOrConformance_EmitsNoStructParentsOnAnyPage()
+    {
+        var reader = BuildTestSupport.Read(AuthorInvoice());
+
+        Assert.All(
+            BuildTestSupport.PageLeaves(reader),
+            leaf =>
+            {
+                Assert.False(leaf.Page.ContainsKey("StructParents"), "page has no /StructParents");
+                Assert.False(leaf.Page.ContainsKey("StructParent"), "page has no /StructParent");
+            });
+    }
+
+    [Fact]
+    public void Build_WithoutAccessibilityOrConformance_EmitsNoMarkedContentInThePageStream()
+    {
+        var reader = BuildTestSupport.Read(AuthorInvoice());
+
+        foreach (var leaf in BuildTestSupport.PageLeaves(reader))
+        {
+            var operators = ContentStreamTokenizer
+                .Parse(BuildTestSupport.Content(reader, leaf.Page))
+                .Select(operation => operation.Operator)
+                .ToList();
+
+            Assert.DoesNotContain("BDC", operators);
+            Assert.DoesNotContain("BMC", operators);
+            Assert.DoesNotContain("EMC", operators);
+        }
+    }
+
+    [Fact]
+    public void Build_WithAccessibility_EmitsMarkedContentThePlainRenderDoesNot()
+    {
+        var tagged = ReadTagged(AuthorInvoice());
+
+        var page = Assert.Single(BuildTestSupport.PageLeaves(tagged)).Page;
+
+        Assert.NotEmpty(MarkedContentInOrder(tagged, page));
+    }
+
+    [Fact]
+    public void Build_StructureNestingMatchesAuthoringOrder()
+    {
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var sect = SectionElement(reader, structRoot);
 
@@ -283,7 +338,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_TableRowsUseThForHeaderAndTdForBody()
     {
-        var reader = BuildTestSupport.Read(AuthorInvoice());
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var sect = SectionElement(reader, structRoot);
 
@@ -300,18 +355,12 @@ public class TaggedPdfStructureTests
             Assert.Equal(2, body.Children.Count);
             Assert.All(body.Children, cell => Assert.Equal("TD", Effective(reader, structRoot, cell.RawType)));
         }
-
-        Assert.All(
-            table.Children.SelectMany(row => row.Children),
-            cell => Assert.Empty(cell.Children));
     }
 
     [Fact]
     public void Build_TaggedCellsNestTheirParagraphsInsideTheCell()
     {
-        var reader = BuildTestSupport.Read(
-            AuthorInvoice(),
-            new DocumentRenderer { Conformance = PdfAConformance.PdfA2A });
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var sect = SectionElement(reader, structRoot);
 
@@ -328,7 +377,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_Heading1StyleMapsToH1WithPageAndMcid()
     {
-        var reader = BuildTestSupport.Read(AuthorInvoice());
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var sect = SectionElement(reader, structRoot);
 
@@ -341,7 +390,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_StructureTreeReferencesExactlyThePageMarks()
     {
-        var reader = BuildTestSupport.Read(AuthorInvoice());
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var document = DocumentElement(reader, structRoot);
 
@@ -361,7 +410,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_ParentTreeResolvesPageMcidsToOwningElements()
     {
-        var reader = BuildTestSupport.Read(AuthorInvoice());
+        var reader = ReadTagged(AuthorInvoice());
         var structRoot = StructTreeRoot(reader);
         var document = DocumentElement(reader, structRoot);
 

@@ -74,7 +74,7 @@ public class SemanticIntentCaptureTests
             RenderRequest.From(renderer));
         tree.Build();
         var types = new List<string>();
-        CollectTypes(tree.DocumentElement, types);
+        CollectTypes(Assert.IsType<StructureElement>(tree.DocumentElement), types);
         return types;
     }
 
@@ -87,7 +87,6 @@ public class SemanticIntentCaptureTests
         var nodes = structure.Nodes;
         var navigation = Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.Navigation));
 
-        Assert.Equal(SemanticStructureTier.Structural, navigation.Tier);
         Assert.Equal(toc.Entries.Count, navigation.Children.Length);
         Assert.All(navigation.Children, child =>
         {
@@ -122,7 +121,7 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void List_CapturesItsTierOnTheStructuralNode()
+    public void List_IsCapturedWithAListItemForEveryItem()
     {
         var document = new Document();
         var list = document.Sections.Add().Blocks.AddList(ListStyle.Bullet);
@@ -131,7 +130,9 @@ public class SemanticIntentCaptureTests
         var nodes = DocumentLayouter.Layout(document).Semantics.Structure.Nodes;
         var captured = Assert.Single(nodes.Where(node => node.Intent == SemanticIntent.List));
 
-        Assert.Equal(SemanticStructureTier.Structural, captured.Tier);
+        Assert.Equal(
+            list.Items.Count,
+            captured.Children.Count(child => nodes[child].Intent == SemanticIntent.ListItem));
     }
 
     [Fact]
@@ -165,13 +166,15 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void TableOfContents_MapsToNothingWhenUntagged()
+    public void UntaggedRenderer_MaterializesNoStructureTree()
     {
-        var types = MappedTypes(Chapters(out _), new DocumentRenderer());
+        var scene = DocumentLayouter.Layout(Chapters(out _));
+        var tree = new StructureTreeBuilder(scene.Semantics, RenderRequest.From(new DocumentRenderer()));
 
-        Assert.DoesNotContain("TOC", types);
-        Assert.DoesNotContain("TOCI", types);
-        Assert.DoesNotContain("Reference", types);
+        tree.Build();
+
+        Assert.False(tree.TaggingActive);
+        Assert.Null(tree.DocumentElement);
     }
 
     [Fact]
@@ -471,12 +474,6 @@ public class SemanticIntentCaptureTests
             row => Assert.False(row.IsHeader)));
         Assert.Contains("TH", Types(BuildTestSupport.Read(document, Accessible())));
     }
-
-    [Fact]
-    public void StructureTiers_AreAlwaysAndStructuralOnly()
-        => Assert.Equal(
-            [nameof(SemanticStructureTier.Always), nameof(SemanticStructureTier.Structural)],
-            System.Enum.GetNames<SemanticStructureTier>());
 
     [Fact]
     public void DecorativeInlineImage_IsClassifiedByTheSnapshotNotTheRenderer()
