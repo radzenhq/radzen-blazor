@@ -112,6 +112,26 @@ public class FontPublicContractTests
     }
 
     [Fact]
+    public void RunFontCascadesOverTheParagraphFont()
+    {
+        var document = new Document();
+        var paragraph = document.Sections.Add().Blocks.AddParagraph();
+        paragraph.Font.Family = "Times";
+        paragraph.Font.Size = 20;
+        var run = paragraph.Inlines.Add("run");
+        run.Font.Size = 9;
+
+        var resolved = document.Resolve(run);
+
+        Assert.Equal("Times", resolved.Family);
+        Assert.Equal(Unit.Parse("9pt"), resolved.Size);
+    }
+
+    [Fact]
+    public void ResolveRejectsARunOutsideTheDocument()
+        => Assert.Throws<System.ArgumentException>(() => new Document().Resolve(new Run("Detached")));
+
+    [Fact]
     public void AssignmentMarksTheFontModified()
     {
         var font = new Font();

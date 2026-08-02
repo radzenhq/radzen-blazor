@@ -398,14 +398,10 @@ public Radzen.Documents.Document..ctor()
 public Radzen.Documents.Document.Fonts : Radzen.Documents.Fonts.FontCollection { public get; }
 public Radzen.Documents.Document.Info : Radzen.Documents.DocumentInfo { public get; }
 public Radzen.Documents.Document.Language : System.String? { public get; public set; }
-public Radzen.Documents.Document.Resolve() : Radzen.Documents.DocumentFormatting
 public Radzen.Documents.Document.Resolve(Radzen.Documents.Paragraph paragraph) : Radzen.Documents.ParagraphFormat
 public Radzen.Documents.Document.Resolve(Radzen.Documents.TextInline run) : Radzen.Documents.Fonts.FontValues
 public Radzen.Documents.Document.Sections : Radzen.Documents.SectionCollection { public get; }
 public Radzen.Documents.Document.Styles : Radzen.Documents.StyleCollection { public get; }
-Radzen.Documents.DocumentFormatting = public sealed class
-public Radzen.Documents.DocumentFormatting.Resolve(Radzen.Documents.Paragraph paragraph) : Radzen.Documents.ParagraphFormat
-public Radzen.Documents.DocumentFormatting.Resolve(Radzen.Documents.TextInline run) : Radzen.Documents.Fonts.FontValues
 Radzen.Documents.DocumentInfo = public sealed class
 public Radzen.Documents.DocumentInfo..ctor()
 public Radzen.Documents.DocumentInfo.Author : System.String? { public get; public set; }
