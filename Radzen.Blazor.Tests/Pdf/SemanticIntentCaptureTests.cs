@@ -531,18 +531,26 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void WatermarkGeometry_CarriesItsArtifactClassification()
+    public void SectionWatermark_StampsInsideAnArtifactMarkedContentSequence()
     {
         var document = new Document();
+        document.Language = "en-US";
+        document.Info.Title = "Watermarked";
         BuildTestSupport.RegisterLatin(document);
         var section = document.Sections.Add();
         section.Watermark = new Watermark { Text = "DRAFT" };
         section.Watermark.Font.Family = BuildTestSupport.Latin;
         section.Blocks.AddParagraph().Inlines.Add("Body").Font.Family = BuildTestSupport.Latin;
 
-        var page = DocumentLayouter.Layout(document).Pages[0];
+        var reader = BuildTestSupport.Read(document, Accessible());
+        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+        var content = System.Text.Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
 
-        Assert.Equal(SemanticArtifactKind.Watermark, page.Watermark!.Artifact);
+        var begin = content.LastIndexOf("/Artifact BMC", System.StringComparison.Ordinal);
+        Assert.True(begin >= 0, content);
+        var end = content.IndexOf("EMC", begin, System.StringComparison.Ordinal);
+        Assert.True(end > begin, content);
+        Assert.Contains("Tj", content[begin..end], System.StringComparison.Ordinal);
     }
 
     [Fact]

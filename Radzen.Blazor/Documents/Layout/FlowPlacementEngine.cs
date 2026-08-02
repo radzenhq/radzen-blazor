@@ -13,7 +13,6 @@ internal enum FlowBreakability
 
 internal readonly record struct FlowPlacementPolicy(
     FlowBreakability Breakability,
-    double AvailableHeight,
     Action Continue,
     bool GuardParagraphMarkers);
 
@@ -25,7 +24,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         => new(
             new FlowPlacementPolicy(
                 FlowBreakability.Paginated,
-                pages.AvailableHeight,
                 pages.PlaceBreak,
                 GuardParagraphMarkers: true),
             pages);
@@ -39,7 +37,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         => new(
             new FlowPlacementPolicy(
                 FlowBreakability.Continuous,
-                double.PositiveInfinity,
                 static () => { },
                 GuardParagraphMarkers: false),
             band,
@@ -57,7 +54,6 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         => new(
             new FlowPlacementPolicy(
                 FlowBreakability.Continuous,
-                double.PositiveInfinity,
                 static () => { },
                 GuardParagraphMarkers: true),
             contentWidth,
@@ -257,7 +253,7 @@ internal sealed class BandFlowPlacementEngine(
         foreach (var fragment in TablePaginator.Paginate(
             layout,
             table,
-            Policy.AvailableHeight,
+            double.PositiveInfinity,
             Capture))
         {
             band.Content.Tables.Add(FlowContentPlacer.Table(

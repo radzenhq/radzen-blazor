@@ -43,6 +43,9 @@ public sealed class Barcode : Block
     /// <summary>Gets or sets the horizontal alignment within the container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
 
+    /// <summary>Gets or sets the color the bars are filled with. Defaults to <see cref="Color.Black"/>.</summary>
+    public Color Foreground { get; set; } = Color.Black;
+
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the barcode, carried on the
     /// barcode in accessible output for assistive technology to announce in place of the bars.

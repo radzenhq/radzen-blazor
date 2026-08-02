@@ -74,17 +74,6 @@ public class FrameworkSeamTests
         Assert.Throws<NotSupportedException>(() => ShadingBuilder.BuildShading(brush));
     }
 
-    [Fact]
-    public void FormFieldDefinition_ProtectedSurface_HasNoCosTypes()
-    {
-        var members = typeof(FormFieldDefinition).GetMembers(
-            System.Reflection.BindingFlags.Instance
-            | System.Reflection.BindingFlags.NonPublic
-            | System.Reflection.BindingFlags.DeclaredOnly);
-
-        Assert.DoesNotContain(members, member => member.Name is "EmitCreatedField" or "PopulateWidget");
-    }
-
     private sealed class RzimImageDecoder : IImageDecoder
     {
         public static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x4D];

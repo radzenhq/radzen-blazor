@@ -41,7 +41,6 @@ internal static class WatermarkPlanner
             CenterY = size.Height.Point / 2,
             Rotation = watermark.Rotation,
             Opacity = watermark.Opacity,
-            Artifact = SemanticArtifactKind.Watermark,
             Image = watermark.Image is { } image ? PlanImage(image, width, capture) : null,
             Text = string.IsNullOrEmpty(watermark.Text)
                 ? null

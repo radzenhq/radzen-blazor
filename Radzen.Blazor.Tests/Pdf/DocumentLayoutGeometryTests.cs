@@ -21,9 +21,10 @@ internal static class LayoutGeometry
     public static string Serialize(LaidOutDocument document)
     {
         var text = new StringBuilder();
-        foreach (var page in document.Pages)
+        for (var index = 0; index < document.Pages.Length; index++)
         {
-            text.Append(CultureInfo.InvariantCulture, $"page {page.Number} size {N(page.Size.Width.Point)}x{N(page.Size.Height.Point)}");
+            var page = document.Pages[index];
+            text.Append(CultureInfo.InvariantCulture, $"page {index + 1} size {N(page.Size.Width.Point)}x{N(page.Size.Height.Point)}");
             text.Append(CultureInfo.InvariantCulture, $" content {N(page.ContentBox.X)},{N(page.ContentBox.Y)},{N(page.ContentBox.Width)},{N(page.ContentBox.Height)}");
             text.AppendLine();
             Layer(text, "body", page.Body);
@@ -57,7 +58,7 @@ internal static class LayoutGeometry
         foreach (var table in layer.Tables)
         {
             text.AppendLine(CultureInfo.InvariantCulture,
-                $"  {name} table y={N(table.Bounds.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} zorder={table.ZOrder} rows={table.Fragment.Rows.Length} headers={table.Fragment.HeaderRowCount} source={Source(table.Source)}");
+                $"  {name} table y={N(table.Bounds.Y)} w={N(table.Layout.Width)} h={N(table.Fragment.Height)} zorder={table.ZOrder} rows={table.Fragment.Rows.Length} headers={table.Fragment.Rows.Count(static row => row.IsHeader)} source={Source(table.Source)}");
         }
 
         foreach (var box in layer.Boxes)
@@ -253,14 +254,18 @@ public class DocumentLayoutGeometryTests
             second => Assert.StartsWith("ChapterTwo4", second, StringComparison.Ordinal));
 
     [Fact]
-    public void Layout_NumbersPagesContinuouslyAcrossSections()
+    public void Layout_FlowsSectionsOntoConsecutivePages()
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.Add(Text("First"));
         document.Sections.Add().Blocks.Add(Text("Second"));
 
-        Assert.Equal([1, 2], DocumentLayouter.Layout(document).Pages.Select(static page => page.Number));
+        var pages = DocumentLayouter.Layout(document).Pages;
+
+        Assert.Equal(2, pages.Length);
+        Assert.Equal(["First"], LayoutGeometry.LineTexts(pages[0].Body));
+        Assert.Equal(["Second"], LayoutGeometry.LineTexts(pages[1].Body));
     }
 
     [Fact]

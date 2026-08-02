@@ -68,7 +68,14 @@ internal sealed class DocumentRenderEngine
         var portable = CreateOutput();
         portable.FontSnapshot = laidOut.Fonts;
         portable.Language = laidOut.Semantics.Language;
-        PdfModelMapper.Apply(laidOut.Info, portable.Info);
+        var info = laidOut.Info;
+        portable.Info.Title = info.Title;
+        portable.Info.Author = info.Author;
+        portable.Info.Subject = info.Subject;
+        portable.Info.Keywords = info.Keywords;
+        portable.Info.Creator = info.Creator;
+        portable.Info.CreationDate = info.CreationDate;
+        portable.Info.ModificationDate = info.ModificationDate;
 
         var paginated = laidOut.Pages;
 
@@ -80,8 +87,7 @@ internal sealed class DocumentRenderEngine
 
         FontEmbedding.Ensure(
             fontRegistry.SfntFaces(),
-            request.AllowRestrictedEmbedding,
-            request.AllowDegradedFonts);
+            request.AllowRestrictedEmbedding);
 
         var fontPlans = fontRegistry.Plan();
         var pages = ImmutableArray.CreateBuilder<PageOutput>(plans.Count);

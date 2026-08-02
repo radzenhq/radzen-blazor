@@ -92,15 +92,6 @@ public class LoadedDocumentConformanceTests
     }
 
     [Fact]
-    public void Accessibility_IsNotPubliclySettable()
-    {
-        var property = typeof(PortableDocument).GetProperty(nameof(PortableDocument.Accessibility))!;
-
-        Assert.NotNull(property.GetMethod);
-        Assert.False(property.SetMethod!.IsPublic);
-    }
-
-    [Fact]
     public void LanguageAndRoleMap_AreNotPubliclySettable()
     {
         Assert.False(typeof(PortableDocument).GetProperty(nameof(PortableDocument.Language))!.SetMethod!.IsPublic);

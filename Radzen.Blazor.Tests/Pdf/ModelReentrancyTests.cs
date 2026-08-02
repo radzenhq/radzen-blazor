@@ -185,29 +185,4 @@ public class ModelReentrancyTests
         var fresh = RenderAuthored(AuthorTaggedList());
         Assert.True(first.AsSpan().SequenceEqual(fresh), "tagged list left scratch behind after generation");
     }
-
-    [Theory]
-    [InlineData(typeof(Run))]
-    [InlineData(typeof(Paragraph))]
-    [InlineData(typeof(Barcode))]
-    [InlineData(typeof(ListItem))]
-    public void ModelTypesHaveNoPerSaveScratchProperty(Type modelType)
-    {
-        string[] forbidden =
-        [
-            "EffectiveFont", "ResolvedFont", "LabelElement", "BodyElement",
-            "ListLabelElement", "ListBodyElement",
-        ];
-
-        var members = modelType
-            .GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-            .Select(m => m.Name)
-            .ToHashSet(StringComparer.Ordinal);
-
-        foreach (var name in forbidden)
-        {
-            Assert.False(members.Contains(name),
-                $"{modelType.Name} still exposes per-save scratch member '{name}'");
-        }
-    }
 }

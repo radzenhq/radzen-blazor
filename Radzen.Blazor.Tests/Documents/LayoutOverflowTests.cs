@@ -194,7 +194,6 @@ public class LayoutOverflowTests
         Assert.Empty(page.Body.Tables);
         Assert.Empty(page.Body.Images);
         Assert.Empty(page.Body.CodeSymbols);
-        Assert.Equal(1, page.Number);
     }
 
     [Fact]

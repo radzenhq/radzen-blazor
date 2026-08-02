@@ -87,136 +87,61 @@ public class XmpMetadataTests
         Assert.NotNull(PacketXml().Descendants(rdf + "Description").FirstOrDefault());
     }
 
-    [Fact]
-    public void DcTitle_FromDocumentInfoTitle_XmlEscaped()
+    [Theory]
+    [InlineData("dc", "title", "Q3 Invoice & Receipt")]
+    [InlineData("dc", "creator", "Radzen Ltd")]
+    [InlineData("dc", "description", "Invoice for services rendered")]
+    [InlineData("xmp", "CreatorTool", "Radzen Blazor Studio")]
+    [InlineData("pdf", "Keywords", "invoice, facturx, pdfa")]
+    [InlineData("pdf", "Producer", "Radzen PDF 1.0")]
+    [InlineData("pdfaid", "part", "3")]
+    [InlineData("pdfaid", "conformance", "B")]
+    [InlineData("facturx", "DocumentType", "INVOICE")]
+    [InlineData("facturx", "DocumentFileName", "factur-x.xml")]
+    [InlineData("facturx", "Version", "1.0")]
+    public void Packet_CarriesTheAuthoredMetadataField(string schema, string local, string expected)
     {
-        var title = PacketXml().Descendants(Dc + "title").FirstOrDefault();
-        Assert.NotNull(title);
-        Assert.Contains("Q3 Invoice & Receipt", title!.Value);
+        var xml = PacketXml();
+        var actual = schema switch
+        {
+            "dc" => xml.Descendants(Dc + local).FirstOrDefault()?.Value.Trim(),
+            "xmp" => ElementOrAttr(xml, Xmp, local),
+            "pdf" => ElementOrAttr(xml, Pdf, local),
+            "pdfaid" => ElementOrAttr(xml, PdfaId, local),
+            _ => FacturX(xml, local)?.Value.Trim(),
+        };
+
+        Assert.NotNull(actual);
+        Assert.Contains(expected, actual, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void DcCreator_FromDocumentInfoAuthor()
-    {
-        var creator = PacketXml().Descendants(Dc + "creator").FirstOrDefault();
-        Assert.NotNull(creator);
-        Assert.Contains("Radzen Ltd", creator!.Value);
-    }
-
-    [Fact]
-    public void DcDescription_FromDocumentInfoSubject()
-    {
-        var description = PacketXml().Descendants(Dc + "description").FirstOrDefault();
-        Assert.NotNull(description);
-        Assert.Contains("Invoice for services rendered", description!.Value);
-    }
-
-    [Fact]
-    public void XmpCreatorTool_FromDocumentInfoCreator()
-    {
-        Assert.Equal("Radzen Blazor Studio", ElementOrAttr(PacketXml(), Xmp, "CreatorTool"));
-    }
-
-    [Fact]
-    public void PdfKeywords_FromDocumentInfoKeywords()
-    {
-        Assert.Equal("invoice, facturx, pdfa", ElementOrAttr(PacketXml(), Pdf, "Keywords"));
-    }
-
-    [Fact]
-    public void PdfProducer_FromProducer()
-    {
-        Assert.Equal("Radzen PDF 1.0", ElementOrAttr(PacketXml(), Pdf, "Producer"));
-    }
-
-    [Fact]
-    public void PdfaId_Part_IsThree()
-    {
-        Assert.Equal("3", ElementOrAttr(PacketXml(), PdfaId, "part"));
-    }
-
-    [Fact]
-    public void PdfaId_Conformance_IsB()
-    {
-        Assert.Equal("B", ElementOrAttr(PacketXml(), PdfaId, "conformance"));
-    }
-
-    [Fact]
-    public void FacturX_Namespace_IsFacturXUrn()
-    {
-        var element = FacturX(PacketXml(), "DocumentType");
-        Assert.NotNull(element);
-        Assert.Contains("factur-x", element!.Name.Namespace.NamespaceName, StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public void FacturX_DocumentType()
-    {
-        Assert.Equal("INVOICE", FacturX(PacketXml(), "DocumentType")?.Value.Trim());
-    }
-
-    [Fact]
-    public void FacturX_DocumentFileName()
-    {
-        Assert.Equal("factur-x.xml", FacturX(PacketXml(), "DocumentFileName")?.Value.Trim());
-    }
-
-    [Fact]
-    public void FacturX_Version()
-    {
-        Assert.Equal("1.0", FacturX(PacketXml(), "Version")?.Value.Trim());
-    }
-
-    [Fact]
-    public void Envelope_BeginProcessingInstruction()
-    {
-        Assert.StartsWith("<?xpacket begin", PacketText().TrimStart());
-    }
-
-    [Fact]
-    public void Envelope_EndProcessingInstruction()
-    {
-        Assert.Contains("<?xpacket end", PacketText());
-    }
-
-    [Fact]
-    public void Envelope_PaddingWhitespacePresentBeforeEnd()
+    public void Packet_IsWrappedInAPaddedXpacketEnvelope()
     {
         var text = PacketText();
+
+        Assert.StartsWith("<?xpacket begin", text.TrimStart(), StringComparison.Ordinal);
+        Assert.Contains("<?xpacket end", text, StringComparison.Ordinal);
+
         var afterMeta = text.IndexOf("</x:xmpmeta>", StringComparison.Ordinal) + "</x:xmpmeta>".Length;
         var beforeEnd = text.IndexOf("<?xpacket end", StringComparison.Ordinal);
         Assert.True(beforeEnd > afterMeta);
+
         var padding = text[afterMeta..beforeEnd];
         Assert.True(string.IsNullOrWhiteSpace(padding));
         Assert.True(padding.Length >= 100, $"expected padding >= 100 whitespace chars, got {padding.Length}");
     }
 
     [Fact]
-    public void Stream_TypeIsMetadata()
-    {
-        var stream = Sample().BuildStream();
-        Assert.Equal("Metadata", ((NameObject)stream.Dictionary["Type"]).Value);
-    }
-
-    [Fact]
-    public void Stream_SubtypeIsXml()
-    {
-        var stream = Sample().BuildStream();
-        Assert.Equal("XML", ((NameObject)stream.Dictionary["Subtype"]).Value);
-    }
-
-    [Fact]
-    public void Stream_HasNoFilter()
-    {
-        var stream = Sample().BuildStream();
-        Assert.False(stream.Dictionary.ContainsKey("Filter"));
-    }
-
-    [Fact]
-    public void Stream_DataEqualsPacket()
+    public void Stream_IsAnUncompressedXmlMetadataStreamHoldingThePacket()
     {
         var sample = Sample();
-        Assert.Equal(sample.BuildPacket(), sample.BuildStream().Data);
+        var stream = sample.BuildStream();
+
+        Assert.Equal("Metadata", ((NameObject)stream.Dictionary["Type"]).Value);
+        Assert.Equal("XML", ((NameObject)stream.Dictionary["Subtype"]).Value);
+        Assert.False(stream.Dictionary.ContainsKey("Filter"));
+        Assert.Equal(sample.BuildPacket(), stream.Data);
     }
 
     [Theory]
@@ -241,28 +166,18 @@ public class XmpMetadataTests
         Assert.NotNull(xmp.BuildPacket());
     }
 
-    private static void AssertRejectsTitle(string title)
+    [Theory]
+    [InlineData("lone", 0xD800, "high")]
+    [InlineData("lone", 0xDC00, "low")]
+    [InlineData("trailing", 0xD800, "")]
+    [InlineData("", 0xDC00, "leadingLow")]
+    public void BuildPacket_ThrowsOnMalformedSurrogates(string prefix, int surrogate, string suffix)
     {
         var xmp = Sample();
-        xmp.Info.Title = title;
+        xmp.Info.Title = prefix + (char)surrogate + suffix;
+
         Assert.Throws<InvalidDataException>(() => xmp.BuildPacket());
     }
-
-    [Fact]
-    public void BuildPacket_ThrowsOnLoneHighSurrogate()
-        => AssertRejectsTitle("lone" + (char)0xD800 + "high");
-
-    [Fact]
-    public void BuildPacket_ThrowsOnLoneLowSurrogate()
-        => AssertRejectsTitle("lone" + (char)0xDC00 + "low");
-
-    [Fact]
-    public void BuildPacket_ThrowsOnTrailingHighSurrogate()
-        => AssertRejectsTitle("trailing" + (char)0xD800);
-
-    [Fact]
-    public void BuildPacket_ThrowsOnLeadingLowSurrogate()
-        => AssertRejectsTitle((char)0xDC00 + "leadingLow");
 
     [Fact]
     public void BuildPacket_PreservesValidSurrogatePair()

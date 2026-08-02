@@ -35,7 +35,6 @@ public class TablePaginationTests
         var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 5));
 
         Assert.Equal(3, fragments.Count);
-        Assert.Equal([1, 2, 3], fragments.Select(f => f.Number).ToArray());
         Assert.Equal(4, TablePaginationSupport.BodyRows(fragments[0]).Count);
         Assert.Equal(4, TablePaginationSupport.BodyRows(fragments[1]).Count);
         Assert.Equal(2, TablePaginationSupport.BodyRows(fragments[2]).Count);
@@ -53,7 +52,7 @@ public class TablePaginationTests
 
         foreach (var fragment in fragments)
         {
-            Assert.Equal(1, fragment.HeaderRowCount);
+            Assert.Equal([0], TablePaginationSupport.HeaderRows(fragment).ToArray());
             Assert.True(fragment.Rows[0].IsHeader);
             Assert.Equal(0, fragment.Rows[0].SourceRow);
             Assert.Equal(0, fragment.Rows[0].Y, 6);
@@ -114,7 +113,7 @@ public class TablePaginationTests
             }
 
             Assert.Equal(y, fragment.Height, 6);
-            Assert.Equal(lh, fragment.Rows[fragment.HeaderRowCount].Y, 6);
+            Assert.Equal(lh, fragment.Rows[TablePaginationSupport.HeaderRows(fragment).Count].Y, 6);
         }
     }
 
@@ -166,7 +165,7 @@ public class TablePaginationTests
         var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 4));
 
         Assert.Equal(3, fragments.Count);
-        Assert.All(fragments, f => Assert.Equal(0, f.HeaderRowCount));
+        Assert.All(fragments, f => Assert.Empty(TablePaginationSupport.HeaderRows(f)));
         Assert.False(fragments[0].Rows[0].IsHeader);
         Assert.Equal(0, fragments[0].Rows[0].SourceRow);
         Assert.Equal(4, fragments[0].Rows.Length);
@@ -184,7 +183,7 @@ public class TablePaginationTests
         var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
 
         Assert.Single(fragments);
-        Assert.Equal(1, fragments[0].HeaderRowCount);
+        Assert.Equal([0], TablePaginationSupport.HeaderRows(fragments[0]).ToArray());
         Assert.Equal(4, fragments[0].Rows.Length);
         Assert.Equal(4 * lh, fragments[0].Height, 6);
         Assert.Equal([1, 2, 3], TablePaginationSupport.BodyRows(fragments[0]).ToArray());

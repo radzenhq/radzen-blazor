@@ -69,7 +69,7 @@ internal static class CodeSymbolDispatch
     {
         public override HorizontalAlignment Alignment => qr.Alignment;
 
-        public override Color Foreground => Color.Black;
+        public override Color Foreground => qr.Foreground;
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,
@@ -119,7 +119,7 @@ internal static class CodeSymbolDispatch
     {
         public override HorizontalAlignment Alignment => barcode.Alignment;
 
-        public override Color Foreground => Color.Black;
+        public override Color Foreground => barcode.Foreground;
 
         public override (double Width, double Height) Size(
             FontCollection? fonts,

@@ -41,6 +41,9 @@ public sealed class QrCode : Block
     /// <summary>Gets or sets the horizontal alignment within the container width. Defaults to <see cref="HorizontalAlignment.Left"/>.</summary>
     public HorizontalAlignment Alignment { get; set; } = HorizontalAlignment.Left;
 
+    /// <summary>Gets or sets the color the dark modules are filled with. Defaults to <see cref="Color.Black"/>.</summary>
+    public Color Foreground { get; set; } = Color.Black;
+
     /// <summary>
     /// Gets or sets the alternate (accessibility) description of the code, carried on the code in
     /// accessible output for assistive technology to announce in place of the modules.

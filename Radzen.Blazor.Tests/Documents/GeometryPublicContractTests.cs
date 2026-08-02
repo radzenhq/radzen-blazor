@@ -101,6 +101,35 @@ public class GeometryPublicContractTests
     }
 
     [Fact]
+    public void MatrixTranslateCarriesTheOffsetInEAndF()
+    {
+        var matrix = Matrix.Translate(10, 20);
+
+        Assert.Equal((1d, 0d, 0d, 1d), (matrix.A, matrix.B, matrix.C, matrix.D));
+        Assert.Equal((10d, 20d), (matrix.E, matrix.F));
+    }
+
+    [Fact]
+    public void MatrixScaleCarriesTheFactorsInAAndD()
+    {
+        var matrix = Matrix.Scale(2, 3);
+
+        Assert.Equal((2d, 0d, 0d, 3d), (matrix.A, matrix.B, matrix.C, matrix.D));
+        Assert.Equal((0d, 0d), (matrix.E, matrix.F));
+    }
+
+    [Fact]
+    public void MatrixRotateCarriesTheSineAndCosineInTheLinearComponents()
+    {
+        var matrix = Matrix.Rotate(90);
+
+        Assert.Equal(0, matrix.A, 12);
+        Assert.Equal(1, matrix.B, 12);
+        Assert.Equal(-1, matrix.C, 12);
+        Assert.Equal(0, matrix.D, 12);
+    }
+
+    [Fact]
     public void MatrixMultiplicationAppliesLeftThenRight()
     {
         var operatorResult = (Matrix.Translate(10, 0) * Matrix.Rotate(90)).Transform(0, 0);

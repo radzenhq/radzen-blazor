@@ -40,9 +40,6 @@ internal enum SemanticIntent
     Link,
     Form,
     Span,
-    Caption,
-    TableHeaderGroup,
-    TableBodyGroup,
 }
 
 internal enum SemanticHeaderScope

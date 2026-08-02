@@ -89,8 +89,6 @@ internal sealed record LaidOutPage
 
     public required Rect ContentBox { get; init; }
 
-    public required int Number { get; init; }
-
     public required LaidOutLayer Body { get; init; }
 
     public required LaidOutLayer HeaderLayer { get; init; }

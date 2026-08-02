@@ -209,9 +209,7 @@ internal static class TablePaginator
 
         return new LaidOutTableSlice
         {
-            Number = number,
             Rows = [.. rows],
-            HeaderRowCount = headers.Count,
             ContainsRepeatedHeaders = number > 1 && headers.Count > 0,
             Height = y,
         };

@@ -24,7 +24,6 @@ internal sealed class PaginationContext
     private double contentWidth;
     private double contentHeight;
     private BlockLayoutCache blockLayouts = null!;
-    private readonly int pageNumberOffset;
     private readonly int sectionIndex;
     private BlockHeightHandler? blockHeightHandler;
     private int order;
@@ -35,14 +34,12 @@ internal sealed class PaginationContext
         List<LaidOutPage> pages,
         LoweringResult resolution,
         LayoutCaptureContext capture,
-        int pageNumberOffset,
         int sectionIndex)
     {
         this.pages = pages;
         this.fonts = fonts;
         this.resolution = resolution;
         this.capture = capture;
-        this.pageNumberOffset = pageNumberOffset;
         this.sectionIndex = sectionIndex;
         current = new PageLayerBuilder();
         StartPageCount = pages.Count;
@@ -124,8 +121,6 @@ internal sealed class PaginationContext
 
     public double Cursor { get; private set; }
 
-    internal double AvailableHeight => contentHeight;
-
     internal FontCollection Fonts => fonts;
 
     internal LoweringResult Resolution => resolution;
@@ -140,7 +135,6 @@ internal sealed class PaginationContext
         {
             Size = size,
             ContentBox = ContentBox,
-            Number = pageNumberOffset + pages.Count + 1,
             Body = current.Build(),
             HeaderLayer = header,
             FooterLayer = footer,

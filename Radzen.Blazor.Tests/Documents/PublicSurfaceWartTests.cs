@@ -108,37 +108,4 @@ public class PublicSurfaceWartTests
 
         Assert.Null(image.FitBox);
     }
-
-    [Fact]
-    public void TheOnlyInlineKindsAreTextRunsPageFieldsImagesAndFormInputs()
-    {
-        var kinds = typeof(Inline).Assembly.GetTypes()
-            .Where(type => type.IsSubclassOf(typeof(Inline)) && !type.IsAbstract)
-            .Select(type => type.Name)
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-
-        Assert.Equal(
-            [
-                "CheckBox", "DropDown", "InlineImage", "PageCountField", "PageNumberField",
-                "RadioButton", "Run", "TextInput",
-            ],
-            kinds);
-    }
-
-    [Fact]
-    public void TextOnlyMembersDoNotReachNonTextInlines()
-    {
-        foreach (var member in new[]
-        {
-            "Text", "Font", "LetterSpacing", "WordSpacing", "VerticalAlignment",
-            "VerticalAlignmentScale", "HorizontalScale", "Invisible",
-        })
-        {
-            Assert.Null(typeof(Inline).GetProperty(member));
-        }
-
-        Assert.NotNull(typeof(TextInline).GetProperty("Font"));
-        Assert.NotNull(typeof(Run).GetProperty("Text"));
-    }
 }

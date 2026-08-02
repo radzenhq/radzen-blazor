@@ -15,11 +15,7 @@ internal readonly struct LaidOutFragmentRow
 
 internal sealed record LaidOutTableSlice
 {
-    public required int Number { get; init; }
-
     public required ImmutableArray<LaidOutFragmentRow> Rows { get; init; }
-
-    public required int HeaderRowCount { get; init; }
 
     public required bool ContainsRepeatedHeaders { get; init; }
 

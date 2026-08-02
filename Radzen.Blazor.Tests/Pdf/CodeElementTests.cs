@@ -370,6 +370,94 @@ public class CodeElementTests
             "POSTNET draws exactly two bar heights");
     }
 
+    private static List<(double R, double G, double B)> FillColors(byte[] content)
+    {
+        var colors = new List<(double, double, double)>();
+        foreach (var operation in ContentStreamTokenizer.Parse(content))
+        {
+            if (operation.Operator == "rg")
+            {
+                colors.Add((operation.Num(0), operation.Num(1), operation.Num(2)));
+            }
+        }
+
+        return colors;
+    }
+
+    private static List<(double R, double G, double B)> ModuleFillColors(Document document)
+        => FillColors(ContentTestHelpers.PageContent(BuildTestSupport.Read(document), 0));
+
+    private static Document QrDocument(Color? foreground)
+    {
+        var document = new Document();
+        var code = document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(120));
+        if (foreground is { } color)
+        {
+            code.Foreground = color;
+        }
+
+        return document;
+    }
+
+    private static Document BarcodeDocument(Color? foreground)
+    {
+        var document = new Document();
+        var code = document.Sections.Add().Blocks.AddBarcode(
+            BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(50));
+        if (foreground is { } color)
+        {
+            code.Foreground = color;
+        }
+
+        return document;
+    }
+
+    [Fact]
+    public void QrCode_Foreground_PaintsTheModulesInTheAuthoredColor()
+    {
+        var colors = ModuleFillColors(QrDocument(Color.FromRgb(65, 105, 225)));
+
+        Assert.NotEmpty(colors);
+        Assert.All(colors, color =>
+        {
+            Assert.Equal(65 / 255.0, color.R, 3);
+            Assert.Equal(105 / 255.0, color.G, 3);
+            Assert.Equal(225 / 255.0, color.B, 3);
+        });
+    }
+
+    [Fact]
+    public void QrCode_DefaultForeground_PaintsTheModulesBlack()
+    {
+        Assert.All(ModuleFillColors(QrDocument(null)), color => Assert.Equal((0d, 0d, 0d), color));
+        Assert.Equal(
+            ContentTestHelpers.PageContent(BuildTestSupport.Read(QrDocument(Color.Black)), 0),
+            ContentTestHelpers.PageContent(BuildTestSupport.Read(QrDocument(null)), 0));
+    }
+
+    [Fact]
+    public void Barcode_Foreground_PaintsTheBarsInTheAuthoredColor()
+    {
+        var colors = ModuleFillColors(BarcodeDocument(Color.FromRgb(200, 0, 100)));
+
+        Assert.NotEmpty(colors);
+        Assert.All(colors, color =>
+        {
+            Assert.Equal(200 / 255.0, color.R, 3);
+            Assert.Equal(0, color.G, 3);
+            Assert.Equal(100 / 255.0, color.B, 3);
+        });
+    }
+
+    [Fact]
+    public void Barcode_DefaultForeground_PaintsTheBarsBlack()
+    {
+        Assert.All(ModuleFillColors(BarcodeDocument(null)), color => Assert.Equal((0d, 0d, 0d), color));
+        Assert.Equal(
+            ContentTestHelpers.PageContent(BuildTestSupport.Read(BarcodeDocument(Color.Black)), 0),
+            ContentTestHelpers.PageContent(BuildTestSupport.Read(BarcodeDocument(null)), 0));
+    }
+
     [Fact]
     public void Barcode_Ean13_LaysOutAsASingleCodeSymbol()
     {

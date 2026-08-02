@@ -39,7 +39,6 @@ public class RepeatingHeaderTests
         Assert.True(fragments.Count >= 3);
         foreach (var fragment in fragments)
         {
-            Assert.Equal(2, fragment.HeaderRowCount);
             Assert.Equal([0, 1], TablePaginationSupport.HeaderRows(fragment).ToArray());
             Assert.True(fragment.Rows[0].IsHeader);
             Assert.True(fragment.Rows[1].IsHeader);
@@ -82,8 +81,7 @@ public class RepeatingHeaderTests
 
         foreach (var fragment in fragments)
         {
-            var bodyCount = TablePaginationSupport.BodyRows(fragment).Count;
-            Assert.Equal((fragment.HeaderRowCount + bodyCount) * lh, fragment.Height, 6);
+            Assert.Equal(fragment.Rows.Length * lh, fragment.Height, 6);
         }
     }
 
@@ -144,7 +142,6 @@ public class RepeatingHeaderTests
         var fragments = IsolatedTablePaginator.Paginate(layout, table, TablePaginationSupport.Capacity(lh, 20));
 
         Assert.Single(fragments);
-        Assert.Equal(2, fragments[0].HeaderRowCount);
         Assert.Equal(4, fragments[0].Rows.Length);
         Assert.Equal([0, 1], TablePaginationSupport.HeaderRows(fragments[0]).ToArray());
         Assert.Equal([2, 3], TablePaginationSupport.BodyRows(fragments[0]).ToArray());

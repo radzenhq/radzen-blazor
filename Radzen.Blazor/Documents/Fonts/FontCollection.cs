@@ -512,8 +512,6 @@ public sealed class FontCollection
             glyphs.Add(new CapturedSfntGlyph(
                 positionedGlyph.GlyphId,
                 positionedGlyph.Advance,
-                0,
-                0,
                 -trailing,
                 positionedGlyph.Cluster,
                 codepoint));
@@ -621,8 +619,6 @@ public sealed class FontCollection
                 sfntGlyphs.Add(new CapturedSfntGlyph(
                     glyph,
                     face!.AdvanceInUserSpace(glyph, font.Size),
-                    0,
-                    0,
                     0,
                     i,
                     codepoint));

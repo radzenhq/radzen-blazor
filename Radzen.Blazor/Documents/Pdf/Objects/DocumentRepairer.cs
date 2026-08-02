@@ -16,7 +16,7 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
     private Dictionary<int, int>? literalStringSpans;
     private int unbalancedStringFrom = int.MaxValue;
 
-    public DictionaryObject Repair(IDocumentRepairStore store)
+    public DictionaryObject Repair(IndirectObjectStore store)
     {
         store.ResetForRepair();
 
@@ -395,23 +395,4 @@ internal sealed class DocumentRepairer(byte[] data, ReaderLimits limits)
     private static bool IsDigit(byte b) => b >= (byte)'0' && b <= (byte)'9';
 
     private bool Matches(int index, string pattern) => PdfBytes.Matches(data, index, pattern);
-}
-
-internal interface IDocumentRepairStore
-{
-    void ResetForRepair();
-
-    List<int> GetEntryNumbers();
-
-    int EntryCount { get; }
-
-    bool ContainsEntry(int number);
-
-    void SetEntry(int number, XrefEntry entry);
-
-    DocumentObject GetObject(int number);
-
-    bool IsObjectStream(int number);
-
-    ObjectStream GetObjectStream(int streamNumber);
 }
