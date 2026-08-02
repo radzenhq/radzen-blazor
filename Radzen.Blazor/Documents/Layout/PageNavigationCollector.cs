@@ -13,15 +13,10 @@ internal sealed class PageNavigationCollector : ISceneVisitor
     private readonly List<LaidOutLink> links = [];
     private readonly List<LaidOutAnchor> anchors = [];
     private readonly IDictionary<string, SourceId> seen;
-    private readonly LaidOutPage page;
     private readonly List<Container> containers = [];
     private double top;
 
-    private PageNavigationCollector(LaidOutPage page, IDictionary<string, SourceId> seen)
-    {
-        this.page = page;
-        this.seen = seen;
-    }
+    private PageNavigationCollector(IDictionary<string, SourceId> seen) => this.seen = seen;
 
     public static LaidOutPage Collect(LaidOutPage page, IDictionary<string, SourceId> seen)
     {
@@ -39,12 +34,12 @@ internal sealed class PageNavigationCollector : ISceneVisitor
 
     private static PageNavigationCollector Walk(LaidOutPage page, IDictionary<string, SourceId> seen)
     {
-        var collector = new PageNavigationCollector(page, seen);
+        var collector = new PageNavigationCollector(seen);
         SceneWalk.Page(page, collector);
         return collector;
     }
 
-    void ISceneVisitor.EnterLayer(SceneLayerKind kind) => top = SceneWalk.LayerTop(page, kind);
+    void ISceneVisitor.EnterLayer(SceneLayerKind kind, double layerTop) => top = layerTop;
 
     void ISceneVisitor.Line(in LaidOutLine line, in SceneFrame frame)
     {
@@ -52,14 +47,14 @@ internal sealed class PageNavigationCollector : ISceneVisitor
         Line(line.Line, frame.Left + line.X, top + line.Y + frame.Delta, current.Transform, current.Clip);
     }
 
-    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
         => containers.Add(new Container(
             box.Transform ?? Current.Transform,
             Clip(frame, box.Bounds)));
 
     void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame) => Pop();
 
-    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneContentBounds bounds)
+    void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneClip clip)
         => containers.Add(new Container(Current.Transform, Clip(frame, cell.Bounds)));
 
     void ISceneVisitor.LeaveCell(LaidOutCell cell, in SceneFrame frame) => Pop();

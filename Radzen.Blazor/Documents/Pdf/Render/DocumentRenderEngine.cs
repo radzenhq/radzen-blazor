@@ -1,10 +1,8 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Scene;
 using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Geometry;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -77,13 +75,16 @@ internal sealed class DocumentRenderEngine
         portable.Info.CreationDate = info.CreationDate;
         portable.Info.ModificationDate = info.ModificationDate;
 
-        var paginated = laidOut.Pages;
+        var recorder = new PageSceneRecorder(
+            structureTree,
+            textRecorder,
+            codeSymbolRecorder,
+            imageRecorder,
+            watermarkRecorder);
 
-        var plans = new List<PagePlan>();
-        for (var i = 0; i < paginated.Length; i++)
-        {
-            plans.Add(GeneratePage(paginated[i]));
-        }
+        SceneWalk.Document(laidOut, recorder);
+
+        var plans = recorder.Plans;
 
         FontEmbedding.Ensure(
             fontRegistry.SfntFaces(),
@@ -103,15 +104,9 @@ internal sealed class DocumentRenderEngine
 
         var pageOutputs = pages.MoveToImmutable();
         var anchors = ImmutableDictionary.CreateBuilder<string, OutputAnchor>(System.StringComparer.Ordinal);
-        for (var pageIndex = 0; pageIndex < paginated.Length; pageIndex++)
+        foreach (var anchor in recorder.Anchors)
         {
-            var pageHeight = paginated[pageIndex].Size.Height.Point;
-            foreach (var anchor in paginated[pageIndex].Anchors)
-            {
-                anchors.Add(
-                    anchor.Name,
-                    new OutputAnchor(pageOutputs[pageIndex], BottomUpSpace.FromTop(pageHeight, anchor.Top)));
-            }
+            anchors.Add(anchor.Name, new OutputAnchor(pageOutputs[anchor.PageIndex], anchor.Top));
         }
 
         portable.Output = new DocumentOutput(
@@ -134,37 +129,4 @@ internal sealed class DocumentRenderEngine
 
         return portable;
     }
-
-    private PagePlan GeneratePage(LaidOutPage page)
-    {
-        var height = page.Size.Height.Point;
-        var plan = new PagePlan { Size = page.Size };
-        var context = new PageRenderContext(
-            plan,
-            textRecorder,
-            codeSymbolRecorder,
-            imageRecorder);
-
-        SceneWalk.Page(page, new PageSceneRecorder(context, structureTree, page, height));
-
-        foreach (var link in page.Links)
-        {
-            plan.Links.Add(new OutputLink(
-                link.Left,
-                BottomUpSpace.FromTop(height, link.Bottom),
-                link.Right,
-                BottomUpSpace.FromTop(height, link.Top),
-                link.Uri,
-                link.Anchor,
-                structureTree.LinkElementOf(link.Source)?.Id));
-        }
-
-        if (page.Watermark is not null)
-        {
-            watermarkRecorder.Plan(plan, page.Watermark);
-        }
-
-        return plan;
-    }
-
 }

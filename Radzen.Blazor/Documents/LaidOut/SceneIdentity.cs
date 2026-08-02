@@ -10,10 +10,13 @@ internal sealed class SceneImageData
 {
     private readonly byte[] bytes;
 
-    internal SceneImageData(byte[] source)
+    internal SceneImageData(byte[] source, string? mediaType = null)
     {
         bytes = [.. source];
+        MediaType = mediaType;
     }
 
     internal ReadOnlyMemory<byte> Memory => bytes;
+
+    internal string? MediaType { get; }
 }

@@ -13,7 +13,8 @@ internal sealed class ImageRecorder(ImageRegistry imageRegistry, StructureTreeBu
         double delta,
         double opacity,
         StructureElement? inherited,
-        SemanticArtifactKind? inheritedArtifact)
+        SemanticArtifactKind? inheritedArtifact,
+        PdfRect? clip = null)
     {
         var plan = context.Plan;
         var paint = positioned.Paint;
@@ -35,6 +36,7 @@ internal sealed class ImageRecorder(ImageRegistry imageRegistry, StructureTreeBu
                 ? inheritedArtifact ?? structureTree.ArtifactOf(positioned.Source)
                 : null,
             ExtGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null,
+            Clip = clip,
         });
         plan.Resources.UsedImages.Add(xobject);
     }

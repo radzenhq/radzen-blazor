@@ -35,7 +35,7 @@ internal sealed class LayoutCaptureContext(ImageProbes probes)
     {
         if (!images.TryGetValue(data, out var captured))
         {
-            captured = new SceneImageData(data);
+            captured = new SceneImageData(data, ImageMetrics.MediaType(Probes.Format(data)));
             images.Add(data, captured);
         }
 

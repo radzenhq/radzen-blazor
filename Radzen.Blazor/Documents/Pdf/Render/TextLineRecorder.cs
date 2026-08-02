@@ -17,7 +17,7 @@ internal sealed class TextLineRecorder(
 {
     private readonly GlyphSpanRecorder spans = new(fontRegistry, allowUnsupportedCharacters);
 
-    public bool EmitLines(
+    public void EmitLines(
         PageRenderContext context,
         ImmutableArray<LaidOutLine> lines,
         double left,
@@ -26,10 +26,9 @@ internal sealed class TextLineRecorder(
         double opacity,
         StructureElement? inherited,
         bool resolveStructure,
-        double overflowThreshold,
+        PdfRect? clip,
         SemanticArtifactKind? artifact = null)
     {
-        var overflows = false;
         foreach (var current in lines)
         {
             var element = resolveStructure ? structureTree.ElementOf(current.Source) ?? inherited : null;
@@ -45,11 +44,9 @@ internal sealed class TextLineRecorder(
                 opacity,
                 marker,
                 lineArtifact,
-                resolveFragments: resolveStructure);
-            overflows |= box.Width > overflowThreshold + 0.01;
+                resolveFragments: resolveStructure,
+                clip: clip);
         }
-
-        return overflows;
     }
 
     public void EmitLine(
@@ -61,7 +58,8 @@ internal sealed class TextLineRecorder(
         double opacity = 1,
         StructureElement? markerElement = null,
         SemanticArtifactKind? artifact = null,
-        bool resolveFragments = false)
+        bool resolveFragments = false,
+        PdfRect? clip = null)
     {
         var plan = context.Plan;
         var y = baseline - line.Baseline;
@@ -112,7 +110,8 @@ internal sealed class TextLineRecorder(
                 y,
                 fragElement,
                 capturedArtifact ?? artifact,
-                extGState);
+                extGState,
+                clip);
         }
 
         var decorationArtifact = SemanticArtifacts.ForDecoration(artifact);
@@ -243,6 +242,7 @@ internal sealed class TextLineRecorder(
         string? extGState,
         double[]? kerns,
         int sequence,
+        PdfRect? clip,
         double strokeWidth = 0,
         double shear = 0)
         => new()
@@ -265,6 +265,7 @@ internal sealed class TextLineRecorder(
             Element = element,
             Artifact = artifact,
             Kerns = kerns,
+            Clip = clip,
         };
 
     private void EmitGlyphRun(
@@ -275,7 +276,8 @@ internal sealed class TextLineRecorder(
         double y,
         StructureElement? element,
         SemanticArtifactKind? artifact,
-        string? extGState)
+        string? extGState,
+        PdfRect? clip)
     {
         var font = paint.Font;
         var size = font.Size * paint.ScriptScale;
@@ -296,6 +298,7 @@ internal sealed class TextLineRecorder(
                 extGState,
                 emitted.Kerns,
                 plan.NextSequence(),
+                clip,
                 emitted.Face is { } face && font.Bold && !face.Bold ? size * 0.03 : 0,
                 emitted.Face is { } italicFace && font.Italic && !italicFace.Italic ? 0.21 : 0));
         }

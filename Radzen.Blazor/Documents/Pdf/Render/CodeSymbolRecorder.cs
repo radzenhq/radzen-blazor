@@ -15,7 +15,8 @@ internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
         double x,
         double topY,
         ImmutableArray<LaidOutCaptionLine>? caption,
-        SemanticArtifactKind? artifact = null)
+        SemanticArtifactKind? artifact = null,
+        PdfRect? clip = null)
     {
         var plan = context.Plan;
         var element = artifact is null ? structureTree.ElementOf(source) : null;
@@ -32,6 +33,7 @@ internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
                 Width = module.Width,
                 Height = module.Height,
                 Color = foreground,
+                Clip = clip,
             });
         }
 
@@ -42,7 +44,7 @@ internal sealed class CodeSymbolRecorder(StructureTreeBuilder structureTree)
 
         foreach (var line in lines)
         {
-            context.Text.EmitLine(context, line.Line, x, topY - line.Y, element, artifact: artifact);
+            context.Text.EmitLine(context, line.Line, x, topY - line.Y, element, artifact: artifact, clip: clip);
         }
     }
 }

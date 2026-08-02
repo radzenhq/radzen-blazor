@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Immutable;
+using Radzen.Documents.Core;
 using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Scene;
@@ -10,13 +12,13 @@ internal readonly record struct SceneFrame
     public required double Delta { get; init; }
 }
 
-internal readonly record struct SceneContentBounds
+internal readonly record struct SceneClip
 {
-    public required double Width { get; init; }
+    public required Rect Bounds { get; init; }
 
-    public required double Left { get; init; }
+    public required bool ClipsLines { get; init; }
 
-    public required double Right { get; init; }
+    public required bool ClipsInline { get; init; }
 }
 
 internal enum SceneLayerKind
@@ -28,7 +30,27 @@ internal enum SceneLayerKind
 
 internal interface ISceneVisitor
 {
-    void EnterLayer(SceneLayerKind kind)
+    void BeginDocument(LaidOutDocument document)
+    {
+    }
+
+    void EndDocument(LaidOutDocument document)
+    {
+    }
+
+    void BeginPage(LaidOutPage page, int index)
+    {
+    }
+
+    void EndPage(LaidOutPage page, int index)
+    {
+    }
+
+    void EnterLayer(SceneLayerKind kind, double top)
+    {
+    }
+
+    void LeaveLayer(SceneLayerKind kind)
     {
     }
 
@@ -52,15 +74,7 @@ internal interface ISceneVisitor
     {
     }
 
-    void AfterLines()
-    {
-    }
-
-    void AfterInline()
-    {
-    }
-
-    void EnterBox(LaidOutBox box, in SceneFrame frame, in SceneContentBounds bounds)
+    void EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
     {
     }
 
@@ -69,10 +83,6 @@ internal interface ISceneVisitor
     }
 
     void EnterFragment(in LaidOutTableFragment fragment, in SceneFrame frame)
-    {
-    }
-
-    void Row(in LaidOutRow row, in SceneFrame frame)
     {
     }
 
@@ -88,25 +98,79 @@ internal interface ISceneVisitor
     {
     }
 
-    void EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneContentBounds bounds)
+    void EnterRow(in LaidOutRow row, in SceneFrame frame)
+    {
+    }
+
+    void LeaveRow(in LaidOutRow row, in SceneFrame frame)
+    {
+    }
+
+    void EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneClip clip)
     {
     }
 
     void LeaveCell(LaidOutCell cell, in SceneFrame frame)
     {
     }
+
+    void Link(in LaidOutLink link)
+    {
+    }
+
+    void Anchor(in LaidOutAnchor anchor)
+    {
+    }
+
+    void Watermark(LaidOutWatermark watermark)
+    {
+    }
 }
 
 internal static class SceneWalk
 {
-    public static void Page(LaidOutPage page, ISceneVisitor visitor)
+    private const double OverflowTolerance = 0.01;
+
+    public static void Document(LaidOutDocument document, ISceneVisitor visitor)
     {
-        Layer(SceneLayerKind.Body, page.Body, page.ContentBox.X, visitor);
-        Layer(SceneLayerKind.Header, page.HeaderLayer, page.ContentBox.X, visitor);
-        Layer(SceneLayerKind.Footer, page.FooterLayer, page.ContentBox.X, visitor);
+        visitor.BeginDocument(document);
+        for (var index = 0; index < document.Pages.Length; index++)
+        {
+            Page(document.Pages[index], index, visitor);
+        }
+
+        visitor.EndDocument(document);
     }
 
-    public static double LayerTop(LaidOutPage page, SceneLayerKind kind)
+    public static void Page(LaidOutPage page, ISceneVisitor visitor) => Page(page, 0, visitor);
+
+    public static void Page(LaidOutPage page, int index, ISceneVisitor visitor)
+    {
+        visitor.BeginPage(page, index);
+
+        Layer(SceneLayerKind.Body, page.Body, page, visitor);
+        Layer(SceneLayerKind.Header, page.HeaderLayer, page, visitor);
+        Layer(SceneLayerKind.Footer, page.FooterLayer, page, visitor);
+
+        foreach (var link in page.Links)
+        {
+            visitor.Link(link);
+        }
+
+        foreach (var anchor in page.Anchors)
+        {
+            visitor.Anchor(anchor);
+        }
+
+        if (page.Watermark is { } watermark)
+        {
+            visitor.Watermark(watermark);
+        }
+
+        visitor.EndPage(page, index);
+    }
+
+    private static double LayerTop(LaidOutPage page, SceneLayerKind kind)
         => kind switch
         {
             SceneLayerKind.Body => page.ContentBox.Y,
@@ -114,10 +178,10 @@ internal static class SceneWalk
             _ => page.FooterTop,
         };
 
-    private static void Layer(SceneLayerKind kind, LaidOutLayer layer, double left, ISceneVisitor visitor)
+    private static void Layer(SceneLayerKind kind, LaidOutLayer layer, LaidOutPage page, ISceneVisitor visitor)
     {
-        var frame = new SceneFrame { Left = left, Delta = 0 };
-        visitor.EnterLayer(kind);
+        var frame = new SceneFrame { Left = page.ContentBox.X, Delta = 0 };
+        visitor.EnterLayer(kind, LayerTop(page, kind));
 
         foreach (var line in layer.Lines)
         {
@@ -126,16 +190,10 @@ internal static class SceneWalk
             visitor.EndItem();
         }
 
-        if (kind == SceneLayerKind.Body)
-        {
-            Fragments(layer, frame, visitor);
-            Inline(layer, frame, visitor);
-        }
-        else
-        {
-            Inline(layer, frame, visitor);
-            Fragments(layer, frame, visitor);
-        }
+        Fragments(layer, frame, visitor);
+        Inline(layer, frame, visitor);
+
+        visitor.LeaveLayer(kind);
     }
 
     private static void Inline(LaidOutLayer layer, in SceneFrame frame, ISceneVisitor visitor)
@@ -188,11 +246,13 @@ internal static class SceneWalk
         visitor.EnterFragment(fragment, table);
         foreach (var row in fragment.Rows)
         {
-            visitor.Row(row, table);
+            visitor.EnterRow(row, table);
             foreach (var placed in row.Cells)
             {
                 Cell(placed.Cell, table with { Delta = placed.Delta }, visitor);
             }
+
+            visitor.LeaveRow(row, table);
         }
 
         visitor.LeaveFragment(fragment, table);
@@ -207,24 +267,60 @@ internal static class SceneWalk
         };
 
         visitor.EnterTable(table, cells);
-        foreach (var cell in table.Layout.Cells)
+
+        var layout = table.Layout;
+        var heights = layout.RowHeights;
+        var y = 0.0;
+        for (var index = 0; index < heights.Length; index++)
         {
-            Cell(cell, cells, visitor);
+            var row = new LaidOutRow
+            {
+                SourceRow = index,
+                IsHeader = false,
+                Y = y,
+                Height = heights[index],
+                Background = layout.Decoration.RowBackground(index),
+                Cells = RowCells(layout, index, cells.Delta),
+            };
+
+            visitor.EnterRow(row, cells);
+            foreach (var placed in row.Cells)
+            {
+                Cell(placed.Cell, cells, visitor);
+            }
+
+            visitor.LeaveRow(row, cells);
+            y += heights[index];
         }
 
         visitor.LeaveTable(table, cells);
     }
 
+    private static ImmutableArray<LaidOutCellPlacement> RowCells(LaidOutTable layout, int row, double delta)
+    {
+        var placed = ImmutableArray.CreateBuilder<LaidOutCellPlacement>();
+        foreach (var cell in layout.Cells)
+        {
+            if (cell.Row == row)
+            {
+                placed.Add(new LaidOutCellPlacement { Cell = cell, Delta = delta });
+            }
+        }
+
+        return placed.ToImmutable();
+    }
+
     private static void Cell(LaidOutCell cell, in SceneFrame frame, ISceneVisitor visitor)
     {
-        var bounds = new SceneContentBounds
-        {
-            Width = cell.ContentBox.Width,
-            Left = cell.Bounds.X,
-            Right = cell.Bounds.X + cell.Bounds.Width,
-        };
+        var clip = Clip(
+            cell,
+            frame,
+            cell.Bounds,
+            cell.ContentBox.Width,
+            cell.Bounds.X,
+            cell.Bounds.X + cell.Bounds.Width);
 
-        visitor.EnterCell(cell, frame, bounds);
+        visitor.EnterCell(cell, frame, clip);
         Content(cell, frame, visitor);
         visitor.LeaveCell(cell, frame);
     }
@@ -237,17 +333,76 @@ internal static class SceneWalk
             Delta = frame.Delta + box.Bounds.Y,
         };
 
-        var bounds = new SceneContentBounds
-        {
-            Width = Math.Max(0, box.Bounds.Width - box.Padding.Horizontal),
-            Left = contentInParentSpace ? box.Bounds.X : 0,
-            Right = contentInParentSpace ? box.Bounds.X + box.Bounds.Width : box.Bounds.Width,
-        };
+        var clip = Clip(
+            box.Content,
+            frame,
+            box.Bounds,
+            Math.Max(0, box.Bounds.Width - box.Padding.Horizontal),
+            contentInParentSpace ? box.Bounds.X : 0,
+            contentInParentSpace ? box.Bounds.X + box.Bounds.Width : box.Bounds.Width);
 
-        visitor.EnterBox(box, frame, bounds);
+        visitor.EnterBox(box, frame, clip);
         Content(box.Content, content, visitor);
         visitor.LeaveBox(box, frame);
     }
+
+    private static SceneClip Clip<TContent>(
+        TContent content,
+        in SceneFrame frame,
+        in Rect bounds,
+        double contentWidth,
+        double left,
+        double right)
+        where TContent : ILaidOutContent<LaidOutTablePlacement>
+        => new()
+        {
+            Bounds = new Rect(
+                frame.Left + bounds.X,
+                frame.Delta + bounds.Y,
+                bounds.Width,
+                bounds.Height),
+            ClipsLines = LinesOverflow(content, contentWidth),
+            ClipsInline = InlineOverflows(content, left, right),
+        };
+
+    private static bool LinesOverflow<TContent>(TContent content, double width)
+        where TContent : ILaidOutContent<LaidOutTablePlacement>
+    {
+        foreach (var line in content.Lines)
+        {
+            if (line.Line.Width > width + OverflowTolerance)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool InlineOverflows<TContent>(TContent content, double left, double right)
+        where TContent : ILaidOutContent<LaidOutTablePlacement>
+    {
+        foreach (var image in content.Images)
+        {
+            if (Overflows(image.X, image.Width, left, right))
+            {
+                return true;
+            }
+        }
+
+        foreach (var codeSymbol in content.CodeSymbols)
+        {
+            if (Overflows(codeSymbol.X, codeSymbol.Width, left, right))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool Overflows(double x, double width, double left, double right)
+        => x < left - OverflowTolerance || x + width > right + OverflowTolerance;
 
     private static void Content<TContent>(TContent content, in SceneFrame frame, ISceneVisitor visitor)
         where TContent : ILaidOutContent<LaidOutTablePlacement>
@@ -258,8 +413,6 @@ internal static class SceneWalk
             visitor.Line(line, frame);
             visitor.EndItem();
         }
-
-        visitor.AfterLines();
 
         foreach (var image in content.Images)
         {
@@ -274,8 +427,6 @@ internal static class SceneWalk
             visitor.CodeSymbol(codeSymbol, frame);
             visitor.EndItem();
         }
-
-        visitor.AfterInline();
 
         var cursor = OrderedMerge.ByOrder(content.Tables, static t => t.ZOrder, content.Boxes, static b => b.ZOrder);
         while (cursor.MoveNext())
