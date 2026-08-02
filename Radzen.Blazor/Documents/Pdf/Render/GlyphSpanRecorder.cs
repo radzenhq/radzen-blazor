@@ -36,13 +36,11 @@ internal sealed class GlyphSpanRecorder(
         }
 
         var face = span.Face.BuiltIn;
-        var glyphs = span.BuiltInGlyphs;
+        var glyphs = span.Glyphs;
         var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
         for (var i = 0; i < kerns.Length; i++)
         {
-            kerns[i] = SfntGlyphEncoder.PdfTextAdjustment(
-                glyphs[i].TextAdjustmentPoints,
-                emSize);
+            kerns[i] = SfntGlyphEncoder.PdfTextAdjustment(glyphs[i].Kerning, emSize);
         }
 
         return new EmittedGlyphSpan

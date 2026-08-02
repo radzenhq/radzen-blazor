@@ -149,18 +149,10 @@ internal sealed class PageNavigationCollector : ISceneVisitor
         var size = fragment.Paint.Font.Size;
         foreach (var span in fragment.GlyphRun.Spans)
         {
-            if (span.Face.Kind == CapturedFontFaceKind.Sfnt)
-            {
-                var face = span.Face.Sfnt;
-                return (
-                    face.Ascent * size / face.UnitsPerEm,
-                    -face.Descent * size / face.UnitsPerEm);
-            }
-
-            var metrics = span.Face.BuiltIn.Metrics;
+            var metrics = span.Face.Metrics;
             return (
-                metrics.Ascender * size / metrics.DesignUnitsPerEm,
-                -metrics.Descender * size / metrics.DesignUnitsPerEm);
+                metrics.Ascent * size / metrics.UnitsPerEm,
+                -metrics.Descent * size / metrics.UnitsPerEm);
         }
 
         return (line.Baseline, line.Height - line.Baseline);

@@ -1,19 +1,13 @@
 using System;
 using System.Collections.Immutable;
 using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Fonts;
 
-internal readonly record struct CapturedSfntGlyph(
-    ushort GlyphId,
+internal readonly record struct CapturedGlyph(
     double Advance,
-    double TextAdjustmentPoints,
-    int Cluster,
-    int Codepoint);
-
-internal readonly record struct CapturedBuiltInGlyph(
-    double Advance,
-    double TextAdjustmentPoints,
+    double Kerning,
     int Cluster,
     int Codepoint);
 
@@ -23,87 +17,116 @@ internal enum CapturedFontFaceKind
     BuiltIn,
 }
 
+internal readonly record struct CapturedFaceMetrics(
+    double Ascent,
+    double Descent,
+    double UnitsPerEm);
+
 internal readonly record struct CapturedBuiltInFace(
     BuiltInFontFamily Family,
     bool Bold,
     bool Italic,
     BuiltInFaceMetrics Metrics);
 
-internal readonly record struct CapturedFontFace
+internal readonly record struct CapturedFontFace : IPdfFontProgramSource
 {
-    private readonly SfntFont? sfnt;
+    private readonly SfntFont? program;
     private readonly CapturedBuiltInFace builtIn;
 
     private CapturedFontFace(
         CapturedFontFaceKind kind,
-        SfntFont? sfnt,
+        string family,
+        bool bold,
+        bool italic,
+        CapturedFaceMetrics metrics,
+        SfntFont? program,
         CapturedBuiltInFace builtIn)
     {
         Kind = kind;
-        this.sfnt = sfnt;
+        Family = family;
+        Bold = bold;
+        Italic = italic;
+        Metrics = metrics;
+        this.program = program;
         this.builtIn = builtIn;
     }
 
     public CapturedFontFaceKind Kind { get; }
 
-    public SfntFont Sfnt
-        => Kind == CapturedFontFaceKind.Sfnt
-            ? sfnt!
-            : throw new InvalidOperationException("A built-in face has no sfnt font.");
+    public string Family { get; }
+
+    public bool Bold { get; }
+
+    public bool Italic { get; }
+
+    public CapturedFaceMetrics Metrics { get; }
 
     public CapturedBuiltInFace BuiltIn
         => Kind == CapturedFontFaceKind.BuiltIn
             ? builtIn
             : throw new InvalidOperationException("An sfnt face has no built-in descriptor.");
 
+    SfntFont IPdfFontProgramSource.Program
+        => program ?? throw new InvalidOperationException("A built-in face has no sfnt font.");
+
     public static CapturedFontFace FromSfnt(SfntFont face)
-        => new(CapturedFontFaceKind.Sfnt, face, default);
+        => new(
+            CapturedFontFaceKind.Sfnt,
+            face.FamilyName,
+            face.Bold,
+            face.Italic,
+            new CapturedFaceMetrics(face.Ascent, face.Descent, face.UnitsPerEm),
+            face,
+            default);
 
     public static CapturedFontFace FromBuiltIn(CapturedBuiltInFace face)
-        => new(CapturedFontFaceKind.BuiltIn, null, face);
+        => new(
+            CapturedFontFaceKind.BuiltIn,
+            GenericFamily(face.Family),
+            face.Bold,
+            face.Italic,
+            new CapturedFaceMetrics(
+                face.Metrics.Ascender,
+                face.Metrics.Descender,
+                face.Metrics.DesignUnitsPerEm),
+            null,
+            face);
+
+    private static string GenericFamily(BuiltInFontFamily family)
+        => family switch
+        {
+            BuiltInFontFamily.Serif => "serif",
+            BuiltInFontFamily.Monospace => "monospace",
+            BuiltInFontFamily.Symbol => "Symbol",
+            BuiltInFontFamily.ZapfDingbats => "ZapfDingbats",
+            _ => "sans-serif",
+        };
 }
 
 internal readonly record struct CapturedGlyphSpan(
     CapturedFontFace Face,
-    ImmutableArray<CapturedSfntGlyph> SfntGlyphs,
-    ImmutableArray<CapturedBuiltInGlyph> BuiltInGlyphs,
+    ImmutableArray<CapturedGlyph> Glyphs,
     double Advance,
     double XOffset)
 {
-    public bool IsSfnt => Face.Kind == CapturedFontFaceKind.Sfnt;
-
-    public int GlyphCount => IsSfnt ? SfntGlyphs.Length : BuiltInGlyphs.Length;
+    public int GlyphCount => Glyphs.Length;
 
     public int WordSpaceCount
     {
         get
         {
             var count = 0;
-            if (IsSfnt)
+            foreach (var glyph in Glyphs)
             {
-                foreach (var glyph in SfntGlyphs)
+                if (glyph.Codepoint == ' ')
                 {
-                    if (glyph.Codepoint == ' ')
-                    {
-                        count++;
-                    }
-                }
-            }
-            else
-            {
-                foreach (var glyph in BuiltInGlyphs)
-                {
-                    if (glyph.Codepoint == ' ')
-                    {
-                        count++;
-                    }
+                    count++;
                 }
             }
 
             return count;
         }
     }
-
 }
 
 internal readonly record struct CapturedGlyphRun(

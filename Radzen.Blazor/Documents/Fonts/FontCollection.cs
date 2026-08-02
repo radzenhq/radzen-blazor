@@ -486,7 +486,7 @@ public sealed class FontCollection
     {
         var positioned = configuration.Shaper.Shape(text, font, out var totalAdvance);
         var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
-        var glyphs = new List<CapturedSfntGlyph>();
+        var glyphs = new List<CapturedGlyph>();
         SfntFont? face = null;
         var spanOffset = 0.0;
 
@@ -498,7 +498,6 @@ public sealed class FontCollection
                 spans.Add(new CapturedGlyphSpan(
                     CapturedFontFace.FromSfnt(face),
                     ImmutableArray.CreateRange(glyphs),
-                    [],
                     advance,
                     spanOffset));
                 spanOffset += advance;
@@ -509,10 +508,9 @@ public sealed class FontCollection
             var codepoint = CodePointAt(text, positionedGlyph.Cluster);
             var trailing = SimpleShaper.TrailingKerning(
                 face, positionedGlyph.GlyphId, positionedGlyph.Advance, font.Size);
-            glyphs.Add(new CapturedSfntGlyph(
-                positionedGlyph.GlyphId,
+            glyphs.Add(new CapturedGlyph(
                 positionedGlyph.Advance,
-                -trailing,
+                trailing,
                 positionedGlyph.Cluster,
                 codepoint));
         }
@@ -523,7 +521,6 @@ public sealed class FontCollection
             spans.Add(new CapturedGlyphSpan(
                 CapturedFontFace.FromSfnt(face),
                 ImmutableArray.CreateRange(glyphs),
-                [],
                 advance,
                 spanOffset));
         }
@@ -541,9 +538,10 @@ public sealed class FontCollection
             ?? throw new InvalidOperationException($"No font is registered for family '{font.Family}'.");
 
         var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
-        var builtInGlyphs = new List<CapturedBuiltInGlyph>();
-        var sfntGlyphs = new List<CapturedSfntGlyph>();
+        var builtInGlyphs = new List<CapturedGlyph>();
+        var sfntGlyphs = new List<CapturedGlyph>();
         SfntFont? fallbackFace = null;
+        ushort previousFallbackGlyph = 0;
         var builtInDesignAdvance = 0.0;
         var builtInKernAdvance = 0.0;
         var sfntAdvance = 0.0;
@@ -560,7 +558,6 @@ public sealed class FontCollection
             var advance = FontMetric.ScaleAfm(builtInDesignAdvance, fontSize) + builtInKernAdvance;
             spans.Add(new CapturedGlyphSpan(
                 CapturedFontFace.FromBuiltIn(metrics.Face()),
-                [],
                 ImmutableArray.CreateRange(builtInGlyphs),
                 advance,
                 totalAdvance));
@@ -580,12 +577,12 @@ public sealed class FontCollection
             spans.Add(new CapturedGlyphSpan(
                 CapturedFontFace.FromSfnt(fallbackFace),
                 ImmutableArray.CreateRange(sfntGlyphs),
-                [],
                 sfntAdvance,
                 totalAdvance));
             totalAdvance += sfntAdvance;
             sfntGlyphs.Clear();
             fallbackFace = null;
+            previousFallbackGlyph = 0;
             sfntAdvance = 0;
         }
 
@@ -607,21 +604,21 @@ public sealed class FontCollection
                 {
                     var previous = sfntGlyphs[^1];
                     var kern = SimpleShaper.PairKerning(
-                        face!, previous.GlyphId, glyph, previous.Codepoint, codepoint, font.Size);
+                        face!, previousFallbackGlyph, glyph, previous.Codepoint, codepoint, font.Size);
                     sfntAdvance += kern;
                     sfntGlyphs[^1] = previous with
                     {
                         Advance = previous.Advance + kern,
-                        TextAdjustmentPoints = -kern,
+                        Kerning = kern,
                     };
                 }
 
-                sfntGlyphs.Add(new CapturedSfntGlyph(
-                    glyph,
+                sfntGlyphs.Add(new CapturedGlyph(
                     face!.AdvanceInUserSpace(glyph, font.Size),
                     0,
                     i,
                     codepoint));
+                previousFallbackGlyph = glyph;
                 sfntAdvance += face.AdvanceInUserSpace(glyph, font.Size);
             }
             else if (kind == BuiltInGlyphKind.BuiltIn)
@@ -637,11 +634,11 @@ public sealed class FontCollection
                     builtInGlyphs[^1] = previous with
                     {
                         Advance = previous.Advance + FontMetric.ScaleAfm(kern, font.Size),
-                        TextAdjustmentPoints = -FontMetric.ScaleAfm(kern, font.Size),
+                        Kerning = FontMetric.ScaleAfm(kern, font.Size),
                     };
                 }
 
-                builtInGlyphs.Add(new CapturedBuiltInGlyph(
+                builtInGlyphs.Add(new CapturedGlyph(
                     FontMetric.ScaleAfm(width, font.Size),
                     0,
                     i,
@@ -661,7 +658,7 @@ public sealed class FontCollection
         return new CapturedGlyphRun(text, spans.ToImmutable(), totalAdvance);
     }
 
-    private static double SumAdvance(List<CapturedSfntGlyph> glyphs)
+    private static double SumAdvance(List<CapturedGlyph> glyphs)
     {
         var advance = 0.0;
         foreach (var glyph in glyphs)

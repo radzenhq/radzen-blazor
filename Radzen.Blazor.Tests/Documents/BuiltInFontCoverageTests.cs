@@ -86,7 +86,7 @@ public class BuiltInFontCoverageTests
         var laidOut = DocumentLayouter.Layout(document);
         var glyph = Assert.Single(
             Assert.Single(laidOut.Pages[0].Body.Lines[0].Line.Fragments[0].GlyphRun.Spans)
-                .BuiltInGlyphs);
+                .Glyphs);
 
         Assert.Equal(0xFB01, glyph.Codepoint);
     }

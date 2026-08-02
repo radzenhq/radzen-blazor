@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -23,25 +24,26 @@ internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry)
 {
     public SfntGlyphRun Build(in CapturedGlyphSpan span, double emSize)
     {
-        if (!span.IsSfnt)
+        if (span.Face.Kind != CapturedFontFaceKind.Sfnt)
         {
             throw new InvalidOperationException("An sfnt run requires a captured sfnt face.");
         }
 
-        var face = span.Face.Sfnt;
+        var face = PdfFontProgram.Of(span.Face);
         var generated = fontRegistry.ResolveSfnt(face);
-        var glyphs = span.SfntGlyphs;
+        var glyphs = span.Glyphs;
         var bytes = new byte[glyphs.Length * 2];
         var kerns = glyphs.Length > 1 ? new double[glyphs.Length - 1] : [];
         for (var i = 0; i < glyphs.Length; i++)
         {
             var glyph = glyphs[i];
-            generated.GidToUnicode.TryAdd(glyph.GlyphId, glyph.Codepoint);
-            bytes[i * 2] = (byte)(glyph.GlyphId >> 8);
-            bytes[i * 2 + 1] = (byte)(glyph.GlyphId & 0xFF);
+            var glyphId = face.GetGlyphId(glyph.Codepoint);
+            generated.GidToUnicode.TryAdd(glyphId, glyph.Codepoint);
+            bytes[i * 2] = (byte)(glyphId >> 8);
+            bytes[i * 2 + 1] = (byte)(glyphId & 0xFF);
             if (i < kerns.Length)
             {
-                kerns[i] = PdfTextAdjustment(glyph.TextAdjustmentPoints, emSize);
+                kerns[i] = PdfTextAdjustment(glyph.Kerning, emSize);
             }
         }
 
@@ -68,6 +70,6 @@ internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry)
         return false;
     }
 
-    internal static double PdfTextAdjustment(double adjustmentPoints, double emSize)
-        => emSize == 0 ? 0 : FontMetric.Scale(adjustmentPoints, 1000, emSize);
+    internal static double PdfTextAdjustment(double kerningPoints, double emSize)
+        => emSize == 0 ? 0 : FontMetric.Scale(-kerningPoints, 1000, emSize);
 }
