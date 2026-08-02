@@ -124,12 +124,18 @@ internal sealed class OutputImage(
     public OutputImagePayload? SoftMask { get; } = softMask;
 }
 
+internal readonly record struct OutputWidgetTextSpan(OutputFont Font, byte[] Bytes, double XOffset);
+
 internal readonly record struct OutputWidget(
     double X,
     double Bottom,
     FormFieldPaint Field,
     Radzen.Documents.Fonts.FontPaint Font,
-    int? StructureElementId);
+    int? StructureElementId,
+    ImmutableArray<OutputWidgetTextSpan> Appearance = default)
+{
+    public bool HasEmbeddedAppearance => !Appearance.IsDefaultOrEmpty;
+}
 
 internal readonly record struct OutputLink(
     double X1,

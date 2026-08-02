@@ -79,6 +79,8 @@ internal readonly struct ImageDraw
     public PaintStack? Stack { get; init; }
 }
 
+internal readonly record struct EmittedWidgetSpan(EmittedFont Font, byte[] Bytes, double XOffset);
+
 internal readonly struct WidgetDraw
 {
     public required double X { get; init; }
@@ -87,6 +89,7 @@ internal readonly struct WidgetDraw
     public required Radzen.Documents.Fonts.FontPaint Font { get; init; }
     public StructureElement? Element { get; init; }
     public int Sequence { get; init; }
+    public System.Collections.Immutable.ImmutableArray<EmittedWidgetSpan> Appearance { get; init; }
 }
 
 internal readonly struct FillDraw

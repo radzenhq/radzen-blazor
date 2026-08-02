@@ -1,4 +1,5 @@
 using Radzen.Documents.Pdf.Objects;
+using Radzen.Documents.Pdf.Output;
 using System.Collections.Generic;
 using Radzen.Documents.Fonts;
 
@@ -13,11 +14,19 @@ internal sealed class FormWriter
     private readonly LoadedFormImporter loadedFormImporter;
     private readonly List<(GraphImporter Importer, DictionaryObject Form)> appendedFormDefaults = [];
     private readonly SortedSet<string> authoredFonts = new(System.StringComparer.Ordinal);
+    private readonly SortedDictionary<string, DocumentObject> embeddedFonts = new(System.StringComparer.Ordinal);
+    private readonly DocumentWriter? objects;
+    private readonly Dictionary<OutputFont, DocumentObject>? fontReferences;
     private bool regenerateAppearances;
 
-    public FormWriter(PortableDocument document)
+    public FormWriter(
+        PortableDocument document,
+        DocumentWriter? objects = null,
+        Dictionary<OutputFont, DocumentObject>? fontReferences = null)
     {
         this.document = document;
+        this.objects = objects;
+        this.fontReferences = fontReferences;
         flattener = new FormFlatteningWriter(document);
         createdFieldWriter = new CreatedFieldWriter(document, this);
         appendedFormImporter = new AppendedFormImporter(document, this);
@@ -68,6 +77,37 @@ internal sealed class FormWriter
     public StreamObject BuildAuthoredText(string value, double width, double height, Font font)
         => FieldAppearances.BuildText(value, width, height, font, scope: default);
 
+    public StreamObject BuildEmptyAppearance(double width, double height)
+        => FieldAppearances.BuildEmbeddedText([], new DictionaryObject(), width, height, FieldAppearances.DefaultFontSize);
+
+    public (StreamObject Appearance, string DefaultAppearance)? EmbeddedText(in OutputWidget widget)
+    {
+        if (!widget.HasEmbeddedAppearance || objects is null || fontReferences is null)
+        {
+            return null;
+        }
+
+        var fonts = new DictionaryObject();
+        var spans = new List<(string Key, byte[] Bytes, double XOffset)>(widget.Appearance.Length);
+        foreach (var span in widget.Appearance)
+        {
+            if (!span.Font.IsEmbedded)
+            {
+                return null;
+            }
+
+            var reference = PageResourceBuilder.ResolveFont(objects, span.Font, fontReferences);
+            fonts[span.Font.Key] = reference;
+            embeddedFonts[span.Font.Key] = reference;
+            spans.Add((span.Font.Key, span.Bytes, span.XOffset));
+        }
+
+        var size = widget.Font.Size > 0.0 ? widget.Font.Size : FieldAppearances.DefaultFontSize;
+        return (
+            FieldAppearances.BuildEmbeddedText(spans, fonts, widget.Field.Width, widget.Field.Height, size),
+            DefaultAppearanceGrammar.Write(widget.Appearance[0].Font.Key, size, "0 g"));
+    }
+
     public string RegisterAuthoredFont(Font font)
     {
         var baseFont = Fonts.FontResolution.ResolveBase14Name(font, scope: default);
@@ -97,7 +137,7 @@ internal sealed class FormWriter
 
     public void ApplyCreatedDefaults(DictionaryObject form)
     {
-        if (document.FormFields.Count == 0 && authoredFonts.Count == 0)
+        if (document.FormFields.Count == 0 && authoredFonts.Count == 0 && embeddedFonts.Count == 0)
         {
             return;
         }
@@ -107,14 +147,28 @@ internal sealed class FormWriter
             form["NeedAppearances"] = new BooleanObject(true);
         }
 
+        var standardFaces = document.FormFields.Count > 0 || authoredFonts.Count > 0 || embeddedFonts.Count == 0;
+
         if (!form.ContainsKey("DA"))
         {
-            form["DA"] = new StringObject("/Helv 0 Tf 0 g");
+            form["DA"] = new StringObject(standardFaces
+                ? "/Helv 0 Tf 0 g"
+                : DefaultAppearanceGrammar.Write(FirstEmbeddedFont(), 0.0, "0 g"));
         }
 
         if (!form.ContainsKey("DR"))
         {
-            var fonts = new DictionaryObject { ["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica") };
+            var fonts = new DictionaryObject();
+            if (standardFaces)
+            {
+                fonts["Helv"] = PageResourceBuilder.Base14FontDictionary("Helvetica");
+            }
+
+            foreach (var embedded in embeddedFonts)
+            {
+                fonts[embedded.Key] = embedded.Value;
+            }
+
             foreach (var baseFont in authoredFonts)
             {
                 if (!fonts.ContainsKey(baseFont))
@@ -146,6 +200,16 @@ internal sealed class FormWriter
                 break;
             }
         }
+    }
+
+    private string FirstEmbeddedFont()
+    {
+        foreach (var embedded in embeddedFonts)
+        {
+            return embedded.Key;
+        }
+
+        return "Helv";
     }
 
     private static (string Value, Font Font)? TextAppearance(FormFieldDefinition definition)

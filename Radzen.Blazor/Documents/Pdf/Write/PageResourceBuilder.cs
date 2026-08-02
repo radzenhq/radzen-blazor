@@ -125,7 +125,7 @@ internal static class PageResourceBuilder
         return dictionary;
     }
 
-    private static DocumentObject ResolveFont(
+    internal static DocumentObject ResolveFont(
         DocumentWriter writer,
         OutputFont font,
         Dictionary<OutputFont, DocumentObject> cache)

@@ -12,7 +12,8 @@ internal sealed class TextLineRecorder(
     FontRegistry fontRegistry,
     ImageRegistry imageRegistry,
     StructureTreeBuilder structureTree,
-    bool allowUnsupportedCharacters)
+    bool allowUnsupportedCharacters,
+    bool embedFieldAppearances = false)
 {
     private readonly GlyphSpanRecorder spans = new(fontRegistry, allowUnsupportedCharacters);
 
@@ -107,6 +108,7 @@ internal sealed class TextLineRecorder(
                     Field = field,
                     Font = run.Paint.Font,
                     Element = captured,
+                    Appearance = FieldAppearance(plan, field, run.Paint.Font),
                 });
                 continue;
             }
@@ -128,6 +130,29 @@ internal sealed class TextLineRecorder(
         var decorationArtifact = SemanticArtifacts.ForDecoration(artifact);
         EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: true);
         EmitDecorations(plan, line, originX, y, opacity, decorationArtifact, underline: false);
+    }
+
+    // ISO 19005-2 6.2.11.4.1: every font used to render text shall be embedded, and a widget appearance
+    // stream renders the field value.
+    private ImmutableArray<EmittedWidgetSpan> FieldAppearance(
+        PagePlan plan,
+        in FormFieldPaint field,
+        in FontPaint font)
+    {
+        if (!embedFieldAppearances || field.ValueGlyphs.Spans.IsDefaultOrEmpty)
+        {
+            return default;
+        }
+
+        var built = ImmutableArray.CreateBuilder<EmittedWidgetSpan>(field.ValueGlyphs.Spans.Length);
+        foreach (var span in field.ValueGlyphs.Spans)
+        {
+            var emitted = spans.Emit(span, font.Size);
+            plan.Resources.UsedFonts.Add(emitted.Font);
+            built.Add(new EmittedWidgetSpan(emitted.Font, emitted.Bytes, span.XOffset));
+        }
+
+        return built.MoveToImmutable();
     }
 
     private static IEnumerable<(int First, double Start, double End)> Spans(

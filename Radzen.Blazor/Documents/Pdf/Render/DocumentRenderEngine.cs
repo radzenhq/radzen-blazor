@@ -35,7 +35,8 @@ internal sealed class DocumentRenderEngine
             fontRegistry,
             imageRegistry,
             structureTree,
-            request.AllowUnsupportedCharacters);
+            request.AllowUnsupportedCharacters,
+            request.Conformance != PdfAConformance.None || request.Accessibility != PdfUaConformance.None);
         codeSymbolRecorder = new(structureTree);
         imageRecorder = new(imageRegistry, structureTree);
         watermarkRecorder = new(

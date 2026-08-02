@@ -7,6 +7,7 @@ namespace Radzen.Documents.Pdf.Write;
 internal sealed class FormFlatteningWriter(PortableDocument document)
 {
     private readonly HashSet<Page> ownedResources = [];
+    private readonly HashSet<string> paintedAuthoredFields = new(StringComparer.Ordinal);
 
     private LoadedState? Loaded => document.Loaded;
 
@@ -31,6 +32,7 @@ internal sealed class FormFlatteningWriter(PortableDocument document)
     {
         foreach (var (pageIndex, _, widget) in AuthoredFields.Placed(document, PageOutputMap.Build(document.Pages)))
         {
+            paintedAuthoredFields.Add(widget.Field.Name);
             PaintAuthoredField(document.Pages[pageIndex], widget);
         }
 
@@ -45,6 +47,16 @@ internal sealed class FormFlatteningWriter(PortableDocument document)
             case LaidOut.FormFieldKind.Text or LaidOut.FormFieldKind.DropDown:
                 if (field.Value.Length == 0)
                 {
+                    return;
+                }
+
+                if (widget.HasEmbeddedAppearance)
+                {
+                    foreach (var content in FieldAppearances.EmbeddedText(widget))
+                    {
+                        page.Content.Add(content);
+                    }
+
                     return;
                 }
 
@@ -194,7 +206,7 @@ internal sealed class FormFlatteningWriter(PortableDocument document)
             return;
         }
 
-        if (Inherited(widget, "FT") is not NameObject type)
+        if (Inherited(widget, "FT") is not NameObject type || paintedAuthoredFields.Contains(FieldName(widget)))
         {
             return;
         }
