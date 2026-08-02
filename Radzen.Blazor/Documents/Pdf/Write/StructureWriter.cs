@@ -15,7 +15,8 @@ internal static class StructureWriter
         List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes,
         PageOutputMap pageMap,
         IReadOnlyList<KeyValuePair<string, string>> roleMap,
-        IReadOnlyList<AnnotationElementJoin> annotationJoins)
+        IReadOnlyList<AnnotationElementJoin> annotationJoins,
+        IReadOnlyList<WidgetElementJoin> widgetJoins)
     {
         var root = new DictionaryObject { ["Type"] = new NameObject("StructTreeRoot") };
         var rootRef = writer.Add(root);
@@ -44,6 +45,12 @@ internal static class StructureWriter
             joins.Add(join);
         }
 
+        var widgetsByPosition = new Dictionary<(int Page, int Widget), WidgetElementJoin>();
+        foreach (var join in widgetJoins)
+        {
+            widgetsByPosition.Add((join.PageIndex, join.WidgetIndex), join);
+        }
+
         var annotationKey = pageNodes.Count;
         root["K"] = WriteStructureElement(
             writer,
@@ -53,6 +60,7 @@ internal static class StructureWriter
             pageMap,
             parents,
             joinsByElement,
+            widgetsByPosition,
             ref annotationKey);
 
         var keys = new List<int>(parents.Keys);
@@ -133,6 +141,7 @@ internal static class StructureWriter
         PageOutputMap pageMap,
         Dictionary<int, List<DocumentObject>> parents,
         IReadOnlyDictionary<int, List<AnnotationElementJoin>> joinsByElement,
+        IReadOnlyDictionary<(int Page, int Widget), WidgetElementJoin> widgetsByPosition,
         ref int annotationKey)
     {
         var dictionary = new DictionaryObject
@@ -193,11 +202,32 @@ internal static class StructureWriter
                     pageMap,
                     parents,
                     joinsByElement,
+                    widgetsByPosition,
                     ref annotationKey));
                 continue;
             }
 
             var kidPage = pageMap.IndexOf(kid.Page!, Feature);
+            if (kid.Annotation is { } widgetIndex)
+            {
+                if (!widgetsByPosition.TryGetValue((kidPage, widgetIndex), out var widget))
+                {
+                    continue;
+                }
+
+                kids.Add(new DictionaryObject
+                {
+                    ["Type"] = new NameObject("OBJR"),
+                    ["Pg"] = pageNodes[kidPage].Reference,
+                    ["Obj"] = widget.Reference,
+                });
+
+                widget.Annotation["StructParent"] = new NumberObject(annotationKey);
+                parents[annotationKey] = [reference];
+                annotationKey++;
+                continue;
+            }
+
             if (kidPage == firstPage)
             {
                 kids.Add(new NumberObject(kid.Mcid));

@@ -322,6 +322,20 @@ internal sealed class SemanticSnapshotBuilder
             capture.Associate(paragraph, element);
             foreach (var inline in paragraph.Inlines)
             {
+                if (inline is FormInput input)
+                {
+                    capture.Associate(
+                        input,
+                        capture.AddChild(
+                            element,
+                            SemanticIntent.Form,
+                            role: input.Role,
+                            roleIsDeclared: input.Role is not null,
+                            language: input.Language,
+                            alternateText: string.IsNullOrEmpty(input.Label) ? null : input.Label));
+                    continue;
+                }
+
                 var linked = IsLink(inline);
                 if (inline is InlineImage image)
                 {

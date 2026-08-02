@@ -56,9 +56,12 @@ internal static partial class LineLayouter
         for (var index = 0; index < fragments.Length; index++)
         {
             var paint = fragments[index].Paint;
-            var (height, ascent) = paint.InlineImage is { } image
-                ? (image.Height, image.Height)
-                : FontExtent(paint.Font, fonts);
+            var (height, ascent) = paint switch
+            {
+                { InlineImage: { } image } => (image.Height, image.Height),
+                { FormField: { } field } => (field.Height, field.Ascent),
+                _ => FontExtent(paint.Font, fonts),
+            };
             if (paint.IsScript)
             {
                 (height, ascent) = ScriptExtent(paint, height, ascent);

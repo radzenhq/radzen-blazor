@@ -110,7 +110,7 @@ public class PublicSurfaceWartTests
     }
 
     [Fact]
-    public void TheOnlyInlineKindsAreTextRunsPageFieldsAndImages()
+    public void TheOnlyInlineKindsAreTextRunsPageFieldsImagesAndFormInputs()
     {
         var kinds = typeof(Inline).Assembly.GetTypes()
             .Where(type => type.IsSubclassOf(typeof(Inline)) && !type.IsAbstract)
@@ -118,7 +118,12 @@ public class PublicSurfaceWartTests
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
-        Assert.Equal(["InlineImage", "PageCountField", "PageNumberField", "Run"], kinds);
+        Assert.Equal(
+            [
+                "CheckBox", "DropDown", "InlineImage", "PageCountField", "PageNumberField",
+                "RadioButton", "Run", "TextInput",
+            ],
+            kinds);
     }
 
     [Fact]

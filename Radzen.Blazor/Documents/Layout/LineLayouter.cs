@@ -150,7 +150,7 @@ internal static partial class LineLayouter
         for (var p = word.PieceStart; p < word.PieceStart + word.PieceCount; p++)
         {
             var piece = pieces[p];
-            if (piece.Run is InlineImage || piece.Text.Length == 0 || piece.Text.Contains('\u00A0', StringComparison.Ordinal))
+            if (piece.Run is InlineImage or FormInput || piece.Text.Length == 0 || piece.Text.Contains('\u00A0', StringComparison.Ordinal))
             {
                 return false;
             }
@@ -551,7 +551,7 @@ internal static partial class LineLayouter
         {
             var current = fragments[i];
             var paint = current.Paint;
-            if (paint.InlineImage is not null)
+            if (paint.InlineImage is not null || paint.FormField is not null)
             {
                 runs.Add(new ShapedTextRun
                 {

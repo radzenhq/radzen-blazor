@@ -66,7 +66,6 @@ internal static class LineTokenizer
         {
             if (inline is not TextInline run)
             {
-                var inlineImage = (InlineImage)inline;
                 if (hasCurrent)
                 {
                     if (current.GapAfter == 0 && current.TabsAfter == 0)
@@ -78,7 +77,9 @@ internal static class LineTokenizer
                     hasCurrent = false;
                 }
 
-                var advance = capture.Probes.Measure(inlineImage).Width;
+                var advance = inline is FormInput input
+                    ? FormInputMetrics.Measure(input, paragraphFont.EffectiveSize.Point).Width
+                    : capture.Probes.Measure((InlineImage)inline).Width;
                 words.Add(new LineWord
                 {
                     PieceStart = pieces.Count,
@@ -88,7 +89,7 @@ internal static class LineTokenizer
                 });
                 pieces.Add(new LinePiece
                 {
-                    Run = inlineImage,
+                    Run = inline,
                     Font = paragraphFont,
                     Start = 0,
                     Length = 0,

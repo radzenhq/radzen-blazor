@@ -50,7 +50,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
                 kids.Add(new StructureKidSnapshot(
                     kid.Child is { } child ? Capture(child) : null,
                     kid.Child is null ? pages[kid.PageIndex] : null,
-                    kid.Mcid));
+                    kid.Mcid,
+                    kid.Annotation));
             }
 
             var snapshot = new StructureElementSnapshot(
@@ -202,6 +203,8 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             SemanticIntent.NavigationEntry => "TOCI",
             SemanticIntent.CrossReference => "Reference",
             SemanticIntent.Link => "Link",
+            // ISO 14289-1 7.18.5: a form field shall be contained in a Form structure element.
+            SemanticIntent.Form => "Form",
             SemanticIntent.Span => "Span",
             SemanticIntent.Caption => "Caption",
             SemanticIntent.TableHeaderGroup => "THead",
@@ -234,10 +237,14 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             return marks;
         }
 
-        for (var mcid = 0; mcid < draws.Count; mcid++)
+        var mcid = 0;
+        foreach (var draw in draws)
         {
-            var draw = draws[mcid];
-            marks.Add(draw.Sequence, new TaggedMark(draw.Element, mcid));
+            if (draw.Annotation is null)
+            {
+                marks.Add(draw.Sequence, new TaggedMark(draw.Element, mcid));
+                mcid++;
+            }
         }
 
         // ISO 32000-1 14.7.4.4: structure kids may reference MCIDs in reading order
@@ -401,15 +408,21 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     {
         for (var i = start; i < end; i++)
         {
-            AddMark(element, pageIndex, marks[draws[i].Sequence].Mcid);
+            AddMark(element, pageIndex, draws[i], marks);
         }
     }
 
-    private void AddMark(StructureElement element, int pageIndex, int mcid)
+    private void AddMark(
+        StructureElement element,
+        int pageIndex,
+        in TaggedDraw draw,
+        Dictionary<int, TaggedMark> marks)
     {
         var kids = orderedKids[element];
         var cursor = kidCursors[element];
-        kids.Insert(cursor, new PlannedStructureKid { PageIndex = pageIndex, Mcid = mcid });
+        kids.Insert(cursor, draw.Annotation is { } annotation
+            ? new PlannedStructureKid { PageIndex = pageIndex, Annotation = annotation }
+            : new PlannedStructureKid { PageIndex = pageIndex, Mcid = marks[draw.Sequence].Mcid });
         kidCursors[element] = cursor + 1;
     }
 
@@ -449,6 +462,8 @@ internal readonly struct PlannedStructureKid
     public int PageIndex { get; init; }
 
     public int Mcid { get; init; }
+
+    public int? Annotation { get; init; }
 }
 
 internal readonly struct TaggedDraw
@@ -457,6 +472,7 @@ internal readonly struct TaggedDraw
 
     public required StructureElement Element { get; init; }
 
+    public int? Annotation { get; init; }
 }
 
 internal readonly record struct TaggedMark(StructureElement Element, int Mcid);

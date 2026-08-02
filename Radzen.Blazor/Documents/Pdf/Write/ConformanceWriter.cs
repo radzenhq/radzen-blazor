@@ -74,6 +74,8 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
                 "Caller-edited XMP cannot be combined with PDF/A or PDF/UA output because conformance metadata has mandatory values. Clear the XMP edits or disable conformance.");
         }
 
+        ValidateAnnotationStructure();
+
         if (document.Conformance == PdfAConformance.None)
         {
             return;
@@ -105,6 +107,68 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
             }
         }
     }
+
+    // ISO 32000-1 14.7.4.3 and ISO 14289-1 7.18: every annotation that is real content shall be
+    // reachable from the structure tree, and ISO 14289-1 7.18.5 requires a form field to sit in a
+    // Form structure element. Only layout places an annotation into the tagged reading order, so
+    // anything added to the document afterwards has no structure and would make the claim false.
+    private void ValidateAnnotationStructure()
+    {
+        if (!document.IsPdfUa && !IsLevelA(document.Conformance))
+        {
+            return;
+        }
+
+        if (document.FormFields.Count > 0)
+        {
+            throw new InvalidOperationException(Unstructured(
+                $"the form field '{document.FormFields[0].Name}' was added to PortableDocument.FormFields",
+                "author the field in the document instead - add a TextInput, CheckBox, RadioButton or "
+                + "DropDown to a paragraph's Inlines, so layout places it and tags it"));
+        }
+
+        foreach (var page in document.Pages)
+        {
+            if (page.Annotations.Count > 0)
+            {
+                throw new InvalidOperationException(Unstructured(
+                    "an annotation was added to Page.Annotations",
+                    "remove the annotation, or express it as document content the renderer can tag - "
+                    + "a hyperlink through Inline.Link, a form field through a TextInput, CheckBox, "
+                    + "RadioButton or DropDown inline"));
+            }
+
+            foreach (var entry in page.Annotations.Entries)
+            {
+                if (entry.Dictionary is { } dictionary
+                    && string.Equals(entry.Reader!.GetName(dictionary, "Subtype"), "Widget", StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException(Unstructured(
+                        "a widget annotation came in with a loaded page",
+                        "flatten the form with PortableDocument.Flatten, or save without a conformance claim"));
+                }
+            }
+        }
+
+        foreach (var generated in PlannedPages())
+        {
+            foreach (var widget in generated.Widgets)
+            {
+                if (widget.StructureElementId is null)
+                {
+                    throw new InvalidOperationException(Unstructured(
+                        $"the form field '{widget.Field.Name}' was placed outside the tagged content "
+                        + "(page headers, footers and watermarks are artifacts and carry no structure)",
+                        "move the field into the document body"));
+                }
+            }
+        }
+    }
+
+    private string Unstructured(string what, string remedy)
+        => $"{Label} requires every annotation to be referenced from the structure tree, but {what} "
+            + $"and carries no structure association; {remedy}, or save without a conformance claim "
+            + "(PdfAConformance.None and PdfUaConformance.None).";
 
     // Font embedding: ISO 19005-2 6.2.11.4.1. DeviceCMYK against sRGB intent: 6.2.4.3.
     private void ValidateInspectable()

@@ -171,6 +171,12 @@ internal sealed record LinkAnnotationEmission(
     ArrayObject Annotations,
     IReadOnlyList<AnnotationElementJoin> StructureJoins);
 
+internal readonly record struct WidgetElementJoin(
+    int PageIndex,
+    int WidgetIndex,
+    DictionaryObject Annotation,
+    ReferenceObject Reference);
+
 internal readonly record struct AnnotationElementJoin(
     int StructureElementId,
     int PageIndex,

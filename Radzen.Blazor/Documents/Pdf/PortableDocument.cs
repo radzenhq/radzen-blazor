@@ -405,6 +405,8 @@ public sealed class PortableDocument
 
     internal DocumentOutput? Output { get; set; }
 
+    internal bool AuthoredFieldsFlattened { get; set; }
+
     /// <summary>
     /// Gets the map of non-standard structure roles to standard ISO 32000-1 structure types
     /// written as <c>/StructTreeRoot /RoleMap</c>. It is captured from

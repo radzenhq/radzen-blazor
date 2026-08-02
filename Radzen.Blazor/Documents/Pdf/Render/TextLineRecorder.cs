@@ -97,6 +97,20 @@ internal sealed class TextLineRecorder(
                 continue;
             }
 
+            if (run.Paint.FormField is { } field)
+            {
+                plan.Widgets.Add(new WidgetDraw
+                {
+                    Sequence = plan.NextSequence(),
+                    X = originX + run.XOffset,
+                    Bottom = y - (field.Height - field.Ascent),
+                    Field = field,
+                    Font = run.Paint.Font,
+                    Element = captured,
+                });
+                continue;
+            }
+
             fragElement = captured ?? fragElement;
 
             var extGState = alpha < 1 ? plan.Resources.RegisterExtGState(alpha, alpha) : null;

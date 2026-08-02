@@ -97,6 +97,21 @@ internal sealed class PageWriter(
             }
         }
 
+        // ISO 32000-1 14.7.4.3: a widget annotation joins the structure tree in its reading-order
+        // position through an object reference rather than through marked content of its own.
+        for (var widget = 0; widget < plan.Widgets.Count; widget++)
+        {
+            if (plan.Widgets[widget].Element is { } element)
+            {
+                tagged.Add(new TaggedDraw
+                {
+                    Sequence = plan.Widgets[widget].Sequence,
+                    Element = element,
+                    Annotation = widget,
+                });
+            }
+        }
+
         taggedMarks = structureTree.PlanTaggedContent(pageIndex, [.. tagged]);
     }
 
@@ -329,13 +344,25 @@ internal sealed class PageWriter(
             fonts.Add(plannedFonts[font].Output);
         }
 
+        var widgets = ImmutableArray.CreateBuilder<OutputWidget>(plan.Widgets.Count);
+        foreach (var widget in plan.Widgets)
+        {
+            widgets.Add(new OutputWidget(
+                widget.X,
+                widget.Bottom,
+                widget.Field,
+                widget.Font,
+                widget.Element?.Id));
+        }
+
         return new PageOutput(
             writer.ToArray(),
             fonts.MoveToImmutable(),
             [.. plan.Resources.UsedImages],
             [.. plan.Links],
             [.. plan.Resources.ExtGStates],
-            [.. plan.Resources.Patterns]);
+            [.. plan.Resources.Patterns],
+            widgets.MoveToImmutable());
     }
 
     private void WriteWatermark(ContentWriter writer, WatermarkDraw watermark)
