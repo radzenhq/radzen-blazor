@@ -17,10 +17,7 @@ public sealed class StyleCollection : IReadOnlyCollection<Style>
 
     private readonly Dictionary<string, Style> styles = new(StringComparer.Ordinal);
 
-    /// <summary>
-    /// Initializes a new <see cref="StyleCollection"/> containing only the built-in <see cref="Normal"/> style.
-    /// </summary>
-    public StyleCollection()
+    internal StyleCollection()
     {
         Normal = new Style(NormalName, null);
         styles.Add(NormalName, Normal);

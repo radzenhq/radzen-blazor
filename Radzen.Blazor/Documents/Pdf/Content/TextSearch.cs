@@ -44,19 +44,12 @@ public readonly struct TextQuadrilateral(TextPoint lowerLeft, TextPoint lowerRig
     public PdfRect Bounds => TextSearch.GetBounds([LowerLeft, LowerRight, UpperRight, UpperLeft]);
 }
 
-/// <summary>Identifies characters within a text-show operator in the page content stream.</summary>
-/// <param name="operatorIndex">The zero-based ordinal of the text-show operator.</param>
-/// <param name="characterOffset">The UTF-16 offset in the operator's decoded text.</param>
-/// <param name="characterLength">The UTF-16 length in the operator's decoded text.</param>
-public readonly struct TextSourceReference(int operatorIndex, int characterOffset, int characterLength)
+internal readonly struct TextSourceReference(int operatorIndex, int characterOffset, int characterLength)
 {
-    /// <summary>Gets the zero-based ordinal of the text-show operator.</summary>
     public int OperatorIndex { get; } = operatorIndex;
 
-    /// <summary>Gets the UTF-16 offset in the operator's decoded text.</summary>
     public int CharacterOffset { get; } = characterOffset;
 
-    /// <summary>Gets the UTF-16 length in the operator's decoded text.</summary>
     public int CharacterLength { get; } = characterLength;
 }
 
@@ -82,8 +75,7 @@ public sealed class PositionedTextRun
     /// <summary>Gets the decoded text.</summary>
     public string Text { get; }
 
-    /// <summary>Gets the zero-based ordinal of the source text-show operator.</summary>
-    public int OperatorIndex { get; }
+    internal int OperatorIndex { get; }
 
     /// <summary>Gets the transformed em-box quadrilateral.</summary>
     public TextQuadrilateral Quadrilateral { get; }
@@ -156,8 +148,7 @@ public sealed class TextHit
     /// <summary>Gets the axis-aligned bounds enclosing all match quadrilaterals.</summary>
     public PdfRect Bounds { get; }
 
-    /// <summary>Gets the source text-show operator references covered by the match.</summary>
-    public IReadOnlyList<TextSourceReference> Sources { get; }
+    internal IReadOnlyList<TextSourceReference> Sources { get; }
 
     /// <summary>
     /// Gets whether <see cref="Quadrilaterals"/> and <see cref="Bounds"/> rest on an estimated

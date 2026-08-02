@@ -51,8 +51,7 @@ public sealed class TextContent(string text, Unit x, Unit y) : ContentElement
         set => Set(ref color, value);
     }
 
-    /// <inheritdoc/>
-    public override bool IsModified => base.IsModified || Font.IsModified;
+    internal override bool IsModified => base.IsModified || Font.IsModified;
 
     internal override void AcceptChanges()
     {

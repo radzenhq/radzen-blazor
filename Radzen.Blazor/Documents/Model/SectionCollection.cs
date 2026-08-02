@@ -12,6 +12,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class SectionCollection : IReadOnlyList<Section>
 {
+    internal SectionCollection()
+    {
+    }
+
     private readonly TrackedList<Section> items = [];
 
     /// <inheritdoc/>

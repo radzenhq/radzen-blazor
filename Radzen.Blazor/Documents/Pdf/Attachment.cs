@@ -62,10 +62,11 @@ public sealed class FacturXProfile : ITracksChanges
         set => tracker.Set(ref conformanceLevel, value);
     }
 
-    /// <summary>Gets a value indicating whether this profile has been modified since the document was loaded.</summary>
-    public bool IsModified => tracker.IsModified;
+    internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
@@ -85,11 +86,7 @@ public sealed class Attachment : ITracksChanges
     private DateTimeOffset modificationDate = DefaultModificationDate;
     private FacturXProfile? facturX;
 
-    /// <summary>
-    /// The modification date written when <see cref="ModificationDate"/> is not set.
-    /// A fixed sentinel keeps the produced bytes reproducible.
-    /// </summary>
-    public static readonly DateTimeOffset DefaultModificationDate = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    internal static readonly DateTimeOffset DefaultModificationDate = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     internal Attachment(string name, byte[] data, AttachmentRelationship relationship, string mimeType)
     {
@@ -124,9 +121,8 @@ public sealed class Attachment : ITracksChanges
 
     /// <summary>
     /// Gets or sets the modification date of the embedded file, written as the
-    /// /Params /ModDate of the embedded file stream. Defaults to
-    /// <see cref="DefaultModificationDate"/> so output stays deterministic; set it
-    /// explicitly to record the real file timestamp.
+    /// /Params /ModDate of the embedded file stream. Defaults to a fixed sentinel date
+    /// so output stays deterministic; set it explicitly to record the real file timestamp.
     /// </summary>
     public DateTimeOffset ModificationDate
     {
@@ -146,18 +142,15 @@ public sealed class Attachment : ITracksChanges
         set => tracker.Set(ref facturX, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this attachment has been modified since the document was
-    /// loaded. Name, payload, relationship and MIME type are immutable, so only the settable
-    /// fields and the owned FacturX profile can move it.
-    /// </summary>
-    public bool IsModified => tracker.IsModified || FacturX?.IsModified == true;
+    internal bool IsModified => tracker.IsModified || FacturX?.IsModified == true;
 
     internal void AcceptChanges()
     {
         tracker.AcceptChanges();
         FacturX?.AcceptChanges();
     }
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
@@ -178,6 +171,10 @@ public sealed class Attachment : ITracksChanges
 /// </summary>
 public sealed class AttachmentCollection : IReadOnlyList<Attachment>
 {
+    internal AttachmentCollection()
+    {
+    }
+
     private readonly TrackedList<Attachment> items = [];
 
     internal void OwnedBy(Action? owner) => items.OwnedBy(owner);

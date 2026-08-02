@@ -300,18 +300,6 @@ public class AnnotationTests
     }
 
     [Fact]
-    public void MarkupAreaOutsideBounds_ThrowsInsteadOfClipping()
-    {
-        var document = new PortableDocument();
-        var markup = document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
-        markup.Areas.Add(PdfRect.FromSize(30, 50, 20, 12));
-
-        var exception = Assert.Throws<InvalidOperationException>(() => document.ToArray());
-
-        Assert.Equal("Markup areas must be contained within the annotation bounds.", exception.Message);
-    }
-
-    [Fact]
     public void EditedLink_PreservesNamedDestinationObjectType()
     {
         var source = new PortableDocument();

@@ -27,7 +27,6 @@ public const Radzen.Documents.BlendMode.Screen : Radzen.Documents.BlendMode
 public const Radzen.Documents.BlendMode.SoftLight : Radzen.Documents.BlendMode
 Radzen.Documents.Block = public abstract class
 Radzen.Documents.BlockCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Block>
-public Radzen.Documents.BlockCollection..ctor()
 public Radzen.Documents.BlockCollection.Add(System.String text) : Radzen.Documents.Paragraph
 public Radzen.Documents.BlockCollection.Add<T>(T block) : T where T : Radzen.Documents.Block
 public Radzen.Documents.BlockCollection.AddBarcode(Radzen.Documents.Codes.BarcodeType type, System.String value, Radzen.Documents.Core.Unit width, Radzen.Documents.Core.Unit height, System.Boolean showText = false) : Radzen.Documents.Barcode
@@ -58,7 +57,6 @@ public const Radzen.Documents.BorderStyle.Dotted : Radzen.Documents.BorderStyle
 public const Radzen.Documents.BorderStyle.None : Radzen.Documents.BorderStyle
 public const Radzen.Documents.BorderStyle.Solid : Radzen.Documents.BorderStyle
 Radzen.Documents.Borders = public sealed class
-public Radzen.Documents.Borders..ctor()
 public Radzen.Documents.Borders.Bottom : Radzen.Documents.Border { public get; }
 public Radzen.Documents.Borders.Left : Radzen.Documents.Border { public get; }
 public Radzen.Documents.Borders.Right : Radzen.Documents.Border { public get; }
@@ -87,7 +85,6 @@ public Radzen.Documents.Cell.StyleName : System.String? { public get; public set
 public Radzen.Documents.Cell.Text : System.String? { public get; public set; }
 public Radzen.Documents.Cell.VerticalAlignment : Radzen.Documents.VerticalAlignment { public get; public set; }
 Radzen.Documents.CellCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Cell>
-public Radzen.Documents.CellCollection..ctor()
 public Radzen.Documents.CellCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.CellCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Cell>
 public Radzen.Documents.CellCollection.Item[System.Int32 index] : Radzen.Documents.Cell { public get; }
@@ -407,7 +404,6 @@ public Radzen.Documents.Document.Resolve(Radzen.Documents.TextInline run) : Radz
 public Radzen.Documents.Document.Sections : Radzen.Documents.SectionCollection { public get; }
 public Radzen.Documents.Document.Styles : Radzen.Documents.StyleCollection { public get; }
 Radzen.Documents.DocumentInfo = public sealed class
-public Radzen.Documents.DocumentInfo..ctor()
 public Radzen.Documents.DocumentInfo.Author : System.String? { public get; public set; }
 public Radzen.Documents.DocumentInfo.CreationDate : System.DateTimeOffset? { public get; public set; }
 public Radzen.Documents.DocumentInfo.Creator : System.String? { public get; public set; }
@@ -433,7 +429,6 @@ public Radzen.Documents.Fonts.Font.Size : Radzen.Documents.Core.Unit? { public g
 public Radzen.Documents.Fonts.Font.Strikethrough : System.Boolean? { public get; public set; }
 public Radzen.Documents.Fonts.Font.Underline : System.Boolean? { public get; public set; }
 Radzen.Documents.Fonts.FontCollection = public sealed class
-public Radzen.Documents.Fonts.FontCollection..ctor()
 public Radzen.Documents.Fonts.FontCollection.EnableKerning : System.Boolean { public get; public set; }
 public Radzen.Documents.Fonts.FontCollection.MeasureText(System.String text, Radzen.Documents.Fonts.Font font) : System.Double
 public Radzen.Documents.Fonts.FontCollection.Register(System.String family, System.IO.Stream font) : System.Void
@@ -464,7 +459,6 @@ public Radzen.Documents.GradientStop..ctor(System.Double offset, Radzen.Document
 public Radzen.Documents.GradientStop.Color : Radzen.Documents.Core.Color { public get; }
 public Radzen.Documents.GradientStop.Offset : System.Double { public get; }
 Radzen.Documents.HeaderFooter = public sealed class
-public Radzen.Documents.HeaderFooter..ctor()
 public Radzen.Documents.HeaderFooter.Blocks : Radzen.Documents.BlockCollection { public get; }
 Radzen.Documents.HorizontalAlignment = public enum : System.Int32
 public const Radzen.Documents.HorizontalAlignment.Center : Radzen.Documents.HorizontalAlignment
@@ -490,7 +484,6 @@ public Radzen.Documents.Inline.LinkToAnchor : System.String? { public get; publi
 public Radzen.Documents.Inline.Opacity : System.Double { public get; public set; }
 public Radzen.Documents.Inline.Role : System.String? { public get; public set; }
 Radzen.Documents.InlineCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Inline>
-public Radzen.Documents.InlineCollection..ctor()
 public Radzen.Documents.InlineCollection.Add(Radzen.Documents.Inline inline) : Radzen.Documents.Inline
 public Radzen.Documents.InlineCollection.Add(System.String text) : Radzen.Documents.Run
 public Radzen.Documents.InlineCollection.AddImage(System.IO.Stream stream, Radzen.Documents.Core.ResourceLimits? limits = null) : Radzen.Documents.InlineImage
@@ -542,7 +535,6 @@ public Radzen.Documents.ListItem.NestedList : Radzen.Documents.ListBlock? { publ
 public Radzen.Documents.ListItem.StyleName : System.String? { public get; public set; }
 public Radzen.Documents.ListItem.Text : System.String? { public get; public set; }
 Radzen.Documents.ListItemCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.ListItem>
-public Radzen.Documents.ListItemCollection..ctor()
 public Radzen.Documents.ListItemCollection.Add() : Radzen.Documents.ListItem
 public Radzen.Documents.ListItemCollection.Add(Radzen.Documents.ListItem item) : Radzen.Documents.ListItem
 public Radzen.Documents.ListItemCollection.Add(System.String text) : Radzen.Documents.ListItem
@@ -560,7 +552,6 @@ Radzen.Documents.ListStyle = public enum : System.Int32
 public const Radzen.Documents.ListStyle.Bullet : Radzen.Documents.ListStyle
 public const Radzen.Documents.ListStyle.Number : Radzen.Documents.ListStyle
 Radzen.Documents.Margins = public sealed class
-public Radzen.Documents.Margins..ctor()
 public Radzen.Documents.Margins.Bottom : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.Margins.Left : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.Margins.Right : Radzen.Documents.Core.Unit { public get; public set; }
@@ -857,12 +848,10 @@ public Radzen.Documents.Pdf.Annotation.Contents : System.String? { public get; p
 public Radzen.Documents.Pdf.Annotation.Flags : Radzen.Documents.Pdf.AnnotationFlags { public get; public set; }
 public Radzen.Documents.Pdf.Annotation.Opacity : System.Double { public get; public set; }
 public Radzen.Documents.Pdf.Annotation.Title : System.String? { public get; public set; }
-public virtual Radzen.Documents.Pdf.Annotation.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.AnnotationAppearance = public sealed class
 public Radzen.Documents.Pdf.AnnotationAppearance..ctor()
 public Radzen.Documents.Pdf.AnnotationAppearance.Content : Radzen.Documents.Pdf.ContentCollection { public get; }
 Radzen.Documents.Pdf.AnnotationCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.Annotation>
-public Radzen.Documents.Pdf.AnnotationCollection..ctor()
 public Radzen.Documents.Pdf.AnnotationCollection.Add<T>(T annotation) : T where T : Radzen.Documents.Pdf.Annotation
 public Radzen.Documents.Pdf.AnnotationCollection.Clear() : System.Void
 public Radzen.Documents.Pdf.AnnotationCollection.Count : System.Int32 { public get; }
@@ -896,14 +885,11 @@ Radzen.Documents.Pdf.Attachment = public sealed class
 public Radzen.Documents.Pdf.Attachment.Description : System.String? { public get; public set; }
 public Radzen.Documents.Pdf.Attachment.FacturX : Radzen.Documents.Pdf.FacturXProfile? { public get; public set; }
 public Radzen.Documents.Pdf.Attachment.GetBytes() : System.Byte[]
-public Radzen.Documents.Pdf.Attachment.IsModified : System.Boolean { public get; }
 public Radzen.Documents.Pdf.Attachment.MimeType : System.String { public get; }
 public Radzen.Documents.Pdf.Attachment.ModificationDate : System.DateTimeOffset { public get; public set; }
 public Radzen.Documents.Pdf.Attachment.Name : System.String { public get; }
 public Radzen.Documents.Pdf.Attachment.Relationship : Radzen.Documents.Pdf.AttachmentRelationship { public get; }
-public static readonly Radzen.Documents.Pdf.Attachment.DefaultModificationDate : System.DateTimeOffset
 Radzen.Documents.Pdf.AttachmentCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.Attachment>
-public Radzen.Documents.Pdf.AttachmentCollection..ctor()
 public Radzen.Documents.Pdf.AttachmentCollection.Add(System.String name, System.Byte[] data, Radzen.Documents.Pdf.AttachmentRelationship relationship, System.String mimeType) : Radzen.Documents.Pdf.Attachment
 public Radzen.Documents.Pdf.AttachmentCollection.Clear() : System.Void
 public Radzen.Documents.Pdf.AttachmentCollection.Count : System.Int32 { public get; }
@@ -929,7 +915,6 @@ public Radzen.Documents.Pdf.ChoiceFieldDefinition.Value : System.String { public
 Radzen.Documents.Pdf.CircleAnnotation = public sealed class : Radzen.Documents.Pdf.ShapeAnnotation
 public Radzen.Documents.Pdf.CircleAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
 Radzen.Documents.Pdf.ContentCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.ContentElement>
-public Radzen.Documents.Pdf.ContentCollection..ctor()
 public Radzen.Documents.Pdf.ContentCollection.Add<T>(T element) : T where T : Radzen.Documents.Pdf.ContentElement
 public Radzen.Documents.Pdf.ContentCollection.Count : System.Int32 { public get; }
 public Radzen.Documents.Pdf.ContentCollection.GetEnumerator() : System.Collections.Generic.IEnumerator<Radzen.Documents.Pdf.ContentElement>
@@ -940,7 +925,6 @@ public Radzen.Documents.Pdf.ContentCollection.RemoveAt(System.Int32 index) : Sys
 Radzen.Documents.Pdf.ContentElement = public abstract class
 public Radzen.Documents.Pdf.ContentElement.IsArtifact : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.ContentElement.Transform : Radzen.Documents.Matrix { public get; public set; }
-public virtual Radzen.Documents.Pdf.ContentElement.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.DocumentParseException = public class : System.Exception
 public Radzen.Documents.Pdf.DocumentParseException..ctor()
 public Radzen.Documents.Pdf.DocumentParseException..ctor(System.String message)
@@ -959,7 +943,6 @@ public Radzen.Documents.Pdf.DocumentRenderer.RoleMap : Radzen.Documents.Pdf.Role
 public Radzen.Documents.Pdf.DocumentRenderer.SaveToStream(Radzen.Documents.Document document, System.IO.Stream stream) : System.Void
 public Radzen.Documents.Pdf.DocumentRenderer.ToArray(Radzen.Documents.Document document) : System.Byte[]
 Radzen.Documents.Pdf.DocumentXmpMetadata = public sealed class
-public Radzen.Documents.Pdf.DocumentXmpMetadata..ctor()
 public Radzen.Documents.Pdf.DocumentXmpMetadata.Clear() : System.Void
 public Radzen.Documents.Pdf.DocumentXmpMetadata.Exists : System.Boolean { public get; }
 public Radzen.Documents.Pdf.DocumentXmpMetadata.GetPacket() : System.Byte[]?
@@ -987,7 +970,6 @@ Radzen.Documents.Pdf.FacturXProfile = public sealed class
 public Radzen.Documents.Pdf.FacturXProfile..ctor()
 public Radzen.Documents.Pdf.FacturXProfile.ConformanceLevel : System.String { public get; public set; }
 public Radzen.Documents.Pdf.FacturXProfile.DocumentType : System.String { public get; public set; }
-public Radzen.Documents.Pdf.FacturXProfile.IsModified : System.Boolean { public get; }
 public Radzen.Documents.Pdf.FacturXProfile.Version : System.String { public get; public set; }
 Radzen.Documents.Pdf.FormField = public sealed class
 public Radzen.Documents.Pdf.FormField.Name : System.String { public get; }
@@ -1007,7 +989,6 @@ public Radzen.Documents.Pdf.FreeTextAnnotation..ctor(Radzen.Documents.Pdf.PdfRec
 public Radzen.Documents.Pdf.FreeTextAnnotation.Font : Radzen.Documents.Fonts.Font { public get; public set; }
 public Radzen.Documents.Pdf.FreeTextAnnotation.FontSize : Radzen.Documents.Core.Unit { public get; public set; }
 public Radzen.Documents.Pdf.FreeTextAnnotation.TextColor : Radzen.Documents.Core.Color { public get; public set; }
-public virtual Radzen.Documents.Pdf.FreeTextAnnotation.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.HighlightAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.HighlightAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
 Radzen.Documents.Pdf.ImageContent = public sealed class : Radzen.Documents.Pdf.ContentElement
@@ -1017,7 +998,6 @@ Radzen.Documents.Pdf.InkAnnotation = public sealed class : Radzen.Documents.Pdf.
 public Radzen.Documents.Pdf.InkAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
 public Radzen.Documents.Pdf.InkAnnotation.StrokeWidth : System.Double { public get; public set; }
 public Radzen.Documents.Pdf.InkAnnotation.Strokes : System.Collections.Generic.IList<Radzen.Documents.Pdf.InkStroke> { public get; }
-public virtual Radzen.Documents.Pdf.InkAnnotation.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.InkStroke = public sealed class : System.Collections.Generic.IList<Radzen.Documents.Pdf.AnnotationPoint>
 public Radzen.Documents.Pdf.InkStroke..ctor()
 public Radzen.Documents.Pdf.InkStroke.Add(Radzen.Documents.Pdf.AnnotationPoint item) : System.Void
@@ -1048,7 +1028,6 @@ public Radzen.Documents.Pdf.OutlineItem.Bold : System.Boolean { public get; publ
 public Radzen.Documents.Pdf.OutlineItem.Children : System.Collections.Generic.IList<Radzen.Documents.Pdf.OutlineItem> { public get; }
 public Radzen.Documents.Pdf.OutlineItem.Collapsed : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.OutlineItem.Color : Radzen.Documents.Core.Color? { public get; public set; }
-public Radzen.Documents.Pdf.OutlineItem.IsModified : System.Boolean { public get; }
 public Radzen.Documents.Pdf.OutlineItem.Italic : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.OutlineItem.Target : Radzen.Documents.Pdf.OutlineTarget? { public get; public set; }
 public Radzen.Documents.Pdf.OutlineItem.Title : System.String { public get; public set; }
@@ -1096,7 +1075,6 @@ public Radzen.Documents.Pdf.PageCollection.RemoveRange(System.Int32 index, Syste
 public Radzen.Documents.Pdf.PageCollection.Split(params System.Int32[] boundaries) : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.PortableDocument>
 Radzen.Documents.Pdf.PageLabel = public sealed class
 public Radzen.Documents.Pdf.PageLabel..ctor(System.Int32 startPage)
-public Radzen.Documents.Pdf.PageLabel.IsModified : System.Boolean { public get; }
 public Radzen.Documents.Pdf.PageLabel.Prefix : System.String? { public get; public set; }
 public Radzen.Documents.Pdf.PageLabel.Start : System.Int32 { public get; public set; }
 public Radzen.Documents.Pdf.PageLabel.StartPage : System.Int32 { public get; }
@@ -1125,7 +1103,6 @@ public Radzen.Documents.Pdf.PathContent.EvenOdd : System.Boolean { public get; p
 public Radzen.Documents.Pdf.PathContent.Fill : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.FillColor : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.FillGradient : Radzen.Documents.GradientBrush? { public get; public set; }
-public Radzen.Documents.Pdf.PathContent.Intent : Radzen.Documents.Pdf.RenderingIntent? { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.Join : Radzen.Documents.LineJoin? { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.LineTo(Radzen.Documents.Core.Unit x, Radzen.Documents.Core.Unit y) : System.Void
 public Radzen.Documents.Pdf.PathContent.MiterLimit : System.Double? { public get; public set; }
@@ -1171,10 +1148,8 @@ public Radzen.Documents.Pdf.PdfRect.Equals(Radzen.Documents.Pdf.PdfRect other) :
 public Radzen.Documents.Pdf.PdfRect.Height : System.Double { public get; }
 public Radzen.Documents.Pdf.PdfRect.Left : System.Double { public get; }
 public Radzen.Documents.Pdf.PdfRect.Right : System.Double { public get; }
-public Radzen.Documents.Pdf.PdfRect.ToLayout(System.Double pageHeight) : Radzen.Documents.Core.Rect
 public Radzen.Documents.Pdf.PdfRect.Top : System.Double { public get; }
 public Radzen.Documents.Pdf.PdfRect.Width : System.Double { public get; }
-public static Radzen.Documents.Pdf.PdfRect.FromLayout(Radzen.Documents.Core.Rect rect, System.Double pageHeight) : Radzen.Documents.Pdf.PdfRect
 public static Radzen.Documents.Pdf.PdfRect.FromSize(System.Double left, System.Double bottom, System.Double width, System.Double height) : Radzen.Documents.Pdf.PdfRect
 public static Radzen.Documents.Pdf.PdfRect.op_Equality(Radzen.Documents.Pdf.PdfRect left, Radzen.Documents.Pdf.PdfRect right) : System.Boolean
 public static Radzen.Documents.Pdf.PdfRect.op_Inequality(Radzen.Documents.Pdf.PdfRect left, Radzen.Documents.Pdf.PdfRect right) : System.Boolean
@@ -1226,7 +1201,6 @@ public Radzen.Documents.Pdf.PositionedFieldDefinition.Y : Radzen.Documents.Core.
 Radzen.Documents.Pdf.PositionedTextRun = public sealed class
 public Radzen.Documents.Pdf.PositionedTextRun.Bounds : Radzen.Documents.Pdf.PdfRect { public get; }
 public Radzen.Documents.Pdf.PositionedTextRun.GeometryEstimated : System.Boolean { public get; }
-public Radzen.Documents.Pdf.PositionedTextRun.OperatorIndex : System.Int32 { public get; }
 public Radzen.Documents.Pdf.PositionedTextRun.Quadrilateral : Radzen.Documents.Pdf.TextQuadrilateral { public get; }
 public Radzen.Documents.Pdf.PositionedTextRun.Text : System.String { public get; }
 Radzen.Documents.Pdf.RadioGroupFieldDefinition = public sealed class : Radzen.Documents.Pdf.FormFieldDefinition
@@ -1242,33 +1216,27 @@ public Radzen.Documents.Pdf.RadioOptionDefinition.X : Radzen.Documents.Core.Unit
 public Radzen.Documents.Pdf.RadioOptionDefinition.Y : Radzen.Documents.Core.Unit { public get; public set; }
 Radzen.Documents.Pdf.ReaderLimits = public sealed class : Radzen.Documents.Core.ResourceLimits
 public Radzen.Documents.Pdf.ReaderLimits..ctor()
-public Radzen.Documents.Pdf.ReaderLimits.ExpansionRatioFloorBytes : System.Int64 { public get; public init; }
+public Radzen.Documents.Pdf.ReaderLimits.ExpansionRatioFloorBytes : System.Int64 { public get; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxAggregateDecodedBytes : System.Int64 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxCMapEntries : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxCharstringOperations : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxDecodeExpansionRatio : System.Int32 { public get; public init; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxCMapEntries : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxCharstringOperations : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxDecodeExpansionRatio : System.Int32 { public get; }
 public Radzen.Documents.Pdf.ReaderLimits.MaxDecodedStreamBytes : System.Int64 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxFilterChainLength : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxFontWidthEntries : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxObjectNestingDepth : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxObjectStreamCount : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxPageTreeDepth : System.Int32 { public get; public init; }
-public Radzen.Documents.Pdf.ReaderLimits.MaxXrefEntries : System.Int32 { public get; public init; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxFilterChainLength : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxFontWidthEntries : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxObjectNestingDepth : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxObjectStreamCount : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxPageTreeDepth : System.Int32 { public get; }
+public Radzen.Documents.Pdf.ReaderLimits.MaxXrefEntries : System.Int32 { public get; }
 public static Radzen.Documents.Pdf.ReaderLimits.Default : Radzen.Documents.Pdf.ReaderLimits { public get; }
 Radzen.Documents.Pdf.RedactionOptions = public sealed class
 public Radzen.Documents.Pdf.RedactionOptions..ctor()
 public Radzen.Documents.Pdf.RedactionOptions.FillColor : Radzen.Documents.Core.Color? { public get; public set; }
-Radzen.Documents.Pdf.RenderingIntent = public enum : System.Int32
-public const Radzen.Documents.Pdf.RenderingIntent.AbsoluteColorimetric : Radzen.Documents.Pdf.RenderingIntent
-public const Radzen.Documents.Pdf.RenderingIntent.Perceptual : Radzen.Documents.Pdf.RenderingIntent
-public const Radzen.Documents.Pdf.RenderingIntent.RelativeColorimetric : Radzen.Documents.Pdf.RenderingIntent
-public const Radzen.Documents.Pdf.RenderingIntent.Saturation : Radzen.Documents.Pdf.RenderingIntent
 Radzen.Documents.Pdf.ReplaceTextOptions = public sealed class
 public Radzen.Documents.Pdf.ReplaceTextOptions..ctor()
 public Radzen.Documents.Pdf.ReplaceTextOptions.Layout : Radzen.Documents.Pdf.TextReplacementLayout { public get; public set; }
 public Radzen.Documents.Pdf.ReplaceTextOptions.Search : Radzen.Documents.Pdf.TextSearchOptions { public get; public set; }
 Radzen.Documents.Pdf.RoleMap = public sealed class
-public Radzen.Documents.Pdf.RoleMap..ctor()
 public Radzen.Documents.Pdf.RoleMap.Add(System.String role, System.String structureType) : System.Void
 public Radzen.Documents.Pdf.RoleMap.Contains(System.String role) : System.Boolean
 public Radzen.Documents.Pdf.RoleMap.Count : System.Int32 { public get; }
@@ -1328,7 +1296,6 @@ public Radzen.Documents.Pdf.TextContent..ctor(System.String text, Radzen.Documen
 public Radzen.Documents.Pdf.TextContent.Color : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Pdf.TextContent.Font : Radzen.Documents.Fonts.Font { public get; public set; }
 public Radzen.Documents.Pdf.TextContent.Text : System.String { public get; public set; }
-public virtual Radzen.Documents.Pdf.TextContent.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.TextFieldDefinition = public sealed class : Radzen.Documents.Pdf.PositionedFieldDefinition
 public Radzen.Documents.Pdf.TextFieldDefinition..ctor(System.String name)
 public Radzen.Documents.Pdf.TextFieldDefinition.Comb : System.Boolean { public get; public set; }
@@ -1342,7 +1309,6 @@ public Radzen.Documents.Pdf.TextHit.Bounds : Radzen.Documents.Pdf.PdfRect { publ
 public Radzen.Documents.Pdf.TextHit.GeometryEstimated : System.Boolean { public get; }
 public Radzen.Documents.Pdf.TextHit.PageIndex : System.Int32 { public get; }
 public Radzen.Documents.Pdf.TextHit.Quadrilaterals : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.TextQuadrilateral> { public get; }
-public Radzen.Documents.Pdf.TextHit.Sources : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.TextSourceReference> { public get; }
 public Radzen.Documents.Pdf.TextHit.Text : System.String { public get; }
 Radzen.Documents.Pdf.TextPoint = public struct
 public Radzen.Documents.Pdf.TextPoint..ctor(System.Double x, System.Double y)
@@ -1364,11 +1330,6 @@ public Radzen.Documents.Pdf.TextSearchOptions..ctor()
 public Radzen.Documents.Pdf.TextSearchOptions.CaseSensitive : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.TextSearchOptions.NormalizeWhitespace : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.TextSearchOptions.WholeWord : System.Boolean { public get; public set; }
-Radzen.Documents.Pdf.TextSourceReference = public struct
-public Radzen.Documents.Pdf.TextSourceReference..ctor(System.Int32 operatorIndex, System.Int32 characterOffset, System.Int32 characterLength)
-public Radzen.Documents.Pdf.TextSourceReference.CharacterLength : System.Int32 { public get; }
-public Radzen.Documents.Pdf.TextSourceReference.CharacterOffset : System.Int32 { public get; }
-public Radzen.Documents.Pdf.TextSourceReference.OperatorIndex : System.Int32 { public get; }
 Radzen.Documents.Pdf.UnderlineAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.UnderlineAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
 Radzen.Documents.Pdf.ViewerPreferences = public sealed class
@@ -1382,7 +1343,6 @@ public Radzen.Documents.Pdf.ViewerPreferences.HideToolbar : System.Boolean { pub
 public Radzen.Documents.Pdf.ViewerPreferences.PageLayout : Radzen.Documents.Pdf.PdfPageLayout? { public get; public set; }
 public Radzen.Documents.Pdf.ViewerPreferences.PageMode : Radzen.Documents.Pdf.PdfPageMode? { public get; public set; }
 Radzen.Documents.Pdf.XObjectContent = public sealed class : Radzen.Documents.Pdf.ContentElement
-public Radzen.Documents.Pdf.XObjectContent..ctor(System.String name)
 public Radzen.Documents.Pdf.XObjectContent.Name : System.String { public get; }
 Radzen.Documents.QrCode = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.QrCode.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
@@ -1445,7 +1405,6 @@ public Radzen.Documents.Section.PageSize : Radzen.Documents.PageSize { public ge
 public Radzen.Documents.Section.Watermark : Radzen.Documents.Watermark? { public get; public set; }
 public Radzen.Documents.Section.WritingMode : Radzen.Documents.WritingMode { public get; public set; }
 Radzen.Documents.SectionCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Section>
-public Radzen.Documents.SectionCollection..ctor()
 public Radzen.Documents.SectionCollection.Add() : Radzen.Documents.Section
 public Radzen.Documents.SectionCollection.Add(Radzen.Documents.Section section) : Radzen.Documents.Section
 public Radzen.Documents.SectionCollection.Clear() : System.Void
@@ -2296,7 +2255,6 @@ public Radzen.Documents.Style.Role : System.String? { public get; public set; }
 public Radzen.Documents.Style.SpacingAfter : Radzen.Documents.Core.Unit? { public get; public set; }
 public Radzen.Documents.Style.SpacingBefore : Radzen.Documents.Core.Unit? { public get; public set; }
 Radzen.Documents.StyleCollection = public sealed class : System.Collections.Generic.IReadOnlyCollection<Radzen.Documents.Style>
-public Radzen.Documents.StyleCollection..ctor()
 public Radzen.Documents.StyleCollection.Add(System.String name, System.String baseStyle = "Normal") : Radzen.Documents.Style
 public Radzen.Documents.StyleCollection.Contains(System.String name) : System.Boolean
 public Radzen.Documents.StyleCollection.Count : System.Int32 { public get; }
@@ -2314,7 +2272,6 @@ public Radzen.Documents.TabStop.Alignment : Radzen.Documents.TabAlignment { publ
 public Radzen.Documents.TabStop.Leader : System.Char { public get; }
 public Radzen.Documents.TabStop.Position : Radzen.Documents.Core.Unit { public get; }
 Radzen.Documents.TabStopCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.TabStop>
-public Radzen.Documents.TabStopCollection..ctor()
 public Radzen.Documents.TabStopCollection.Add(Radzen.Documents.Core.Unit position, Radzen.Documents.TabAlignment alignment = Radzen.Documents.TabAlignment.Left, System.Char leader = '\u0000') : Radzen.Documents.TabStop
 public Radzen.Documents.TabStopCollection.Add(Radzen.Documents.TabStop stop) : Radzen.Documents.TabStop
 public Radzen.Documents.TabStopCollection.Clear() : System.Void
@@ -2358,7 +2315,6 @@ public Radzen.Documents.TocEntry.Anchor : System.String { public get; }
 public Radzen.Documents.TocEntry.Level : System.Int32 { public get; }
 public Radzen.Documents.TocEntry.Text : System.String { public get; }
 Radzen.Documents.TocEntryCollection = public sealed class : System.Collections.Generic.IReadOnlyList<Radzen.Documents.TocEntry>
-public Radzen.Documents.TocEntryCollection..ctor()
 public Radzen.Documents.TocEntryCollection.Add(Radzen.Documents.TocEntry entry) : Radzen.Documents.TocEntry
 public Radzen.Documents.TocEntryCollection.Clear() : System.Void
 public Radzen.Documents.TocEntryCollection.Count : System.Int32 { public get; }

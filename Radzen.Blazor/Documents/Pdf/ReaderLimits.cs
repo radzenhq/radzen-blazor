@@ -8,8 +8,8 @@ namespace Radzen.Documents.Pdf;
 /// sizes/depths into a recoverable <see cref="DocumentParseException"/> instead of a hang,
 /// out-of-memory, or process-killing stack overflow. All defaults are generous for real
 /// documents and configurable via the reading entry points. The inherited
-/// <see cref="ResourceLimits"/> caps bound authored input as well, and are configured for that
-/// path with <see cref="ImageDecoders.WithLimits(ResourceLimits)"/>.
+/// <see cref="ResourceLimits"/> caps bound authored input as well, and govern the image decoders
+/// used during rendering.
 /// </summary>
 public sealed class ReaderLimits : ResourceLimits
 {
@@ -18,13 +18,13 @@ public sealed class ReaderLimits : ResourceLimits
     /// Real documents nest a handful of levels inline; deeper structures use indirect
     /// references (bounded separately by cycle detection). Default 512.
     /// </summary>
-    public int MaxObjectNestingDepth { get; init; } = 512;
+    public int MaxObjectNestingDepth { get; internal init; } = 512;
 
     /// <summary>
     /// Backstop depth cap for the page-tree walk (cycle detection is the primary guard).
     /// Default 1024.
     /// </summary>
-    public int MaxPageTreeDepth { get; init; } = 1024;
+    public int MaxPageTreeDepth { get; internal init; } = 1024;
 
     /// <summary>
     /// Maximum total decoded bytes produced by the filter chain of a single stream.
@@ -40,31 +40,31 @@ public sealed class ReaderLimits : ResourceLimits
     /// enforced only once decoded output exceeds <see cref="ExpansionRatioFloorBytes"/> so
     /// small legitimate streams are never rejected. Secondary bomb guard. Default 1000.
     /// </summary>
-    public int MaxDecodeExpansionRatio { get; init; } = 1000;
+    public int MaxDecodeExpansionRatio { get; internal init; } = 1000;
 
     /// <summary>
     /// Decoded-size floor below which <see cref="MaxDecodeExpansionRatio"/> is not applied.
     /// Default 16 MB.
     /// </summary>
-    public long ExpansionRatioFloorBytes { get; init; } = 16L * 1024 * 1024;
+    public long ExpansionRatioFloorBytes { get; internal init; } = 16L * 1024 * 1024;
 
     /// <summary>Maximum number of filters that may be chained on a single stream. Default 8.</summary>
-    public int MaxFilterChainLength { get; init; } = 8;
+    public int MaxFilterChainLength { get; internal init; } = 8;
 
     /// <summary>Maximum number of cross-reference entries built from an xref (stream or table). Default 8,000,000.</summary>
-    public int MaxXrefEntries { get; init; } = 8_000_000;
+    public int MaxXrefEntries { get; internal init; } = 8_000_000;
 
     /// <summary>Maximum number of objects declared by a single object stream (/N). Default 1,000,000.</summary>
-    public int MaxObjectStreamCount { get; init; } = 1_000_000;
+    public int MaxObjectStreamCount { get; internal init; } = 1_000_000;
 
     /// <summary>Maximum number of entries materialized from a /ToUnicode CMap. Default 1,000,000.</summary>
-    public int MaxCMapEntries { get; init; } = 1_000_000;
+    public int MaxCMapEntries { get; internal init; } = 1_000_000;
 
     /// <summary>
     /// Maximum number of per-code width entries materialized from a font's width table
     /// (a CID font /W array). Default 1,000,000.
     /// </summary>
-    public int MaxFontWidthEntries { get; init; } = 1_000_000;
+    public int MaxFontWidthEntries { get; internal init; } = 1_000_000;
 
     /// <summary>
     /// Maximum number of Type 2 charstring operations interpreted while reading one glyph of a
@@ -74,7 +74,7 @@ public sealed class ReaderLimits : ResourceLimits
     /// argument stack nor the depth cap bounds it. This is the only cap on that product.
     /// Default 1,000,000.
     /// </summary>
-    public int MaxCharstringOperations { get; init; } = 1_000_000;
+    public int MaxCharstringOperations { get; internal init; } = 1_000_000;
 
     /// <summary>The default limits used when a caller does not supply their own.</summary>
     public static new ReaderLimits Default => new();

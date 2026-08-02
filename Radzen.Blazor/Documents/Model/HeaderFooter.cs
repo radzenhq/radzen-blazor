@@ -6,6 +6,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class HeaderFooter
 {
+    internal HeaderFooter()
+    {
+    }
+
     /// <summary>Gets the content blocks of the header or footer.</summary>
     public BlockCollection Blocks { get; } = [];
 }

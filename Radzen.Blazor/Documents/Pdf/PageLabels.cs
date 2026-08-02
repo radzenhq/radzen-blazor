@@ -65,10 +65,11 @@ public sealed class PageLabel(int startPage) : ITracksChanges
         set => tracker.Set(ref start, value);
     }
 
-    /// <summary>Gets a value indicating whether this range has been modified since the document was loaded.</summary>
-    public bool IsModified => tracker.IsModified;
+    internal bool IsModified => tracker.IsModified;
 
     internal void AcceptChanges() => tracker.AcceptChanges();
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 

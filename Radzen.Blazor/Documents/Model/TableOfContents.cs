@@ -49,6 +49,10 @@ public sealed class TocEntry
 /// </summary>
 public sealed class TocEntryCollection : IReadOnlyList<TocEntry>
 {
+    internal TocEntryCollection()
+    {
+    }
+
     private readonly TrackedList<TocEntry> items = [];
 
     /// <inheritdoc/>

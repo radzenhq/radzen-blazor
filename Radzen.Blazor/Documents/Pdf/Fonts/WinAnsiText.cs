@@ -8,8 +8,6 @@ internal enum OnUnencodable
     Substitute,
 
     Throw,
-
-    Drop,
 }
 
 internal static class WinAnsiText
@@ -47,8 +45,6 @@ internal static class WinAnsiText
                 case OnUnencodable.Throw:
                     throw new NotSupportedException(
                         $"{context} contains a character (U+{(int)c:X4}) not representable in the base-14 WinAnsi encoding; register a font that covers it.");
-                case OnUnencodable.Drop:
-                    break;
             }
         }
 

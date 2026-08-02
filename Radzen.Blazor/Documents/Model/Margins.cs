@@ -8,6 +8,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Margins
 {
+    internal Margins()
+    {
+    }
+
     private Unit top;
     private Unit right;
     private Unit bottom;

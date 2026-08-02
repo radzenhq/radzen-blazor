@@ -14,6 +14,10 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class RoleMap
 {
+    internal RoleMap()
+    {
+    }
+
     // ISO 32000-1:2008 Table 333 (standard structure types) and 14.8.4.
     private static readonly string[] StandardTypeNames =
     [

@@ -15,6 +15,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class BlockCollection : IReadOnlyList<Block>
 {
+    internal BlockCollection()
+    {
+    }
+
     private readonly TrackedList<Block> items = [];
     private readonly HashSet<Block> membership = new(ReferenceEqualityComparer.Instance);
 

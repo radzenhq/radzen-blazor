@@ -6,6 +6,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class Borders
 {
+    internal Borders()
+    {
+    }
+
     /// <summary>Gets the top border edge.</summary>
     public Border Top { get; } = new();
 

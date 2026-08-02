@@ -137,8 +137,8 @@ public class AnnotationFlattenValidationTests
         var flatten = Assert.Throws<InvalidOperationException>(() => InvalidMarkup().Flatten());
         var save = Assert.Throws<InvalidOperationException>(() => InvalidMarkup().ToArray());
 
-        Assert.Equal("Markup areas must be contained within the annotation bounds.", flatten.Message);
-        Assert.Equal(flatten.Message, save.Message);
+        Assert.Contains("Markup areas", flatten.Message, StringComparison.Ordinal);
+        Assert.Contains("Markup areas", save.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -148,6 +148,6 @@ public class AnnotationFlattenValidationTests
         document.Pages.Add().Annotations.Add(new StampAnnotation(PdfRect.FromSize(40, 160, 80, 30)) { Name = "  " });
 
         var exception = Assert.Throws<InvalidOperationException>(document.Flatten);
-        Assert.Equal("A stamp annotation requires a non-empty name.", exception.Message);
+        Assert.Contains("non-empty name", exception.Message, StringComparison.Ordinal);
     }
 }

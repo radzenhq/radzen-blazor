@@ -77,7 +77,7 @@ internal sealed class PageSceneRecorder(
     {
         height = page.Size.Height.Point;
         var plan = new PagePlan { Size = page.Size };
-        context = new PageRenderContext(plan, textRecorder, codeSymbolRecorder, imageRecorder);
+        context = new PageRenderContext(plan, textRecorder);
         Plans.Add(plan);
         scopes.Clear();
         tables.Clear();

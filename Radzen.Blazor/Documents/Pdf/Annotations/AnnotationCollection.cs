@@ -15,8 +15,7 @@ public sealed class AnnotationCollection : IReadOnlyList<Annotation>
     private bool loaded;
     private bool rewriteImported;
 
-    /// <summary>Initializes an empty annotation collection.</summary>
-    public AnnotationCollection() => entries = new TrackedList<Entry>(Invalidate);
+    internal AnnotationCollection() => entries = new TrackedList<Entry>(Invalidate);
 
     internal void OwnedBy(Action owner) => invalidate = owner;
 

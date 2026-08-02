@@ -1,10 +1,6 @@
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class PageRenderContext(
-    PagePlan plan,
-    TextLineRecorder text,
-    CodeSymbolRecorder codeSymbols,
-    ImageRecorder images)
+internal sealed class PageRenderContext(PagePlan plan, TextLineRecorder text)
 {
     public PagePlan Plan { get; } = plan;
     public int Layer { get; set; }
@@ -23,6 +19,4 @@ internal sealed class PageRenderContext(
         stackParent = mark.Stack.Order.Parent;
     }
     public TextLineRecorder Text { get; } = text;
-    public CodeSymbolRecorder CodeSymbols { get; } = codeSymbols;
-    public ImageRecorder Images { get; } = images;
 }

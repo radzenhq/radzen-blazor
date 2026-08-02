@@ -211,25 +211,16 @@ internal sealed class DocumentReader
         return [];
     }
 
-    private void Load() => Load(LoadFromXref);
-
-    private void Load(Action loadFromXref)
+    private void Load()
     {
         try
         {
-            loadFromXref();
+            LoadFromXref();
         }
         catch (Exception exception) when (IsRecoverableParseFailure(exception))
         {
             trailer = repairer.Repair(store);
         }
-    }
-
-    internal static DocumentReader ParseWithXrefLoad(byte[] data, Action loadFromXref)
-    {
-        var reader = new DocumentReader(data, ReaderLimits.Default.Snapshot());
-        reader.Load(loadFromXref);
-        return reader;
     }
 
     private static bool IsRecoverableParseFailure(Exception exception)
