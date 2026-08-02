@@ -138,6 +138,10 @@ internal readonly record struct FontCollectionSnapshot(
 /// </remarks>
 public sealed class FontCollection
 {
+    internal FontCollection()
+    {
+    }
+
     private const int SignatureWindow = 64 * 1024;
 
     private readonly Dictionary<(string Family, bool Bold, bool Italic), SfntFont> registered = [];

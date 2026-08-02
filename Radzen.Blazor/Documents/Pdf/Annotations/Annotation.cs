@@ -68,12 +68,7 @@ public abstract class Annotation : ITracksChanges
         set => Set(ref appearance, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this annotation has been modified since it was loaded.
-    /// A loaded page re-emits only the annotations that report true, so an untouched one keeps
-    /// its original dictionary.
-    /// </summary>
-    public virtual bool IsModified => tracker.IsModified || Appearance?.IsModified == true;
+    internal virtual bool IsModified => tracker.IsModified || Appearance?.IsModified == true;
 
     internal abstract string Subtype { get; }
 

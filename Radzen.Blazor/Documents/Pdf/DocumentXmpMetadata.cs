@@ -10,6 +10,10 @@ namespace Radzen.Documents.Pdf;
 /// <summary>Provides raw and simple-property access to a document XMP packet.</summary>
 public sealed class DocumentXmpMetadata
 {
+    internal DocumentXmpMetadata()
+    {
+    }
+
     private const string RdfNamespace = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     private byte[]? packet;
     private Action? changed;

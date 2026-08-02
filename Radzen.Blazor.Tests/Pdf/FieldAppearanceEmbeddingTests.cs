@@ -217,7 +217,7 @@ public class FieldAppearanceEmbeddingTests
     }
 
     [Fact]
-    public void PlainDocument_GivenAnAuthoredTextInput_KeepsTheStandard14Appearance()
+    public void PlainDocument_GivenAnAuthoredTextInput_KeepsTheStandard14AppearanceAndRendersDeterministically()
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
@@ -234,21 +234,8 @@ public class FieldAppearanceEmbeddingTests
         Assert.Equal("Type1", BuildTestSupport.Name(reader, font, "Subtype"));
         Assert.Equal("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont"));
         Assert.False(font.ContainsKey("FontDescriptor"), "a standard-14 appearance embeds nothing");
-    }
 
-    [Fact]
-    public void PlainDocument_GivenAnAuthoredTextInput_ProducesTheSameBytesAsBeforeEmbedding()
-    {
-        var document = new Document();
-        BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
-
-        var first = new DocumentRenderer().ToArray(document);
-        var second = new DocumentRenderer().ToArray(document);
-
-        Assert.Equal(first, second);
+        Assert.Equal(new DocumentRenderer().ToArray(document), new DocumentRenderer().ToArray(document));
     }
 
     [Fact]

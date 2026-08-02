@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -38,19 +39,19 @@ public class PathContentRenderingIntentTests
     }
 
     [Theory]
-    [InlineData(RenderingIntent.AbsoluteColorimetric, "AbsoluteColorimetric")]
-    [InlineData(RenderingIntent.RelativeColorimetric, "RelativeColorimetric")]
-    [InlineData(RenderingIntent.Saturation, "Saturation")]
-    [InlineData(RenderingIntent.Perceptual, "Perceptual")]
-    public void Intent_EmitsRiOperatorWithSpecName(RenderingIntent intent, string expected)
+    [InlineData("AbsoluteColorimetric")]
+    [InlineData("RelativeColorimetric")]
+    [InlineData("Saturation")]
+    [InlineData("Perceptual")]
+    public void Intent_EmitsRiOperatorWithSpecName(string name)
     {
         var path = Line();
-        path.Intent = intent;
+        path.Intent = Enum.Parse<RenderingIntent>(name);
 
         var ri = Find(Render(path), "ri");
 
         Assert.Single(ri.Operands);
-        Assert.Equal(expected, ri.Operands[0].Text);
+        Assert.Equal(name, ri.Operands[0].Text);
     }
 
     [Fact]

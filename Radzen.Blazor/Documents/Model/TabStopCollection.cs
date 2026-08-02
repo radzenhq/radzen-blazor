@@ -11,6 +11,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class TabStopCollection : IReadOnlyList<TabStop>
 {
+    internal TabStopCollection()
+    {
+    }
+
     private readonly List<TabStop> items = [];
 
     /// <inheritdoc/>

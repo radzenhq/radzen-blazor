@@ -12,6 +12,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class CellCollection : IReadOnlyList<Cell>
 {
+    internal CellCollection()
+    {
+    }
+
     private readonly TrackedList<Cell> items = [];
 
     /// <inheritdoc/>

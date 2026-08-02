@@ -15,26 +15,29 @@ public class ImageDecoderSetTests
     private static readonly byte[] JpegMagic = [0xFF, 0xD8, 0xFF, 0xE0];
     private static readonly byte[] Jpeg2000CodestreamMagic = [0xFF, 0x4F, 0xFF, 0x51];
 
-    [Fact]
-    public void PngDecoder_YieldsOnForeignMagic()
+    private static IImageDecoder Decoder(string format) => format switch
     {
-        Assert.False(new PngImageDecoder().TryDecode(JpegMagic, ReaderLimits.Default, out var png));
-        Assert.Null(png);
-        Assert.False(new PngImageDecoder().TryDecode(Jpeg2000CodestreamMagic, ReaderLimits.Default, out _));
-    }
+        "png" => new PngImageDecoder(),
+        "jpeg" => new JpegImageDecoder(),
+        _ => new Jpeg2000ImageDecoder(),
+    };
 
-    [Fact]
-    public void JpegDecoder_YieldsOnForeignMagic()
+    private static byte[] Magic(string format) => format switch
     {
-        Assert.False(new JpegImageDecoder().TryDecode(PngMagic, ReaderLimits.Default, out var jpeg));
-        Assert.Null(jpeg);
-    }
+        "png" => PngMagic,
+        "jpeg" => JpegMagic,
+        _ => Jpeg2000CodestreamMagic,
+    };
 
-    [Fact]
-    public void Jpeg2000Decoder_YieldsOnForeignMagic()
+    [Theory]
+    [InlineData("png", "jpeg")]
+    [InlineData("png", "jpeg2000")]
+    [InlineData("jpeg", "png")]
+    [InlineData("jpeg2000", "png")]
+    public void Decoder_YieldsOnForeignMagic(string decoder, string magic)
     {
-        Assert.False(new Jpeg2000ImageDecoder().TryDecode(PngMagic, ReaderLimits.Default, out var jp2));
-        Assert.Null(jp2);
+        Assert.False(Decoder(decoder).TryDecode(Magic(magic), ReaderLimits.Default, out var image));
+        Assert.Null(image);
     }
 
     [Fact]

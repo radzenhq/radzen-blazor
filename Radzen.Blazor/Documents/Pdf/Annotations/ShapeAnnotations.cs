@@ -89,8 +89,7 @@ public sealed class FreeTextAnnotation(PdfRect bounds) : Annotation(bounds)
         set => Set(ref textColor, value);
     }
 
-    /// <inheritdoc />
-    public override bool IsModified => base.IsModified || Font.IsModified;
+    internal override bool IsModified => base.IsModified || Font.IsModified;
 
     internal override string Subtype => "FreeText";
 

@@ -16,22 +16,12 @@ public class RoleMapValidationTests
     [InlineData("TOCI")]
     [InlineData("Span")]
     [InlineData("Formula")]
-    public void StandardStructureTypesAreAccepted(string structureType)
-    {
-        var map = new RoleMap();
-
-        map.Add("Callout", structureType);
-
-        Assert.True(map.Contains("Callout"));
-    }
-
-    [Theory]
     [InlineData("Figure2")]
     [InlineData("p")]
     [InlineData("Paragraph")]
     [InlineData("Artifact")]
     [InlineData("H7")]
-    public void NonStandardStructureTypesAreAcceptedAsChainLinks(string structureType)
+    public void StandardAndNonStandardStructureTypesAreAcceptedAsChainLinks(string structureType)
     {
         var map = new RoleMap();
 

@@ -10,11 +10,7 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class XObjectContent : ContentElement
 {
-    /// <summary>
-    /// Initializes a new <see cref="XObjectContent"/>.
-    /// </summary>
-    /// <param name="name">The XObject resource name, without the leading slash.</param>
-    public XObjectContent(string name)
+    internal XObjectContent(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
         Name = name;

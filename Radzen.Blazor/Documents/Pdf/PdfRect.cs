@@ -5,8 +5,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// An axis-aligned rectangle in PDF user space (Y-up, bottom-left origin), given by its
-/// edges. Layout space is <see cref="Rect"/>; convert with <see cref="FromLayout"/> or
-/// <see cref="ToLayout"/>, which need the height of the page being measured against.
+/// edges.
 /// </summary>
 /// <param name="left">The minimum horizontal coordinate.</param>
 /// <param name="bottom">The minimum vertical coordinate.</param>
@@ -40,12 +39,10 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
     public static PdfRect FromSize(double left, double bottom, double width, double height)
         => new(left, bottom, left + width, bottom + height);
 
-    /// <summary>Converts a layout rectangle on a page of the given height into PDF user space.</summary>
-    public static PdfRect FromLayout(Rect rect, double pageHeight)
+    internal static PdfRect FromLayout(Rect rect, double pageHeight)
         => new(rect.Left, pageHeight - rect.Bottom, rect.Right, pageHeight - rect.Top);
 
-    /// <summary>Converts this rectangle into layout space on a page of the given height.</summary>
-    public Rect ToLayout(double pageHeight) => new(Left, pageHeight - Top, Width, Height);
+    internal Rect ToLayout(double pageHeight) => new(Left, pageHeight - Top, Width, Height);
 
     /// <summary>Determines whether two rectangles are equal.</summary>
     public static bool operator ==(PdfRect left, PdfRect right) => left.Equals(right);

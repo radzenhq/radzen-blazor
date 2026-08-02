@@ -38,12 +38,7 @@ public abstract class ContentElement : ITracksChanges
         set => Set(ref isArtifact, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this element has been modified since it was
-    /// materialized from a loaded content stream. A loaded page re-emits only the
-    /// elements that report true, so an untouched one keeps its original bytes.
-    /// </summary>
-    public virtual bool IsModified => tracker.IsModified;
+    internal virtual bool IsModified => tracker.IsModified;
 
     private protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
 

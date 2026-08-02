@@ -75,8 +75,7 @@ public sealed class InkAnnotation : Annotation
         set => Set(ref strokeWidth, value);
     }
 
-    /// <inheritdoc />
-    public override bool IsModified
+    internal override bool IsModified
     {
         get
         {

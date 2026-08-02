@@ -9,6 +9,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class DocumentInfo : ITracksChanges
 {
+    internal DocumentInfo()
+    {
+    }
+
     private ChangeTracker tracker;
     private string? title;
     private string? author;

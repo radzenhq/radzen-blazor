@@ -162,11 +162,7 @@ public sealed class PathContent : ContentElement
         set => Set(ref miterLimit, value);
     }
 
-    /// <summary>
-    /// Gets or sets the color rendering intent (the <c>ri</c> operator). When null
-    /// (the default), no rendering-intent operator is emitted.
-    /// </summary>
-    public RenderingIntent? Intent
+    internal RenderingIntent? Intent
     {
         get => intent;
         set => Set(ref intent, value);

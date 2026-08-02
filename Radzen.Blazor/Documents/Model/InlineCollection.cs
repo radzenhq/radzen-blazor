@@ -13,6 +13,10 @@ namespace Radzen.Documents;
 /// </summary>
 public sealed class InlineCollection : IReadOnlyList<Inline>
 {
+    internal InlineCollection()
+    {
+    }
+
     private readonly TrackedList<Inline> items = [];
 
     /// <inheritdoc/>

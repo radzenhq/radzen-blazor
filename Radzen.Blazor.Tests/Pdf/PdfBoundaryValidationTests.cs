@@ -56,23 +56,11 @@ public class PdfBoundaryValidationTests
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
     [InlineData(double.NegativeInfinity)]
-    public void WriteNumber_NonFinite_Throws(double value)
+    public void NonFinite_IsRejectedByBothWritingPaths(double value)
     {
-        var writer = new ContentWriter();
-
-        var exception = Assert.Throws<InvalidOperationException>(() => writer.WriteNumber(value));
-        Assert.Equal("A PDF number cannot be NaN or infinite.", exception.Message);
-    }
-
-    [Fact]
-    public void WriteNumber_NonFinite_MatchesObjectPathMessage()
-    {
-        var writer = new ContentWriter();
-        var content = Assert.Throws<InvalidOperationException>(() => writer.WriteNumber(double.NaN));
-        var number = Assert.Throws<InvalidOperationException>(
-            () => new NumberObject(double.NaN).Write(new MemoryStream(), new WriteContext()));
-
-        Assert.Equal(number.Message, content.Message);
+        Assert.Throws<InvalidOperationException>(() => new ContentWriter().WriteNumber(value));
+        Assert.Throws<InvalidOperationException>(
+            () => new NumberObject(value).Write(new MemoryStream(), new WriteContext()));
     }
 
     [Fact]

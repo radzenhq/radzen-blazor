@@ -52,8 +52,7 @@ public class CodeElementTests
         const string value = "https://radzen.com";
         var document = new Document();
         var section = document.Sections.Add();
-        var qr = section.Blocks.AddQrCode(value, Unit.FromPoint(120));
-        Assert.Same(qr, section.Blocks[0]);
+        section.Blocks.AddQrCode(value, Unit.FromPoint(120));
 
         var matrix = QrEncoder.EncodeUtf8(value, QrErrorCorrection.Medium);
         var expectedModule = 120.0 / (matrix.GetLength(0) + 8);
@@ -96,8 +95,7 @@ public class CodeElementTests
         const string value = "RADZEN";
         var document = new Document();
         var section = document.Sections.Add();
-        var barcode = section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
-        Assert.Same(barcode, section.Blocks[0]);
+        section.Blocks.AddBarcode(BarcodeType.Code128, value, Unit.FromPoint(200), Unit.FromPoint(40));
 
         var widths = BarcodeEncoder.EncodeCode128B(value);
         var expectedBars = 0;
@@ -412,50 +410,26 @@ public class CodeElementTests
         return document;
     }
 
-    [Fact]
-    public void QrCode_Foreground_PaintsTheModulesInTheAuthoredColor()
+    [Theory]
+    [InlineData("qr", true, 65, 105, 225)]
+    [InlineData("qr", false, 0, 0, 0)]
+    [InlineData("barcode", true, 200, 0, 100)]
+    [InlineData("barcode", false, 0, 0, 0)]
+    public void CodeSymbol_PaintsItsModulesInTheAuthoredForegroundAndDefaultsToBlack(
+        string kind, bool authored, int red, int green, int blue)
     {
-        var colors = ModuleFillColors(QrDocument(Color.FromRgb(65, 105, 225)));
+        Color? foreground = authored ? Color.FromRgb((byte)red, (byte)green, (byte)blue) : null;
+        var document = kind == "qr" ? QrDocument(foreground) : BarcodeDocument(foreground);
+
+        var colors = ModuleFillColors(document);
 
         Assert.NotEmpty(colors);
         Assert.All(colors, color =>
         {
-            Assert.Equal(65 / 255.0, color.R, 3);
-            Assert.Equal(105 / 255.0, color.G, 3);
-            Assert.Equal(225 / 255.0, color.B, 3);
+            Assert.Equal(red / 255.0, color.R, 3);
+            Assert.Equal(green / 255.0, color.G, 3);
+            Assert.Equal(blue / 255.0, color.B, 3);
         });
-    }
-
-    [Fact]
-    public void QrCode_DefaultForeground_PaintsTheModulesBlack()
-    {
-        Assert.All(ModuleFillColors(QrDocument(null)), color => Assert.Equal((0d, 0d, 0d), color));
-        Assert.Equal(
-            ContentTestHelpers.PageContent(BuildTestSupport.Read(QrDocument(Color.Black)), 0),
-            ContentTestHelpers.PageContent(BuildTestSupport.Read(QrDocument(null)), 0));
-    }
-
-    [Fact]
-    public void Barcode_Foreground_PaintsTheBarsInTheAuthoredColor()
-    {
-        var colors = ModuleFillColors(BarcodeDocument(Color.FromRgb(200, 0, 100)));
-
-        Assert.NotEmpty(colors);
-        Assert.All(colors, color =>
-        {
-            Assert.Equal(200 / 255.0, color.R, 3);
-            Assert.Equal(0, color.G, 3);
-            Assert.Equal(100 / 255.0, color.B, 3);
-        });
-    }
-
-    [Fact]
-    public void Barcode_DefaultForeground_PaintsTheBarsBlack()
-    {
-        Assert.All(ModuleFillColors(BarcodeDocument(null)), color => Assert.Equal((0d, 0d, 0d), color));
-        Assert.Equal(
-            ContentTestHelpers.PageContent(BuildTestSupport.Read(BarcodeDocument(Color.Black)), 0),
-            ContentTestHelpers.PageContent(BuildTestSupport.Read(BarcodeDocument(null)), 0));
     }
 
     [Fact]

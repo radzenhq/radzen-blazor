@@ -12,6 +12,10 @@ namespace Radzen.Documents.Pdf;
 /// </summary>
 public sealed class ContentCollection : IReadOnlyList<ContentElement>
 {
+    internal ContentCollection()
+    {
+    }
+
     private readonly TrackedList<ContentElement> items = [];
     private Action? invalidate;
     private bool loading;

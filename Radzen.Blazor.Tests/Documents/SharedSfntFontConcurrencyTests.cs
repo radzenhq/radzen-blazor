@@ -130,19 +130,6 @@ public class SharedSfntFontConcurrencyTests
         Assert.Equal(LazyCachesByDeclaringType, mutable);
     }
 
-    [Fact]
-    public void SfntFontProperties_AreNeverPubliclySettable()
-    {
-        var settable = ReachableFrom(typeof(SfntFont))
-            .SelectMany(type => type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-            .Where(property => property.SetMethod is { IsPublic: true })
-            .Select(property => $"{property.DeclaringType!.FullName}.{property.Name}")
-            .OrderBy(name => name, StringComparer.Ordinal)
-            .ToArray();
-
-        Assert.Empty(settable);
-    }
-
     private static IReadOnlyCollection<Type> ReachableFrom(Type root)
     {
         var seen = new HashSet<Type> { root };

@@ -93,6 +93,6 @@ public class EncryptionPublicApiTests
 
         var a = new DocumentRenderer().ToArray(plain);
         var b = withNullRendered.ToArray();
-        Assert.Equal(a.Length, b.Length);
+        Assert.Equal(a, b);
     }
 }

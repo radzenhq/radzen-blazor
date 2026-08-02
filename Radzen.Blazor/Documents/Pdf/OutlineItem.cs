@@ -73,17 +73,15 @@ public sealed class OutlineItem(string title, OutlineTarget? target) : ITracksCh
         set => tracker.Set(ref collapsed, value);
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this entry or any descendant has been modified since the
-    /// document was loaded.
-    /// </summary>
-    public bool IsModified => tracker.IsModified || TrackedChanges.AnyModified(children);
+    internal bool IsModified => tracker.IsModified || TrackedChanges.AnyModified(children);
 
     internal void AcceptChanges()
     {
         tracker.AcceptChanges();
         TrackedChanges.Accept(children);
     }
+
+    bool ITracksChanges.IsModified => IsModified;
 
     void ITracksChanges.AcceptChanges() => AcceptChanges();
 
