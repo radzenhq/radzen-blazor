@@ -14,15 +14,72 @@ public sealed class RedactionOptions
     public Color? FillColor { get; set; }
 }
 
+internal sealed class RedactionPlan
+{
+    private readonly Page page;
+    private readonly bool beginGeneratedEdit;
+    private readonly byte[]? editedContent;
+    private readonly int elementCount;
+    private readonly int[] removals;
+    private readonly PathContent[] overlays;
+
+    internal RedactionPlan(Page page, bool beginGeneratedEdit, byte[]? editedContent, int elementCount, int[] removals, PathContent[] overlays)
+    {
+        this.page = page;
+        this.beginGeneratedEdit = beginGeneratedEdit;
+        this.editedContent = editedContent;
+        this.elementCount = elementCount;
+        this.removals = removals;
+        this.overlays = overlays;
+    }
+
+    internal void Commit()
+    {
+        if (beginGeneratedEdit)
+        {
+            page.BeginGeneratedEdit();
+        }
+
+        if (editedContent is not null)
+        {
+            page.ApplyEditedContent(editedContent);
+        }
+
+        var content = page.Content;
+        if (content.Count != elementCount)
+        {
+            throw new InvalidOperationException("The page content changed while the redaction was being planned.");
+        }
+
+        foreach (var index in removals)
+        {
+            content.RemoveAt(index);
+        }
+
+        foreach (var overlay in overlays)
+        {
+            content.Add(overlay);
+        }
+    }
+}
+
 internal static class Redactor
 {
     public static int RedactText(Page page, string text, TextSearchOptions? searchOptions, RedactionOptions? redactionOptions)
     {
+        var plan = PlanText(page, text, searchOptions, redactionOptions, out var count);
+        plan?.Commit();
+        return count;
+    }
+
+    public static RedactionPlan? PlanText(Page page, string text, TextSearchOptions? searchOptions, RedactionOptions? redactionOptions, out int count)
+    {
         var cache = new ContentTokenizer.Cache();
         var hits = page.FindText(text, searchOptions, -1, cache);
+        count = hits.Count;
         if (hits.Count == 0)
         {
-            return 0;
+            return null;
         }
 
         if (hits.Any(static hit => hit.GeometryEstimated))
@@ -30,11 +87,13 @@ internal static class Redactor
             throw new NotSupportedException("The source font does not provide a usable width for every matched glyph, so the bounds of the match are an estimate that cannot be redacted safely.");
         }
 
-        Redact(page, hits.Select(static hit => hit.Bounds), redactionOptions, cache);
-        return hits.Count;
+        return Plan(page, hits.Select(static hit => hit.Bounds), redactionOptions, cache);
     }
 
     public static void Redact(Page page, IEnumerable<PdfRect> areas, RedactionOptions? options, ContentTokenizer.Cache? cache = null)
+        => Plan(page, areas, options, cache)?.Commit();
+
+    public static RedactionPlan? Plan(Page page, IEnumerable<PdfRect> areas, RedactionOptions? options, ContentTokenizer.Cache? cache = null)
     {
         ArgumentNullException.ThrowIfNull(areas);
         cache ??= new ContentTokenizer.Cache();
@@ -49,52 +108,74 @@ internal static class Redactor
 
         if (regions.Length == 0)
         {
-            return;
+            return null;
         }
 
-        page.BeginGeneratedEdit();
+        var beginGeneratedEdit = page.IsGenerated && !page.IsEditingGenerated;
+        var raw = beginGeneratedEdit ? page.RawContent : page.CurrentContent;
 
-        Func<string, bool> isRemovableXObject = static _ => false;
-        if (page.OutputIdentity is { } generated)
+        byte[]? edited = null;
+        if (raw is { Length: > 0 })
         {
-            var imageNames = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var image in generated.Images)
-            {
-                imageNames.Add(image.Key);
-            }
-
-            isRemovableXObject = imageNames.Contains;
-        }
-
-        if (page.CurrentContent is { Length: > 0 } raw)
-        {
-            var selected = SelectIntersectingGlyphs(page, regions, cache);
+            var selected = SelectIntersectingGlyphs(raw, page.TextFonts, regions, cache);
             if (selected.Count > 0)
             {
-                page.ApplyEditedContent(RemoveTextGlyphs(raw, selected, cache));
+                edited = RemoveTextGlyphs(raw, selected, cache);
             }
         }
 
-        SweepElements(page.Content, regions, isRemovableXObject);
+        var swept = edited ?? raw;
+        IReadOnlyList<ContentElement> elements;
+        if (swept is { Length: > 0 })
+        {
+            var parsed = new ContentCollection();
+            ContentInterpreter.Materialize(swept, parsed, page.TextFonts, cache);
+            elements = parsed;
+        }
+        else
+        {
+            elements = page.Content;
+        }
 
+        var removals = PlanRemovals(elements, regions, RemovableXObjects(page));
+        var overlays = Array.Empty<PathContent>();
         if (options?.FillColor is { } fill)
         {
-            var content = page.Content;
-            foreach (var area in regions)
+            overlays = new PathContent[regions.Length];
+            for (var i = 0; i < regions.Length; i++)
             {
+                var area = regions[i];
                 var overlay = PathContent.Rectangle(area.Left, area.Bottom, area.Width, area.Height);
                 overlay.Fill = true;
                 overlay.FillColor = fill;
-                content.Add(overlay);
+                overlays[i] = overlay;
             }
         }
+
+        return new RedactionPlan(page, beginGeneratedEdit, edited, elements.Count, removals, overlays);
+    }
+
+    private static Func<string, bool> RemovableXObjects(Page page)
+    {
+        if (page.OutputIdentity is not { } generated)
+        {
+            return static _ => false;
+        }
+
+        var imageNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var image in generated.Images)
+        {
+            imageNames.Add(image.Key);
+        }
+
+        return imageNames.Contains;
     }
 
     private static Dictionary<int, (PositionedTextRun Run, bool[] Removed)> SelectIntersectingGlyphs(
-        Page page, IReadOnlyList<PdfRect> regions, ContentTokenizer.Cache cache)
+        byte[] content, IReadOnlyDictionary<string, ReverseFont>? fonts, IReadOnlyList<PdfRect> regions, ContentTokenizer.Cache cache)
     {
         var selected = new Dictionary<int, (PositionedTextRun Run, bool[] Removed)>();
-        foreach (var run in page.ExtractPositionedText(cache))
+        foreach (var run in TextSearch.Extract(content, fonts, cache))
         {
             if (run.GeometryEstimated)
             {
@@ -123,8 +204,9 @@ internal static class Redactor
         return selected;
     }
 
-    private static void SweepElements(ContentCollection content, IReadOnlyList<PdfRect> regions, Func<string, bool> isRemovableXObject)
+    private static int[] PlanRemovals(IReadOnlyList<ContentElement> content, IReadOnlyList<PdfRect> regions, Func<string, bool> isRemovableXObject)
     {
+        var removals = new List<int>();
         for (var i = content.Count - 1; i >= 0; i--)
         {
             switch (content[i])
@@ -135,10 +217,10 @@ internal static class Redactor
                         throw new NotSupportedException("A redaction region intersects a clipping path that cannot be removed safely.");
                     }
 
-                    content.RemoveAt(i);
+                    removals.Add(i);
                     break;
                 case ImageContent image when IntersectsAny(TransformedBounds(image.Bounds, image.Transform), regions):
-                    content.RemoveAt(i);
+                    removals.Add(i);
                     break;
                 case XObjectContent xobject when IntersectsAny(UnitBounds(xobject.Transform), regions):
                     if (!isRemovableXObject(xobject.Name))
@@ -146,10 +228,10 @@ internal static class Redactor
                         throw new NotSupportedException($"A redaction region intersects XObject '{xobject.Name}'. Its image or form subtype cannot be determined safely from the content stream.");
                     }
 
-                    content.RemoveAt(i);
+                    removals.Add(i);
                     break;
                 case InlineImageContent inline when IntersectsAny(UnitBounds(inline.Transform), regions):
-                    content.RemoveAt(i);
+                    removals.Add(i);
                     break;
                 case RawContent unmodeled when ContentOperatorClass.MayPaintUnknown(unmodeled.Operator)
                     && (unmodeled.ClipBounds is not { } clip || IntersectsAny(clip, regions)):
@@ -158,6 +240,8 @@ internal static class Redactor
                     break;
             }
         }
+
+        return [.. removals];
     }
 
     private static byte[] RemoveTextGlyphs(byte[] source, IReadOnlyDictionary<int, (PositionedTextRun Run, bool[] Removed)> selected, ContentTokenizer.Cache? cache)

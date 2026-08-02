@@ -114,7 +114,7 @@ internal static class BlockExpander
         }
     }
 
-    private const string TocPagePlaceholder = "0000";
+    private const string TocPagePlaceholder = PageFieldPlaceholder.Text;
 
     private const double TocSentinelStop = 100000;
 

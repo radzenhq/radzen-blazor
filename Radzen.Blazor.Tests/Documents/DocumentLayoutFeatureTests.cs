@@ -147,8 +147,8 @@ public class DocumentLayoutFeatureTests
         var face = Assert.Single(document.Fonts.RegisteredFaces());
 
         Assert.Equal(BuildTestSupport.Latin, face.Family);
-        Assert.False(face.Source.Memory.IsEmpty);
-        Assert.Same(face.Face, document.Fonts.ResolveFace(new Font { Family = BuildTestSupport.Latin }));
+        Assert.False(PdfFontProgram.DataOf(face).Memory.IsEmpty);
+        Assert.Same(FontProgram.Of(face), document.Fonts.ResolveFace(new Font { Family = BuildTestSupport.Latin }));
     }
 
     [Fact]

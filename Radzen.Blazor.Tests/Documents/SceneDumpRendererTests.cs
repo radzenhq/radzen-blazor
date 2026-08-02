@@ -8,6 +8,8 @@ using System.Text;
 using System;
 using Radzen.Blazor.Pdf.Tests;
 using Radzen.Documents.Core;
+using Radzen.Documents.Fonts.Sfnt;
+using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf;
@@ -150,6 +152,38 @@ public class SceneDumpRendererTests
             .ToArray();
 
         Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void SceneFontView_HandsOutNoFontProgram()
+    {
+        const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic
+            | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
+
+        var offenders = typeof(RegisteredFace).GetProperties(All)
+            .Where(property => property.GetMethod is { IsPrivate: false })
+            .Select(property => (property.Name, Type: property.PropertyType))
+            .Concat(typeof(RegisteredFace).GetFields(All)
+                .Where(field => !field.IsPrivate)
+                .Select(field => (field.Name, Type: field.FieldType)))
+            .Where(member => member.Type == typeof(SfntFont) || member.Type == typeof(FontSourceData))
+            .Select(member => member.Name)
+            .OrderBy(name => name, StringComparer.Ordinal)
+            .ToArray();
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void SceneFontView_ReportsFamilyStyleAndMetrics()
+    {
+        var face = Assert.Single(DocumentLayouter.Layout(Everything()).Fonts.Faces);
+
+        Assert.Equal(Latin, face.Family);
+        Assert.False(face.Bold);
+        Assert.False(face.Italic);
+        Assert.True(face.Metrics.UnitsPerEm > 0);
+        Assert.True(face.Metrics.Ascent > face.Metrics.Descent);
     }
 
     [Fact]
