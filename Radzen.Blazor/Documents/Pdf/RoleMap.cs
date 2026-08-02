@@ -28,6 +28,10 @@ public sealed class RoleMap
 
     private readonly SortedDictionary<string, string> map = new(StringComparer.Ordinal);
 
+    private Action? changed;
+
+    internal void OwnedBy(Action? owner) => changed = owner;
+
     /// <summary>Gets the number of declared role mappings.</summary>
     public int Count => map.Count;
 
@@ -80,6 +84,7 @@ public sealed class RoleMap
         }
 
         map[role] = structureType;
+        changed?.Invoke();
     }
 
     private bool Reaches(string from, string target)
@@ -123,7 +128,7 @@ public sealed class RoleMap
 
     internal static bool IsStandardType(string type) => StandardTypes.Contains(type);
 
-    internal IEnumerable<KeyValuePair<string, string>> Entries => map;
+    internal IReadOnlyList<KeyValuePair<string, string>> Entries => [.. map];
 
     internal RoleMap Snapshot()
     {

@@ -9,7 +9,6 @@ internal sealed class DocumentOutput(
     ImmutableArray<PageOutput> pages,
     StructureElementSnapshot? structure,
     ImmutableDictionary<string, OutputAnchor> anchors,
-    ImmutableArray<KeyValuePair<string, string>> roleMap,
     ImmutableArray<string> unmappedRoles)
 {
     public ImmutableArray<PageOutput> Pages { get; } = pages;
@@ -17,8 +16,6 @@ internal sealed class DocumentOutput(
     public StructureElementSnapshot? Structure { get; } = structure;
 
     public ImmutableDictionary<string, OutputAnchor> Anchors { get; } = anchors;
-
-    public ImmutableArray<KeyValuePair<string, string>> RoleMap { get; } = roleMap;
 
     public ImmutableArray<string> UnmappedRoles { get; } = unmappedRoles;
 }

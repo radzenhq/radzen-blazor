@@ -9,21 +9,20 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Write;
 
-internal sealed class DocumentGraphBuilder(PortableDocument doc)
+internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime)
 {
     internal DocumentObjectGraph Build()
     {
         var pageMap = PageOutputMap.Build(doc.Pages);
         var conformance = new ConformanceWriter(doc, pageMap);
-        if (doc.Xmp.IsModified && (doc.Conformance != PdfAConformance.None || doc.IsPdfUa))
+        if (!renderTime)
         {
-            throw new InvalidOperationException(
-                "Caller-edited XMP cannot be combined with PDF/A or PDF/UA output because conformance metadata has mandatory values. Clear the XMP edits or disable conformance.");
+            conformance.ValidateSaveTime();
         }
 
         if (doc.Conformance != PdfAConformance.None || doc.IsPdfUa)
         {
-            conformance.ValidateConformance();
+            conformance.ValidateRenderTime();
         }
 
         var writer = new DocumentWriter(Stream.Null)
@@ -89,7 +88,7 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc)
         {
             catalog["MarkInfo"] = new DictionaryObject { ["Marked"] = new BooleanObject(true) };
             catalog["StructTreeRoot"] = StructureWriter.WriteStructureTree(
-                writer, structure, pageNodes, pageMap, doc.Output.RoleMap, annotationJoins);
+                writer, structure, pageNodes, pageMap, doc.RoleMap.Entries, annotationJoins);
         }
 
         var forms = new FormWriter(doc);

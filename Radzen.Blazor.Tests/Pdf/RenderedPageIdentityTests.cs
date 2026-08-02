@@ -141,7 +141,7 @@ public class RenderedPageIdentityTests
         var rendered = new DocumentRenderer().Render(ThreePages(anchors: true));
         var plan = rendered.Output!;
         rendered.Output = new Radzen.Documents.Pdf.Output.DocumentOutput(
-            plan.Pages, null, plan.Anchors, plan.RoleMap, plan.UnmappedRoles);
+            plan.Pages, null, plan.Anchors, plan.UnmappedRoles);
         rendered.Pages.RemoveAt(1);
 
         var error = Assert.Throws<InvalidOperationException>(() => rendered.ToArray());

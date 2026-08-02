@@ -233,6 +233,37 @@ public class StructureRoleMapTests
     }
 
     [Fact]
+    public void RoleAddedToTheDocumentAfterRender_ReachesTheSavedRoleMap()
+    {
+        var (document, renderer) = AuthorTagged(declareRole: true);
+        var rendered = renderer.Render(document);
+
+        rendered.RoleMap.Add("Aside", "Div");
+
+        var reader = DocumentReader.Parse(rendered.ToArray());
+        var structRoot = StructTreeRoot(reader);
+        var roleMap = Assert.IsType<DictionaryObject>(reader.Resolve(structRoot["RoleMap"]));
+
+        Assert.True(roleMap.TryGetValue("Aside", out var mapped), "/RoleMap maps the role added after render");
+        Assert.Equal("Div", Assert.IsType<NameObject>(reader.Resolve(mapped!)).Value);
+        Assert.True(roleMap.ContainsKey("Callout"), "/RoleMap keeps the role declared before render");
+    }
+
+    [Fact]
+    public void DanglingRoleAddedToTheDocumentAfterRender_FailsAtSave()
+    {
+        var (document, renderer) = AuthorTagged(declareRole: true);
+        var rendered = renderer.Render(document);
+
+        rendered.RoleMap.Add("Aside", "Sidebar");
+
+        var error = Assert.Throws<System.InvalidOperationException>(rendered.ToArray);
+
+        Assert.Contains("Sidebar", error.Message, System.StringComparison.Ordinal);
+        Assert.Contains("neither a standard type nor itself role mapped", error.Message, System.StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void DeclaredRole_ProducesByteIdenticalOutputAcrossBuilds()
     {
         var first = RenderAuthored(AuthorTagged(declareRole: true));

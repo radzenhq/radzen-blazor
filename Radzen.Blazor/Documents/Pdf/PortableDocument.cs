@@ -49,6 +49,7 @@ public sealed class PortableDocument
         pageLabels = new TrackedList<PageLabel>(InvalidateMaterializedGraph);
         formFields = new TrackedList<FormFieldDefinition>(InvalidateMaterializedGraph);
         attachments.OwnedBy(InvalidateMaterializedGraph);
+        roleMap.OwnedBy(InvalidateMaterializedGraph);
         info.OwnedBy(InvalidateMaterializedGraph);
         xmp.OwnedBy(InvalidateMaterializedGraph);
     }
@@ -409,9 +410,21 @@ public sealed class PortableDocument
     /// written as <c>/StructTreeRoot /RoleMap</c>. It is captured from
     /// <see cref="DocumentRenderer.RoleMap"/> when the document is rendered; a role map is
     /// meaningful only alongside a structure tree, which only rendering produces, so a loaded
-    /// document cannot be given one.
+    /// document cannot be given one. A mapping added to this map after the document was
+    /// rendered reaches the saved file and is validated when the document is saved.
     /// </summary>
-    public RoleMap RoleMap { get; internal set; } = new();
+    public RoleMap RoleMap
+    {
+        get => roleMap;
+        internal set
+        {
+            roleMap.OwnedBy(null);
+            roleMap = value;
+            roleMap.OwnedBy(InvalidateMaterializedGraph);
+        }
+    }
+
+    private RoleMap roleMap = new();
 
     private PdfAConformance conformance;
 
@@ -806,7 +819,10 @@ public sealed class PortableDocument
     {
         ArgumentNullException.ThrowIfNull(stream);
 
-        var graph = (MaterializedGraph ?? new DocumentGraphBuilder(this).Build()).CopyForSerialization();
+        ValidateSaveTimeConformance();
+
+        var graph = (MaterializedGraph ?? new DocumentGraphBuilder(this, renderTime: false).Build())
+            .CopyForSerialization();
         var writer = new DocumentWriter(stream, graph)
         {
             Encryption = graph.Encryption,
@@ -843,6 +859,8 @@ public sealed class PortableDocument
                 + "Use SaveToStream to write a newly built document.");
         }
 
+        ValidateSaveTimeConformance();
+
         new IncrementalDocumentWriter(this).Save(stream);
     }
 
@@ -859,4 +877,7 @@ public sealed class PortableDocument
     /// <returns>The bytes of the signed document.</returns>
     public byte[] Sign(SignatureOptions options, ISigner signer)
         => PdfSigner.Sign(ToArray(), options, signer);
+
+    private void ValidateSaveTimeConformance()
+        => new ConformanceWriter(this, PageOutputMap.Build(Pages)).ValidateSaveTime();
 }

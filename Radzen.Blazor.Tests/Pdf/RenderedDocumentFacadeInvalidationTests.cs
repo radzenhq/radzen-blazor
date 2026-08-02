@@ -40,7 +40,7 @@ public class RenderedDocumentFacadeInvalidationTests
         Assert.True(loaded.HasPreservableStructureGraph);
         Assert.True(loaded.Loaded!.SourceCatalog!.ContainsKey("MarkInfo"));
 
-        loaded.MaterializedGraph = new DocumentGraphBuilder(loaded).Build();
+        loaded.MaterializedGraph = new DocumentGraphBuilder(loaded, renderTime: false).Build();
         return loaded;
     }
 
