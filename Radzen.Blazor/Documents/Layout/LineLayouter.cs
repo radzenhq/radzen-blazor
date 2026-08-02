@@ -540,6 +540,25 @@ internal static partial class LineLayouter
         };
     }
 
+    private static FragmentPaint ShapeFieldValue(in FragmentPaint paint, FontCollection fonts)
+    {
+        if (paint.FormField is not { Kind: FormFieldKind.Text or FormFieldKind.DropDown } field
+            || field.Value.Length == 0)
+        {
+            return paint;
+        }
+
+        return paint with
+        {
+            FormField = field with
+            {
+                ValueGlyphs = GeometryCapture.PositionSpans(
+                    fonts.CaptureGlyphRun(field.Value, paint.Font),
+                    paint),
+            },
+        };
+    }
+
     private static ImmutableArray<ShapedTextRun> ShapeRuns(
         List<LineFragment> fragments,
         FontCollection fonts,
@@ -556,7 +575,7 @@ internal static partial class LineLayouter
                 runs.Add(new ShapedTextRun
                 {
                     Fragments = [current],
-                    Paint = paint,
+                    Paint = ShapeFieldValue(paint, fonts),
                     XOffset = current.XOffset,
                     IsMarker = current.IsMarker,
                     GlyphRun = current.GlyphRun,

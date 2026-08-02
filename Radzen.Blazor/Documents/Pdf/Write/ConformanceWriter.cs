@@ -75,6 +75,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         }
 
         ValidateAnnotationStructure();
+        ValidateAppearanceFonts();
 
         if (document.Conformance == PdfAConformance.None)
         {
@@ -160,6 +161,124 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
                         $"the form field '{widget.Field.Name}' was placed outside the tagged content "
                         + "(page headers, footers and watermarks are artifacts and carry no structure)",
                         "move the field into the document body"));
+                }
+            }
+        }
+    }
+
+    // ISO 19005-2 6.2.11.4.1: every font used to render text shall be embedded, and ISO 32000-1 12.5.5
+    // makes a widget annotation's appearance stream the content a viewer renders for that annotation.
+    private void ValidateAppearanceFonts()
+    {
+        foreach (var definition in document.FormFields)
+        {
+            var font = definition switch
+            {
+                TextFieldDefinition text => text.Font,
+                ChoiceFieldDefinition choice => choice.Font,
+                _ => null,
+            };
+
+            if (font is not null)
+            {
+                throw new InvalidOperationException(
+                    $"{Label} requires every font used to render text to be embedded, and the field "
+                    + $"'{definition.Name}' added to PortableDocument.FormFields draws its value with the standard-14 "
+                    + $"face '{Fonts.FontResolution.ResolveBase14Name(font, scope: default)}', which carries no "
+                    + "font program this library can embed, so the widget's appearance stream would name a font that "
+                    + "is not embedded. Author the field in the document instead - add a TextInput or DropDown to a "
+                    + "paragraph's Inlines, so it renders with the paragraph's embedded font - or save without a "
+                    + "conformance claim (PdfAConformance.None and PdfUaConformance.None).");
+            }
+        }
+
+        foreach (var generated in PlannedPages())
+        {
+            foreach (var widget in generated.Widgets)
+            {
+                RequireEmbeddedAppearance(widget);
+            }
+        }
+
+        ValidateLoadedAppearanceFonts();
+    }
+
+    private void RequireEmbeddedAppearance(in OutputWidget widget)
+    {
+        var field = widget.Field;
+        if (field.Kind is not (LaidOut.FormFieldKind.Text or LaidOut.FormFieldKind.DropDown)
+            || field.Value.Length == 0)
+        {
+            return;
+        }
+
+        if (widget.HasEmbeddedAppearance)
+        {
+            foreach (var span in widget.Appearance)
+            {
+                if (!span.Font.IsEmbedded)
+                {
+                    throw Fonts.FontResolution.Base14Forbidden(Label, span.Font.Base14Name, family: null);
+                }
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"{Label} requires every font used to render text to be embedded, but the appearance stream of the "
+                + $"form field '{field.Name}' has no embedded font for its value; give the field's paragraph a "
+                + "registered font family, or save without a conformance claim (PdfAConformance.None and "
+                + "PdfUaConformance.None).");
+        }
+    }
+
+    private void ValidateLoadedAppearanceFonts()
+    {
+        foreach (var page in document.Pages)
+        {
+            foreach (var entry in page.Annotations.Entries)
+            {
+                if (entry.Dictionary is not { } dictionary || entry.Reader is not { } reader)
+                {
+                    continue;
+                }
+
+                var validator = new LoadedPageValidator(reader, Label);
+                foreach (var stream in AppearanceStreams(reader, dictionary))
+                {
+                    if (reader.GetDictionary(stream.Dictionary, "Resources") is { } resources)
+                    {
+                        validator.Inspect(resources);
+                    }
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<StreamObject> AppearanceStreams(DocumentReader reader, DictionaryObject annotation)
+    {
+        if (reader.GetDictionary(annotation, "AP") is not { } appearances)
+        {
+            yield break;
+        }
+
+        foreach (var key in appearances.Keys)
+        {
+            var resolved = reader.Resolve(appearances[key]);
+            if (resolved is StreamObject direct)
+            {
+                yield return direct;
+                continue;
+            }
+
+            if (resolved is DictionaryObject states)
+            {
+                foreach (var state in states.Keys)
+                {
+                    if (reader.AsStream(states[state]) is { } stream)
+                    {
+                        yield return stream;
+                    }
                 }
             }
         }

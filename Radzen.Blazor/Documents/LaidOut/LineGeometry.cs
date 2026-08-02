@@ -45,6 +45,8 @@ internal readonly record struct FormFieldPaint
     public string? Label { get; init; }
 
     public ImmutableArray<string> Options { get; init; }
+
+    public CapturedGlyphRun ValueGlyphs { get; init; }
 }
 
 internal readonly record struct FragmentPaint

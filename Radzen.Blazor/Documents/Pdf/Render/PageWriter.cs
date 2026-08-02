@@ -336,6 +336,26 @@ internal sealed class PageWriter(
         }
     }
 
+    private ImmutableArray<OutputWidgetTextSpan> WidgetAppearance(in WidgetDraw widget)
+    {
+        if (widget.Appearance.IsDefaultOrEmpty)
+        {
+            return default;
+        }
+
+        var spans = ImmutableArray.CreateBuilder<OutputWidgetTextSpan>(widget.Appearance.Length);
+        foreach (var span in widget.Appearance)
+        {
+            var planned = plannedFonts[span.Font];
+            spans.Add(new OutputWidgetTextSpan(
+                planned.Output,
+                RemapBytes(span.Bytes, planned.CompactGidMap),
+                span.XOffset));
+        }
+
+        return spans.MoveToImmutable();
+    }
+
     private PageOutput PackageResources()
     {
         var fonts = ImmutableArray.CreateBuilder<OutputFont>(plan.Resources.UsedFonts.Count);
@@ -352,7 +372,8 @@ internal sealed class PageWriter(
                 widget.Bottom,
                 widget.Field,
                 widget.Font,
-                widget.Element?.Id));
+                widget.Element?.Id,
+                WidgetAppearance(widget)));
         }
 
         return new PageOutput(

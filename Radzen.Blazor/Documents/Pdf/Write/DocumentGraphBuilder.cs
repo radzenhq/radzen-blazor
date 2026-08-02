@@ -69,7 +69,7 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         catalog["Pages"] = pagesRef;
 
         WriteStructureFormsAndAnnotations(
-            writer, catalog, pagesRef, pageNodes, pageMap, annotationJoins, importer, loaded, appendImporters);
+            writer, catalog, pagesRef, pageNodes, pageMap, annotationJoins, importer, loaded, appendImporters, fontRefs);
         WriteCatalogFeatures(writer, catalog, pageNodes, pageMap, conformance);
         return FinishGraph(writer, catalogRef, catalog, pageNodes, emittedContent, importer);
     }
@@ -83,9 +83,10 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         List<AnnotationElementJoin> annotationJoins,
         GraphImporter? importer,
         LoadedState? loaded,
-        Dictionary<DocumentReader, GraphImporter> appendImporters)
+        Dictionary<DocumentReader, GraphImporter> appendImporters,
+        Dictionary<OutputFont, DocumentObject> fontRefs)
     {
-        var forms = new FormWriter(doc);
+        var forms = new FormWriter(doc, writer, fontRefs);
         var appendedFields = forms.AppendForms(pageNodes, appendImporters, writer);
         var authored = new AuthoredFieldWriter(doc, forms).Write(writer, pageNodes, pageMap, appendedFields);
 

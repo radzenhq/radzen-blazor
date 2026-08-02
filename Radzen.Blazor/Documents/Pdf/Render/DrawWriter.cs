@@ -60,7 +60,7 @@ internal static class DrawWriter
         }
     }
 
-    private static byte[] RemapBytes(byte[] bytes, IReadOnlyDictionary<ushort, ushort>? gidMap)
+    internal static byte[] RemapBytes(byte[] bytes, IReadOnlyDictionary<ushort, ushort>? gidMap)
     {
         if (gidMap is null)
         {

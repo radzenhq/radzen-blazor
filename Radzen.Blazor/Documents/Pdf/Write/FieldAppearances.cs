@@ -19,6 +19,51 @@ internal static class FieldAppearances
     public static StreamObject BuildText(string value, double width, double height, Font font, FontScope scope)
         => Appearance(scope, width, height, [Text(value, 0.0, 0.0, height, font)], "/Tx BMC\nq\n", "Q\nEMC\n");
 
+    // ISO 19005-2 6.2.11.4.1: every font used to render text shall be embedded, and ISO 32000-1 12.5.5
+    // makes a widget's appearance stream the content a viewer renders for that annotation.
+    public static StreamObject BuildEmbeddedText(
+        IReadOnlyList<(string Key, byte[] Bytes, double XOffset)> spans,
+        DictionaryObject fonts,
+        double width,
+        double height,
+        double size)
+    {
+        using var content = new ContentWriter(default, ContentResourcePrefixes.Appearance);
+        content.WriteRaw("/Tx BMC\nq\n");
+        foreach (var (key, bytes, offset) in spans)
+        {
+            ContentEmitter.WriteTextShow(content, new TextShowOp
+            {
+                FontKey = key,
+                Size = size,
+                X = 2.0 + offset,
+                Baseline = Baseline(height, size),
+                Color = Color.Black,
+                Bytes = bytes,
+            });
+        }
+
+        content.WriteRaw("Q\nEMC\n");
+        var stream = new StreamObject(content.ToArray());
+        FormXObjectBuilder.ApplyHeader(
+            stream.Dictionary,
+            new ArrayObject
+            {
+                new NumberObject(0.0),
+                new NumberObject(0.0),
+                new NumberObject(width),
+                new NumberObject(height),
+            },
+            formType: false);
+
+        if (fonts.Count > 0)
+        {
+            stream.Dictionary["Resources"] = new DictionaryObject { ["Font"] = fonts };
+        }
+
+        return stream;
+    }
+
     public static StreamObject BuildSignatureAppearance(
         IReadOnlyList<string> lines, double width, double height, Font font, FontScope scope)
         => Appearance(scope, width, height, SignatureLines(lines, height, font), "q\n", "Q\n");
@@ -99,6 +144,26 @@ internal static class FieldAppearances
         {
             Font = font,
         };
+
+    public static IEnumerable<TextContent> EmbeddedText(Output.OutputWidget widget)
+    {
+        var field = widget.Field;
+        var size = widget.Font.Size > 0.0 ? widget.Font.Size : DefaultFontSize;
+        var baseline = widget.Bottom + Baseline(field.Height, size);
+        foreach (var span in widget.Appearance)
+        {
+            yield return new TextContent(
+                field.Value,
+                Unit.FromPoint(widget.X + 2.0 + span.XOffset),
+                Unit.FromPoint(baseline))
+            {
+                Font = new Font { Size = size },
+                FontResourceName = span.Font.Key,
+                SourceText = field.Value,
+                SourceBytes = span.Bytes,
+            };
+        }
+    }
 
     public static Font AppearanceFont(string? daFont, double size) => new()
     {
