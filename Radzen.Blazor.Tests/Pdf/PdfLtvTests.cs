@@ -400,9 +400,9 @@ public class PdfLtvTests
 
         var signed = PdfSigner.Sign(pdf, options, new FixedSigner(cms));
 
-        Assert.Equal(37647, signed.Length);
+        Assert.Equal(36989, signed.Length);
         Assert.Equal(
-            "6280C446B666D888BDD412434412E2C04325955078A35EDED010D65A4351CB99",
+            "F8843C20D74E855A33F73C6E7BF846FF35FBCB39AD077C74ADD5B582497F012C",
             Convert.ToHexString(SHA256.HashData(signed)));
     }
 

@@ -3,12 +3,6 @@ using System.Collections.Immutable;
 
 namespace Radzen.Documents.LaidOut;
 
-internal enum SemanticStructureTier
-{
-    Always,
-    Structural,
-}
-
 internal enum SemanticArtifactKind
 {
     LayoutDecoration,
@@ -93,8 +87,6 @@ internal readonly struct SemanticStructureNode
     public int ColumnSpan { get; init; }
 
     public bool IsDecorative { get; init; }
-
-    public required SemanticStructureTier Tier { get; init; }
 
     public required ImmutableArray<int> Children { get; init; }
 }

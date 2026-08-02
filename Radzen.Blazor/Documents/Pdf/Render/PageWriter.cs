@@ -12,11 +12,11 @@ namespace Radzen.Documents.Pdf.Render;
 
 internal sealed class PageWriter(
     StructureTreeBuilder structureTree,
-    bool markArtifacts,
     PagePlan plan,
     int pageIndex,
     IReadOnlyDictionary<EmittedFont, PlannedFont> fontPlans) : IDisposable
 {
+    private readonly bool markArtifacts = structureTree.TaggingActive;
     private readonly List<TaggedDraw> tagged = [];
     private Dictionary<int, TaggedMark> taggedMarks = [];
     private readonly ContentWriter writer = new();

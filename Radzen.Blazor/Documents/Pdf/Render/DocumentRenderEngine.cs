@@ -21,14 +21,10 @@ internal sealed class DocumentRenderEngine
     private readonly CodeSymbolRecorder codeSymbolRecorder;
     private readonly WatermarkRecorder watermarkRecorder;
 
-    private readonly bool markArtifacts;
-
     private DocumentRenderEngine(RenderRequest request, LaidOutDocument laidOut)
     {
         this.request = request;
         this.laidOut = laidOut;
-        markArtifacts = request.Accessibility != PdfUaConformance.None
-            || request.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
 
         structureTree = new(laidOut.Semantics, request);
         structureTree.Build();
@@ -92,7 +88,6 @@ internal sealed class DocumentRenderEngine
         {
             using var finalizer = new PageWriter(
                 structureTree,
-                markArtifacts,
                 plans[pageIndex],
                 pageIndex,
                 fontPlans);

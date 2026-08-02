@@ -28,7 +28,10 @@ public sealed class DocumentRenderer
     /// <see cref="PdfAConformance.None"/> the saved file carries an XMP
     /// metadata stream with the PDF/A identification, an sRGB output intent
     /// and a document identifier; every font must be an embedded subset, so
-    /// referencing a standard-14 font by name throws.
+    /// referencing a standard-14 font by name throws. The Level A parts -
+    /// <see cref="PdfAConformance.PdfA2A"/> and <see cref="PdfAConformance.PdfA3A"/> -
+    /// require Tagged PDF, so they turn tagging on exactly as
+    /// <see cref="Accessibility"/> does; the Level B parts do not.
     /// </summary>
     public PdfAConformance Conformance { get; set; }
 
@@ -38,7 +41,11 @@ public sealed class DocumentRenderer
     /// its XMP metadata, is marked as Tagged PDF (/MarkInfo /Marked true with a
     /// /StructTreeRoot) and sets the DisplayDocTitle viewer preference; every font must
     /// be an embedded subset. Composable with <see cref="Conformance"/>. Requires
-    /// <see cref="Document.Language"/> to be set.
+    /// <see cref="Document.Language"/> to be set. Tagging is emitted only when this
+    /// property or a Level A <see cref="Conformance"/> asks for it: left at
+    /// <see cref="PdfUaConformance.None"/> the output carries no structure tree, no
+    /// <c>/MarkInfo</c>, no <c>/StructTreeRoot</c> and no marked content in its page
+    /// streams.
     /// </summary>
     public PdfUaConformance Accessibility { get; set; }
 

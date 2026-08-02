@@ -57,7 +57,9 @@ public class TaggedMultiPageMcidTests
     public void EachPageEmitsDenseMcidSequenceStartingAtZero()
     {
         const int Count = 40;
-        var reader = BuildTestSupport.Read(AuthorManyParagraphs(Count));
+        var reader = BuildTestSupport.Read(
+            AuthorManyParagraphs(Count),
+            new DocumentRenderer { Conformance = PdfAConformance.PdfA2A });
         var pages = BuildTestSupport.PageLeaves(reader);
 
         Assert.True(pages.Count > 1, "content must span multiple pages");

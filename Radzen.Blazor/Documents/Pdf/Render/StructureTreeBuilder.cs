@@ -18,15 +18,17 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private readonly Dictionary<StructureElement, int> kidCursors = [];
     private Dictionary<StructureElement, StructureElement>? parents;
     private Dictionary<StructureElement, int>? childOrder;
-    private StructureElement documentElement = null!;
+    private StructureElement? documentElement;
     private int nextElementId;
 
-    public StructureElement DocumentElement => documentElement;
+    public StructureElement? DocumentElement => documentElement;
 
     public ImmutableArray<string> UnmappedRoles => [.. unmappedRoles];
 
-    public StructureElementSnapshot Capture(ImmutableArray<PageOutput> pages)
-        => new StructureCapture(pages, orderedKids).Capture(documentElement);
+    public StructureElementSnapshot? Capture(ImmutableArray<PageOutput> pages)
+        => documentElement is { } root
+            ? new StructureCapture(pages, orderedKids).Capture(root)
+            : null;
 
     private sealed class StructureCapture(
         ImmutableArray<PageOutput> pages,
@@ -72,13 +74,19 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
     private void BuildStructureTree()
     {
         var snapshot = semantics.Structure;
-        var materialized = new StructureElement?[snapshot.Nodes.Length];
-        documentElement = Materialize(0, snapshot, materialized)!;
 
         foreach (var artifact in snapshot.Artifacts)
         {
             artifactsBySource[artifact.Source] = artifact.Kind;
         }
+
+        if (!TaggingActive)
+        {
+            return;
+        }
+
+        var materialized = new StructureElement?[snapshot.Nodes.Length];
+        documentElement = Materialize(0, snapshot, materialized);
 
         foreach (var association in snapshot.Associations)
         {
@@ -110,7 +118,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
 
         // ISO 14289-1 7.1: content that carries no meaning is real content of no interest to assistive
         // technology and is marked as an artifact rather than tagged as a structure element.
-        if (captured.IsDecorative || !Materializes(captured.Tier))
+        if (captured.IsDecorative)
         {
             return null;
         }
@@ -201,9 +209,6 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             _ => throw new ArgumentOutOfRangeException(nameof(intent), intent, null),
         };
 
-    private bool Materializes(SemanticStructureTier tier)
-        => tier == SemanticStructureTier.Always || TaggingActive;
-
     public bool TaggingActive
         => settings.Accessibility != PdfUaConformance.None
             || settings.Conformance is PdfAConformance.PdfA2A or PdfAConformance.PdfA3A;
@@ -251,17 +256,21 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
             list.Add(draw);
         }
 
-        IndexTree();
+        var root = documentElement
+            ?? throw new InvalidOperationException(
+                "Marked content was planned for a document whose structure tree was never materialized.");
+
+        IndexTree(root);
         var touched = TouchedChildren(own.Keys);
 
         var subtreeStart = new Dictionary<StructureElement, int>();
-        ComputeSubtreeStart(documentElement, own, touched, subtreeStart);
+        ComputeSubtreeStart(root, own, touched, subtreeStart);
 
-        Walk(documentElement, own, touched, subtreeStart, pageIndex, marks);
+        Walk(root, own, touched, subtreeStart, pageIndex, marks);
         return marks;
     }
 
-    private void IndexTree()
+    private void IndexTree(StructureElement root)
     {
         if (parents is not null)
         {
@@ -272,7 +281,7 @@ internal sealed class StructureTreeBuilder(DocumentSemantics semantics, RenderRe
         childOrder = [];
 
         var pending = new Stack<StructureElement>();
-        pending.Push(documentElement);
+        pending.Push(root);
         while (pending.Count > 0)
         {
             var element = pending.Pop();

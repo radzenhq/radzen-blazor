@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
@@ -182,6 +183,55 @@ public class DeterminismManifestTests
         return new DocumentRenderer().ToArray(document);
     }
 
+    private static Document TaggedStructure()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "Tagged structure";
+        BuildTestSupport.RegisterLatin(document);
+
+        var section = document.Sections.Add();
+
+        var heading = section.Blocks.Add(Text("Invoice", BuildTestSupport.Latin, 18));
+        heading.StyleName = "Heading1";
+        section.Blocks.Add(Text("Billed to Acme Corp.", BuildTestSupport.Latin));
+
+        var linked = section.Blocks.AddParagraph();
+        var link = linked.Inlines.Add("Radzen");
+        link.Font.Family = BuildTestSupport.Latin;
+        link.Link = "https://www.radzen.com";
+
+        var bullets = section.Blocks.AddList(ListStyle.Bullet);
+        bullets.Font.Family = BuildTestSupport.Latin;
+        bullets.AddItem("Alpha").Font.Family = BuildTestSupport.Latin;
+        bullets.AddItem("Beta").Font.Family = BuildTestSupport.Latin;
+
+        var table = section.Blocks.AddTable();
+        table.Columns.Add();
+        table.Columns.Add();
+
+        var header = table.Rows.Add();
+        header.IsHeaderRow = true;
+        TableLayoutSupport.Fill(header.Cells[0], "Item");
+        TableLayoutSupport.Fill(header.Cells[1], "Price");
+
+        foreach (var (name, price) in new[] { ("Apple", "111"), ("Bread", "222") })
+        {
+            var row = table.Rows.Add();
+            TableLayoutSupport.Fill(row.Cells[0], name);
+            TableLayoutSupport.Fill(row.Cells[1], price);
+        }
+
+        section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A red square";
+
+        return document;
+    }
+
+    private static byte[] TaggedAccessible()
+        => new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.ToArray(TaggedStructure());
+
+    private static byte[] TaggedPdfALevelA()
+        => new DocumentRenderer { Conformance = PdfAConformance.PdfA2A }.ToArray(TaggedStructure());
+
     private static byte[] Encrypted()
     {
         var document = new PortableDocument();
@@ -234,6 +284,8 @@ public class DeterminismManifestTests
         yield return new object[] { "gradients", (Func<byte[]>)Gradients };
         yield return new object[] { "overlapping-z-order", (Func<byte[]>)OverlappingZOrder };
         yield return new object[] { "flat-lists", (Func<byte[]>)FlatLists };
+        yield return new object[] { "tagged-accessible", (Func<byte[]>)TaggedAccessible };
+        yield return new object[] { "tagged-pdfa-level-a", (Func<byte[]>)TaggedPdfALevelA };
         yield return new object[] { "encrypted", (Func<byte[]>)Encrypted };
         yield return new object[] { "signed", (Func<byte[]>)Signed };
         yield return new object[] { "timestamped", (Func<byte[]>)Timestamped };
@@ -241,16 +293,18 @@ public class DeterminismManifestTests
 
     private static readonly Dictionary<string, string> ExpectedSha256 = new()
     {
-        ["plain-text"] = "4f35fe8aedda1820c01cd16160f48c6ac825b7162f7a1372489a5e25f029a4d5",
-        ["truetype-subset"] = "2e28d4416c5c7925b9d581ebd7e99f20d23a491bd6d75a1cd2155393e481e963",
-        ["tables"] = "6a16fe3b40d900cde01f93d12dd072eaddd1c8f3b6fd7f870c80fb1f038b249f",
-        ["image"] = "d85431f2632cdccfc4699270f92007c5ce74cb1f9e96c10f0af9c140a6b3ef0f",
-        ["gradients"] = "3dd03dccc68660200d0a42b089d355dfe8db6046441e04f8dbfd52aad62e3b4a",
-        ["overlapping-z-order"] = "825b2b6b5d331487cc5ea59bcb8cc21dc2ad5f8874412a9e5b16304641380a5a",
-        ["flat-lists"] = "8a55bfdbeae4394a0362c5b5abd1b547660ac30501604fac12661fbfb7ba6917",
+        ["plain-text"] = "43dd319a72c366eb26685a4ab1820c4a1278d6e007ea8f5ac59a60518c0550d6",
+        ["truetype-subset"] = "d34226429319058e3d0ef7462a32c60f2497e3f7eb252ade5f9a39785dd15a8d",
+        ["tables"] = "980b99a7cbdd0c90405eaed869e27af378e0830f71ec6dc5f51d319350179a19",
+        ["image"] = "f2eae06c720322e074bb1d8acdae654c37c1926807495c2c9442bae829451caa",
+        ["gradients"] = "06b60969773939b6475f5447163b8228e6a85fb10711f9b1721db75006f48089",
+        ["overlapping-z-order"] = "8c7f801a013aa0921962214d6d06326b357c07c613e0ecd76ed109a43e8e89b5",
+        ["flat-lists"] = "e3cd6555c5ad23d53cba15e9f1ee3e99759afd98883fd34af9e4b681e2746c68",
+        ["tagged-accessible"] = "039de4316e0bce0c9dbaecd016f534655b8f060ba207504de03943211829dfe7",
+        ["tagged-pdfa-level-a"] = "dcdc0a8dcd4abe10419d64dbf6fc731a01c133f164f421432a4fe680b30ef594",
         ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
-        ["signed"] = "ab5875e082b064a4ed84920dc14b9801da372bb9cbbe9036e7cb6a4289ec2fd7",
-        ["timestamped"] = "bc6d540a6e43addae1e74627e6c972f3c8c23abb4bd72ef7e43f5c64acd7dd49",
+        ["signed"] = "27350d26638aa12b6dc605b9cc052d41ac13bf6cdb9f8b7d502b555908d2f8e3",
+        ["timestamped"] = "3acf8fa5b456a20985a4de33dd1d05dc98c742c07e65a2172495925866ca3dbc",
     };
 
     private static string Sha256Hex(byte[] bytes)
@@ -280,6 +334,31 @@ public class DeterminismManifestTests
                 + $"pinned:   {expected}{Environment.NewLine}"
                 + $"produced: {actual}{Environment.NewLine}"
                 + RePinInstructions(name, actual));
+    }
+
+    public static IEnumerable<object[]> TaggedCorpus()
+    {
+        yield return new object[] { (Func<byte[]>)TaggedAccessible };
+        yield return new object[] { (Func<byte[]>)TaggedPdfALevelA };
+    }
+
+    [Theory]
+    [MemberData(nameof(TaggedCorpus))]
+    public void TaggedCorpusDocument_CarriesAStructureTree(Func<byte[]> build)
+    {
+        var reader = DocumentReader.Parse(build());
+        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+
+        Assert.True(catalog.TryGetValue("MarkInfo", out var markInfo), "catalog has /MarkInfo");
+        Assert.True(
+            Assert.IsType<BooleanObject>(
+                reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(markInfo!))["Marked"])).Value,
+            "/Marked is true");
+
+        var structRoot = Assert.IsType<DictionaryObject>(
+            reader.Resolve(catalog["StructTreeRoot"]));
+        Assert.True(structRoot.ContainsKey("K"), "StructTreeRoot has kids");
+        Assert.True(structRoot.ContainsKey("ParentTree"), "StructTreeRoot has /ParentTree");
     }
 
     private static string RePinInstructions(string name, string actual)
