@@ -55,6 +55,27 @@ public sealed class AcroForm
 
     private readonly record struct Terminal(DictionaryObject Field, IReadOnlyList<DictionaryObject> Widgets);
 
+    internal bool NeedAppearances => reader.GetBool(Dictionary, "NeedAppearances") == true;
+
+    internal IEnumerable<(string Name, DictionaryObject Widget)> TerminalWidgets()
+    {
+        foreach (var name in fieldNames)
+        {
+            foreach (var widget in terminals[name].Widgets)
+            {
+                if (FormField.IsWidget(reader, widget))
+                {
+                    yield return (name, widget);
+                }
+            }
+        }
+    }
+
+    internal bool HasNormalAppearance(DictionaryObject widget)
+        => reader.GetDictionary(widget, "AP") is { } appearances
+            && appearances.TryGetValue("N", out var normal)
+            && reader.Resolve(normal!) is StreamObject or DictionaryObject;
+
     // A /T on a kid distinguishes a non-terminal node from a terminal whose kids are its widget annotations (ISO 32000-1 12.7.3.1).
     private void Collect(DocumentObject entry, string prefix, HashSet<DictionaryObject> visited, int depth)
     {
@@ -136,7 +157,7 @@ public sealed class AcroForm
         RequireFieldType(name, terminal.Field, "Tx", allowUntyped: true);
         terminal.Field["V"] = StringObject.FromText(value);
         ChangedObjects.Add(terminal.Field);
-        WriteTextAppearance(terminal, value);
+        WriteTextAppearance(name, terminal, value);
     }
 
     /// <summary>
@@ -170,7 +191,7 @@ public sealed class AcroForm
 
         terminal.Field["V"] = StringObject.FromText(value);
         ChangedObjects.Add(terminal.Field);
-        WriteTextAppearance(terminal, value);
+        WriteTextAppearance(name, terminal, value);
     }
 
     /// <summary>
@@ -213,7 +234,7 @@ public sealed class AcroForm
         }
     }
 
-    private void WriteTextAppearance(Terminal terminal, string value)
+    private void WriteTextAppearance(string name, Terminal terminal, string value)
     {
         if (FieldBakePolicy.CanBakeSingleLine(reader, terminal.Field, value))
         {
@@ -225,6 +246,11 @@ public sealed class AcroForm
         }
         else
         {
+            if (FormAppearanceConformance.Claim(owner) is { } label)
+            {
+                throw new InvalidOperationException(FormAppearanceConformance.UnbakeableValue(label, name));
+            }
+
             Dictionary["NeedAppearances"] = new BooleanObject(true);
             ChangedObjects.Add(Dictionary);
             foreach (var widget in terminal.Widgets)

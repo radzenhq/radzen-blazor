@@ -76,6 +76,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
 
         ValidateAnnotationStructure();
         ValidateAppearanceFonts();
+        ValidateFormAppearances();
 
         if (document.Conformance == PdfAConformance.None)
         {
@@ -105,6 +106,29 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
             {
                 RequireCompleteFacturXProfile(attachment.FacturX);
                 break;
+            }
+        }
+    }
+
+    // ISO 19005-2 6.9 and 6.3.3, ISO 14289-1 7.18.1: NeedAppearances shall be absent or false and every
+    // widget annotation shall carry an appearance stream.
+    private void ValidateFormAppearances()
+    {
+        if (document.AcroForm is not { } form)
+        {
+            return;
+        }
+
+        if (form.NeedAppearances)
+        {
+            throw new InvalidOperationException(FormAppearanceConformance.NeedAppearancesForbidden(Label));
+        }
+
+        foreach (var (name, widget) in form.TerminalWidgets())
+        {
+            if (!form.HasNormalAppearance(widget))
+            {
+                throw new InvalidOperationException(FormAppearanceConformance.MissingAppearance(Label, name));
             }
         }
     }
