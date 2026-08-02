@@ -383,4 +383,94 @@ public class AuthoredFormFieldTests
         Assert.False(ContentTestHelpers.Catalog(reader).ContainsKey("AcroForm"), "the form is gone");
         Assert.Contains("(Ada) Tj", PageContent(reader, 0), StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void RadioGroupExportingOff_NamesItsAppearanceStatesByOptionIndex()
+    {
+        var document = Plain(out var paragraph);
+        paragraph.Inlines.Add(new RadioButton("stance", "On"));
+        paragraph.Inlines.Add(" on ");
+        paragraph.Inlines.Add(new RadioButton("stance", "Off") { Selected = true });
+        paragraph.Inlines.Add(" off");
+
+        var reader = BuildTestSupport.Read(document);
+        var widgets = Widgets(reader, 0);
+        var group = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(FormFields(reader))));
+
+        Assert.Equal(
+            new[] { "On", "Off" },
+            Assert.IsType<ArrayObject>(reader.Resolve(group["Opt"]))
+                .Select(value => Assert.IsType<StringObject>(reader.Resolve(value)).Value)
+                .ToArray());
+        Assert.Equal("1", BuildTestSupport.Name(reader, group, "V"));
+        Assert.Equal(
+            new[] { "Off", "1" },
+            widgets.Select(widget => BuildTestSupport.Name(reader, widget, "AS")).ToArray());
+
+        var states = widgets.Select(widget => Assert.IsType<DictionaryObject>(
+            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]))["N"])));
+        Assert.Equal(
+            new[] { "0", "1" },
+            states.Select(state => state.Keys.Single(key => key != "Off")).ToArray());
+    }
+
+    [Fact]
+    public void RadioGroupWithoutAnOffExport_CarriesNoOptArray()
+    {
+        var document = Plain(out var paragraph);
+        paragraph.Inlines.Add(new RadioButton("size", "S"));
+        paragraph.Inlines.Add(new RadioButton("size", "M"));
+
+        var reader = BuildTestSupport.Read(document);
+        var group = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(FormFields(reader))));
+
+        Assert.False(group.ContainsKey("Opt"), "an unambiguous group keeps its export values as state names");
+    }
+
+    [Fact]
+    public void RadioGroup_WithTwoButtonsExportingOneValue_Fails()
+    {
+        var document = Plain(out var paragraph);
+        paragraph.Inlines.Add(new RadioButton("size", "S"));
+        paragraph.Inlines.Add(new RadioButton("size", "S"));
+
+        var error = Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().ToArray(document));
+
+        Assert.Contains("give each button of a group a distinct Value", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void RadioGroupRules_AreEnforcedByLayoutBeforeAnyRendererRuns()
+    {
+        var document = Plain(out var paragraph);
+        paragraph.Inlines.Add(new RadioButton("size", "S") { Selected = true });
+        paragraph.Inlines.Add(new RadioButton("size", "M") { Selected = true });
+
+        var error = Assert.Throws<InvalidOperationException>(
+            () => Radzen.Documents.Layout.DocumentLayouter.Layout(document));
+
+        Assert.Contains("only one button of a group may be selected", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void LinkedFormField_EmitsALinkAnnotationOverTheWidgetRect()
+    {
+        var document = Plain(out var paragraph);
+        paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Link = "https://www.radzen.com/" });
+
+        var reader = BuildTestSupport.Read(document);
+        var widget = Assert.Single(Widgets(reader, 0));
+        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+        var annotations = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
+        var link = Assert.Single(annotations
+            .Select(item => Assert.IsType<DictionaryObject>(reader.Resolve(item)))
+            .Where(annotation => BuildTestSupport.Name(reader, annotation, "Subtype") == "Link"));
+
+        var widgetRect = Rect(reader, widget);
+        var linkRect = Rect(reader, link);
+        for (var i = 0; i < 4; i++)
+        {
+            Assert.Equal(widgetRect[i], linkRect[i], 3);
+        }
+    }
 }

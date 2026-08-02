@@ -75,6 +75,8 @@ internal static class GeometryCapture
         Rise = 0,
         IsScript = false,
         Invisible = false,
+        Link = input.Link,
+        LinkToAnchor = input.LinkToAnchor,
         Anchor = input.Anchor,
         FormField = FieldPaint(input, font.Size, capture),
     };
@@ -213,8 +215,6 @@ internal static class GeometryCapture
 
     public static ResolvedEdge? Edge(Border edge)
     {
-        // Capture policy: setting a width opts an otherwise unstyled edge into a solid border,
-        // while selecting a style with zero width uses the historical hairline width.
         var style = edge.Style;
         if (style == BorderStyle.None && edge.Width.Point > 0)
         {

@@ -5,7 +5,9 @@ using System.Text;
 using Radzen.Documents.Core;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
+using Radzen.Documents.Layout;
 using Radzen.Documents.Scene;
+using Radzen.Documents;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -15,6 +17,7 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
     private readonly Dictionary<int, SemanticArtifactKind> artifacts = [];
     private readonly Dictionary<int, SemanticIntent> intents = [];
     private int depth;
+    private int item;
     private double layerTop;
 
     public static string Render(LaidOutDocument document)
@@ -23,6 +26,19 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
         SceneWalk.Document(document, renderer);
         return renderer.text.ToString();
     }
+
+    private static readonly FragmentPaint Unspaced = new()
+    {
+        Font = default,
+        Opacity = 1,
+        LetterSpacing = 0,
+        WordSpacing = 0,
+        HorizontalScale = 1,
+        ScriptScale = 1,
+        Rise = 0,
+        IsScript = false,
+        Invisible = false,
+    };
 
     private static string N(double value)
         => (value == 0 ? 0 : value).ToString("F2", CultureInfo.InvariantCulture);
@@ -75,15 +91,30 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
         Enter(string.Create(
             CultureInfo.InvariantCulture,
             $"scene pages={document.Pages.Length} language={document.Semantics.Language ?? "-"}"));
+
+        var info = document.Info;
+        Write(string.Create(
+            CultureInfo.InvariantCulture,
+            $"info title={info.Title ?? "-"} author={info.Author ?? "-"} subject={info.Subject ?? "-"}"
+                + $" keywords={info.Keywords ?? "-"} creator={info.Creator ?? "-"}"
+                + $" created={Stamp(info.CreationDate)} modified={Stamp(info.ModificationDate)}"));
     }
+
+    private static string Stamp(System.DateTimeOffset? value)
+        => value is { } moment
+            ? moment.ToString("yyyy-MM-ddTHH:mm:ssK", CultureInfo.InvariantCulture)
+            : "-";
 
     void ISceneVisitor.EndDocument(LaidOutDocument document) => Leave("/scene");
 
     void ISceneVisitor.BeginPage(LaidOutPage page, int index)
-        => Enter(string.Create(
+    {
+        item = 0;
+        Enter(string.Create(
             CultureInfo.InvariantCulture,
             $"page {index} size={N(page.Size.Width.Point)}x{N(page.Size.Height.Point)}"
                 + $" content={N(page.ContentBox.X)},{N(page.ContentBox.Y)},{N(page.ContentBox.Width)},{N(page.ContentBox.Height)}"));
+    }
 
     void ISceneVisitor.EndPage(LaidOutPage page, int index) => Leave("/page");
 
@@ -95,28 +126,40 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
 
     void ISceneVisitor.LeaveLayer(SceneLayerKind kind) => Leave($"/layer {kind}");
 
+    void ISceneVisitor.BeginItem(int zOrder)
+        => Enter(string.Create(CultureInfo.InvariantCulture, $"item {item++} z={zOrder}"));
+
+    void ISceneVisitor.EndItem() => Leave("/item");
+
     void ISceneVisitor.Line(in LaidOutLine line, in SceneFrame frame)
     {
         var x = frame.Left + line.X;
         var y = layerTop + frame.Delta + line.Y;
+        Line(line.Line, x, y, line.Source);
+    }
+
+    private void Line(LineBox box, double x, double y, SourceId source)
+    {
         Enter(string.Create(
             CultureInfo.InvariantCulture,
-            $"line at={N(x)},{N(y)} size={N(line.Line.Width)}x{N(line.Line.Height)}"
-                + $" baseline={N(line.Line.Baseline)}{Semantics(line.Source)}"));
+            $"line at={N(x)},{N(y)} size={N(box.Width)}x{N(box.Height)}"
+                + $" baseline={N(box.Baseline)}{Semantics(source)}"));
 
-        foreach (var fragment in line.Line.Fragments)
+        foreach (var run in box.ShapedRuns)
         {
-            Fragment(fragment, x, y + line.Line.Baseline);
+            Run(run, x, y + box.Baseline);
         }
 
         Leave("/line");
     }
 
-    private void Fragment(in LineFragment fragment, double lineX, double baseline)
+    private void Run(in ShapedTextRun run, double lineX, double baseline)
     {
-        var paint = fragment.Paint;
+        var paint = run.Paint;
         var font = paint.Font;
-        var x = lineX + fragment.XOffset;
+        var x = lineX + run.XOffset;
+        var last = run.Fragments[^1];
+        var advance = last.XOffset + last.Advance - run.XOffset;
         var style = new StringBuilder();
         if (font.Bold)
         {
@@ -140,16 +183,17 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
 
         Enter(string.Create(
             CultureInfo.InvariantCulture,
-            $"run \"{fragment.Text}\" at={N(x)},{N(baseline)} advance={N(fragment.Advance)}"
+            $"run \"{run.GlyphRun.Text}\" at={N(x)},{N(baseline)} advance={N(advance)}"
                 + $" family={font.Family} size={N(font.Size)} style={(style.Length == 0 ? "regular" : style.ToString().TrimEnd())}"
                 + $" color={Rgba(font.Color)} opacity={N(paint.Opacity)}"
+                + $"{Spacing(paint)}"
                 + $"{(paint.IsScript ? $" script={N(paint.ScriptScale)}@{N(paint.Rise)}" : string.Empty)}"
                 + $"{(paint.Invisible ? " invisible" : string.Empty)}"
-                + $"{(fragment.IsMarker ? " marker" : string.Empty)}"
+                + $"{(run.IsMarker ? " marker" : string.Empty)}"
                 + $"{(paint.LinkTarget is { } uri ? $" link={uri}" : string.Empty)}"
                 + $"{(paint.AnchorTarget is { } target ? $" linkAnchor={target}" : string.Empty)}"
                 + $"{(paint.Anchor is { } anchor ? $" anchor={anchor}" : string.Empty)}"
-                + $"{Semantics(fragment.Source)}"));
+                + $"{Semantics(run.Source)}"));
 
         if (paint.InlineImage is { } inline)
         {
@@ -160,20 +204,44 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
 
         if (paint.FormField is { } field)
         {
-            Write(string.Create(
+            Enter(string.Create(
                 CultureInfo.InvariantCulture,
                 $"formField {field.Kind} name={field.Name} value=\"{field.Value}\" label={field.Label ?? "-"}"
                     + $" required={field.Required} chosen={field.Chosen}"
                     + $" size={N(field.Width)}x{N(field.Height)} ascent={N(field.Ascent)}"
                     + $" options=[{(field.Options.IsDefaultOrEmpty ? string.Empty : string.Join("|", field.Options))}]"));
+            Clusters(field.ValueGlyphs, x, paint);
+            Leave("/formField");
         }
 
-        Clusters(fragment.GlyphRun, x);
+        Clusters(run.GlyphRun, x, paint);
         Leave("/run");
     }
 
-    private void Clusters(in CapturedGlyphRun run, double originX)
+    private static string Spacing(in FragmentPaint paint)
     {
+        var described = new StringBuilder();
+        if (paint.LetterSpacing != 0 || paint.WordSpacing != 0)
+        {
+            described.Append(CultureInfo.InvariantCulture,
+                $" spacing={N(paint.LetterSpacing)}/{N(paint.WordSpacing)}");
+        }
+
+        if (paint.HorizontalScale != 1)
+        {
+            described.Append(CultureInfo.InvariantCulture, $" scale={N(paint.HorizontalScale)}");
+        }
+
+        return described.ToString();
+    }
+
+    private void Clusters(in CapturedGlyphRun run, double originX, in FragmentPaint paint)
+    {
+        if (run.Spans.IsDefaultOrEmpty)
+        {
+            return;
+        }
+
         foreach (var span in run.Spans)
         {
             var face = span.Face;
@@ -190,7 +258,12 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
                     CultureInfo.InvariantCulture,
                     $"cluster {glyph.Cluster} u+{glyph.Codepoint:X4} x={N(pen)}"
                         + $" advance={N(glyph.Advance)} kerning={N(glyph.Kerning)}"));
-                pen += glyph.Advance;
+                pen += RunTextAdvance.Calculate(
+                    glyph.Advance,
+                    1,
+                    glyph.Codepoint == ' ' ? 1 : 0,
+                    paint,
+                    trailingCharacterSpacing: true);
             }
 
             Leave("/span");
@@ -207,12 +280,34 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
                 + $"{Semantics(image.Source)}"));
 
     void ISceneVisitor.CodeSymbol(in LaidOutCodeSymbol codeSymbol, in SceneFrame frame)
-        => Write(string.Create(
+    {
+        var x = frame.Left + codeSymbol.X;
+        var y = layerTop + frame.Delta + codeSymbol.Y;
+        Enter(string.Create(
             CultureInfo.InvariantCulture,
             $"code modules={codeSymbol.Modules.Length} foreground={Rgba(codeSymbol.Foreground)}"
-                + $" at={N(frame.Left + codeSymbol.X)},{N(layerTop + frame.Delta + codeSymbol.Y)}"
+                + $" at={N(x)},{N(y)}"
                 + $" size={N(codeSymbol.Width)}x{N(codeSymbol.Height)}"
                 + $"{Semantics(codeSymbol.Source)}"));
+
+        foreach (var module in codeSymbol.Modules)
+        {
+            Write(string.Create(
+                CultureInfo.InvariantCulture,
+                $"module at={N(x + module.X)},{N(y + module.Y)}"
+                    + $" size={N(module.Width)}x{N(module.Height)}"));
+        }
+
+        if (codeSymbol.Caption is { } caption)
+        {
+            foreach (var line in caption)
+            {
+                Line(line.Line, x, y + line.Y, codeSymbol.Source);
+            }
+        }
+
+        Leave("/code");
+    }
 
     private string Style(in BoxStyle style)
     {
@@ -224,7 +319,9 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
 
         if (style.BackgroundGradient is { } gradient)
         {
-            described.Append(CultureInfo.InvariantCulture, $" gradient={gradient.Kind}[");
+            described.Append(CultureInfo.InvariantCulture,
+                $" gradient={gradient.Kind}({N(gradient.X0)},{N(gradient.Y0)},{N(gradient.R0)}"
+                    + $"->{N(gradient.X1)},{N(gradient.Y1)},{N(gradient.R1)})[");
             for (var i = 0; i < gradient.Stops.Length; i++)
             {
                 if (i > 0)
@@ -279,12 +376,19 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
                     + $"{(clip.ClipsLines ? "+lines" : string.Empty)}{(clip.ClipsInline ? "+inline" : string.Empty)}")
             : string.Empty;
 
+    private static string Transform(Matrix? transform)
+        => transform is { } matrix
+            ? string.Create(
+                CultureInfo.InvariantCulture,
+                $"{N(matrix.A)},{N(matrix.B)},{N(matrix.C)},{N(matrix.D)},{N(matrix.E)},{N(matrix.F)}")
+            : "-";
+
     void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
         => Enter(string.Create(
             CultureInfo.InvariantCulture,
             $"box at={N(frame.Left + box.Bounds.X)},{N(layerTop + frame.Delta + box.Bounds.Y)}"
                 + $" size={N(box.Bounds.Width)}x{N(box.Bounds.Height)} opacity={N(box.Opacity)}"
-                + $" transform={(box.Transform is null ? "-" : "yes")}"
+                + $" transform={Transform(box.Transform)}"
                 + $"{Style(box.Style)}{Clip(clip)}{Semantics(box.Source)}"));
 
     void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame) => Leave("/box");
@@ -347,7 +451,7 @@ internal sealed class SceneDumpRenderer : ISceneVisitor
                 $"watermarkText \"{text.Text}\" family={text.Font.Family} size={N(text.Size)}"
                     + $" color={Rgba(text.Color)} at={N(text.X)},{N(text.Baseline)}"
                     + $" alpha={(text.AlphaOverride is { } alpha ? N(alpha) : "-")}"));
-            Clusters(text.GlyphRun, text.X);
+            Clusters(text.GlyphRun, text.X, Unspaced);
             Leave("/watermarkText");
         }
 

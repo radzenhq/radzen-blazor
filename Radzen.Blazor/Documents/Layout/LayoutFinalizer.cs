@@ -18,6 +18,7 @@ internal static class LayoutFinalizer
         var count = document.Pages.Length;
         var pages = ImmutableArray.CreateBuilder<LaidOutPage>(count);
         var anchors = new Dictionary<string, SourceId>(StringComparer.Ordinal);
+        var fields = new FormFieldRules();
         for (var index = 0; index < count; index++)
         {
             var page = document.Pages[index];
@@ -38,6 +39,7 @@ internal static class LayoutFinalizer
                 };
             }
 
+            fields.Enforce(page);
             pages.Add(PageNavigationCollector.Collect(page, anchors));
         }
 

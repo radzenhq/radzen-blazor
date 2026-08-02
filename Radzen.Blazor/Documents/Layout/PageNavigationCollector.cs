@@ -146,6 +146,11 @@ internal sealed class PageNavigationCollector : ISceneVisitor
             return (image.Height, 0.0);
         }
 
+        if (fragment.Paint.FormField is { } field)
+        {
+            return (field.Ascent, field.Height - field.Ascent);
+        }
+
         var size = fragment.Paint.Font.Size;
         foreach (var span in fragment.GlyphRun.Spans)
         {
@@ -195,5 +200,7 @@ internal sealed class PageNavigationCollector : ISceneVisitor
 
     private static bool IsLink(in LineFragment fragment)
         => (fragment.Paint.LinkTarget is not null || fragment.Paint.AnchorTarget is not null)
-            && (fragment.Text.Length > 0 || fragment.Paint.InlineImage is not null);
+            && (fragment.Text.Length > 0
+                || fragment.Paint.InlineImage is not null
+                || fragment.Paint.FormField is not null);
 }

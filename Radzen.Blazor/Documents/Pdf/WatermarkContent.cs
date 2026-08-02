@@ -1,3 +1,4 @@
+using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Radzen.Documents.LaidOut;
@@ -8,6 +9,49 @@ using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
+internal static class Base14Watermark
+{
+    public static LaidOutWatermark? Plan(
+        Watermark? watermark,
+        PageSize size,
+        FontCollectionSnapshot? knownFonts,
+        LayoutCaptureContext capture)
+    {
+        if (watermark is null)
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrEmpty(watermark.Text))
+        {
+            RequireBase14(watermark.Font, knownFonts);
+        }
+
+        return WatermarkPlanner.Plan(watermark, size, new FontCollection(), capture);
+    }
+
+    private static void RequireBase14(Font font, FontCollectionSnapshot? knownFonts)
+    {
+        var family = font.EffectiveFamily;
+        if (string.IsNullOrEmpty(family))
+        {
+            return;
+        }
+
+        if (knownFonts?.HasFamily(family) == true)
+        {
+            throw new NotSupportedException(
+                $"Font family '{family}' is registered as an embeddable font file, but text added to a loaded or already-built page cannot embed one; use a base-14 family (Helvetica, Courier, Times, Symbol, ZapfDingbats) here.");
+        }
+
+        if (BuiltInFontMetrics.Resolve(font) is null)
+        {
+            throw new NotSupportedException(
+                $"Font family '{family}' is not one of the base-14 families (Helvetica, Courier, Times, Symbol, ZapfDingbats), and text added to a loaded or already-built page cannot embed a font file; use a base-14 family here.");
+        }
+    }
+}
+
 internal sealed class WatermarkContent(
     Watermark watermark,
     PdfRect box,
@@ -17,7 +61,7 @@ internal sealed class WatermarkContent(
 {
     private protected override void EmitBody(ContentWriter writer)
     {
-        var planned = WatermarkPlanner.PlanBase14(
+        var planned = Base14Watermark.Plan(
             watermark,
             new PageSize(Unit.FromPoint(box.Width), Unit.FromPoint(box.Height)),
             knownFonts,
