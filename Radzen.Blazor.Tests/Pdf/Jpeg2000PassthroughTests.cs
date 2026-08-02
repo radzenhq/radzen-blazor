@@ -21,7 +21,7 @@ public class Jpeg2000PassthroughTests
     {
         var bytes = Concat(RawCodestream(4, 3, components: 3), [0xDE, 0xAD, 0xFF, 0xD9]);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("XObject", ImageTestHelpers.Name(dict, "Type"));
@@ -41,7 +41,7 @@ public class Jpeg2000PassthroughTests
     {
         var bytes = Jp2File(width: 5, height: 7, components: 3);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("JPXDecode", ImageTestHelpers.Name(dict, "Filter"));
@@ -57,7 +57,7 @@ public class Jpeg2000PassthroughTests
     {
         var bytes = Jp2FileCodestreamOnly(6, 2, components: 1);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("JPXDecode", ImageTestHelpers.Name(dict, "Filter"));
@@ -69,21 +69,21 @@ public class Jpeg2000PassthroughTests
     public void RawCodestream_OversizedDimensions_ThrowsFast()
     {
         var bytes = RawCodestream(70000, 70000, components: 3);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(bytes));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(bytes));
     }
 
     [Fact]
     public void Jp2File_OversizedDimensions_ThrowsFast()
     {
         var bytes = Jp2File(70000, 70000, components: 3);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(bytes));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(bytes));
     }
 
     [Fact]
     public void RawCodestream_ZeroDimension_Throws()
     {
         var bytes = RawCodestream(0, 8, components: 3);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(bytes));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(bytes));
     }
 
     [Theory]
@@ -91,7 +91,7 @@ public class Jpeg2000PassthroughTests
     [InlineData("Images/rgb.jpg")]
     public void ExistingFormats_StillDecode(string resource)
     {
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes(resource)));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(PdfTestResources.ReadAllBytes(resource)));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Height"));
         Assert.NotEqual("JPXDecode", ImageTestHelpers.Name(xobj.Image.Dictionary, "Filter"));

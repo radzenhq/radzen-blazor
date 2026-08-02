@@ -49,7 +49,7 @@ public class SectionWatermarkParityTests
     [Fact]
     public void DecodeWatermark_ReflectsReplacedImage()
     {
-        var images = new ImageRegistry(ImageDecoders.Default);
+        var images = new ImageRegistry(ImageDecoders.BuiltIn);
         var watermark = new Watermark();
         var first = watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
         var decodedFirst = images.DecodeWatermark(

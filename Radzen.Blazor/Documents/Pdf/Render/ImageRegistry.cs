@@ -42,7 +42,7 @@ internal sealed class ImageRegistry(ImageDecoders decoders)
     public static DecodedImage SourceOf(OutputImage image) => image.Identity;
 
     private static OutputImage Interpolate(string name, OutputImage decoded)
-        => Capture(name, ImageDecoder.ApplyOptions(SourceOf(decoded), interpolate: true));
+        => Capture(name, SourceOf(decoded).Interpolated());
 
     private static OutputImage Capture(string key, DecodedImage image)
         => new(

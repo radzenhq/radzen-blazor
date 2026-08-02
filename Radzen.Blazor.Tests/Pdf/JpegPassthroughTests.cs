@@ -13,7 +13,7 @@ public class JpegPassthroughTests
     public void Rgb_DctDecodePassthrough()
     {
         var bytes = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("XObject", ImageTestHelpers.Name(dict, "Type"));
@@ -32,7 +32,7 @@ public class JpegPassthroughTests
     public void Gray_DctDecodePassthrough()
     {
         var bytes = PdfTestResources.ReadAllBytes("Images/gray.jpg");
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("DeviceGray", ImageTestHelpers.Name(dict, "ColorSpace"));
@@ -49,7 +49,7 @@ public class JpegPassthroughTests
     public void Cmyk_DctDecodeWithAdobeInvertedDecode()
     {
         var bytes = PdfTestResources.ReadAllBytes("Images/cmyk.jpg");
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(bytes));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(bytes));
         var dict = xobj.Image.Dictionary;
 
         Assert.Equal("DeviceCMYK", ImageTestHelpers.Name(dict, "ColorSpace"));

@@ -941,19 +941,6 @@ Radzen.Documents.Pdf.ContentElement = public abstract class
 public Radzen.Documents.Pdf.ContentElement.IsArtifact : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.ContentElement.Transform : Radzen.Documents.Matrix { public get; public set; }
 public virtual Radzen.Documents.Pdf.ContentElement.IsModified : System.Boolean { public get; }
-Radzen.Documents.Pdf.DecodedImage = public sealed class
-public Radzen.Documents.Pdf.DecodedImage..ctor(System.ReadOnlyMemory<System.Byte> samples, System.Int32 width, System.Int32 height, System.Int32 bitsPerComponent, Radzen.Documents.Pdf.ImageColorSpace colorSpace)
-public Radzen.Documents.Pdf.DecodedImage.Alpha : Radzen.Documents.Pdf.DecodedImage? { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.BitsPerComponent : System.Int32 { public get; }
-public Radzen.Documents.Pdf.DecodedImage.ColorKeyMask : System.Collections.Immutable.ImmutableArray<System.Int32> { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.ColorSpace : Radzen.Documents.Pdf.ImageColorSpace { public get; }
-public Radzen.Documents.Pdf.DecodedImage.Compression : Radzen.Documents.Pdf.ImageCompression { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.Decode : System.Collections.Immutable.ImmutableArray<System.Double> { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.Height : System.Int32 { public get; }
-public Radzen.Documents.Pdf.DecodedImage.Interpolate : System.Boolean { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.Palette : System.ReadOnlyMemory<System.Byte> { public get; public init; }
-public Radzen.Documents.Pdf.DecodedImage.Samples : System.ReadOnlyMemory<System.Byte> { public get; }
-public Radzen.Documents.Pdf.DecodedImage.Width : System.Int32 { public get; }
 Radzen.Documents.Pdf.DocumentParseException = public class : System.Exception
 public Radzen.Documents.Pdf.DocumentParseException..ctor()
 public Radzen.Documents.Pdf.DocumentParseException..ctor(System.String message)
@@ -966,7 +953,6 @@ public Radzen.Documents.Pdf.DocumentRenderer.Accessibility : Radzen.Documents.Pd
 public Radzen.Documents.Pdf.DocumentRenderer.AllowRestrictedEmbedding : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowUnsupportedCharacters : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Conformance : Radzen.Documents.Pdf.PdfAConformance { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.ImageDecoders : Radzen.Documents.Pdf.ImageDecoders { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Producer : System.String? { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Render(Radzen.Documents.Document document) : Radzen.Documents.Pdf.PortableDocument
 public Radzen.Documents.Pdf.DocumentRenderer.RoleMap : Radzen.Documents.Pdf.RoleMap { public get; }
@@ -1024,29 +1010,9 @@ public Radzen.Documents.Pdf.FreeTextAnnotation.TextColor : Radzen.Documents.Core
 public virtual Radzen.Documents.Pdf.FreeTextAnnotation.IsModified : System.Boolean { public get; }
 Radzen.Documents.Pdf.HighlightAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.HighlightAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
-Radzen.Documents.Pdf.IImageDecoder = public interface
-public Radzen.Documents.Pdf.IImageDecoder.TryReadPixelSize(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out System.Int32 width, out System.Int32 height) : System.Boolean
-public abstract Radzen.Documents.Pdf.IImageDecoder.TryDecode(System.ReadOnlyMemory<System.Byte> data, Radzen.Documents.Pdf.ReaderLimits limits, out Radzen.Documents.Pdf.DecodedImage? image) : System.Boolean
-Radzen.Documents.Pdf.ImageColorSpace = public enum : System.Int32
-public const Radzen.Documents.Pdf.ImageColorSpace.DeviceCmyk : Radzen.Documents.Pdf.ImageColorSpace
-public const Radzen.Documents.Pdf.ImageColorSpace.DeviceGray : Radzen.Documents.Pdf.ImageColorSpace
-public const Radzen.Documents.Pdf.ImageColorSpace.DeviceRgb : Radzen.Documents.Pdf.ImageColorSpace
-public const Radzen.Documents.Pdf.ImageColorSpace.Embedded : Radzen.Documents.Pdf.ImageColorSpace
-public const Radzen.Documents.Pdf.ImageColorSpace.Indexed : Radzen.Documents.Pdf.ImageColorSpace
-Radzen.Documents.Pdf.ImageCompression = public enum : System.Int32
-public const Radzen.Documents.Pdf.ImageCompression.Jpeg : Radzen.Documents.Pdf.ImageCompression
-public const Radzen.Documents.Pdf.ImageCompression.Jpeg2000 : Radzen.Documents.Pdf.ImageCompression
-public const Radzen.Documents.Pdf.ImageCompression.None : Radzen.Documents.Pdf.ImageCompression
 Radzen.Documents.Pdf.ImageContent = public sealed class : Radzen.Documents.Pdf.ContentElement
 public Radzen.Documents.Pdf.ImageContent..ctor(System.Byte[] encodedXObject)
 public Radzen.Documents.Pdf.ImageContent.Bounds : Radzen.Documents.Pdf.PdfRect { public get; public set; }
-Radzen.Documents.Pdf.ImageDecoder = public static class
-public static Radzen.Documents.Pdf.ImageDecoder.Register(Radzen.Documents.Pdf.IImageDecoder decoder) : System.Void
-Radzen.Documents.Pdf.ImageDecoders = public sealed class
-public Radzen.Documents.Pdf.ImageDecoders.Add(Radzen.Documents.Pdf.IImageDecoder decoder) : Radzen.Documents.Pdf.ImageDecoders
-public Radzen.Documents.Pdf.ImageDecoders.WithLimits(Radzen.Documents.Core.ResourceLimits limits) : Radzen.Documents.Pdf.ImageDecoders
-public static Radzen.Documents.Pdf.ImageDecoders.BuiltIn : Radzen.Documents.Pdf.ImageDecoders { public get; }
-public static Radzen.Documents.Pdf.ImageDecoders.Default : Radzen.Documents.Pdf.ImageDecoders { public get; }
 Radzen.Documents.Pdf.InkAnnotation = public sealed class : Radzen.Documents.Pdf.Annotation
 public Radzen.Documents.Pdf.InkAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
 public Radzen.Documents.Pdf.InkAnnotation.StrokeWidth : System.Double { public get; public set; }
@@ -1231,7 +1197,6 @@ public Radzen.Documents.Pdf.PortableDocument.ExtractText() : System.String
 public Radzen.Documents.Pdf.PortableDocument.FindText(System.String text, Radzen.Documents.Pdf.TextSearchOptions? options = null) : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.TextHit>
 public Radzen.Documents.Pdf.PortableDocument.Flatten() : System.Void
 public Radzen.Documents.Pdf.PortableDocument.FormFields : System.Collections.Generic.IList<Radzen.Documents.Pdf.FormFieldDefinition> { public get; }
-public Radzen.Documents.Pdf.PortableDocument.ImageDecoders : Radzen.Documents.Pdf.ImageDecoders { public get; public set; }
 public Radzen.Documents.Pdf.PortableDocument.ImportPage(Radzen.Documents.Pdf.PortableDocument source, System.Int32 pageIndex) : Radzen.Documents.Pdf.Page
 public Radzen.Documents.Pdf.PortableDocument.ImportPages(Radzen.Documents.Pdf.PortableDocument source, System.Range range) : System.Collections.Generic.IReadOnlyList<Radzen.Documents.Pdf.Page>
 public Radzen.Documents.Pdf.PortableDocument.IncludeDocumentId : System.Boolean { public get; public set; }

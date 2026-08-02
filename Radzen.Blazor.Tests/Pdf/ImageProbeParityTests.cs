@@ -45,14 +45,14 @@ public class ImageProbeParityTests
     private static byte[] Bytes(string resource) => PdfTestResources.ReadAllBytes(resource);
 
     private static (double Width, double Height) Decoded(Image image, double availableWidth)
-        => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), availableWidth);
+        => ImageTestHelpers.Measure(image, ImageTestHelpers.Decode(image.Data), availableWidth);
 
     [Theory]
     [MemberData(nameof(ImageResources))]
     public void PixelSize_MatchesDecoder(string resource)
     {
         var data = Bytes(resource);
-        var expected = ImageDecoder.PixelSize(ImageDecoder.Decode(data));
+        var expected = ImageTestHelpers.PixelSize(ImageTestHelpers.Decode(data));
 
         Assert.Equal(expected, ImageProbes.None.PixelSize(data));
     }
@@ -65,7 +65,7 @@ public class ImageProbeParityTests
     {
         var data = Concat([0xFF, 0x4F], Siz(width, height, components));
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
+        Assert.Equal(ImageTestHelpers.PixelSize(ImageTestHelpers.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Theory]
@@ -75,7 +75,7 @@ public class ImageProbeParityTests
     {
         var data = Jp2File(width, height, components);
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
+        Assert.Equal(ImageTestHelpers.PixelSize(ImageTestHelpers.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ImageProbeParityTests
     {
         var data = Jp2FileCodestreamOnly(6, 2, components: 1);
 
-        Assert.Equal(ImageDecoder.PixelSize(ImageDecoder.Decode(data)), ImageProbes.None.PixelSize(data));
+        Assert.Equal(ImageTestHelpers.PixelSize(ImageTestHelpers.Decode(data)), ImageProbes.None.PixelSize(data));
     }
 
     [Fact]

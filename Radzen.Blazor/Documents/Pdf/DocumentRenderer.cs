@@ -78,15 +78,7 @@ public sealed class DocumentRenderer
     /// </summary>
     public bool AllowRestrictedEmbedding { get; set; }
 
-    /// <summary>
-    /// Gets or sets the image decoders this renderer decodes and measures images with. Seeded from
-    /// <see cref="ImageDecoders.Default"/>, so a decoder registered with
-    /// <see cref="ImageDecoder.Register(IImageDecoder)"/> before this renderer was created is
-    /// already in the set. Assign <c>ImageDecoders.BuiltIn.Add(...)</c> to reach a custom format
-    /// from this renderer alone. Used to measure and decode the images this render draws, and
-    /// carried onto the produced document so images added to it later decode the same way.
-    /// </summary>
-    public ImageDecoders ImageDecoders { get; set; } = ImageDecoders.Default;
+    internal ImageDecoders ImageDecoders { get; set; } = ImageDecoders.BuiltIn;
 
     /// <summary>
     /// Runs the layout engine over the model's sections and produces a physical

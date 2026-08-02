@@ -28,7 +28,7 @@ public class ImageDecoderValidationTests
         var scanline = new byte[1 + rowBytes];
         byte[]? palette = colorType == 3 ? [0, 0, 0] : null;
         var png = FullPng(1, 1, bitDepth, colorType, palette, trns: null, scanline);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
@@ -36,21 +36,21 @@ public class ImageDecoderValidationTests
     {
         var png = FullPng(1, 1, 8, colorType: 0, palette: null, trns: null, new byte[4096]);
         var limits = new ReaderLimits { MaxDecodedStreamBytes = 1024 };
-        Assert.Throws<DocumentParseException>(() => ImageDecoder.Decode(png, limits));
+        Assert.Throws<DocumentParseException>(() => ImageTestHelpers.Decode(png, limits));
     }
 
     [Fact]
     public void EmptyPalette_Throws()
     {
         var png = FullPng(1, 1, 8, colorType: 3, palette: [], trns: null, [0x00, 0x00]);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
     public void PaletteNotMultipleOfThree_Throws()
     {
         var png = FullPng(1, 1, 8, colorType: 3, palette: [10, 20, 30, 40], trns: null, [0x00, 0x00]);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class ImageDecoderValidationTests
         byte[] trns = [0x00, 0x10, 0x00, 0x20, 0x00, 0x30];
         var png = FullPng(1, 1, 8, colorType: 2, palette: null, trns, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         Assert.Null(xobj.SoftMask);
         var mask = Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Mask"]);
@@ -79,7 +79,7 @@ public class ImageDecoderValidationTests
         byte[] trns = [0x00, 0x80];
         var png = FullPng(1, 1, 8, colorType: 0, palette: null, trns, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         var mask = Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Mask"]);
         Assert.Equal(2, mask.Count);
@@ -93,7 +93,7 @@ public class ImageDecoderValidationTests
         byte[] scanline = [0x00, 0x11, 0x22, 0x33];
         byte[] trns = [0x00, 0x10, 0x00];
         var png = FullPng(1, 1, 8, colorType: 2, palette: null, trns, scanline);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class ImageDecoderValidationTests
         byte[] scanline = [0x00, 0x80];
         var png = FullPng(1, 1, 8, colorType: 0, palette: null, trns: null, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         Assert.False(xobj.Image.Dictionary.TryGetValue("Mask", out _));
     }
@@ -113,7 +113,7 @@ public class ImageDecoderValidationTests
     public void JpegZeroDimension_Throws(int width, int height)
     {
         var jpeg = Jpeg(0xC0, width, height, components: 1, adobe: false);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(jpeg));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(jpeg));
     }
 
     [Fact]
@@ -121,14 +121,14 @@ public class ImageDecoderValidationTests
     {
         var jpeg = Jpeg(0xC0, 1000, 1000, components: 1, adobe: false);
         var limits = new ReaderLimits { MaxImagePixels = 100 };
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(jpeg, limits));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(jpeg, limits));
     }
 
     [Fact]
     public void NonAdobeCmyk_HasNoInvertedDecode()
     {
         var jpeg = Jpeg(0xC0, 8, 8, components: 4, adobe: false);
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(jpeg));
         Assert.Equal("DeviceCMYK", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.False(xobj.Image.Dictionary.TryGetValue("Decode", out _));
     }
@@ -137,7 +137,7 @@ public class ImageDecoderValidationTests
     public void AdobeCmyk_HasInvertedDecode()
     {
         var jpeg = Jpeg(0xC0, 8, 8, components: 4, adobe: true);
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(jpeg));
         Assert.IsType<ArrayObject>(xobj.Image.Dictionary["Decode"]);
     }
 
@@ -148,7 +148,7 @@ public class ImageDecoderValidationTests
     public void UndecodableSofMarker_Throws(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false);
-        Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(jpeg));
+        Assert.Throws<NotSupportedException>(() => ImageTestHelpers.Decode(jpeg));
     }
 
     // ISO 32000-1 8.9.5.1: /BitsPerComponent allows only 1/2/4/8/16, so 12-bit JPEG (SOF1/SOF2) must fail loud.
@@ -158,7 +158,7 @@ public class ImageDecoderValidationTests
     public void TwelveBitJpeg_Throws(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false, precision: 12);
-        Assert.Throws<NotSupportedException>(() => ImageDecoder.Decode(jpeg));
+        Assert.Throws<NotSupportedException>(() => ImageTestHelpers.Decode(jpeg));
     }
 
     [Theory]
@@ -168,7 +168,7 @@ public class ImageDecoderValidationTests
     public void EightBitJpeg_EmitsLegalBitsPerComponent(int marker)
     {
         var jpeg = Jpeg((byte)marker, 8, 8, components: 1, adobe: false);
-        var dict = ImageTestHelpers.Xobject(ImageDecoder.Decode(jpeg)).Image.Dictionary;
+        var dict = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(jpeg)).Image.Dictionary;
         Assert.Equal(8, ImageTestHelpers.Int(dict, "BitsPerComponent"));
     }
 

@@ -17,7 +17,7 @@ public class ImageLayoutTests
         => new(PdfTestResources.ReadAllBytes(resource));
 
     private static (double Width, double Height) Measure(Image image)
-        => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), double.PositiveInfinity);
+        => ImageTestHelpers.Measure(image, ImageTestHelpers.Decode(image.Data), double.PositiveInfinity);
 
     [Fact]
     public void FitBox_UsesSmallerScale_ForLandscapeBase()

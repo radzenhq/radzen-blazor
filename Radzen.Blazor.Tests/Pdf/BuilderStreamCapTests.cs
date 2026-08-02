@@ -25,7 +25,7 @@ public class BuilderStreamCapTests
     public void ImageReadFully_RejectsUnseekableStreamPastCap()
     {
         var stream = new UnseekableStream(new byte[Cap * 4]);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.ReadFully(stream, Bounded));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.ReadFully(stream, Bounded));
     }
 
     [Fact]
@@ -39,6 +39,6 @@ public class BuilderStreamCapTests
     public void ImageReadFully_AcceptsStreamWithinCap()
     {
         var payload = new byte[Cap / 2];
-        Assert.Equal(payload.Length, ImageDecoder.ReadFully(new UnseekableStream(payload), Bounded).Length);
+        Assert.Equal(payload.Length, ImageTestHelpers.ReadFully(new UnseekableStream(payload), Bounded).Length);
     }
 }

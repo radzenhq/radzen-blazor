@@ -53,6 +53,6 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
             throw new InvalidDataException("JPEG2000 image has invalid dimensions.");
         }
 
-        ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG2000");
+        limits.ValidateImageDimensions(width, height, "JPEG2000");
     }
 }
