@@ -47,6 +47,12 @@ internal sealed class AppendedFormImporter(PortableDocument document, FormWriter
                 continue;
             }
 
+            if (reader.GetBool(sourceForm, "NeedAppearances") == true
+                && FormAppearanceConformance.Claim(document) is { } label)
+            {
+                throw new InvalidOperationException(FormAppearanceConformance.AppendedNeedAppearances(label));
+            }
+
             forms.RegisterAppendedDefaults(importer, sourceForm);
 
             for (var i = 0; i < annots.Count; i++)
