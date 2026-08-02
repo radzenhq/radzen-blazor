@@ -124,8 +124,7 @@ public class ColorAlphaTests
         var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container());
-        container.Borders.Width = 2;
-        container.Borders.Color = Color.FromArgb(64, 255, 0, 0);
+        container.Borders.SetAll(width: 2, color: Color.FromArgb(64, 255, 0, 0));
         container.Blocks.Add(Text("Bordered"));
 
         var states = ExtGStates(document);

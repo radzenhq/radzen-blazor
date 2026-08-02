@@ -58,16 +58,17 @@ public class MeasurementUnitSurfaceTests
     [Fact]
     public void BorderWidth_FromMeasurementString_IsPoints()
     {
-        var borders = new Borders { Width = Unit.Parse("1.5pt") };
+        var borders = new Borders();
+        borders.Top.Width = Unit.Parse("1.5pt");
 
-        Assert.Equal(1.5, borders.Width.Point);
         Assert.Equal(1.5, borders.Top.Width.Point);
     }
 
     [Fact]
-    public void BorderWidth_EdgeOverrideAcceptsMillimeters()
+    public void BorderWidth_EdgeAcceptsMillimeters()
     {
-        var borders = new Borders { Width = 1 };
+        var borders = new Borders();
+        borders.SetAll(width: 1);
         borders.Left.Width = Unit.Parse("1mm");
 
         Assert.Equal(Unit.FromMillimeter(1).Point, borders.Left.Width.Point);

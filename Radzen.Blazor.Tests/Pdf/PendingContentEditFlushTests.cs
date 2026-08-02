@@ -36,7 +36,7 @@ public class PendingContentEditFlushTests
     {
         using var input = new MemoryStream(Source());
         var document = PortableDocument.LoadFromStream(input);
-        document.AddWatermark("DRAFT");
+        document.AddWatermark(new Watermark { Text = "DRAFT" });
         return document;
     }
 

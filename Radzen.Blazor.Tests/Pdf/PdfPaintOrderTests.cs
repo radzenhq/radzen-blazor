@@ -119,8 +119,7 @@ public class PdfPaintOrderTests
             Opacity = 0.8,
             BlendMode = BlendMode.Multiply,
         });
-        container.Borders.Width = 3;
-        container.Borders.Color = Color.FromRgb(10, 20, 30);
+        container.Borders.SetAll(width: 3, color: Color.FromRgb(10, 20, 30));
 
         var caption = new Paragraph();
         var run = caption.Inlines.Add("Overlapping");

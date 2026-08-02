@@ -171,7 +171,6 @@ public class AuthoredValueValidationTests
             { "Section.FooterDistance", value => section.FooterDistance = value },
             { "PageSize.Width", value => _ = new PageSize(value, Unit.FromPoint(10)) },
             { "PageSize.Height", value => _ = new PageSize(Unit.FromPoint(10), value) },
-            { "Borders.Width", value => borders.Width = value },
             { "Border.Width", value => borders.Top.Width = value },
             { "BoxShadow.BlurRadius", value => shadow.BlurRadius = value },
             { "BoxShadow.OffsetX", value => shadow.OffsetX = value },
@@ -237,8 +236,8 @@ public class AuthoredValueValidationTests
     {
         var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
 
-        var width = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPoint(value), Unit.FromPoint(10)));
-        var height = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPoint(10), Unit.FromPoint(value)));
+        var width = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPoint(value), Unit.FromPoint(10)));
+        var height = Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPoint(10), Unit.FromPoint(value)));
 
         Assert.Contains("Image.FitBox.MaxWidth", width.Message, StringComparison.Ordinal);
         Assert.Contains("Image.FitBox.MaxHeight", height.Message, StringComparison.Ordinal);
@@ -250,7 +249,7 @@ public class AuthoredValueValidationTests
     {
         var image = new Document().Sections.Add().Blocks.AddImage(new System.IO.MemoryStream());
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => image.FitInBox(Unit.FromPercent(50), Unit.FromPoint(10)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image.FitBox = (Unit.FromPercent(50), Unit.FromPoint(10)));
     }
 
     [Theory]

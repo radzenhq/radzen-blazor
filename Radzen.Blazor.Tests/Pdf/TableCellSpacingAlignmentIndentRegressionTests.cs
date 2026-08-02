@@ -219,7 +219,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         var table = OneCellTable(section, "X");
         table.Columns[0].Width = null;
         table.LeftIndent = Unit.FromPoint(100);
-        table.Borders.Width = 1;
+        table.Borders.SetAll(width: 1);
 
         AssertIndentedEdges(document);
     }
@@ -234,7 +234,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         table.Columns.Add();
         table.Rows.Add().Cells[0].Blocks.AddParagraph("H");
         table.LeftIndent = Unit.FromPoint(100);
-        table.Borders.Width = 1;
+        table.Borders.SetAll(width: 1);
 
         AssertIndentedEdges(document);
     }
@@ -251,7 +251,7 @@ public class TableCellSpacingAlignmentIndentRegressionTests
         nested.Columns.Add();
         nested.Rows.Add().Cells[0].Blocks.AddParagraph("N");
         nested.LeftIndent = Unit.FromPoint(80);
-        nested.Borders.Width = 1;
+        nested.Borders.SetAll(width: 1);
 
         var vertical = VerticalSegments(document);
         Assert.True(vertical.Count > 0, "nested table borders must draw vertical edges");

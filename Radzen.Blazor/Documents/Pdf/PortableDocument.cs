@@ -776,14 +776,6 @@ public sealed class PortableDocument
         }
     }
 
-    /// <summary>Adds centered watermark text to every current page.</summary>
-    /// <param name="text">The watermark text.</param>
-    public void AddWatermark(string text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
-        AddWatermark(new Watermark { Text = text });
-    }
-
     /// <summary>
     /// Flattens interactive forms and modeled annotations into static page
     /// content. Field widgets, modeled annotations and the catalog

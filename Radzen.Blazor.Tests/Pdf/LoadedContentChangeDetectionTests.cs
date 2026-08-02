@@ -162,7 +162,7 @@ public class LoadedContentChangeDetectionTests
                 ((TextContent)page.Content[0]).Font.Size = 22;
                 break;
             case "QueuedAppend":
-                document.AddWatermark("Draft");
+                document.AddWatermark(new Watermark { Text = "Draft" });
                 break;
             default:
                 throw new InvalidOperationException($"Unknown edit path '{edit}'.");

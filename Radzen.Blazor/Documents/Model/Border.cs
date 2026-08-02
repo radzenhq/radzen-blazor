@@ -4,45 +4,51 @@ namespace Radzen.Documents;
 
 
 /// <summary>
-/// A single border edge. When a property has not been set on the edge, it falls back to the
-/// box-level value of its owning <see cref="Borders"/>.
+/// A single border edge of a <see cref="Borders"/> box.
 /// </summary>
 public sealed class Border
 {
-    private readonly Borders owner;
-    private Unit? width;
-    private Color? color;
-    private BorderStyle? style;
+    private Unit width;
+    private Color color = Color.Black;
+    private BorderStyle style = BorderStyle.None;
 
-    internal Border(Borders owner) => this.owner = owner;
+    internal Border()
+    {
+    }
 
-    /// <summary>
-    /// Gets or sets the border width. Falls back to the box width when not set on the edge.
-    /// </summary>
+    /// <summary>Gets or sets the border width. Defaults to zero.</summary>
     /// <exception cref="System.ArgumentOutOfRangeException">The value is relative.</exception>
     public Unit Width
     {
-        get => width ?? owner.Width;
-        set => width = AuthoredNumber.Absolute(value, "Border.Width");
+        get => width;
+        set
+        {
+            width = AuthoredNumber.Absolute(value, "Border.Width");
+            IsSet = true;
+        }
     }
 
-    /// <summary>
-    /// Gets or sets the border color. Falls back to the box color when not set on the edge.
-    /// </summary>
+    /// <summary>Gets or sets the border color. Defaults to black.</summary>
     public Color Color
     {
-        get => color ?? owner.Color;
-        set => color = value;
+        get => color;
+        set
+        {
+            color = value;
+            IsSet = true;
+        }
     }
 
-    /// <summary>
-    /// Gets or sets the border line style. Falls back to the box style when not set on the edge.
-    /// </summary>
+    /// <summary>Gets or sets the border line style. Defaults to <see cref="BorderStyle.None"/>.</summary>
     public BorderStyle Style
     {
-        get => style ?? owner.Style;
-        set => style = value;
+        get => style;
+        set
+        {
+            style = value;
+            IsSet = true;
+        }
     }
 
-    internal bool IsSet => width is not null || color is not null || style is not null || owner.IsSet;
+    internal bool IsSet { get; private set; }
 }

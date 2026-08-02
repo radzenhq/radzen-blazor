@@ -341,9 +341,7 @@ public class LaidOutContractTests
     {
         var table = new Table();
         table.Columns.Add(Unit.FromPoint(100));
-        table.Borders.Width = 1;
-        table.Borders.Style = BorderStyle.Solid;
-        table.Borders.Color = Color.FromRgb(1, 1, 1);
+        table.Borders.SetAll(width: 1, color: Color.FromRgb(1, 1, 1), style: BorderStyle.Solid);
 
         var header = table.Rows.Add();
         header.RepeatOnEveryPage = true;
@@ -397,7 +395,7 @@ public class LaidOutContractTests
         Assert.Equal(Color.FromRgb(200, 200, 200), layout.Decoration.RowBackground(0));
         Assert.Null(layout.Decoration.RowBackground(1));
 
-        table.Borders.Width = 9;
+        table.Borders.SetAll(width: 9);
         table.Rows[0].Background = Color.FromRgb(7, 7, 7);
 
         Assert.Equal(new ResolvedEdge(Color.FromRgb(1, 1, 1), 1, BorderStyle.Solid), head.Decoration.Top);
@@ -623,7 +621,7 @@ public class LaidOutContractTests
                 Spread = Unit.FromPoint(1),
             },
         });
-        gradient.Borders.Width = 2;
+        gradient.Borders.SetAll(width: 2);
         gradient.Blocks.AddParagraph("Gradient box");
 
         var table = section.Blocks.AddTable();

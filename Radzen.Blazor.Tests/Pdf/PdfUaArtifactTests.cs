@@ -46,8 +46,7 @@ public class PdfUaArtifactTests
         var table = section.Blocks.AddTable();
         table.Columns.Add();
         table.Columns.Add();
-        table.Borders.Width = 1;
-        table.Borders.Color = Color.FromRgb(0, 0, 0);
+        table.Borders.SetAll(width: 1, color: Color.FromRgb(0, 0, 0));
 
         var row = table.Rows.Add();
         var left = TableLayoutSupport.Fill(row.Cells[0], "Item");

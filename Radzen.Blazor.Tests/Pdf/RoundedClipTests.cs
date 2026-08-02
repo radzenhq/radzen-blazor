@@ -44,7 +44,7 @@ public class RoundedClipTests
         table.Columns.Add(Unit.FromPoint(150));
         if (borderWidth is { } width)
         {
-            table.Borders.Width = width;
+            table.Borders.SetAll(width: width);
         }
 
         if (radius > 0)
@@ -138,7 +138,7 @@ public class RoundedClipTests
     [Fact]
     public void RoundedContainer_DoesNotClipItsOwnBorderStroke()
     {
-        var document = RoundedContainerBuilder(8, container => container.Borders.Width = 1);
+        var document = RoundedContainerBuilder(8, container => container.Borders.SetAll(width: 1));
 
         var content = FirstPageContent(document);
 
@@ -210,11 +210,11 @@ public class RoundedClipTests
                 Padding = Unit.FromPoint(10),
                 Background = Color.FromRgb(230, 230, 230),
             });
-            container.Borders.Width = 1;
+            container.Borders.SetAll(width: 1);
             var table = container.Blocks.AddTable();
             table.Columns.Add(Unit.FromPoint(120));
             table.Columns.Add(Unit.FromPoint(120));
-            table.Borders.Width = 1;
+            table.Borders.SetAll(width: 1);
             var row = table.Rows.Add();
             row.Cells[0].Background = Color.FromRgb(200, 220, 255);
             var run = row.Cells[0].Blocks.AddParagraph().Inlines.Add("Zero");

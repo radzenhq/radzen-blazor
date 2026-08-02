@@ -59,12 +59,9 @@ public const Radzen.Documents.BorderStyle.Solid : Radzen.Documents.BorderStyle
 Radzen.Documents.Borders = public sealed class
 public Radzen.Documents.Borders..ctor()
 public Radzen.Documents.Borders.Bottom : Radzen.Documents.Border { public get; }
-public Radzen.Documents.Borders.Color : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Borders.Left : Radzen.Documents.Border { public get; }
 public Radzen.Documents.Borders.Right : Radzen.Documents.Border { public get; }
-public Radzen.Documents.Borders.Style : Radzen.Documents.BorderStyle { public get; public set; }
 public Radzen.Documents.Borders.Top : Radzen.Documents.Border { public get; }
-public Radzen.Documents.Borders.Width : Radzen.Documents.Core.Unit { public get; public set; }
 Radzen.Documents.BoxShadow = public sealed class
 public Radzen.Documents.BoxShadow..ctor()
 public Radzen.Documents.BoxShadow.BlurRadius : Radzen.Documents.Core.Unit { public get; public set; }
@@ -471,7 +468,6 @@ Radzen.Documents.Image = public sealed class : Radzen.Documents.Block
 public Radzen.Documents.Image.Alignment : Radzen.Documents.HorizontalAlignment { public get; public set; }
 public Radzen.Documents.Image.AlternateText : System.String? { public get; public set; }
 public Radzen.Documents.Image.FitBox : System.ValueTuple<Radzen.Documents.Core.Unit, Radzen.Documents.Core.Unit>? { public get; public set; }
-public Radzen.Documents.Image.FitInBox(Radzen.Documents.Core.Unit maxWidth, Radzen.Documents.Core.Unit maxHeight) : Radzen.Documents.Image
 public Radzen.Documents.Image.Height : Radzen.Documents.Core.Unit? { public get; public set; }
 public Radzen.Documents.Image.Interpolate : System.Boolean { public get; public set; }
 public Radzen.Documents.Image.Opacity : System.Double { public get; public set; }
@@ -1218,7 +1214,6 @@ public Radzen.Documents.Pdf.PortableDocument..ctor()
 public Radzen.Documents.Pdf.PortableDocument.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; }
 public Radzen.Documents.Pdf.PortableDocument.AcroForm : Radzen.Documents.Pdf.AcroForm? { public get; }
 public Radzen.Documents.Pdf.PortableDocument.AddWatermark(Radzen.Documents.Watermark watermark) : System.Void
-public Radzen.Documents.Pdf.PortableDocument.AddWatermark(System.String text) : System.Void
 public Radzen.Documents.Pdf.PortableDocument.Append(Radzen.Documents.Pdf.PortableDocument other) : System.Void
 public Radzen.Documents.Pdf.PortableDocument.Attachments : Radzen.Documents.Pdf.AttachmentCollection { public get; }
 public Radzen.Documents.Pdf.PortableDocument.CompressOutput : System.Boolean { public get; public set; }

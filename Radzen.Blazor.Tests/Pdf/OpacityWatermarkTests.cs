@@ -74,7 +74,7 @@ public class OpacityWatermarkTests
         var document = new Document();
         var section = document.Sections.Add();
         var container = section.Blocks.Add(new Container { Opacity = 0.4 });
-        container.Borders.Width = 2;
+        container.Borders.SetAll(width: 2);
         container.Blocks.Add(Text("Bordered"));
 
         var text = PageText(document);

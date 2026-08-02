@@ -27,32 +27,11 @@ public class BorderPublicContractTests
     }
 
     [Fact]
-    public void UniformValuesFlowToEveryEdge()
+    public void EdgeValuesAreIndependentOfTheOtherEdges()
     {
-        var borders = new Borders
-        {
-            Width = Unit.Parse("2pt"),
-            Color = Color.Red,
-            Style = BorderStyle.Dashed,
-        };
+        var borders = new Borders();
+        borders.SetAll(Unit.Parse("2pt"), Color.Red, BorderStyle.Dashed);
 
-        foreach (var edge in new[] { borders.Top, borders.Right, borders.Bottom, borders.Left })
-        {
-            Assert.Equal(Unit.Parse("2pt"), edge.Width);
-            Assert.Equal(Color.Red, edge.Color);
-            Assert.Equal(BorderStyle.Dashed, edge.Style);
-        }
-    }
-
-    [Fact]
-    public void PerEdgeValuesOverrideOnlyThatEdge()
-    {
-        var borders = new Borders
-        {
-            Width = Unit.Parse("2pt"),
-            Color = Color.Red,
-            Style = BorderStyle.Dashed,
-        };
         borders.Bottom.Width = Unit.Parse("4pt");
         borders.Bottom.Color = Color.Blue;
         borders.Bottom.Style = BorderStyle.Dotted;
@@ -64,30 +43,4 @@ public class BorderPublicContractTests
         Assert.Equal(Color.Red, borders.Top.Color);
         Assert.Equal(BorderStyle.Dashed, borders.Top.Style);
     }
-
-    [Fact]
-    public void PerEdgeOverridesRemainWhenUniformValuesChange()
-    {
-        var borders = new Borders
-        {
-            Width = Unit.Parse("2pt"),
-            Color = Color.Red,
-            Style = BorderStyle.Dashed,
-        };
-        borders.Left.Width = Unit.Parse("4pt");
-        borders.Left.Color = Color.Blue;
-        borders.Left.Style = BorderStyle.Dotted;
-
-        borders.Width = Unit.Parse("6pt");
-        borders.Color = Color.Green;
-        borders.Style = BorderStyle.Solid;
-
-        Assert.Equal(Unit.Parse("4pt"), borders.Left.Width);
-        Assert.Equal(Color.Blue, borders.Left.Color);
-        Assert.Equal(BorderStyle.Dotted, borders.Left.Style);
-        Assert.Equal(Unit.Parse("6pt"), borders.Right.Width);
-        Assert.Equal(Color.Green, borders.Right.Color);
-        Assert.Equal(BorderStyle.Solid, borders.Right.Style);
-    }
-
 }

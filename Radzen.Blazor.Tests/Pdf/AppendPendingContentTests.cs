@@ -33,7 +33,7 @@ public class AppendPendingContentTests
     public void Append_CarriesWatermarkQueuedOnTheSourcePage()
     {
         var source = Loaded(1);
-        source.AddWatermark("DRAFT");
+        source.AddWatermark(new Watermark { Text = "DRAFT" });
 
         var target = new PortableDocument();
         target.Append(source);
@@ -58,7 +58,7 @@ public class AppendPendingContentTests
     public void Append_LeavesTheSourceDocumentUnchanged()
     {
         var source = Loaded(1);
-        source.AddWatermark("DRAFT");
+        source.AddWatermark(new Watermark { Text = "DRAFT" });
         var before = source.ToArray();
 
         new PortableDocument().Append(source);

@@ -21,7 +21,7 @@ public class ContentStreamCompactionTests
         heading.Alignment = HorizontalAlignment.Right;
 
         var table = section.Blocks.AddTable();
-        table.Borders.Width = 0.75;
+        table.Borders.SetAll(width: 0.75);
         table.Columns.Add();
         table.Columns.Add();
 
