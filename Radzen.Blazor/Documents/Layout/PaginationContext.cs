@@ -44,7 +44,7 @@ internal sealed class PaginationContext
         this.capture = capture;
         this.pageNumberOffset = pageNumberOffset;
         this.sectionIndex = sectionIndex;
-        current = new PageLayerBuilder(capture);
+        current = new PageLayerBuilder();
         StartPageCount = pages.Count;
     }
 
@@ -138,7 +138,6 @@ internal sealed class PaginationContext
     {
         pages.Add(new LaidOutPage
         {
-            Id = capture.Node(),
             Size = size,
             ContentBox = ContentBox,
             Number = pageNumberOffset + pages.Count + 1,
@@ -149,7 +148,7 @@ internal sealed class PaginationContext
             FooterTop = footerTop,
             Watermark = watermark,
         });
-        current = new PageLayerBuilder(capture);
+        current = new PageLayerBuilder();
     }
 
     public void Finish()
@@ -312,7 +311,6 @@ internal sealed class PaginationContext
 
         current.Boxes.Add(new LaidOutBox
         {
-            Id = capture.Node(),
             Source = capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, Cursor, boxWidth, boxHeight),

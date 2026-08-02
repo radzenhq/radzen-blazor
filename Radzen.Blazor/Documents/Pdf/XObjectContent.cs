@@ -27,8 +27,7 @@ public sealed class XObjectContent : ContentElement
 
     internal override ContentElement DeepClone() => CopyStateTo(new XObjectContent(Name) { Opacity = Opacity });
 
-    /// <inheritdoc/>
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         if (Opacity is { } opacity)
         {

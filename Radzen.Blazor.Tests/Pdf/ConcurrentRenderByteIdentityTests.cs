@@ -31,22 +31,16 @@ public class ConcurrentRenderByteIdentityTests
         return document;
     }
 
-    private static DocumentRenderer Renderer()
-    {
-        var renderer = new DocumentRenderer
-        {
-            Producer = "Concurrent Producer 1.0",
-            ViewerPreferences = new ViewerPreferences { HideToolbar = true, PageMode = PdfPageMode.UseOutlines },
-        };
-
-        renderer.Outline.Add(new OutlineItem("Chapter", OutlineTarget.ToPage(0)));
-        renderer.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.UppercaseRoman });
-
-        return renderer;
-    }
+    private static DocumentRenderer Renderer() => new() { Producer = "Concurrent Producer 1.0" };
 
     private static byte[] Render(LaidOutDocument laidOut)
-        => DocumentRenderEngine.Generate(RenderRequest.From(Renderer()), laidOut).ToArray();
+    {
+        var rendered = DocumentRenderEngine.Generate(RenderRequest.From(Renderer()), laidOut);
+        rendered.ViewerPreferences = new ViewerPreferences { HideToolbar = true, PageMode = PdfPageMode.UseOutlines };
+        rendered.Outline.Add(new OutlineItem("Chapter", OutlineTarget.ToPage(0)));
+        rendered.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.UppercaseRoman });
+        return rendered.ToArray();
+    }
 
     [Fact]
     public void RenderingOneLaidOutDocumentOnManyThreads_ProducesBytesIdenticalToASingleThreadedRender()

@@ -269,10 +269,10 @@ public class FormFieldHardeningTests
     {
         var document = new Document();
         BuildTestSupport.AddText(document.Sections.Add(), "Body", "Helvetica");
-        var renderer = new DocumentRenderer();
-        renderer.Attachments.Add("data.xml", [1, 2, 3], AttachmentRelationship.Data, "text/xml");
-        renderer.Attachments.Add("data.xml", [4, 5, 6], AttachmentRelationship.Data, "text/xml");
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Attachments.Add("data.xml", [1, 2, 3], AttachmentRelationship.Data, "text/xml");
+        rendered.Attachments.Add("data.xml", [4, 5, 6], AttachmentRelationship.Data, "text/xml");
 
-        Assert.Throws<InvalidOperationException>(() => renderer.Render(document).ToArray());
+        Assert.Throws<InvalidOperationException>(rendered.ToArray);
     }
 }

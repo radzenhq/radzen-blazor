@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -120,18 +121,30 @@ public class LaidOutZOrderTests
         Assert.Equal(orders.OrderBy(order => order).ToArray(), orders.ToArray());
     }
 
+    private static IReadOnlyList<string> Merge(
+        ImmutableArray<string> tables,
+        Func<string, int> tableOrder,
+        ImmutableArray<string> boxes,
+        Func<string, int> boxOrder)
+    {
+        var visited = new List<string>();
+        var cursor = OrderedMerge.ByOrder(tables, tableOrder, boxes, boxOrder);
+        while (cursor.MoveNext())
+        {
+            visited.Add(cursor.IsTable ? tables[cursor.TableIndex] : boxes[cursor.BoxIndex]);
+        }
+
+        return visited;
+    }
+
     [Fact]
     public void OrderedMerge_EmitsTheTableFirstWhenTheZOrdersTie()
     {
-        var visited = new List<string>();
-
-        OrderedMerge.VisitByOrder(
+        var visited = Merge(
             ImmutableArray.Create("t0", "t5"),
             table => table == "t0" ? 0 : 5,
             ImmutableArray.Create("b0", "b5"),
-            box => box == "b0" ? 0 : 5,
-            table => visited.Add(table),
-            box => visited.Add(box));
+            box => box == "b0" ? 0 : 5);
 
         Assert.Equal(new[] { "t0", "b0", "t5", "b5" }, visited);
     }
@@ -139,15 +152,11 @@ public class LaidOutZOrderTests
     [Fact]
     public void OrderedMerge_DrainsTheRemainingSideWhenOneRunsOut()
     {
-        var visited = new List<string>();
-
-        OrderedMerge.VisitByOrder(
+        var visited = Merge(
             ImmutableArray.Create("t9"),
             _ => 9,
             ImmutableArray.Create("b1", "b2"),
-            box => box == "b1" ? 1 : 2,
-            table => visited.Add(table),
-            box => visited.Add(box));
+            box => box == "b1" ? 1 : 2);
 
         Assert.Equal(new[] { "b1", "b2", "t9" }, visited);
     }
@@ -155,16 +164,10 @@ public class LaidOutZOrderTests
     [Fact]
     public void OrderedMerge_VisitsNothingWhenBothSidesAreEmpty()
     {
-        var visited = 0;
-
-        OrderedMerge.VisitByOrder(
+        Assert.Empty(Merge(
             ImmutableArray<string>.Empty,
             _ => 0,
             ImmutableArray<string>.Empty,
-            _ => 0,
-            _ => visited++,
-            _ => visited++);
-
-        Assert.Equal(0, visited);
+            _ => 0));
     }
 }

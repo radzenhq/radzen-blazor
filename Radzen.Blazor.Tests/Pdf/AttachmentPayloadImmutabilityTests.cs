@@ -11,10 +11,8 @@ public class AttachmentPayloadImmutabilityTests
     [Fact]
     public void MutatingTheCallerArrayDoesNotChangeTheStoredPayload()
     {
-        var document = new Document();
         var data = Encoding.UTF8.GetBytes("payload");
-        var builderRenderer = new DocumentRenderer();
-        var attachment = builderRenderer.Attachments.Add("data.bin", data, AttachmentRelationship.Supplement, "application/octet-stream");
+        var attachment = new PortableDocument().Attachments.Add("data.bin", data, AttachmentRelationship.Supplement, "application/octet-stream");
 
         data[0] = (byte)'X';
 

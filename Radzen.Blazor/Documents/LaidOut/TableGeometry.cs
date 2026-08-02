@@ -67,8 +67,6 @@ internal readonly struct LaidOutTablePlacement
 
 internal sealed record LaidOutBox
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required SourceId Source { get; init; }
 
     public required LaidOutBoxContent Content { get; init; }
@@ -88,8 +86,6 @@ internal sealed record LaidOutBox
 
 internal sealed record LaidOutCell : ILaidOutContent<LaidOutTablePlacement>
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required SourceId Source { get; init; }
 
     public required int Row { get; init; }
@@ -121,8 +117,6 @@ internal sealed record LaidOutCell : ILaidOutContent<LaidOutTablePlacement>
 
 internal sealed class LaidOutTable
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required ImmutableArray<double> ColumnWidths { get; init; }
 
     public required ImmutableArray<double> RowHeights { get; init; }

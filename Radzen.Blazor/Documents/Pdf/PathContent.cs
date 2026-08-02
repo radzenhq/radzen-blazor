@@ -313,8 +313,7 @@ public sealed class PathContent : ContentElement
         return Math.Min(fill, stroke);
     }
 
-    /// <inheritdoc/>
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         var leaksStrokeState = Cap is not null || Join is not null || MiterLimit is not null
             || Intent is not null || DashArray is not null;

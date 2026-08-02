@@ -16,7 +16,7 @@ public class FrameworkSeamTests
 {
     private sealed class RectangleElement : ContentElement
     {
-        protected override void EmitBody(ContentWriter writer)
+        private protected override void EmitBody(ContentWriter writer)
         {
             writer.WriteNumber(12);
             writer.WriteRaw(" ");

@@ -7,8 +7,7 @@ namespace Radzen.Documents.Pdf;
 
 /// <summary>
 /// An entry in the document outline (bookmark) tree shown in the viewer's
-/// navigation panel. Add or edit root entries through <see cref="PortableDocument.Outline"/>
-/// or <see cref="DocumentRenderer.Outline"/>.
+/// navigation panel. Add or edit root entries through <see cref="PortableDocument.Outline"/>.
 /// </summary>
 /// <param name="title">The title shown in the bookmark panel.</param>
 /// <param name="target">The location the entry navigates to, or <c>null</c> for a non-navigating entry.</param>

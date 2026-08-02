@@ -95,10 +95,12 @@ public class EncryptionDeterminismTests
     }
 
     [Fact]
-    public void MissingMaterial_FailsLoud()
+    public void MissingMaterial_GeneratesDistinctOutput()
     {
-        Assert.Throws<InvalidOperationException>(
-            () => WriteGraph(new EncryptionOptions { Algorithm = EncryptionAlgorithm.Aes128 }));
+        var a = WriteGraph(new EncryptionOptions { Algorithm = EncryptionAlgorithm.Aes128 });
+        var b = WriteGraph(new EncryptionOptions { Algorithm = EncryptionAlgorithm.Aes128 });
+
+        Assert.NotEqual(a, b);
     }
 
     [Fact]

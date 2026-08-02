@@ -13,10 +13,11 @@ public class EncryptionPublicApiTests
     private static byte[] BuildEncrypted(EncryptionOptions options)
     {
         var document = new Document();
-        var builderRenderer = new DocumentRenderer { Encryption = options };
         var section = document.Sections.Add();
         section.Blocks.AddParagraph("Hello encrypted world");
-        return builderRenderer.ToArray(document);
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Encryption = options;
+        return rendered.ToArray();
     }
 
     [Fact]
@@ -47,6 +48,38 @@ public class EncryptionPublicApiTests
         Assert.Throws<InvalidPasswordException>(() => DocumentReader.Parse(bytes, "wrong"));
     }
 
+    private static byte[] BuildWithPasswordAndPermissionsOnly()
+        => BuildEncrypted(new EncryptionOptions
+        {
+            UserPassword = "secret",
+            OwnerPassword = "owner",
+            AllowPrinting = false,
+            AllowContentCopy = false,
+        });
+
+    [Fact]
+    public void DocumentEncryption_WithoutMaterial_ProducesReadableEncryptedFile()
+    {
+        var bytes = BuildWithPasswordAndPermissionsOnly();
+
+        var reader = DocumentReader.Parse(bytes, "secret");
+        Assert.NotNull(reader.Resolve(reader.Trailer["Root"]!));
+        var encrypt = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Encrypt"]!));
+        var permissions = Assert.IsType<NumberObject>(reader.Resolve(encrypt["P"]!)).IntValue;
+        Assert.Equal(0, permissions & 0x004);
+        Assert.Equal(0, permissions & 0x010);
+        Assert.Throws<InvalidPasswordException>(() => DocumentReader.Parse(bytes, "wrong"));
+    }
+
+    [Fact]
+    public void DocumentEncryption_WithoutMaterial_DiffersBetweenDocuments()
+    {
+        var first = BuildWithPasswordAndPermissionsOnly();
+        var second = BuildWithPasswordAndPermissionsOnly();
+
+        Assert.NotEqual(first, second);
+    }
+
     [Fact]
     public void NoEncryption_ByteIdenticalToPlainBuild()
     {
@@ -54,11 +87,12 @@ public class EncryptionPublicApiTests
         plain.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
 
         var withNull = new Document();
-        var withNullRenderer = new DocumentRenderer { Encryption = null };
         withNull.Sections.Add().Blocks.AddParagraph("Hello encrypted world");
+        var withNullRendered = new DocumentRenderer().Render(withNull);
+        withNullRendered.Encryption = null;
 
         var a = new DocumentRenderer().ToArray(plain);
-        var b = withNullRenderer.ToArray(withNull);
+        var b = withNullRendered.ToArray();
         Assert.Equal(a.Length, b.Length);
     }
 }

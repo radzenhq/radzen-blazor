@@ -56,7 +56,6 @@ internal static class FlowContentPlacer
         int order,
         LayoutCaptureContext capture)
         => TableFragmentJoin.Join(
-            capture.Node(),
             capture.Source(source),
             layout,
             fragment,

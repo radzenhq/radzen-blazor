@@ -19,7 +19,7 @@ public class IncrementalSaveTests
     {
         public int Emissions { get; private set; }
 
-        protected override void EmitBody(ContentWriter writer)
+        private protected override void EmitBody(ContentWriter writer)
         {
             Emissions++;
             writer.WriteRaw("q Q\n");

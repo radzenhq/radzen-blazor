@@ -77,14 +77,9 @@ public abstract class Annotation : ITracksChanges
 
     internal abstract string Subtype { get; }
 
-    /// <summary>Assigns a tracked backing field and marks this annotation modified.</summary>
-    /// <typeparam name="T">The field type.</typeparam>
-    /// <param name="field">The backing field to assign.</param>
-    /// <param name="value">The value to assign.</param>
-    protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
+    private protected void Set<T>(ref T field, T value) => tracker.Set(ref field, value);
 
-    /// <summary>Marks this annotation modified without assigning a tracked field.</summary>
-    protected void Touch() => tracker.Touch();
+    private protected void Touch() => tracker.Touch();
 
     internal virtual void AcceptChanges()
     {

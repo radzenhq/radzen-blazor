@@ -43,7 +43,6 @@ internal static class LayoutFinalizer
 
         return new LaidOutDocument
         {
-            Id = document.Id,
             Fonts = document.Fonts,
             Pages = pages.MoveToImmutable(),
             Semantics = document.Semantics,
@@ -128,7 +127,6 @@ internal static class LayoutFinalizer
                 ? null
                 : new LaidOutTable
                 {
-                    Id = table.Id,
                     ColumnWidths = table.ColumnWidths,
                     RowHeights = table.RowHeights,
                     Width = table.Width,

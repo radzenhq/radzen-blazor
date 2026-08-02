@@ -56,7 +56,6 @@ public class ImageDecoderRegistryTests
     [Fact]
     public void ConcurrentRegistrationsAreAllRetained()
     {
-        using var scope = ImageDecoder.Scope();
         const int Threads = 8;
         using var start = new Barrier(Threads);
         var magics = new byte[Threads][];

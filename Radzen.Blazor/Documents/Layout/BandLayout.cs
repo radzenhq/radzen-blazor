@@ -2,9 +2,9 @@ using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.Layout;
 
-internal sealed class BandLayout(LayoutCaptureContext capture)
+internal sealed class BandLayout
 {
-    public PageLayerBuilder Content { get; } = new(capture);
+    public PageLayerBuilder Content { get; } = new();
 
     public double Height { get; set; }
 }
@@ -18,7 +18,7 @@ internal static class BandLayouter
         LoweringResult resolution,
         LayoutCaptureContext capture)
     {
-        var result = new BandLayout(capture);
+        var result = new BandLayout();
         var engine = FlowPlacementEngine.ForBand(
             result,
             width,

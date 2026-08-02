@@ -116,13 +116,15 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4F)]
     public void PdfA4Levels_Catalog_DeclaresVersion20(PdfAConformance level)
     {
-        var (document, renderer) = Author(level);
+        var (document, renderer) = Author(level == PdfAConformance.PdfA4F ? PdfAConformance.PdfA4 : level);
+        var rendered = renderer.Render(document);
         if (level == PdfAConformance.PdfA4F)
         {
-            renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+            rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+            rendered.Conformance = PdfAConformance.PdfA4F;
         }
 
-        var catalog = Catalog(BuildTestSupport.Read(document, renderer));
+        var catalog = Catalog(DocumentReader.Parse(rendered.ToArray()));
         Assert.True(catalog.TryGetValue("Version", out var version), "catalog has /Version");
         Assert.Equal("2.0", Assert.IsType<NameObject>(version).Value);
     }
@@ -147,10 +149,12 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA4F_WithAttachment_HasConformanceF()
     {
-        var (document, renderer) = Author(PdfAConformance.PdfA4F);
-        renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+        var (document, renderer) = Author(PdfAConformance.PdfA4);
+        var rendered = renderer.Render(document);
+        rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+        rendered.Conformance = PdfAConformance.PdfA4F;
 
-        var packet = MetadataPacket(BuildTestSupport.Read(document, renderer));
+        var packet = MetadataPacket(DocumentReader.Parse(rendered.ToArray()));
         Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:rev>2020</pdfaid:rev>", packet, StringComparison.Ordinal);
         Assert.Contains("<pdfaid:conformance>F</pdfaid:conformance>", packet, StringComparison.Ordinal);
@@ -174,9 +178,10 @@ public class ConformanceProfilesTests
     public void AttachmentRestrictedLevels_WithAttachment_Throw(PdfAConformance level)
     {
         var (document, renderer) = Author(level);
-        renderer.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
+        var rendered = renderer.Render(document);
+        rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
 
-        var exception = Record.Exception(() => renderer.ToArray(document));
+        var exception = Record.Exception(rendered.ToArray);
 
         Assert.NotNull(exception);
         Assert.Contains(level.ToString(), exception!.Message, StringComparison.Ordinal);

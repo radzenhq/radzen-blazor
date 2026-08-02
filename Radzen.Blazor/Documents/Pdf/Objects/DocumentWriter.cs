@@ -229,13 +229,7 @@ public sealed class DocumentWriter : IObjectWriter
             return (null, -1);
         }
 
-        if (Encryption.Material is null)
-        {
-            throw new InvalidOperationException(
-                "EncryptionOptions.Material must be set to write an encrypted document; the library generates no randomness of its own.");
-        }
-
-        var sequence = new MaterialSequence(Encryption.Material);
+        var sequence = new MaterialSequence(Encryption.Material ?? RandomEncryptionMaterial.Instance);
         var documentId = sequence.Next(16);
         var writer = EncryptionWriter.Build(Encryption, documentId, sequence, out var dictionary);
         var reference = Add(dictionary);

@@ -14,8 +14,6 @@ internal readonly record struct ImagePaint
 
 internal readonly struct LaidOutTableFragment
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required SourceId Source { get; init; }
 
     public required LaidOutTable Layout { get; init; }
@@ -73,8 +71,6 @@ internal readonly record struct LaidOutAnchor
 
 internal sealed record LaidOutLayer : ILaidOutContent<LaidOutTableFragment>
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public ImmutableArray<LaidOutLine> Lines { get; init; } = [];
 
     public ImmutableArray<LaidOutImage> Images { get; init; } = [];
@@ -89,8 +85,6 @@ internal sealed record LaidOutLayer : ILaidOutContent<LaidOutTableFragment>
 
 internal sealed record LaidOutPage
 {
-    public required LaidOutNodeId Id { get; init; }
-
     public required PageSize Size { get; init; }
 
     public required Rect ContentBox { get; init; }

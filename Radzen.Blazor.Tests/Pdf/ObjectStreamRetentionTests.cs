@@ -164,14 +164,16 @@ public class ObjectStreamRetentionTests
     public void CompressedDocument_HoldsNoDecodedObjectStreamsAfterAFullGraphWalk()
     {
         var document = new Document();
-        var builderRenderer = new DocumentRenderer { CompressOutput = true };
         var section = document.Sections.Add();
         for (var i = 0; i < 2000; i++)
         {
             section.Blocks.AddParagraph($"Compressible line number {i} with repeated filler text.");
         }
 
-        var reader = DocumentReader.Parse(builderRenderer.ToArray(document));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.CompressOutput = true;
+
+        var reader = DocumentReader.Parse(rendered.ToArray());
         for (var number = 1; number <= reader.ObjectCount; number++)
         {
             reader.GetObject(number);

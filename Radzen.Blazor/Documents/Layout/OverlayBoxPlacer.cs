@@ -138,7 +138,6 @@ internal static class OverlayBoxPlacer
 
         return new LaidOutBox
         {
-            Id = measured.Capture.Node(),
             Source = measured.Capture.Source(container),
             Content = content,
             Bounds = new Rect(indent, y, boxWidth, boxHeight),

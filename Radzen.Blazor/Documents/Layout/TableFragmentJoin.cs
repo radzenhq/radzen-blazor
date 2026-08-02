@@ -9,7 +9,6 @@ namespace Radzen.Documents.Layout;
 internal static class TableFragmentJoin
 {
     public static LaidOutTableFragment Join(
-        LaidOutNodeId id,
         SourceId source,
         LaidOutTable layout,
         LaidOutTableSlice fragment,
@@ -52,7 +51,6 @@ internal static class TableFragmentJoin
 
         return new LaidOutTableFragment
         {
-            Id = id,
             Source = source,
             Layout = layout,
             Fragment = fragment,
@@ -66,7 +64,6 @@ internal static class TableFragmentJoin
 
     public static LaidOutTableFragment Rejoin(in LaidOutTableFragment positioned, LaidOutTable layout)
         => Join(
-            positioned.Id,
             positioned.Source,
             layout,
             positioned.Fragment,

@@ -6,10 +6,10 @@
 
 ; --- System.Security.Cryptography: all algorithm / RNG / hashing / signing types ---
 N:System.Security.Cryptography; Do not use System.Security.Cryptography in the PDF library - reimplement in pure managed WASM-safe code.
-; Two carve-outs exist. Both are deterministic and available on every shipped target including
-; browser-wasm, and both are suppressed with a local "#pragma warning disable RS0030" at their
-; single call site; the analyzer has no allow-list, so a namespace ban plus a local suppression
-; is the only way to express this.
+; Carve-outs exist. Each is available on every shipped target including browser-wasm, and each is
+; suppressed with a local "#pragma warning disable RS0030" at its single call site; the analyzer
+; has no allow-list, so a namespace ban plus a local suppression is the only way to express this.
+; Carve-outs 1-3 are deterministic; carve-out 4 is deliberately not.
 ;   1. CryptographicOperations.FixedTimeEquals - a constant-time comparison that no
 ;      reimplementation could improve on (Documents/Pdf/Objects/Encryption/StandardSecurityHandler.cs).
 ;   2. SHA1.HashData - the BCL SHA-1 backing Documents/Pdf/Crypto/Sha1.cs. It replaces a hand-rolled
@@ -17,6 +17,12 @@ N:System.Security.Cryptography; Do not use System.Security.Cryptography in the P
 ;   3. SHA256/SHA384/SHA512.HashData and IncrementalHash - the BCL SHA-2 backing
 ;      Documents/Pdf/Crypto/Sha2.cs, for the same reason as SHA-1: a FIPS 180-4 digest is
 ;      deterministic and available on every shipped target.
+;   4. RandomNumberGenerator.Fill - the default encryption material in
+;      Documents/Pdf/IEncryptionMaterial.cs. PDF encryption keys, salts and the document /ID
+;      must be unpredictable (ISO 32000-2 7.6.4.3), so this is the one place where the library
+;      must be non-deterministic; a managed reimplementation could not be a secure RNG. Callers
+;      that need byte-reproducible output set EncryptionOptions.Material instead, which bypasses
+;      this path entirely.
 
 ; --- Non-deterministic wall-clock time ---
 P:System.DateTime.Now; Non-deterministic. Do not use wall-clock time in the PDF library.

@@ -23,11 +23,10 @@ public class CompressOutputTests
     [Fact]
     public void CompressOutput_ProducesReadableFile()
     {
-        var document = MakeBuilder();
-        var builderRenderer = new DocumentRenderer();
-        builderRenderer.CompressOutput = true;
+        var rendered = new DocumentRenderer().Render(MakeBuilder());
+        rendered.CompressOutput = true;
 
-        var bytes = builderRenderer.ToArray(document);
+        var bytes = rendered.ToArray();
 
         var reader = DocumentReader.Parse(bytes);
         Assert.NotNull(reader.Resolve(reader.Trailer["Root"]!));
@@ -38,10 +37,9 @@ public class CompressOutputTests
     {
         var plain = new DocumentRenderer().ToArray(MakeBuilder());
 
-        var compressedBuilderRenderer = new DocumentRenderer();
-        var compressedBuilder = MakeBuilder();
-        compressedBuilderRenderer.CompressOutput = true;
-        var compressed = compressedBuilderRenderer.ToArray(compressedBuilder);
+        var rendered = new DocumentRenderer().Render(MakeBuilder());
+        rendered.CompressOutput = true;
+        var compressed = rendered.ToArray();
 
         Assert.True(compressed.Length < plain.Length,
             $"expected compressed ({compressed.Length}) < plain ({plain.Length})");
@@ -51,11 +49,10 @@ public class CompressOutputTests
     public void CompressOutput_DefaultsToPlain()
     {
         var a = new DocumentRenderer().ToArray(MakeBuilder());
-var explicitFalseRenderer = new DocumentRenderer();
 
-        var explicitFalse = MakeBuilder();
-        explicitFalseRenderer.CompressOutput = false;
-        var b = explicitFalseRenderer.ToArray(explicitFalse);
+        var rendered = new DocumentRenderer().Render(MakeBuilder());
+        rendered.CompressOutput = false;
+        var b = rendered.ToArray();
 
         Assert.Equal(a.Length, b.Length);
     }

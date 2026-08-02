@@ -33,15 +33,15 @@ public class OutlineStylingTests
     public void OutlineItem_EmitsColorAndStyleFlags()
     {
         var document = ThreePages();
-        var builderRenderer = new DocumentRenderer();
-        builderRenderer.Outline.Add(new OutlineItem("Styled", OutlineTarget.ToPage(0))
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("Styled", OutlineTarget.ToPage(0))
         {
             Color = Color.Red,
             Bold = true,
             Italic = true,
         });
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var item = Resolve(reader, Outlines(reader)["First"]);
 
         var color = Assert.IsType<ArrayObject>(reader.Resolve(item["C"]));
@@ -60,10 +60,10 @@ public class OutlineStylingTests
         var parent = new OutlineItem("Parent", OutlineTarget.ToPage(0)) { Collapsed = true };
         parent.Children.Add(new OutlineItem("Child A", OutlineTarget.ToPage(1)));
         parent.Children.Add(new OutlineItem("Child B", OutlineTarget.ToPage(2)));
-        var builderRenderer = new DocumentRenderer();
-        builderRenderer.Outline.Add(parent);
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(parent);
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var outlines = Outlines(reader);
 
         Assert.Equal(1, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
@@ -76,13 +76,13 @@ public class OutlineStylingTests
     public void OpenParent_KeepsPositiveCounts()
     {
         var document = ThreePages();
-        var builderRenderer = new DocumentRenderer();
+        var rendered = new DocumentRenderer().Render(document);
         var parent = new OutlineItem("Parent", OutlineTarget.ToPage(0));
         parent.Children.Add(new OutlineItem("Child A", OutlineTarget.ToPage(1)));
         parent.Children.Add(new OutlineItem("Child B", OutlineTarget.ToPage(2)));
-        builderRenderer.Outline.Add(parent);
+        rendered.Outline.Add(parent);
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var outlines = Outlines(reader);
         Assert.Equal(3, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
         Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(Resolve(reader, outlines["First"])["Count"])).IntValue);
@@ -91,9 +91,9 @@ public class OutlineStylingTests
     private static ArrayObject Dest(DocumentReader reader, OutlineTarget target)
     {
         var document = ThreePages();
-        var builderRenderer = new DocumentRenderer();
-        builderRenderer.Outline.Add(new OutlineItem("D", target));
-        var read = BuildTestSupport.Read(document, builderRenderer);
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("D", target));
+        var read = DocumentReader.Parse(rendered.ToArray());
         return Assert.IsType<ArrayObject>(read.Resolve(Resolve(read, Outlines(read)["First"])["Dest"]));
     }
 
@@ -131,10 +131,10 @@ public class OutlineStylingTests
     public void PlainOutlineItem_EmitsNoStyleKeys()
     {
         var document = ThreePages();
-        var builderRenderer = new DocumentRenderer();
-        builderRenderer.Outline.Add(new OutlineItem("Plain", OutlineTarget.ToPage(0)));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("Plain", OutlineTarget.ToPage(0)));
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var item = Resolve(reader, Outlines(reader)["First"]);
         Assert.False(item.ContainsKey("C"));
         Assert.False(item.ContainsKey("F"));

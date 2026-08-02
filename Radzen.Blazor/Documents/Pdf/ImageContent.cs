@@ -33,8 +33,7 @@ public sealed class ImageContent : ContentElement
     internal override ContentElement DeepClone()
         => CopyStateTo(new ImageContent([.. EncodedXObject]) { Bounds = Bounds });
 
-    /// <inheritdoc/>
-    protected override void EmitBody(ContentWriter writer)
+    private protected override void EmitBody(ContentWriter writer)
     {
         var key = writer.RegisterImage(EncodedXObject);
         ContentEmitter.WriteImagePlacement(

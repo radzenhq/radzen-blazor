@@ -37,7 +37,6 @@ internal static class WatermarkPlanner
         var width = size.Width.Point;
         return new LaidOutWatermark
         {
-            Id = capture.Node(),
             CenterX = width / 2,
             CenterY = size.Height.Point / 2,
             Rotation = watermark.Rotation,

@@ -68,10 +68,10 @@ public class NavigationOutlineTests
         var child = new OutlineItem("Details", OutlineTarget.ToAnchor("details"));
         var root = new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro"));
         root.Children.Add(child);
-        var renderer = new DocumentRenderer();
-        renderer.Outline.Add(root);
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(root);
 
-        var reader = BuildTestSupport.Read(document, renderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var catalog = ContentTestHelpers.Catalog(reader);
         Assert.True(catalog.TryGetValue("Outlines", out var outlinesObject), "catalog must carry /Outlines");
         var outlines = Resolve(reader, outlinesObject!);
@@ -99,11 +99,11 @@ public class NavigationOutlineTests
     public void OutlineSiblings_LinkPrevAndNext()
     {
         var document = TwoSectionDocument();
-        var renderer = new DocumentRenderer();
-        renderer.Outline.Add(new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro")));
-        renderer.Outline.Add(new OutlineItem("Details", OutlineTarget.ToAnchor("details")));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro")));
+        rendered.Outline.Add(new OutlineItem("Details", OutlineTarget.ToAnchor("details")));
 
-        var reader = BuildTestSupport.Read(document, renderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
         Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
         var first = Resolve(reader, outlines["First"]);
@@ -120,10 +120,10 @@ public class NavigationOutlineTests
     public void OutlinePageTarget_EmitsExplicitDestination()
     {
         var document = TwoSectionDocument();
-        var renderer = new DocumentRenderer();
-        renderer.Outline.Add(new OutlineItem("Second page", OutlineTarget.ToPage(1)));
+        var rendered = new DocumentRenderer().Render(document);
+        rendered.Outline.Add(new OutlineItem("Second page", OutlineTarget.ToPage(1)));
 
-        var reader = BuildTestSupport.Read(document, renderer);
+        var reader = DocumentReader.Parse(rendered.ToArray());
         var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
         var item = Resolve(reader, outlines["First"]);
         var dest = Assert.IsType<ArrayObject>(reader.Resolve(item["Dest"]));

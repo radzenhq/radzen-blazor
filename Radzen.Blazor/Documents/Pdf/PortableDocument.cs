@@ -220,8 +220,7 @@ public sealed class PortableDocument
     /// <summary>
     /// Gets the form fields to create on this document. Each definition is
     /// saved as a widget annotation on its page and listed in the catalog
-    /// <c>/AcroForm /Fields</c> with a generated appearance stream. A rendered document starts
-    /// from a copy of <see cref="DocumentRenderer.FormFields"/>; from then on this list is what
+    /// <c>/AcroForm /Fields</c> with a generated appearance stream. This list is what
     /// <see cref="SaveToStream"/> writes.
     /// </summary>
     public IList<FormFieldDefinition> FormFields
@@ -231,9 +230,7 @@ public sealed class PortableDocument
 
     /// <summary>
     /// Gets or sets the encryption to apply when saving. When <c>null</c> the
-    /// document is written unencrypted. A rendered document starts from
-    /// <see cref="DocumentRenderer.Encryption"/>; from then on this value is what
-    /// <see cref="SaveToStream"/> applies.
+    /// document is written unencrypted. This value is what <see cref="SaveToStream"/> applies.
     /// </summary>
     public EncryptionOptions? Encryption
     {
@@ -249,8 +246,7 @@ public sealed class PortableDocument
     /// Gets or sets whether to pack indirect objects into compressed object
     /// streams (<c>/ObjStm</c>) with a cross-reference stream (<c>/XRef</c>),
     /// which typically shrinks the output. Not compatible with PDF/A-1;
-    /// leave <c>false</c> for maximum reader compatibility. A rendered document starts from
-    /// <see cref="DocumentRenderer.CompressOutput"/>; from then on this value is what
+    /// leave <c>false</c> for maximum reader compatibility. This value is what
     /// <see cref="SaveToStream"/> applies.
     /// </summary>
     public bool CompressOutput
@@ -268,9 +264,8 @@ public sealed class PortableDocument
     /// is written on the unencrypted save path. The value derives only from the
     /// document content and metadata, never from the clock or a random source.
     /// Defaults to <c>false</c> so a document that does not opt in stays byte
-    /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless. A rendered
-    /// document starts from <see cref="DocumentRenderer.IncludeDocumentId"/>; from then on this
-    /// value is what <see cref="SaveToStream"/> applies.
+    /// identical. Encrypted and PDF/A output always carry an <c>/ID</c> regardless. This value is
+    /// what <see cref="SaveToStream"/> applies.
     /// </summary>
     public bool IncludeDocumentId
     {
@@ -286,8 +281,7 @@ public sealed class PortableDocument
     /// Gets or sets the viewer preferences written to the document catalog
     /// (page layout, page mode, and the <c>/ViewerPreferences</c> flags). When
     /// <c>null</c> no viewer-preference keys are written and the output is
-    /// unchanged. A rendered document starts from <see cref="DocumentRenderer.ViewerPreferences"/>;
-    /// from then on this value is what <see cref="SaveToStream"/> writes.
+    /// unchanged. This value is what <see cref="SaveToStream"/> writes.
     /// </summary>
     public ViewerPreferences? ViewerPreferences
     {
@@ -319,9 +313,7 @@ public sealed class PortableDocument
     /// Gets the page-label ranges written to the catalog <c>/PageLabels</c> number
     /// tree. Each <see cref="PageLabel"/> starts a range whose pages a viewer numbers
     /// with the given style, prefix and start ordinal. When empty no <c>/PageLabels</c>
-    /// entry is written. A rendered document starts from a copy of
-    /// <see cref="DocumentRenderer.PageLabels"/>; from then on this list is what
-    /// <see cref="SaveToStream"/> writes.
+    /// entry is written. This list is what <see cref="SaveToStream"/> writes.
     /// </summary>
     public IList<PageLabel> PageLabels
     {
@@ -333,8 +325,7 @@ public sealed class PortableDocument
     }
 
     /// <summary>
-    /// Gets the root entries of the document outline (bookmark) tree. A rendered document starts
-    /// from a copy of <see cref="DocumentRenderer.Outline"/>; from then on this list is what
+    /// Gets the root entries of the document outline (bookmark) tree. This list is what
     /// <see cref="SaveToStream"/> writes.
     /// </summary>
     public IList<OutlineItem> Outline
@@ -347,8 +338,7 @@ public sealed class PortableDocument
     }
 
     /// <summary>
-    /// Gets the files embedded in the document. A rendered document starts from a copy of
-    /// <see cref="DocumentRenderer.Attachments"/>; from then on this collection is what
+    /// Gets the files embedded in the document. This collection is what
     /// <see cref="SaveToStream"/> embeds.
     /// </summary>
     public AttachmentCollection Attachments

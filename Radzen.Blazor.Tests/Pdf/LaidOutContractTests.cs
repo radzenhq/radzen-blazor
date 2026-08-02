@@ -689,7 +689,7 @@ public class LaidOutContractTests
         var document = new Document();
         Page(document).Blocks.AddParagraph("Body");
         var renderer = new DocumentRenderer();
-        renderer.FormFields.Add(new TextFieldDefinition("name")
+        TextFieldDefinition Field() => new("name")
         {
             Value = "Ada",
             X = 20,
@@ -697,7 +697,7 @@ public class LaidOutContractTests
             Width = 100,
             Height = 20,
             Font = new Font { Family = LateFamily },
-        });
+        };
 
         var laidOut = DocumentLayouter.Layout(document);
         var settings = RenderRequest.From(renderer);
@@ -707,6 +707,7 @@ public class LaidOutContractTests
             new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSans-Regular.ttf")));
 
         var generated = DocumentRenderEngine.Generate(settings, laidOut);
+        generated.FormFields.Add(Field());
         var capturedError = Assert.Throws<NotSupportedException>(
             () => generated.ToArray());
         Assert.Contains(
@@ -714,8 +715,11 @@ public class LaidOutContractTests
             capturedError.Message,
             StringComparison.Ordinal);
 
-        var recapturedError = Assert.Throws<NotSupportedException>(
-            () => Render(DocumentLayouter.Layout(document), document, renderer));
+        var relaidOut = DocumentRenderEngine.Generate(
+            RenderRequest.From(renderer),
+            DocumentLayouter.Layout(document));
+        relaidOut.FormFields.Add(Field());
+        var recapturedError = Assert.Throws<NotSupportedException>(relaidOut.ToArray);
         Assert.Contains(
             "is registered as an embeddable font file",
             recapturedError.Message,

@@ -43,24 +43,24 @@ public class AttachmentSpecConformanceTests
         return (document, builderRenderer);
     }
 
-    private static (Document Document, DocumentRenderer Renderer) AuthorWithBothAttachments(PdfAConformance? conformance = null)
+    private static PortableDocument AuthorWithBothAttachments(PdfAConformance? conformance = null)
     {
         var (document, builderRenderer) = Author(conformance);
+        var rendered = builderRenderer.Render(document);
 
-        var xml = builderRenderer.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
+        var xml = rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Alternative, "text/xml");
         xml.Description = "Factur-X invoice data";
         xml.ModificationDate = XmlModified;
 
-        builderRenderer.Attachments.Add("scan.bin", BinaryPayload, AttachmentRelationship.Supplement, "application/octet-stream");
+        rendered.Attachments.Add("scan.bin", BinaryPayload, AttachmentRelationship.Supplement, "application/octet-stream");
 
-        return (document, builderRenderer);
+        return rendered;
     }
 
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+    private static DocumentReader ReadAuthored(PortableDocument rendered)
+        => DocumentReader.Parse(rendered.ToArray());
 
-    private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => authored.Renderer.ToArray(authored.Document);
+    private static byte[] RenderAuthored(PortableDocument rendered) => rendered.ToArray();
 
     private static DictionaryObject Catalog(DocumentReader reader)
     {
