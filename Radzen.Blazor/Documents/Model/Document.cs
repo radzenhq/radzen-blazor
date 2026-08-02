@@ -37,14 +37,6 @@ public sealed class Document
     private string? language;
 
     /// <summary>
-    /// Takes a snapshot of the effective formatting of this document, resolving its named style
-    /// chains once. Resolve many paragraphs or runs through the returned snapshot instead of
-    /// calling the single-element overloads in a loop.
-    /// </summary>
-    /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public DocumentFormatting Resolve() => new(StyleResolver.Resolve(this));
-
-    /// <summary>
     /// Resolves the effective formatting of a paragraph in this document. Every value is resolved with the
     /// precedence described on <see cref="Style"/>: the value set directly on the paragraph wins, then the
     /// nearest named style in its chain that sets the value, then the built-in default.
@@ -53,7 +45,33 @@ public sealed class Document
     /// <exception cref="System.ArgumentNullException"><paramref name="paragraph"/> is <see langword="null"/>.</exception>
     /// <exception cref="System.ArgumentException"><paramref name="paragraph"/> is not part of this document.</exception>
     /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public ParagraphFormat Resolve(Paragraph paragraph) => Resolve().Resolve(paragraph);
+    public ParagraphFormat Resolve(Paragraph paragraph)
+    {
+        System.ArgumentNullException.ThrowIfNull(paragraph);
+
+        var styles = StyleResolver.Resolve(this);
+
+        if (!styles.Contains(paragraph))
+        {
+            throw new System.ArgumentException(
+                "The paragraph is not part of this document. Add it to a section, header or footer before resolving it.",
+                nameof(paragraph));
+        }
+
+        var format = styles.Format(paragraph);
+
+        return new ParagraphFormat
+        {
+            Alignment = format.Alignment,
+            SpacingBefore = format.SpacingBefore,
+            SpacingAfter = format.SpacingAfter,
+            LeftIndent = format.LeftIndent,
+            KeepTogether = format.KeepTogether,
+            KeepWithNext = format.KeepWithNext,
+            HeadingLevel = styles.HeadingLevel(paragraph) is var level and > 0 ? level : null,
+            Font = (styles.ParagraphFont(paragraph) ?? paragraph.Font).Effective(),
+        };
+    }
 
     /// <summary>
     /// Resolves the effective font values of a run in this document, cascading the run's own font over the
@@ -63,5 +81,15 @@ public sealed class Document
     /// <exception cref="System.ArgumentNullException"><paramref name="run"/> is <see langword="null"/>.</exception>
     /// <exception cref="System.ArgumentException"><paramref name="run"/> is not part of this document.</exception>
     /// <exception cref="System.InvalidOperationException">A named style in the chain is undefined or cyclic.</exception>
-    public FontValues Resolve(TextInline run) => Resolve().Resolve(run);
+    public FontValues Resolve(TextInline run)
+    {
+        System.ArgumentNullException.ThrowIfNull(run);
+
+        var font = StyleResolver.Resolve(this).RunFont(run)
+            ?? throw new System.ArgumentException(
+                "The run is not part of this document. Add it to a paragraph in a section, header or footer before resolving it.",
+                nameof(run));
+
+        return font.Effective();
+    }
 }
