@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Output;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -15,6 +16,19 @@ internal sealed record ImageXObjectView(StreamObject Image, StreamObject? SoftMa
 
 internal static class ImageTestHelpers
 {
+    public static DecodedImage Decode(ReadOnlyMemory<byte> data) => ImageDecoders.BuiltIn.Decode(data);
+
+    public static DecodedImage Decode(ReadOnlyMemory<byte> data, ReaderLimits limits)
+        => ImageDecoders.BuiltIn.Decode(data, limits);
+
+    public static (double Width, double Height) PixelSize(DecodedImage image) => (image.Width, image.Height);
+
+    public static (double Width, double Height) Measure(Image image, DecodedImage decoded, double availableWidth)
+        => ImageMetrics.Measure(image, decoded.Width, decoded.Height, availableWidth);
+
+    public static byte[] ReadFully(Stream stream, ReaderLimits limits)
+        => StreamBytes.ReadFully(stream, limits.MaxFileBytes);
+
     public static ImageXObjectView Xobject(DecodedImage image)
         => new(Stream(image), image.Alpha is { } alpha ? Stream(alpha) : null);
 

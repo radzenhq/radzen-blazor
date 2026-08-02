@@ -18,21 +18,21 @@ public class ImageDecoderHardeningTests
     public void Png_OversizedDimensions_ThrowsFast()
     {
         var png = PngHeaderOnly(30000, 20000, bitDepth: 8, colorType: 6);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
     public void Png_DimensionsThatWrapInt32_ThrowsFast()
     {
         var png = PngHeaderOnly(60000, 40000, bitDepth: 8, colorType: 6);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
     public void Png_ZeroDimension_Throws()
     {
         var png = PngHeaderOnly(0, 16, bitDepth: 8, colorType: 2);
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png));
     }
 
     [Fact]
@@ -44,14 +44,14 @@ public class ImageDecoderHardeningTests
         WriteRawChunk(ms, "PLTE", declaredLength: 0x80000000u, body: [0x00, 0x00, 0x00]);
         WriteChunk(ms, "IEND", []);
 
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(ms.ToArray()));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(ms.ToArray()));
     }
 
     [Fact]
     public void Jpeg_TruncatedStartOfFrame_ThrowsFast()
     {
         byte[] jpeg = [0xFF, 0xD8, 0xFF, 0xC0, 0x00, 0x0B, 0x08];
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(jpeg));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(jpeg));
     }
 
     [Theory]
@@ -61,7 +61,7 @@ public class ImageDecoderHardeningTests
     [InlineData("Images/alpha.png")]
     public void ValidPng_StillDecodes(string resource)
     {
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes(resource)));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(PdfTestResources.ReadAllBytes(resource)));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Height"));
     }
@@ -69,7 +69,7 @@ public class ImageDecoderHardeningTests
     [Fact]
     public void ValidJpeg_StillDecodes()
     {
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(PdfTestResources.ReadAllBytes("Images/rgb.jpg")));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(PdfTestResources.ReadAllBytes("Images/rgb.jpg")));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal("DCTDecode", ImageTestHelpers.Name(xobj.Image.Dictionary, "Filter"));
     }

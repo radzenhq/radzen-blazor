@@ -49,7 +49,7 @@ public sealed class Page
 
     internal Fonts.FontScope FontScope => Owner?.FontScope ?? default;
 
-    internal ImageDecoders Decoders => Owner?.ImageDecoders ?? ImageDecoders.Default;
+    internal ImageDecoders Decoders => Owner?.ImageDecoders ?? ImageDecoders.BuiltIn;
 
     /// <summary>Gets the page width in points.</summary>
     public Unit Width => width;

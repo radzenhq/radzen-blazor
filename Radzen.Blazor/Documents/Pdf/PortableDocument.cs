@@ -477,14 +477,7 @@ public sealed class PortableDocument
         }
     }
 
-    /// <summary>
-    /// Gets or sets the image decoders this document decodes <see cref="ImageContent"/> and
-    /// watermark images with. Seeded from <see cref="ImageDecoders.Default"/>, so a decoder
-    /// registered with <see cref="ImageDecoder.Register(IImageDecoder)"/> before this document was
-    /// created is already in the set. Assign <c>ImageDecoders.BuiltIn.Add(...)</c> to reach a
-    /// custom format from this document alone.
-    /// </summary>
-    public ImageDecoders ImageDecoders { get; set; } = ImageDecoders.Default;
+    internal ImageDecoders ImageDecoders { get; set; } = ImageDecoders.BuiltIn;
 
     internal FontCollectionSnapshot? FontSnapshot { get; set; }
 

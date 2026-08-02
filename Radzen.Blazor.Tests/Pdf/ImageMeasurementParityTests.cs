@@ -76,7 +76,7 @@ public class ImageMeasurementParityTests
 
     private static void AssertPaginationAgrees(Document document, DocumentRenderer? renderer = null)
     {
-        var laidOut = LaidOut(document, (renderer?.ImageDecoders ?? ImageDecoders.Default).Probes);
+        var laidOut = LaidOut(document, (renderer?.ImageDecoders ?? ImageDecoders.BuiltIn).Probes);
         var rendered = Rendered(document, renderer);
 
         Assert.Equal(laidOut.Count, rendered.Count);
@@ -155,7 +155,7 @@ public class ImageMeasurementParityTests
     private static DocumentRenderer IsolatedRenderer()
     {
         Assert.Throws<NotSupportedException>(
-            () => ImageDecoders.Default.Probes.PixelSize(IsolatedDecoder.Payload()));
+            () => ImageDecoders.BuiltIn.Probes.PixelSize(IsolatedDecoder.Payload()));
 
         return new DocumentRenderer { ImageDecoders = ImageDecoders.BuiltIn.Add(new IsolatedDecoder()) };
     }

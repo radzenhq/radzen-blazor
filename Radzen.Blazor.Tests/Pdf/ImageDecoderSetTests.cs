@@ -3,14 +3,13 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-public class ImageDecoderRegistryTests
+public class ImageDecoderSetTests
 {
     private static readonly byte[] PngMagic = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
     private static readonly byte[] JpegMagic = [0xFF, 0xD8, 0xFF, 0xE0];
@@ -54,33 +53,6 @@ public class ImageDecoderRegistryTests
             () => ImageDecoders.BuiltIn.Decode(new byte[] { 0x00, 0x01, 0x02, 0x03 }, ReaderLimits.Default));
 
     [Fact]
-    public void ConcurrentRegistrationsAreAllRetained()
-    {
-        const int Threads = 8;
-        using var start = new Barrier(Threads);
-        var magics = new byte[Threads][];
-
-        var tasks = new Task[Threads];
-        for (var i = 0; i < Threads; i++)
-        {
-            var magic = new byte[] { 0x5A, 0x5A, (byte)i };
-            magics[i] = magic;
-            tasks[i] = Task.Run(() =>
-            {
-                start.SignalAndWait();
-                ImageDecoder.Register(new StubDecoder(magic));
-            });
-        }
-
-        Task.WaitAll(tasks);
-
-        foreach (var magic in magics)
-        {
-            Assert.NotNull(ImageDecoders.Default.Decode(magic, ReaderLimits.Default));
-        }
-    }
-
-    [Fact]
     public void AddingTheSameDecoderAgainDoesNotAddAnotherProbe()
     {
         var decoder = new CountingDecoder();
@@ -93,13 +65,13 @@ public class ImageDecoderRegistryTests
     }
 
     [Fact]
-    public void AddedDecodersDoNotReachTheProcessDefault()
+    public void AddingADecoderDoesNotMutateTheBuiltInSet()
     {
         var payload = new byte[] { 0x5A, 0x5A, 0xEE, 0x00 };
         var decoders = ImageDecoders.BuiltIn.Add(new StubDecoder([0x5A, 0x5A, 0xEE]));
 
         Assert.NotNull(decoders.Decode(payload, ReaderLimits.Default));
-        Assert.Throws<NotSupportedException>(() => ImageDecoders.Default.Decode(payload, ReaderLimits.Default));
+        Assert.Throws<NotSupportedException>(() => ImageDecoders.BuiltIn.Decode(payload, ReaderLimits.Default));
     }
 
     private sealed class StubDecoder(byte[] magic) : IImageDecoder
@@ -112,7 +84,7 @@ public class ImageDecoderRegistryTests
                 return false;
             }
 
-            image = new DecodedImage(Array.Empty<byte>(), 1, 1, 8, ImageColorSpace.DeviceGray);
+            image = new DecodedImage(new byte[] { 0xFF }, 1, 1, 8, ImageColorSpace.DeviceGray);
             return true;
         }
     }

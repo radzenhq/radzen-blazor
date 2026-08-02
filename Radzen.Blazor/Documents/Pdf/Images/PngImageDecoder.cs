@@ -110,7 +110,7 @@ internal sealed class PngImageDecoder : IImageDecoder
             }
         }
 
-        ImageDecoder.ValidateImageDimensions(width, height, limits, "PNG");
+        limits.ValidateImageDimensions(width, height, "PNG");
 
         var channels = colorType switch
         {

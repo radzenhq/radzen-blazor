@@ -20,7 +20,7 @@ public class PngAlphaBitDepthTests
         byte[] scanline = [0x00, 0xAA, 0xBB, 0xCC, 0xDD, 0x11, 0x22, 0x33, 0x44];
         var png = BuildPng(2, 1, 16, colorType: 4, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         Assert.Equal("DeviceGray", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
@@ -43,7 +43,7 @@ public class PngAlphaBitDepthTests
         ];
         var png = BuildPng(2, 1, 16, colorType: 6, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         Assert.Equal("DeviceRGB", ImageTestHelpers.Name(xobj.Image.Dictionary, "ColorSpace"));
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
@@ -61,7 +61,7 @@ public class PngAlphaBitDepthTests
         byte[] scanline = [0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70, 0x80];
         var png = BuildPng(2, 1, 8, colorType: 6, scanline);
 
-        var xobj = ImageTestHelpers.Xobject(ImageDecoder.Decode(png));
+        var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(png));
 
         Assert.Equal(8, ImageTestHelpers.Int(xobj.Image.Dictionary, "BitsPerComponent"));
 

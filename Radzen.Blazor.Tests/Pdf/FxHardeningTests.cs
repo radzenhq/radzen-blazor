@@ -193,7 +193,7 @@ public class FxHardeningTests
         WriteChunk(ms, "IDAT", FlateFilter.Encode(new byte[17]));
         WriteChunk(ms, "IEND", []);
 
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(ms.ToArray()));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(ms.ToArray()));
     }
 
     [Fact]
@@ -201,8 +201,8 @@ public class FxHardeningTests
     {
         var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
         var tight = new ReaderLimits { MaxImagePixels = 100 };
-        Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png, tight));
-        Assert.NotNull(ImageDecoder.Decode(png));
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png, tight));
+        Assert.NotNull(ImageTestHelpers.Decode(png));
     }
 
     [Fact]
@@ -210,10 +210,10 @@ public class FxHardeningTests
     {
         var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
         var tight = new ReaderLimits { MaxImagePixels = 100 };
-        var decoders = ImageDecoders.Default.WithLimits(tight);
+        var decoders = ImageDecoders.BuiltIn.WithLimits(tight);
 
         var measured = Assert.Throws<InvalidDataException>(() => decoders.Probes.PixelSize(png));
-        var decoded = Assert.Throws<InvalidDataException>(() => ImageDecoder.Decode(png, tight));
+        var decoded = Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png, tight));
         Assert.Equal(decoded.Message, measured.Message);
 
         var document = new Document();

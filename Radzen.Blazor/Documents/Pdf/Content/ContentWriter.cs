@@ -40,7 +40,7 @@ internal sealed class ContentWriter : IDisposable
         ImageDecoders? decoders = null)
     {
         this.scope = scope;
-        this.decoders = decoders ?? ImageDecoders.Default;
+        this.decoders = decoders ?? ImageDecoders.BuiltIn;
         var names = prefixes ?? ContentResourcePrefixes.Page;
         fonts = new ResourceNameAllocator<string, KeyValuePair<string, string>>(names.Font, reserved, StringComparer.Ordinal);
         images = new ResourceNameAllocator<DecodedImage, KeyValuePair<string, DecodedImage>>(names.Image, reserved);

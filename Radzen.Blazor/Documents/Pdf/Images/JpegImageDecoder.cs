@@ -40,7 +40,7 @@ internal sealed class JpegImageDecoder : IImageDecoder
     {
         var (width, height, precision, components, adobe) = ReadFrame(data.Span);
 
-        ImageDecoder.ValidateImageDimensions(width, height, limits, "JPEG");
+        limits.ValidateImageDimensions(width, height, "JPEG");
 
         // ISO 32000-1 8.9.5.1: /BitsPerComponent admits only 1/2/4/8/16.
         if (precision != 8)
