@@ -102,7 +102,7 @@ public class InvoiceStylingRegressionTests
     {
         var (document, section) = NewDocument();
         var table = OneCellTable(section, "X");
-        table.Borders.Width = 1;
+        table.Borders.SetAll(width: 1);
 
         var segments = Segments(Ops(document));
 

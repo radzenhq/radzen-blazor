@@ -82,8 +82,11 @@ public sealed class Image : Block
     public bool Interpolate { get; set; }
 
     /// <summary>
-    /// Gets or sets the box the image is scaled down to fit, or <see langword="null"/> (the default)
-    /// for none. Setting <see langword="null"/> clears it. See <see cref="FitInBox"/>.
+    /// Gets or sets the box the image is scaled to fit, or <see langword="null"/> (the default)
+    /// for none. Setting <see langword="null"/> clears it. The image keeps its aspect ratio: the
+    /// smaller of the two scale factors is applied so it fits both bounds. The base aspect is
+    /// taken from any explicit <see cref="Width"/>/<see cref="Height"/>, otherwise from the
+    /// image's natural size.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">A bound is relative or is not greater than zero.</exception>
     public (Unit MaxWidth, Unit MaxHeight)? FitBox
@@ -93,20 +96,5 @@ public sealed class Image : Block
             ? (AuthoredNumber.AbsolutePositive(box.MaxWidth, "Image.FitBox.MaxWidth"),
                 AuthoredNumber.AbsolutePositive(box.MaxHeight, "Image.FitBox.MaxHeight"))
             : null;
-    }
-
-    /// <summary>
-    /// Scales the image to fit within a <paramref name="maxWidth"/> x <paramref name="maxHeight"/> box
-    /// while preserving aspect ratio, picking the smaller of the two scale factors so the image fits
-    /// both bounds. The base aspect is taken from any explicit <see cref="Width"/>/<see cref="Height"/>,
-    /// otherwise from the image's natural size. Equivalent to setting <see cref="FitBox"/>.
-    /// </summary>
-    /// <param name="maxWidth">The maximum width of the fit box.</param>
-    /// <param name="maxHeight">The maximum height of the fit box.</param>
-    /// <returns>The same <see cref="Image"/> instance.</returns>
-    public Image FitInBox(Unit maxWidth, Unit maxHeight)
-    {
-        FitBox = (maxWidth, maxHeight);
-        return this;
     }
 }

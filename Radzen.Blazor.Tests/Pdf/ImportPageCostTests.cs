@@ -57,7 +57,7 @@ public class ImportPageCostTests
     public void ImportPage_CarriesWatermarkQueuedOnTheSourcePage()
     {
         var source = Loaded(2);
-        source.AddWatermark("DRAFT");
+        source.AddWatermark(new Watermark { Text = "DRAFT" });
 
         var target = new PortableDocument();
         target.ImportPage(source, 0);

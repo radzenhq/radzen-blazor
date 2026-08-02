@@ -20,12 +20,12 @@ public class ImageLayoutTests
         => ImageDecoder.Measure(image, ImageDecoder.Decode(image.Data), double.PositiveInfinity);
 
     [Fact]
-    public void FitInBox_UsesSmallerScale_ForLandscapeBase()
+    public void FitBox_UsesSmallerScale_ForLandscapeBase()
     {
         var image = Load("Images/rgb.jpg");
         image.Width = Unit.FromPoint(100);
         image.Height = Unit.FromPoint(50);
-        image.FitInBox(Unit.FromPoint(80), Unit.FromPoint(80));
+        image.FitBox = (Unit.FromPoint(80), Unit.FromPoint(80));
 
         var (width, height) = Measure(image);
 
@@ -36,12 +36,12 @@ public class ImageLayoutTests
     }
 
     [Fact]
-    public void FitInBox_UsesSmallerScale_ForPortraitBase()
+    public void FitBox_UsesSmallerScale_ForPortraitBase()
     {
         var image = Load("Images/rgb.jpg");
         image.Width = Unit.FromPoint(50);
         image.Height = Unit.FromPoint(100);
-        image.FitInBox(Unit.FromPoint(80), Unit.FromPoint(80));
+        image.FitBox = (Unit.FromPoint(80), Unit.FromPoint(80));
 
         var (width, height) = Measure(image);
 
@@ -52,10 +52,10 @@ public class ImageLayoutTests
     }
 
     [Fact]
-    public void FitInBox_WithoutExplicitSize_FitsNaturalAspect()
+    public void FitBox_WithoutExplicitSize_FitsNaturalAspect()
     {
         var image = Load("Images/rgb.jpg");
-        image.FitInBox(Unit.FromPoint(30), Unit.FromPoint(120));
+        image.FitBox = (Unit.FromPoint(30), Unit.FromPoint(120));
 
         var (width, height) = Measure(image);
 

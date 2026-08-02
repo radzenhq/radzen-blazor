@@ -55,7 +55,7 @@ public class RoundedCornersTests
         var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
-            container.Borders.Width = 1;
+            container.Borders.SetAll(width: 1);
         });
 
         var content = FirstPageContent(document);
@@ -72,7 +72,7 @@ public class RoundedCornersTests
         var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
-            container.Borders.Width = 1;
+            container.Borders.SetAll(width: 1);
         });
 
         var content = FirstPageContent(document);
@@ -101,7 +101,7 @@ public class RoundedCornersTests
         var document = Builder(container =>
         {
             container.CornerRadius = Unit.FromPoint(6);
-            container.Borders.Width = 1;
+            container.Borders.SetAll(width: 1);
             container.Borders.Left.Width = 3;
         });
 
@@ -132,10 +132,10 @@ public class RoundedCornersTests
     [Fact]
     public void CornerRadiusZero_IsByteIdenticalToUntouched()
     {
-        var untouched = new DocumentRenderer().ToArray(Builder(container => container.Borders.Width = 1));
+        var untouched = new DocumentRenderer().ToArray(Builder(container => container.Borders.SetAll(width: 1)));
         var zeroed = new DocumentRenderer().ToArray(Builder(container =>
         {
-            container.Borders.Width = 1;
+            container.Borders.SetAll(width: 1);
             container.CornerRadius = Unit.FromPoint(0);
         }));
 

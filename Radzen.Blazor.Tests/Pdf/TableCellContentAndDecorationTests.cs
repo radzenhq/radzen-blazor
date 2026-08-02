@@ -147,8 +147,7 @@ public class TableCellContentAndDecorationTests
     {
         var document = Author((table, _) =>
         {
-            table.Borders.Width = 1;
-            table.Borders.Style = BorderStyle.Solid;
+            table.Borders.SetAll(width: 1, style: BorderStyle.Solid);
         });
 
         var ops = Ops(document);

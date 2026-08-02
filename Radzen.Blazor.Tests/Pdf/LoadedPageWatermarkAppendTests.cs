@@ -60,7 +60,7 @@ public class LoadedPageWatermarkAppendTests
         var bytes = Source(2, 30);
 
         var lazy = Load(bytes);
-        lazy.AddWatermark("DRAFT");
+        lazy.AddWatermark(new Watermark { Text = "DRAFT" });
         using var lazyOutput = new MemoryStream();
         lazy.SaveToStream(lazyOutput);
 
@@ -70,7 +70,7 @@ public class LoadedPageWatermarkAppendTests
             _ = page.Content.Count;
         }
 
-        eager.AddWatermark("DRAFT");
+        eager.AddWatermark(new Watermark { Text = "DRAFT" });
         using var eagerOutput = new MemoryStream();
         eager.SaveToStream(eagerOutput);
 
@@ -81,7 +81,7 @@ public class LoadedPageWatermarkAppendTests
     public void AddWatermark_LoadedPage_StampsInsideArtifactMarkedContent()
     {
         var document = Load(Source(1, 2));
-        document.AddWatermark("DRAFT");
+        document.AddWatermark(new Watermark { Text = "DRAFT" });
 
         var content = Encoding.ASCII.GetString(
             ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));

@@ -304,7 +304,7 @@ public class ContainerOverlayRotationTests
             Padding = Unit.FromPoint(8),
             Background = Color.FromRgb(230, 230, 230),
         });
-        container.Borders.Width = 1;
+        container.Borders.SetAll(width: 1);
         container.Blocks.AddParagraph().Inlines.Add("Inside the box");
         container.Blocks.AddParagraph().Inlines.Add("Second line inside");
         section.Blocks.AddParagraph().Inlines.Add("After the box");
@@ -329,7 +329,7 @@ public class ContainerOverlayRotationTests
             Padding = Unit.FromPoint(8),
             Background = Color.FromRgb(230, 230, 230),
         });
-        container.Borders.Width = 1;
+        container.Borders.SetAll(width: 1);
         container.Blocks.AddParagraph().Inlines.Add("Under");
         container.Blocks.AddParagraph().Inlines.Add("Over");
         section.Blocks.AddParagraph().Inlines.Add("After the box");
@@ -354,7 +354,7 @@ public class ContainerOverlayRotationTests
             Background = Color.FromRgb(230, 230, 230),
             CornerRadius = Unit.FromPoint(6),
         });
-        container.Borders.Width = 1;
+        container.Borders.SetAll(width: 1);
         container.Blocks.AddParagraph().Inlines.Add("Rounded overlay");
 
         var pdf = new DocumentRenderer().Render(document);

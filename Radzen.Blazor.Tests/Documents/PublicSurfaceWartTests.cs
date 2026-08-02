@@ -100,7 +100,7 @@ public class PublicSurfaceWartTests
 
         Assert.Null(image.FitBox);
 
-        image.FitInBox(Unit.FromPoint(100), Unit.FromPoint(80));
+        image.FitBox = (Unit.FromPoint(100), Unit.FromPoint(80));
 
         Assert.Equal((Unit.FromPoint(100), Unit.FromPoint(80)), image.FitBox);
 
