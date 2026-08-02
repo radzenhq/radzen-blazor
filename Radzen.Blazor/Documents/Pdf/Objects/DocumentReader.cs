@@ -6,15 +6,9 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Reads a PDF file (ISO 32000-1 section 7.5): it locates the last
-/// cross-reference section via <c>startxref</c>, follows any <c>/Prev</c> chain of
-/// incremental updates - classic tables, cross-reference streams, or a mix - and
-/// parses indirect objects (including objects compressed inside object streams) on
-/// demand. When the cross-reference machinery is unusable the reader falls back to
-/// scanning the file for <c>N G obj</c> headers and reconstructing the trailer.
-/// </summary>
-public sealed class DocumentReader
+// ISO 32000-1 7.5: the last cross-reference section is located via startxref and any
+// /Prev chain of incremental updates is followed.
+internal sealed class DocumentReader
 {
     private readonly ReaderLimits limits;
     internal ReaderLimits Limits => limits;
@@ -45,16 +39,8 @@ public sealed class DocumentReader
         repairer = null!;
     }
 
-    /// <summary>
-    /// Gets the trailer dictionary of the most recent cross-reference section. For
-    /// a cross-reference stream this is the stream's own dictionary.
-    /// </summary>
     public DictionaryObject Trailer => trailer;
 
-    /// <summary>
-    /// Gets the number of in-use (non-free) objects across the merged
-    /// cross-reference sections, including objects stored in object streams.
-    /// </summary>
     public int ObjectCount
     {
         get
@@ -77,40 +63,14 @@ public sealed class DocumentReader
         }
     }
 
-    /// <summary>
-    /// Gets a value indicating whether the document is encrypted (its trailer
-    /// carries an <c>/Encrypt</c> entry and a security handler was constructed).
-    /// </summary>
     public bool IsEncrypted => graph is null && store.IsEncrypted;
 
     internal int GenerationOf(int number) => graph is null ? store.GenerationOf(number) : 0;
 
-    /// <summary>
-    /// Parses a PDF document from a byte array.
-    /// </summary>
-    /// <param name="data">The complete document bytes.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(byte[] data) => Parse(data, null);
 
-    /// <summary>
-    /// Parses a PDF document from a byte array, supplying a password for an
-    /// encrypted document. Opening an encrypted document whose user and owner
-    /// passwords both reject the supplied password throws
-    /// <see cref="InvalidPasswordException"/>.
-    /// </summary>
-    /// <param name="data">The complete document bytes.</param>
-    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(byte[] data, string? password) => Parse(data, password, ReaderLimits.Default);
 
-    /// <summary>
-    /// Parses a PDF document from a byte array, supplying a password for an
-    /// encrypted document and the resource limits to enforce while reading.
-    /// </summary>
-    /// <param name="data">The complete document bytes.</param>
-    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
-    /// <param name="limits">The resource limits to enforce while reading.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(byte[] data, string? password, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -127,30 +87,11 @@ public sealed class DocumentReader
         return reader;
     }
 
-    /// <summary>
-    /// Parses a PDF document from a stream. The stream is fully read into memory.
-    /// </summary>
-    /// <param name="stream">The source stream.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(Stream stream) => Parse(stream, null);
 
-    /// <summary>
-    /// Parses a PDF document from a stream, supplying a password for an encrypted
-    /// document. The stream is fully read into memory.
-    /// </summary>
-    /// <param name="stream">The source stream.</param>
-    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(Stream stream, string? password)
         => Parse(stream, password, ReaderLimits.Default);
 
-    /// <summary>
-    /// Parses a PDF document from a stream with resource limits.
-    /// </summary>
-    /// <param name="stream">The source stream.</param>
-    /// <param name="password">The user or owner password, or <c>null</c>/empty for none.</param>
-    /// <param name="limits">The resource limits to enforce while reading.</param>
-    /// <returns>A reader positioned over the parsed cross-reference tables.</returns>
     public static DocumentReader Parse(Stream stream, string? password, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(stream);
@@ -211,11 +152,6 @@ public sealed class DocumentReader
         return null;
     }
 
-    /// <summary>
-    /// Parses and returns the indirect object with the given object number.
-    /// </summary>
-    /// <param name="number">The object number.</param>
-    /// <returns>The parsed object.</returns>
     public DocumentObject GetObject(int number)
         => graph is null
             ? store.GetObject(number)
@@ -228,12 +164,6 @@ public sealed class DocumentReader
         return graph is null ? store.BuildObjectNumberIndex() : graph.BuildObjectNumberIndex();
     }
 
-    /// <summary>
-    /// Resolves an indirect reference to the object it points at. Non-reference
-    /// objects are returned unchanged.
-    /// </summary>
-    /// <param name="value">The object to resolve.</param>
-    /// <returns>The referenced object, or <paramref name="value"/> itself.</returns>
     public DocumentObject Resolve(DocumentObject value)
     {
         ArgumentNullException.ThrowIfNull(value);
@@ -316,14 +246,6 @@ public sealed class DocumentReader
         trailer = xrefLoader.Load(store);
     }
 
-    /// <summary>
-    /// Decodes the data of a stream object by applying its full <c>/Filter</c>
-    /// chain (with <c>/DecodeParms</c> predictors) in order. A stream without a
-    /// filter returns its data unchanged.
-    /// </summary>
-    /// <param name="stream">The stream object to decode.</param>
-    /// <returns>The decoded stream bytes.</returns>
-    /// <exception cref="DocumentParseException">The chain contains an unsupported filter.</exception>
     public byte[] DecodeStream(StreamObject stream)
     {
         ArgumentNullException.ThrowIfNull(stream);

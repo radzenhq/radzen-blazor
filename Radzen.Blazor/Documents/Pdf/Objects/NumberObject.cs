@@ -4,30 +4,18 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// A PDF numeric object (ISO 32000-1 section 7.3.3). Integers are emitted
-/// without a decimal point; reals are emitted culture-invariantly with a dot,
-/// trailing zeros trimmed, and never in exponent notation.
-/// </summary>
-public sealed class NumberObject : DocumentObject
+// ISO 32000-1 7.3.3: integers are emitted without a decimal point; reals are emitted
+// culture-invariantly with a dot, trailing zeros trimmed, never in exponent notation.
+internal sealed class NumberObject : DocumentObject
 {
     private readonly long integerValue;
     private readonly double realValue;
 
-    /// <summary>
-    /// Initializes a new integer-valued instance of the <see cref="NumberObject"/> class.
-    /// </summary>
-    /// <param name="value">The integer value.</param>
     public NumberObject(int value)
         : this((long)value)
     {
     }
 
-    /// <summary>
-    /// Initializes a new integer-valued instance of the <see cref="NumberObject"/>
-    /// class from a 64-bit value, preserving integers wider than 32 bits.
-    /// </summary>
-    /// <param name="value">The integer value.</param>
     public NumberObject(long value)
     {
         integerValue = value;
@@ -35,10 +23,6 @@ public sealed class NumberObject : DocumentObject
         IsInteger = true;
     }
 
-    /// <summary>
-    /// Initializes a new real-valued instance of the <see cref="NumberObject"/> class.
-    /// </summary>
-    /// <param name="value">The real value.</param>
     public NumberObject(double value)
     {
         realValue = value;
@@ -46,23 +30,13 @@ public sealed class NumberObject : DocumentObject
         IsInteger = false;
     }
 
-    /// <summary>
-    /// Gets a value indicating whether this number was created as an integer.
-    /// </summary>
     public bool IsInteger { get; }
 
-    /// <summary>
-    /// Gets the value as a 32-bit integer (truncated when the number is real).
-    /// </summary>
     public int IntValue => (int)integerValue;
 
-    /// <summary>
-    /// Gets the value as a double.
-    /// </summary>
     public double DoubleValue => IsInteger ? integerValue : realValue;
 
-    /// <exception cref="InvalidOperationException">The value is NaN or infinite; PDF
-    /// has no valid token for non-finite numbers (ISO 32000-1 section 7.3.3).</exception>
+    // ISO 32000-1 7.3.3: PDF has no valid token for non-finite numbers.
     internal override void Write(Stream stream, WriteContext context)
     {
         if (!IsInteger && !double.IsFinite(realValue))
