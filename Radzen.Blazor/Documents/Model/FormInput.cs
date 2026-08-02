@@ -103,16 +103,16 @@ public sealed class RadioButton : FormInput
 
     /// <summary>Initializes a radio button with the specified field name and export value.</summary>
     /// <param name="name">The field name shared by every button of the group.</param>
-    /// <param name="value">The value the group exports when this button is chosen; must not be <c>Off</c>.</param>
+    /// <param name="value">The value the group exports when this button is chosen.</param>
     /// <exception cref="ArgumentException"><paramref name="name"/> or <paramref name="value"/> is
-    /// <see langword="null"/> or empty, or <paramref name="value"/> is <c>Off</c>.</exception>
+    /// <see langword="null"/> or empty.</exception>
     public RadioButton(string name, string value) : base(name)
     {
         this.value = Validated(value);
     }
 
     /// <summary>Gets or sets the value the group exports when this button is chosen.</summary>
-    /// <exception cref="ArgumentException">The value is <see langword="null"/>, empty or <c>Off</c>.</exception>
+    /// <exception cref="ArgumentException">The value is <see langword="null"/> or empty.</exception>
     public string Value
     {
         get => value;
@@ -125,14 +125,6 @@ public sealed class RadioButton : FormInput
     private static string Validated(string value)
     {
         ArgumentException.ThrowIfNullOrEmpty(value);
-
-        if (string.Equals(value, "Off", StringComparison.Ordinal))
-        {
-            throw new ArgumentException(
-                "A radio button value cannot be 'Off'; that name is reserved for the unselected state.",
-                nameof(value));
-        }
-
         return value;
     }
 }

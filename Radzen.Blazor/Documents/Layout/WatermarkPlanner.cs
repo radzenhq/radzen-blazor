@@ -11,28 +11,11 @@ internal static class WatermarkPlanner
         PageSize size,
         FontCollection fonts,
         LayoutCaptureContext capture)
-        => Plan(watermark, size, fonts, knownFonts: null, canEmbed: true, capture);
-
-    public static LaidOutWatermark? PlanBase14(
-        Watermark? watermark,
-        PageSize size,
-        FontCollectionSnapshot? knownFonts,
-        LayoutCaptureContext capture)
-        => Plan(watermark, size, new FontCollection(), knownFonts, canEmbed: false, capture);
-
-    private static LaidOutWatermark? Plan(
-        Watermark? watermark,
-        PageSize size,
-        FontCollection fonts,
-        FontCollectionSnapshot? knownFonts,
-        bool canEmbed,
-        LayoutCaptureContext capture)
     {
         if (watermark is null)
         {
             return null;
         }
-
 
         var width = size.Width.Point;
         return new LaidOutWatermark
@@ -44,7 +27,7 @@ internal static class WatermarkPlanner
             Image = watermark.Image is { } image ? PlanImage(image, width, capture) : null,
             Text = string.IsNullOrEmpty(watermark.Text)
                 ? null
-                : PlanText(watermark, watermark.Text, fonts, knownFonts, canEmbed),
+                : PlanText(watermark, watermark.Text, fonts),
         };
     }
 
@@ -66,29 +49,16 @@ internal static class WatermarkPlanner
         };
     }
 
-    private static LaidOutWatermarkText PlanText(
-        Watermark watermark,
-        string text,
-        FontCollection fonts,
-        FontCollectionSnapshot? knownFonts,
-        bool canEmbed)
+    private static LaidOutWatermarkText PlanText(Watermark watermark, string text, FontCollection fonts)
     {
         var font = watermark.Font;
         var family = font.EffectiveFamily;
-        if (!canEmbed && !string.IsNullOrEmpty(family) && knownFonts?.HasFamily(family) == true)
-        {
-            throw new NotSupportedException(
-                $"Font family '{family}' is registered as an embeddable font file, but text added to a loaded or already-built page cannot embed one; use a base-14 family (Helvetica, Courier, Times, Symbol, ZapfDingbats) here.");
-        }
-
         if (!fonts.TryResolvePrimary(font, out _)
             && !string.IsNullOrEmpty(family)
             && BuiltInFontMetrics.Resolve(font) is null)
         {
             throw new NotSupportedException(
-                canEmbed
-                    ? $"No font is registered for family '{family}'; register it with Document.Fonts or use a family supplied by the built-in metrics."
-                    : $"Font family '{family}' is not one of the base-14 families (Helvetica, Courier, Times, Symbol, ZapfDingbats), and text added to a loaded or already-built page cannot embed a font file; use a base-14 family here.");
+                $"No font is registered for family '{family}'; register it with Document.Fonts or use a family supplied by the built-in metrics.");
         }
 
         var glyphRun = fonts.CaptureGlyphRun(text, font);

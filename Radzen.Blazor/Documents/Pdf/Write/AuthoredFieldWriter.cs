@@ -4,6 +4,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Output;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Documents.Pdf.Write;
 
@@ -47,7 +48,8 @@ internal sealed class AuthoredFieldWriter(PortableDocument document, FormWriter 
     private readonly Dictionary<string, DictionaryObject> radioGroups = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ReferenceObject> radioReferences = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> radioSelection = new(StringComparer.Ordinal);
-    private readonly HashSet<(string Name, string Value)> radioValues = [];
+    private readonly Dictionary<string, List<string>> radioExports = new(StringComparer.Ordinal);
+    private readonly HashSet<string> radioIndexedStates = new(StringComparer.Ordinal);
     private readonly HashSet<string> fieldNames = new(StringComparer.Ordinal);
 
     private bool Claimed => document.Conformance != PdfAConformance.None || document.IsPdfUa;
@@ -60,6 +62,8 @@ internal sealed class AuthoredFieldWriter(PortableDocument document, FormWriter 
     {
         var emitted = new List<(int, ReferenceObject)>();
         var joins = new List<WidgetElementJoin>();
+
+        SurveyRadioExports(pageMap);
 
         foreach (var (pageIndex, widgetIndex, widget) in AuthoredFields.Placed(document, pageMap))
         {
@@ -95,6 +99,38 @@ internal sealed class AuthoredFieldWriter(PortableDocument document, FormWriter 
 
         return new AuthoredFieldEmission(emitted, joins);
     }
+
+    // ISO 32000-1 12.7.4.2.3: a radio group whose /Opt array carries the export values names its
+    // widget appearance states by the option's index, freeing the export values from having to be
+    // usable as appearance state names.
+    private void SurveyRadioExports(PageOutputMap pageMap)
+    {
+        foreach (var (_, _, widget) in AuthoredFields.Placed(document, pageMap))
+        {
+            var field = widget.Field;
+            if (field.Kind != FormFieldKind.Radio)
+            {
+                continue;
+            }
+
+            if (!radioExports.TryGetValue(field.Name, out var exports))
+            {
+                exports = [];
+                radioExports.Add(field.Name, exports);
+            }
+
+            exports.Add(field.Value);
+            if (string.Equals(field.Value, "Off", StringComparison.Ordinal))
+            {
+                radioIndexedStates.Add(field.Name);
+            }
+        }
+    }
+
+    private string RadioState(string name, string value, int index)
+        => radioIndexedStates.Contains(name)
+            ? index.ToString(CultureInfo.InvariantCulture)
+            : value;
 
     private static DictionaryObject Widget(ReferenceObject page, in OutputWidget widget) => new()
     {
@@ -218,6 +254,17 @@ internal sealed class AuthoredFieldWriter(PortableDocument document, FormWriter 
                 ["T"] = StringObject.FromText(field.Name),
                 ["Ff"] = new NumberObject(FieldFlags.Radio | (field.Required ? FieldFlags.Required : 0)),
             };
+            if (radioIndexedStates.Contains(field.Name))
+            {
+                var options = new ArrayObject();
+                foreach (var export in radioExports[field.Name])
+                {
+                    options.Add(StringObject.FromText(export));
+                }
+
+                group["Opt"] = options;
+            }
+
             radioGroups.Add(field.Name, group);
             radioKids.Add(field.Name, []);
             var groupReference = writer.Add(group);
@@ -225,34 +272,21 @@ internal sealed class AuthoredFieldWriter(PortableDocument document, FormWriter 
             fields.Add(groupReference);
         }
 
-        if (!radioValues.Add((field.Name, field.Value)))
-        {
-            throw new InvalidOperationException(
-                $"Radio group '{field.Name}' has two buttons exporting '{field.Value}'; "
-                + "give each button of a group a distinct Value.");
-        }
-
+        var state = RadioState(field.Name, field.Value, radioKids[field.Name].Count);
         if (field.Chosen)
         {
-            if (radioSelection.TryGetValue(field.Name, out var already))
-            {
-                throw new InvalidOperationException(
-                    $"Radio group '{field.Name}' selects both '{already}' and '{field.Value}'; "
-                    + "only one button of a group may be selected.");
-            }
-
-            radioSelection.Add(field.Name, field.Value);
+            radioSelection[field.Name] = state;
         }
 
         var dictionary = Widget(page, widget);
         dictionary["Parent"] = radioReferences[field.Name];
         Describe(dictionary, field);
-        dictionary["AS"] = new NameObject(field.Chosen ? field.Value : "Off");
+        dictionary["AS"] = new NameObject(field.Chosen ? state : "Off");
         dictionary["AP"] = new DictionaryObject
         {
             ["N"] = new DictionaryObject
             {
-                [field.Value] = writer.Add(forms.BuildRadio(field.Width, field.Height, selected: true)),
+                [state] = writer.Add(forms.BuildRadio(field.Width, field.Height, selected: true)),
                 ["Off"] = writer.Add(forms.BuildRadio(field.Width, field.Height, selected: false)),
             },
         };

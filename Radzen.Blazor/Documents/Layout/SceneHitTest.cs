@@ -13,18 +13,16 @@ internal static class SceneHitTest
 {
     public static SourceId? At(LaidOutPage page, double x, double y)
     {
-        var deepest = -1;
-        SourceId? hit = null;
+        SceneGeometryCollector.Item? best = null;
         foreach (var item in SceneGeometryCollector.Collect(page))
         {
-            if (item.Depth >= deepest && Contains(item.Bounds, x, y))
+            if (Contains(item.Bounds, x, y) && (best is not { } current || Above(item, current)))
             {
-                deepest = item.Depth;
-                hit = item.Source;
+                best = item;
             }
         }
 
-        return hit;
+        return best?.Source;
     }
 
     public static ImmutableArray<SceneGeometry> Geometry(LaidOutDocument document, SourceId source)
@@ -46,6 +44,12 @@ internal static class SceneHitTest
         return geometry.ToImmutable();
     }
 
+    private static bool Above(in SceneGeometryCollector.Item item, in SceneGeometryCollector.Item other)
+    {
+        var painted = item.Paint.CompareTo(other.Paint);
+        return painted > 0 || (painted == 0 && item.Depth >= other.Depth);
+    }
+
     private static bool Contains(in Rect bounds, double x, double y)
         => bounds.Width > 0
             && bounds.Height > 0
@@ -55,14 +59,54 @@ internal static class SceneHitTest
             && y <= bounds.Y + bounds.Height;
 }
 
+internal sealed class PaintRank : IComparable<PaintRank>
+{
+    private readonly int layer;
+    private readonly int[] path;
+
+    public PaintRank(int layer, int[] path)
+    {
+        this.layer = layer;
+        this.path = path;
+    }
+
+    public int CompareTo(PaintRank? other)
+    {
+        if (other is null)
+        {
+            return 1;
+        }
+
+        if (layer != other.layer)
+        {
+            return layer.CompareTo(other.layer);
+        }
+
+        var shared = Math.Min(path.Length, other.path.Length);
+        for (var i = 0; i < shared; i++)
+        {
+            var comparison = path[i].CompareTo(other.path[i]);
+            if (comparison != 0)
+            {
+                return comparison;
+            }
+        }
+
+        return path.Length.CompareTo(other.path.Length);
+    }
+}
+
 internal sealed class SceneGeometryCollector : ISceneVisitor
 {
-    internal readonly record struct Item(SourceId Source, Rect Bounds, int Depth);
+    internal readonly record struct Item(SourceId Source, Rect Bounds, int Depth, PaintRank Paint);
 
     private readonly record struct Container(Matrix? Transform, Rect? Clip);
 
     private readonly List<Item> items = [];
     private readonly List<Container> containers = [];
+    private readonly List<int> stack = [];
+    private PaintRank? rank;
+    private int layer;
     private double top;
 
     public static IReadOnlyList<Item> Collect(LaidOutPage page)
@@ -75,7 +119,22 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
     void ISceneVisitor.EnterLayer(SceneLayerKind kind, double layerTop)
     {
         containers.Clear();
+        stack.Clear();
+        rank = null;
+        layer = (int)kind;
         top = layerTop;
+    }
+
+    void ISceneVisitor.BeginItem(int zOrder)
+    {
+        stack.Add(zOrder);
+        rank = null;
+    }
+
+    void ISceneVisitor.EndItem()
+    {
+        stack.RemoveAt(stack.Count - 1);
+        rank = null;
     }
 
     void ISceneVisitor.Line(in LaidOutLine line, in SceneFrame frame)
@@ -112,7 +171,7 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
     {
         var rect = Local(frame, box.Bounds);
         Add(box.Source, rect);
-        containers.Add(new Container(box.Transform ?? Current.Transform, rect));
+        containers.Add(new Container(Compose(box.Transform), Confine(rect, clip)));
     }
 
     void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame) => Pop();
@@ -145,7 +204,7 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
     {
         var rect = Local(frame, cell.Bounds);
         Add(cell.Source, rect);
-        containers.Add(new Container(Current.Transform, rect));
+        containers.Add(new Container(Current.Transform, Confine(rect, clip)));
     }
 
     void ISceneVisitor.LeaveCell(LaidOutCell cell, in SceneFrame frame) => Pop();
@@ -154,13 +213,44 @@ internal sealed class SceneGeometryCollector : ISceneVisitor
 
     private void Pop() => containers.RemoveAt(containers.Count - 1);
 
+    private Matrix? Compose(Matrix? local)
+    {
+        var inherited = Current.Transform;
+        if (local is not { } matrix)
+        {
+            return inherited;
+        }
+
+        return inherited is { } parent ? matrix * parent : matrix;
+    }
+
+    private Rect? Confine(in Rect bounds, in SceneClip clip)
+    {
+        var inherited = Current.Clip;
+        if (!clip.ClipsLines && !clip.ClipsInline)
+        {
+            return inherited;
+        }
+
+        return inherited is { } outer ? Intersect(outer, bounds) : bounds;
+    }
+
+    private static Rect Intersect(in Rect a, in Rect b)
+    {
+        var left = Math.Max(a.X, b.X);
+        var upper = Math.Max(a.Y, b.Y);
+        var right = Math.Min(a.X + a.Width, b.X + b.Width);
+        var lower = Math.Min(a.Y + a.Height, b.Y + b.Height);
+        return new Rect(left, upper, Math.Max(0, right - left), Math.Max(0, lower - upper));
+    }
+
     private Rect Local(in SceneFrame frame, in Rect bounds)
         => new(frame.Left + bounds.X, top + bounds.Y + frame.Delta, bounds.Width, bounds.Height);
 
     private void Add(SourceId source, in Rect bounds) => Add(source, bounds, containers.Count);
 
     private void Add(SourceId source, in Rect bounds, int depth)
-        => items.Add(new Item(source, Place(bounds), depth));
+        => items.Add(new Item(source, Place(bounds), depth, rank ??= new PaintRank(layer, [.. stack])));
 
     private Rect Place(in Rect bounds)
     {
