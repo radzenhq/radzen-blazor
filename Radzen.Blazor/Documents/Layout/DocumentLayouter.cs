@@ -6,12 +6,20 @@ using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
+internal readonly record struct LaidOutLayout(LaidOutDocument Scene, SourceResolver Sources);
+
 internal static class DocumentLayouter
 {
     public static LaidOutDocument Layout(Document document)
         => Layout(document, ImageProbes.None);
 
     public static LaidOutDocument Layout(Document document, ImageProbes probes)
+        => LayoutWithSources(document, probes).Scene;
+
+    public static LaidOutLayout LayoutWithSources(Document document)
+        => LayoutWithSources(document, ImageProbes.None);
+
+    public static LaidOutLayout LayoutWithSources(Document document, ImageProbes probes)
     {
         ArgumentNullException.ThrowIfNull(probes);
         var fonts = document.Fonts;
@@ -45,11 +53,12 @@ internal static class DocumentLayouter
         return Resolve(third, document, fonts);
     }
 
-    private static LaidOutDocument Resolve(
+    private static LaidOutLayout Resolve(
         in LayoutPassResult pass,
         Document document,
         FontCollection fonts)
-        => LayoutFinalizer.Resolve(
+    {
+        var scene = LayoutFinalizer.Resolve(
             new LaidOutDocument
             {
                 Fonts = fonts.Snapshot(),
@@ -60,6 +69,9 @@ internal static class DocumentLayouter
             fonts,
             pass.Lowering,
             pass.Capture);
+
+        return new LaidOutLayout(scene, pass.Capture.Sources());
+    }
 
     internal static bool AnchorsStable(
         IReadOnlyDictionary<string, int> previous,
