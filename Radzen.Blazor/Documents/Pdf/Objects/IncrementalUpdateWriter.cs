@@ -5,25 +5,11 @@ using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Appends an incremental update (ISO 32000-1 section 7.5.6) to an existing PDF
-/// file: new and overridden indirect objects are written after the original
-/// end-of-file, followed by a cross-reference section chained to the previous
-/// one via <c>/Prev</c>, a trailer, <c>startxref</c> and <c>%%EOF</c>. The
-/// original bytes are preserved verbatim as a prefix of the output, which is
-/// what digital signatures over a byte range require.
-/// </summary>
-/// <remarks>
-/// The style of the appended cross-reference section matches the original
-/// file: a classic <c>xref</c> table and trailer when the original ends with
-/// one, or a <c>/Type /XRef</c> cross-reference stream when the original uses
-/// one. Overridden objects keep both their object number and their current
-/// generation - per section 7.5.6 an updated object reuses its number, and a
-/// generation bump is only required when a number from the free list is reused,
-/// which this writer never does; new objects are written at generation 0.
-/// Output is deterministic: identical inputs produce identical bytes.
-/// </remarks>
-public sealed class IncrementalUpdateWriter : IObjectWriter
+// ISO 32000-1 7.5.6: new and overridden objects are appended after the original
+// end-of-file, followed by a cross-reference section chained via /Prev. An updated
+// object reuses its number; a generation bump is only required when a number from the
+// free list is reused.
+internal sealed class IncrementalUpdateWriter : IObjectWriter
 {
     private readonly byte[] original;
     private readonly DocumentReader reader;
@@ -35,23 +21,11 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
     private int nextNumber;
     private IReadOnlyDictionary<int, long>? writtenOffsets;
 
-    /// <summary>
-    /// Initializes a new instance over the bytes of an existing, valid PDF file.
-    /// The bytes are parsed with <see cref="DocumentReader"/> to obtain the
-    /// trailer entries (<c>/Root</c>, <c>/ID</c>, <c>/Size</c>) the update must carry.
-    /// </summary>
-    /// <param name="original">The complete bytes of the existing document.</param>
     public IncrementalUpdateWriter(byte[] original)
         : this(original, DocumentReader.Parse(original ?? throw new ArgumentNullException(nameof(original))))
     {
     }
 
-    /// <summary>
-    /// Initializes a new instance over the bytes of an existing, valid PDF file
-    /// and an already-parsed reader for those same bytes.
-    /// </summary>
-    /// <param name="original">The complete bytes of the existing document.</param>
-    /// <param name="reader">A reader parsed from <paramref name="original"/>.</param>
     public IncrementalUpdateWriter(byte[] original, DocumentReader reader)
     {
         ArgumentNullException.ThrowIfNull(original);
@@ -75,22 +49,8 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         nextNumber = originalMaxNumber + 1;
     }
 
-    /// <summary>
-    /// Gets additional trailer entries to carry in the appended trailer (for
-    /// example an <c>/Encrypt</c> passthrough). <c>/Root</c>, <c>/Info</c> and
-    /// <c>/ID</c> are copied from the original trailer automatically but may be
-    /// overridden here; <c>/Size</c> and <c>/Prev</c> are always computed by the
-    /// writer and cannot be overridden.
-    /// </summary>
     public DictionaryObject Trailer { get; } = new();
 
-    /// <summary>
-    /// Registers a new indirect object. It receives the next unused object
-    /// number in the chain (starting at the original <c>/Size</c>) with
-    /// generation 0.
-    /// </summary>
-    /// <param name="value">The object to append.</param>
-    /// <returns>An indirect reference to the new object.</returns>
     public ReferenceObject Add(DocumentObject value)
         => IndirectObjectRegistration.Add(value, AppendObject);
 
@@ -101,15 +61,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         return number;
     }
 
-    /// <summary>
-    /// Registers a replacement for an existing indirect object. The replacement
-    /// keeps both the object number and the object's current generation; readers
-    /// resolve it instead of the original because the appended cross-reference
-    /// section is newer.
-    /// </summary>
-    /// <param name="objectNumber">The number of the object to override.</param>
-    /// <param name="value">The replacement object.</param>
-    /// <returns>An indirect reference to the overridden object.</returns>
     public ReferenceObject Override(int objectNumber, DocumentObject value)
     {
         ArgumentNullException.ThrowIfNull(value);
@@ -129,11 +80,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
     private int GenerationOf(int objectNumber)
         => generations.TryGetValue(objectNumber, out var generation) ? generation : 0;
 
-    /// <summary>
-    /// Writes the original bytes followed by the incremental update section and
-    /// returns the complete new document.
-    /// </summary>
-    /// <returns>The bytes of the updated document.</returns>
     public byte[] ToArray()
     {
         using var buffer = new PooledBufferStream(original.Length + (64 * 1024));
@@ -141,14 +87,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         return buffer.ToArray();
     }
 
-    /// <summary>
-    /// Gets the absolute byte offset at which the given object was written in the
-    /// most recent <see cref="ToArray"/> / <see cref="WriteTo"/>. Valid only after
-    /// one of those has run. Used to bound in-place patching (e.g. a signature's
-    /// <c>/ByteRange</c> and <c>/Contents</c>) to a single object's own bytes.
-    /// </summary>
-    /// <param name="reference">A reference returned by <see cref="Add"/> or <see cref="Override"/>.</param>
-    /// <returns>The object's absolute start offset in the output.</returns>
     public long OffsetOf(ReferenceObject reference)
     {
         ArgumentNullException.ThrowIfNull(reference);
@@ -166,11 +104,6 @@ public sealed class IncrementalUpdateWriter : IObjectWriter
         return offset;
     }
 
-    /// <summary>
-    /// Writes the original bytes followed by the incremental update section to
-    /// <paramref name="stream"/>.
-    /// </summary>
-    /// <param name="stream">The destination stream.</param>
     public void WriteTo(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);

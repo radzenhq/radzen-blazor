@@ -5,21 +5,10 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// A PDF name object (ISO 32000-1 section 7.3.5). Serialized with a leading
-/// slash; delimiters, whitespace, the number sign, and bytes outside the
-/// range 0x21-0x7E are escaped as <c>#xx</c> using uppercase hexadecimal.
-/// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="NameObject"/> class.
-/// </remarks>
-/// <param name="value">The unescaped name (without the leading slash).</param>
-public sealed class NameObject(string value) : DocumentObject
+// ISO 32000-1 7.3.5: a name is written with a leading slash; delimiters, whitespace,
+// the number sign and bytes outside 0x21-0x7E are escaped as #xx in uppercase hex.
+internal sealed class NameObject(string value) : DocumentObject
 {
-
-    /// <summary>
-    /// Gets the unescaped name value.
-    /// </summary>
     public string Value { get; } = value;
 
     internal override void Write(Stream stream, WriteContext context)

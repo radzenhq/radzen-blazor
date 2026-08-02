@@ -4,24 +4,10 @@ using System.Text;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// A PDF literal string object (ISO 32000-1 section 7.3.4.2). Serialized in
-/// parentheses; the backslash and both parentheses are escaped, the named
-/// control escapes are used where applicable, and any other byte outside
-/// printable ASCII is written as a 3-digit octal escape. A value containing
-/// characters above U+00FF is written as a UTF-16BE text string with a byte
-/// order mark (ISO 32000-2 section 7.9.2.2).
-/// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="StringObject"/> class.
-/// </remarks>
-/// <param name="value">The raw string value; each character is treated as a byte 0-255.</param>
-public sealed class StringObject(string value) : DocumentObject
+// ISO 32000-1 7.3.4.2: a literal string is parenthesised. A value containing characters
+// above U+00FF is written as a UTF-16BE text string with a BOM (ISO 32000-2 7.9.2.2).
+internal sealed class StringObject(string value) : DocumentObject
 {
-
-    /// <summary>
-    /// Gets the raw string value.
-    /// </summary>
     public string Value { get; } = value;
 
     internal override void Write(Stream stream, WriteContext context)

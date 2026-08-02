@@ -4,32 +4,16 @@ using System.IO;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// A PDF dictionary object (ISO 32000-1 section 7.3.7). Entries preserve
-/// insertion order and are serialized between <c>&lt;&lt;</c> and <c>&gt;&gt;</c>,
-/// each key written as a name followed by its value.
-/// </summary>
-public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<string, DocumentObject>>
+// ISO 32000-1 7.3.7.
+internal sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<string, DocumentObject>>
 {
     private readonly List<string> keys = [];
     private readonly Dictionary<string, DocumentObject> values = [];
 
-    /// <summary>
-    /// Gets the number of entries in the dictionary.
-    /// </summary>
     public int Count => keys.Count;
 
-    /// <summary>
-    /// Gets the keys in insertion order.
-    /// </summary>
     public IReadOnlyList<string> Keys => keys;
 
-    /// <summary>
-    /// Gets or sets the value for the specified key (without a leading slash).
-    /// Setting a new key appends it; setting an existing key preserves its position.
-    /// </summary>
-    /// <param name="key">The entry key.</param>
-    /// <returns>The value for <paramref name="key"/>.</returns>
     public DocumentObject this[string key]
     {
         get => values[key];
@@ -44,19 +28,8 @@ public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<
         }
     }
 
-    /// <summary>
-    /// Determines whether the dictionary contains the specified key.
-    /// </summary>
-    /// <param name="key">The key to locate.</param>
-    /// <returns><c>true</c> if the key is present; otherwise <c>false</c>.</returns>
     public bool ContainsKey(string key) => values.ContainsKey(key);
 
-    /// <summary>
-    /// Gets the value associated with the specified key.
-    /// </summary>
-    /// <param name="key">The key to locate.</param>
-    /// <param name="value">When this method returns, the value if found; otherwise <c>null</c>.</param>
-    /// <returns><c>true</c> if the key is present; otherwise <c>false</c>.</returns>
     public bool TryGetValue(string key, out DocumentObject? value) => values.TryGetValue(key, out value);
 
     internal override void Write(Stream stream, WriteContext context)
@@ -73,7 +46,6 @@ public sealed class DictionaryObject : DocumentObject, IEnumerable<KeyValuePair<
         PdfBytes.WriteAscii(stream, " >>");
     }
 
-    /// <inheritdoc />
     public IEnumerator<KeyValuePair<string, DocumentObject>> GetEnumerator()
     {
         foreach (var key in keys)

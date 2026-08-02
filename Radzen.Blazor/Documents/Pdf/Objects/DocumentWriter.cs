@@ -5,27 +5,14 @@ using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
 
-/// <summary>
-/// Writes a COS object model to a stream as a classic PDF file (ISO 32000-1
-/// section 7.5): file header, indirect object bodies, a cross-reference table,
-/// and a trailer.
-/// </summary>
-/// <remarks>
-/// <see cref="Add(DocumentObject)"/> registers an object and immediately
-/// returns its indirect reference; the object may be mutated afterwards.
-/// Object bodies are serialized only when <see cref="Close"/> is called.
-/// </remarks>
-public sealed class DocumentWriter : IObjectWriter
+// ISO 32000-1 7.5: file header, indirect object bodies, cross-reference table, trailer.
+internal sealed class DocumentWriter : IObjectWriter
 {
     private static readonly byte[] HeaderSuffix =
     [
         (byte)'\n', (byte)'%', 0xE2, 0xE3, 0xCF, 0xD3, (byte)'\n',
     ];
 
-    /// <summary>
-    /// Gets or sets the PDF version written in the file header (e.g. "1.7" or
-    /// "2.0"). PDF/A-4 requires "2.0".
-    /// </summary>
     public string Version
     {
         get => graph.Version;
@@ -51,10 +38,6 @@ public sealed class DocumentWriter : IObjectWriter
     private readonly Stream stream;
     private readonly DocumentObjectGraph graph;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentWriter"/> class.
-    /// </summary>
-    /// <param name="stream">The destination stream.</param>
     public DocumentWriter(Stream stream)
         : this(stream, new DocumentObjectGraph())
     {
@@ -68,44 +51,19 @@ public sealed class DocumentWriter : IObjectWriter
 
     internal DocumentObjectGraph Graph => graph;
 
-    /// <summary>
-    /// Gets the trailer dictionary. Entries such as <c>/Root</c> are written
-    /// verbatim; <c>/Size</c> is set automatically by <see cref="Close"/>.
-    /// </summary>
     public DictionaryObject Trailer => graph.Trailer;
 
-    /// <summary>
-    /// Gets or sets standard PDF encryption options. When non-null, <see cref="Close"/>
-    /// writes an <c>/Encrypt</c> dictionary and a document <c>/ID</c>, and encrypts
-    /// every string and stream. When null the output is unencrypted.
-    /// </summary>
     public EncryptionOptions? Encryption { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="Close"/> packs eligible
-    /// non-stream objects into a Flate-compressed <c>/Type /ObjStm</c> object stream
-    /// and writes a <c>/Type /XRef</c> cross-reference stream (ISO 32000-1 sections
-    /// 7.5.7 and 7.5.8) instead of the classic cross-reference table and trailer.
-    /// Defaults to <c>false</c>, which keeps the classic output unchanged.
-    /// </summary>
+    // ISO 32000-1 7.5.7 and 7.5.8: object streams and cross-reference streams.
     public bool UseCompressedStreams { get; set; }
 
-    /// <summary>
-    /// Registers <paramref name="value"/> as an indirect object and returns a
-    /// reference to it. The object body is serialized later by <see cref="Close"/>.
-    /// </summary>
-    /// <param name="value">The object to register.</param>
-    /// <returns>An indirect reference to the registered object.</returns>
     public ReferenceObject Add(DocumentObject value)
         => graph.Add(value);
 
     internal DocumentObject? Resolve(ReferenceObject reference)
         => graph.Resolve(reference);
 
-    /// <summary>
-    /// Serializes all registered objects, the cross-reference table, and the
-    /// trailer to the destination stream.
-    /// </summary>
     public void Close()
     {
         using var buffer = new CountingBufferedStream(stream);
