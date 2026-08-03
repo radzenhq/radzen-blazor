@@ -7505,3 +7505,38 @@ Radzen.datePickerKeydown = function (e) {
   }
 };
 document.addEventListener('keydown', Radzen.datePickerKeydown);
+Radzen.aesCbcFromBase64 = function (value) {
+  var binary = atob(value);
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+};
+
+Radzen.aesCbcToBase64 = function (bytes) {
+  var binary = '';
+  var chunk = 0x8000;
+  for (var i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+};
+
+Radzen.aesCbcImportKey = function (key, usage) {
+  return crypto.subtle.importKey('raw', Radzen.aesCbcFromBase64(key), 'AES-CBC', false, [usage]);
+};
+
+Radzen.aesCbcEncrypt = async function (key, iv, data) {
+  var imported = await Radzen.aesCbcImportKey(key, 'encrypt');
+  var result = await crypto.subtle.encrypt(
+    { name: 'AES-CBC', iv: Radzen.aesCbcFromBase64(iv) }, imported, Radzen.aesCbcFromBase64(data));
+  return Radzen.aesCbcToBase64(new Uint8Array(result));
+};
+
+Radzen.aesCbcDecrypt = async function (key, iv, data) {
+  var imported = await Radzen.aesCbcImportKey(key, 'decrypt');
+  var result = await crypto.subtle.decrypt(
+    { name: 'AES-CBC', iv: Radzen.aesCbcFromBase64(iv) }, imported, Radzen.aesCbcFromBase64(data));
+  return Radzen.aesCbcToBase64(new Uint8Array(result));
+};

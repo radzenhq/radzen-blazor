@@ -955,6 +955,7 @@ public const Radzen.Documents.Pdf.EncryptionAlgorithm.Aes256 : Radzen.Documents.
 public const Radzen.Documents.Pdf.EncryptionAlgorithm.Rc4 : Radzen.Documents.Pdf.EncryptionAlgorithm
 Radzen.Documents.Pdf.EncryptionOptions = public sealed class
 public Radzen.Documents.Pdf.EncryptionOptions..ctor()
+public Radzen.Documents.Pdf.EncryptionOptions.AesProvider : Radzen.Documents.Pdf.IAesCbcProvider? { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.Algorithm : Radzen.Documents.Pdf.EncryptionAlgorithm { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.AllowAnnotation : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.EncryptionOptions.AllowAssembly : System.Boolean { public get; public set; }
@@ -991,6 +992,9 @@ public Radzen.Documents.Pdf.FreeTextAnnotation.FontSize : Radzen.Documents.Core.
 public Radzen.Documents.Pdf.FreeTextAnnotation.TextColor : Radzen.Documents.Core.Color { public get; public set; }
 Radzen.Documents.Pdf.HighlightAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.HighlightAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
+Radzen.Documents.Pdf.IAesCbcProvider = public interface
+public abstract Radzen.Documents.Pdf.IAesCbcProvider.DecryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> ciphertext) : System.Threading.Tasks.ValueTask<System.Byte[]>
+public abstract Radzen.Documents.Pdf.IAesCbcProvider.EncryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> plaintext) : System.Threading.Tasks.ValueTask<System.Byte[]>
 Radzen.Documents.Pdf.ImageContent = public sealed class : Radzen.Documents.Pdf.ContentElement
 public Radzen.Documents.Pdf.ImageContent..ctor(System.Byte[] encodedXObject)
 public Radzen.Documents.Pdf.ImageContent.Bounds : Radzen.Documents.Pdf.PdfRect { public get; public set; }
@@ -1019,6 +1023,7 @@ public Radzen.Documents.Pdf.LinkAnnotation.TargetPageIndex : System.Int32? { pub
 public Radzen.Documents.Pdf.LinkAnnotation.Uri : System.Uri? { public get; public set; }
 Radzen.Documents.Pdf.LoadOptions = public sealed class
 public Radzen.Documents.Pdf.LoadOptions..ctor()
+public Radzen.Documents.Pdf.LoadOptions.AesProvider : Radzen.Documents.Pdf.IAesCbcProvider? { public get; public set; }
 public Radzen.Documents.Pdf.LoadOptions.Password : System.String? { public get; public set; }
 Radzen.Documents.Pdf.MarkupAnnotation = public abstract class : Radzen.Documents.Pdf.Annotation
 public Radzen.Documents.Pdf.MarkupAnnotation.Areas : System.Collections.Generic.IList<Radzen.Documents.Pdf.PdfRect> { public get; }
@@ -1158,6 +1163,12 @@ public virtual Radzen.Documents.Pdf.PdfRect.GetHashCode() : System.Int32
 Radzen.Documents.Pdf.PdfUaConformance = public enum : System.Int32
 public const Radzen.Documents.Pdf.PdfUaConformance.None : Radzen.Documents.Pdf.PdfUaConformance
 public const Radzen.Documents.Pdf.PdfUaConformance.PdfUa1 : Radzen.Documents.Pdf.PdfUaConformance
+Radzen.Documents.Pdf.PlatformAesCbcProvider = public sealed class : Radzen.Documents.Pdf.IAesCbcProvider
+public Radzen.Documents.Pdf.PlatformAesCbcProvider..ctor()
+public Radzen.Documents.Pdf.PlatformAesCbcProvider.DecryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> ciphertext) : System.Threading.Tasks.ValueTask<System.Byte[]>
+public Radzen.Documents.Pdf.PlatformAesCbcProvider.EncryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> plaintext) : System.Threading.Tasks.ValueTask<System.Byte[]>
+public static Radzen.Documents.Pdf.PlatformAesCbcProvider.Instance : Radzen.Documents.Pdf.PlatformAesCbcProvider { public get; }
+public static Radzen.Documents.Pdf.PlatformAesCbcProvider.IsSupported : System.Boolean { public get; }
 Radzen.Documents.Pdf.PortableDocument = public sealed class
 public Radzen.Documents.Pdf.PortableDocument..ctor()
 public Radzen.Documents.Pdf.PortableDocument.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; }
@@ -1186,12 +1197,16 @@ public Radzen.Documents.Pdf.PortableDocument.ReplaceText(System.String search, S
 public Radzen.Documents.Pdf.PortableDocument.RoleMap : Radzen.Documents.Pdf.RoleMap { public get; }
 public Radzen.Documents.Pdf.PortableDocument.SaveIncremental(System.IO.Stream stream) : System.Void
 public Radzen.Documents.Pdf.PortableDocument.SaveToStream(System.IO.Stream stream) : System.Void
+public Radzen.Documents.Pdf.PortableDocument.SaveToStreamAsync(System.IO.Stream stream) : System.Threading.Tasks.ValueTask
 public Radzen.Documents.Pdf.PortableDocument.Sign(Radzen.Documents.Pdf.Signing.SignatureOptions options, Radzen.Documents.Pdf.Signing.ISigner signer) : System.Byte[]
 public Radzen.Documents.Pdf.PortableDocument.ToArray() : System.Byte[]
+public Radzen.Documents.Pdf.PortableDocument.ToArrayAsync() : System.Threading.Tasks.ValueTask<System.Byte[]>
 public Radzen.Documents.Pdf.PortableDocument.ViewerPreferences : Radzen.Documents.Pdf.ViewerPreferences? { public get; public set; }
 public Radzen.Documents.Pdf.PortableDocument.Xmp : Radzen.Documents.Pdf.DocumentXmpMetadata { public get; }
 public static Radzen.Documents.Pdf.PortableDocument.LoadFromStream(System.IO.Stream stream, Radzen.Documents.Pdf.LoadOptions? options = null) : Radzen.Documents.Pdf.PortableDocument
 public static Radzen.Documents.Pdf.PortableDocument.LoadFromStream(System.IO.Stream stream, Radzen.Documents.Pdf.ReaderLimits limits, Radzen.Documents.Pdf.LoadOptions? options = null) : Radzen.Documents.Pdf.PortableDocument
+public static Radzen.Documents.Pdf.PortableDocument.LoadFromStreamAsync(System.IO.Stream stream, Radzen.Documents.Pdf.LoadOptions? options = null) : System.Threading.Tasks.ValueTask<Radzen.Documents.Pdf.PortableDocument>
+public static Radzen.Documents.Pdf.PortableDocument.LoadFromStreamAsync(System.IO.Stream stream, Radzen.Documents.Pdf.ReaderLimits limits, Radzen.Documents.Pdf.LoadOptions? options = null) : System.Threading.Tasks.ValueTask<Radzen.Documents.Pdf.PortableDocument>
 public static Radzen.Documents.Pdf.PortableDocument.Merge(params Radzen.Documents.Pdf.PortableDocument[] documents) : Radzen.Documents.Pdf.PortableDocument
 Radzen.Documents.Pdf.PositionedFieldDefinition = public abstract class : Radzen.Documents.Pdf.FormFieldDefinition
 public Radzen.Documents.Pdf.PositionedFieldDefinition.Height : Radzen.Documents.Core.Unit { public get; public set; }

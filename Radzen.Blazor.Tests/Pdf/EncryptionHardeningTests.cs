@@ -76,7 +76,7 @@ public class EncryptionHardeningTests
     public void AesExpandKey_AcceptsValidKeyLengths(int keyLength)
     {
         var exception = Record.Exception(
-            () => AesCbc.DecryptCbcNoPadding(new byte[keyLength], ZeroIv, new byte[16]));
+            () => new AesCbcEngine(null).DecryptNoPadding(new byte[keyLength], ZeroIv, new byte[16]));
         Assert.Null(exception);
     }
 
@@ -88,7 +88,7 @@ public class EncryptionHardeningTests
     public void AesExpandKey_RejectsInvalidKeyLengths(int keyLength)
     {
         Assert.Throws<InvalidDataException>(
-            () => AesCbc.DecryptCbcNoPadding(new byte[keyLength], ZeroIv, new byte[16]));
+            () => new AesCbcEngine(null).DecryptNoPadding(new byte[keyLength], ZeroIv, new byte[16]));
     }
 
     private static DictionaryObject R6Dictionary(byte[] userEncrypted)

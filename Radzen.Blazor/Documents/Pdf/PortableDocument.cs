@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Internal;
@@ -566,6 +567,31 @@ public sealed class PortableDocument
         => DocumentLoader.Load(stream, limits, options);
 
     /// <summary>
+    /// Loads a physical document from a stream, flowing an asynchronous
+    /// <see cref="IAesCbcProvider"/> supplied through <see cref="LoadOptions.AesProvider"/>. An
+    /// AES-encrypted document is decrypted eagerly during the load, so the returned document is
+    /// usable through the ordinary synchronous members afterwards.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="options">Load options such as the decryption password and the AES provider.</param>
+    /// <returns>The loaded document.</returns>
+    public static ValueTask<PortableDocument> LoadFromStreamAsync(Stream stream, LoadOptions? options = null)
+        => LoadFromStreamAsync(stream, ReaderLimits.Default, options);
+
+    /// <summary>
+    /// Loads a physical document from a stream, applying the supplied resource limits and flowing
+    /// an asynchronous <see cref="IAesCbcProvider"/>. See
+    /// <see cref="LoadFromStreamAsync(Stream, LoadOptions)"/> and <see cref="ReaderLimits"/>.
+    /// </summary>
+    /// <param name="stream">The source stream.</param>
+    /// <param name="limits">The resource limits to enforce while reading.</param>
+    /// <param name="options">Load options such as the decryption password and the AES provider.</param>
+    /// <returns>The loaded document.</returns>
+    public static ValueTask<PortableDocument> LoadFromStreamAsync(
+        Stream stream, ReaderLimits limits, LoadOptions? options = null)
+        => DocumentLoader.LoadAsync(stream, limits, options);
+
+    /// <summary>
     /// Extracts the visible text of every page in reading order, concatenated in
     /// page order with a newline between pages.
     /// </summary>
@@ -819,23 +845,51 @@ public sealed class PortableDocument
     }
 
     /// <summary>
+    /// Serializes the document to a byte array, flowing an asynchronous
+    /// <see cref="IAesCbcProvider"/> supplied through <see cref="EncryptionOptions.AesProvider"/>.
+    /// The bytes are identical to those <see cref="ToArray"/> produces from the same input.
+    /// </summary>
+    /// <returns>The complete PDF file bytes.</returns>
+    public async ValueTask<byte[]> ToArrayAsync()
+    {
+        using var stream = new PooledBufferStream(64 * 1024);
+        await SaveToStreamAsync(stream).ConfigureAwait(false);
+        return stream.ToArray();
+    }
+
+    /// <summary>
     /// Serializes the document to the given stream.
     /// </summary>
     /// <param name="stream">The destination stream.</param>
     public void SaveToStream(Stream stream)
     {
         ArgumentNullException.ThrowIfNull(stream);
+        BuildWriter(stream).Close();
+    }
 
+    /// <summary>
+    /// Serializes the document to the given stream, flowing an asynchronous
+    /// <see cref="IAesCbcProvider"/> supplied through <see cref="EncryptionOptions.AesProvider"/>.
+    /// The bytes are identical to those <see cref="SaveToStream"/> produces from the same input.
+    /// </summary>
+    /// <param name="stream">The destination stream.</param>
+    public ValueTask SaveToStreamAsync(Stream stream)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        return BuildWriter(stream).CloseAsync();
+    }
+
+    private DocumentWriter BuildWriter(Stream stream)
+    {
         ValidateSaveTimeConformance();
 
         var graph = (MaterializedGraph ?? new DocumentGraphBuilder(this, renderTime: false).Build())
             .CopyForSerialization();
-        var writer = new DocumentWriter(stream, graph)
+        return new DocumentWriter(stream, graph)
         {
             Encryption = graph.Encryption,
             UseCompressedStreams = graph.UseCompressedStreams,
         };
-        writer.Close();
     }
 
     /// <summary>

@@ -9,7 +9,8 @@ N:System.Security.Cryptography; Do not use System.Security.Cryptography in the P
 ; Carve-outs exist. Each is available on every shipped target including browser-wasm, and each is
 ; suppressed with a local "#pragma warning disable RS0030" at its single call site; the analyzer
 ; has no allow-list, so a namespace ban plus a local suppression is the only way to express this.
-; Carve-outs 1-3 are deterministic; carve-out 4 is deliberately not.
+; Carve-outs 1-3 and 5 are deterministic; carve-out 4 is deliberately not. Carve-out 5 is the one
+; that is NOT available on every shipped target, and is guarded at runtime instead.
 ;   1. CryptographicOperations.FixedTimeEquals - a constant-time comparison that no
 ;      reimplementation could improve on (Documents/Pdf/Objects/Encryption/StandardSecurityHandler.cs).
 ;   2. SHA1.HashData - the BCL SHA-1 backing Documents/Pdf/Crypto/Sha1.cs. It replaces a hand-rolled
@@ -23,6 +24,16 @@ N:System.Security.Cryptography; Do not use System.Security.Cryptography in the P
 ;      must be non-deterministic; a managed reimplementation could not be a secure RNG. Callers
 ;      that need byte-reproducible output set EncryptionOptions.Material instead, which bypasses
 ;      this path entirely.
+;   5. Aes.Create, Aes.EncryptCbc and Aes.DecryptCbc with PaddingMode.None - the whole of
+;      Documents/Pdf/PlatformAesCbcProvider.cs. The library ships no AES implementation of its own;
+;      it calls the IAesCbcProvider the caller supplies, and this is the built-in default. Unlike
+;      the other carve-outs it is NOT available on browser-wasm: System.Security.Cryptography.Aes
+;      throws PlatformNotSupportedException there and Microsoft removed the SubtleCrypto bridge that
+;      used to back it with no plan to retry (dotnet/runtime#73858). The provider is therefore
+;      registered as the default only when OperatingSystem.IsBrowser() is false; on browser-wasm an
+;      AES-needing operation without a supplied provider throws instead, and callers use
+;      Radzen.Blazor.SubtleCryptoAesCbcProvider or encrypt outside the browser. The RC4 and MD5
+;      legacy paths (revisions 2 to 4) stay pure managed code and need no provider anywhere.
 
 ; --- Non-deterministic wall-clock time ---
 P:System.DateTime.Now; Non-deterministic. Do not use wall-clock time in the PDF library.

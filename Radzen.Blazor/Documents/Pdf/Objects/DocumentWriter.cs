@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Radzen.Documents.Internal;
+using Radzen.Documents.Pdf.Crypto;
 using Radzen.Documents.Pdf.Objects.Encryption;
 
 namespace Radzen.Documents.Pdf.Objects;
@@ -66,11 +69,59 @@ internal sealed class DocumentWriter : IObjectWriter
 
     public void Close()
     {
-        using var buffer = new CountingBufferedStream(stream);
+        var prepared = PrepareEncryption(Encryption?.AesProvider, memoizeMaterial: false);
+        WriteBody(stream, prepared);
+    }
+
+    public async ValueTask CloseAsync()
+    {
+        if (Encryption is null)
+        {
+            Close();
+            return;
+        }
+
+        var pump = new AesCbcPump(Encryption.AesProvider);
+        var prepared = await PrepareEncryptionAsync(pump).ConfigureAwait(false);
+
+        for (var attempt = 0; attempt < 64; attempt++)
+        {
+            pump.Mode = AesCbcPump.Stage.Collect;
+            Rewind(prepared);
+            using var scratch = new PooledBufferStream(64 * 1024);
+            WriteBody(scratch, prepared);
+            if (pump.PendingCount == 0)
+            {
+                pump.Mode = AesCbcPump.Stage.PassThrough;
+                stream.Write(scratch.WrittenSpan);
+                return;
+            }
+
+            await pump.ResolvePendingAsync().ConfigureAwait(false);
+        }
+
+        throw new InvalidOperationException(
+            "The supplied IAesCbcProvider did not settle after 64 encryption passes.");
+    }
+
+    private static void Rewind(PreparedEncryption prepared)
+    {
+        if (prepared.Material is { } material)
+        {
+            material.Position = prepared.MaterialPosition;
+        }
+    }
+
+    private readonly record struct PreparedEncryption(
+        EncryptionWriter? Writer, int EncryptNumber, MaterialSequence? Material, int MaterialPosition);
+
+    private void WriteBody(Stream target, PreparedEncryption prepared)
+    {
+        using var buffer = new CountingBufferedStream(target);
         var header = BuildHeader();
         buffer.Write(header, 0, header.Length);
 
-        var (encryption, encryptNumber) = PrepareEncryption();
+        var (encryption, encryptNumber) = (prepared.Writer, prepared.EncryptNumber);
 
         if (UseCompressedStreams)
         {
@@ -180,23 +231,44 @@ internal sealed class DocumentWriter : IObjectWriter
         WriteIndirectObject(buffer, xrefNumber, xref, null, -1);
     }
 
-    private (EncryptionWriter? Writer, int EncryptNumber) PrepareEncryption()
+    private PreparedEncryption PrepareEncryption(IAesCbcProvider? provider, bool memoizeMaterial)
     {
         if (Encryption is null)
         {
-            return (null, -1);
+            return new PreparedEncryption(null, -1, null, 0);
         }
 
-        var sequence = new MaterialSequence(Encryption.Material ?? RandomEncryptionMaterial.Instance);
+        var sequence = NewSequence(memoizeMaterial);
         var documentId = sequence.Next(16);
-        var writer = EncryptionWriter.Build(Encryption, documentId, sequence, out var dictionary);
+        var writer = EncryptionWriter.Build(Encryption, documentId, sequence, provider, out var dictionary);
+        return Register(writer, dictionary, documentId, sequence);
+    }
+
+    private async ValueTask<PreparedEncryption> PrepareEncryptionAsync(IAesCbcProvider provider)
+    {
+        var sequence = NewSequence(memoizeMaterial: true);
+        var documentId = sequence.Next(16);
+        var built = await EncryptionWriter.BuildAsync(Encryption!, documentId, sequence, provider)
+            .ConfigureAwait(false);
+        return Register(built.Writer, built.Dictionary, documentId, sequence);
+    }
+
+    private MaterialSequence NewSequence(bool memoizeMaterial)
+    {
+        var material = Encryption!.Material ?? RandomEncryptionMaterial.Instance;
+        return new MaterialSequence(memoizeMaterial ? new MemoizedEncryptionMaterial(material) : material);
+    }
+
+    private PreparedEncryption Register(
+        EncryptionWriter writer, DictionaryObject dictionary, byte[] documentId, MaterialSequence sequence)
+    {
         var reference = Add(dictionary);
         Trailer["Encrypt"] = reference;
 
         var id = new StringObject(Encoding.Latin1.GetString(documentId));
         Trailer["ID"] = new ArrayObject { id, id };
 
-        return (writer, reference.ObjectNumber);
+        return new PreparedEncryption(writer, reference.ObjectNumber, sequence, sequence.Position);
     }
 }
 
