@@ -22,7 +22,6 @@ public sealed class PathContent : ContentElement
     private LineCap? cap;
     private LineJoin? join;
     private double? miterLimit;
-    private RenderingIntent? intent;
     private bool evenOdd;
     private PathClipMode clip;
     private ReadOnlyMemory<double>? dashArray;
@@ -94,7 +93,6 @@ public sealed class PathContent : ContentElement
             Cap = Cap,
             Join = Join,
             MiterLimit = MiterLimit,
-            Intent = Intent,
             EvenOdd = EvenOdd,
             Clip = Clip,
             DashArray = DashArray is { } dash ? new ReadOnlyMemory<double>(dash.ToArray()) : null,
@@ -160,12 +158,6 @@ public sealed class PathContent : ContentElement
     {
         get => miterLimit;
         set => Set(ref miterLimit, value);
-    }
-
-    internal RenderingIntent? Intent
-    {
-        get => intent;
-        set => Set(ref intent, value);
     }
 
     /// <summary>
@@ -312,7 +304,7 @@ public sealed class PathContent : ContentElement
     private protected override void EmitBody(ContentWriter writer)
     {
         var leaksStrokeState = Cap is not null || Join is not null || MiterLimit is not null
-            || Intent is not null || DashArray is not null;
+            || DashArray is not null;
 
         var alpha = ColorAlpha();
         var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState || alpha < 1;
@@ -357,12 +349,6 @@ public sealed class PathContent : ContentElement
         {
             writer.WriteNumber(miter);
             writer.WriteRaw(" M\n");
-        }
-
-        if (Intent is { } intent)
-        {
-            writer.WriteName(intent.PdfName());
-            writer.WriteRaw(" ri\n");
         }
 
         if (DashArray is { } dash)
