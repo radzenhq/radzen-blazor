@@ -1168,7 +1168,6 @@ public Radzen.Documents.Pdf.PlatformAesCbcProvider..ctor()
 public Radzen.Documents.Pdf.PlatformAesCbcProvider.DecryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> ciphertext) : System.Threading.Tasks.ValueTask<System.Byte[]>
 public Radzen.Documents.Pdf.PlatformAesCbcProvider.EncryptCbcAsync(System.ReadOnlyMemory<System.Byte> key, System.ReadOnlyMemory<System.Byte> iv, System.ReadOnlyMemory<System.Byte> plaintext) : System.Threading.Tasks.ValueTask<System.Byte[]>
 public static Radzen.Documents.Pdf.PlatformAesCbcProvider.Instance : Radzen.Documents.Pdf.PlatformAesCbcProvider { public get; }
-public static Radzen.Documents.Pdf.PlatformAesCbcProvider.IsSupported : System.Boolean { public get; }
 Radzen.Documents.Pdf.PortableDocument = public sealed class
 public Radzen.Documents.Pdf.PortableDocument..ctor()
 public Radzen.Documents.Pdf.PortableDocument.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; }

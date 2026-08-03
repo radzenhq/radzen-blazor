@@ -13,12 +13,6 @@ public sealed class PlatformAesCbcProvider : IAesCbcProvider
     /// <summary>Gets the shared instance. The type is stateless.</summary>
     public static PlatformAesCbcProvider Instance { get; } = new();
 
-    /// <summary>
-    /// Gets a value indicating whether the platform AES implementation is usable here. It is
-    /// <c>false</c> on browser-wasm, where a provider must be supplied explicitly.
-    /// </summary>
-    public static bool IsSupported => !OperatingSystem.IsBrowser();
-
     /// <inheritdoc />
     public ValueTask<byte[]> EncryptCbcAsync(
         ReadOnlyMemory<byte> key, ReadOnlyMemory<byte> iv, ReadOnlyMemory<byte> plaintext)
