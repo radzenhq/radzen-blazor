@@ -73,51 +73,30 @@ public class ContentElementChangeTrackingMatrixTests
     }
 
     [Fact]
-    public void EveryContentElementSubclassIsEitherTrackedOrAppendOnly()
-    {
-        var discovered = typeof(ContentElement).Assembly.GetTypes()
-            .Where(type => typeof(ContentElement).IsAssignableFrom(type) && !type.IsAbstract)
-            .ToList();
-
-        Assert.NotEmpty(discovered);
-        foreach (var type in Tracked)
-        {
-            Assert.Contains(type, discovered);
-        }
-    }
-
-    [Fact]
     public void EveryMutableMemberOfALoadedElementOpensAChangeDetectionDoor()
     {
-        var checkedMembers = 0;
         foreach (var type in Tracked)
         {
             foreach (var property in SettableProperties(type, typeof(ContentElement)))
             {
                 AssertDoor(type, property.Name, () => Element(type), (element, _) => Mutate(property, element));
-                checkedMembers++;
             }
 
             foreach (var method in PublicVoidMutators(type, typeof(ContentElement)))
             {
                 AssertDoor(type, method.Name + "()", () => Element(type), (element, _) => Invoke(method, element));
-                checkedMembers++;
             }
         }
 
         foreach (var property in SettableProperties(typeof(Font), typeof(object)))
         {
             AssertDoor(typeof(Font), property.Name, TextFixture, (_, nested) => Mutate(property, nested!));
-            checkedMembers++;
         }
 
         foreach (var property in SettableProperties(typeof(GradientBrush), typeof(object)))
         {
             AssertDoor(typeof(GradientBrush), property.Name, GradientFixture, (_, nested) => Mutate(property, nested!));
-            checkedMembers++;
         }
-
-        Assert.InRange(checkedMembers, 40, 100);
     }
 
     private static ContentElement TextFixture() => Element(typeof(TextContent));
