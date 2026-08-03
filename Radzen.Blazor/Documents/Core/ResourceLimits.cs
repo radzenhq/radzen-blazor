@@ -9,7 +9,7 @@ namespace Radzen.Documents.Core;
 /// recoverable exception instead of an out-of-memory failure. The authoring entry points that
 /// buffer a stream accept them and apply <see cref="MaxFileBytes"/>; measuring and rendering an
 /// authored document applies the default caps; loading a document applies the limits passed to
-/// the reading entry points. See <see cref="Radzen.Documents.Pdf.ReaderLimits"/>.
+/// the reading entry points.
 /// </summary>
 public class ResourceLimits
 {
