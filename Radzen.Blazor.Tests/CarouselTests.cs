@@ -367,6 +367,57 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Carousel_ItemsPerPage_SnapsPageBoundaryItemsOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.ItemsPerPage, 2);
+                parameters.Add(p => p.Items, builder =>
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        var seq = i * 2;
+                        builder.OpenComponent<RadzenCarouselItem>(seq);
+                        builder.AddAttribute(seq + 1, "ChildContent", (RenderFragment)(b => b.AddContent(0, $"Slide {i + 1}")));
+                        builder.CloseComponent();
+                    }
+                });
+            });
+
+            var snappers = component.FindAll(".rz-carousel-snapper");
+            Assert.Equal(6, snappers.Count);
+            for (int i = 0; i < snappers.Count; i++)
+            {
+                var expected = i % 2 == 0 ? "scroll-snap-align: start" : "scroll-snap-align: none";
+                Assert.Equal(expected, snappers[i].GetAttribute("style"));
+            }
+        }
+
+        [Fact]
+        public void Carousel_ItemsPerPage_One_NoSnapperStyle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenCarousel>(parameters =>
+            {
+                parameters.Add(p => p.Items, builder =>
+                {
+                    builder.OpenComponent<RadzenCarouselItem>(0);
+                    builder.AddAttribute(1, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Slide 1")));
+                    builder.CloseComponent();
+
+                    builder.OpenComponent<RadzenCarouselItem>(2);
+                    builder.AddAttribute(3, "ChildContent", (RenderFragment)(b => b.AddContent(0, "Slide 2")));
+                    builder.CloseComponent();
+                });
+            });
+
+            Assert.DoesNotContain("scroll-snap-align", component.Markup);
+        }
+
+        [Fact]
         public void Carousel_ItemsPerPage_PagerButtonCount_WithTopAndBottom()
         {
             using var ctx = new TestContext();

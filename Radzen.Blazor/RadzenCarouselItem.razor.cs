@@ -63,6 +63,10 @@ namespace Radzen.Blazor
             ? $"flex: 0 0 calc(100% / {Carousel.ItemsPerPage}); width: calc(100% / {Carousel.ItemsPerPage})"
             : null;
 
+        string? SnapperStyle => Carousel != null && Carousel.ItemsPerPage > 1
+            ? (Carousel.items.IndexOf(this) % Carousel.ItemsPerPage == 0 ? "scroll-snap-align: start" : "scroll-snap-align: none")
+            : null;
+
         int itemIndex;
         internal ElementReference element;
 
