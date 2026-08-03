@@ -40,14 +40,6 @@ public class LoadedResourceKeyCollisionTests
         return pdf.ToArray();
     }
 
-    private static DictionaryObject PageFonts(byte[] file)
-    {
-        var reader = DocumentReader.Parse(file);
-        var page = ContentTestHelpers.Kid(reader, 0);
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(page["Resources"]));
-        return Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
-    }
-
     private static string BaseFont(DocumentReader reader, DocumentObject fontValue)
         => ((NameObject)reader.Resolve(((DictionaryObject)reader.Resolve(fontValue))["BaseFont"])).Value;
 
