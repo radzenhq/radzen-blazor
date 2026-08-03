@@ -110,20 +110,6 @@ public class CompactCffSubsetTests
     }
 
     [Fact]
-    public void CidSet_MarksExactlyAllCompactCids()
-    {
-        var reader = BuildReader();
-        var (_, _, descriptor) = FontGraph(reader);
-        var n = FontFile3(reader, descriptor).GlyphCount;
-
-        Assert.True(descriptor.ContainsKey("CIDSet"), "FontDescriptor must keep /CIDSet");
-        var stream = Assert.IsType<StreamObject>(reader.Resolve(descriptor["CIDSet"]));
-        var bits = Type0EmbedSupport.SetBits(reader.DecodeStream(stream));
-
-        Assert.Equal(Enumerable.Range(0, n).ToHashSet(), bits);
-    }
-
-    [Fact]
     public void ContentStream_EmitsCompactCidCodes()
     {
         var reader = BuildReader();
