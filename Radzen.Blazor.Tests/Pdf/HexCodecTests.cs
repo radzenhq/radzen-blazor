@@ -50,14 +50,6 @@ public class HexCodecTests
     }
 
     [Fact]
-    public void Sha2ComputeHashHex_StaysLowercase()
-    {
-        var hex = Sha2.ComputeHashHex256(Encoding.ASCII.GetBytes("abc"));
-
-        Assert.Equal("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", hex);
-    }
-
-    [Fact]
     public void EncodeToString_InputTooLargeToEncode_ThrowsDiagnosable()
     {
         var data = new byte[1 << 30];

@@ -10,8 +10,6 @@ internal sealed class SourceResolver
     private readonly ImmutableArray<object> values;
     private readonly Dictionary<object, SourceId> ids;
 
-    public static SourceResolver Empty { get; } = new([]);
-
     public SourceResolver(IReadOnlyList<object> sources)
     {
         ArgumentNullException.ThrowIfNull(sources);

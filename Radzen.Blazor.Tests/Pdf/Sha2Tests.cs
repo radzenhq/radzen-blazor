@@ -12,15 +12,6 @@ public class Sha2Tests
 {
     private static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 
-    [Fact]
-    public void HexApis_RouteToTheirSelectedDigests()
-    {
-        var input = TestBytes.Ascii("abc");
-        Assert.Equal(Hex(Sha2.ComputeHash256(input)), Sha2.ComputeHashHex256(input));
-        Assert.Equal(Hex(Sha2.ComputeHash384(input)), Sha2.ComputeHashHex384(input));
-        Assert.Equal(Hex(Sha2.ComputeHash512(input)), Sha2.ComputeHashHex512(input));
-    }
-
     [Theory]
     [InlineData("", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")]
     [InlineData("abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad")]

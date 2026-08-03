@@ -33,14 +33,6 @@ internal static class Sha2
         return SHA512.HashData(data);
 #pragma warning restore RS0030
     }
-
-    public static string ComputeHashHex256(byte[] data) => ToHex(ComputeHash256(data));
-
-    public static string ComputeHashHex384(byte[] data) => ToHex(ComputeHash384(data));
-
-    public static string ComputeHashHex512(byte[] data) => ToHex(ComputeHash512(data));
-
-    private static string ToHex(byte[] digest) => HexCodec.EncodeToString(digest, HexCase.Lower);
 }
 
 #pragma warning disable RS0030
