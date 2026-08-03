@@ -417,6 +417,7 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
                 UserPassword = source.UserPassword,
                 OwnerPassword = source.OwnerPassword,
                 Algorithm = source.Algorithm,
+                AesProvider = source.AesProvider,
                 Material = source.Material is { } material
                     ? new CapturedEncryptionMaterial(material, EncryptionRequestLimit(graph))
                     : null,

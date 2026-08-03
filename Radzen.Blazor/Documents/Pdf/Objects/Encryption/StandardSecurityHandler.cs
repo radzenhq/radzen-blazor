@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Radzen.Documents.Pdf.Crypto;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
@@ -31,17 +32,37 @@ internal sealed class StandardSecurityHandler
     private readonly bool encryptMetadata;
     private readonly CryptMethod streamCipher;
     private readonly CryptMethod stringCipher;
+    private readonly AesCbcEngine aes;
 
     public StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, byte[] password)
-        : this(encrypt, documentId, Encoding.Latin1.GetString(password ?? throw new ArgumentNullException(nameof(password))))
+        : this(encrypt, documentId, Encoding.Latin1.GetString(password ?? throw new ArgumentNullException(nameof(password))), null)
     {
     }
 
     public StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, string password)
+        : this(encrypt, documentId, password, null)
+    {
+    }
+
+    public StandardSecurityHandler(
+        DictionaryObject encrypt, byte[] documentId, string password, IAesCbcProvider? aesProvider)
+        : this(encrypt, documentId, aesProvider)
+    {
+        AesCbcEngine.Complete(AuthenticateAsync(EncodePassword(password)));
+    }
+
+    internal static async ValueTask<StandardSecurityHandler> CreateAsync(
+        DictionaryObject encrypt, byte[] documentId, string password, IAesCbcProvider? aesProvider)
+    {
+        var handler = new StandardSecurityHandler(encrypt, documentId, aesProvider);
+        await handler.AuthenticateAsync(handler.EncodePassword(password)).ConfigureAwait(false);
+        return handler;
+    }
+
+    private StandardSecurityHandler(DictionaryObject encrypt, byte[] documentId, IAesCbcProvider? aesProvider)
     {
         ArgumentNullException.ThrowIfNull(encrypt);
         ArgumentNullException.ThrowIfNull(documentId);
-        ArgumentNullException.ThrowIfNull(password);
 
         this.documentId = documentId;
         version = GetInt(encrypt, "V", 0);
@@ -67,14 +88,19 @@ internal sealed class StandardSecurityHandler
         streamCipher = ResolveCipher(encrypt, "StmF");
         stringCipher = ResolveCipher(encrypt, "StrF");
         FileKey = [];
+        aes = new AesCbcEngine(aesProvider);
+    }
 
-        // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-normalized UTF-8.
-        Authenticate(revision switch
+    // ISO 32000-2 7.6.4.3.3: revision 6 passwords are SASLprep-normalized UTF-8.
+    private byte[] EncodePassword(string password)
+    {
+        ArgumentNullException.ThrowIfNull(password);
+        return revision switch
         {
             5 => Encoding.UTF8.GetBytes(password),
             >= 6 => EncodeR6Password(password),
             _ => Encoding.Latin1.GetBytes(password),
-        });
+        };
     }
 
     private enum CryptMethod
@@ -138,8 +164,8 @@ internal sealed class StandardSecurityHandler
         var bytes = data.ToArray();
         return cipher switch
         {
-            CryptMethod.AesV3 => ParseAes.Decrypt(FileKey, bytes),
-            CryptMethod.AesV2 => ParseAes.Decrypt(ObjectKey(objectNumber, generation, aes: true), bytes),
+            CryptMethod.AesV3 => DecryptAes(FileKey, bytes),
+            CryptMethod.AesV2 => DecryptAes(ObjectKey(objectNumber, generation, aes: true), bytes),
             _ => Rc4.Transform(ObjectKey(objectNumber, generation, aes: false), bytes),
         };
     }
@@ -179,11 +205,11 @@ internal sealed class StandardSecurityHandler
         return version == 5 ? CryptMethod.AesV3 : CryptMethod.Rc4;
     }
 
-    private void Authenticate(byte[] password)
+    private async ValueTask AuthenticateAsync(byte[] password)
     {
         if (revision >= 5)
         {
-            AuthenticateR6(password);
+            await AuthenticateR6Async(password).ConfigureAwait(false);
             return;
         }
 
@@ -234,7 +260,7 @@ internal sealed class StandardSecurityHandler
     }
 
     // ISO 32000-2 algorithm 2.A.
-    private void AuthenticateR6(byte[] password)
+    private async ValueTask AuthenticateR6Async(byte[] password)
     {
         var pw = password.Length > 127 ? password[..127] : password;
         var u = userEntry;
@@ -242,33 +268,35 @@ internal sealed class StandardSecurityHandler
 
         if (u.Length >= 48)
         {
-            var userHash = HashPassword(pw, u[32..40], []);
+            var userHash = await HashPasswordAsync(pw, u[32..40], []).ConfigureAwait(false);
             if (Equal(userHash, u, 32))
             {
                 IsUserPassword = true;
-                var intermediate = HashPassword(pw, u[40..48], []);
-                FileKey = RequireAes256Key(ParseAes.DecryptCbcNoPadding(intermediate, ZeroIv, userEncrypted));
-                VerifyPerms();
+                var intermediate = await HashPasswordAsync(pw, u[40..48], []).ConfigureAwait(false);
+                FileKey = RequireAes256Key(
+                    await DecryptNoPaddingAsync(intermediate, ZeroIv, userEncrypted).ConfigureAwait(false));
+                await VerifyPermsAsync().ConfigureAwait(false);
                 return;
             }
         }
 
         if (o.Length >= 48 && u.Length >= 48)
         {
-            var ownerHash = HashPassword(pw, o[32..40], u[..48]);
+            var ownerHash = await HashPasswordAsync(pw, o[32..40], u[..48]).ConfigureAwait(false);
             if (Equal(ownerHash, o, 32))
             {
                 IsOwnerPassword = true;
-                var intermediate = HashPassword(pw, o[40..48], u[..48]);
-                FileKey = RequireAes256Key(ParseAes.DecryptCbcNoPadding(intermediate, ZeroIv, ownerEncrypted));
-                VerifyPerms();
+                var intermediate = await HashPasswordAsync(pw, o[40..48], u[..48]).ConfigureAwait(false);
+                FileKey = RequireAes256Key(
+                    await DecryptNoPaddingAsync(intermediate, ZeroIv, ownerEncrypted).ConfigureAwait(false));
+                await VerifyPermsAsync().ConfigureAwait(false);
                 return;
             }
         }
     }
 
     // ISO 32000-2 algorithm 13: decrypt /Perms with the file key and validate its permission binding.
-    private void VerifyPerms()
+    private async ValueTask VerifyPermsAsync()
     {
         if (!hasPermsEntry)
         {
@@ -280,7 +308,7 @@ internal sealed class StandardSecurityHandler
             throw new DocumentParseException("Encryption /Perms must be exactly 16 bytes.");
         }
 
-        var decoded = ParseAes.DecryptCbcNoPadding(FileKey, ZeroIv, permsEntry);
+        var decoded = await DecryptNoPaddingAsync(FileKey, ZeroIv, permsEntry).ConfigureAwait(false);
         if (decoded[9] != (byte)'a' || decoded[10] != (byte)'d' || decoded[11] != (byte)'b')
         {
             throw new DocumentParseException("Encryption /Perms block failed its integrity check.");
@@ -525,13 +553,14 @@ internal sealed class StandardSecurityHandler
             : throw new DocumentParseException("Revision 6 file key must be exactly 32 bytes.");
 
     // ISO 32000-2 algorithm 2.B: iterated for revision 6; revision 5 uses a single SHA-256 pass.
-    private byte[] HashPassword(byte[] password, byte[] salt, byte[] userData)
+    private ValueTask<byte[]> HashPasswordAsync(byte[] password, byte[] salt, byte[] userData)
         => revision == 5
-            ? Sha2.ComputeHash256(Concat(password, salt, userData))
-            : Hash2B(password, salt, userData);
+            ? ValueTask.FromResult(Sha2.ComputeHash256(Concat(password, salt, userData)))
+            : Hash2BAsync(aes, password, salt, userData);
 
     // ISO 32000-2 algorithm 2.B.
-    private static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)
+    private static async ValueTask<byte[]> Hash2BAsync(
+        AesCbcEngine engine, byte[] password, byte[] salt, byte[] userData)
     {
         var input = Concat(password, salt, userData);
         var k = Sha2.ComputeHash256(input);
@@ -545,7 +574,7 @@ internal sealed class StandardSecurityHandler
                 Array.Copy(block, 0, k1, i * block.Length, block.Length);
             }
 
-            var e = AesCbc.EncryptCbcNoPadding(k[..16], k[16..32], k1);
+            var e = await engine.EncryptNoPaddingAsync(k[..16], k[16..32], k1).ConfigureAwait(false);
             var mod = 0;
             for (var i = 0; i < 16; i++)
             {
@@ -607,20 +636,25 @@ internal sealed class StandardSecurityHandler
     }
 
     // ISO 32000-2 algorithms 8-10: derive /O, /U, /OE, /UE and /Perms for the AESV3 (R6) handler.
-    internal static (byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms) DeriveAes256(
-        string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata,
+    internal static async ValueTask<(byte[] Owner, byte[] User, byte[] OwnerEncrypted, byte[] UserEncrypted, byte[] Perms)> DeriveAes256Async(
+        AesCbcEngine engine, string userPassword, string ownerPassword, byte[] fileKey, int permissions, bool encryptMetadata,
         byte[] userValidation, byte[] userKeySalt, byte[] ownerValidation, byte[] ownerKeySalt, byte[] permsNoise)
     {
         var userPw = TruncateUtf8(userPassword);
         var ownerPw = TruncateUtf8(ownerPassword.Length > 0 ? ownerPassword : userPassword);
 
-        var user = Concat(Hash2B(userPw, userValidation, []), userValidation, userKeySalt);
-        var userEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(userPw, userKeySalt, []), ZeroIv, fileKey);
+        var user = Concat(
+            await Hash2BAsync(engine, userPw, userValidation, []).ConfigureAwait(false), userValidation, userKeySalt);
+        var userEncrypted = await engine.EncryptNoPaddingAsync(
+            await Hash2BAsync(engine, userPw, userKeySalt, []).ConfigureAwait(false), ZeroIv, fileKey).ConfigureAwait(false);
 
-        var owner = Concat(Hash2B(ownerPw, ownerValidation, user), ownerValidation, ownerKeySalt);
-        var ownerEncrypted = AesCbc.EncryptCbcNoPadding(Hash2B(ownerPw, ownerKeySalt, user), ZeroIv, fileKey);
+        var owner = Concat(
+            await Hash2BAsync(engine, ownerPw, ownerValidation, user).ConfigureAwait(false), ownerValidation, ownerKeySalt);
+        var ownerEncrypted = await engine.EncryptNoPaddingAsync(
+            await Hash2BAsync(engine, ownerPw, ownerKeySalt, user).ConfigureAwait(false), ZeroIv, fileKey).ConfigureAwait(false);
 
-        return (owner, user, ownerEncrypted, userEncrypted, ComputePerms(permissions, encryptMetadata, fileKey, permsNoise));
+        var perms = await ComputePermsAsync(engine, permissions, encryptMetadata, fileKey, permsNoise).ConfigureAwait(false);
+        return (owner, user, ownerEncrypted, userEncrypted, perms);
     }
 
     private static byte[] TruncateUtf8(string password)
@@ -710,7 +744,8 @@ internal sealed class StandardSecurityHandler
     }
 
     // ISO 32000-2 algorithm 10: the /Perms block is a single AES-256 ECB block (CBC with a zero IV).
-    private static byte[] ComputePerms(int permissions, bool encryptMetadata, byte[] fileKey, byte[] noise)
+    private static ValueTask<byte[]> ComputePermsAsync(
+        AesCbcEngine engine, int permissions, bool encryptMetadata, byte[] fileKey, byte[] noise)
     {
         var perms = new byte[16];
         perms[0] = (byte)permissions;
@@ -726,7 +761,7 @@ internal sealed class StandardSecurityHandler
         perms[10] = (byte)'d';
         perms[11] = (byte)'b';
         Array.Copy(noise, 0, perms, 12, 4);
-        return AesCbc.EncryptCbcNoPadding(fileKey, ZeroIv, perms);
+        return engine.EncryptNoPaddingAsync(fileKey, ZeroIv, perms);
     }
 
     // ISO 32000-1 7.6.5: for V>=4 the file-key length comes from the crypt-filter dictionary. AESV2/AESV3 fix it at 16/32 bytes.
@@ -826,33 +861,39 @@ internal sealed class StandardSecurityHandler
             ? Encoding.Latin1.GetBytes(text.Value)
             : null;
 
-    private static class ParseAes
+    // ISO 32000-1 7.6.2: AESV2 and AESV3 strings and streams begin with the 16-byte initialization vector.
+    private byte[] DecryptAes(byte[] key, byte[] data)
     {
-        // ISO 32000-1 7.6.2: AESV2 and AESV3 strings and streams begin with the 16-byte initialization vector.
-        public static byte[] Decrypt(byte[] key, byte[] data)
+        ArgumentNullException.ThrowIfNull(data);
+        if (data.Length < 16)
         {
-            ArgumentNullException.ThrowIfNull(data);
-            if (data.Length < 16)
-            {
-                throw new DocumentParseException("AES data is shorter than the required 16-byte IV.");
-            }
-
-            return Guard(() => AesCbc.Decrypt(key, data[..16], data[16..]));
+            throw new DocumentParseException("AES data is shorter than the required 16-byte IV.");
         }
 
-        public static byte[] DecryptCbcNoPadding(byte[] key, byte[] iv, byte[] data)
-            => Guard(() => AesCbc.DecryptCbcNoPadding(key, iv, data));
+        return Guard(() => aes.DecryptPadded(key, data[..16], data[16..]));
+    }
 
-        private static byte[] Guard(Func<byte[]> decrypt)
+    private async ValueTask<byte[]> DecryptNoPaddingAsync(byte[] key, byte[] iv, byte[] data)
+    {
+        try
         {
-            try
-            {
-                return decrypt();
-            }
-            catch (InvalidDataException exception)
-            {
-                throw new DocumentParseException(exception.Message);
-            }
+            return await aes.DecryptNoPaddingAsync(key, iv, data).ConfigureAwait(false);
+        }
+        catch (InvalidDataException exception)
+        {
+            throw new DocumentParseException(exception.Message);
+        }
+    }
+
+    private static byte[] Guard(Func<byte[]> decrypt)
+    {
+        try
+        {
+            return decrypt();
+        }
+        catch (InvalidDataException exception)
+        {
+            throw new DocumentParseException(exception.Message);
         }
     }
 }

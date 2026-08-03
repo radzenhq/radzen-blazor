@@ -1,8 +1,10 @@
+using Radzen.Documents.Pdf.Crypto;
 using Radzen.Documents.Pdf.Objects.Encryption;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -72,6 +74,46 @@ internal sealed class DocumentReader
     public static DocumentReader Parse(byte[] data, string? password) => Parse(data, password, ReaderLimits.Default);
 
     public static DocumentReader Parse(byte[] data, string? password, ReaderLimits limits)
+        => Parse(data, password, null, limits);
+
+    public static DocumentReader Parse(
+        byte[] data, string? password, IAesCbcProvider? aesProvider, ReaderLimits limits)
+    {
+        var reader = Prepare(data, limits);
+        reader.InitializeSecurity(password, aesProvider);
+        return reader;
+    }
+
+    public static async ValueTask<DocumentReader> ParseAsync(
+        byte[] data, string? password, IAesCbcProvider? aesProvider, ReaderLimits limits)
+    {
+        var reader = Prepare(data, limits);
+        var pump = new AesCbcPump(aesProvider);
+        await reader.InitializeSecurityAsync(password, pump).ConfigureAwait(false);
+        if (!reader.store.IsEncrypted)
+        {
+            return reader;
+        }
+
+        for (var attempt = 0; attempt < 64; attempt++)
+        {
+            pump.Mode = AesCbcPump.Stage.Collect;
+            reader.store.ResetCache();
+            reader.store.WarmDecryption();
+            if (pump.PendingCount == 0)
+            {
+                pump.Mode = AesCbcPump.Stage.PassThrough;
+                return reader;
+            }
+
+            await pump.ResolvePendingAsync().ConfigureAwait(false);
+        }
+
+        throw new InvalidOperationException(
+            "The supplied IAesCbcProvider did not settle after 64 decryption passes.");
+    }
+
+    private static DocumentReader Prepare(byte[] data, ReaderLimits limits)
     {
         ArgumentNullException.ThrowIfNull(data);
         ArgumentNullException.ThrowIfNull(limits);
@@ -83,7 +125,6 @@ internal sealed class DocumentReader
 
         var reader = new DocumentReader(data, snapshot);
         reader.Load();
-        reader.InitializeSecurity(password);
         return reader;
     }
 
@@ -177,27 +218,51 @@ internal sealed class DocumentReader
             : value;
     }
 
-    private void InitializeSecurity(string? password)
+    private void InitializeSecurity(string? password, IAesCbcProvider? aesProvider)
     {
-        if (!trailer.TryGetValue("Encrypt", out var encryptObject) || encryptObject is null)
+        if (!TryReadEncryptDictionary(out var encrypt, out var encryptObjectNumber))
         {
             return;
         }
 
-        var encryptObjectNumber = encryptObject is ReferenceObject reference ? reference.ObjectNumber : -1;
+        Adopt(new StandardSecurityHandler(encrypt!, ReadDocumentId(), password ?? "", aesProvider), encryptObjectNumber);
+    }
 
-        if (Resolve(encryptObject) is not DictionaryObject encrypt)
+    private async ValueTask InitializeSecurityAsync(string? password, IAesCbcProvider aesProvider)
+    {
+        if (!TryReadEncryptDictionary(out var encrypt, out var encryptObjectNumber))
         {
-            throw new DocumentParseException("The /Encrypt entry is not a dictionary.", -1);
+            return;
         }
 
-        var handler = new StandardSecurityHandler(encrypt, ReadDocumentId(), password ?? "");
+        var handler = await StandardSecurityHandler
+            .CreateAsync(encrypt!, ReadDocumentId(), password ?? "", aesProvider).ConfigureAwait(false);
+        Adopt(handler, encryptObjectNumber);
+    }
+
+    private void Adopt(StandardSecurityHandler handler, int encryptObjectNumber)
+    {
         if (!handler.IsUserPassword && !handler.IsOwnerPassword)
         {
             throw new InvalidPasswordException();
         }
 
         store.SetSecurity(handler, encryptObjectNumber);
+    }
+
+    private bool TryReadEncryptDictionary(out DictionaryObject? encrypt, out int encryptObjectNumber)
+    {
+        encrypt = null;
+        encryptObjectNumber = -1;
+        if (!trailer.TryGetValue("Encrypt", out var encryptObject) || encryptObject is null)
+        {
+            return false;
+        }
+
+        encryptObjectNumber = encryptObject is ReferenceObject reference ? reference.ObjectNumber : -1;
+        encrypt = Resolve(encryptObject) as DictionaryObject
+            ?? throw new DocumentParseException("The /Encrypt entry is not a dictionary.", -1);
+        return true;
     }
 
     private byte[] ReadDocumentId()

@@ -161,10 +161,11 @@ public class R6PermsAndPasswordTests
 
     private static DictionaryObject BuildEncrypt(string userPassword, string ownerPassword, int permissions, bool includePerms = true)
     {
-        var (owner, user, ownerEncrypted, userEncrypted, perms) = StandardSecurityHandler.DeriveAes256(
-            userPassword, ownerPassword, FileKey, permissions, encryptMetadata: true,
+        var (owner, user, ownerEncrypted, userEncrypted, perms) = AesCbcEngine.Complete(
+            StandardSecurityHandler.DeriveAes256Async(
+            new AesCbcEngine(null), userPassword, ownerPassword, FileKey, permissions, encryptMetadata: true,
             userValidation: Fixed(8, 1), userKeySalt: Fixed(8, 2),
-            ownerValidation: Fixed(8, 4), ownerKeySalt: Fixed(8, 5), permsNoise: Fixed(4, 6));
+            ownerValidation: Fixed(8, 4), ownerKeySalt: Fixed(8, 5), permsNoise: Fixed(4, 6)));
 
         var encrypt = new DictionaryObject
         {
@@ -190,9 +191,9 @@ public class R6PermsAndPasswordTests
     private static void RewritePerms(DictionaryObject encrypt, Action<byte[]> rewrite)
     {
         var encrypted = Encoding.Latin1.GetBytes(Assert.IsType<StringObject>(encrypt["Perms"]).Value);
-        var decoded = AesCbc.DecryptCbcNoPadding(FileKey, new byte[16], encrypted);
+        var decoded = CryptoFixtureSupport.AesCbcNoPaddingDecrypt(FileKey, new byte[16], encrypted);
         rewrite(decoded);
-        encrypt["Perms"] = Str(AesCbc.EncryptCbcNoPadding(FileKey, new byte[16], decoded));
+        encrypt["Perms"] = Str(CryptoFixtureSupport.AesCbcNoPadding(FileKey, new byte[16], decoded));
     }
 
     private static byte[] Fixed(int length, int seed)

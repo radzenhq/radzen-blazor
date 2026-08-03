@@ -157,10 +157,30 @@ internal sealed class IndirectObjectStore(
     {
         security = handler;
         encryptObjectNumber = objectNumber;
+        ResetCache();
+    }
 
+    internal void ResetCache()
+    {
         cache.Clear();
         objectStreams.Clear();
         memberCounts = null;
+    }
+
+    internal void WarmDecryption()
+    {
+        var numbers = new List<int>(entries.Keys);
+        foreach (var number in numbers)
+        {
+            try
+            {
+                GetObject(number);
+            }
+            catch (Exception exception) when (exception is DocumentParseException
+                or KeyNotFoundException or ArgumentException or OverflowException or InvalidOperationException)
+            {
+            }
+        }
     }
 
     private DocumentObject DecryptObject(DocumentObject value, int number, int generation)

@@ -27,7 +27,7 @@ public class ReaderCryptoRobustnessTests
         var iv = CryptoFixtureSupport.FixedBytes(16, 7);
         var data = CryptoFixtureSupport.FixedBytes(length, 3);
 
-        Assert.Throws<InvalidDataException>(() => AesCbc.Decrypt(key, iv, data));
+        Assert.Throws<InvalidDataException>(() => new AesCbcEngine(null).DecryptPadded(key, iv, data));
     }
 
 

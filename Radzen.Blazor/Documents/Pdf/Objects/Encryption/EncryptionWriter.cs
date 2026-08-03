@@ -1,16 +1,18 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using Radzen.Documents.Pdf.Crypto;
 
 namespace Radzen.Documents.Pdf.Objects.Encryption;
 
 // ISO 32000-1 algorithm 1: per-object key encryption of each string and stream.
 internal sealed class EncryptionWriter(
-    byte[] fileKey, EncryptionWriter.Method cipher, MaterialSequence material, bool encryptMetadata = true)
+    byte[] fileKey, EncryptionWriter.Method cipher, MaterialSequence material, AesCbcEngine aes, bool encryptMetadata = true)
 {
     private readonly byte[] fileKey = fileKey;
     private readonly Method cipher = cipher;
     private readonly MaterialSequence material = material;
+    private readonly AesCbcEngine aes = aes;
     private readonly bool encryptMetadata = encryptMetadata;
 
     internal enum Method
@@ -22,11 +24,25 @@ internal sealed class EncryptionWriter(
 
     public static EncryptionWriter Build(
         EncryptionOptions options, byte[] documentId, MaterialSequence material, out DictionaryObject dictionary)
+        => Build(options, documentId, material, options?.AesProvider, out dictionary);
+
+    public static EncryptionWriter Build(
+        EncryptionOptions options, byte[] documentId, MaterialSequence material,
+        IAesCbcProvider? aesProvider, out DictionaryObject dictionary)
+    {
+        var built = AesCbcEngine.Complete(BuildAsync(options, documentId, material, aesProvider));
+        dictionary = built.Dictionary;
+        return built.Writer;
+    }
+
+    public static async ValueTask<(EncryptionWriter Writer, DictionaryObject Dictionary)> BuildAsync(
+        EncryptionOptions options, byte[] documentId, MaterialSequence material, IAesCbcProvider? aesProvider)
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(documentId);
         ArgumentNullException.ThrowIfNull(material);
 
+        var aes = new AesCbcEngine(aesProvider);
         var permissions = options.ToPermissions();
         var encryptMetadata = options.EncryptMetadata;
         switch (options.Algorithm)
@@ -34,29 +50,29 @@ internal sealed class EncryptionWriter(
             case EncryptionAlgorithm.Aes256:
             {
                 var fileKey = material.Next(32);
-                var derived = StandardSecurityHandler.DeriveAes256(
-                    options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata,
+                var derived = await StandardSecurityHandler.DeriveAes256Async(
+                    aes, options.UserPassword, options.OwnerPassword, fileKey, permissions, encryptMetadata,
                     userValidation: material.Next(8), userKeySalt: material.Next(8),
                     ownerValidation: material.Next(8), ownerKeySalt: material.Next(8),
-                    permsNoise: material.Next(4));
-                dictionary = BuildV5Dictionary(derived, permissions, encryptMetadata);
-                return new EncryptionWriter(fileKey, Method.AesV3, material, encryptMetadata);
+                    permsNoise: material.Next(4)).ConfigureAwait(false);
+                return (new EncryptionWriter(fileKey, Method.AesV3, material, aes, encryptMetadata),
+                    BuildV5Dictionary(derived, permissions, encryptMetadata));
             }
 
             case EncryptionAlgorithm.Aes128:
             {
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 4, 16, permissions, documentId, encryptMetadata);
-                dictionary = BuildLegacyDictionary(derived, permissions, aes: true, encryptMetadata);
-                return new EncryptionWriter(derived.FileKey, Method.AesV2, material, encryptMetadata);
+                return (new EncryptionWriter(derived.FileKey, Method.AesV2, material, aes, encryptMetadata),
+                    BuildLegacyDictionary(derived, permissions, useAes: true, encryptMetadata));
             }
 
             default:
             {
                 var derived = StandardSecurityHandler.DeriveLegacy(
                     options.UserPassword, options.OwnerPassword, 3, 16, permissions, documentId, true);
-                dictionary = BuildLegacyDictionary(derived, permissions, aes: false, encryptMetadata: true);
-                return new EncryptionWriter(derived.FileKey, Method.Rc4, material);
+                return (new EncryptionWriter(derived.FileKey, Method.Rc4, material, aes),
+                    BuildLegacyDictionary(derived, permissions, useAes: false, encryptMetadata: true));
             }
         }
     }
@@ -81,17 +97,17 @@ internal sealed class EncryptionWriter(
     }
 
     private static DictionaryObject BuildLegacyDictionary(
-        (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool aes, bool encryptMetadata)
+        (byte[] Owner, byte[] User, byte[] FileKey) derived, int permissions, bool useAes, bool encryptMetadata)
     {
         var dictionary = new DictionaryObject
         {
             ["Filter"] = new NameObject("Standard"),
-            ["V"] = new NumberObject(aes ? 4 : 2),
-            ["R"] = new NumberObject(aes ? 4 : 3),
+            ["V"] = new NumberObject(useAes ? 4 : 2),
+            ["R"] = new NumberObject(useAes ? 4 : 3),
             ["Length"] = new NumberObject(128),
         };
 
-        if (aes)
+        if (useAes)
         {
             AddStandardCryptFilter(dictionary, "AESV2", 16);
         }
@@ -99,7 +115,7 @@ internal sealed class EncryptionWriter(
         dictionary["O"] = FromBytes(derived.Owner);
         dictionary["U"] = FromBytes(derived.User);
         dictionary["P"] = new NumberObject(permissions);
-        AddEncryptMetadata(dictionary, aes, encryptMetadata);
+        AddEncryptMetadata(dictionary, useAes, encryptMetadata);
         return dictionary;
     }
 
@@ -122,13 +138,13 @@ internal sealed class EncryptionWriter(
         dictionary["UE"] = FromBytes(derived.UserEncrypted);
         dictionary["Perms"] = FromBytes(derived.Perms);
         dictionary["P"] = new NumberObject(permissions);
-        AddEncryptMetadata(dictionary, aes: true, encryptMetadata);
+        AddEncryptMetadata(dictionary, useAes: true, encryptMetadata);
         return dictionary;
     }
 
-    private static void AddEncryptMetadata(DictionaryObject dictionary, bool aes, bool encryptMetadata)
+    private static void AddEncryptMetadata(DictionaryObject dictionary, bool useAes, bool encryptMetadata)
     {
-        if (aes && !encryptMetadata)
+        if (useAes && !encryptMetadata)
         {
             dictionary["EncryptMetadata"] = new BooleanObject(false);
         }
@@ -171,23 +187,10 @@ internal sealed class EncryptionWriter(
     private byte[] AesEncrypt(byte[] key, byte[] data)
     {
         var iv = material.Next(16);
-        var cipher = AesCbc.EncryptCbcNoPadding(key, iv, Pkcs7(data));
+        var cipher = aes.EncryptNoPadding(key, iv, Pkcs7.Pad(data));
         var result = new byte[iv.Length + cipher.Length];
         Array.Copy(iv, result, iv.Length);
         Array.Copy(cipher, 0, result, iv.Length, cipher.Length);
-        return result;
-    }
-
-    private static byte[] Pkcs7(byte[] data)
-    {
-        var pad = 16 - (data.Length % 16);
-        var result = new byte[data.Length + pad];
-        Array.Copy(data, result, data.Length);
-        for (var i = data.Length; i < result.Length; i++)
-        {
-            result[i] = (byte)pad;
-        }
-
         return result;
     }
 }

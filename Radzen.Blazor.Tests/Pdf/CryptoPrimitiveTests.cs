@@ -237,35 +237,35 @@ public class CryptoPrimitiveTests
     }
 
     [Fact]
-    public void AesCbc_128_DecryptRemovesPadding()
+    public void AesCbcEngine_128_DecryptRemovesPadding()
     {
         var key = Convert.FromHexString("000102030405060708090a0b0c0d0e0f");
         var iv = Convert.FromHexString("101112131415161718191a1b1c1d1e1f");
         var cipher = Convert.FromHexString(
             "93e11dc27929233d2a1f758a15282c29869bf5aee56a855c9819b1805cbf4aa225f08de943505b327bee843729283261");
-        var plain = AesCbc.Decrypt(key, iv, cipher);
+        var plain = new AesCbcEngine(null).DecryptPadded(key, iv, cipher);
         Assert.Equal("Hello AES-CBC PDF decrypt test!!", Encoding.ASCII.GetString(plain));
     }
 
     [Fact]
-    public void AesCbc_256_DecryptRemovesPadding()
+    public void AesCbcEngine_256_DecryptRemovesPadding()
     {
         var key = Convert.FromHexString("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
         var iv = Convert.FromHexString("101112131415161718191a1b1c1d1e1f");
         var cipher = Convert.FromHexString(
             "262a223698169dbd4bc569d22c5a01164e82ba0f046e7cc428217a15d40f9f7e3c73b2112e0357819a89edf1d91c0936");
-        var plain = AesCbc.Decrypt(key, iv, cipher);
+        var plain = new AesCbcEngine(null).DecryptPadded(key, iv, cipher);
         Assert.Equal("Hello AES-CBC PDF decrypt test!!", Encoding.ASCII.GetString(plain));
     }
 
     // FIPS-197 AES-128 KAT: zero IV, first cipher block = 3ad77bb40d7a3660a89ecaf32466ef97
     [Fact]
-    public void AesCbc_128_NistAnchoredSingleBlock()
+    public void AesCbcEngine_128_NistAnchoredSingleBlock()
     {
         var key = Convert.FromHexString("2b7e151628aed2a6abf7158809cf4f3c");
         var cipher = Convert.FromHexString(
             "3ad77bb40d7a3660a89ecaf32466ef974b0673d23da20679744afa8e3d589236");
-        var plain = AesCbc.Decrypt(key, new byte[16], cipher);
+        var plain = new AesCbcEngine(null).DecryptPadded(key, new byte[16], cipher);
         Assert.Equal("6bc1bee22e409f96e93d7e117393172a", Hex(plain));
     }
 

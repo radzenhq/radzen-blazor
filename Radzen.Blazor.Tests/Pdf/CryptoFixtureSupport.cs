@@ -162,6 +162,17 @@ internal static class CryptoFixtureSupport
         return encryptor.TransformFinalBlock(plain, 0, plain.Length);
     }
 
+    public static byte[] AesCbcNoPaddingDecrypt(byte[] key, byte[] iv, byte[] cipher)
+    {
+        using var aes = Aes.Create();
+        aes.Key = key;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.None;
+        aes.IV = iv;
+        using var decryptor = aes.CreateDecryptor();
+        return decryptor.TransformFinalBlock(cipher, 0, cipher.Length);
+    }
+
     // ISO 32000-2 algorithm 2.B hash
     public static byte[] Hash2B(byte[] password, byte[] salt, byte[] userData)
     {

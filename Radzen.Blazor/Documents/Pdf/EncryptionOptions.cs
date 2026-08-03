@@ -50,6 +50,14 @@ public sealed class EncryptionOptions
     internal IEncryptionMaterial? Material { get; set; }
 
     /// <summary>
+    /// Gets or sets the AES-CBC implementation used by <see cref="EncryptionAlgorithm.Aes128"/> and
+    /// <see cref="EncryptionAlgorithm.Aes256"/>. When <c>null</c> the platform implementation is used,
+    /// except on browser-wasm where there is none and a provider is required. Has no effect on
+    /// <see cref="EncryptionAlgorithm.Rc4"/>.
+    /// </summary>
+    public IAesCbcProvider? AesProvider { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the document metadata is encrypted
     /// along with the rest of the file. Defaults to <c>true</c>. When set to
     /// <c>false</c> with a crypt-filter handler (<see cref="EncryptionAlgorithm.Aes128"/>

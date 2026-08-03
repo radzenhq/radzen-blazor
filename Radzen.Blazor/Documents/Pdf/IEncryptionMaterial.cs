@@ -76,7 +76,31 @@ internal sealed class MaterialSequence(IEncryptionMaterial material)
 {
     private int index;
 
+    public int Position
+    {
+        get => index;
+        set => index = value;
+    }
+
     public byte[] Next(int count) => material.GetBytes(index++, count);
+}
+
+internal sealed class MemoizedEncryptionMaterial(IEncryptionMaterial source) : IEncryptionMaterial
+{
+    private readonly Dictionary<(int Index, int Count), byte[]> values = [];
+
+    public byte[] GetBytes(int index, int count)
+    {
+        if (!values.TryGetValue((index, count), out var known))
+        {
+            known = source.GetBytes(index, count);
+            values[(index, count)] = known;
+        }
+
+        var result = new byte[known.Length];
+        Array.Copy(known, result, known.Length);
+        return result;
+    }
 }
 
 internal sealed class CapturedEncryptionMaterial : IEncryptionMaterial

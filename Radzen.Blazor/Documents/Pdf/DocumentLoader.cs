@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
@@ -17,8 +18,24 @@ internal static class DocumentLoader
         limits = limits.Snapshot();
 
         var bytes = PdfSourceBytes.ReadFully(stream, limits.MaxFileBytes);
-        var reader = DocumentReader.Parse(bytes, options?.Password, limits);
+        var reader = DocumentReader.Parse(bytes, options?.Password, options?.AesProvider, limits);
+        return Build(reader, bytes, limits);
+    }
 
+    public static async ValueTask<PortableDocument> LoadAsync(Stream stream, ReaderLimits limits, LoadOptions? options)
+    {
+        ArgumentNullException.ThrowIfNull(stream);
+        ArgumentNullException.ThrowIfNull(limits);
+        limits = limits.Snapshot();
+
+        var bytes = PdfSourceBytes.ReadFully(stream, limits.MaxFileBytes);
+        var reader = await DocumentReader
+            .ParseAsync(bytes, options?.Password, options?.AesProvider, limits).ConfigureAwait(false);
+        return Build(reader, bytes, limits);
+    }
+
+    private static PortableDocument Build(DocumentReader reader, byte[] bytes, ReaderLimits limits)
+    {
         var state = new LoadedState(reader, bytes);
         var document = PortableDocument.CreateLoaded(state);
         state.SourceInfo = reader.GetDictionary(reader.Trailer, "Info");
