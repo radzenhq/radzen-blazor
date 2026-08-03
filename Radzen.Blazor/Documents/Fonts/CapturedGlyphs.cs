@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Immutable;
 using Radzen.Documents.Fonts.Sfnt;
-using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Fonts;
 
@@ -28,7 +27,7 @@ internal readonly record struct CapturedBuiltInFace(
     bool Italic,
     BuiltInFaceMetrics Metrics);
 
-internal readonly record struct CapturedFontFace : IPdfFontProgramSource
+internal readonly record struct CapturedFontFace : IFontProgramSource
 {
     private readonly SfntFont? program;
     private readonly CapturedBuiltInFace builtIn;
@@ -66,7 +65,7 @@ internal readonly record struct CapturedFontFace : IPdfFontProgramSource
             ? builtIn
             : throw new InvalidOperationException("An sfnt face has no built-in descriptor.");
 
-    SfntFont IPdfFontProgramSource.Program
+    SfntFont IFontProgramSource.Program
         => program ?? throw new InvalidOperationException("A built-in face has no sfnt font.");
 
     public static CapturedFontFace FromSfnt(SfntFont face)

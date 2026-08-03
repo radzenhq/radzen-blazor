@@ -28,19 +28,17 @@ internal static class FontProgram
         => source.Program;
 }
 
-internal readonly record struct RegisteredFace : IFontProgramSource, Pdf.Fonts.IPdfEmbeddedFace
+internal readonly record struct RegisteredFace : IFontProgramSource
 {
     private readonly SfntFont program;
-    private readonly FontSourceData source;
 
-    internal RegisteredFace(string family, bool bold, bool italic, SfntFont program, FontSourceData source, int faceIndex)
+    internal RegisteredFace(string family, bool bold, bool italic, SfntFont program, int faceIndex)
     {
         Family = family;
         Bold = bold;
         Italic = italic;
         FaceIndex = faceIndex;
         this.program = program;
-        this.source = source;
     }
 
     public string Family { get; }
@@ -54,15 +52,6 @@ internal readonly record struct RegisteredFace : IFontProgramSource, Pdf.Fonts.I
     public CapturedFaceMetrics Metrics => new(program.Ascent, program.Descent, program.UnitsPerEm);
 
     SfntFont IFontProgramSource.Program => program;
-
-    SfntFont Pdf.Fonts.IPdfFontProgramSource.Program => program;
-
-    FontSourceData Pdf.Fonts.IPdfEmbeddedFace.ProgramData => source;
-}
-
-internal sealed class FontSourceData(byte[] bytes)
-{
-    internal ReadOnlyMemory<byte> Memory { get; } = bytes;
 }
 
 internal readonly record struct FontCollectionSnapshot(
@@ -226,8 +215,6 @@ public sealed class FontCollection
     private sealed class ParsedSource(byte[] data, bool isCollection, IReadOnlyList<SfntFont> faces)
     {
         public byte[] Data { get; } = data;
-
-        public FontSourceData Source { get; } = new(data);
 
         public bool IsCollection { get; } = isCollection;
 
@@ -874,7 +861,6 @@ public sealed class FontCollection
                 key.Bold,
                 key.Italic,
                 face,
-                parsed.Source,
                 index);
         }
     }

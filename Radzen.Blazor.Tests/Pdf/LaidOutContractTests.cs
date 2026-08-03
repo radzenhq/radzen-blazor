@@ -10,7 +10,6 @@ using Radzen.Documents.Codes;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
@@ -115,9 +114,9 @@ public class LaidOutContractTests
 
         Assert.Equal("A\u4E2DB", fragment.GlyphRun.Text);
         Assert.Equal(3, spans.Length);
-        Assert.Same(document.Fonts.ResolveFace(run.Font), PdfFontProgram.Of(spans[0].Face));
-        Assert.NotSame(PdfFontProgram.Of(spans[0].Face), PdfFontProgram.Of(spans[1].Face));
-        Assert.Same(PdfFontProgram.Of(spans[0].Face), PdfFontProgram.Of(spans[2].Face));
+        Assert.Same(document.Fonts.ResolveFace(run.Font), FontProgram.Of(spans[0].Face));
+        Assert.NotSame(FontProgram.Of(spans[0].Face), FontProgram.Of(spans[1].Face));
+        Assert.Same(FontProgram.Of(spans[0].Face), FontProgram.Of(spans[2].Face));
         Assert.Equal(0, spans[0].XOffset, 9);
         Assert.Equal(spans[0].Advance, spans[1].XOffset, 9);
         Assert.Equal(spans[0].Advance + spans[1].Advance, spans[2].XOffset, 9);
@@ -125,7 +124,7 @@ public class LaidOutContractTests
             spans.Where(span => span.Face.Kind == CapturedFontFaceKind.Sfnt),
             span => Assert.Contains(
                 laidOut.Fonts.Faces,
-                registered => ReferenceEquals(PdfFontProgram.Of(registered), PdfFontProgram.Of(span.Face))));
+                registered => ReferenceEquals(FontProgram.Of(registered), FontProgram.Of(span.Face))));
         Assert.Equal(new[] { 0, 1, 2 }, spans.SelectMany(span => span.Glyphs).Select(glyph => glyph.Cluster));
     }
 
@@ -304,14 +303,13 @@ public class LaidOutContractTests
 
         var laidOut = DocumentLayouter.Layout(document);
         var fragment = FirstFragment(Assert.Single(laidOut.Pages));
-        var capturedFace = PdfFontProgram.Of(Assert.Single(fragment.GlyphRun.Spans).Face);
+        var capturedFace = FontProgram.Of(Assert.Single(fragment.GlyphRun.Spans).Face);
         var registered = Assert.Single(document.Fonts.RegisteredFaces());
         var asset = Assert.Single(laidOut.Fonts.Faces);
         var before = Render(laidOut, document);
 
-        Assert.Same(PdfFontProgram.DataOf(registered), PdfFontProgram.DataOf(asset));
         Assert.Equal(registered.FaceIndex, asset.FaceIndex);
-        Assert.Same(capturedFace, PdfFontProgram.Of(asset));
+        Assert.Same(capturedFace, FontProgram.Of(asset));
 
         document.Fonts.Register(
             BuildTestSupport.Latin,
@@ -1011,7 +1009,7 @@ public class LaidOutContractTests
 
             if (value is byte[])
             {
-                if (owner != typeof(SceneImageData) && owner != typeof(FontSourceData))
+                if (owner != typeof(SceneImageData))
                 {
                     offenders.Add($"{path} is a byte[] outside a scene-owned wrapper");
                 }
