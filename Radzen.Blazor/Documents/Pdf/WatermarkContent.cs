@@ -12,16 +12,11 @@ namespace Radzen.Documents.Pdf;
 internal static class Base14Watermark
 {
     public static LaidOutWatermark? Plan(
-        Watermark? watermark,
+        Watermark watermark,
         PageSize size,
         FontCollectionSnapshot? knownFonts,
         LayoutCaptureContext capture)
     {
-        if (watermark is null)
-        {
-            return null;
-        }
-
         if (!string.IsNullOrEmpty(watermark.Text))
         {
             RequireBase14(watermark.Font, knownFonts);
