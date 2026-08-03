@@ -9,6 +9,7 @@ namespace Radzen.Documents.Fonts;
 internal sealed class BuiltInFontMetrics
 {
     private static readonly Dictionary<string, BuiltInFontData.Entry> EntryByName = BuildEntryIndex();
+    private static readonly Dictionary<(BuiltInFontFamily Family, bool Bold, bool Italic), BuiltInFontData.Entry> EntryByFace = BuildFaceIndex();
     private static readonly Dictionary<string, string> KernByName = BuildKernIndex();
     private static readonly ConcurrentDictionary<string, BuiltInFontMetrics> Cache = new(StringComparer.Ordinal);
 
@@ -23,8 +24,6 @@ internal sealed class BuiltInFontMetrics
         kernByPair = ParseKerning(entry.FontName);
         (Family, Bold, Italic) = ClassifyEntry(entry.FontName);
     }
-
-    public string PostScriptName => entry.FontName;
 
     public BuiltInFontFamily Family { get; }
 
@@ -93,26 +92,13 @@ internal sealed class BuiltInFontMetrics
     public double BBoxTop => entry.BBoxTop;
 
     public static BuiltInFontMetrics? Resolve(Font font)
-    {
-        var psName = ResolvePostScriptName(
-            font.EffectiveFamily,
-            font.EffectiveBold,
-            font.EffectiveItalic);
-        return Resolve(psName);
-    }
+        => Resolve(ResolveEntry(font.EffectiveFamily, font.EffectiveBold, font.EffectiveItalic));
 
     public static BuiltInFontMetrics? Resolve(in FontPaint font)
-        => Resolve(ResolvePostScriptName(font.Family, font.Bold, font.Italic));
+        => Resolve(ResolveEntry(font.Family, font.Bold, font.Italic));
 
-    private static BuiltInFontMetrics? Resolve(string? psName)
-    {
-        if (psName == null || !EntryByName.TryGetValue(psName, out var entry))
-        {
-            return null;
-        }
-
-        return Cache.GetOrAdd(entry.FontName, _ => new BuiltInFontMetrics(entry));
-    }
+    private static BuiltInFontMetrics? Resolve(BuiltInFontData.Entry? entry)
+        => entry is null ? null : Cache.GetOrAdd(entry.FontName, _ => new BuiltInFontMetrics(entry));
 
     public double GetWidth(string glyphName)
         => widthByName.TryGetValue(glyphName, out var width) ? width : 0;
@@ -165,38 +151,41 @@ internal sealed class BuiltInFontMetrics
         return FontMetric.Scale(sum, size, 1000);
     }
 
-    private static string? ResolvePostScriptName(string name, bool bold, bool italic)
+    private static BuiltInFontData.Entry? ResolveEntry(string name, bool bold, bool italic)
     {
         if (string.IsNullOrEmpty(name))
         {
             return null;
         }
 
-        return name.ToLowerInvariant() switch
+        (BuiltInFontFamily Family, bool Bold, bool Italic)? face = name.ToLowerInvariant() switch
         {
-            "helvetica" => StyleSuffix(bold, italic, "Helvetica", "-Bold", "-Oblique", "-BoldOblique"),
-            "courier" => StyleSuffix(bold, italic, "Courier", "-Bold", "-Oblique", "-BoldOblique"),
-            "times" or "times-roman" => bold && italic ? "Times-BoldItalic"
-                                : bold ? "Times-Bold"
-                                : italic ? "Times-Italic"
-                                : "Times-Roman",
-            "symbol" => "Symbol",
-            "zapfdingbats" => "ZapfDingbats",
-            _ => EntryByName.ContainsKey(name) ? name : null,
+            "helvetica" => (BuiltInFontFamily.Sans, bold, italic),
+            "courier" => (BuiltInFontFamily.Monospace, bold, italic),
+            "times" or "times-roman" => (BuiltInFontFamily.Serif, bold, italic),
+            "symbol" => (BuiltInFontFamily.Symbol, false, false),
+            "zapfdingbats" => (BuiltInFontFamily.ZapfDingbats, false, false),
+            _ => null,
         };
+
+        if (face is { } known)
+        {
+            return EntryByFace[known];
+        }
+
+        return EntryByName.TryGetValue(name, out var exact) ? exact : null;
     }
 
-    private static string StyleSuffix(
-        bool isBold,
-        bool isItalic,
-        string family,
-        string bold,
-        string italic,
-        string boldItalic)
-        => isBold && isItalic ? family + boldItalic
-            : isBold ? family + bold
-            : isItalic ? family + italic
-            : family;
+    private static Dictionary<(BuiltInFontFamily Family, bool Bold, bool Italic), BuiltInFontData.Entry> BuildFaceIndex()
+    {
+        var index = new Dictionary<(BuiltInFontFamily, bool, bool), BuiltInFontData.Entry>();
+        foreach (var entry in BuiltInFontData.Fonts)
+        {
+            index[ClassifyEntry(entry.FontName)] = entry;
+        }
+
+        return index;
+    }
 
     private static Dictionary<string, int> ParseWidths(string widths)
     {
@@ -214,14 +203,14 @@ internal sealed class BuiltInFontMetrics
 
     private string? GlyphName(int codepoint)
     {
-        if (entry.FontName == "Symbol"
+        if (Family == BuiltInFontFamily.Symbol
             && codepoint <= byte.MaxValue
             && BuiltInFontGlyphData.Symbol.TryGetValue((byte)codepoint, out var symbol))
         {
             return symbol;
         }
 
-        if (entry.FontName == "ZapfDingbats"
+        if (Family == BuiltInFontFamily.ZapfDingbats
             && codepoint <= byte.MaxValue
             && BuiltInFontGlyphData.ZapfDingbats.TryGetValue((byte)codepoint, out var dingbat))
         {

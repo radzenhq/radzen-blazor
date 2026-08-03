@@ -36,7 +36,7 @@ internal static class FontResolution
             }
         }
 
-        var psName = metrics?.PostScriptName ?? "Helvetica";
+        var psName = metrics is { } resolved ? StandardFonts.PostScriptName(resolved.Face()) : "Helvetica";
 
         if (scope.Base14ForbiddenBy is { } label)
         {
