@@ -224,6 +224,26 @@ public class FxHardeningTests
         Assert.NotNull(new DocumentRenderer().Render(document));
     }
 
+    [Fact]
+    public void LoadFromStream_CarriesMaxImagePixelsIntoLoadedImageDecoding()
+    {
+        var source = new Document();
+        source.Sections.Add().Blocks.AddParagraph("body");
+        var bytes = new DocumentRenderer().ToArray(source);
+        var watermark = new Watermark { Text = "DRAFT" };
+        watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        using var tightStream = new MemoryStream(bytes);
+        var tight = PortableDocument.LoadFromStream(tightStream, new ReaderLimits { MaxImagePixels = 4 });
+        tight.AddWatermark(watermark);
+        Assert.Throws<InvalidDataException>(() => tight.ToArray());
+
+        using var defaultStream = new MemoryStream(bytes);
+        var loaded = PortableDocument.LoadFromStream(defaultStream);
+        loaded.AddWatermark(watermark);
+        Assert.NotEmpty(loaded.ToArray());
+    }
+
     private static byte[] Ihdr(int width, int height, byte bitDepth, byte colorType)
     {
         var body = new byte[13];

@@ -38,6 +38,7 @@ internal static class DocumentLoader
     {
         var state = new LoadedState(reader, bytes);
         var document = PortableDocument.CreateLoaded(state);
+        document.ImageDecoders = ImageDecoders.BuiltIn.WithLimits(limits);
         state.SourceInfo = reader.GetDictionary(reader.Trailer, "Info");
 
         var catalog = reader.GetDictionary(reader.Trailer, "Root");
