@@ -399,7 +399,7 @@ public class AppendMergeTests
         path.MoveTo(Unit.FromPoint(1), Unit.FromPoint(2));
         path.LineTo(Unit.FromPoint(3), Unit.FromPoint(4));
         path.SetDash([2, 3], 1);
-        path.SetFillCmyk(0.1, 0.2, 0.3, 0.4);
+        path.FillPaint = DeviceColor.Cmyk(0.1, 0.2, 0.3, 0.4);
         var annotation = new TextAnnotation(PdfRect.FromSize(10, 20, 30, 40))
         {
             Appearance = new AnnotationAppearance(),
@@ -412,7 +412,7 @@ public class AppendMergeTests
         target.Append(source);
         path.LineTo(Unit.FromPoint(100), Unit.FromPoint(200));
         path.SetDash([9], 8);
-        path.SetFillGray(0.8);
+        path.FillPaint = DeviceColor.Cmyk(0.9, 0.9, 0.9, 0.9);
 
         var clone = Assert.IsType<PathContent>(target.Pages[0].Annotations[0].Appearance!.Content[0]);
         Assert.Equal(new PdfRect(1, 2, 3, 4), clone.GetBounds());

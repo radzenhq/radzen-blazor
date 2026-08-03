@@ -208,44 +208,6 @@ public sealed class PathContent : ContentElement
     }
 
     /// <summary>
-    /// Sets the fill color to a DeviceCMYK color (the <c>k</c> operator). Each
-    /// component is clamped to the 0..1 range. Overrides <see cref="FillColor"/>.
-    /// </summary>
-    /// <param name="cyan">The cyan component.</param>
-    /// <param name="magenta">The magenta component.</param>
-    /// <param name="yellow">The yellow component.</param>
-    /// <param name="black">The black (key) component.</param>
-    public void SetFillCmyk(double cyan, double magenta, double yellow, double black)
-        => FillPaint = DeviceColor.Cmyk(cyan, magenta, yellow, black);
-
-    /// <summary>
-    /// Sets the stroke color to a DeviceCMYK color (the <c>K</c> operator). Each
-    /// component is clamped to the 0..1 range. Overrides <see cref="StrokeColor"/>.
-    /// </summary>
-    /// <param name="cyan">The cyan component.</param>
-    /// <param name="magenta">The magenta component.</param>
-    /// <param name="yellow">The yellow component.</param>
-    /// <param name="black">The black (key) component.</param>
-    public void SetStrokeCmyk(double cyan, double magenta, double yellow, double black)
-        => StrokePaint = DeviceColor.Cmyk(cyan, magenta, yellow, black);
-
-    /// <summary>
-    /// Sets the fill color to a DeviceGray color (the <c>g</c> operator), from 0
-    /// (black) to 1 (white). Overrides <see cref="FillColor"/>.
-    /// </summary>
-    /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
-    public void SetFillGray(double gray)
-        => FillPaint = DeviceColor.Gray(gray);
-
-    /// <summary>
-    /// Sets the stroke color to a DeviceGray color (the <c>G</c> operator), from 0
-    /// (black) to 1 (white). Overrides <see cref="StrokeColor"/>.
-    /// </summary>
-    /// <param name="gray">The gray level, clamped to the 0..1 range.</param>
-    public void SetStrokeGray(double gray)
-        => StrokePaint = DeviceColor.Gray(gray);
-
-    /// <summary>
     /// Sets the dash pattern (the <c>d</c> operator). The pattern is a sequence of
     /// alternating on/off dash lengths in points; an empty pattern draws a solid line.
     /// </summary>

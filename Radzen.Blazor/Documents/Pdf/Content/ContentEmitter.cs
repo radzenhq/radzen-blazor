@@ -396,7 +396,6 @@ internal static class ContentEmitter
         writer.WriteRaw(color.Kind switch
         {
             DeviceColorKind.Named => stroke ? "SCN" : "scn",
-            DeviceColorKind.Gray => stroke ? "G" : "g",
             _ => stroke ? "K" : "k",
         });
         writer.WriteRaw("\n");

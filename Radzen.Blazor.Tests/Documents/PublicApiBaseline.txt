@@ -1113,10 +1113,6 @@ public Radzen.Documents.Pdf.PathContent.LineTo(Radzen.Documents.Core.Unit x, Rad
 public Radzen.Documents.Pdf.PathContent.MiterLimit : System.Double? { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.MoveTo(Radzen.Documents.Core.Unit x, Radzen.Documents.Core.Unit y) : System.Void
 public Radzen.Documents.Pdf.PathContent.SetDash(System.Double[] pattern, System.Double phase = 0) : System.Void
-public Radzen.Documents.Pdf.PathContent.SetFillCmyk(System.Double cyan, System.Double magenta, System.Double yellow, System.Double black) : System.Void
-public Radzen.Documents.Pdf.PathContent.SetFillGray(System.Double gray) : System.Void
-public Radzen.Documents.Pdf.PathContent.SetStrokeCmyk(System.Double cyan, System.Double magenta, System.Double yellow, System.Double black) : System.Void
-public Radzen.Documents.Pdf.PathContent.SetStrokeGray(System.Double gray) : System.Void
 public Radzen.Documents.Pdf.PathContent.Stroke : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.StrokeColor : Radzen.Documents.Core.Color { public get; public set; }
 public Radzen.Documents.Pdf.PathContent.Thickness : System.Double { public get; public set; }

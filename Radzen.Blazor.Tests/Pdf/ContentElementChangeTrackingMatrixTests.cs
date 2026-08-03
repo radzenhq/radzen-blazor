@@ -286,7 +286,7 @@ public class ContentElementChangeTrackingMatrixTests
 
         if (type == typeof(DeviceColor))
         {
-            return new DeviceColor(DeviceColorKind.Gray, null, [0.25]);
+            return DeviceColor.Cmyk(0.25, 0.25, 0.25, 0.25);
         }
 
         if (type == typeof(GradientBrush))
