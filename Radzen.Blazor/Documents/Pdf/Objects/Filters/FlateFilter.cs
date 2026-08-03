@@ -8,8 +8,6 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class FlateFilter
 {
-    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
-
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);

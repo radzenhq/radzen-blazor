@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf.Objects.Filters;
@@ -12,8 +11,6 @@ internal static class RunLengthFilter
     // above 128 by a single byte repeated 257-length times. Returns the packet's total
     // span including its length byte (Eod carries no payload and is handled by the caller).
     internal static int PacketSpan(int lengthByte) => lengthByte < Eod ? lengthByte + 2 : 2;
-
-    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
 
     public static byte[] Decode(byte[] data, long maxOutput)
     {
@@ -61,55 +58,6 @@ internal static class RunLengthFilter
         }
 
         return output.ToArray();
-    }
-
-    public static byte[] Encode(byte[] data)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        var output = new List<byte>();
-        int i = 0;
-        int n = data.Length;
-
-        while (i < n)
-        {
-            int runLength = 1;
-            while (i + runLength < n && data[i + runLength] == data[i] && runLength < 128)
-            {
-                runLength++;
-            }
-
-            if (runLength >= 2)
-            {
-                output.Add((byte)(257 - runLength));
-                output.Add(data[i]);
-                i += runLength;
-            }
-            else
-            {
-                int start = i;
-                int literal = 0;
-                while (i < n && literal < 128)
-                {
-                    if (i + 1 < n && data[i + 1] == data[i])
-                    {
-                        break;
-                    }
-
-                    i++;
-                    literal++;
-                }
-
-                output.Add((byte)(literal - 1));
-                for (int k = 0; k < literal; k++)
-                {
-                    output.Add(data[start + k]);
-                }
-            }
-        }
-
-        output.Add(Eod);
-        return [.. output];
     }
 }
 

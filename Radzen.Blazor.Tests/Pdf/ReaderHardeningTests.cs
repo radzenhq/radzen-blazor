@@ -92,8 +92,14 @@ public class ReaderHardeningTests
     [Fact]
     public void NormalRunLength_Decodes_PositiveControl()
     {
-        var data = Encoding.ASCII.GetBytes("aaaaaabbbbccdefggggg");
-        Assert.Equal(data, RunLengthFilter.Decode(RunLengthFilter.Encode(data), 1 << 20));
+        var encoded = new byte[]
+        {
+            0xFB, 0x61, 0xFD, 0x62, 0xFF, 0x63, 0x02, 0x64, 0x65, 0x66, 0xFC, 0x67, 0x80,
+        };
+
+        Assert.Equal(
+            Encoding.ASCII.GetBytes("aaaaaabbbbccdefggggg"),
+            RunLengthFilter.Decode(encoded, 1 << 20));
     }
 
     [Fact]
@@ -126,15 +132,18 @@ public class ReaderHardeningTests
     [Fact]
     public void Ascii85Bomb_ExceedsCap_Throws()
     {
-        var bomb = Ascii85Filter.Encode(new byte[64 * 1024]);
+        var bomb = Encoding.ASCII.GetBytes(new string('z', 16 * 1024) + "~>");
         Assert.Throws<DocumentParseException>(() => Ascii85Filter.Decode(bomb, 1024));
     }
 
     [Fact]
     public void NormalAscii85_Decodes_PositiveControl()
     {
-        var data = Encoding.ASCII.GetBytes("Hello ASCII85 world");
-        Assert.Equal(data, Ascii85Filter.Decode(Ascii85Filter.Encode(data), 1 << 20));
+        var encoded = Encoding.ASCII.GetBytes("87cURD]h>E6V0j/2'@*]Ebo7~>");
+
+        Assert.Equal(
+            Encoding.ASCII.GetBytes("Hello ASCII85 world"),
+            Ascii85Filter.Decode(encoded, 1 << 20));
     }
 
     private static byte[] PackLzw(List<int> codes)

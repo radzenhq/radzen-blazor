@@ -269,13 +269,13 @@ public class FxHardeningTests
     public void Ascii85_TupleOverflows32Bits_Throws()
     {
         var data = Encoding.ASCII.GetBytes("uuuuu~>");
-        Assert.Throws<InvalidDataException>(() => Ascii85Filter.Decode(data));
+        Assert.Throws<InvalidDataException>(() => Ascii85Filter.Decode(data, 1 << 20));
     }
 
     [Fact]
     public void Ascii85_MaxValidTuple_StillDecodes()
     {
-        var decoded = Ascii85Filter.Decode(Encoding.ASCII.GetBytes("s8W-!~>"));
+        var decoded = Ascii85Filter.Decode(Encoding.ASCII.GetBytes("s8W-!~>"), 1 << 20);
         Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }, decoded);
     }
 

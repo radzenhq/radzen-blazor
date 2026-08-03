@@ -60,60 +60,6 @@ internal static class PngPredictor
         return output;
     }
 
-    public static byte[] Encode(byte[] data, int predictor, int colors, int bitsPerComponent, int columns)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        int bpp = BytesPerPixel(colors, bitsPerComponent);
-        int rowLength = RowLength(colors, bitsPerComponent, columns);
-        if (rowLength == 0)
-        {
-            return [];
-        }
-
-        int filter = predictor >= 10 ? predictor - 10 : predictor;
-        if (filter < 0 || filter > 4)
-        {
-            throw new ArgumentOutOfRangeException(nameof(predictor));
-        }
-
-        int rows = data.Length / rowLength;
-        int stride = rowLength + 1;
-        var output = new byte[rows * stride];
-
-        var prior = new byte[rowLength];
-        for (int row = 0; row < rows; row++)
-        {
-            int src = row * rowLength;
-            int dst = row * stride;
-            output[dst] = (byte)filter;
-
-            for (int i = 0; i < rowLength; i++)
-            {
-                int raw = data[src + i];
-                int a = i >= bpp ? data[src + i - bpp] : 0;
-                int b = prior[i];
-                int c = i >= bpp ? prior[i - bpp] : 0;
-
-                int value = filter switch
-                {
-                    0 => raw,
-                    1 => raw - a,
-                    2 => raw - b,
-                    3 => raw - ((a + b) >> 1),
-                    4 => raw - Paeth(a, b, c),
-                    _ => raw,
-                };
-
-                output[dst + 1 + i] = (byte)value;
-            }
-
-            Array.Copy(data, src, prior, 0, rowLength);
-        }
-
-        return output;
-    }
-
     static void ValidateParameters(int colors, int bitsPerComponent, int columns)
     {
         PredictorParameters.ValidateColorsAndColumns(colors, columns, "PNG");
@@ -127,9 +73,6 @@ internal static class PngPredictor
     // ceil(colors * bitsPerComponent / 8) per the PNG spec (ISO 32000-1 7.4.4.4 defers to it).
     static int BytesPerPixel(int colors, int bitsPerComponent) =>
         (colors * bitsPerComponent + 7) / 8;
-
-    static int RowLength(int colors, int bitsPerComponent, int columns) =>
-        (colors * bitsPerComponent * columns + 7) / 8;
 
     static int Paeth(int a, int b, int c)
     {
