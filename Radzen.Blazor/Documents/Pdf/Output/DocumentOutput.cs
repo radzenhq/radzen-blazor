@@ -144,7 +144,8 @@ internal readonly record struct OutputLink(
     double Y2,
     string? Uri,
     string? Destination,
-    int? StructureElementId);
+    int? StructureElementId,
+    string? Text = null);
 
 internal readonly record struct OutputAnchor(PageOutput Page, double Top);
 

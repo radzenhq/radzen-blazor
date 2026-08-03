@@ -61,6 +61,8 @@ internal readonly record struct LaidOutLink
 
     public string? Anchor { get; init; }
 
+    public string? Text { get; init; }
+
     public SourceId Source { get; init; }
 }
 

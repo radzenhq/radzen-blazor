@@ -59,7 +59,8 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
             imageRefs,
             sharedImages,
             emittedContent,
-            annotationJoins);
+            annotationJoins,
+            doc.Output?.Structure is not null);
 
         pagesNode["Type"] = new NameObject("Pages");
         pagesNode["Kids"] = kids;
@@ -132,6 +133,23 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
             else
             {
                 node["Annots"] = new ArrayObject { reference };
+            }
+        }
+
+        if (doc.Output?.Structure is not null)
+        {
+            WriteTabOrder(pageNodes);
+        }
+    }
+
+    // ISO 14289-1 7.18.3: a page carrying an annotation shall have /Tabs with the value S.
+    private static void WriteTabOrder(List<(Page Page, DictionaryObject Node, ReferenceObject Reference)> pageNodes)
+    {
+        foreach (var (_, node, _) in pageNodes)
+        {
+            if (node.TryGetValue("Annots", out var annots) && annots is ArrayObject { Count: > 0 })
+            {
+                node["Tabs"] = new NameObject("S");
             }
         }
     }
@@ -264,7 +282,8 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         Dictionary<OutputImage, ReferenceObject> imageRefs,
         Dictionary<object, ReferenceObject> sharedImages,
         Dictionary<Page, List<ReadOnlyMemory<byte>>> emittedContent,
-        List<AnnotationElementJoin> annotationJoins)
+        List<AnnotationElementJoin> annotationJoins,
+        bool tagged)
     {
         for (var pageIndex = 0; pageIndex < pageNodes.Count; pageIndex++)
         {
@@ -274,7 +293,7 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
             if (pageMap.PlanAt(pageIndex) is { } generated)
             {
                 WriteGeneratedPage(
-                    writer, pageIndex, page, pageNode, generated, fontRefs, imageRefs, contentBytes, annotationJoins);
+                    writer, pageIndex, page, pageNode, generated, fontRefs, imageRefs, contentBytes, annotationJoins, tagged);
                 continue;
             }
 
@@ -288,12 +307,9 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
             var emitted = activeResources.IsEmpty
                 ? null
                 : PageResourceBuilder.BuildResources(writer, activeResources, sharedImages);
-            var merged = MergePageResources(
-                writer, page, emitted, importer, loaded, appendImporters);
-            if (merged is not null)
-            {
-                pageNode["Resources"] = merged;
-            }
+            // ISO 32000-1 7.8.3: /Resources is a required inheritable page attribute.
+            pageNode["Resources"] = MergePageResources(
+                writer, page, emitted, importer, loaded, appendImporters) ?? new DictionaryObject();
         }
     }
 
@@ -306,7 +322,8 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
         Dictionary<OutputFont, DocumentObject> fontRefs,
         Dictionary<OutputImage, ReferenceObject> imageRefs,
         List<ReadOnlyMemory<byte>> contentBytes,
-        List<AnnotationElementJoin> annotationJoins)
+        List<AnnotationElementJoin> annotationJoins,
+        bool tagged)
     {
         IReadOnlySet<string>? referenced = null;
         Content.ContentEmissionResult? overlay = null;
@@ -337,14 +354,12 @@ internal sealed class DocumentGraphBuilder(PortableDocument doc, bool renderTime
             resources = PageResourceBuilder.OverlayResources(writer, resources, overlay.Resources);
         }
 
-        if (resources is not null)
-        {
-            pageNode["Resources"] = resources;
-        }
+        // ISO 32000-1 7.8.3: /Resources is a required inheritable page attribute.
+        pageNode["Resources"] = resources ?? new DictionaryObject();
 
         if (generated.Links.Length > 0)
         {
-            var links = NavigationWriter.BuildLinkAnnotations(writer, generated.Links, pageIndex);
+            var links = NavigationWriter.BuildLinkAnnotations(writer, generated.Links, pageIndex, tagged);
             pageNode["Annots"] = links.Annotations;
             annotationJoins.AddRange(links.StructureJoins);
         }
