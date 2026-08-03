@@ -354,13 +354,17 @@ internal static class TextSearch
     }
 
     internal static TextQuadrilateral Quad(Matrix matrix, int offset, int length, IReadOnlyList<double> advanceOffsets, double fontSize)
+        => Quad(matrix, offset, length, advanceOffsets, 0, fontSize);
+
+    internal static TextQuadrilateral Quad(
+        Matrix matrix, int offset, int length, IReadOnlyList<double> advanceOffsets, double bottom, double top)
     {
         var start = advanceOffsets[offset];
         var end = advanceOffsets[offset + length];
-        var lowerLeft = matrix.Transform(start, 0);
-        var lowerRight = matrix.Transform(end, 0);
-        var upperRight = matrix.Transform(end, fontSize);
-        var upperLeft = matrix.Transform(start, fontSize);
+        var lowerLeft = matrix.Transform(start, bottom);
+        var lowerRight = matrix.Transform(end, bottom);
+        var upperRight = matrix.Transform(end, top);
+        var upperLeft = matrix.Transform(start, top);
         return new TextQuadrilateral(
             new TextPoint(lowerLeft.X, lowerLeft.Y),
             new TextPoint(lowerRight.X, lowerRight.Y),

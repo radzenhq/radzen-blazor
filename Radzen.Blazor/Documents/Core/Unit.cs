@@ -75,19 +75,19 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     /// Creates a <see cref="Unit"/> from a value in inches (1 inch = 72 points).
     /// </summary>
     /// <exception cref="ArgumentException"><paramref name="value"/> is not finite.</exception>
-    public static Unit FromInch(double value) => new(Finite(value, nameof(value)) * PointsPerInch, false);
+    public static Unit FromInch(double value) => new(Finite(Finite(value, nameof(value)) * PointsPerInch, nameof(value)), false);
 
     /// <summary>
     /// Creates a <see cref="Unit"/> from a value in centimeters.
     /// </summary>
     /// <exception cref="ArgumentException"><paramref name="value"/> is not finite.</exception>
-    public static Unit FromCentimeter(double value) => new(Finite(value, nameof(value)) * PointsPerCentimeter, false);
+    public static Unit FromCentimeter(double value) => new(Finite(Finite(value, nameof(value)) * PointsPerCentimeter, nameof(value)), false);
 
     /// <summary>
     /// Creates a <see cref="Unit"/> from a value in millimeters.
     /// </summary>
     /// <exception cref="ArgumentException"><paramref name="value"/> is not finite.</exception>
-    public static Unit FromMillimeter(double value) => new(Finite(value, nameof(value)) * PointsPerMillimeter, false);
+    public static Unit FromMillimeter(double value) => new(Finite(Finite(value, nameof(value)) * PointsPerMillimeter, nameof(value)), false);
 
     /// <summary>
     /// Converts a <see cref="double"/> value, interpreted as points, to a <see cref="Unit"/>.
@@ -146,7 +146,7 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
         }
 
         if (!double.TryParse(number, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
-            || !double.IsFinite(parsed))
+            || !double.IsFinite(parsed) || !double.IsFinite(parsed * factor))
         {
             throw new FormatException($"'{value}' is not a valid measurement.");
         }
@@ -190,7 +190,7 @@ public readonly struct Unit : IEquatable<Unit>, IComparable<Unit>, IComparable
     public static Unit operator -(Unit left, Unit right) => Combine(left, right, left.value - right.value);
 
     private static Unit Combine(Unit left, Unit right, double combined) => left.relative == right.relative
-        ? new(combined, left.relative)
+        ? new(Finite(combined, nameof(right)), left.relative)
         : throw new InvalidOperationException("An absolute measurement cannot be combined with a relative one.");
 
     /// <summary>

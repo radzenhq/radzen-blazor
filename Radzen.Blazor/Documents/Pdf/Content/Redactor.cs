@@ -191,7 +191,7 @@ internal static class Redactor
             var any = false;
             for (var i = 0; i < removed.Length; i++)
             {
-                removed[i] = IntersectsAny(run.CharacterQuadrilateral(i).Bounds, regions);
+                removed[i] = IntersectsAny(InkQuad(run, i).Bounds, regions);
                 any |= removed[i];
             }
 
@@ -327,6 +327,17 @@ internal static class Redactor
         return bounds.ToRect();
     }
 
+    private const double DescentEmFraction = 0.3;
+
+    private static TextQuadrilateral InkQuad(PositionedTextRun run, int index)
+        => TextSearch.Quad(
+            run.Matrix,
+            index,
+            1,
+            run.AdvanceOffsets,
+            Math.Min(run.FontSize, -DescentEmFraction * run.FontSize),
+            Math.Max(run.FontSize, -DescentEmFraction * run.FontSize));
+
     private static bool MayReach(PositionedTextRun run, IReadOnlyList<PdfRect> regions)
     {
         if (!run.Matrix.TryInvert(out var inverse))
@@ -334,8 +345,8 @@ internal static class Redactor
             return true;
         }
 
-        var top = Math.Max(run.FontSize, 0);
-        var bottom = Math.Min(run.FontSize, 0);
+        var top = Math.Max(run.FontSize, -DescentEmFraction * run.FontSize);
+        var bottom = Math.Min(run.FontSize, -DescentEmFraction * run.FontSize);
         foreach (var area in regions)
         {
             var corners = new[]

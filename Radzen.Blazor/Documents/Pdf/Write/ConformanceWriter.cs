@@ -367,6 +367,10 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         if (document.Output?.Structure is { } structure)
         {
             ValidateFigureAltText(structure);
+            if (document.IsPdfUa)
+            {
+                ValidateFormLabels(structure);
+            }
         }
 
         ValidateRoleMap();
@@ -473,6 +477,25 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
             if (kid.Child is { } child)
             {
                 ValidateFigureAltText(child);
+            }
+        }
+    }
+
+    // ISO 14289-1:2014 7.18: an interactive form field needs a name assistive technology can announce.
+    private void ValidateFormLabels(StructureElementSnapshot element)
+    {
+        if (element.Type == "Form" && string.IsNullOrWhiteSpace(element.Alt))
+        {
+            throw new InvalidOperationException(
+                $"{Label} requires every form field to carry an accessible name assistive technology can announce; "
+                + "set the input's Label.");
+        }
+
+        foreach (var kid in element.Kids)
+        {
+            if (kid.Child is { } child)
+            {
+                ValidateFormLabels(child);
             }
         }
     }

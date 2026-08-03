@@ -56,6 +56,7 @@ public class FieldAppearanceBakeAgreementTests
                 break;
             case "comb":
                 definition.Comb = true;
+                definition.MaxLength = 6;
                 break;
         }
 

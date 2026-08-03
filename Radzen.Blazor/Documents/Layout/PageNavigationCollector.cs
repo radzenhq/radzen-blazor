@@ -50,18 +50,27 @@ internal sealed class PageNavigationCollector : ISceneVisitor
     void ISceneVisitor.EnterBox(LaidOutBox box, in SceneFrame frame, in SceneClip clip)
         => containers.Add(new Container(
             box.Transform ?? Current.Transform,
-            Clip(frame, box.Bounds)));
+            IntersectClips(Current.Clip, Clip(frame, box.Bounds))));
 
     void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame) => Pop();
 
     void ISceneVisitor.EnterCell(LaidOutCell cell, in SceneFrame frame, in SceneClip clip)
-        => containers.Add(new Container(Current.Transform, Clip(frame, cell.Bounds)));
+        => containers.Add(new Container(Current.Transform, IntersectClips(Current.Clip, Clip(frame, cell.Bounds))));
 
     void ISceneVisitor.LeaveCell(LaidOutCell cell, in SceneFrame frame) => Pop();
 
     private Container Current => containers.Count > 0 ? containers[^1] : default;
 
     private void Pop() => containers.RemoveAt(containers.Count - 1);
+
+    private static Clipping IntersectClips(Clipping? outer, Clipping inner)
+        => outer is { } a
+            ? new Clipping(
+                Math.Max(a.Left, inner.Left),
+                Math.Max(a.Top, inner.Top),
+                Math.Min(a.Right, inner.Right),
+                Math.Min(a.Bottom, inner.Bottom))
+            : inner;
 
     private Clipping Clip(in SceneFrame frame, in Rect bounds)
         => new(

@@ -69,6 +69,8 @@ internal sealed class PageSceneRecorder(
 
     private ContentScope? Scope => scopes.Count > 0 ? scopes[^1] : null;
 
+    private ContentScope? Parent => Scope;
+
     private TableScope Table => tables[^1];
 
     private PagePlan Plan => context.Plan;
@@ -172,10 +174,22 @@ internal sealed class PageSceneRecorder(
             Radius = radius,
             ContentMark = radius > 0 ? Plan.Mark() : default,
             BoxMark = mark,
-            LineClip = clip.ClipsLines ? rect : null,
-            InlineClip = clip.ClipsInline ? rect : null,
+            LineClip = IntersectClips(parent?.LineClip, clip.ClipsLines ? rect : null),
+            InlineClip = IntersectClips(parent?.InlineClip, clip.ClipsInline ? rect : null),
         });
     }
+
+    private static PdfRect? IntersectClips(PdfRect? outer, PdfRect? inner)
+        => (outer, inner) switch
+        {
+            (null, _) => inner,
+            (_, null) => outer,
+            ({ } a, { } b) => new PdfRect(
+                Math.Max(a.Left, b.Left),
+                Math.Max(a.Bottom, b.Bottom),
+                Math.Min(a.Right, b.Right),
+                Math.Min(a.Top, b.Top)),
+        };
 
     void ISceneVisitor.LeaveBox(LaidOutBox box, in SceneFrame frame)
     {
@@ -326,8 +340,8 @@ internal sealed class PageSceneRecorder(
             Radius = 0,
             ContentMark = default,
             BoxMark = default,
-            LineClip = clip.ClipsLines ? rect : null,
-            InlineClip = clip.ClipsInline ? rect : null,
+            LineClip = IntersectClips(Parent?.LineClip, clip.ClipsLines ? rect : null),
+            InlineClip = IntersectClips(Parent?.InlineClip, clip.ClipsInline ? rect : null),
         });
     }
 

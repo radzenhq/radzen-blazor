@@ -324,15 +324,19 @@ internal sealed class SemanticSnapshotBuilder
             {
                 if (inline is FormInput input)
                 {
+                    var fieldLink = IsLink(input)
+                        ? capture.AddChild(element, SemanticIntent.Link)
+                        : null;
                     capture.Associate(
                         input,
                         capture.AddChild(
-                            element,
+                            fieldLink ?? element,
                             SemanticIntent.Form,
                             role: input.Role,
                             roleIsDeclared: input.Role is not null,
                             language: input.Language,
-                            alternateText: string.IsNullOrEmpty(input.Label) ? null : input.Label));
+                            alternateText: string.IsNullOrEmpty(input.Label) ? null : input.Label),
+                        fieldLink);
                     continue;
                 }
 
