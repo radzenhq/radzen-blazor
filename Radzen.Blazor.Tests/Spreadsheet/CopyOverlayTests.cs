@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Bunit;
 using Xunit;
 
@@ -42,7 +43,7 @@ public class CopyOverlayTests : TestContext
         var overlays = cut.FindAll(".rz-spreadsheet-copy-overlay");
         Assert.Single(overlays);
 
-        Assert.NotEmpty(cut.FindAll(".rz-copy-edge"));
+        Assert.NotEmpty(cut.FindAll(".rz-spreadsheet-copy-edge"));
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class CopyOverlayTests : TestContext
         sheet1.Selection.Select(RangeRef.Parse("A1:B2"));
 
         var clipboard = new SpreadsheetClipboard();
-        clipboard.Copy(sheet1); // Copied on sheet1
+        clipboard.Copy(sheet1);
 
         var context = new CopyMockContext(sheet2);
 
@@ -62,10 +63,10 @@ public class CopyOverlayTests : TestContext
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
 
-        Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-overlay")); // Not drawn on sheet2
+        Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-overlay"));
     }
     [Fact]
-    public async void RendersEdges_WhenClipboardChanged_FiresAfterInitialRender()
+    public async Task RendersEdges_WhenClipboardChanged_FiresAfterInitialRender()
     {
         var sheet = new Worksheet(10, 10);
         var clipboard = new SpreadsheetClipboard();
@@ -76,11 +77,11 @@ public class CopyOverlayTests : TestContext
             .Add(p => p.Context, context)
             .AddCascadingValue(clipboard));
 
-        Assert.Empty(cut.FindAll(".rz-copy-edge"));
+        Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-edge"));
 
         sheet.Selection.Select(RangeRef.Parse("A1"));
         await cut.InvokeAsync(() => clipboard.Copy(sheet));
-        Assert.NotEmpty(cut.FindAll(".rz-copy-edge"));
+        Assert.NotEmpty(cut.FindAll(".rz-spreadsheet-copy-edge"));
     }
 
     [Fact]
@@ -112,8 +113,8 @@ public class CopyOverlayTests : TestContext
             .AddCascadingValue(clipboard));
 
         Assert.NotNull(cut.Find(".rz-spreadsheet-frozen-row"));
-        Assert.NotEmpty(cut.FindAll(".rz-copy-edge-top"));
-        Assert.Empty(cut.FindAll(".rz-copy-edge-bottom"));
+        Assert.NotEmpty(cut.FindAll(".rz-spreadsheet-copy-edge-top"));
+        Assert.Empty(cut.FindAll(".rz-spreadsheet-copy-edge-bottom"));
     }
 }
 

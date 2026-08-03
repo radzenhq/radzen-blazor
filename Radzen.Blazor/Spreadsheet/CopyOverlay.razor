@@ -11,10 +11,10 @@
         if (rangeInfo.FrozenColumn) cssClass += " rz-spreadsheet-frozen-column";
 
         <div class="@cssClass" style="@rect.ToStyle()">
-            @if (rangeInfo.Top) { <div class="rz-copy-edge rz-copy-edge-top"></div> }
-            @if (rangeInfo.Bottom) { <div class="rz-copy-edge rz-copy-edge-bottom"></div> }
-            @if (rangeInfo.Left) { <div class="rz-copy-edge rz-copy-edge-left"></div> }
-            @if (rangeInfo.Right) { <div class="rz-copy-edge rz-copy-edge-right"></div> }
+            @if (rangeInfo.Top) { <div class="rz-spreadsheet-copy-edge rz-spreadsheet-copy-edge-top"></div> }
+            @if (rangeInfo.Bottom) { <div class="rz-spreadsheet-copy-edge rz-spreadsheet-copy-edge-bottom"></div> }
+            @if (rangeInfo.Left) { <div class="rz-spreadsheet-copy-edge rz-spreadsheet-copy-edge-left"></div> }
+            @if (rangeInfo.Right) { <div class="rz-spreadsheet-copy-edge rz-spreadsheet-copy-edge-right"></div> }
         </div>
     }
 }

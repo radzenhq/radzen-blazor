@@ -21,11 +21,9 @@ public partial class CopyOverlay : IDisposable
     [Parameter]
     public IVirtualGridContext Context { get; set; } = default!;
 
-    /// <summary>
-    /// Gets or sets the parent spreadsheet component.
-    /// </summary>
     [CascadingParameter]
     internal SpreadsheetClipboard Clipboard { get; set; } = default!;
+
     /// <inheritdoc/>
     protected override void OnInitialized()
     {

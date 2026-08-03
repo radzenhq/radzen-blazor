@@ -1557,7 +1557,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     // Approximate page size (rows) for PageUp/PageDown - a screenful without coupling to the viewport.
     private const int PageRows = 20;
 
-    internal readonly SpreadsheetClipboard clipboard = new();
+    private readonly SpreadsheetClipboard clipboard = new();
 
     /// <inheritdoc/>
     protected override void OnInitialized()

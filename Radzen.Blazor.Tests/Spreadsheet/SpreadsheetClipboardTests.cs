@@ -153,7 +153,7 @@ public class SpreadsheetClipboardTests
         clipboard.Copy(sheet1);
         
         Assert.Equal(RangeRef.Parse("A1:B2"), clipboard.GetSource(sheet1));
-        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet2)); // Isn't drawn on a different sheet
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet2));
     }
 
     [Fact]
@@ -166,13 +166,11 @@ public class SpreadsheetClipboardTests
         var clipboard = new SpreadsheetClipboard();
         clipboard.Copy(sheet);
         
-        // Internal Paste (matches CSV, simulating a normal app paste)
         clipboard.TryPaste(sheet, RangeRef.Parse("B1"), "Data");
-        Assert.Equal(RangeRef.Parse("A1"), clipboard.GetSource(sheet)); // Survives copy-paste
+        Assert.Equal(RangeRef.Parse("A1"), clipboard.GetSource(sheet));
         
-        // External Paste (doesn't match CSV, simulating paste from another app)
         clipboard.TryPaste(sheet, RangeRef.Parse("C1"), "ExternalData");
-        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet)); // Clears on external paste
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet));
     }
 
     [Fact]
@@ -188,7 +186,7 @@ public class SpreadsheetClipboardTests
         Assert.Equal(RangeRef.Parse("A1"), clipboard.GetSource(sheet));
         
         clipboard.Paste(sheet, RangeRef.Parse("B1"));
-        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet)); // Clears after cut-paste completes
+        Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet));
     }
 
     [Fact]
@@ -200,7 +198,7 @@ public class SpreadsheetClipboardTests
         var clipboard = new SpreadsheetClipboard();
         clipboard.Copy(sheet);
         
-        clipboard.Clear(); // Simulates the Escape key or structural edits
+        clipboard.Clear();
         Assert.Equal(RangeRef.Invalid, clipboard.GetSource(sheet));
     }
 }
