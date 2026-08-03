@@ -48,8 +48,8 @@ public abstract class Inline
     /// output, or <see langword="null"/> (the default) when it carries none and the inline is
     /// content of its paragraph. An inline that declares a role becomes a span of its own in
     /// structured output. A renderer decides how to express the role and which role names it
-    /// accepts - the PDF renderer, for one, maps it onto a structure type and rejects an unknown
-    /// name that its role map does not declare.
+    /// accepts; a name outside the renderer's role vocabulary is rejected when the document is
+    /// rendered.
     /// </summary>
     /// <exception cref="System.ArgumentException">The value is empty.</exception>
     public string? Role

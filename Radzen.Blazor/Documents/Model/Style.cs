@@ -116,8 +116,8 @@ public sealed class Style
     /// Gets or sets the semantic role a paragraph in this style carries for assistive technology and
     /// structured output, or <see langword="null"/> when it sets none and the value is inherited from
     /// its base style chain. A style without a role falls back to its <see cref="Name"/>. A renderer
-    /// decides how to express the role and which role names it accepts - the PDF renderer, for one,
-    /// maps it onto a structure type and rejects an unknown name that its role map does not declare.
+    /// decides how to express the role and which role names it accepts; a name outside the
+    /// renderer's role vocabulary is rejected when the document is rendered.
     /// <see cref="HeadingLevel"/> takes precedence over the role when both are set.
     /// </summary>
     /// <exception cref="ArgumentException">The value is empty.</exception>
