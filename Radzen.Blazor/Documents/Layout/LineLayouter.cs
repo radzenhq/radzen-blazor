@@ -104,7 +104,18 @@ internal static partial class LineLayouter
         {
             if (words.Count == 0)
             {
-                boxes.Add(EmptyLine(paragraph, fonts, resolution));
+                if (markerPending
+                    && tokenization.Segments.TrueForAll(static segment => segment.Count == 0)
+                    && resolution?.ListMarker(paragraph) is { Text.Length: > 0 })
+                {
+                    markerPending = false;
+                    boxes.Add(FinalizeLine([], 0, context, includeMarker: true, default));
+                }
+                else
+                {
+                    boxes.Add(EmptyLine(paragraph, fonts, resolution));
+                }
+
                 continue;
             }
 

@@ -49,6 +49,20 @@ internal static class FormFieldWriter
         switch (definition)
         {
             case TextFieldDefinition text:
+                if (text.MaxLength is < 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Form field '{text.Name}' has a MaxLength of {text.MaxLength}; a length limit must be at least 1.");
+                }
+
+                // ISO 32000-1 12.7.4.3: the Comb flag shall be used only when MaxLen is present and
+                // the Multiline, Password and FileSelect flags are clear.
+                if (text.Comb && (text.Multiline || text.Password || text.MaxLength is null))
+                {
+                    throw new InvalidOperationException(
+                        $"Form field '{text.Name}' sets Comb, which requires MaxLength and cannot be combined with Multiline or Password.");
+                }
+
                 widget["FT"] = new NameObject("Tx");
                 widget["V"] = StringObject.FromText(text.Value);
                 widget["DA"] = new StringObject(context.Forms.DefaultAppearanceOf(text.Font));

@@ -22,7 +22,7 @@ public class FormAppearanceConformanceTests
 
         paragraph = document.Sections.Add().Blocks.AddParagraph();
         paragraph.Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
+        paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
         return document;
     }
 

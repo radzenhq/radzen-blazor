@@ -83,6 +83,14 @@ public static class PdfSigner
         byte[] pdf, DictionaryObject signature, StreamObject? appearanceStream, ArrayObject rect, int pageIndex)
     {
         var (reader, rootRef, catalog, writer) = IncrementalEditSession.Begin(pdf, "Signing");
+        if (appearanceStream is not null && ClaimsEmbeddedFonts(reader, catalog))
+        {
+            throw new InvalidOperationException(
+                "PDF/A and PDF/UA require every font used for rendering to be embedded, but a visible signature "
+                + "appearance draws with a standard-14 face; sign without SignatureOptions.Appearance, or sign the "
+                + "document before saving it with a conformance claim.");
+        }
+
         var pageLeaf = FindPage(reader, catalog, pageIndex);
         var page = pageLeaf.Node.Dictionary;
         var directPage = pageLeaf.Node.Source is not ReferenceObject;
@@ -319,6 +327,20 @@ public static class PdfSigner
         var font = new Font { Family = "Helvetica", Size = 9 };
         return FieldAppearances.BuildSignatureAppearance(
             lines, appearance.Width, appearance.Height, font, scope: default);
+    }
+
+    // ISO 19005-2 6.2.11.4.1 and ISO 14289-1: conformance identification lives in the XMP metadata
+    // namespaces http://www.aiim.org/pdfa/ns/id/ and http://www.aiim.org/pdfua/ns/id/.
+    private static bool ClaimsEmbeddedFonts(DocumentReader reader, DictionaryObject catalog)
+    {
+        if (reader.GetStream(catalog, "Metadata") is not { } metadata)
+        {
+            return false;
+        }
+
+        var packet = System.Text.Encoding.UTF8.GetString(reader.DecodeStream(metadata));
+        return packet.Contains("pdfa/ns/id", StringComparison.Ordinal)
+            || packet.Contains("pdfua/ns/id", StringComparison.Ordinal);
     }
 
     private static PageTreeWalker.Leaf FindPage(DocumentReader reader, DictionaryObject catalog, int index)
