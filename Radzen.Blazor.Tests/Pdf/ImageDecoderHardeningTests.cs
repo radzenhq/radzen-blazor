@@ -4,6 +4,7 @@ using System.Buffers.Binary;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 
 using Radzen.Documents.Pdf.Render;
@@ -72,6 +73,66 @@ public class ImageDecoderHardeningTests
         var xobj = ImageTestHelpers.Xobject(ImageTestHelpers.Decode(PdfTestResources.ReadAllBytes("Images/rgb.jpg")));
         Assert.Equal(64, ImageTestHelpers.Int(xobj.Image.Dictionary, "Width"));
         Assert.Equal("DCTDecode", ImageTestHelpers.Name(xobj.Image.Dictionary, "Filter"));
+    }
+
+    [Fact]
+    public void Png_TruncatedIdat_Throws()
+    {
+        using var ms = new MemoryStream();
+        ms.Write(Signature);
+        WriteChunk(ms, "IHDR", Ihdr(4, 4, 8, 6));
+        WriteChunk(ms, "IDAT", FlateFilter.Encode(new byte[17]));
+        WriteChunk(ms, "IEND", []);
+
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(ms.ToArray()));
+    }
+
+    [Fact]
+    public void ImageDecoder_HonorsTightenedMaxImagePixels()
+    {
+        var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
+        var tight = new ReaderLimits { MaxImagePixels = 100 };
+        Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png, tight));
+        Assert.NotNull(ImageTestHelpers.Decode(png));
+    }
+
+    [Fact]
+    public void TightenedMaxImagePixels_ReachesMeasurementAndDecodingAlike()
+    {
+        var png = PdfTestResources.ReadAllBytes("Images/rgb.png");
+        var tight = new ReaderLimits { MaxImagePixels = 100 };
+        var decoders = ImageDecoders.BuiltIn.WithLimits(tight);
+
+        var measured = Assert.Throws<InvalidDataException>(() => decoders.Probes.PixelSize(png));
+        var decoded = Assert.Throws<InvalidDataException>(() => ImageTestHelpers.Decode(png, tight));
+        Assert.Equal(decoded.Message, measured.Message);
+
+        var document = new Document();
+        document.Sections.Add().Blocks.AddImage(new MemoryStream(png));
+
+        Assert.Throws<InvalidDataException>(
+            () => new DocumentRenderer { ImageDecoders = decoders }.Render(document));
+        Assert.NotNull(new DocumentRenderer().Render(document));
+    }
+
+    [Fact]
+    public void LoadFromStream_CarriesMaxImagePixelsIntoLoadedImageDecoding()
+    {
+        var source = new Document();
+        source.Sections.Add().Blocks.AddParagraph("body");
+        var bytes = new DocumentRenderer().ToArray(source);
+        var watermark = new Watermark { Text = "DRAFT" };
+        watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
+
+        using var tightStream = new MemoryStream(bytes);
+        var tight = PortableDocument.LoadFromStream(tightStream, new ReaderLimits { MaxImagePixels = 4 });
+        tight.AddWatermark(watermark);
+        Assert.Throws<InvalidDataException>(() => tight.ToArray());
+
+        using var defaultStream = new MemoryStream(bytes);
+        var loaded = PortableDocument.LoadFromStream(defaultStream);
+        loaded.AddWatermark(watermark);
+        Assert.NotEmpty(loaded.ToArray());
     }
 
     private static byte[] PngHeaderOnly(int width, int height, byte bitDepth, byte colorType)

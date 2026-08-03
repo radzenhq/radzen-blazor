@@ -2,6 +2,7 @@
 using System;
 using System.Text;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Content;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
@@ -68,5 +69,31 @@ public class GradientEmissionTests
         var pattern = Assert.IsType<DictionaryObject>(reader.Resolve(patterns[Assert.Single(patterns.Keys)]));
         var shading = Assert.IsType<DictionaryObject>(reader.Resolve(pattern["Shading"]!));
         Assert.Equal(3, ((NumberObject)shading["ShadingType"]).IntValue);
+    }
+
+    [Fact]
+    public void ContentWriter_SameBrush_RegistersOnePattern()
+    {
+        using var writer = new ContentWriter();
+        var brush = new LinearGradient(0, 0, 10, 0,
+            new GradientStop(0, Color.Red),
+            new GradientStop(1, Color.Blue));
+
+        var first = writer.RegisterPattern(brush);
+        var second = writer.RegisterPattern(brush);
+
+        Assert.Equal(first, second);
+        Assert.Single(writer.Patterns);
+    }
+
+    [Fact]
+    public void ContentWriter_DistinctBrushes_RegisterSeparatePatterns()
+    {
+        using var writer = new ContentWriter();
+        var a = new LinearGradient(0, 0, 10, 0, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+        var b = new LinearGradient(0, 0, 10, 0, new GradientStop(0, Color.Red), new GradientStop(1, Color.Blue));
+
+        Assert.NotEqual(writer.RegisterPattern(a), writer.RegisterPattern(b));
+        Assert.Equal(2, writer.Patterns.Count);
     }
 }

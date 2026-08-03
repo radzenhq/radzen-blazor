@@ -79,4 +79,17 @@ public class WatermarkFontCapabilityTests
 
         Assert.Null(Record.Exception(() => pdf.AddWatermark(watermark)));
     }
+
+    [Fact]
+    public void NonWinAnsiText_ThrowsInsteadOfDropping()
+    {
+        var document = new Document();
+        var section = document.Sections.Add();
+        section.Watermark = new Watermark { Text = "机密" };
+        var paragraph = new Paragraph();
+        paragraph.Inlines.Add("Body");
+        section.Blocks.Add(paragraph);
+
+        Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().ToArray(document));
+    }
 }

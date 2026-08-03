@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
@@ -125,5 +126,40 @@ public class GradientStopOffsetTests
         Assert.Equal(2, bounds.Count);
         Assert.Equal(0.5, Num(bounds[0]), 3);
         Assert.Equal(0.8, Num(bounds[1]), 3);
+    }
+
+    [Fact]
+    public void OffsetOutOfRange_Throws()
+    {
+        Assert.Throws<ArgumentException>(() => new LinearGradient(0, 0, 1, 0,
+            new GradientStop(0, Color.Red),
+            new GradientStop(1.5, Color.Blue)));
+    }
+
+    [Fact]
+    public void DecreasingOffsets_Throw()
+    {
+        Assert.Throws<ArgumentException>(() => new LinearGradient(0, 0, 1, 0,
+            new GradientStop(0.7, Color.Red),
+            new GradientStop(0.3, Color.Blue)));
+    }
+
+    [Fact]
+    public void HardStop_EmitsStrictlyIncreasingBounds()
+    {
+        var brush = new LinearGradient(0, 0, 100, 0,
+            new GradientStop(0, Color.Red),
+            new GradientStop(0.5, Color.Red),
+            new GradientStop(0.5, Color.Blue),
+            new GradientStop(1, Color.Blue));
+
+        var func = Assert.IsType<DictionaryObject>(Shading(brush)["Function"]!);
+        var bounds = Array(func["Bounds"]!);
+
+        for (var i = 1; i < bounds.Count; i++)
+        {
+            Assert.True(Num(bounds[i]) > Num(bounds[i - 1]),
+                $"bound {i} ({Num(bounds[i])}) must exceed bound {i - 1} ({Num(bounds[i - 1])})");
+        }
     }
 }

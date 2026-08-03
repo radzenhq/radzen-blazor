@@ -45,6 +45,19 @@ public class ToUnicodeHardeningTests
         Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap));
     }
 
+    [Fact]
+    public void HonorsTightenedMaxCMapEntries()
+    {
+        var cmap = Encoding.ASCII.GetBytes(
+            "1 begincodespacerange <0000> <FFFF> endcodespacerange\n" +
+            "1 beginbfrange <0003> <012C> <0041> endbfrange\n");
+        var tight = new ReaderLimits { MaxCMapEntries = 100 };
+        Assert.Throws<DocumentParseException>(() => ToUnicodeCMap.Parse(cmap, tight));
+
+        var (map, _) = ToUnicodeCMap.Parse(cmap);
+        Assert.Equal("A", map[0x0003]);
+    }
+
     private static byte[] Cmap(string body) => Encoding.ASCII.GetBytes(
         "/CIDInit /ProcSet findresource begin 12 dict begin begincmap\n" +
         "1 begincodespacerange <0000> <FFFF> endcodespacerange\n" +
