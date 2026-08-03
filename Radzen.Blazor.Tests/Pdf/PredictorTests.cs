@@ -80,12 +80,11 @@ public class PredictorTests
     }
 
     [Fact]
-    public void Png_Encode12_Decode_RoundTrip()
+    public void Png_Up_ThreeRows()
     {
-        var raw = new byte[] { 10, 20, 30, 40, 11, 21, 31, 41, 12, 22, 32, 42 };
-        var encoded = PngPredictor.Encode(raw, predictor: 12, colors: 1, bitsPerComponent: 8, columns: 4);
-        var decoded = PngPredictor.Decode(encoded, colors: 1, bitsPerComponent: 8, columns: 4);
-        Assert.Equal(raw, decoded);
+        var input = new byte[] { 2, 10, 20, 30, 40, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1 };
+        var expected = new byte[] { 10, 20, 30, 40, 11, 21, 31, 41, 12, 22, 32, 42 };
+        Assert.Equal(expected, PngPredictor.Decode(input, colors: 1, bitsPerComponent: 8, columns: 4));
     }
 
     [Fact]

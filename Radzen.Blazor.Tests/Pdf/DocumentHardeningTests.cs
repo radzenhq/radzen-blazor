@@ -92,8 +92,10 @@ public class DocumentHardeningTests
     [Fact]
     public void FilterChainBomb_ExceedsCap_Throws()
     {
-        var inner = FlateFilter.Encode(new byte[1024 * 1024]);
-        var payload = Ascii85Filter.Encode(inner);
+        var payload = Encoding.ASCII.GetBytes(
+            "Gb\"0;0`_7S!5bE%:MgAETE\"rl"
+            + new string('z', 253)
+            + "!'UJbn,NI~>");
         var bytes = StreamObjectFile("<< /Length LEN /Filter [/ASCII85Decode /FlateDecode] >>", payload);
 
         var reader = DocumentReader.Parse(bytes, null, new ReaderLimits { MaxDecodedStreamBytes = 4096 });
@@ -105,7 +107,7 @@ public class DocumentHardeningTests
     public void ValidFilterChain_Decodes_PositiveControl()
     {
         var expected = Encoding.ASCII.GetBytes("Hello filter chain world");
-        var payload = Ascii85Filter.Encode(FlateFilter.Encode(expected));
+        var payload = Encoding.ASCII.GetBytes("Gb\"@rc,n(/8B]4+8M*h2c:H1';^fsFb\"2U6DZL.K~>");
         var bytes = StreamObjectFile("<< /Length LEN /Filter [/ASCII85Decode /FlateDecode] >>", payload);
 
         var reader = DocumentReader.Parse(bytes);

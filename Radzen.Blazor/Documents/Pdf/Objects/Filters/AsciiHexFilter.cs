@@ -5,8 +5,6 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class AsciiHexFilter
 {
-    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
-
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -45,25 +43,6 @@ internal static class AsciiHexFilter
         {
             throw new DocumentParseException("Decoded stream exceeds the maximum allowed size.", -1);
         }
-    }
-
-    public static byte[] Encode(byte[] data)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        var maxEncodable = (Array.MaxLength - 1) / 2;
-
-        if (data.Length > maxEncodable)
-        {
-            throw new ArgumentException(
-                $"Cannot ASCIIHex-encode {data.Length} bytes: the encoded output exceeds the maximum array length. The limit is {maxEncodable} bytes.",
-                nameof(data));
-        }
-
-        var output = new byte[data.Length * 2 + 1];
-        HexCodec.Encode(data, output, HexCase.Upper);
-        output[^1] = (byte)'>';
-        return output;
     }
 }
 

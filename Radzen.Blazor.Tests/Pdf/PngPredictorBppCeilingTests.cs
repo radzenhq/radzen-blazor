@@ -25,11 +25,10 @@ public class PngPredictorBppCeilingTests
     }
 
     [Fact]
-    public void Png_RoundTrip_WidePixel()
+    public void Png_Paeth_WidePixel()
     {
-        var original = new byte[] { 40, 90, 12, 200, 7, 130 };
-        var encoded = PngPredictor.Encode(original, predictor: 14, colors: 3, bitsPerComponent: 4, columns: 4);
-        var decoded = PngPredictor.Decode(encoded, colors: 3, bitsPerComponent: 4, columns: 4);
-        Assert.Equal(original, decoded);
+        var input = new byte[] { 4, 0x28, 0x5A, 0xE4, 0x6E, 0xFB, 0xBA };
+        var expected = new byte[] { 40, 90, 12, 200, 7, 130 };
+        Assert.Equal(expected, PngPredictor.Decode(input, colors: 3, bitsPerComponent: 4, columns: 4));
     }
 }

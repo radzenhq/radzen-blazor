@@ -97,9 +97,9 @@ public class PdfBoundaryValidationTests
     // contrast the hex-string object reader 7.3.4.3 whose '>' is a required delimiter.
     [Fact]
     public void AsciiHex_MissingEod_IsNotAnError()
-        => Assert.Equal("He", Encoding.ASCII.GetString(AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("4865"))));
+        => Assert.Equal("He", Encoding.ASCII.GetString(AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("4865"), 1 << 20)));
 
     [Fact]
     public void AsciiHex_NonHexByte_Throws()
-        => Assert.Throws<InvalidDataException>(() => AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("48ZZ>")));
+        => Assert.Throws<InvalidDataException>(() => AsciiHexFilter.Decode(Encoding.ASCII.GetBytes("48ZZ>"), 1 << 20));
 }

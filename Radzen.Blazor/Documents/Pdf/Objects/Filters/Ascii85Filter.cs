@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Radzen.Documents.Internal;
 
@@ -7,8 +6,6 @@ namespace Radzen.Documents.Pdf.Objects.Filters;
 
 internal static class Ascii85Filter
 {
-    public static byte[] Decode(byte[] data) => Decode(data, ReaderLimits.Default.MaxDecodedStreamBytes);
-
     public static byte[] Decode(byte[] data, long maxOutput)
     {
         ArgumentNullException.ThrowIfNull(data);
@@ -86,53 +83,6 @@ internal static class Ascii85Filter
         }
 
         return output.ToArray();
-    }
-
-    public static byte[] Encode(byte[] data)
-    {
-        ArgumentNullException.ThrowIfNull(data);
-
-        var output = new List<byte>();
-        int i = 0;
-
-        while (i < data.Length)
-        {
-            int n = Math.Min(4, data.Length - i);
-            uint tuple = 0;
-            for (int k = 0; k < 4; k++)
-            {
-                tuple <<= 8;
-                if (k < n)
-                {
-                    tuple |= data[i + k];
-                }
-            }
-
-            if (n == 4 && tuple == 0)
-            {
-                output.Add((byte)'z');
-            }
-            else
-            {
-                var group = new byte[5];
-                for (int k = 4; k >= 0; k--)
-                {
-                    group[k] = (byte)('!' + tuple % 85);
-                    tuple /= 85;
-                }
-
-                for (int k = 0; k < n + 1; k++)
-                {
-                    output.Add(group[k]);
-                }
-            }
-
-            i += n;
-        }
-
-        output.Add((byte)'~');
-        output.Add((byte)'>');
-        return [.. output];
     }
 }
 
