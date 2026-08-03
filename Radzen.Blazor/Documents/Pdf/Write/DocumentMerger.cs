@@ -5,9 +5,15 @@ internal static class DocumentMerger
     internal static void Append(PortableDocument target, PortableDocument other)
     {
         var pageOffset = target.Pages.Count;
-        foreach (var source in other.Pages)
+        var sources = new Page[other.Pages.Count];
+        for (var index = 0; index < sources.Length; index++)
         {
-            AppendPage(target, other, source, 0, other.Pages.Count, pageOffset);
+            sources[index] = other.Pages[index];
+        }
+
+        foreach (var source in sources)
+        {
+            AppendPage(target, other, source, 0, sources.Length, pageOffset);
         }
     }
 

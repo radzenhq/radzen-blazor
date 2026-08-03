@@ -26,6 +26,19 @@ public class EmbeddedFileNameTreeWalkTests
     }
 
     [Fact]
+    public void EmbeddedFileTree_SharedKid_SecondAccessThrowsAgainInsteadOfReturningPartialData()
+    {
+        var bytes = NameTreeFile(
+            (6, "<< /Kids [7 0 R 7 0 R] >>"),
+            (7, "<< /Names [(a.txt) 4 0 R] >>"));
+
+        var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
+
+        Assert.Throws<DocumentParseException>(() => document.Attachments.Count);
+        Assert.Throws<DocumentParseException>(() => document.Attachments.Count);
+    }
+
+    [Fact]
     public void EmbeddedFileTree_OddLengthNamesArray_ThrowsWhenAttachmentsAreAccessed()
     {
         var bytes = NameTreeFile(

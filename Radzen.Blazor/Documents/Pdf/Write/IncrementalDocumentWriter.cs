@@ -59,7 +59,7 @@ internal sealed class IncrementalDocumentWriter(PortableDocument doc)
             throw Unsupported("Editing XMP metadata");
         }
 
-        if (doc.ViewerPreferences is not null || doc.OutlineChanged || doc.PageLabelsChanged)
+        if (doc.ViewerPreferencesChanged || doc.OutlineChanged || doc.PageLabelsChanged)
         {
             throw Unsupported("Editing catalog-level document features");
         }

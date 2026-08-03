@@ -129,5 +129,9 @@ public sealed class ViewerPreferences
         set => tracker.Set(ref direction, value);
     }
 
+    internal bool IsModified => tracker.IsModified;
+
+    internal void AcceptChanges() => tracker.AcceptChanges();
+
     internal void OwnedBy(System.Action? changed) => tracker.OwnedBy(changed);
 }

@@ -31,6 +31,13 @@ public sealed class ReplaceTextOptions
     public TextReplacementLayout Layout { get; set; } = TextReplacementLayout.PreserveAdvance;
 }
 
+internal sealed class ReplacementPlan(Page page, byte[] content, int count)
+{
+    public int Count { get; } = count;
+
+    public void Commit() => page.ApplyEditedContent(content);
+}
+
 internal static class TextReplacer
 {
     private sealed record Show(int Index, string Operator, Token Text, int OperatorEnd, string? FontName, ReverseFont Font, double FontSize, double Scale, double CharSpacing, double WordSpacing);
@@ -39,6 +46,13 @@ internal static class TextReplacer
 
     public static int Replace(Page page, string search, string replacement, ReplaceTextOptions? options)
     {
+        var plan = Plan(page, search, replacement, options);
+        plan?.Commit();
+        return plan?.Count ?? 0;
+    }
+
+    public static ReplacementPlan? Plan(Page page, string search, string replacement, ReplaceTextOptions? options)
+    {
         ArgumentNullException.ThrowIfNull(search);
         ArgumentNullException.ThrowIfNull(replacement);
         options ??= new ReplaceTextOptions();
@@ -46,7 +60,7 @@ internal static class TextReplacer
         var hits = page.FindText(search, options.Search, -1, cache);
         if (hits.Count == 0)
         {
-            return 0;
+            return null;
         }
 
         var content = page.CurrentContent ?? throw new NotSupportedException("Text replacement requires an existing serialized content stream.");
@@ -132,11 +146,10 @@ internal static class TextReplacer
             }
         }
 
-        page.ApplyEditedContent(ContentEdits.Apply(content, edits));
-        return hits.Count;
+        return new ReplacementPlan(page, ContentEdits.Apply(content, edits), hits.Count);
     }
 
-    private static int ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content, ContentTokenizer.Cache? cache)
+    private static ReplacementPlan ReplaceMultipleShows(Page page, IReadOnlyList<TextHit> hits, string replacement, ReplaceTextOptions options, byte[] content, ContentTokenizer.Cache? cache)
     {
         var shows = ParseShows(content, page.TextFonts, cache);
         var grouped = new Dictionary<int, List<SourceReplacement>>();
@@ -196,8 +209,7 @@ internal static class TextReplacer
             edits.Add(BuildMultipleShowEdit(show, decoded, group.Value, options.Layout));
         }
 
-        page.ApplyEditedContent(ContentEdits.Apply(content, edits));
-        return hits.Count;
+        return new ReplacementPlan(page, ContentEdits.Apply(content, edits), hits.Count);
     }
 
     private static IReadOnlyList<string> GetSourceReplacements(TextHit hit, string replacement, ReverseFont font)
