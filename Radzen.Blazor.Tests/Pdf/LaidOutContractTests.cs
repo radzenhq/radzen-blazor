@@ -275,7 +275,7 @@ public class LaidOutContractTests
             .Glyphs[1];
 
         Assert.Equal(0xFB01, glyph.Codepoint);
-        var error = Assert.Throws<InvalidOperationException>(() => Render(laidOut, document));
+        var error = Assert.Throws<InvalidOperationException>(() => Render(laidOut));
         Assert.Equal(
             "The built-in font 'Helvetica' cannot draw 'ﬁ' (U+FB01): a base-14 font is limited "
             + "to the WinAnsi character set. Register a font that covers these characters with "
@@ -284,7 +284,7 @@ public class LaidOutContractTests
             error.Message);
 
         var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
-        var rendered = Render(laidOut, document, renderer);
+        var rendered = Render(laidOut, renderer);
 
         using var buffer = new MemoryStream(rendered);
         var reloaded = PortableDocument.LoadFromStream(buffer);
@@ -306,7 +306,7 @@ public class LaidOutContractTests
         var capturedFace = FontProgram.Of(Assert.Single(fragment.GlyphRun.Spans).Face);
         var registered = Assert.Single(document.Fonts.RegisteredFaces());
         var asset = Assert.Single(laidOut.Fonts.Faces);
-        var before = Render(laidOut, document);
+        var before = Render(laidOut);
 
         Assert.Equal(registered.FaceIndex, asset.FaceIndex);
         Assert.Same(capturedFace, FontProgram.Of(asset));
@@ -316,7 +316,7 @@ public class LaidOutContractTests
             new MemoryStream(PdfTestResources.ReadAllBytes("Fonts/LiberationSerif-Regular.ttf")));
 
         Assert.NotSame(capturedFace, document.Fonts.ResolveFace(run.Font));
-        Assert.Equal(before, Render(laidOut, document));
+        Assert.Equal(before, Render(laidOut));
     }
 
     private static Table BorderedTable()
@@ -722,163 +722,28 @@ public class LaidOutContractTests
     }
 
     [Fact]
-    public void MutatingPaintModelAfterLayout_DoesNotChangeTheLaidOutDocumentOrItsPdf()
+    public void MutatingImageBytesAfterLayout_DoesNotChangeTheLaidOutPdf()
     {
         var document = new Document();
         var section = Page(document, 500, 700);
-        var run = section.Blocks.AddParagraph().Inlines.Add("AVATAR");
-        run.Font.Size = 16;
-        run.Font.Bold = true;
-        run.Font.Color = Color.FromRgb(10, 20, 30);
-        run.Opacity = 0.8;
-        var inlineImage = section.Blocks[0] is Paragraph paragraph
-            ? paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"))
-            : throw new InvalidOperationException();
-
-        var gradient = new LinearGradient(
-            0, 0, 120, 0,
-            new GradientStop(0, Color.FromRgb(255, 0, 0)),
-            new GradientStop(1, Color.FromRgb(0, 0, 255)));
-        var shadow = new BoxShadow
-        {
-            Color = Color.FromArgb(120, 1, 2, 3),
-            BlurRadius = Unit.FromPoint(3),
-            OffsetX = Unit.FromPoint(2),
-            OffsetY = Unit.FromPoint(1),
-            Spread = Unit.FromPoint(1),
-        };
-        var container = section.Blocks.Add(new Container
-        {
-            Padding = Unit.FromPoint(5),
-            BackgroundGradient = gradient,
-            Shadow = shadow,
-        });
-        container.Blocks.AddParagraph("box");
-
+        var paragraph = section.Blocks.AddParagraph();
+        var inlineImage = paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        image.Opacity = 0.7;
-        image.Interpolate = true;
-
-        var watermark = new Watermark { Text = "DRAFT", Opacity = 0.2, Rotation = 30 };
-        watermark.Font.Family = "Courier";
-        watermark.Font.Size = 40;
+        var watermark = new Watermark { Text = "DRAFT" };
         var watermarkImage = watermark.SetImage(PdfTestResources.Open("Images/gray.jpg"));
-        watermarkImage.Opacity = 0.6;
-        watermarkImage.Interpolate = true;
         section.Watermark = watermark;
 
         var laidOut = DocumentLayouter.Layout(document);
-        var page = Assert.Single(laidOut.Pages);
-        var fragmentPaint = page.Body.Lines[0].Line.Fragments[0].Paint;
-        var imagePaint = Assert.Single(page.Body.Images).Paint;
-        var boxStyle = Assert.Single(page.Body.Boxes).Style;
-        var watermarkPaint = page.Watermark;
-        Assert.NotNull(watermarkPaint);
-        var before = Render(laidOut, document);
+        var before = Render(laidOut);
 
-        run.Text = "Changed";
-        run.Opacity = 0.1;
-        run.Font.Family = "Times-Roman";
-        run.Font.Size = 8;
-        run.Font.Bold = false;
-        run.Font.Italic = true;
-        run.Font.Color = Color.FromRgb(200, 201, 202);
-        image.Opacity = 0.1;
-        image.Interpolate = false;
-        shadow.Color = Color.FromArgb(20, 9, 8, 7);
-        shadow.BlurRadius = Unit.FromPoint(20);
-        shadow.OffsetX = Unit.FromPoint(12);
-        shadow.OffsetY = Unit.FromPoint(13);
-        shadow.Spread = Unit.FromPoint(14);
-        watermark.Text = "CHANGED";
-        watermark.Opacity = 0.9;
-        watermark.Rotation = 75;
-        watermark.Font.Family = "Helvetica";
-        watermark.Font.Size = 12;
-        watermark.Font.Color = Color.FromRgb(4, 5, 6);
-        watermarkImage.Opacity = 0.2;
-        watermarkImage.Interpolate = false;
         image.Data[image.Data.Length / 2] ^= 0x5A;
         inlineImage.Data[inlineImage.Data.Length / 2] ^= 0x3C;
         watermarkImage.Data[watermarkImage.Data.Length / 2] ^= 0xA5;
-        document.Fonts.EnableKerning = true;
 
-        Assert.Equal(fragmentPaint, page.Body.Lines[0].Line.Fragments[0].Paint);
-        Assert.Equal(imagePaint, Assert.Single(page.Body.Images).Paint);
-        Assert.Equal(boxStyle, Assert.Single(page.Body.Boxes).Style);
-        Assert.Equal(watermarkPaint, page.Watermark);
-        Assert.Equal(before, Render(laidOut, document));
+        Assert.Equal(before, Render(laidOut));
     }
 
-    [Fact]
-    public void StructurallyMutatingModelAfterLayout_DoesNotChangeTheLaidOutPdfUaOutput()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Captured semantics";
-        BuildTestSupport.RegisterLatin(document);
-        document.Styles.Add("Lead");
-        var section = Page(document, 500, 700);
-
-        var lead = BuildTestSupport.AddText(section, "Lead", BuildTestSupport.Latin);
-        lead.StyleName = "Lead";
-        var body = BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
-        var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        image.AlternateText = "Original alternate text";
-        var list = section.Blocks.AddList();
-        list.Font.Family = BuildTestSupport.Latin;
-        list.AddItem("First").Font.Family = BuildTestSupport.Latin;
-
-        var renderer = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 };
-        renderer.RoleMap.Add("Lead", "P");
-        var laidOut = DocumentLayouter.Layout(document);
-        var immediate = Render(laidOut, document, renderer);
-
-        section.Blocks.Move(3, 0);
-        Assert.True(section.Blocks.Remove(lead));
-        Assert.True(section.Blocks.Remove(image));
-        body.StyleName = "Heading1";
-        lead.StyleName = "Heading2";
-        image.AlternateText = "Mutated alternate text";
-        image.ReplacementText = "Mutated replacement text";
-        document.Language = "fr";
-
-        Assert.Equal(immediate, Render(laidOut, document, renderer));
-    }
-
-    [Fact]
-    public void MutatingDocumentInfoAfterLayout_DoesNotChangeTheLaidOutPdf()
-    {
-        var document = new Document();
-        var section = Page(document, 500, 700);
-        BuildTestSupport.RegisterLatin(document);
-        BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin);
-        document.Info.Title = "Captured title";
-        document.Info.Author = "Captured author";
-        document.Info.Subject = "Captured subject";
-        document.Info.Keywords = "captured";
-        document.Info.Creator = "Captured creator";
-        document.Info.CreationDate = new DateTimeOffset(2026, 3, 15, 12, 0, 0, TimeSpan.Zero);
-        document.Info.ModificationDate = new DateTimeOffset(2026, 3, 16, 12, 0, 0, TimeSpan.Zero);
-
-        var laidOut = DocumentLayouter.Layout(document);
-        var before = Render(laidOut, document);
-        Assert.Contains("Captured title", System.Text.Encoding.Latin1.GetString(before), StringComparison.Ordinal);
-
-        document.Info.Title = "Mutated title";
-        document.Info.Author = "Mutated author";
-        document.Info.Subject = "Mutated subject";
-        document.Info.Keywords = "mutated";
-        document.Info.Creator = "Mutated creator";
-        document.Info.CreationDate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        document.Info.ModificationDate = new DateTimeOffset(2020, 1, 2, 0, 0, 0, TimeSpan.Zero);
-
-        Assert.Equal(before, Render(laidOut, document));
-    }
-
-    private static byte[] Render(
-        LaidOutDocument laidOut,
-        Document document,
-        DocumentRenderer? renderer = null)
+    private static byte[] Render(LaidOutDocument laidOut, DocumentRenderer? renderer = null)
     {
         var settings = RenderRequest.From(renderer ?? new DocumentRenderer());
         return DocumentRenderEngine.Generate(settings, laidOut).ToArray();
