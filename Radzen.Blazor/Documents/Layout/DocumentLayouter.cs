@@ -6,7 +6,12 @@ using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
-internal readonly record struct LaidOutLayout(LaidOutDocument Scene, SourceResolver Sources);
+internal readonly struct LaidOutLayout(LaidOutDocument scene, Lazy<SourceResolver> sources)
+{
+    public LaidOutDocument Scene { get; } = scene;
+
+    public SourceResolver Sources => sources.Value;
+}
 
 internal static class DocumentLayouter
 {
@@ -70,7 +75,7 @@ internal static class DocumentLayouter
             pass.Lowering,
             pass.Capture);
 
-        return new LaidOutLayout(scene, pass.Capture.Sources());
+        return new LaidOutLayout(scene, pass.Capture.DeferredSources());
     }
 
     internal static bool AnchorsStable(

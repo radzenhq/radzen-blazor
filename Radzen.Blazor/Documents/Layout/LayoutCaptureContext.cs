@@ -29,7 +29,7 @@ internal sealed class LayoutCaptureContext(ImageProbes probes)
     public T Resolve<T>(SourceId id) where T : class
         => (T)sourceValues[id.Value];
 
-    public SourceResolver Sources() => new(sourceValues);
+    public Lazy<SourceResolver> DeferredSources() => new(() => new SourceResolver(sourceValues));
 
     public SceneImageData Image(byte[] data)
     {
