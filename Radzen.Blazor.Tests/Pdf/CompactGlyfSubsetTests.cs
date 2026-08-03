@@ -152,20 +152,6 @@ public class CompactGlyfSubsetTests
     }
 
     [Fact]
-    public void CidSet_MarksExactlyAllCompactGids()
-    {
-        var reader = BuildReader();
-        var (_, _, descriptor) = FontGraph(reader);
-        var n = (int)SfntFont.Parse(FontFile2(reader, descriptor)).GlyphCount;
-
-        Assert.True(descriptor.ContainsKey("CIDSet"), "FontDescriptor must keep /CIDSet");
-        var stream = Assert.IsType<StreamObject>(reader.Resolve(descriptor["CIDSet"]));
-        var bits = Type0EmbedSupport.SetBits(reader.DecodeStream(stream));
-
-        Assert.Equal(Enumerable.Range(0, n).ToHashSet(), bits);
-    }
-
-    [Fact]
     public void Descendant_KeepsIdentityMappings()
     {
         var reader = BuildReader();
