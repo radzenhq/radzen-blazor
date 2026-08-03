@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
-using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents;
@@ -52,7 +51,7 @@ public class SharedSfntFontConcurrencyTests
                 ",",
                 run.Spans.SelectMany(span =>
                     span.Glyphs.Select(glyph =>
-                        $"{PdfFontProgram.Of(span.Face).GetGlyphId(glyph.Codepoint)}:{glyph.Advance:R}"))));
+                        $"{FontProgram.Of(span.Face).GetGlyphId(glyph.Codepoint)}:{glyph.Advance:R}"))));
     }
 
     [Fact]

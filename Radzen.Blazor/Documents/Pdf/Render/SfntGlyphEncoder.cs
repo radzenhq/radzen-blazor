@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Fonts;
-using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf.Render;
 
@@ -29,7 +28,7 @@ internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry)
             throw new InvalidOperationException("An sfnt run requires a captured sfnt face.");
         }
 
-        var face = PdfFontProgram.Of(span.Face);
+        var face = FontProgram.Of(span.Face);
         var generated = fontRegistry.ResolveSfnt(face);
         var glyphs = span.Glyphs;
         var bytes = new byte[glyphs.Length * 2];

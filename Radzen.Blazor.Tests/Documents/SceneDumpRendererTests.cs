@@ -241,24 +241,31 @@ public class SceneDumpRendererTests
             Encoding.UTF8.GetBytes(Dump()),
             Encoding.UTF8.GetBytes(Dump()));
 
-    [Fact]
-    public void SceneFontView_HandsOutNoFontProgram()
+    [Theory]
+    [InlineData(typeof(RegisteredFace))]
+    [InlineData(typeof(CapturedFontFace))]
+    public void SceneFontView_HandsOutTheFontProgramOnlyThroughTheExplicitSeam(Type face)
     {
         const BindingFlags All = BindingFlags.Public | BindingFlags.NonPublic
             | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
-        var offenders = typeof(RegisteredFace).GetProperties(All)
+        var offenders = face.GetProperties(All)
             .Where(property => property.GetMethod is { IsPrivate: false })
             .Select(property => (property.Name, Type: property.PropertyType))
-            .Concat(typeof(RegisteredFace).GetFields(All)
+            .Concat(face.GetFields(All)
                 .Where(field => !field.IsPrivate)
                 .Select(field => (field.Name, Type: field.FieldType)))
-            .Where(member => member.Type == typeof(SfntFont) || member.Type == typeof(FontSourceData))
+            .Where(member => member.Type == typeof(SfntFont))
             .Select(member => member.Name)
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
 
         Assert.Empty(offenders);
+
+        var seam = Assert.Single(
+            face.GetProperties(All),
+            property => property.Name == $"{typeof(IFontProgramSource).FullName}.Program");
+        Assert.True(seam.GetMethod!.IsPrivate);
     }
 
     [Fact]

@@ -6,7 +6,6 @@ using Radzen.Documents.Codes;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents;
 using Xunit;
 using Radzen.Documents.Core;
@@ -135,11 +134,11 @@ public class DocumentLayoutFeatureTests
             line.Line.Fragments,
             fragment => Assert.All(
                 fragment.GlyphRun.Spans,
-                span => Assert.Same(resolved, PdfFontProgram.Of(span.Face))));
+                span => Assert.Same(resolved, FontProgram.Of(span.Face))));
     }
 
     [Fact]
-    public void FontCollection_EnumeratesRegisteredFacesWithSourceBytes()
+    public void FontCollection_EnumeratesRegisteredFaces()
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
@@ -147,7 +146,6 @@ public class DocumentLayoutFeatureTests
         var face = Assert.Single(document.Fonts.RegisteredFaces());
 
         Assert.Equal(BuildTestSupport.Latin, face.Family);
-        Assert.False(PdfFontProgram.DataOf(face).Memory.IsEmpty);
         Assert.Same(FontProgram.Of(face), document.Fonts.ResolveFace(new Font { Family = BuildTestSupport.Latin }));
     }
 
