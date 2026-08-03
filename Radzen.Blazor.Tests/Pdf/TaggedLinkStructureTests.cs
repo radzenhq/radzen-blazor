@@ -53,6 +53,68 @@ public class TaggedLinkStructureTests
     }
 
     [Fact]
+    public void UriLink_CarriesItsVisibleTextAsContents()
+    {
+        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
+        var annotation = Assert.Single(Annotations(reader, 0));
+
+        Assert.True(annotation.TryGetValue("Contents", out var contents), "the link carries /Contents");
+        Assert.Equal("Radzen", Assert.IsType<StringObject>(reader.Resolve(contents!)).Value);
+    }
+
+    [Fact]
+    public void AnchorLink_CarriesItsVisibleTextAsContents()
+    {
+        var reader = BuildTestSupport.Read(Authored(null, "target"), Accessible());
+        var annotation = Assert.Single(Annotations(reader, 0));
+
+        Assert.True(annotation.TryGetValue("Contents", out var contents), "the link carries /Contents");
+        Assert.Equal("Radzen", Assert.IsType<StringObject>(reader.Resolve(contents!)).Value);
+    }
+
+    [Fact]
+    public void UntaggedUriLink_CarriesNoContents()
+    {
+        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null));
+        var annotation = Assert.Single(Annotations(reader, 0));
+
+        Assert.False(annotation.ContainsKey("Contents"), "untagged output leaves /Contents out");
+    }
+
+    [Fact]
+    public void TaggedAnnotatedPage_DeclaresStructureTabOrder()
+    {
+        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
+        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+
+        Assert.True(page.TryGetValue("Tabs", out var tabs), "the page carries /Tabs");
+        Assert.Equal("S", Assert.IsType<NameObject>(reader.Resolve(tabs!)).Value);
+    }
+
+    [Fact]
+    public void UntaggedAnnotatedPage_DeclaresNoTabOrder()
+    {
+        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null));
+        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+
+        Assert.False(page.ContainsKey("Tabs"), "untagged output leaves /Tabs out");
+    }
+
+    [Fact]
+    public void TaggedPageWithoutAnnotations_DeclaresNoTabOrder()
+    {
+        var document = new Document { Language = "en-US" };
+        document.Info.Title = "No links";
+        BuildTestSupport.RegisterLatin(document);
+        BuildTestSupport.AddText(document.Sections.Add(), "Plain body", BuildTestSupport.Latin);
+
+        var reader = BuildTestSupport.Read(document, Accessible());
+        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+
+        Assert.False(page.ContainsKey("Tabs"), "a page without annotations leaves /Tabs out");
+    }
+
+    [Fact]
     public void UriLink_IsALinkElementInsideItsParagraph()
     {
         var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());

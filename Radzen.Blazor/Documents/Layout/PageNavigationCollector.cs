@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Text;
 using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.LaidOut;
@@ -127,10 +128,12 @@ internal sealed class PageNavigationCollector : ISceneVisitor
 
             var start = first.XOffset;
             var end = start + first.Advance;
+            var text = new StringBuilder(first.Text);
             var j = i + 1;
             while (j < fragments.Length && fragments[j].Source == first.Source)
             {
                 end = fragments[j].XOffset + fragments[j].Advance;
+                text.Append(fragments[j].Text);
                 j++;
             }
 
@@ -142,6 +145,7 @@ internal sealed class PageNavigationCollector : ISceneVisitor
                 y + below,
                 first.Paint,
                 first.Source,
+                text.ToString(),
                 transform,
                 clip));
             i = j;
@@ -173,7 +177,7 @@ internal sealed class PageNavigationCollector : ISceneVisitor
     }
 
     private LaidOutLink Link(
-        double left, double top, double right, double bottom, in FragmentPaint paint, SourceId source, Matrix? transform, Clipping? clip)
+        double left, double top, double right, double bottom, in FragmentPaint paint, SourceId source, string text, Matrix? transform, Clipping? clip)
     {
         if (clip is { } bounds)
         {
@@ -203,6 +207,7 @@ internal sealed class PageNavigationCollector : ISceneVisitor
             Bottom = bottom,
             Uri = paint.LinkTarget,
             Anchor = paint.AnchorTarget,
+            Text = text,
             Source = source,
         };
     }

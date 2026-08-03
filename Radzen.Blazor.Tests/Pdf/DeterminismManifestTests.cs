@@ -300,9 +300,9 @@ public class DeterminismManifestTests
         ["gradients"] = "06b60969773939b6475f5447163b8228e6a85fb10711f9b1721db75006f48089",
         ["overlapping-z-order"] = "8c7f801a013aa0921962214d6d06326b357c07c613e0ecd76ed109a43e8e89b5",
         ["flat-lists"] = "e3cd6555c5ad23d53cba15e9f1ee3e99759afd98883fd34af9e4b681e2746c68",
-        ["tagged-accessible"] = "039de4316e0bce0c9dbaecd016f534655b8f060ba207504de03943211829dfe7",
-        ["tagged-pdfa-level-a"] = "dcdc0a8dcd4abe10419d64dbf6fc731a01c133f164f421432a4fe680b30ef594",
-        ["encrypted"] = "4d127aa5387dd6565d2da8083d765dc5fa85c57147ddfb1061a51cd17c58e611",
+        ["tagged-accessible"] = "53cf5b884b9075790e2f3a574e64fb820905872b1b2d25a4f85d21f169c16bb0",
+        ["tagged-pdfa-level-a"] = "53bfaf5298a44578cf11bdcf4ec7e91fbd9d9c8e287e657b39de69e37da64fd2",
+        ["encrypted"] = "b5275db20e46847a798c68d46ca9d3ab7f79afd1a50ae04e8ef375ff60befbf5",
         ["signed"] = "27350d26638aa12b6dc605b9cc052d41ac13bf6cdb9f8b7d502b555908d2f8e3",
         ["timestamped"] = "3acf8fa5b456a20985a4de33dd1d05dc98c742c07e65a2172495925866ca3dbc",
     };

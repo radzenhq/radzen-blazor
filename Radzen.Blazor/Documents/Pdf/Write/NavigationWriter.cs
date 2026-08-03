@@ -136,7 +136,7 @@ internal sealed class NavigationWriter(PortableDocument document)
     ];
 
     public static LinkAnnotationEmission BuildLinkAnnotations(
-        DocumentWriter writer, IReadOnlyList<OutputLink> links, int pageIndex)
+        DocumentWriter writer, IReadOnlyList<OutputLink> links, int pageIndex, bool tagged)
     {
         var annots = new ArrayObject();
         var joins = new List<AnnotationElementJoin>();
@@ -155,6 +155,13 @@ internal sealed class NavigationWriter(PortableDocument document)
                     : LinkAction.Uri(link.Uri!),
             };
 
+            // ISO 14289-1 7.18.5 and ISO 32000-1 14.9.3: a link annotation carries an alternate
+            // description in /Contents.
+            if (tagged && LinkDescription(link) is { Length: > 0 } description)
+            {
+                annotation["Contents"] = StringObject.FromText(description);
+            }
+
             var reference = writer.Add(annotation);
             annots.Add(reference);
             if (link.StructureElementId is { } elementId)
@@ -164,6 +171,12 @@ internal sealed class NavigationWriter(PortableDocument document)
         }
 
         return new LinkAnnotationEmission(annots, joins);
+    }
+
+    private static string? LinkDescription(in OutputLink link)
+    {
+        var text = link.Text?.Trim();
+        return text is { Length: > 0 } ? text : link.Uri ?? link.Destination;
     }
 }
 

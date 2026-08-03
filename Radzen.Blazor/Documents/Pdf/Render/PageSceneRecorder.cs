@@ -356,7 +356,8 @@ internal sealed class PageSceneRecorder(
             BottomUpSpace.FromTop(height, link.Top),
             link.Uri,
             link.Anchor,
-            structureTree.LinkElementOf(link.Source)?.Id));
+            structureTree.LinkElementOf(link.Source)?.Id,
+            link.Text));
 
     void ISceneVisitor.Anchor(in LaidOutAnchor anchor)
         => Anchors.Add(new PlannedAnchor(
