@@ -6,9 +6,10 @@ namespace Radzen.Documents.Core;
 /// <summary>
 /// Resource limits that bound the work done on image and font payloads, whether they are authored
 /// into a document or read out of one. They turn an attacker-controlled or accidental size into a
-/// recoverable exception instead of an out-of-memory failure. Pass them to the authoring entry
-/// points that buffer a stream, and to the renderer's image decoders to govern measurement and
-/// decoding during rendering.
+/// recoverable exception instead of an out-of-memory failure. The authoring entry points that
+/// buffer a stream accept them and apply <see cref="MaxFileBytes"/>; measuring and rendering an
+/// authored document applies the default caps; loading a document applies the limits passed to
+/// the reading entry points. See <see cref="Radzen.Documents.Pdf.ReaderLimits"/>.
 /// </summary>
 public class ResourceLimits
 {
@@ -20,7 +21,11 @@ public class ResourceLimits
     {
     }
 
-    /// <summary>Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).</summary>
+    /// <summary>
+    /// Maximum decoded image size in pixels (width * height). Default 64M (e.g. 8000 x 8000).
+    /// Enforced at its default value while measuring and rendering authored images; a custom value
+    /// applies to documents loaded through the reading entry points.
+    /// </summary>
     public long MaxImagePixels { get; init; } = DefaultMaxImagePixels;
 
     /// <summary>
