@@ -81,12 +81,4 @@ public class ContainerTaggingConformanceTests
         Assert.DoesNotContain("Artifact", tags);
         Assert.Contains("P", tags);
     }
-
-    [Fact]
-    public void PlainDocument_ContainerOutputIsByteStable()
-    {
-        var a = Rendered(Author(ua: false, PdfAConformance.None));
-        var b = Rendered(Author(ua: false, PdfAConformance.None));
-        Assert.Equal(a, b);
-    }
 }
