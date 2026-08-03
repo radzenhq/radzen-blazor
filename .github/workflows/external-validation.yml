@@ -1,0 +1,71 @@
+name: External validation
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+env:
+  VERAPDF_VERSION: 1.30.2
+  VERAPDF_SHA256: 6cc6341cb1af644044054b81f00a6590a7918abb18f762243de115258bcad838
+
+jobs:
+  external-validation:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
+
+    - name: Install qpdf and ghostscript
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends qpdf ghostscript
+
+    - name: Install veraPDF
+      run: |
+        set -euo pipefail
+        work="$RUNNER_TEMP/verapdf"
+        mkdir -p "$work"
+        curl -fsSL -o "$work/installer.zip" \
+          "https://software.verapdf.org/releases/${VERAPDF_VERSION%.*}/verapdf-greenfield-${VERAPDF_VERSION}-installer.zip"
+        echo "$VERAPDF_SHA256  $work/installer.zip" | sha256sum -c -
+        unzip -q "$work/installer.zip" -d "$work"
+        cat > "$work/auto-install.xml" <<'XML'
+        <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <AutomatedInstallation langpack="eng">
+          <com.izforge.izpack.panels.htmlhello.HTMLHelloPanel/>
+          <com.izforge.izpack.panels.target.TargetPanel>
+            <installpath>${INSTALL_DIR}</installpath>
+          </com.izforge.izpack.panels.target.TargetPanel>
+          <com.izforge.izpack.panels.packs.PacksPanel>
+            <pack index="0" name="veraPDF GUI" selected="true"/>
+            <pack index="1" name="veraPDF CLI" selected="true"/>
+            <pack index="2" name="veraPDF Documentation" selected="false"/>
+            <pack index="3" name="veraPDF Sample Plugins" selected="false"/>
+          </com.izforge.izpack.panels.packs.PacksPanel>
+          <com.izforge.izpack.panels.install.InstallPanel/>
+          <com.izforge.izpack.panels.finish.FinishPanel/>
+        </AutomatedInstallation>
+        XML
+        chmod +x "$work/verapdf-greenfield-${VERAPDF_VERSION}/verapdf-install"
+        install_dir="$work/verapdf"
+        sed -i "s|\${INSTALL_DIR}|$install_dir|" "$work/auto-install.xml"
+        "$work/verapdf-greenfield-${VERAPDF_VERSION}/verapdf-install" "$work/auto-install.xml"
+        echo "$install_dir" >> "$GITHUB_PATH"
+
+    - name: Validate PDF corpus
+      run: Radzen.Blazor.Tests/Pdf/external-validation.sh
