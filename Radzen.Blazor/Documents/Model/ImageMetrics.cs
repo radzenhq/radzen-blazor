@@ -8,7 +8,6 @@ internal enum ImageFormat
     Png,
     Jpeg,
     Jpeg2000,
-    Custom,
 }
 
 internal sealed record ImageInfo(ImageFormat Format, double Width, double Height);

@@ -74,10 +74,10 @@ public class ImageMeasurementParityTests
         return pages;
     }
 
-    private static void AssertPaginationAgrees(Document document, DocumentRenderer? renderer = null)
+    private static void AssertPaginationAgrees(Document document)
     {
-        var laidOut = LaidOut(document, (renderer?.ImageDecoders ?? ImageDecoders.BuiltIn).Probes);
-        var rendered = Rendered(document, renderer);
+        var laidOut = LaidOut(document, ImageProbes.None);
+        var rendered = Rendered(document, null);
 
         Assert.Equal(laidOut.Count, rendered.Count);
         for (var i = 0; i < laidOut.Count; i++)
@@ -135,157 +135,6 @@ public class ImageMeasurementParityTests
     }
 
     [Fact]
-    public void ScopedDecoder_BridgesToItsProbeSet_AndPaginatesIdentically()
-    {
-        Assert.Throws<NotSupportedException>(() => ImageProbes.None.PixelSize(BridgeDecoder.Payload()));
-
-        var renderer = new DocumentRenderer { ImageDecoders = ImageDecoders.BuiltIn.Add(new BridgeDecoder()) };
-        var probes = renderer.ImageDecoders.Probes;
-
-        Assert.Equal(((double)BridgeDecoder.PixelWidth, (double)BridgeDecoder.PixelHeight), probes.PixelSize(BridgeDecoder.Payload()));
-        Assert.Equal(ImageFormat.Custom, probes.Format(BridgeDecoder.Payload()));
-
-        AssertPaginationAgrees(ImageFlow(BridgeDecoder.Payload(), 6, null), renderer);
-    }
-
-    private const double IsolatedPointWidth = IsolatedDecoder.PixelWidth * 72.0 / 96.0;
-
-    private const double IsolatedPointHeight = IsolatedDecoder.PixelHeight * 72.0 / 96.0;
-
-    private static DocumentRenderer IsolatedRenderer()
-    {
-        Assert.Throws<NotSupportedException>(
-            () => ImageDecoders.BuiltIn.Probes.PixelSize(IsolatedDecoder.Payload()));
-
-        return new DocumentRenderer { ImageDecoders = ImageDecoders.BuiltIn.Add(new IsolatedDecoder()) };
-    }
-
-    private static LaidOutPage LaidOutWithRendererProbes(Document document, DocumentRenderer renderer, int page = 0)
-    {
-        Assert.Throws<NotSupportedException>(() => DocumentLayouter.Layout(document));
-
-        return DocumentLayouter.Layout(document, renderer.ImageDecoders.Probes).Pages[page];
-    }
-
-    private static Paragraph PlainText(string text)
-    {
-        var paragraph = new Paragraph();
-        paragraph.Inlines.Add(text);
-        return paragraph;
-    }
-
-    private static Section IsolatedSection(Document document, double width, double height)
-    {
-        var section = document.Sections.Add();
-        section.PageSize = new PageSize(Unit.FromPoint(width), Unit.FromPoint(height));
-        section.Margins.SetAll(Unit.FromPoint(0));
-        section.HeaderDistance = Unit.FromPoint(0);
-        section.FooterDistance = Unit.FromPoint(0);
-        return section;
-    }
-
-    [Fact]
-    public void Layout_MeasuresBlockImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
-    {
-        var renderer = IsolatedRenderer();
-        var document = ImageFlow(IsolatedDecoder.Payload(), 1, null);
-
-        var image = LaidOutWithRendererProbes(document, renderer).Body.Images[0];
-
-        Assert.Equal(IsolatedPointWidth, image.Width, 3);
-        Assert.Equal(IsolatedPointHeight, image.Height, 3);
-    }
-
-    [Fact]
-    public void Layout_MeasuresWatermarkImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
-    {
-        var renderer = IsolatedRenderer();
-        var document = new Document();
-        var section = IsolatedSection(document, 300, 300);
-        section.Blocks.Add(PlainText("body"));
-        section.Watermark = new Watermark { Image = new Image(IsolatedDecoder.Payload()) };
-
-        var watermark = LaidOutWithRendererProbes(document, renderer).Watermark;
-
-        Assert.NotNull(watermark);
-        var image = Assert.NotNull(watermark!.Image);
-        Assert.Equal(IsolatedPointWidth, image.Width, 3);
-        Assert.Equal(IsolatedPointHeight, image.Height, 3);
-        Assert.NotEmpty(renderer.ToArray(document));
-    }
-
-    [Fact]
-    public void Layout_MeasuresInlineImagesWithTheRendererProbeSet_NotTheGlobalRegistry()
-    {
-        var renderer = IsolatedRenderer();
-        var document = new Document();
-        var section = IsolatedSection(document, 300, 300);
-        var paragraph = new Paragraph();
-        paragraph.Inlines.AddImage(new MemoryStream(IsolatedDecoder.Payload()));
-        section.Blocks.Add(paragraph);
-
-        var line = Assert.Single(LaidOutWithRendererProbes(document, renderer).Body.Lines);
-        var fragment = Assert.Single(line.Line.Fragments);
-        var inline = Assert.NotNull(fragment.Paint.InlineImage);
-
-        Assert.Equal(IsolatedPointWidth, inline.Width, 3);
-        Assert.Equal(IsolatedPointHeight, inline.Height, 3);
-        Assert.Equal(IsolatedPointWidth, fragment.Advance, 3);
-        Assert.NotEmpty(renderer.ToArray(document));
-    }
-
-    [Fact]
-    public void Layout_MeasuresTheKeepWithNextLookaheadWithTheRendererProbeSet_NotTheGlobalRegistry()
-    {
-        var renderer = IsolatedRenderer();
-        var lineHeight = PaginationSupport.BuiltInLineHeight();
-        var document = new Document();
-        var section = IsolatedSection(document, 300, lineHeight + IsolatedPointHeight + 1);
-        section.Blocks.Add(PlainText("filler"));
-        var heading = PlainText("heading");
-        heading.KeepWithNext = true;
-        section.Blocks.Add(heading);
-        section.Blocks.Add(new Image(IsolatedDecoder.Payload()));
-
-        Assert.Throws<NotSupportedException>(() => DocumentLayouter.Layout(document));
-        var pages = DocumentLayouter.Layout(document, renderer.ImageDecoders.Probes).Pages;
-
-        Assert.Equal(2, pages.Length);
-        Assert.Empty(pages[0].Body.Images);
-        Assert.Single(pages[1].Body.Lines);
-        Assert.Single(pages[1].Body.Images);
-    }
-
-    private sealed class IsolatedDecoder : IImageDecoder
-    {
-        public const int PixelWidth = 120;
-
-        public const int PixelHeight = 60;
-
-        private static readonly byte[] Magic = [0x52, 0x5A, 0x49, 0x53];
-
-        public static byte[] Payload()
-        {
-            var data = new byte[Magic.Length + 1];
-            Magic.CopyTo(data, 0);
-            return data;
-        }
-
-        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
-        {
-            if (!data.Span.StartsWith(Magic))
-            {
-                image = null;
-                return false;
-            }
-
-            image = new DecodedImage(
-                new byte[PixelWidth * PixelHeight], PixelWidth, PixelHeight, 8, ImageColorSpace.DeviceGray);
-            return true;
-        }
-    }
-
-    [Fact]
     public void Inspect_ReportsFormatAndMediaType()
     {
         var expected = new (string Resource, ImageFormat Format, string MediaType)[]
@@ -336,34 +185,5 @@ public class ImageMeasurementParityTests
         data[43] = 0x01;
         data[44] = 0x01;
         return data;
-    }
-
-    private sealed class BridgeDecoder : IImageDecoder
-    {
-        public const int PixelWidth = 240;
-
-        public const int PixelHeight = 90;
-
-        private static readonly byte[] Magic = [0x52, 0x5A, 0x42, 0x52];
-
-        public static byte[] Payload()
-        {
-            var data = new byte[Magic.Length + 1];
-            Magic.CopyTo(data, 0);
-            return data;
-        }
-
-        public bool TryDecode(ReadOnlyMemory<byte> data, ReaderLimits limits, [NotNullWhen(true)] out DecodedImage? image)
-        {
-            if (!data.Span.StartsWith(Magic))
-            {
-                image = null;
-                return false;
-            }
-
-            image = new DecodedImage(
-                new byte[PixelWidth * PixelHeight], PixelWidth, PixelHeight, 8, ImageColorSpace.DeviceGray);
-            return true;
-        }
     }
 }

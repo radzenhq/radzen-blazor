@@ -23,21 +23,6 @@ internal sealed class PngImageDecoder : IImageDecoder
         return true;
     }
 
-    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, ReaderLimits limits, out int width, out int height)
-    {
-        if (!ImageHeaders.IsPng(data.Span))
-        {
-            width = 0;
-            height = 0;
-            return false;
-        }
-
-        var header = ImageHeaders.ReadPngHeader(data.Span);
-        width = header.Width;
-        height = header.Height;
-        return true;
-    }
-
     private static ReadOnlyMemory<byte> JoinIdat(ReadOnlyMemory<byte> data, List<Range>? chunks)
     {
         if (chunks is null)

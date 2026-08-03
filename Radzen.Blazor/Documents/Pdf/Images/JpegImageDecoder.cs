@@ -21,21 +21,6 @@ internal sealed class JpegImageDecoder : IImageDecoder
         return true;
     }
 
-    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, ReaderLimits limits, out int width, out int height)
-    {
-        if (!ImageHeaders.IsJpeg(data.Span))
-        {
-            width = 0;
-            height = 0;
-            return false;
-        }
-
-        var frame = ReadFrame(data.Span);
-        width = frame.Width;
-        height = frame.Height;
-        return true;
-    }
-
     private static DecodedImage DecodeJpeg(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
         var (width, height, precision, components, adobe) = ReadFrame(data.Span);

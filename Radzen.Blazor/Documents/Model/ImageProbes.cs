@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Radzen.Documents.Core;
 
@@ -7,32 +6,18 @@ namespace Radzen.Documents;
 
 internal sealed class ImageProbes
 {
-    public static readonly ImageProbes None = new([], ResourceLimits.Default);
-
-    private readonly ImmutableArray<Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?>> probes;
+    public static readonly ImageProbes None = new(ResourceLimits.Default);
 
     private readonly ConditionalWeakTable<byte[], ImageInfo> cache = new();
 
-    private ImageProbes(ImmutableArray<Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?>> probes, ResourceLimits limits)
-    {
-        this.probes = probes;
-        Limits = limits;
-    }
-
-    public int Count => probes.Length;
+    private ImageProbes(ResourceLimits limits) => Limits = limits;
 
     public ResourceLimits Limits { get; }
-
-    public ImageProbes Add(Func<ReadOnlyMemory<byte>, ResourceLimits, (double Width, double Height)?> probe)
-    {
-        ArgumentNullException.ThrowIfNull(probe);
-        return new ImageProbes(probes.Add(probe), Limits);
-    }
 
     public ImageProbes WithLimits(ResourceLimits limits)
     {
         ArgumentNullException.ThrowIfNull(limits);
-        return new ImageProbes(probes, limits);
+        return new ImageProbes(limits);
     }
 
     public ImageInfo Inspect(byte[] data)
@@ -84,14 +69,6 @@ internal sealed class ImageProbes
             return Validate(size.Width, size.Height, ImageFormat.Jpeg2000);
         }
 
-        foreach (var probe in probes)
-        {
-            if (probe(data, Limits) is { } size)
-            {
-                return Validate((long)size.Width, (long)size.Height, ImageFormat.Custom);
-            }
-        }
-
         throw new NotSupportedException("Unrecognized image format; only PNG, JPEG and JPEG2000 are supported.");
     }
 
@@ -118,7 +95,6 @@ internal sealed class ImageProbes
     {
         ImageFormat.Png => "PNG",
         ImageFormat.Jpeg => "JPEG",
-        ImageFormat.Jpeg2000 => "JPEG2000",
-        _ => "Custom-format",
+        _ => "JPEG2000",
     };
 }
