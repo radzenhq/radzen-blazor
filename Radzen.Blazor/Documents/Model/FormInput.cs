@@ -42,8 +42,8 @@ public abstract class FormInput : Inline
     /// <summary>
     /// Gets or sets the caption naming this field for a reader who cannot see the surrounding
     /// text, or <see langword="null"/> (the default) when the field declares none. It is the
-    /// field's accessible name: the PDF renderer writes it as the widget's alternate field name
-    /// and as the alternate description of the Form structure element wrapping the widget.
+    /// field's accessible name, carried into each output format's accessibility structure
+    /// alongside the field.
     /// </summary>
     public string? Label { get; set; }
 }
