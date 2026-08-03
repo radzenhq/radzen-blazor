@@ -23,6 +23,9 @@ public sealed class Font : ITracksChanges
     /// names the built-in metric-compatible sans family shipped with the library rather than the Adobe typeface; the
     /// built-in families are the sans (<c>"Helvetica"</c>), serif (<c>"Times"</c>), monospace (<c>"Courier"</c>),
     /// <c>"Symbol"</c> and <c>"ZapfDingbats"</c> faces, for which the library ships metrics but no font files.
+    /// The built-in families are the engine's default typefaces for every output format: text is measured with the
+    /// shipped metrics, PDF output names the matching standard viewer fonts without embedding a font program, and
+    /// other renderers substitute a face by family, style and those metrics.
     /// Register a font file with <see cref="FontCollection.Register(string, System.IO.Stream)"/> to use any other family.</summary>
     public string? Family
     {
