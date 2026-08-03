@@ -216,4 +216,34 @@ public class ReaderCryptoRobustnessTests
         Assert.True(reader.IsEncrypted, "Repair dropped /Encrypt.");
         Assert.Contains("Hello encrypted world!", ContentText(reader));
     }
+
+    private static byte[] ClassicPdf(string extraTrailer)
+    {
+        var pdf = new FixturePdf().Append("%PDF-1.7\n");
+        pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        pdf.Object(2, "2 0 obj\n<< /Type /Pages /Kids [] /Count 0 >>\nendobj\n");
+        var xref = pdf.Position;
+        pdf.Append("xref\n0 3\n")
+            .Append(FixturePdf.Entry20(0, 65535, 'f'))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(1)))
+            .Append(FixturePdf.Entry20(pdf.OffsetOf(2)))
+            .Append("trailer\n<< /Size 3 /Root 1 0 R" + extraTrailer + " >>\nstartxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
+    public void EncryptEntryThatIsNotADictionary_Throws()
+    {
+        Assert.Throws<DocumentParseException>(() => DocumentReader.Parse(ClassicPdf(" /Encrypt [ 1 2 ]")));
+    }
+
+    [Fact]
+    public void NoEncryptEntry_ParsesUnencrypted()
+    {
+        var reader = DocumentReader.Parse(ClassicPdf(""));
+
+        Assert.False(reader.IsEncrypted);
+        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
+        Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
+    }
 }

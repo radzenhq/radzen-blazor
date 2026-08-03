@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents;
@@ -8,7 +9,7 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class CmapTests
 {
-    private static byte[] BuildFormat12Cmap()
+    private static byte[] BuildFormat12Cmap(long numGroups = 2)
     {
         var bytes = new List<byte>();
 
@@ -27,7 +28,6 @@ public class CmapTests
         U16(10);
         U32(12);
 
-        const int numGroups = 2;
         U16(12);
         U16(0);
         U32(16 + numGroups * 12);
@@ -61,5 +61,19 @@ public class CmapTests
         var mapper = Cmap.Parse(BuildFormat12Cmap());
         Assert.Equal(0, (int)mapper.GetGlyphId(0x1F610));
         Assert.Equal(0, (int)mapper.GetGlyphId('A'));
+    }
+
+    [Fact]
+    public void Format12_OversizedNumGroups_Throws()
+    {
+        Assert.Throws<InvalidDataException>(() => Cmap.Parse(BuildFormat12Cmap(numGroups: 0x4000_0000)));
+    }
+
+    [Fact]
+    public void Format12_ValidGroups_StillParse()
+    {
+        var mapper = Cmap.Parse(BuildFormat12Cmap(numGroups: 2));
+        Assert.Equal(5, (int)mapper.GetGlyphId(0x1F600));
+        Assert.Equal(6, (int)mapper.GetGlyphId(0x1F601));
     }
 }

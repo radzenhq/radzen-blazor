@@ -396,4 +396,127 @@ public class ContainerOverlayRotationTests
         Font = new EmittedFont { Key = "F0", Base14 = "Helvetica" },
         Bytes = Encoding.ASCII.GetBytes("Hi"),
     };
+
+    private static EdgeDraw Edge() => new()
+    {
+        X1 = 10,
+        Y1 = 20,
+        X2 = 110,
+        Y2 = 20,
+        LineWidth = 2,
+        Color = Color.Black,
+        Style = BorderStyle.Solid,
+    };
+
+    [Fact]
+    public void ApplyTransform_RotatedRoundedFill_Throws()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.Fills.Add(new FillDraw
+        {
+            X = 10,
+            Y = 20,
+            Width = 100,
+            Height = 40,
+            Color = Color.FromRgb(200, 200, 200),
+            Radius = 8,
+        });
+
+        Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
+    }
+
+    [Fact]
+    public void ApplyTransform_RotatedRoundedBorder_Throws()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.RoundedStrokes.Add(new RoundedStrokeDraw
+        {
+            X = 10,
+            Y = 20,
+            Width = 100,
+            Height = 40,
+            Radius = 6,
+            LineWidth = 1,
+            Color = Color.Black,
+            Style = BorderStyle.Solid,
+        });
+
+        Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
+    }
+
+    [Fact]
+    public void ApplyTransform_RotatedEdgeWithRoundedClip_ThrowsNamingTheEdge()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.Edges.Add(Edge());
+        PageDrawTransformer.ApplyRoundedClip(plan, new PdfRect(10, 20, 100, 40), 6, mark);
+
+        var error = Assert.Throws<NotSupportedException>(() => PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark));
+        Assert.Contains("edge", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ApplyTransform_RotatedEdgeWithoutClip_KeepsRotatingEndpoints()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.Edges.Add(Edge());
+
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(90), mark);
+
+        var edge = Assert.Single(plan.Edges);
+        Assert.Equal(-20, edge.X1, 6);
+        Assert.Equal(10, edge.Y1, 6);
+        Assert.Null(edge.Clip);
+    }
+
+    [Fact]
+    public void ApplyTransform_RotatedEdgeWithSquareClip_DoesNotThrow()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.Edges.Add(Edge());
+        PageDrawTransformer.ApplyRoundedClip(plan, new PdfRect(10, 20, 100, 40), 0, mark);
+
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark);
+        Assert.Single(plan.Edges);
+    }
+
+    [Fact]
+    public void ApplyTransform_RotatedSquareFill_DoesNotThrow()
+    {
+        var plan = new PagePlan { Size = PageSizes.A4 };
+        var mark = plan.Mark();
+        plan.Fills.Add(new FillDraw
+        {
+            X = 10,
+            Y = 20,
+            Width = 100,
+            Height = 40,
+            Color = Color.FromRgb(200, 200, 200),
+        });
+
+        PageDrawTransformer.ApplyTransform(plan, Matrix.Rotate(30), mark);
+        Assert.Single(plan.Edges);
+    }
+
+    [Fact]
+    public void RotatedContainer_RoundedTableWithBorderEdgesAndNoFills_Throws()
+    {
+        var document = new Document();
+        BuildTestSupport.RegisterLatin(document);
+        var section = document.Sections.Add();
+        var container = section.Blocks.Add(new Container { Rotation = 30 });
+        var table = container.Blocks.AddTable();
+        table.Columns.Add(Unit.FromPoint(150));
+        table.Borders.Top.Width = 1;
+        table.CornerRadius = Unit.FromPoint(8);
+        var run = table.Rows.Add().Cells[0].Blocks.AddParagraph().Inlines.Add("NoFill");
+        run.Font.Family = BuildTestSupport.Latin;
+
+        Assert.Throws<NotSupportedException>(() => new DocumentRenderer().Render(document));
+    }
 }

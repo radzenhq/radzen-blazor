@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Xunit;
 using Radzen.Documents.Fonts.Sfnt;
@@ -165,5 +166,41 @@ public class CffParserTests
         Array.Copy(cffTable, truncated, 32);
 
         Assert.ThrowsAny<Exception>(() => CffFont.Parse(truncated));
+    }
+
+    private static byte[][] ThreeCharStrings() => [[0x0E], [0x0E], [239, 0x0E]];
+
+    [Fact]
+    public void Parse_PrivateDictSizePastEnd_Throws()
+    {
+        var data = CffFixtureBuilder.Build([0x8B, 20], ThreeCharStrings(), (cs, priv) =>
+        {
+            var dict = new List<byte>();
+            CffFixtureBuilder.Int5(dict, cs);
+            dict.Add(17);
+            CffFixtureBuilder.Int5(dict, 0x7FFF_FFFF);
+            CffFixtureBuilder.Int5(dict, priv);
+            dict.Add(18);
+            return [.. dict];
+        });
+
+        Assert.Throws<InvalidDataException>(() => CffFont.Parse(data));
+    }
+
+    [Fact]
+    public void Parse_ValidPrivateDict_StillParses()
+    {
+        var font = CffFont.Parse(CffFixtureBuilder.Build([0x8B, 20], ThreeCharStrings()));
+        Assert.Equal(3, font.GlyphCount);
+    }
+
+    [Theory]
+    [InlineData(new byte[] { 29 })]
+    [InlineData(new byte[] { 28 })]
+    [InlineData(new byte[] { 12 })]
+    [InlineData(new byte[] { 0xF7 })]
+    public void CffDictTruncatedOperand_ThrowsInvalidData(byte[] dict)
+    {
+        Assert.Throws<InvalidDataException>(() => CffDict.Parse(dict));
     }
 }

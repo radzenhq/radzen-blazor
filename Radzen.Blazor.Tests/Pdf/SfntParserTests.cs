@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Xunit;
@@ -209,5 +210,89 @@ public class SfntParserTests
         }
 
         Assert.Throws<InvalidDataException>(() => SfntFont.Parse(bytes));
+    }
+
+    [Fact]
+    public void TableRecordPastEnd_Throws()
+    {
+        var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 0xFFFF_FFF0u));
+        Assert.Throws<InvalidDataException>(() => font.TryGetTable("TEST", out _));
+    }
+
+    [Fact]
+    public void InBoundsTable_StillReturned()
+    {
+        var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 4));
+        Assert.True(font.TryGetTable("TEST", out var table));
+        Assert.Equal(4, table.Length);
+    }
+
+    [Fact]
+    public void WithoutHorizontalMetrics_Throws()
+    {
+        var error = Assert.Throws<InvalidDataException>(
+            () => SfntFont.Parse(MinimalSfnt(bogusTableLength: 4, numberOfHMetrics: 0)));
+
+        Assert.Contains("no horizontal metrics", error.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TableRecordPastEnd_MemoryVariant_Throws()
+    {
+        var font = SfntFont.Parse(MinimalSfnt(bogusTableLength: 0xFFFF_FFF0u));
+        Assert.Throws<InvalidDataException>(() => font.TryGetTableMemory("TEST", out _));
+    }
+
+    private static byte[] MinimalSfnt(uint bogusTableLength, int numberOfHMetrics = 1)
+    {
+        const int numTables = 5;
+        var dirLen = 12 + (numTables * 16);
+        var head = new byte[54];
+        var maxp = new byte[6];
+        var hhea = new byte[36];
+        hhea[34] = (byte)(numberOfHMetrics >> 8);
+        hhea[35] = (byte)numberOfHMetrics;
+        var hmtx = new byte[4];
+        var test = new byte[] { 1, 2, 3, 4 };
+
+        var headOffset = dirLen;
+        var maxpOffset = headOffset + head.Length;
+        var hheaOffset = maxpOffset + maxp.Length;
+        var hmtxOffset = hheaOffset + hhea.Length;
+        var testOffset = hmtxOffset + hmtx.Length;
+
+        var buffer = new List<byte>();
+        void U16(int v) { buffer.Add((byte)(v >> 8)); buffer.Add((byte)v); }
+        void U32(long v)
+        {
+            buffer.Add((byte)(v >> 24));
+            buffer.Add((byte)(v >> 16));
+            buffer.Add((byte)(v >> 8));
+            buffer.Add((byte)v);
+        }
+
+        void Record(string tag, long offset, long length)
+        {
+            buffer.AddRange(Encoding.ASCII.GetBytes(tag));
+            U32(0);
+            U32(offset);
+            U32(length);
+        }
+
+        U32(0x00010000);
+        U16(numTables);
+        U16(0); U16(0); U16(0);
+        Record("head", headOffset, head.Length);
+        Record("maxp", maxpOffset, maxp.Length);
+        Record("hhea", hheaOffset, hhea.Length);
+        Record("hmtx", hmtxOffset, hmtx.Length);
+        Record("TEST", testOffset, bogusTableLength);
+
+        buffer.AddRange(head);
+        buffer.AddRange(maxp);
+        buffer.AddRange(hhea);
+        buffer.AddRange(hmtx);
+        buffer.AddRange(test);
+        return buffer.ToArray();
     }
 }

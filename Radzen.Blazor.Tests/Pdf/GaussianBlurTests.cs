@@ -56,4 +56,25 @@ public class GaussianBlurTests
             }
         }
     }
+
+    [Fact]
+    public void HugeBlur_ProducesBoundedRaster()
+    {
+        var mask = GaussianBlur.Render(250, 250, 0, 200);
+
+        Assert.True(mask.Width < 400, $"width {mask.Width} should be bounded");
+        Assert.True(mask.Height < 400, $"height {mask.Height} should be bounded");
+
+        var soft = false;
+        foreach (var p in mask.Pixels)
+        {
+            if (p is > 0 and < 255)
+            {
+                soft = true;
+                break;
+            }
+        }
+
+        Assert.True(soft, "a blurred shape still has a soft edge");
+    }
 }

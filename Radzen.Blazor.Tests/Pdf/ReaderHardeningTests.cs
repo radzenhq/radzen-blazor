@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -144,6 +145,34 @@ public class ReaderHardeningTests
         Assert.Equal(
             Encoding.ASCII.GetBytes("Hello ASCII85 world"),
             Ascii85Filter.Decode(encoded, 1 << 20));
+    }
+
+    [Fact]
+    public void Lzw_CodeBeyondNextSlot_Throws()
+    {
+        var bomb = PackLzw([256, 65, 300]);
+        Assert.Throws<DocumentParseException>(() => LzwFilter.Decode(bomb, 1, 1 << 20));
+    }
+
+    [Fact]
+    public void Lzw_ValidKwKwK_StillDecodes()
+    {
+        var stream = PackLzw([256, 65, 258]);
+        Assert.Equal(new byte[] { 65, 65, 65 }, LzwFilter.Decode(stream, 1, 1 << 20));
+    }
+
+    [Fact]
+    public void Ascii85_TupleOverflows32Bits_Throws()
+    {
+        var data = Encoding.ASCII.GetBytes("uuuuu~>");
+        Assert.Throws<InvalidDataException>(() => Ascii85Filter.Decode(data, 1 << 20));
+    }
+
+    [Fact]
+    public void Ascii85_MaxValidTuple_StillDecodes()
+    {
+        var decoded = Ascii85Filter.Decode(Encoding.ASCII.GetBytes("s8W-!~>"), 1 << 20);
+        Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }, decoded);
     }
 
     private static byte[] PackLzw(List<int> codes)

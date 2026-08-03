@@ -1,4 +1,5 @@
 #nullable enable
+using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
@@ -103,6 +104,77 @@ public class ObjectStreamTests
         var reader = DocumentReader.Parse(HandCraftedObjStmFile());
         var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
         Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
+    }
+
+    private static byte[] ObjStmWithMemberOffset(int memberOffset)
+    {
+        var header = $"1 {memberOffset} ";
+        var body = "42";
+        var stmData = header + body;
+        var first = header.Length;
+
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        var offset4 = pdf.Position;
+        pdf.Append($"4 0 obj\n<< /Type /ObjStm /N 1 /First {first} /Length {stmData.Length} >>\nstream\n")
+            .Append(stmData)
+            .Append("\nendstream\nendobj\n");
+
+        var offset5 = pdf.Position;
+        var payload = new byte[12];
+        Copy(payload, 0, FixturePdf.XrefStreamEntry(2, 4, 0));
+        Copy(payload, 4, FixturePdf.XrefStreamEntry(1, (int)offset4, 0));
+        Copy(payload, 8, FixturePdf.XrefStreamEntry(1, (int)offset5, 0));
+
+        pdf.Append("5 0 obj\n<< /Type /XRef /Size 6 /Index [1 1 4 2] /W [1 2 1] /Root 4 0 R /Length 12 >>\nstream\n")
+            .Append(payload)
+            .Append("\nendstream\nendobj\n")
+            .Append("startxref\n" + offset5 + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
+
+    [Fact]
+    public void ObjStmNegativeMemberOffset_ThrowsDocumentParseException()
+    {
+        var reader = DocumentReader.Parse(ObjStmWithMemberOffset(-100000));
+        var exception = Record.Exception(() => reader.GetObject(1));
+        Assert.IsType<DocumentParseException>(exception);
+    }
+
+    [Fact]
+    public void ObjStmMemberNumberMismatch_Throws()
+    {
+        var b0 = "42";
+        var b1 = "<< /Type /Catalog >>";
+        var body = b0 + "\n" + b1;
+        var off1 = (b0 + "\n").Length;
+
+        var header = $"99 0 2 {off1} ";
+        var stmData = header + body;
+        var first = header.Length;
+
+        var pdf = new FixturePdf().Append("%PDF-1.5\n");
+        var offStm = pdf.Position;
+        pdf.Append($"4 0 obj\n<< /Type /ObjStm /N 2 /First {first} /Length {stmData.Length} >>\nstream\n")
+            .Append(stmData)
+            .Append("\nendstream\nendobj\n");
+
+        var offXref = pdf.Position;
+        var payload = new byte[16];
+        Copy(payload, 0, FixturePdf.XrefStreamEntry(2, 4, 0));
+        Copy(payload, 4, FixturePdf.XrefStreamEntry(2, 4, 1));
+        Copy(payload, 8, FixturePdf.XrefStreamEntry(1, (int)offStm, 0));
+        Copy(payload, 12, FixturePdf.XrefStreamEntry(1, (int)offXref, 0));
+        pdf.Append("5 0 obj\n<< /Type /XRef /Size 6 /Index [1 2 4 2] /W [1 2 1] /Root 2 0 R /Length 16 >>\nstream\n")
+            .Append(payload)
+            .Append("\nendstream\nendobj\n")
+            .Append("startxref\n" + offXref + "\n%%EOF\n");
+
+        var reader = DocumentReader.Parse(pdf.ToArray());
+
+        var catalog = Assert.IsType<DictionaryObject>(reader.GetObject(2));
+        Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
+
+        Assert.Throws<DocumentParseException>(() => reader.GetObject(1));
     }
 
     private static void Copy(byte[] target, int at, byte[] source)
