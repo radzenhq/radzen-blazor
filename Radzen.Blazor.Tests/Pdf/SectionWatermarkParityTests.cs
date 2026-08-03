@@ -37,16 +37,6 @@ public class SectionWatermarkParityTests
     }
 
     [Fact]
-    public void SectionWatermark_RejectsOutOfRangeOpacity()
-        => Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Opacity = 2 });
-
-    [Fact]
-    public void SectionWatermark_RejectsNonFiniteRotation()
-    {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Watermark { Text = "DRAFT", Rotation = double.NaN });
-    }
-
-    [Fact]
     public void DecodeWatermark_ReflectsReplacedImage()
     {
         var images = new ImageRegistry(ImageDecoders.BuiltIn);

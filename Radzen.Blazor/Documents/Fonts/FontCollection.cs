@@ -883,9 +883,6 @@ public sealed class FontCollection
 
     internal SfntFont? ResolveFace(Font font) => TryResolvePrimary(font, out var face) ? face : null;
 
-    internal SfntFont? ResolveFace(in FontPaint font)
-        => TryResolvePrimary(font, out var face) ? face : null;
-
     internal bool TryResolvePrimary(Font font, out SfntFont primary)
         => Freeze().Snapshot.TryResolvePrimary(
             font.EffectiveFamily,
