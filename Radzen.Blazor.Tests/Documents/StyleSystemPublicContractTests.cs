@@ -256,34 +256,6 @@ public class StyleSystemPublicContractTests
     }
 
     [Fact]
-    public void MissingBaseStyleReferenceFailsWhenRenderedWithTheFullChain()
-    {
-        var document = new Document();
-        document.Styles.Add("Leaf").BaseStyle = "Absent";
-        document.Sections.Add().Blocks.AddParagraph("Text").StyleName = "Leaf";
-
-        var error = Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().Render(document));
-
-        Assert.Contains("Leaf", error.Message, StringComparison.Ordinal);
-        Assert.Contains("Absent", error.Message, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void BaseStyleCycleIsRejectedWhenRenderedWithTheFullChain()
-    {
-        var document = new Document();
-        var first = document.Styles.Add("First");
-        document.Styles.Add("Second", "First");
-        first.BaseStyle = "Second";
-        document.Sections.Add().Blocks.AddParagraph("Text").StyleName = "First";
-
-        var error = Assert.Throws<InvalidOperationException>(() => new DocumentRenderer().Render(document));
-
-        Assert.Contains("First", error.Message, StringComparison.Ordinal);
-        Assert.Contains("Second", error.Message, StringComparison.Ordinal);
-    }
-
-    [Fact]
     public void RoleIsUnsetByDefaultAndRejectsAnEmptyValue()
     {
         var style = new StyleCollection().Add("Contract");

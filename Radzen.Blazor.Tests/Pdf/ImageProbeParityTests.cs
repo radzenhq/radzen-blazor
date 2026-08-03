@@ -26,26 +26,7 @@ public class ImageProbeParityTests
         "Images/cmyk.jpg",
     ];
 
-    private sealed record Sizing(double? Width, double? Height, double? BoxWidth, double? BoxHeight, double AvailableWidth);
-
-    private static readonly Sizing[] Sizings =
-    [
-        new(null, null, null, null, double.PositiveInfinity),
-        new(null, null, null, null, 20),
-        new(null, null, null, null, 1000),
-        new(null, null, null, null, 0),
-        new(100, null, null, null, double.PositiveInfinity),
-        new(null, 100, null, null, 30),
-        new(100, 50, null, null, 10),
-        new(null, null, 80, 80, double.PositiveInfinity),
-        new(100, 50, 80, 80, 5),
-        new(null, null, 30, 120, 7),
-    ];
-
     private static byte[] Bytes(string resource) => PdfTestResources.ReadAllBytes(resource);
-
-    private static (double Width, double Height) Decoded(Image image, double availableWidth)
-        => ImageTestHelpers.Measure(image, ImageTestHelpers.Decode(image.Data), availableWidth);
 
     [Theory]
     [MemberData(nameof(ImageResources))]
