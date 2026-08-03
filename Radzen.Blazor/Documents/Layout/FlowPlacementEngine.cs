@@ -5,28 +5,12 @@ using Radzen.Documents.LaidOut;
 
 namespace Radzen.Documents.Layout;
 
-internal enum FlowBreakability
+internal abstract class FlowPlacementEngine(bool guardParagraphMarkers) : ILoweredBlockHandler<int, Nothing>
 {
-    Continuous,
-    Paginated,
-}
-
-internal readonly record struct FlowPlacementPolicy(
-    FlowBreakability Breakability,
-    Action Continue,
-    bool GuardParagraphMarkers);
-
-internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILoweredBlockHandler<int, Nothing>
-{
-    protected FlowPlacementPolicy Policy { get; } = policy;
+    protected bool GuardParagraphMarkers { get; } = guardParagraphMarkers;
 
     internal static PagesFlowPlacementEngine ForPages(PaginationContext pages)
-        => new(
-            new FlowPlacementPolicy(
-                FlowBreakability.Paginated,
-                pages.PlaceBreak,
-                GuardParagraphMarkers: true),
-            pages);
+        => new(pages);
 
     internal static BandFlowPlacementEngine ForBand(
         BandLayout band,
@@ -34,16 +18,7 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         FontCollection fonts,
         LoweringResult resolution,
         LayoutCaptureContext capture)
-        => new(
-            new FlowPlacementPolicy(
-                FlowBreakability.Continuous,
-                static () => { },
-                GuardParagraphMarkers: false),
-            band,
-            width,
-            fonts,
-            resolution,
-            capture);
+        => new(band, width, fonts, resolution, capture);
 
     internal static BoxFlowPlacementEngine ForBox(
         double contentWidth,
@@ -51,29 +26,12 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
         FontCollection fonts,
         LoweringResult resolution,
         LayoutCaptureContext capture)
-        => new(
-            new FlowPlacementPolicy(
-                FlowBreakability.Continuous,
-                static () => { },
-                GuardParagraphMarkers: true),
-            contentWidth,
-            align,
-            fonts,
-            resolution,
-            capture);
+        => new(contentWidth, align, fonts, resolution, capture);
 
     internal void Place(Block block, int index)
         => LoweredBlockDispatch.Place(block, this, index);
 
-    public Nothing PageBreak(PageBreak block, int index)
-    {
-        if (Policy.Breakability == FlowBreakability.Paginated)
-        {
-            Policy.Continue();
-        }
-
-        return default;
-    }
+    public virtual Nothing PageBreak(PageBreak block, int index) => default;
 
     public abstract Nothing Table(Table table, int index);
 
@@ -86,9 +44,15 @@ internal abstract class FlowPlacementEngine(FlowPlacementPolicy policy) : ILower
     public abstract Nothing Paragraph(Paragraph paragraph, int index);
 }
 
-internal sealed class PagesFlowPlacementEngine(FlowPlacementPolicy policy, PaginationContext pages)
-    : FlowPlacementEngine(policy)
+internal sealed class PagesFlowPlacementEngine(PaginationContext pages)
+    : FlowPlacementEngine(guardParagraphMarkers: true)
 {
+    public override Nothing PageBreak(PageBreak block, int index)
+    {
+        pages.PlaceBreak();
+        return default;
+    }
+
     public override Nothing Table(Table table, int index)
     {
         pages.PlaceTable(index, table);
@@ -129,13 +93,13 @@ internal sealed class PagesFlowPlacementEngine(FlowPlacementPolicy policy, Pagin
 }
 
 internal abstract class ContentFlowPlacementEngine(
-    FlowPlacementPolicy policy,
+    bool guardParagraphMarkers,
     double width,
     HorizontalAlignment? align,
     FontCollection fonts,
     LoweringResult resolution,
     LayoutCaptureContext capture)
-    : FlowPlacementEngine(policy)
+    : FlowPlacementEngine(guardParagraphMarkers)
 {
     protected FontCollection Fonts => fonts;
 
@@ -147,7 +111,7 @@ internal abstract class ContentFlowPlacementEngine(
 
     protected LineBox? Marker(Block block)
     {
-        if (Policy.GuardParagraphMarkers && block is Paragraph)
+        if (GuardParagraphMarkers && block is Paragraph)
         {
             return null;
         }
@@ -236,13 +200,12 @@ internal abstract class ContentFlowPlacementEngine(
 }
 
 internal sealed class BandFlowPlacementEngine(
-    FlowPlacementPolicy policy,
     BandLayout band,
     double width,
     FontCollection fonts,
     LoweringResult resolution,
     LayoutCaptureContext capture)
-    : ContentFlowPlacementEngine(policy, width, align: null, fonts, resolution, capture)
+    : ContentFlowPlacementEngine(guardParagraphMarkers: false, width, align: null, fonts, resolution, capture)
 {
     private int order;
 
@@ -372,13 +335,12 @@ internal sealed class BandFlowPlacementEngine(
 }
 
 internal sealed class BoxFlowPlacementEngine(
-    FlowPlacementPolicy policy,
     double width,
     HorizontalAlignment? align,
     FontCollection fonts,
     LoweringResult resolution,
     LayoutCaptureContext capture)
-    : ContentFlowPlacementEngine(policy, width, align, fonts, resolution, capture)
+    : ContentFlowPlacementEngine(guardParagraphMarkers: true, width, align, fonts, resolution, capture)
 {
     internal List<CellItem> Items { get; } = [];
 
