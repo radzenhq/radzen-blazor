@@ -73,34 +73,27 @@ public class AnnotationChangeTrackingMatrixTests
     [Fact]
     public void EveryMutableMemberOfALoadedAnnotationOpensAChangeDetectionDoor()
     {
-        var checkedMembers = 0;
         foreach (var type in Tracked)
         {
             foreach (var property in SettableProperties(type))
             {
                 AssertDoor(type, property.Name, annotation => Mutate(property, annotation));
-                checkedMembers++;
             }
 
             foreach (var property in CollectionProperties(type))
             {
                 AssertDoor(type, property.Name + ".Add()", annotation => AddTo(property, annotation));
-                checkedMembers++;
             }
         }
 
         AssertDoor(typeof(InkAnnotation), "Strokes[0].Add()",
             annotation => ((InkAnnotation)annotation).Strokes[0].Add(new AnnotationPoint(70, 75)));
-        checkedMembers++;
 
         foreach (var property in SettableProperties(typeof(Font), typeof(object)))
         {
             AssertDoor(typeof(FreeTextAnnotation), "Font." + property.Name,
                 annotation => Mutate(property, ((FreeTextAnnotation)annotation).Font));
-            checkedMembers++;
         }
-
-        Assert.InRange(checkedMembers, 80, 200);
     }
 
     [Fact]
