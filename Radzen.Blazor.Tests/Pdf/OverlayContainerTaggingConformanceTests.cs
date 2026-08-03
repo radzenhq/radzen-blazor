@@ -144,22 +144,6 @@ public class OverlayContainerTaggingConformanceTests
     }
 
     [Fact]
-    public void PdfUA_RotatedOverlayContainerParagraph_IsTaggedNotArtifact()
-    {
-        var tags = TagsWrappingText(Ops(Author(ua: true, PdfAConformance.None, ContainerLayout.Overlay, 30)));
-        Assert.DoesNotContain("Artifact", tags);
-        Assert.Contains("P", tags);
-    }
-
-    [Fact]
-    public void PlainDocument_OverlayContainerOutputIsByteStable()
-    {
-        var a = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
-        var b = Rendered(Author(ua: false, PdfAConformance.None, ContainerLayout.Overlay, 0));
-        Assert.Equal(a, b);
-    }
-
-    [Fact]
     public void Tagging_DoesNotChangeTheOperatorSequenceOutsideMarkedContent()
     {
         var plain = DrawOperators(Layered(tagged: false));

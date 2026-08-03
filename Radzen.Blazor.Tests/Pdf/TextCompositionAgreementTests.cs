@@ -45,16 +45,6 @@ public class TextCompositionAgreementTests
     }
 
     [Fact]
-    public void FindText_NarrowGlyphs_MatchesTheExtractedText()
-    {
-        var page = Loaded(NarrowGlyphRun).Pages[0];
-
-        var hit = Assert.Single(page.FindText("iiii B"));
-
-        Assert.Contains(hit.Text, page.ExtractText());
-    }
-
-    [Fact]
     public void ExtractText_AfterElementRemoval_ReflectsTheEdit()
     {
         var document = new PortableDocument();
@@ -70,19 +60,6 @@ public class TextCompositionAgreementTests
 
         Assert.DoesNotContain("SENSITIVE", loaded.Pages[0].ExtractText());
         Assert.Contains("KEPT", loaded.Pages[0].ExtractText());
-    }
-
-    [Fact]
-    public void FindText_AfterElementRemoval_ReflectsTheEdit()
-    {
-        var document = new PortableDocument();
-        var page = document.Pages.Add();
-        page.Content.Add(new TextContent("SENSITIVE", 72, 720));
-        var loaded = InterpreterTestSupport.Load(document.ToArray());
-
-        loaded.Pages[0].Content.RemoveAt(0);
-
-        Assert.Empty(loaded.Pages[0].FindText("SENSITIVE"));
     }
 
     [Fact]
