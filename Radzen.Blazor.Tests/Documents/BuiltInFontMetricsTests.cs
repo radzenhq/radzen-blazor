@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -130,7 +131,7 @@ public class BuiltInFontMetricsTests
     {
         var metrics = BuiltInFontMetrics.Resolve(MakeFont(family, bold, italic));
         Assert.NotNull(metrics);
-        Assert.Equal(expected, metrics!.PostScriptName);
+        Assert.Equal(expected, StandardFonts.PostScriptName(metrics!.Face()));
     }
 
     [Fact]
@@ -138,7 +139,7 @@ public class BuiltInFontMetricsTests
     {
         var metrics = BuiltInFontMetrics.Resolve(MakeFont("helvetica", bold: true));
         Assert.NotNull(metrics);
-        Assert.Equal("Helvetica-Bold", metrics!.PostScriptName);
+        Assert.Equal("Helvetica-Bold", StandardFonts.PostScriptName(metrics!.Face()));
     }
 
     [Theory]
@@ -149,7 +150,7 @@ public class BuiltInFontMetricsTests
     {
         var metrics = BuiltInFontMetrics.Resolve(MakeFont(psName));
         Assert.NotNull(metrics);
-        Assert.Equal(psName, metrics!.PostScriptName);
+        Assert.Equal(psName, StandardFonts.PostScriptName(metrics!.Face()));
     }
 
     [Theory]
@@ -169,7 +170,7 @@ public class BuiltInFontMetricsTests
     {
         var metrics = BuiltInFontMetrics.Resolve(MakeFont(family, bold: true, italic: true));
         Assert.NotNull(metrics);
-        Assert.Equal(expected, metrics!.PostScriptName);
+        Assert.Equal(expected, StandardFonts.PostScriptName(metrics!.Face()));
     }
 
     [Theory]
