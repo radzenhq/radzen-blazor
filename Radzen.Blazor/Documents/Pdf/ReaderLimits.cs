@@ -6,8 +6,8 @@ namespace Radzen.Documents.Pdf;
 /// Resource limits applied while reading a PDF, to bound work on malformed or hostile input.
 /// A general-purpose reader is fed untrusted files; these caps turn attacker-controlled
 /// sizes/depths into a recoverable <see cref="DocumentParseException"/> instead of a hang,
-/// out-of-memory, or process-killing stack overflow. All defaults are generous for real
-/// documents and configurable via the reading entry points. The inherited
+/// out-of-memory, or process-killing stack overflow. The limits are generous for real
+/// documents. The inherited
 /// <see cref="ResourceLimits"/> caps bound authored input as well, and govern the image decoders
 /// used during rendering.
 /// </summary>
@@ -48,8 +48,8 @@ public sealed class ReaderLimits : ResourceLimits
     /// </summary>
     public long ExpansionRatioFloorBytes { get; internal init; } = 16L * 1024 * 1024;
 
-    /// <summary>Maximum number of filters that may be chained on a single stream. Default 8.</summary>
-    public int MaxFilterChainLength { get; internal init; } = 8;
+    /// <summary>Maximum number of filters that may be chained on a single stream. The limit is 8.</summary>
+    public int MaxFilterChainLength => 8;
 
     /// <summary>Maximum number of cross-reference entries built from an xref (stream or table). Default 8,000,000.</summary>
     public int MaxXrefEntries { get; internal init; } = 8_000_000;
@@ -91,7 +91,6 @@ public sealed class ReaderLimits : ResourceLimits
         RequirePositive(MaxAggregateDecodedBytes, nameof(MaxAggregateDecodedBytes));
         RequirePositive(MaxDecodeExpansionRatio, nameof(MaxDecodeExpansionRatio));
         RequirePositive(ExpansionRatioFloorBytes, nameof(ExpansionRatioFloorBytes));
-        RequirePositive(MaxFilterChainLength, nameof(MaxFilterChainLength));
         RequirePositive(MaxXrefEntries, nameof(MaxXrefEntries));
         RequirePositive(MaxObjectStreamCount, nameof(MaxObjectStreamCount));
         RequirePositive(MaxCMapEntries, nameof(MaxCMapEntries));
@@ -107,7 +106,6 @@ public sealed class ReaderLimits : ResourceLimits
             MaxAggregateDecodedBytes = MaxAggregateDecodedBytes,
             MaxDecodeExpansionRatio = MaxDecodeExpansionRatio,
             ExpansionRatioFloorBytes = ExpansionRatioFloorBytes,
-            MaxFilterChainLength = MaxFilterChainLength,
             MaxXrefEntries = MaxXrefEntries,
             MaxObjectStreamCount = MaxObjectStreamCount,
             MaxCMapEntries = MaxCMapEntries,
