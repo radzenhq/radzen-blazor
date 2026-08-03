@@ -1,5 +1,4 @@
 using System;
-using Radzen.Documents.Core;
 
 namespace Radzen.Documents.Pdf;
 
@@ -38,11 +37,6 @@ public readonly struct PdfRect(double left, double bottom, double right, double 
     /// <summary>Creates a rectangle from its lower-left corner and a size.</summary>
     public static PdfRect FromSize(double left, double bottom, double width, double height)
         => new(left, bottom, left + width, bottom + height);
-
-    internal static PdfRect FromLayout(Rect rect, double pageHeight)
-        => new(rect.Left, pageHeight - rect.Bottom, rect.Right, pageHeight - rect.Top);
-
-    internal Rect ToLayout(double pageHeight) => new(Left, pageHeight - Top, Width, Height);
 
     /// <summary>Determines whether two rectangles are equal.</summary>
     public static bool operator ==(PdfRect left, PdfRect right) => left.Equals(right);

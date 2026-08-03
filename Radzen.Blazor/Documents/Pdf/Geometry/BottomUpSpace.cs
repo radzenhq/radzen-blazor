@@ -8,8 +8,6 @@ internal static class BottomUpSpace
 
     public static double Bottom(double top, double y, double height) => FromTop(top, y) - height;
 
-    public static double BottomFromTop(double top, double height) => FromTop(top, height);
-
     public static PageBox Box(double left, double top, in Rect bounds, double delta)
         => new(
             left + bounds.X,

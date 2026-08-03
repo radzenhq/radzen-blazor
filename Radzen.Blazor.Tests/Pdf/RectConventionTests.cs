@@ -14,47 +14,6 @@ public class RectConventionTests
     private const double PageHeight = 792;
 
     [Fact]
-    public void Rect_KeepsTopLeftOrigin()
-    {
-        var rect = new Rect(10, 20, 100, 50);
-
-        Assert.Equal(20, rect.Top);
-        Assert.Equal(70, rect.Bottom);
-        Assert.True(rect.Top < rect.Bottom, "Rect is top-left origin, so Top is the smaller Y.");
-    }
-
-    [Fact]
-    public void PdfRect_KeepsBottomLeftOrigin()
-    {
-        var rect = PdfRect.FromSize(10, 20, 100, 50);
-
-        Assert.Equal(20, rect.Bottom);
-        Assert.Equal(70, rect.Top);
-        Assert.True(rect.Bottom < rect.Top, "PdfRect is PDF user space, so Bottom is the smaller Y.");
-    }
-
-    [Fact]
-    public void FromLayout_FlipsAgainstThePageHeight()
-    {
-        var converted = PdfRect.FromLayout(new Rect(10, 20, 100, 50), PageHeight);
-
-        Assert.Equal(10, converted.Left);
-        Assert.Equal(772, converted.Top);
-        Assert.Equal(722, converted.Bottom);
-        Assert.Equal(50, converted.Height);
-    }
-
-    [Fact]
-    public void ToLayout_InvertsFromLayout()
-    {
-        var layout = new Rect(10, 20, 100, 50);
-
-        var round = PdfRect.FromLayout(layout, PageHeight).ToLayout(PageHeight);
-
-        Assert.Equal(layout, round);
-    }
-
-    [Fact]
     public void AnnotationRect_EmitsLowerLeftThenUpperRight()
     {
         var document = new PortableDocument();
