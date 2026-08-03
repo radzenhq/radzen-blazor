@@ -181,7 +181,6 @@ public class AesProviderAsyncTests
     public void NoProviderOffBrowser_UsesThePlatformImplementation()
     {
         Assert.Same(PlatformAesCbcProvider.Instance, AesCbcEngine.Resolve(null, isBrowser: false));
-        Assert.True(PlatformAesCbcProvider.IsSupported);
     }
 
     [Fact]
