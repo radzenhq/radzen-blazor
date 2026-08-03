@@ -1471,7 +1471,7 @@ namespace Radzen
 
             var columnsWithCustomFilter = columns.Where(canFilterCustom).ToList();
 
-            if (columnsToFilter.Count > 0)
+            if (columnsWithCustomFilter.Count > 0)
             {
                 var expressions = columnsWithCustomFilter.Select(c => (c.GetCustomFilterExpression() ?? "").Replace(" or ", " || ", StringComparison.Ordinal).Replace(" and ", " && ", StringComparison.Ordinal)).Where(e => !string.IsNullOrEmpty(e)).ToList();
                 source = expressions.Count > 0 ?
