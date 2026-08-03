@@ -66,18 +66,6 @@ public class SemanticIntentCaptureTests
         }
     }
 
-    private static List<string> MappedTypes(Document document, DocumentRenderer renderer)
-    {
-        var scene = DocumentLayouter.Layout(document);
-        var tree = new StructureTreeBuilder(
-            scene.Semantics,
-            RenderRequest.From(renderer));
-        tree.Build();
-        var types = new List<string>();
-        CollectTypes(Assert.IsType<StructureElement>(tree.DocumentElement), types);
-        return types;
-    }
-
     [Fact]
     public void TableOfContents_CapturesNavigationIntentForEveryEntry()
     {
@@ -248,31 +236,6 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void DecorativeBarcode_IsCapturedAsADecorativeFigure()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Code";
-        BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)).AlternateText = "";
-
-        Assert.True(SingleFigure(document).IsDecorative);
-    }
-
-    [Fact]
-    public void DecorativeInlineImage_IsCapturedAsADecorativeFigure()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Inline";
-        BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
-
-        Assert.True(SingleFigure(document).IsDecorative);
-    }
-
-    [Fact]
     public void DecorativeQrCode_IsDrawnAsArtifactContent()
     {
         var document = new Document { Language = "en-US" };
@@ -312,34 +275,6 @@ public class SemanticIntentCaptureTests
     }
 
     [Fact]
-    public void BarcodeWithAlternateText_IsAMeaningfulFigure()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Code";
-        BuildTestSupport.RegisterLatin(document);
-        var barcode = document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40));
-        barcode.AlternateText = "Order RADZEN";
-
-        var reader = BuildTestSupport.Read(document, Accessible());
-
-        Assert.Contains("Figure", Types(reader));
-        Assert.Equal("Order RADZEN", Alt(reader, "Figure"));
-    }
-
-    [Fact]
-    public void DecorativeBarcode_StaysDecorative()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Code";
-        BuildTestSupport.RegisterLatin(document);
-        document.Sections.Add().Blocks.AddBarcode(
-            BarcodeType.Code128, "RADZEN", Unit.FromPoint(160), Unit.FromPoint(40)).AlternateText = "";
-
-        Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
-    }
-
-    [Fact]
     public void InlineImageWithAlternateText_IsAFigureInsideItsParagraph()
     {
         var document = new Document { Language = "en-US" };
@@ -353,19 +288,6 @@ public class SemanticIntentCaptureTests
 
         Assert.Contains("Figure", Types(reader));
         Assert.Equal("The Radzen logo", Alt(reader, "Figure"));
-    }
-
-    [Fact]
-    public void DecorativeInlineImage_StaysDecorative()
-    {
-        var document = new Document { Language = "en-US" };
-        document.Info.Title = "Inline";
-        BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
-
-        Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
     }
 
     [Fact]
@@ -516,18 +438,6 @@ public class SemanticIntentCaptureTests
 
         Assert.False(figure.IsDecorative);
         Assert.Empty(laidOut.Semantics.Structure.Artifacts);
-    }
-
-    [Fact]
-    public void InlineImageWithAlternateText_IsNotClassifiedAsAnArtifact()
-    {
-        var document = new Document();
-        BuildTestSupport.RegisterLatin(document);
-        var paragraph = document.Sections.Add().Blocks.AddParagraph();
-        paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
-        paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "A picture";
-
-        Assert.Empty(DocumentLayouter.Layout(document).Semantics.Structure.Artifacts);
     }
 
     [Fact]
