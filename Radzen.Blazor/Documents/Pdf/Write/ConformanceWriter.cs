@@ -188,6 +188,87 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
                 }
             }
         }
+
+        foreach (var (reader, annotation) in LiveAnnotations())
+        {
+            if (RequiresStructure(reader, annotation)
+                && reader.GetInt(annotation, "StructParent") is null)
+            {
+                throw new InvalidOperationException(Unstructured(
+                    $"the {AnnotationDescription(reader, annotation)} in the document graph has no /StructParent "
+                    + "entry",
+                    "remove the annotation, or express it as document content the renderer can tag - "
+                    + "a hyperlink through Inline.Link, a form field through a TextInput, CheckBox, "
+                    + "RadioButton or DropDown inline"));
+            }
+        }
+    }
+
+    // ISO 14289-1 7.18.1: an annotation of subtype Popup, and an annotation whose Hidden or NoView
+    // flag is set (ISO 32000-1 12.5.3), is not content and needs no structure element.
+    private static bool RequiresStructure(DocumentReader reader, DictionaryObject annotation)
+    {
+        if (string.Equals(reader.GetName(annotation, "Subtype"), "Popup", StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        var flags = (AnnotationFlags)(reader.GetInt(annotation, "F") ?? 0);
+        return (flags & (AnnotationFlags.Hidden | AnnotationFlags.NoView)) == 0;
+    }
+
+    private static string AnnotationDescription(DocumentReader reader, DictionaryObject annotation)
+    {
+        var subtype = reader.GetName(annotation, "Subtype") ?? "annotation";
+        var name = GraphImporter.DecodedName(reader, annotation);
+        return string.IsNullOrEmpty(name)
+            ? $"/{subtype} annotation"
+            : $"/{subtype} annotation of the form field '{name}'";
+    }
+
+    private IEnumerable<(DocumentReader Reader, DictionaryObject Annotation)> LiveAnnotations()
+    {
+        foreach (var page in document.Pages)
+        {
+            if (LiveNode(page) is not { } live)
+            {
+                continue;
+            }
+
+            var (reader, node) = live;
+            if (reader.GetArray(node, "Annots") is not { } annotations)
+            {
+                continue;
+            }
+
+            foreach (var entry in annotations)
+            {
+                if (reader.AsDictionary(entry) is { } annotation)
+                {
+                    yield return (reader, annotation);
+                }
+            }
+        }
+    }
+
+    private (DocumentReader Reader, DictionaryObject Node)? LiveNode(Page page)
+    {
+        if (document.Loaded is not { } loaded)
+        {
+            return null;
+        }
+
+        if (loaded.Source is { } source && loaded.SourcePages.TryGetValue(page, out var node))
+        {
+            return (source, node);
+        }
+
+        if (loaded.AppendedPages.TryGetValue(page, out var appended))
+        {
+            return appended;
+        }
+
+        return null;
     }
 
     // ISO 19005-2 6.2.11.4.1: every font used to render text shall be embedded, and ISO 32000-1 12.5.5
@@ -224,7 +305,7 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
             }
         }
 
-        ValidateLoadedAppearanceFonts();
+        ValidateAnnotationAppearanceFonts();
     }
 
     private void RequireEmbeddedAppearance(in OutputWidget widget)
@@ -256,24 +337,42 @@ internal sealed class ConformanceWriter(PortableDocument document, PageOutputMap
         }
     }
 
-    private void ValidateLoadedAppearanceFonts()
+    private void ValidateAnnotationAppearanceFonts()
     {
+        var validators = new Dictionary<DocumentReader, LoadedPageValidator>();
+
+        foreach (var (reader, annotation) in AnnotationDictionaries())
+        {
+            foreach (var stream in AppearanceStreams(reader, annotation))
+            {
+                if (reader.GetDictionary(stream.Dictionary, "Resources") is { } resources)
+                {
+                    if (!validators.TryGetValue(reader, out var validator))
+                    {
+                        validator = new LoadedPageValidator(reader, Label);
+                        validators[reader] = validator;
+                    }
+
+                    validator.Inspect(resources);
+                }
+            }
+        }
+    }
+
+    private IEnumerable<(DocumentReader Reader, DictionaryObject Annotation)> AnnotationDictionaries()
+    {
+        foreach (var live in LiveAnnotations())
+        {
+            yield return live;
+        }
+
         foreach (var page in document.Pages)
         {
             foreach (var entry in page.Annotations.Entries)
             {
-                if (entry.Dictionary is not { } dictionary || entry.Reader is not { } reader)
+                if (entry.Dictionary is { } dictionary && entry.Reader is { } reader)
                 {
-                    continue;
-                }
-
-                var validator = new LoadedPageValidator(reader, Label);
-                foreach (var stream in AppearanceStreams(reader, dictionary))
-                {
-                    if (reader.GetDictionary(stream.Dictionary, "Resources") is { } resources)
-                    {
-                        validator.Inspect(resources);
-                    }
+                    yield return (reader, dictionary);
                 }
             }
         }
