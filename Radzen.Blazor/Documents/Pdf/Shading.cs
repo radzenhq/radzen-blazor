@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Pdf.Objects;
@@ -13,10 +14,6 @@ internal static class ShadingBuilder
 
     // ISO 32000-1 Table 78: /Extend defaults to [false false].
     private static ArrayObject BothEndsExtended() => [new BooleanObject(true), new BooleanObject(true)];
-
-    public static DictionaryObject BuildShading(GradientBrush brush) => BuildShading(Describe(brush));
-
-    public static DictionaryObject BuildShading(in GradientPaint brush) => BuildShading(Describe(brush));
 
     private static DictionaryObject BuildShading(ShadingDescriptor shading) => new()
     {
@@ -46,34 +43,34 @@ internal static class ShadingBuilder
         _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.Kind}'."),
     };
 
-    private static ShadingDescriptor Describe(GradientBrush brush) => brush switch
+    private static ShadingDescriptor Describe(GradientBrush brush) => Describe(Paint(brush));
+
+    private static GradientPaint Paint(GradientBrush brush) => brush switch
     {
-        LinearGradient linear => new ShadingDescriptor(
-            2,
-            [
-                new NumberObject(linear.X0.Point), new NumberObject(linear.Y0.Point),
-                new NumberObject(linear.X1.Point), new NumberObject(linear.Y1.Point),
-            ],
+        LinearGradient linear => new GradientPaint(
+            default,
+            GradientPaintKind.Linear,
+            linear.X0.Point, linear.Y0.Point, 0,
+            linear.X1.Point, linear.Y1.Point, 0,
             Stops(brush)),
-        RadialGradient radial => new ShadingDescriptor(
-            3,
-            [
-                new NumberObject(radial.X0.Point), new NumberObject(radial.Y0.Point), new NumberObject(radial.R0.Point),
-                new NumberObject(radial.X1.Point), new NumberObject(radial.Y1.Point), new NumberObject(radial.R1.Point),
-            ],
+        RadialGradient radial => new GradientPaint(
+            default,
+            GradientPaintKind.Radial,
+            radial.X0.Point, radial.Y0.Point, radial.R0.Point,
+            radial.X1.Point, radial.Y1.Point, radial.R1.Point,
             Stops(brush)),
         _ => throw new NotSupportedException($"Unsupported gradient kind '{brush.GetType()}'."),
     };
 
-    private static GradientStopPaint[] Stops(GradientBrush brush)
+    private static ImmutableArray<GradientStopPaint> Stops(GradientBrush brush)
     {
-        var stops = new GradientStopPaint[brush.Stops.Count];
-        for (var i = 0; i < stops.Length; i++)
+        var stops = ImmutableArray.CreateBuilder<GradientStopPaint>(brush.Stops.Count);
+        foreach (var stop in brush.Stops)
         {
-            stops[i] = new GradientStopPaint(brush.Stops[i].Offset, brush.Stops[i].Color);
+            stops.Add(new GradientStopPaint(stop.Offset, stop.Color));
         }
 
-        return stops;
+        return stops.MoveToImmutable();
     }
 
     public static DictionaryObject BuildPattern(GradientBrush brush) => BuildPattern(Describe(brush));

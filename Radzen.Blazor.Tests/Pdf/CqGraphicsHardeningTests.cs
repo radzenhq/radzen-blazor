@@ -15,6 +15,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class CqGraphicsHardeningTests
 {
+    private static DictionaryObject Shading(GradientBrush brush)
+        => (DictionaryObject)ShadingBuilder.BuildPattern(brush)["Shading"]!;
+
     private static double Num(DocumentObject o) => Assert.IsType<NumberObject>(o).DoubleValue;
 
     private static ArrayObject Arr(DocumentObject o) => Assert.IsType<ArrayObject>(o);
@@ -89,7 +92,7 @@ public class CqGraphicsHardeningTests
             new GradientStop(0.5, Color.Blue),
             new GradientStop(1, Color.Blue));
 
-        var func = Assert.IsType<DictionaryObject>(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Assert.IsType<DictionaryObject>(Shading(brush)["Function"]!);
         var bounds = Arr(func["Bounds"]!);
 
         for (var i = 1; i < bounds.Count; i++)

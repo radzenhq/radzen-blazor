@@ -12,6 +12,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 // ISO 32000-1 7.10.3 (stitching functions): each adjacent stop pair interpolates over its own offset sub-range; endpoints stay constant outside [first, last].
 public class GradientStopOffsetTests
 {
+    private static DictionaryObject Shading(GradientBrush brush)
+        => (DictionaryObject)ShadingBuilder.BuildPattern(brush)["Shading"]!;
+
     private static DictionaryObject Dict(DocumentObject o) => Assert.IsType<DictionaryObject>(o);
 
     private static ArrayObject Array(DocumentObject o) => Assert.IsType<ArrayObject>(o);
@@ -25,7 +28,7 @@ public class GradientStopOffsetTests
             new GradientStop(0.3, Color.Red),
             new GradientStop(0.7, Color.Blue));
 
-        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Dict(Shading(brush)["Function"]!);
 
         Assert.Equal(3, Num(func["FunctionType"]!));
 
@@ -59,7 +62,7 @@ public class GradientStopOffsetTests
             new GradientStop(0, Color.Red),
             new GradientStop(1, Color.Blue));
 
-        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Dict(Shading(brush)["Function"]!);
 
         Assert.Equal(2, Num(func["FunctionType"]!));
     }
@@ -73,7 +76,7 @@ public class GradientStopOffsetTests
             new GradientStop(1, Color.Green),
             new GradientStop(1, Color.Blue));
 
-        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Dict(Shading(brush)["Function"]!);
 
         Assert.Equal(3, Num(func["FunctionType"]!));
         var bounds = Array(func["Bounds"]!);
@@ -94,7 +97,7 @@ public class GradientStopOffsetTests
             new GradientStop(0.5, Color.Green),
             new GradientStop(1, Color.Blue));
 
-        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Dict(Shading(brush)["Function"]!);
 
         var bounds = Array(func["Bounds"]!);
         Assert.Equal(Array(func["Functions"]!).Count - 1, bounds.Count);
@@ -113,7 +116,7 @@ public class GradientStopOffsetTests
             new GradientStop(0.5, Color.FromRgb(0, 255, 0)),
             new GradientStop(0.8, Color.Blue));
 
-        var func = Dict(ShadingBuilder.BuildShading(brush)["Function"]!);
+        var func = Dict(Shading(brush)["Function"]!);
 
         Assert.Equal(3, Num(func["FunctionType"]!));
         Assert.Equal(3, Array(func["Functions"]!).Count);

@@ -138,7 +138,7 @@ public class MeasurementUnitSurfaceTests
     {
         var brush = new LinearGradient(Unit.FromPercent(0), 0, Unit.FromPercent(100), 0, Stops());
 
-        Assert.Throws<InvalidOperationException>(() => ShadingBuilder.BuildShading(brush));
+        Assert.Throws<InvalidOperationException>(() => ShadingBuilder.BuildPattern(brush));
     }
 
     [Fact]
