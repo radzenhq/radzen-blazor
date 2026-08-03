@@ -1,22 +1,14 @@
 using System;
 
-namespace Radzen.Documents;
+namespace Radzen.Documents.Pdf;
 
-/// <summary>
-/// Which alphabet <see cref="HexCodec"/> emits.
-/// </summary>
 internal enum HexCase
 {
-    /// <summary>Emit <c>0123456789ABCDEF</c>.</summary>
     Upper,
 
-    /// <summary>Emit <c>0123456789abcdef</c>.</summary>
     Lower,
 }
 
-/// <summary>
-/// Byte to base-16 encoding.
-/// </summary>
 internal static class HexCodec
 {
     const string UpperDigits = "0123456789ABCDEF";
@@ -24,9 +16,6 @@ internal static class HexCodec
 
     static string Digits(HexCase hexCase) => hexCase == HexCase.Upper ? UpperDigits : LowerDigits;
 
-    /// <summary>
-    /// Writes two hex bytes per input byte into <paramref name="destination"/>.
-    /// </summary>
     public static void Encode(ReadOnlySpan<byte> data, Span<byte> destination, HexCase hexCase)
     {
         var digits = Digits(hexCase);
@@ -38,9 +27,6 @@ internal static class HexCodec
         }
     }
 
-    /// <summary>
-    /// Returns two hex characters per input byte.
-    /// </summary>
     public static string EncodeToString(ReadOnlySpan<byte> data, HexCase hexCase)
     {
         var maxEncodable = Array.MaxLength / 2;
