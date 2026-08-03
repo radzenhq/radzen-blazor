@@ -18,21 +18,6 @@ internal sealed class Jpeg2000ImageDecoder : IImageDecoder
         return true;
     }
 
-    public bool TryReadPixelSize(ReadOnlyMemory<byte> data, ReaderLimits limits, out int width, out int height)
-    {
-        if (!ImageHeaders.IsJpeg2000(data.Span))
-        {
-            width = 0;
-            height = 0;
-            return false;
-        }
-
-        var size = ImageHeaders.ReadJpeg2000Size(data.Span);
-        width = size.Width;
-        height = size.Height;
-        return true;
-    }
-
     // JPXDecode embeds verbatim with no /ColorSpace, so the JPX stream's own color space applies (ISO 32000-1 7.4.9).
     private static DecodedImage DecodeJpeg2000(ReadOnlyMemory<byte> data, ReaderLimits limits)
     {
