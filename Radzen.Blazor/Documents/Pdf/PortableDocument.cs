@@ -40,6 +40,7 @@ public sealed class PortableDocument
     private bool pageLabelsLoaded = true;
     private bool xmpLoaded = true;
     private bool viewerPreferencesLoaded = true;
+    private bool viewerPreferencesReplaced;
     private bool acroFormLoaded = true;
 
     /// <summary>Initializes an empty PDF document.</summary>
@@ -147,6 +148,7 @@ public sealed class PortableDocument
         xmp.OwnedBy(InvalidateMaterializedGraph);
         viewerPreferences?.OwnedBy(null);
         viewerPreferences = null;
+        viewerPreferencesReplaced = false;
         acroForm = null;
         infoLoaded = false;
         attachmentsLoaded = false;
@@ -182,8 +184,20 @@ public sealed class PortableDocument
         if (!infoLoaded && Loaded?.Source is { } reader)
         {
             infoLoaded = true;
-            Loaded.SourceInfo = DocumentLoader.ReadInfo(reader, info);
-            info.AcceptChanges();
+            try
+            {
+                Loaded.SourceInfo = DocumentLoader.ReadInfo(reader, info);
+                info.AcceptChanges();
+            }
+            catch
+            {
+                info.OwnedBy(null);
+                info = new DocumentInfo();
+                info.OwnedBy(InvalidateMaterializedGraph);
+                Loaded.SourceInfo = null;
+                infoLoaded = false;
+                throw;
+            }
         }
     });
 
@@ -205,7 +219,16 @@ public sealed class PortableDocument
                     acroFormLoaded = true;
                     if (Loaded?.Source is { } reader && Loaded.SourceAcroForm is { } form)
                     {
-                        acroForm = new AcroForm(reader, form, this);
+                        try
+                        {
+                            acroForm = new AcroForm(reader, form, this);
+                        }
+                        catch
+                        {
+                            acroForm = null;
+                            acroFormLoaded = false;
+                            throw;
+                        }
                     }
                 }
             });
@@ -294,8 +317,18 @@ public sealed class PortableDocument
                 if (!viewerPreferencesLoaded)
                 {
                     viewerPreferencesLoaded = true;
-                    viewerPreferences = DocumentLoader.ReadViewerPreferences(Loaded?.Source, Loaded?.SourceCatalog);
-                    viewerPreferences?.OwnedBy(InvalidateMaterializedGraph);
+                    try
+                    {
+                        viewerPreferences = DocumentLoader.ReadViewerPreferences(Loaded?.Source, Loaded?.SourceCatalog);
+                        viewerPreferences?.AcceptChanges();
+                        viewerPreferences?.OwnedBy(InvalidateMaterializedGraph);
+                    }
+                    catch
+                    {
+                        viewerPreferences = null;
+                        viewerPreferencesLoaded = false;
+                        throw;
+                    }
                 }
             });
 
@@ -305,6 +338,7 @@ public sealed class PortableDocument
         {
             InvalidateMaterializedGraph();
             viewerPreferencesLoaded = true;
+            viewerPreferencesReplaced = true;
             viewerPreferences?.OwnedBy(null);
             viewerPreferences = value;
             viewerPreferences?.OwnedBy(InvalidateMaterializedGraph);
@@ -370,8 +404,18 @@ public sealed class PortableDocument
         if (!attachmentsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
             attachmentsLoaded = true;
-            DocumentLoader.ReadAttachments(reader, catalog, this, reader.Limits);
-            attachments.AcceptChanges();
+            try
+            {
+                DocumentLoader.ReadAttachments(reader, catalog, this, reader.Limits);
+                attachments.AcceptChanges();
+            }
+            catch
+            {
+                attachments.Clear();
+                attachments.AcceptChanges();
+                attachmentsLoaded = false;
+                throw;
+            }
         }
     });
 
@@ -380,8 +424,18 @@ public sealed class PortableDocument
         if (!outlineLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
             outlineLoaded = true;
-            DocumentLoader.ReadOutline(reader, catalog, this, Loaded, reader.Limits);
-            TrackedChanges.Accept(outline);
+            try
+            {
+                DocumentLoader.ReadOutline(reader, catalog, this, Loaded, reader.Limits);
+                TrackedChanges.Accept(outline);
+            }
+            catch
+            {
+                outline.Clear();
+                TrackedChanges.Accept(outline);
+                outlineLoaded = false;
+                throw;
+            }
         }
     });
 
@@ -390,8 +444,18 @@ public sealed class PortableDocument
         if (!pageLabelsLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
             pageLabelsLoaded = true;
-            DocumentLoader.ReadPageLabels(reader, catalog, this, reader.Limits);
-            TrackedChanges.Accept(pageLabels);
+            try
+            {
+                DocumentLoader.ReadPageLabels(reader, catalog, this, reader.Limits);
+                TrackedChanges.Accept(pageLabels);
+            }
+            catch
+            {
+                pageLabels.Clear();
+                TrackedChanges.Accept(pageLabels);
+                pageLabelsLoaded = false;
+                throw;
+            }
         }
     });
 
@@ -400,7 +464,18 @@ public sealed class PortableDocument
         if (!xmpLoaded && Loaded?.Source is { } reader && Loaded.SourceCatalog is { } catalog)
         {
             xmpLoaded = true;
-            DocumentLoader.ReadXmp(reader, catalog, xmp);
+            try
+            {
+                DocumentLoader.ReadXmp(reader, catalog, xmp);
+            }
+            catch
+            {
+                xmp.OwnedBy(null);
+                xmp = new DocumentXmpMetadata();
+                xmp.OwnedBy(InvalidateMaterializedGraph);
+                xmpLoaded = false;
+                throw;
+            }
         }
     });
 
@@ -515,6 +590,10 @@ public sealed class PortableDocument
     internal bool PageLabelsChanged => Loaded?.Source is null
         || (pageLabelsLoaded && TrackedChanges.AnyModified(pageLabels));
 
+    internal bool ViewerPreferencesChanged => Loaded?.Source is null
+        || viewerPreferencesReplaced
+        || (viewerPreferencesLoaded && viewerPreferences?.IsModified == true);
+
     internal bool HasPreservableStructureGraph
         => Loaded is { Source: { } reader, SourceCatalog: { } catalog } loaded
             && reader.GetDictionary(catalog, "StructTreeRoot") is not null
@@ -542,6 +621,9 @@ public sealed class PortableDocument
         {
             TrackedChanges.Accept(pageLabels);
         }
+
+        viewerPreferences?.AcceptChanges();
+        viewerPreferencesReplaced = false;
     }
 
     /// <summary>
@@ -652,9 +734,19 @@ public sealed class PortableDocument
     public int ReplaceText(string search, string replacement, ReplaceTextOptions? options = null)
     {
         var count = 0;
+        var plans = new List<ReplacementPlan>();
         foreach (var page in Pages)
         {
-            count += page.ReplaceText(search, replacement, options);
+            if (TextReplacer.Plan(page, search, replacement, options) is { } plan)
+            {
+                count += plan.Count;
+                plans.Add(plan);
+            }
+        }
+
+        foreach (var plan in plans)
+        {
+            plan.Commit();
         }
 
         return count;

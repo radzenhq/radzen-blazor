@@ -60,7 +60,8 @@ internal sealed class CatalogImporter(PortableDocument document)
 
             if ((string.Equals(key, "Outlines", StringComparison.Ordinal) && document.OutlineChanged)
                 || (string.Equals(key, "PageLabels", StringComparison.Ordinal) && document.PageLabelsChanged)
-                || (string.Equals(key, "Metadata", StringComparison.Ordinal) && document.Xmp.IsModified))
+                || (string.Equals(key, "Metadata", StringComparison.Ordinal) && document.Xmp.IsModified)
+                || (key is "ViewerPreferences" or "PageLayout" or "PageMode" && document.ViewerPreferencesChanged))
             {
                 continue;
             }
