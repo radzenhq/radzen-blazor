@@ -1244,8 +1244,85 @@ class XlsxWriter(Workbook sourceWorkbook)
         return widths;
     }
 
+    // ECMA-376 part 1, 18.3.1.40 (shared formulas)
+    private static Dictionary<CellRef, (int Si, string? Ref)> BuildSharedFormulaGroups(Worksheet sheet)
+    {
+        var formulas = new Dictionary<CellRef, string>();
+
+        foreach (var cell in sheet.Cells.GetPopulatedCells())
+        {
+            if (!string.IsNullOrEmpty(cell.Formula))
+            {
+                formulas[cell.Address] = cell.Formula;
+            }
+        }
+
+        var groups = new Dictionary<CellRef, (int Si, string? Ref)>();
+        var si = 0;
+
+        void CollectRuns(bool vertical)
+        {
+            var starts = vertical
+                ? formulas.Keys.OrderBy(a => a.Column).ThenBy(a => a.Row)
+                : formulas.Keys.OrderBy(a => a.Row).ThenBy(a => a.Column);
+
+            foreach (var start in starts.ToList())
+            {
+                if (groups.ContainsKey(start))
+                {
+                    continue;
+                }
+
+                var run = new List<CellRef> { start };
+
+                while (true)
+                {
+                    var next = vertical
+                        ? new CellRef(start.Row + run.Count, start.Column)
+                        : new CellRef(start.Row, start.Column + run.Count);
+
+                    if (groups.ContainsKey(next) || !formulas.TryGetValue(next, out var formula))
+                    {
+                        break;
+                    }
+
+                    var expected = Worksheet.AdjustFormulaForCopy(formulas[start],
+                        next.Row - start.Row, next.Column - start.Column);
+
+                    if (!string.Equals(formula, expected, StringComparison.Ordinal))
+                    {
+                        break;
+                    }
+
+                    run.Add(next);
+                }
+
+                if (run.Count < 2)
+                {
+                    continue;
+                }
+
+                groups[start] = (si, new RangeRef(start, run[^1]).ToString());
+
+                foreach (var follower in run.Skip(1))
+                {
+                    groups[follower] = (si, null);
+                }
+
+                si++;
+            }
+        }
+
+        CollectRuns(vertical: true);
+        CollectRuns(vertical: false);
+
+        return groups;
+    }
+
     private void ProcessSheetData(Worksheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
+        var sharedFormulas = BuildSharedFormulaGroups(sheet);
+
         // row -> (col -> <c> element). SortedDictionary keeps cells in column
         // order within each row, as required by ECMA-376.
         var rowMap = new SortedDictionary<int, SortedDictionary<int, XElement>>();
@@ -1259,7 +1336,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         foreach (var cell in sheet.Cells.GetPopulatedCells().Where(c => c.Value is not null || c.Formula is not null))
         {
             var rowDict = EnsureRow(cell.Address.Row);
-            rowDict[cell.Address.Column] = CreateCellElement(sheet, cell.Address.Row, cell.Address.Column, cell, styleTracker, sharedStrings, sharedStringsDoc);
+            rowDict[cell.Address.Column] = CreateCellElement(sheet, cell.Address.Row, cell.Address.Column, cell, styleTracker, sharedStrings, sharedStringsDoc, sharedFormulas);
         }
 
         // 2. Empty <c> placeholders for cells inside merge ranges. Excel
@@ -1351,7 +1428,7 @@ class XlsxWriter(Workbook sourceWorkbook)
         return rowElement;
     }
 
-    private XElement CreateCellElement(Worksheet sheet, int row, int col, Cell cell, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private XElement CreateCellElement(Worksheet sheet, int row, int col, Cell cell, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<CellRef, (int Si, string? Ref)> sharedFormulas)
     {
         var cellElement = new XElement(XName.Get("c", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("r", new CellRef(row, col).ToString()));
@@ -1362,7 +1439,7 @@ class XlsxWriter(Workbook sourceWorkbook)
             cellElement.Add(new XAttribute("s", styleId));
         }
 
-        AddCellValue(cellElement, cell, sharedStrings, sharedStringsDoc);
+        AddCellValue(cellElement, cell, sharedStrings, sharedStringsDoc, sharedFormulas);
 
         return cellElement;
     }
@@ -1693,12 +1770,35 @@ class XlsxWriter(Workbook sourceWorkbook)
         _               => "#NAME?",
     };
 
-    private static void AddCellValue(XElement cellElement, Cell cell, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    private static void AddCellValue(XElement cellElement, Cell cell, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc, Dictionary<CellRef, (int Si, string? Ref)> sharedFormulas)
     {
         if (!string.IsNullOrEmpty(cell.Formula))
         {
             var formulaValue = cell.Formula.StartsWith('=') ? cell.Formula[1..] : cell.Formula;
-            cellElement.Add(new XElement(FElement, formulaValue));
+            var formulaElement = new XElement(FElement);
+
+            if (sharedFormulas.TryGetValue(cell.Address, out var shared))
+            {
+                formulaElement.Add(new XAttribute("t", "shared"));
+
+                if (shared.Ref is not null)
+                {
+                    formulaElement.Add(new XAttribute("ref", shared.Ref));
+                }
+
+                formulaElement.Add(new XAttribute("si", shared.Si));
+
+                if (shared.Ref is not null)
+                {
+                    formulaElement.Value = formulaValue;
+                }
+            }
+            else
+            {
+                formulaElement.Value = formulaValue;
+            }
+
+            cellElement.Add(formulaElement);
             EmitTypedValue(cellElement, cell, isFormula: true);
         }
         else if (cell.ValueType == CellDataType.String)

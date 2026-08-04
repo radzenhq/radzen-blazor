@@ -502,13 +502,15 @@ static class XlsxReader
 
     private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
     {
+        var sharedFormulas = new Dictionary<string, (string Formula, CellRef Master)>();
+
         foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
         {
-            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
+            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight, sharedFormulas);
         }
     }
 
-    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    private static void ParseRow(XElement rowElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
     {
         var rowIndex = rowElem.Attribute("r")?.Value;
         var rowHeight = rowElem.Attribute("ht")?.Value;
@@ -537,11 +539,11 @@ static class XlsxReader
 
         foreach (var cellElem in rowElem.Elements(sNs + "c"))
         {
-            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings);
+            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings, sharedFormulas);
         }
     }
 
-    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings)
+    private static void ParseCell(XElement cellElem, XNamespace sNs, Worksheet sheet, StyleInfo styleInfo, List<string> sharedStrings, Dictionary<string, (string Formula, CellRef Master)> sharedFormulas)
     {
         var cellRef = cellElem.Attribute("r")!;
 
@@ -562,16 +564,31 @@ static class XlsxReader
 
         var cellType = (string?)cellElem.Attribute("t") ?? "n";
 
-        if (formulaElem is not null)
+        var formulaValue = formulaElem?.Value;
+
+        // ECMA-376 part 1, 18.3.1.40 (shared formulas)
+        if (formulaElem is not null && formulaElem.Attribute("si")?.Value is string si)
         {
-            var formulaValue = formulaElem.Value;
+            if (!string.IsNullOrEmpty(formulaValue))
+            {
+                sharedFormulas[si] = (formulaValue, address);
+            }
+            else if (sharedFormulas.TryGetValue(si, out var shared))
+            {
+                formulaValue = Worksheet.AdjustFormulaForCopy("=" + shared.Formula,
+                    address.Row - shared.Master.Row, address.Column - shared.Master.Column);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(formulaValue))
+        {
             if (!formulaValue.StartsWith('='))
             {
                 formulaValue = "=" + formulaValue;
             }
             sheet.Cells[address.Row, address.Column].Formula = formulaValue;
         }
-        else
+        else if (valueElem is not null)
         {
             var value = cellType switch
             {
