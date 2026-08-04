@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System;
 using Radzen.Documents.Fonts.Sfnt;
@@ -506,14 +507,59 @@ public sealed class FontCollection
             : CaptureBuiltInGlyphRun(configuration.Snapshot, text, font);
     }
 
+    private struct SpanAccumulator
+    {
+        private CapturedGlyphSpan first;
+        private ImmutableArray<CapturedGlyphSpan>.Builder? rest;
+        private int count;
+
+        public void Add(in CapturedGlyphSpan span)
+        {
+            if (count == 0)
+            {
+                first = span;
+            }
+            else
+            {
+                if (rest is null)
+                {
+                    rest = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
+                    rest.Add(first);
+                }
+
+                rest.Add(span);
+            }
+
+            count++;
+        }
+
+        public readonly ImmutableArray<CapturedGlyphSpan> ToImmutable()
+            => count switch
+            {
+                0 => [],
+                1 => ImmutableArray.Create(first),
+                _ => rest!.ToImmutable(),
+            };
+    }
+
     private static CapturedGlyphRun CaptureSfntGlyphRun(
         FrozenConfiguration configuration,
         string text,
         in FontPaint font)
     {
         var positioned = configuration.Shaper.Shape(text, font, out var totalAdvance);
-        var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
-        var glyphs = new List<CapturedGlyph>();
+        if (positioned.Count == 0)
+        {
+            return new CapturedGlyphRun(text, [], totalAdvance);
+        }
+
+        if (SingleFace(positioned) is { } only)
+        {
+            return CaptureSingleFaceRun(positioned, only, text, font, totalAdvance);
+        }
+
+        var spans = default(SpanAccumulator);
+        var glyphs = new List<CapturedGlyph>(text.Length);
         SfntFont? face = null;
         var spanOffset = 0.0;
 
@@ -555,6 +601,50 @@ public sealed class FontCollection
         return new CapturedGlyphRun(text, spans.ToImmutable(), totalAdvance);
     }
 
+    private static SfntFont? SingleFace(List<ShapedGlyph> positioned)
+    {
+        var face = positioned[0].Face;
+        for (var i = 1; i < positioned.Count; i++)
+        {
+            if (!ReferenceEquals(face, positioned[i].Face))
+            {
+                return null;
+            }
+        }
+
+        return face;
+    }
+
+    private static CapturedGlyphRun CaptureSingleFaceRun(
+        List<ShapedGlyph> positioned,
+        SfntFont face,
+        string text,
+        in FontPaint font,
+        double totalAdvance)
+    {
+        var captured = new CapturedGlyph[positioned.Count];
+        var advance = 0.0;
+        for (var i = 0; i < positioned.Count; i++)
+        {
+            var positionedGlyph = positioned[i];
+            captured[i] = new CapturedGlyph(
+                positionedGlyph.Advance,
+                SimpleShaper.TrailingKerning(face, positionedGlyph.GlyphId, positionedGlyph.Advance, font.Size),
+                positionedGlyph.Cluster,
+                CodePointAt(text, positionedGlyph.Cluster));
+            advance += positionedGlyph.Advance;
+        }
+
+        return new CapturedGlyphRun(
+            text,
+            ImmutableArray.Create(new CapturedGlyphSpan(
+                CapturedFontFace.FromSfnt(face),
+                ImmutableCollectionsMarshal.AsImmutableArray(captured),
+                advance,
+                0)),
+            totalAdvance);
+    }
+
     private static CapturedGlyphRun CaptureBuiltInGlyphRun(
         in FontCollectionSnapshot snapshot,
         string text,
@@ -564,8 +654,8 @@ public sealed class FontCollection
         var metrics = BuiltInFontMetrics.Resolve(font)
             ?? throw new InvalidOperationException($"No font is registered for family '{font.Family}'.");
 
-        var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>();
-        var builtInGlyphs = new List<CapturedGlyph>();
+        var spans = default(SpanAccumulator);
+        var builtInGlyphs = new List<CapturedGlyph>(text.Length);
         var sfntGlyphs = new List<CapturedGlyph>();
         SfntFont? fallbackFace = null;
         ushort previousFallbackGlyph = 0;

@@ -31,7 +31,11 @@ internal sealed class BuiltInFontMetrics
 
     public bool Italic { get; }
 
-    public CapturedBuiltInFace Face()
+    private CapturedBuiltInFace? face;
+
+    public CapturedBuiltInFace Face() => face ??= CaptureFace();
+
+    private CapturedBuiltInFace CaptureFace()
         => new(
             Family,
             Bold,

@@ -60,8 +60,7 @@ internal static partial class LineLayouter
                 fonts.CaptureGlyphRun(marker.Text, marker.Font),
                 paint),
         };
-        var fragments = ImmutableArray.Create(fragment);
-        var (height, baseline) = Measure(fragments, 1, fonts);
+        var (height, baseline) = Measure(new ReadOnlySpan<LineFragment>(in fragment), 1, fonts);
         return new LineBox(ShapeRuns([fragment], fonts, capture))
         {
             Width = 0,
@@ -542,7 +541,7 @@ internal static partial class LineLayouter
         }
 
         var shapedRuns = ShapeRuns(fragments, fonts, context.Capture);
-        var (height, baseline) = Measure(fragments.ToImmutableArray(), paragraph.LineSpacing, fonts);
+        var (height, baseline) = Measure(CollectionsMarshal.AsSpan(fragments), paragraph.LineSpacing, fonts);
         return new LineBox(shapedRuns)
         {
             Width = width,

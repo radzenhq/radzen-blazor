@@ -214,6 +214,11 @@ internal static class StyleResolver
 
     private static List<Style> StyleChain(string? name, StyleCollection styles, bool includeNormal = true)
     {
+        if (name is null)
+        {
+            return includeNormal ? [styles.Normal] : [];
+        }
+
         var chain = new List<Style>();
         var visited = new HashSet<string>(StringComparer.Ordinal);
         var path = new List<string>();

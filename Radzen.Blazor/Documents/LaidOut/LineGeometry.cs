@@ -3,7 +3,7 @@ using Radzen.Documents.Fonts;
 
 namespace Radzen.Documents.LaidOut;
 
-internal readonly record struct InlineImagePaint
+internal sealed record InlineImagePaint
 {
     public required SourceId Key { get; init; }
 
@@ -22,7 +22,7 @@ internal enum FormFieldKind
     DropDown,
 }
 
-internal readonly record struct FormFieldPaint
+internal sealed record FormFieldPaint
 {
     public required SourceId Key { get; init; }
 
