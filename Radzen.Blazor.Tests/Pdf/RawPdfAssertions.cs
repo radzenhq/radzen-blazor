@@ -1,8 +1,10 @@
 #nullable enable
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
 
@@ -11,6 +13,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 internal static class RawPdfAssertions
 {
     public static string Emit(PortableDocument document) => Encoding.Latin1.GetString(document.ToArray());
+
+    public static string Emit(Document document, DocumentRenderer? renderer = null)
+        => Emit((renderer ?? new DocumentRenderer()).Render(document));
 
     public static string Excerpt(string text)
         => text.Length <= 600 ? text : text[..600] + "...";
@@ -62,6 +67,33 @@ internal static class RawPdfAssertions
         var match = Shaped($"{subject} /{key} with {count} references", pattern, container);
         return [.. match.Groups.Cast<System.Text.RegularExpressions.Group>().Skip(1).Select(group => group.Value)];
     }
+
+    public static string[] ReferencesIn(string subject, string key, string container)
+    {
+        var array = Shaped($"{subject} /{key}", $@"/{Regex.Escape(key)} \[([^\]]*)\]", container);
+        return [.. Regex.Matches(array.Groups[1].Value, @"(\d+) 0 R").Select(match => match.Groups[1].Value)];
+    }
+
+    public static string StructureMarker(string type) => $"/Type /StructElem /S /{type} /P ";
+
+    public static string StructureElement(string emission, string type)
+        => Line(emission, StructureMarker(type));
+
+    public static string StructureRoot(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
+
+    public static string StructureKids(string subject, string element)
+        => Shaped(subject, @"/K \[([^\]]*)\]", element).Groups[1].Value;
+
+    public static string[] ChildElements(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, "<< [^>]*>>", " "), @"(\d+) 0 R")
+            .Select(match => match.Groups[1].Value)];
+
+    public static int[] Mcids(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, @"<< [^>]*>>|\d+ 0 R", " "), @"\d+")
+            .Select(match => int.Parse(match.Value, CultureInfo.InvariantCulture))];
 
     public static int NumberIn(string objectBody, string key)
     {

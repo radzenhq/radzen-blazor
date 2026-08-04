@@ -32,8 +32,6 @@ public class InlineImageLinkTests
         return (document, image);
     }
 
-    private static string Emitted(Document document) => Emit(new DocumentRenderer().Render(document));
-
     private static string Tagged(Document document)
         => Emit(new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.Render(document));
 
@@ -45,7 +43,7 @@ public class InlineImageLinkTests
     {
         var (document, _) = Authored(image => image.Link = "https://www.radzen.com/");
 
-        var emission = Emitted(document);
+        var emission = Emit(document);
         var annotation = LinkAnnotation(emission);
 
         Carries("link annotation", "/Subtype /Link", annotation);
@@ -67,7 +65,7 @@ public class InlineImageLinkTests
     {
         var (document, _) = Authored(static _ => { });
 
-        Lacks("document emission", "/Subtype /Link", Emitted(document));
+        Lacks("document emission", "/Subtype /Link", Emit(document));
     }
 
     [Fact]
@@ -84,7 +82,7 @@ public class InlineImageLinkTests
         image.LinkToAnchor = "target";
         section.Blocks.AddParagraph().Inlines.Add("destination").Anchor = "target";
 
-        var annotation = LinkAnnotation(Emitted(document));
+        var annotation = LinkAnnotation(Emit(document));
 
         Carries("link annotation", "/Subtype /Link", annotation);
         Carries("link annotation", "/A << /S /GoTo /D ", annotation);

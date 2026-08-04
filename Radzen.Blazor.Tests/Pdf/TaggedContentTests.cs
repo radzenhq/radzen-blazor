@@ -1,5 +1,4 @@
 #nullable enable
-using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -10,14 +9,9 @@ namespace Radzen.Blazor.Pdf.Tests;
 
 public class TaggedContentTests
 {
-    private static string Rendered(Document document, DocumentRenderer renderer)
-        => Encoding.Latin1.GetString(renderer.ToArray(document));
-
-    private static string Element(string type) => $"/Type /StructElem /S /{type} /P ";
-
     private static void ElementCount(string emission, string type, int expected)
     {
-        var actual = Regex.Matches(emission, Regex.Escape(Element(type))).Count;
+        var actual = Regex.Matches(emission, Regex.Escape(StructureMarker(type))).Count;
         Assert.True(
             actual == expected,
             $"Expected {expected} '/S /{type}' structure elements, found {actual}.\n{Excerpt(emission)}");
@@ -32,9 +26,9 @@ public class TaggedContentTests
         var image = section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.AlternateText = "A red square";
 
-        var emission = Rendered(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
-        Carries("figure element", "/Alt (A red square)", Line(emission, Element("Figure")));
+        Carries("figure element", "/Alt (A red square)", StructureElement(emission, "Figure"));
     }
 
     [Fact]
@@ -50,9 +44,9 @@ public class TaggedContentTests
         list.AddItem("First");
         list.AddItem("Second");
 
-        var emission = Rendered(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
-        Carries("emission", Element("L"), emission);
+        Carries("emission", StructureMarker("L"), emission);
         ElementCount(emission, "LI", 2);
         ElementCount(emission, "Lbl", 2);
         ElementCount(emission, "LBody", 2);
@@ -67,9 +61,9 @@ public class TaggedContentTests
         list.AddItem("First");
         list.AddItem("Second");
 
-        var emission = Rendered(document, new DocumentRenderer());
+        var emission = Emit(document, new DocumentRenderer());
 
-        Lacks("emission", Element("L"), emission);
-        Lacks("emission", Element("LBody"), emission);
+        Lacks("emission", StructureMarker("L"), emission);
+        Lacks("emission", StructureMarker("LBody"), emission);
     }
 }

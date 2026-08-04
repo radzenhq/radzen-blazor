@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
@@ -15,36 +14,15 @@ public class TaggedLinkStructureTests
 {
     private static DocumentRenderer Accessible() => new() { Accessibility = PdfUaConformance.PdfUa1 };
 
-    private static string Rendered(Document document, DocumentRenderer? renderer = null)
-        => Encoding.Latin1.GetString((renderer ?? new DocumentRenderer()).ToArray(document));
-
-    private static string Element(string type) => $"/Type /StructElem /S /{type} /P ";
-
     private static string ElementNumber(string emission, string type)
         => Shaped(
             $"{type} element",
-            $@"(\d+) 0 obj\n<< {Regex.Escape(Element(type))}",
+            $@"(\d+) 0 obj\n<< {Regex.Escape(StructureMarker(type))}",
             emission).Groups[1].Value;
-
-    private static string StructureRoot(string emission)
-        => IndirectObject(
-            emission,
-            Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
-
-    private static string Kids(string subject, string element)
-        => Shaped(subject, @"/K \[([^\]]*)\]", element).Groups[1].Value;
-
-    private static string[] ChildElements(string kids)
-        => [.. Regex.Matches(Regex.Replace(kids, "<< [^>]*>>", " "), @"(\d+) 0 R")
-            .Select(match => match.Groups[1].Value)];
 
     private static string[] ObjectReferences(string kids)
         => [.. Regex.Matches(kids, @"<< /Type /OBJR /Pg \d+ 0 R /Obj (\d+) 0 R >>")
             .Select(match => match.Groups[1].Value)];
-
-    private static int[] Mcids(string kids)
-        => [.. Regex.Matches(Regex.Replace(kids, @"<< [^>]*>>|\d+ 0 R", " "), @"\d+")
-            .Select(match => int.Parse(match.Value, CultureInfo.InvariantCulture))];
 
     private static string ParentTreeOwner(string emission, string structureRoot, int key)
     {
@@ -93,7 +71,7 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UriLink_CarriesItsVisibleTextAsContents()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var emission = Emit(Authored("https://www.radzen.com", null), Accessible());
         var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
         Carries($"link annotation {annotation} 0 R", "/Contents (Radzen)", IndirectObject(emission, annotation));
@@ -102,7 +80,7 @@ public class TaggedLinkStructureTests
     [Fact]
     public void AnchorLink_CarriesItsVisibleTextAsContents()
     {
-        var emission = Rendered(Authored(null, "target"), Accessible());
+        var emission = Emit(Authored(null, "target"), Accessible());
         var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
         Carries($"link annotation {annotation} 0 R", "/Contents (Radzen)", IndirectObject(emission, annotation));
@@ -111,7 +89,7 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UntaggedUriLink_CarriesNoContents()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null));
+        var emission = Emit(Authored("https://www.radzen.com", null));
         var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
         Lacks($"link annotation {annotation} 0 R", "/Contents", IndirectObject(emission, annotation));
@@ -120,7 +98,7 @@ public class TaggedLinkStructureTests
     [Fact]
     public void TaggedAnnotatedPage_DeclaresStructureTabOrder()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var emission = Emit(Authored("https://www.radzen.com", null), Accessible());
 
         Carries("page", "/Tabs /S", Line(emission, "/Type /Page "));
     }
@@ -128,7 +106,7 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UntaggedAnnotatedPage_DeclaresNoTabOrder()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null));
+        var emission = Emit(Authored("https://www.radzen.com", null));
 
         Lacks("page", "/Tabs", Line(emission, "/Type /Page "));
     }
@@ -141,7 +119,7 @@ public class TaggedLinkStructureTests
         BuildTestSupport.RegisterLatin(document);
         BuildTestSupport.AddText(document.Sections.Add(), "Plain body", BuildTestSupport.Latin);
 
-        var emission = Rendered(document, Accessible());
+        var emission = Emit(document, Accessible());
 
         Lacks("page", "/Tabs", Line(emission, "/Type /Page "));
     }
@@ -149,12 +127,12 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UriLink_IsALinkElementInsideItsParagraph()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
-        var paragraph = Line(emission, Element("P"));
+        var emission = Emit(Authored("https://www.radzen.com", null), Accessible());
+        var paragraph = StructureElement(emission, "P");
 
-        var child = Assert.Single(ChildElements(Kids("paragraph element", paragraph)));
+        var child = Assert.Single(ChildElements(StructureKids("paragraph element", paragraph)));
 
-        Carries($"paragraph child {child} 0 R", Element("Link"), IndirectObject(emission, child));
+        Carries($"paragraph child {child} 0 R", StructureMarker("Link"), IndirectObject(emission, child));
     }
 
     [Fact]
@@ -188,9 +166,9 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UriLink_AnnotationIsReachedByObjrAndPointsBackThroughStructParent()
     {
-        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var emission = Emit(Authored("https://www.radzen.com", null), Accessible());
         var linkNumber = ElementNumber(emission, "Link");
-        var objectReferences = ObjectReferences(Kids("link element", IndirectObject(emission, linkNumber)));
+        var objectReferences = ObjectReferences(StructureKids("link element", IndirectObject(emission, linkNumber)));
 
         var referenced = Assert.Single(objectReferences);
         var annotation = IndirectObject(emission, referenced);
@@ -210,8 +188,8 @@ public class TaggedLinkStructureTests
     [Fact]
     public void AnchorLink_IsAlsoWiredIntoTheStructureTree()
     {
-        var emission = Rendered(Authored(null, "target"), Accessible());
-        var kids = Kids("link element", IndirectObject(emission, ElementNumber(emission, "Link")));
+        var emission = Emit(Authored(null, "target"), Accessible());
+        var kids = StructureKids("link element", IndirectObject(emission, ElementNumber(emission, "Link")));
 
         Assert.Single(ObjectReferences(kids));
         Assert.NotEmpty(Mcids(kids));
@@ -251,27 +229,27 @@ public class TaggedLinkStructureTests
             run.Anchor = anchor;
         }
 
-        var emission = Rendered(document, Accessible());
+        var emission = Emit(document, Accessible());
         var structureRoot = StructureRoot(emission);
         var navigation = IndirectObject(emission, ElementNumber(emission, "TOC"));
-        var entries = ChildElements(Kids("TOC element", navigation));
+        var entries = ChildElements(StructureKids("TOC element", navigation));
 
         Assert.True(entries.Length == 2, $"Expected 2 TOCI entries, found {entries.Length}.");
 
         foreach (var entryNumber in entries)
         {
             var entry = IndirectObject(emission, entryNumber);
-            Carries($"TOC entry {entryNumber} 0 R", Element("TOCI"), entry);
+            Carries($"TOC entry {entryNumber} 0 R", StructureMarker("TOCI"), entry);
 
-            var referenceNumber = Assert.Single(ChildElements(Kids($"TOC entry {entryNumber} 0 R", entry)));
+            var referenceNumber = Assert.Single(ChildElements(StructureKids($"TOC entry {entryNumber} 0 R", entry)));
             var reference = IndirectObject(emission, referenceNumber);
-            Carries($"reference {referenceNumber} 0 R", Element("Reference"), reference);
+            Carries($"reference {referenceNumber} 0 R", StructureMarker("Reference"), reference);
 
-            var linkNumber = Assert.Single(ChildElements(Kids($"reference {referenceNumber} 0 R", reference)));
+            var linkNumber = Assert.Single(ChildElements(StructureKids($"reference {referenceNumber} 0 R", reference)));
             var link = IndirectObject(emission, linkNumber);
-            Carries($"link {linkNumber} 0 R", Element("Link"), link);
+            Carries($"link {linkNumber} 0 R", StructureMarker("Link"), link);
 
-            var kids = Kids($"link {linkNumber} 0 R", link);
+            var kids = StructureKids($"link {linkNumber} 0 R", link);
             Assert.NotEmpty(Mcids(kids));
 
             var objectReferences = ObjectReferences(kids);

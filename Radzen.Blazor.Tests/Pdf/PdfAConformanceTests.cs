@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
@@ -30,7 +29,7 @@ public class PdfAConformanceTests
     }
 
     private static string Emitted((Document Document, DocumentRenderer Renderer) authored)
-        => Encoding.Latin1.GetString(authored.Renderer.ToArray(authored.Document));
+        => Emit(authored.Document, authored.Renderer);
 
     private static string MetadataStream(string emission)
     {
@@ -183,7 +182,7 @@ public class PdfAConformanceTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Plain", BuildTestSupport.Latin);
 
-        var emission = Encoding.Latin1.GetString(new DocumentRenderer().ToArray(document));
+        var emission = Emit(document);
 
         Lacks("catalog", "/OutputIntents", Line(emission, "/Type /Catalog"));
         Lacks("emission", "pdfaid:part", emission);

@@ -37,9 +37,6 @@ public class AuthoredFormFieldTests
         return document;
     }
 
-    private static string Emission(Document document, DocumentRenderer? renderer = null)
-        => Emit((renderer ?? new DocumentRenderer()).Render(document));
-
     private static string[] PageNumbers(string emission)
         => [.. Regex.Matches(Line(emission, "/Type /Pages"), @"(\d+) 0 R").Select(match => match.Groups[1].Value)];
 
@@ -82,7 +79,7 @@ public class AuthoredFormFieldTests
             index => double.Parse(match.Groups[index].Value, CultureInfo.InvariantCulture))];
     }
 
-    private static (string Number, string Body) StructureElement(string emission, string type)
+    private static (string Number, string Body) SoleStructureElement(string emission, string type)
     {
         var matches = Regex.Matches(emission, $@"\n(\d+) 0 obj\n(<< /Type /StructElem /S /{type} [^\n]*)\n");
         Assert.True(
@@ -98,7 +95,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add("Name: ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Full name" });
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var widget = Assert.Single(PageWidgets(emission, 0));
 
         Carries("text widget", "/FT /Tx", widget.Body);
@@ -118,7 +115,7 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new CheckBox("agree") { Checked = true, Required = true });
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var widget = Assert.Single(PageWidgets(emission, 0));
 
         Carries("check box widget", "/FT /Btn", widget.Body);
@@ -140,7 +137,7 @@ public class AuthoredFormFieldTests
         drop.Options.Add("Germany");
         paragraph.Inlines.Add(drop);
 
-        var widget = Assert.Single(PageWidgets(Emission(document), 0));
+        var widget = Assert.Single(PageWidgets(Emit(document), 0));
 
         Carries("choice widget", "/FT /Ch", widget.Body);
         Carries("choice widget", "/V (Bulgaria)", widget.Body);
@@ -155,7 +152,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add("Name: ").Font.Size = 10;
         paragraph.Inlines.Add(new TextInput("name") { Width = 90 });
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var rect = Rect("text widget", Assert.Single(PageWidgets(emission, 0)).Body);
 
         Assert.Equal(90, rect[2] - rect[0], 3);
@@ -173,7 +170,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(" sign here ");
         paragraph.Inlines.Add(new CheckBox("signed"));
 
-        var emission = Emission(document);
+        var emission = Emit(document);
 
         Assert.Equal(2, PageNumbers(emission).Length);
         Assert.Empty(PageWidgets(emission, 0));
@@ -189,7 +186,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("size", "M") { Selected = true });
         paragraph.Inlines.Add(" medium");
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var widgets = PageWidgets(emission, 0);
 
         Assert.Equal(2, widgets.Count);
@@ -250,8 +247,8 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new TextInput("name") { Label = "Full name" });
         paragraph.Inlines.Add(" please");
 
-        var emission = Emission(document, Accessible());
-        var form = StructureElement(emission, "Form");
+        var emission = Emit(document, Accessible());
+        var form = SoleStructureElement(emission, "Form");
 
         Carries("form element", "/Alt (Full name)", form.Body);
 
@@ -279,11 +276,11 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new TextInput("name") { Label = "Full name" });
         paragraph.Inlines.Add(" please");
 
-        var emission = Emission(document, Accessible());
+        var emission = Emit(document, Accessible());
         var kids = Shaped(
             "paragraph element",
             @"/K \[\d+ (\d+) 0 R \d+\]",
-            StructureElement(emission, "P").Body);
+            SoleStructureElement(emission, "P").Body);
 
         Carries("paragraph kid", "/Type /StructElem", IndirectObject(emission, kids.Groups[1].Value));
     }
@@ -306,7 +303,7 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new CheckBox("agree"));
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var widget = Assert.Single(PageWidgets(emission, 0));
 
         Lacks("check box widget", "/StructParent", widget.Body);
@@ -395,7 +392,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("stance", "Off") { Selected = true });
         paragraph.Inlines.Add(" off");
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var group = IndirectObject(emission, Assert.Single(AcroFormFields(emission, 1)));
 
         Carries("radio group", "/Opt [(On) (Off)]", group);
@@ -422,7 +419,7 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("size", "S"));
         paragraph.Inlines.Add(new RadioButton("size", "M"));
 
-        var emission = Emission(document);
+        var emission = Emit(document);
 
         Lacks(
             "radio group",
@@ -461,14 +458,13 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Link = "https://www.radzen.com/" });
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var widget = Assert.Single(PageWidgets(emission, 0));
 
-        var annots = Shaped("page", @"/Annots \[([^\]]*)\]", PageObject(emission, 0));
         var links = new List<string>();
-        foreach (Match reference in Regex.Matches(annots.Groups[1].Value, @"(\d+) 0 R"))
+        foreach (var reference in ReferencesIn("page", "Annots", PageObject(emission, 0)))
         {
-            var body = IndirectObject(emission, reference.Groups[1].Value);
+            var body = IndirectObject(emission, reference);
             if (body.Contains("/Subtype /Link", StringComparison.Ordinal))
             {
                 links.Add(body);

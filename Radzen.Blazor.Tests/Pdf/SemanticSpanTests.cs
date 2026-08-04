@@ -36,10 +36,6 @@ public class SemanticSpanTests
         => DocumentLayouter.Layout(document).Semantics.Structure.Nodes
             .Where(node => node.Intent == SemanticIntent.Span);
 
-    private static string ElementMarker(string type) => $"/Type /StructElem /S /{type} /P ";
-
-    private static string Element(string emission, string type) => Line(emission, ElementMarker(type));
-
     private static string RootElement(string emission)
         => Shaped("StructTreeRoot", @"/K (\d+) 0 R", Line(emission, "/Type /StructTreeRoot")).Groups[1].Value;
 
@@ -96,7 +92,7 @@ public class SemanticSpanTests
     {
         var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Carries("tagged emission", ElementMarker("Span"), emission);
+        Carries("tagged emission", StructureMarker("Span"), emission);
     }
 
     [Fact]
@@ -104,8 +100,8 @@ public class SemanticSpanTests
     {
         var emission = Emit(Accessible().Render(Authored(static run => run.Role = "Quote")));
 
-        Carries("tagged emission", ElementMarker("Quote"), emission);
-        Lacks("tagged emission", ElementMarker("Span"), emission);
+        Carries("tagged emission", StructureMarker("Quote"), emission);
+        Lacks("tagged emission", StructureMarker("Span"), emission);
     }
 
     [Fact]
@@ -125,7 +121,7 @@ public class SemanticSpanTests
 
         var emission = Emit(renderer.Render(Authored(static run => run.Role = "Motto")));
 
-        Carries("tagged emission", ElementMarker("Motto"), emission);
+        Carries("tagged emission", StructureMarker("Motto"), emission);
     }
 
     [Fact]
@@ -133,7 +129,7 @@ public class SemanticSpanTests
     {
         var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Carries("Span element", "/Lang (la)", Element(emission, "Span"));
+        Carries("Span element", "/Lang (la)", StructureElement(emission, "Span"));
     }
 
     [Fact]
@@ -141,7 +137,7 @@ public class SemanticSpanTests
     {
         var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Lacks("P element", "/Lang", Element(emission, "P"));
+        Lacks("P element", "/Lang", StructureElement(emission, "P"));
     }
 
     [Fact]
@@ -178,7 +174,7 @@ public class SemanticSpanTests
 
         var emission = Emit(Accessible().Render(document));
 
-        Carries("Figure element", "/Lang (bg)", Element(emission, "Figure"));
+        Carries("Figure element", "/Lang (bg)", StructureElement(emission, "Figure"));
     }
 
     [Fact]
