@@ -4,15 +4,10 @@ using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 
-using Radzen.Documents.Pdf.Objects;
-
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PdfAEncryptionRejectionTests
 {
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
-
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
 

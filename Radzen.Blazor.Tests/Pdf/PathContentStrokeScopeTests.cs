@@ -1,16 +1,17 @@
 #nullable enable
 
-using System.Collections.Generic;
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.4.2 graphics state; stroke state confined to a q..Q scope.
 public class PathContentStrokeScopeTests
 {
-    private static IReadOnlyList<string> Operators(params PathContent[] paths)
+    private static string Render(params PathContent[] paths)
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
@@ -19,11 +20,13 @@ public class PathContentStrokeScopeTests
             page.Content.Add(path);
         }
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        return ContentStreamTokenizer.Operators(content);
+        var emission = Emit(document);
+        return IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page ")).Groups[1].Value);
     }
 
-    private static PathContent Line()
+    private static PathContent StrokedLine()
     {
         var path = new PathContent { Stroke = true };
         path.MoveTo(0, 0);
@@ -31,61 +34,66 @@ public class PathContentStrokeScopeTests
         return path;
     }
 
-    private static int IndexOf(IReadOnlyList<string> operators, string op, int from = 0)
+    private static int At(string content, string fragment)
     {
-        for (var i = from; i < operators.Count; i++)
-        {
-            if (operators[i] == op)
-            {
-                return i;
-            }
-        }
-
-        return -1;
+        Carries("page content", fragment, content);
+        return content.IndexOf(fragment, StringComparison.Ordinal);
     }
 
     [Fact]
     public void DashedStroke_IsWrappedInSaveRestore()
     {
-        var path = Line();
+        var path = StrokedLine();
         path.SetDash([3, 2], 0);
         path.Cap = LineCap.Round;
 
-        var operators = Operators(path);
+        var content = Render(path);
 
-        var q = IndexOf(operators, "q");
-        var d = IndexOf(operators, "d");
-        var s = IndexOf(operators, "S");
-        var restore = IndexOf(operators, "Q");
+        var q = At(content, "\nq\n");
+        var d = At(content, " d\n");
+        var s = At(content, "\nS\n");
+        var restore = At(content, "\nQ\n");
 
-        Assert.True(q >= 0, "expected a q");
-        Assert.True(q < d, "the dash operator must be inside the saved state");
-        Assert.True(d < s, "the stroke paints after the dash is set");
-        Assert.True(s < restore, "the saved state is restored after the paint");
+        Assert.True(
+            q < d,
+            $"the dash operator must be inside the saved state.\npage content:\n{Excerpt(content)}");
+        Assert.True(
+            d < s,
+            $"the stroke paints after the dash is set.\npage content:\n{Excerpt(content)}");
+        Assert.True(
+            s < restore,
+            $"the saved state is restored after the paint.\npage content:\n{Excerpt(content)}");
     }
 
     [Fact]
     public void PlainStroke_AfterDashedStroke_DoesNotInheritDash()
     {
-        var dashed = Line();
+        var dashed = StrokedLine();
         dashed.SetDash([3, 2], 0);
 
-        var operators = Operators(dashed, Line());
+        var content = Render(dashed, StrokedLine());
 
-        var first = IndexOf(operators, "d");
-        Assert.True(first >= 0);
-        Assert.Equal(-1, IndexOf(operators, "d", first + 1));
+        var dash = At(content, " d\n");
+        Assert.Equal(1, BuildTestSupport.CountOccurrences(content, " d\n"));
 
-        var restore = IndexOf(operators, "Q", first);
-        var firstStroke = IndexOf(operators, "S");
-        var secondStroke = IndexOf(operators, "S", firstStroke + 1);
-        Assert.True(restore >= 0 && secondStroke >= 0);
-        Assert.True(restore < secondStroke, "the dash scope must close before the next path");
+        var restore = At(content, "\nQ\n");
+        var firstStroke = At(content, "\nS\n");
+        var secondStroke = content.IndexOf("\nS\n", firstStroke + 1, StringComparison.Ordinal);
+
+        Assert.True(
+            secondStroke > 0,
+            $"the second path is missing its own 'S' stroke.\npage content:\n{Excerpt(content)}");
+        Assert.True(
+            restore > dash,
+            $"the dash must be closed by a later 'Q'.\npage content:\n{Excerpt(content)}");
+        Assert.True(
+            restore < secondStroke,
+            $"the dash scope must close before the next path.\npage content:\n{Excerpt(content)}");
     }
 
     [Fact]
     public void PlainStroke_EmitsNoSaveRestore()
     {
-        Assert.Equal(-1, IndexOf(Operators(Line()), "q"));
+        Lacks("page content", "\nq\n", Render(StrokedLine()));
     }
 }

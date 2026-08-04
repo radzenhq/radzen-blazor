@@ -1,11 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -25,55 +24,32 @@ public class FieldAppearanceEmbeddingTests
 
     private static DocumentRenderer PdfA() => new() { Conformance = PdfAConformance.PdfA2B };
 
-    private static DictionaryObject Widget(DocumentReader reader)
+    private static string Emission(Document document, DocumentRenderer? renderer = null)
+        => Emit((renderer ?? new DocumentRenderer()).Render(document));
+
+    private static string Appearance(string emission)
     {
-        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
-        var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
-        foreach (var item in annots)
+        var widget = Line(emission, "/T (name)");
+        var reference = Shaped("widget", @"/AP << /N (\d+) 0 R >>", widget);
+        return IndirectObject(emission, reference.Groups[1].Value);
+    }
+
+    private static Match EmbeddedFont(string appearance)
+        => Shaped("appearance /Resources", @"/Resources << /Font << /(\w+) (\d+) 0 R >> >>", appearance);
+
+    private static void CarriesAnEmbeddedProgram(string emission, string fontNumber)
+    {
+        var font = IndirectObject(emission, fontNumber);
+        if (font.Contains("/Subtype /Type0", StringComparison.Ordinal))
         {
-            var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(item));
-            if (BuildTestSupport.Name(reader, annotation, "Subtype") == "Widget"
-                && annotation.ContainsKey("AP"))
-            {
-                return annotation;
-            }
+            font = IndirectObject(emission, References("Type0 font", "DescendantFonts", 1, font)[0]);
         }
 
-        throw new InvalidOperationException("no widget with an appearance stream");
-    }
+        var descriptor = IndirectObject(
+            emission,
+            Shaped("font", @"/FontDescriptor (\d+) 0 R", font).Groups[1].Value);
 
-    private static StreamObject NormalAppearance(DocumentReader reader, DictionaryObject widget)
-    {
-        var appearance = Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]));
-        return Assert.IsType<StreamObject>(reader.Resolve(appearance["N"]));
-    }
-
-    private static Dictionary<string, DictionaryObject> AppearanceFonts(DocumentReader reader, StreamObject stream)
-    {
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(stream.Dictionary["Resources"]));
-        var fonts = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
-        return fonts.Keys.ToDictionary(
-            key => key,
-            key => Assert.IsType<DictionaryObject>(reader.Resolve(fonts[key])));
-    }
-
-    private static DictionaryObject FontDescriptor(DocumentReader reader, DictionaryObject font)
-    {
-        if (BuildTestSupport.Name(reader, font, "Subtype") == "Type0")
-        {
-            var descendants = Assert.IsType<ArrayObject>(reader.Resolve(font["DescendantFonts"]));
-            font = Assert.IsType<DictionaryObject>(reader.Resolve(descendants[0]));
-        }
-
-        return Assert.IsType<DictionaryObject>(reader.Resolve(font["FontDescriptor"]));
-    }
-
-    private static void AssertEmbedded(DocumentReader reader, DictionaryObject font)
-    {
-        var descriptor = FontDescriptor(reader, font);
-        Assert.True(
-            descriptor.ContainsKey("FontFile") || descriptor.ContainsKey("FontFile2") || descriptor.ContainsKey("FontFile3"),
-            "the appearance font carries an embedded font program");
+        Shaped("font descriptor", @"/FontFile[23]? \d+ 0 R", descriptor);
     }
 
     [Fact]
@@ -83,12 +59,9 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var reader = BuildTestSupport.Read(document, PdfA());
-        var stream = NormalAppearance(reader, Widget(reader));
-        var fonts = AppearanceFonts(reader, stream);
+        var emission = Emission(document, PdfA());
 
-        var font = Assert.Single(fonts).Value;
-        AssertEmbedded(reader, font);
+        CarriesAnEmbeddedProgram(emission, EmbeddedFont(Appearance(emission)).Groups[2].Value);
     }
 
     [Fact]
@@ -97,19 +70,19 @@ public class FieldAppearanceEmbeddingTests
         var document = Conformant(out var paragraph);
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var reader = BuildTestSupport.Read(document, PdfA());
-        var widget = Widget(reader);
-        var fonts = AppearanceFonts(reader, NormalAppearance(reader, widget));
-        var key = Assert.Single(fonts).Key;
+        var emission = Emission(document, PdfA());
+        var key = EmbeddedFont(Appearance(emission)).Groups[1].Value;
 
-        var da = Assert.IsType<StringObject>(reader.Resolve(widget["DA"])).Value;
-        Assert.Contains("/" + key + " ", da, StringComparison.Ordinal);
+        var defaultAppearance = Shaped("widget", @"/DA \(([^)]*)\)", Line(emission, "/T (name)")).Groups[1].Value;
+        Carries("widget /DA", "/" + key + " ", defaultAppearance);
 
-        var form = FormTestSupport.AcroForm(reader);
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(form["DR"]));
-        var formFonts = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
-        Assert.True(formFonts.ContainsKey(key), "the default resources name the embedded appearance font");
-        Assert.False(formFonts.ContainsKey("Helv"), "no standard-14 face is offered as a default");
+        var resources = Shaped(
+            "AcroForm /DR",
+            @"/DR << /Font << (.*?) >> >>",
+            Line(emission, "/Fields [")).Groups[1].Value;
+
+        Carries("AcroForm /DR /Font", "/" + key + " ", resources);
+        Lacks("AcroForm /DR /Font", "/Helv ", resources);
     }
 
     [Fact]
@@ -119,15 +92,12 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("aaa ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Zq", Label = "Name" });
 
-        var reader = BuildTestSupport.Read(document, PdfA());
-        var stream = NormalAppearance(reader, Widget(reader));
-        var font = Assert.Single(AppearanceFonts(reader, stream)).Value;
+        var emission = Emission(document, PdfA());
+        var appearance = Appearance(emission);
 
-        AssertEmbedded(reader, font);
-
-        var text = FormTestSupport.Decode(stream);
-        Assert.Contains(" Tj", text, StringComparison.Ordinal);
-        Assert.DoesNotContain("(Zq)", text, StringComparison.Ordinal);
+        CarriesAnEmbeddedProgram(emission, EmbeddedFont(appearance).Groups[2].Value);
+        Carries("field appearance stream", " Tj", appearance);
+        Lacks("field appearance stream", "(Zq)", appearance);
     }
 
     [Fact]
@@ -153,10 +123,9 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var reader = BuildTestSupport.Read(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
-        var font = Assert.Single(AppearanceFonts(reader, NormalAppearance(reader, Widget(reader)))).Value;
+        var emission = Emission(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
-        AssertEmbedded(reader, font);
+        CarriesAnEmbeddedProgram(emission, EmbeddedFont(Appearance(emission)).Groups[2].Value);
     }
 
     [Fact]
@@ -166,10 +135,9 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Label = "Name" });
 
-        var reader = BuildTestSupport.Read(document, PdfA());
-        var stream = NormalAppearance(reader, Widget(reader));
+        var emission = Emission(document, PdfA());
 
-        Assert.False(stream.Dictionary.ContainsKey("Resources"), "an empty appearance renders no text");
+        Lacks("field appearance stream", "/Resources", Appearance(emission));
     }
 
     [Fact]
@@ -225,15 +193,19 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
 
-        var reader = BuildTestSupport.Read(document);
-        var stream = NormalAppearance(reader, Widget(reader));
+        var emission = Emission(document);
+        var appearance = Appearance(emission);
 
-        Assert.Contains("(Ada) Tj", FormTestSupport.Decode(stream), StringComparison.Ordinal);
+        Carries("field appearance stream", "(Ada) Tj", appearance);
 
-        var font = Assert.Single(AppearanceFonts(reader, stream)).Value;
-        Assert.Equal("Type1", BuildTestSupport.Name(reader, font, "Subtype"));
-        Assert.Equal("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont"));
-        Assert.False(font.ContainsKey("FontDescriptor"), "a standard-14 appearance embeds nothing");
+        var font = Shaped(
+            "appearance /Resources",
+            @"/Resources << /Font << /\w+ << ([^>]*) >> >> >>",
+            appearance).Groups[1].Value;
+
+        Carries("standard-14 appearance font", "/Subtype /Type1", font);
+        Carries("standard-14 appearance font", "/BaseFont /Helvetica", font);
+        Lacks("standard-14 appearance font", "/FontDescriptor", font);
 
         Assert.Equal(new DocumentRenderer().ToArray(document), new DocumentRenderer().ToArray(document));
     }
@@ -248,11 +220,14 @@ public class FieldAppearanceEmbeddingTests
         var rendered = PdfA().Render(document);
         rendered.Flatten();
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
+        var emission = Emit(rendered);
+        var fonts = Shaped("page /Resources", @"/Font << (.*?) >>", Line(emission, "/Type /Page ")).Groups[1].Value;
 
-        foreach (var font in BuildTestSupport.Fonts(reader))
+        Lacks("page /Resources /Font", "<<", fonts);
+
+        foreach (Match font in Regex.Matches(fonts, @"/\w+ (\d+) 0 R"))
         {
-            AssertEmbedded(reader, font);
+            CarriesAnEmbeddedProgram(emission, font.Groups[1].Value);
         }
     }
 }

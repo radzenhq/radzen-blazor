@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,22 +31,10 @@ public class AppendAuxiliaryBoxTests
         return pdf.ToArray();
     }
 
-    private static DictionaryObject Kid(DocumentReader reader, int index)
-    {
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
-        var pages = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Pages"]));
-        var kids = Assert.IsType<ArrayObject>(reader.Resolve(pages["Kids"]));
-        return Assert.IsType<DictionaryObject>(reader.Resolve(kids[index]));
-    }
-
-    private static void AssertBox(DocumentReader reader, DictionaryObject page, string key, double l, double b, double r, double t)
-    {
-        var box = Assert.IsType<ArrayObject>(reader.Resolve(page[key]));
-        Assert.Equal(l, Assert.IsType<NumberObject>(box[0]).DoubleValue);
-        Assert.Equal(b, Assert.IsType<NumberObject>(box[1]).DoubleValue);
-        Assert.Equal(r, Assert.IsType<NumberObject>(box[2]).DoubleValue);
-        Assert.Equal(t, Assert.IsType<NumberObject>(box[3]).DoubleValue);
-    }
+    private static string AppendedPage(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("pages node", @"/Kids \[\d+ 0 R (\d+) 0 R", Line(emission, "/Type /Pages ")).Groups[1].Value);
 
     [Fact]
     public void Append_LoadedPage_KeepsBleedTrimAndArtBoxes()
@@ -56,11 +44,11 @@ public class AppendAuxiliaryBoxTests
         target.Append(PortableDocument.LoadFromStream(new MemoryStream(
             LoadedBytes("/BleedBox [1 2 3 4] /TrimBox [5 6 7 8] /ArtBox [9 10 11 12]"))));
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var appended = Kid(reader, 1);
-        AssertBox(reader, appended, "BleedBox", 1, 2, 3, 4);
-        AssertBox(reader, appended, "TrimBox", 5, 6, 7, 8);
-        AssertBox(reader, appended, "ArtBox", 9, 10, 11, 12);
+        var appended = AppendedPage(Emit(target));
+
+        Carries("appended page", "/BleedBox [1 2 3 4]", appended);
+        Carries("appended page", "/TrimBox [5 6 7 8]", appended);
+        Carries("appended page", "/ArtBox [9 10 11 12]", appended);
     }
 
     [Fact]
@@ -76,10 +64,10 @@ public class AppendAuxiliaryBoxTests
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(source);
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var appended = Kid(reader, 1);
-        Assert.Equal(90, Assert.IsType<NumberObject>(reader.Resolve(appended["Rotate"])).IntValue);
-        AssertBox(reader, appended, "TrimBox", 5, 6, 7, 8);
-        AssertBox(reader, appended, "BleedBox", 1, 2, 3, 4);
+        var appended = AppendedPage(Emit(target));
+
+        Carries("appended page", "/Rotate 90", appended);
+        Carries("appended page", "/TrimBox [5 6 7 8]", appended);
+        Carries("appended page", "/BleedBox [1 2 3 4]", appended);
     }
 }

@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -35,11 +36,35 @@ public class SemanticSpanTests
         => DocumentLayouter.Layout(document).Semantics.Structure.Nodes
             .Where(node => node.Intent == SemanticIntent.Span);
 
-    private static List<string> Types(DocumentReader reader)
+    private static string ElementMarker(string type) => $"/Type /StructElem /S /{type} /P ";
+
+    private static string Element(string emission, string type) => Line(emission, ElementMarker(type));
+
+    private static string RootElement(string emission)
+        => Shaped("StructTreeRoot", @"/K (\d+) 0 R", Line(emission, "/Type /StructTreeRoot")).Groups[1].Value;
+
+    private static string TypeOf(string emission, string number)
+        => Shaped(
+            $"structure element {number} 0 R",
+            @"/Type /StructElem /S /(\w+) /P ",
+            IndirectObject(emission, number)).Groups[1].Value;
+
+    private static string? OnlyElementKid(string emission, string number)
     {
-        var types = new List<string>();
-        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
-        return types;
+        var kids = Regex.Match(IndirectObject(emission, number), @"/K \[([^\]]*)\]");
+        if (!kids.Success)
+        {
+            return null;
+        }
+
+        string[] references =
+        [
+            .. Regex.Matches(Regex.Replace(kids.Groups[1].Value, "<<.*?>>", " "), @"(\d+) 0 R")
+                .Cast<Match>()
+                .Select(match => match.Groups[1].Value),
+        ];
+
+        return references.Length == 0 ? null : Assert.Single(references);
     }
 
     [Fact]
@@ -69,19 +94,18 @@ public class SemanticSpanTests
     [Fact]
     public void SpanWithoutARole_IsTaggedAsSpan()
     {
-        var reader = BuildTestSupport.Read(Authored(static run => run.Language = "la"), Accessible());
+        var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Assert.Contains("Span", Types(reader));
+        Carries("tagged emission", ElementMarker("Span"), emission);
     }
 
     [Fact]
     public void SpanRole_NamingAStandardStructureType_IsTaggedWithIt()
     {
-        var reader = BuildTestSupport.Read(Authored(static run => run.Role = "Quote"), Accessible());
-        var types = Types(reader);
+        var emission = Emit(Accessible().Render(Authored(static run => run.Role = "Quote")));
 
-        Assert.Contains("Quote", types);
-        Assert.DoesNotContain("Span", types);
+        Carries("tagged emission", ElementMarker("Quote"), emission);
+        Lacks("tagged emission", ElementMarker("Span"), emission);
     }
 
     [Fact]
@@ -98,28 +122,26 @@ public class SemanticSpanTests
     {
         var renderer = Accessible();
         renderer.RoleMap.Add("Motto", "Span");
-        var reader = DocumentReader.Parse(
-            renderer.ToArray(Authored(static run => run.Role = "Motto")));
 
-        Assert.Contains("Motto", Types(reader));
+        var emission = Emit(renderer.Render(Authored(static run => run.Role = "Motto")));
+
+        Carries("tagged emission", ElementMarker("Motto"), emission);
     }
 
     [Fact]
     public void SpanLanguage_IsWrittenAsLangOnTheStructureElement()
     {
-        var reader = BuildTestSupport.Read(Authored(static run => run.Language = "la"), Accessible());
-        var span = Assert.IsType<DictionaryObject>(StructureTestHelpers.FindElement(reader, "Span"));
+        var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Assert.Equal("la", Assert.IsType<StringObject>(reader.Resolve(span["Lang"])).Value);
+        Carries("Span element", "/Lang (la)", Element(emission, "Span"));
     }
 
     [Fact]
     public void ParagraphElements_CarryNoLanguageOfTheirOwn()
     {
-        var reader = BuildTestSupport.Read(Authored(static run => run.Language = "la"), Accessible());
-        var paragraph = Assert.IsType<DictionaryObject>(StructureTestHelpers.FindElement(reader, "P"));
+        var emission = Emit(Accessible().Render(Authored(static run => run.Language = "la")));
 
-        Assert.False(paragraph.ContainsKey("Lang"));
+        Lacks("P element", "/Lang", Element(emission, "P"));
     }
 
     [Fact]
@@ -131,8 +153,13 @@ public class SemanticSpanTests
             run.Link = "https://www.radzen.com";
         });
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var types = Types(reader);
+        var emission = Emit(Accessible().Render(document));
+        var types = new List<string>();
+
+        for (string? number = RootElement(emission); number is not null; number = OnlyElementKid(emission, number))
+        {
+            types.Add(TypeOf(emission, number));
+        }
 
         Assert.Equal(["Document", "Sect", "P", "Link", "Span"], types);
     }
@@ -149,10 +176,9 @@ public class SemanticSpanTests
         picture.AlternateText = "Radzen";
         picture.Language = "bg";
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var figure = Assert.IsType<DictionaryObject>(StructureTestHelpers.FindElement(reader, "Figure"));
+        var emission = Emit(Accessible().Render(document));
 
-        Assert.Equal("bg", Assert.IsType<StringObject>(reader.Resolve(figure["Lang"])).Value);
+        Carries("Figure element", "/Lang (bg)", Element(emission, "Figure"));
     }
 
     [Fact]

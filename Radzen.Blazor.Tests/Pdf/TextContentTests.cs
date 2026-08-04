@@ -1,42 +1,30 @@
 #nullable enable
 
-using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Fonts;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
+using Radzen.Documents.Fonts;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TextContentTests
 {
-    private static ContentOperation Find(byte[] content, string op)
-    {
-        foreach (var operation in ContentStreamTokenizer.Parse(content))
-        {
-            if (operation.Operator == op)
-            {
-                return operation;
-            }
-        }
+    private static string PageLine(string emission) => Line(emission, "/Type /Page ");
 
-        throw new Xunit.Sdk.XunitException($"operator '{op}' not found");
-    }
+    private static string PageContent(string emission)
+        => IndirectObject(emission, Shaped("page", @"/Contents (\d+) 0 R", PageLine(emission)).Groups[1].Value);
 
-    private static byte[] WinAnsi(string text)
-    {
-        var bytes = new List<byte>();
-        foreach (var c in text)
-        {
-            Assert.True(WinAnsiEncoding.TryGetCode(c, out var code), $"cannot encode U+{(int)c:X4}");
-            bytes.Add(code);
-        }
+    private static string FontKey(string content)
+        => Shaped("text object", @"/(\S+) [\d.]+ Tf\n", content).Groups[1].Value;
 
-        return [.. bytes];
-    }
+    private static string FontResource(string emission, string key)
+        => Shaped(
+            $"font resource /{key}",
+            $@"/{Regex.Escape(key)} << ([^>]*)>>",
+            PageLine(emission)).Groups[1].Value;
 
     [Fact]
     public void Text_EmitsBtTfTjEtInOrder()
@@ -45,18 +33,7 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 72, 700));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var operators = ContentStreamTokenizer.Operators(content);
-
-        var bt = operators.IndexOf("BT");
-        var tf = operators.IndexOf("Tf");
-        var tj = operators.IndexOf("Tj");
-        var et = operators.IndexOf("ET");
-
-        Assert.True(bt >= 0);
-        Assert.True(bt < tf);
-        Assert.True(tf < tj);
-        Assert.True(tj < et);
+        Shaped("text object", @"BT\n[\s\S]*? Tf\n[\s\S]*? Tj\n[\s\S]*?ET\n", PageContent(Emit(document)));
     }
 
     [Fact]
@@ -66,12 +43,7 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Size = 18 } });
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var tf = Find(content, "Tf");
-
-        Assert.Equal(2, tf.Operands.Count);
-        Assert.Equal(ContentTokenKind.Name, tf.Operands[0].Kind);
-        Assert.Equal(18, tf.Operands[1].Number, 3);
+        Shaped("text object", @"\n/\S+ 18 Tf\n", PageContent(Emit(document)));
     }
 
     [Fact]
@@ -81,17 +53,14 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica" } });
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
-        var name = Find(content, "Tf").Operands[0].Text;
+        var emission = Emit(document);
+        var key = FontKey(PageContent(emission));
+        var font = FontResource(emission, key);
 
-        var font = ContentTestHelpers.FontResource(reader, 0, name);
-        Assert.Equal("Font", Assert.IsType<NameObject>(font["Type"]).Value);
-        Assert.Equal("Type1", Assert.IsType<NameObject>(font["Subtype"]).Value);
-        Assert.Equal("Helvetica", Assert.IsType<NameObject>(font["BaseFont"]).Value);
-
-        var encoding = Assert.IsType<NameObject>(reader.Resolve(font["Encoding"]));
-        Assert.Equal("WinAnsiEncoding", encoding.Value);
+        Carries($"font resource /{key}", "/Type /Font ", font);
+        Carries($"font resource /{key}", "/Subtype /Type1 ", font);
+        Carries($"font resource /{key}", "/BaseFont /Helvetica ", font);
+        Carries($"font resource /{key}", "/Encoding /WinAnsiEncoding ", font);
     }
 
     [Fact]
@@ -101,12 +70,10 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Helvetica", Bold = true } });
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
-        var name = Find(content, "Tf").Operands[0].Text;
+        var emission = Emit(document);
+        var key = FontKey(PageContent(emission));
 
-        var font = ContentTestHelpers.FontResource(reader, 0, name);
-        Assert.Equal("Helvetica-Bold", Assert.IsType<NameObject>(font["BaseFont"]).Value);
+        Carries($"font resource /{key}", "/BaseFont /Helvetica-Bold ", FontResource(emission, key));
     }
 
     [Fact]
@@ -116,12 +83,10 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Times" } });
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
-        var name = Find(content, "Tf").Operands[0].Text;
+        var emission = Emit(document);
+        var key = FontKey(PageContent(emission));
 
-        var font = ContentTestHelpers.FontResource(reader, 0, name);
-        Assert.Equal("Times-Roman", Assert.IsType<NameObject>(font["BaseFont"]).Value);
+        Carries($"font resource /{key}", "/BaseFont /Times-Roman ", FontResource(emission, key));
     }
 
     [Fact]
@@ -131,12 +96,10 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hi", 0, 0) { Font = new Font { Family = "Courier" } });
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
-        var name = Find(content, "Tf").Operands[0].Text;
+        var emission = Emit(document);
+        var key = FontKey(PageContent(emission));
 
-        var font = ContentTestHelpers.FontResource(reader, 0, name);
-        Assert.Equal("Courier", Assert.IsType<NameObject>(font["BaseFont"]).Value);
+        Carries($"font resource /{key}", "/BaseFont /Courier ", FontResource(emission, key));
     }
 
     [Fact]
@@ -147,19 +110,10 @@ public class TextContentTests
         page.Content.Add(new TextContent("a", 0, 0) { Font = new Font { Family = "Helvetica" } });
         page.Content.Add(new TextContent("b", 0, 0) { Font = new Font { Family = "Times" } });
 
-        var reader = ContentTestHelpers.Reload(document);
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(ContentTestHelpers.Kid(reader, 0)["Resources"]));
-        var fonts = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
+        var resources = PageLine(Emit(document));
 
-        var baseFonts = new List<string>();
-        foreach (var key in fonts.Keys)
-        {
-            var font = Assert.IsType<DictionaryObject>(reader.Resolve(fonts[key]));
-            baseFonts.Add(Assert.IsType<NameObject>(font["BaseFont"]).Value);
-        }
-
-        Assert.Contains("Helvetica", baseFonts);
-        Assert.Contains("Times-Roman", baseFonts);
+        Carries("page resources", "/BaseFont /Helvetica ", resources);
+        Carries("page resources", "/BaseFont /Times-Roman ", resources);
     }
 
     [Fact]
@@ -167,16 +121,9 @@ public class TextContentTests
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
-        var text = "A\u20AC\u2013z";
-        page.Content.Add(new TextContent(text, 0, 0));
+        page.Content.Add(new TextContent("A\u20AC\u2013z", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var tj = Find(content, "Tj");
-
-        Assert.Single(tj.Operands);
-        Assert.Equal(ContentTokenKind.String, tj.Operands[0].Kind);
-        Assert.Equal(WinAnsi(text), tj.Operands[0].Bytes);
-        Assert.Equal([0x41, 0x80, 0x96, 0x7A], tj.Operands[0].Bytes);
+        Carries("text object", "(A\u0080\u0096z) Tj\n", PageContent(Emit(document)));
     }
 
     [Fact]
@@ -186,10 +133,7 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var tj = Find(content, "Tj");
-
-        Assert.Equal(WinAnsi("Hello"), tj.Operands[0].Bytes);
+        Carries("text object", "(Hello) Tj\n", PageContent(Emit(document)));
     }
 
     [Fact]
@@ -197,12 +141,9 @@ public class TextContentTests
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
-        page.Content.Add(new TextContent("AΩz", 0, 0));
+        page.Content.Add(new TextContent("A\u03A9z", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var tj = Find(content, "Tj");
-
-        Assert.Equal([0x41, 0x3F, 0x7A], tj.Operands[0].Bytes);
+        Carries("text object", "(A?z) Tj\n", PageContent(Emit(document)));
     }
 
     [Fact]
@@ -212,25 +153,10 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("P", 72, 700));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        double x, y;
-        var operators = ContentStreamTokenizer.Operators(content);
-        if (operators.Contains("Tm"))
-        {
-            var tm = Find(content, "Tm");
-            x = tm.Num(4);
-            y = tm.Num(5);
-        }
-        else
-        {
-            var td = Find(content, "Td");
-            x = td.Num(0);
-            y = td.Num(1);
-        }
-
-        Assert.Equal(72, x, 3);
-        Assert.Equal(700, y, 3);
+        Shaped(
+            "text object",
+            @"\n(?:72 700 Td|1 0 [-\d.]+ 1 72 700 Tm)\n",
+            PageContent(Emit(document)));
     }
 
     [Fact]
@@ -240,12 +166,6 @@ public class TextContentTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("C", 0, 0) { Color = Color.Red });
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var rg = Find(content, "rg");
-
-        Assert.Equal(3, rg.Operands.Count);
-        Assert.Equal(1.0, rg.Num(0), 3);
-        Assert.Equal(0.0, rg.Num(1), 3);
-        Assert.Equal(0.0, rg.Num(2), 3);
+        Carries("text object", "\n1 0 0 rg\n", PageContent(Emit(document)));
     }
 }

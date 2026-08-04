@@ -1,12 +1,14 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -35,57 +37,58 @@ public class AuthoredFormFieldTests
         return document;
     }
 
-    private static List<DictionaryObject> Widgets(DocumentReader reader, int pageIndex)
+    private static string Emission(Document document, DocumentRenderer? renderer = null)
+        => Emit((renderer ?? new DocumentRenderer()).Render(document));
+
+    private static string[] PageNumbers(string emission)
+        => [.. Regex.Matches(Line(emission, "/Type /Pages"), @"(\d+) 0 R").Select(match => match.Groups[1].Value)];
+
+    private static string PageObject(string emission, int index)
     {
-        var page = BuildTestSupport.PageLeaves(reader)[pageIndex].Page;
-        var widgets = new List<DictionaryObject>();
-        if (page.TryGetValue("Annots", out var annots) && reader.Resolve(annots!) is ArrayObject array)
+        var pages = PageNumbers(emission);
+        Assert.True(index < pages.Length, $"The page tree has {pages.Length} kids; page {index} was requested.");
+        return IndirectObject(emission, pages[index]);
+    }
+
+    private static List<(string Number, string Body)> PageWidgets(string emission, int pageIndex)
+    {
+        var widgets = new List<(string Number, string Body)>();
+        var annots = Regex.Match(PageObject(emission, pageIndex), @"/Annots \[([^\]]*)\]");
+        if (!annots.Success)
         {
-            foreach (var item in array)
+            return widgets;
+        }
+
+        foreach (Match reference in Regex.Matches(annots.Groups[1].Value, @"(\d+) 0 R"))
+        {
+            var number = reference.Groups[1].Value;
+            var body = IndirectObject(emission, number);
+            if (body.Contains("/Subtype /Widget", StringComparison.Ordinal))
             {
-                var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(item));
-                if (BuildTestSupport.Name(reader, annotation, "Subtype") == "Widget")
-                {
-                    widgets.Add(annotation);
-                }
+                widgets.Add((number, body));
             }
         }
 
         return widgets;
     }
 
-    private static ArrayObject FormFields(DocumentReader reader)
+    private static string[] AcroFormFields(string emission, int count)
+        => References("AcroForm", "Fields", count, Line(emission, "/Fields ["));
+
+    private static double[] Rect(string subject, string body)
     {
-        var catalog = ContentTestHelpers.Catalog(reader);
-        var form = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["AcroForm"]));
-        return Assert.IsType<ArrayObject>(reader.Resolve(form["Fields"]));
+        var match = Shaped(subject, @"/Rect \[(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)\]", body);
+        return [.. Enumerable.Range(1, 4).Select(
+            index => double.Parse(match.Groups[index].Value, CultureInfo.InvariantCulture))];
     }
 
-    private static double[] Rect(DocumentReader reader, DictionaryObject widget)
+    private static (string Number, string Body) StructureElement(string emission, string type)
     {
-        var array = Assert.IsType<ArrayObject>(reader.Resolve(widget["Rect"]));
-        return [.. array.Select(value => ((NumberObject)reader.Resolve(value)).DoubleValue)];
-    }
-
-    private static string Text(DocumentReader reader, DictionaryObject dictionary, string key)
-        => Assert.IsType<StringObject>(reader.Resolve(dictionary[key])).Value;
-
-    private static string PageContent(DocumentReader reader, int pageIndex)
-    {
-        var page = BuildTestSupport.PageLeaves(reader)[pageIndex].Page;
-        var resolved = reader.Resolve(page["Contents"]);
-        if (resolved is StreamObject stream)
-        {
-            return FormTestSupport.Decode(stream);
-        }
-
-        var text = new System.Text.StringBuilder();
-        foreach (var part in (ArrayObject)resolved)
-        {
-            text.Append(FormTestSupport.Decode((StreamObject)reader.Resolve(part)));
-        }
-
-        return text.ToString();
+        var matches = Regex.Matches(emission, $@"\n(\d+) 0 obj\n(<< /Type /StructElem /S /{type} [^\n]*)\n");
+        Assert.True(
+            matches.Count == 1,
+            $"Expected 1 '/S /{type}' structure element, found {matches.Count}.");
+        return (matches[0].Groups[1].Value, matches[0].Groups[2].Value);
     }
 
     [Fact]
@@ -95,19 +98,18 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add("Name: ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Full name" });
 
-        var reader = BuildTestSupport.Read(document);
-        var widget = Assert.Single(Widgets(reader, 0));
+        var emission = Emission(document);
+        var widget = Assert.Single(PageWidgets(emission, 0));
 
-        Assert.Equal("Tx", BuildTestSupport.Name(reader, widget, "FT"));
-        Assert.Equal("name", Text(reader, widget, "T"));
-        Assert.Equal("Ada", Text(reader, widget, "V"));
-        Assert.Equal("Full name", Text(reader, widget, "TU"));
+        Carries("text widget", "/FT /Tx", widget.Body);
+        Carries("text widget", "/T (name)", widget.Body);
+        Carries("text widget", "/V (Ada)", widget.Body);
+        Carries("text widget", "/TU (Full name)", widget.Body);
 
-        var appearance = Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]));
-        Assert.IsType<StreamObject>(reader.Resolve(appearance["N"]));
+        var appearance = Shaped("text widget", @"/AP << /N (\d+) 0 R >>", widget.Body);
+        Carries("text appearance", ">>\nstream\n", IndirectObject(emission, appearance.Groups[1].Value));
 
-        var fields = FormFields(reader);
-        Assert.Same(widget, Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(fields))));
+        Assert.Equal(widget.Number, Assert.Single(AcroFormFields(emission, 1)));
     }
 
     [Fact]
@@ -116,18 +118,17 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new CheckBox("agree") { Checked = true, Required = true });
 
-        var reader = BuildTestSupport.Read(document);
-        var widget = Assert.Single(Widgets(reader, 0));
+        var emission = Emission(document);
+        var widget = Assert.Single(PageWidgets(emission, 0));
 
-        Assert.Equal("Btn", BuildTestSupport.Name(reader, widget, "FT"));
-        Assert.Equal("Yes", BuildTestSupport.Name(reader, widget, "V"));
-        Assert.Equal("Yes", BuildTestSupport.Name(reader, widget, "AS"));
-        Assert.Equal(2, BuildTestSupport.Int(widget, "Ff"));
+        Carries("check box widget", "/FT /Btn", widget.Body);
+        Carries("check box widget", "/V /Yes", widget.Body);
+        Carries("check box widget", "/AS /Yes", widget.Body);
+        CarriesFlag("check box widget", widget.Body, "Ff", 2);
 
-        var states = Assert.IsType<DictionaryObject>(
-            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]))["N"]));
-        Assert.IsType<StreamObject>(reader.Resolve(states["Yes"]));
-        Assert.IsType<StreamObject>(reader.Resolve(states["Off"]));
+        var states = Shaped("check box widget", @"/AP << /N << /Yes (\d+) 0 R /Off (\d+) 0 R >> >>", widget.Body);
+        Carries("check box on appearance", ">>\nstream\n", IndirectObject(emission, states.Groups[1].Value));
+        Carries("check box off appearance", ">>\nstream\n", IndirectObject(emission, states.Groups[2].Value));
     }
 
     [Fact]
@@ -139,16 +140,11 @@ public class AuthoredFormFieldTests
         drop.Options.Add("Germany");
         paragraph.Inlines.Add(drop);
 
-        var reader = BuildTestSupport.Read(document);
-        var widget = Assert.Single(Widgets(reader, 0));
+        var widget = Assert.Single(PageWidgets(Emission(document), 0));
 
-        Assert.Equal("Ch", BuildTestSupport.Name(reader, widget, "FT"));
-        Assert.Equal("Bulgaria", Text(reader, widget, "V"));
-
-        var options = Assert.IsType<ArrayObject>(reader.Resolve(widget["Opt"]));
-        Assert.Equal(
-            new[] { "Bulgaria", "Germany" },
-            options.Select(option => ((StringObject)reader.Resolve(option)).Value).ToArray());
+        Carries("choice widget", "/FT /Ch", widget.Body);
+        Carries("choice widget", "/V (Bulgaria)", widget.Body);
+        Carries("choice widget", "/Opt [(Bulgaria) (Germany)]", widget.Body);
     }
 
     [Fact]
@@ -159,8 +155,8 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add("Name: ").Font.Size = 10;
         paragraph.Inlines.Add(new TextInput("name") { Width = 90 });
 
-        var reader = BuildTestSupport.Read(document);
-        var rect = Rect(reader, Assert.Single(Widgets(reader, 0)));
+        var emission = Emission(document);
+        var rect = Rect("text widget", Assert.Single(PageWidgets(emission, 0)).Body);
 
         Assert.Equal(90, rect[2] - rect[0], 3);
         Assert.Equal(14, rect[3] - rect[1], 3);
@@ -177,11 +173,11 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(" sign here ");
         paragraph.Inlines.Add(new CheckBox("signed"));
 
-        var reader = BuildTestSupport.Read(document);
+        var emission = Emission(document);
 
-        Assert.Equal(2, BuildTestSupport.PageLeaves(reader).Count);
-        Assert.Empty(Widgets(reader, 0));
-        Assert.Single(Widgets(reader, 1));
+        Assert.Equal(2, PageNumbers(emission).Length);
+        Assert.Empty(PageWidgets(emission, 0));
+        Assert.Single(PageWidgets(emission, 1));
     }
 
     [Fact]
@@ -193,34 +189,33 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("size", "M") { Selected = true });
         paragraph.Inlines.Add(" medium");
 
-        var reader = BuildTestSupport.Read(document);
-        var widgets = Widgets(reader, 0);
+        var emission = Emission(document);
+        var widgets = PageWidgets(emission, 0);
 
         Assert.Equal(2, widgets.Count);
 
-        var group = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(FormFields(reader))));
-        Assert.Equal("size", Text(reader, group, "T"));
-        Assert.Equal("M", BuildTestSupport.Name(reader, group, "V"));
-        Assert.Equal(1 << 15, BuildTestSupport.Int(group, "Ff"));
+        var number = Assert.Single(AcroFormFields(emission, 1));
+        var group = IndirectObject(emission, number);
 
-        var kids = Assert.IsType<ArrayObject>(reader.Resolve(group["Kids"]));
-        Assert.Equal(2, kids.Count);
+        Carries("radio group", "/T (size)", group);
+        Carries("radio group", "/V /M", group);
+        CarriesFlag("radio group", group, "Ff", 1 << 15);
 
-        Assert.Equal(
-            new[] { "Off", "M" },
-            widgets.Select(widget => BuildTestSupport.Name(reader, widget, "AS")).ToArray());
+        var kids = References("radio group", "Kids", 2, group);
+        string[] states = ["/AS /Off", "/AS /M"];
+        string[] on = ["S", "M"];
 
-        foreach (var widget in widgets)
+        for (var i = 0; i < kids.Length; i++)
         {
-            Assert.Same(group, reader.Resolve(widget["Parent"]));
-            Assert.False(widget.ContainsKey("T"), "a radio button widget takes its name from the group");
-        }
+            var kid = IndirectObject(emission, kids[i]);
+            var subject = $"radio kid {kids[i]} 0 R";
 
-        var states = widgets.Select(widget => Assert.IsType<DictionaryObject>(
-            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]))["N"])));
-        Assert.Equal(
-            new[] { "S", "M" },
-            states.Select(state => state.Keys.Single(key => key != "Off")).ToArray());
+            Assert.Equal(widgets[i].Number, kids[i]);
+            Carries(subject, $"/Parent {number} 0 R", kid);
+            Lacks(subject, "/T (", kid);
+            Carries(subject, states[i], kid);
+            Shaped(subject, $@"/AP << /N << /{on[i]} \d+ 0 R /Off \d+ 0 R >> >>", kid);
+        }
     }
 
     [Fact]
@@ -255,20 +250,25 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new TextInput("name") { Label = "Full name" });
         paragraph.Inlines.Add(" please");
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var structRoot = TaggedStructureProbe.StructRoot(reader);
-        var form = TaggedStructureProbe.Single(TaggedStructureProbe.Root(reader), "Form");
+        var emission = Emission(document, Accessible());
+        var form = StructureElement(emission, "Form");
 
-        Assert.Equal("Full name", Text(reader, form.Dict, "Alt"));
+        Carries("form element", "/Alt (Full name)", form.Body);
 
-        var objr = Assert.Single(form.ObjectReferences);
-        var widget = Assert.IsType<DictionaryObject>(reader.Resolve(objr["Obj"]!));
-        Assert.Same(Assert.Single(Widgets(reader, 0)), widget);
+        var objr = Shaped("form element", @"/K \[<< /Type /OBJR /Pg \d+ 0 R /Obj (\d+) 0 R >>\]", form.Body);
+        var widget = Assert.Single(PageWidgets(emission, 0));
 
-        var structParent = Assert.IsType<NumberObject>(reader.Resolve(widget["StructParent"])).IntValue;
-        Assert.Same(
-            form.Dict,
-            Assert.IsType<DictionaryObject>(TaggedStructureProbe.ParentTreeEntry(reader, structRoot, structParent)));
+        Assert.Equal(widget.Number, objr.Groups[1].Value);
+
+        var parentTree = Shaped(
+            "structure tree root",
+            @"/ParentTree (\d+) 0 R",
+            Line(emission, "/Type /StructTreeRoot"));
+
+        Shaped(
+            "parent tree",
+            $@"[\[ ]{NumberIn(widget.Body, "StructParent")} {form.Number} 0 R",
+            IndirectObject(emission, parentTree.Groups[1].Value));
     }
 
     [Fact]
@@ -279,13 +279,13 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new TextInput("name") { Label = "Full name" });
         paragraph.Inlines.Add(" please");
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var paragraphElement = TaggedStructureProbe.Single(TaggedStructureProbe.Root(reader), "P");
+        var emission = Emission(document, Accessible());
+        var kids = Shaped(
+            "paragraph element",
+            @"/K \[\d+ (\d+) 0 R \d+\]",
+            StructureElement(emission, "P").Body);
 
-        Assert.Equal(3, paragraphElement.Kids.Count);
-        Assert.IsType<int>(paragraphElement.Kids[0]);
-        Assert.IsType<ProbeElement>(paragraphElement.Kids[1]);
-        Assert.IsType<int>(paragraphElement.Kids[2]);
+        Carries("paragraph kid", "/Type /StructElem", IndirectObject(emission, kids.Groups[1].Value));
     }
 
     [Fact]
@@ -306,11 +306,11 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new CheckBox("agree"));
 
-        var reader = BuildTestSupport.Read(document);
-        var widget = Assert.Single(Widgets(reader, 0));
+        var emission = Emission(document);
+        var widget = Assert.Single(PageWidgets(emission, 0));
 
-        Assert.False(widget.ContainsKey("StructParent"), "an untagged widget carries no /StructParent");
-        Assert.False(ContentTestHelpers.Catalog(reader).ContainsKey("StructTreeRoot"), "no structure tree is written");
+        Lacks("check box widget", "/StructParent", widget.Body);
+        Lacks("catalog", "/StructTreeRoot", Line(emission, "/Type /Catalog"));
     }
 
     [Fact]
@@ -377,11 +377,13 @@ public class AuthoredFormFieldTests
         var rendered = new DocumentRenderer().Render(document);
         rendered.Flatten();
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
+        var emission = Emit(rendered);
 
-        Assert.Empty(Widgets(reader, 0));
-        Assert.False(ContentTestHelpers.Catalog(reader).ContainsKey("AcroForm"), "the form is gone");
-        Assert.Contains("(Ada) Tj", PageContent(reader, 0), StringComparison.Ordinal);
+        Assert.Empty(PageWidgets(emission, 0));
+        Lacks("catalog", "/AcroForm", Line(emission, "/Type /Catalog"));
+
+        var contents = References("page", "Contents", 2, PageObject(emission, 0));
+        Carries("flattened content", "(Ada) Tj", IndirectObject(emission, contents[1]));
     }
 
     [Fact]
@@ -393,25 +395,24 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("stance", "Off") { Selected = true });
         paragraph.Inlines.Add(" off");
 
-        var reader = BuildTestSupport.Read(document);
-        var widgets = Widgets(reader, 0);
-        var group = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(FormFields(reader))));
+        var emission = Emission(document);
+        var group = IndirectObject(emission, Assert.Single(AcroFormFields(emission, 1)));
 
-        Assert.Equal(
-            new[] { "On", "Off" },
-            Assert.IsType<ArrayObject>(reader.Resolve(group["Opt"]))
-                .Select(value => Assert.IsType<StringObject>(reader.Resolve(value)).Value)
-                .ToArray());
-        Assert.Equal("1", BuildTestSupport.Name(reader, group, "V"));
-        Assert.Equal(
-            new[] { "Off", "1" },
-            widgets.Select(widget => BuildTestSupport.Name(reader, widget, "AS")).ToArray());
+        Carries("radio group", "/Opt [(On) (Off)]", group);
+        Carries("radio group", "/V /1", group);
 
-        var states = widgets.Select(widget => Assert.IsType<DictionaryObject>(
-            reader.Resolve(Assert.IsType<DictionaryObject>(reader.Resolve(widget["AP"]))["N"])));
-        Assert.Equal(
-            new[] { "0", "1" },
-            states.Select(state => state.Keys.Single(key => key != "Off")).ToArray());
+        var kids = References("radio group", "Kids", 2, group);
+        string[] states = ["/AS /Off", "/AS /1"];
+        string[] on = ["0", "1"];
+
+        for (var i = 0; i < kids.Length; i++)
+        {
+            var kid = IndirectObject(emission, kids[i]);
+            var subject = $"radio kid {kids[i]} 0 R";
+
+            Carries(subject, states[i], kid);
+            Shaped(subject, $@"/AP << /N << /{on[i]} \d+ 0 R /Off \d+ 0 R >> >>", kid);
+        }
     }
 
     [Fact]
@@ -421,10 +422,12 @@ public class AuthoredFormFieldTests
         paragraph.Inlines.Add(new RadioButton("size", "S"));
         paragraph.Inlines.Add(new RadioButton("size", "M"));
 
-        var reader = BuildTestSupport.Read(document);
-        var group = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(FormFields(reader))));
+        var emission = Emission(document);
 
-        Assert.False(group.ContainsKey("Opt"), "an unambiguous group keeps its export values as state names");
+        Lacks(
+            "radio group",
+            "/Opt",
+            IndirectObject(emission, Assert.Single(AcroFormFields(emission, 1))));
     }
 
     [Fact]
@@ -458,16 +461,22 @@ public class AuthoredFormFieldTests
         var document = Plain(out var paragraph);
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Link = "https://www.radzen.com/" });
 
-        var reader = BuildTestSupport.Read(document);
-        var widget = Assert.Single(Widgets(reader, 0));
-        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
-        var annotations = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
-        var link = Assert.Single(annotations
-            .Select(item => Assert.IsType<DictionaryObject>(reader.Resolve(item)))
-            .Where(annotation => BuildTestSupport.Name(reader, annotation, "Subtype") == "Link"));
+        var emission = Emission(document);
+        var widget = Assert.Single(PageWidgets(emission, 0));
 
-        var widgetRect = Rect(reader, widget);
-        var linkRect = Rect(reader, link);
+        var annots = Shaped("page", @"/Annots \[([^\]]*)\]", PageObject(emission, 0));
+        var links = new List<string>();
+        foreach (Match reference in Regex.Matches(annots.Groups[1].Value, @"(\d+) 0 R"))
+        {
+            var body = IndirectObject(emission, reference.Groups[1].Value);
+            if (body.Contains("/Subtype /Link", StringComparison.Ordinal))
+            {
+                links.Add(body);
+            }
+        }
+
+        var widgetRect = Rect("text widget", widget.Body);
+        var linkRect = Rect("link annotation", Assert.Single(links));
         for (var i = 0; i < 4; i++)
         {
             Assert.Equal(widgetRect[i], linkRect[i], 3);

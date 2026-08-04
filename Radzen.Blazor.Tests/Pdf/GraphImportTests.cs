@@ -1,8 +1,10 @@
 #nullable enable
 using System.IO;
+using System.Text;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,56 +23,60 @@ public class GraphImportTests
         return DocumentReader.Parse(FixturePdf.Wrap(pdf, 7));
     }
 
-    private static DocumentReader ImportAndReparse(DocumentReader reader, DocumentObject root)
+    private static string ImportedCatalogEmission()
     {
+        var source = SourceWithIndirectScalars();
+        var root = Assert.IsType<DictionaryObject>(source.GetObject(1));
+
         using var stream = new MemoryStream();
         var writer = new DocumentWriter(stream);
-        var importer = new GraphImporter(reader, writer);
+        var importer = new GraphImporter(source, writer);
         writer.Trailer["Root"] = importer.ImportInstance(root);
         writer.Close();
-        return DocumentReader.Parse(stream.ToArray());
+
+        return Encoding.Latin1.GetString(stream.ToArray());
     }
 
-    private static DictionaryObject Field(DocumentReader reader)
+    private static string ImportedField(string emission)
     {
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
-        return Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Field"]));
+        var catalog = IndirectObject(
+            emission,
+            Shaped("trailer", @"/Root (\d+) 0 R", emission).Groups[1].Value);
+
+        return IndirectObject(
+            emission,
+            Shaped("imported catalog", @"/Field (\d+) 0 R", catalog).Groups[1].Value);
     }
+
+    private static string Entry(string emission, string field, string key)
+        => IndirectObject(
+            emission,
+            Shaped($"imported field /{key}", $@"/{key} (\d+) 0 R", field).Groups[1].Value);
 
     [Fact]
     public void ImportInstance_IndirectString_PreservesValue()
     {
-        var source = SourceWithIndirectScalars();
-        var catalog = Assert.IsType<DictionaryObject>(source.GetObject(1));
+        var emission = ImportedCatalogEmission();
 
-        var round = ImportAndReparse(source, catalog);
-
-        var value = round.Resolve(Field(round)["V"]);
-        Assert.Equal("hello", Assert.IsType<StringObject>(value).Value);
+        Shaped("imported /V", @"^\(hello\)$", Entry(emission, ImportedField(emission), "V"));
     }
 
     [Fact]
     public void ImportInstance_IndirectNumberNameBoolean_PreserveValues()
     {
-        var source = SourceWithIndirectScalars();
-        var catalog = Assert.IsType<DictionaryObject>(source.GetObject(1));
+        var emission = ImportedCatalogEmission();
+        var field = ImportedField(emission);
 
-        var round = ImportAndReparse(source, catalog);
-        var field = Field(round);
-
-        Assert.Equal(42, Assert.IsType<NumberObject>(round.Resolve(field["MaxLen"])).IntValue);
-        Assert.Equal("Helv", Assert.IsType<NameObject>(round.Resolve(field["DA"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(round.Resolve(field["Flag"])).Value);
+        Shaped("imported /MaxLen", @"^42$", Entry(emission, field, "MaxLen"));
+        Shaped("imported /DA", @"^/Helv$", Entry(emission, field, "DA"));
+        Shaped("imported /Flag", @"^true$", Entry(emission, field, "Flag"));
     }
 
     [Fact]
     public void ImportInstance_IndirectScalar_NotImportedAsEmptyDictionary()
     {
-        var source = SourceWithIndirectScalars();
-        var catalog = Assert.IsType<DictionaryObject>(source.GetObject(1));
+        var emission = ImportedCatalogEmission();
 
-        var round = ImportAndReparse(source, catalog);
-
-        Assert.IsNotType<DictionaryObject>(round.Resolve(Field(round)["V"]));
+        Lacks("imported /V", "<<", Entry(emission, ImportedField(emission), "V"));
     }
 }

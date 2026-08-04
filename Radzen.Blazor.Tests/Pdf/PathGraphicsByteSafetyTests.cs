@@ -2,8 +2,8 @@
 
 using Radzen.Documents.Pdf;
 using Xunit;
-using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,16 +31,24 @@ public class PathGraphicsByteSafetyTests
     [Fact]
     public void DefaultPath_EmitsNoNewGraphicsOperators()
     {
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(BuildDocument()), 0);
+        var emission = Emit(BuildDocument());
+        var content = IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page ")).Groups[1].Value);
 
-        var operators = ContentStreamTokenizer.Operators(content);
+        Carries("page content", " rg\n", content);
+        Carries("page content", " RG\n", content);
+        Carries("page content", "\nB\n", content);
 
-        Assert.Contains("rg", operators);
-        Assert.Contains("RG", operators);
-        Assert.Contains("B", operators);
-        foreach (var forbidden in new[] { "k", "K", "g", "G", "J", "j", "M", "ri", "d", "W", "W*", "f*", "B*", "scn", "cs" })
+        string[] forbidden =
+        [
+            " k\n", " K\n", " g\n", " G\n", " J\n", " j\n", " M\n", " ri\n", " d\n",
+            "\nW\n", "\nW*\n", "\nf*\n", "\nB*\n", " scn\n", " cs\n",
+        ];
+
+        foreach (var fragment in forbidden)
         {
-            Assert.DoesNotContain(forbidden, operators);
+            Lacks("page content", fragment, content);
         }
     }
 }

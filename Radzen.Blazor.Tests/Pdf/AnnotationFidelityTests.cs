@@ -1,12 +1,13 @@
 #nullable enable
 using System.IO;
-using System.Text;
+using System.Linq;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -21,12 +22,6 @@ public class AnnotationFidelityTests
     private static ArrayObject PageAnnotations(DocumentReader reader)
         => Assert.IsType<ArrayObject>(reader.Resolve(DocumentLoadTests.Kid(reader, 0)["Annots"]));
 
-    private static string AppearanceText(DocumentReader reader, DictionaryObject annotation)
-    {
-        var appearance = reader.GetDictionary(annotation, "AP")!;
-        return FormTestSupport.Decode(Assert.IsType<StreamObject>(reader.Resolve(appearance["N"])));
-    }
-
     private static T TwoLines<T>(T annotation) where T : MarkupAnnotation
     {
         annotation.Areas.Clear();
@@ -39,8 +34,24 @@ public class AnnotationFidelityTests
     {
         var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(annotation);
-        var reader = DocumentReader.Parse(document.ToArray());
-        return AppearanceText(reader, Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(PageAnnotations(reader)))));
+
+        var emission = Emit(document);
+        var annots = References("page", "Annots", 1, Line(emission, "/Type /Page "));
+        var appearance = Shaped(
+            $"annotation {annots[0]} 0 R",
+            @"/AP << /N (\d+) 0 R >>",
+            IndirectObject(emission, annots[0]));
+
+        return IndirectObject(emission, appearance.Groups[1].Value);
+    }
+
+    private static void Paints(string subject, string operation, int times, string appearance)
+    {
+        var actual = appearance.Split('\n').Count(line => line == operation);
+        Assert.True(
+            actual == times,
+            $"Expected {times} lone '{operation}' operators in the {subject}, found {actual}."
+            + $"\n{subject}:\n{Excerpt(appearance)}");
     }
 
     [Fact]
@@ -48,10 +59,10 @@ public class AnnotationFidelityTests
     {
         var content = MarkupAppearance(TwoLines(new HighlightAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
-        Assert.Equal(2, Occurrences(content, "\nf\n"));
-        Assert.Contains("0 30 m", content);
-        Assert.Contains("0 0 m", content);
-        Assert.Contains("60 12 l", content);
+        Paints("highlight appearance", "f", 2, content);
+        Carries("highlight appearance", "0 30 m", content);
+        Carries("highlight appearance", "0 0 m", content);
+        Carries("highlight appearance", "60 12 l", content);
     }
 
     [Fact]
@@ -59,10 +70,10 @@ public class AnnotationFidelityTests
     {
         var content = MarkupAppearance(TwoLines(new UnderlineAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
-        Assert.Equal(2, Occurrences(content, "\nS\n"));
-        Assert.Contains("0 31 m", content);
-        Assert.Contains("0 1 m", content);
-        Assert.Contains("60 1 l", content);
+        Paints("underline appearance", "S", 2, content);
+        Carries("underline appearance", "0 31 m", content);
+        Carries("underline appearance", "0 1 m", content);
+        Carries("underline appearance", "60 1 l", content);
     }
 
     [Fact]
@@ -70,9 +81,9 @@ public class AnnotationFidelityTests
     {
         var content = MarkupAppearance(TwoLines(new StrikeOutAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
-        Assert.Equal(2, Occurrences(content, "\nS\n"));
-        Assert.Contains("0 36 m", content);
-        Assert.Contains("0 6 m", content);
+        Paints("strike out appearance", "S", 2, content);
+        Carries("strike out appearance", "0 36 m", content);
+        Carries("strike out appearance", "0 6 m", content);
     }
 
     [Fact]
@@ -80,9 +91,9 @@ public class AnnotationFidelityTests
     {
         var content = MarkupAppearance(TwoLines(new SquigglyAnnotation(PdfRect.FromSize(40, 100, 100, 42))));
 
-        Assert.Equal(2, Occurrences(content, "\nS\n"));
-        Assert.Contains("0 31 m", content);
-        Assert.Contains("0 1 m", content);
+        Paints("squiggly appearance", "S", 2, content);
+        Carries("squiggly appearance", "0 31 m", content);
+        Carries("squiggly appearance", "0 1 m", content);
     }
 
     [Fact]
@@ -90,20 +101,9 @@ public class AnnotationFidelityTests
     {
         var content = MarkupAppearance(new HighlightAnnotation(PdfRect.FromSize(40, 100, 100, 12)));
 
-        Assert.Equal(1, Occurrences(content, "\nf\n"));
-        Assert.Contains("0 0 m", content);
-        Assert.Contains("100 12 l", content);
-    }
-
-    private static int Occurrences(string value, string token)
-    {
-        var count = 0;
-        for (var i = value.IndexOf(token); i >= 0; i = value.IndexOf(token, i + 1))
-        {
-            count++;
-        }
-
-        return count;
+        Paints("highlight appearance", "f", 1, content);
+        Carries("highlight appearance", "0 0 m", content);
+        Carries("highlight appearance", "100 12 l", content);
     }
 
 

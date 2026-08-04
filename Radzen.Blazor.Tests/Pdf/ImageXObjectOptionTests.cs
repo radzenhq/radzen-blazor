@@ -1,14 +1,10 @@
 #nullable enable
 using System;
-using System.Buffers.Binary;
-using System.IO;
-using System.IO.Compression;
-using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -23,11 +19,17 @@ public class ImageXObjectOptionTests
         return image;
     }
 
-    private static DictionaryObject SingleImageDictionary(Document document)
+    private static string SingleImageXObject(Document document)
     {
-        var reader = BuildTestSupport.Read(document);
-        var images = BuildTestSupport.ImageXObjects(reader);
-        return Assert.Single(images).Dictionary;
+        var emission = Emit(new DocumentRenderer().Render(document));
+        var entry = Shaped(
+            "page /Resources with one image XObject",
+            @"/XObject << /(\S+) (\d+) 0 R >>",
+            Line(emission, "/Type /Page "));
+
+        var image = IndirectObject(emission, entry.Groups[2].Value);
+        Carries($"image XObject {entry.Groups[2].Value} 0 R", "/Subtype /Image", image);
+        return image;
     }
 
     [Theory]
@@ -62,11 +64,10 @@ public class ImageXObjectOptionTests
         var document = new Document();
         AddImage(document, "Images/gray.png").Interpolate = true;
 
-        var dict = SingleImageDictionary(document);
+        var image = SingleImageXObject(document);
 
-        Assert.True(dict.ContainsKey("Interpolate"), "image XObject is missing /Interpolate");
-        Assert.True(Assert.IsType<BooleanObject>(dict["Interpolate"]).Value);
-        Assert.Equal("DeviceGray", ((NameObject)dict["ColorSpace"]).Value);
+        Carries("image XObject", "/Interpolate true", image);
+        Carries("image XObject", "/ColorSpace /DeviceGray", image);
     }
 
     [Fact]
@@ -75,9 +76,7 @@ public class ImageXObjectOptionTests
         var document = new Document();
         AddImage(document, "Images/gray.png");
 
-        var dict = SingleImageDictionary(document);
-
-        Assert.False(dict.ContainsKey("Interpolate"), "default image must not carry /Interpolate");
+        Lacks("default image XObject", "/Interpolate", SingleImageXObject(document));
     }
 
     [Fact]

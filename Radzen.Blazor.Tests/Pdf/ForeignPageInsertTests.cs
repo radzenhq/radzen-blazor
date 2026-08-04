@@ -7,6 +7,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -164,8 +165,12 @@ public class ForeignPageInsertTests
 
         target.Pages.Insert(0, Release(source, 0));
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        AssertFontsResolve(reader, 0);
+        var emission = Emit(target);
+
+        Shaped(
+            "inserted page /Resources /Font",
+            @"/Font << /\w+ << /Type /Font /Subtype /Type1 /BaseFont /\w+",
+            Line(emission, "/Type /Page "));
     }
 
     [Fact]

@@ -1,12 +1,13 @@
 #nullable enable
 
-using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -62,9 +63,20 @@ public class ContentInterpreterSpanTests
         page.SetContent(TestBytes.Ascii("q Do Q"));
         page.Content.Add(new TextContent("x", 10, 10));
 
-        using var buffer = new MemoryStream(document.ToArray());
-        var reloaded = PortableDocument.LoadFromStream(buffer);
+        Carries("page content", "Do", PageContent(document));
+    }
 
-        Assert.Contains("Do", ContentOperationTestHelpers.Operators(reloaded.Pages[0].GetContent()!));
+    private static string PageContent(PortableDocument document)
+    {
+        var emission = Emit(document);
+        var contents = Shaped("page", @"/Contents (\d+ 0 R|\[[^\]]*\])", Line(emission, "/Type /Page "));
+        var streams = new StringBuilder();
+
+        foreach (Match reference in Regex.Matches(contents.Groups[1].Value, @"(\d+) 0 R"))
+        {
+            streams.Append(IndirectObject(emission, reference.Groups[1].Value)).Append('\n');
+        }
+
+        return streams.ToString();
     }
 }

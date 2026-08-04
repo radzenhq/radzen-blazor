@@ -1,29 +1,30 @@
 #nullable enable
 
 using System;
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ContentElementTests
 {
-    private static int IndexOfOperator(byte[] content, string op)
-        => ContentStreamTokenizer.Operators(content).IndexOf(op);
-
-    private static ContentOperation? FindOperator(byte[] content, string op)
+    private static string PageContent(PortableDocument document)
     {
-        foreach (var operation in ContentStreamTokenizer.Parse(content))
+        var emission = Emit(document);
+        var contents = Shaped("page", @"/Contents (\d+ 0 R|\[[^\]]*\])", Line(emission, "/Type /Page "));
+        var streams = new StringBuilder();
+
+        foreach (Match reference in Regex.Matches(contents.Groups[1].Value, @"(\d+) 0 R"))
         {
-            if (operation.Operator == op)
-            {
-                return operation;
-            }
+            streams.Append(IndirectObject(emission, reference.Groups[1].Value)).Append('\n');
         }
 
-        return null;
+        return streams.ToString();
     }
 
     [Fact]
@@ -33,11 +34,10 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("Hello", 72, 700));
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
+        var content = PageContent(document);
 
-        Assert.Contains("BT", ContentStreamTokenizer.Operators(content));
-        Assert.Contains("ET", ContentStreamTokenizer.Operators(content));
+        Carries("page content", "BT\n", content);
+        Carries("page content", "ET\n", content);
     }
 
     [Fact]
@@ -50,13 +50,7 @@ public class ContentElementTests
         path.MoveTo(0, 0);
         path.LineTo(50, 50);
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        var textIndex = IndexOfOperator(content, "Tj");
-        var pathIndex = IndexOfOperator(content, "m");
-        Assert.True(textIndex >= 0);
-        Assert.True(pathIndex >= 0);
-        Assert.True(textIndex < pathIndex);
+        Shaped("page content", @" Tj\n[\s\S]* m\n", PageContent(document));
     }
 
     [Fact]
@@ -69,11 +63,7 @@ public class ContentElementTests
         path.LineTo(50, 50);
         page.Content.Add(new TextContent("Z", 10, 10));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        var textIndex = IndexOfOperator(content, "Tj");
-        var pathIndex = IndexOfOperator(content, "m");
-        Assert.True(pathIndex < textIndex);
+        Shaped("page content", @" m\n[\s\S]* Tj\n", PageContent(document));
     }
 
     [Fact]
@@ -84,17 +74,19 @@ public class ContentElementTests
         var matrix = Matrix.Scale(2, 3) * Matrix.Translate(10, 20);
         page.Content.Add(new TextContent("T", 0, 0) { Transform = matrix });
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var cm = FindOperator(content, "cm");
+        var cm = Shaped(
+            "page content",
+            @"([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+) cm\n",
+            PageContent(document));
 
-        Assert.NotNull(cm);
-        Assert.Equal(6, cm!.Operands.Count);
-        Assert.Equal(matrix.A, cm.Num(0), 3);
-        Assert.Equal(matrix.B, cm.Num(1), 3);
-        Assert.Equal(matrix.C, cm.Num(2), 3);
-        Assert.Equal(matrix.D, cm.Num(3), 3);
-        Assert.Equal(matrix.E, cm.Num(4), 3);
-        Assert.Equal(matrix.F, cm.Num(5), 3);
+        double[] expected = [matrix.A, matrix.B, matrix.C, matrix.D, matrix.E, matrix.F];
+        for (var i = 0; i < expected.Length; i++)
+        {
+            Assert.Equal(
+                expected[i],
+                double.Parse(cm.Groups[i + 1].Value, CultureInfo.InvariantCulture),
+                3);
+        }
     }
 
     [Fact]
@@ -104,9 +96,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("T", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        Assert.DoesNotContain("cm", ContentStreamTokenizer.Operators(content));
+        Lacks("page content", " cm\n", PageContent(document));
     }
 
     [Fact]
@@ -116,23 +106,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("A", 0, 0) { IsArtifact = true });
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var operators = ContentStreamTokenizer.Operators(content);
-
-        Assert.Contains("BMC", operators);
-        Assert.Contains("EMC", operators);
-
-        var bmc = FindOperator(content, "BMC");
-        Assert.NotNull(bmc);
-        Assert.Single(bmc!.Operands);
-        Assert.Equal(ContentTokenKind.Name, bmc.Operands[0].Kind);
-        Assert.Equal("Artifact", bmc.Operands[0].Text);
-
-        var bmcIndex = operators.IndexOf("BMC");
-        var emcIndex = operators.IndexOf("EMC");
-        var tjIndex = operators.IndexOf("Tj");
-        Assert.True(bmcIndex < tjIndex);
-        Assert.True(tjIndex < emcIndex);
+        Shaped("page content", @"/Artifact BMC\n[\s\S]* Tj\n[\s\S]*EMC\n", PageContent(document));
     }
 
     [Fact]
@@ -142,9 +116,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.Content.Add(new TextContent("A", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        Assert.DoesNotContain("BDC", ContentStreamTokenizer.Operators(content));
+        Lacks("page content", "BDC", PageContent(document));
     }
 
     [Fact]
@@ -158,14 +130,7 @@ public class ContentElementTests
         path.LineTo(1, 1);
         page.Content.Add(new TextContent("third", 0, 0));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var operators = ContentStreamTokenizer.Operators(content);
-
-        var firstBt = operators.IndexOf("BT");
-        var m = operators.IndexOf("m");
-        var lastEt = operators.LastIndexOf("ET");
-        Assert.True(firstBt < m);
-        Assert.True(m < lastEt);
+        Shaped("page content", @"BT\n[\s\S]* m\n[\s\S]*ET\n", PageContent(document));
     }
 
     [Fact]
@@ -176,10 +141,7 @@ public class ContentElementTests
         page.SetContent(Encoding.ASCII.GetBytes("q Q"));
         page.Content.Add(new TextContent("MARKER", 10, 10));
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-        var text = Encoding.ASCII.GetString(content);
-
-        Assert.Contains("MARKER", text);
+        Carries("page content", "MARKER", PageContent(document));
     }
 
     [Fact]
@@ -190,9 +152,7 @@ public class ContentElementTests
         var page = document.Pages.Add();
         page.SetContent(raw);
 
-        var content = ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
-
-        Assert.Contains("cm", ContentStreamTokenizer.Operators(content));
+        Carries("page content", " cm\n", PageContent(document));
     }
 
     [Fact]

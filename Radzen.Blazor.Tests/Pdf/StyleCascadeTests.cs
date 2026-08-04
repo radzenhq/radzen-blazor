@@ -8,6 +8,7 @@ using System.Linq;
 using Radzen.Documents;
 using Xunit;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -41,9 +42,10 @@ public class StyleCascadeTests
         var paragraph = section.Blocks.AddParagraph("Hello");
         paragraph.Font.Family = BuildTestSupport.Latin;
 
-        var reader = BuildTestSupport.Read(document);
+        var emission = Emit(new DocumentRenderer().Render(document));
+        var fonts = BuildTestSupport.CountOccurrences(emission, "/Subtype /Type0");
 
-        Assert.Single(BuildTestSupport.Type0Fonts(reader));
+        Assert.True(fonts == 1, $"Expected 1 '/Subtype /Type0' font in the emission, found {fonts}.");
     }
 
     [Fact]

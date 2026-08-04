@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Write;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -28,12 +28,10 @@ public class SaveTimeConformanceTests
         => document.Attachments.Add(
             "data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
 
-    private static string MetadataPacket(byte[] bytes)
+    private static string MetadataPacket(string emission)
     {
-        var reader = DocumentReader.Parse(bytes);
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
-        var metadata = Assert.IsType<StreamObject>(reader.Resolve(catalog["Metadata"]));
-        return Encoding.UTF8.GetString(reader.DecodeStream(metadata));
+        var reference = Shaped("catalog", @"/Metadata (\d+) 0 R", Line(emission, "/Type /Catalog"));
+        return IndirectObject(emission, reference.Groups[1].Value);
     }
 
     private static PortableDocument LoadedDocument()
@@ -54,9 +52,9 @@ public class SaveTimeConformanceTests
         var rendered = renderer.Render(document);
         Attach(rendered);
 
-        var packet = MetadataPacket(rendered.ToArray());
-        Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:conformance>F</pdfaid:conformance>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(Emit(rendered));
+        Carries("metadata packet", "<pdfaid:part>4</pdfaid:part>", packet);
+        Carries("metadata packet", "<pdfaid:conformance>F</pdfaid:conformance>", packet);
     }
 
     [Fact]

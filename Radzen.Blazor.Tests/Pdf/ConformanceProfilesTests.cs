@@ -2,16 +2,16 @@
 using System;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class ConformanceProfilesTests
 {
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+    private static string EmitAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => Emit(authored.Renderer.Render(authored.Document));
 
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
@@ -38,47 +38,46 @@ public class ConformanceProfilesTests
         return (document, renderer);
     }
 
-    private static DictionaryObject Catalog(DocumentReader reader)
+    private static string Catalog(string emission) => Line(emission, "/Type /Catalog");
+
+    private static string Trailer(string emission) => Line(emission, "/Root ");
+
+    private static string MetadataPacket(string emission)
     {
-        Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
-        return Assert.IsType<DictionaryObject>(reader.Resolve(rootObject!));
+        var reference = Shaped("catalog", @"/Metadata (\d+) 0 R", Catalog(emission));
+        var metadata = IndirectObject(emission, reference.Groups[1].Value);
+
+        Carries("metadata stream", "/Type /Metadata", metadata);
+        Carries("metadata stream", "/Subtype /XML", metadata);
+        Lacks("metadata stream", "/Filter", metadata);
+        return metadata;
     }
 
-    private static string MetadataPacket(DocumentReader reader)
+    private static void AssertSrgbOutputIntent(string emission)
     {
-        var catalog = Catalog(reader);
-        Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
-        var metadata = Assert.IsType<StreamObject>(reader.Resolve(metadataObject!));
-        Assert.Equal("Metadata", BuildTestSupport.Name(reader, metadata.Dictionary, "Type"));
-        Assert.Equal("XML", BuildTestSupport.Name(reader, metadata.Dictionary, "Subtype"));
-        Assert.False(metadata.Dictionary.ContainsKey("Filter"), "/Metadata must be unfiltered");
-        return Encoding.UTF8.GetString(metadata.Data.ToArray());
+        var intents = References("catalog", "OutputIntents", 1, Catalog(emission));
+        var intent = IndirectObject(emission, intents[0]);
+
+        Carries("output intent", "/S /GTS_PDFA1", intent);
+
+        var reference = Shaped("output intent", @"/DestOutputProfile (\d+) 0 R", intent);
+        var profile = IndirectObject(emission, reference.Groups[1].Value);
+
+        Assert.Equal(3, NumberIn(profile, "N"));
+        Shaped("destination output profile", @"stream\n[\s\S]{36}acsp", profile);
     }
 
-    private static void AssertSrgbOutputIntent(DocumentReader reader)
+    private static void AssertTagged(string emission)
     {
-        var catalog = Catalog(reader);
-        Assert.True(catalog.TryGetValue("OutputIntents", out var intentsObject), "catalog has /OutputIntents");
-        var intents = Assert.IsType<ArrayObject>(reader.Resolve(intentsObject!));
-        var intent = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(intents)));
+        var catalog = Catalog(emission);
 
-        Assert.Equal("GTS_PDFA1", BuildTestSupport.Name(reader, intent, "S"));
-        var profile = Assert.IsType<StreamObject>(reader.Resolve(intent["DestOutputProfile"]));
-        Assert.Equal(3, ((NumberObject)reader.Resolve(profile.Dictionary["N"])).IntValue);
-        Assert.Equal("acsp", Encoding.ASCII.GetString(reader.DecodeStream(profile), 36, 4));
-    }
+        Carries("catalog", "/MarkInfo << /Marked true >>", catalog);
 
-    private static void AssertTagged(DocumentReader reader)
-    {
-        var catalog = Catalog(reader);
-
-        Assert.True(catalog.TryGetValue("MarkInfo", out var markInfoObject), "catalog has /MarkInfo");
-        var markInfo = Assert.IsType<DictionaryObject>(reader.Resolve(markInfoObject!));
-        Assert.True(((BooleanObject)reader.Resolve(markInfo["Marked"])).Value, "/MarkInfo Marked must be true");
-
-        Assert.True(catalog.TryGetValue("StructTreeRoot", out var structObject), "catalog has /StructTreeRoot");
-        var structRoot = Assert.IsType<DictionaryObject>(reader.Resolve(structObject!));
-        Assert.Equal("StructTreeRoot", BuildTestSupport.Name(reader, structRoot, "Type"));
+        var reference = Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", catalog);
+        Carries(
+            "structure tree root",
+            "/Type /StructTreeRoot",
+            IndirectObject(emission, reference.Groups[1].Value));
     }
 
     [Theory]
@@ -87,27 +86,27 @@ public class ConformanceProfilesTests
     [InlineData(PdfAConformance.PdfA4E, 4, "E")]
     public void PdfALevel_Xmp_HasPartAndConformance(PdfAConformance level, int part, string conformance)
     {
-        var reader = ReadAuthored(Author(level));
+        var emission = EmitAuthored(Author(level));
 
-        var packet = MetadataPacket(reader);
-        Assert.Contains($"<pdfaid:part>{part}</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains($"<pdfaid:conformance>{conformance}</pdfaid:conformance>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(emission);
+        Carries("XMP packet", $"<pdfaid:part>{part}</pdfaid:part>", packet);
+        Carries("XMP packet", $"<pdfaid:conformance>{conformance}</pdfaid:conformance>", packet);
 
-        AssertSrgbOutputIntent(reader);
-        Assert.True(reader.Trailer.ContainsKey("ID"), "trailer has /ID");
+        AssertSrgbOutputIntent(emission);
+        Carries("trailer", "/ID [", Trailer(emission));
     }
 
     [Fact]
     public void PdfA4_Xmp_HasPart4RevAndNoConformanceLetter()
     {
-        var reader = ReadAuthored(Author(PdfAConformance.PdfA4));
+        var emission = EmitAuthored(Author(PdfAConformance.PdfA4));
 
-        var packet = MetadataPacket(reader);
-        Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:rev>2020</pdfaid:rev>", packet, StringComparison.Ordinal);
-        Assert.DoesNotContain("<pdfaid:conformance>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(emission);
+        Carries("XMP packet", "<pdfaid:part>4</pdfaid:part>", packet);
+        Carries("XMP packet", "<pdfaid:rev>2020</pdfaid:rev>", packet);
+        Lacks("XMP packet", "<pdfaid:conformance>", packet);
 
-        AssertSrgbOutputIntent(reader);
+        AssertSrgbOutputIntent(emission);
     }
 
     [Theory]
@@ -123,9 +122,7 @@ public class ConformanceProfilesTests
             rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
         }
 
-        var catalog = Catalog(DocumentReader.Parse(rendered.ToArray()));
-        Assert.True(catalog.TryGetValue("Version", out var version), "catalog has /Version");
-        Assert.Equal("2.0", Assert.IsType<NameObject>(version).Value);
+        Carries("catalog", "/Version /2.0", Catalog(Emit(rendered)));
     }
 
     [Theory]
@@ -142,7 +139,7 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfA2A_OutputIsTagged()
     {
-        AssertTagged(ReadAuthored(Author(PdfAConformance.PdfA2A)));
+        AssertTagged(EmitAuthored(Author(PdfAConformance.PdfA2A)));
     }
 
     [Fact]
@@ -152,10 +149,10 @@ public class ConformanceProfilesTests
         var rendered = renderer.Render(document);
         rendered.Attachments.Add("data.xml", Encoding.UTF8.GetBytes("<data/>"), AttachmentRelationship.Data, "text/xml");
 
-        var packet = MetadataPacket(DocumentReader.Parse(rendered.ToArray()));
-        Assert.Contains("<pdfaid:part>4</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:rev>2020</pdfaid:rev>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:conformance>F</pdfaid:conformance>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(Emit(rendered));
+        Carries("XMP packet", "<pdfaid:part>4</pdfaid:part>", packet);
+        Carries("XMP packet", "<pdfaid:rev>2020</pdfaid:rev>", packet);
+        Carries("XMP packet", "<pdfaid:conformance>F</pdfaid:conformance>", packet);
     }
 
     [Fact]
@@ -188,32 +185,26 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_Xmp_HasPdfuaidPart1()
     {
-        var reader = ReadAuthored(Author(ua: true));
+        var packet = MetadataPacket(EmitAuthored(Author(ua: true)));
 
-        var packet = MetadataPacket(reader);
-        Assert.Contains("xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfuaid:part>1</pdfuaid:part>", packet, StringComparison.Ordinal);
-        Assert.DoesNotContain("<pdfaid:part>", packet, StringComparison.Ordinal);
+        Carries("XMP packet", "xmlns:pdfuaid=\"http://www.aiim.org/pdfua/ns/id/\"", packet);
+        Carries("XMP packet", "<pdfuaid:part>1</pdfuaid:part>", packet);
+        Lacks("XMP packet", "<pdfaid:part>", packet);
     }
 
     [Fact]
     public void PdfUA_OutputIsTaggedWithDisplayDocTitle()
     {
-        var reader = ReadAuthored(Author(ua: true));
-        AssertTagged(reader);
+        var emission = EmitAuthored(Author(ua: true));
+        AssertTagged(emission);
 
-        var catalog = Catalog(reader);
-        Assert.True(catalog.TryGetValue("ViewerPreferences", out var preferencesObject), "catalog has /ViewerPreferences");
-        var preferences = Assert.IsType<DictionaryObject>(reader.Resolve(preferencesObject!));
-        Assert.True(((BooleanObject)reader.Resolve(preferences["DisplayDocTitle"])).Value, "DisplayDocTitle must be true");
+        Carries("catalog /ViewerPreferences", "/DisplayDocTitle true", Catalog(emission));
     }
 
     [Fact]
     public void PdfUA_Catalog_HasLang()
     {
-        var catalog = Catalog(ReadAuthored(Author(ua: true)));
-        var lang = Assert.IsType<StringObject>(catalog["Lang"]);
-        Assert.Equal("en-US", lang.Value);
+        Carries("catalog", "/Lang (en-US)", Catalog(EmitAuthored(Author(ua: true))));
     }
 
     [Fact]
@@ -231,37 +222,36 @@ public class ConformanceProfilesTests
     [Fact]
     public void PdfUA_WithPdfA_Xmp_DeclaresPdfuaidExtensionSchema()
     {
-        var packet = MetadataPacket(ReadAuthored(Author(PdfAConformance.PdfA2A, ua: true)));
-        Assert.Contains("<pdfaSchema:prefix>pdfuaid</pdfaSchema:prefix>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaSchema:namespaceURI>http://www.aiim.org/pdfua/ns/id/</pdfaSchema:namespaceURI>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(EmitAuthored(Author(PdfAConformance.PdfA2A, ua: true)));
+
+        Carries("XMP packet", "<pdfaSchema:prefix>pdfuaid</pdfaSchema:prefix>", packet);
+        Carries("XMP packet", "<pdfaSchema:namespaceURI>http://www.aiim.org/pdfua/ns/id/</pdfaSchema:namespaceURI>", packet);
     }
 
     [Fact]
     public void PdfA4_Trailer_HasNoInfo()
     {
-        var reader = ReadAuthored(Author(PdfAConformance.PdfA4));
-        Assert.False(reader.Trailer.ContainsKey("Info"), "PDF/A-4 forbids the trailer /Info key");
+        Lacks("trailer", "/Info", Trailer(EmitAuthored(Author(PdfAConformance.PdfA4))));
     }
 
     [Fact]
     public void PdfUA_Alone_EmitsNoPdfAMachinery()
     {
-        var catalog = Catalog(ReadAuthored(Author(ua: true)));
-        Assert.False(catalog.ContainsKey("OutputIntents"), "PDF/UA alone requires no /OutputIntents");
+        Lacks("catalog", "/OutputIntents", Catalog(EmitAuthored(Author(ua: true))));
     }
 
     [Fact]
     public void PdfUA_ComposesWithPdfA2A()
     {
-        var reader = ReadAuthored(Author(PdfAConformance.PdfA2A, ua: true));
+        var emission = EmitAuthored(Author(PdfAConformance.PdfA2A, ua: true));
 
-        var packet = MetadataPacket(reader);
-        Assert.Contains("<pdfaid:part>2</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:conformance>A</pdfaid:conformance>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfuaid:part>1</pdfuaid:part>", packet, StringComparison.Ordinal);
+        var packet = MetadataPacket(emission);
+        Carries("XMP packet", "<pdfaid:part>2</pdfaid:part>", packet);
+        Carries("XMP packet", "<pdfaid:conformance>A</pdfaid:conformance>", packet);
+        Carries("XMP packet", "<pdfuaid:part>1</pdfuaid:part>", packet);
 
-        AssertTagged(reader);
-        AssertSrgbOutputIntent(reader);
+        AssertTagged(emission);
+        AssertSrgbOutputIntent(emission);
     }
 
     [Fact]

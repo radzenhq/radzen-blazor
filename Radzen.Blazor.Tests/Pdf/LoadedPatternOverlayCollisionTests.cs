@@ -1,10 +1,11 @@
 #nullable enable
 using System.IO;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -36,18 +37,18 @@ public class LoadedPatternOverlayCollisionTests
         return PortableDocument.LoadFromStream(input);
     }
 
-    private static DictionaryObject Patterns(DocumentReader reader)
-    {
-        var resources = BuildTestSupport.PageLeaves(reader)[0].Resources;
-        Assert.NotNull(resources);
-        Assert.True(resources!.TryGetValue("Pattern", out var patternObject));
-        return (DictionaryObject)reader.Resolve(patternObject!);
-    }
+    private static string Patterns(string emission)
+        => Shaped("page /Resources /Pattern", @"/Pattern <<([^>]*)>>", Line(emission, "/Type /Page ")).Groups[1].Value;
 
-    private static int ShadingType(DocumentReader reader, DictionaryObject pattern)
+    private static void AssertLoadedPatternSurvives(string emission, string message)
     {
-        var shading = (DictionaryObject)reader.Resolve(pattern["Shading"]);
-        return ((NumberObject)reader.Resolve(shading["ShadingType"])).IntValue;
+        var patterns = Patterns(emission);
+        var loaded = Shaped("page /Resources /Pattern", @"/P0 (\d+) 0 R", patterns);
+
+        Carries("loaded pattern /P0", "/ShadingType 3", IndirectObject(emission, loaded.Groups[1].Value));
+
+        var names = Regex.Matches(patterns, @"/\w+ \d+ 0 R").Count;
+        Assert.True(names >= 2, $"{message}; the page carries {names} pattern name(s):{patterns}");
     }
 
     [Fact]
@@ -65,12 +66,7 @@ public class LoadedPatternOverlayCollisionTests
         path.Close();
         document.Pages[0].Content.Add(path);
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var patterns = Patterns(reader);
-
-        Assert.True(patterns.TryGetValue("P0", out var p0));
-        Assert.Equal(3, ShadingType(reader, (DictionaryObject)reader.Resolve(p0!)));
-        Assert.True(patterns.Keys.Count >= 2, "the overlay gradient is registered under a non-colliding name");
+        AssertLoadedPatternSurvives(Emit(document), "the overlay gradient is registered under a non-colliding name");
     }
 
     [Fact]
@@ -92,11 +88,6 @@ public class LoadedPatternOverlayCollisionTests
         path.Close();
         page.Content.Add(path);
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var patterns = Patterns(reader);
-
-        Assert.True(patterns.TryGetValue("P0", out var p0));
-        Assert.Equal(3, ShadingType(reader, (DictionaryObject)reader.Resolve(p0!)));
-        Assert.True(patterns.Keys.Count >= 2, "the reemitted gradient is registered under a non-colliding name");
+        AssertLoadedPatternSurvives(Emit(document), "the reemitted gradient is registered under a non-colliding name");
     }
 }

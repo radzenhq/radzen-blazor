@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -73,10 +74,11 @@ public class InfoUnmodeledEntryTests
         document.Pages.Add();
         document.Info.Title = "Fresh";
 
-        var info = SavedInfo(document.ToArray());
+        var emission = Emit(document);
+        var info = IndirectObject(emission, Shaped("trailer", @"/Info (\d+) 0 R", emission).Groups[1].Value);
 
-        Assert.Equal("Fresh", Assert.IsType<StringObject>(info["Title"]).Value);
-        Assert.False(info.ContainsKey("Trapped"));
+        Carries("info dictionary", "/Title (Fresh)", info);
+        Lacks("info dictionary", "/Trapped", info);
     }
 
     private static byte[] BuildPdf()

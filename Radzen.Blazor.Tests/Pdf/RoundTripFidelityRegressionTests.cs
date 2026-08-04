@@ -9,6 +9,7 @@ using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -333,19 +334,19 @@ public class RoundTripFidelityRegressionTests
         return pdf.ToArray();
     }
 
+    private static string InfoDictionary(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("trailer", @"/Info (\d+) 0 R", Line(emission, "/Root ")).Groups[1].Value);
+
     [Fact]
     public void InfoProducerAndDates_SurviveLoadSave()
     {
-        var reader = SaveAndParse(Load(BuildWithInfo()));
+        var info = InfoDictionary(Emit(Load(BuildWithInfo())));
 
-        Assert.True(reader.Trailer.TryGetValue("Info", out var infoObject));
-        var info = Assert.IsType<DictionaryObject>(reader.Resolve(infoObject!));
-        Assert.Equal("Acme Producer", Assert.IsType<StringObject>(reader.Resolve(info["Producer"])).Value);
-
-        var created = Assert.IsType<StringObject>(reader.Resolve(info["CreationDate"])).Value;
-        Assert.StartsWith("D:20200102030405", created, StringComparison.Ordinal);
-        var modified = Assert.IsType<StringObject>(reader.Resolve(info["ModDate"])).Value;
-        Assert.StartsWith("D:20210304050607", modified, StringComparison.Ordinal);
+        Carries("info dictionary", "/Producer (Acme Producer)", info);
+        Carries("info dictionary", "/CreationDate (D:20200102030405", info);
+        Carries("info dictionary", "/ModDate (D:20210304050607", info);
     }
 
     [Fact]
@@ -354,9 +355,7 @@ public class RoundTripFidelityRegressionTests
         var document = Load(BuildWithInfo());
         document.Info.Producer = "Overridden";
 
-        var reader = SaveAndParse(document);
-        var info = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Info"]!));
-        Assert.Equal("Overridden", Assert.IsType<StringObject>(reader.Resolve(info["Producer"])).Value);
+        Carries("info dictionary", "/Producer (Overridden)", InfoDictionary(Emit(document)));
     }
 
     private static byte[] BuildWithEmbeddedFile()

@@ -1,15 +1,17 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Codes;
 using Radzen.Documents.LaidOut;
 using Radzen.Documents.Layout;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf;
+using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents;
 using Xunit;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,12 +28,34 @@ public class SemanticIntentCaptureTests
         return types;
     }
 
-    private static string? Alt(DocumentReader reader, string type)
-        => StructureTestHelpers.FindElement(reader, type) is { } element
-            && element.TryGetValue("Alt", out var alt)
-            && reader.Resolve(alt!) is StringObject text
-            ? text.Value
-            : null;
+    private static string ElementMarker(string type) => $"/Type /StructElem /S /{type} /P ";
+
+    private static string Element(string emission, string type) => Line(emission, ElementMarker(type));
+
+    private static void Elements(string emission, string type, int expected)
+    {
+        var marker = ElementMarker(type);
+        var count = Regex.Matches(emission, Regex.Escape(marker)).Count;
+        Assert.True(
+            count == expected,
+            $"Expected {expected} '{marker}' elements in the emission, found {count}.");
+    }
+
+    private static string[] ElementKids(string element)
+    {
+        var kids = Regex.Match(element, @"/K \[([^\]]*)\]");
+        if (!kids.Success)
+        {
+            return [];
+        }
+
+        return
+        [
+            .. Regex.Matches(Regex.Replace(kids.Groups[1].Value, "<<.*?>>", " "), @"(\d+) 0 R")
+                .Cast<Match>()
+                .Select(match => match.Groups[1].Value),
+        ];
+    }
 
     private static Document Chapters(out TableOfContents toc)
     {
@@ -128,29 +152,34 @@ public class SemanticIntentCaptureTests
     {
         var document = Chapters(out var toc);
 
-        var types = Types(BuildTestSupport.Read(document, Tagged()));
+        var emission = Emit(Tagged().Render(document));
 
-        Assert.Single(types.Where(type => type == "TOC"));
-        Assert.Equal(toc.Entries.Count, types.Count(type => type == "TOCI"));
-        Assert.Equal(toc.Entries.Count, types.Count(type => type == "Reference"));
-        Assert.Equal(toc.Entries.Count, types.Count(type => type == "Link"));
+        Elements(emission, "TOC", 1);
+        Elements(emission, "TOCI", toc.Entries.Count);
+        Elements(emission, "Reference", toc.Entries.Count);
+        Elements(emission, "Link", toc.Entries.Count);
     }
 
     [Fact]
     public void TableOfContents_RendersItsEntryTextUnderTheNavigationStructure()
     {
-        var reader = BuildTestSupport.Read(Chapters(out _), Tagged());
-        var root = TaggedStructureProbe.Root(reader);
-        var navigation = TaggedStructureProbe.Single(root, "TOC");
+        var emission = Emit(Tagged().Render(Chapters(out _)));
 
-        Assert.All(navigation.Children, entry =>
+        foreach (var number in ElementKids(Element(emission, "TOC")))
         {
-            var reference = Assert.Single(entry.Children);
-            var link = Assert.Single(reference.Children);
-            Assert.Equal("Link", link.Type);
-            Assert.NotEmpty(link.Mcids);
-            Assert.NotEmpty(link.ObjectReferences);
-        });
+            var entry = IndirectObject(emission, number);
+            Carries($"TOC kid {number} 0 R", ElementMarker("TOCI"), entry);
+
+            var referenceNumber = Assert.Single(ElementKids(entry));
+            var reference = IndirectObject(emission, referenceNumber);
+            Carries($"TOCI kid {referenceNumber} 0 R", ElementMarker("Reference"), reference);
+
+            var linkNumber = Assert.Single(ElementKids(reference));
+            var link = IndirectObject(emission, linkNumber);
+            Carries($"Reference kid {linkNumber} 0 R", ElementMarker("Link"), link);
+            Shaped($"link element {linkNumber} 0 R marked content", @"/K \[\d", link);
+            Carries($"link element {linkNumber} 0 R", "/Type /OBJR", link);
+        }
     }
 
     [Fact]
@@ -170,10 +199,10 @@ public class SemanticIntentCaptureTests
     {
         var document = Chapters(out _);
 
-        var types = Types(BuildTestSupport.Read(document, new DocumentRenderer()));
+        var emission = Emit(new DocumentRenderer().Render(document));
 
-        Assert.DoesNotContain("TOC", types);
-        Assert.DoesNotContain("TOCI", types);
+        Lacks("untagged emission", ElementMarker("TOC"), emission);
+        Lacks("untagged emission", ElementMarker("TOCI"), emission);
     }
 
     [Fact]
@@ -184,10 +213,9 @@ public class SemanticIntentCaptureTests
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "Scan for details";
 
-        var reader = BuildTestSupport.Read(document, Accessible());
+        var emission = Emit(Accessible().Render(document));
 
-        Assert.Contains("Figure", Types(reader));
-        Assert.Equal("Scan for details", Alt(reader, "Figure"));
+        Carries("Figure element", "/Alt (Scan for details)", Element(emission, "Figure"));
     }
 
     [Fact]
@@ -198,7 +226,7 @@ public class SemanticIntentCaptureTests
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
 
-        Assert.DoesNotContain("Figure", Types(BuildTestSupport.Read(document, Accessible())));
+        Lacks("tagged emission", ElementMarker("Figure"), Emit(Accessible().Render(document)));
     }
 
     private static SemanticStructureNode SingleFigure(Document document)
@@ -284,10 +312,9 @@ public class SemanticIntentCaptureTests
         paragraph.Inlines.Add("Logo: ").Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "The Radzen logo";
 
-        var reader = BuildTestSupport.Read(document, Accessible());
+        var emission = Emit(Accessible().Render(document));
 
-        Assert.Contains("Figure", Types(reader));
-        Assert.Equal("The Radzen logo", Alt(reader, "Figure"));
+        Carries("Figure element", "/Alt (The Radzen logo)", Element(emission, "Figure"));
     }
 
     [Fact]
@@ -299,10 +326,12 @@ public class SemanticIntentCaptureTests
         var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
         container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
 
-        var root = TaggedStructureProbe.Root(BuildTestSupport.Read(document, Accessible()));
-        var div = TaggedStructureProbe.Single(root, "Div");
+        var emission = Emit(Accessible().Render(document));
 
-        Assert.Equal("P", Assert.Single(div.Children).Type);
+        Elements(emission, "Div", 1);
+
+        var child = Assert.Single(ElementKids(Element(emission, "Div")));
+        Carries($"Div kid {child} 0 R", ElementMarker("P"), IndirectObject(emission, child));
     }
 
     [Fact]
@@ -314,7 +343,7 @@ public class SemanticIntentCaptureTests
         var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
         container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
 
-        Assert.DoesNotContain("Div", Types(BuildTestSupport.Read(document, new DocumentRenderer())));
+        Lacks("untagged emission", ElementMarker("Div"), Emit(new DocumentRenderer().Render(document)));
     }
 
     private static Table SpanningTable(Document document, bool repeat, bool header)
@@ -377,10 +406,10 @@ public class SemanticIntentCaptureTests
     [Fact]
     public void RepeatOnEveryPage_WithoutTheHeaderRole_ProducesNoHeaderCells()
     {
-        var types = Types(BuildTestSupport.Read(SpanningDocument(repeat: true, header: false), Accessible()));
+        var emission = Emit(Accessible().Render(SpanningDocument(repeat: true, header: false)));
 
-        Assert.DoesNotContain("TH", types);
-        Assert.Contains("TD", types);
+        Lacks("tagged emission", ElementMarker("TH"), emission);
+        Carries("tagged emission", ElementMarker("TD"), emission);
     }
 
     [Fact]
@@ -394,7 +423,7 @@ public class SemanticIntentCaptureTests
         Assert.All(pages, page => Assert.All(
             Assert.Single(page.Body.Tables).Rows,
             row => Assert.False(row.IsHeader)));
-        Assert.Contains("TH", Types(BuildTestSupport.Read(document, Accessible())));
+        Carries("tagged emission", ElementMarker("TH"), Emit(Accessible().Render(document)));
     }
 
     [Fact]

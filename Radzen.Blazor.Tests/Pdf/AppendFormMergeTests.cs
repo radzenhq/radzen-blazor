@@ -1,12 +1,12 @@
 #nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
-using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,35 +31,19 @@ public class AppendFormMergeTests
         return FixturePdf.Wrap(pdf, 12);
     }
 
-    private static DictionaryObject AcroForm(DocumentReader reader)
-    {
-        var root = (DictionaryObject)reader.Resolve(reader.Trailer["Root"]!)!;
-        return (DictionaryObject)reader.Resolve(root["AcroForm"]!)!;
-    }
+    private static string[] RootFields(string emission, int count)
+        => [.. References("AcroForm", "Fields", count, Line(emission, "/Fields ["))
+            .Select(number => IndirectObject(emission, number))];
 
-    private static string[] RootFieldNames(DocumentReader reader)
+    private static string Field(string[] fields, string name)
     {
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]!)!;
-        return fields
-            .Select(f => reader.Resolve(f) as DictionaryObject)
-            .Where(d => d is not null && d!.TryGetValue("T", out _))
-            .Select(d => ((StringObject)reader.Resolve(d!["T"]!)!).Value)
-            .ToArray();
-    }
-
-    private static DictionaryObject RootByName(DocumentReader reader, string name)
-    {
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]!)!;
-        foreach (var f in fields)
-        {
-            if (reader.Resolve(f) is DictionaryObject d && d.TryGetValue("T", out var t)
-                && reader.Resolve(t!) is StringObject s && s.Value == name)
-            {
-                return d;
-            }
-        }
-
-        throw new Xunit.Sdk.XunitException($"root field '{name}' not found; got [{string.Join(", ", RootFieldNames(reader))}]");
+        var marker = $"/T ({name})";
+        var matches = fields.Where(field => field.Contains(marker, StringComparison.Ordinal)).ToArray();
+        Assert.True(
+            matches.Length == 1,
+            $"Exactly one field must carry '{marker}', found {matches.Length}."
+            + $"\nFields:\n{string.Join("\n", fields.Select(Excerpt))}");
+        return matches[0];
     }
 
     [Fact]
@@ -69,20 +53,16 @@ public class AppendFormMergeTests
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var names = RootFieldNames(reader);
+        var emission = Emit(a);
+        var roots = RootFields(emission, 2);
 
-        Assert.Contains("address", names);
-        Assert.Contains("Name", names);
+        var address = Field(roots, "address");
+        Field(roots, "Name");
 
-        var address = RootByName(reader, "address");
-        var kids = (ArrayObject)reader.Resolve(address["Kids"]!)!;
-        Assert.Equal(2, kids.Count);
+        string[] kids = [.. References("address field", "Kids", 2, address)
+            .Select(number => IndirectObject(emission, number))];
 
-        var zip = kids
-            .Select(k => (DictionaryObject)reader.Resolve(k)!)
-            .Single(d => ((StringObject)reader.Resolve(d["T"]!)!).Value == "zip");
-        Assert.True(zip.ContainsKey("Kids"));
+        Carries("zip field", "/Kids [", Field(kids, "zip"));
     }
 
     [Fact]
@@ -92,11 +72,7 @@ public class AppendFormMergeTests
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var dr = (DictionaryObject)reader.Resolve(AcroForm(reader)["DR"]!)!;
-        var fonts = (DictionaryObject)reader.Resolve(dr["Font"]!)!;
-
-        Assert.True(fonts.ContainsKey("Cour"), "source /DR font must union into merged form");
+        Shaped("AcroForm /DR", @"/DR << /Font << /Cour \d+ 0 R", Line(Emit(a), "/Fields ["));
     }
 
     [Fact]
@@ -115,12 +91,11 @@ public class AppendFormMergeTests
         });
         a.Append(PortableDocument.LoadFromStream(new MemoryStream(NestedForm())));
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var names = RootFieldNames(reader);
+        var emission = Emit(a);
+        var roots = RootFields(emission, 3);
 
-        Assert.Contains("Name", names);
-        Assert.Contains("Name_2", names);
-        Assert.Contains("address", names);
-        Assert.Equal(names.Length, names.Distinct().Count());
+        Field(roots, "Name");
+        Field(roots, "Name_2");
+        Field(roots, "address");
     }
 }

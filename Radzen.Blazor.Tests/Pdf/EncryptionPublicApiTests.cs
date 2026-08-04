@@ -3,6 +3,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -61,13 +62,13 @@ public class EncryptionPublicApiTests
     public void DocumentEncryption_WithoutMaterial_ProducesReadableEncryptedFile()
     {
         var bytes = BuildWithPasswordAndPermissionsOnly();
+        var encryption = Line(Encoding.Latin1.GetString(bytes), "/Filter /Standard");
+
+        LacksFlag("encryption dictionary", encryption, "P", 0x004);
+        LacksFlag("encryption dictionary", encryption, "P", 0x010);
 
         var reader = DocumentReader.Parse(bytes, "secret");
         Assert.NotNull(reader.Resolve(reader.Trailer["Root"]!));
-        var encrypt = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Encrypt"]!));
-        var permissions = Assert.IsType<NumberObject>(reader.Resolve(encrypt["P"]!)).IntValue;
-        Assert.Equal(0, permissions & 0x004);
-        Assert.Equal(0, permissions & 0x010);
         Assert.Throws<InvalidPasswordException>(() => DocumentReader.Parse(bytes, "wrong"));
     }
 

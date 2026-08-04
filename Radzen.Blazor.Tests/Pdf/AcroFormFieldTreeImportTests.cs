@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -132,50 +133,46 @@ public class AcroFormFieldTreeImportTests
         return stream.ToArray();
     }
 
-    private static ArrayObject Fields(DocumentReader reader)
-        => (ArrayObject)reader.Resolve(FormTestSupport.AcroForm(reader)["Fields"]);
+    private static string Merged(bool destinationHasNameField, bool destinationHasDa)
+        => Encoding.Latin1.GetString(Merge(destinationHasNameField, destinationHasDa));
 
-    private static string Title(DocumentReader reader, DictionaryObject field)
-        => Assert.IsType<StringObject>(reader.Resolve(field["T"])).Value;
+    private static string AcroFormObject(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("catalog", @"/AcroForm (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
 
     [Fact]
     public void NestedTreeRootIsListedOnceWithBothKids()
     {
-        var reader = DocumentReader.Parse(Merge(destinationHasNameField: false, destinationHasDa: true));
-        var fields = Fields(reader);
+        var emission = Merged(destinationHasNameField: false, destinationHasDa: true);
+        var fields = References("AcroForm", "Fields", 2, AcroFormObject(emission));
 
-        Assert.Equal(2, fields.Count);
-        var root = (DictionaryObject)reader.Resolve(fields[0]);
-        Assert.Equal("address", Title(reader, root));
+        var rootNumber = fields[0];
+        var root = IndirectObject(emission, rootNumber);
+        Carries("field tree root", "/T (address)", root);
 
-        var kids = (ArrayObject)reader.Resolve(root["Kids"]);
-        Assert.Equal(2, kids.Count);
-        Assert.Equal(
-            ["city", "zip"],
-            kids.Select(kid => Title(reader, (DictionaryObject)reader.Resolve(kid))).ToArray());
+        var kids = References("field tree root", "Kids", 2, root);
+        string[] titles = ["/T (city)", "/T (zip)"];
 
-        var rootNumber = Assert.IsType<ReferenceObject>(fields[0]).ObjectNumber;
-        foreach (var kid in kids)
+        for (var i = 0; i < kids.Length; i++)
         {
-            var parent = ((DictionaryObject)reader.Resolve(kid))["Parent"];
-            Assert.Equal(rootNumber, Assert.IsType<ReferenceObject>(parent).ObjectNumber);
+            var kid = IndirectObject(emission, kids[i]);
+            Carries($"field kid {kids[i]} 0 R", titles[i], kid);
+            Carries($"field kid {kids[i]} 0 R", $"/Parent {rootNumber} 0 R", kid);
         }
     }
 
     [Fact]
     public void KidWidgetsStayOnThePageAndAreTheKidObjects()
     {
-        var reader = DocumentReader.Parse(Merge(destinationHasNameField: false, destinationHasDa: true));
-        var fields = Fields(reader);
-        var root = (DictionaryObject)reader.Resolve(fields[0]);
-        var kids = (ArrayObject)reader.Resolve(root["Kids"]);
+        var emission = Merged(destinationHasNameField: false, destinationHasDa: true);
+        var fields = References("AcroForm", "Fields", 2, AcroFormObject(emission));
+        var kids = References("field tree root", "Kids", 2, IndirectObject(emission, fields[0]));
+        var annotations = Shaped("page", @"/Annots \[([^\]]*)\]", Line(emission, "/Type /Page ")).Groups[1].Value;
 
-        var annotations = ((ArrayObject)reader.Resolve(FormTestSupport.FirstPage(reader)["Annots"]))
-            .Select(entry => Assert.IsType<ReferenceObject>(entry).ObjectNumber)
-            .ToArray();
         foreach (var kid in kids)
         {
-            Assert.Contains(Assert.IsType<ReferenceObject>(kid).ObjectNumber, annotations);
+            Carries("page /Annots", $"{kid} 0 R", annotations);
         }
     }
 
@@ -196,41 +193,38 @@ public class AcroFormFieldTreeImportTests
     [Fact]
     public void DefaultResourceFontsAreUnionedAndDestinationDaWins()
     {
-        var reader = DocumentReader.Parse(Merge(destinationHasNameField: false, destinationHasDa: true));
-        var form = FormTestSupport.AcroForm(reader);
+        var emission = Merged(destinationHasNameField: false, destinationHasDa: true);
+        var form = AcroFormObject(emission);
 
-        var resources = (DictionaryObject)reader.Resolve(form["DR"]);
-        var fonts = (DictionaryObject)reader.Resolve(resources["Font"]);
-        Assert.True(fonts.ContainsKey("DestF"));
-        Assert.True(fonts.ContainsKey("Helv"));
-        var helv = (DictionaryObject)reader.Resolve(fonts["Helv"]);
-        Assert.Equal("Helvetica", Assert.IsType<NameObject>(reader.Resolve(helv["BaseFont"])).Value);
+        var fonts = Shaped("AcroForm /DR", @"/DR << /Font << (.*) >> >>", form).Groups[1].Value;
+        Carries("AcroForm default resource fonts", "/DestF ", fonts);
+        var helv = Shaped("AcroForm default resource fonts", @"/Helv (\d+) 0 R", fonts).Groups[1].Value;
+        Carries("/Helv font", "/BaseFont /Helvetica", IndirectObject(emission, helv));
 
-        Assert.Equal("/DestF 0 Tf 0 g", Assert.IsType<StringObject>(reader.Resolve(form["DA"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(form["NeedAppearances"])).Value);
+        Carries("AcroForm", "/DA (/DestF 0 Tf 0 g)", form);
+        Carries("AcroForm", "/NeedAppearances true", form);
     }
 
     [Fact]
     public void SourceDaIsAdoptedWhenDestinationHasNone()
     {
-        var reader = DocumentReader.Parse(Merge(destinationHasNameField: false, destinationHasDa: false));
-        var form = FormTestSupport.AcroForm(reader);
+        var emission = Merged(destinationHasNameField: false, destinationHasDa: false);
 
-        Assert.Equal("/Helv 0 Tf 0 g", Assert.IsType<StringObject>(reader.Resolve(form["DA"])).Value);
+        Carries("AcroForm", "/DA (/Helv 0 Tf 0 g)", AcroFormObject(emission));
     }
 
     [Fact]
     public void CollidingTopLevelNameIsSuffixedAndBothFieldsSurvive()
     {
         var bytes = Merge(destinationHasNameField: true, destinationHasDa: true);
-        var reader = DocumentReader.Parse(bytes);
-        var fields = Fields(reader);
+        var emission = Encoding.Latin1.GetString(bytes);
+        var fields = References("AcroForm", "Fields", 3, AcroFormObject(emission));
+        string[] titles = ["/T (Name)", "/T (address)", "/T (Name_2)"];
 
-        Assert.Equal(3, fields.Count);
-        var titles = fields
-            .Select(entry => Title(reader, (DictionaryObject)reader.Resolve(entry)))
-            .ToArray();
-        Assert.Equal(["Name", "address", "Name_2"], titles);
+        for (var i = 0; i < fields.Length; i++)
+        {
+            Carries($"AcroForm field {fields[i]} 0 R", titles[i], IndirectObject(emission, fields[i]));
+        }
 
         var document = PortableDocument.LoadFromStream(new MemoryStream(bytes));
         Assert.Contains("Name", document.AcroForm!.FieldNames);

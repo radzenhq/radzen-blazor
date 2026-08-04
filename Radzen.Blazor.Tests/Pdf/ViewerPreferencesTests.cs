@@ -1,9 +1,9 @@
 #nullable enable
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -16,10 +16,10 @@ public class ViewerPreferencesTests
         return document;
     }
 
-    private static DictionaryObject Catalog(byte[] pdf) => ContentTestHelpers.Catalog(DocumentReader.Parse(pdf));
+    private static string Catalog(PortableDocument document) => Line(Emit(document), "/Type /Catalog");
 
-    private static string NameOf(DocumentReader reader, DictionaryObject dict, string key)
-        => Assert.IsType<NameObject>(reader.Resolve(dict[key])).Value;
+    private static string Preferences(string catalog)
+        => Shaped("catalog /ViewerPreferences", @"/ViewerPreferences << ([^>]*)>>", catalog).Groups[1].Value;
 
     [Fact]
     public void ViewerPreferences_EmitsCatalogAndDictionaryEntries()
@@ -37,19 +37,19 @@ public class ViewerPreferencesTests
             Direction = PdfReadingDirection.RightToLeft,
         };
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var catalog = ContentTestHelpers.Catalog(reader);
+        var catalog = Catalog(document);
 
-        Assert.Equal("TwoColumnLeft", NameOf(reader, catalog, "PageLayout"));
-        Assert.Equal("UseOutlines", NameOf(reader, catalog, "PageMode"));
+        Carries("catalog", "/PageLayout /TwoColumnLeft", catalog);
+        Carries("catalog", "/PageMode /UseOutlines", catalog);
 
-        var prefs = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["ViewerPreferences"]));
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(prefs["HideToolbar"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(prefs["HideMenubar"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(prefs["FitWindow"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(prefs["CenterWindow"])).Value);
-        Assert.True(Assert.IsType<BooleanObject>(reader.Resolve(prefs["DisplayDocTitle"])).Value);
-        Assert.Equal("R2L", NameOf(reader, prefs, "Direction"));
+        var preferences = Preferences(catalog);
+
+        Carries("viewer preferences", "/HideToolbar true", preferences);
+        Carries("viewer preferences", "/HideMenubar true", preferences);
+        Carries("viewer preferences", "/FitWindow true", preferences);
+        Carries("viewer preferences", "/CenterWindow true", preferences);
+        Carries("viewer preferences", "/DisplayDocTitle true", preferences);
+        Carries("viewer preferences", "/Direction /R2L", preferences);
     }
 
     [Fact]
@@ -58,24 +58,27 @@ public class ViewerPreferencesTests
         var document = Document();
         document.ViewerPreferences = new ViewerPreferences { FitWindow = true };
 
-        var catalog = Catalog(document.ToArray());
-        Assert.False(catalog.ContainsKey("PageLayout"));
-        Assert.False(catalog.ContainsKey("PageMode"));
-        var prefs = Assert.IsType<DictionaryObject>(catalog["ViewerPreferences"]);
-        Assert.True(prefs.ContainsKey("FitWindow"));
-        Assert.False(prefs.ContainsKey("HideToolbar"));
-        Assert.False(prefs.ContainsKey("Direction"));
+        var catalog = Catalog(document);
+
+        Lacks("catalog", "/PageLayout", catalog);
+        Lacks("catalog", "/PageMode", catalog);
+
+        var preferences = Preferences(catalog);
+
+        Carries("viewer preferences", "/FitWindow", preferences);
+        Lacks("viewer preferences", "/HideToolbar", preferences);
+        Lacks("viewer preferences", "/Direction", preferences);
     }
 
     [Fact]
     public void NoViewerPreferences_EmitsNothing_AndByteIdentical()
     {
-        var bytes = Document().ToArray();
-        Assert.Equal(bytes, Document().ToArray());
+        Assert.Equal(Document().ToArray(), Document().ToArray());
 
-        var catalog = Catalog(bytes);
-        Assert.False(catalog.ContainsKey("ViewerPreferences"));
-        Assert.False(catalog.ContainsKey("PageLayout"));
-        Assert.False(catalog.ContainsKey("PageMode"));
+        var catalog = Catalog(Document());
+
+        Lacks("catalog", "/ViewerPreferences", catalog);
+        Lacks("catalog", "/PageLayout", catalog);
+        Lacks("catalog", "/PageMode", catalog);
     }
 }

@@ -1,10 +1,8 @@
 #nullable enable
-using System;
-using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -18,34 +16,27 @@ public class DeterministicDocumentIdTests
         return document;
     }
 
-    private static ArrayObject Id(byte[] pdf)
+    private static string[] Id(PortableDocument document)
     {
-        var reader = DocumentReader.Parse(pdf);
-        Assert.True(reader.Trailer.TryGetValue("ID", out var idObject), "trailer must carry /ID");
-        return Assert.IsType<ArrayObject>(reader.Resolve(idObject!));
+        var emission = Emit(document);
+        var match = Shaped(
+            "trailer /ID",
+            @"/ID \[\(([0-9A-Fa-f]{32})\) \(([0-9A-Fa-f]{32})\)\]",
+            Line(emission, "/ID ["));
+        return [match.Groups[1].Value, match.Groups[2].Value];
     }
 
     [Fact]
     public void EverySavedDocument_HasTrailerId_WithTwoEqual32HexHalves()
     {
-        var id = Id(PlainDocument().ToArray());
-        Assert.Equal(2, id.Count);
-        var first = Assert.IsType<StringObject>(id[0]);
-        var second = Assert.IsType<StringObject>(id[1]);
-        Assert.Equal(32, first.Value.Length);
-        Assert.Equal(first.Value, second.Value);
-        foreach (var ch in first.Value)
-        {
-            Assert.True(Uri.IsHexDigit(ch), $"'{ch}' is not a hex digit");
-        }
+        var id = Id(PlainDocument());
+        Assert.Equal(id[0], id[1]);
     }
 
     [Fact]
     public void DocumentId_IsDeterministic_AcrossIndependentSaves()
     {
-        var first = Assert.IsType<StringObject>(Id(PlainDocument().ToArray())[0]);
-        var second = Assert.IsType<StringObject>(Id(PlainDocument().ToArray())[0]);
-        Assert.Equal(first.Value, second.Value);
+        Assert.Equal(Id(PlainDocument())[0], Id(PlainDocument())[0]);
     }
 
     [Fact]
@@ -57,9 +48,7 @@ public class DeterministicDocumentIdTests
         var b = new PortableDocument { IncludeDocumentId = true };
         b.Pages.Add(PageSizes.A4).SetContent(TestBytes.Ascii("BT (beta) Tj ET"));
 
-        Assert.NotEqual(
-            Assert.IsType<StringObject>(Id(a.ToArray())[0]).Value,
-            Assert.IsType<StringObject>(Id(b.ToArray())[0]).Value);
+        Assert.NotEqual(Id(a)[0], Id(b)[0]);
     }
 
     [Fact]
@@ -71,9 +60,6 @@ public class DeterministicDocumentIdTests
     [Fact]
     public void DocumentId_HasAPinnedValue_ForAKnownDocument()
     {
-        Assert.Equal(
-            "FB42652C3E52C1AECAC2A39EFA11EC9D",
-            Assert.IsType<StringObject>(Id(PlainDocument().ToArray())[0]).Value);
+        Assert.Equal("FB42652C3E52C1AECAC2A39EFA11EC9D", Id(PlainDocument())[0]);
     }
-
 }

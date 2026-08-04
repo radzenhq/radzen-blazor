@@ -9,6 +9,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -51,6 +52,35 @@ public class ImageStampOverlayRegressionTests
         return Assert.IsType<DictionaryObject>(reader.Resolve(xobjectsObject!));
     }
 
+    private static string AuthoredContent(string emission)
+    {
+        var page = Line(emission, "/Type /Page ");
+        var reference = Shaped("page", @"/Contents (\d+) 0 R", page);
+        return IndirectObject(emission, reference.Groups[1].Value);
+    }
+
+    private static string OverlayContent(string emission)
+        => IndirectObject(emission, References("page", "Contents", 2, Line(emission, "/Type /Page "))[1]);
+
+    private static void AssertEmittedImageStamp(string emission, string content, string streamName)
+    {
+        var stamp = Shaped(streamName, @"/(\S+)\s+Do\b", content);
+        Carries(streamName, " cm", content);
+        Carries(streamName, "q", content);
+
+        var key = stamp.Groups[1].Value;
+        var entry = Shaped(
+            $"page /Resources /XObject entry for /{key}",
+            $@"/XObject <<[^>]*/{Regex.Escape(key)} (\d+) 0 R",
+            Line(emission, "/Type /Page "));
+
+        var image = IndirectObject(emission, entry.Groups[1].Value);
+        Carries($"image XObject {entry.Groups[1].Value} 0 R", "/Type /XObject", image);
+        Carries($"image XObject {entry.Groups[1].Value} 0 R", "/Subtype /Image", image);
+        Carries($"image XObject {entry.Groups[1].Value} 0 R", "/Width 64", image);
+        Carries($"image XObject {entry.Groups[1].Value} 0 R", "/Height 64", image);
+    }
+
     private static void AssertImageStamp(DocumentReader reader, DictionaryObject page)
     {
         var content = AllContentText(reader, page);
@@ -76,8 +106,8 @@ public class ImageStampOverlayRegressionTests
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
+        var emission = Emit(document);
+        AssertEmittedImageStamp(emission, AuthoredContent(emission), "authored page content");
     }
 
     [Fact]
@@ -100,8 +130,8 @@ public class ImageStampOverlayRegressionTests
         var pdf = new DocumentRenderer().Render(document);
         pdf.Pages[0].Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(72, 72, 96, 48) });
 
-        var reader = DocumentReader.Parse(pdf.ToArray());
-        AssertImageStamp(reader, FormTestSupport.FirstPage(reader));
+        var emission = Emit(pdf);
+        AssertEmittedImageStamp(emission, OverlayContent(emission), "built page overlay");
     }
 
     [Fact]
@@ -111,12 +141,12 @@ public class ImageStampOverlayRegressionTests
         var page = document.Pages.Add();
         page.Content.Add(new ImageContent(Png()) { Bounds = PdfRect.FromSize(100, 500, 96, 48) });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var content = AllContentText(reader, FormTestSupport.FirstPage(reader));
+        var emission = Emit(document);
+        var cm = Shaped(
+            "authored page content /cm",
+            @"([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) cm",
+            AuthoredContent(emission));
 
-        var cm = Regex.Match(
-            content, @"([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+) cm");
-        Assert.True(cm.Success, "no cm operator emitted for the ImageContent stamp");
         Assert.Equal("96", cm.Groups[1].Value);
         Assert.Equal("48", cm.Groups[4].Value);
         Assert.Equal("100", cm.Groups[5].Value);

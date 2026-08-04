@@ -3,11 +3,13 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -19,6 +21,20 @@ public class RoundTripIntegrityTests
         return PortableDocument.LoadFromStream(stream);
     }
 
+    private static byte[] StreamData(string emission, string marker)
+    {
+        var dictionary = Line(emission, marker);
+        var start = emission.IndexOf(dictionary, StringComparison.Ordinal) + dictionary.Length;
+        var body = emission.IndexOf("\nstream\n", start, StringComparison.Ordinal);
+        Assert.True(
+            body == start,
+            $"The object carrying '{marker}' is not a stream.\nObject:\n{Excerpt(dictionary)}");
+
+        var end = emission.IndexOf("\nendstream", body, StringComparison.Ordinal);
+        Assert.True(end >= 0, $"The stream carrying '{marker}' has no endstream.");
+        return Encoding.Latin1.GetBytes(emission[(body + 8)..end]);
+    }
+
 
     [Fact]
     public void Resave_LoadedBase14Page_KeepsFontResourcesAndText()
@@ -27,14 +43,12 @@ public class RoundTripIntegrityTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Hello Resave", "Helvetica");
 
-        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
+        var reloaded = Load(new DocumentRenderer().ToArray(document));
+        var resaved = reloaded.ToArray();
+        var emission = Emit(reloaded);
 
-        var reader = DocumentReader.Parse(resaved);
-        var leaves = BuildTestSupport.PageLeaves(reader);
-        Assert.Single(leaves);
-        var resources = leaves[0].Resources;
-        Assert.NotNull(resources);
-        Assert.True(resources!.ContainsKey("Font"), "re-saved page lost its /Font resources");
+        References("page tree", "Kids", 1, Line(emission, "/Type /Pages"));
+        Shaped("re-saved page", @"/Resources <<.*/Font ", Line(emission, "/Type /Page "));
 
         Assert.Contains("Hello Resave", Load(resaved).ExtractText(), StringComparison.Ordinal);
     }
@@ -47,9 +61,10 @@ public class RoundTripIntegrityTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Embedded Survives", BuildTestSupport.Latin);
 
-        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
+        var reloaded = Load(new DocumentRenderer().ToArray(document));
+        var resaved = reloaded.ToArray();
 
-        Assert.NotEmpty(BuildTestSupport.Type0Fonts(DocumentReader.Parse(resaved)));
+        Carries("emission", "/Subtype /Type0", Emit(reloaded));
         Assert.Contains("Embedded Survives", Load(resaved).ExtractText(), StringComparison.Ordinal);
     }
 
@@ -63,11 +78,11 @@ public class RoundTripIntegrityTests
         image.Height = Unit.FromPoint(100);
 
         var original = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        var resaved = Load(new DocumentRenderer().ToArray(document)).ToArray();
+        var emission = Emit(Load(new DocumentRenderer().ToArray(document)));
 
-        var images = BuildTestSupport.ImageXObjects(DocumentReader.Parse(resaved));
-        Assert.Single(images);
-        Assert.Equal(original, images[0].Data);
+        var count = Regex.Matches(emission, "/Subtype /Image").Count;
+        Assert.True(count == 1, $"Expected exactly 1 image XObject in the emission, found {count}.");
+        Assert.Equal(original, StreamData(emission, "/Subtype /Image"));
     }
 
 

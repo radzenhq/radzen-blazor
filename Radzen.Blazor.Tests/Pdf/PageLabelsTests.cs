@@ -1,11 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -22,20 +21,7 @@ public class PageLabelsTests
         return document;
     }
 
-    private static Dictionary<int, DictionaryObject> Labels(DocumentReader reader)
-    {
-        var catalog = ContentTestHelpers.Catalog(reader);
-        var tree = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["PageLabels"]));
-        var nums = Assert.IsType<ArrayObject>(reader.Resolve(tree["Nums"]));
-        var result = new Dictionary<int, DictionaryObject>();
-        for (var i = 0; i + 1 < nums.Count; i += 2)
-        {
-            var key = Assert.IsType<NumberObject>(reader.Resolve(nums[i])).IntValue;
-            result[key] = Assert.IsType<DictionaryObject>(reader.Resolve(nums[i + 1]));
-        }
-
-        return result;
-    }
+    private static string Catalog(PortableDocument document) => Line(Emit(document), "/Type /Catalog");
 
     [Fact]
     public void PageLabels_EmitStyledRangesWithPrefixAndStart()
@@ -44,20 +30,20 @@ public class PageLabelsTests
         document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.LowercaseRoman });
         document.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal, Prefix = "A-", Start = 5 });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var labels = Labels(reader);
+        var ranges = Shaped(
+            "catalog /PageLabels",
+            @"/PageLabels << /Nums \[0 (<<[^>]*>>) 2 (<<[^>]*>>)\] >>",
+            Catalog(document));
 
-        Assert.Equal(new[] { 0, 2 }, new List<int>(labels.Keys).ToArray());
+        var front = ranges.Groups[1].Value;
+        Carries("front label range", "/S /r", front);
+        Lacks("front label range", "/P ", front);
+        Lacks("front label range", "/St ", front);
 
-        var front = labels[0];
-        Assert.Equal("r", Assert.IsType<NameObject>(reader.Resolve(front["S"])).Value);
-        Assert.False(front.ContainsKey("P"));
-        Assert.False(front.ContainsKey("St"));
-
-        var body = labels[2];
-        Assert.Equal("D", Assert.IsType<NameObject>(reader.Resolve(body["S"])).Value);
-        Assert.Equal("A-", Assert.IsType<StringObject>(reader.Resolve(body["P"])).Value);
-        Assert.Equal(5, Assert.IsType<NumberObject>(reader.Resolve(body["St"])).IntValue);
+        var body = ranges.Groups[2].Value;
+        Carries("body label range", "/S /D", body);
+        Carries("body label range", "/P (A-)", body);
+        Carries("body label range", "/St 5", body);
     }
 
     [Fact]
@@ -67,12 +53,10 @@ public class PageLabelsTests
         document.PageLabels.Add(new PageLabel(2) { Style = PageLabelStyle.Decimal });
         document.PageLabels.Add(new PageLabel(0) { Style = PageLabelStyle.UppercaseRoman });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var catalog = ContentTestHelpers.Catalog(reader);
-        var nums = Assert.IsType<ArrayObject>(reader.Resolve(
-            Assert.IsType<DictionaryObject>(reader.Resolve(catalog["PageLabels"]))["Nums"]));
-        Assert.Equal(0, Assert.IsType<NumberObject>(reader.Resolve(nums[0])).IntValue);
-        Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(nums[2])).IntValue);
+        Shaped(
+            "catalog /PageLabels",
+            @"/PageLabels << /Nums \[0 <<[^>]*>> 2 <<",
+            Catalog(document));
     }
 
     [Fact]
@@ -81,10 +65,13 @@ public class PageLabelsTests
         var document = Document(2);
         document.PageLabels.Add(new PageLabel(0) { Prefix = "Cover" });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var label = Labels(reader)[0];
-        Assert.False(label.ContainsKey("S"));
-        Assert.Equal("Cover", Assert.IsType<StringObject>(reader.Resolve(label["P"])).Value);
+        var range = Shaped(
+            "catalog /PageLabels",
+            @"/PageLabels << /Nums \[0 (<<[^>]*>>)\] >>",
+            Catalog(document)).Groups[1].Value;
+
+        Lacks("label range", "/S ", range);
+        Carries("label range", "/P (Cover)", range);
     }
 
     [Fact]
@@ -120,7 +107,8 @@ public class PageLabelsTests
     {
         var bytes = Document(2).ToArray();
         Assert.Equal(bytes, Document(2).ToArray());
-        Assert.False(ContentTestHelpers.Catalog(DocumentReader.Parse(bytes)).ContainsKey("PageLabels"));
+
+        Lacks("catalog", "/PageLabels", Line(Encoding.Latin1.GetString(bytes), "/Type /Catalog"));
     }
 
     [Theory]
@@ -134,8 +122,9 @@ public class PageLabelsTests
         var document = Document(2);
         document.PageLabels.Add(new PageLabel(0) { Style = style });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-
-        Assert.Equal(name, Assert.IsType<NameObject>(reader.Resolve(Labels(reader)[0]["S"])).Value);
+        Shaped(
+            $"catalog /PageLabels /S /{name}",
+            $@"/PageLabels << /Nums \[0 << /S /{name} >>\] >>",
+            Catalog(document));
     }
 }

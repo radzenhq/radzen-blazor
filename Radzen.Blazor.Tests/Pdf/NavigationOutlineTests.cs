@@ -1,12 +1,12 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -40,26 +40,25 @@ public class NavigationOutlineTests
         return document;
     }
 
-    private static DictionaryObject Resolve(DocumentReader reader, DocumentObject value)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(value));
-
-    private static Dictionary<string, ArrayObject> NamedDestinations(DocumentReader reader)
+    private static string[] PageReferences(string emission, int count)
     {
-        var catalog = ContentTestHelpers.Catalog(reader);
-        Assert.True(catalog.TryGetValue("Names", out var namesObject), "catalog must carry /Names");
-        var names = Resolve(reader, namesObject!);
-        Assert.True(names.TryGetValue("Dests", out var destsObject), "/Names must carry /Dests");
-        var dests = Resolve(reader, destsObject!);
-        var entries = Assert.IsType<ArrayObject>(reader.Resolve(dests["Names"]));
-        var result = new Dictionary<string, ArrayObject>(StringComparer.Ordinal);
-        for (var i = 0; i + 1 < entries.Count; i += 2)
-        {
-            var name = Assert.IsType<StringObject>(reader.Resolve(entries[i]));
-            result[name.Value] = Assert.IsType<ArrayObject>(reader.Resolve(entries[i + 1]));
-        }
-
-        return result;
+        var catalog = Line(emission, "/Type /Catalog");
+        var pages = IndirectObject(emission, Shaped("catalog", @"/Pages (\d+) 0 R", catalog).Groups[1].Value);
+        return References("page tree", "Kids", count, pages);
     }
+
+    private static string OutlineRoot(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("catalog", @"/Outlines (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
+
+    private static string NamedDestinations(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("catalog", @"/Names << /Dests (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
+
+    private static double Coordinate(Match destination, int group)
+        => double.Parse(destination.Groups[group].Value, CultureInfo.InvariantCulture);
 
     [Fact]
     public void Outline_EmitsCatalogTree_WithTitlesAndNesting()
@@ -71,28 +70,32 @@ public class NavigationOutlineTests
         var rendered = new DocumentRenderer().Render(document);
         rendered.Outline.Add(root);
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var catalog = ContentTestHelpers.Catalog(reader);
-        Assert.True(catalog.TryGetValue("Outlines", out var outlinesObject), "catalog must carry /Outlines");
-        var outlines = Resolve(reader, outlinesObject!);
-        Assert.Equal("Outlines", Assert.IsType<NameObject>(reader.Resolve(outlines["Type"])).Value);
-        Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
+        var emission = Emit(rendered);
+        var rootNumber = Shaped("catalog", @"/Outlines (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value;
+        var outlines = IndirectObject(emission, rootNumber);
 
-        var first = Resolve(reader, outlines["First"]);
-        var last = Resolve(reader, outlines["Last"]);
-        Assert.Equal("Introduction", Assert.IsType<StringObject>(reader.Resolve(first["Title"])).Value);
-        Assert.Equal("Introduction", Assert.IsType<StringObject>(reader.Resolve(last["Title"])).Value);
-        Assert.Same(outlines, Resolve(reader, first["Parent"]));
-        Assert.Equal("intro", Assert.IsType<StringObject>(reader.Resolve(first["Dest"])).Value);
-        Assert.Equal(1, Assert.IsType<NumberObject>(reader.Resolve(first["Count"])).IntValue);
+        Carries("outline root", "/Type /Outlines", outlines);
+        Carries("outline root", "/Count 2", outlines);
 
-        var nested = Resolve(reader, first["First"]);
-        Assert.Equal("Details", Assert.IsType<StringObject>(reader.Resolve(nested["Title"])).Value);
-        Assert.Same(first, Resolve(reader, nested["Parent"]));
-        Assert.Equal("details", Assert.IsType<StringObject>(reader.Resolve(nested["Dest"])).Value);
-        Assert.Same(nested, Resolve(reader, first["Last"]));
-        Assert.False(nested.ContainsKey("Next"));
-        Assert.False(nested.ContainsKey("Prev"));
+        var firstNumber = Shaped("outline root", @"/First (\d+) 0 R", outlines).Groups[1].Value;
+        var lastNumber = Shaped("outline root", @"/Last (\d+) 0 R", outlines).Groups[1].Value;
+        var first = IndirectObject(emission, firstNumber);
+
+        Carries("outline first item", "/Title (Introduction)", first);
+        Carries("outline last item", "/Title (Introduction)", IndirectObject(emission, lastNumber));
+        Carries("outline first item", $"/Parent {rootNumber} 0 R", first);
+        Carries("outline first item", "/Dest (intro)", first);
+        Carries("outline first item", "/Count 1", first);
+
+        var nestedNumber = Shaped("outline first item", @"/First (\d+) 0 R", first).Groups[1].Value;
+        var nested = IndirectObject(emission, nestedNumber);
+
+        Carries("nested outline item", "/Title (Details)", nested);
+        Carries("nested outline item", $"/Parent {firstNumber} 0 R", nested);
+        Carries("nested outline item", "/Dest (details)", nested);
+        Carries("outline first item", $"/Last {nestedNumber} 0 R", first);
+        Lacks("nested outline item", "/Next", nested);
+        Lacks("nested outline item", "/Prev", nested);
     }
 
     [Fact]
@@ -103,17 +106,22 @@ public class NavigationOutlineTests
         rendered.Outline.Add(new OutlineItem("Introduction", OutlineTarget.ToAnchor("intro")));
         rendered.Outline.Add(new OutlineItem("Details", OutlineTarget.ToAnchor("details")));
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
-        Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
-        var first = Resolve(reader, outlines["First"]);
-        var last = Resolve(reader, outlines["Last"]);
-        Assert.Equal("Introduction", Assert.IsType<StringObject>(reader.Resolve(first["Title"])).Value);
-        Assert.Equal("Details", Assert.IsType<StringObject>(reader.Resolve(last["Title"])).Value);
-        Assert.Same(last, Resolve(reader, first["Next"]));
-        Assert.Same(first, Resolve(reader, last["Prev"]));
-        Assert.False(first.ContainsKey("Prev"));
-        Assert.False(last.ContainsKey("Next"));
+        var emission = Emit(rendered);
+        var outlines = OutlineRoot(emission);
+
+        Carries("outline root", "/Count 2", outlines);
+
+        var firstNumber = Shaped("outline root", @"/First (\d+) 0 R", outlines).Groups[1].Value;
+        var lastNumber = Shaped("outline root", @"/Last (\d+) 0 R", outlines).Groups[1].Value;
+        var first = IndirectObject(emission, firstNumber);
+        var last = IndirectObject(emission, lastNumber);
+
+        Carries("outline first item", "/Title (Introduction)", first);
+        Carries("outline last item", "/Title (Details)", last);
+        Carries("outline first item", $"/Next {lastNumber} 0 R", first);
+        Carries("outline last item", $"/Prev {firstNumber} 0 R", last);
+        Lacks("outline first item", "/Prev", first);
+        Lacks("outline last item", "/Next", last);
     }
 
     [Fact]
@@ -123,33 +131,39 @@ public class NavigationOutlineTests
         var rendered = new DocumentRenderer().Render(document);
         rendered.Outline.Add(new OutlineItem("Second page", OutlineTarget.ToPage(1)));
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var outlines = Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
-        var item = Resolve(reader, outlines["First"]);
-        var dest = Assert.IsType<ArrayObject>(reader.Resolve(item["Dest"]));
-        Assert.Equal(5, dest.Count);
-        Assert.Same(ContentTestHelpers.Kid(reader, 1), Resolve(reader, dest[0]));
-        Assert.Equal("XYZ", Assert.IsType<NameObject>(reader.Resolve(dest[1])).Value);
-        Assert.Equal(300, Assert.IsType<NumberObject>(reader.Resolve(dest[3])).DoubleValue, 0.5);
+        var emission = Emit(rendered);
+        var pages = PageReferences(emission, 2);
+        var outlines = OutlineRoot(emission);
+        var item = IndirectObject(emission, Shaped("outline root", @"/First (\d+) 0 R", outlines).Groups[1].Value);
+
+        var destination = Shaped(
+            "outline item /Dest",
+            $@"/Dest \[{pages[1]} 0 R /XYZ ([^ \]]+) ([^ \]]+) ([^ \]]+)\]",
+            item);
+
+        Assert.Equal(300, Coordinate(destination, 2), 0.5);
     }
 
     [Fact]
     public void Anchors_EmitNamedDestinations_OnTheRightPages()
     {
-        var reader = BuildTestSupport.Read(TwoSectionDocument());
-        var dests = NamedDestinations(reader);
-        Assert.Equal(2, dests.Count);
+        var emission = Emit(new DocumentRenderer().Render(TwoSectionDocument()));
+        var pages = PageReferences(emission, 2);
+        var dests = NamedDestinations(emission);
 
-        var intro = dests["intro"];
-        var details = dests["details"];
-        Assert.Same(ContentTestHelpers.Kid(reader, 0), Resolve(reader, intro[0]));
-        Assert.Same(ContentTestHelpers.Kid(reader, 1), Resolve(reader, details[0]));
-        foreach (var dest in new[] { intro, details })
+        var entries = Regex.Matches(dests, @"\([^)]*\) \[");
+        Assert.True(
+            entries.Count == 2,
+            $"Expected 2 named destinations, found {entries.Count}.\n/Dests node:\n{Excerpt(dests)}");
+
+        foreach (var (name, page) in new[] { ("intro", pages[0]), ("details", pages[1]) })
         {
-            Assert.Equal(5, dest.Count);
-            Assert.Equal("XYZ", Assert.IsType<NameObject>(reader.Resolve(dest[1])).Value);
-            var top = Assert.IsType<NumberObject>(reader.Resolve(dest[3])).DoubleValue;
-            Assert.InRange(top, 1, 300);
+            var destination = Shaped(
+                $"named destination ({name})",
+                $@"\({name}\) \[{page} 0 R /XYZ ([^ \]]+) ([^ \]]+) ([^ \]]+)\]",
+                dests);
+
+            Assert.InRange(Coordinate(destination, 2), 1, 300);
         }
     }
 
@@ -161,17 +175,18 @@ public class NavigationOutlineTests
         paragraph.Inlines.Add("jump to details").LinkToAnchor = "details";
         document.Sections[0].Blocks.Add(paragraph);
 
-        var reader = BuildTestSupport.Read(document);
-        var page = ContentTestHelpers.Kid(reader, 0);
-        var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
-        var annot = Resolve(reader, Assert.Single(annots));
-        Assert.Equal("Link", Assert.IsType<NameObject>(reader.Resolve(annot["Subtype"])).Value);
-        var action = Resolve(reader, annot["A"]);
-        Assert.Equal("GoTo", Assert.IsType<NameObject>(reader.Resolve(action["S"])).Value);
-        Assert.Equal("details", Assert.IsType<StringObject>(reader.Resolve(action["D"])).Value);
+        var emission = Emit(new DocumentRenderer().Render(document));
+        var pages = PageReferences(emission, 2);
+        var annots = References("first page", "Annots", 1, IndirectObject(emission, pages[0]));
+        var annotation = IndirectObject(emission, annots[0]);
 
-        var dests = NamedDestinations(reader);
-        Assert.Same(ContentTestHelpers.Kid(reader, 1), Resolve(reader, dests["details"][0]));
+        Carries("link annotation", "/Subtype /Link", annotation);
+        Carries("link annotation", "/A << /S /GoTo /D (details) >>", annotation);
+
+        Shaped(
+            "named destination (details)",
+            $@"\(details\) \[{pages[1]} 0 R ",
+            NamedDestinations(emission));
     }
 
     [Fact]
@@ -180,9 +195,7 @@ public class NavigationOutlineTests
         var document = new DocumentRenderer().Render(PlainDocument());
         document.Pages[0].Rotate = 90;
 
-        var reader = ContentTestHelpers.Reload(document);
-        var page = ContentTestHelpers.Kid(reader, 0);
-        Assert.Equal(90, Assert.IsType<NumberObject>(reader.Resolve(page["Rotate"])).IntValue);
+        Assert.Equal(90, NumberIn(Line(Emit(document), "/Type /Page "), "Rotate"));
     }
 
     [Fact]
@@ -195,17 +208,16 @@ public class NavigationOutlineTests
     [Fact]
     public void PlainDocument_EmitsNoNavigationKeys_AndStaysDeterministic()
     {
-        var bytes = new DocumentRenderer().ToArray(PlainDocument());
-        Assert.Equal(bytes, new DocumentRenderer().ToArray(PlainDocument()));
+        var emission = Emit(new DocumentRenderer().Render(PlainDocument()));
+        Assert.Equal(emission, Emit(new DocumentRenderer().Render(PlainDocument())));
 
-        var reader = DocumentReader.Parse(bytes);
-        var catalog = ContentTestHelpers.Catalog(reader);
-        Assert.False(catalog.ContainsKey("Outlines"));
-        Assert.False(catalog.ContainsKey("Dests"));
-        Assert.False(catalog.ContainsKey("Names"));
+        var catalog = Line(emission, "/Type /Catalog");
+        Lacks("catalog", "/Outlines", catalog);
+        Lacks("catalog", "/Dests", catalog);
+        Lacks("catalog", "/Names", catalog);
 
-        var page = ContentTestHelpers.Kid(reader, 0);
-        Assert.False(page.ContainsKey("Rotate"));
-        Assert.False(page.ContainsKey("Annots"));
+        var page = Line(emission, "/Type /Page ");
+        Lacks("page", "/Rotate", page);
+        Lacks("page", "/Annots", page);
     }
 }

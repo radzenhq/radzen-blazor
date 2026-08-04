@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -33,12 +33,11 @@ public class LoadedDocumentConformanceTests
 
         loaded.Conformance = PdfAConformance.PdfA2B;
 
-        var bytes = loaded.ToArray();
-        Assert.Contains("pdfaid:part", Encoding.Latin1.GetString(bytes), StringComparison.Ordinal);
+        var emission = Emit(loaded);
+        Assert.Contains("pdfaid:part", emission, StringComparison.Ordinal);
 
-        var reader = DocumentReader.Parse(bytes);
-        Assert.NotNull(reader.Resolve(ContentTestHelpers.Catalog(reader)["OutputIntents"]) as ArrayObject);
-        Assert.NotNull(reader.Resolve(reader.Trailer["ID"]!) as ArrayObject);
+        Carries("catalog", "/OutputIntents [", Line(emission, "/Type /Catalog"));
+        Carries("trailer", "/ID [", Line(emission, "/Root "));
     }
 
     [Fact]

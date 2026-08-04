@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -58,18 +59,16 @@ public class AppendRemovePreservationTests
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("cover"));
         target.Append(Load(LinkAnnotSource()));
 
-        var output = target.ToArray();
+        var emission = Emit(target);
 
-        Assert.Contains("https://radzen.com/appended", Latin1(output));
+        Carries("emission", "https://radzen.com/appended", emission);
 
-        var reader = DocumentReader.Parse(output);
-        var kids = Kids(reader);
-        Assert.Equal(2, kids.Count);
-        var appended = Assert.IsType<DictionaryObject>(reader.Resolve(kids[1]));
-        var annots = Assert.IsType<ArrayObject>(reader.Resolve(appended["Annots"]));
-        var annot = Assert.IsType<DictionaryObject>(reader.Resolve(annots[0]));
-        var action = Assert.IsType<DictionaryObject>(reader.Resolve(annot["A"]));
-        Assert.Equal("https://radzen.com/appended", Assert.IsType<StringObject>(reader.Resolve(action["URI"])).Value);
+        var appended = IndirectObject(emission, References("pages", "Kids", 2, Line(emission, "/Type /Pages "))[1]);
+        var annotation = IndirectObject(
+            emission,
+            Shaped("appended page", @"/Annots \[(\d+) 0 R", appended).Groups[1].Value);
+
+        Carries("appended annotation", "/URI (https://radzen.com/appended)", annotation);
     }
 
     private static byte[] TwoPageFormSource()

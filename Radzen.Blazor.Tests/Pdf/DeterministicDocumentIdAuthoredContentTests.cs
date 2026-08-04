@@ -1,10 +1,10 @@
 #nullable enable
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -12,9 +12,12 @@ public class DeterministicDocumentIdAuthoredContentTests
 {
     private static string Id(PortableDocument document)
     {
-        var reader = DocumentReader.Parse(document.ToArray());
-        var id = Assert.IsType<ArrayObject>(reader.Resolve(reader.Trailer["ID"]));
-        return Assert.IsType<StringObject>(id[0]).Value;
+        var emission = Emit(document);
+        var match = Shaped(
+            "trailer /ID",
+            @"/ID \[\(([0-9A-Fa-f]{32})\) \([0-9A-Fa-f]{32}\)\]",
+            Line(emission, "/ID ["));
+        return match.Groups[1].Value;
     }
 
     private static PortableDocument Authored(string text)

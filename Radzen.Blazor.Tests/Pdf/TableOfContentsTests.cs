@@ -6,10 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -64,20 +64,15 @@ public class TableOfContentsTests
         return pdf;
     }
 
-    private static Dictionary<string, ArrayObject> NamedDestinations(DocumentReader reader)
+    private static string[] Annotations(string page)
     {
-        var catalog = ContentTestHelpers.Catalog(reader);
-        var names = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Names"]));
-        var dests = Assert.IsType<DictionaryObject>(reader.Resolve(names["Dests"]));
-        var entries = Assert.IsType<ArrayObject>(reader.Resolve(dests["Names"]));
-        var result = new Dictionary<string, ArrayObject>(StringComparer.Ordinal);
-        for (var i = 0; i + 1 < entries.Count; i += 2)
-        {
-            var name = Assert.IsType<StringObject>(reader.Resolve(entries[i]));
-            result[name.Value] = Assert.IsType<ArrayObject>(reader.Resolve(entries[i + 1]));
-        }
-
-        return result;
+        var annots = Shaped("page /Annots", @"/Annots \[([^\]]*)\]", page);
+        return
+        [
+            .. Regex.Matches(annots.Groups[1].Value, @"(\d+) 0 R")
+                .Cast<Match>()
+                .Select(match => match.Groups[1].Value),
+        ];
     }
 
     [Fact]
@@ -95,25 +90,29 @@ public class TableOfContentsTests
     [Fact]
     public void Toc_EmitsGoToLinkAnnotations_ToEveryEntryAnchor()
     {
-        var reader = BuildTestSupport.Read(ChapterDocument());
-        var page = ContentTestHelpers.Kid(reader, 0);
-        var annots = Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]));
+        var emission = Emit(new DocumentRenderer().Render(ChapterDocument()));
+        var pages = References("pages node", "Kids", 4, Line(emission, "/Type /Pages"));
 
         var destinations = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var entry in annots)
+        foreach (var number in Annotations(IndirectObject(emission, pages[0])))
         {
-            var annot = Assert.IsType<DictionaryObject>(reader.Resolve(entry));
-            Assert.Equal("Link", Assert.IsType<NameObject>(reader.Resolve(annot["Subtype"])).Value);
-            var action = Assert.IsType<DictionaryObject>(reader.Resolve(annot["A"]));
-            Assert.Equal("GoTo", Assert.IsType<NameObject>(reader.Resolve(action["S"])).Value);
-            destinations.Add(Assert.IsType<StringObject>(reader.Resolve(action["D"])).Value);
+            var annotation = IndirectObject(emission, number);
+            Carries($"annotation {number} 0 R", "/Subtype /Link", annotation);
+            destinations.Add(
+                Shaped($"annotation {number} 0 R", @"/A << /S /GoTo /D \((\w+)\) >>", annotation).Groups[1].Value);
         }
 
         Assert.Equal(new HashSet<string>(new[] { "ch1", "ch2" }, StringComparer.Ordinal), destinations);
 
-        var dests = NamedDestinations(reader);
-        Assert.Same(ContentTestHelpers.Kid(reader, 1), Assert.IsType<DictionaryObject>(reader.Resolve(dests["ch1"][0])));
-        Assert.Same(ContentTestHelpers.Kid(reader, 3), Assert.IsType<DictionaryObject>(reader.Resolve(dests["ch2"][0])));
+        var dests = IndirectObject(
+            emission,
+            Shaped(
+                "catalog /Names",
+                @"/Names << /Dests (\d+) 0 R >>",
+                Line(emission, "/Type /Catalog")).Groups[1].Value);
+
+        Assert.Equal(pages[1], Shaped("/Dests", @"\(ch1\) \[(\d+) 0 R", dests).Groups[1].Value);
+        Assert.Equal(pages[3], Shaped("/Dests", @"\(ch2\) \[(\d+) 0 R", dests).Groups[1].Value);
     }
 
     [Fact]

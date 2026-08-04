@@ -9,6 +9,7 @@ using Radzen.Documents.Pdf.Signing;
 using Radzen.Documents.Pdf;
 using Radzen.Documents;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -42,28 +43,32 @@ public class PdfLtvTests
     private static byte[] SignFixed(byte[] pdf, byte[] cms)
         => PdfSigner.Sign(pdf, new SignatureOptions { SignerName = "Signer" }, new FixedSigner(cms));
 
-    private static DictionaryObject Catalog(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(reader.Trailer["Root"]);
+    private static string Emitted(byte[] bytes) => Encoding.Latin1.GetString(bytes);
 
-    private static DictionaryObject AcroForm(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(Catalog(reader)["AcroForm"]);
-
-    private static DictionaryObject Field(DocumentReader reader, int index)
+    private static string SignatureOf(string emission, string fieldName)
     {
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]);
-        return (DictionaryObject)reader.Resolve(fields[index]);
+        var field = Line(emission, $"/T ({fieldName})");
+        var value = Shaped($"field {fieldName}", @"/V (\d+) 0 R", field);
+        return IndirectObject(emission, value.Groups[1].Value);
     }
 
-    private static DictionaryObject SignatureValue(DocumentReader reader, int index)
-        => (DictionaryObject)reader.Resolve(Field(reader, index)["V"]);
-
-    private static (int GapStart, int GapEnd, int Tail) ByteRange(DocumentReader reader, DictionaryObject signature)
+    private static (int GapStart, int GapEnd, int Tail) ByteRange(string emission, string fieldName)
     {
-        var range = (ArrayObject)reader.Resolve(signature["ByteRange"]);
-        Assert.Equal(4, range.Count);
-        Assert.Equal(0, ((NumberObject)range[0]).IntValue);
-        return (((NumberObject)range[1]).IntValue, ((NumberObject)range[2]).IntValue, ((NumberObject)range[3]).IntValue);
+        var match = Shaped(
+            $"signature of {fieldName}",
+            @"/ByteRange \[0 (\d+) (\d+) (\d+) *\]",
+            SignatureOf(emission, fieldName));
+        return (
+            int.Parse(match.Groups[1].Value),
+            int.Parse(match.Groups[2].Value),
+            int.Parse(match.Groups[3].Value));
     }
+
+    private static string StreamPayload(byte[] data)
+        => "stream\n" + Encoding.Latin1.GetString(data) + "\nendstream";
+
+    private static void CarriesStream(string subject, string emission, string number, byte[] expected)
+        => Carries(subject, StreamPayload(expected), IndirectObject(emission, number));
 
     private static byte[] CoveredContent(byte[] bytes, int gapStart, int gapEnd, int tail)
     {
@@ -87,21 +92,6 @@ public class PdfLtvTests
         return raw;
     }
 
-    private static DictionaryObject Dss(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(Catalog(reader)["DSS"]);
-
-    private static byte[][] StreamBytes(DocumentReader reader, DictionaryObject dss, string key)
-    {
-        if (!dss.TryGetValue(key, out var value) || value is null)
-        {
-            return Array.Empty<byte[]>();
-        }
-
-        var array = (ArrayObject)reader.Resolve(value);
-        return array.Select(item => reader.DecodeStream((StreamObject)reader.Resolve(item))).ToArray();
-    }
-
-
     [Fact]
     public void Timestamp_AppendsDocTimeStampFieldAsIncrementalUpdate()
     {
@@ -114,12 +104,12 @@ public class PdfLtvTests
         Assert.True(stamped.Length > original.Length);
         Assert.True(stamped.AsSpan(0, original.Length).SequenceEqual(original));
 
-        var reader = DocumentReader.Parse(stamped);
-        var signature = SignatureValue(reader, 0);
-        Assert.Equal("DocTimeStamp", ((NameObject)signature["Type"]).Value);
-        Assert.Equal("Adobe.PPKLite", ((NameObject)signature["Filter"]).Value);
-        Assert.Equal("ETSI.RFC3161", ((NameObject)signature["SubFilter"]).Value);
-        Assert.Equal("Sig", ((NameObject)Field(reader, 0)["FT"]).Value);
+        var emission = Emitted(stamped);
+        var signature = SignatureOf(emission, "Signature1");
+        Carries("time stamp", "/Type /DocTimeStamp", signature);
+        Carries("time stamp", "/Filter /Adobe.PPKLite", signature);
+        Carries("time stamp", "/SubFilter /ETSI.RFC3161", signature);
+        Carries("time stamp field", "/FT /Sig", Line(emission, "/T (Signature1)"));
     }
 
     [Fact]
@@ -130,8 +120,7 @@ public class PdfLtvTests
         var provider = new RecordingTimestampProvider(token);
 
         var stamped = PdfTimestamper.Timestamp(original, provider);
-        var reader = DocumentReader.Parse(stamped);
-        var (gapStart, gapEnd, tail) = ByteRange(reader, SignatureValue(reader, 0));
+        var (gapStart, gapEnd, tail) = ByteRange(Emitted(stamped), "Signature1");
 
         Assert.Equal(stamped.Length, gapEnd + tail);
 
@@ -179,23 +168,20 @@ public class PdfLtvTests
 
         Assert.True(ltv.AsSpan(0, signed.Length).SequenceEqual(signed));
 
-        var reader = DocumentReader.Parse(ltv);
-        var dss = Dss(reader);
+        var emission = Emitted(ltv);
+        var dss = Line(emission, "/Type /DSS");
 
-        var certs = StreamBytes(reader, dss, "Certs");
-        Assert.Equal(2, certs.Length);
-        Assert.True(certs[0].SequenceEqual(cert1));
-        Assert.True(certs[1].SequenceEqual(cert2));
+        var certs = References("DSS", "Certs", 2, dss);
+        CarriesStream("certificate 1", emission, certs[0], cert1);
+        CarriesStream("certificate 2", emission, certs[1], cert2);
 
-        var ocsps = StreamBytes(reader, dss, "OCSPs");
-        Assert.Single(ocsps);
-        Assert.True(ocsps[0].SequenceEqual(ocsp));
+        var ocsps = References("DSS", "OCSPs", 1, dss);
+        CarriesStream("OCSP response", emission, ocsps[0], ocsp);
 
-        var crls = StreamBytes(reader, dss, "CRLs");
-        Assert.Single(crls);
-        Assert.True(crls[0].SequenceEqual(crl));
+        var crls = References("DSS", "CRLs", 1, dss);
+        CarriesStream("CRL", emission, crls[0], crl);
 
-        Assert.False(dss.ContainsKey("VRI"));
+        Lacks("DSS", "/VRI", dss);
     }
 
     [Fact]
@@ -203,24 +189,20 @@ public class PdfLtvTests
     {
         var signed = SignFixed(BuildPdf(), Enumerable.Range(0, 200).Select(i => (byte)i).ToArray());
 
-        var signedReader = DocumentReader.Parse(signed);
-        var (gapStart, gapEnd, _) = ByteRange(signedReader, SignatureValue(signedReader, 0));
+        var (gapStart, gapEnd, _) = ByteRange(Emitted(signed), "Signature1");
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
 
         var cert = Enumerable.Range(0, 40).Select(i => (byte)i).ToArray();
         var ltv = DssBuilder.AddValidationData(signed, [cert], null, null, contents);
 
-        var reader = DocumentReader.Parse(ltv);
-        var dss = Dss(reader);
-        var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
+        var emission = Emitted(ltv);
+        var dss = Line(emission, "/Type /DSS");
 
         var expectedKey = Convert.ToHexString(SHA1.HashData(contents));
-        Assert.Contains(expectedKey, vri.Keys);
+        Carries("DSS /VRI", $"/{expectedKey} << /Type /VRI ", dss);
 
-        var entry = (DictionaryObject)reader.Resolve(vri[expectedKey]);
-        var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
-        Assert.Single(vriCerts);
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(cert));
+        var vriCerts = References("VRI entry", "Cert", 1, dss);
+        CarriesStream("VRI certificate", emission, vriCerts[0], cert);
     }
 
     [Fact]
@@ -230,28 +212,25 @@ public class PdfLtvTests
         var cert1 = Enumerable.Range(0, 40).Select(i => (byte)(i + 1)).ToArray();
         var cert2 = Enumerable.Range(0, 44).Select(i => (byte)(i + 9)).ToArray();
 
-        var contentsReader = DocumentReader.Parse(signed);
-        var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
+        var (gapStart, gapEnd, _) = ByteRange(Emitted(signed), "Signature1");
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
 
         var first = DssBuilder.AddValidationData(signed, [cert1], null, null, contents);
         var second = DssBuilder.AddValidationData(first, [cert2], null, null, contents);
 
-        var reader = DocumentReader.Parse(second);
-        var dss = Dss(reader);
+        var emission = Emitted(second);
 
-        var certs = StreamBytes(reader, dss, "Certs");
-        Assert.Equal(2, certs.Length);
-        Assert.True(certs[0].SequenceEqual(cert1));
-        Assert.True(certs[1].SequenceEqual(cert2));
+        var certs = References("DSS", "Certs", 2, emission);
+        CarriesStream("certificate 1", emission, certs[0], cert1);
+        CarriesStream("certificate 2", emission, certs[1], cert2);
 
-        var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
+        var dss = Line(emission, $"/Certs [{certs[0]} 0 R {certs[1]} 0 R]");
         var key = Convert.ToHexString(SHA1.HashData(contents));
-        var entry = (DictionaryObject)reader.Resolve(vri[key]);
-        var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
-        Assert.Equal(2, vriCerts.Count);
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(cert1));
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[1])).SequenceEqual(cert2));
+        Carries("merged DSS /VRI", $"/{key} << /Type /VRI ", dss);
+
+        var vriCerts = References("VRI entry", "Cert", 2, dss);
+        CarriesStream("VRI certificate 1", emission, vriCerts[0], cert1);
+        CarriesStream("VRI certificate 2", emission, vriCerts[1], cert2);
     }
 
     [Fact]
@@ -261,26 +240,22 @@ public class PdfLtvTests
         var certA = Enumerable.Range(0, 40).Select(i => (byte)(i + 1)).ToArray();
         var crlB = Enumerable.Range(0, 50).Select(i => (byte)(i + 2)).ToArray();
 
-        var contentsReader = DocumentReader.Parse(signed);
-        var (gapStart, gapEnd, _) = ByteRange(contentsReader, SignatureValue(contentsReader, 0));
+        var (gapStart, gapEnd, _) = ByteRange(Emitted(signed), "Signature1");
         var contents = DecodeContentsHex(signed, gapStart, gapEnd);
 
         var first = DssBuilder.AddValidationData(signed, [certA], null, null, contents);
         var second = DssBuilder.AddValidationData(first, null, null, [crlB], contents);
 
-        var reader = DocumentReader.Parse(second);
-        var dss = Dss(reader);
-        var vri = (DictionaryObject)reader.Resolve(dss["VRI"]);
+        var emission = Emitted(second);
+        var dss = Line(emission, "/CRLs [");
         var key = Convert.ToHexString(SHA1.HashData(contents));
-        var entry = (DictionaryObject)reader.Resolve(vri[key]);
+        Carries("merged DSS /VRI", $"/{key} << /Type /VRI ", dss);
 
-        var vriCerts = (ArrayObject)reader.Resolve(entry["Cert"]);
-        Assert.Single(vriCerts);
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCerts[0])).SequenceEqual(certA));
+        var vriCerts = References("VRI entry", "Cert", 1, dss);
+        CarriesStream("VRI certificate", emission, vriCerts[0], certA);
 
-        var vriCrls = (ArrayObject)reader.Resolve(entry["CRL"]);
-        Assert.Single(vriCrls);
-        Assert.True(reader.DecodeStream((StreamObject)reader.Resolve(vriCrls[0])).SequenceEqual(crlB));
+        var vriCrls = References("VRI entry", "CRL", 1, dss);
+        CarriesStream("VRI CRL", emission, vriCrls[0], crlB);
     }
 
     [Fact]
@@ -292,10 +267,12 @@ public class PdfLtvTests
         var first = DssBuilder.AddValidationData(signed, [cert], null, null);
         var second = DssBuilder.AddValidationData(first, [cert], null, null);
 
-        var reader = DocumentReader.Parse(second);
-        var certs = StreamBytes(reader, Dss(reader), "Certs");
-        Assert.Single(certs);
-        Assert.True(certs[0].SequenceEqual(cert));
+        var emission = Emitted(second);
+        var certs = References("DSS", "Certs", 1, Line(emission, "/Type /DSS"));
+        CarriesStream("certificate", emission, certs[0], cert);
+
+        var copies = BuildTestSupport.CountOccurrences(emission, StreamPayload(cert));
+        Assert.True(copies == 1, $"Expected the certificate stream once in the emission, found {copies}.");
     }
 
     [Fact]
@@ -307,10 +284,8 @@ public class PdfLtvTests
 
         var augmented = DssBuilder.AddValidationData(withDss, [Enumerable.Range(0, 10).Select(i => (byte)i).ToArray()], null, null);
 
-        var augmentedReader = DocumentReader.Parse(augmented);
-        var dss = Dss(augmentedReader);
-        Assert.True(dss.ContainsKey("TU"));
-        Assert.Equal(7, ((NumberObject)augmentedReader.Resolve(dss["TU"])).IntValue);
+        var dss = Line(Emitted(augmented), "/Certs [");
+        Assert.Equal(7, NumberIn(dss, "TU"));
     }
 
     private static byte[] InjectDssWithCustomKey(byte[] pdf)
@@ -371,15 +346,14 @@ public class PdfLtvTests
         var lta = PdfTimestamper.Timestamp(ltv, new RecordingTimestampProvider(token));
         Assert.True(lta.AsSpan(0, ltv.Length).SequenceEqual(ltv));
 
-        var reader = DocumentReader.Parse(lta);
+        var emission = Emitted(lta);
 
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]);
-        Assert.Equal(2, fields.Count);
-        Assert.Equal("adbe.pkcs7.detached", ((NameObject)SignatureValue(reader, 0)["SubFilter"]).Value);
-        Assert.Equal("ETSI.RFC3161", ((NameObject)SignatureValue(reader, 1)["SubFilter"]).Value);
-        Assert.True(Dss(reader).ContainsKey("Certs"));
+        References("AcroForm", "Fields", 2, emission);
+        Carries("approval signature", "/SubFilter /adbe.pkcs7.detached", SignatureOf(emission, "Signature1"));
+        Carries("time stamp", "/SubFilter /ETSI.RFC3161", SignatureOf(emission, "Signature2"));
+        Carries("DSS", "/Certs [", Line(emission, "/Type /DSS"));
 
-        var (_, gapEnd, tail) = ByteRange(reader, SignatureValue(reader, 0));
+        var (_, gapEnd, tail) = ByteRange(emission, "Signature1");
         Assert.Equal(signed.Length, gapEnd + tail);
     }
 

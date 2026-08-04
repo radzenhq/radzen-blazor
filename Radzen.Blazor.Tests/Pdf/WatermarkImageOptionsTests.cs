@@ -1,18 +1,19 @@
 #nullable enable
 using System;
-using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class WatermarkImageOptionsTests
 {
-    private static byte[] Build(bool sectionWatermark, Watermark watermark)
+    private static string Build(bool sectionWatermark, Watermark watermark)
     {
         var document = new Document();
         var section = document.Sections.Add();
@@ -22,19 +23,23 @@ public class WatermarkImageOptionsTests
         if (sectionWatermark)
         {
             section.Watermark = watermark;
-            return new DocumentRenderer().ToArray(document);
+            return Encoding.Latin1.GetString(new DocumentRenderer().ToArray(document));
         }
 
         var pdf = new DocumentRenderer().Render(document);
         pdf.AddWatermark(watermark);
-        return pdf.ToArray();
+        return Emit(pdf);
     }
 
-    private static string Content(DocumentReader reader)
+    private static double[] PageFillAlphas(string emission)
     {
-        var page = Assert.Single(PdfPageContentTestHelper.PageLeaves(reader, assertStructure: true)).Page;
-        return Encoding.ASCII.GetString(PdfPageContentTestHelper.Content(
-            reader, page, assertStreams: true, appendSeparatorAfterEveryStream: false));
+        var states = Shaped(
+            "page /Resources /ExtGState",
+            @"/ExtGState << ((?:/\S+ << [^>]*>> )+)>>",
+            Line(emission, "/Type /Page "));
+
+        return [.. Regex.Matches(states.Groups[1].Value, @"/ca (-?[\d.]+)")
+            .Select(match => double.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture))];
     }
 
     [Theory]
@@ -46,16 +51,11 @@ public class WatermarkImageOptionsTests
         var image = watermark.SetImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.Opacity = 0.4;
 
-        var reader = DocumentReader.Parse(Build(sectionWatermark, watermark));
-        var page = Assert.Single(PdfPageContentTestHelper.PageLeaves(reader, assertStructure: true));
-        var states = reader.GetDictionary(page.Resources!, "ExtGState");
+        var alphas = PageFillAlphas(Build(sectionWatermark, watermark));
 
-        Assert.NotNull(states);
-        Assert.Contains(states!.Keys, key =>
-            reader.AsDictionary(states[key]) is { } state
-            && state.TryGetValue("ca", out var alphaValue)
-            && reader.Resolve(alphaValue!) is NumberObject alpha
-            && Math.Abs(alpha.DoubleValue - 0.2) < 0.000001);
+        Assert.True(
+            alphas.Any(alpha => Math.Abs(alpha - 0.2) < 0.000001),
+            $"No page ExtGState carries a /ca of 0.2. Fill alphas: {string.Join(", ", alphas)}");
     }
 
     [Fact]

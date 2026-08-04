@@ -1,12 +1,14 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,6 +19,9 @@ public class PdfUaArtifactTests
 
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
+
+    private static string Emitted(Document document, DocumentRenderer renderer)
+        => Encoding.Latin1.GetString(renderer.ToArray(document));
 
     private static (Document Document, DocumentRenderer Renderer) AuthorBanded(bool ua, PdfAConformance conformance = PdfAConformance.None)
     {
@@ -181,11 +186,7 @@ public class PdfUaArtifactTests
         var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
-        var types = new List<string>();
-        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
-
-        Assert.DoesNotContain("Figure", types);
+        Lacks("emission", "/S /Figure", Emitted(document, builderRenderer));
     }
 
     [Theory]
@@ -237,13 +238,9 @@ public class PdfUaArtifactTests
         var image = document.Sections.Add().Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.AlternateText = "";
 
-        var reader = BuildTestSupport.Read(
-            document,
-            new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
-        var types = new List<string>();
-        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
+        var emission = Emitted(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
-        Assert.DoesNotContain("Figure", types);
+        Lacks("emission", "/S /Figure", emission);
     }
 
     [Fact]
@@ -289,14 +286,12 @@ public class PdfUaArtifactTests
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
-        var types = new List<string>();
-        StructureTestHelpers.CollectTypes(reader, StructureTestHelpers.RootKids(reader), types);
+        var emission = Emitted(document, builderRenderer);
 
-        Assert.Contains("L", types);
-        Assert.Contains("LI", types);
-        Assert.Contains("Lbl", types);
-        Assert.Contains("LBody", types);
+        Shaped("structure tree", @"/S /L[^A-Za-z]", emission);
+        Shaped("structure tree", @"/S /LI[^A-Za-z]", emission);
+        Shaped("structure tree", @"/S /Lbl[^A-Za-z]", emission);
+        Shaped("structure tree", @"/S /LBody[^A-Za-z]", emission);
     }
 
     [Fact]

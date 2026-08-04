@@ -1,12 +1,10 @@
 #nullable enable
-using System;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,13 +29,14 @@ public class GradientEmissionTests
         Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(content, "cs"));
         Assert.Contains("scn", ContentOperationTestHelpers.Operators(content));
 
-        var reader = BuildTestSupport.Read(document);
-        var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
-        var patterns = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Pattern"]!));
-        var pattern = Assert.IsType<DictionaryObject>(reader.Resolve(patterns[Assert.Single(patterns.Keys)]));
-        Assert.Equal(2, ((NumberObject)pattern["PatternType"]).IntValue);
-        var shading = Assert.IsType<DictionaryObject>(reader.Resolve(pattern["Shading"]!));
-        Assert.Equal(2, ((NumberObject)shading["ShadingType"]).IntValue);
+        var emission = Emit(new DocumentRenderer().Render(document));
+        var page = Line(emission, "/Type /Page ");
+        var pattern = IndirectObject(
+            emission,
+            Shaped("page", @"/Pattern << /\w+ (\d+) 0 R >>", page).Groups[1].Value);
+
+        Assert.Equal(2, NumberIn(pattern, "PatternType"));
+        Assert.Equal(2, NumberIn(pattern, "ShadingType"));
     }
 
     [Fact]
@@ -59,16 +58,20 @@ public class GradientEmissionTests
         path.Close();
         page.Content.Add(path);
 
-        var reader = ContentTestHelpers.Reload(document);
-        var content = ContentTestHelpers.PageContent(reader, 0);
-        Assert.Contains("Pattern", ContentOperationTestHelpers.ResourceNames(content, "cs"));
-        Assert.Contains("scn", ContentOperationTestHelpers.Operators(content));
+        var emission = Emit(document);
+        var node = Line(emission, "/Type /Page ");
+        var content = IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", node).Groups[1].Value);
 
-        var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
-        var patterns = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Pattern"]!));
-        var pattern = Assert.IsType<DictionaryObject>(reader.Resolve(patterns[Assert.Single(patterns.Keys)]));
-        var shading = Assert.IsType<DictionaryObject>(reader.Resolve(pattern["Shading"]!));
-        Assert.Equal(3, ((NumberObject)shading["ShadingType"]).IntValue);
+        Carries("page content", "/Pattern cs", content);
+        Shaped("page content", @"/\w+ scn", content);
+
+        var pattern = IndirectObject(
+            emission,
+            Shaped("page", @"/Pattern << /\w+ (\d+) 0 R >>", node).Groups[1].Value);
+
+        Assert.Equal(3, NumberIn(pattern, "ShadingType"));
     }
 
     [Fact]

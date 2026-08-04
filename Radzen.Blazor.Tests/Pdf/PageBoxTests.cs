@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -36,12 +37,11 @@ public class PageBoxTests
     [Fact]
     public void Setters_WriteBoxesToPageNode()
     {
-        var reader = DocumentReader.Parse(WithBoxes().ToArray());
-        var page = ContentTestHelpers.Kid(reader, 0);
+        var page = Line(Emit(WithBoxes()), "/Type /Page ");
 
-        Assert.Equal(new[] { 10.0, 10, 585, 831 }, Box(reader, page, "BleedBox"));
-        Assert.Equal(new[] { 20.0, 20, 575, 821 }, Box(reader, page, "TrimBox"));
-        Assert.Equal(new[] { 30.0, 30, 565, 811 }, Box(reader, page, "ArtBox"));
+        Carries("page node", "/BleedBox [10 10 585 831]", page);
+        Carries("page node", "/TrimBox [20 20 575 821]", page);
+        Carries("page node", "/ArtBox [30 30 565 811]", page);
     }
 
     [Fact]
@@ -82,10 +82,11 @@ public class PageBoxTests
 
         var bytes = Plain().ToArray();
         Assert.Equal(bytes, Plain().ToArray());
-        var page = ContentTestHelpers.Kid(DocumentReader.Parse(bytes), 0);
-        Assert.False(page.ContainsKey("BleedBox"));
-        Assert.False(page.ContainsKey("TrimBox"));
-        Assert.False(page.ContainsKey("ArtBox"));
+
+        var page = Line(Encoding.Latin1.GetString(bytes), "/Type /Page ");
+        Lacks("page node", "/BleedBox", page);
+        Lacks("page node", "/TrimBox", page);
+        Lacks("page node", "/ArtBox", page);
     }
 
     [Fact]

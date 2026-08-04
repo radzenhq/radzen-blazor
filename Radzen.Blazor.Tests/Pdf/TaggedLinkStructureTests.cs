@@ -1,16 +1,69 @@
 #nullable enable
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TaggedLinkStructureTests
 {
     private static DocumentRenderer Accessible() => new() { Accessibility = PdfUaConformance.PdfUa1 };
+
+    private static string Rendered(Document document, DocumentRenderer? renderer = null)
+        => Encoding.Latin1.GetString((renderer ?? new DocumentRenderer()).ToArray(document));
+
+    private static string Element(string type) => $"/Type /StructElem /S /{type} /P ";
+
+    private static string ElementNumber(string emission, string type)
+        => Shaped(
+            $"{type} element",
+            $@"(\d+) 0 obj\n<< {Regex.Escape(Element(type))}",
+            emission).Groups[1].Value;
+
+    private static string StructureRoot(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
+
+    private static string Kids(string subject, string element)
+        => Shaped(subject, @"/K \[([^\]]*)\]", element).Groups[1].Value;
+
+    private static string[] ChildElements(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, "<< [^>]*>>", " "), @"(\d+) 0 R")
+            .Select(match => match.Groups[1].Value)];
+
+    private static string[] ObjectReferences(string kids)
+        => [.. Regex.Matches(kids, @"<< /Type /OBJR /Pg \d+ 0 R /Obj (\d+) 0 R >>")
+            .Select(match => match.Groups[1].Value)];
+
+    private static int[] Mcids(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, @"<< [^>]*>>|\d+ 0 R", " "), @"\d+")
+            .Select(match => int.Parse(match.Value, CultureInfo.InvariantCulture))];
+
+    private static string ParentTreeOwner(string emission, string structureRoot, int key)
+    {
+        var tree = IndirectObject(
+            emission,
+            Shaped("structure root", @"/ParentTree (\d+) 0 R", structureRoot).Groups[1].Value);
+        var nums = Shaped("parent tree", @"/Nums \[([^\]]*)\]", tree).Groups[1].Value;
+
+        foreach (Match pair in Regex.Matches(nums, @"(\d+) (\d+) 0 R"))
+        {
+            if (int.Parse(pair.Groups[1].Value, CultureInfo.InvariantCulture) == key)
+            {
+                return pair.Groups[2].Value;
+            }
+        }
+
+        Assert.Fail($"The parent tree has no entry {key}.\nparent tree:\n{Excerpt(nums)}");
+        return string.Empty;
+    }
 
     private static Document Authored(string? uri, string? anchor)
     {
@@ -37,67 +90,47 @@ public class TaggedLinkStructureTests
         return document;
     }
 
-    private static List<DictionaryObject> Annotations(DocumentReader reader, int pageIndex)
-    {
-        var page = BuildTestSupport.PageLeaves(reader)[pageIndex].Page;
-        var annotations = new List<DictionaryObject>();
-        if (page.TryGetValue("Annots", out var annots) && reader.Resolve(annots!) is ArrayObject array)
-        {
-            foreach (var item in array)
-            {
-                annotations.Add(Assert.IsType<DictionaryObject>(reader.Resolve(item)));
-            }
-        }
-
-        return annotations;
-    }
-
     [Fact]
     public void UriLink_CarriesItsVisibleTextAsContents()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
-        var annotation = Assert.Single(Annotations(reader, 0));
+        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
-        Assert.True(annotation.TryGetValue("Contents", out var contents), "the link carries /Contents");
-        Assert.Equal("Radzen", Assert.IsType<StringObject>(reader.Resolve(contents!)).Value);
+        Carries($"link annotation {annotation} 0 R", "/Contents (Radzen)", IndirectObject(emission, annotation));
     }
 
     [Fact]
     public void AnchorLink_CarriesItsVisibleTextAsContents()
     {
-        var reader = BuildTestSupport.Read(Authored(null, "target"), Accessible());
-        var annotation = Assert.Single(Annotations(reader, 0));
+        var emission = Rendered(Authored(null, "target"), Accessible());
+        var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
-        Assert.True(annotation.TryGetValue("Contents", out var contents), "the link carries /Contents");
-        Assert.Equal("Radzen", Assert.IsType<StringObject>(reader.Resolve(contents!)).Value);
+        Carries($"link annotation {annotation} 0 R", "/Contents (Radzen)", IndirectObject(emission, annotation));
     }
 
     [Fact]
     public void UntaggedUriLink_CarriesNoContents()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null));
-        var annotation = Assert.Single(Annotations(reader, 0));
+        var emission = Rendered(Authored("https://www.radzen.com", null));
+        var annotation = References("page", "Annots", 1, Line(emission, "/Type /Page "))[0];
 
-        Assert.False(annotation.ContainsKey("Contents"), "untagged output leaves /Contents out");
+        Lacks($"link annotation {annotation} 0 R", "/Contents", IndirectObject(emission, annotation));
     }
 
     [Fact]
     public void TaggedAnnotatedPage_DeclaresStructureTabOrder()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
-        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
 
-        Assert.True(page.TryGetValue("Tabs", out var tabs), "the page carries /Tabs");
-        Assert.Equal("S", Assert.IsType<NameObject>(reader.Resolve(tabs!)).Value);
+        Carries("page", "/Tabs /S", Line(emission, "/Type /Page "));
     }
 
     [Fact]
     public void UntaggedAnnotatedPage_DeclaresNoTabOrder()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null));
-        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+        var emission = Rendered(Authored("https://www.radzen.com", null));
 
-        Assert.False(page.ContainsKey("Tabs"), "untagged output leaves /Tabs out");
+        Lacks("page", "/Tabs", Line(emission, "/Type /Page "));
     }
 
     [Fact]
@@ -108,21 +141,20 @@ public class TaggedLinkStructureTests
         BuildTestSupport.RegisterLatin(document);
         BuildTestSupport.AddText(document.Sections.Add(), "Plain body", BuildTestSupport.Latin);
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var page = BuildTestSupport.PageLeaves(reader)[0].Page;
+        var emission = Rendered(document, Accessible());
 
-        Assert.False(page.ContainsKey("Tabs"), "a page without annotations leaves /Tabs out");
+        Lacks("page", "/Tabs", Line(emission, "/Type /Page "));
     }
 
     [Fact]
     public void UriLink_IsALinkElementInsideItsParagraph()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var paragraph = Line(emission, Element("P"));
 
-        var paragraph = TaggedStructureProbe.Single(root, "P");
-        var link = Assert.Single(paragraph.Children);
-        Assert.Equal("Link", link.Type);
+        var child = Assert.Single(ChildElements(Kids("paragraph element", paragraph)));
+
+        Carries($"paragraph child {child} 0 R", Element("Link"), IndirectObject(emission, child));
     }
 
     [Fact]
@@ -156,32 +188,33 @@ public class TaggedLinkStructureTests
     [Fact]
     public void UriLink_AnnotationIsReachedByObjrAndPointsBackThroughStructParent()
     {
-        var reader = BuildTestSupport.Read(Authored("https://www.radzen.com", null), Accessible());
-        var structRoot = TaggedStructureProbe.StructRoot(reader);
-        var link = TaggedStructureProbe.Single(TaggedStructureProbe.Root(reader), "Link");
+        var emission = Rendered(Authored("https://www.radzen.com", null), Accessible());
+        var linkNumber = ElementNumber(emission, "Link");
+        var objectReferences = ObjectReferences(Kids("link element", IndirectObject(emission, linkNumber)));
 
-        var objr = Assert.Single(link.ObjectReferences);
-        var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(objr["Obj"]!));
-        Assert.Equal("Link", BuildTestSupport.Name(reader, annotation, "Subtype"));
+        var referenced = Assert.Single(objectReferences);
+        var annotation = IndirectObject(emission, referenced);
+        Carries($"annotation {referenced} 0 R", "/Subtype /Link", annotation);
 
-        var referenced = Assert.Single(Annotations(reader, 0));
-        Assert.Same(referenced, annotation);
+        var annots = References("page", "Annots", 1, Line(emission, "/Type /Page "));
+        Assert.True(
+            annots[0] == referenced,
+            $"The page carries annotation {annots[0]} 0 R but the OBJR points at {referenced} 0 R.");
 
-        Assert.True(annotation.TryGetValue("StructParent", out var key), "the annotation carries /StructParent");
-        var structParent = Assert.IsType<NumberObject>(reader.Resolve(key!)).IntValue;
-        var owner = Assert.IsType<DictionaryObject>(
-            TaggedStructureProbe.ParentTreeEntry(reader, structRoot, structParent));
-        Assert.Same(link.Dict, owner);
+        var owner = ParentTreeOwner(emission, StructureRoot(emission), NumberIn(annotation, "StructParent"));
+        Assert.True(
+            owner == linkNumber,
+            $"The parent tree maps /StructParent to {owner} 0 R, not the link element {linkNumber} 0 R.");
     }
 
     [Fact]
     public void AnchorLink_IsAlsoWiredIntoTheStructureTree()
     {
-        var reader = BuildTestSupport.Read(Authored(null, "target"), Accessible());
-        var link = TaggedStructureProbe.Single(TaggedStructureProbe.Root(reader), "Link");
+        var emission = Rendered(Authored(null, "target"), Accessible());
+        var kids = Kids("link element", IndirectObject(emission, ElementNumber(emission, "Link")));
 
-        Assert.Single(link.ObjectReferences);
-        Assert.NotEmpty(link.Mcids);
+        Assert.Single(ObjectReferences(kids));
+        Assert.NotEmpty(Mcids(kids));
     }
 
     [Fact]
@@ -218,32 +251,43 @@ public class TaggedLinkStructureTests
             run.Anchor = anchor;
         }
 
-        var reader = BuildTestSupport.Read(document, Accessible());
-        var structRoot = TaggedStructureProbe.StructRoot(reader);
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(document, Accessible());
+        var structureRoot = StructureRoot(emission);
+        var navigation = IndirectObject(emission, ElementNumber(emission, "TOC"));
+        var entries = ChildElements(Kids("TOC element", navigation));
 
-        var navigation = TaggedStructureProbe.Single(root, "TOC");
-        Assert.Equal(2, navigation.Children.Count);
-        foreach (var entry in navigation.Children)
+        Assert.True(entries.Length == 2, $"Expected 2 TOCI entries, found {entries.Length}.");
+
+        foreach (var entryNumber in entries)
         {
-            Assert.Equal("TOCI", entry.Type);
-            var reference = Assert.Single(entry.Children);
-            Assert.Equal("Reference", reference.Type);
-            var link = Assert.Single(reference.Children);
-            Assert.Equal("Link", link.Type);
-            Assert.NotEmpty(link.Mcids);
+            var entry = IndirectObject(emission, entryNumber);
+            Carries($"TOC entry {entryNumber} 0 R", Element("TOCI"), entry);
 
-            foreach (var objr in link.ObjectReferences)
+            var referenceNumber = Assert.Single(ChildElements(Kids($"TOC entry {entryNumber} 0 R", entry)));
+            var reference = IndirectObject(emission, referenceNumber);
+            Carries($"reference {referenceNumber} 0 R", Element("Reference"), reference);
+
+            var linkNumber = Assert.Single(ChildElements(Kids($"reference {referenceNumber} 0 R", reference)));
+            var link = IndirectObject(emission, linkNumber);
+            Carries($"link {linkNumber} 0 R", Element("Link"), link);
+
+            var kids = Kids($"link {linkNumber} 0 R", link);
+            Assert.NotEmpty(Mcids(kids));
+
+            var objectReferences = ObjectReferences(kids);
+            Assert.True(
+                objectReferences.Length == 2,
+                $"Expected the link element {linkNumber} 0 R to carry 2 OBJRs, found {objectReferences.Length}.");
+
+            foreach (var annotationNumber in objectReferences)
             {
-                var annotation = Assert.IsType<DictionaryObject>(reader.Resolve(objr["Obj"]!));
-                Assert.True(annotation.TryGetValue("StructParent", out var key), "the annotation carries /StructParent");
-                var structParent = Assert.IsType<NumberObject>(reader.Resolve(key!)).IntValue;
-                Assert.Same(
-                    link.Dict,
-                    Assert.IsType<DictionaryObject>(TaggedStructureProbe.ParentTreeEntry(reader, structRoot, structParent)));
+                var annotation = IndirectObject(emission, annotationNumber);
+                var owner = ParentTreeOwner(emission, structureRoot, NumberIn(annotation, "StructParent"));
+                Assert.True(
+                    owner == linkNumber,
+                    $"The parent tree maps annotation {annotationNumber} 0 R to {owner} 0 R,"
+                    + $" not the link element {linkNumber} 0 R.");
             }
-
-            Assert.Equal(2, link.ObjectReferences.Count);
         }
     }
 }

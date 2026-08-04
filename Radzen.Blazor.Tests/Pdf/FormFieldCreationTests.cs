@@ -10,6 +10,7 @@ using Radzen.Documents.Fonts;
 using Radzen.Documents.Pdf.Signing;
 using System.Security.Cryptography.Pkcs;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -48,13 +49,6 @@ public class FormFieldCreationTests
 
     private static DocumentReader Reload(PortableDocument document)
         => DocumentReader.Parse(document.ToArray());
-
-    private static double[] RectOf(DocumentReader reader, DictionaryObject widget)
-    {
-        Assert.True(widget.TryGetValue("Rect", out var rectObject));
-        var rect = Assert.IsType<ArrayObject>(reader.Resolve(rectObject!));
-        return [.. rect.Select(entry => ((NumberObject)reader.Resolve(entry)).DoubleValue)];
-    }
 
     private static string AllPageContent(DocumentReader reader)
     {
@@ -98,64 +92,56 @@ public class FormFieldCreationTests
     [Fact]
     public void CreatedFieldsSaveIntoAcroFormFields()
     {
-        var reader = Reload(WithFields());
-        var form = FormTestSupport.AcroForm(reader);
+        var emission = Emit(WithFields());
 
-        Assert.True(form.TryGetValue("Fields", out var fieldsObject));
-        var fields = Assert.IsType<ArrayObject>(reader.Resolve(fieldsObject!));
-        Assert.Equal(2, fields.Count);
+        References("AcroForm", "Fields", 2, AcroForm(emission));
 
-        var name = FormTestSupport.Field(reader, "Name");
-        Assert.Equal("Tx", FormTestSupport.NameValue(reader, name, "FT"));
-        Assert.Equal([100, 700, 350, 720], RectOf(reader, name));
-        var value = Assert.IsType<StringObject>(reader.Resolve(name["V"]));
-        Assert.Equal("Radzen Ltd", value.Value);
+        var name = Line(emission, "/T (Name)");
+        Carries("Name field", "/FT /Tx", name);
+        Carries("Name field", "/Rect [100 700 350 720]", name);
+        Carries("Name field", "/V (Radzen Ltd)", name);
 
-        var agree = FormTestSupport.Field(reader, "Agree");
-        Assert.Equal("Btn", FormTestSupport.NameValue(reader, agree, "FT"));
-        Assert.Equal([100, 660, 118, 678], RectOf(reader, agree));
-        Assert.Equal("Yes", FormTestSupport.NameValue(reader, agree, "V"));
-        Assert.Equal("Yes", FormTestSupport.NameValue(reader, agree, "AS"));
+        var agree = Line(emission, "/T (Agree)");
+        Carries("Agree field", "/FT /Btn", agree);
+        Carries("Agree field", "/Rect [100 660 118 678]", agree);
+        Carries("Agree field", "/V /Yes", agree);
+        Carries("Agree field", "/AS /Yes", agree);
+    }
+
+    private static string AcroForm(string emission)
+    {
+        var catalog = Line(emission, "/Type /Catalog");
+        return IndirectObject(emission, Shaped("catalog", @"/AcroForm (\d+) 0 R", catalog).Groups[1].Value);
     }
 
     [Fact]
     public void CreatedFormCarriesDefaultResourcesAndAppearances()
     {
-        var reader = Reload(WithFields());
-        var form = FormTestSupport.AcroForm(reader);
+        var emission = Emit(WithFields());
+        var form = AcroForm(emission);
 
-        var da = Assert.IsType<StringObject>(reader.Resolve(form["DA"]));
-        Assert.Contains("Tf", da.Value);
+        Shaped("AcroForm /DA", @"/DA \([^)]*Tf[^)]*\)", form);
+        Carries("AcroForm /DR", "/DR << /Font << /Helv ", form);
 
-        var dr = Assert.IsType<DictionaryObject>(reader.Resolve(form["DR"]));
-        var fonts = Assert.IsType<DictionaryObject>(reader.Resolve(dr["Font"]));
-        Assert.True(fonts.ContainsKey("Helv"));
+        var name = Line(emission, "/T (Name)");
+        Shaped("Name field /DA", @"/DA \([^)]*12 Tf[^)]*\)", name);
 
-        var name = FormTestSupport.Field(reader, "Name");
-        var fieldDa = Assert.IsType<StringObject>(reader.Resolve(name["DA"]));
-        Assert.Contains("12 Tf", fieldDa.Value);
-        Assert.Contains("Radzen Ltd", FormTestSupport.NormalAppearanceText(reader, name));
+        var appearance = Shaped("Name field", @"/AP << /N (\d+) 0 R >>", name);
+        Carries("Name field appearance", "(Radzen Ltd)", IndirectObject(emission, appearance.Groups[1].Value));
 
-        var agree = FormTestSupport.Field(reader, "Agree");
-        var ap = Assert.IsType<DictionaryObject>(reader.Resolve(agree["AP"]));
-        var states = Assert.IsType<DictionaryObject>(reader.Resolve(ap["N"]));
-        Assert.True(states.ContainsKey("Yes"));
-        Assert.True(states.ContainsKey("Off"));
+        var agree = Line(emission, "/T (Agree)");
+        Shaped("Agree field", @"/AP << /N << /Yes \d+ 0 R /Off \d+ 0 R >> >>", agree);
     }
 
     [Fact]
     public void CreatedWidgetsLandOnTheirPageAnnots()
     {
-        var reader = Reload(WithFields());
-        var page = FormTestSupport.FirstPage(reader);
+        var emission = Emit(WithFields());
 
-        Assert.True(page.TryGetValue("Annots", out var annotsObject));
-        var annots = Assert.IsType<ArrayObject>(reader.Resolve(annotsObject!));
-        var widgets = annots
-            .Select(entry => (DictionaryObject)reader.Resolve(entry))
-            .Where(annot => FormTestSupport.NameValue(reader, annot, "Subtype") == "Widget")
-            .ToList();
-        Assert.Equal(2, widgets.Count);
+        foreach (var number in References("page", "Annots", 2, Line(emission, "/Type /Page ")))
+        {
+            Carries($"page annotation {number} 0 R", "/Subtype /Widget", IndirectObject(emission, number));
+        }
     }
 
     [Fact]
@@ -209,9 +195,11 @@ public class FormFieldCreationTests
 
         Assert.Empty(document.FormFields);
 
-        var reader = Reload(document);
-        Assert.False(FormTestSupport.Catalog(reader).ContainsKey("AcroForm"));
-        Assert.Contains("Radzen Ltd", AllPageContent(reader));
+        var emission = Emit(document);
+        Lacks("catalog", "/AcroForm", Line(emission, "/Type /Catalog"));
+
+        var contents = References("page", "Contents", 2, Line(emission, "/Type /Page "));
+        Carries("flattened content", "(Radzen Ltd)", IndirectObject(emission, contents[1]));
     }
 
     [Fact]

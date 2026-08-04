@@ -1,24 +1,26 @@
 #nullable enable
 using System;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Content;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class BezierGeometryTests
 {
-    private static string Emit(Action<PathContent> build)
+    private static string Painted(Action<PathContent> build)
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
         var path = new PathContent { Stroke = true };
         build(path);
         page.Content.Add(path);
-        return Encoding.Latin1.GetString(
-            ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));
+
+        var emission = Emit(document);
+        var contents = Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page "));
+        return IndirectObject(emission, contents.Groups[1].Value);
     }
 
     [Fact]
@@ -30,8 +32,8 @@ public class BezierGeometryTests
     [Fact]
     public void AppendCircle_IsAppendEllipseWithEqualRadii()
     {
-        var circle = Emit(path => BezierGeometry.AppendCircle(path, 100, 120, 40));
-        var ellipse = Emit(path => BezierGeometry.AppendEllipse(path, 100, 120, 40, 40));
+        var circle = Painted(path => BezierGeometry.AppendCircle(path, 100, 120, 40));
+        var ellipse = Painted(path => BezierGeometry.AppendEllipse(path, 100, 120, 40, 40));
         Assert.Equal(ellipse, circle);
     }
 

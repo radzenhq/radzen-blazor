@@ -2,10 +2,12 @@
 
 using System;
 using System.IO;
+using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -30,34 +32,11 @@ public class GeneratedPageRedactionTests
         return new DocumentRenderer().Render(document);
     }
 
-    private static bool Contains(byte[] haystack, byte[] needle)
-    {
-        for (var i = 0; i + needle.Length <= haystack.Length; i++)
-        {
-            var match = true;
-            for (var j = 0; j < needle.Length; j++)
-            {
-                if (haystack[i + j] != needle[j])
-                {
-                    match = false;
-                    break;
-                }
-            }
-
-            if (match)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     [Fact]
     public void Redact_RegionOverImageOnGeneratedPage_RemovesImageBytesFromOutput()
     {
-        var jpeg = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        Assert.True(Contains(GeneratedImagePage().ToArray(), jpeg));
+        var jpeg = Encoding.Latin1.GetString(PdfTestResources.ReadAllBytes("Images/rgb.jpg"));
+        Carries("unredacted emission", jpeg, Emit(GeneratedImagePage()));
 
         var document = GeneratedImagePage();
         var page = document.Pages[0];
@@ -65,9 +44,10 @@ public class GeneratedPageRedactionTests
 
         page.Redact(new[] { whole }, new RedactionOptions { FillColor = Color.Black });
 
-        var redacted = document.ToArray();
-        Assert.False(Contains(redacted, jpeg));
-        using var buffer = new MemoryStream(redacted);
+        var redacted = Emit(document);
+        Lacks("redacted emission", jpeg, redacted);
+
+        using var buffer = new MemoryStream(Encoding.Latin1.GetBytes(redacted));
         PortableDocument.LoadFromStream(buffer);
     }
 

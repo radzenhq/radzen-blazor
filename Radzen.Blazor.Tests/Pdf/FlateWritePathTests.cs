@@ -1,11 +1,13 @@
 #nullable enable
 using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -138,12 +140,35 @@ public class FlateWritePathTests
         var document = new Document();
         var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
-        var reader = BuildTestSupport.Read(document);
 
-        var image = Assert.Single(BuildTestSupport.ImageXObjects(reader));
-        var filter = Assert.IsType<NameObject>(reader.Resolve(image.Dictionary["Filter"]));
-        Assert.Equal("DCTDecode", filter.Value);
-        Assert.Equal(original, image.Data);
+        var emission = Encoding.Latin1.GetString(new DocumentRenderer().ToArray(document));
+        var images = Regex.Matches(emission, ImageObjectPattern);
+        Assert.True(images.Count == 1, $"Expected exactly 1 image XObject in the emission, found {images.Count}.");
+
+        var body = IndirectObject(emission, images[0].Groups[1].Value);
+        Carries("image XObject", "/Filter /DCTDecode", body);
+
+        var payload = StreamPayload("image XObject", body);
+        Assert.True(
+            payload == Encoding.Latin1.GetString(original),
+            "The image XObject payload is not the original JPEG bytes;"
+            + $" expected {original.Length} bytes, emitted {payload.Length}.");
+    }
+
+    private const string ImageObjectPattern = @"\n(\d+) 0 obj\n<< [^\n]*/Subtype /Image[^\n]*>>\nstream\n";
+
+    private static string StreamPayload(string subject, string body)
+    {
+        const string opening = "\nstream\n";
+        const string closing = "\nendstream";
+
+        var start = body.IndexOf(opening, StringComparison.Ordinal);
+        Assert.True(start >= 0, $"{subject} is not a stream object.\n{subject}:\n{Excerpt(body)}");
+
+        var end = body.LastIndexOf(closing, StringComparison.Ordinal);
+        Assert.True(end > start, $"{subject} has no endstream.\n{subject}:\n{Excerpt(body)}");
+
+        return body[(start + opening.Length)..end];
     }
 
     [Fact]

@@ -1,43 +1,42 @@
-using System;
-using System.Collections.Generic;
+#nullable enable
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
-#nullable enable
-
 public class DocumentWriteTests
 {
-    private static DocumentReader Reload(PortableDocument document) => DocumentReader.Parse(document.ToArray());
+    private static string Catalog(string emission) => Line(emission, "/Type /Catalog");
 
-    private static DictionaryObject Catalog(DocumentReader reader)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
+    private static string PagesNode(string emission) => Line(emission, "/Type /Pages ");
 
-    private static DictionaryObject PagesNode(DocumentReader reader)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(Catalog(reader)["Pages"]));
+    private static string PagesNumber(string emission)
+        => Shaped("catalog", @"/Pages (\d+) 0 R", Catalog(emission)).Groups[1].Value;
 
-    private static ArrayObject Kids(DocumentReader reader)
-        => Assert.IsType<ArrayObject>(reader.Resolve(PagesNode(reader)["Kids"]));
+    private static string[] Kids(string emission, int count)
+        => References("pages node", "Kids", count, PagesNode(emission));
 
-    private static DictionaryObject Kid(DocumentReader reader, int index)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(Kids(reader)[index]));
+    private static string PageContent(string emission, string pageObject)
+        => IndirectObject(emission, Shaped("page", @"/Contents (\d+) 0 R", pageObject).Groups[1].Value);
 
-    private static byte[] KidContent(DocumentReader reader, int index)
-        => Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, index)["Contents"])).Data.ToArray();
-
-    private static void AssertMediaBox(DocumentReader reader, DictionaryObject page, double width, double height)
+    private static void AssertMediaBox(string subject, string pageObject, double width, double height)
     {
-        var box = Assert.IsType<ArrayObject>(reader.Resolve(page["MediaBox"]));
-        Assert.Equal(4, box.Count);
-        Assert.True(Math.Abs(0.0 - Assert.IsType<NumberObject>(box[0]).DoubleValue) < 0.01);
-        Assert.True(Math.Abs(0.0 - Assert.IsType<NumberObject>(box[1]).DoubleValue) < 0.01);
-        Assert.True(Math.Abs(width - Assert.IsType<NumberObject>(box[2]).DoubleValue) < 0.01);
-        Assert.True(Math.Abs(height - Assert.IsType<NumberObject>(box[3]).DoubleValue) < 0.01);
+        var box = Shaped(
+            $"{subject} /MediaBox",
+            @"/MediaBox \[([-\d.]+) ([-\d.]+) ([-\d.]+) ([-\d.]+)\]",
+            pageObject);
+
+        Assert.Equal(0.0, double.Parse(box.Groups[1].Value, CultureInfo.InvariantCulture), 0.01);
+        Assert.Equal(0.0, double.Parse(box.Groups[2].Value, CultureInfo.InvariantCulture), 0.01);
+        Assert.Equal(width, double.Parse(box.Groups[3].Value, CultureInfo.InvariantCulture), 0.01);
+        Assert.Equal(height, double.Parse(box.Groups[4].Value, CultureInfo.InvariantCulture), 0.01);
     }
 
     [Fact]
@@ -54,15 +53,14 @@ public class DocumentWriteTests
     [Fact]
     public void EmptyDocument_SavesValidCatalogAndEmptyPagesTree()
     {
-        var reader = Reload(new PortableDocument());
+        var emission = Emit(new PortableDocument());
 
-        var catalog = Catalog(reader);
-        Assert.Equal("Catalog", Assert.IsType<NameObject>(catalog["Type"]).Value);
+        Carries("catalog", "/Type /Catalog", Catalog(emission));
 
-        var pages = PagesNode(reader);
-        Assert.Equal("Pages", Assert.IsType<NameObject>(pages["Type"]).Value);
-        Assert.Equal(0, Assert.IsType<NumberObject>(pages["Count"]).IntValue);
-        Assert.Empty(Kids(reader));
+        var pages = PagesNode(emission);
+        Carries("pages node", "/Type /Pages ", pages);
+        Carries("pages node", "/Count 0", pages);
+        References("pages node", "Kids", 0, pages);
     }
 
     [Fact]
@@ -71,17 +69,14 @@ public class DocumentWriteTests
         var document = new PortableDocument();
         document.Pages.Add();
 
-        var reader = Reload(document);
-        Assert.Equal(1, Assert.IsType<NumberObject>(PagesNode(reader)["Count"]).IntValue);
-        Assert.Single(Kids(reader));
+        var emission = Emit(document);
+        Carries("pages node", "/Count 1", PagesNode(emission));
 
-        var page = Kid(reader, 0);
-        Assert.Equal("Page", Assert.IsType<NameObject>(page["Type"]).Value);
-        AssertMediaBox(reader, page, PageSizes.A4.Width.Point, PageSizes.A4.Height.Point);
-
-        var pagesRef = Assert.IsType<ReferenceObject>(Catalog(reader)["Pages"]);
-        var parentRef = Assert.IsType<ReferenceObject>(page["Parent"]);
-        Assert.Equal(pagesRef.ObjectNumber, parentRef.ObjectNumber);
+        var kid = Kids(emission, 1)[0];
+        var page = IndirectObject(emission, kid);
+        Carries($"page {kid} 0 R", "/Type /Page ", page);
+        AssertMediaBox($"page {kid} 0 R", page, PageSizes.A4.Width.Point, PageSizes.A4.Height.Point);
+        Carries($"page {kid} 0 R", $"/Parent {PagesNumber(emission)} 0 R", page);
     }
 
     [Fact]
@@ -92,14 +87,14 @@ public class DocumentWriteTests
         document.Pages.Add(PageSizes.Letter);
         document.Pages.Add(PageSizes.A4, PageOrientation.Landscape);
 
-        var reader = Reload(document);
-        Assert.Equal(3, Assert.IsType<NumberObject>(PagesNode(reader)["Count"]).IntValue);
-        Assert.Equal(3, Kids(reader).Count);
+        var emission = Emit(document);
+        Carries("pages node", "/Count 3", PagesNode(emission));
 
-        AssertMediaBox(reader, Kid(reader, 0), PageSizes.A4.Width.Point, PageSizes.A4.Height.Point);
-        AssertMediaBox(reader, Kid(reader, 1), PageSizes.Letter.Width.Point, PageSizes.Letter.Height.Point);
-        AssertMediaBox(reader, Kid(reader, 2), PageSizes.A4.Height.Point, PageSizes.A4.Width.Point);
-        AssertMediaBox(reader, Kid(reader, 2), 841.88, 595.27);
+        var kids = Kids(emission, 3);
+        AssertMediaBox("first page", IndirectObject(emission, kids[0]), PageSizes.A4.Width.Point, PageSizes.A4.Height.Point);
+        AssertMediaBox("second page", IndirectObject(emission, kids[1]), PageSizes.Letter.Width.Point, PageSizes.Letter.Height.Point);
+        AssertMediaBox("third page", IndirectObject(emission, kids[2]), PageSizes.A4.Height.Point, PageSizes.A4.Width.Point);
+        AssertMediaBox("third page", IndirectObject(emission, kids[2]), 841.88, 595.27);
     }
 
     [Fact]
@@ -110,14 +105,12 @@ public class DocumentWriteTests
         document.Pages.Add(PageSizes.Letter);
         document.Pages.Add(PageSizes.A5, PageOrientation.Landscape);
 
-        var reader = Reload(document);
-        var pagesRef = Assert.IsType<ReferenceObject>(Catalog(reader)["Pages"]).ObjectNumber;
+        var emission = Emit(document);
+        var parent = $"/Parent {PagesNumber(emission)} 0 R";
 
-        var kids = Kids(reader);
-        for (var i = 0; i < kids.Count; i++)
+        foreach (var kid in Kids(emission, 3))
         {
-            var parent = Assert.IsType<ReferenceObject>(Kid(reader, i)["Parent"]);
-            Assert.Equal(pagesRef, parent.ObjectNumber);
+            Carries($"page {kid} 0 R", parent, IndirectObject(emission, kid));
         }
     }
 
@@ -132,14 +125,14 @@ public class DocumentWriteTests
         document.Info.Creator = "Radzen";
         document.Pages.Add();
 
-        var reader = Reload(document);
-        var info = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Info"]!));
+        var emission = Emit(document);
+        var info = IndirectObject(emission, Shaped("trailer", @"/Info (\d+) 0 R", Line(emission, "/Root ")).Groups[1].Value);
 
-        Assert.Equal("The Title", Assert.IsType<StringObject>(info["Title"]).Value);
-        Assert.Equal("The Author", Assert.IsType<StringObject>(info["Author"]).Value);
-        Assert.Equal("The Subject", Assert.IsType<StringObject>(info["Subject"]).Value);
-        Assert.Equal("one two three", Assert.IsType<StringObject>(info["Keywords"]).Value);
-        Assert.Equal("Radzen", Assert.IsType<StringObject>(info["Creator"]).Value);
+        Carries("info dictionary", "/Title (The Title)", info);
+        Carries("info dictionary", "/Author (The Author)", info);
+        Carries("info dictionary", "/Subject (The Subject)", info);
+        Carries("info dictionary", "/Keywords (one two three)", info);
+        Carries("info dictionary", "/Creator (Radzen)", info);
     }
 
     [Fact]
@@ -148,36 +141,37 @@ public class DocumentWriteTests
         var document = new PortableDocument();
         document.Info.Title = "Only Title";
 
-        var reader = Reload(document);
-        var info = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Info"]!));
+        var emission = Emit(document);
+        var info = IndirectObject(emission, Shaped("trailer", @"/Info (\d+) 0 R", Line(emission, "/Root ")).Groups[1].Value);
 
-        Assert.Equal("Only Title", Assert.IsType<StringObject>(info["Title"]).Value);
-        Assert.False(info.ContainsKey("Author"));
-        Assert.False(info.ContainsKey("Subject"));
-        Assert.False(info.ContainsKey("Keywords"));
-        Assert.False(info.ContainsKey("Creator"));
+        Carries("info dictionary", "/Title (Only Title)", info);
+        Lacks("info dictionary", "/Author", info);
+        Lacks("info dictionary", "/Subject", info);
+        Lacks("info dictionary", "/Keywords", info);
+        Lacks("info dictionary", "/Creator", info);
     }
 
     [Fact]
     public void Info_NoFieldsSet_NoInfoInTrailer()
     {
-        var reader = Reload(new PortableDocument());
+        var emission = Emit(new PortableDocument());
 
-        Assert.False(reader.Trailer.ContainsKey("Info"));
+        Lacks("trailer", "/Info", Line(emission, "/Root "));
     }
 
     [Fact]
     public void Page_WithContent_ContentsStreamRoundTripsByteIdentical()
     {
-        var content = Encoding.ASCII.GetBytes("BT /F1 12 Tf 72 700 Td (Hi) Tj ET");
+        const string content = "BT /F1 12 Tf 72 700 Td (Hi) Tj ET";
         var document = new PortableDocument();
         var page = document.Pages.Add();
-        page.SetContent(content);
+        page.SetContent(Encoding.ASCII.GetBytes(content));
 
-        var reader = Reload(document);
-        var stream = Assert.IsType<StreamObject>(reader.Resolve(Kid(reader, 0)["Contents"]));
-        Assert.Equal(content, stream.Data);
-        Assert.False(stream.Dictionary.ContainsKey("Filter"));
+        var emission = Emit(document);
+        var stream = PageContent(emission, IndirectObject(emission, Kids(emission, 1)[0]));
+
+        Carries("page content stream", $"<< /Length {content.Length} >>\nstream\n{content}\nendstream", stream);
+        Lacks("page content stream", "/Filter", stream);
     }
 
     [Fact]
@@ -186,8 +180,9 @@ public class DocumentWriteTests
         var document = new PortableDocument();
         document.Pages.Add();
 
-        var reader = Reload(document);
-        Assert.False(Kid(reader, 0).ContainsKey("Contents"));
+        var emission = Emit(document);
+
+        Lacks("page", "/Contents", IndirectObject(emission, Kids(emission, 1)[0]));
     }
 
     [Fact]
@@ -198,8 +193,12 @@ public class DocumentWriteTests
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("a"));
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("b"));
 
-        var reader = Reload(document);
-        Assert.Equal(7, reader.ObjectCount);
+        var emission = Emit(document);
+        var objects = Regex.Matches(emission, @"(?m)^\d+ 0 obj$").Count;
+
+        Assert.True(
+            objects == 7,
+            $"Expected 7 indirect objects in the emission, found {objects}.\n{Excerpt(emission)}");
     }
 
     [Fact]
@@ -210,46 +209,17 @@ public class DocumentWriteTests
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("one"));
         document.Pages.Add(PageSizes.Letter);
 
-        var reader = Reload(document);
-        var visited = new HashSet<int>();
-        AssertResolves(reader, reader.Trailer, visited);
-    }
+        var emission = Emit(document);
+        var referenced = Regex.Matches(emission, @"(\d+) 0 R")
+            .Select(match => match.Groups[1].Value)
+            .Distinct()
+            .ToList();
 
-    private static void AssertResolves(DocumentReader reader, DocumentObject value, HashSet<int> visited)
-    {
-        switch (value)
+        Assert.NotEmpty(referenced);
+
+        foreach (var number in referenced)
         {
-            case ReferenceObject reference:
-                if (!visited.Add(reference.ObjectNumber))
-                {
-                    return;
-                }
-
-                var resolved = reader.Resolve(reference);
-                Assert.NotNull(resolved);
-                AssertResolves(reader, resolved, visited);
-                break;
-            case DictionaryObject dictionary:
-                foreach (var key in dictionary.Keys)
-                {
-                    AssertResolves(reader, dictionary[key], visited);
-                }
-
-                break;
-            case StreamObject stream:
-                foreach (var key in stream.Dictionary.Keys)
-                {
-                    AssertResolves(reader, stream.Dictionary[key], visited);
-                }
-
-                break;
-            case ArrayObject array:
-                for (var i = 0; i < array.Count; i++)
-                {
-                    AssertResolves(reader, array[i], visited);
-                }
-
-                break;
+            IndirectObject(emission, number);
         }
     }
 
@@ -285,10 +255,11 @@ public class DocumentWriteTests
 
         document.Pages.RemoveAt(0);
 
-        var reader = Reload(document);
-        Assert.Equal(1, Assert.IsType<NumberObject>(PagesNode(reader)["Count"]).IntValue);
-        Assert.Single(Kids(reader));
-        Assert.Equal(Encoding.ASCII.GetBytes("second"), KidContent(reader, 0));
+        var emission = Emit(document);
+        Carries("pages node", "/Count 1", PagesNode(emission));
+
+        var page = IndirectObject(emission, Kids(emission, 1)[0]);
+        Carries("page content stream", "<< /Length 6 >>\nstream\nsecond\nendstream", PageContent(emission, page));
     }
 
     [Fact]
@@ -302,9 +273,17 @@ public class DocumentWriteTests
         document.Pages.RemoveAt(0);
         document.Pages.Insert(1, first);
 
-        var reader = Reload(document);
-        Assert.Equal(2, Assert.IsType<NumberObject>(PagesNode(reader)["Count"]).IntValue);
-        Assert.Equal(Encoding.ASCII.GetBytes("B"), KidContent(reader, 0));
-        Assert.Equal(Encoding.ASCII.GetBytes("A"), KidContent(reader, 1));
+        var emission = Emit(document);
+        Carries("pages node", "/Count 2", PagesNode(emission));
+
+        var kids = Kids(emission, 2);
+        Carries(
+            "first page content stream",
+            "<< /Length 1 >>\nstream\nB\nendstream",
+            PageContent(emission, IndirectObject(emission, kids[0])));
+        Carries(
+            "second page content stream",
+            "<< /Length 1 >>\nstream\nA\nendstream",
+            PageContent(emission, IndirectObject(emission, kids[1])));
     }
 }

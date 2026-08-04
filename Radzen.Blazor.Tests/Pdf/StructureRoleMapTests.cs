@@ -1,15 +1,15 @@
 #nullable enable
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class StructureRoleMapTests
 {
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
+    private static string EmitAuthored((Document Document, DocumentRenderer Renderer) authored)
+        => Emit(authored.Renderer.Render(authored.Document));
 
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
@@ -34,51 +34,44 @@ public class StructureRoleMapTests
         return (document, builderRenderer);
     }
 
-    private static DictionaryObject StructTreeRoot(DocumentReader reader)
+    private static string StructTreeRoot(string emission)
+        => Line(emission, "/Type /StructTreeRoot");
+
+    private static string FirstKid(string subject, string body)
+        => Shaped(subject, @"/K \[?(\d+) 0 R", body).Groups[1].Value;
+
+    private static string FirstStructureElement(string emission)
     {
-        Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(rootObject!));
-        Assert.True(catalog.TryGetValue("StructTreeRoot", out var structObject), "catalog has /StructTreeRoot");
-        return Assert.IsType<DictionaryObject>(reader.Resolve(structObject!));
+        var document = IndirectObject(emission, FirstKid("StructTreeRoot", StructTreeRoot(emission)));
+        var sect = IndirectObject(emission, FirstKid("Document element", document));
+        return IndirectObject(emission, FirstKid("Sect element", sect));
     }
 
-    private static string? FirstStructureRole(DocumentReader reader, DictionaryObject structRoot)
-    {
-        var document = Assert.IsType<DictionaryObject>(reader.Resolve(FirstKid(reader, structRoot)));
-        var sect = Assert.IsType<DictionaryObject>(reader.Resolve(FirstKid(reader, document)));
-        var element = Assert.IsType<DictionaryObject>(reader.Resolve(FirstKid(reader, sect)));
-        return element.TryGetValue("S", out var s) && reader.Resolve(s!) is NameObject role ? role.Value : null;
-    }
+    private static void FirstStructureRoleIs(string emission, string type)
+        => Carries(
+            "first structure element",
+            $"/Type /StructElem /S /{type} /P ",
+            FirstStructureElement(emission));
 
-    private static DocumentObject FirstKid(DocumentReader reader, DictionaryObject parent)
-    {
-        Assert.True(parent.TryGetValue("K", out var k), "structure element has /K");
-        var resolved = reader.Resolve(k!);
-        return resolved is ArrayObject array ? array[0] : resolved;
-    }
+    private static void RoleMaps(string root, string role, string type)
+        => Shaped("StructTreeRoot /RoleMap", $@"/RoleMap <<[^>]* /{role} /{type}\b", root);
 
     [Fact]
     public void DeclaredRole_EmitsRoleMapAndTagsElementWithTheRole()
     {
-        var reader = ReadAuthored(AuthorTagged(declareRole: true));
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(AuthorTagged(declareRole: true));
 
-        Assert.True(structRoot.TryGetValue("RoleMap", out var mapObject), "StructTreeRoot has /RoleMap");
-        var roleMap = Assert.IsType<DictionaryObject>(reader.Resolve(mapObject!));
-        Assert.True(roleMap.TryGetValue("Callout", out var mapped), "/RoleMap maps Callout");
-        Assert.Equal("P", Assert.IsType<NameObject>(reader.Resolve(mapped!)).Value);
-
-        Assert.Equal("Callout", FirstStructureRole(reader, structRoot));
+        RoleMaps(StructTreeRoot(emission), "Callout", "P");
+        FirstStructureRoleIs(emission, "Callout");
     }
 
     [Fact]
     public void NoDeclaredRoles_OmitsRoleMapAndKeepsStandardTag()
     {
-        var reader = ReadAuthored(AuthorTagged(declareRole: false));
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(AuthorTagged(declareRole: false));
 
-        Assert.False(structRoot.ContainsKey("RoleMap"), "StructTreeRoot has no /RoleMap when no roles declared");
-        Assert.Equal("P", FirstStructureRole(reader, structRoot));
+        Lacks("StructTreeRoot", "/RoleMap", StructTreeRoot(emission));
+        FirstStructureRoleIs(emission, "P");
     }
 
     [Fact]
@@ -92,11 +85,10 @@ public class StructureRoleMapTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Body", BuildTestSupport.Latin).StyleName = "Unknown";
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
-        var structRoot = StructTreeRoot(reader);
+        var emission = Emit(builderRenderer.Render(document));
 
-        Assert.False(structRoot.ContainsKey("RoleMap"), "no /RoleMap for an undeclared style");
-        Assert.Equal("P", FirstStructureRole(reader, structRoot));
+        Lacks("StructTreeRoot", "/RoleMap", StructTreeRoot(emission));
+        FirstStructureRoleIs(emission, "P");
     }
 
     private static (Document Document, DocumentRenderer Renderer) AuthorWithStyleRole(
@@ -128,9 +120,7 @@ public class StructureRoleMapTests
     [Fact]
     public void StyleRole_ReplacesTheStyleNameAsTheRoleMapLookup()
     {
-        var reader = ReadAuthored(AuthorWithStyleRole("Body", "Callout", "P"));
-
-        Assert.Equal("Callout", FirstStructureRole(reader, StructTreeRoot(reader)));
+        FirstStructureRoleIs(EmitAuthored(AuthorWithStyleRole("Body", "Callout", "P")), "Callout");
     }
 
     [Fact]
@@ -145,19 +135,16 @@ public class StructureRoleMapTests
         document.Styles.Add("Derived", "Base");
         BuildTestSupport.AddText(document.Sections.Add(), "Body", BuildTestSupport.Latin).StyleName = "Derived";
 
-        var reader = BuildTestSupport.Read(document, renderer);
-
-        Assert.Equal("Callout", FirstStructureRole(reader, StructTreeRoot(reader)));
+        FirstStructureRoleIs(Emit(renderer.Render(document)), "Callout");
     }
 
     [Fact]
     public void HeadingLevel_WinsOverADeclaredRole()
     {
-        var reader = ReadAuthored(AuthorWithStyleRole("Heading2", "Callout", "P"));
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(AuthorWithStyleRole("Heading2", "Callout", "P"));
 
-        Assert.Equal("H2", FirstStructureRole(reader, structRoot));
-        Assert.True(structRoot.ContainsKey("RoleMap"), "the declared role is still role mapped");
+        FirstStructureRoleIs(emission, "H2");
+        Carries("StructTreeRoot", "/RoleMap <<", StructTreeRoot(emission));
     }
 
     [Fact]
@@ -166,21 +153,19 @@ public class StructureRoleMapTests
         var authored = AuthorWithStyleRole("Subtitle", "Sub", mapsTo: null);
         authored.Document.Styles["Subtitle"].HeadingLevel = 2;
 
-        var reader = ReadAuthored(authored);
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(authored);
 
-        Assert.Equal("H2", FirstStructureRole(reader, structRoot));
-        Assert.False(structRoot.ContainsKey("RoleMap"), "the discarded role is not role mapped");
+        FirstStructureRoleIs(emission, "H2");
+        Lacks("StructTreeRoot", "/RoleMap", StructTreeRoot(emission));
     }
 
     [Fact]
     public void StandardStructureTypeAsARole_NeedsNoRoleMapEntry()
     {
-        var reader = ReadAuthored(AuthorWithStyleRole("Quote", "BlockQuote", mapsTo: null));
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(AuthorWithStyleRole("Quote", "BlockQuote", mapsTo: null));
 
-        Assert.False(structRoot.ContainsKey("RoleMap"), "a standard type is not remapped");
-        Assert.Equal("BlockQuote", FirstStructureRole(reader, structRoot));
+        Lacks("StructTreeRoot", "/RoleMap", StructTreeRoot(emission));
+        FirstStructureRoleIs(emission, "BlockQuote");
     }
 
     [Fact]
@@ -213,11 +198,10 @@ public class StructureRoleMapTests
         authored.Renderer.RoleMap.Add("Aside", "Sidebar");
         authored.Renderer.RoleMap.Add("Sidebar", "Div");
 
-        var reader = ReadAuthored(authored);
-        var structRoot = StructTreeRoot(reader);
+        var emission = EmitAuthored(authored);
 
-        Assert.Equal("Callout", FirstStructureRole(reader, structRoot));
-        Assert.True(structRoot.ContainsKey("RoleMap"), "the chain is written to /RoleMap");
+        FirstStructureRoleIs(emission, "Callout");
+        Carries("StructTreeRoot", "/RoleMap <<", StructTreeRoot(emission));
     }
 
     [Fact]
@@ -240,13 +224,10 @@ public class StructureRoleMapTests
 
         rendered.RoleMap.Add("Aside", "Div");
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var structRoot = StructTreeRoot(reader);
-        var roleMap = Assert.IsType<DictionaryObject>(reader.Resolve(structRoot["RoleMap"]));
+        var root = StructTreeRoot(Emit(rendered));
 
-        Assert.True(roleMap.TryGetValue("Aside", out var mapped), "/RoleMap maps the role added after render");
-        Assert.Equal("Div", Assert.IsType<NameObject>(reader.Resolve(mapped!)).Value);
-        Assert.True(roleMap.ContainsKey("Callout"), "/RoleMap keeps the role declared before render");
+        RoleMaps(root, "Aside", "Div");
+        Shaped("StructTreeRoot /RoleMap", @"/RoleMap <<[^>]* /Callout\b", root);
     }
 
     [Fact]

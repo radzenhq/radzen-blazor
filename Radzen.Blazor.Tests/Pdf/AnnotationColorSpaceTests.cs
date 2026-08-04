@@ -1,10 +1,11 @@
 #nullable enable
 using System.IO;
+using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -98,8 +99,7 @@ public class AnnotationColorSpaceTests
         Assert.Equal(Color.FromRgb(255, 0, 0), Assert.IsType<SquareAnnotation>(annotation).Color);
     }
 
-    [Fact]
-    public void Load_TwoComponentAnnotationColor_IsRetainedAsUnmodeled()
+    private static byte[] TwoComponentAnnotationColor()
     {
         var pdf = new FixturePdf().Append("%PDF-1.7\n");
         pdf.Object(1, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
@@ -119,11 +119,17 @@ public class AnnotationColorSpaceTests
             .Append(FixturePdf.Entry20(pdf.OffsetOf(5)))
             .Append("trailer\n<< /Size 6 /Root 1 0 R >>\n")
             .Append("startxref\n" + xref + "\n%%EOF\n");
+        return pdf.ToArray();
+    }
 
-        var loaded = Load(pdf.ToArray());
+    [Fact]
+    public void Load_TwoComponentAnnotationColor_IsRetainedAsUnmodeled()
+    {
+        var loaded = Load(TwoComponentAnnotationColor());
 
         Assert.Empty(loaded.Pages[0].Annotations);
-        var savedReader = DocumentReader.Parse(loaded.ToArray());
-        Assert.Single(savedReader.GetArray(DocumentLoadTests.Kid(savedReader, 0), "Annots")!);
+
+        var emission = Encoding.Latin1.GetString(loaded.ToArray());
+        References("page", "Annots", 1, Line(emission, "/Type /Page "));
     }
 }

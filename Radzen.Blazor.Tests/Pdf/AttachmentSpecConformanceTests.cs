@@ -8,6 +8,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Objects.Filters;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -104,110 +105,124 @@ public class AttachmentSpecConformanceTests
         return FlateFilter.Decode(stream.Data.ToArray());
     }
 
-    private static string ParamsModDate(DocumentReader reader, StreamObject stream)
+    private static string NameTreeNode(string emission)
     {
-        var parameters = Assert.IsType<DictionaryObject>(reader.Resolve(stream.Dictionary["Params"]));
-        return Assert.IsType<StringObject>(reader.Resolve(parameters["ModDate"])).Value;
+        var tree = Shaped("catalog", @"/Names << /EmbeddedFiles (\d+) 0 R >>", Line(emission, "/Type /Catalog"));
+        return IndirectObject(emission, tree.Groups[1].Value);
+    }
+
+    private static string Filespec(string emission, string name)
+    {
+        var entry = Shaped(
+            $"embedded files name tree entry for {name}",
+            $@"\({Regex.Escape(name)}\) (\d+) 0 R",
+            NameTreeNode(emission));
+        return IndirectObject(emission, entry.Groups[1].Value);
+    }
+
+    private static string EmbeddedFileDictionary(string emission, string filespec)
+    {
+        var ef = Shaped("filespec /EF", @"/EF << /F (\d+) 0 R /UF (\d+) 0 R >>", filespec);
+        return Line(IndirectObject(emission, ef.Groups[1].Value), "/Type /EmbeddedFile");
     }
 
     [Fact]
     public void Attach_TwoFiles_NameTreeContainsBoth()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var files = EmbeddedFiles(reader);
+        var tree = NameTreeNode(Emit(AuthorWithBothAttachments()));
 
-        Assert.Equal(2, files.Count);
-        Assert.Contains("factur-x.xml", files.Keys);
-        Assert.Contains("scan.bin", files.Keys);
+        Carries("embedded files name tree", "(factur-x.xml) ", tree);
+        Carries("embedded files name tree", "(scan.bin) ", tree);
+
+        var entries = Regex.Matches(tree, @"\([^)]*\) \d+ 0 R").Count;
+        Assert.True(
+            entries == 2,
+            $"Expected 2 embedded file entries, found {entries}.\nname tree:\n{Excerpt(tree)}");
     }
 
     [Fact]
     public void Attach_Filespec_HasAllSpecKeys()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var files = EmbeddedFiles(reader);
+        var emission = Emit(AuthorWithBothAttachments());
 
         foreach (var (name, relationship) in new[] { ("factur-x.xml", "Alternative"), ("scan.bin", "Supplement") })
         {
-            var filespec = files[name];
-            Assert.Equal("Filespec", BuildTestSupport.Name(reader, filespec, "Type"));
-            Assert.Equal(name, Assert.IsType<StringObject>(reader.Resolve(filespec["F"])).Value);
-            Assert.Equal(name, Assert.IsType<StringObject>(reader.Resolve(filespec["UF"])).Value);
-            Assert.Equal(relationship, BuildTestSupport.Name(reader, filespec, "AFRelationship"));
+            var filespec = Filespec(emission, name);
+            Carries($"{name} filespec", "/Type /Filespec", filespec);
+            Carries($"{name} filespec", $"/F ({name})", filespec);
+            Carries($"{name} filespec", $"/UF ({name})", filespec);
+            Carries($"{name} filespec", $"/AFRelationship /{relationship}", filespec);
 
-            var stream = EmbeddedStream(reader, filespec);
-            var parameters = Assert.IsType<DictionaryObject>(reader.Resolve(stream.Dictionary["Params"]));
-            Assert.True(parameters.ContainsKey("Size"), "/Params has /Size");
-            Assert.True(parameters.ContainsKey("ModDate"), "/Params has /ModDate");
+            var embedded = EmbeddedFileDictionary(emission, filespec);
+            Carries($"{name} embedded file", "/Params << /Size ", embedded);
+            Carries($"{name} embedded file", "/ModDate (", embedded);
         }
     }
 
     [Fact]
     public void Attach_EmbeddedFileDict_HasFAndUfStreamReferences()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var filespec = EmbeddedFiles(reader)["factur-x.xml"];
+        var rendered = AuthorWithBothAttachments();
+        var ef = Shaped(
+            "factur-x.xml filespec /EF",
+            @"/EF << /F (\d+) 0 R /UF (\d+) 0 R >>",
+            Filespec(Emit(rendered), "factur-x.xml"));
 
-        var f = EmbeddedStream(reader, filespec, "F");
-        var uf = EmbeddedStream(reader, filespec, "UF");
+        Assert.Equal(ef.Groups[1].Value, ef.Groups[2].Value);
 
-        Assert.Same(f, uf);
-        Assert.Equal(InvoiceXml, Payload(reader, f));
+        var reader = ReadAuthored(rendered);
+        Assert.Equal(InvoiceXml, Payload(reader, EmbeddedStream(reader, EmbeddedFiles(reader)["factur-x.xml"])));
     }
 
     [Fact]
     public void Attach_EmbeddedStream_ParamsSizeAndModDate()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var files = EmbeddedFiles(reader);
+        var emission = Emit(AuthorWithBothAttachments());
 
-        var xml = EmbeddedStream(reader, files["factur-x.xml"]);
-        var xmlParams = Assert.IsType<DictionaryObject>(reader.Resolve(xml.Dictionary["Params"]));
-        Assert.Equal(InvoiceXml.Length, BuildTestSupport.Int(xmlParams, "Size"));
-        Assert.Equal("D:20260315083045+00'00'", ParamsModDate(reader, xml));
+        var xml = EmbeddedFileDictionary(emission, Filespec(emission, "factur-x.xml"));
+        Assert.Equal(InvoiceXml.Length, NumberIn(xml, "Size"));
+        Carries("factur-x.xml embedded file", "/ModDate (D:20260315083045+00'00')", xml);
 
-        var binary = EmbeddedStream(reader, files["scan.bin"]);
-        var binaryParams = Assert.IsType<DictionaryObject>(reader.Resolve(binary.Dictionary["Params"]));
-        Assert.Equal(BinaryPayload.Length, BuildTestSupport.Int(binaryParams, "Size"));
-        Assert.Equal("D:20000101000000+00'00'", ParamsModDate(reader, binary));
+        var binary = EmbeddedFileDictionary(emission, Filespec(emission, "scan.bin"));
+        Assert.Equal(BinaryPayload.Length, NumberIn(binary, "Size"));
+        Carries("scan.bin embedded file", "/ModDate (D:20000101000000+00'00')", binary);
     }
 
     [Fact]
     public void Attach_MimeType_WrittenAsSubtypeName()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var files = EmbeddedFiles(reader);
+        var emission = Emit(AuthorWithBothAttachments());
 
-        Assert.Equal("text/xml", BuildTestSupport.Name(reader, EmbeddedStream(reader, files["factur-x.xml"]).Dictionary, "Subtype"));
-        Assert.Equal("application/octet-stream", BuildTestSupport.Name(reader, EmbeddedStream(reader, files["scan.bin"]).Dictionary, "Subtype"));
+        Carries(
+            "factur-x.xml embedded file",
+            "/Subtype /text#2Fxml",
+            EmbeddedFileDictionary(emission, Filespec(emission, "factur-x.xml")));
+        Carries(
+            "scan.bin embedded file",
+            "/Subtype /application#2Foctet-stream",
+            EmbeddedFileDictionary(emission, Filespec(emission, "scan.bin")));
     }
 
     [Fact]
     public void Attach_Description_RoundTrips()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var files = EmbeddedFiles(reader);
+        var emission = Emit(AuthorWithBothAttachments());
 
-        Assert.Equal("Factur-X invoice data",
-            Assert.IsType<StringObject>(reader.Resolve(files["factur-x.xml"]["Desc"])).Value);
-        Assert.False(files["scan.bin"].ContainsKey("Desc"), "no /Desc when the description is not set");
+        Carries("factur-x.xml filespec", "/Desc (Factur-X invoice data)", Filespec(emission, "factur-x.xml"));
+        Lacks("scan.bin filespec", "/Desc", Filespec(emission, "scan.bin"));
     }
 
     [Fact]
     public void Attach_CatalogAf_ListsBothFilespecs()
     {
-        var reader = ReadAuthored(AuthorWithBothAttachments());
-        var catalog = Catalog(reader);
-        var af = Assert.IsType<ArrayObject>(reader.Resolve(catalog["AF"]));
-
-        Assert.Equal(2, af.Count);
+        var emission = Emit(AuthorWithBothAttachments());
 
         var names = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var entry in af)
+        foreach (var number in References("catalog", "AF", 2, Line(emission, "/Type /Catalog")))
         {
-            var filespec = Assert.IsType<DictionaryObject>(reader.Resolve(entry));
-            Assert.Equal("Filespec", BuildTestSupport.Name(reader, filespec, "Type"));
-            names.Add(Assert.IsType<StringObject>(reader.Resolve(filespec["F"])).Value);
+            var filespec = IndirectObject(emission, number);
+            Carries($"filespec {number} 0 R", "/Type /Filespec", filespec);
+            names.Add(Shaped($"filespec {number} 0 R", @"/F \(([^)]*)\)", filespec).Groups[1].Value);
         }
 
         Assert.Equal(new HashSet<string>(["factur-x.xml", "scan.bin"]), names);
