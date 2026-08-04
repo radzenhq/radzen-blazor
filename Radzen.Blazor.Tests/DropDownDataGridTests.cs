@@ -527,6 +527,59 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDownDataGrid_OpenOnFocus_FocusThenClick_OpensPopupOnce()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.OpenOnFocus, true);
+            });
+
+            var root = component.Find("div.rz-dropdown");
+            root.Focus(new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            root.Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Equal(0, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closePopup"));
+        }
+
+        [Fact]
+        public void DropDownDataGrid_OpenOnFocus_ClickWhileOpen_ClosesPopup()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.OpenOnFocus, true);
+            });
+
+            var root = component.Find("div.rz-dropdown");
+            root.Focus(new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            root.Click();
+            root.Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closePopup"));
+        }
+
+        [Fact]
         public void DropDownDataGrid_Multiple_CtrlA_SelectsAllItems()
         {
             using var ctx = new TestContext();

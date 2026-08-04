@@ -189,10 +189,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string OpenPopupKey { get; set; } = "Enter";
 
+        bool openedOnFocus;
+
         private async Task OnFocus()
         {
             if (OpenOnFocus)
             {
+                openedOnFocus = true;
                 await OpenPopup(OpenPopupKey, false);
             }
         }
@@ -208,6 +211,23 @@ namespace Radzen.Blazor
             if (Disabled)
             {
                 return;
+            }
+
+            if (OpenOnFocus && isFromClick)
+            {
+                var fromFocus = openedOnFocus;
+                openedOnFocus = false;
+
+                if (isPopupOpen)
+                {
+                    if (fromFocus)
+                    {
+                        return;
+                    }
+
+                    await ClosePopup(key);
+                    return;
+                }
             }
 
             if (IsVirtualizationAllowed() && grid != null)
@@ -257,6 +277,7 @@ namespace Radzen.Blazor
         public Task OnClose()
         {
             isPopupOpen = false;
+            openedOnFocus = false;
             return Task.CompletedTask;
         }
 

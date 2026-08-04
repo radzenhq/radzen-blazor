@@ -1251,6 +1251,64 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DropDown_OpenOnFocus_FocusThenClick_OpensPopupOnce()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.OpenOnFocus, true);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.Focus(new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            combobox.Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Equal(0, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closePopup"));
+        }
+
+        [Fact]
+        public void DropDown_OpenOnFocus_ClickWhileOpen_ClosesPopup()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.OpenOnFocus, true);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.Focus(new Microsoft.AspNetCore.Components.Web.FocusEventArgs());
+            combobox.Click();
+            combobox.Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.openPopup"));
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.closePopup"));
+        }
+
+        [Fact]
+        public void DropDown_WithoutOpenOnFocus_Click_TogglesPopup()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.Click();
+
+            Assert.Equal(1, ctx.JSInterop.Invocations.Count(i => i.Identifier == "Radzen.togglePopup"));
+        }
+
+        [Fact]
         public void DropDown_Single_CtrlA_DoesNotChangeValue()
         {
             using var ctx = new TestContext();

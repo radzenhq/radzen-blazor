@@ -2489,7 +2489,11 @@ window.Radzen = {
         return obj.id !== id;
     });
 
-    if (!preventFocusRestore &&
+    var closedByOutsideMousedown = e && e.type == 'mousedown' && e.target && e.target.nodeType &&
+        popup && !popup.contains(e.target) &&
+        !(popupInfo && popupInfo.parent && popupInfo.parent.contains(e.target));
+
+    if (!preventFocusRestore && !closedByOutsideMousedown &&
         (Radzen.activeElement && Radzen.activeElement == document.activeElement ||
         Radzen.activeElement && document.activeElement == document.body ||
         Radzen.activeElement && popup && popup.contains(document.activeElement) ||
@@ -2507,6 +2511,8 @@ window.Radzen = {
             }
             Radzen.activeElement = null;
         }, 100);
+    } else if (closedByOutsideMousedown) {
+        Radzen.activeElement = null;
     }
   },
   popupOpened: function (id) {
