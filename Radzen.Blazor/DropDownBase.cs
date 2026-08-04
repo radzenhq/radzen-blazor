@@ -952,6 +952,12 @@ namespace Radzen
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
+            else if (args.CtrlKey && (key == "KeyA" || key == "a" || key == "A") && Multiple && AllowSelectAll)
+            {
+                preventKeydown = true;
+
+                await SelectAll();
+            }
             else if (AllowFiltering && isFilter && FilterAsYouType && !(Multiple && key == "Space" && selectedIndex >= 0))
             {
                 preventKeydown = true;

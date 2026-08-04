@@ -1143,5 +1143,130 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain("empty-marker", component.Markup);
         }
+
+        private static IRenderedComponent<RadzenDropDown<IEnumerable<int>>> MultipleDropDown(TestContext ctx, Action<IEnumerable<int>> valueChanged, Action<ComponentParameterCollectionBuilder<RadzenDropDown<IEnumerable<int>>>> configure = null)
+        {
+            var data = new[]
+            {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            return ctx.RenderComponent<RadzenDropDown<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.ValueChanged, valueChanged);
+                configure?.Invoke(parameters);
+            });
+        }
+
+        private static Microsoft.AspNetCore.Components.Web.KeyboardEventArgs CtrlA => new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true };
+
+        [Fact]
+        public void DropDown_Multiple_CtrlA_SelectsAllItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = null;
+            var component = MultipleDropDown(ctx, v => value = v);
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+
+            Assert.Equal(new[] { 1, 2 }, value);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_CtrlA_TogglesToNoneWhenAllSelected()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = null;
+            var component = MultipleDropDown(ctx, v => value = v);
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+            combobox.KeyDown(CtrlA);
+
+            Assert.Empty(value);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_CtrlA_WithFilteringEnabled_SelectsAllItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = null;
+            var component = MultipleDropDown(ctx, v => value = v, parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, true);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+
+            Assert.Equal(new[] { 1, 2 }, value);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_CtrlA_DoesNothingWhenSelectAllNotAllowed()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = null;
+            var component = MultipleDropDown(ctx, v => value = v, parameters =>
+            {
+                parameters.Add(p => p.AllowSelectAll, false);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+
+            Assert.Null(value);
+        }
+
+        [Fact]
+        public void DropDown_Multiple_CtrlA_DoesNothingWhenReadOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            IEnumerable<int> value = null;
+            var component = MultipleDropDown(ctx, v => value = v, parameters =>
+            {
+                parameters.Add(p => p.ReadOnly, true);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+
+            Assert.Null(value);
+        }
+
+        [Fact]
+        public void DropDown_Single_CtrlA_DoesNotChangeValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var changed = false;
+            var component = DropDown<int>(ctx, parameters =>
+            {
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Change, _ => changed = true);
+            });
+
+            var combobox = component.Find("div[role='combobox']");
+            combobox.KeyDown(CtrlA);
+
+            Assert.False(changed);
+        }
     }
 }
