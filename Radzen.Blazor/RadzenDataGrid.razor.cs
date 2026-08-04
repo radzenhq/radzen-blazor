@@ -2156,9 +2156,14 @@ namespace Radzen.Blazor
 
             var viewListQueryable = viewList.AsQueryable();
 
+            var filteredItems = new HashSet<TItem>(viewListQueryable.Where<TItem>(allColumns));
+
+            var parentsWithMatchingChildren = new HashSet<TItem>(childData
+                .Where(c => (c.Value.Data ?? Enumerable.Empty<TItem>()).AsQueryable().Where<TItem>(allColumns).Any())
+                .Select(c => c.Key));
+
             view = viewListQueryable
-                .Where(i => childData.ContainsKey(i) && (childData[i].Data ?? Enumerable.Empty<TItem>()).AsQueryable().Where<TItem>(allColumns).Any()
-                    || viewListQueryable.Where<TItem>(allColumns).Contains(i));
+                .Where(i => parentsWithMatchingChildren.Contains(i) || filteredItems.Contains(i));
 
             return view;
         }
