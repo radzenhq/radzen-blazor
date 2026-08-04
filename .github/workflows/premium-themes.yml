@@ -1,0 +1,19 @@
+name: Premium themes
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - Radzen.Blazor/themes/**
+
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    name: Trigger the premium themes build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to radzen-next
+        env:
+          GH_TOKEN: ${{ secrets.THEMES_DISPATCH_TOKEN }}
+        run: gh api repos/radzenhq/radzen-next/dispatches -f event_type=premium-themes
