@@ -10,14 +10,12 @@ using Radzen.Documents.Fonts;
 using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class FontResolutionPolicyTests
 {
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
-
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
 
@@ -200,11 +198,9 @@ public class FontResolutionPolicyTests
     [Fact]
     public void PdfA3B_CleanDocument_EmitsNoUnembeddedType1()
     {
-        var reader = DocumentReader.Parse(RenderAuthored(Author(PdfAConformance.PdfA3B)));
+        var emission = Encoding.Latin1.GetString(RenderAuthored(Author(PdfAConformance.PdfA3B)));
 
-        Assert.All(
-            BuildTestSupport.Fonts(reader),
-            font => Assert.NotEqual("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont")));
+        Lacks("emission", "/BaseFont /Helvetica ", emission);
     }
 
     [Fact]

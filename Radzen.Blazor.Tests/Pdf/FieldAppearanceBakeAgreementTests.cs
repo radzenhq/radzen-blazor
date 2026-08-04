@@ -1,8 +1,8 @@
 #nullable enable
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,26 +17,22 @@ public class FieldAppearanceBakeAgreementTests
         Value = "secret",
     };
 
-    private static DocumentReader Reload(TextFieldDefinition definition)
+    private static string Emission(TextFieldDefinition definition)
     {
         var document = new Document();
         BuildTestSupport.AddText(document.Sections.Add(), "Body", "Helvetica");
         var pdf = new DocumentRenderer().Render(document);
         pdf.FormFields.Add(definition);
-        return DocumentReader.Parse(pdf.ToArray());
+        return Emit(pdf);
     }
-
-    private static bool NeedAppearances(DocumentReader reader)
-        => FormTestSupport.AcroForm(reader).TryGetValue("NeedAppearances", out var need)
-            && reader.Resolve(need!) is BooleanObject flag && flag.Value;
 
     [Fact]
     public void PlainCreatedTextField_GetsABakedAppearance()
     {
-        var reader = Reload(Field());
+        var emission = Emission(Field());
 
-        Assert.True(FormTestSupport.Field(reader, "f").ContainsKey("AP"));
-        Assert.False(NeedAppearances(reader));
+        Carries("text field", "/AP ", Line(emission, "/T (f)"));
+        Lacks("AcroForm", "/NeedAppearances true", Line(emission, "/Fields ["));
     }
 
     [Theory]
@@ -60,9 +56,9 @@ public class FieldAppearanceBakeAgreementTests
                 break;
         }
 
-        var reader = Reload(definition);
+        var emission = Emission(definition);
 
-        Assert.False(FormTestSupport.Field(reader, "f").ContainsKey("AP"));
-        Assert.True(NeedAppearances(reader));
+        Lacks("text field", "/AP ", Line(emission, "/T (f)"));
+        Carries("AcroForm", "/NeedAppearances true", Line(emission, "/Fields ["));
     }
 }

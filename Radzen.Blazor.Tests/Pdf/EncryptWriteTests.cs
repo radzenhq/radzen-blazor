@@ -6,6 +6,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -128,17 +129,15 @@ public class EncryptWriteTests
             AllowContentCopy = false,
         });
 
-        var reader = DocumentReader.Parse(pdf, string.Empty);
-        var encrypt = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Encrypt"]));
+        var encrypt = Line(Encoding.Latin1.GetString(pdf), "/Filter /Standard");
 
-        Assert.Equal(version, IntValue(encrypt, "V"));
-        Assert.Equal(revision, IntValue(encrypt, "R"));
-        Assert.Equal("Standard", Assert.IsType<NameObject>(encrypt["Filter"]).Value);
+        Assert.Equal(version, NumberIn(encrypt, "V"));
+        Assert.Equal(revision, NumberIn(encrypt, "R"));
+        Carries("encryption dictionary", "/Filter /Standard", encrypt);
 
-        var permissions = IntValue(encrypt, "P");
-        Assert.Equal(0, permissions & 0x008);
-        Assert.Equal(0, permissions & 0x010);
-        Assert.NotEqual(0, permissions & 0x004);
+        LacksFlag("encryption dictionary", encrypt, "P", 0x008);
+        LacksFlag("encryption dictionary", encrypt, "P", 0x010);
+        CarriesFlag("encryption dictionary", encrypt, "P", 0x004);
     }
 
     [Fact]
@@ -148,10 +147,6 @@ public class EncryptWriteTests
         var second = WriteGraph(null);
 
         Assert.Equal(first, second);
-        Assert.DoesNotContain("/Encrypt", Encoding.Latin1.GetString(first), StringComparison.Ordinal);
-        Assert.False(DocumentReader.Parse(first).IsEncrypted);
+        Lacks("emission", "/Encrypt", Encoding.Latin1.GetString(first));
     }
-
-    private static int IntValue(DictionaryObject dictionary, string key)
-        => Assert.IsType<NumberObject>(dictionary[key]).IntValue;
 }

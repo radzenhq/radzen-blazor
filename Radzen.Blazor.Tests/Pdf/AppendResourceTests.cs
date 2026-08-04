@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,6 +27,11 @@ public class AppendResourceTests
         return PortableDocument.LoadFromStream(stream);
     }
 
+    private static string AppendedPage(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("pages node", @"/Kids \[\d+ 0 R (\d+) 0 R", Line(emission, "/Type /Pages ")).Groups[1].Value);
+
     private static (bool HasFont, bool HasXObject) ResourceKinds(DocumentReader reader, int leafIndex)
     {
         var leaves = BuildTestSupport.PageLeaves(reader);
@@ -43,11 +49,10 @@ public class AppendResourceTests
         target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(new DocumentRenderer().Render(BuildFontAndImage()));
 
-        var reader = DocumentReader.Parse(target.ToArray());
+        var appended = AppendedPage(Emit(target));
 
-        var (hasFont, hasXObject) = ResourceKinds(reader, 1);
-        Assert.True(hasFont, "appended built page has /Font resources");
-        Assert.True(hasXObject, "appended built page has /XObject resources");
+        Shaped("appended built page /Font resources", @"/Font << /[^\s/>]+ \d+ 0 R", appended);
+        Shaped("appended built page /XObject resources", @"/XObject << /[^\s/>]+ \d+ 0 R", appended);
     }
 
     [Fact]
@@ -69,11 +74,10 @@ public class AppendResourceTests
         target.Pages.Add().SetContent(TestBytes.Ascii("BT ET"));
         target.Append(loaded);
 
-        var reader = DocumentReader.Parse(target.ToArray());
+        var appended = AppendedPage(Emit(target));
 
-        var (hasFont, hasXObject) = ResourceKinds(reader, 1);
-        Assert.True(hasFont, "appended loaded page has /Font resources");
-        Assert.True(hasXObject, "appended loaded page has /XObject resources");
+        Shaped("appended loaded page /Font resources", @"/Font << /[^\s/>]+ \d+ 0 R", appended);
+        Shaped("appended loaded page /XObject resources", @"/XObject << /[^\s/>]+ \d+ 0 R", appended);
     }
 
     [Fact]

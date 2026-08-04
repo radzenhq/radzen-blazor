@@ -4,8 +4,8 @@ using System.IO;
 using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -34,6 +34,12 @@ public class FormAppearanceConformanceTests
         using var stream = new MemoryStream();
         document.SaveToStream(stream);
         return stream.ToArray();
+    }
+
+    private static string AcroForm(string emission)
+    {
+        var catalog = Line(emission, "/Type /Catalog");
+        return IndirectObject(emission, Shaped("catalog", @"/AcroForm (\d+) 0 R", catalog).Groups[1].Value);
     }
 
     private static byte[] MultilineFieldDocument()
@@ -95,15 +101,10 @@ public class FormAppearanceConformanceTests
         var document = Render(new DocumentRenderer());
         document.AcroForm!.FillField("name", Cyrillic);
 
-        var reader = DocumentReader.Parse(Save(document));
-        var form = FormTestSupport.AcroForm(reader);
+        var emission = Emit(document);
 
-        Assert.True(form.TryGetValue("NeedAppearances", out var need)
-            && reader.Resolve(need!) is BooleanObject { Value: true });
-
-        var field = FormTestSupport.Field(reader, "name");
-        Assert.True(field.TryGetValue("AP", out var appearance));
-        Assert.IsType<NullObject>(reader.Resolve(appearance!));
+        Carries("AcroForm", "/NeedAppearances true", AcroForm(emission));
+        Carries("name field", "/AP null", Line(emission, "/T (name)"));
     }
 
     [Fact]
@@ -189,11 +190,7 @@ public class FormAppearanceConformanceTests
         document.Pages.Add().SetContent(Encoding.ASCII.GetBytes("base"));
         document.Append(PortableDocument.LoadFromStream(new MemoryStream(DonorFormWithNeedAppearances())));
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var form = FormTestSupport.AcroForm(reader);
-
-        Assert.True(form.TryGetValue("NeedAppearances", out var need)
-            && reader.Resolve(need!) is BooleanObject { Value: true });
+        Carries("AcroForm", "/NeedAppearances true", AcroForm(Emit(document)));
     }
 
     [Fact]
@@ -204,12 +201,13 @@ public class FormAppearanceConformanceTests
 
         Assert.Equal(before, after);
 
-        var reader = DocumentReader.Parse(after);
-        var form = FormTestSupport.AcroForm(reader);
-        Assert.False(form.ContainsKey("NeedAppearances"));
+        var emission = Encoding.Latin1.GetString(after);
+        Lacks("AcroForm", "/NeedAppearances", AcroForm(emission));
 
-        var field = FormTestSupport.Field(reader, "name");
-        var appearance = Assert.IsType<DictionaryObject>(reader.Resolve(field["AP"]!));
-        Assert.IsType<StreamObject>(reader.Resolve(appearance["N"]!));
+        var appearance = Shaped("name field", @"/AP << /N (\d+) 0 R >>", Line(emission, "/T (name)"));
+        Carries(
+            "name field /AP /N",
+            ">>\nstream\n",
+            IndirectObject(emission, appearance.Groups[1].Value));
     }
 }

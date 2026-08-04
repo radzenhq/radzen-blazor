@@ -7,6 +7,7 @@ using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -134,11 +135,14 @@ public class AnnotationTests
         page.Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
         document.Flatten();
-        var bytes = document.ToArray();
+        var emission = Emit(document);
+        var pageLine = Line(emission, "/Type /Page ");
 
         Assert.Empty(page.Annotations);
-        Assert.False(DocumentLoadTests.Kid(DocumentReader.Parse(bytes), 0).ContainsKey("Annots"));
-        Assert.Contains("rg", ContentOperationTestHelpers.Operators(page.GetContent() ?? DocumentLoadTests.KidContent(DocumentReader.Parse(bytes), 0)));
+        Lacks("page", "/Annots", pageLine);
+
+        var contents = Shaped("page", @"/Contents (\d+) 0 R", pageLine);
+        Carries("flattened content", " rg", IndirectObject(emission, contents.Groups[1].Value));
     }
 
     [Fact]
@@ -276,11 +280,10 @@ public class AnnotationTests
         var document = new PortableDocument();
         document.Pages.Add().Annotations.Add(new HighlightAnnotation(PdfRect.FromSize(40, 50, 100, 12)));
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var dictionary = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(PageAnnotations(reader))));
-        var points = Assert.IsType<ArrayObject>(dictionary["QuadPoints"]);
+        var emission = Emit(document);
+        var annotation = IndirectObject(emission, References("page", "Annots", 1, Line(emission, "/Type /Page "))[0]);
 
-        Assert.Equal([40, 62, 140, 62, 40, 50, 140, 50], Numbers(reader, points));
+        Carries("highlight annotation", "/QuadPoints [40 62 140 62 40 50 140 50]", annotation);
     }
 
     [Fact]
@@ -290,13 +293,11 @@ public class AnnotationTests
         var ink = document.Pages.Add().Annotations.Add(new InkAnnotation(PdfRect.FromSize(40, 190, 100, 50)));
         ink.Strokes.Add(new InkStroke { new AnnotationPoint(20, 180), new AnnotationPoint(160, 260) });
 
-        var reader = DocumentReader.Parse(document.ToArray());
-        var dictionary = Assert.IsType<DictionaryObject>(reader.Resolve(Assert.Single(PageAnnotations(reader))));
-        var appearances = reader.GetDictionary(dictionary, "AP")!;
-        var appearance = Assert.IsType<StreamObject>(reader.Resolve(appearances["N"]));
-        var box = Assert.IsType<ArrayObject>(appearance.Dictionary["BBox"]);
+        var emission = Emit(document);
+        var annotation = IndirectObject(emission, References("page", "Annots", 1, Line(emission, "/Type /Page "))[0]);
+        var appearance = Shaped("ink annotation", @"/AP << /N (\d+) 0 R >>", annotation);
 
-        Assert.Equal([-20, -10, 120, 70], Numbers(reader, box));
+        Carries("ink appearance", "/BBox [-20 -10 120 70]", IndirectObject(emission, appearance.Groups[1].Value));
     }
 
     [Fact]
@@ -323,17 +324,6 @@ public class AnnotationTests
 
     private static ArrayObject PageAnnotations(DocumentReader reader)
         => Assert.IsType<ArrayObject>(reader.Resolve(DocumentLoadTests.Kid(reader, 0)["Annots"]));
-
-    private static double[] Numbers(DocumentReader reader, ArrayObject values)
-    {
-        var result = new double[values.Count];
-        for (var i = 0; i < values.Count; i++)
-        {
-            result[i] = Assert.IsType<NumberObject>(reader.Resolve(values[i])).DoubleValue;
-        }
-
-        return result;
-    }
 
     private static byte[] ChangeLinkDestinationToName(byte[] bytes)
     {
@@ -400,14 +390,11 @@ public class AnnotationTests
         document.Pages.Add().Annotations.Add(
             new SquareAnnotation(PdfRect.FromSize(10, 10, 40, 40)) { Flags = flags });
 
-        var bytes = document.ToArray();
-        var reader = DocumentReader.Parse(bytes);
-        var page = PdfPageContentTestHelper.PageLeaves(reader, assertStructure: true)[0].Page;
-        var annotation = (DictionaryObject)reader.Resolve(
-            ((ArrayObject)reader.Resolve(page["Annots"]))[0]);
+        var emission = Emit(document);
+        var annotation = IndirectObject(emission, References("page", "Annots", 1, Line(emission, "/Type /Page "))[0]);
 
-        Assert.Equal(bits, ((NumberObject)reader.Resolve(annotation["F"])).IntValue);
-        Assert.Equal(flags, Assert.Single(Load(bytes).Pages[0].Annotations).Flags);
+        Assert.Equal(bits, NumberIn(annotation, "F"));
+        Assert.Equal(flags, Assert.Single(Load(document.ToArray()).Pages[0].Annotations).Flags);
     }
 
     [Fact]

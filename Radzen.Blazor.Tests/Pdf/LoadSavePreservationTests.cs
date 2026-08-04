@@ -2,9 +2,8 @@
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
-using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -17,8 +16,8 @@ public class LoadSavePreservationTests
         return document;
     }
 
-    private static DocumentReader SaveAndParse(PortableDocument document)
-        => DocumentReader.Parse(document.ToArray());
+    private static string PageObject(PortableDocument document)
+        => Line(Emit(document), "/Type /Page ");
 
     private static byte[] Build(string pageExtra, string catalogExtra, string extraObjects, int objectCount)
     {
@@ -47,23 +46,10 @@ public class LoadSavePreservationTests
         return pdf.ToArray();
     }
 
-    private static DictionaryObject Catalog(DocumentReader reader)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
-
-    private static DictionaryObject FirstPage(DocumentReader reader)
-    {
-        var pages = Assert.IsType<DictionaryObject>(reader.Resolve(Catalog(reader)["Pages"]));
-        var kids = Assert.IsType<ArrayObject>(reader.Resolve(pages["Kids"]));
-        return Assert.IsType<DictionaryObject>(reader.Resolve(kids[0]));
-    }
-
     [Fact]
     public void Rotate90_SurvivesLoadSave()
     {
-        var reader = SaveAndParse(LoadSaveReload(Build("/Rotate 90", "", "", 5)));
-
-        var page = FirstPage(reader);
-        Assert.Equal(90, Assert.IsType<NumberObject>(reader.Resolve(page["Rotate"])).IntValue);
+        Carries("page", "/Rotate 90", PageObject(LoadSaveReload(Build("/Rotate 90", "", "", 5))));
     }
 
     [Fact]
@@ -85,8 +71,7 @@ public class LoadSavePreservationTests
 
         Assert.Equal(270, document.Pages[0].Rotate);
 
-        var reader = SaveAndParse(document);
-        Assert.Equal(270, Assert.IsType<NumberObject>(reader.Resolve(FirstPage(reader)["Rotate"])).IntValue);
+        Carries("page", "/Rotate 270", PageObject(document));
     }
 
     [Fact]
@@ -95,7 +80,7 @@ public class LoadSavePreservationTests
         var document = LoadSaveReload(Build("/Rotate 90", "", "", 5));
         document.Pages[0].Rotate = 0;
 
-        Assert.False(FirstPage(SaveAndParse(document)).ContainsKey("Rotate"));
+        Lacks("page", "/Rotate", PageObject(document));
     }
 
     [Fact]
@@ -104,21 +89,16 @@ public class LoadSavePreservationTests
         var document = LoadSaveReload(InheritedRotate270());
         document.Pages[0].Rotate = 0;
 
-        Assert.False(FirstPage(SaveAndParse(document)).ContainsKey("Rotate"));
+        Lacks("page", "/Rotate", PageObject(document));
     }
 
     [Fact]
     public void CropBox_SurvivesLoadSave()
     {
-        var reader = SaveAndParse(LoadSaveReload(Build("/CropBox [10 20 200 400]", "", "", 5)));
-
-        var page = FirstPage(reader);
-        var crop = Assert.IsType<ArrayObject>(reader.Resolve(page["CropBox"]));
-        Assert.Equal(4, crop.Count);
-        Assert.Equal(10.0, Assert.IsType<NumberObject>(crop[0]).DoubleValue);
-        Assert.Equal(20.0, Assert.IsType<NumberObject>(crop[1]).DoubleValue);
-        Assert.Equal(200.0, Assert.IsType<NumberObject>(crop[2]).DoubleValue);
-        Assert.Equal(400.0, Assert.IsType<NumberObject>(crop[3]).DoubleValue);
+        Carries(
+            "page",
+            "/CropBox [10 20 200 400]",
+            PageObject(LoadSaveReload(Build("/CropBox [10 20 200 400]", "", "", 5))));
     }
 
     private static byte[] InheritedRotate270()
@@ -144,18 +124,16 @@ public class LoadSavePreservationTests
     [Fact]
     public void InheritedRotate_FromPageTree_SurvivesLoadSave()
     {
-        var reader = SaveAndParse(LoadSaveReload(InheritedRotate270()));
-        Assert.Equal(270, Assert.IsType<NumberObject>(reader.Resolve(FirstPage(reader)["Rotate"])).IntValue);
+        Carries("page", "/Rotate 270", PageObject(LoadSaveReload(InheritedRotate270())));
     }
 
     [Fact]
     public void NoRotateNoCropBox_StaysUnchanged()
     {
-        var reader = SaveAndParse(LoadSaveReload(Build("", "", "", 5)));
+        var page = PageObject(LoadSaveReload(Build("", "", "", 5)));
 
-        var page = FirstPage(reader);
-        Assert.False(page.ContainsKey("Rotate"));
-        Assert.False(page.ContainsKey("CropBox"));
+        Lacks("page", "/Rotate", page);
+        Lacks("page", "/CropBox", page);
     }
 
     [Fact]
@@ -183,18 +161,19 @@ public class LoadSavePreservationTests
 
         pdf.Append("trailer\n<< /Size 7 /Root 1 0 R >>\n").Append("startxref\n" + xref + "\n%%EOF\n");
 
-        var reader = SaveAndParse(LoadSaveReload(pdf.ToArray()));
-        var catalog = Catalog(reader);
+        var emission = Emit(LoadSaveReload(pdf.ToArray()));
+        var catalog = Line(emission, "/Type /Catalog");
 
-        var outlinesDict = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Outlines"]));
-        var first = Assert.IsType<DictionaryObject>(reader.Resolve(outlinesDict["First"]));
-        Assert.Equal("My Bookmark", Assert.IsType<StringObject>(reader.Resolve(first["Title"])).Value);
+        var outlines = IndirectObject(emission, Shaped("catalog", @"/Outlines (\d+) 0 R", catalog).Groups[1].Value);
+        var first = IndirectObject(emission, Shaped("outline root", @"/First (\d+) 0 R", outlines).Groups[1].Value);
+        Carries("first outline item", "/Title (My Bookmark)", first);
 
-        Assert.True(catalog.ContainsKey("PageLabels"));
-        Assert.Equal("en-US", Assert.IsType<StringObject>(reader.Resolve(catalog["Lang"])).Value);
+        Carries("catalog", "/PageLabels <<", catalog);
+        Carries("catalog", "/Lang (en-US)", catalog);
 
-        var openAction = Assert.IsType<ArrayObject>(reader.Resolve(catalog["OpenAction"]));
-        var target = Assert.IsType<DictionaryObject>(reader.Resolve(openAction[0]));
-        Assert.Equal("Page", Assert.IsType<NameObject>(target["Type"]).Value);
+        var target = IndirectObject(
+            emission,
+            Shaped("catalog", @"/OpenAction \[(\d+) 0 R /Fit\]", catalog).Groups[1].Value);
+        Carries("open action target", "/Type /Page ", target);
     }
 }

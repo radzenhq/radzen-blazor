@@ -5,10 +5,10 @@ using System.Linq;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -70,27 +70,25 @@ public class PdfSignerTests
         }
     }
 
-    private static DictionaryObject Catalog(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(reader.Trailer["Root"]);
+    private static string Emitted(byte[] bytes) => Encoding.Latin1.GetString(bytes);
 
-    private static DictionaryObject AcroForm(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(Catalog(reader)["AcroForm"]);
-
-    private static DictionaryObject Field(DocumentReader reader, int index)
+    private static string SignatureOf(string emission, string fieldName)
     {
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]);
-        return (DictionaryObject)reader.Resolve(fields[index]);
+        var field = Line(emission, $"/T ({fieldName})");
+        var value = Shaped($"field {fieldName}", @"/V (\d+) 0 R", field);
+        return IndirectObject(emission, value.Groups[1].Value);
     }
 
-    private static DictionaryObject SignatureValue(DocumentReader reader, int index)
-        => (DictionaryObject)reader.Resolve(Field(reader, index)["V"]);
-
-    private static (int GapStart, int GapEnd, int Tail) ByteRange(DocumentReader reader, DictionaryObject signature)
+    private static (int GapStart, int GapEnd, int Tail) ByteRange(string emission, string fieldName)
     {
-        var range = (ArrayObject)reader.Resolve(signature["ByteRange"]);
-        Assert.Equal(4, range.Count);
-        Assert.Equal(0, ((NumberObject)range[0]).IntValue);
-        return (((NumberObject)range[1]).IntValue, ((NumberObject)range[2]).IntValue, ((NumberObject)range[3]).IntValue);
+        var match = Shaped(
+            $"signature of {fieldName}",
+            @"/ByteRange \[0 (\d+) (\d+) (\d+) *\]",
+            SignatureOf(emission, fieldName));
+        return (
+            int.Parse(match.Groups[1].Value),
+            int.Parse(match.Groups[2].Value),
+            int.Parse(match.Groups[3].Value));
     }
 
     private static byte[] CoveredContent(byte[] bytes, int gapStart, int gapEnd, int tail)
@@ -135,10 +133,9 @@ public class PdfSignerTests
         return 2 + count + length;
     }
 
-    private static void VerifySignature(byte[] fileBytes, DocumentReader reader, int fieldIndex)
+    private static void VerifySignature(byte[] fileBytes, string fieldName)
     {
-        var signature = SignatureValue(reader, fieldIndex);
-        var (gapStart, gapEnd, tail) = ByteRange(reader, signature);
+        var (gapStart, gapEnd, tail) = ByteRange(Emitted(fileBytes), fieldName);
         var content = CoveredContent(fileBytes, gapStart, gapEnd, tail);
         var padded = DecodeContentsHex(fileBytes, gapStart, gapEnd);
         var der = padded[..DerTotalLength(padded)];
@@ -238,10 +235,10 @@ public class PdfSignerTests
         Assert.Single(PortableDocument.LoadFromStream(new MemoryStream(original)).Pages);
 
         var signed = PdfSigner.Sign(original, Options(), new DelegateSigner(_ => [1, 2, 3]));
+        var emission = Emitted(signed);
 
-        var reader = DocumentReader.Parse(signed);
-        Assert.Single(reader.GetArray(DocumentLoadTests.PagesNode(reader), "Kids")!);
-        Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 0), "Annots")!);
+        var pages = Shaped("rewritten page tree", @"/Type /Pages /Kids \[(\d+) 0 R\] /Count 1", emission);
+        References("signed page", "Annots", 1, IndirectObject(emission, pages.Groups[1].Value));
     }
 
     [Fact]
@@ -288,8 +285,7 @@ public class PdfSignerTests
 
         Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
 
-        var reader = DocumentReader.Parse(signed);
-        VerifySignature(signed, reader, 0);
+        VerifySignature(signed, "Signature1");
 
         var decoyStart = IndexOfAscii(signed, "/Decoy (/Contents <");
         Assert.True(decoyStart >= 0);
@@ -328,34 +324,31 @@ public class PdfSignerTests
         Assert.True(signed.Length > original.Length);
         Assert.True(signed.AsSpan(0, original.Length).SequenceEqual(original));
 
-        var reader = DocumentReader.Parse(signed);
-        var acroForm = AcroForm(reader);
-        Assert.Equal(3, ((NumberObject)reader.Resolve(acroForm["SigFlags"])).IntValue);
-        Assert.Equal(1, ((ArrayObject)reader.Resolve(acroForm["Fields"])).Count);
+        var emission = Emitted(signed);
+        var acroForm = Line(emission, "/SigFlags");
+        Assert.Equal(3, NumberIn(acroForm, "SigFlags"));
 
-        var field = Field(reader, 0);
-        Assert.Equal("Sig", ((NameObject)field["FT"]).Value);
-        Assert.Equal("Signature1", ((StringObject)field["T"]).Value);
-        Assert.Equal("Widget", ((NameObject)field["Subtype"]).Value);
-        Assert.Equal(132, ((NumberObject)field["F"]).IntValue);
+        var fields = References("AcroForm", "Fields", 1, acroForm);
+        var field = IndirectObject(emission, fields[0]);
+        Carries("signature field", "/FT /Sig", field);
+        Carries("signature field", "/T (Signature1)", field);
+        Carries("signature field", "/Subtype /Widget", field);
+        Assert.Equal(132, NumberIn(field, "F"));
 
-        var signature = SignatureValue(reader, 0);
-        Assert.Equal("Sig", ((NameObject)signature["Type"]).Value);
-        Assert.Equal("Adobe.PPKLite", ((NameObject)signature["Filter"]).Value);
-        Assert.Equal("adbe.pkcs7.detached", ((NameObject)signature["SubFilter"]).Value);
-        Assert.True(signature.ContainsKey("ByteRange"));
-        Assert.True(signature.ContainsKey("Contents"));
-        Assert.Equal("Approval", ((StringObject)signature["Reason"]).Value);
-        Assert.Equal("Sofia", ((StringObject)signature["Location"]).Value);
-        Assert.Equal("info@radzen.com", ((StringObject)signature["ContactInfo"]).Value);
-        Assert.Equal("Radzen Test Signer", ((StringObject)signature["Name"]).Value);
-        Assert.Equal("D:20260315120000+00'00'", ((StringObject)signature["M"]).Value);
+        var signature = SignatureOf(emission, "Signature1");
+        Carries("signature", "/Type /Sig", signature);
+        Carries("signature", "/Filter /Adobe.PPKLite", signature);
+        Carries("signature", "/SubFilter /adbe.pkcs7.detached", signature);
+        Carries("signature", "/ByteRange [", signature);
+        Carries("signature", "/Contents <", signature);
+        Carries("signature", "/Reason (Approval)", signature);
+        Carries("signature", "/Location (Sofia)", signature);
+        Carries("signature", "/ContactInfo (info@radzen.com)", signature);
+        Carries("signature", "/Name (Radzen Test Signer)", signature);
+        Carries("signature", "/M (D:20260315120000+00'00')", signature);
 
-        var page = (DictionaryObject)reader.Resolve(
-            ((ArrayObject)reader.Resolve(((DictionaryObject)reader.Resolve(Catalog(reader)["Pages"]))["Kids"]))[0]);
-        var annots = (ArrayObject)reader.Resolve(page["Annots"]);
-        var fieldNumber = ((ReferenceObject)((ArrayObject)reader.Resolve(acroForm["Fields"]))[0]).ObjectNumber;
-        Assert.Contains(annots, annot => annot is ReferenceObject r && r.ObjectNumber == fieldNumber);
+        var annots = References("signed page", "Annots", 1, Line(emission, "/Annots ["));
+        Assert.Equal(fields[0], annots[0]);
     }
 
     [Fact]
@@ -367,8 +360,7 @@ public class PdfSignerTests
         var options = Options();
 
         var signed = PdfSigner.Sign(original, options, signer);
-        var reader = DocumentReader.Parse(signed);
-        var (gapStart, gapEnd, tail) = ByteRange(reader, SignatureValue(reader, 0));
+        var (gapStart, gapEnd, tail) = ByteRange(Emitted(signed), "Signature1");
 
         Assert.Equal(signed.Length, gapEnd + tail);
         Assert.Equal(options.SignatureMaxSizeBytes * 2 + 2, gapEnd - gapStart);
@@ -391,9 +383,8 @@ public class PdfSignerTests
         using var certificate = CreateCertificate();
 
         var signed = PdfSigner.Sign(original, Options(), CmsSigner(certificate));
-        var reader = DocumentReader.Parse(signed);
 
-        VerifySignature(signed, reader, 0);
+        VerifySignature(signed, "Signature1");
     }
 
     [Fact]
@@ -409,14 +400,13 @@ public class PdfSignerTests
 
         Assert.True(twice.AsSpan(0, once.Length).SequenceEqual(once));
 
-        var reader = DocumentReader.Parse(twice);
-        var fields = (ArrayObject)reader.Resolve(AcroForm(reader)["Fields"]);
-        Assert.Equal(2, fields.Count);
-        Assert.Equal("Signature1", ((StringObject)Field(reader, 0)["T"]).Value);
-        Assert.Equal("Signature2", ((StringObject)Field(reader, 1)["T"]).Value);
+        var emission = Emitted(twice);
+        var fields = References("AcroForm", "Fields", 2, emission);
+        Carries("first signature field", "/T (Signature1)", IndirectObject(emission, fields[0]));
+        Carries("second signature field", "/T (Signature2)", IndirectObject(emission, fields[1]));
 
-        VerifySignature(twice, reader, 0);
-        VerifySignature(twice, reader, 1);
+        VerifySignature(twice, "Signature1");
+        VerifySignature(twice, "Signature2");
     }
 
     [Fact]
@@ -484,11 +474,8 @@ public class PdfSignerTests
     public void Sign_DefaultSubFilter_IsTheDetachedPkcs7Name()
     {
         var signed = PdfSigner.Sign(BuildPdf(), Options(), new DelegateSigner(_ => [1, 2, 3]));
-        var reader = DocumentReader.Parse(signed);
 
-        Assert.Equal(
-            "adbe.pkcs7.detached",
-            ((NameObject)reader.Resolve(SignatureValue(reader, 0)["SubFilter"])).Value);
+        Carries("signature", "/SubFilter /adbe.pkcs7.detached", SignatureOf(Emitted(signed), "Signature1"));
     }
 
     [Theory]
@@ -500,11 +487,8 @@ public class PdfSignerTests
         options.SubFilter = subFilter;
 
         var signed = PdfSigner.Sign(BuildPdf(), options, new DelegateSigner(_ => [1, 2, 3]));
-        var reader = DocumentReader.Parse(signed);
 
-        Assert.Equal(
-            subFilter,
-            ((NameObject)reader.Resolve(SignatureValue(reader, 0)["SubFilter"])).Value);
+        Carries("signature", $"/SubFilter /{subFilter}", SignatureOf(Emitted(signed), "Signature1"));
     }
 
     [Fact]

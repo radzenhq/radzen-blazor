@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -35,12 +35,11 @@ public class AppendRotateCropTests
     private static PortableDocument Load(string pageExtra)
         => PortableDocument.LoadFromStream(new MemoryStream(Build(pageExtra)));
 
-    private static DictionaryObject Kid(DocumentReader reader, int index)
+    private static string AppendedPage(string emission)
     {
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
-        var pages = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["Pages"]));
-        var kids = Assert.IsType<ArrayObject>(reader.Resolve(pages["Kids"]));
-        return Assert.IsType<DictionaryObject>(reader.Resolve(kids[index]));
+        var pages = Shaped("catalog", @"/Pages (\d+) 0 R", Line(emission, "/Type /Catalog"));
+        var kids = References("page tree", "Kids", 2, IndirectObject(emission, pages.Groups[1].Value));
+        return IndirectObject(emission, kids[1]);
     }
 
     [Fact]
@@ -50,16 +49,10 @@ public class AppendRotateCropTests
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(Load("/Rotate 90 /CropBox [10 20 200 400]"));
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var appended = Kid(reader, 1);
+        var appended = AppendedPage(Emit(target));
 
-        Assert.Equal(90, Assert.IsType<NumberObject>(reader.Resolve(appended["Rotate"])).IntValue);
-        var crop = Assert.IsType<ArrayObject>(reader.Resolve(appended["CropBox"]));
-        Assert.Equal(4, crop.Count);
-        Assert.Equal(10.0, Assert.IsType<NumberObject>(crop[0]).DoubleValue);
-        Assert.Equal(20.0, Assert.IsType<NumberObject>(crop[1]).DoubleValue);
-        Assert.Equal(200.0, Assert.IsType<NumberObject>(crop[2]).DoubleValue);
-        Assert.Equal(400.0, Assert.IsType<NumberObject>(crop[3]).DoubleValue);
+        Carries("appended page", "/Rotate 90", appended);
+        Carries("appended page", "/CropBox [10 20 200 400]", appended);
     }
 
     [Fact]
@@ -74,12 +67,14 @@ public class AppendRotateCropTests
         a.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         a.Append(c);
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var appended = Kid(reader, 1);
+        var appended = AppendedPage(Emit(a));
 
-        Assert.Equal(270, Assert.IsType<NumberObject>(reader.Resolve(appended["Rotate"])).IntValue);
-        var crop = Assert.IsType<ArrayObject>(reader.Resolve(appended["CropBox"]));
-        Assert.Equal(100.0, Assert.IsType<NumberObject>(crop[2]).DoubleValue);
+        Carries("appended page", "/Rotate 270", appended);
+        var crop = Shaped(
+            "appended page",
+            @"/CropBox \[(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+)\]",
+            appended);
+        Assert.Equal("100", crop.Groups[3].Value);
     }
 
     [Fact]
@@ -89,10 +84,9 @@ public class AppendRotateCropTests
         target.Pages.Add().SetContent(Encoding.ASCII.GetBytes("own-page"));
         target.Append(Load(""));
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var appended = Kid(reader, 1);
+        var appended = AppendedPage(Emit(target));
 
-        Assert.False(appended.ContainsKey("Rotate"));
-        Assert.False(appended.ContainsKey("CropBox"));
+        Lacks("appended page", "/Rotate", appended);
+        Lacks("appended page", "/CropBox", appended);
     }
 }

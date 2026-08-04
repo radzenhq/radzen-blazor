@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -43,9 +44,6 @@ public class EncryptMetadataOptionTests
         return buffer.ToArray();
     }
 
-    private static DictionaryObject Encrypt(DocumentReader reader)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Encrypt"]));
-
     private static DictionaryObject FirstPage(DocumentReader reader)
     {
         var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
@@ -66,12 +64,11 @@ public class EncryptMetadataOptionTests
     public void EncryptMetadataFalse_WritesFlagFalse(EncryptionAlgorithm algorithm)
     {
         var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm, EncryptMetadata = false });
-        var reader = DocumentReader.Parse(pdf, string.Empty);
 
-        var encrypt = Encrypt(reader);
-        Assert.True(encrypt.TryGetValue("EncryptMetadata", out var value));
-        var flag = Assert.IsType<BooleanObject>(reader.Resolve(value!));
-        Assert.False(flag.Value);
+        Carries(
+            "encryption dictionary",
+            "/EncryptMetadata false",
+            Line(Encoding.Latin1.GetString(pdf), "/Filter /Standard"));
     }
 
     [Theory]
@@ -104,8 +101,10 @@ public class EncryptMetadataOptionTests
     public void EncryptMetadataTrue_OmitsFlag(EncryptionAlgorithm algorithm)
     {
         var pdf = WriteGraph(new EncryptionOptions { Material = new SeededEncryptionMaterial([7]), Algorithm = algorithm });
-        var reader = DocumentReader.Parse(pdf, string.Empty);
 
-        Assert.False(Encrypt(reader).ContainsKey("EncryptMetadata"));
+        Lacks(
+            "encryption dictionary",
+            "/EncryptMetadata",
+            Line(Encoding.Latin1.GetString(pdf), "/Filter /Standard"));
     }
 }

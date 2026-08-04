@@ -1,37 +1,28 @@
 #nullable enable
 
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.4.3 line cap, join, miter limit and dash pattern.
 public class PathContentStrokeStyleTests
 {
-    private static ContentOperation Find(byte[] content, string op)
-    {
-        foreach (var operation in ContentStreamTokenizer.Parse(content))
-        {
-            if (operation.Operator == op)
-            {
-                return operation;
-            }
-        }
-
-        throw new Xunit.Sdk.XunitException($"operator '{op}' not found");
-    }
-
-    private static byte[] Render(PathContent path)
+    private static string Render(PathContent path)
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(path);
-        return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
+
+        var emission = Emit(document);
+        return IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page ")).Groups[1].Value);
     }
 
-    private static PathContent Line()
+    private static PathContent StrokedLine()
     {
         var path = new PathContent { Stroke = true };
         path.MoveTo(0, 0);
@@ -42,49 +33,47 @@ public class PathContentStrokeStyleTests
     [Fact]
     public void LineCap_EmitsJOperatorWithEnumValue()
     {
-        var path = Line();
+        var path = StrokedLine();
         path.Cap = LineCap.Round;
 
-        Assert.Equal(1, Find(Render(path), "J").Num(0), 3);
+        Carries("page content", "\n1 J\n", Render(path));
     }
 
     [Fact]
     public void LineJoin_EmitsLowercaseJOperatorWithEnumValue()
     {
-        var path = Line();
+        var path = StrokedLine();
         path.Join = LineJoin.Bevel;
 
-        Assert.Equal(2, Find(Render(path), "j").Num(0), 3);
+        Carries("page content", "\n2 j\n", Render(path));
     }
 
     [Fact]
     public void MiterLimit_EmitsMOperator()
     {
-        var path = Line();
+        var path = StrokedLine();
         path.MiterLimit = 4.5;
 
-        Assert.Equal(4.5, Find(Render(path), "M").Num(0), 3);
+        Carries("page content", "\n4.5 M\n", Render(path));
     }
 
     [Fact]
     public void SetDash_EmitsDashArrayAndPhase()
     {
-        var path = Line();
+        var path = StrokedLine();
         path.SetDash([3, 2], 1);
 
-        var dash = Find(Render(path), "d");
-
-        Assert.Equal([3d, 2d, 1d], dash.Operands.FindAll(o => o.Kind == ContentTokenKind.Number).ConvertAll(o => o.Number));
+        Carries("page content", "\n[3 2] 1 d\n", Render(path));
     }
 
     [Fact]
     public void Defaults_EmitNoStrokeStyleOperators()
     {
-        var operators = ContentStreamTokenizer.Operators(Render(Line()));
+        var content = Render(StrokedLine());
 
-        Assert.DoesNotContain("J", operators);
-        Assert.DoesNotContain("j", operators);
-        Assert.DoesNotContain("M", operators);
-        Assert.DoesNotContain("d", operators);
+        Lacks("page content", " J\n", content);
+        Lacks("page content", " j\n", content);
+        Lacks("page content", " M\n", content);
+        Lacks("page content", " d\n", content);
     }
 }

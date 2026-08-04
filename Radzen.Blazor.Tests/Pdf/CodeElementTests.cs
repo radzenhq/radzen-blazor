@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -213,13 +213,10 @@ public class CodeElementTests
         var section = document.Sections.Add();
         section.Blocks.AddBarcode(BarcodeType.Code128, "RADZEN", Unit.FromPoint(200), Unit.FromPoint(40), showText: true);
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var emission = Emit(builderRenderer.Render(document));
 
-        Assert.DoesNotContain(BuildTestSupport.Fonts(reader), f =>
-            f.TryGetValue("BaseFont", out var baseFont)
-            && reader.Resolve(baseFont!) is NameObject name
-            && name.Value == "Helvetica");
-        Assert.NotEmpty(BuildTestSupport.Type0Fonts(reader));
+        Lacks("PDF/A-3b emission", "/BaseFont /Helvetica", emission);
+        Carries("PDF/A-3b emission", "/Subtype /Type0", emission);
     }
 
     [Fact]
@@ -246,14 +243,8 @@ public class CodeElementTests
         barcode.Font.Family = "Courier";
         barcode.Font.Size = 8;
 
-        var reader = BuildTestSupport.Read(document);
-        var content = CascadeTestSupport.FirstPageContent(document);
-
-        Assert.Contains(8.0, CascadeTestSupport.TfSizes(content));
-        Assert.Contains(BuildTestSupport.Fonts(reader), f =>
-            f.TryGetValue("BaseFont", out var baseFont)
-            && reader.Resolve(baseFont!) is NameObject name
-            && name.Value == "Courier");
+        Assert.Contains(8.0, CascadeTestSupport.TfSizes(CascadeTestSupport.FirstPageContent(document)));
+        Carries("emission", "/BaseFont /Courier", Emit(new DocumentRenderer().Render(document)));
     }
 
     [Fact]
@@ -320,12 +311,12 @@ public class CodeElementTests
         section.Blocks.AddBarcode(BarcodeType.Code128, "PDFA", Unit.FromPoint(160), Unit.FromPoint(30));
 
         var reader = BuildTestSupport.Read(document, builderRenderer);
+        var emission = Emit(new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(document));
+        var metadata = Shaped("catalog", @"/Metadata (\d+) 0 R", Line(emission, "/Type /Catalog"));
+        var packet = IndirectObject(emission, metadata.Groups[1].Value);
 
-        var root = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]!));
-        var metadata = Assert.IsType<StreamObject>(reader.Resolve(root["Metadata"]));
-        var packet = Encoding.UTF8.GetString(metadata.Data.ToArray());
-        Assert.Contains("<pdfaid:part>3</pdfaid:part>", packet, StringComparison.Ordinal);
-        Assert.Contains("<pdfaid:conformance>B</pdfaid:conformance>", packet, StringComparison.Ordinal);
+        Carries("XMP packet", "<pdfaid:part>3</pdfaid:part>", packet);
+        Carries("XMP packet", "<pdfaid:conformance>B</pdfaid:conformance>", packet);
 
         Assert.NotEmpty(FilledRects(ContentTestHelpers.PageContent(reader, 0)));
     }

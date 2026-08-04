@@ -1,14 +1,18 @@
 #nullable enable
 using System;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
-using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class PathClipTests
 {
+    private static string PageContent(string emission)
+        => IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page ")).Groups[1].Value);
+
     [Fact]
     public void PathClip_IsScoped_AndDoesNotLeak()
     {
@@ -29,18 +33,22 @@ public class PathClipTests
         fill.Close();
         page.Content.Add(fill);
 
-        var content = Encoding.Latin1.GetString(
-            ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0));
+        var content = PageContent(Emit(document));
 
         Assert.Equal(
             BuildTestSupport.CountOccurrences(content, "q\n"),
             BuildTestSupport.CountOccurrences(content, "Q\n"));
 
-        var w = content.IndexOf("W\n", StringComparison.Ordinal);
-        var q = content.IndexOf("Q\n", w, StringComparison.Ordinal);
-        var f = content.LastIndexOf("f\n", StringComparison.Ordinal);
-        Assert.True(w >= 0, "expected a clip W operator");
-        Assert.True(q > w, "the clip must be closed by a Q before anything else");
-        Assert.True(f > q, "the following fill must paint after the clip's Q");
+        Carries("page content", "\nW\n", content);
+        var w = content.IndexOf("\nW\n", StringComparison.Ordinal);
+        var q = content.IndexOf("\nQ\n", w, StringComparison.Ordinal);
+        var f = content.LastIndexOf("\nf\n", StringComparison.Ordinal);
+
+        Assert.True(
+            q > w,
+            $"the clip must be closed by a 'Q' before anything else.\npage content:\n{Excerpt(content)}");
+        Assert.True(
+            f > q,
+            $"the following fill must paint after the clip's 'Q'.\npage content:\n{Excerpt(content)}");
     }
 }

@@ -8,9 +8,9 @@ using Radzen.Documents.Core;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -117,34 +117,6 @@ public class ColdReviewRegressionTests
         Assert.Contains("accessible name", exception.Message);
     }
 
-    private static bool HasLinkWrappingForm(DocumentReader reader, DictionaryObject element)
-    {
-        if (reader.GetName(element, "S") == "Link"
-            && reader.Resolve(element.TryGetValue("K", out var kids) ? kids! : new NullObject()) is { } resolved)
-        {
-            foreach (var kid in resolved is ArrayObject array ? array.ToArray() : [resolved])
-            {
-                if (reader.Resolve(kid) is DictionaryObject child && reader.GetName(child, "S") == "Form")
-                {
-                    return true;
-                }
-            }
-        }
-
-        if (element.TryGetValue("K", out var walk) && reader.Resolve(walk!) is { } value)
-        {
-            foreach (var kid in value is ArrayObject array ? array.ToArray() : [value])
-            {
-                if (reader.Resolve(kid) is DictionaryObject child && HasLinkWrappingForm(reader, child))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     [Fact]
     public void LinkedFormField_IsWrappedInALinkStructureElement()
     {
@@ -156,12 +128,11 @@ public class ColdReviewRegressionTests
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name", Link = "https://radzen.com" });
 
-        var rendered = new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.Render(document);
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var catalog = ContentTestHelpers.Catalog(reader);
-        var root = Assert.IsType<DictionaryObject>(reader.Resolve(catalog["StructTreeRoot"]));
+        var emission = Emit(new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.Render(document));
+        var form = Line(emission, "/S /Form");
+        var parent = Shaped("Form structure element", @"/P (\d+) 0 R", form);
 
-        Assert.True(HasLinkWrappingForm(reader, root), "the widget's Link annotation must be owned by a Link element wrapping the Form");
+        Carries("Form structure element parent", "/S /Link", IndirectObject(emission, parent.Groups[1].Value));
     }
 
     [Fact]

@@ -1,6 +1,10 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.LaidOut;
@@ -8,12 +12,36 @@ using Radzen.Documents.Layout;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class TaggedTableSemanticsTests
 {
     private static DocumentRenderer Accessible() => new() { Accessibility = PdfUaConformance.PdfUa1 };
+
+    private static string Rendered(Document document, DocumentRenderer renderer)
+        => Encoding.Latin1.GetString(renderer.ToArray(document));
+
+    private static string Element(string type) => $"/Type /StructElem /S /{type} /P ";
+
+    private static string[] Elements(string emission, string type)
+        => [.. Regex.Matches(emission, $@"\d+ 0 obj\n<< {Regex.Escape(Element(type))}[^\n]*")
+            .Select(match => match.Value)];
+
+    private static string Kids(string subject, string element)
+        => Shaped(subject, @"/K \[([^\]]*)\]", element).Groups[1].Value;
+
+    private static string[] ChildElements(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, "<< [^>]*>>", " "), @"(\d+) 0 R")
+            .Select(match => match.Groups[1].Value)];
+
+    private static int[] Mcids(string kids)
+        => [.. Regex.Matches(Regex.Replace(kids, @"<< [^>]*>>|\d+ 0 R", " "), @"\d+")
+            .Select(match => int.Parse(match.Value, CultureInfo.InvariantCulture))];
+
+    private static string Scope(string headerCell)
+        => Shaped("header cell", @"/Scope /(\w+)", headerCell).Groups[1].Value;
 
     private static Document Invoice()
     {
@@ -41,14 +69,17 @@ public class TaggedTableSemanticsTests
     [Fact]
     public void CellContent_IsCapturedAsParagraphsBeneathTheCell()
     {
-        var root = TaggedStructureProbe.Root(BuildTestSupport.Read(Invoice(), Accessible()));
+        var emission = Rendered(Invoice(), Accessible());
 
-        foreach (var cell in TaggedStructureProbe.All(root, "TH").Concat(TaggedStructureProbe.All(root, "TD")))
+        foreach (var cell in Elements(emission, "TH").Concat(Elements(emission, "TD")))
         {
-            Assert.Empty(cell.Mcids);
-            var paragraph = Assert.Single(cell.Children);
-            Assert.Equal("P", paragraph.Type);
-            Assert.NotEmpty(paragraph.Mcids);
+            var kids = Kids("cell element", cell);
+            Assert.Empty(Mcids(kids));
+
+            var child = Assert.Single(ChildElements(kids));
+            var paragraph = IndirectObject(emission, child);
+            Carries($"cell child {child} 0 R", Element("P"), paragraph);
+            Assert.NotEmpty(Mcids(Kids($"paragraph {child} 0 R", paragraph)));
         }
     }
 
@@ -66,28 +97,27 @@ public class TaggedTableSemanticsTests
         TableLayoutSupport.Fill(cell, "Summary");
         ((Paragraph)cell.Blocks[0]).StyleName = "Heading3";
 
-        var root = TaggedStructureProbe.Root(BuildTestSupport.Read(document, Accessible()));
-        var td = TaggedStructureProbe.Single(root, "TD");
+        var emission = Rendered(document, Accessible());
+        var td = Assert.Single(Elements(emission, "TD"));
 
-        Assert.Equal("H3", Assert.Single(td.Children).Type);
+        var child = Assert.Single(ChildElements(Kids("body cell", td)));
+        Carries($"body cell child {child} 0 R", Element("H3"), IndirectObject(emission, child));
     }
 
     [Fact]
     public void HeaderCell_DerivesItsScopeFromTheHeaderRow()
     {
-        var reader = BuildTestSupport.Read(Invoice(), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Invoice(), Accessible());
 
-        foreach (var th in TaggedStructureProbe.All(root, "TH"))
+        foreach (var th in Elements(emission, "TH"))
         {
-            var attributes = Assert.IsType<DictionaryObject>(reader.Resolve(th.Dict["A"]!));
-            Assert.Equal("Table", BuildTestSupport.Name(reader, attributes, "O"));
-            Assert.Equal("Column", BuildTestSupport.Name(reader, attributes, "Scope"));
+            Carries("header cell", "/A << /O /Table ", th);
+            Carries("header cell", "/Scope /Column ", th);
         }
 
-        foreach (var td in TaggedStructureProbe.All(root, "TD"))
+        foreach (var td in Elements(emission, "TD"))
         {
-            Assert.False(td.Dict.ContainsKey("A"), "a body cell carries no table scope");
+            Lacks("body cell", "/A <<", td);
         }
     }
 
@@ -115,46 +145,36 @@ public class TaggedTableSemanticsTests
         return document;
     }
 
-    private static DictionaryObject Attributes(DocumentReader reader, ProbeElement element)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(element.Dict["A"]!));
-
     [Fact]
     public void HeaderColumn_GivesItsCellsTheRowScope()
     {
-        var reader = BuildTestSupport.Read(Matrix(headerRow: false, headerColumn: true), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Matrix(headerRow: false, headerColumn: true), Accessible());
+        var headers = Elements(emission, "TH");
 
-        var headers = TaggedStructureProbe.All(root, "TH");
-
-        Assert.Equal(2, headers.Count);
-        Assert.All(headers, th => Assert.Equal("Row", BuildTestSupport.Name(reader, Attributes(reader, th), "Scope")));
-        Assert.Equal(2, TaggedStructureProbe.All(root, "TD").Count);
+        Assert.Equal(2, headers.Length);
+        Assert.All(headers, th => Assert.Equal("Row", Scope(th)));
+        Assert.Equal(2, Elements(emission, "TD").Length);
     }
 
     [Fact]
     public void HeaderRowAndHeaderColumn_MeetInACellScopedToBoth()
     {
-        var reader = BuildTestSupport.Read(Matrix(headerRow: true, headerColumn: true), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Matrix(headerRow: true, headerColumn: true), Accessible());
 
-        var scopes = TaggedStructureProbe.All(root, "TH")
-            .Select(th => BuildTestSupport.Name(reader, Attributes(reader, th), "Scope"))
-            .ToList();
+        var scopes = Elements(emission, "TH").Select(Scope).ToList();
 
-        Assert.Equal(["Both", "Column", "Row"], scopes.OrderBy(scope => scope).ToList());
-        Assert.Single(TaggedStructureProbe.All(root, "TD"));
+        Assert.Equal(["Both", "Column", "Row"], scopes.OrderBy(scope => scope, StringComparer.Ordinal).ToList());
+        Assert.Single(Elements(emission, "TD"));
     }
 
     [Fact]
     public void HeaderRowAlone_ScopesEveryHeaderCellToItsColumn()
     {
-        var reader = BuildTestSupport.Read(Matrix(headerRow: true, headerColumn: false), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Matrix(headerRow: true, headerColumn: false), Accessible());
+        var headers = Elements(emission, "TH");
 
-        var headers = TaggedStructureProbe.All(root, "TH");
-
-        Assert.Equal(2, headers.Count);
-        Assert.All(headers, th => Assert.Equal("Column", BuildTestSupport.Name(reader, Attributes(reader, th), "Scope")));
+        Assert.Equal(2, headers.Length);
+        Assert.All(headers, th => Assert.Equal("Column", Scope(th)));
     }
 
     private static Document Merged(int rowSpan, int columnSpan)
@@ -194,15 +214,12 @@ public class TaggedTableSemanticsTests
     [Fact]
     public void SpanningCell_CarriesItsRowAndColumnSpanIntoTheStructureTree()
     {
-        var reader = BuildTestSupport.Read(Merged(rowSpan: 2, columnSpan: 2), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Merged(rowSpan: 2, columnSpan: 2), Accessible());
+        var merged = Assert.Single(Elements(emission, "TD"));
 
-        var merged = Assert.Single(TaggedStructureProbe.All(root, "TD"));
-        var attributes = Attributes(reader, merged);
-
-        Assert.Equal("Table", BuildTestSupport.Name(reader, attributes, "O"));
-        Assert.Equal(2, BuildTestSupport.Int(attributes, "RowSpan"));
-        Assert.Equal(2, BuildTestSupport.Int(attributes, "ColSpan"));
+        Carries("merged cell", "/A << /O /Table ", merged);
+        Assert.Equal(2, NumberIn(merged, "RowSpan"));
+        Assert.Equal(2, NumberIn(merged, "ColSpan"));
     }
 
     private static Document CombinedSpans()
@@ -266,50 +283,39 @@ public class TaggedTableSemanticsTests
     [Fact]
     public void CombinedSpans_TaggedGridHasExactCountsScopesAndEffectiveSpans()
     {
-        var reader = BuildTestSupport.Read(CombinedSpans(), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
-        var headers = TaggedStructureProbe.All(root, "TH");
+        var emission = Rendered(CombinedSpans(), Accessible());
+        var headers = Elements(emission, "TH");
 
-        Assert.Equal(3, headers.Count);
-        Assert.Empty(TaggedStructureProbe.All(root, "TD"));
-        Assert.Equal(
-            ["Column", "Both", "Row"],
-            headers.Select(header => BuildTestSupport.Name(reader, Attributes(reader, header), "Scope")).ToArray());
+        Assert.Equal(3, headers.Length);
+        Assert.Empty(Elements(emission, "TD"));
+        Assert.Equal(["Column", "Both", "Row"], headers.Select(Scope).ToArray());
 
-        var merged = Attributes(reader, headers[0]);
-        Assert.Equal(3, BuildTestSupport.Int(merged, "RowSpan"));
-        Assert.Equal(2, BuildTestSupport.Int(merged, "ColSpan"));
+        Assert.Equal(3, NumberIn(headers[0], "RowSpan"));
+        Assert.Equal(2, NumberIn(headers[0], "ColSpan"));
 
-        var unspanned = Attributes(reader, headers[1]);
-        Assert.False(unspanned.ContainsKey("RowSpan"));
-        Assert.False(unspanned.ContainsKey("ColSpan"));
+        Lacks("unspanned header cell", "/RowSpan", headers[1]);
+        Lacks("unspanned header cell", "/ColSpan", headers[1]);
 
-        var clamped = Attributes(reader, headers[2]);
-        Assert.Equal(2, BuildTestSupport.Int(clamped, "RowSpan"));
-        Assert.False(clamped.ContainsKey("ColSpan"));
+        Assert.Equal(2, NumberIn(headers[2], "RowSpan"));
+        Lacks("clamped header cell", "/ColSpan", headers[2]);
     }
 
     [Fact]
     public void SingleColumnSpan_IsLeftAtTheImplicitDefault()
     {
-        var reader = BuildTestSupport.Read(Merged(rowSpan: 2, columnSpan: 1), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Merged(rowSpan: 2, columnSpan: 1), Accessible());
+        var cell = Elements(emission, "TD")[0];
 
-        var attributes = Attributes(reader, TaggedStructureProbe.All(root, "TD")[0]);
-
-        Assert.Equal(2, BuildTestSupport.Int(attributes, "RowSpan"));
-        Assert.False(attributes.ContainsKey("ColSpan"), "an unspanned column is left implicit");
+        Assert.Equal(2, NumberIn(cell, "RowSpan"));
+        Lacks("body cell", "/ColSpan", cell);
     }
 
     [Fact]
     public void UnspannedCells_CarryNoTableAttributes()
     {
-        var reader = BuildTestSupport.Read(Merged(rowSpan: 1, columnSpan: 1), Accessible());
-        var root = TaggedStructureProbe.Root(reader);
+        var emission = Rendered(Merged(rowSpan: 1, columnSpan: 1), Accessible());
 
-        Assert.All(
-            TaggedStructureProbe.All(root, "TD"),
-            td => Assert.False(td.Dict.ContainsKey("A"), "an unspanned body cell carries no table attributes"));
+        Assert.All(Elements(emission, "TD"), td => Lacks("body cell", "/A <<", td));
     }
 
     private static Document Spanning()
@@ -409,8 +415,6 @@ public class TaggedTableSemanticsTests
     [Fact]
     public void RepeatedHeaderRow_ProducesASingleSemanticHeaderCell()
     {
-        var root = TaggedStructureProbe.Root(BuildTestSupport.Read(Spanning(), Accessible()));
-
-        Assert.Single(TaggedStructureProbe.All(root, "TH"));
+        Assert.Single(Elements(Rendered(Spanning(), Accessible()), "TH"));
     }
 }

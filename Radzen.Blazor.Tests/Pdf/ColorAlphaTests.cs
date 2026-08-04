@@ -1,11 +1,14 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -25,19 +28,36 @@ public class ColorAlphaTests
         return Encoding.ASCII.GetString(BuildTestSupport.Content(reader, page));
     }
 
-    private static DictionaryObject? ExtGStates(Document document)
+    private static string PageDictionary(Document document)
+        => Line(Emit(new DocumentRenderer().Render(document)), "/Type /Page ");
+
+    private static string PageContentObject(string emission)
     {
-        var reader = BuildTestSupport.Read(document);
-        var (_, resources) = BuildTestSupport.PageLeaves(reader)[0];
-        return resources is not null
-            && resources.TryGetValue("ExtGState", out var states)
-            && reader.Resolve(states!) is DictionaryObject dict
-            ? dict
-            : null;
+        var page = Line(emission, "/Type /Page ");
+        return IndirectObject(emission, Shaped("page", @"/Contents (\d+) 0 R", page).Groups[1].Value);
     }
 
-    private static double Alpha(DictionaryObject states, string key, string entry)
-        => ((NumberObject)((DictionaryObject)states[key]!)[entry]!).DoubleValue;
+    private static double Number(string value) => double.Parse(value, CultureInfo.InvariantCulture);
+
+    private static (double Fill, double Stroke) ExtGState(string page, string key)
+    {
+        var match = Shaped(
+            $"page /ExtGState /{key}",
+            $@"/{key} << /Type /ExtGState /ca (-?[\d.]+) /CA (-?[\d.]+)",
+            page);
+        return (Number(match.Groups[1].Value), Number(match.Groups[2].Value));
+    }
+
+    private static List<(double Fill, double Stroke)> ExtGStates(string page)
+    {
+        var states = new List<(double, double)>();
+        foreach (Match match in Regex.Matches(page, @"/Type /ExtGState /ca (-?[\d.]+) /CA (-?[\d.]+)"))
+        {
+            states.Add((Number(match.Groups[1].Value), Number(match.Groups[2].Value)));
+        }
+
+        return states;
+    }
 
     private static Document TextColor(Color color)
     {
@@ -54,10 +74,9 @@ public class ColorAlphaTests
     {
         var document = TextColor(Color.FromArgb(128, 255, 0, 0));
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Equal(128 / 255.0, Alpha(states!, "GS0", "ca"), 6);
-        Assert.Equal(128 / 255.0, Alpha(states!, "GS0", "CA"), 6);
+        var (fill, stroke) = ExtGState(PageDictionary(document), "GS0");
+        Assert.Equal(128 / 255.0, fill, 6);
+        Assert.Equal(128 / 255.0, stroke, 6);
 
         var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
@@ -70,10 +89,9 @@ public class ColorAlphaTests
     {
         var document = TextColor(Color.Transparent);
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Equal(0, Alpha(states!, "GS0", "ca"), 6);
-        Assert.Equal(0, Alpha(states!, "GS0", "CA"), 6);
+        var (fill, stroke) = ExtGState(PageDictionary(document), "GS0");
+        Assert.Equal(0, fill, 6);
+        Assert.Equal(0, stroke, 6);
 
         var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
@@ -92,9 +110,12 @@ public class ColorAlphaTests
         run.Opacity = 0.5;
         section.Blocks.Add(paragraph);
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (0.5 * 128 / 255.0)) < 1e-6);
+        var page = PageDictionary(document);
+        var expected = 0.5 * 128 / 255.0;
+
+        Assert.True(
+            ExtGStates(page).Exists(state => Math.Abs(state.Fill - expected) < 1e-6),
+            $"No /ExtGState carries /ca {expected}.\npage:\n{Excerpt(page)}");
     }
 
     [Fact]
@@ -108,9 +129,11 @@ public class ColorAlphaTests
         });
         container.Blocks.Add(Text("Boxed"));
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (128 / 255.0)) < 1e-6);
+        var page = PageDictionary(document);
+
+        Assert.True(
+            ExtGStates(page).Exists(state => Math.Abs(state.Fill - (128 / 255.0)) < 1e-6),
+            $"No /ExtGState carries /ca {128 / 255.0}.\npage:\n{Excerpt(page)}");
 
         var text = PageText(document);
         var gs = text.IndexOf("/GS0 gs", StringComparison.Ordinal);
@@ -127,9 +150,11 @@ public class ColorAlphaTests
         container.Borders.SetAll(width: 2, color: Color.FromArgb(64, 255, 0, 0));
         container.Blocks.Add(Text("Bordered"));
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "CA") - (64 / 255.0)) < 1e-6);
+        var page = PageDictionary(document);
+
+        Assert.True(
+            ExtGStates(page).Exists(state => Math.Abs(state.Stroke - (64 / 255.0)) < 1e-6),
+            $"No /ExtGState carries /CA {64 / 255.0}.\npage:\n{Excerpt(page)}");
     }
 
     [Fact]
@@ -149,16 +174,21 @@ public class ColorAlphaTests
         });
         container.Blocks.Add(Text("Shadowed"));
 
-        var states = ExtGStates(document);
-        Assert.NotNull(states);
-        Assert.Contains(states!.Keys, key => Math.Abs(Alpha(states!, key, "ca") - (160 / 255.0)) < 1e-6);
-        Assert.DoesNotContain(states!.Keys, key => Alpha(states!, key, "ca") < 160 / 255.0);
+        var page = PageDictionary(document);
+        var states = ExtGStates(page);
+
+        Assert.True(
+            states.Exists(state => Math.Abs(state.Fill - (160 / 255.0)) < 1e-6),
+            $"No /ExtGState carries /ca {160 / 255.0}.\npage:\n{Excerpt(page)}");
+        Assert.True(
+            !states.Exists(state => state.Fill < 160 / 255.0),
+            $"An /ExtGState carries /ca below {160 / 255.0}.\npage:\n{Excerpt(page)}");
     }
 
     [Fact]
     public void OpaqueColors_AreByteIdenticalToUnsetAlpha()
     {
-        static byte[] Content(bool explicitAlpha)
+        static string Emission(bool explicitAlpha)
         {
             var document = new Document();
             var section = document.Sections.Add();
@@ -174,22 +204,20 @@ public class ColorAlphaTests
             });
             container.Blocks.Add(Text("Boxed"));
 
-            var reader = BuildTestSupport.Read(document);
-            var (page, _) = BuildTestSupport.PageLeaves(reader)[0];
-            return BuildTestSupport.Content(reader, page);
+            return Emit(new DocumentRenderer().Render(document));
         }
 
-        Assert.Equal(Content(explicitAlpha: false), Content(explicitAlpha: true));
-        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(Content(explicitAlpha: true)));
+        var authored = Emission(explicitAlpha: true);
+
+        Assert.Equal(PageContentObject(Emission(explicitAlpha: false)), PageContentObject(authored));
+        Lacks("page", "/ExtGState", Line(authored, "/Type /Page "));
     }
 
-
-    private static byte[] DirectContent(ContentElement element)
+    private static string DirectContent(ContentElement element)
     {
         var document = new PortableDocument();
-        var page = document.Pages.Add();
-        page.Content.Add(element);
-        return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
+        document.Pages.Add().Content.Add(element);
+        return PageContentObject(Emit(document));
     }
 
     [Fact]
@@ -200,13 +228,7 @@ public class ColorAlphaTests
             Color = Color.FromArgb(128, 255, 0, 0),
         });
 
-        var operators = ContentOperationTestHelpers.Operators(content);
-        var gs = ContentOperationTestHelpers.IndexOfSequence(operators, "q", "gs");
-        Assert.True(gs >= 0);
-        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(content, "gs"));
-        var show = operators.IndexOf("Tj", gs);
-        Assert.True(show > gs);
-        Assert.True(operators.IndexOf("Q", show) > show);
+        Shaped("page content", @"q\n/GS0 gs\n[\s\S]*?Tj[\s\S]*?\nQ\n", content);
     }
 
     [Fact]
@@ -217,7 +239,7 @@ public class ColorAlphaTests
             Color = Color.FromRgb(255, 0, 0),
         });
 
-        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(content));
+        Lacks("page content", " gs\n", content);
     }
 
     [Fact]
@@ -229,12 +251,7 @@ public class ColorAlphaTests
         path.LineTo(10, 10);
         path.Close();
 
-        var content = DirectContent(path);
-        var operators = ContentOperationTestHelpers.Operators(content);
-        var gs = ContentOperationTestHelpers.IndexOfSequence(operators, "q", "gs");
-        Assert.True(gs >= 0);
-        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(content, "gs"));
-        Assert.True(operators.IndexOf("Q", gs) > gs);
+        Shaped("page content", @"q\n/GS0 gs\n[\s\S]*?\nQ\n", DirectContent(path));
     }
 
     [Fact]
@@ -268,6 +285,6 @@ public class ColorAlphaTests
         path.LineTo(10, 0);
         path.Close();
 
-        Assert.Contains("GS0", ContentOperationTestHelpers.ResourceNames(DirectContent(path), "gs"));
+        Carries("page content", "/GS0 gs\n", DirectContent(path));
     }
 }

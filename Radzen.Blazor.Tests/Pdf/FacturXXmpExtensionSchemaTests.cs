@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -40,13 +40,24 @@ public class FacturXXmpExtensionSchemaTests
         var rendered = renderer.Render(document);
         rendered.Attachments.Add("factur-x.xml", InvoiceXml, AttachmentRelationship.Data, "text/xml");
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        Assert.True(reader.Trailer.TryGetValue("Root", out var rootObject), "trailer has /Root");
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(rootObject!));
-        Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
-        var metadata = Assert.IsType<StreamObject>(reader.Resolve(metadataObject!));
+        return XmpPacket(rendered);
+    }
 
-        return XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
+    private static XDocument XmpPacket(PortableDocument document)
+    {
+        var emission = Emit(document);
+        var reference = Shaped("catalog", @"/Metadata (\d+) 0 R", Line(emission, "/Type /Catalog"));
+        var metadata = IndirectObject(emission, reference.Groups[1].Value);
+
+        const string opening = ">>\nstream\n";
+        var start = metadata.IndexOf(opening, StringComparison.Ordinal);
+        var end = metadata.LastIndexOf("\nendstream", StringComparison.Ordinal);
+        Assert.True(
+            start >= 0 && end > start,
+            $"The /Metadata object carries no stream payload.\n/Metadata object:\n{Excerpt(metadata)}");
+
+        var payload = metadata[(start + opening.Length)..end];
+        return XDocument.Parse(Encoding.UTF8.GetString(Encoding.Latin1.GetBytes(payload)));
     }
 
     private static string? Value(XElement scope, XName name)
@@ -124,10 +135,7 @@ public class FacturXXmpExtensionSchemaTests
             ConformanceLevel = "EN 16931",
         };
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
-        var metadata = Assert.IsType<StreamObject>(reader.Resolve(catalog["Metadata"]));
-        var xmp = XDocument.Parse(Encoding.UTF8.GetString(reader.DecodeStream(metadata)));
+        var xmp = XmpPacket(rendered);
 
         XNamespace fx = FxNamespace;
         var descriptions = xmp.Descendants(Rdf + "Description").ToList();

@@ -8,6 +8,7 @@ using Radzen.Documents.Fonts.Sfnt;
 using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -154,11 +155,12 @@ public class CompactGlyfSubsetTests
     [Fact]
     public void Descendant_KeepsIdentityMappings()
     {
-        var reader = BuildReader();
-        var (top, descendant, _) = FontGraph(reader);
+        var emission = Emit(new DocumentRenderer { Conformance = PdfAConformance.PdfA3B }.Render(Builder()));
+        var top = Line(emission, "/Subtype /Type0");
+        var descendant = References("Type0 font", "DescendantFonts", 1, top)[0];
 
-        Assert.Equal("Identity-H", BuildTestSupport.Name(reader, top, "Encoding"));
-        Assert.Equal("Identity", BuildTestSupport.Name(reader, descendant, "CIDToGIDMap"));
+        Carries("Type0 font", "/Encoding /Identity-H", top);
+        Carries($"descendant font {descendant} 0 R", "/CIDToGIDMap /Identity", IndirectObject(emission, descendant));
     }
 
     [Fact]

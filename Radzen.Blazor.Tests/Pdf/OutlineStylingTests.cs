@@ -1,9 +1,9 @@
 #nullable enable
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -23,17 +23,10 @@ public class OutlineStylingTests
         return document;
     }
 
-    private static DictionaryObject Resolve(DocumentReader reader, DocumentObject value)
-        => Assert.IsType<DictionaryObject>(reader.Resolve(value));
-
-    private static DictionaryObject Outlines(DocumentReader reader)
-        => Resolve(reader, ContentTestHelpers.Catalog(reader)["Outlines"]);
-
     [Fact]
     public void OutlineItem_EmitsColorAndStyleFlags()
     {
-        var document = ThreePages();
-        var rendered = new DocumentRenderer().Render(document);
+        var rendered = new DocumentRenderer().Render(ThreePages());
         rendered.Outline.Add(new OutlineItem("Styled", OutlineTarget.ToPage(0))
         {
             Color = Color.Red,
@@ -41,102 +34,82 @@ public class OutlineStylingTests
             Italic = true,
         });
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var item = Resolve(reader, Outlines(reader)["First"]);
+        var item = Line(Emit(rendered), "/Title (Styled)");
 
-        var color = Assert.IsType<ArrayObject>(reader.Resolve(item["C"]));
-        Assert.Equal(3, color.Count);
-        Assert.Equal(1.0, Assert.IsType<NumberObject>(reader.Resolve(color[0])).DoubleValue, 5);
-        Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(color[1])).DoubleValue, 5);
-        Assert.Equal(0.0, Assert.IsType<NumberObject>(reader.Resolve(color[2])).DoubleValue, 5);
-
-        Assert.Equal(3, Assert.IsType<NumberObject>(reader.Resolve(item["F"])).IntValue);
+        Carries("outline item", "/C [1 0 0]", item);
+        Shaped("outline item /F", @"/F 3\b", item);
     }
 
     [Fact]
     public void CollapsedItem_EmitsNegativeCount_AndHidesDescendantsFromAncestorCount()
     {
-        var document = ThreePages();
         var parent = new OutlineItem("Parent", OutlineTarget.ToPage(0)) { Collapsed = true };
         parent.Children.Add(new OutlineItem("Child A", OutlineTarget.ToPage(1)));
         parent.Children.Add(new OutlineItem("Child B", OutlineTarget.ToPage(2)));
-        var rendered = new DocumentRenderer().Render(document);
+        var rendered = new DocumentRenderer().Render(ThreePages());
         rendered.Outline.Add(parent);
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var outlines = Outlines(reader);
+        var emission = Emit(rendered);
 
-        Assert.Equal(1, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
-
-        var parentNode = Resolve(reader, outlines["First"]);
-        Assert.Equal(-2, Assert.IsType<NumberObject>(reader.Resolve(parentNode["Count"])).IntValue);
+        Shaped("outline root /Count", @"/Count 1\b", Line(emission, "/Type /Outlines"));
+        Shaped("collapsed parent /Count", @"/Count -2\b", Line(emission, "/Title (Parent)"));
     }
 
     [Fact]
     public void OpenParent_KeepsPositiveCounts()
     {
-        var document = ThreePages();
-        var rendered = new DocumentRenderer().Render(document);
+        var rendered = new DocumentRenderer().Render(ThreePages());
         var parent = new OutlineItem("Parent", OutlineTarget.ToPage(0));
         parent.Children.Add(new OutlineItem("Child A", OutlineTarget.ToPage(1)));
         parent.Children.Add(new OutlineItem("Child B", OutlineTarget.ToPage(2)));
         rendered.Outline.Add(parent);
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var outlines = Outlines(reader);
-        Assert.Equal(3, Assert.IsType<NumberObject>(reader.Resolve(outlines["Count"])).IntValue);
-        Assert.Equal(2, Assert.IsType<NumberObject>(reader.Resolve(Resolve(reader, outlines["First"])["Count"])).IntValue);
+        var emission = Emit(rendered);
+
+        Shaped("outline root /Count", @"/Count 3\b", Line(emission, "/Type /Outlines"));
+        Shaped("open parent /Count", @"/Count 2\b", Line(emission, "/Title (Parent)"));
     }
 
-    private static ArrayObject Dest(DocumentReader reader, OutlineTarget target)
+    private static string ItemTargeting(OutlineTarget target)
     {
-        var document = ThreePages();
-        var rendered = new DocumentRenderer().Render(document);
+        var rendered = new DocumentRenderer().Render(ThreePages());
         rendered.Outline.Add(new OutlineItem("D", target));
-        var read = DocumentReader.Parse(rendered.ToArray());
-        return Assert.IsType<ArrayObject>(read.Resolve(Resolve(read, Outlines(read)["First"])["Dest"]));
+        return Line(Emit(rendered), "/Title (D)");
     }
 
     [Fact]
     public void FitModes_EmitCorrectDestinationArrays()
     {
-        var reader = BuildTestSupport.Read(ThreePages());
+        Shaped(
+            "Fit outline item /Dest",
+            @"/Dest \[\d+ 0 R /Fit\]",
+            ItemTargeting(OutlineTarget.ToPageFit(1)));
 
-        var fit = Dest(reader, OutlineTarget.ToPageFit(1));
-        Assert.Equal(2, fit.Count);
-        Assert.Equal("Fit", Assert.IsType<NameObject>(reader.Resolve(fit[1])).Value);
+        Shaped(
+            "FitH outline item /Dest",
+            @"/Dest \[\d+ 0 R /FitH 250\]",
+            ItemTargeting(OutlineTarget.ToPageFitHorizontal(1, 250)));
 
-        var fitH = Dest(reader, OutlineTarget.ToPageFitHorizontal(1, 250));
-        Assert.Equal(3, fitH.Count);
-        Assert.Equal("FitH", Assert.IsType<NameObject>(reader.Resolve(fitH[1])).Value);
-        Assert.Equal(250, Assert.IsType<NumberObject>(reader.Resolve(fitH[2])).DoubleValue, 5);
+        Shaped(
+            "FitR outline item /Dest",
+            @"/Dest \[\d+ 0 R /FitR 10 20 100 200\]",
+            ItemTargeting(OutlineTarget.ToPageRectangle(1, 10, 20, 100, 200)));
 
-        var fitR = Dest(reader, OutlineTarget.ToPageRectangle(1, 10, 20, 100, 200));
-        Assert.Equal(6, fitR.Count);
-        Assert.Equal("FitR", Assert.IsType<NameObject>(reader.Resolve(fitR[1])).Value);
-        Assert.Equal(10, Assert.IsType<NumberObject>(reader.Resolve(fitR[2])).DoubleValue, 5);
-        Assert.Equal(20, Assert.IsType<NumberObject>(reader.Resolve(fitR[3])).DoubleValue, 5);
-        Assert.Equal(100, Assert.IsType<NumberObject>(reader.Resolve(fitR[4])).DoubleValue, 5);
-        Assert.Equal(200, Assert.IsType<NumberObject>(reader.Resolve(fitR[5])).DoubleValue, 5);
-
-        var xyz = Dest(reader, OutlineTarget.ToPageXYZ(1, 5, 295, 2.0));
-        Assert.Equal(5, xyz.Count);
-        Assert.Equal("XYZ", Assert.IsType<NameObject>(reader.Resolve(xyz[1])).Value);
-        Assert.Equal(5, Assert.IsType<NumberObject>(reader.Resolve(xyz[2])).DoubleValue, 5);
-        Assert.Equal(295, Assert.IsType<NumberObject>(reader.Resolve(xyz[3])).DoubleValue, 5);
-        Assert.Equal(2.0, Assert.IsType<NumberObject>(reader.Resolve(xyz[4])).DoubleValue, 5);
+        Shaped(
+            "XYZ outline item /Dest",
+            @"/Dest \[\d+ 0 R /XYZ 5 295 2\]",
+            ItemTargeting(OutlineTarget.ToPageXYZ(1, 5, 295, 2.0)));
     }
 
     [Fact]
     public void PlainOutlineItem_EmitsNoStyleKeys()
     {
-        var document = ThreePages();
-        var rendered = new DocumentRenderer().Render(document);
+        var rendered = new DocumentRenderer().Render(ThreePages());
         rendered.Outline.Add(new OutlineItem("Plain", OutlineTarget.ToPage(0)));
 
-        var reader = DocumentReader.Parse(rendered.ToArray());
-        var item = Resolve(reader, Outlines(reader)["First"]);
-        Assert.False(item.ContainsKey("C"));
-        Assert.False(item.ContainsKey("F"));
+        var item = Line(Emit(rendered), "/Title (Plain)");
+
+        Lacks("outline item", "/C ", item);
+        Lacks("outline item", "/F ", item);
     }
 }

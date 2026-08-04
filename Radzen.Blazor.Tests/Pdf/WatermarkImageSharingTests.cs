@@ -1,11 +1,12 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -26,46 +27,29 @@ public class WatermarkImageSharingTests
         return document;
     }
 
-    private static List<int> WatermarkImageRefs(byte[] pdf)
+    private static string[] PageImageRefs(string emission)
     {
-        var reader = DocumentReader.Parse(pdf);
-        var refs = new List<int>();
-        foreach (var (page, resources) in PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false))
-        {
-            Assert.NotNull(resources);
-            var xobjects = Assert.IsType<DictionaryObject>(reader.Resolve(resources!["XObject"]!));
-            var entry = Assert.Single(xobjects.Keys);
-            refs.Add(Assert.IsType<ReferenceObject>(xobjects[entry]).ObjectNumber);
-        }
+        var refs = Regex.Matches(emission, @"/Type /Page [^\n]*?/XObject << /\S+ (\d+) 0 R >>")
+            .Select(match => match.Groups[1].Value)
+            .ToArray();
 
+        Assert.True(
+            refs.Length > 0,
+            $"No page carries a single-entry /XObject resource dictionary.\nEmission:\n{Excerpt(emission)}");
         return refs;
     }
 
-    private static int ImageStreamCount(byte[] pdf)
-    {
-        var reader = DocumentReader.Parse(pdf);
-        var count = 0;
-        for (var number = 1; number <= reader.ObjectCount; number++)
-        {
-            if (reader.Resolve(new ReferenceObject(number, 0)) is StreamObject stream
-                && stream.Dictionary.TryGetValue("Subtype", out var subtype)
-                && subtype is NameObject { Value: "Image" })
-            {
-                count++;
-            }
-        }
-
-        return count;
-    }
+    private static int ImageStreamCount(string emission)
+        => Regex.Matches(emission, "/Subtype /Image").Count;
 
     [Fact]
     public void ImageWatermark_EmitsOneImageStreamSharedByEveryPage()
     {
-        var pdf = Watermarked(10).ToArray();
+        var emission = Emit(Watermarked(10));
 
-        Assert.Equal(1, ImageStreamCount(pdf));
-        var refs = WatermarkImageRefs(pdf);
-        Assert.Equal(10, refs.Count);
+        Assert.Equal(1, ImageStreamCount(emission));
+        var refs = PageImageRefs(emission);
+        Assert.Equal(10, refs.Length);
         Assert.All(refs, number => Assert.Equal(refs[0], number));
     }
 
@@ -90,14 +74,12 @@ public class WatermarkImageSharingTests
     [Fact]
     public void ImageWatermarkWithXObjectOptions_StillSharesOneImageStream()
     {
-        var pdf = Watermarked(10, configure: image => image.Interpolate = true).ToArray();
+        var emission = Emit(Watermarked(10, configure: image => image.Interpolate = true));
 
-        Assert.Equal(1, ImageStreamCount(pdf));
-        var reader = DocumentReader.Parse(pdf);
-        var (_, resources) = PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false)[0];
-        var xobjects = Assert.IsType<DictionaryObject>(reader.Resolve(resources!["XObject"]!));
-        var image = Assert.IsType<StreamObject>(reader.Resolve(xobjects[Assert.Single(xobjects.Keys)]!));
-        Assert.True(((BooleanObject)image.Dictionary["Interpolate"]!).Value);
+        Assert.Equal(1, ImageStreamCount(emission));
+
+        var number = PageImageRefs(emission)[0];
+        Carries($"watermark image XObject {number} 0 R", "/Interpolate true", IndirectObject(emission, number));
     }
 
     [Fact]
@@ -109,21 +91,15 @@ public class WatermarkImageSharingTests
         var image = watermark.SetImage(new MemoryStream(PdfTestResources.ReadAllBytes("Images/rgb.png")));
         document.AddWatermark(watermark);
 
-        Assert.DoesNotContain("Interpolate", ImageDictionaryKeys(document.ToArray()));
+        Lacks("watermark image XObject", "/Interpolate", WatermarkImage(Emit(document)));
 
         image.Interpolate = true;
 
-        Assert.Contains("Interpolate", ImageDictionaryKeys(document.ToArray()));
+        Carries("watermark image XObject", "/Interpolate", WatermarkImage(Emit(document)));
     }
 
-    private static IEnumerable<string> ImageDictionaryKeys(byte[] pdf)
-    {
-        var reader = DocumentReader.Parse(pdf);
-        var (_, resources) = PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false)[0];
-        var xobjects = Assert.IsType<DictionaryObject>(reader.Resolve(resources!["XObject"]!));
-        var image = Assert.IsType<StreamObject>(reader.Resolve(xobjects[Assert.Single(xobjects.Keys)]!));
-        return image.Dictionary.Keys;
-    }
+    private static string WatermarkImage(string emission)
+        => IndirectObject(emission, PageImageRefs(emission)[0]);
 
     [Fact]
     public void SoftMaskedWatermarkSharedAcrossDocuments_ResolvesItsMaskInEverySave()
@@ -140,17 +116,17 @@ public class WatermarkImageSharingTests
         second.Pages.Add();
         second.AddWatermark(watermark);
 
-        foreach (var pdf in new[] { first.ToArray(), second.ToArray() })
+        foreach (var emission in new[] { Emit(first), Emit(second) })
         {
-            var reader = DocumentReader.Parse(pdf);
-            var (_, resources) = PdfPageContentTestHelper.PageLeaves(reader, assertStructure: false)[0];
-            var xobjects = Assert.IsType<DictionaryObject>(reader.Resolve(resources!["XObject"]!));
-            var image = Assert.IsType<StreamObject>(reader.Resolve(xobjects[Assert.Single(xobjects.Keys)]!));
-            var mask = Assert.IsType<StreamObject>(reader.Resolve(image.Dictionary["SMask"]!));
-            Assert.Equal("Image", ((NameObject)mask.Dictionary["Subtype"]!).Value);
-        }
+            var image = WatermarkImage(emission);
+            var mask = Shaped("watermark image XObject", @"/SMask (\d+) 0 R", image);
 
-        Assert.Equal(2, ImageStreamCount(first.ToArray()));
-        Assert.Equal(2, ImageStreamCount(second.ToArray()));
+            Carries(
+                $"watermark soft mask {mask.Groups[1].Value} 0 R",
+                "/Subtype /Image",
+                IndirectObject(emission, mask.Groups[1].Value));
+
+            Assert.Equal(2, ImageStreamCount(emission));
+        }
     }
 }

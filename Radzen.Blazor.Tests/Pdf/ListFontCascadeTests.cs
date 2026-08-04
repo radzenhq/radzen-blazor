@@ -1,9 +1,9 @@
 #nullable enable
 using System;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -32,10 +32,12 @@ public class ListFontCascadeTests
         var section = document.Sections.Add();
         section.Blocks.AddList().AddItem("Hello");
 
-        var builderRenderer = new DocumentRenderer();
-        var reader = BuildTestSupport.Read(document, builderRenderer);
+        var emission = Emit(new DocumentRenderer().Render(document));
+        var composite = BuildTestSupport.CountOccurrences(emission, "/Subtype /Type0");
 
-        Assert.Single(BuildTestSupport.Type0Fonts(reader));
+        Assert.True(
+            composite == 1,
+            $"Expected exactly one '/Subtype /Type0' font, found {composite}.\nEmission starts:\n{Excerpt(emission)}");
     }
 
     [Fact]
@@ -68,14 +70,10 @@ public class ListFontCascadeTests
         var exception = Record.Exception(() => builderRenderer.ToArray(document));
         Assert.Null(exception);
 
-        var reader = BuildTestSupport.Read(document, builderRenderer);
-        var fonts = BuildTestSupport.Fonts(reader);
-        Assert.NotEmpty(fonts);
-        Assert.All(fonts, font => Assert.Equal("Type0", BuildTestSupport.Name(reader, font, "Subtype")));
-
-        Assert.All(
-            fonts,
-            font => Assert.NotEqual("Helvetica", BuildTestSupport.Name(reader, font, "BaseFont")));
+        var emission = Emit(builderRenderer.Render(document));
+        Carries("emission", "/Subtype /Type0", emission);
+        Lacks("emission", "/Subtype /Type1 /BaseFont", emission);
+        Lacks("emission", "/BaseFont /Helvetica", emission);
 
         Assert.Contains("Embedded item", BuildTestSupport.Reload(document, builderRenderer).Pages[0].ExtractText(), StringComparison.Ordinal);
     }

@@ -2,15 +2,31 @@
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Pdf;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class HeadingLevelStructureTests
 {
-    private static DocumentRenderer Accessible() => new() { Accessibility = PdfUaConformance.PdfUa1 };
+    private static string Structure(Document document)
+    {
+        var emission = Emit(new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 }.Render(document));
+        var root = IndirectObject(
+            emission,
+            Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
 
-    private static ProbeElement Structure(Document document)
-        => TaggedStructureProbe.Root(BuildTestSupport.Read(document, Accessible()));
+        Shaped("structure tree root", @"/K (\d+) 0 R", root);
+        return emission;
+    }
+
+    private static void ElementCount(string emission, string type, int expected)
+    {
+        var fragment = $"/Type /StructElem /S /{type} /P ";
+        var count = BuildTestSupport.CountOccurrences(emission, fragment);
+        Assert.True(
+            count == expected,
+            $"Expected {expected} structure elements carrying '{fragment}', found {count}.\n{Excerpt(emission)}");
+    }
 
     private static Document Authored(string styleName, int? headingLevel, bool declare)
     {
@@ -30,11 +46,11 @@ public class HeadingLevelStructureTests
 
     [Fact]
     public void StyleWithHeadingLevel_MapsToTheMatchingHeadingElement()
-        => Assert.Equal("H2", TaggedStructureProbe.Single(Structure(Authored("Lead", 2, declare: true)), "H2").Type);
+        => ElementCount(Structure(Authored("Lead", 2, declare: true)), "H2", 1);
 
     [Fact]
     public void BuiltInHeadingStyle_KeepsMappingToItsLevel()
-        => Assert.Equal("H4", TaggedStructureProbe.Single(Structure(Authored("Heading4", null, declare: false)), "H4").Type);
+        => ElementCount(Structure(Authored("Heading4", null, declare: false)), "H4", 1);
 
     [Fact]
     public void HeadingLevel_IsInheritedFromTheBaseStyleChain()
@@ -47,15 +63,15 @@ public class HeadingLevelStructureTests
         var paragraph = BuildTestSupport.AddText(document.Sections.Add(), "Title", BuildTestSupport.Latin);
         paragraph.StyleName = "ChapterTitle";
 
-        Assert.Equal("H1", TaggedStructureProbe.Single(Structure(document), "H1").Type);
+        ElementCount(Structure(document), "H1", 1);
     }
 
     [Fact]
     public void StyleNamedLikeAHeadingWithoutTheLevel_IsAnOrdinaryParagraph()
     {
-        var root = Structure(Authored("H1", null, declare: true));
+        var emission = Structure(Authored("H1", null, declare: true));
 
-        Assert.Empty(TaggedStructureProbe.All(root, "H1"));
-        Assert.Single(TaggedStructureProbe.All(root, "P"));
+        ElementCount(emission, "H1", 0);
+        ElementCount(emission, "P", 1);
     }
 }

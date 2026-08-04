@@ -2,10 +2,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -56,9 +56,7 @@ public class MatrixNonFiniteTests
         var source = FileWithContent($"q {Huge} 0 0 1 0 0 cm 10 10 100 50 re f Q\n");
         var document = Load(source);
 
-        var saved = document.ToArray();
-
-        Assert.Contains(Huge, Encoding.Latin1.GetString(saved));
+        Carries("emission", Huge, Emit(document));
     }
 
     [Theory]

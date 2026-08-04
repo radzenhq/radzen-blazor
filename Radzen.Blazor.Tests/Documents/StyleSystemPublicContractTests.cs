@@ -8,6 +8,7 @@ using Radzen.Documents;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Documents.Tests;
 
@@ -81,8 +82,8 @@ public class StyleSystemPublicContractTests
 
         var pdf = TaggedPdf(document);
 
-        Assert.Contains("/S /H4", pdf, StringComparison.Ordinal);
-        Assert.DoesNotContain("/S /H2", pdf, StringComparison.Ordinal);
+        Carries("tagged emission", "/S /H4", pdf);
+        Lacks("tagged emission", "/S /H2", pdf);
     }
 
     [Fact]
@@ -91,7 +92,7 @@ public class StyleSystemPublicContractTests
         var document = new Document();
         document.Sections.Add().Blocks.AddParagraph("Heading").StyleName = "Heading3";
 
-        Assert.Contains("/S /H3", TaggedPdf(document), StringComparison.Ordinal);
+        Carries("tagged emission", "/S /H3", TaggedPdf(document));
     }
 
     [Fact]

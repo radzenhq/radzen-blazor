@@ -3,11 +3,11 @@
 using System.IO;
 using System.Linq;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -40,9 +40,6 @@ public class LoadedResourceKeyCollisionTests
         return pdf.ToArray();
     }
 
-    private static string BaseFont(DocumentReader reader, DocumentObject fontValue)
-        => ((NameObject)reader.Resolve(((DictionaryObject)reader.Resolve(fontValue))["BaseFont"])).Value;
-
     [Fact]
     public void FullReencode_AddingBase14Text_DoesNotClobberLoadedFont()
     {
@@ -54,16 +51,18 @@ public class LoadedResourceKeyCollisionTests
         existing.Color = Color.Red;
         page.Content.Add(new TextContent("New", 72, 680) { Font = new Font { Family = "Helvetica" } });
 
-        var saved = document.ToArray();
+        var emission = Emit(document);
+        var pageObject = Line(emission, "/Type /Page ");
 
-        var reader = DocumentReader.Parse(saved);
-        var page0 = ContentTestHelpers.Kid(reader, 0);
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(page0["Resources"]));
-        var fonts = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
+        var loaded = Shaped("page /Resources /Font", @"/Font << /F0 (\d+) 0 R", pageObject);
+        Carries("loaded font /F0", "/BaseFont /CLOBBERCANARY", IndirectObject(emission, loaded.Groups[1].Value));
 
-        Assert.True(fonts.ContainsKey("F0"));
-        Assert.Equal("CLOBBERCANARY", BaseFont(reader, fonts["F0"]));
-
-        Assert.Contains(fonts.Keys, k => k != "F0" && BaseFont(reader, fonts[k]) == "Helvetica");
+        var added = Shaped(
+            "page /Resources /Font",
+            @"/(\w+) << /Type /Font /Subtype /Type1 /BaseFont /Helvetica",
+            pageObject);
+        Assert.True(
+            added.Groups[1].Value != "F0",
+            $"The added Helvetica font took the loaded /F0 name.\npage:\n{Excerpt(pageObject)}");
     }
 }

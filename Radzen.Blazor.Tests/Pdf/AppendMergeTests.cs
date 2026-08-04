@@ -8,11 +8,25 @@ using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Core;
+using System.Linq;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class AppendMergeTests
 {
+    private static string[] KidNumbers(string emission, int count)
+        => References("pages", "Kids", count, Line(emission, "/Type /Pages "));
+
+    private static string[] Kids(string emission, int count)
+        => [.. KidNumbers(emission, count).Select(number => IndirectObject(emission, number))];
+
+    private static string PageContent(string emission, string page)
+        => IndirectObject(emission, Shaped("page", @"/Contents (\d+) 0 R", page).Groups[1].Value);
+
+    private static string FirstAnnotation(string emission, string page)
+        => IndirectObject(emission, Shaped("page", @"/Annots \[(\d+) 0 R", page).Groups[1].Value);
+
     private static PortableDocument BuildA()
     {
         var a = new PortableDocument();
@@ -38,15 +52,16 @@ public class AppendMergeTests
 
         Assert.Equal(5, a.Pages.Count);
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        Assert.Equal(5, DocumentLoadTests.PageCount(reader));
-        Assert.Equal(5, DocumentLoadTests.Kids(reader).Count);
+        var emission = Emit(a);
+        Carries("pages node", "/Count 5", Line(emission, "/Type /Pages "));
 
-        Assert.Equal(TestBytes.Ascii("A0-content"), DocumentLoadTests.KidContent(reader, 0));
-        Assert.Equal(TestBytes.Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 1));
-        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
-        Assert.Equal(TestBytes.Ascii("shared-bytes"), DocumentLoadTests.KidContent(reader, 3));
-        Assert.Equal(TestBytes.Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 4));
+        var kids = Kids(emission, 5);
+        string[] expected = ["A0-content", "shared-bytes", "B0-content", "shared-bytes", "B2-content"];
+
+        for (var i = 0; i < kids.Length; i++)
+        {
+            Carries($"page {i} content", $"stream\n{expected[i]}\nendstream", PageContent(emission, kids[i]));
+        }
     }
 
     [Fact]
@@ -65,14 +80,12 @@ public class AppendMergeTests
         var a = BuildA();
         a.Append(BuildB());
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var pagesRef = Assert.IsType<ReferenceObject>(DocumentLoadTests.Catalog(reader)["Pages"]).ObjectNumber;
+        var emission = Emit(a);
+        var pages = Shaped("catalog", @"/Pages (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value;
 
-        var kids = DocumentLoadTests.Kids(reader);
-        for (var i = 0; i < kids.Count; i++)
+        foreach (var kid in Kids(emission, 5))
         {
-            var parent = Assert.IsType<ReferenceObject>(DocumentLoadTests.Kid(reader, i)["Parent"]);
-            Assert.Equal(pagesRef, parent.ObjectNumber);
+            Carries("page", $"/Parent {pages} 0 R", kid);
         }
     }
 
@@ -82,17 +95,12 @@ public class AppendMergeTests
         var a = BuildA();
         a.Append(BuildB());
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        var kids = DocumentLoadTests.Kids(reader);
+        var emission = Emit(a);
+        var contentNumbers = Kids(emission, 5)
+            .Select(kid => Shaped("page", @"/Contents (\d+) 0 R", kid).Groups[1].Value)
+            .ToArray();
 
-        var contentNumbers = new HashSet<int>();
-        for (var i = 0; i < kids.Count; i++)
-        {
-            var contents = Assert.IsType<ReferenceObject>(DocumentLoadTests.Kid(reader, i)["Contents"]);
-            Assert.True(contentNumbers.Add(contents.ObjectNumber));
-        }
-
-        Assert.Equal(5, contentNumbers.Count);
+        Assert.Equal(5, contentNumbers.Distinct().Count());
     }
 
     [Fact]
@@ -104,10 +112,12 @@ public class AppendMergeTests
 
         Assert.Equal(3, b.Pages.Count);
 
-        var reader = DocumentReader.Parse(b.ToArray());
-        Assert.Equal(3, DocumentLoadTests.PageCount(reader));
-        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 0));
-        Assert.Equal(TestBytes.Ascii("B2-content"), DocumentLoadTests.KidContent(reader, 2));
+        var emission = Emit(b);
+        Carries("pages node", "/Count 3", Line(emission, "/Type /Pages "));
+
+        var kids = Kids(emission, 3);
+        Carries("page 0 content", "stream\nB0-content\nendstream", PageContent(emission, kids[0]));
+        Carries("page 2 content", "stream\nB2-content\nendstream", PageContent(emission, kids[2]));
     }
 
     [Fact]
@@ -119,8 +129,8 @@ public class AppendMergeTests
 
         b.Pages[0].SetContent(TestBytes.Ascii("mutated-after-append"));
 
-        var reader = DocumentReader.Parse(a.ToArray());
-        Assert.Equal(TestBytes.Ascii("B0-content"), DocumentLoadTests.KidContent(reader, 2));
+        var emission = Emit(a);
+        Carries("page 2 content", "stream\nB0-content\nendstream", PageContent(emission, Kids(emission, 5)[2]));
     }
 
     [Fact]
@@ -143,8 +153,12 @@ public class AppendMergeTests
         Assert.NotSame(annotation.Appearance, copy.Appearance);
         Assert.Single(copy.Appearance!.Content);
         Assert.Equal("appearance", Assert.IsType<TextContent>(copy.Appearance.Content[0]).Text);
-        var reloaded = InterpreterTestSupport.Load(target.ToArray());
-        Assert.Equal("original", Assert.IsType<TextAnnotation>(reloaded.Pages[0].Annotations[0]).Contents);
+
+        var emission = Emit(target);
+        Carries(
+            "appended annotation",
+            "/Contents (original)",
+            FirstAnnotation(emission, Line(emission, "/Type /Page ")));
     }
 
     [Fact]
@@ -160,8 +174,13 @@ public class AppendMergeTests
         target.Append(source);
 
         Assert.Equal(2, Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[0]).TargetPageIndex);
-        var reloaded = InterpreterTestSupport.Load(target.ToArray());
-        Assert.Equal(2, Assert.IsType<LinkAnnotation>(reloaded.Pages[1].Annotations[0]).TargetPageIndex);
+
+        var emission = Emit(target);
+        var kids = KidNumbers(emission, 3);
+        Carries(
+            "link annotation",
+            $"/Dest [{kids[2]} 0 R /Fit]",
+            FirstAnnotation(emission, IndirectObject(emission, kids[1])));
     }
 
     [Fact]
@@ -180,8 +199,13 @@ public class AppendMergeTests
 
         Assert.Equal(2, Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[0]).TargetPageIndex);
         Assert.Equal("https://example.com/", Assert.IsType<LinkAnnotation>(target.Pages[1].Annotations[1]).Uri?.AbsoluteUri);
-        var reloaded = InterpreterTestSupport.Load(target.ToArray());
-        Assert.Equal(2, Assert.IsType<LinkAnnotation>(reloaded.Pages[1].Annotations[0]).TargetPageIndex);
+
+        var emission = Emit(target);
+        var kids = KidNumbers(emission, 3);
+        Carries(
+            "link annotation",
+            $"/Dest [{kids[2]} 0 R /Fit]",
+            FirstAnnotation(emission, IndirectObject(emission, kids[1])));
     }
 
     [Fact]
@@ -203,16 +227,12 @@ public class AppendMergeTests
         Assert.Equal("https://example.com/", Assert.IsType<LinkAnnotation>(
             reloaded.Pages[1].Annotations[1]).Uri?.AbsoluteUri);
 
-        var reader = DocumentReader.Parse(bytes);
-        var page = DocumentLoadTests.Kid(reader, 1);
-        var annotation = reader.AsDictionary(Assert.IsType<ArrayObject>(reader.Resolve(page["Annots"]))[0])!;
-        var destination = Assert.IsType<ArrayObject>(reader.Resolve(annotation["Dest"]));
-        Assert.Equal(Assert.IsType<ReferenceObject>(DocumentLoadTests.Kids(reader)[2]).ObjectNumber,
-            Assert.IsType<ReferenceObject>(destination[0]).ObjectNumber);
-        Assert.Equal("XYZ", Assert.IsType<NameObject>(destination[1]).Value);
-        Assert.Equal(0.0, Assert.IsType<NumberObject>(destination[2]).DoubleValue);
-        Assert.Equal(500.0, Assert.IsType<NumberObject>(destination[3]).DoubleValue);
-        Assert.Equal(0.0, Assert.IsType<NumberObject>(destination[4]).DoubleValue);
+        var emission = Emit(target);
+        var kids = KidNumbers(emission, 3);
+        Carries(
+            "named destination link",
+            $"/Dest [{kids[2]} 0 R /XYZ 0 500 0]",
+            FirstAnnotation(emission, IndirectObject(emission, kids[1])));
     }
 
     [Fact]
@@ -232,11 +252,12 @@ public class AppendMergeTests
         target.Pages.Add();
         target.Append(source);
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var annotation = reader.AsDictionary(
-            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 1), "Annots")!))!;
-        Assert.Equal("keep-me", reader.GetString(annotation, "Custom"));
-        Assert.Equal("note", reader.GetString(annotation, "Contents"));
+        var emission = Emit(target);
+        var page = Kids(emission, 2)[1];
+        var annotation = IndirectObject(emission, References("appended page", "Annots", 1, page)[0]);
+
+        Carries("appended annotation", "/Custom (keep-me)", annotation);
+        Carries("appended annotation", "/Contents (note)", annotation);
     }
 
     private static byte[] UnrebuildableAnnotationsPdf()
@@ -323,10 +344,13 @@ public class AppendMergeTests
 
         target.Append(source);
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var annotation = reader.AsDictionary(
-            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 1), "Annots")!))!;
-        Assert.Equal("I", reader.GetName(annotation, "H"));
+        var emission = Emit(target);
+        var page = Kids(emission, 2)[1];
+
+        Carries(
+            "appended annotation",
+            "/H /I",
+            IndirectObject(emission, References("appended page", "Annots", 1, page)[0]));
     }
 
     [Fact]
@@ -342,11 +366,11 @@ public class AppendMergeTests
         var c = new PortableDocument();
         c.Append(b);
 
-        var reader = DocumentReader.Parse(c.ToArray());
-        var page = DocumentLoadTests.Kid(reader, 0);
-        var resources = Assert.IsType<DictionaryObject>(reader.Resolve(page["Resources"]));
-        var fonts = Assert.IsType<DictionaryObject>(reader.Resolve(resources["Font"]));
-        Assert.NotEmpty(fonts.Keys);
+        var emission = Emit(c);
+        var page = Line(emission, "/Type /Page ");
+
+        Carries("page", "/Resources <<", page);
+        Shaped("page /Font resources", @"/Font << /[^\s/>]+ (?:\d+ 0 R|<< /Type /Font )", page);
     }
 
     [Fact]
@@ -358,11 +382,10 @@ public class AppendMergeTests
 
         target.Append(source);
 
-        var reader = DocumentReader.Parse(target.ToArray());
-        var annots = reader.GetArray(DocumentLoadTests.Kid(reader, 1), "Annots")!;
-        Assert.Equal(2, annots.Count);
-        var action = reader.AsDictionary(reader.AsDictionary(annots[0])!["A"])!;
-        Assert.Equal("Launch", reader.GetName(action, "S"));
+        var emission = Emit(target);
+        var annots = References("appended page", "Annots", 2, Kids(emission, 2)[1]);
+
+        Carries("appended annotation", "/S /Launch", IndirectObject(emission, annots[0]));
     }
 
     [Fact]
@@ -381,15 +404,16 @@ public class AppendMergeTests
         c.Pages.Add();
         c.Append(b);
 
-        var bytes = c.ToArray();
-        var reader = DocumentReader.Parse(bytes);
-        var text = Encoding.Latin1.GetString(bytes);
+        var emission = Emit(c);
 
-        Assert.Equal(3, DocumentLoadTests.PageCount(reader));
-        Assert.Equal(3, System.Text.RegularExpressions.Regex.Matches(text, @"/Type\s*/Page\b").Count);
-        var annotation = reader.AsDictionary(
-            Assert.Single(reader.GetArray(DocumentLoadTests.Kid(reader, 1), "Annots")!))!;
-        Assert.Equal("note", reader.GetString(annotation, "Contents"));
+        Carries("pages node", "/Count 3", Line(emission, "/Type /Pages "));
+        Assert.Equal(3, System.Text.RegularExpressions.Regex.Matches(emission, @"/Type\s*/Page\b").Count);
+
+        var page = Kids(emission, 3)[1];
+        Carries(
+            "appended annotation",
+            "/Contents (note)",
+            IndirectObject(emission, References("appended page", "Annots", 1, page)[0]));
     }
 
     [Fact]

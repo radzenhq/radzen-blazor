@@ -1,15 +1,14 @@
 #nullable enable
 using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Radzen.Documents;
 using Radzen.Documents.Layout;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Write;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -22,9 +21,6 @@ public class RenderedDocumentFacadeInvalidationTests
         BuildTestSupport.AddText(document.Sections.Add(), "Body", BuildTestSupport.Latin);
         return document;
     }
-
-    private static string Save(PortableDocument document)
-        => Encoding.Latin1.GetString(document.ToArray());
 
     private static PortableDocument LoadedTaggedWithPreservationGraphCached()
     {
@@ -44,19 +40,18 @@ public class RenderedDocumentFacadeInvalidationTests
         return loaded;
     }
 
-    private static void AssertMarkInfoPrecedesStructTreeRoot(byte[] bytes)
+    private static void AssertMarkInfoPrecedesStructTreeRoot(string emission)
     {
-        var reader = DocumentReader.Parse(bytes);
-        var catalog = Assert.IsType<DictionaryObject>(reader.Resolve(reader.Trailer["Root"]));
-        var keys = catalog.Keys.ToList();
-        var markInfo = keys.IndexOf("MarkInfo");
-        var structTreeRoot = keys.IndexOf("StructTreeRoot");
+        var catalog = Line(emission, "/Type /Catalog");
+        Carries("preserved catalog", "/MarkInfo ", catalog);
+        Carries("preserved catalog", "/StructTreeRoot ", catalog);
 
-        Assert.True(markInfo >= 0, "preserved catalog has /MarkInfo");
-        Assert.True(structTreeRoot >= 0, "preserved catalog has /StructTreeRoot");
+        var markInfo = catalog.IndexOf("/MarkInfo ", StringComparison.Ordinal);
+        var structTreeRoot = catalog.IndexOf("/StructTreeRoot ", StringComparison.Ordinal);
+
         Assert.True(
             markInfo < structTreeRoot,
-            $"/MarkInfo must precede /StructTreeRoot in the preserved catalog; actual keys: /{string.Join(" /", catalog.Keys)}");
+            $"/MarkInfo must precede /StructTreeRoot in the preserved catalog.\npreserved catalog:\n{Excerpt(catalog)}");
     }
 
     [Fact]
@@ -71,7 +66,7 @@ public class RenderedDocumentFacadeInvalidationTests
             Material = new SeededEncryptionMaterial([1, 2, 3, 4]),
         };
 
-        Assert.Contains("/Encrypt", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "/Encrypt", Emit(rendered));
     }
 
     [Fact]
@@ -90,7 +85,7 @@ public class RenderedDocumentFacadeInvalidationTests
         rendered.Encryption!.Algorithm = EncryptionAlgorithm.Aes256;
 
         Assert.NotEqual(immediate, rendered.ToArray());
-        Assert.Contains("/AESV3", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "/AESV3", Emit(rendered));
     }
 
     [Fact]
@@ -101,21 +96,20 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.CompressOutput = true;
 
-        var compressed = Save(rendered);
+        var compressed = Emit(rendered);
         Assert.NotEqual(immediate, rendered.ToArray());
-        Assert.Contains("/ObjStm", compressed, StringComparison.Ordinal);
+        Carries("emission", "/ObjStm", compressed);
     }
 
     [Fact]
     public void IncludeDocumentIdSetAfterRender_ReachesTheSavedBytes()
     {
         var rendered = new DocumentRenderer().Render(Authored());
-        var immediate = rendered.ToArray();
-        Assert.False(DocumentReader.Parse(immediate).Trailer.ContainsKey("ID"));
+        Lacks("trailer", "/ID ", Line(Emit(rendered), "/Root "));
 
         rendered.IncludeDocumentId = true;
 
-        Assert.Contains("/ID", Save(rendered), StringComparison.Ordinal);
+        Carries("trailer", "/ID ", Line(Emit(rendered), "/Root "));
     }
 
     [Fact]
@@ -133,9 +127,9 @@ public class RenderedDocumentFacadeInvalidationTests
             Height = 20,
         });
 
-        var saved = Save(rendered);
-        Assert.Contains("/AcroForm", saved, StringComparison.Ordinal);
-        Assert.Contains("Ada", saved, StringComparison.Ordinal);
+        var saved = Emit(rendered);
+        Carries("emission", "/AcroForm", saved);
+        Carries("emission", "Ada", saved);
     }
 
     [Fact]
@@ -147,7 +141,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.ViewerPreferences!.HideMenubar = true;
 
-        Assert.Contains("/HideMenubar true", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "/HideMenubar true", Emit(rendered));
     }
 
     [Fact]
@@ -158,7 +152,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.Info.Title = "Late title";
 
-        Assert.Contains("Late title", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Late title", Emit(rendered));
     }
 
     [Fact]
@@ -169,7 +163,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.Outline.Add(new OutlineItem("Late chapter", OutlineTarget.ToPage(0)));
 
-        Assert.Contains("Late chapter", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Late chapter", Emit(rendered));
     }
 
     [Fact]
@@ -180,7 +174,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.PageLabels.Add(new PageLabel(0) { Prefix = "Late" });
 
-        Assert.Contains("Late", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Late", Emit(rendered));
     }
 
     [Fact]
@@ -191,7 +185,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.Attachments.Add("late.txt", Encoding.ASCII.GetBytes("late"), AttachmentRelationship.Data, "text/plain");
 
-        Assert.Contains("late.txt", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "late.txt", Emit(rendered));
     }
 
     [Fact]
@@ -202,7 +196,7 @@ public class RenderedDocumentFacadeInvalidationTests
 
         rendered.Xmp.SetProperty("http://purl.org/dc/elements/1.1/", "source", "Late source");
 
-        Assert.Contains("Late source", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Late source", Emit(rendered));
     }
 
     [Fact]
@@ -228,7 +222,7 @@ public class RenderedDocumentFacadeInvalidationTests
             Uri = new Uri("https://radzen.com/late"),
         });
 
-        Assert.Contains("https://radzen.com/late", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "https://radzen.com/late", Emit(rendered));
     }
 
     [Fact]
@@ -301,7 +295,7 @@ public class RenderedDocumentFacadeInvalidationTests
         rendered.Info.Title = "Facade mutation marker";
         var mutated = rendered.ToArray();
         Assert.NotEqual(first, mutated);
-        Assert.Contains("Facade mutation marker", Encoding.Latin1.GetString(mutated), StringComparison.Ordinal);
+        Carries("emission", "Facade mutation marker", Emit(rendered));
     }
 
     [Fact]
@@ -325,12 +319,12 @@ public class RenderedDocumentFacadeInvalidationTests
 
         var rebuilt = loaded.ToArray();
         Assert.Equal(first, rebuilt);
-        AssertMarkInfoPrecedesStructTreeRoot(rebuilt);
+        AssertMarkInfoPrecedesStructTreeRoot(Encoding.Latin1.GetString(rebuilt));
 
         loaded.Info.Title = "Tagged facade mutation marker";
         var mutated = loaded.ToArray();
         Assert.NotEqual(first, mutated);
-        Assert.Contains("Tagged facade mutation marker", Encoding.Latin1.GetString(mutated), StringComparison.Ordinal);
+        Carries("emission", "Tagged facade mutation marker", Emit(loaded));
     }
 
     [Fact]
@@ -369,34 +363,34 @@ public class RenderedDocumentFacadeInvalidationTests
         var first = rendered.ToArray();
 
         info.Author = "Nested author";
-        Assert.Contains("Nested author", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested author", Emit(rendered));
 
         preferences.HideMenubar = true;
-        Assert.Contains("/HideMenubar true", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "/HideMenubar true", Emit(rendered));
 
         outline.Add(new OutlineItem("Nested chapter", OutlineTarget.ToPage(0)));
-        Assert.Contains("Nested chapter", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested chapter", Emit(rendered));
 
         outline[0].Title = "Renamed chapter";
-        Assert.Contains("Renamed chapter", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Renamed chapter", Emit(rendered));
 
         labels.Add(new PageLabel(0) { Prefix = "Nested" });
-        Assert.Contains("Nested", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested", Emit(rendered));
 
         labels[0].Prefix = "Relabelled";
-        Assert.Contains("Relabelled", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Relabelled", Emit(rendered));
 
         attachments.Add("nested.txt", Encoding.ASCII.GetBytes("nested"), AttachmentRelationship.Data, "text/plain");
-        Assert.Contains("nested.txt", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "nested.txt", Emit(rendered));
 
         attachments[0].Description = "Nested description";
-        Assert.Contains("Nested description", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested description", Emit(rendered));
 
         xmp.SetProperty("http://purl.org/dc/elements/1.1/", "source", "Nested source");
-        Assert.Contains("Nested source", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested source", Emit(rendered));
 
         content.Add(new TextContent("Nested content", 72, 600) { Font = new Radzen.Documents.Fonts.Font { Size = 12 } });
-        Assert.Contains("Nested content", Save(rendered), StringComparison.Ordinal);
+        Carries("emission", "Nested content", Emit(rendered));
 
         Assert.NotEqual(first, rendered.ToArray());
     }

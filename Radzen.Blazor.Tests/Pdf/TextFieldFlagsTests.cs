@@ -1,8 +1,9 @@
 #nullable enable
+using System;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -23,11 +24,11 @@ public class TextFieldFlagsTests
     private static TextFieldDefinition PlainField()
         => new("Plain") { X = 100, Y = 700, Width = 250, Height = 20, Value = "hello" };
 
-    private static DocumentReader Reload(PortableDocument document)
-        => DocumentReader.Parse(document.ToArray());
+    private static string Field(PortableDocument document, string name)
+        => Line(Emit(document), $"/T ({name})");
 
-    private static int FlagsOf(DocumentReader reader, DictionaryObject field)
-        => field.TryGetValue("Ff", out var ff) && reader.Resolve(ff!) is NumberObject flags ? flags.IntValue : 0;
+    private static int FlagsOf(string field)
+        => field.Contains("/Ff ", StringComparison.Ordinal) ? NumberIn(field, "Ff") : 0;
 
     [Fact]
     public void MultilineFieldSetsFfBit13()
@@ -43,10 +44,7 @@ public class TextFieldFlagsTests
             Multiline = true,
         });
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Notes");
-
-        Assert.Equal(MultilineFlag, FlagsOf(reader, field) & MultilineFlag);
+        CarriesFlag("Notes field", Field(document, "Notes"), "Ff", MultilineFlag);
     }
 
     [Fact]
@@ -62,10 +60,7 @@ public class TextFieldFlagsTests
             Password = true,
         });
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Secret");
-
-        Assert.Equal(PasswordFlag, FlagsOf(reader, field) & PasswordFlag);
+        CarriesFlag("Secret field", Field(document, "Secret"), "Ff", PasswordFlag);
     }
 
     [Fact]
@@ -83,12 +78,10 @@ public class TextFieldFlagsTests
             MaxLength = 5,
         });
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Code");
+        var field = Field(document, "Code");
 
-        Assert.Equal(CombFlag, FlagsOf(reader, field) & CombFlag);
-        var maxLen = Assert.IsType<NumberObject>(reader.Resolve(field["MaxLen"]));
-        Assert.Equal(5, maxLen.IntValue);
+        CarriesFlag("Code field", field, "Ff", CombFlag);
+        Assert.Equal(5, NumberIn(field, "MaxLen"));
     }
 
     [Fact]
@@ -105,10 +98,7 @@ public class TextFieldFlagsTests
             Password = true,
         });
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Both");
-
-        Assert.Equal(MultilineFlag | PasswordFlag, FlagsOf(reader, field));
+        Assert.Equal(MultilineFlag | PasswordFlag, FlagsOf(Field(document, "Both")));
     }
 
     [Fact]
@@ -124,11 +114,10 @@ public class TextFieldFlagsTests
             MaxLength = 4,
         });
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Pin");
+        var field = Field(document, "Pin");
 
-        Assert.Equal(4, Assert.IsType<NumberObject>(reader.Resolve(field["MaxLen"])).IntValue);
-        Assert.Equal(0, FlagsOf(reader, field));
+        Assert.Equal(4, NumberIn(field, "MaxLen"));
+        Assert.Equal(0, FlagsOf(field));
     }
 
     [Fact]
@@ -137,11 +126,10 @@ public class TextFieldFlagsTests
         var document = BuildDocument();
         document.FormFields.Add(PlainField());
 
-        var reader = Reload(document);
-        var field = FormTestSupport.Field(reader, "Plain");
+        var field = Field(document, "Plain");
 
-        Assert.False(field.ContainsKey("Ff"));
-        Assert.False(field.ContainsKey("MaxLen"));
+        Lacks("Plain field", "/Ff", field);
+        Lacks("Plain field", "/MaxLen", field);
     }
 
     [Fact]

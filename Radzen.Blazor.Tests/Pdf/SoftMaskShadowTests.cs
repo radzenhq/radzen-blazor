@@ -10,6 +10,7 @@ using Radzen.Documents.Pdf.Render;
 using Radzen.Documents.Pdf.Write;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 namespace Radzen.Blazor.Pdf.Tests;
 
 public class SoftMaskShadowTests
@@ -66,66 +67,40 @@ public class SoftMaskShadowTests
     }
 
 
-    private static StreamObject ShadowGroupForm(DocumentReader reader)
-    {
-        var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
-        var states = Assert.IsType<DictionaryObject>(reader.Resolve(resources["ExtGState"]!));
-        foreach (var key in states.Keys)
-        {
-            if (reader.Resolve(states[key]) is DictionaryObject state
-                && state.TryGetValue("SMask", out var sm)
-                && reader.Resolve(sm!) is DictionaryObject mask
-                && mask.TryGetValue("G", out var g)
-                && reader.Resolve(g!) is StreamObject form)
-            {
-                return form;
-            }
-        }
-
-        throw new Xunit.Sdk.XunitException("no ExtGState carried an /SMask /G group form");
-    }
+    private static string ShadowGroupForm(string emission)
+        => IndirectObject(
+            emission,
+            Shaped(
+                "page /ExtGState",
+                @"/ExtGState <<(?: /\w+ << [^>]*>>)* /\w+ << /Type /ExtGState "
+                    + @"[^>]*/SMask << /Type /Mask /S /Luminosity /G (\d+) 0 R >>",
+                emission).Groups[1].Value);
 
     [Fact]
     public void Shadow_EmitsFormTransparencyGroup_WithDeviceGrayImage()
     {
-        var reader = BuildTestSupport.Read(ShadowDocument());
-        var form = ShadowGroupForm(reader);
+        var emission = Emit(new DocumentRenderer().Render(ShadowDocument()));
+        var form = ShadowGroupForm(emission);
 
-        Assert.Equal("Form", Assert.IsType<NameObject>(reader.Resolve(form.Dictionary["Subtype"]!)).Value);
-        var groupDict = Assert.IsType<DictionaryObject>(reader.Resolve(form.Dictionary["Group"]!));
-        Assert.Equal("Transparency", Assert.IsType<NameObject>(reader.Resolve(groupDict["S"]!)).Value);
-        Assert.Equal("DeviceGray", Assert.IsType<NameObject>(reader.Resolve(groupDict["CS"]!)).Value);
+        Carries("soft mask group form", "/Subtype /Form", form);
+        Carries("soft mask group form", "/Group << /S /Transparency /CS /DeviceGray >>", form);
 
-        var formResources = Assert.IsType<DictionaryObject>(reader.Resolve(form.Dictionary["Resources"]!));
-        var formXobjects = Assert.IsType<DictionaryObject>(reader.Resolve(formResources["XObject"]!));
-        var image = Assert.IsType<StreamObject>(reader.Resolve(formXobjects[Assert.Single(formXobjects.Keys)]));
-        Assert.Equal("Image", Assert.IsType<NameObject>(reader.Resolve(image.Dictionary["Subtype"]!)).Value);
-        Assert.Equal("DeviceGray", Assert.IsType<NameObject>(reader.Resolve(image.Dictionary["ColorSpace"]!)).Value);
+        var xobject = Shaped(
+            "soft mask group form",
+            @"/Resources << /XObject << /\w+ (\d+) 0 R >> >>",
+            form);
+        var image = IndirectObject(emission, xobject.Groups[1].Value);
+
+        Carries("soft mask image", "/Subtype /Image", image);
+        Carries("soft mask image", "/ColorSpace /DeviceGray", image);
     }
 
     [Fact]
     public void Shadow_InstallsLuminositySoftMask_ThroughExtGState()
     {
-        var reader = BuildTestSupport.Read(ShadowDocument());
-        var resources = BuildTestSupport.PageLeaves(reader)[0].Resources!;
-        var states = Assert.IsType<DictionaryObject>(reader.Resolve(resources["ExtGState"]!));
+        var emission = Emit(new DocumentRenderer().Render(ShadowDocument()));
 
-        DictionaryObject? smask = null;
-        foreach (var key in states.Keys)
-        {
-            if (reader.Resolve(states[key]) is DictionaryObject state
-                && state.TryGetValue("SMask", out var sm)
-                && reader.Resolve(sm!) is DictionaryObject dict)
-            {
-                smask = dict;
-            }
-        }
-
-        Assert.NotNull(smask);
-        Assert.Equal("Luminosity", Assert.IsType<NameObject>(reader.Resolve(smask!["S"]!)).Value);
-        var g = reader.Resolve(smask!["G"]!);
-        var group = Assert.IsType<StreamObject>(g);
-        Assert.Equal("Form", Assert.IsType<NameObject>(reader.Resolve(group.Dictionary["Subtype"]!)).Value);
+        Carries("soft mask group form", "/Subtype /Form", ShadowGroupForm(emission));
     }
 
     [Fact]

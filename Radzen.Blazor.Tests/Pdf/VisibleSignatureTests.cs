@@ -4,12 +4,11 @@ using System.Linq;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
-using Radzen.Documents.Pdf.Objects.Filters;
 using Radzen.Documents.Pdf.Signing;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -58,44 +57,23 @@ public class VisibleSignatureTests
         public byte[] Sign(SignedContent content) => blob;
     }
 
-    private static DictionaryObject Catalog(DocumentReader reader)
-        => (DictionaryObject)reader.Resolve(reader.Trailer["Root"]);
+    private static string Emission(byte[] pdf) => Encoding.Latin1.GetString(pdf);
 
-    private static DictionaryObject Field(DocumentReader reader, int index)
-    {
-        var acroForm = (DictionaryObject)reader.Resolve(Catalog(reader)["AcroForm"]);
-        var fields = (ArrayObject)reader.Resolve(acroForm["Fields"]);
-        return (DictionaryObject)reader.Resolve(fields[index]);
-    }
+    private static string SignatureFieldNumber(string emission)
+        => References("AcroForm", "Fields", 1, Line(emission, "/SigFlags"))[0];
 
-    private static double[] RectOf(DocumentReader reader, DictionaryObject field)
-    {
-        var rect = (ArrayObject)reader.Resolve(field["Rect"]);
-        return [.. rect.Select(entry => ((NumberObject)reader.Resolve(entry)).DoubleValue)];
-    }
-
-    private static string AppearanceText(DocumentReader reader, DictionaryObject field)
-    {
-        var ap = (DictionaryObject)reader.Resolve(field["AP"]);
-        var stream = (StreamObject)reader.Resolve(ap["N"]);
-        var data = stream.Data.ToArray();
-        if (stream.Dictionary.TryGetValue("Filter", out var filter)
-            && filter is NameObject name && name.Value is "FlateDecode" or "Fl")
-        {
-            data = FlateFilter.Decode(data);
-        }
-
-        return Encoding.Latin1.GetString(data);
-    }
+    private static string SignatureField(string emission)
+        => IndirectObject(emission, SignatureFieldNumber(emission));
 
     private static void VerifyCms(byte[] signed)
     {
-        var reader = DocumentReader.Parse(signed);
-        var signature = (DictionaryObject)reader.Resolve(Field(reader, 0)["V"]);
-        var range = (ArrayObject)reader.Resolve(signature["ByteRange"]);
-        int gapStart = ((NumberObject)range[1]).IntValue;
-        int gapEnd = ((NumberObject)range[2]).IntValue;
-        int tail = ((NumberObject)range[3]).IntValue;
+        var range = Shaped(
+            "signature /ByteRange",
+            @"/ByteRange \[(\d+) (\d+) (\d+) (\d+) *\]",
+            Emission(signed));
+        var gapStart = int.Parse(range.Groups[2].Value);
+        var gapEnd = int.Parse(range.Groups[3].Value);
+        var tail = int.Parse(range.Groups[4].Value);
 
         var content = new byte[gapStart + tail];
         Array.Copy(signed, 0, content, 0, gapStart);
@@ -135,14 +113,11 @@ public class VisibleSignatureTests
     [Fact]
     public void DefaultSignatureKeepsInvisibleZeroRectAndNoAppearance()
     {
-        var original = BuildPdf();
-        var signed = PdfSigner.Sign(original, Options(), new FixedSigner(new byte[100]));
+        var emission = Emission(PdfSigner.Sign(BuildPdf(), Options(), new FixedSigner(new byte[100])));
+        var field = SignatureField(emission);
 
-        var reader = DocumentReader.Parse(signed);
-        var field = Field(reader, 0);
-
-        Assert.Equal([0, 0, 0, 0], RectOf(reader, field));
-        Assert.False(field.ContainsKey("AP"));
+        Carries("signature field", "/Rect [0 0 0 0]", field);
+        Lacks("signature field", "/AP", field);
     }
 
     [Fact]
@@ -160,19 +135,18 @@ public class VisibleSignatureTests
     [Fact]
     public void VisibleSignatureSetsRectAndAppearanceStream()
     {
-        var original = BuildPdf();
         var appearance = new SignatureAppearance { X = 72, Y = 700, Width = 200, Height = 60 };
-        var signed = PdfSigner.Sign(original, Options(appearance), new FixedSigner(new byte[100]));
+        var emission = Emission(PdfSigner.Sign(BuildPdf(), Options(appearance), new FixedSigner(new byte[100])));
+        var field = SignatureField(emission);
 
-        var reader = DocumentReader.Parse(signed);
-        var field = Field(reader, 0);
+        Carries("signature field", "/Rect [72 700 272 760]", field);
 
-        Assert.Equal([72, 700, 272, 760], RectOf(reader, field));
+        var normal = Shaped("signature field /AP", @"/AP << /N (\d+) 0 R >>", field);
+        var painted = IndirectObject(emission, normal.Groups[1].Value);
 
-        var text = AppearanceText(reader, field);
-        Assert.Contains("Radzen Test Signer", text);
-        Assert.Contains("Approval", text);
-        Assert.Contains("2026-03-15", text);
+        Carries("signature appearance", "Radzen Test Signer", painted);
+        Carries("signature appearance", "Approval", painted);
+        Carries("signature appearance", "2026-03-15", painted);
     }
 
     [Fact]
@@ -220,23 +194,17 @@ public class VisibleSignatureTests
     [Fact]
     public void VisibleSignatureLandsOnRequestedPage()
     {
-        var original = BuildPdf(pages: 2);
         var appearance = new SignatureAppearance { PageIndex = 1, X = 72, Y = 700, Width = 200, Height = 60 };
-        var signed = PdfSigner.Sign(original, Options(appearance), new FixedSigner(new byte[100]));
+        var emission = Emission(
+            PdfSigner.Sign(BuildPdf(pages: 2), Options(appearance), new FixedSigner(new byte[100])));
 
-        var reader = DocumentReader.Parse(signed);
-        var pages = BuildTestSupport.PageLeaves(reader).Select(p => p.Page).ToList();
-        Assert.Equal(2, pages.Count);
+        var pages = References("page tree", "Kids", 2, Line(emission, "/Type /Pages"));
+        var annotated = Shaped(
+            "annotated page",
+            $@"\n(\d+) 0 obj\n<<[^\n]*/Annots \[{SignatureFieldNumber(emission)} 0 R\]",
+            emission);
 
-        var fieldNumber = ((ReferenceObject)((ArrayObject)reader.Resolve(
-            ((DictionaryObject)reader.Resolve(Catalog(reader)["AcroForm"]))["Fields"]))[0]).ObjectNumber;
-
-        Assert.True(pages[1].TryGetValue("Annots", out var annots1));
-        Assert.Contains((ArrayObject)reader.Resolve(annots1!),
-            a => a is ReferenceObject r && r.ObjectNumber == fieldNumber);
-
-        var onFirst = pages[0].TryGetValue("Annots", out var annots0)
-            && ((ArrayObject)reader.Resolve(annots0!)).Any(a => a is ReferenceObject r && r.ObjectNumber == fieldNumber);
-        Assert.False(onFirst);
+        Assert.Equal(pages[1], annotated.Groups[1].Value);
+        Lacks($"page {pages[0]} 0 R", "/Annots", IndirectObject(emission, pages[0]));
     }
 }

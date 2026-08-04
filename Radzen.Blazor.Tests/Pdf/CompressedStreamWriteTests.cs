@@ -5,6 +5,7 @@ using Radzen.Documents.Pdf.Objects;
 using Radzen.Documents.Pdf;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -63,10 +64,10 @@ public class CompressedStreamWriteTests
     {
         var text = Latin1(WriteGraph(compressed: false));
 
-        Assert.Contains("\nxref\n0 ", text);
-        Assert.Contains("trailer\n", text);
-        Assert.DoesNotContain("/ObjStm", text);
-        Assert.DoesNotContain("/XRef", text);
+        Carries("classic emission", "\nxref\n0 ", text);
+        Carries("classic emission", "trailer\n", text);
+        Lacks("classic emission", "/ObjStm", text);
+        Lacks("classic emission", "/XRef", text);
     }
 
     [Fact]
@@ -74,11 +75,11 @@ public class CompressedStreamWriteTests
     {
         var text = Latin1(WriteGraph(compressed: true));
 
-        Assert.Contains("/Type /XRef", text);
-        Assert.Contains("/Type /ObjStm", text);
-        Assert.Contains("startxref\n", text);
-        Assert.DoesNotContain("\nxref\n", text);
-        Assert.DoesNotContain("trailer\n", text);
+        Carries("compressed emission", "/Type /XRef", text);
+        Carries("compressed emission", "/Type /ObjStm", text);
+        Carries("compressed emission", "startxref\n", text);
+        Lacks("compressed emission", "\nxref\n", text);
+        Lacks("compressed emission", "trailer\n", text);
     }
 
     [Fact]
@@ -86,9 +87,9 @@ public class CompressedStreamWriteTests
     {
         var text = Latin1(WriteGraph(compressed: true));
 
-        Assert.DoesNotContain("\n1 0 obj\n", text);
-        Assert.DoesNotContain("\n2 0 obj\n", text);
-        Assert.Contains("\n3 0 obj\n", text);
+        Lacks("compressed emission", "\n1 0 obj\n", text);
+        Lacks("compressed emission", "\n2 0 obj\n", text);
+        Carries("compressed emission", "\n3 0 obj\n", text);
     }
 
     [Fact]

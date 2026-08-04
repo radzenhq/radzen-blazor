@@ -2,8 +2,10 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Xunit;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 using Radzen.Documents.Pdf.Render;
 using Radzen.Documents;
@@ -72,20 +74,22 @@ public class BuildEndToEndTests
         image.Height = Unit.FromPoint(100);
 
         var original = PdfTestResources.ReadAllBytes("Images/rgb.jpg");
-        var reader = BuildTestSupport.Read(document);
+        var emission = Emit(new DocumentRenderer().Render(document));
 
-        var images = BuildTestSupport.ImageXObjects(reader);
-        Assert.Single(images);
+        var images = Regex.Matches(emission, @"\n(\d+) 0 obj\n(<<[^\n]*/Subtype /Image[^\n]*)\n");
+        Assert.True(images.Count == 1, $"Expected 1 image XObject, found {images.Count}.");
 
-        var dict = images[0].Dictionary;
-        Assert.Equal("Image", BuildTestSupport.Name(reader, dict, "Subtype"));
-        Assert.Equal(64, BuildTestSupport.Int(dict, "Width"));
-        Assert.Equal(64, BuildTestSupport.Int(dict, "Height"));
-        Assert.Equal("DeviceRGB", BuildTestSupport.Name(reader, dict, "ColorSpace"));
-        Assert.Equal(8, BuildTestSupport.Int(dict, "BitsPerComponent"));
-        Assert.Equal("DCTDecode", BuildTestSupport.Name(reader, dict, "Filter"));
+        var dictionary = images[0].Groups[2].Value;
+        Carries("image xobject", "/Width 64", dictionary);
+        Carries("image xobject", "/Height 64", dictionary);
+        Carries("image xobject", "/ColorSpace /DeviceRGB", dictionary);
+        Carries("image xobject", "/BitsPerComponent 8", dictionary);
+        Carries("image xobject", "/Filter /DCTDecode", dictionary);
 
-        Assert.Equal(original, images[0].Data);
+        Carries(
+            "image xobject",
+            Encoding.Latin1.GetString(original),
+            IndirectObject(emission, images[0].Groups[1].Value));
     }
 
     [Fact]
@@ -155,12 +159,15 @@ public class BuildEndToEndTests
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Helvetica Sample", "Helvetica");
 
-        var reader = BuildTestSupport.Read(document);
-        Assert.Empty(BuildTestSupport.Type0Fonts(reader));
+        var emission = Emit(new DocumentRenderer().Render(document));
+        Lacks("emission", "/Subtype /Type0", emission);
 
-        var fonts = BuildTestSupport.Fonts(reader);
-        Assert.Single(fonts);
-        Assert.Equal("Type1", BuildTestSupport.Name(reader, fonts[0], "Subtype"));
-        Assert.Equal("Helvetica", BuildTestSupport.Name(reader, fonts[0], "BaseFont"));
+        var font = Shaped(
+            "page /Font resource",
+            @"/Font << /\w+ (<< /Type /Font [^>]*>>) >>",
+            Line(emission, "/Type /Page "));
+
+        Carries("font", "/Subtype /Type1", font.Groups[1].Value);
+        Carries("font", "/BaseFont /Helvetica", font.Groups[1].Value);
     }
 }

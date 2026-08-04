@@ -1,20 +1,25 @@
 #nullable enable
 
+using System;
 using Radzen.Documents.Pdf;
 using Xunit;
-using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
 // ISO 32000-1 8.5.3.1 and 8.5.4 even-odd fill and path clipping.
 public class PathContentClipTests
 {
-    private static byte[] Render(PathContent path)
+    private static string Render(PathContent path)
     {
         var document = new PortableDocument();
         var page = document.Pages.Add();
         page.Content.Add(path);
-        return ContentTestHelpers.PageContent(ContentTestHelpers.Reload(document), 0);
+
+        var emission = Emit(document);
+        return IndirectObject(
+            emission,
+            Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page ")).Groups[1].Value);
     }
 
     private static PathContent Triangle(bool stroke, bool fill)
@@ -33,10 +38,10 @@ public class PathContentClipTests
         var path = Triangle(stroke: false, fill: true);
         path.EvenOdd = true;
 
-        var operators = ContentStreamTokenizer.Operators(Render(path));
+        var content = Render(path);
 
-        Assert.Contains("f*", operators);
-        Assert.DoesNotContain("f", operators);
+        Carries("page content", "\nf*\n", content);
+        Lacks("page content", "\nf\n", content);
     }
 
     [Fact]
@@ -45,7 +50,7 @@ public class PathContentClipTests
         var path = Triangle(stroke: true, fill: true);
         path.EvenOdd = true;
 
-        Assert.Contains("B*", ContentStreamTokenizer.Operators(Render(path)));
+        Carries("page content", "\nB*\n", Render(path));
     }
 
     [Fact]
@@ -54,12 +59,16 @@ public class PathContentClipTests
         var path = Triangle(stroke: false, fill: false);
         path.Clip = PathClipMode.NonZero;
 
-        var operators = ContentStreamTokenizer.Operators(Render(path));
+        var content = Render(path);
 
-        var w = operators.IndexOf("W");
-        var n = operators.IndexOf("n");
-        Assert.True(w >= 0, "expected W operator");
-        Assert.True(w < n, "W must precede the n paint operator");
+        Carries("page content", "\nW\n", content);
+        Carries("page content", "\nn\n", content);
+
+        var w = content.IndexOf("\nW\n", StringComparison.Ordinal);
+        var n = content.IndexOf("\nn\n", StringComparison.Ordinal);
+        Assert.True(
+            w < n,
+            $"'W' must precede the 'n' paint operator.\npage content:\n{Excerpt(content)}");
     }
 
     [Fact]
@@ -68,17 +77,17 @@ public class PathContentClipTests
         var path = Triangle(stroke: false, fill: true);
         path.Clip = PathClipMode.EvenOdd;
 
-        Assert.Contains("W*", ContentStreamTokenizer.Operators(Render(path)));
+        Carries("page content", "\nW*\n", Render(path));
     }
 
     [Fact]
     public void Defaults_UseNonZeroFillAndNoClip()
     {
-        var operators = ContentStreamTokenizer.Operators(Render(Triangle(stroke: false, fill: true)));
+        var content = Render(Triangle(stroke: false, fill: true));
 
-        Assert.Contains("f", operators);
-        Assert.DoesNotContain("f*", operators);
-        Assert.DoesNotContain("W", operators);
-        Assert.DoesNotContain("W*", operators);
+        Carries("page content", "\nf\n", content);
+        Lacks("page content", "\nf*\n", content);
+        Lacks("page content", "\nW\n", content);
+        Lacks("page content", "\nW*\n", content);
     }
 }

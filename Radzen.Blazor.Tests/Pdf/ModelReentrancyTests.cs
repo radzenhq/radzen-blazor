@@ -20,9 +20,6 @@ public class ModelReentrancyTests
     private const string Heading = "Heading";
     private const string CellStyle = "CellHeading";
 
-    private static DocumentReader ReadAuthored((Document Document, DocumentRenderer Renderer) authored)
-        => BuildTestSupport.Read(authored.Document, authored.Renderer);
-
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
 

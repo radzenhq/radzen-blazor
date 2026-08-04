@@ -1,12 +1,11 @@
 #nullable enable
 using System;
 using System.IO;
-using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
 using Radzen.Documents.Core;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -70,16 +69,13 @@ public class AnnotationFlattenValidationTests
         Assert.Throws<InvalidOperationException>(document.Flatten);
     }
 
-    private static byte[] FlattenedContentBytes(PortableDocument document)
+    private static string FlattenedContent(PortableDocument document)
     {
         document.Flatten();
-        var reader = DocumentReader.Parse(document.ToArray());
-        var page = DocumentLoadTests.Kid(reader, 0);
-        return page.ContainsKey("Contents") ? DocumentLoadTests.KidContent(reader, 0) : [];
+        var emission = Emit(document);
+        var contents = Shaped("page", @"/Contents (\d+) 0 R", Line(emission, "/Type /Page "));
+        return IndirectObject(emission, contents.Groups[1].Value);
     }
-
-    private static string FlattenedContent(PortableDocument document)
-        => Encoding.ASCII.GetString(FlattenedContentBytes(document));
 
     private static PortableDocument InvalidMarkup()
     {
@@ -96,7 +92,7 @@ public class AnnotationFlattenValidationTests
         document.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow });
 
-        Assert.Contains("1 1 0 rg", FlattenedContent(document), StringComparison.Ordinal);
+        Carries("flattened content", "1 1 0 rg", FlattenedContent(document));
     }
 
     [Fact]
@@ -110,8 +106,8 @@ public class AnnotationFlattenValidationTests
         translucent.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow, Opacity = 0.4 });
 
-        Assert.DoesNotContain("gs", ContentOperationTestHelpers.Operators(FlattenedContentBytes(opaque)));
-        Assert.Contains("gs", ContentOperationTestHelpers.Operators(FlattenedContentBytes(translucent)));
+        Lacks("opaque flattened content", " gs\n", FlattenedContent(opaque));
+        Carries("translucent flattened content", " gs\n", FlattenedContent(translucent));
     }
 
     [Fact]
@@ -125,10 +121,11 @@ public class AnnotationFlattenValidationTests
             Flags = AnnotationFlags.Hidden,
         });
 
-        var content = FlattenedContent(document);
+        document.Flatten();
+        var emission = Emit(document);
 
         Assert.Empty(page.Annotations);
-        Assert.DoesNotContain("1 1 0 rg", content, StringComparison.Ordinal);
+        Lacks("emission", "1 1 0 rg", emission);
     }
 
     [Fact]

@@ -2,9 +2,9 @@
 using System;
 using System.Text;
 using Radzen.Documents.Pdf;
-using Radzen.Documents.Pdf.Objects;
 using Xunit;
 using Radzen.Documents;
+using static Radzen.Blazor.Pdf.Tests.RawPdfAssertions;
 
 namespace Radzen.Blazor.Pdf.Tests;
 
@@ -31,43 +31,36 @@ public class DocumentDateProducerTests
         return document;
     }
 
-    private static DictionaryObject Info(DocumentReader reader)
+    private static string Info(string emission)
     {
-        Assert.True(reader.Trailer.TryGetValue("Info", out var infoObject), "trailer has /Info");
-        return Assert.IsType<DictionaryObject>(reader.Resolve(infoObject!));
+        var reference = Shaped("trailer", @"/Info (\d+) 0 R", Line(emission, "/Info "));
+        return IndirectObject(emission, reference.Groups[1].Value);
     }
 
-    private static string Xmp(DocumentReader reader)
+    private static string Xmp(string emission)
     {
-        var catalog = ContentTestHelpers.Catalog(reader);
-        Assert.True(catalog.TryGetValue("Metadata", out var metadataObject), "catalog has /Metadata");
-        var stream = Assert.IsType<StreamObject>(reader.Resolve(metadataObject!));
-        return Encoding.UTF8.GetString(stream.Data.ToArray());
+        var reference = Shaped("catalog", @"/Metadata (\d+) 0 R", Line(emission, "/Type /Catalog"));
+        return IndirectObject(emission, reference.Groups[1].Value);
     }
 
     [Fact]
     public void CreationAndModificationDate_WrittenToInfoInPdfDateFormat()
     {
-        var reader = DocumentReader.Parse(Document(withMetadata: true).ToArray());
-        var info = Info(reader);
+        var info = Info(Emit(Document(withMetadata: true)));
 
-        Assert.Equal("D:20240115103000+02'00'",
-            Assert.IsType<StringObject>(reader.Resolve(info["CreationDate"])).Value);
-        Assert.Equal("D:20240320081545-05'00'",
-            Assert.IsType<StringObject>(reader.Resolve(info["ModDate"])).Value);
-        Assert.Equal("Acme Publisher 3.0",
-            Assert.IsType<StringObject>(reader.Resolve(info["Producer"])).Value);
+        Carries("info dictionary", "/CreationDate (D:20240115103000+02'00')", info);
+        Carries("info dictionary", "/ModDate (D:20240320081545-05'00')", info);
+        Carries("info dictionary", "/Producer (Acme Publisher 3.0)", info);
     }
 
     [Fact]
     public void Producer_And_Dates_Mirrored_IntoXmpPacket()
     {
-        var reader = DocumentReader.Parse(Document(withMetadata: true).ToArray());
-        var xmp = Xmp(reader);
+        var xmp = Xmp(Emit(Document(withMetadata: true)));
 
-        Assert.Contains("<pdf:Producer>Acme Publisher 3.0</pdf:Producer>", xmp);
-        Assert.Contains("<xmp:CreateDate>2024-01-15T10:30:00+02:00</xmp:CreateDate>", xmp);
-        Assert.Contains("<xmp:ModifyDate>2024-03-20T08:15:45-05:00</xmp:ModifyDate>", xmp);
+        Carries("xmp packet", "<pdf:Producer>Acme Publisher 3.0</pdf:Producer>", xmp);
+        Carries("xmp packet", "<xmp:CreateDate>2024-01-15T10:30:00+02:00</xmp:CreateDate>", xmp);
+        Carries("xmp packet", "<xmp:ModifyDate>2024-03-20T08:15:45-05:00</xmp:ModifyDate>", xmp);
     }
 
     [Fact]
@@ -76,13 +69,11 @@ public class DocumentDateProducerTests
         var bytes = Document(withMetadata: false).ToArray();
         Assert.Equal(bytes, Document(withMetadata: false).ToArray());
 
-        var text = Encoding.Latin1.GetString(bytes);
-        Assert.DoesNotContain("/CreationDate", text);
-        Assert.DoesNotContain("/ModDate", text);
-        Assert.DoesNotContain("/Producer", text);
-        Assert.DoesNotContain("/Metadata", text);
-
-        var reader = DocumentReader.Parse(bytes);
-        Assert.False(ContentTestHelpers.Catalog(reader).ContainsKey("Metadata"));
+        var emission = Encoding.Latin1.GetString(bytes);
+        Lacks("emission", "/CreationDate", emission);
+        Lacks("emission", "/ModDate", emission);
+        Lacks("emission", "/Producer", emission);
+        Lacks("emission", "/Metadata", emission);
+        Lacks("catalog", "/Metadata", Line(emission, "/Type /Catalog"));
     }
 }
