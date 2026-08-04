@@ -20,6 +20,13 @@ fixtures=(
   timestamped
 )
 
+producers=(
+  ghostscript
+  mupdf
+  cups
+  chromium
+)
+
 for tool in qpdf gs verapdf dotnet; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "FATAL: required tool '$tool' is not on PATH"
@@ -117,5 +124,63 @@ verify_verapdf() {
 verify_verapdf tagged-accessible ua1
 verify_verapdf tagged-pdfa-level-a 2a
 
+foreign_dir="$repo_root/Radzen.Blazor.Tests/Pdf/Resources/Foreign"
+foreign_resave_dir="$corpus_dir/foreign"
+
 echo
-echo "external validation passed: ${#fixtures[@]} fixtures"
+echo "== foreign producer corpus =="
+for name in "${producers[@]}"; do
+  if [ ! -s "$foreign_resave_dir/$name-resaved.pdf" ]; then
+    echo "FATAL: re-save $name-resaved.pdf was not exported"
+    exit 3
+  fi
+done
+
+check_qpdf() {
+  local label="$1"
+  local file="$2"
+  local output
+
+  if ! output="$(qpdf --check "$file" 2>&1)"; then
+    echo "FAIL qpdf $label"
+    echo "$output"
+    exit 4
+  fi
+
+  if printf '%s\n' "$output" | grep -q "WARNING"; then
+    echo "FAIL qpdf $label (warnings)"
+    echo "$output"
+    exit 4
+  fi
+
+  echo "PASS qpdf $label"
+}
+
+check_gs() {
+  local label="$1"
+  local file="$2"
+  local output
+
+  if ! output="$(gs -dNOPAUSE -dBATCH -dQUIET -sDEVICE=nullpage "$file" 2>&1)"; then
+    echo "FAIL ghostscript $label"
+    echo "$output"
+    exit 5
+  fi
+
+  if printf '%s\n' "$output" | grep -q "Error"; then
+    echo "FAIL ghostscript $label (error output)"
+    echo "$output"
+    exit 5
+  fi
+
+  echo "PASS ghostscript $label"
+}
+
+for name in "${producers[@]}"; do
+  check_qpdf "foreign/$name" "$foreign_dir/$name.pdf"
+  check_qpdf "foreign/$name-resaved" "$foreign_resave_dir/$name-resaved.pdf"
+  check_gs "foreign/$name-resaved" "$foreign_resave_dir/$name-resaved.pdf"
+done
+
+echo
+echo "external validation passed: ${#fixtures[@]} fixtures, ${#producers[@]} foreign producers"

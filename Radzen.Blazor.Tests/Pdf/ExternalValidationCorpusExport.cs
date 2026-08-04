@@ -26,4 +26,24 @@ public class ExternalValidationCorpusExport
             File.WriteAllBytes(Path.Combine(directory, name + ".pdf"), build());
         }
     }
+
+    [Fact]
+    public void ForeignResaves_AreWrittenToTheRequestedDirectory()
+    {
+        var directory = Environment.GetEnvironmentVariable("RADZEN_EXTERNAL_CORPUS");
+
+        if (string.IsNullOrEmpty(directory))
+        {
+            return;
+        }
+
+        var foreign = Path.Combine(directory, "foreign");
+        Directory.CreateDirectory(foreign);
+
+        foreach (var name in ForeignProducerCorpusTests.Producers)
+        {
+            var document = ForeignProducerCorpusTests.Load(ForeignProducerCorpusTests.Source(name));
+            File.WriteAllBytes(Path.Combine(foreign, name + "-resaved.pdf"), ForeignProducerCorpusTests.Save(document));
+        }
+    }
 }
