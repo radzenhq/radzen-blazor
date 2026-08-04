@@ -1,9 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -64,14 +62,6 @@ public class TaggedPdfStructureTests
     private static DocumentReader ReadTagged(Document document)
         => BuildTestSupport.Read(document, TaggedRenderer());
 
-    private static string Rendered(Document document, DocumentRenderer renderer)
-        => Encoding.Latin1.GetString(renderer.ToArray(document));
-
-    private static string StructureRoot(string emission)
-        => IndirectObject(
-            emission,
-            Shaped("catalog", @"/StructTreeRoot (\d+) 0 R", Line(emission, "/Type /Catalog")).Groups[1].Value);
-
     private static string RawType(string element)
         => Shaped("structure element", @"/S /(\w+) /P ", element).Groups[1].Value;
 
@@ -90,17 +80,6 @@ public class TaggedPdfStructureTests
         return rawType;
     }
 
-    private static string Kids(string subject, string element)
-        => Shaped(subject, @"/K \[([^\]]*)\]", element).Groups[1].Value;
-
-    private static string[] ChildElements(string kids)
-        => [.. Regex.Matches(Regex.Replace(kids, "<< [^>]*>>", " "), @"(\d+) 0 R")
-            .Select(match => match.Groups[1].Value)];
-
-    private static int[] DirectMcids(string kids)
-        => [.. Regex.Matches(Regex.Replace(kids, @"<< [^>]*>>|\d+ 0 R", " "), @"\d+")
-            .Select(match => int.Parse(match.Value, CultureInfo.InvariantCulture))];
-
     private static string[] Pages(string emission)
         => [.. Regex.Matches(emission, @"\d+ 0 obj\n<< /Type /Page [^\n]*").Select(match => match.Value)];
 
@@ -114,14 +93,14 @@ public class TaggedPdfStructureTests
 
         var sect = IndirectObject(
             emission,
-            Assert.Single(ChildElements(Kids("document element", documentElement))));
+            Assert.Single(ChildElements(StructureKids("document element", documentElement))));
         Assert.Equal("Sect", EffectiveType(structureRoot, RawType(sect)));
 
         return (structureRoot, sect);
     }
 
     private static string TableElement(string emission, string structureRoot, string sect)
-        => ChildElements(Kids("section element", sect))
+        => ChildElements(StructureKids("section element", sect))
             .Select(number => IndirectObject(emission, number))
             .Single(element => EffectiveType(structureRoot, RawType(element)) == "Table");
 
@@ -318,7 +297,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_EmitsMarkInfoAndStructTreeRoot()
     {
-        var emission = Rendered(AuthorInvoice(), TaggedRenderer());
+        var emission = Emit(AuthorInvoice(), TaggedRenderer());
 
         Carries("catalog", "/MarkInfo << /Marked true >>", Line(emission, "/Type /Catalog"));
 
@@ -331,7 +310,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_WithoutAccessibilityOrConformance_EmitsNoMarkInfoAndNoStructTreeRoot()
     {
-        var catalog = Line(Rendered(AuthorInvoice(), new DocumentRenderer()), "/Type /Catalog");
+        var catalog = Line(Emit(AuthorInvoice(), new DocumentRenderer()), "/Type /Catalog");
 
         Lacks("catalog", "/MarkInfo", catalog);
         Lacks("catalog", "/StructTreeRoot", catalog);
@@ -340,7 +319,7 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_WithoutAccessibilityOrConformance_EmitsNoStructParentsOnAnyPage()
     {
-        var emission = Rendered(AuthorInvoice(), new DocumentRenderer());
+        var emission = Emit(AuthorInvoice(), new DocumentRenderer());
 
         Assert.All(Pages(emission), page =>
         {
@@ -380,10 +359,10 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_StructureNestingMatchesAuthoringOrder()
     {
-        var emission = Rendered(AuthorInvoice(), TaggedRenderer());
+        var emission = Emit(AuthorInvoice(), TaggedRenderer());
         var (structureRoot, sect) = SectionElement(emission);
 
-        var kinds = ChildElements(Kids("section element", sect))
+        var kinds = ChildElements(StructureKids("section element", sect))
             .Select(number => EffectiveType(structureRoot, RawType(IndirectObject(emission, number))))
             .ToArray();
 
@@ -393,14 +372,14 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_TableRowsUseThForHeaderAndTdForBody()
     {
-        var emission = Rendered(AuthorInvoice(), TaggedRenderer());
+        var emission = Emit(AuthorInvoice(), TaggedRenderer());
         var (structureRoot, sect) = SectionElement(emission);
 
-        var rows = ChildElements(Kids("table element", TableElement(emission, structureRoot, sect)));
+        var rows = ChildElements(StructureKids("table element", TableElement(emission, structureRoot, sect)));
         Assert.Equal(3, rows.Length);
         Assert.All(rows, row => Assert.Equal("TR", EffectiveType(structureRoot, RawType(IndirectObject(emission, row)))));
 
-        var headerCells = ChildElements(Kids("header row", IndirectObject(emission, rows[0])));
+        var headerCells = ChildElements(StructureKids("header row", IndirectObject(emission, rows[0])));
         Assert.Equal(2, headerCells.Length);
         Assert.All(
             headerCells,
@@ -408,7 +387,7 @@ public class TaggedPdfStructureTests
 
         foreach (var row in rows.Skip(1))
         {
-            var cells = ChildElements(Kids("body row", IndirectObject(emission, row)));
+            var cells = ChildElements(StructureKids("body row", IndirectObject(emission, row)));
             Assert.Equal(2, cells.Length);
             Assert.All(
                 cells,
@@ -419,33 +398,33 @@ public class TaggedPdfStructureTests
     [Fact]
     public void Build_TaggedCellsNestTheirParagraphsInsideTheCell()
     {
-        var emission = Rendered(AuthorInvoice(), TaggedRenderer());
+        var emission = Emit(AuthorInvoice(), TaggedRenderer());
         var (structureRoot, sect) = SectionElement(emission);
 
-        var rows = ChildElements(Kids("table element", TableElement(emission, structureRoot, sect)));
+        var rows = ChildElements(StructureKids("table element", TableElement(emission, structureRoot, sect)));
 
-        foreach (var cell in rows.SelectMany(row => ChildElements(Kids("row element", IndirectObject(emission, row)))))
+        foreach (var cell in rows.SelectMany(row => ChildElements(StructureKids("row element", IndirectObject(emission, row)))))
         {
-            var kids = Kids("cell element", IndirectObject(emission, cell));
-            Assert.Empty(DirectMcids(kids));
+            var kids = StructureKids("cell element", IndirectObject(emission, cell));
+            Assert.Empty(Mcids(kids));
 
             var paragraph = IndirectObject(emission, Assert.Single(ChildElements(kids)));
             Assert.Equal("P", EffectiveType(structureRoot, RawType(paragraph)));
-            Assert.NotEmpty(DirectMcids(Kids("paragraph element", paragraph)));
+            Assert.NotEmpty(Mcids(StructureKids("paragraph element", paragraph)));
         }
     }
 
     [Fact]
     public void Build_Heading1StyleMapsToH1WithPageAndMcid()
     {
-        var emission = Rendered(AuthorInvoice(), TaggedRenderer());
+        var emission = Emit(AuthorInvoice(), TaggedRenderer());
         var (structureRoot, sect) = SectionElement(emission);
 
-        var heading = IndirectObject(emission, ChildElements(Kids("section element", sect))[0]);
+        var heading = IndirectObject(emission, ChildElements(StructureKids("section element", sect))[0]);
 
         Assert.Equal("H1", EffectiveType(structureRoot, RawType(heading)));
         Carries("heading element", "/Pg ", heading);
-        Assert.NotEmpty(DirectMcids(Kids("heading element", heading)));
+        Assert.NotEmpty(Mcids(StructureKids("heading element", heading)));
     }
 
     [Fact]

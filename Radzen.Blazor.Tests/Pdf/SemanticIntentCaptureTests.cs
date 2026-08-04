@@ -28,13 +28,9 @@ public class SemanticIntentCaptureTests
         return types;
     }
 
-    private static string ElementMarker(string type) => $"/Type /StructElem /S /{type} /P ";
-
-    private static string Element(string emission, string type) => Line(emission, ElementMarker(type));
-
     private static void Elements(string emission, string type, int expected)
     {
-        var marker = ElementMarker(type);
+        var marker = StructureMarker(type);
         var count = Regex.Matches(emission, Regex.Escape(marker)).Count;
         Assert.True(
             count == expected,
@@ -165,18 +161,18 @@ public class SemanticIntentCaptureTests
     {
         var emission = Emit(Tagged().Render(Chapters(out _)));
 
-        foreach (var number in ElementKids(Element(emission, "TOC")))
+        foreach (var number in ElementKids(StructureElement(emission, "TOC")))
         {
             var entry = IndirectObject(emission, number);
-            Carries($"TOC kid {number} 0 R", ElementMarker("TOCI"), entry);
+            Carries($"TOC kid {number} 0 R", StructureMarker("TOCI"), entry);
 
             var referenceNumber = Assert.Single(ElementKids(entry));
             var reference = IndirectObject(emission, referenceNumber);
-            Carries($"TOCI kid {referenceNumber} 0 R", ElementMarker("Reference"), reference);
+            Carries($"TOCI kid {referenceNumber} 0 R", StructureMarker("Reference"), reference);
 
             var linkNumber = Assert.Single(ElementKids(reference));
             var link = IndirectObject(emission, linkNumber);
-            Carries($"Reference kid {linkNumber} 0 R", ElementMarker("Link"), link);
+            Carries($"Reference kid {linkNumber} 0 R", StructureMarker("Link"), link);
             Shaped($"link element {linkNumber} 0 R marked content", @"/K \[\d", link);
             Carries($"link element {linkNumber} 0 R", "/Type /OBJR", link);
         }
@@ -201,8 +197,8 @@ public class SemanticIntentCaptureTests
 
         var emission = Emit(new DocumentRenderer().Render(document));
 
-        Lacks("untagged emission", ElementMarker("TOC"), emission);
-        Lacks("untagged emission", ElementMarker("TOCI"), emission);
+        Lacks("untagged emission", StructureMarker("TOC"), emission);
+        Lacks("untagged emission", StructureMarker("TOCI"), emission);
     }
 
     [Fact]
@@ -215,7 +211,7 @@ public class SemanticIntentCaptureTests
 
         var emission = Emit(Accessible().Render(document));
 
-        Carries("Figure element", "/Alt (Scan for details)", Element(emission, "Figure"));
+        Carries("Figure element", "/Alt (Scan for details)", StructureElement(emission, "Figure"));
     }
 
     [Fact]
@@ -226,7 +222,7 @@ public class SemanticIntentCaptureTests
         BuildTestSupport.RegisterLatin(document);
         document.Sections.Add().Blocks.AddQrCode("RADZEN", Unit.FromPoint(80)).AlternateText = "";
 
-        Lacks("tagged emission", ElementMarker("Figure"), Emit(Accessible().Render(document)));
+        Lacks("tagged emission", StructureMarker("Figure"), Emit(Accessible().Render(document)));
     }
 
     private static SemanticStructureNode SingleFigure(Document document)
@@ -314,7 +310,7 @@ public class SemanticIntentCaptureTests
 
         var emission = Emit(Accessible().Render(document));
 
-        Carries("Figure element", "/Alt (The Radzen logo)", Element(emission, "Figure"));
+        Carries("Figure element", "/Alt (The Radzen logo)", StructureElement(emission, "Figure"));
     }
 
     [Fact]
@@ -330,8 +326,8 @@ public class SemanticIntentCaptureTests
 
         Elements(emission, "Div", 1);
 
-        var child = Assert.Single(ElementKids(Element(emission, "Div")));
-        Carries($"Div kid {child} 0 R", ElementMarker("P"), IndirectObject(emission, child));
+        var child = Assert.Single(ElementKids(StructureElement(emission, "Div")));
+        Carries($"Div kid {child} 0 R", StructureMarker("P"), IndirectObject(emission, child));
     }
 
     [Fact]
@@ -343,7 +339,7 @@ public class SemanticIntentCaptureTests
         var container = document.Sections.Add().Blocks.Add(new Container { Padding = Unit.FromPoint(8) });
         container.Blocks.AddParagraph().Inlines.Add("BOXED").Font.Family = BuildTestSupport.Latin;
 
-        Lacks("untagged emission", ElementMarker("Div"), Emit(new DocumentRenderer().Render(document)));
+        Lacks("untagged emission", StructureMarker("Div"), Emit(new DocumentRenderer().Render(document)));
     }
 
     private static Table SpanningTable(Document document, bool repeat, bool header)
@@ -408,8 +404,8 @@ public class SemanticIntentCaptureTests
     {
         var emission = Emit(Accessible().Render(SpanningDocument(repeat: true, header: false)));
 
-        Lacks("tagged emission", ElementMarker("TH"), emission);
-        Carries("tagged emission", ElementMarker("TD"), emission);
+        Lacks("tagged emission", StructureMarker("TH"), emission);
+        Carries("tagged emission", StructureMarker("TD"), emission);
     }
 
     [Fact]
@@ -423,7 +419,7 @@ public class SemanticIntentCaptureTests
         Assert.All(pages, page => Assert.All(
             Assert.Single(page.Body.Tables).Rows,
             row => Assert.False(row.IsHeader)));
-        Carries("tagged emission", ElementMarker("TH"), Emit(Accessible().Render(document)));
+        Carries("tagged emission", StructureMarker("TH"), Emit(Accessible().Render(document)));
     }
 
     [Fact]

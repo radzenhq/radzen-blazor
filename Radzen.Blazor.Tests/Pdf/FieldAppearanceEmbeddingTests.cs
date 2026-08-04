@@ -24,9 +24,6 @@ public class FieldAppearanceEmbeddingTests
 
     private static DocumentRenderer PdfA() => new() { Conformance = PdfAConformance.PdfA2B };
 
-    private static string Emission(Document document, DocumentRenderer? renderer = null)
-        => Emit((renderer ?? new DocumentRenderer()).Render(document));
-
     private static string Appearance(string emission)
     {
         var widget = Line(emission, "/T (name)");
@@ -59,7 +56,7 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var emission = Emission(document, PdfA());
+        var emission = Emit(document, PdfA());
 
         CarriesAnEmbeddedProgram(emission, EmbeddedFont(Appearance(emission)).Groups[2].Value);
     }
@@ -70,7 +67,7 @@ public class FieldAppearanceEmbeddingTests
         var document = Conformant(out var paragraph);
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var emission = Emission(document, PdfA());
+        var emission = Emit(document, PdfA());
         var key = EmbeddedFont(Appearance(emission)).Groups[1].Value;
 
         var defaultAppearance = Shaped("widget", @"/DA \(([^)]*)\)", Line(emission, "/T (name)")).Groups[1].Value;
@@ -92,7 +89,7 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("aaa ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Zq", Label = "Name" });
 
-        var emission = Emission(document, PdfA());
+        var emission = Emit(document, PdfA());
         var appearance = Appearance(emission);
 
         CarriesAnEmbeddedProgram(emission, EmbeddedFont(appearance).Groups[2].Value);
@@ -123,7 +120,7 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada", Label = "Name" });
 
-        var emission = Emission(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
         CarriesAnEmbeddedProgram(emission, EmbeddedFont(Appearance(emission)).Groups[2].Value);
     }
@@ -135,7 +132,7 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Inlines.Add("Name ");
         paragraph.Inlines.Add(new TextInput("name") { Label = "Name" });
 
-        var emission = Emission(document, PdfA());
+        var emission = Emit(document, PdfA());
 
         Lacks("field appearance stream", "/Resources", Appearance(emission));
     }
@@ -193,7 +190,7 @@ public class FieldAppearanceEmbeddingTests
         paragraph.Font.Family = BuildTestSupport.Latin;
         paragraph.Inlines.Add(new TextInput("name") { Value = "Ada" });
 
-        var emission = Emission(document);
+        var emission = Emit(document);
         var appearance = Appearance(emission);
 
         Carries("field appearance stream", "(Ada) Tj", appearance);

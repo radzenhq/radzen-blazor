@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Radzen.Documents.Codes;
 using Radzen.Documents.Pdf;
 using Radzen.Documents.Pdf.Objects;
@@ -19,9 +18,6 @@ public class PdfUaArtifactTests
 
     private static byte[] RenderAuthored((Document Document, DocumentRenderer Renderer) authored)
         => authored.Renderer.ToArray(authored.Document);
-
-    private static string Emitted(Document document, DocumentRenderer renderer)
-        => Encoding.Latin1.GetString(renderer.ToArray(document));
 
     private static (Document Document, DocumentRenderer Renderer) AuthorBanded(bool ua, PdfAConformance conformance = PdfAConformance.None)
     {
@@ -186,7 +182,7 @@ public class PdfUaArtifactTests
         var section = document.Sections.Add();
         section.Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg")).AlternateText = "";
 
-        Lacks("emission", "/S /Figure", Emitted(document, builderRenderer));
+        Lacks("emission", "/S /Figure", Emit(document, builderRenderer));
     }
 
     [Theory]
@@ -238,7 +234,7 @@ public class PdfUaArtifactTests
         var image = document.Sections.Add().Blocks.AddImage(PdfTestResources.Open("Images/rgb.jpg"));
         image.AlternateText = "";
 
-        var emission = Emitted(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
+        var emission = Emit(document, new DocumentRenderer { Accessibility = PdfUaConformance.PdfUa1 });
 
         Lacks("emission", "/S /Figure", emission);
     }
@@ -286,7 +282,7 @@ public class PdfUaArtifactTests
         list.Font.Family = BuildTestSupport.Latin;
         list.AddItem("First");
 
-        var emission = Emitted(document, builderRenderer);
+        var emission = Emit(document, builderRenderer);
 
         Shaped("structure tree", @"/S /L[^A-Za-z]", emission);
         Shaped("structure tree", @"/S /LI[^A-Za-z]", emission);

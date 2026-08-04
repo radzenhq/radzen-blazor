@@ -64,17 +64,6 @@ public class TableOfContentsTests
         return pdf;
     }
 
-    private static string[] Annotations(string page)
-    {
-        var annots = Shaped("page /Annots", @"/Annots \[([^\]]*)\]", page);
-        return
-        [
-            .. Regex.Matches(annots.Groups[1].Value, @"(\d+) 0 R")
-                .Cast<Match>()
-                .Select(match => match.Groups[1].Value),
-        ];
-    }
-
     [Fact]
     public void Toc_RendersEntryLines_WithLeaderAndResolvedPageNumbers()
     {
@@ -94,7 +83,7 @@ public class TableOfContentsTests
         var pages = References("pages node", "Kids", 4, Line(emission, "/Type /Pages"));
 
         var destinations = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var number in Annotations(IndirectObject(emission, pages[0])))
+        foreach (var number in ReferencesIn("page", "Annots", IndirectObject(emission, pages[0])))
         {
             var annotation = IndirectObject(emission, number);
             Carries($"annotation {number} 0 R", "/Subtype /Link", annotation);
