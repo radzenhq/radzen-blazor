@@ -47,7 +47,7 @@ internal static partial class LineLayouter
     }
 
     private static (double Height, double Baseline) Measure(
-        ImmutableArray<LineFragment> fragments,
+        ReadOnlySpan<LineFragment> fragments,
         double lineSpacing,
         FontCollection fonts)
     {

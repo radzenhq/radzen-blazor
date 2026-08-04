@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Radzen.Documents.Internal;
 
 namespace Radzen.Documents.Pdf.Objects;
 
@@ -69,57 +70,91 @@ internal sealed class StringObject(string value) : DocumentObject
 
 internal static class PdfLiteralString
 {
+    private interface IEscapeSink
+    {
+        void Put(char value);
+
+        void Put(string value);
+    }
+
+    private readonly struct BuilderSink(StringBuilder builder) : IEscapeSink
+    {
+        public void Put(char value) => builder.Append(value);
+
+        public void Put(string value) => builder.Append(value);
+    }
+
+    private readonly struct AccumulatorSink(PooledByteAccumulator accumulator) : IEscapeSink
+    {
+        public void Put(char value) => accumulator.Append((byte)value);
+
+        public void Put(string value)
+        {
+            foreach (var character in value)
+            {
+                accumulator.Append((byte)character);
+            }
+        }
+    }
+
+    public static void AppendEscaped(StringBuilder builder, ReadOnlySpan<byte> bytes, bool binary)
+        => Escape(new BuilderSink(builder), bytes, binary);
+
+    public static void WriteEscaped(PooledByteAccumulator accumulator, ReadOnlySpan<byte> bytes, bool binary)
+        => Escape(new AccumulatorSink(accumulator), bytes, binary);
+
     // ISO 32000-1 7.3.4.2: a literal string is parenthesised; the backslash and unbalanced
     // parentheses are escaped, the named control escapes and three-digit octal escapes are
     // permitted, and any other byte may be written raw.
-    public static void AppendEscaped(StringBuilder builder, ReadOnlySpan<byte> bytes, bool binary)
+    private static void Escape<TSink>(TSink sink, ReadOnlySpan<byte> bytes, bool binary)
+        where TSink : struct, IEscapeSink
     {
-        builder.Append('(');
+        sink.Put('(');
         foreach (var b in bytes)
         {
             switch (b)
             {
                 case (byte)'\\':
-                    builder.Append("\\\\");
+                    sink.Put("\\\\");
                     break;
                 case (byte)'(':
-                    builder.Append("\\(");
+                    sink.Put("\\(");
                     break;
                 case (byte)')':
-                    builder.Append("\\)");
+                    sink.Put("\\)");
                     break;
                 case (byte)'\n' when !binary:
-                    builder.Append("\\n");
+                    sink.Put("\\n");
                     break;
                 case (byte)'\r' when !binary:
-                    builder.Append("\\r");
+                    sink.Put("\\r");
                     break;
                 case (byte)'\t' when !binary:
-                    builder.Append("\\t");
+                    sink.Put("\\t");
                     break;
                 case (byte)'\b' when !binary:
-                    builder.Append("\\b");
+                    sink.Put("\\b");
                     break;
                 case (byte)'\f' when !binary:
-                    builder.Append("\\f");
+                    sink.Put("\\f");
                     break;
                 default:
                     if ((b >= 0x20 && b <= 0x7E) || (binary && b >= 0x80))
                     {
-                        builder.Append((char)b);
+                        sink.Put((char)b);
                     }
                     else
                     {
-                        builder.Append('\\');
-                        builder.Append((char)('0' + ((b >> 6) & 0x7)));
-                        builder.Append((char)('0' + ((b >> 3) & 0x7)));
-                        builder.Append((char)('0' + (b & 0x7)));
+                        sink.Put('\\');
+                        sink.Put((char)('0' + ((b >> 6) & 0x7)));
+                        sink.Put((char)('0' + ((b >> 3) & 0x7)));
+                        sink.Put((char)('0' + (b & 0x7)));
                     }
 
                     break;
             }
         }
 
-        builder.Append(')');
+        sink.Put(')');
     }
 }

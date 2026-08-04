@@ -248,6 +248,29 @@ internal static class GeometryCapture
             return run;
         }
 
+        var placed = 0.0;
+        var index = 0;
+        for (; index < run.Spans.Length; index++)
+        {
+            var span = run.Spans[index];
+            if (span.XOffset != placed)
+            {
+                break;
+            }
+
+            placed += RunTextAdvance.Calculate(
+                span.Advance,
+                span.GlyphCount,
+                span.WordSpaceCount,
+                paint,
+                trailingCharacterSpacing: true);
+        }
+
+        if (index == run.Spans.Length)
+        {
+            return run;
+        }
+
         var spans = ImmutableArray.CreateBuilder<CapturedGlyphSpan>(run.Spans.Length);
         var x = 0.0;
         foreach (var span in run.Spans)

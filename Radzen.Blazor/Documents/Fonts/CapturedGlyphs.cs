@@ -21,7 +21,7 @@ internal readonly record struct CapturedFaceMetrics(
     double Descent,
     double UnitsPerEm);
 
-internal readonly record struct CapturedBuiltInFace(
+internal sealed record CapturedBuiltInFace(
     BuiltInFontFamily Family,
     bool Bold,
     bool Italic,
@@ -30,7 +30,7 @@ internal readonly record struct CapturedBuiltInFace(
 internal readonly record struct CapturedFontFace : IFontProgramSource
 {
     private readonly SfntFont? program;
-    private readonly CapturedBuiltInFace builtIn;
+    private readonly CapturedBuiltInFace? builtIn;
 
     private CapturedFontFace(
         CapturedFontFaceKind kind,
@@ -39,7 +39,7 @@ internal readonly record struct CapturedFontFace : IFontProgramSource
         bool italic,
         CapturedFaceMetrics metrics,
         SfntFont? program,
-        CapturedBuiltInFace builtIn)
+        CapturedBuiltInFace? builtIn)
     {
         Kind = kind;
         Family = family;
@@ -61,7 +61,7 @@ internal readonly record struct CapturedFontFace : IFontProgramSource
     public CapturedFaceMetrics Metrics { get; }
 
     public CapturedBuiltInFace BuiltIn
-        => Kind == CapturedFontFaceKind.BuiltIn
+        => Kind == CapturedFontFaceKind.BuiltIn && builtIn is not null
             ? builtIn
             : throw new InvalidOperationException("An sfnt face has no built-in descriptor.");
 
@@ -76,7 +76,7 @@ internal readonly record struct CapturedFontFace : IFontProgramSource
             face.Italic,
             new CapturedFaceMetrics(face.Ascent, face.Descent, face.UnitsPerEm),
             face,
-            default);
+            null);
 
     public static CapturedFontFace FromBuiltIn(CapturedBuiltInFace face)
         => new(

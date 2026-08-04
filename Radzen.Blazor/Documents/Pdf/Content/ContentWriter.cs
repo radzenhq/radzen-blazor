@@ -5,7 +5,6 @@ using Radzen.Documents.Pdf.Fonts;
 using Radzen.Documents.Pdf.Objects;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System;
 using Radzen.Documents.Core;
 namespace Radzen.Documents.Pdf.Content;
@@ -192,9 +191,7 @@ internal sealed class ContentWriter : IDisposable
 
     internal void WriteString(ReadOnlySpan<byte> bytes)
     {
-        var builder = new StringBuilder(bytes.Length + 2);
-        PdfLiteralString.AppendEscaped(builder, bytes, binary: true);
-        WriteRaw(builder.ToString());
+        PdfLiteralString.WriteEscaped(accumulator, bytes, binary: true);
     }
 
     private void Append(byte value) => accumulator.Append(value);
