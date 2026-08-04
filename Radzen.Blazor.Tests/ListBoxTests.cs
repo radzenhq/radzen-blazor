@@ -435,6 +435,61 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain("empty-marker", component.Markup);
         }
+
+        [Fact]
+        public void ListBox_Multiple_CtrlA_SelectsAllItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Item>
+            {
+                new Item { Id = 1, Name = "First Item" },
+                new Item { Id = 2, Name = "Second Item" }
+            };
+
+            IEnumerable<int> value = null;
+            var component = ctx.RenderComponent<RadzenListBox<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            var root = component.Find("div.rz-listbox");
+            root.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true });
+
+            Assert.Equal(new[] { 1, 2 }, value);
+        }
+
+        [Fact]
+        public void ListBox_Multiple_CtrlA_DoesNothingWhenReadOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Item>
+            {
+                new Item { Id = 1, Name = "First Item" },
+                new Item { Id = 2, Name = "Second Item" }
+            };
+
+            IEnumerable<int> value = null;
+            var component = ctx.RenderComponent<RadzenListBox<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.ReadOnly, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            var root = component.Find("div.rz-listbox");
+            root.KeyDown(new KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true });
+
+            Assert.Null(value);
+        }
     }
 }
 

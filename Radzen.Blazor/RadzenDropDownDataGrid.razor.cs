@@ -1162,6 +1162,12 @@ namespace Radzen.Blazor
                     Debounce(DebounceFilter, FilterDelay);
                 }
             }
+            else if (args.CtrlKey && (key == "KeyA" || key == "a" || key == "A") && Multiple && AllowSelectAll)
+            {
+                preventKeydown = true;
+
+                await SelectAll();
+            }
             else if (AllowFiltering && isFilter && FilterAsYouType)
             {
                 preventKeydown = true;

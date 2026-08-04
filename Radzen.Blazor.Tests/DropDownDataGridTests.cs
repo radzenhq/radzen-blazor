@@ -525,6 +525,61 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("loading-marker", component.Markup);
         }
+
+        [Fact]
+        public void DropDownDataGrid_Multiple_CtrlA_SelectsAllItems()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" },
+                new Customer { Id = 2, CompanyName = "Tech Inc" }
+            };
+
+            IEnumerable<int> value = null;
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            var root = component.Find("div.rz-dropdown");
+            root.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true });
+
+            Assert.Equal(new[] { 1, 2 }, value);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Multiple_CtrlA_DoesNothingWhenSelectAllNotAllowed()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme Corp" },
+                new Customer { Id = 2, CompanyName = "Tech Inc" }
+            };
+
+            IEnumerable<int> value = null;
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowSelectAll, false);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.ValueChanged, v => value = v);
+            });
+
+            var root = component.Find("div.rz-dropdown");
+            root.KeyDown(new Microsoft.AspNetCore.Components.Web.KeyboardEventArgs { Key = "a", Code = "KeyA", CtrlKey = true });
+
+            Assert.Null(value);
+        }
     }
 }
 
