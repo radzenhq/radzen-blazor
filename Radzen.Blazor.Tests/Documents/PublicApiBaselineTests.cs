@@ -27,6 +27,12 @@ public class PublicApiBaselineTests
 
         if (Environment.GetEnvironmentVariable(WriteVariable) is { Length: > 0 } path)
         {
+            if (Environment.GetEnvironmentVariable("CI") is { Length: > 0 })
+            {
+                throw new InvalidOperationException(
+                    $"{WriteVariable} regenerates the approved baseline and must never be set in CI.");
+            }
+
             File.WriteAllLines(path, actual);
         }
 
