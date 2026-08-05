@@ -228,7 +228,7 @@ internal static class PageResourceBuilder
             yield return new ResourceEntry(
                 "ExtGState",
                 state.Key,
-                () => ExtGStateDictionary(state.Value, state.Value));
+                () => ExtGStateDictionary(state.Value.Alpha, state.Value.Alpha, state.Value.Blend));
         }
     }
 

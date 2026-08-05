@@ -20,7 +20,7 @@ internal static class AnnotationAppearanceBuilder
         return annotation switch
         {
             HighlightAnnotation highlight => Markup(highlight, static (area, color) =>
-                Rectangle(area.Left, area.Bottom, area.Width, area.Height, color, fill: true, stroke: false, 0)),
+                Highlight(area, color)),
             UnderlineAnnotation underline => Markup(underline, static (area, color) =>
                 Line(area.Left, area.Bottom + 1, area.Right, area.Bottom + 1, color, 1)),
             StrikeOutAnnotation strikeOut => Markup(strikeOut, static (area, color) =>
@@ -34,6 +34,16 @@ internal static class AnnotationAppearanceBuilder
             CircleAnnotation circle => Shape(width, height, circle, circle: true),
             _ => [],
         };
+    }
+
+    // ISO 32000-1 12.5.6.10 leaves highlight rendering to the appearance; multiply blending keeps
+    // the highlighted text legible beneath the fill, matching interactive viewers.
+    private static ContentElement Highlight(PdfRect area, Color color)
+    {
+        var rectangle = (PathContent)Rectangle(
+            area.Left, area.Bottom, area.Width, area.Height, color, fill: true, stroke: false, 0);
+        rectangle.Blend = BlendMode.Multiply;
+        return rectangle;
     }
 
     private static IReadOnlyList<ContentElement> Markup(MarkupAnnotation annotation, Func<PdfRect, Color, ContentElement> build)

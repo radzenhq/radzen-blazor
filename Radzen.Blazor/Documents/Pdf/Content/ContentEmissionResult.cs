@@ -4,13 +4,15 @@ using Radzen.Documents.Pdf.Objects;
 
 namespace Radzen.Documents.Pdf.Content;
 
+internal readonly record struct ContentExtGState(double Alpha, BlendMode? Blend);
+
 internal sealed class ContentResourceManifest
 {
     public ContentResourceManifest(
         IReadOnlyList<KeyValuePair<string, string>> fonts,
         IReadOnlyList<KeyValuePair<string, DecodedImage>> images,
         IReadOnlyList<KeyValuePair<string, DictionaryObject>> patterns,
-        IReadOnlyList<KeyValuePair<string, double>> extGStates)
+        IReadOnlyList<KeyValuePair<string, ContentExtGState>> extGStates)
     {
         Fonts = fonts;
         Images = images;
@@ -40,7 +42,7 @@ internal sealed class ContentResourceManifest
 
     public IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns { get; }
 
-    public IReadOnlyList<KeyValuePair<string, double>> ExtGStates { get; }
+    public IReadOnlyList<KeyValuePair<string, ContentExtGState>> ExtGStates { get; }
 
     public bool IsEmpty => Fonts.Count == 0 && Images.Count == 0 && Patterns.Count == 0 && ExtGStates.Count == 0;
 

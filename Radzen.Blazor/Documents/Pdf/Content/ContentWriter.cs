@@ -26,7 +26,7 @@ internal sealed class ContentWriter : IDisposable
     private readonly ResourceNameAllocator<DecodedImage, KeyValuePair<string, DecodedImage>> images;
     private readonly ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>> patterns;
 
-    private readonly ResourceNameAllocator<string, KeyValuePair<string, double>> extGStates;
+    private readonly ResourceNameAllocator<string, KeyValuePair<string, ContentExtGState>> extGStates;
 
     private readonly FontScope scope;
 
@@ -44,7 +44,7 @@ internal sealed class ContentWriter : IDisposable
         fonts = new ResourceNameAllocator<string, KeyValuePair<string, string>>(names.Font, reserved, StringComparer.Ordinal);
         images = new ResourceNameAllocator<DecodedImage, KeyValuePair<string, DecodedImage>>(names.Image, reserved);
         patterns = new ResourceNameAllocator<GradientBrush, KeyValuePair<string, DictionaryObject>>(names.Pattern, reserved, ReferenceKeyComparer<GradientBrush>.Instance);
-        extGStates = new ResourceNameAllocator<string, KeyValuePair<string, double>>(names.ExtGState, reserved, StringComparer.Ordinal);
+        extGStates = new ResourceNameAllocator<string, KeyValuePair<string, ContentExtGState>>(names.ExtGState, reserved, StringComparer.Ordinal);
     }
 
     internal IEnumerable<KeyValuePair<string, string>> Fonts => fonts.Values;
@@ -53,15 +53,17 @@ internal sealed class ContentWriter : IDisposable
 
     internal IReadOnlyList<KeyValuePair<string, DictionaryObject>> Patterns => patterns.Values;
 
-    internal string RegisterOpacity(double opacity)
+    internal string RegisterOpacity(double opacity) => RegisterExtGState(opacity, blend: null);
+
+    internal string RegisterExtGState(double opacity, BlendMode? blend)
     {
         var value = Math.Clamp(opacity, 0, 1);
         return ExtGStateRegistration.RegisterAlpha(
             extGStates,
             value,
             value,
-            blend: null,
-            key => new KeyValuePair<string, double>(key, value));
+            blend,
+            key => new KeyValuePair<string, ContentExtGState>(key, new ContentExtGState(value, blend)));
     }
 
     internal string RegisterImage(DecodedImage image)

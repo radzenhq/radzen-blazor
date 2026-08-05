@@ -106,8 +106,10 @@ public class AnnotationFlattenValidationTests
         translucent.Pages.Add().Annotations.Add(
             new HighlightAnnotation(PdfRect.FromSize(20, 30, 100, 15)) { Color = Color.Yellow, Opacity = 0.4 });
 
-        Lacks("opaque flattened content", " gs\n", FlattenedContent(opaque));
+        Carries("opaque flattened content", " gs\n", FlattenedContent(opaque));
+        Carries("opaque flattened emission", "/BM /Multiply", Emit(opaque));
         Carries("translucent flattened content", " gs\n", FlattenedContent(translucent));
+        Carries("translucent flattened emission", "/ca 0.4", Emit(translucent));
     }
 
     [Fact]

@@ -23,6 +23,7 @@ public sealed class PathContent : ContentElement
     private LineJoin? join;
     private double? miterLimit;
     private bool evenOdd;
+    private BlendMode? blend;
     private PathClipMode clip;
     private ReadOnlyMemory<double>? dashArray;
     private double dashPhase;
@@ -171,6 +172,12 @@ public sealed class PathContent : ContentElement
         set => Set(ref evenOdd, value);
     }
 
+    internal BlendMode? Blend
+    {
+        get => blend;
+        set => Set(ref blend, value);
+    }
+
     /// <summary>
     /// Gets or sets the clipping applied by this path. When not
     /// <see cref="PathClipMode.None"/>, a <c>W</c> (nonzero) or <c>W*</c> (even-odd)
@@ -269,15 +276,16 @@ public sealed class PathContent : ContentElement
             || DashArray is not null;
 
         var alpha = ColorAlpha();
-        var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState || alpha < 1;
+        var scoped = Clip != PathClipMode.None || FillGradient is not null || leaksStrokeState || alpha < 1
+            || Blend is not null;
         if (scoped)
         {
             writer.WriteRaw("q\n");
         }
 
-        if (alpha < 1)
+        if (alpha < 1 || Blend is not null)
         {
-            writer.WriteName(writer.RegisterOpacity(alpha));
+            writer.WriteName(writer.RegisterExtGState(alpha, Blend));
             writer.WriteRaw(" gs\n");
         }
 
