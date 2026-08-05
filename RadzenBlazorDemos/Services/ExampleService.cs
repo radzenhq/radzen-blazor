@@ -4336,7 +4336,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "ProgressBar in determinate mode, Get and Set the value", Anchor = "#progressbar-determinate" }, new () { Text = "ProgressBar in indeterminate mode", Anchor = "#progressbar-indeterminate" }, new () { Text = "ProgressBar Min and Max values", Anchor = "#progressbar-min-max-values" } ],
+                    Toc = [ new () { Text = "ProgressBar in determinate mode, Get and Set the value", Anchor = "#progressbar-determinate" }, new () { Text = "ProgressBar in indeterminate mode", Anchor = "#progressbar-indeterminate" }, new () { Text = "ProgressBar Min and Max values", Anchor = "#progressbar-min-max-values" }, new () { Text = "ProgressBar Buffer Value", Anchor = "#progressbar-buffer" } ],
                     Name = "ProgressBar",
                     Description = "Demonstration and configuration of the Radzen Blazor ProgressBar component.",
                     Path = "progressbar",
