@@ -263,7 +263,7 @@ public class LaidOutContractTests
     }
 
     [Fact]
-    public void AllowUnsupportedCharacters_IsReadFromTheRenderRequest()
+    public void UnsupportedCharacters_IsReadFromTheRenderRequest()
     {
         var document = new Document();
         var section = Page(document);
@@ -277,13 +277,13 @@ public class LaidOutContractTests
         Assert.Equal(0xFB01, glyph.Codepoint);
         var error = Assert.Throws<InvalidOperationException>(() => Render(laidOut));
         Assert.Equal(
-            "The built-in font 'Helvetica' cannot draw 'ﬁ' (U+FB01): a base-14 font is limited "
-            + "to the WinAnsi character set. Register a font that covers these characters with "
-            + "FontCollection.Register, add such a font to the SetFallback chain, or set "
-            + "DocumentRenderer.AllowUnsupportedCharacters to true to draw '?' in their place.",
+            "The document uses characters its fonts cannot draw: 'ﬁ' (U+FB01) in font 'Helvetica'. "
+            + "Register a font that covers these characters with FontCollection.Register, add one to the "
+            + "FontCollection.SetFallback chain, or set DocumentRenderer.UnsupportedCharacters to "
+            + "UnsupportedCharacterPolicy.Substitute to draw a substitute in their place.",
             error.Message);
 
-        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        var renderer = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute };
         var rendered = Render(laidOut, renderer);
 
         using var buffer = new MemoryStream(rendered);

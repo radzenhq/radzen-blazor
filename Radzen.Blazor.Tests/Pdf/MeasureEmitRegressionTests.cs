@@ -65,7 +65,7 @@ public class MeasureEmitRegressionTests
 
         var shows = ShowsSortedTopDown(
             document,
-            new DocumentRenderer { AllowUnsupportedCharacters = true });
+            new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute });
 
         Assert.Equal(2, shows.Count);
         Assert.Equal("?????", Encoding.Latin1.GetString(shows[0].Bytes));
@@ -99,12 +99,13 @@ public class MeasureEmitRegressionTests
     {
         var document = new Document();
         BuildTestSupport.RegisterLatin(document);
+        var renderer = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute };
 
         var section = document.Sections.Add();
         RightAligned(section, "A\U0001F600B", BuildTestSupport.Latin);
         RightAligned(section, "A中B", BuildTestSupport.Latin);
 
-        var shows = ShowsSortedTopDown(document);
+        var shows = ShowsSortedTopDown(document, renderer);
 
         Assert.Equal(2, shows.Count);
         Assert.Equal(shows[1].Bytes, shows[0].Bytes);

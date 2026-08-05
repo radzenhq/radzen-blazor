@@ -9,7 +9,7 @@ internal sealed class RenderRequest
         RoleMap = renderer.RoleMap.Snapshot();
         Producer = renderer.Producer;
         Decoders = renderer.ImageDecoders;
-        AllowUnsupportedCharacters = renderer.AllowUnsupportedCharacters;
+        UnsupportedCharacters = renderer.UnsupportedCharacters;
         AllowRestrictedEmbedding = renderer.AllowRestrictedEmbedding;
     }
 
@@ -23,7 +23,9 @@ internal sealed class RenderRequest
 
     public ImageDecoders Decoders { get; }
 
-    public bool AllowUnsupportedCharacters { get; }
+    public UnsupportedCharacterPolicy UnsupportedCharacters { get; }
+
+    public UnsupportedCharacterLog Unsupported { get; } = new();
 
     public bool AllowRestrictedEmbedding { get; }
 

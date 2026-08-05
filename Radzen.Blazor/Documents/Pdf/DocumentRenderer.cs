@@ -60,14 +60,22 @@ public sealed class DocumentRenderer
     public RoleMap RoleMap { get; } = new();
 
     /// <summary>
-    /// Gets or sets whether a glyph captured from a built-in metrics font that the PDF text
-    /// encoding cannot represent is drawn as '?'. Defaults to <see langword="false"/>, so
-    /// rendering throws and names the offending characters. Read once by <see cref="Render(Document)"/>,
+    /// Gets or sets what happens when text uses a character that neither its font nor any
+    /// fallback covers. Defaults to <see cref="UnsupportedCharacterPolicy.Throw"/>, so rendering
+    /// fails naming every uncovered character and its font. Read once by <see cref="Render(Document)"/>,
     /// which applies it while it draws text and watermarks; it is not carried on the laid-out scene
     /// or on the produced document, so changing it afterwards has no effect on an already-rendered
     /// document.
     /// </summary>
-    public bool AllowUnsupportedCharacters { get; set; }
+    public UnsupportedCharacterPolicy UnsupportedCharacters { get; set; }
+
+    /// <summary>
+    /// Gets or sets a callback invoked after <see cref="Render(Document)"/> completes under
+    /// <see cref="UnsupportedCharacterPolicy.Substitute"/> - once per distinct uncovered
+    /// character and font, in the order they were first encountered. Never invoked while the
+    /// document is being drawn.
+    /// </summary>
+    public Action<UnsupportedCharacter>? UnsupportedCharacterFound { get; set; }
 
     /// <summary>
     /// Gets or sets whether a registered font whose OS/2 fsType marks it as Restricted License
@@ -92,10 +100,19 @@ public sealed class DocumentRenderer
     {
         ArgumentNullException.ThrowIfNull(document);
 
+        var request = RenderRequest.From(this);
         var output = DocumentRenderEngine.Generate(
-            RenderRequest.From(this),
+            request,
             Layout.DocumentLayouter.Layout(document, ImageDecoders.Probes));
         output.AdoptMaterializedGraph(new DocumentGraphBuilder(output, renderTime: true).Build());
+        if (UnsupportedCharacterFound is { } found)
+        {
+            foreach (var character in request.Unsupported.Entries)
+            {
+                found(character);
+            }
+        }
+
         return output;
     }
 

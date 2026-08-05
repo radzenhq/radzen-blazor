@@ -6,9 +6,10 @@ namespace Radzen.Documents.Pdf.Render;
 internal sealed class WatermarkRecorder(
     FontRegistry fontRegistry,
     ImageRegistry imageRegistry,
-    bool allowUnsupportedCharacters)
+    UnsupportedCharacterPolicy unsupportedCharacters,
+    UnsupportedCharacterLog unsupported)
 {
-    private readonly GlyphSpanRecorder spans = new(fontRegistry, allowUnsupportedCharacters);
+    private readonly GlyphSpanRecorder spans = new(fontRegistry, unsupportedCharacters, unsupported);
 
     public void Plan(PagePlan plan, LaidOutWatermark watermark)
     {

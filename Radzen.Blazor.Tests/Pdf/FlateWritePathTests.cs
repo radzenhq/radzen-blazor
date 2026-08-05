@@ -81,7 +81,7 @@ public class FlateWritePathTests
         var document = new Document();
         BuildTestSupport.RegisterCjk(document);
         var section = document.Sections.Add();
-        BuildTestSupport.AddText(section, "你好", BuildTestSupport.Cjk);
+        BuildTestSupport.AddText(section, "中文", BuildTestSupport.Cjk);
         var reader = BuildTestSupport.Read(document);
 
         var descriptor = SingleType0Descriptor(reader, out _);

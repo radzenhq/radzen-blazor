@@ -14,6 +14,7 @@ internal enum BuiltInGlyphKind
 {
     BuiltIn,
     Fallback,
+    Skip,
     Missing,
 }
 
@@ -762,7 +763,7 @@ public sealed class FontCollection
                     codepoint));
                 builtInDesignAdvance += width;
             }
-            else
+            else if (kind != BuiltInGlyphKind.Skip)
             {
                 throw MissingMetrics(snapshot, text, font, metrics);
             }
@@ -827,6 +828,8 @@ public sealed class FontCollection
                     prevFallbackFace = face;
                     prevFallbackGlyph = glyph;
                     prevFallbackCodepoint = codepoint;
+                    break;
+                case BuiltInGlyphKind.Skip:
                     break;
                 default:
                     throw MissingMetrics(snapshot, text, font, metrics);
@@ -895,6 +898,21 @@ public sealed class FontCollection
             width = 0;
             fallbackFace = face;
             return BuiltInGlyphKind.Fallback;
+        }
+
+        if (IgnorableCharacters.IsIgnorableOnMiss(codepoint))
+        {
+            width = 0;
+            fallbackFace = null;
+            fallbackGlyph = 0;
+            return BuiltInGlyphKind.Skip;
+        }
+
+        if (IgnorableCharacters.IsSpaceOnMiss(codepoint) && metrics.TryGetWidth(' ', out width))
+        {
+            fallbackFace = null;
+            fallbackGlyph = 0;
+            return BuiltInGlyphKind.BuiltIn;
         }
 
         if (!IsReportable(codepoint) && metrics.TryGetWidth('?', out width))

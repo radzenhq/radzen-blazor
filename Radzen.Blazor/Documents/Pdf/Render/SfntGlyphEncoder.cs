@@ -19,7 +19,7 @@ internal readonly struct SfntGlyphRun
 
 }
 
-internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry)
+internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry, UnsupportedCharacterLog unsupported)
 {
     public SfntGlyphRun Build(in CapturedGlyphSpan span, double emSize)
     {
@@ -37,7 +37,15 @@ internal sealed class SfntGlyphEncoder(FontRegistry fontRegistry)
         {
             var glyph = glyphs[i];
             var glyphId = face.GetGlyphId(glyph.Codepoint);
-            generated.GidToUnicode.TryAdd(glyphId, glyph.Codepoint);
+            if (glyphId == 0)
+            {
+                unsupported.Record(glyph.Codepoint, face.FamilyName);
+                generated.GidToUnicode.TryAdd(0, 0xFFFD);
+            }
+            else
+            {
+                generated.GidToUnicode.TryAdd(glyphId, glyph.Codepoint);
+            }
             bytes[i * 2] = (byte)(glyphId >> 8);
             bytes[i * 2 + 1] = (byte)(glyphId & 0xFF);
             if (i < kerns.Length)

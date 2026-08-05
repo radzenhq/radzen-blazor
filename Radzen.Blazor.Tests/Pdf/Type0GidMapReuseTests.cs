@@ -15,7 +15,7 @@ public class Type0GidMapReuseTests
         BuildTestSupport.RegisterCjk(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, "Invoice 12345 - Total 4200.00", BuildTestSupport.Latin, 16);
-        BuildTestSupport.AddText(section, "你好世界 金额", BuildTestSupport.Cjk, 14);
+        BuildTestSupport.AddText(section, "发票中文 金额", BuildTestSupport.Cjk, 14);
         return new DocumentRenderer().ToArray(document);
     }
 
