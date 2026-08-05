@@ -56,7 +56,7 @@ public class FailLoudFontGuardTests
         BuildTestSupport.RegisterCjk(document);
         var section = document.Sections.Add();
         BuildTestSupport.AddText(section, text, BuildTestSupport.Cjk);
-        var bytes = new DocumentRenderer().ToArray(document);
+        var bytes = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute }.ToArray(document);
         Assert.True(bytes.Length > 0);
     }
 }

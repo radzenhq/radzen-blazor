@@ -219,7 +219,7 @@ public class RoundTripIntegrityTests
     {
         var document = BuilderWithLatinText("A😀B");
 
-        var bytes = new DocumentRenderer().ToArray(document);
+        var bytes = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute }.ToArray(document);
 
         var text = Load(bytes).ExtractText();
         Assert.Contains("A", text, StringComparison.Ordinal);

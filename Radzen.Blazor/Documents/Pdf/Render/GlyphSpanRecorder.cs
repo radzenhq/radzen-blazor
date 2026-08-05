@@ -16,10 +16,11 @@ internal readonly struct EmittedGlyphSpan
 
 internal sealed class GlyphSpanRecorder(
     FontRegistry fontRegistry,
-    bool allowUnsupportedCharacters)
+    UnsupportedCharacterPolicy unsupportedCharacters,
+    UnsupportedCharacterLog unsupported)
 {
-    private readonly SfntGlyphEncoder sfnt = new(fontRegistry);
-    private readonly Base14GlyphEncoder base14 = new(allowUnsupportedCharacters);
+    private readonly SfntGlyphEncoder sfnt = new(fontRegistry, unsupported);
+    private readonly Base14GlyphEncoder base14 = new(unsupportedCharacters, unsupported);
 
     public EmittedGlyphSpan Emit(in CapturedGlyphSpan span, double emSize)
     {

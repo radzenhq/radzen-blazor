@@ -69,6 +69,20 @@ internal sealed class SimpleShaper(FontCollectionSnapshot fonts)
         {
             var codepoint = FontCollection.CodePointAt(text, i, out var codePointLength);
             var (face, glyph) = fonts.ResolveGlyph(primary, codepoint);
+            if (glyph == 0)
+            {
+                if (IgnorableCharacters.IsIgnorableOnMiss(codepoint))
+                {
+                    i += codePointLength;
+                    continue;
+                }
+
+                if (IgnorableCharacters.IsSpaceOnMiss(codepoint))
+                {
+                    (face, glyph) = fonts.ResolveGlyph(primary, ' ');
+                }
+            }
+
             var advance = face.AdvanceInUserSpace(glyph, size);
 
             if (fonts.EnableKerning && ReferenceEquals(previousFace, face) && count > 0)
@@ -186,7 +200,7 @@ internal sealed class SimpleShaper(FontCollectionSnapshot fonts)
             or (>= 0x2066 and <= 0x2069)
             or (>= 0xFB1D and <= 0xFB4F)
             or (>= 0xFB50 and <= 0xFDFF)
-            or (>= 0xFE70 and <= 0xFEFF)
+            or (>= 0xFE70 and <= 0xFEFE)
             or (>= 0x10A00 and <= 0x10A5F)
             or (>= 0x10AC0 and <= 0x10AFF)
             or (>= 0x10B80 and <= 0x10BAF)

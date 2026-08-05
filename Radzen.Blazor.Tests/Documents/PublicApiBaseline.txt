@@ -930,13 +930,14 @@ Radzen.Documents.Pdf.DocumentRenderer = public sealed class
 public Radzen.Documents.Pdf.DocumentRenderer..ctor()
 public Radzen.Documents.Pdf.DocumentRenderer.Accessibility : Radzen.Documents.Pdf.PdfUaConformance { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.AllowRestrictedEmbedding : System.Boolean { public get; public set; }
-public Radzen.Documents.Pdf.DocumentRenderer.AllowUnsupportedCharacters : System.Boolean { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Conformance : Radzen.Documents.Pdf.PdfAConformance { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Producer : System.String? { public get; public set; }
 public Radzen.Documents.Pdf.DocumentRenderer.Render(Radzen.Documents.Document document) : Radzen.Documents.Pdf.PortableDocument
 public Radzen.Documents.Pdf.DocumentRenderer.RoleMap : Radzen.Documents.Pdf.RoleMap { public get; }
 public Radzen.Documents.Pdf.DocumentRenderer.SaveToStream(Radzen.Documents.Document document, System.IO.Stream stream) : System.Void
 public Radzen.Documents.Pdf.DocumentRenderer.ToArray(Radzen.Documents.Document document) : System.Byte[]
+public Radzen.Documents.Pdf.DocumentRenderer.UnsupportedCharacterFound : System.Action<Radzen.Documents.Pdf.UnsupportedCharacter>? { public get; public set; }
+public Radzen.Documents.Pdf.DocumentRenderer.UnsupportedCharacters : Radzen.Documents.Pdf.UnsupportedCharacterPolicy { public get; public set; }
 Radzen.Documents.Pdf.DocumentXmpMetadata = public sealed class
 public Radzen.Documents.Pdf.DocumentXmpMetadata.Clear() : System.Void
 public Radzen.Documents.Pdf.DocumentXmpMetadata.Exists : System.Boolean { public get; }
@@ -1337,6 +1338,21 @@ public Radzen.Documents.Pdf.TextSearchOptions.NormalizeWhitespace : System.Boole
 public Radzen.Documents.Pdf.TextSearchOptions.WholeWord : System.Boolean { public get; public set; }
 Radzen.Documents.Pdf.UnderlineAnnotation = public sealed class : Radzen.Documents.Pdf.MarkupAnnotation
 public Radzen.Documents.Pdf.UnderlineAnnotation..ctor(Radzen.Documents.Pdf.PdfRect bounds)
+Radzen.Documents.Pdf.UnsupportedCharacter = public struct : System.IEquatable<Radzen.Documents.Pdf.UnsupportedCharacter>
+public Radzen.Documents.Pdf.UnsupportedCharacter..ctor(System.Int32 Codepoint, System.String FontFamily)
+public Radzen.Documents.Pdf.UnsupportedCharacter.Character : System.String { public get; }
+public Radzen.Documents.Pdf.UnsupportedCharacter.Codepoint : System.Int32 { public get; public init; }
+public Radzen.Documents.Pdf.UnsupportedCharacter.Deconstruct(out System.Int32 Codepoint, out System.String FontFamily) : System.Void
+public Radzen.Documents.Pdf.UnsupportedCharacter.Equals(Radzen.Documents.Pdf.UnsupportedCharacter other) : System.Boolean
+public Radzen.Documents.Pdf.UnsupportedCharacter.FontFamily : System.String { public get; public init; }
+public static Radzen.Documents.Pdf.UnsupportedCharacter.op_Equality(Radzen.Documents.Pdf.UnsupportedCharacter left, Radzen.Documents.Pdf.UnsupportedCharacter right) : System.Boolean
+public static Radzen.Documents.Pdf.UnsupportedCharacter.op_Inequality(Radzen.Documents.Pdf.UnsupportedCharacter left, Radzen.Documents.Pdf.UnsupportedCharacter right) : System.Boolean
+public virtual Radzen.Documents.Pdf.UnsupportedCharacter.Equals(System.Object obj) : System.Boolean
+public virtual Radzen.Documents.Pdf.UnsupportedCharacter.GetHashCode() : System.Int32
+public virtual Radzen.Documents.Pdf.UnsupportedCharacter.ToString() : System.String
+Radzen.Documents.Pdf.UnsupportedCharacterPolicy = public enum : System.Int32
+public const Radzen.Documents.Pdf.UnsupportedCharacterPolicy.Substitute : Radzen.Documents.Pdf.UnsupportedCharacterPolicy
+public const Radzen.Documents.Pdf.UnsupportedCharacterPolicy.Throw : Radzen.Documents.Pdf.UnsupportedCharacterPolicy
 Radzen.Documents.Pdf.ViewerPreferences = public sealed class
 public Radzen.Documents.Pdf.ViewerPreferences..ctor()
 public Radzen.Documents.Pdf.ViewerPreferences.CenterWindow : System.Boolean { public get; public set; }

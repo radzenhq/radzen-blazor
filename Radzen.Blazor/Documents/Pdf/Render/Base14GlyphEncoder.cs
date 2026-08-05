@@ -1,19 +1,16 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System;
 using Radzen.Documents.Fonts;
 using Radzen.Documents.Pdf.Fonts;
 
 namespace Radzen.Documents.Pdf.Render;
 
-internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
+internal sealed class Base14GlyphEncoder(UnsupportedCharacterPolicy policy, UnsupportedCharacterLog unsupported)
 {
     public byte[] Encode(
         ImmutableArray<CapturedGlyph> glyphs,
         CapturedBuiltInFace face)
     {
         var bytes = new byte[glyphs.Length];
-        List<int>? unsupported = null;
         for (var i = 0; i < glyphs.Length; i++)
         {
             var codepoint = glyphs[i].Codepoint;
@@ -23,45 +20,19 @@ internal sealed class Base14GlyphEncoder(bool allowUnsupportedCharacters)
                 continue;
             }
 
-            if ((codepoint <= char.MaxValue && char.IsControl((char)codepoint))
-                || allowUnsupportedCharacters)
+            if (codepoint > char.MaxValue || !char.IsControl((char)codepoint))
             {
-                WinAnsiEncoding.TryGetCode('?', out bytes[i]);
-                continue;
+                unsupported.Record(codepoint, StandardFonts.PostScriptName(face));
+                if (policy == UnsupportedCharacterPolicy.Throw)
+                {
+                    continue;
+                }
             }
 
-            unsupported ??= [];
-            if (!unsupported.Contains(codepoint))
-            {
-                unsupported.Add(codepoint);
-            }
-        }
-
-        if (unsupported is { Count: > 0 })
-        {
-            throw UnsupportedCharacters(face, unsupported);
+            WinAnsiEncoding.TryGetCode('?', out bytes[i]);
         }
 
         return bytes;
     }
 
-    private static InvalidOperationException UnsupportedCharacters(
-        CapturedBuiltInFace face,
-        List<int> codepoints)
-    {
-        const int MaxReported = 8;
-        var offenders = new List<string>(Math.Min(codepoints.Count, MaxReported));
-        for (var i = 0; i < codepoints.Count && i < MaxReported; i++)
-        {
-            var codepoint = codepoints[i];
-            offenders.Add($"'{UnicodeCodePoint.ToString(codepoint)}' (U+{codepoint:X4})");
-        }
-
-        return new InvalidOperationException(
-            $"The built-in font '{StandardFonts.PostScriptName(face)}' cannot draw {string.Join(", ", offenders)}: a base-14 font is limited "
-            + "to the WinAnsi character set. Register a font that covers these characters with "
-            + $"{nameof(FontCollection)}.{nameof(FontCollection.Register)}, add such a font to the "
-            + $"{nameof(FontCollection.SetFallback)} chain, or set "
-            + $"{nameof(DocumentRenderer)}.{nameof(DocumentRenderer.AllowUnsupportedCharacters)} to true to draw '?' in their place.");
-    }
 }

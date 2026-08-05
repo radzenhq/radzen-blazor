@@ -12,10 +12,11 @@ internal sealed class TextLineRecorder(
     FontRegistry fontRegistry,
     ImageRegistry imageRegistry,
     StructureTreeBuilder structureTree,
-    bool allowUnsupportedCharacters,
+    UnsupportedCharacterPolicy unsupportedCharacters,
+    UnsupportedCharacterLog unsupported,
     bool embedFieldAppearances)
 {
-    private readonly GlyphSpanRecorder spans = new(fontRegistry, allowUnsupportedCharacters);
+    private readonly GlyphSpanRecorder spans = new(fontRegistry, unsupportedCharacters, unsupported);
 
     public void EmitLines(
         PageRenderContext context,

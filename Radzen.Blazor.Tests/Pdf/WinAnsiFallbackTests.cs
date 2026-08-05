@@ -31,7 +31,7 @@ public class WinAnsiFallbackTests
         var section = document.Sections.Add();
         section.Blocks.Add(new Paragraph("AﬁB"));
 
-        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        var renderer = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute };
         var text = BuildTestSupport.Reload(document, renderer).ExtractText().Trim();
 
         Assert.NotEqual("AB", text);
@@ -45,7 +45,7 @@ public class WinAnsiFallbackTests
         var section = document.Sections.Add();
         section.Blocks.Add(new Paragraph("ﬁﬁﬁﬁ"));
 
-        var renderer = new DocumentRenderer { AllowUnsupportedCharacters = true };
+        var renderer = new DocumentRenderer { UnsupportedCharacters = UnsupportedCharacterPolicy.Substitute };
         var text = BuildTestSupport.Reload(document, renderer).ExtractText();
 
         Assert.False(string.IsNullOrWhiteSpace(text), "non-cp1252 text must not vanish from the page");

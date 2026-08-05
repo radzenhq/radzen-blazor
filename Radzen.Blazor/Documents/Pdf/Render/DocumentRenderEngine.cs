@@ -33,14 +33,16 @@ internal sealed class DocumentRenderEngine
             fontRegistry,
             imageRegistry,
             structureTree,
-            request.AllowUnsupportedCharacters,
+            request.UnsupportedCharacters,
+            request.Unsupported,
             request.Conformance != PdfAConformance.None || request.Accessibility != PdfUaConformance.None);
         codeSymbolRecorder = new(structureTree);
         imageRecorder = new(imageRegistry, structureTree);
         watermarkRecorder = new(
             fontRegistry,
             imageRegistry,
-            request.AllowUnsupportedCharacters);
+            request.UnsupportedCharacters,
+            request.Unsupported);
     }
 
     internal static PortableDocument Generate(RenderRequest request, LaidOutDocument laidOut)
@@ -83,6 +85,11 @@ internal sealed class DocumentRenderEngine
             watermarkRecorder);
 
         SceneWalk.Document(laidOut, recorder);
+
+        if (request.UnsupportedCharacters == UnsupportedCharacterPolicy.Throw)
+        {
+            request.Unsupported.ThrowIfAny();
+        }
 
         var plans = recorder.Plans;
 
